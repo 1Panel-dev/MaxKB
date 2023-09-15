@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "smart-doc"
+version = "0.1.0"
+description = "智能客服系统"
+authors = ["shaohuzhang1 <shaohu.zhang@fit2cloud.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "4.1.10"
+djangorestframework = "3.14.0"
+drf-yasg = "1.21.7"
+django-filter = "23.2"
+elasticsearch = "8.9.0"
+langchain = "0.0.274"
+psycopg2 = "2.9.7"
+jieba = "^0.42.1"
+diskcache = "^5.6.3"
+pillow = "9.5.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

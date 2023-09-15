@@ -1,0 +1,16 @@
+# 数据库配置
+EMAIL_ADDRESS:
+EMAIL_USE_TLS: False
+EMAIL_USE_SSL: True
+EMAIL_HOST: smtp.qq.com
+EMAIL_PORT: 465
+EMAIL_HOST_USER:
+EMAIL_HOST_PASSWORD:
+
+# 数据库链接信息
+DB_NAME: smart-doc
+DB_HOST: localhost
+DB_PORT: 5432
+DB_USER: root
+DB_PASSWORD: xxx
+DB_ENGINE: django.db.backends.postgresql_psycopg2

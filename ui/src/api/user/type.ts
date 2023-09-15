@@ -1,0 +1,102 @@
+interface User {
+  /**
+   * 用户名
+   */
+  username: string
+  /**
+   * 邮箱
+   */
+  email: string
+}
+
+interface LoginRequest {
+  /**
+   * 用户名
+   */
+  username: string
+  /**
+   * 密码
+   */
+  password: string
+}
+
+interface RegisterRequest {
+  /**
+   * 用户名
+   */
+  username: string
+  /**
+   * 密码
+   */
+  password: string
+  /**
+   * 确定密码
+   */
+  re_password: string
+  /**
+   * 邮箱
+   */
+  email: string
+  /**
+   * 验证码
+   */
+  code: string
+}
+
+interface CheckCodeRequest {
+  /**
+   * 邮箱
+   */
+  email: string
+  /**
+   *验证码
+   */
+  code: string
+  /**
+   * 类型
+   */
+  type: 'register' | 'reset_password'
+}
+
+interface ResetCurrentUserPasswordRequest {
+  /**
+   * 验证码
+   */
+  code: string
+  /**
+   *密码
+   */
+  password: string
+  /**
+   * 确认密码
+   */
+  re_password: string
+}
+
+interface ResetPasswordRequest {
+  /**
+   * 邮箱
+   */
+  email: string
+  /**
+   * 验证码
+   */
+  code: string
+  /**
+   * 密码
+   */
+  password: string
+  /**
+   * 确认密码
+   */
+  re_password: string
+}
+
+export type {
+  LoginRequest,
+  RegisterRequest,
+  CheckCodeRequest,
+  ResetPasswordRequest,
+  User,
+  ResetCurrentUserPasswordRequest
+}

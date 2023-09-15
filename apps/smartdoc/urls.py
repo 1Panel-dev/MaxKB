@@ -1,0 +1,69 @@
+"""
+URL configuration for apps project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/4.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+import os
+
+from django.http import HttpResponse
+from django.urls import path, re_path, include
+from django.views import static
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions, status
+
+from common.auth import AnonymousAuthentication
+from common.response.result import Result
+from smartdoc import settings
+from smartdoc.conf import PROJECT_DIR
+
+schema_view = get_schema_view(
+
+    openapi.Info(
+        title="Python API",
+        default_version='v1',
+        description="智能客服平台",
+    ),
+    public=True,
+    permission_classes=[permissions.AllowAny],
+    authentication_classes=[AnonymousAuthentication]
+)
+
+urlpatterns = [
+    path("api/", include("users.urls")),
+    # 暴露静态主要是swagger资源
+    re_path(r'^static/(?P<path>.*)$', static.serve, {'document_root': settings.STATIC_ROOT}, name='static'),
+    # 暴露ui静态资源
+    re_path(r'^ui/(?P<path>.*)$', static.serve, {'document_root': os.path.join(settings.STATIC_ROOT, "ui")}, name='ui'),
+]
+
+urlpatterns += [
+    re_path(r'^doc(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
+            name='schema-json'),  # 导出
+    path('doc/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+]
+
+
+def page_not_found(request, exception):
+    if request.path.startswith("/api/"):
+        return Result(response_status=status.HTTP_404_NOT_FOUND, code=404, message="找不到接口")
+    else:
+        file = open(os.path.join(PROJECT_DIR, 'apps', "static", 'ui', 'index.html'), "r", encoding='utf-8')
+        content = file.read()
+        file.close()
+        return HttpResponse(content, status=200)
+
+
+handler404 = page_not_found
