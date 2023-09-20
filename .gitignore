@@ -165,3 +165,4 @@ apps/static
 data
 .idea
 .dev
+poetry.lock
