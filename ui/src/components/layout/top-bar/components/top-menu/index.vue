@@ -1,6 +1,6 @@
 <template >
     <div class="top-menu-container">
-        <MenuItem :menu="menu" v-for="(menu, index) in topMenuList" :key="index">
+        <MenuItem :menu="menu" v-hasPermission="menu.meta?.permission" v-for="(menu, index) in topMenuList" :key="index">
         </MenuItem>
     </div>
 </template>

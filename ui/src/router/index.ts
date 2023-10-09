@@ -1,3 +1,4 @@
+import { hasPermission } from '@/common/permission/index'
 import {
   createRouter,
   createWebHistory,
@@ -37,11 +38,16 @@ router.beforeEach(
         return
       }
       if (!userStore.userInfo) {
-        userStore.profile()
+        await userStore.profile()
       }
     }
-
-    next()
+    // 判断是否有菜单权限
+    if (to.meta.permission ? hasPermission(to.meta.permission as any, 'OR') : true) {
+      next()
+    } else {
+      // 如果没有权限则直接取404页面
+      next('404')
+    }
   }
 )
 

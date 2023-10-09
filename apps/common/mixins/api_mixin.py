@@ -11,11 +11,14 @@ from rest_framework import serializers
 
 class ApiMixin(serializers.Serializer):
 
-    def get_request_params_api(self):
+    @staticmethod
+    def get_request_params_api():
         pass
 
-    def get_request_body_api(self):
+    @staticmethod
+    def get_request_body_api():
         pass
 
-    def get_response_body_api(self):
+    @staticmethod
+    def get_response_body_api():
         pass

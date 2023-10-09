@@ -16,6 +16,12 @@ class Group(Enum):
     """
     USER = "USER"
 
+    DATASET = "DATASET"
+
+    APPLICATION = "APPLICATION"
+
+    SETTING = "SETTING"
+
 
 class Operate(Enum):
     """
@@ -25,6 +31,14 @@ class Operate(Enum):
     EDIT = "EDIT"
     CREATE = "CREATE"
     DELETE = "DELETE"
+    """
+    管理权限
+    """
+    MANAGE = "MANAGE"
+    """
+    使用权限
+    """
+    USE = "USE"
 
 
 class Role:
@@ -44,13 +58,20 @@ class Permission:
     权限信息
     """
 
-    def __init__(self, group: Group, operate: Operate, roles: List[RoleConstants]):
+    def __init__(self, group: Group, operate: Operate, roles=None, dynamic_tag=None):
+        if roles is None:
+            roles = []
         self.group = group
         self.operate = operate
         self.roleList = roles
+        self.dynamic_tag = dynamic_tag
 
     def __str__(self):
-        return self.group.value + ":" + self.operate.value
+        return self.group.value + ":" + self.operate.value + (
+            (":" + self.dynamic_tag) if self.dynamic_tag is not None else '')
+
+    def __eq__(self, other):
+        return str(self) == str(other)
 
 
 class PermissionConstants(Enum):
@@ -59,7 +80,19 @@ class PermissionConstants(Enum):
     """
     USER_READ = Permission(group=Group.USER, operate=Operate.READ, roles=[RoleConstants.ADMIN, RoleConstants.USER])
     USER_EDIT = Permission(group=Group.USER, operate=Operate.EDIT, roles=[RoleConstants.ADMIN, RoleConstants.USER])
-    USER_DELETE = Permission(group=Group.USER, operate=Operate.EDIT, roles=[RoleConstants.USER])
+    USER_DELETE = Permission(group=Group.USER, operate=Operate.DELETE, roles=[RoleConstants.USER])
+
+    DATASET_CREATE = Permission(group=Group.DATASET, operate=Operate.CREATE,
+                                roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    DATASET_READ = Permission(group=Group.DATASET, operate=Operate.READ,
+                              roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    APPLICATION_READ = Permission(group=Group.APPLICATION, operate=Operate.READ,
+                                  roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    SETTING_READ = Permission(group=Group.SETTING, operate=Operate.READ,
+                              roles=[RoleConstants.ADMIN, RoleConstants.USER])
 
 
 def get_permission_list_by_role(role: RoleConstants):

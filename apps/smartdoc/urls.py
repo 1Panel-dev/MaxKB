@@ -42,6 +42,8 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("api/", include("users.urls")),
+    path("api/", include("dataset.urls")),
+    path("api/", include("setting.urls"))
 ]
 
 

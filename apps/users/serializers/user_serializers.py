@@ -2,7 +2,7 @@
 """
     @project: qabot
     @Author：虎
-    @file： user_serializers.py
+    @file： team_serializers.py
     @date：2023/9/5 16:32
     @desc:
 """
@@ -10,22 +10,25 @@ import datetime
 import os
 import random
 import re
+import uuid
 
 from django.core import validators, signing, cache
 from django.core.mail import send_mail
+from django.db import transaction
 from django.db.models import Q
 from drf_yasg import openapi
 from rest_framework import serializers
 
 from common.constants.exception_code_constants import ExceptionCodeConstants
-from common.constants.permission_constants import RoleConstants
+from common.constants.permission_constants import RoleConstants, get_permission_list_by_role
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.response.result import get_api_response
 from common.util.lock import lock
+from setting.models import Team
 from smartdoc.conf import PROJECT_DIR
 from smartdoc.settings import EMAIL_ADDRESS
-from users.models.user import User, password_encrypt
+from users.models.user import User, password_encrypt, get_user_dynamics_permission
 
 user_cache = cache.caches['user_cache']
 
@@ -63,7 +66,7 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
         :return: 用户Token(认证信息)
         """
         user = self.is_valid()
-        token = signing.dumps({'username': user.username, 'id': user.id, 'email': user.email})
+        token = signing.dumps({'username': user.username, 'id': str(user.id), 'email': user.email})
         return token
 
     class Meta:
@@ -86,7 +89,7 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
             title="token",
             default="xxxx",
             description="认证token"
-        ), "token value")
+        ))
 
 
 class RegisterSerializer(ApiMixin, serializers.Serializer):
@@ -138,19 +141,23 @@ class RegisterSerializer(ApiMixin, serializers.Serializer):
 
         return True
 
+    @transaction.atomic
     def save(self, **kwargs):
         m = User(
-            **{'email': self.data.get("email"), 'username': self.data.get("username"),
+            **{'id': uuid.uuid1(), 'email': self.data.get("email"), 'username': self.data.get("username"),
                'role': RoleConstants.USER.name})
         m.set_password(self.data.get("password"))
         # 插入用户
         m.save()
+        # 初始化用户团队
+        Team(**{'user': m, 'name': m.username + '的团队'}).save()
         email = self.data.get("email")
         code_cache_key = email + ":register"
         # 删除验证码缓存
         user_cache.delete(code_cache_key)
 
-    def get_request_body_api(self):
+    @staticmethod
+    def get_request_body_api():
         return openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=['username', 'email', 'password', 're_password', 'code'],
@@ -205,7 +212,7 @@ class CheckCodeSerializer(ApiMixin, serializers.Serializer):
             type=openapi.TYPE_BOOLEAN,
             title="是否成功",
             default=True,
-            description="错误提示"), True)
+            description="错误提示"))
 
 
 class RePasswordSerializer(ApiMixin, serializers.Serializer):
@@ -334,11 +341,55 @@ class SendEmailSerializer(ApiMixin, serializers.Serializer):
         )
 
     def get_response_body_api(self):
-        return get_api_response(openapi.Schema(type=openapi.TYPE_STRING, default=True), True)
+        return get_api_response(openapi.Schema(type=openapi.TYPE_STRING, default=True))
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserProfile(ApiMixin):
+
+    @staticmethod
+    def get_user_profile(user: User):
+        """
+        获取用户详情
+        :param user: 用户对象
+        :return:
+        """
+        permission_list = get_user_dynamics_permission(str(user.id))
+        permission_list += [p.value for p in get_permission_list_by_role(RoleConstants[user.role])]
+        return {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role,
+                'permissions': [str(p) for p in permission_list]}
+
+    @staticmethod
+    def get_response_body_api():
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['id', 'username', 'email', 'role', 'is_active'],
+            properties={
+                'id': openapi.Schema(type=openapi.TYPE_STRING, title="用户id", description="用户id"),
+                'username': openapi.Schema(type=openapi.TYPE_STRING, title="用户名", description="用户名"),
+                'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址"),
+                'role': openapi.Schema(type=openapi.TYPE_STRING, title="角色", description="角色"),
+                'is_active': openapi.Schema(type=openapi.TYPE_STRING, title="是否可用", description="是否可用"),
+                "permissions": openapi.Schema(type=openapi.TYPE_ARRAY, title="权限列表", description="权限列表",
+                                              items=openapi.Schema(type=openapi.TYPE_STRING))
+            }
+        )
+
+
+class UserSerializer(ApiMixin, serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["email", "id",
                   "username", ]
+
+    def get_response_body_api(self):
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['id', 'username', 'email', 'role', 'is_active'],
+            properties={
+                'id': openapi.Schema(type=openapi.TYPE_STRING, title="用户id", description="用户id"),
+                'username': openapi.Schema(type=openapi.TYPE_STRING, title="用户名", description="用户名"),
+                'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址"),
+                'role': openapi.Schema(type=openapi.TYPE_STRING, title="角色", description="角色"),
+                'is_active': openapi.Schema(type=openapi.TYPE_STRING, title="是否可用", description="是否可用")
+            }
+        )

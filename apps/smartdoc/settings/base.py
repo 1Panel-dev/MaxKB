@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-g1u*$)1ddn20_3orw^f+g4(i(2dacj^awe*2vh-$icgqwfnbq('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -29,12 +29,17 @@ DATABASES = {
 
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
+    'setting',
+    'dataset',
+    'application',
+    'embedding',
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
     "drf_yasg",  # swagger 接口
     'django_filters',  # 条件过滤
+
 ]
 
 MIDDLEWARE = [

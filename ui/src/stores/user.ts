@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import type { User } from '@/api/user/type'
 import UserApi from '@/api/user'
 import { ref } from 'vue'
+
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref<User>()
   // 用户认证token
@@ -14,10 +15,25 @@ export const useUserStore = defineStore('user', () => {
     return localStorage.getItem('token')
   }
 
+  const getPermissions = () => {
+    if (userInfo.value) {
+      return userInfo.value.permissions
+    } else {
+      return []
+    }
+  }
+
+  const getRole = () => {
+    if (userInfo.value) {
+      return userInfo.value.role
+    } else {
+      return ''
+    }
+  }
+
   const profile = () => {
     return UserApi.profile().then((ok) => {
       userInfo.value = ok.data
-      return ok.data
     })
   }
 
@@ -35,6 +51,5 @@ export const useUserStore = defineStore('user', () => {
       return true
     })
   }
-
-  return { token, getToken, userInfo, profile, login, logout }
+  return { token, getToken, userInfo, profile, login, logout, getPermissions, getRole }
 })

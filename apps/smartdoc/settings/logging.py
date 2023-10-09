@@ -10,7 +10,7 @@ DRF_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'drf_exception.log')
 UNEXPECTED_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'unexpected_exception.log')
 ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible.log')
 GUNICORN_LOG_FILE = os.path.join(LOG_DIR, 'gunicorn.log')
-LOG_LEVEL = CONFIG.LOG_LEVEL
+LOG_LEVEL = "DEBUG"
 
 LOGGING = {
     'version': 1,
@@ -100,39 +100,20 @@ LOGGING = {
             'level': LOG_LEVEL,
             'propagate': False,
         },
+        'django.db.backends': {
+            'handlers': ['console', 'file', 'syslog'],
+            'propagate': False,
+            'level': LOG_LEVEL,
+        },
         'django.server': {
             'handlers': ['console', 'file', 'syslog'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
-        'jumpserver': {
+        'smartdoc': {
             'handlers': ['console', 'file'],
             'level': LOG_LEVEL,
         },
-        'drf_exception': {
-            'handlers': ['console', 'drf_exception'],
-            'level': LOG_LEVEL,
-        },
-        'unexpected_exception': {
-            'handlers': ['unexpected_exception'],
-            'level': LOG_LEVEL,
-        },
-        'ops.ansible_api': {
-            'handlers': ['console', 'ansible_logs'],
-            'level': LOG_LEVEL,
-        },
-        'django_auth_ldap': {
-            'handlers': ['console', 'file'],
-            'level': "INFO",
-        },
-        'syslog': {
-            'handlers': ['syslog'],
-            'level': 'INFO'
-        },
-        'azure': {
-            'handlers': ['null'],
-            'level': 'ERROR'
-        }
     }
 }
 

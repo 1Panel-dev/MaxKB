@@ -6,6 +6,8 @@
     @date：2023/9/5 19:29
     @desc:
 """
+import django.core.exceptions
+from psycopg2 import IntegrityError
 from rest_framework.exceptions import ValidationError, ErrorDetail, APIException
 from rest_framework.views import exception_handler
 
@@ -13,19 +15,27 @@ from common.exception.app_exception import AppApiException
 from common.response import result
 
 
-def to_result(key, args):
+def to_result(key, args, parent_key=None):
     """
     将校验异常 args转换为统一数据
-    :param key: 校验key
-    :param args: 校验异常参数
+    :param key:       校验key
+    :param args:      校验异常参数
+    :param parent_key 父key
     :return: 接口响应对象
     """
-    error_detail = (args[0] if len(args) > 0 else {key: [ErrorDetail('未知异常', code='unknown')]}).get(key)[
-        0]
+    error_detail = list(filter(
+        lambda d: True if isinstance(d, ErrorDetail) else True if isinstance(d, dict) and len(
+            d.keys()) > 0 else False,
+        (args[0] if len(args) > 0 else {key: [ErrorDetail('未知异常', code='unknown')]}).get(key)))[0]
+
+    if isinstance(error_detail, dict):
+        return list(map(lambda k: to_result(k, args=[error_detail],
+                                            parent_key=key if parent_key is None else parent_key + '.' + key),
+                        error_detail.keys() if len(error_detail) > 0 else []))[0]
 
     return result.Result(500 if isinstance(error_detail.code, str) else error_detail.code,
-                         message=f"【{key}】为必填参数" if str(
-                             error_detail) == "This field is required." else error_detail)
+                         message=f"【{key if parent_key is None else parent_key + '.' + key}】为必填参数" if str(
+                             error_detail) == "This field is required." else f"【{key if parent_key is None else parent_key + '.' + key}】" + error_detail)
 
 
 def validation_error_to_result(exc: ValidationError):
@@ -34,8 +44,11 @@ def validation_error_to_result(exc: ValidationError):
     :param exc: 校验异常
     :return: 接口响应对象
     """
-    res = list(map(lambda key: to_result(key, args=exc.args),
-                   exc.args[0].keys() if len(exc.args) > 0 else []))
+    try:
+        res = list(map(lambda key: to_result(key, args=exc.args),
+                       exc.args[0].keys() if len(exc.args) > 0 else []))
+    except Exception as e:
+        return result.error(str(exc.detail))
     if len(res) > 0:
         return res[0]
     else:
@@ -53,4 +66,6 @@ def handle_exception(exc, context):
         return result.Result(exc.code, exc.message, response_status=exc.status_code)
     if issubclass(exception_class, APIException):
         return result.error(exc.detail)
+    if response is None:
+        return result.error(str(exc))
     return response

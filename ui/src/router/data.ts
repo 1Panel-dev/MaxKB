@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-
+import { Role } from '@/common/permission/type'
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -15,19 +15,19 @@ export const routes: Array<RouteRecordRaw> = [
       {
         path: '/app',
         name: 'app',
-        meta: { icon: 'app', title: '应用' },
+        meta: { icon: 'app', title: '应用', permission: 'APPLICATION:READ' },
         component: () => import('@/views/app/index.vue')
       },
       {
         path: '/dataset',
         name: 'dataset',
-        meta: { icon: 'dataset', title: '数据集' },
+        meta: { icon: 'dataset', title: '数据集', permission: 'DATASET:READ' },
         component: () => import('@/views/dataset/index.vue')
       },
       {
         path: '/setting',
         name: 'setting',
-        meta: { icon: 'setting', title: '数据设置' },
+        meta: { icon: 'setting', title: '数据设置', permission: 'SETTING:READ' },
         component: () => import('@/views/setting/index.vue')
       }
     ]

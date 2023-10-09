@@ -8,7 +8,8 @@
 """
 from typing import List
 
-from common.constants.permission_constants import ViewPermission, CompareConstants, RoleConstants, PermissionConstants
+from common.constants.permission_constants import ViewPermission, CompareConstants, RoleConstants, PermissionConstants, \
+    Permission
 from common.exception.app_exception import AppUnauthorizedFailed
 
 
@@ -55,7 +56,17 @@ def exist_permissions(user_role: List[RoleConstants], user_permission: List[Perm
         return exist_role_by_role_constants(user_role, [permission])
     elif isinstance(permission, PermissionConstants):
         return exist_permissions_by_permission_constants(user_permission, [permission])
+    elif isinstance(permission, Permission):
+        return user_permission.__contains__(permission)
     return False
+
+
+def exist(user_role: List[RoleConstants], user_permission: List[PermissionConstants], permission, request, **kwargs):
+    if callable(permission):
+        p = permission(request, kwargs)
+        return exist_permissions(user_role, user_permission, p)
+    else:
+        return exist_permissions(user_role, user_permission, permission)
 
 
 def has_permissions(*permission, compare=CompareConstants.OR):
@@ -69,7 +80,8 @@ def has_permissions(*permission, compare=CompareConstants.OR):
     def inner(func):
         def run(view, request, **kwargs):
             exit_list = list(
-                map(lambda p: exist_permissions(request.auth.role_list, request.auth.permission_list, p), permission))
+                map(lambda p: exist(request.auth.role_list, request.auth.permission_list, p, request, **kwargs),
+                    permission))
             # 判断是否有权限
             if any(exit_list) if compare == CompareConstants.OR else all(exit_list):
                 return func(view, request, **kwargs)

@@ -7,6 +7,7 @@
     @desc:
 """
 from django.core import cache
+from django.db.models import QuerySet
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
@@ -23,7 +24,7 @@ from smartdoc.settings import JWT_AUTH
 from users.models.user import User as UserModel
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, UserSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
-    SendEmailSerializer
+    SendEmailSerializer, UserProfile
 
 user_cache = cache.caches['user_cache']
 token_cache = cache.caches['token_cache']
@@ -34,10 +35,11 @@ class User(APIView):
 
     @action(methods=['GET'], detail=False)
     @swagger_auto_schema(operation_summary="获取当前用户信息",
-                         operation_id="获取当前用户信息")
+                         operation_id="获取当前用户信息",
+                         responses=result.get_api_response(UserProfile.get_response_body_api()))
     @has_permissions(PermissionConstants.USER_READ, compare=CompareConstants.AND)
     def get(self, request: Request):
-        return result.success(UserSerializer(instance=UserModel.objects.get(id=request.user.id)).data)
+        return result.success(UserProfile.get_user_profile(request.user))
 
 
 class ResetCurrentUserPasswordView(APIView):

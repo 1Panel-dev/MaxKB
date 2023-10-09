@@ -7,8 +7,15 @@
     @desc:
 """
 import hashlib
+import os
+import uuid
 
 from django.db import models
+
+from common.constants.permission_constants import Permission, Group, Operate
+from common.db.sql_execute import select_list
+from common.util.file_util import get_file_content
+from smartdoc.conf import PROJECT_DIR
 
 __all__ = ["User", "password_encrypt"]
 
@@ -25,7 +32,36 @@ def password_encrypt(raw_password):
     return result
 
 
+def to_dynamics_permission(group_type: str, operate: list[str], dynamic_tag: str):
+    """
+    转换为权限对象
+    :param group_type:  分组类型
+    :param operate:     操作
+    :param dynamic_tag: 标记
+    :return: 权限列表
+    """
+    return [Permission(group=Group[group_type], operate=Operate[o], dynamic_tag=dynamic_tag)
+            for o in operate]
+
+
+def get_user_dynamics_permission(user_id: str):
+    """
+    获取 应用和数据集权限
+    :param user_id: 用户id
+    :return: 用户 应用和数据集权限
+    """
+    member_permission_list = select_list(
+        get_file_content(os.path.join(PROJECT_DIR, "apps", "setting", 'sql', 'get_user_permission.sql')),
+        [user_id, user_id, user_id])
+    result = []
+    for member_permission in member_permission_list:
+        result += to_dynamics_permission(member_permission.get('type'), member_permission.get('operate'),
+                                         str(member_permission.get('id')))
+    return result
+
+
 class User(models.Model):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     email = models.EmailField(unique=True, verbose_name="邮箱")
     username = models.CharField(max_length=150, unique=True, verbose_name="用户名")
     password = models.CharField(max_length=150, verbose_name="密码")
