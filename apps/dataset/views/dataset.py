@@ -29,7 +29,7 @@ class Dataset(APIView):
                          responses=get_api_response(DataSetSerializers.Query.get_response_body_api()))
     @has_permissions(PermissionConstants.DATASET_READ, compare=CompareConstants.AND)
     def get(self, request: Request):
-        d = DataSetSerializers.Query(data=request.query_params)
+        d = DataSetSerializers.Query(data={**request.query_params, 'user_id': str(request.user.id)})
         d.is_valid()
         return result.success(d.list())
 
@@ -63,7 +63,7 @@ class Dataset(APIView):
         @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.USE,
                                                         dynamic_tag=keywords.get('dataset_id')))
         def get(self, request: Request, dataset_id: str):
-            return result.success(DataSetSerializers.Operate(data={'id': dataset_id}).one())
+            return result.success(DataSetSerializers.Operate(data={'id': dataset_id}).one(user_id=request.user.id))
 
         @action(methods="PUT", detail=False)
         @swagger_auto_schema(operation_summary="修改数据集信息", operation_id="修改数据集信息",
@@ -72,7 +72,8 @@ class Dataset(APIView):
         @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                                         dynamic_tag=keywords.get('dataset_id')))
         def put(self, request: Request, dataset_id: str):
-            return result.success(DataSetSerializers.Operate(data={'id': dataset_id}).edit(request.data))
+            return result.success(
+                DataSetSerializers.Operate(data={'id': dataset_id}).edit(request.data, user_id=request.user.id))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]
@@ -85,6 +86,6 @@ class Dataset(APIView):
                              responses=get_page_api_response(DataSetSerializers.Query.get_response_body_api()))
         @has_permissions(PermissionConstants.USER_READ, compare=CompareConstants.AND)
         def get(self, request: Request, current_page, page_size):
-            d = DataSetSerializers.Query(data=request.query_params)
+            d = DataSetSerializers.Query(data={**request.query_params, 'user_id': str(request.user.id)})
             d.is_valid()
             return result.success(d.page(current_page, page_size))

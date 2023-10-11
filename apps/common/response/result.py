@@ -11,7 +11,7 @@ class Page(dict):
     """
 
     def __init__(self, total: int, records: List, current_page: int, page_size: int, **kwargs):
-        super().__init__(**{'total': total, 'records': records, 'current_page': current_page, 'page_size': page_size})
+        super().__init__(**{'total': total, 'records': records, 'current': current_page, 'size': page_size})
 
 
 class Result(JsonResponse):
@@ -71,12 +71,12 @@ def get_page_api_response(response_data_schema: openapi.Schema):
                                                                                   default=1,
                                                                                   description="数据总条数"),
                                                                               "records": response_data_schema,
-                                                                              "current_page": openapi.Schema(
+                                                                              "current": openapi.Schema(
                                                                                   type=openapi.TYPE_INTEGER,
                                                                                   title="当前页",
                                                                                   default=1,
                                                                                   description="当前页"),
-                                                                              "page_size": openapi.Schema(
+                                                                              "size": openapi.Schema(
                                                                                   type=openapi.TYPE_INTEGER,
                                                                                   title="每页大小",
                                                                                   default=10,

@@ -11,6 +11,7 @@ import uuid
 from functools import reduce
 from typing import Dict
 
+from django.contrib.postgres.fields import ArrayField
 from django.core import validators
 from django.db import transaction, models
 from django.db.models import QuerySet
@@ -23,6 +24,7 @@ from common.mixins.api_mixin import ApiMixin
 from common.util.file_util import get_file_content
 from dataset.models.data_set import DataSet, Document, Paragraph
 from dataset.serializers.document_serializers import CreateDocumentSerializers
+from setting.models import AuthOperate
 from smartdoc.conf import PROJECT_DIR
 from users.models import User
 
@@ -73,17 +75,38 @@ class DataSetSerializers(serializers.ModelSerializer):
                                                                        message="数据集名称在1-256个字符之间")
                                      ])
 
+        user_id = serializers.CharField(required=True)
+
         def get_query_set(self):
+            user_id = self.data.get("user_id")
+            query_set_dict = {}
             query_set = QuerySet(model=get_dynamics_model(
                 {'dataset.name': models.CharField(), 'dataset.desc': models.CharField(),
                  "document_temp.char_length": models.IntegerField()}))
             if "desc" in self.data:
-                query_string = {'dataset.desc__contains', self.data.get("desc")}
-                query_set = query_set.filter(query_string)
+                query_set = query_set.filter(**{'dataset.desc__contains': self.data.get("desc")})
             if "name" in self.data:
-                query_string = {'dataset.name__contains', self.data.get("name")}
-                query_set = query_set.filter(query_string)
-            return query_set
+                query_set = query_set.filter(**{'dataset.name__contains': self.data.get("name")})
+
+            query_set_dict['default_sql'] = query_set
+
+            query_set_dict['dataset_custom_sql'] = QuerySet(model=get_dynamics_model(
+                {'dataset.user_id': models.CharField(),
+                 })).filter(
+                **{'dataset.user_id': user_id}
+            )
+
+            query_set_dict['team_member_permission_custom_sql'] = QuerySet(model=get_dynamics_model(
+                {'user_id': models.CharField(),
+                 'team_member_permission.operate': ArrayField(verbose_name="权限操作列表",
+                                                              base_field=models.CharField(max_length=256,
+                                                                                          blank=True,
+                                                                                          choices=AuthOperate.choices,
+                                                                                          default=AuthOperate.USE)
+                                                              )})).filter(
+                **{'user_id': user_id, 'team_member_permission.operate__contains': ['USE']})
+
+            return query_set_dict
 
         def page(self, current_page: int, page_size: int):
             return native_page_search(current_page, page_size, self.get_query_set(), select_string=get_file_content(
@@ -200,18 +223,32 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset.delete()
             return True
 
-        def one(self, with_valid=True):
+        def one(self, user_id, with_valid=True):
             if with_valid:
                 self.is_valid()
-            query_string = {'dataset.id', self.data.get("id")}
-            query_set = QuerySet(model=get_dynamics_model(
-                {'dataset.id': models.UUIDField()})).filter(query_string)
-            return native_search(query_set, select_string=get_file_content(
+            query_set_dict = {'default_sql': QuerySet(model=get_dynamics_model(
+                {'temp.id': models.UUIDField()})).filter(**{'temp.id': self.data.get("id")}),
+                              'dataset_custom_sql': QuerySet(model=get_dynamics_model(
+                                  {'dataset.user_id': models.CharField()})).filter(
+                                  **{'dataset.user_id': user_id}
+                              ), 'team_member_permission_custom_sql': QuerySet(
+                    model=get_dynamics_model({'user_id': models.CharField(),
+                                              'team_member_permission.operate': ArrayField(
+                                                  verbose_name="权限操作列表",
+                                                  base_field=models.CharField(max_length=256,
+                                                                              blank=True,
+                                                                              choices=AuthOperate.choices,
+                                                                              default=AuthOperate.USE)
+                                              )})).filter(
+                    **{'user_id': user_id, 'team_member_permission.operate__contains': ['USE']})}
+
+            return native_search(query_set_dict, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_dataset.sql')), with_search_one=True)
 
-        def edit(self, dataset: Dict):
+        def edit(self, dataset: Dict, user_id: str):
             """
             修改数据集
+            :param user_id: 用户id
             :param dataset: Dict name desc
             :return:
             """
@@ -222,7 +259,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             if 'desc' in dataset:
                 _dataset.desc = dataset.get("desc")
             _dataset.save()
-            return self.one(with_valid=False)
+            return self.one(with_valid=False, user_id=user_id)
 
         @staticmethod
         def get_request_body_api():

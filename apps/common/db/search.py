@@ -6,8 +6,9 @@
     @date：2023/10/7 18:20
     @desc:
 """
+from typing import Dict, Any
 
-from django.db import DEFAULT_DB_ALIAS, models
+from django.db import DEFAULT_DB_ALIAS, models, connections
 from django.db.models import QuerySet
 
 from common.db.compiler import AppSQLCompiler
@@ -30,8 +31,61 @@ def get_dynamics_model(attr: dict, table_name='dynamics'):
     return type('Dynamics', (models.Model,), attributes)
 
 
-def native_search(queryset: QuerySet, select_string: str,
-                  field_replace_dict=None,
+def generate_sql_by_query_dict(queryset_dict: Dict[str, QuerySet], select_string: str,
+                               field_replace_dict: None | Dict[str, Dict[str, str]] = None):
+    """
+    生成 查询sql
+    :param queryset_dict: 多条件 查询条件
+    :param select_string: 查询sql
+    :param field_replace_dict:  需要替换的查询字段,一般不需要传入如果有特殊的需要传入
+    :return: sql:需要查询的sql params: sql 参数
+    """
+
+    params_dict: Dict[int, Any] = {}
+    result_params = []
+    for key in queryset_dict.keys():
+        value = queryset_dict.get(key)
+        sql, params = compiler_queryset(value, None if field_replace_dict is None else field_replace_dict.get(key))
+        params_dict = {**params_dict, select_string.index("${" + key + "}"): params}
+        select_string = select_string.replace("${" + key + "}", sql)
+
+    for key in sorted(list(params_dict.keys())):
+        result_params = [*result_params, *params_dict.get(key)]
+    return select_string, result_params
+
+
+def generate_sql_by_query(queryset: QuerySet, select_string: str,
+                          field_replace_dict: None | Dict[str, str] = None):
+    """
+    生成 查询sql
+    :param queryset:            查询条件
+    :param select_string:       原始sql
+    :param field_replace_dict:  需要替换的查询字段,一般不需要传入如果有特殊的需要传入
+    :return:  sql:需要查询的sql params: sql 参数
+    """
+    sql, params = compiler_queryset(queryset, field_replace_dict)
+    return select_string + " " + sql, params
+
+
+def compiler_queryset(queryset: QuerySet, field_replace_dict: None | Dict[str, str] = None):
+    """
+    解析 queryset查询对象
+    :param queryset:            查询对象
+    :param field_replace_dict:  需要替换的查询字段,一般不需要传入如果有特殊的需要传入
+    :return: sql:需要查询的sql params: sql 参数
+    """
+    q = queryset.query
+    compiler = q.get_compiler(DEFAULT_DB_ALIAS)
+    if field_replace_dict is None:
+        field_replace_dict = get_field_replace_dict(queryset)
+    app_sql_compiler = AppSQLCompiler(q, using=DEFAULT_DB_ALIAS, connection=compiler.connection,
+                                      field_replace_dict=field_replace_dict)
+    sql, params = app_sql_compiler.get_query_str(with_table_name=False)
+    return sql, params
+
+
+def native_search(queryset: QuerySet | Dict[str, QuerySet], select_string: str,
+                  field_replace_dict: None | Dict[str, Dict[str, str]] | Dict[str, str] = None,
                   with_search_one=False):
     """
     复杂查询
@@ -41,19 +95,14 @@ def native_search(queryset: QuerySet, select_string: str,
     :param with_search_one:     查询
     :return: 查询结果
     """
-    if field_replace_dict is None:
-        field_replace_dict = get_field_replace_dict(queryset)
-    q = queryset.query
-    compiler = q.get_compiler(DEFAULT_DB_ALIAS)
-    app_sql_compiler = AppSQLCompiler(q, using=DEFAULT_DB_ALIAS, connection=compiler.connection,
-                                      field_replace_dict=field_replace_dict)
-    sql, params = app_sql_compiler.get_query_str(with_table_name=False)
-    if with_search_one:
-        return select_one(select_string + " " +
-                          sql, params)
+    if isinstance(queryset, Dict):
+        exec_sql, exec_params = generate_sql_by_query_dict(queryset, select_string, field_replace_dict)
     else:
-        return select_list(select_string + " " +
-                           sql, params)
+        exec_sql, exec_params = generate_sql_by_query(queryset, select_string, field_replace_dict)
+    if with_search_one:
+        return select_one(exec_sql, exec_params)
+    else:
+        return select_list(exec_sql, exec_params)
 
 
 def page_search(current_page: int, page_size: int, queryset: QuerySet, post_records_handler):
@@ -70,7 +119,7 @@ def page_search(current_page: int, page_size: int, queryset: QuerySet, post_reco
     return Page(total, list(map(post_records_handler, result)), current_page, page_size)
 
 
-def native_page_search(current_page: int, page_size: int, queryset: QuerySet, select_string: str,
+def native_page_search(current_page: int, page_size: int, queryset: QuerySet | Dict[str, QuerySet], select_string: str,
                        field_replace_dict=None,
                        post_records_handler=lambda r: r):
     """
@@ -83,20 +132,17 @@ def native_page_search(current_page: int, page_size: int, queryset: QuerySet, se
     :param post_records_handler:  数据row处理器
     :return: 分页结果
     """
-    if field_replace_dict is None:
-        field_replace_dict = get_field_replace_dict(queryset)
-    q = queryset.query
-    compiler = q.get_compiler(DEFAULT_DB_ALIAS)
-    app_sql_compiler = AppSQLCompiler(q, using=DEFAULT_DB_ALIAS, connection=compiler.connection,
-                                      field_replace_dict=field_replace_dict)
-    page_sql, params = app_sql_compiler.get_query_str(with_table_name=False)
-    total_sql = "SELECT \"count\"(*) FROM (%s) temp" % (select_string + " " + page_sql)
-    total = select_one(total_sql, params)
-    q.set_limits(((current_page - 1) * page_size), (current_page * page_size))
-    app_sql_compiler = AppSQLCompiler(q, using=DEFAULT_DB_ALIAS, connection=compiler.connection,
-                                      field_replace_dict=field_replace_dict)
-    page_sql, params = app_sql_compiler.get_query_str(with_table_name=False)
-    result = select_list(select_string + " " + page_sql, params)
+    if isinstance(queryset, Dict):
+        exec_sql, exec_params = generate_sql_by_query_dict(queryset, select_string, field_replace_dict)
+    else:
+        exec_sql, exec_params = generate_sql_by_query(queryset, select_string, field_replace_dict)
+    total_sql = "SELECT \"count\"(*) FROM (%s) temp" % exec_sql
+    total = select_one(total_sql, exec_params)
+    limit_sql = connections[DEFAULT_DB_ALIAS].ops.limit_offset_sql(
+        ((current_page - 1) * page_size), (current_page * page_size)
+    )
+    page_sql = exec_sql + " " + limit_sql
+    result = select_list(page_sql, exec_params)
     return Page(total.get("count"), list(map(post_records_handler, result)), current_page, page_size)
 
 
