@@ -3,8 +3,8 @@ import { hasPermission } from '@/common/permission'
 
 const display = async (el: any, binding: any) => {
   const has = hasPermission(
-    binding.value.permission ? binding.value.permission : binding.value,
-    binding.value.compare ? binding.value.compare : 'OR'
+    binding.value?.permission || binding.value,
+    binding.value?.compare || 'OR'
   )
   if (!has) {
     el.style.display = 'none'

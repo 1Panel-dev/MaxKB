@@ -1,4 +1,7 @@
-@use "./variables/index.scss";
-@use "./app.scss";
-@use "./element-plus.scss";
-@use "./drawer.scss";
+
+@import 'element-plus/dist/index.css';
+@import './variables.scss';
+@import './app.scss';
+@import './element-plus.scss';
+@import 'nprogress/nprogress.css'
+

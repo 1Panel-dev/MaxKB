@@ -10,6 +10,9 @@ const hasPermissionChild = (permission: Role | string | Permission | ComplexPerm
   const userStore = useUserStore(store)
   const permissions = userStore.getPermissions()
   const role = userStore.getRole()
+  if (!permission) {
+    return true
+  }
   if (permission instanceof Role) {
     return role === permission.role
   }
@@ -24,6 +27,7 @@ const hasPermissionChild = (permission: Role | string | Permission | ComplexPerm
   if (typeof permission === 'string') {
     return permissions.includes(permission)
   }
+
   return false
 }
 /**

@@ -2,7 +2,7 @@
   <div class="top-bar-container">
     <div class="app-title-container">
       <div class="app-title-icon"></div>
-      <div class="app-title-text">智能客服</div>
+      <div class="app-title-text">{{ defaultTitle }}</div>
       <div class="line"></div>
     </div>
     <div class="app-top-menu-container">
@@ -15,8 +15,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import TopMenu from "@/components/layout/top-bar/components/top-menu/index.vue"
-import Avatar from "@/components/layout/top-bar/components/avatar/index.vue"
+import TopMenu from '@/components/layout/top-bar/components/top-menu/index.vue'
+import Avatar from '@/components/layout/top-bar/components/avatar/index.vue'
+const defaultTitle = import.meta.env.VITE_APP_TITLE
 </script>
 <style lang="scss">
 .top-bar-container {
@@ -46,20 +47,18 @@ import Avatar from "@/components/layout/top-bar/components/avatar/index.vue"
     justify-content: center;
     align-items: center;
 
-
     .app-title-icon {
       background-image: url('@/assets/logo.png');
       background-size: 100% 100%;
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
     }
 
     .app-title-text {
       color: var(--app-base-action-text-color);
-      font-size: 28px;
+      font-size: 20px;
       font-weight: 600;
       align-items: center;
-
     }
 
     .line {

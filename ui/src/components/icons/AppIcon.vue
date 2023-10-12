@@ -4,6 +4,7 @@
 </template>
 <script setup lang="ts">
 import { iconMap } from "@/components/icons/index"
+defineOptions({ name: 'AppIcon' });
 withDefaults(defineProps<{
   iconName?: string;
 }>(), {

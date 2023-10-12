@@ -4,7 +4,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/views/home/index.vue'),
+    component: () => import('@/components/layout/home-layout/index.vue'),
     children: [
       {
         path: '/first',
@@ -27,7 +27,7 @@ export const routes: Array<RouteRecordRaw> = [
       {
         path: '/setting',
         name: 'setting',
-        meta: { icon: 'setting', title: '数据设置', permission: 'SETTING:READ' },
+        meta: { icon: 'setting', title: '系统设置', permission: 'SETTING:READ' },
         component: () => import('@/views/setting/index.vue')
       }
     ]
@@ -40,17 +40,17 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/register',
     name: 'register',
-    component: () => import('@/views/register/index.vue')
+    component: () => import('@/views/login/register/index.vue')
   },
   {
     path: '/forgot_password',
     name: 'forgot_password',
-    component: () => import('@/views/forgot-password/index.vue')
+    component: () => import('@/views/login/forgot-password/index.vue')
   },
   {
     path: '/reset_password/:code/:email',
     name: 'reset_password',
-    component: () => import('@/views/reset-password/index.vue')
+    component: () => import('@/views/login/reset-password/index.vue')
   },
   {
     path: '/:pathMatch(.*)',

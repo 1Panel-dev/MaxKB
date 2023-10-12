@@ -1,10 +1,19 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
 html {
   height: 100%;
   box-sizing: border-box;
 }
 
 body {
-  font-family: Helvetica, PingFang SC, Arial, sans-serif;
+  font-family:
+    Helvetica,
+    PingFang SC,
+    Arial,
+    sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -15,7 +24,7 @@ body {
 }
 
 #app {
-  height:100%;
+  height: 100%;
 }
 
 :focus {
@@ -32,6 +41,16 @@ a:hover {
   cursor: pointer;
   color: inherit;
   text-decoration: none;
+}
+
+div:focus {
+  outline: none;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 // 滚动条整体部分
@@ -52,30 +71,68 @@ a:hover {
   background-color: transparent;
 }
 
+.w-full {
+  width: 100%;
+}
+.h-full {
+  height: 100%;
+}
+
+.mt-1 {
+  margin-top: 10px;
+}
+
+.ml-1 {
+  margin-left: 10px;
+}
+.mr-1 {
+  margin-right: 10px;
+}
+.mb-1 {
+  margin-bottom: 10px;
+}
+.mb-2 {
+  margin-bottom: 20px;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 // 创建表单
 .create-catalog-container {
   height: 100%;
   margin-top: -20px;
-  .padding-top-30{
-    padding-top:30px;
+  .padding-top-30 {
+    padding-top: 30px;
   }
-  .padding-top-40{
-    padding-top:40px;
+  .padding-top-40 {
+    padding-top: 40px;
   }
   // 表单外套
-  .form-div{
+  .form-div {
     text-align: center;
     margin: 0 auto;
     width: 80%;
     min-width: 300px;
-    form{
-      .el-form-item {margin-bottom: 28px;}
-      label{
+    form {
+      .el-form-item {
+        margin-bottom: 28px;
+      }
+      label {
         font-style: normal;
         font-weight: 400;
         font-size: 14px;
         line-height: 22px;
-        color: #1F2329;
+        color: #1f2329;
         flex: none;
         order: 0;
         flex-grow: 0;
@@ -84,13 +141,13 @@ a:hover {
   }
 
   // 删除按钮样式
-  .delete-button-class{
+  .delete-button-class {
     cursor: pointer;
-    color: #646a73
+    color: #646a73;
   }
 
   // 添加按钮样式
-  .add-button-class{
+  .add-button-class {
     cursor: pointer;
     border: 0 solid;
     //width: 105px;
@@ -102,23 +159,22 @@ a:hover {
     display: flex;
     align-items: center;
     letter-spacing: -0.1px;
-    color: #3370FF;
-    .span-class{
-      vertical-align:2px;
-      color: #3370FF;
-      padding-left: 5px
+    color: #3370ff;
+    .span-class {
+      vertical-align: 2px;
+      color: #3370ff;
+      padding-left: 5px;
     }
   }
 
-  button{
+  button {
     height: 32px;
-    min-width: 80px
+    min-width: 80px;
   }
-  .save-btn{
-    background-color: #3370FF;
+  .save-btn {
+    background-color: #3370ff;
   }
-  .cancel-btn{
-
+  .cancel-btn {
   }
 
   // 下方操作按钮区域
@@ -159,70 +215,65 @@ a:hover {
 }
 
 // 自定义弹出框样式
-.custom-dialog{
+.custom-dialog {
   //标题样式
-  .el-dialog__header{
+  .el-dialog__header {
     padding: 24px !important;
   }
   //关闭按钮样式
-  .el-dialog__headerbtn .el-dialog__close{
+  .el-dialog__headerbtn .el-dialog__close {
     height: auto !important;
-    color: #646A73 !important;
+    color: #646a73 !important;
     font-size: x-large !important;
   }
-  .el-dialog__headerbtn .el-dialog__close:hover{
+  .el-dialog__headerbtn .el-dialog__close:hover {
     background: rgba(31, 35, 41, 0.1) !important;
     border-radius: 4px !important;
   }
   //内容间距
-  .el-dialog__body{
+  .el-dialog__body {
     padding: 0px 24px 0px 24px;
   }
-  .el-dialog__footer{
+  .el-dialog__footer {
     padding-bottom: 29px !important;
   }
   //下方按钮
-  .footer-btn{
-    button{
+  .footer-btn {
+    button {
       height: 32px;
-      min-width: 80px
+      min-width: 80px;
     }
-    .save-btn{
-      background-color: #3370FF;
+    .save-btn {
+      background-color: #3370ff;
     }
-    .cancel-btn{
-
+    .cancel-btn {
     }
   }
 }
 
-.custom-radio-group.el-radio-group{
-  border: 1px solid #BBBFC4;
+.custom-radio-group.el-radio-group {
+  border: 1px solid #bbbfc4;
   border-radius: 5px;
   height: 30px;
-  label{
+  label {
     border: 0px solid;
     padding: 2px 10px 2px 4px;
   }
-  .el-radio-button__inner{
+  .el-radio-button__inner {
     padding: 4px;
     border: 0px;
     border-radius: 5px;
   }
-  .el-radio-button{
+  .el-radio-button {
     height: auto;
   }
-  .el-radio-button is-active{
+  .el-radio-button is-active {
     height: auto;
   }
-  .el-radio-button__original-radio:checked + .el-radio-button__inner{
-    color: #3370FF;
+  .el-radio-button__original-radio:checked + .el-radio-button__inner {
+    color: #3370ff;
     border: 0;
     box-shadow: 0 0 0 0;
     background: rgba(51, 112, 255, 0.1);
   }
-
 }
-
-
-
