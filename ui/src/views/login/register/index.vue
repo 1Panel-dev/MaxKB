@@ -100,7 +100,7 @@ import type { RegisterRequest } from '@/api/user/type'
 import { UserFilled, Lock, Message, Key } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import UserApi from '@/api/user/index'
-import { ElMessage } from 'element-plus'
+import { MsgSuccess } from '@/utils/message'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const router = useRouter()
@@ -192,7 +192,7 @@ const sendEmail = () => {
   registerFormRef.value?.validateField('email', (v: boolean) => {
     if (v) {
       UserApi.sendEmit(registerForm.value.email, 'register', sendEmailLoading).then(() => {
-        ElMessage.success('发送验证码成功')
+        MsgSuccess('发送验证码成功')
       })
     }
   })

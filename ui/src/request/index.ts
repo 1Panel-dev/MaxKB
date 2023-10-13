@@ -1,5 +1,5 @@
 import axios, { type AxiosRequestConfig } from 'axios'
-import { ElMessage } from 'element-plus'
+import { MsgError } from '@/utils/message'
 import type { NProgress } from 'nprogress'
 import type { Ref } from 'vue'
 import type { Result } from '@/request/Result'
@@ -41,7 +41,7 @@ instance.interceptors.response.use(
   (response: any) => {
     if (response.data) {
       if (response.data.code !== 200 && !(response.data instanceof Blob)) {
-        ElMessage.error(response.data.message)
+        MsgError(response.data.message)
       }
     }
     if (response.headers['content-type'] === 'application/octet-stream') {
@@ -51,7 +51,7 @@ instance.interceptors.response.use(
   },
   (err: any) => {
     if (err.code === 'ECONNABORTED') {
-      ElMessage.error(err.message)
+      MsgError(err.message)
       console.error(err)
     }
     if (err.response?.status === 401) {
@@ -59,7 +59,7 @@ instance.interceptors.response.use(
     }
 
     if (err.response?.status === 403) {
-      ElMessage.error(
+      MsgError(
         err.response.data && err.response.data.message ? err.response.data.message : '没有权限访问'
       )
     }

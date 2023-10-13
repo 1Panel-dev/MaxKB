@@ -1,6 +1,6 @@
 import { store } from '@/stores'
 import { useUserStore } from '@/stores/user'
-import { Role, Permission, ComplexPermission } from '@/common/permission/type'
+import { Role, Permission, ComplexPermission } from '@/utils/permission/type'
 /**
  * 是否包含当前权限
  * @param permission 当前权限

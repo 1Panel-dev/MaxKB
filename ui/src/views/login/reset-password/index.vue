@@ -18,7 +18,7 @@
             show-password
           >
             <template #prepend>
-              <el-button :icon="Lock" />
+              <el-button icon="Lock" />
             </template>
           </el-input>
         </el-form-item>
@@ -32,7 +32,7 @@
             show-password
           >
             <template #prepend>
-              <el-button :icon="Lock" />
+              <el-button icon="Lock" />
             </template>
           </el-input>
         </el-form-item>
@@ -57,9 +57,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import type { ResetPasswordRequest } from '@/api/user/type'
-import { Lock } from '@element-plus/icons-vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { MsgSuccess } from '@/utils/message'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserApi from '@/api/user/index'
 const router = useRouter()
@@ -127,7 +126,7 @@ const resetPassword = () => {
     ?.validate()
     .then(() => UserApi.resetPassword(resetPasswordForm.value, loading))
     .then(() => {
-      ElMessage.success('修改密码成功')
+      MsgSuccess('修改密码成功')
       router.push({ name: 'login' })
     })
 }

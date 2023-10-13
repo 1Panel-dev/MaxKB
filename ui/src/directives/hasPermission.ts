@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import { hasPermission } from '@/common/permission'
+import { hasPermission } from '@/utils/permission'
 
 const display = async (el: any, binding: any) => {
   const has = hasPermission(

@@ -1,3 +1,8 @@
+.el-avatar {
+  --el-avatar-bg-color: var(--el-color-primary);
+  --el-avatar-size-small: 33px;
+  cursor: pointer;
+}
 .el-popper {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -5,24 +10,22 @@
 .el-form {
   --el-form-inline-content-width: 100%;
 }
- 
+
 // 抽屉样式整体修改
-.el-drawer{
-    
-  .el-drawer__header{
-   padding: 0;
-   margin: 0 24px;
-   height: 56px;
-   border-bottom: 1px solid #D5D6D8;
-   .el-drawer__title {
+.el-drawer {
+  .el-drawer__header {
+    padding: 0;
+    margin: 0 24px;
+    height: 56px;
+    border-bottom: 1px solid #d5d6d8;
+    .el-drawer__title {
       color: #1f2329;
       font-weight: 500;
       font-size: 16px;
       line-height: 24px;
     }
-    
   }
-  .el-drawer__body{
-    --el-drawer-padding-primary:24px
+  .el-drawer__body {
+    --el-drawer-padding-primary: 24px;
   }
 }

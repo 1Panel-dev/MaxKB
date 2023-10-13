@@ -1,35 +1,22 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { Role } from '@/common/permission/type'
+import { Role } from '@/utils/permission/type'
+
+const modules: any = import.meta.glob('./modules/*.ts', { eager: true })
+const rolesRoutes: RouteRecordRaw[] = [...Object.keys(modules).map((key) => modules[key].default)]
+
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/components/layout/home-layout/index.vue'),
+    component: () => import('@/components/layout/app-layout/index.vue'),
     children: [
       {
         path: '/first',
         name: 'first',
-        meta: { icon: 'app', title: '首页' },
+        meta: { icon: 'House', title: '首页' },
         component: () => import('@/views/first/index.vue')
       },
-      {
-        path: '/app',
-        name: 'app',
-        meta: { icon: 'app', title: '应用', permission: 'APPLICATION:READ' },
-        component: () => import('@/views/app/index.vue')
-      },
-      {
-        path: '/dataset',
-        name: 'dataset',
-        meta: { icon: 'dataset', title: '数据集', permission: 'DATASET:READ' },
-        component: () => import('@/views/dataset/index.vue')
-      },
-      {
-        path: '/setting',
-        name: 'setting',
-        meta: { icon: 'setting', title: '系统设置', permission: 'SETTING:READ' },
-        component: () => import('@/views/setting/index.vue')
-      }
+      ...rolesRoutes
     ]
   },
   {

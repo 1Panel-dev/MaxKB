@@ -1,4 +1,4 @@
-import { hasPermission } from '@/common/permission/index'
+import { hasPermission } from '@/utils/permission/index'
 import {
   createRouter,
   createWebHistory,
@@ -8,7 +8,7 @@ import {
 } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { store } from '@/stores'
-import { routes } from '@/router/data'
+import { routes } from '@/router/routes'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes

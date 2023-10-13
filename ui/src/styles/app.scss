@@ -9,15 +9,11 @@ html {
 }
 
 body {
-  font-family:
-    Helvetica,
-    PingFang SC,
-    Arial,
-    sans-serif;
   font-size: 14px;
-  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    '微软雅黑', Arial, sans-serif;
   height: 100%;
   margin: 0;
   padding: 0;
@@ -93,6 +89,10 @@ ul {
 }
 .mb-2 {
   margin-bottom: 20px;
+}
+
+.flex {
+  display: flex;
 }
 
 .flex-center {

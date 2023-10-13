@@ -16,7 +16,7 @@
             placeholder="请输入邮箱"
           >
             <template #prepend>
-              <el-button :icon="UserFilled" />
+              <el-button icon="UserFilled" />
             </template>
           </el-input>
         </el-form-item>
@@ -29,7 +29,7 @@
               placeholder="请输入验证码"
             >
               <template #prepend>
-                <el-button :icon="Key" />
+                <el-button icon="Key" />
               </template>
             </el-input>
             <el-button
@@ -61,12 +61,11 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import { UserFilled, Key } from '@element-plus/icons-vue'
 import type { CheckCodeRequest } from '@/api/user/type'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserApi from '@/api/user/index'
-import { ElMessage } from 'element-plus'
+import { MsgSuccess } from '@/utils/message'
 
 const router = useRouter()
 const CheckEmailForm = ref<CheckCodeRequest>({
@@ -108,7 +107,7 @@ const sendEmail = () => {
   resetPasswordFormRef.value?.validateField('email', (v: boolean) => {
     if (v) {
       UserApi.sendEmit(CheckEmailForm.value.email, 'reset_password', loading).then(() => {
-        ElMessage.success('发送验证码成功')
+        MsgSuccess('发送验证码成功')
       })
     }
   })
