@@ -18,7 +18,7 @@
 import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
-import ResetPassword from '@/components/layout/top-bar/components/avatar/ResetPasssword.vue'
+import ResetPassword from './ResetPasssword.vue'
 const userStore = useUserStore()
 const router = useRouter()
 const firstUserName = computed(() => {

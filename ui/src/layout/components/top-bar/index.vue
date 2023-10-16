@@ -14,13 +14,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import TopMenu from '@/components/layout/top-bar/components/top-menu/index.vue'
-import Avatar from '@/components/layout/top-bar/components/avatar/index.vue'
+import TopMenu from './top-menu/index.vue'
+import Avatar from './avatar/index.vue'
 const defaultTitle = import.meta.env.VITE_APP_TITLE
 </script>
 <style lang="scss">
 .top-bar-container {
-  border-bottom: 1px solid rgba(229, 229, 229, 1);
+  border-bottom: 1px solid var(--el-border-color);
   height: var(--app-header-height);
   box-sizing: border-box;
   padding: var(--app-header-padding);

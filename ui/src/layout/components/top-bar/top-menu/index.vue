@@ -12,7 +12,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { getChildRouteListByPathAndName } from '@/router/index'
-import MenuItem from '@/components/layout/top-bar/components/top-menu/MenuItem.vue'
+import MenuItem from './MenuItem.vue'
+
 const topMenuList = computed(() => {
   return getChildRouteListByPathAndName('/', 'home')
 })

@@ -8,7 +8,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/components/layout/app-layout/index.vue'),
+    component: () => import('@/layout/app-layout/index.vue'),
     children: [
       {
         path: '/first',
@@ -19,6 +19,7 @@ export const routes: Array<RouteRecordRaw> = [
       ...rolesRoutes
     ]
   },
+
   {
     path: '/login',
     name: 'login',

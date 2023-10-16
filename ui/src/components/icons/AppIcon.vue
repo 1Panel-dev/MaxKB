@@ -6,7 +6,7 @@
         ? iconMap[iconName].iconReader()
         : iconMap['404'].iconReader()
     "
-    class="app-icon"
+    class="el-icon app-icon"
   >
   </component>
   <el-icon v-else-if="iconName">

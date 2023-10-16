@@ -1,7 +1,7 @@
 import { type App } from 'vue'
 import AppIcon from './icons/AppIcon.vue'
-import LoginLayout from './layout/login-layout/index.vue'
-import LoginContainer from './layout/login-container/index.vue'
+import LoginLayout from './login-layout/index.vue'
+import LoginContainer from './login-container/index.vue'
 
 export default {
   install(app: App) {
