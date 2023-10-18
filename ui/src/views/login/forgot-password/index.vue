@@ -1,7 +1,7 @@
 <template>
   <login-layout>
     <LoginContainer>
-      <h3 class="mb-2">忘记密码</h3>
+      <h3 class="mb-20">忘记密码</h3>
       <el-form
         class="register-form"
         ref="resetPasswordFormRef"
@@ -34,7 +34,7 @@
             </el-input>
             <el-button
               size="large"
-              class="send-email-button ml-1"
+              class="send-email-button ml-10"
               @click="sendEmail"
               :loading="loading"
               >获取验证码</el-button
@@ -45,7 +45,7 @@
       <el-button type="primary" class="login-submit-button w-full" @click="checkCode"
         >立即验证</el-button
       >
-      <div class="operate-container mt-1">
+      <div class="operate-container mt-10">
         <el-button
           class="register"
           @click="router.push('/login')"

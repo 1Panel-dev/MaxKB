@@ -30,12 +30,4 @@ const props = withDefaults(
 const isIconfont = computed(() => props.iconName?.includes('app-'))
 </script>
 
-<style lang="scss" scoped>
-.app-icon {
-  line-height: 1em;
-  svg {
-    height: 1em;
-    width: 1em;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

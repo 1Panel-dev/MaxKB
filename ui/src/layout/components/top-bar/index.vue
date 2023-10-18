@@ -1,9 +1,9 @@
 <template>
-  <div class="top-bar-container flex-between">
+  <div class="top-bar-container flex-between border-b">
     <div class="flex-center h-full">
       <div class="app-title-container flex-center">
         <div class="app-title-icon"></div>
-        <div class="app-title-text ml-1">{{ defaultTitle }}</div>
+        <div class="app-title-text ml-10">{{ defaultTitle }}</div>
       </div>
       <el-divider direction="vertical" class="line" />
       <TopMenu></TopMenu>
@@ -20,13 +20,12 @@ const defaultTitle = import.meta.env.VITE_APP_TITLE
 </script>
 <style lang="scss">
 .top-bar-container {
-  border-bottom: 1px solid var(--el-border-color);
   height: var(--app-header-height);
   box-sizing: border-box;
   padding: var(--app-header-padding);
 
   .app-title-container {
-    margin-right: 30px;
+    margin-right: 20px;
     .app-title-icon {
       background-image: url('@/assets/logo.png');
       background-size: 100% 100%;

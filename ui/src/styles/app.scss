@@ -74,21 +74,25 @@ ul {
   height: 100%;
 }
 
-.mt-1 {
+.mt-10 {
   margin-top: 10px;
 }
 
-.ml-1 {
+.ml-10 {
   margin-left: 10px;
 }
-.mr-1 {
+.mr-10 {
   margin-right: 10px;
 }
-.mb-1 {
+.mb-10 {
   margin-bottom: 10px;
 }
-.mb-2 {
+.mb-20 {
   margin-bottom: 20px;
+}
+
+.p-15 {
+  padding: 15px;
 }
 
 .flex {
@@ -107,173 +111,24 @@ ul {
   align-items: center;
 }
 
-// 创建表单
-.create-catalog-container {
-  height: 100%;
-  margin-top: -20px;
-  .padding-top-30 {
-    padding-top: 30px;
-  }
-  .padding-top-40 {
-    padding-top: 40px;
-  }
-  // 表单外套
-  .form-div {
-    text-align: center;
-    margin: 0 auto;
-    width: 80%;
-    min-width: 300px;
-    form {
-      .el-form-item {
-        margin-bottom: 28px;
-      }
-      label {
-        font-style: normal;
-        font-weight: 400;
-        font-size: 14px;
-        line-height: 22px;
-        color: #1f2329;
-        flex: none;
-        order: 0;
-        flex-grow: 0;
-      }
-    }
-  }
-
-  // 删除按钮样式
-  .delete-button-class {
-    cursor: pointer;
-    color: #646a73;
-  }
-
-  // 添加按钮样式
-  .add-button-class {
-    cursor: pointer;
-    border: 0 solid;
-    //width: 105px;
-    height: 22px;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 22px;
-    display: flex;
-    align-items: center;
-    letter-spacing: -0.1px;
-    color: #3370ff;
-    .span-class {
-      vertical-align: 2px;
-      color: #3370ff;
-      padding-left: 5px;
-    }
-  }
-
-  button {
-    height: 32px;
-    min-width: 80px;
-  }
-  .save-btn {
-    background-color: #3370ff;
-  }
-  .cancel-btn {
-  }
-
-  // 下方操作按钮区域
-  .footer {
-    border-top: 1px solid var(--el-border-color);
-    padding: 24px 0px 0px 0px;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    margin: 0px -50px 0px;
-
-    .footer-form {
-      min-width: 400px;
-    }
-    .footer-center {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .footer-btn {
-      margin: 0px 80px 0px;
-      text-align: right;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-  }
-
-  .description {
-    padding-left: 15px;
-    font-size: smaller;
-    color: #606266;
-  }
+.align-center {
+  text-align: center;
+}
+.align-right {
+  text-align: right;
 }
 
-// 自定义弹出框样式
-.custom-dialog {
-  //标题样式
-  .el-dialog__header {
-    padding: 24px !important;
-  }
-  //关闭按钮样式
-  .el-dialog__headerbtn .el-dialog__close {
-    height: auto !important;
-    color: #646a73 !important;
-    font-size: x-large !important;
-  }
-  .el-dialog__headerbtn .el-dialog__close:hover {
-    background: rgba(31, 35, 41, 0.1) !important;
-    border-radius: 4px !important;
-  }
-  //内容间距
-  .el-dialog__body {
-    padding: 0px 24px 0px 24px;
-  }
-  .el-dialog__footer {
-    padding-bottom: 29px !important;
-  }
-  //下方按钮
-  .footer-btn {
-    button {
-      height: 32px;
-      min-width: 80px;
-    }
-    .save-btn {
-      background-color: #3370ff;
-    }
-    .cancel-btn {
-    }
-  }
+.border-b {
+  border-bottom: 1px solid var(--el-border-color);
+}
+.border-r {
+  border-right: 1px solid var(--el-border-color);
 }
 
-.custom-radio-group.el-radio-group {
-  border: 1px solid #bbbfc4;
-  border-radius: 5px;
-  height: 30px;
-  label {
-    border: 0px solid;
-    padding: 2px 10px 2px 4px;
-  }
-  .el-radio-button__inner {
-    padding: 4px;
-    border: 0px;
-    border-radius: 5px;
-  }
-  .el-radio-button {
-    height: auto;
-  }
-  .el-radio-button is-active {
-    height: auto;
-  }
-  .el-radio-button__original-radio:checked + .el-radio-button__inner {
-    color: #3370ff;
-    border: 0;
-    box-shadow: 0 0 0 0;
-    background: rgba(51, 112, 255, 0.1);
-  }
+.border-b-light {
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.main-calc-height {
+  height: calc(100vh - 125px);
 }

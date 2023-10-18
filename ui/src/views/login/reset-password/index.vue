@@ -1,7 +1,7 @@
 <template>
   <login-layout>
     <LoginContainer>
-      <h3 class="mb-2">修改密码</h3>
+      <h3 class="mb-20">修改密码</h3>
       <el-form
         class="reset-password-form"
         ref="resetPasswordFormRef"
@@ -40,7 +40,7 @@
       <el-button type="primary" class="login-submit-button w-full" @click="resetPassword"
         >确认修改</el-button
       >
-      <div class="operate-container mt-1">
+      <div class="operate-container mt-10">
         <el-button
           class="register"
           @click="router.push('/login')"

@@ -4,7 +4,8 @@ import {
   createWebHistory,
   type NavigationGuardNext,
   type RouteLocationNormalized,
-  type RouteRecordRaw
+  type RouteRecordRaw,
+  type RouteRecordName
 } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { store } from '@/stores'
@@ -51,14 +52,14 @@ router.beforeEach(
   }
 )
 
-export const getChildRouteListByPathAndName = (path: string, name: string) => {
+export const getChildRouteListByPathAndName = (path: string, name?: RouteRecordName | null | undefined) => {
   return getChildRouteList(routes, path, name)
 }
 
 export const getChildRouteList: (
   routeList: Array<RouteRecordRaw>,
   path: string,
-  name: string
+  name?: RouteRecordName | null | undefined
 ) => Array<RouteRecordRaw> = (routeList, path, name) => {
   for (let index = 0; index < routeList.length; index++) {
     const route = routeList[index]

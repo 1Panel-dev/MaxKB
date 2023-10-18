@@ -1,6 +1,6 @@
 <template>
   <div class="main-layout h-full flex">
-    <div class="sidebar-container"><Sidebar /></div>
+    <div class="sidebar-container border-r"><Sidebar /></div>
     <div class="view-container">
       <AppMain />
     </div>
@@ -15,6 +15,9 @@ import { Sidebar, AppMain } from '../components'
   transition: width 0.28s;
   width: var(--sidebar-width);
   background-color: var(--sidebar-bg-color);
-  border-right: 1px solid var(--el-border-color);
+}
+.view-container {
+  width: 100%;
+  padding: var(--app-view-padding);
 }
 </style>

@@ -60,7 +60,7 @@
           </el-input>
           <el-button
             size="large"
-            class="send-email-button ml-1"
+            class="send-email-button ml-10"
             @click="sendEmail"
             :loading="loading"
             >获取验证码</el-button

@@ -1,7 +1,43 @@
 <template>
-  <div>团队管理</div>
+  <LayoutContent header="团队管理">
+    <div class="team-manage flex main-calc-height">
+      <div class="team-member p-15 border-r">
+        <h3>团队成员</h3>
+        <div class="align-right">
+          <el-button type="primary" link
+            ><AppIcon iconName="app-add-users" class="add-user-icon" />添加成员</el-button
+          >
+        </div>
+        <div class="mt-10">
+          <el-input v-model="filterText" placeholder="请输入用户名搜索" suffix-icon="Search" />
+        </div>
+        <div class="member-list mt-10">
+          <ul>
+            <li class="active border-b-light flex-between p-15">
+              <div>
+                <span>baixin</span>
+                <el-tag class="ml-10" effect="dark">所有者</el-tag>
+              </div>
+              <el-dropdown trigger="click">
+                <span class="el-dropdown-link">
+                  <el-icon><MoreFilled /></el-icon>
+                </span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item>移除</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="permission-setting p-15">
+        <h3>权限设置</h3>
+      </div>
+    </div>
 
-  <!-- <div class="sales-department__tree">
+    <!-- <div class="sales-department__tree">
         <support-tree
           ref="salesDepartmentTree"
           v-model:data="dataSource"
@@ -59,13 +95,16 @@
         </complex-table>
         <el-empty :image-size="200" v-else />
       </div> -->
-  <!-- 设置部门
+    <!-- 设置部门
       <department-dialog ref="departmentDialogRef" :title="dialogTitle" @refresh="refresh" />
       <member-dialog ref="memberDialogRef" @refresh="refresh" /> -->
+  </LayoutContent>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, watch, nextTick } from 'vue'
+
+const filterText = ref('')
 // import DepartmentDialog from './components/DepartmentDialog.vue'
 // import MemberDialog from './components/MemberDialog.vue'
 // import { getSalesTeams, deleteSalesTeams, putSetLeader } from '@/api/sales-team-controller'
@@ -212,22 +251,18 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-$department-left-width: 300px;
-
-.sales-department {
-  &__tree {
-    width: $department-left-width;
-    min-width: $department-left-width;
-    padding-right: 20px;
-    box-sizing: content-box;
+.team-manage {
+  .add-user-icon {
+    margin-right: 5px;
+    font-size: 20px;
   }
-  &__table {
-    border-left: 1px solid var(--el-border-color);
-    width: calc(100% - $department-left-width - 40px);
-    padding-left: 20px;
-    .table-header {
-      h3 {
-        font-size: 18px;
+}
+.team-member {
+  width: 250px;
+  .member-list {
+    li {
+      &.active {
+        background: var(--el-color-primary-light-9);
       }
     }
   }
