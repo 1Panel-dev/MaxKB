@@ -37,7 +37,7 @@
           size="large"
           class="input-item"
           :disabled="true"
-          v-bind:modelValue="userStore.userInfo?.email"
+          v-bind:modelValue="user.userInfo?.email"
           @change="() => {}"
           placeholder="请输入邮箱"
         >
@@ -81,10 +81,10 @@ import type { ResetCurrentUserPasswordRequest } from '@/api/user/type'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import UserApi from '@/api/user'
-import { useUserStore } from '@/stores/user'
+import useStore from '@/stores';
 import { useRouter } from 'vue-router'
 const router = useRouter()
-const userStore = useUserStore()
+const { user } = useStore();
 
 const resetPasswordDialog = ref<boolean>(false)
 
@@ -161,7 +161,7 @@ const resetPassword = () => {
       return UserApi.resetCurrentUserPassword(resetPasswordForm.value)
     })
     .then(() => {
-      return userStore.logout()
+      return user.logout()
     })
     .then(() => {
       router.push({ name: 'login' })

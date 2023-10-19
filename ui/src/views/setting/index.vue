@@ -19,7 +19,7 @@
                 <el-tag class="ml-10" effect="dark">所有者</el-tag>
               </div>
               <el-dropdown trigger="click">
-                <span class="el-dropdown-link">
+                <span class="cursor">
                   <el-icon><MoreFilled /></el-icon>
                 </span>
                 <template #dropdown>
@@ -32,72 +32,40 @@
           </ul>
         </div>
       </div>
-      <div class="permission-setting p-15">
-        <h3>权限设置</h3>
+      <div class="permission-setting flex">
+        <div class="team-manage__table p-15">
+          <h3>权限设置</h3>
+          <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+            <el-tab-pane label="数据集" name="dataset">
+              <el-table :data="tableData" :max-height="tableHeight">
+                <el-table-column prop="date" label="数据集名称" />
+                <el-table-column label="管理" align="center">
+                  <template #header>
+                    <el-checkbox v-model="allChecked" label="管理" />
+                  </template>
+                  <template #default="scope">
+                    <el-checkbox v-model="scope.row.checked" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="使用" align="center">
+                  <template #header>
+                    <el-checkbox v-model="allChecked" label="使用" />
+                  </template>
+                  <template #default="scope">
+                    <el-checkbox v-model="scope.row.checked" />
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-tab-pane>
+            <el-tab-pane label="应用" name="application">应用</el-tab-pane>
+          </el-tabs>
+        </div>
+
+        <div class="team-manage__footer border-t p-15 flex">
+          <el-button type="primary">保存</el-button>
+        </div>
       </div>
     </div>
-
-    <!-- <div class="sales-department__tree">
-        <support-tree
-          ref="salesDepartmentTree"
-          v-model:data="dataSource"
-          :title="`飞致云 ${regionName}`"
-          buttonName="新建部门"
-          :beforeAppend="appendDepartment"
-          :beforeRemove="removedDepartment"
-          :beforeEdit="editDepartment"
-          :filterable="true"
-          :highlight-current="true"
-          node-key="id"
-          :props="defaultProps"
-          @node-click="treeClick"
-        />
-      </div>
-      <div class="sales-department__table">
-        <complex-table v-if="currentDepartment" :data="memberTable" border>
-          <template #toolbar>
-            <div class="table-header">
-              <h3>{{ currentDepartment?.name }}</h3>
-              <div>
-                <el-button type="primary" @click="addMember">设置人员</el-button>
-              </div>
-            </div>
-          </template>
-          <el-table-column label="账户ID" prop="username" show-overflow-tooltip />
-          <el-table-column label="姓名">
-            <template #default="{ row }">
-              <icon
-                icon="iconfont icon-vip"
-                v-if="currentDepartment?.leaderId === row.userId"
-                style="color: #f8bc2e"
-              ></icon>
-              {{ row.name }}
-            </template>
-          </el-table-column>
-          <el-table-column label="手机号" prop="phone" />
-          <el-table-column label="邮箱" prop="email" show-overflow-tooltip />
-          <el-table-column label="角色">
-            <template #default="{ row }">
-              {{ currentDepartment?.leaderId === row.userId ? '销售主管' : '销售' }}
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="80" align="center">
-            <template #default="{ row }">
-              <el-button
-                type="primary"
-                size="small"
-                v-if="currentDepartment?.leaderId !== row.userId"
-                @click="setLeader(row)"
-                >升级</el-button
-              >
-            </template>
-          </el-table-column>
-        </complex-table>
-        <el-empty :image-size="200" v-else />
-      </div> -->
-    <!-- 设置部门
-      <department-dialog ref="departmentDialogRef" :title="dialogTitle" @refresh="refresh" />
-      <member-dialog ref="memberDialogRef" @refresh="refresh" /> -->
   </LayoutContent>
 </template>
 
@@ -105,145 +73,56 @@
 import { onMounted, ref, watch, nextTick } from 'vue'
 
 const filterText = ref('')
-// import DepartmentDialog from './components/DepartmentDialog.vue'
-// import MemberDialog from './components/MemberDialog.vue'
-// import { getSalesTeams, deleteSalesTeams, putSetLeader } from '@/api/sales-team-controller'
-// import { searchiInTree } from '@/utils/utils'
-// import { $error, $confirm, $success } from '@/utils/message'
+const activeName = ref('dataset')
+const allChecked = ref(false)
+const tableHeight = ref(0)
+function handleClick() {}
 
-// import useStore from '@/store'
-// const { user } = useStore()
-
-// const defaultProps = {
-//   children: 'subTeams'
-// }
-
-// const salesDepartmentTree = ref()
-// const memberDialogRef = ref()
-// const departmentDialogRef = ref()
-// const loading = ref(false)
-
-// const regionName = ref('')
-// const dialogTitle = ref('')
-// const dataSource = ref([])
-// const salesOptions = ref([])
-// const currentDepartment = ref(null)
-// const memberTable = ref([])
-
-// watch([salesOptions, currentDepartment], (val) => {
-//   if (val[0]?.length && val[1]) {
-//     const leader = val[0].filter((item) => item.userId === val[1]?.leaderId)
-//     const member = val[1]?.teamMember
-//       ? val[0].filter((item) => val[1]?.teamMember.includes(item.userId))
-//       : []
-//     memberTable.value = [...leader, ...member]
-//   }
-// })
-
-// function addMember() {
-//   memberDialogRef.value.open(currentDepartment.value)
-// }
-
-// const appendDepartment = (data) => {
-//   dialogTitle.value = '新建部门'
-//   departmentDialogRef.value.open('create', data)
-//   return false
-// }
-
-// const removedDepartment = (node, data) => {
-//   $confirm('确定要删除这个部门吗?', {
-//     confirmButtonText: '确定',
-//     cancelButtonText: '取消',
-//     type: 'warning'
-//   })
-//     .then(() => {
-//       loading.value = true
-//       deleteSalesTeams(data.id)
-//         .then(() => {
-//           $success('删除成功')
-//           getTeams()
-//         })
-//         .catch(() => {
-//           loading.value = false
-//         })
-//     })
-//     .catch(() => {})
-
-//   return false
-// }
-
-// const editDepartment = (node) => {
-//   dialogTitle.value = '编辑部门'
-//   const parent = node.isLeaf ? node.parent.data : null
-//   departmentDialogRef.value.open('edit', node.data, parent)
-//   return false
-// }
-
-// function setLeader(row) {
-//   loading.value = true
-//   putSetLeader(currentDepartment.value.id, row.userId)
-//     .then((data) => {
-//       getTeams()
-//     })
-//     .catch(() => {
-//       loading.value = false
-//     })
-// }
-
-// function treeClick(node) {
-//   currentDepartment.value = node
-// }
-
-// function getTeams() {
-//   loading.value = true
-//   getSalesTeams({ includeUsers: true })
-//     .then((data) => {
-//       dataSource.value = data
-//       currentDepartment.value = currentDepartment.value
-//         ? searchiInTree(dataSource.value, currentDepartment.value, 'subTeams')
-//         : dataSource.value?.length && dataSource.value[0]
-//       nextTick(() => {
-//         salesDepartmentTree.value.setCurrentKey(currentDepartment.value?.id)
-//       })
-
-//       loading.value = false
-//     })
-//     .catch(() => {
-//       loading.value = false
-//     })
-// }
-
-// function getSalesList() {
-//   loading.value = true
-//   user
-//     .asyncGetInternalUsers({ group: ['sales', 'sales_leader', 'region_sales_admin'] })
-//     .then((res) => {
-//       salesOptions.value = res
-//       loading.value = false
-//     })
-//     .catch(() => {
-//       loading.value = false
-//     })
-// }
-
-// function getInfo() {
-//   loading.value = true
-//   user
-//     .asyncGetUserInfo()
-//     .then((data) => {
-//       regionName.value = data?.region?.name ? `- ${data?.region?.name}` : ''
-//       loading.value = false
-//     })
-//     .catch(() => {
-//       loading.value = false
-//     })
-// }
-
-// function refresh() {
-//   getTeams()
-// }
+const tableData = [
+  {
+    date: '2016-05-03',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles'
+  },
+  {
+    date: '2016-05-02',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles'
+  },
+  {
+    date: '2016-05-04',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles'
+  },
+  {
+    date: '2016-05-01',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles'
+  },
+  {
+    date: '2016-05-08',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles'
+  },
+  {
+    date: '2016-05-06',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles'
+  },
+  {
+    date: '2016-05-07',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles'
+  }
+]
 
 onMounted(() => {
+  tableHeight.value = window.innerHeight - 300
+  window.onresize = () => {
+    return (() => {
+      tableHeight.value = window.innerHeight - 300
+    })()
+  }
   // getSalesList()
   // getInfo()
   // getTeams()
@@ -256,15 +135,29 @@ onMounted(() => {
     margin-right: 5px;
     font-size: 20px;
   }
-}
-.team-member {
-  width: 250px;
-  .member-list {
-    li {
-      &.active {
-        background: var(--el-color-primary-light-9);
+  .team-member {
+    box-sizing: border-box;
+    width: var(--team-manage-left-width);
+    min-width: var(--team-manage-left-width);
+    .member-list {
+      li {
+        &.active {
+          background: var(--el-color-primary-light-9);
+        }
       }
     }
+  }
+  .permission-setting {
+    box-sizing: border-box;
+    width: calc(100% - var(--team-manage-left-width) - 5px);
+    flex-direction: column;
+  }
+  .team-manage__table {
+    flex: 1;
+  }
+  .team-manage__footer {
+    flex: 0 0 auto;
+    justify-content: right;
   }
 }
 </style>

@@ -16,13 +16,13 @@
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useUserStore } from '@/stores/user'
+import useStore from '@/stores';
 import { useRouter } from 'vue-router'
 import ResetPassword from './ResetPasssword.vue'
-const userStore = useUserStore()
+const { user } = useStore();
 const router = useRouter()
 const firstUserName = computed(() => {
-  return userStore.userInfo?.username?.substring(0, 1)
+  return user.userInfo?.username?.substring(0, 1)
 })
 const resetPasswordRef = ref<InstanceType<typeof ResetPassword>>()
 
@@ -31,7 +31,7 @@ const openResetPassword = () => {
 }
 
 const logout = () => {
-  userStore.logout().then(() => {
+  user.logout().then(() => {
     router.push({ name: 'login' })
   })
 }

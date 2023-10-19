@@ -1,16 +1,16 @@
 <template>
-  <el-scrollbar>
-    <div class="content-container">
-      <div class="content-container__header mb-10" v-if="slots.header || header">
-        <slot name="header">
-          <span>{{ header }}</span>
-        </slot>
-      </div>
+  <div class="content-container">
+    <div class="content-container__header mb-10" v-if="slots.header || header">
+      <slot name="header">
+        <span>{{ header }}</span>
+      </slot>
+    </div>
+    <el-scrollbar>
       <div class="content-container__main">
         <slot></slot>
       </div>
-    </div>
-  </el-scrollbar>
+    </el-scrollbar>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -35,7 +35,8 @@ defineProps({
     background-color: var(--app-view-bg-color);
     border-radius: 6px;
     box-sizing: border-box;
-    min-height: calc(100vh - var(--app-header-height) - 69px);
+    // overflow: auto;
+    // height: 100%;
   }
 }
 </style>

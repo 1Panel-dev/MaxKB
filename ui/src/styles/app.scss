@@ -124,9 +124,16 @@ ul {
 .border-r {
   border-right: 1px solid var(--el-border-color);
 }
+.border-t {
+  border-top: 1px solid var(--el-border-color);
+}
 
 .border-b-light {
   border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.cursor{
+  cursor: pointer;
 }
 
 .main-calc-height {

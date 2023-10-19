@@ -51,10 +51,10 @@ import { ref } from 'vue'
 import type { LoginRequest } from '@/api/user/type'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import { useUserStore } from '@/stores/user'
+import useStore from '@/stores'
 
 const loading = ref<boolean>(false)
-const userStore = useUserStore()
+const { user } = useStore()
 const router = useRouter()
 const loginForm = ref<LoginRequest>({
   username: '',
@@ -88,7 +88,7 @@ const loginFormRef = ref<FormInstance>()
 const login = () => {
   loginFormRef.value?.validate().then(() => {
     loading.value = true
-    userStore
+    user
       .login(loginForm.value.username, loginForm.value.password)
       .then(() => {
         router.push({ name: 'home' })

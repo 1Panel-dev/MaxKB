@@ -7,16 +7,13 @@ import {
   type RouteRecordRaw,
   type RouteRecordName
 } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { store } from '@/stores'
+import useStore from '@/stores';
 import { routes } from '@/router/routes'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes
 })
 
-//  解决刷新获取用户信息问题
-let userStore: any = null
 
 // 路由前置拦截器
 router.beforeEach(
@@ -25,21 +22,19 @@ router.beforeEach(
       next()
       return
     }
-    if (userStore === null) {
-      userStore = useUserStore(store)
-    }
+    const { user } = useStore();
     const notAuthRouteNameList = ['register', 'login', 'forgot_password', 'reset_password']
 
     if (!notAuthRouteNameList.includes(to.name ? to.name.toString() : '')) {
-      const token = userStore.getToken()
+      const token = user.getToken()
       if (!token) {
         next({
           path: '/login'
         })
         return
       }
-      if (!userStore.userInfo) {
-        await userStore.profile()
+      if (!user.userInfo) {
+        await user.profile()
       }
     }
     // 判断是否有菜单权限

@@ -1,4 +1,4 @@
-import { Result } from './../../request/Result'
+import { Result } from '@/request/Result'
 import { get, post } from '@/request/index'
 import type {
   LoginRequest,

@@ -12,8 +12,10 @@ import { Sidebar, AppMain } from '../components'
 </script>
 <style lang="scss">
 .sidebar-container {
+  box-sizing: border-box;
   transition: width 0.28s;
   width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
   background-color: var(--sidebar-bg-color);
 }
 .view-container {

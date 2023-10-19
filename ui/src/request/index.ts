@@ -3,8 +3,7 @@ import { MsgError } from '@/utils/message'
 import type { NProgress } from 'nprogress'
 import type { Ref } from 'vue'
 import type { Result } from '@/request/Result'
-import { store } from '@/stores/index'
-import { useUserStore } from '@/stores/user'
+import useStore from '@/stores'
 import router from '@/router'
 
 import { ref, type WritableComputedRef } from 'vue'
@@ -24,10 +23,10 @@ instance.interceptors.request.use(
     if (config.headers === undefined) {
       config.headers = {}
     }
-    const userStore = useUserStore(store)
-    const token = userStore.getToken()
+    const { user } = useStore()
+    const token = user.getToken()
     if (token) {
-      config.headers['AUTHORIZATION'] = token
+      config.headers['AUTHORIZATION'] = `${token}`
     }
     return config
   },
