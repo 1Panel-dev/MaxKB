@@ -150,7 +150,7 @@ export const put: (
   data?: unknown,
   loading?: NProgress | Ref<boolean>
 ) => Promise<Result<any>> = (url, params, data, loading) => {
-  return promise(request({ url: url, method: 'put', data, params }), loading)
+  return promise(request({ url: url, method: 'put', params, data }), loading)
 }
 
 /**
@@ -166,7 +166,7 @@ export const del: (
   data?: unknown,
   loading?: NProgress | Ref<boolean>
 ) => Promise<Result<any>> = (url, params, data, loading) => {
-  return promise(request({ url: url, method: 'delete', data, params }), loading)
+  return promise(request({ url: url, method: 'delete', params, data }), loading)
 }
 
 export const exportExcel: (

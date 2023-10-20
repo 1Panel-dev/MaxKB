@@ -14,6 +14,16 @@
   --el-form-inline-content-width: 100%;
 }
 
+.el-dialog {
+  .dialog-sub-title {
+    color: var(--el-text-color-regular);
+    margin: 5px 0;
+  }
+  .el-dialog__body {
+    padding: 15px var(--el-dialog-padding-primary) 10px !important;
+  }
+}
+
 // 抽屉样式整体修改
 .el-drawer {
   .el-drawer__header {

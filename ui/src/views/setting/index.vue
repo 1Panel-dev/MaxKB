@@ -4,35 +4,43 @@
       <div class="team-member p-15 border-r">
         <h3>团队成员</h3>
         <div class="align-right">
-          <el-button type="primary" link
-            ><AppIcon iconName="app-add-users" class="add-user-icon" />添加成员</el-button
-          >
+          <el-button type="primary" link @click="addMember">
+            <AppIcon iconName="app-add-users" class="add-user-icon" />添加成员
+          </el-button>
         </div>
         <div class="mt-10">
           <el-input v-model="filterText" placeholder="请输入用户名搜索" suffix-icon="Search" />
         </div>
-        <div class="member-list mt-10">
+        <div class="member-list mt-10" v-loading="loading">
           <el-scrollbar>
-            <ul>
-              <template v-for="(item, index) in memberList" :key="index">
-                <li class="active border-b-light flex-between p-15">
+            <ul v-if="filterMember.length > 0">
+              <template v-for="(item, index) in filterMember" :key="index">
+                <li
+                  @click="clickMemberHandle(item.id)"
+                  :class="currentUser === item.id ? 'active' : ''"
+                  class="border-b-light flex-between p-15 cursor"
+                >
                   <div>
-                    <span>{{ item.username }}</span>
-                    <el-tag class="ml-10" effect="dark">所有者</el-tag>
+                    <span class="mr-10">{{ item.username }}</span>
+                    <el-tag effect="dark" v-if="isManage(item.type)">所有者</el-tag>
+                    <el-tag effect="dark" type="warning" v-else>用户</el-tag>
                   </div>
-                  <el-dropdown trigger="click">
+                  <el-dropdown trigger="click" v-if="!isManage(item.type)">
                     <span class="cursor">
                       <el-icon><MoreFilled /></el-icon>
                     </span>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item>移除</el-dropdown-item>
+                        <el-dropdown-item @click.stop="deleteMember(item.id)"
+                          >移除</el-dropdown-item
+                        >
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
                 </li>
               </template>
             </ul>
+            <el-empty description="暂无数据" v-else />
           </el-scrollbar>
         </div>
       </div>
@@ -70,6 +78,7 @@
         </div>
       </div>
     </div>
+    <CreateMemberDialog ref="CreateMemberRef" @refresh="refresh" />
   </LayoutContent>
 </template>
 
@@ -77,11 +86,16 @@
 import { onMounted, ref, watch, nextTick } from 'vue'
 import TeamApi from '@/api/team'
 import type { TeamMember } from '@/api/type/team'
+import CreateMemberDialog from './component/CreateMemberDialog.vue'
+import { MsgSuccess } from '@/utils/message'
 
+const CreateMemberRef = ref<InstanceType<typeof CreateMemberDialog>>()
 const loading = ref(false)
-const memberList = ref<TeamMember[]>([])
-
+const memberList = ref<TeamMember[]>([]) // 全部成员
+const filterMember = ref<TeamMember[]>([]) // 搜索过滤后列表
+const currentUser = ref<String>('')
 const filterText = ref('')
+
 const activeName = ref('dataset')
 const allChecked = ref(false)
 const tableHeight = ref(0)
@@ -125,12 +139,53 @@ const tableData = [
   }
 ]
 
+watch(filterText, (val) => {
+  if (val) {
+    filterMember.value = memberList.value.filter((v) => v.username.includes(val))
+  } else {
+    filterMember.value = memberList.value
+  }
+})
+
+function deleteMember(id: String) {
+  loading.value = true
+  TeamApi.delTeamMember(id)
+    .then(() => {
+      MsgSuccess('删除成功')
+      getMember()
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
+function isManage(type: String) {
+  return type === 'manage'
+}
+
+function clickMemberHandle(id: String) {
+  currentUser.value = id
+}
+function addMember() {
+  CreateMemberRef.value?.open()
+}
+
 function getMember() {
   loading.value = true
-  TeamApi.getTeamMember().then((res) => {
-    memberList.value = res.data
-    loading.value = false
-  })
+  TeamApi.getTeamMember()
+    .then((res) => {
+      memberList.value = res.data
+      filterMember.value = res.data
+      currentUser.value = memberList.value[0].id
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
+function refresh() {
+  getMember()
 }
 
 onMounted(() => {
