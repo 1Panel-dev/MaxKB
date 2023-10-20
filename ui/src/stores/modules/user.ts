@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { User } from '@/api/user/type'
+import type { User } from '@/api/type/user'
 import UserApi from '@/api/user'
 
 export interface appStateTypes {

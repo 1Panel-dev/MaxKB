@@ -96,10 +96,10 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { RegisterRequest } from '@/api/user/type'
+import type { RegisterRequest } from '@/api/type/user'
 import { UserFilled, Lock, Message, Key } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import UserApi from '@/api/user/index'
+import UserApi from '@/api/user'
 import { MsgSuccess } from '@/utils/message'
 import type { FormInstance, FormRules } from 'element-plus'
 

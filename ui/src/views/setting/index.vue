@@ -12,24 +12,28 @@
           <el-input v-model="filterText" placeholder="请输入用户名搜索" suffix-icon="Search" />
         </div>
         <div class="member-list mt-10">
-          <ul>
-            <li class="active border-b-light flex-between p-15">
-              <div>
-                <span>baixin</span>
-                <el-tag class="ml-10" effect="dark">所有者</el-tag>
-              </div>
-              <el-dropdown trigger="click">
-                <span class="cursor">
-                  <el-icon><MoreFilled /></el-icon>
-                </span>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item>移除</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </li>
-          </ul>
+          <el-scrollbar>
+            <ul>
+              <template v-for="(item, index) in memberList" :key="index">
+                <li class="active border-b-light flex-between p-15">
+                  <div>
+                    <span>{{ item.username }}</span>
+                    <el-tag class="ml-10" effect="dark">所有者</el-tag>
+                  </div>
+                  <el-dropdown trigger="click">
+                    <span class="cursor">
+                      <el-icon><MoreFilled /></el-icon>
+                    </span>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item>移除</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </li>
+              </template>
+            </ul>
+          </el-scrollbar>
         </div>
       </div>
       <div class="permission-setting flex">
@@ -71,6 +75,11 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, watch, nextTick } from 'vue'
+import TeamApi from '@/api/team'
+import type { TeamMember } from '@/api/type/team'
+
+const loading = ref(false)
+const memberList = ref<TeamMember[]>([])
 
 const filterText = ref('')
 const activeName = ref('dataset')
@@ -116,6 +125,14 @@ const tableData = [
   }
 ]
 
+function getMember() {
+  loading.value = true
+  TeamApi.getTeamMember().then((res) => {
+    memberList.value = res.data
+    loading.value = false
+  })
+}
+
 onMounted(() => {
   tableHeight.value = window.innerHeight - 300
   window.onresize = () => {
@@ -123,9 +140,7 @@ onMounted(() => {
       tableHeight.value = window.innerHeight - 300
     })()
   }
-  // getSalesList()
-  // getInfo()
-  // getTeams()
+  getMember()
 })
 </script>
 

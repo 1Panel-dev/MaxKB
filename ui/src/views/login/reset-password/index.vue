@@ -56,11 +56,11 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import type { ResetPasswordRequest } from '@/api/user/type'
+import type { ResetPasswordRequest } from '@/api/type/user'
 import { useRouter, useRoute } from 'vue-router'
 import { MsgSuccess } from '@/utils/message'
 import type { FormInstance, FormRules } from 'element-plus'
-import UserApi from '@/api/user/index'
+import UserApi from '@/api/user'
 const router = useRouter()
 const route = useRoute()
 const resetPasswordForm = ref<ResetPasswordRequest>({

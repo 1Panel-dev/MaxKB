@@ -129,10 +129,10 @@ export const get: (
  */
 export const post: (
   url: string,
-  params?: unknown,
   data?: unknown,
+  params?: unknown,
   loading?: NProgress | Ref<boolean>
-) => Promise<Result<any> | any> = (url, params, data, loading) => {
+) => Promise<Result<any> | any> = (url, data, params, loading) => {
   return promise(request({ url: url, method: 'post', data, params }), loading)
 }
 

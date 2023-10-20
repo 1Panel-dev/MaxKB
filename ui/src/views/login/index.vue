@@ -48,7 +48,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { LoginRequest } from '@/api/user/type'
+import type { LoginRequest } from '@/api/type/user'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import useStore from '@/stores'

@@ -7,7 +7,7 @@ import type {
   ResetPasswordRequest,
   User,
   ResetCurrentUserPasswordRequest
-} from './type'
+} from '@/api/type/user'
 import type { Ref } from 'vue'
 
 /**
@@ -20,7 +20,7 @@ const login: (request: LoginRequest, loading?: Ref<boolean>) => Promise<Result<s
   request,
   loading
 ) => {
-  return post('/user/login', undefined, request, loading)
+  return post('/user/login', request, undefined, loading)
 }
 /**
  * 登出
@@ -41,7 +41,7 @@ const register: (request: RegisterRequest, loading?: Ref<boolean>) => Promise<Re
   request,
   loading
 ) => {
-  return post('/user/register', undefined, request, loading)
+  return post('/user/register', request, undefined, loading)
 }
 
 /**
@@ -54,7 +54,7 @@ const checkCode: (request: CheckCodeRequest, loading?: Ref<boolean>) => Promise<
   request,
   loading
 ) => {
-  return post('/user/check_code', undefined, request, loading)
+  return post('/user/check_code', request, undefined, loading)
 }
 
 /**
@@ -68,7 +68,7 @@ const sendEmit: (
   type: 'register' | 'reset_password',
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (email, type, loading) => {
-  return post('/user/send_email', undefined, { email, type }, loading)
+  return post('/user/send_email', { email, type }, undefined, loading)
 }
 /**
  * 发送邮件到当前用户
@@ -88,7 +88,7 @@ const resetCurrentUserPassword: (
   request: ResetCurrentUserPasswordRequest,
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (request, loading) => {
-  return post('/user/current/reset_password', undefined, request, loading)
+  return post('/user/current/reset_password', request, undefined, loading)
 }
 /**
  * 获取用户基本信息
@@ -109,7 +109,7 @@ const resetPassword: (
   request: ResetPasswordRequest,
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (request, loading) => {
-  return post('/user/re_password', undefined, request, loading)
+  return post('/user/re_password', request, undefined, loading)
 }
 
 export default {

@@ -77,14 +77,14 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { ResetCurrentUserPasswordRequest } from '@/api/user/type'
+import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import UserApi from '@/api/user'
-import useStore from '@/stores';
+import useStore from '@/stores'
 import { useRouter } from 'vue-router'
 const router = useRouter()
-const { user } = useStore();
+const { user } = useStore()
 
 const resetPasswordDialog = ref<boolean>(false)
 

@@ -61,10 +61,10 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { CheckCodeRequest } from '@/api/user/type'
+import type { CheckCodeRequest } from '@/api/type/user'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import UserApi from '@/api/user/index'
+import UserApi from '@/api/user'
 import { MsgSuccess } from '@/utils/message'
 
 const router = useRouter()
