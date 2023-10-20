@@ -16,7 +16,7 @@
             <ul v-if="filterMember.length > 0">
               <template v-for="(item, index) in filterMember" :key="index">
                 <li
-                  @click="clickMemberHandle(item.id)"
+                  @click.prevent="clickMemberHandle(item.id)"
                   :class="currentUser === item.id ? 'active' : ''"
                   class="border-b-light flex-between p-15 cursor"
                 >
@@ -31,7 +31,7 @@
                     </span>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item @click.stop="deleteMember(item.id)"
+                        <el-dropdown-item @click.prevent="deleteMember(item.id)"
                           >移除</el-dropdown-item
                         >
                       </el-dropdown-menu>
@@ -44,12 +44,12 @@
           </el-scrollbar>
         </div>
       </div>
-      <div class="permission-setting flex">
+      <div class="permission-setting flex" v-loading="rLoading">
         <div class="team-manage__table p-15">
           <h3>权限设置</h3>
           <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
             <el-tab-pane label="数据集" name="dataset">
-              <el-table :data="tableData" :max-height="tableHeight">
+              <el-table :data="permissionsData" :max-height="tableHeight">
                 <el-table-column prop="date" label="数据集名称" />
                 <el-table-column label="管理" align="center">
                   <template #header>
@@ -91,6 +91,7 @@ import { MsgSuccess } from '@/utils/message'
 
 const CreateMemberRef = ref<InstanceType<typeof CreateMemberDialog>>()
 const loading = ref(false)
+const rLoading = ref(false)
 const memberList = ref<TeamMember[]>([]) // 全部成员
 const filterMember = ref<TeamMember[]>([]) // 搜索过滤后列表
 const currentUser = ref<String>('')
@@ -101,43 +102,7 @@ const allChecked = ref(false)
 const tableHeight = ref(0)
 function handleClick() {}
 
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    date: '2016-05-08',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    date: '2016-05-06',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    date: '2016-05-07',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  }
-]
+const permissionsData = ref([])
 
 watch(filterText, (val) => {
   if (val) {
@@ -146,6 +111,23 @@ watch(filterText, (val) => {
     filterMember.value = memberList.value
   }
 })
+
+function MemberPermissions(id: String) {
+  rLoading.value = true
+  TeamApi.getMemberPermissions(id)
+    .then((res) => {
+      // if (!res.data || Object.keys(res.data).length == 0) {
+      //   permissionsData.value = []
+      // } else {
+      //   permissionsData.value = res.data
+      // }
+
+      rLoading.value = false
+    })
+    .catch(() => {
+      rLoading.value = false
+    })
+}
 
 function deleteMember(id: String) {
   loading.value = true
@@ -165,6 +147,7 @@ function isManage(type: String) {
 
 function clickMemberHandle(id: String) {
   currentUser.value = id
+  MemberPermissions(id)
 }
 function addMember() {
   CreateMemberRef.value?.open()
@@ -177,6 +160,7 @@ function getMember() {
       memberList.value = res.data
       filterMember.value = res.data
       currentUser.value = memberList.value[0].id
+      MemberPermissions(currentUser.value)
       loading.value = false
     })
     .catch(() => {

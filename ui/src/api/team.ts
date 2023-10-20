@@ -28,8 +28,17 @@ const delTeamMember: (member_id: String) => Promise<Result<boolean>> = (member_i
   return del(`${prefix}/${member_id}`)
 }
 
+/**
+ * 获取成员权限
+ * @param 参数 member_id
+ */
+const getMemberPermissions: (member_id: String) => Promise<Result<Object>> = (member_id) => {
+  return get(`${prefix}/${member_id}`)
+}
+
 export default {
   getTeamMember,
   postCreatTeamMember,
-  delTeamMember
+  delTeamMember,
+  getMemberPermissions
 }
