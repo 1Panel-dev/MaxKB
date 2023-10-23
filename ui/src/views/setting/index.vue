@@ -47,29 +47,16 @@
       <div class="permission-setting flex" v-loading="rLoading">
         <div class="team-manage__table p-15">
           <h3>权限设置</h3>
-          <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-            <el-tab-pane label="数据集" name="dataset">
-              <el-table :data="permissionsData" :max-height="tableHeight">
-                <el-table-column prop="date" label="数据集名称" />
-                <el-table-column label="管理" align="center">
-                  <template #header>
-                    <el-checkbox v-model="allChecked" label="管理" />
-                  </template>
-                  <template #default="scope">
-                    <el-checkbox v-model="scope.row.checked" />
-                  </template>
-                </el-table-column>
-                <el-table-column label="使用" align="center">
-                  <template #header>
-                    <el-checkbox v-model="allChecked" label="使用" />
-                  </template>
-                  <template #default="scope">
-                    <el-checkbox v-model="scope.row.checked" />
-                  </template>
-                </el-table-column>
-              </el-table>
+          <el-tabs v-model="activeName" class="demo-tabs">
+            <el-tab-pane
+              v-for="item in settingTags"
+              :key="item.value"
+              :label="item.label"
+              :name="item.value"
+            >
+              <PermissionSetting :data="item.data"></PermissionSetting>
             </el-tab-pane>
-            <el-tab-pane label="应用" name="application">应用</el-tab-pane>
+            <!-- <el-tab-pane label="应用" name="application">应用</el-tab-pane> -->
           </el-tabs>
         </div>
 
@@ -83,11 +70,15 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, nextTick } from 'vue'
+import { onMounted, ref, reactive, watch } from 'vue'
 import TeamApi from '@/api/team'
 import type { TeamMember } from '@/api/type/team'
 import CreateMemberDialog from './component/CreateMemberDialog.vue'
+import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess } from '@/utils/message'
+import { timePanelSharedProps } from 'element-plus/es/components/time-picker/src/props/shared'
+
+const DATASET = 'DATASET'
 
 const CreateMemberRef = ref<InstanceType<typeof CreateMemberDialog>>()
 const loading = ref(false)
@@ -97,12 +88,20 @@ const filterMember = ref<TeamMember[]>([]) // 搜索过滤后列表
 const currentUser = ref<String>('')
 const filterText = ref('')
 
-const activeName = ref('dataset')
-const allChecked = ref(false)
-const tableHeight = ref(0)
-function handleClick() {}
+const activeName = ref(DATASET)
 
-const permissionsData = ref([])
+const settingTags = reactive([
+  {
+    label: '数据集',
+    value: DATASET,
+    data: [] as any
+  }
+  // {
+  //   label: '应用',
+  //   value: 'application',
+  //   data: []
+  // }
+])
 
 watch(filterText, (val) => {
   if (val) {
@@ -116,6 +115,13 @@ function MemberPermissions(id: String) {
   rLoading.value = true
   TeamApi.getMemberPermissions(id)
     .then((res) => {
+      if (!res.data || Object.keys(res.data).length > 0) {
+        settingTags.map((item) => {
+          if (Object.keys(res.data).indexOf(item.value) !== -1) {
+            item.data = res.data[item.value]
+          }
+        })
+      }
       // if (!res.data || Object.keys(res.data).length == 0) {
       //   permissionsData.value = []
       // } else {
@@ -173,12 +179,6 @@ function refresh() {
 }
 
 onMounted(() => {
-  tableHeight.value = window.innerHeight - 300
-  window.onresize = () => {
-    return (() => {
-      tableHeight.value = window.innerHeight - 300
-    })()
-  }
   getMember()
 })
 </script>
