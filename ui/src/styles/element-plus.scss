@@ -1,3 +1,11 @@
+:root {
+  --el-menu-item-height: 45px;
+}
+.el-avatar {
+  --el-avatar-bg-color: var(--el-color-primary);
+  --el-avatar-size-small: 33px;
+  cursor: pointer;
+}
 .el-popper {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -5,4 +13,32 @@
 .el-form {
   --el-form-inline-content-width: 100%;
 }
- 
+
+.el-dialog {
+  .dialog-sub-title {
+    color: var(--el-text-color-regular);
+    margin: 5px 0;
+  }
+  .el-dialog__body {
+    padding: 15px var(--el-dialog-padding-primary) 10px !important;
+  }
+}
+
+// 抽屉样式整体修改
+.el-drawer {
+  .el-drawer__header {
+    padding: 0;
+    margin: 0 24px;
+    height: 56px;
+    border-bottom: 1px solid var(--el-border-color);
+    .el-drawer__title {
+      color: #1f2329;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 24px;
+    }
+  }
+  .el-drawer__body {
+    --el-drawer-padding-primary: 24px;
+  }
+}

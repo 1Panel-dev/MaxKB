@@ -1,7 +1,10 @@
 import { fileURLToPath, URL } from 'node:url'
 import type { ProxyOptions } from 'vite'
 import { defineConfig, loadEnv } from 'vite'
+
 import vue from '@vitejs/plugin-vue'
+import DefineOptions from 'unplugin-vue-define-options/vite'
+
 const envDir = './env'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -13,10 +16,11 @@ export default defineConfig(({ mode }) => {
     rewrite: (path) => path.replace(ENV.VITE_BASE_PATH, '/')
   }
   return {
+    preflight: false,
     lintOnSave: false,
     base: ENV.VITE_BASE_PATH,
     envDir: envDir,
-    plugins: [vue()],
+    plugins: [vue(), DefineOptions()],
     server: {
       cors: true,
       host: '0.0.0.0',

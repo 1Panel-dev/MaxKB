@@ -1,0 +1,104 @@
+<template>
+  <el-table :data="data" :max-height="tableHeight">
+    <el-table-column prop="name" label="数据集名称" />
+    <el-table-column label="管理" align="center">
+      <template #header>
+        <el-checkbox
+          v-model="allChecked[MANAGE]"
+          label="管理"
+          @change="handleCheckAllChange($event, MANAGE)"
+        />
+      </template>
+      <template #default="{ row }">
+        <el-checkbox v-model="row.operate[MANAGE]" @change="checkedOperateChange(MANAGE, row)" />
+      </template>
+    </el-table-column>
+    <el-table-column label="使用" align="center">
+      <template #header>
+        <el-checkbox
+          v-model="allChecked[USE]"
+          label="使用"
+          @change="handleCheckAllChange($event, USE)"
+        />
+      </template>
+      <template #default="{ row }">
+        <el-checkbox v-model="row.operate[USE]" @change="checkedOperateChange(USE, row)" />
+      </template>
+    </el-table-column>
+  </el-table>
+</template>
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue'
+
+const MANAGE = 'MANAGE'
+const USE = 'USE'
+
+const props = defineProps({
+  data: {
+    type: Array,
+    default: () => []
+  },
+  id: String
+})
+
+const emit = defineEmits(['update:data'])
+const allChecked: any = ref({
+  [MANAGE]: false,
+  [USE]: false
+})
+
+const tableHeight = ref(100)
+
+watch(
+  () => props.data,
+  (val) => {
+    Object.keys(allChecked.value).map((item) => {
+      allChecked.value[item] = compare(item)
+    })
+    emit('update:data', val)
+  },
+  {
+    deep: true
+  }
+)
+
+function handleCheckAllChange(val: string | number | boolean, Name: string | number) {
+  if (val) {
+    props.data.map((item: any) => {
+      item.operate[Name] = true
+    })
+  } else {
+    props.data.map((item: any) => {
+      item.operate[Name] = false
+    })
+  }
+}
+function checkedOperateChange(Name: string | number, row: any) {
+  if (Name === MANAGE) {
+    props.data.map((item: any) => {
+      if (item.id === row.id) {
+        item.operate[USE] = true
+      }
+    })
+  }
+  allChecked.value[Name] = compare(Name)
+}
+
+function compare(attrs: string | number) {
+  const filterData = props.data.filter((item: any) => item?.operate[attrs])
+  return props.data.length > 0 && filterData.length === props.data.length
+}
+
+onMounted(() => {
+  tableHeight.value = window.innerHeight - 300
+  window.onresize = () => {
+    return (() => {
+      tableHeight.value = window.innerHeight - 300
+    })()
+  }
+  Object.keys(allChecked.value).map((item) => {
+    allChecked.value[item] = compare(item)
+  })
+})
+</script>
+<style lang="scss" scope></style>

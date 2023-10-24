@@ -1,10 +1,9 @@
 import axios, { type AxiosRequestConfig } from 'axios'
-import { ElMessage } from 'element-plus'
+import { MsgError } from '@/utils/message'
 import type { NProgress } from 'nprogress'
 import type { Ref } from 'vue'
 import type { Result } from '@/request/Result'
-import { store } from '@/stores/index'
-import { useUserStore } from '@/stores/user'
+import useStore from '@/stores'
 import router from '@/router'
 
 import { ref, type WritableComputedRef } from 'vue'
@@ -24,10 +23,10 @@ instance.interceptors.request.use(
     if (config.headers === undefined) {
       config.headers = {}
     }
-    const userStore = useUserStore(store)
-    const token = userStore.getToken()
+    const { user } = useStore()
+    const token = user.getToken()
     if (token) {
-      config.headers['AUTHORIZATION'] = token
+      config.headers['AUTHORIZATION'] = `${token}`
     }
     return config
   },
@@ -41,7 +40,7 @@ instance.interceptors.response.use(
   (response: any) => {
     if (response.data) {
       if (response.data.code !== 200 && !(response.data instanceof Blob)) {
-        ElMessage.error(response.data.message)
+        MsgError(response.data.message)
       }
     }
     if (response.headers['content-type'] === 'application/octet-stream') {
@@ -51,7 +50,7 @@ instance.interceptors.response.use(
   },
   (err: any) => {
     if (err.code === 'ECONNABORTED') {
-      ElMessage.error(err.message)
+      MsgError(err.message)
       console.error(err)
     }
     if (err.response?.status === 401) {
@@ -59,7 +58,7 @@ instance.interceptors.response.use(
     }
 
     if (err.response?.status === 403) {
-      ElMessage.error(
+      MsgError(
         err.response.data && err.response.data.message ? err.response.data.message : '没有权限访问'
       )
     }
@@ -130,10 +129,10 @@ export const get: (
  */
 export const post: (
   url: string,
-  params?: unknown,
   data?: unknown,
+  params?: unknown,
   loading?: NProgress | Ref<boolean>
-) => Promise<Result<any> | any> = (url, params, data, loading) => {
+) => Promise<Result<any> | any> = (url, data, params, loading) => {
   return promise(request({ url: url, method: 'post', data, params }), loading)
 }
 
@@ -151,7 +150,7 @@ export const put: (
   data?: unknown,
   loading?: NProgress | Ref<boolean>
 ) => Promise<Result<any>> = (url, params, data, loading) => {
-  return promise(request({ url: url, method: 'put', data, params }), loading)
+  return promise(request({ url: url, method: 'put', params, data }), loading)
 }
 
 /**
@@ -167,7 +166,7 @@ export const del: (
   data?: unknown,
   loading?: NProgress | Ref<boolean>
 ) => Promise<Result<any>> = (url, params, data, loading) => {
-  return promise(request({ url: url, method: 'delete', data, params }), loading)
+  return promise(request({ url: url, method: 'delete', params, data }), loading)
 }
 
 export const exportExcel: (
