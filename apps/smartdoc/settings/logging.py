@@ -100,6 +100,11 @@ LOGGING = {
             'level': LOG_LEVEL,
             'propagate': False,
         },
+        'sqlalchemy': {
+            'handlers': ['console', 'file', 'syslog'],
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
         'django.db.backends': {
             'handlers': ['console', 'file', 'syslog'],
             'propagate': False,

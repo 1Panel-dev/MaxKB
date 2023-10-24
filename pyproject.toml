@@ -17,6 +17,12 @@ psycopg2-binary = "2.9.7"
 jieba = "^0.42.1"
 diskcache = "^5.6.3"
 pillow = "9.5.0"
+filetype = "^1.2.0"
+chardet = "^5.2.0"
+torch = "^2.1.0"
+sentence-transformers = "^2.2.2"
+blinker = "^1.6.3"
+
 
 [build-system]
 requires = ["poetry-core"]

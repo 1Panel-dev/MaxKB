@@ -1,4 +1,3 @@
-# coding=utf-8
 """
     @project: qabot
     @Author：虎

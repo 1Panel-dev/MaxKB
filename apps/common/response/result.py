@@ -70,7 +70,9 @@ def get_page_api_response(response_data_schema: openapi.Schema):
                                                                                   title="总条数",
                                                                                   default=1,
                                                                                   description="数据总条数"),
-                                                                              "records": response_data_schema,
+                                                                              "records": openapi.Schema(
+                                                                                  type=openapi.TYPE_ARRAY,
+                                                                                  items=response_data_schema),
                                                                               "current": openapi.Schema(
                                                                                   type=openapi.TYPE_INTEGER,
                                                                                   title="当前页",
@@ -109,6 +111,36 @@ def get_api_response(response_data_schema: openapi.Schema):
                                                                           default='成功',
                                                                           description="错误提示"),
                                                                       "data": response_data_schema
+
+                                                                  }
+                                                              ),
+                                                              )})
+
+
+def get_default_response():
+    return get_api_response(openapi.Schema(type=openapi.TYPE_BOOLEAN))
+
+
+def get_api_array_response(response_data_schema: openapi.Schema):
+    """
+    获取统一返回 响应Api
+    """
+    return openapi.Responses(responses={200: openapi.Response(description="响应参数",
+                                                              schema=openapi.Schema(
+                                                                  type=openapi.TYPE_OBJECT,
+                                                                  properties={
+                                                                      'code': openapi.Schema(
+                                                                          type=openapi.TYPE_INTEGER,
+                                                                          title="响应码",
+                                                                          default=200,
+                                                                          description="成功:200 失败:其他"),
+                                                                      "message": openapi.Schema(
+                                                                          type=openapi.TYPE_STRING,
+                                                                          title="提示",
+                                                                          default='成功',
+                                                                          description="错误提示"),
+                                                                      "data": openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                                                             items=response_data_schema)
 
                                                                   }
                                                               ),

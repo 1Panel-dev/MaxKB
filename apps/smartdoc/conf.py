@@ -13,7 +13,7 @@ import os
 import re
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
-
+import torch.backends
 import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -88,7 +88,14 @@ class Config(dict):
         "EMAIL_HOST": "",
         "EMAIL_PORT": 465,
         "EMAIL_HOST_USER": "",
-        "EMAIL_HOST_PASSWORD": ""
+        "EMAIL_HOST_PASSWORD": "",
+        # 向量模型
+        "EMBEDDING_MODEL_NAME": "shibing624/text2vec-base-chinese",
+        "EMBEDDING_DEVICE": "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu",
+        "EMBEDDING_MODEL_PATH": os.path.join(PROJECT_DIR, 'models'),
+        # 向量库配置
+        "VECTOR_STORE_NAME": 'pg_vector'
+
     }
 
     def get_db_setting(self) -> dict:
@@ -120,6 +127,8 @@ class ConfigManager:
     def __init__(self, root_path=None):
         self.root_path = root_path
         self.config = self.config_class()
+        for key in self.config_class.defaults:
+            self.config[key] = self.config_class.defaults[key]
 
     def from_mapping(self, *mapping, **kwargs):
         """Updates the config like :meth:`update` ignoring items with non-upper

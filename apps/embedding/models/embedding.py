@@ -9,7 +9,7 @@
 from django.db import models
 
 from common.field.vector_field import VectorField
-from dataset.models.data_set import DataSet
+from dataset.models.data_set import Document, Paragraph, DataSet
 
 
 class SourceType(models.TextChoices):
@@ -26,7 +26,13 @@ class Embedding(models.Model):
     source_type = models.CharField(verbose_name='资源类型', max_length=1, choices=SourceType.choices,
                                    default=SourceType.PROBLEM)
 
-    dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING, verbose_name="数据集关联")
+    is_active = models.BooleanField(verbose_name="是否可用", max_length=1, default=True)
+
+    dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING, verbose_name="文档关联", db_constraint=False)
+
+    document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, verbose_name="文档关联", db_constraint=False)
+
+    paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, verbose_name="段落关联", db_constraint=False)
 
     embedding = VectorField(verbose_name="向量")
 

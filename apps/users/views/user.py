@@ -22,7 +22,7 @@ from common.constants.permission_constants import PermissionConstants, CompareCo
 from common.response import result
 from smartdoc.settings import JWT_AUTH
 from users.models.user import User as UserModel
-from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, UserSerializer, CheckCodeSerializer, \
+from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
     SendEmailSerializer, UserProfile
 

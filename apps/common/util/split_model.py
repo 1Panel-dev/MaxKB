@@ -7,6 +7,7 @@
     @desc:
 """
 import re
+from functools import reduce
 from typing import List
 
 import jieba
@@ -25,7 +26,7 @@ def get_level_block(text, level_content_list, level_content_index):
         level_content_list) else None
     start_index = text.index(start_content)
     end_index = text.index(next_content) if next_content is not None else len(text)
-    return text[start_index:end_index]
+    return text[start_index:end_index].replace(level_content_list[level_content_index]['content'], "")
 
 
 def to_tree_obj(content, state='title'):
@@ -88,7 +89,7 @@ def to_paragraph(obj: dict):
     content = obj['content']
     return {"keywords": get_keyword(content),
             'parent_chain': list(map(lambda p: p['content'], obj['parent_chain'])),
-            'content': content}
+            'content': ",".join(list(map(lambda p: p['content'], obj['parent_chain']))) + content}
 
 
 def get_keyword(content: str):
@@ -109,13 +110,15 @@ def titles_to_paragraph(list_title: List[dict]):
     :return: 块段落
     """
     if len(list_title) > 0:
-        content = "\n".join(
+        content = "\n,".join(
             list(map(lambda d: d['content'].strip("\r\n").strip("\n").strip("\\s"), list_title)))
 
         return {'keywords': '',
                 'parent_chain': list(
                     map(lambda p: p['content'].strip("\r\n").strip("\n").strip("\\s"), list_title[0]['parent_chain'])),
-                'content': content}
+                'content': ",".join(list(
+                    map(lambda p: p['content'].strip("\r\n").strip("\n").strip("\\s"),
+                        list_title[0]['parent_chain']))) + content}
     return None
 
 
@@ -144,6 +147,15 @@ def to_block_paragraph(tree_data_list: List[dict]):
     return list(map(lambda level: parse_group_key(level_group_dict[level]), level_group_dict))
 
 
+def parse_title_level(text, content_level_pattern: List, index):
+    if len(content_level_pattern) == index:
+        return []
+    result = parse_level(text, content_level_pattern[index])
+    if len(result) == 0 and len(content_level_pattern) > index + 1:
+        return parse_title_level(text, content_level_pattern, index + 1)
+    return result
+
+
 def parse_level(text, pattern: str):
     """
     获取正则匹配到的文本
@@ -151,8 +163,15 @@ def parse_level(text, pattern: str):
     :param pattern:  正则
     :return: 符合正则的文本
     """
-    level_content_list = list(map(to_tree_obj, re.findall(pattern, text, flags=0)))
+    level_content_list = list(map(to_tree_obj, re_findall(pattern, text)))
     return list(map(filter_special_symbol, level_content_list))
+
+
+def re_findall(pattern, text):
+    result = re.findall(pattern, text, flags=0)
+    return list(filter(lambda r: r is not None and len(r) > 0, reduce(lambda x, y: [*x, *y], list(
+        map(lambda row: [*(row if isinstance(row, tuple) else [row])], result)),
+                                                                      [])))
 
 
 def to_flat_obj(parent_chain: List[dict], content: str, state: str):
@@ -194,10 +213,79 @@ def group_by(list_source: List, key):
     return result
 
 
+def result_tree_to_paragraph(result_tree: List[dict], result, parent_chain):
+    """
+    转换为分段对象
+    :param result_tree: 解析文本的树
+    :param result:      传[]  用于递归
+    :param parent_chain: 传[] 用户递归存储数据
+    :return: List[{'problem':'xx','content':'xx'}]
+    """
+    for item in result_tree:
+        print(item)
+        if item.get('state') == 'block':
+            result.append({'title': " ".join(parent_chain), 'content': item.get("content")})
+        children = item.get("children")
+        if children is not None and len(children) > 0:
+            result_tree_to_paragraph(children, result, [*parent_chain, item.get('content')])
+    return result
+
+
+def post_handler_paragraph(content: str, limit: int, with_filter: bool):
+    """
+       根据文本的最大字符分段
+       :param with_filter: 是否过滤特殊字符
+       :param content: 需要分段的文本字段
+       :param limit:   最大分段字符
+       :return: 分段后数据
+       """
+    split_list = content.split('\n')
+    result = []
+    temp_char = ''
+    for split in split_list:
+        if len(temp_char + split) > limit:
+            result.append(temp_char)
+            temp_char = ''
+        temp_char = temp_char + split
+    if len(temp_char) > 0:
+        result.append(temp_char)
+    pattern = "[\\S\\s]{1," + str(limit) + '}'
+    # 如果\n 单段超过限制,则继续拆分
+    s = list(map(lambda row: filter_special_char(row) if with_filter else row, list(
+        reduce(lambda x, y: [*x, *y], list(map(lambda row: list(re.findall(pattern, row)), result)), []))))
+    return s
+
+
+replace_map = {
+    re.compile('\n+'): '\n',
+    re.compile('\\s+'): ' ',
+    re.compile('#+'): "",
+    re.compile("\t+"): ''
+}
+
+
+def filter_special_char(content: str):
+    """
+    过滤特殊字段
+    :param content: 文本
+    :return: 过滤后字段
+    """
+    items = replace_map.items()
+    for key, value in items:
+        content = re.sub(key, value, content)
+    return content
+
+
 class SplitModel:
 
-    def __init__(self, content_level_pattern):
+    def __init__(self, content_level_pattern, with_filter=True, limit=1024):
         self.content_level_pattern = content_level_pattern
+        self.with_filter = with_filter
+        if limit is None or limit > 1024:
+            limit = 1024
+        if limit < 50:
+            limit = 50
+        self.limit = limit
 
     def parse_to_tree(self, text: str, index=0):
         """
@@ -208,23 +296,27 @@ class SplitModel:
         """
         if len(self.content_level_pattern) == index:
             return
-        level_content_list = parse_level(text, pattern=self.content_level_pattern[index])
+        level_content_list = parse_title_level(text, self.content_level_pattern, index)
         for i in range(len(level_content_list)):
             block = get_level_block(text, level_content_list, i)
-            children = self.parse_to_tree(text=block.replace(level_content_list[i]['content'][:-1], ""),
+            children = self.parse_to_tree(text=block,
                                           index=index + 1)
             if children is not None and len(children) > 0:
                 level_content_list[i]['children'] = children
             else:
                 if len(block) > 0:
-                    level_content_list[i]['children'] = [to_tree_obj(block, 'block')]
+                    level_content_list[i]['children'] = list(
+                        map(lambda row: to_tree_obj(row, 'block'),
+                            post_handler_paragraph(block, with_filter=self.with_filter, limit=self.limit)))
         if len(level_content_list) > 0:
             end_index = text.index(level_content_list[0].get('content'))
             if end_index == 0:
                 return level_content_list
             other_content = text[0:end_index]
             if len(other_content.strip()) > 0:
-                level_content_list.append(to_tree_obj(other_content, 'block'))
+                level_content_list = [*level_content_list, *list(
+                    map(lambda row: to_tree_obj(row, 'block'),
+                        post_handler_paragraph(other_content, with_filter=self.with_filter, limit=self.limit)))]
         return level_content_list
 
     def parse(self, text: str):
@@ -234,4 +326,35 @@ class SplitModel:
         :return: 解析后数据 {content:段落数据,keywords:[‘段落关键词’],parent_chain:['段落父级链路']}
         """
         result_tree = self.parse_to_tree(text, 0)
-        return flat_map(to_block_paragraph(result_tree))
+        return result_tree_to_paragraph(result_tree, [], [])
+
+
+split_model_map = {
+    'md': SplitModel(
+        [re.compile("^# .*"), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
+         re.compile("(?<!#)####(?!#).*"), re.compile("(?<!#)#####(?!#).*"),
+         re.compile("(?<!#)#####(?!#).*"),
+         re.compile("(?<! )- .*")]),
+    'default': SplitModel([re.compile("(?<!\n)\n\n.+")])
+}
+
+
+def get_split_model(filename: str):
+    """
+    根据文件名称获取分段模型
+    :param filename: 文件名称
+    :return: 分段模型
+    """
+    if filename.endswith(".md"):
+        return split_model_map.get('md')
+    return split_model_map.get("default")
+
+
+def to_title_tree_string(result_tree: List):
+    f = flat(result_tree, [], [])
+    return "\n│".join(list(map(lambda r: title_tostring(r), list(filter(lambda row: row.get('state') == 'title', f)))))
+
+
+def title_tostring(title_obj):
+    f = "│ ".join(list(map(lambda index: " ", range(0, len(title_obj.get("parent_chain"))))))
+    return f + "├───" + title_obj.get('content')

@@ -162,6 +162,7 @@ cython_debug/
 ui/node_modules
 ui/dist
 apps/static
+models/
 data
 .idea
 .dev

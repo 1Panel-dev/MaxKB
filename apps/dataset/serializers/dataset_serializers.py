@@ -8,7 +8,6 @@
 """
 import os.path
 import uuid
-from functools import reduce
 from typing import Dict
 
 from django.contrib.postgres.fields import ArrayField
@@ -19,11 +18,12 @@ from drf_yasg import openapi
 from rest_framework import serializers
 
 from common.db.search import get_dynamics_model, native_page_search, native_search
+from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.file_util import get_file_content
-from dataset.models.data_set import DataSet, Document, Paragraph
-from dataset.serializers.document_serializers import CreateDocumentSerializers
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem
+from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
 from setting.models import AuthOperate
 from smartdoc.conf import PROJECT_DIR
 from users.models import User
@@ -81,12 +81,12 @@ class DataSetSerializers(serializers.ModelSerializer):
             user_id = self.data.get("user_id")
             query_set_dict = {}
             query_set = QuerySet(model=get_dynamics_model(
-                {'dataset.name': models.CharField(), 'dataset.desc': models.CharField(),
+                {'temp.name': models.CharField(), 'temp.desc': models.CharField(),
                  "document_temp.char_length": models.IntegerField()}))
-            if "desc" in self.data:
-                query_set = query_set.filter(**{'dataset.desc__contains': self.data.get("desc")})
-            if "name" in self.data:
-                query_set = query_set.filter(**{'dataset.name__contains': self.data.get("name")})
+            if "desc" in self.data and self.data.get('desc') is not None:
+                query_set = query_set.filter(**{'temp.desc__contains': self.data.get("desc")})
+            if "name" in self.data and self.data.get('name') is not None:
+                query_set = query_set.filter(**{'temp.name__contains': self.data.get("name")})
 
             query_set_dict['default_sql'] = query_set
 
@@ -133,9 +133,7 @@ class DataSetSerializers(serializers.ModelSerializer):
 
         @staticmethod
         def get_response_body_api():
-            return openapi.Schema(type=openapi.TYPE_ARRAY,
-                                  title="数据集列表", description="数据集列表",
-                                  items=DataSetSerializers.Operate.get_response_body_api())
+            return DataSetSerializers.Operate.get_response_body_api()
 
     class Create(ApiMixin, serializers.Serializer):
         """
@@ -157,7 +155,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                                                                        message="数据集名称在1-256个字符之间")
                                      ])
 
-        documents = CreateDocumentSerializers(required=False, many=True)
+        documents = DocumentInstanceSerializer(required=False, many=True)
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -168,28 +166,46 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset_id = uuid.uuid1()
             dataset = DataSet(
                 **{'id': dataset_id, 'name': self.data.get("name"), 'desc': self.data.get('desc'), 'user': user})
-            document_model_list = []
-            paragraph_model_list = []
-            if 'documents' in self.data:
-                documents = self.data.get('documents')
-                for document in documents:
-                    document_model = Document(**{'dataset': dataset, 'id': uuid.uuid1(), 'name': document.get('name'),
-                                                 'char_length': reduce(lambda x, y: x + y,
-                                                                       list(
-                                                                           map(lambda p: len(p),
-                                                                               document.get("paragraphs"))), 0)})
-                    document_model_list.append(document_model)
-                    if 'paragraphs' in document:
-                        paragraph_model_list += list(map(lambda p: Paragraph(
-                            **{'document': document_model, 'id': uuid.uuid1(), 'content': p}),
-                                                         document.get('paragraphs')))
             # 插入数据集
             dataset.save()
-            # 插入文档
-            QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
-            # 插入段落
-            QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
-            return True
+            for document in self.data.get('documents') if 'documents' in self.data else []:
+                DocumentSerializers.Create(data={'dataset_id': dataset_id}).save(document, with_valid=True,
+                                                                                 with_embedding=False)
+            ListenerManagement.embedding_by_dataset_signal.send(str(dataset.id))
+            return {**DataSetSerializers(dataset).data,
+                    'document_list': DocumentSerializers.Query(data={'dataset_id': dataset_id}).list(with_valid=True)}
+
+        @staticmethod
+        def get_response_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['id', 'name', 'desc', 'user_id', 'char_length', 'document_count',
+                          'update_time', 'create_time', 'document_list'],
+                properties={
+                    'id': openapi.Schema(type=openapi.TYPE_STRING, title="id",
+                                         description="id", default="xx"),
+                    'name': openapi.Schema(type=openapi.TYPE_STRING, title="名称",
+                                           description="名称", default="测试数据集"),
+                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title="描述",
+                                           description="描述", default="测试数据集描述"),
+                    'user_id': openapi.Schema(type=openapi.TYPE_STRING, title="所属用户id",
+                                              description="所属用户id", default="user_xxxx"),
+                    'char_length': openapi.Schema(type=openapi.TYPE_STRING, title="字符数",
+                                                  description="字符数", default=10),
+                    'document_count': openapi.Schema(type=openapi.TYPE_STRING, title="文档数量",
+                                                     description="文档数量", default=1),
+                    'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间",
+                                                  description="修改时间",
+                                                  default="1970-01-01 00:00:00"),
+                    'create_time': openapi.Schema(type=openapi.TYPE_STRING, title="创建时间",
+                                                  description="创建时间",
+                                                  default="1970-01-01 00:00:00"
+                                                  ),
+                    'document_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档列表",
+                                                    description="文档列表",
+                                                    items=DocumentSerializers.Operate.get_response_body_api())
+                }
+            )
 
         @staticmethod
         def get_request_body_api():
@@ -200,7 +216,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="数据集名称", description="数据集名称"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="数据集描述", description="数据集描述"),
                     'documents': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档数据", description="文档数据",
-                                                items=CreateDocumentSerializers().get_request_body_api()
+                                                items=DocumentSerializers().Create.get_request_body_api()
                                                 )
                 }
             )
@@ -217,10 +233,11 @@ class DataSetSerializers(serializers.ModelSerializer):
         def delete(self):
             self.is_valid()
             dataset = QuerySet(DataSet).get(id=self.data.get("id"))
-            document_list = QuerySet(Document).filter(dataset=dataset)
-            QuerySet(Paragraph).filter(document__in=document_list).delete()
-            document_list.delete()
+            QuerySet(Document).filter(dataset=dataset).delete()
+            QuerySet(Paragraph).filter(dataset=dataset).delete()
+            QuerySet(Problem).filter(dataset=dataset).delete()
             dataset.delete()
+            ListenerManagement.delete_embedding_by_dataset_signal.send(self.data.get('id'))
             return True
 
         def one(self, user_id, with_valid=True):
@@ -303,9 +320,9 @@ class DataSetSerializers(serializers.ModelSerializer):
 
         @staticmethod
         def get_request_params_api():
-            return [openapi.Parameter(name='id',
+            return [openapi.Parameter(name='dataset_id',
                                       in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
-                                      required=False,
+                                      required=True,
                                       description='数据集id')
                     ]
