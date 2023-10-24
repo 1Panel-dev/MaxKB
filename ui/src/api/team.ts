@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del } from '@/request/index'
+import { get, post, del, put } from '@/request/index'
 import type { TeamMember, TeamMemberRequest } from '@/api/type/team'
 // import type { Ref } from 'vue'
 
@@ -36,9 +36,33 @@ const getMemberPermissions: (member_id: String) => Promise<Result<any>> = (membe
   return get(`${prefix}/${member_id}`)
 }
 
+/**
+ * 获取成员权限
+ * @param 参数 member_id
+ * @param 参数 {
+          "team_member_permission_list": [
+            {
+              "target_id": "string",
+              "type": "string",
+              "operate": {
+                "USE": true,
+                "MANAGE": true
+              }
+            }
+          ]
+        }
+ */
+const putMemberPermissions: (member_id: String, body: any) => Promise<Result<any>> = (
+  member_id,
+  body
+) => {
+  return put(`${prefix}/${member_id}`, undefined, body)
+}
+
 export default {
   getTeamMember,
   postCreatTeamMember,
   delTeamMember,
-  getMemberPermissions
+  getMemberPermissions,
+  putMemberPermissions
 }

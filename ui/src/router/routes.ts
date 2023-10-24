@@ -9,6 +9,7 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'home',
     component: () => import('@/layout/app-layout/index.vue'),
+    redirect: '/setting',
     children: [
       {
         path: '/first',

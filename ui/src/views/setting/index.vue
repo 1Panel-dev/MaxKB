@@ -56,12 +56,11 @@
             >
               <PermissionSetting :data="item.data"></PermissionSetting>
             </el-tab-pane>
-            <!-- <el-tab-pane label="应用" name="application">应用</el-tab-pane> -->
           </el-tabs>
         </div>
 
         <div class="team-manage__footer border-t p-15 flex">
-          <el-button type="primary">保存</el-button>
+          <el-button type="primary" @click="submitPermissions">保存</el-button>
         </div>
       </div>
     </div>
@@ -76,7 +75,6 @@ import type { TeamMember } from '@/api/type/team'
 import CreateMemberDialog from './component/CreateMemberDialog.vue'
 import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess } from '@/utils/message'
-import { timePanelSharedProps } from 'element-plus/es/components/time-picker/src/props/shared'
 
 const DATASET = 'DATASET'
 
@@ -95,12 +93,12 @@ const settingTags = reactive([
     label: '数据集',
     value: DATASET,
     data: [] as any
+  },
+  {
+    label: '应用',
+    value: 'application',
+    data: [] as any
   }
-  // {
-  //   label: '应用',
-  //   value: 'application',
-  //   data: []
-  // }
 ])
 
 watch(filterText, (val) => {
@@ -110,6 +108,30 @@ watch(filterText, (val) => {
     filterMember.value = memberList.value
   }
 })
+
+function submitPermissions() {
+  rLoading.value = true
+  const obj: any = {
+    team_member_permission_list: []
+  }
+  settingTags.map((item) => {
+    item.data.map((v: any) => {
+      obj['team_member_permission_list'].push({
+        target_id: v.id,
+        type: v.type,
+        operate: v.operate
+      })
+    })
+  })
+  TeamApi.putMemberPermissions(currentUser.value, obj)
+    .then(() => {
+      MsgSuccess('提交成功')
+      MemberPermissions(currentUser.value)
+    })
+    .catch(() => {
+      rLoading.value = false
+    })
+}
 
 function MemberPermissions(id: String) {
   rLoading.value = true
@@ -122,12 +144,6 @@ function MemberPermissions(id: String) {
           }
         })
       }
-      // if (!res.data || Object.keys(res.data).length == 0) {
-      //   permissionsData.value = []
-      // } else {
-      //   permissionsData.value = res.data
-      // }
-
       rLoading.value = false
     })
     .catch(() => {
