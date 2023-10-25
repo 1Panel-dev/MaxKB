@@ -6,7 +6,7 @@
       </slot>
     </div>
     <el-scrollbar>
-      <div class="content-container__main">
+      <div class="content-container__main main-calc-height">
         <slot></slot>
       </div>
     </el-scrollbar>
@@ -25,7 +25,7 @@ defineProps({
 <style lang="scss" scope>
 .content-container {
   transition: 0.3s;
-
+  padding: var(--app-view-padding);
   .content-container__header {
     font-weight: 600;
     font-size: 18px;

@@ -47,7 +47,7 @@ const allChecked: any = ref({
   [USE]: false
 })
 
-const tableHeight = ref(100)
+const tableHeight = ref(0)
 
 watch(
   () => props.data,

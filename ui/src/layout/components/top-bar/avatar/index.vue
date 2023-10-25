@@ -1,6 +1,6 @@
 <template>
   <el-dropdown trigger="click" type="primary">
-    <el-avatar :size="30"> {{ firstUserName }} </el-avatar>
+    <AppAvatar :name="user.userInfo?.username" />
     <template #dropdown>
       <el-dropdown-menu>
         <el-dropdown-item @click="openResetPassword">
@@ -15,15 +15,13 @@
   <ResetPassword ref="resetPasswordRef"></ResetPassword>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import useStore from '@/stores';
+import { ref } from 'vue'
+import useStore from '@/stores'
 import { useRouter } from 'vue-router'
 import ResetPassword from './ResetPasssword.vue'
-const { user } = useStore();
+const { user } = useStore()
 const router = useRouter()
-const firstUserName = computed(() => {
-  return user.userInfo?.username?.substring(0, 1)
-})
+
 const resetPasswordRef = ref<InstanceType<typeof ResetPassword>>()
 
 const openResetPassword = () => {

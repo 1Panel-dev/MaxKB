@@ -20,6 +20,5 @@ import { Sidebar, AppMain } from '../components'
 }
 .view-container {
   width: 100%;
-  padding: var(--app-view-padding);
 }
 </style>

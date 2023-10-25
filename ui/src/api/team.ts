@@ -1,6 +1,6 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
-import type { TeamMember, TeamMemberRequest } from '@/api/type/team'
+import type { TeamMember } from '@/api/type/team'
 // import type { Ref } from 'vue'
 
 const prefix = '/team/member'
@@ -16,8 +16,8 @@ const getTeamMember: () => Promise<Result<TeamMember[]>> = () => {
  * 添加成员
  * @param 参数 { "username_or_email": "string" }
  */
-const postCreatTeamMember: (body: TeamMemberRequest) => Promise<Result<boolean>> = (body) => {
-  return post(`${prefix}`, body)
+const postCreatTeamMember: (data: String) => Promise<Result<boolean>> = (data) => {
+  return post(`${prefix}`, { username_or_email: data })
 }
 
 /**

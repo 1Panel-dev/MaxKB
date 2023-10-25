@@ -136,6 +136,15 @@ ul {
   cursor: pointer;
 }
 
+.ellipsis {
+  display: inline-block;
+  max-width: 100px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+// 内容部分 自适应高度
 .main-calc-height {
   height: calc(100vh - 125px);
 }

@@ -10,8 +10,4 @@ interface TeamMember {
   user_id: string
 }
 
-interface TeamMemberRequest {
-  username_or_email: string
-}
-
-export type { TeamMember, TeamMemberRequest }
+export type { TeamMember }

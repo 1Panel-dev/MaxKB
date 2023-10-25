@@ -81,12 +81,10 @@ const submitMember = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       loading.value = true
-      const obj: any = {
-        username_or_email: memberForm.value.users?.length
-          ? memberForm.value.users.toString()
-          : memberForm.value.user
-      }
-      TeamApi.postCreatTeamMember(obj).then(() => {
+      const submitValue: string = memberForm.value.users?.length
+        ? memberForm.value.users.toString()
+        : memberForm.value.user
+      TeamApi.postCreatTeamMember(submitValue).then(() => {
         MsgSuccess('提交成功')
         emit('refresh')
         dialogVisible.value = false
