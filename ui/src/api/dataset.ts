@@ -24,7 +24,17 @@ const getAllDateset: (param?: String) => Promise<Result<any[]>> = (param) => {
   return get(`${prefix}`, param && { search_text: param })
 }
 
+/**
+ * 删除数据集
+ * @param 参数 dataset_id
+ */
+const delDateset: (dataset_id: String) => Promise<Result<boolean>> = (dataset_id) => {
+  return del(`${prefix}/${dataset_id}`)
+}
+
+
 export default {
   getDateset,
-  getAllDateset
+  getAllDateset,
+  delDateset
 }

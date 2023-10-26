@@ -2,8 +2,8 @@
   <LayoutContent header="团队管理">
     <div class="team-manage flex main-calc-height">
       <div class="team-member p-15 border-r">
-        <h3>团队成员</h3>
-        <div class="align-right">
+        <h4>团队成员</h4>
+        <div class="text-right">
           <el-button type="primary" link @click="addMember">
             <AppIcon iconName="app-add-users" class="add-user-icon" />添加成员
           </el-button>
@@ -25,18 +25,20 @@
                     <el-tag effect="dark" v-if="isManage(item.type)">所有者</el-tag>
                     <el-tag effect="dark" type="warning" v-else>用户</el-tag>
                   </div>
-                  <el-dropdown trigger="click" v-if="!isManage(item.type)">
-                    <span class="cursor">
-                      <el-icon><MoreFilled /></el-icon>
-                    </span>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item @click.prevent="deleteMember(item.id)"
-                          >移除</el-dropdown-item
-                        >
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
+                  <span @click.stop>
+                    <el-dropdown trigger="click" v-if="!isManage(item.type)">
+                      <span class="cursor">
+                        <el-icon><MoreFilled /></el-icon>
+                      </span>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item @click.prevent="deleteMember(item)"
+                            >移除</el-dropdown-item
+                          >
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </span>
                 </li>
               </template>
             </ul>
@@ -46,7 +48,7 @@
       </div>
       <div class="permission-setting flex" v-loading="rLoading">
         <div class="team-manage__table p-15">
-          <h3>权限设置</h3>
+          <h4>权限设置</h4>
           <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane
               v-for="item in settingTags"
@@ -74,7 +76,7 @@ import TeamApi from '@/api/team'
 import type { TeamMember } from '@/api/type/team'
 import CreateMemberDialog from './component/CreateMemberDialog.vue'
 import PermissionSetting from './component/PermissionSetting.vue'
-import { MsgSuccess } from '@/utils/message'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 
 const DATASET = 'DATASET'
 
@@ -151,16 +153,26 @@ function MemberPermissions(id: String) {
     })
 }
 
-function deleteMember(id: String) {
-  loading.value = true
-  TeamApi.delTeamMember(id)
+function deleteMember(row: TeamMember) {
+  MsgConfirm({
+    title: `是否移除成员：${row.username}`,
+    decription: '移除后将会取消成员拥有的数据集和应用权限。',
+    confirmButtonText: '移除',
+  }, {
+    confirmButtonClass: 'danger',
+  })
     .then(() => {
-      MsgSuccess('删除成功')
-      getMember()
+      loading.value = true
+      TeamApi.delTeamMember(row.id)
+        .then(() => {
+          MsgSuccess('删除成功')
+          getMember()
+        })
+        .catch(() => {
+          loading.value = false
+        })
     })
-    .catch(() => {
-      loading.value = false
-    })
+    .catch(() => {})
 }
 
 function isManage(type: String) {

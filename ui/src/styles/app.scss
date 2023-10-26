@@ -12,7 +12,7 @@ body {
   font-size: 14px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+  font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Hiragino Sans GB', 'Microsoft YaHei',
     '微软雅黑', Arial, sans-serif;
   height: 100%;
   margin: 0;
@@ -67,6 +67,22 @@ ul {
   background-color: transparent;
 }
 
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
 .w-full {
   width: 100%;
 }
@@ -74,12 +90,18 @@ ul {
   height: 100%;
 }
 
+.mt-8 {
+  margin-top: 8px;
+}
 .mt-10 {
   margin-top: 10px;
 }
 
 .ml-10 {
   margin-left: 10px;
+}
+.ml-16 {
+  margin-left: 16px;
 }
 .mr-10 {
   margin-right: 10px;
@@ -112,9 +134,13 @@ ul {
 }
 
 .align-center {
+  align-items: center;
+}
+
+.text-center {
   text-align: center;
 }
-.align-right {
+.text-right {
   text-align: right;
 }
 
@@ -132,7 +158,7 @@ ul {
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
-.cursor{
+.cursor {
   cursor: pointer;
 }
 

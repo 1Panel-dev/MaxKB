@@ -1,4 +1,6 @@
-import { ElMessageBox, ElMessage } from 'element-plus'
+import { h } from 'vue'
+import { ElMessageBox, ElMessage, ElIcon } from 'element-plus'
+import { WarningFilled } from '@element-plus/icons-vue'
 
 export const MsgSuccess = (message: string) => {
   ElMessage.success({
@@ -36,10 +38,25 @@ export const MsgError = (message: string) => {
   })
 }
 
-export const MsgConfirm = (message: string, options = {}) => {
+/**
+ * 删除数据集
+ * @param 参数 message: {title, decription,type}
+ */
+
+export const MsgConfirm = ({ title, decription }: any, options?: any) => {
+  const message: any = h('div', { class: 'app-confirm' }, [
+    h('h4', { class: 'app-confirm-title flex align-center' }, [
+      h(ElIcon, { class: 'icon' }, [h(WarningFilled)]),
+      h('span', { class: 'ml-16' }, title)
+    ]),
+    h('div', { class: 'app-confirm-decription mt-8' }, decription)
+  ])
+
   const defaultOptions: Object = {
-    type: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
     ...options
   }
-  return ElMessageBox.confirm(message, '确认', defaultOptions)
+  return ElMessageBox({ message, ...defaultOptions })
 }

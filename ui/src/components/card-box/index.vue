@@ -2,11 +2,11 @@
   <el-card shadow="hover" class="card-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
     <div class="card-header">
       <slot name="header">
-        <div class="title flex">
+        <div class="title flex align-center">
           <AppAvatar class="mr-10">
             <el-icon><Document /></el-icon>
           </AppAvatar>
-          <h3>{{ title }}</h3>
+          <h4>{{ title }}</h4>
         </div>
       </slot>
     </div>
@@ -50,14 +50,6 @@ function cardLeave() {
   position: relative;
   min-height: 150px;
 
-  .card-header {
-    .title {
-      align-items: center;
-      h3 {
-        font-size: 15px;
-      }
-    }
-  }
   .description {
     display: -webkit-box;
     -webkit-box-orient: vertical;

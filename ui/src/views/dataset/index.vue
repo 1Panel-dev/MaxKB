@@ -1,7 +1,7 @@
 <template>
   <LayoutContent header="数据集">
     <div class="dataset-list-container p-15">
-      <div class="align-right">
+      <div class="text-right">
         <el-input
           v-model="filterText"
           placeholder="搜索内容"
@@ -15,14 +15,14 @@
           v-infinite-scroll="loadDataset"
           :infinite-scroll-disabled="disabledScroll"
         >
-          <el-col :xs="24" :sm="12" :md="6" :lg="6" :xl="4" class="mt-10">
+          <el-col :xs="24" :sm="12" :md="6" :lg="5" :xl="4" class="mt-10">
             <CardAdd title="创建数据集" />
           </el-col>
           <el-col
             :xs="24"
             :sm="12"
             :md="6"
-            :lg="6"
+            :lg="5"
             :xl="4"
             v-for="(item, index) in datasetList"
             :key="index"
@@ -31,7 +31,7 @@
             <CardBox :title="item.name" :description="item.desc" class="cursor">
               <template #mouseEnter>
                 <div class="delete-button">
-                  <el-button type="primary" link>
+                  <el-button type="primary" link @click.stop="deleteDateset(item)">
                     <el-icon><Delete /></el-icon>
                   </el-button>
                 </div>
@@ -54,6 +54,7 @@
 import { ref, onMounted } from 'vue'
 import datasetApi from '@/api/dataset'
 import type { datasetListRequest } from '@/api/type/dataset'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 
 const loading = ref(false)
 const filterText = ref('')
@@ -65,7 +66,30 @@ const pageConfig = ref<datasetListRequest>({
   search_text: ''
 })
 
-function loadDataset() {}
+function loadDataset() { }
+
+
+function deleteDateset(row: any) {
+  MsgConfirm({
+    title: `是否删除数据集：${row.name}？`,
+    decription: '此数据集关联2个应用，删除后无法恢复，请谨慎操作。',
+    confirmButtonText: '删除',
+  }, {
+    confirmButtonClass: 'danger',
+  })
+    .then(() => {
+      loading.value = true
+      datasetApi.delDateset(row.id)
+        .then(() => {
+          MsgSuccess('删除成功')
+          getList()
+        })
+        .catch(() => {
+          loading.value = false
+        })
+    })
+    .catch(() => {})
+}
 
 function getList() {
   loading.value = true

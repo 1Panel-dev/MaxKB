@@ -1,5 +1,5 @@
 <template>
-  <div class="top-menu-container flex h-full">
+  <div class="top-menu-container flex align-center h-full">
     <MenuItem
       :menu="menu"
       v-hasPermission="menu.meta?.permission"
@@ -20,7 +20,6 @@ const topMenuList = computed(() => {
 </script>
 <style lang="scss" scope>
 .top-menu-container {
-  align-items: center;
   margin-bottom: -1px;
 }
 </style>

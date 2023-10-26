@@ -1,5 +1,6 @@
 :root {
   --el-menu-item-height: 45px;
+  --el-text-color-primary: '#1F2329';
 }
 .el-avatar {
   --el-avatar-bg-color: var(--el-color-primary);
@@ -21,6 +22,63 @@
   }
   .el-dialog__body {
     padding: 15px var(--el-dialog-padding-primary) 10px !important;
+  }
+}
+
+.el-message-box {
+  padding-bottom: 24px;
+  .app-confirm {
+    .app-confirm-title {
+      color: var(--el-text-color-primary);
+    }
+    .icon {
+      font-size: 24px;
+      color: var(--el-color-warning);
+    }
+    .app-confirm-decription {
+      margin-left: 40px;
+    }
+  }
+}
+
+
+.el-message-box__content {
+  padding: 24px;
+  color: var(--el-text-color-primary);
+}
+.el-message-box__btns {
+  padding: 5px 24px 0;
+  button {
+    min-width: 80px;
+    &:nth-child(2) {
+      margin-left: 12px;
+    }
+  }
+  button.danger {
+    background: var(--el-color-danger);
+    border: var(--el-color-danger);
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .el-col-lg-5 {
+    display: block;
+    max-width: 25%;
+    flex: 0 0 25%;
+  }
+}
+@media only screen and (min-width: 1400px) {
+  .el-col-lg-5 {
+    display: block;
+    max-width: 20.8333333333%;
+    flex: 0 0 20.8333333333%;
+  }
+}
+@media only screen and (min-width: 1920px) {
+  .el-col-xl-4 {
+    display: block;
+    max-width: 16.6666666667%;
+    flex: 0 0 16.6666666667%;
   }
 }
 

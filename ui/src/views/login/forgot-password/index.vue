@@ -1,7 +1,7 @@
 <template>
   <login-layout>
     <LoginContainer>
-      <h3 class="mb-20">忘记密码</h3>
+      <h4 class="mb-20">忘记密码</h4>
       <el-form
         class="register-form"
         ref="resetPasswordFormRef"
