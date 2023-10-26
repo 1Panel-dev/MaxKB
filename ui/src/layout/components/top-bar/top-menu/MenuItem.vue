@@ -20,7 +20,10 @@ const props = defineProps<{
 }>()
 
 const isActive = computed(() => {
-  return route.name == props.menu.name && route.path == props.menu.path
+  return (
+    (route.name == props.menu.name && route.path == props.menu.path) ||
+    route?.meta?.activeMenu == props.menu.path
+  )
 })
 </script>
 <style lang="scss" scoped>

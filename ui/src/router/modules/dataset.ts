@@ -11,6 +11,13 @@ const datasetRouter = {
       component: () => import('@/views/dataset/index.vue')
     },
     {
+      path: '/dataset/create',
+      name: 'CreateDataset',
+      meta: { activeMenu: '/dataset' },
+      component: () => import('@/views/dataset/CreateDataset.vue'),
+      hidden: true
+    },
+    {
       path: '/dataset/doc',
       name: 'DatasetDoc',
       meta: { icon: 'House', title: '文档', activeMenu: '/dataset' },

@@ -16,7 +16,7 @@
           :infinite-scroll-disabled="disabledScroll"
         >
           <el-col :xs="24" :sm="12" :md="6" :lg="5" :xl="4" class="mt-10">
-            <CardAdd title="创建数据集" />
+            <CardAdd title="创建数据集" @click="router.push({ path: '/dataset/create' })" />
           </el-col>
           <el-col
             :xs="24"
@@ -55,6 +55,8 @@ import { ref, onMounted } from 'vue'
 import datasetApi from '@/api/dataset'
 import type { datasetListRequest } from '@/api/type/dataset'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const loading = ref(false)
 const filterText = ref('')
