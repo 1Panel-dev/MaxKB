@@ -144,6 +144,10 @@ h4 {
   text-align: right;
 }
 
+.vertical-middle {
+  vertical-align: middle;
+}
+
 .border-b {
   border-bottom: 1px solid var(--el-border-color);
 }
@@ -173,4 +177,22 @@ h4 {
 // 内容部分 自适应高度
 .main-calc-height {
   height: calc(100vh - 125px);
+  box-sizing: border-box;
+}
+
+// 标题前带竖线样式
+.title-decoration-1 {
+  position: relative;
+  padding-left: 15px;
+  &:before {
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 90%;
+    content: '';
+    background: var(--el-color-primary);
+    border-radius: 10px;
+  }
 }

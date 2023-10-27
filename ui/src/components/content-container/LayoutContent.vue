@@ -2,7 +2,8 @@
   <div class="content-container">
     <div class="content-container__header mb-10" v-if="slots.header || header">
       <slot name="header">
-        <span>{{ header }}</span>
+        <back-button :to="backTo" v-if="showBack"></back-button>
+        <span class="vertical-middle">{{ header }}</span>
       </slot>
     </div>
     <el-scrollbar>
@@ -14,11 +15,16 @@
 </template>
 
 <script setup lang="ts">
-import { useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 defineOptions({ name: 'LayoutContent' })
 const slots = useSlots()
-defineProps({
-  header: String
+const props = defineProps({
+  header: String,
+  backTo: String
+})
+const showBack = computed(() => {
+  const { backTo } = props
+  return backTo
 })
 </script>
 

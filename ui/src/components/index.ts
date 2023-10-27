@@ -7,7 +7,7 @@ import LayoutContent from './content-container/LayoutContent.vue'
 import TagsInput from './tags-input/index.vue'
 import CardBox from './card-box/index.vue'
 import CardAdd from './card-add/index.vue'
-
+import BackButton from './back-button/index.vue'
 
 
 export default {
@@ -20,5 +20,6 @@ export default {
     app.component(TagsInput.name, TagsInput)
     app.component(CardBox.name, CardBox)
     app.component(CardAdd.name, CardAdd)
+    app.component(BackButton.name, BackButton)
   }
 }

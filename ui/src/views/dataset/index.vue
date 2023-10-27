@@ -55,8 +55,8 @@ import { ref, onMounted } from 'vue'
 import datasetApi from '@/api/dataset'
 import type { datasetListRequest } from '@/api/type/dataset'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { useRouter } from 'vue-router';
-const router = useRouter();
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const loading = ref(false)
 const filterText = ref('')
@@ -68,20 +68,23 @@ const pageConfig = ref<datasetListRequest>({
   search_text: ''
 })
 
-function loadDataset() { }
-
+function loadDataset() {}
 
 function deleteDateset(row: any) {
-  MsgConfirm({
-    title: `是否删除数据集：${row.name}？`,
-    decription: '此数据集关联2个应用，删除后无法恢复，请谨慎操作。',
-    confirmButtonText: '删除',
-  }, {
-    confirmButtonClass: 'danger',
-  })
+  MsgConfirm(
+    {
+      title: `是否删除数据集：${row.name}？`,
+      decription: '此数据集关联2个应用，删除后无法恢复，请谨慎操作。',
+      confirmButtonText: '删除'
+    },
+    {
+      confirmButtonClass: 'danger'
+    }
+  )
     .then(() => {
       loading.value = true
-      datasetApi.delDateset(row.id)
+      datasetApi
+        .delDateset(row.id)
         .then(() => {
           MsgSuccess('删除成功')
           getList()

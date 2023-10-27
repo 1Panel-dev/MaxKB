@@ -2,6 +2,10 @@
   --el-menu-item-height: 45px;
   --el-text-color-primary: '#1F2329';
 }
+
+.el-button {
+  padding: 5px 12px;
+}
 .el-avatar {
   --el-avatar-bg-color: var(--el-color-primary);
   --el-avatar-size-small: 33px;
@@ -40,7 +44,6 @@
     }
   }
 }
-
 
 .el-message-box__content {
   padding: 24px;
