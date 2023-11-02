@@ -9,14 +9,17 @@ html {
 }
 
 body {
-  font-size: 14px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Hiragino Sans GB', 'Microsoft YaHei',
     '微软雅黑', Arial, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
   height: 100%;
   margin: 0;
   padding: 0;
+  color: var(--app-text-color-primary);
 }
 
 #app {
@@ -73,6 +76,7 @@ h1 {
 
 h2 {
   font-size: 20px;
+  font-weight: 500;
 }
 
 h3 {
@@ -93,28 +97,34 @@ h4 {
 .mt-8 {
   margin-top: 8px;
 }
-.mt-10 {
-  margin-top: 10px;
+.mt-16 {
+  margin-top: 16px;
+}
+.mb-8 {
+  margin-bottom: 8px;
+}
+.mb-16 {
+  margin-bottom: 16px;
 }
 
-.ml-10 {
-  margin-left: 10px;
+.ml-8 {
+  margin-left: 8px;
 }
 .ml-16 {
   margin-left: 16px;
 }
-.mr-10 {
-  margin-right: 10px;
-}
-.mb-10 {
-  margin-bottom: 10px;
-}
-.mb-20 {
-  margin-bottom: 20px;
+.mr-8 {
+  margin-right: 8px;
 }
 
-.p-15 {
-  padding: 15px;
+.p-8 {
+  padding: 8px;
+}
+.p-16 {
+  padding: 16px;
+}
+.p-24 {
+  padding: 24px;
 }
 
 .flex {
@@ -176,8 +186,7 @@ h4 {
 
 // 内容部分 自适应高度
 .main-calc-height {
-  height: calc(100vh - 125px);
-  box-sizing: border-box;
+  height: calc(100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 40px);
 }
 
 // 标题前带竖线样式
@@ -195,4 +204,20 @@ h4 {
     background: var(--el-color-primary);
     border-radius: 10px;
   }
+}
+
+.app-logo-font {
+  background: var(--app-logo-color);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: Arial Black;
+  font-style: normal;
+  font-weight: 900;
+}
+
+// tag
+.default-tag {
+  background: var(--tag-deflaut-bg);
+  color: var(--tag-deflaut-color);
 }

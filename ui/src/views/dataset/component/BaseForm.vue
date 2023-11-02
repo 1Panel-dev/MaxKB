@@ -1,5 +1,5 @@
 <template>
-  <h4 class="title-decoration-1 mb-10">基本信息</h4>
+  <h4 class="title-decoration-1 mb-8">基本信息</h4>
   <el-form ref="FormRef" :model="form" :rules="rules" label-position="top">
     <el-form-item label="数据集名称" prop="name">
       <el-input

@@ -3,14 +3,14 @@
     <div class="card-header">
       <slot name="header">
         <div class="title flex align-center">
-          <AppAvatar class="mr-10">
+          <AppAvatar class="mr-8">
             <el-icon><Document /></el-icon>
           </AppAvatar>
           <h4>{{ title }}</h4>
         </div>
       </slot>
     </div>
-    <div class="description mt-10">
+    <div class="description mt-8">
       <slot name="description">
         {{ description }}
       </slot>

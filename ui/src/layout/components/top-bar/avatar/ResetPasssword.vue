@@ -38,7 +38,6 @@
           class="input-item"
           :disabled="true"
           v-bind:modelValue="user.userInfo?.email"
-          @change="() => {}"
           placeholder="请输入邮箱"
         >
           <template #prepend>

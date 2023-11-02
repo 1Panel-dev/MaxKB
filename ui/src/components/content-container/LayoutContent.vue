@@ -1,9 +1,9 @@
 <template>
   <div class="content-container">
-    <div class="content-container__header mb-10" v-if="slots.header || header">
+    <div class="content-container__header mt-16 mb-16" v-if="slots.header || header">
       <slot name="header">
         <back-button :to="backTo" v-if="showBack"></back-button>
-        <span class="vertical-middle">{{ header }}</span>
+        <h2 class="vertical-middle">{{ header }}</h2>
       </slot>
     </div>
     <el-scrollbar>
@@ -31,18 +31,14 @@ const showBack = computed(() => {
 <style lang="scss" scope>
 .content-container {
   transition: 0.3s;
-  padding: var(--app-view-padding);
+  padding: 0 var(--app-view-padding) var(--app-view-padding);
   .content-container__header {
-    font-weight: 600;
-    font-size: 18px;
     box-sizing: border-box;
   }
   .content-container__main {
     background-color: var(--app-view-bg-color);
-    border-radius: 6px;
+    border-radius: 4px;
     box-sizing: border-box;
-    // overflow: auto;
-    // height: 100%;
   }
 }
 </style>

@@ -4,9 +4,9 @@
     :class="isActive ? 'active' : ''"
     @click="router.push({ name: menu.name })"
   >
-    <div class="icon">
+    <!-- <div class="icon">
       <AppIcon :iconName="menu.meta ? (menu.meta.icon as string) : '404'" />
-    </div>
+    </div> -->
     <div class="title">{{ menu.meta?.title }}</div>
   </div>
 </template>
@@ -28,8 +28,10 @@ const isActive = computed(() => {
 </script>
 <style lang="scss" scoped>
 .menu-item-container {
-  padding: 0 20px;
+  margin-right: 28px;
   cursor: pointer;
+  font-size: 16px;
+  position: relative;
   .icon {
     font-size: 15px;
     margin-right: 5px;
@@ -41,9 +43,15 @@ const isActive = computed(() => {
 }
 
 .active {
-  font-weight: 600;
   color: var(--el-color-primary);
-  background-color: var(--el-color-primary-light-9);
-  border-bottom: 3px solid var(--el-color-primary);
+  &::after {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    content: '';
+    background-color: var(--el-color-primary-light-9);
+    border-bottom: 3px solid var(--el-color-primary);
+  }
 }
 </style>

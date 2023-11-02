@@ -1,5 +1,5 @@
 <template>
-  <el-icon class="back-button cursor mr-10 vertical-middle" @click="jump">
+  <el-icon class="back-button cursor mr-8 vertical-middle" @click="jump">
     <Back />
   </el-icon>
 </template>

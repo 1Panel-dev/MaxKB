@@ -3,7 +3,7 @@
     <div class="login-title">
       <div class="title flex-center">
         <div class="logo"></div>
-        <div>{{ title || defaultTitle }}</div>
+        <div class="app-logo-font">{{ title || defaultTitle }}</div>
       </div>
       <div class="sub-title" v-if="subTitle">{{ subTitle }}</div>
     </div>
@@ -27,8 +27,6 @@ defineProps({
 
     .title {
       font-size: 28px;
-      font-weight: 900;
-      color: #101010;
       height: 60px;
       .logo {
         background-image: url('@/assets/logo.png');

@@ -2,7 +2,7 @@
   <div class="set-rules">
     <el-row>
       <el-col :span="12">
-        <h4 class="title-decoration-1 mb-10">分段规则</h4>
+        <h4 class="title-decoration-1 mb-8">分段规则</h4>
         <el-radio-group v-model="radio1" class="set-rules__radio">
           <div>
             <el-radio label="1" size="large">智能分段（推荐）</el-radio>
@@ -17,7 +17,7 @@
       </el-col>
 
       <el-col :span="12">
-        <h4 class="title-decoration-1 mb-10">分段预览</h4>
+        <h4 class="title-decoration-1 mb-8">分段预览</h4>
         <SegmentPreview />
       </el-col>
     </el-row>

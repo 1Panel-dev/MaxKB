@@ -36,6 +36,7 @@ const activeMenu = computed(() => {
 
 <style lang="scss">
 .sidebar {
+  padding: 8px;
   .el-menu {
     height: 100%;
     border: none;

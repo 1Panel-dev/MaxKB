@@ -2,6 +2,7 @@
   --el-menu-item-height: 45px;
   --el-text-color-primary: '#1F2329';
   --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
+  --el-border-color: rgba(31, 35, 41, 0.15);
 }
 
 .el-button {
@@ -89,6 +90,25 @@
 .el-card {
   --el-card-border-radius: 8px;
   border: none !important;
+}
+.el-dropdown {
+  color: var(--app-text-color-primary);
+}
+
+.el-tag {
+  --el-tag-border-radius: 2px;
+}
+.el-table {
+  --el-table-header-bg-color: #f5f6f7;
+}
+.el-table {
+  --el-table-text-color: var(--app-text-color-primary);
+  thead {
+    color: var(--app-text-color-secondary);
+  }
+  th.el-table__cell {
+    border-top: var(--el-table-border);
+  }
 }
 
 // 抽屉样式整体修改

@@ -1,4 +1,6 @@
 <template>
+  <el-input v-model="filterText" placeholder="搜索" prefix-icon="Search"  class="mb-16" />
+
   <el-table :data="data" :max-height="tableHeight">
     <el-table-column prop="name" label="数据集名称" />
     <el-table-column label="管理" align="center">
@@ -48,6 +50,8 @@ const allChecked: any = ref({
 })
 
 const tableHeight = ref(0)
+
+const filterText = ref('')
 
 watch(
   () => props.data,

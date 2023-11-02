@@ -1,5 +1,5 @@
 <template>
-  <h4 class="title-decoration-1 mb-10">上传文档</h4>
+  <h4 class="title-decoration-1 mb-8">上传文档</h4>
   <el-form ref="FormRef" :model="form" :rules="rules" label-position="top">
     <el-form-item prop="fileList">
       <el-upload

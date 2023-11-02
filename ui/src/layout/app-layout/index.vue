@@ -20,8 +20,9 @@ import { TopBar, AppMain } from '../components'
 .app-main {
   height: calc(100vh - var(--app-header-height));
   padding: 0 !important;
+  box-sizing: border-box;
 }
 .app-header {
-  background-color: var(--app-header-bg-color);
+  background: var(--app-header-bg-color);
 }
 </style>

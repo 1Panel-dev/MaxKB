@@ -1,6 +1,6 @@
 <template>
   <login-layout v-loading="loading">
-    <LoginContainer subTitle="欢迎使用智能客服管理平台">
+    <LoginContainer subTitle="欢迎使用 MaxKB 管理平台">
       <el-form class="login-form" :rules="rules" :model="loginForm" ref="loginFormRef">
         <el-form-item>
           <el-input

@@ -1,11 +1,11 @@
 <template>
-  <div class="dataset-list-container p-15">
+  <div class="dataset-list-container p-24">
     <div class="flex-between">
       <h3>数据集</h3>
       <el-input
         v-model="filterText"
         placeholder="搜索内容"
-        suffix-icon="Search"
+        prefix-icon="Search"
         style="width: 300px"
       />
     </div>
@@ -15,7 +15,7 @@
         v-infinite-scroll="loadDataset"
         :infinite-scroll-disabled="disabledScroll"
       >
-        <el-col :xs="24" :sm="12" :md="6" :lg="5" :xl="4" class="mt-10">
+        <el-col :xs="24" :sm="12" :md="6" :lg="5" :xl="4" class="mt-8">
           <CardAdd title="创建数据集" @click="router.push({ path: '/dataset/create' })" />
         </el-col>
         <el-col
@@ -26,7 +26,7 @@
           :xl="4"
           v-for="(item, index) in datasetList"
           :key="index"
-          class="mt-10"
+          class="mt-8"
         >
           <CardBox :title="item.name" :description="item.desc" class="cursor">
             <template #mouseEnter>
