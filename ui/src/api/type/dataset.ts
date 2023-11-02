@@ -4,4 +4,10 @@ interface datasetListRequest {
   search_text: string
 }
 
-export type { datasetListRequest }
+interface datasetData {
+  name: String
+  desc: String
+  documents?: Array<any>
+}
+
+export type { datasetListRequest, datasetData }

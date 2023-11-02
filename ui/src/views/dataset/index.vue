@@ -1,54 +1,53 @@
 <template>
-  <LayoutContent header="数据集">
-    <div class="dataset-list-container p-15">
-      <div class="text-right">
-        <el-input
-          v-model="filterText"
-          placeholder="搜索内容"
-          suffix-icon="Search"
-          style="width: 300px"
-        />
-      </div>
-      <div>
-        <el-row
-          :gutter="15"
-          v-infinite-scroll="loadDataset"
-          :infinite-scroll-disabled="disabledScroll"
-        >
-          <el-col :xs="24" :sm="12" :md="6" :lg="5" :xl="4" class="mt-10">
-            <CardAdd title="创建数据集" @click="router.push({ path: '/dataset/create' })" />
-          </el-col>
-          <el-col
-            :xs="24"
-            :sm="12"
-            :md="6"
-            :lg="5"
-            :xl="4"
-            v-for="(item, index) in datasetList"
-            :key="index"
-            class="mt-10"
-          >
-            <CardBox :title="item.name" :description="item.desc" class="cursor">
-              <template #mouseEnter>
-                <div class="delete-button">
-                  <el-button type="primary" link @click.stop="deleteDateset(item)">
-                    <el-icon><Delete /></el-icon>
-                  </el-button>
-                </div>
-              </template>
-
-              <template #footer>
-                <div class="footer-content">
-                  {{ item?.document_count || 0 }}文档数 {{ item?.char_length || 0 }}字符数
-                  {{ item?.char_length || 0 }}关联应用
-                </div>
-              </template>
-            </CardBox>
-          </el-col>
-        </el-row>
-      </div>
+  <div class="dataset-list-container p-15">
+    <div class="flex-between">
+      <h3>数据集</h3>
+      <el-input
+        v-model="filterText"
+        placeholder="搜索内容"
+        suffix-icon="Search"
+        style="width: 300px"
+      />
     </div>
-  </LayoutContent>
+    <div>
+      <el-row
+        :gutter="15"
+        v-infinite-scroll="loadDataset"
+        :infinite-scroll-disabled="disabledScroll"
+      >
+        <el-col :xs="24" :sm="12" :md="6" :lg="5" :xl="4" class="mt-10">
+          <CardAdd title="创建数据集" @click="router.push({ path: '/dataset/create' })" />
+        </el-col>
+        <el-col
+          :xs="24"
+          :sm="12"
+          :md="6"
+          :lg="5"
+          :xl="4"
+          v-for="(item, index) in datasetList"
+          :key="index"
+          class="mt-10"
+        >
+          <CardBox :title="item.name" :description="item.desc" class="cursor">
+            <template #mouseEnter>
+              <div class="delete-button">
+                <el-button type="primary" link @click.stop="deleteDateset(item)">
+                  <el-icon><Delete /></el-icon>
+                </el-button>
+              </div>
+            </template>
+
+            <template #footer>
+              <div class="footer-content">
+                {{ item?.document_count || 0 }}文档数 {{ item?.char_length || 0 }}字符数
+                {{ item?.char_length || 0 }}关联应用
+              </div>
+            </template>
+          </CardBox>
+        </el-col>
+      </el-row>
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'

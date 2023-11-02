@@ -1,12 +1,14 @@
 <template>
   <h4 class="title-decoration-1 mb-10">上传文档</h4>
   <el-form ref="FormRef" :model="form" :rules="rules" label-position="top">
-    <el-form-item prop="name">
+    <el-form-item prop="fileList">
       <el-upload
         class="w-full"
         drag
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
         multiple
+        v-model:file-list="form.fileList"
+        action="#"
+        :auto-upload="false"
       >
         <div class="el-upload__text">
           <p>
@@ -30,17 +32,18 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 const form = reactive({
-  name: '',
-  describe: ''
+  fileList: []
 })
 
-const rules = reactive({})
+const rules = reactive({
+  fileList: [{ required: true, message: '请上传文件', trigger: 'change' }]
+})
 const FormRef = ref()
 
 // 表单校验
 function validate() {
   if (!FormRef.value) return
-  return FormRef.value.validate((valid) => {
+  return FormRef.value.validate((valid: any) => {
     return valid
   })
 }
@@ -48,7 +51,8 @@ function validate() {
 onMounted(() => {})
 
 defineExpose({
-  validate
+  validate,
+  form
 })
 </script>
 <style scoped lang="scss">

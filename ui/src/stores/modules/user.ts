@@ -2,14 +2,14 @@ import { defineStore } from 'pinia'
 import type { User } from '@/api/type/user'
 import UserApi from '@/api/user'
 
-export interface appStateTypes {
+export interface userStateTypes {
   userInfo: User | null
   token: any
 }
 
 const useUserStore = defineStore({
   id: 'user',
-  state: (): appStateTypes => ({
+  state: (): userStateTypes => ({
     userInfo: null,
     token: ''
   }),

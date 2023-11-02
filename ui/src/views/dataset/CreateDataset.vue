@@ -8,12 +8,12 @@
       </div>
       <div class="create-dataset__component p-15">
         <el-scrollbar>
-          <component :is="steps[active].component" />
+          <component :is="steps[active].component" :ref="steps[active]?.ref" />
         </el-scrollbar>
       </div>
       <div class="create-dataset__footer text-right p-15 border-t">
         <el-button @click="next">取 消</el-button>
-        <el-button @click="next">上一步</el-button>
+        <el-button @click="prev">上一步</el-button>
         <el-button @click="next" type="primary">下一步</el-button>
         <el-button @click="next" type="primary">开始导入</el-button>
       </div>
@@ -22,24 +22,32 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import BaseForm from './component/BaseForm.vue'
-
-const active = ref(0)
+import UploadDocument from './step/UploadDocument.vue'
+import SetRules from './step/SetRules.vue'
 
 const steps = [
   {
+    ref: 'UploadDocumentRef',
     name: '上传文档',
-    component: BaseForm
+    component: UploadDocument
   },
   {
+    ref: 'SetRulesRef',
     name: '设置分段规则',
-    component: ''
+    component: SetRules
   }
 ]
 
-const next = () => {
-  if (active.value++ > 2) active.value = 0
+const UploadDocumentRef = ref()
+
+const active = ref(0)
+
+async function next() {
+  if (await UploadDocumentRef.value.onSubmit()) {
+    if (active.value++ > 2) active.value = 0
+  }
 }
+const prev = () => {}
 </script>
 <style lang="scss" scoped>
 .create-dataset {

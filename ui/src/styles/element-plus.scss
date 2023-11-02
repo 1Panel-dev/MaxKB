@@ -1,6 +1,7 @@
 :root {
   --el-menu-item-height: 45px;
   --el-text-color-primary: '#1F2329';
+  --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
 }
 
 .el-button {
@@ -83,6 +84,11 @@
     max-width: 16.6666666667%;
     flex: 0 0 16.6666666667%;
   }
+}
+
+.el-card {
+  --el-card-border-radius: 8px;
+  border: none !important;
 }
 
 // 抽屉样式整体修改

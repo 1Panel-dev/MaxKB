@@ -1,5 +1,5 @@
 <template>
-  <el-card shadow="hover">
+  <el-card shadow="always">
     <div class="card-add">
       <AppIcon :iconName="icon" class="add-icon" />
       <span class="ml-10">{{ title }}</span>

@@ -32,9 +32,49 @@ const delDateset: (dataset_id: String) => Promise<Result<boolean>> = (dataset_id
   return del(`${prefix}/${dataset_id}`)
 }
 
+/**
+ * 创建数据集
+ * @param 参数 
+ * {
+  "name": "string",
+  "desc": "string",
+  "documents": [
+    {
+      "name": "string",
+      "paragraphs": [
+        {
+          "content": "string",
+          "title": "string",
+          "is_active": true,
+          "problem_list": [
+            {
+              "id": "string",
+              "content": "string"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+ */
+const postDateset: (data: any) => Promise<Result<any>> = (data) => {
+  return post(`${prefix}`, data)
+}
+
+/**
+ * 分段预览（上传文档）
+ * @param 参数  file:file,limit:number,patterns:array,with_filter:boolean
+ */
+const postSplitDocument: (data: any) => Promise<Result<any>> = (data) => {
+  console.log(data)
+  return post(`${prefix}/document/split`, data)
+}
 
 export default {
   getDateset,
   getAllDateset,
-  delDateset
+  delDateset,
+  postDateset,
+  postSplitDocument
 }
