@@ -1,5 +1,5 @@
 <template>
-  <LayoutContent header="团队管理">
+  <LayoutContainer header="团队管理">
     <div class="team-manage flex main-calc-height">
       <div class="team-member p-8 border-r">
         <div class="flex-between p-16">
@@ -67,7 +67,7 @@
       </div>
     </div>
     <CreateMemberDialog ref="CreateMemberRef" @refresh="refresh" />
-  </LayoutContent>
+  </LayoutContainer>
 </template>
 
 <script lang="ts" setup>

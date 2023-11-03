@@ -202,17 +202,16 @@ h4 {
 // 标题前带竖线样式
 .title-decoration-1 {
   position: relative;
-  padding-left: 15px;
+  padding-left: 12px;
   &:before {
     position: absolute;
     left: 2px;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 4px;
-    height: 90%;
+    width: 2px;
+    height: 80%;
     content: '';
     background: var(--el-color-primary);
-    border-radius: 10px;
   }
 }
 

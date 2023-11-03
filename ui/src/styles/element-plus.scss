@@ -102,6 +102,20 @@
   }
 }
 
+// el-steps
+.el-step__icon {
+  background: none;
+}
+.el-step__head.is-process {
+  .el-step__icon {
+    &.is-text {
+      color: #ffffff;
+      border-color: var(--el-color-primary) !important;
+      background: var(--el-color-primary) !important;
+    }
+  }
+}
+
 // 抽屉样式整体修改
 .el-drawer {
   .el-drawer__header {

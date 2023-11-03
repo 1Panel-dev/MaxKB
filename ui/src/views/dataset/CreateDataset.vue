@@ -1,11 +1,20 @@
 <template>
-  <LayoutContent header="创建数据集" back-to="-1">
-    <div class="create-dataset flex main-calc-height">
-      <div class="p-24">
-        <el-steps :active="active" finish-status="success" align-center>
-          <el-step v-for="(item, index) in steps" :key="index" :title="item.name" />
-        </el-steps>
-      </div>
+  <LayoutContainer header="创建数据集" back-to="-1" class="create-dataset">
+    <template #header>
+      <el-steps :active="active" finish-status="success" align-center class="create-dataset__steps">
+        <el-step v-for="(item, index) in steps" :key="index">
+          <template #icon>
+            <div class="app-step">
+              <div class="el-step__icon is-text">
+                <div class="el-step__icon-inner">{{ index + 1 }}</div>
+              </div>
+              {{ item.name }}
+            </div>
+          </template>
+        </el-step>
+      </el-steps>
+    </template>
+    <div class="create-dataset__main flex main-calc-height">
       <div class="create-dataset__component p-24">
         <el-scrollbar>
           <component :is="steps[active].component" :ref="steps[active]?.ref" />
@@ -18,7 +27,7 @@
         <el-button @click="next" type="primary">开始导入</el-button>
       </div>
     </div>
-  </LayoutContent>
+  </LayoutContainer>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -51,7 +60,22 @@ const prev = () => {}
 </script>
 <style lang="scss" scoped>
 .create-dataset {
-  flex-direction: column;
+  &__steps {
+    min-width: 450px;
+    max-width: 800px;
+    width: 80%;
+    margin: 0 auto;
+    padding-right: 60px;
+
+    :deep(.el-step__line) {
+      left: 64% !important;
+      right: -33% !important;
+    }
+  }
+  &__main {
+    flex-direction: column;
+  }
+
   // height: 100%;
   &__component {
     flex: 1;
