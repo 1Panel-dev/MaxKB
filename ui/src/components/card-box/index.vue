@@ -3,14 +3,14 @@
     <div class="card-header">
       <slot name="header">
         <div class="title flex align-center">
-          <AppAvatar class="mr-8">
-            <el-icon><Document /></el-icon>
+          <AppAvatar class="mr-12" shape="square" :size="32">
+            <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
           <h4>{{ title }}</h4>
         </div>
       </slot>
     </div>
-    <div class="description mt-8">
+    <div class="description mt-12">
       <slot name="description">
         {{ description }}
       </slot>
@@ -48,7 +48,7 @@ function cardLeave() {
 .card-box {
   font-size: 14px;
   position: relative;
-  min-height: 150px;
+  min-height: var(--card-min-height);
 
   .description {
     display: -webkit-box;
@@ -56,11 +56,16 @@ function cardLeave() {
     -webkit-line-clamp: 2;
     overflow: hidden;
     height: 40px;
+    color: var(--app-text-color-secondary);
+    line-height: 22px;
+    font-weight: 400;
   }
   .card-footer {
     position: absolute;
-    bottom: 0;
+    bottom: 8px;
     min-height: 30px;
+    color: var(--app-text-color-secondary);
+    font-weight: 400;
   }
 }
 </style>

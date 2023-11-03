@@ -1,6 +1,5 @@
 :root {
   --el-menu-item-height: 45px;
-  --el-text-color-primary: '#1F2329';
   --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
   --el-border-color: rgba(31, 35, 41, 0.15);
 }
@@ -11,10 +10,8 @@
 .el-avatar {
   --el-avatar-bg-color: var(--el-color-primary);
   --el-avatar-size-small: 33px;
+  --el-avatar-border-radius: 8px;
   cursor: pointer;
-}
-.el-popper {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .el-form {
@@ -35,7 +32,7 @@
   padding-bottom: 24px;
   .app-confirm {
     .app-confirm-title {
-      color: var(--el-text-color-primary);
+      color: var(--app-text-color-primary);
     }
     .icon {
       font-size: 24px;
@@ -49,7 +46,7 @@
 
 .el-message-box__content {
   padding: 24px;
-  color: var(--el-text-color-primary);
+  color: var(--app-text-color-primary);
 }
 .el-message-box__btns {
   padding: 5px 24px 0;
@@ -65,15 +62,8 @@
   }
 }
 
-@media only screen and (min-width: 1200px) {
-  .el-col-lg-5 {
-    display: block;
-    max-width: 25%;
-    flex: 0 0 25%;
-  }
-}
 @media only screen and (min-width: 1400px) {
-  .el-col-lg-5 {
+  .el-col-lg-6 {
     display: block;
     max-width: 20.8333333333%;
     flex: 0 0 20.8333333333%;
@@ -89,7 +79,8 @@
 
 .el-card {
   --el-card-border-radius: 8px;
-  border: none !important;
+  --el-card-padding: 16px;
+  border: 1px solid #ffffff;
 }
 .el-dropdown {
   color: var(--app-text-color-primary);
