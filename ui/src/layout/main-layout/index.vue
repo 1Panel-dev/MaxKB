@@ -1,6 +1,7 @@
 <template>
   <div class="main-layout h-full flex">
-    <div class="sidebar-container"><Sidebar /></div>
+    <div class="sidebar-container">
+      <Sidebar /></div>
     <div class="view-container">
       <AppMain />
     </div>

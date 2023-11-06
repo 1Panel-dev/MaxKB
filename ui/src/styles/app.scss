@@ -90,6 +90,9 @@ h4 {
 .bold {
   font-weight: 600;
 }
+.lighter {
+  font-weight: 400;
+}
 
 .w-full {
   width: 100%;
@@ -114,6 +117,9 @@ h4 {
   margin-bottom: 16px;
 }
 
+.ml-4 {
+  margin-left: 4px;
+}
 .ml-8 {
   margin-left: 8px;
 }
@@ -125,6 +131,9 @@ h4 {
 }
 .mr-12 {
   margin-right: 12px;
+}
+.mr-16 {
+  margin-right: 16px;
 }
 
 .p-8 {
@@ -166,6 +175,10 @@ h4 {
 
 .vertical-middle {
   vertical-align: middle;
+}
+
+.border-l {
+  border-left: 1px solid var(--el-border-color);
 }
 
 .border-b {
@@ -229,4 +242,10 @@ h4 {
 .default-tag {
   background: var(--tag-deflaut-bg);
   color: var(--tag-deflaut-color);
+}
+
+// card 无边框无阴影
+.card-never {
+  background: var(--app-layout-bg-color);
+  border: none;
 }

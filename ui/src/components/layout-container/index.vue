@@ -5,11 +5,10 @@
       <h3>{{ header }}</h3>
       <slot name="header"> </slot>
     </div>
-    <el-scrollbar>
-      <div class="content-container__main main-calc-height">
-        <slot></slot>
-      </div>
-    </el-scrollbar>
+
+    <div class="content-container__main">
+      <slot></slot>
+    </div>
   </div>
 </template>
 

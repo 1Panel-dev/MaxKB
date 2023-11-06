@@ -1,4 +1,6 @@
 :root {
+  --el-color-primary: #3370ff;
+  --el-color-primary-light-9: rgba(51, 112, 255, 0.1);
   --el-menu-item-height: 45px;
   --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
   --el-border-color: rgba(31, 35, 41, 0.15);
@@ -80,7 +82,6 @@
 .el-card {
   --el-card-border-radius: 8px;
   --el-card-padding: 16px;
-  border: 1px solid #ffffff;
 }
 .el-dropdown {
   color: var(--app-text-color-primary);
@@ -90,7 +91,7 @@
   --el-tag-border-radius: 2px;
 }
 .el-table {
-  --el-table-header-bg-color: #f5f6f7;
+  --el-table-header-bg-color: var(--app-layout-bg-color);
 }
 .el-table {
   --el-table-text-color: var(--app-text-color-primary);
@@ -116,21 +117,14 @@
   }
 }
 
-// 抽屉样式整体修改
-.el-drawer {
-  .el-drawer__header {
-    padding: 0;
-    margin: 0 24px;
-    height: 56px;
-    border-bottom: 1px solid var(--el-border-color);
-    .el-drawer__title {
-      color: #1f2329;
-      font-weight: 500;
-      font-size: 16px;
-      line-height: 24px;
-    }
+.el-text {
+  font-weight: 400;
+  &.el-text--info {
+    color: var(--app-text-color-secondary);
   }
-  .el-drawer__body {
-    --el-drawer-padding-primary: 24px;
-  }
+}
+
+.el-scrollbar {
+  overflow-x: hidden;
+
 }

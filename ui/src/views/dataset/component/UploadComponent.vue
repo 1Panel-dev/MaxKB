@@ -9,36 +9,74 @@
         v-model:file-list="form.fileList"
         action="#"
         :auto-upload="false"
+        :show-file-list="false"
+        accept=".txt, .md"
       >
+        <img src="@/assets/upload-icon.svg" alt="" />
         <div class="el-upload__text">
           <p>
-            拖拽文件到此上传或
-            <em>
-              选择文件
-              <el-icon style="font-size: 25px"><upload-filled /></el-icon>
-            </em>
+            将文件拖拽至此区域或
+            <em> 选择文件上传 </em>
           </p>
           <div class="upload__decoration">
-            <p>1. 当前支持TXT、Markdown文本文件。</p>
-            <p>2. 每次最多上传50个文档，每个文档最大不能超过10MB。</p>
-            <p>3. 系统会对文档进行分段处理，若使用【高级分段】建议上传文档前规范文档的分段标识。</p>
+            <p>支持格式：TXT、Markdown，每次最多上传50个文件，每个文件不超过 10MB</p>
+            <p>若使用【高级分段】建议上传前规范文件的分段标识</p>
           </div>
         </div>
       </el-upload>
     </el-form-item>
   </el-form>
-  <p>文档列表</p>
+  <el-row :gutter="8" v-if="form.fileList?.length">
+    <template v-for="(item, index) in form.fileList" :key="index">
+      <el-col :span="12" class="mb-8">
+        <el-card shadow="never" class="file-List-card">
+          <div class="flex-between">
+            <div class="flex">
+              <img :src="getImgUrl(item && item?.name)" alt="" />
+              <div class="ml-8">
+                <p>{{ item && item?.name }}</p>
+                <el-text type="info">{{ filesize(item && item?.size) }}</el-text>
+              </div>
+            </div>
+            <el-button text @click="deleteFlie(index)">
+              <el-icon><Delete /></el-icon>
+            </el-button>
+          </div>
+        </el-card>
+      </el-col>
+    </template>
+  </el-row>
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import type { UploadProps } from 'element-plus'
+import { filesize, getImgUrl } from '@/utils/utils'
+import { MsgError } from '@/utils/message'
 const form = reactive({
-  fileList: []
+  fileList: [] as any
 })
 
 const rules = reactive({
   fileList: [{ required: true, message: '请上传文件', trigger: 'change' }]
 })
 const FormRef = ref()
+
+
+// const beforeUploadHandle: UploadProps['beforeUpload'] = (rawFile) => {
+//   const type = fileType(rawFile?.name)
+//   console.log(type)
+//   if (type !== 'txt' || type !== 'md') {
+//     MsgError('Avatar picture must be JPG format!')
+//     return false
+//   } else if (rawFile.size / 1024 / 1024 > 10) {
+//     MsgError('文件不超过 10MB!')
+//     return false
+//   }
+//   return true
+// }
+function deleteFlie(index: number) {
+  form.fileList.splice(index, 1)
+}
 
 // 表单校验
 function validate() {
@@ -47,7 +85,6 @@ function validate() {
     return valid
   })
 }
-
 onMounted(() => {})
 
 defineExpose({
@@ -56,6 +93,12 @@ defineExpose({
 })
 </script>
 <style scoped lang="scss">
+.file-List-card {
+  border-radius: 4px;
+  :deep(.el-card__body) {
+    padding: 8px 16px 8px 12px;
+  }
+}
 .upload__decoration {
   font-size: 12px;
   line-height: 20px;

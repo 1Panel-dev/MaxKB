@@ -30,6 +30,12 @@ const datasetRouter = {
           name: 'DatasetDoc',
           meta: { icon: 'House', title: '文档' },
           component: () => import('@/views/dataset/DatasetDoc.vue')
+        },
+        {
+          path: '/dataset/doc',
+          name: 'DatasetDoc',
+          meta: { icon: 'House', title: '设置' },
+          component: () => import('@/views/dataset/DatasetDoc.vue')
         }
       ]
     }

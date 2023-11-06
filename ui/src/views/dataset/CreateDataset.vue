@@ -16,9 +16,7 @@
     </template>
     <div class="create-dataset__main flex main-calc-height">
       <div class="create-dataset__component p-24">
-        <el-scrollbar>
-          <component :is="steps[active].component" :ref="steps[active]?.ref" />
-        </el-scrollbar>
+        <component :is="steps[active].component" :ref="steps[active]?.ref" />
       </div>
       <div class="create-dataset__footer text-right p-24 border-t">
         <el-button @click="next">取 消</el-button>
@@ -36,14 +34,14 @@ import SetRules from './step/SetRules.vue'
 
 const steps = [
   {
-    ref: 'UploadDocumentRef',
-    name: '上传文档',
-    component: UploadDocument
-  },
-  {
     ref: 'SetRulesRef',
     name: '设置分段规则',
     component: SetRules
+  },
+  {
+    ref: 'UploadDocumentRef',
+    name: '上传文档',
+    component: UploadDocument
   }
 ]
 
@@ -80,9 +78,10 @@ const prev = () => {}
   &__component {
     flex: 1;
     flex-basis: auto;
-    min-width: 70%;
+    width: 100%;
     margin: 0 auto;
     overflow: hidden;
+    box-sizing: border-box;
   }
   &__footer {
     flex: 0 0 auto;

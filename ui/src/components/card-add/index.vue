@@ -1,5 +1,5 @@
 <template>
-  <el-card shadow="always" class="card-add">
+  <el-card shadow="never" class="card-add">
     <div class="flex-center">
       <AppIcon iconName="Plus" class="add-icon" />
       <span>{{ title }}</span>
@@ -26,13 +26,12 @@ defineProps({
   min-height: var(--card-min-height);
   border: 1px dashed var(--el-color-primary);
   background: #eff0f1;
-  box-shadow: none;
 
   .add-icon {
     font-size: 14px;
     border-radius: 4px;
     border: 1px solid #bbbfc4;
-    background: #f5f6f7;
+    background: var(--app-layout-bg-color);
     padding: 8px;
     margin-right: 12px;
   }
