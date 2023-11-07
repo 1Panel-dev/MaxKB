@@ -9,7 +9,12 @@ const settingRouter = {
     {
       path: '/setting',
       name: 'setting',
-      meta: { icon: 'app-team', title: '团队管理' },
+      meta: {
+        icon: 'app-team',
+        title: '团队管理',
+        parentPath: '/setting',
+        parentName: 'setting'
+      },
       component: () => import('@/views/setting/index.vue')
     }
   ]

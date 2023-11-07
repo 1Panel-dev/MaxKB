@@ -14,7 +14,6 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const cachedViews: any = ref([])
-
 onBeforeUpdate(() => {
   let isCached = route.meta?.cache
   let name = route.name

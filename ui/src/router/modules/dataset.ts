@@ -18,24 +18,35 @@ const datasetRouter = {
       hidden: true
     },
     {
-      path: '/dataset/doc',
-      name: 'DatasetDoc',
-      meta: { icon: 'House', title: '文档', activeMenu: '/dataset' },
+      path: '/dataset/:id',
+      name: 'DatasetDetail',
+      meta: { title: '文档', activeMenu: '/dataset' },
       component: Layout,
       hidden: true,
-      redirect: '/dataset/doc',
       children: [
         {
-          path: '/dataset/doc',
+          path: 'doc',
           name: 'DatasetDoc',
-          meta: { icon: 'House', title: '文档' },
+          meta: {
+            icon: 'Document',
+            title: '文档',
+            active: 'doc',
+            parentPath: '/dataset/:id',
+            parentName: 'DatasetDetail'
+          },
           component: () => import('@/views/dataset/DatasetDoc.vue')
         },
         {
-          path: '/dataset/doc',
-          name: 'DatasetDoc',
-          meta: { icon: 'House', title: '设置' },
-          component: () => import('@/views/dataset/DatasetDoc.vue')
+          path: 'setting',
+          name: 'DatasetSetting',
+          meta: {
+            icon: 'Setting',
+            title: '设置',
+            active: 'setting',
+            parentPath: '/dataset/:id',
+            parentName: 'DatasetDetail'
+          },
+          component: () => import('@/views/dataset/DatasetSetting.vue')
         }
       ]
     }

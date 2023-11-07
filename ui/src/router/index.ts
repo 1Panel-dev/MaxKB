@@ -47,7 +47,7 @@ router.beforeEach(
   }
 )
 
-export const getChildRouteListByPathAndName = (path: string, name?: RouteRecordName | null | undefined) => {
+export const getChildRouteListByPathAndName = (path: any, name?: RouteRecordName | any) => {
   return getChildRouteList(routes, path, name)
 }
 

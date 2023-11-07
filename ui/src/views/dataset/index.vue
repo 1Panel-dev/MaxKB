@@ -28,7 +28,12 @@
           :key="index"
           class="mt-8"
         >
-          <CardBox :title="item.name" :description="item.desc" class="cursor">
+          <CardBox
+            :title="item.name"
+            :description="item.desc"
+            class="cursor"
+            @click="router.push({ path: `/dataset/${item.id}/doc` })"
+          >
             <template #mouseEnter>
               <el-tooltip effect="dark" content="删除" placement="top">
                 <el-button text @click.stop="deleteDateset(item)" class="delete-button">
@@ -59,7 +64,7 @@ import datasetApi from '@/api/dataset'
 import type { datasetListRequest } from '@/api/type/dataset'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { useRouter } from 'vue-router'
-import { numberFormat } from '@/utils/utils';
+import { numberFormat } from '@/utils/utils'
 const router = useRouter()
 
 const loading = ref(false)

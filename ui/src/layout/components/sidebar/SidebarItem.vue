@@ -31,6 +31,10 @@ defineProps<{
     padding: 13px 12px 13px 16px !important;
     font-weight: 500;
     border-radius: 4px;
+    &:hover {
+      background: none;
+      color: var(--el-menu-active-color);
+    }
   }
 
   .el-menu-item.is-active {

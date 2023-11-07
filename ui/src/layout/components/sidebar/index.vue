@@ -1,12 +1,12 @@
 <template>
   <div class="sidebar">
     <el-scrollbar wrap-class="scrollbar-wrapper">
-      <el-menu :default-active="activeMenu">
+      <el-menu :default-active="activeMenu" router>
         <sidebar-item
-          :menu="menu"
           v-hasPermission="menu.meta?.permission"
           v-for="(menu, index) in subMenuList"
           :key="index"
+          :menu="menu"
         >
         </sidebar-item>
       </el-menu>
@@ -21,16 +21,14 @@ import { getChildRouteListByPathAndName } from '@/router/index'
 import SidebarItem from './SidebarItem.vue'
 
 const route = useRoute()
+
 const subMenuList = computed(() => {
-  return getChildRouteListByPathAndName(route.path, route.name)
+  return getChildRouteListByPathAndName(route.meta.parentPath, route.meta.parentName)
 })
 
 const activeMenu = computed(() => {
-  const { meta, path } = route
-  if (meta.activeMenu) {
-    return meta.activeMenu
-  }
-  return path
+  const { path, meta } = route
+  return meta.active || path
 })
 </script>
 
