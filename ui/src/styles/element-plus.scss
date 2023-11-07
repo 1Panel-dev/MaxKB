@@ -8,6 +8,14 @@
 
 .el-button {
   padding: 5px 12px;
+  &.is-text {
+    padding: 4px !important;
+    font-size: 16px;
+    max-height: 24px;
+    &:not(.is-disabled):hover {
+      background: var(--app-text-color-primary-light-1);
+    }
+  }
 }
 .el-avatar {
   --el-avatar-bg-color: var(--el-color-primary);
@@ -92,14 +100,23 @@
 }
 .el-table {
   --el-table-header-bg-color: var(--app-layout-bg-color);
-}
-.el-table {
   --el-table-text-color: var(--app-text-color-primary);
+  font-weight: 400;
   thead {
     color: var(--app-text-color-secondary);
+    th {
+      font-weight: 500;
+    }
   }
+
   th.el-table__cell {
     border-top: var(--el-table-border);
+  }
+  .el-table__cell {
+    padding: 12px 0;
+  }
+  .el-checkbox {
+    height: 23px;
   }
 }
 
@@ -124,7 +141,6 @@
   }
 }
 
-.el-scrollbar {
-  overflow-x: hidden;
-
+.el-switch {
+  height: auto;
 }

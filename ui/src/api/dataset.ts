@@ -67,8 +67,19 @@ const postDateset: (data: any) => Promise<Result<any>> = (data) => {
  * @param 参数  file:file,limit:number,patterns:array,with_filter:boolean
  */
 const postSplitDocument: (data: any) => Promise<Result<any>> = (data) => {
-  console.log(data)
   return post(`${prefix}/document/split`, data)
+}
+
+/**
+ * 文档列表
+ * @param 参数  dataset_id, name
+ */
+
+const getDocument: (dataset_id: string, name?: string) => Promise<Result<any>> = (
+  dataset_id,
+  name
+) => {
+  return get(`${prefix}/${dataset_id}/document`, name && { name })
 }
 
 export default {
@@ -76,5 +87,6 @@ export default {
   getAllDateset,
   delDateset,
   postDateset,
-  postSplitDocument
+  postSplitDocument,
+  getDocument
 }

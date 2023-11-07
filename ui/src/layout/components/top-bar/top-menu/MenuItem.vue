@@ -15,15 +15,14 @@ import { useRouter, useRoute, type RouteRecordRaw } from 'vue-router'
 import { computed } from 'vue'
 const router = useRouter()
 const route = useRoute()
+
 const props = defineProps<{
   menu: RouteRecordRaw
 }>()
 
 const isActive = computed(() => {
-  return (
-    (route.name == props.menu.name && route.path == props.menu.path) ||
-    route?.meta?.activeMenu == props.menu.path
-  )
+  const { name, path, meta } = route
+  return (name == props.menu.name && path == props.menu.path) || meta?.activeMenu == props.menu.path
 })
 </script>
 <style lang="scss" scoped>

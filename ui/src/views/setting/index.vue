@@ -240,7 +240,7 @@ onMounted(() => {
 
   .permission-setting {
     box-sizing: border-box;
-    width: calc(100% - var(--team-manage-left-width) - 5px);
+    width: calc(100% - var(--team-manage-left-width));
     flex-direction: column;
   }
 

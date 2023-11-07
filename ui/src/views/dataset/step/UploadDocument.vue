@@ -1,11 +1,10 @@
 <template>
-    <div class="upload-document">
-        <!-- 基本信息 -->
-  <BaseForm ref="BaseFormRef" />
-  <!-- 上传文档 -->
-  <UploadComponent ref="UploadComponentRef" />
-    </div>
-
+  <div class="upload-document">
+    <!-- 基本信息 -->
+    <BaseForm ref="BaseFormRef" />
+    <!-- 上传文档 -->
+    <UploadComponent ref="UploadComponentRef" />
+  </div>
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
@@ -39,6 +38,5 @@ defineExpose({
 .upload-document {
   width: 70%;
   margin: 0 auto;
-
 }
 </style>

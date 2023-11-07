@@ -2,12 +2,7 @@
   <div class="dataset-list-container p-24">
     <div class="flex-between">
       <h3>数据集</h3>
-      <el-input
-        v-model="filterText"
-        placeholder="搜索内容"
-        prefix-icon="Search"
-        style="width: 300px"
-      />
+      <el-input v-model="filterText" placeholder="搜索内容" prefix-icon="Search" class="w-240" />
     </div>
     <div v-loading.fullscreen.lock="loading">
       <el-row
@@ -32,7 +27,7 @@
             :title="item.name"
             :description="item.desc"
             class="cursor"
-            @click="router.push({ path: `/dataset/${item.id}/doc` })"
+            @click="router.push({ path: `/dataset/${item.id}/document` })"
           >
             <template #mouseEnter>
               <el-tooltip effect="dark" content="删除" placement="top">
@@ -128,7 +123,6 @@ onMounted(() => {
     position: absolute;
     right: 12px;
     top: 18px;
-    padding: 6px;
     height: auto;
   }
   .footer-content {

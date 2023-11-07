@@ -63,6 +63,8 @@ import type { FormInstance, FormRules } from 'element-plus'
 import UserApi from '@/api/user'
 const router = useRouter()
 const route = useRoute()
+const { params } = route
+const { code, email } = params
 const resetPasswordForm = ref<ResetPasswordRequest>({
   password: '',
   re_password: '',
@@ -71,8 +73,6 @@ const resetPasswordForm = ref<ResetPasswordRequest>({
 })
 
 onMounted(() => {
-  const code = route.params.code
-  const email = route.params.email
   if (code && email) {
     resetPasswordForm.value.code = code as string
     resetPasswordForm.value.email = email as string

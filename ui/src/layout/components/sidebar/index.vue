@@ -23,7 +23,8 @@ import SidebarItem from './SidebarItem.vue'
 const route = useRoute()
 
 const subMenuList = computed(() => {
-  return getChildRouteListByPathAndName(route.meta.parentPath, route.meta.parentName)
+  const { meta } = route
+  return getChildRouteListByPathAndName(meta.parentPath, meta.parentName)
 })
 
 const activeMenu = computed(() => {
