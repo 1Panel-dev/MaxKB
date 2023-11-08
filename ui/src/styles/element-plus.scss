@@ -39,27 +39,20 @@
 }
 
 .el-message-box {
-  padding-bottom: 24px;
-  .app-confirm {
-    .app-confirm-title {
-      color: var(--app-text-color-primary);
-    }
-    .icon {
-      font-size: 24px;
-      color: var(--el-color-warning);
-    }
-    .app-confirm-decription {
-      margin-left: 40px;
-    }
+  --el-messagebox-font-size: 16px;
+  padding: 24px;
+  .el-message-box__header {
+    padding: 0;
   }
 }
 
 .el-message-box__content {
-  padding: 24px;
+  padding: 24px 0;
   color: var(--app-text-color-primary);
+  font-weight: 400;
 }
 .el-message-box__btns {
-  padding: 5px 24px 0;
+  padding: 0;
   button {
     min-width: 80px;
     &:nth-child(2) {
@@ -69,6 +62,13 @@
   button.danger {
     background: var(--el-color-danger);
     border: var(--el-color-danger);
+  }
+}
+.el-message-box__headerbtn {
+  right: -5px;
+  top: -5px;
+  .el-message-box__close {
+    font-size: 20px;
   }
 }
 
@@ -89,7 +89,7 @@
 
 .el-card {
   --el-card-border-radius: 8px;
-  --el-card-padding: 16px;
+  --el-card-padding: calc(var(--app-base-px) * 2);
 }
 .el-dropdown {
   color: var(--app-text-color-primary);
@@ -143,4 +143,21 @@
 
 .el-switch {
   height: auto;
+}
+
+.el-slider {
+  --el-slider-button-size: 14px;
+  --el-slider-height: 4px;
+}
+.el-slider__button {
+  border: solid 1px var(--app-border-color-dark);
+  &.hover {
+    border: solid 2px var(--el-slider-main-bg-color);
+  }
+}
+.el-slider__runway.show-input {
+  margin-right: calc(var(--app-base-px) + 4px);
+}
+.el-slider__input {
+  width: 60px;
 }

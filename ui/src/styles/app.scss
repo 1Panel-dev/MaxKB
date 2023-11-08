@@ -61,7 +61,6 @@ ul {
 // 滑块
 ::-webkit-scrollbar-thumb {
   border-radius: 5px;
-  background-color: var(--ce-webkit-scrollbar-background-color, rgba(31, 35, 41, 0.3));
 }
 
 // 轨道
@@ -105,48 +104,48 @@ h4 {
 }
 
 .mt-8 {
-  margin-top: 8px;
+  margin-top: var(--app-base-px);
 }
 .mt-12 {
-  margin-top: 12px;
+  margin-top: calc(var(--app-base-px) + 4px);
 }
 .mt-16 {
-  margin-top: 16px;
+  margin-top: calc(var(--app-base-px) * 2);
 }
 .mb-8 {
-  margin-bottom: 8px;
+  margin-bottom: var(--app-base-px);
 }
 .mb-16 {
-  margin-bottom: 16px;
+  margin-bottom: calc(var(--app-base-px) * 2);
 }
 
 .ml-4 {
-  margin-left: 4px;
+  margin-left: calc(var(--app-base-px) - 4px);
 }
 .ml-8 {
-  margin-left: 8px;
+  margin-left: var(--app-base-px);
 }
 .ml-16 {
-  margin-left: 16px;
+  margin-left: calc(var(--app-base-px) * 2);
 }
 .mr-8 {
-  margin-right: 8px;
+  margin-right: var(--app-base-px);
 }
 .mr-12 {
-  margin-right: 12px;
+  margin-right: calc(var(--app-base-px) + 4px);
 }
 .mr-16 {
-  margin-right: 16px;
+  margin-right: calc(var(--app-base-px) * 3);
 }
 
 .p-8 {
-  padding: 8px;
+  padding: var(--app-base-px);
 }
 .p-16 {
-  padding: 16px;
+  padding: calc(var(--app-base-px) * 2);
 }
 .p-24 {
-  padding: 24px;
+  padding: calc(var(--app-base-px) * 3);
 }
 
 .flex {
@@ -212,7 +211,7 @@ h4 {
 
 // 内容部分 自适应高度
 .main-calc-height {
-  height: calc(100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 40px);
+  height: var(--app-main-height);
 }
 
 // 标题前带竖线样式
@@ -251,6 +250,11 @@ h4 {
 .card-never {
   background: var(--app-layout-bg-color);
   border: none;
+}
+
+// 图标旋转90度
+.rotate-90 {
+  transform: rotateZ(90deg);
 }
 
 // 表格第一行插入自定义行

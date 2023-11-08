@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar">
+  <div class="sidebar p-8">
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu :default-active="activeMenu" router>
         <sidebar-item
@@ -35,7 +35,6 @@ const activeMenu = computed(() => {
 
 <style lang="scss">
 .sidebar {
-  padding: 8px;
   .el-menu {
     height: 100%;
     border: none;

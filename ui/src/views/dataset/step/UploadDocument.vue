@@ -1,10 +1,12 @@
 <template>
-  <div class="upload-document">
-    <!-- 基本信息 -->
-    <BaseForm ref="BaseFormRef" />
-    <!-- 上传文档 -->
-    <UploadComponent ref="UploadComponentRef" />
-  </div>
+  <el-scrollbar>
+    <div class="upload-document p-24">
+      <!-- 基本信息 -->
+      <BaseForm ref="BaseFormRef" />
+      <!-- 上传文档 -->
+      <UploadComponent ref="UploadComponentRef" />
+    </div>
+  </el-scrollbar>
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'

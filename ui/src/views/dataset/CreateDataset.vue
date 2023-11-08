@@ -14,34 +14,37 @@
         </el-step>
       </el-steps>
     </template>
-    <div class="create-dataset__main flex main-calc-height">
-      <div class="create-dataset__component p-24">
+    <div class="create-dataset__main flex">
+      <div class="create-dataset__component">
         <component :is="steps[active].component" :ref="steps[active]?.ref" />
       </div>
-      <div class="create-dataset__footer text-right p-24 border-t">
-        <el-button @click="next">取 消</el-button>
-        <el-button @click="prev">上一步</el-button>
-        <el-button @click="next" type="primary">下一步</el-button>
-        <el-button @click="next" type="primary">开始导入</el-button>
-      </div>
+    </div>
+    <div class="create-dataset__footer text-right border-t">
+      <el-button @click="router.go(-1)">取 消</el-button>
+      <el-button @click="prev">上一步</el-button>
+      <el-button @click="next" type="primary">下一步</el-button>
+      <el-button @click="next" type="primary">开始导入</el-button>
     </div>
   </LayoutContainer>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import UploadDocument from './step/UploadDocument.vue'
 import SetRules from './step/SetRules.vue'
 
+const router = useRouter()
+
 const steps = [
-  {
-    ref: 'SetRulesRef',
-    name: '设置分段规则',
-    component: SetRules
-  },
   {
     ref: 'UploadDocumentRef',
     name: '上传文档',
     component: UploadDocument
+  },
+  {
+    ref: 'SetRulesRef',
+    name: '设置分段规则',
+    component: SetRules
   }
 ]
 
@@ -54,7 +57,9 @@ async function next() {
     if (active.value++ > 2) active.value = 0
   }
 }
-const prev = () => {}
+const prev = () => {
+  active.value = 0
+}
 </script>
 <style lang="scss" scoped>
 .create-dataset {
@@ -70,21 +75,22 @@ const prev = () => {}
       right: -33% !important;
     }
   }
-  &__main {
-    flex-direction: column;
-  }
 
-  // height: 100%;
   &__component {
-    flex: 1;
-    flex-basis: auto;
     width: 100%;
+    height: var(--create-dataset-height);
     margin: 0 auto;
     overflow: hidden;
     box-sizing: border-box;
   }
   &__footer {
-    flex: 0 0 auto;
+    padding: 16px 24px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: #ffffff;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 </style>

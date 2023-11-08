@@ -28,7 +28,7 @@
                   <span @click.stop>
                     <el-dropdown trigger="click" v-if="!isManage(item.type)">
                       <span class="cursor">
-                        <el-icon><MoreFilled /></el-icon>
+                        <el-icon class="rotate-90"><MoreFilled /></el-icon>
                       </span>
                       <template #dropdown>
                         <el-dropdown-menu>
@@ -155,12 +155,11 @@ function MemberPermissions(id: String) {
 
 function deleteMember(row: TeamMember) {
   MsgConfirm(
+    `是否移除成员：${row.username}?`,
+    '移除后将会取消成员拥有的数据集和应用权限。',
+
     {
-      title: `是否移除成员：${row.username}`,
-      decription: '移除后将会取消成员拥有的数据集和应用权限。',
-      confirmButtonText: '移除'
-    },
-    {
+      confirmButtonText: '移除',
       confirmButtonClass: 'danger'
     }
   )
@@ -220,7 +219,7 @@ onMounted(() => {
     font-size: 17px;
   }
   .team-member-input {
-    padding: 0 16px;
+    padding: 0 calc(var(--app-base-px) * 2);
   }
   .team-member {
     box-sizing: border-box;

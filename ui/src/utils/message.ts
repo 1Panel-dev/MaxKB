@@ -43,20 +43,30 @@ export const MsgError = (message: string) => {
  * @param 参数 message: {title, decription,type}
  */
 
-export const MsgConfirm = ({ title, decription }: any, options?: any) => {
-  const message: any = h('div', { class: 'app-confirm' }, [
-    h('h4', { class: 'app-confirm-title flex align-center' }, [
-      h(ElIcon, { class: 'icon' }, [h(WarningFilled)]),
-      h('span', { class: 'ml-16' }, title)
-    ]),
-    h('div', { class: 'app-confirm-decription mt-8' }, decription)
-  ])
-
+export const MsgConfirm = (title: string, decription: string, options?: any) => {
   const defaultOptions: Object = {
     showCancelButton: true,
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     ...options
   }
-  return ElMessageBox({ message, ...defaultOptions })
+  return ElMessageBox.confirm(decription, title, defaultOptions)
 }
+
+// export const MsgConfirm = ({ title, decription }: any, options?: any) => {
+//   const message: any = h('div', { class: 'app-confirm' }, [
+//     h('h4', { class: 'app-confirm-title flex align-center' }, [
+//       h(ElIcon, { class: 'icon' }, [h(WarningFilled)]),
+//       h('span', { class: 'ml-16' }, title)
+//     ]),
+//     h('div', { class: 'app-confirm-decription mt-8' }, decription)
+//   ])
+
+//   const defaultOptions: Object = {
+//     showCancelButton: true,
+//     confirmButtonText: '确定',
+//     cancelButtonText: '取消',
+//     ...options
+//   }
+//   return ElMessageBox({ message, ...defaultOptions })
+// }

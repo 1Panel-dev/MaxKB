@@ -3,7 +3,7 @@
     <div class="main-calc-height">
       <div class="p-24" v-loading="loading">
         <div class="flex-between">
-          <el-button type="primary">上传文档</el-button>
+          <el-button type="primary" @click="router.push({ path: '/dataset/upload' })" >上传文档</el-button>
           <el-input
             v-model="filterText"
             placeholder="按 文档名称 搜索"
@@ -11,7 +11,7 @@
             class="w-240"
           />
         </div>
-        <el-table :data="documentData" class="table-custom-append mt-16">
+        <el-table :data="documentData" class="table-custom-append mt-16 cursor">
           <template #append>
             <el-button type="primary" link>
               <el-icon><Plus /></el-icon>
