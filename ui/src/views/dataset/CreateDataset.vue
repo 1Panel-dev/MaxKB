@@ -21,39 +21,39 @@
     </div>
     <div class="create-dataset__footer text-right border-t">
       <el-button @click="router.go(-1)">取 消</el-button>
-      <el-button @click="prev">上一步</el-button>
-      <el-button @click="next" type="primary">下一步</el-button>
-      <el-button @click="next" type="primary">开始导入</el-button>
+      <el-button @click="prev" v-if="active === 1">上一步</el-button>
+      <el-button @click="next" type="primary" v-if="active === 0">下一步</el-button>
+      <el-button @click="next" type="primary" v-if="active === 1">开始导入</el-button>
     </div>
   </LayoutContainer>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import UploadDocument from './step/UploadDocument.vue'
-import SetRules from './step/SetRules.vue'
+import StepFirst from './step/StepFirst.vue'
+import StepSecond from './step/StepSecond.vue'
 
 const router = useRouter()
 
 const steps = [
   {
-    ref: 'UploadDocumentRef',
+    ref: 'StepFirstRef',
     name: '上传文档',
-    component: UploadDocument
+    component: StepFirst
   },
   {
     ref: 'SetRulesRef',
     name: '设置分段规则',
-    component: SetRules
+    component: StepSecond
   }
 ]
 
-const UploadDocumentRef = ref()
+const StepFirstRef = ref()
 
 const active = ref(0)
 
 async function next() {
-  if (await UploadDocumentRef.value.onSubmit()) {
+  if (await StepFirstRef.value.onSubmit()) {
     if (active.value++ > 2) active.value = 0
   }
 }

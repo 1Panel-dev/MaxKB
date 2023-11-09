@@ -8,6 +8,8 @@ import TagsInput from './tags-input/index.vue'
 import CardBox from './card-box/index.vue'
 import CardAdd from './card-add/index.vue'
 import BackButton from './back-button/index.vue'
+import AppTable from './app-table/index.vue'
+import ReadWrite from './read-write/index.vue'
 
 export default {
   install(app: App) {
@@ -20,5 +22,7 @@ export default {
     app.component(CardBox.name, CardBox)
     app.component(CardAdd.name, CardAdd)
     app.component(BackButton.name, BackButton)
+    app.component(AppTable.name, AppTable)
+    app.component(ReadWrite.name, ReadWrite)
   }
 }

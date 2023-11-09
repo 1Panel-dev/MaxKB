@@ -258,7 +258,7 @@ h4 {
 }
 
 // 表格第一行插入自定义行
-.table-custom-append {
+.table-quick-append {
   .el-table__append-wrapper {
     position: absolute;
     top: 0;
@@ -269,6 +269,7 @@ h4 {
     align-items: center;
     display: flex;
     padding: 0 12px;
+    cursor: pointer;
     &:hover {
       background: var(--el-color-primary-light-9);
     }
@@ -276,4 +277,17 @@ h4 {
   .el-table__body {
     margin-top: 49px;
   }
+}
+
+.success {
+  color: var(--el-color-success);
+}
+.danger {
+  color: var(--el-color-danger);
+}
+.warning {
+  color: var(--el-color-warning);
+}
+.primary {
+  color: var(--el-color-primary);
 }

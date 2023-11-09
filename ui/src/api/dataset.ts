@@ -82,11 +82,29 @@ const getDocument: (dataset_id: string, name?: string) => Promise<Result<any>> =
   return get(`${prefix}/${dataset_id}/document`, name && { name })
 }
 
+/**
+ * 修改文档
+ * @param 参数 
+ * dataset_id, document_id, 
+ * {
+      "name": "string",
+      "is_active": true
+    }
+ */
+const putDocument: (dataset_id: string, document_id: string, data: any) => Promise<Result<any>> = (
+  dataset_id,
+  document_id,
+  data: any
+) => {
+  return put(`${prefix}/${dataset_id}/document/${document_id}`, data)
+}
+
 export default {
   getDateset,
   getAllDateset,
   delDateset,
   postDateset,
   postSplitDocument,
-  getDocument
+  getDocument,
+  putDocument
 }
