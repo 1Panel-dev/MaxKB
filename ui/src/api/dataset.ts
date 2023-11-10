@@ -99,6 +99,17 @@ const putDocument: (dataset_id: string, document_id: string, data: any) => Promi
   return put(`${prefix}/${dataset_id}/document/${document_id}`, data)
 }
 
+/**
+ * 删除文档
+ * @param 参数 dataset_id, document_id,
+ */
+const delDocument: (dataset_id: string, document_id: string) => Promise<Result<boolean>> = (
+  dataset_id,
+  document_id
+) => {
+  return del(`${prefix}/${dataset_id}/document/${document_id}`)
+}
+
 export default {
   getDateset,
   getAllDateset,
@@ -106,5 +117,6 @@ export default {
   postDateset,
   postSplitDocument,
   getDocument,
-  putDocument
+  putDocument,
+  delDocument
 }

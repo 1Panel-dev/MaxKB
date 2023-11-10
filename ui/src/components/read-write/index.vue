@@ -12,12 +12,12 @@
       <div class="flex align-center" v-if="isEdit">
         <el-input ref="inputRef" v-model="writeValue" placeholder="请输入"></el-input>
         <span class="ml-4">
-          <el-button type="primary" text @click="submit">
+          <el-button type="primary" text @click="submit" :disabled="loading">
             <el-icon><Select /></el-icon>
           </el-button>
         </span>
         <span>
-          <el-button text @click="isEdit = false">
+          <el-button text @click="isEdit = false" :disabled="loading">
             <el-icon><CloseBold /></el-icon>
           </el-button>
         </span>
@@ -41,6 +41,7 @@ const props = defineProps({
 const emit = defineEmits(['change'])
 const isEdit = ref(false)
 const writeValue = ref('')
+const loading = ref(false)
 
 watch(isEdit, (bool) => {
   if (!bool) {
@@ -48,9 +49,13 @@ watch(isEdit, (bool) => {
   }
 })
 
-function submit() { 
+function submit() {
+  loading.value = true
   emit('change', writeValue.value)
-  isEdit.value = false
+  setTimeout(() => {
+    isEdit.value = false
+    loading.value = false
+  }, 200)
 }
 function editNameHandle(row: any) {
   writeValue.value = props.data

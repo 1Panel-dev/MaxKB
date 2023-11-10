@@ -1,7 +1,7 @@
 <template>
   <LayoutContainer header="文档">
     <div class="main-calc-height">
-      <div class="p-24" v-loading="loading">
+      <div class="p-24">
         <div class="flex-between">
           <el-button type="primary" @click="router.push({ path: '/dataset/upload' })"
             >上传文档</el-button
@@ -22,6 +22,7 @@
           @changePage="handleCurrentChange"
           @cell-mouse-enter="cellMouseEnter"
           @cell-mouse-leave="cellMouseLeave"
+          v-loading="loading"
         >
           <el-table-column prop="name" label="文件名称" min-width="280">
             <template #default="{ row }">
@@ -53,7 +54,7 @@
           </el-table-column>
           <el-table-column prop="name" label="启动状态">
             <template #default="{ row }">
-              <el-switch v-model="row.is_active" />
+              <el-switch v-model="row.is_active" @change="changeState($event, row)" />
             </template>
           </el-table-column>
           <el-table-column prop="create_time" label="创建时间" width="170">
@@ -77,7 +78,7 @@
               </span>
               <span class="ml-4">
                 <el-tooltip effect="dark" content="删除" placement="top">
-                  <el-button type="primary" text>
+                  <el-button type="primary" text @click="deleteDocument(row)">
                     <el-icon><Delete /></el-icon>
                   </el-button>
                 </el-tooltip>
@@ -95,12 +96,11 @@ import { useRouter, useRoute } from 'vue-router'
 import datasetApi from '@/api/dataset'
 import { toThousands } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 const router = useRouter()
 const route = useRoute()
 const { params } = route
-const { datasetId } = params
-
-const inputRef = ref()
+const { datasetId } = params as any
 
 const loading = ref(false)
 const filterText = ref('')
@@ -113,7 +113,58 @@ const paginationConfig = reactive({
   total: 0
 })
 
-function editName(val: string) {}
+function deleteDocument(row: any) {
+  MsgConfirm(
+    `是否删除文档：${row.name} ?`,
+    `此文档下的 ${row.paragraph_count} 个分段都会被删除，请谨慎操作。`,
+    {
+      confirmButtonText: '删除',
+      confirmButtonClass: 'danger'
+    }
+  )
+    .then(() => {
+      loading.value = true
+      datasetApi
+        .delDocument(datasetId, row.id)
+        .then(() => {
+          MsgSuccess('删除成功')
+          getList()
+        })
+        .catch(() => {
+          loading.value = false
+        })
+    })
+    .catch(() => {})
+}
+
+function updateData(documentId: string, data: any) {
+  loading.value = true
+  datasetApi
+    .putDocument(datasetId, documentId, data)
+    .then((res) => {
+      const index = documentData.value.findIndex((v) => v.id === documentId)
+      documentData.value.splice(index, 1, res.data)
+      MsgSuccess('修改成功')
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
+function changeState(bool: Boolean, row: any) {
+  const obj = {
+    is_active: bool
+  }
+  currentMouseId.value && updateData(row.id, obj)
+}
+
+function editName(val: string) {
+  const obj = {
+    name: val
+  }
+  currentMouseId.value && updateData(currentMouseId.value, obj)
+}
 
 function cellMouseEnter(row: any) {
   currentMouseId.value = row.id

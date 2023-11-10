@@ -76,7 +76,7 @@ function loadDataset() {}
 
 function deleteDateset(row: any) {
   MsgConfirm(
-    `是否删除数据集：${row.name}？`,
+    `是否删除数据集：${row.name} ?`,
     `此数据集关联 ${row.char_length} 个应用，删除后无法恢复，请谨慎操作。`,
     {
       confirmButtonText: '删除',
