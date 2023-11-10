@@ -22,8 +22,20 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-const form = reactive({
+import { ref, reactive, onMounted, computed, watch } from 'vue'
+import useStore from '@/stores'
+
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => {}
+  }
+})
+
+const { dataset } = useStore()
+const baseInfo = computed(() => dataset.baseInfo)
+
+const form = ref<any>({
   name: '',
   desc: ''
 })
@@ -33,6 +45,21 @@ const rules = reactive({
   desc: [{ required: true, message: '请输入数据集描述', trigger: 'blur' }]
 })
 const FormRef = ref()
+
+watch(
+  () => props.data,
+  (value) => {
+    if (JSON.stringify(value) !== '{}') {
+      form.value.name = value.name
+      form.value.desc = value.desc
+    }
+  },
+  {
+    // 初始化立即执行
+    immediate: true
+  }
+)
+
 // 表单校验
 function validate() {
   if (!FormRef.value) return
@@ -41,7 +68,11 @@ function validate() {
   })
 }
 
-onMounted(() => {})
+onMounted(() => {
+  if (baseInfo.value) {
+    form.value = baseInfo.value
+  }
+})
 
 defineExpose({
   validate,

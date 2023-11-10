@@ -1,6 +1,6 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
-import type { datasetListRequest } from '@/api/type/dataset'
+import type { datasetListRequest, datasetData } from '@/api/type/dataset'
 
 const prefix = '/dataset'
 
@@ -9,19 +9,22 @@ const prefix = '/dataset'
  * @param 参数  {
               "current_page": "string",
               "page_size": "string",
-              "search_text": "string",
+              "name": "string",
             }
  */
-const getDateset: (param: datasetListRequest) => Promise<Result<any[]>> = (param) => {
-  return get(`${prefix}`, param)
+const getDateset: (param: datasetListRequest) => Promise<Result<any>> = (param) => {
+  return get(
+    `${prefix}/${param.current_page}/${param.page_size}`,
+    param.name && { name: param.name }
+  )
 }
 
 /**
  * 获取全部数据集
- * @param 参数 search_text
+ * @param 参数 name
  */
-const getAllDateset: (param?: String) => Promise<Result<any[]>> = (param) => {
-  return get(`${prefix}`, param && { search_text: param })
+const getAllDateset: (param?: string) => Promise<Result<any[]>> = (param) => {
+  return get(`${prefix}`, param && { name: param })
 }
 
 /**
@@ -45,7 +48,6 @@ const delDateset: (dataset_id: String) => Promise<Result<boolean>> = (dataset_id
         {
           "content": "string",
           "title": "string",
-          "is_active": true,
           "problem_list": [
             {
               "id": "string",
@@ -58,8 +60,32 @@ const delDateset: (dataset_id: String) => Promise<Result<boolean>> = (dataset_id
   ]
 }
  */
-const postDateset: (data: any) => Promise<Result<any>> = (data) => {
+const postDateset: (data: datasetData) => Promise<Result<any>> = (data) => {
   return post(`${prefix}`, data)
+}
+
+/**
+ * 数据集详情
+ * @param 参数 dataset_id
+ */
+const getDatesetDetail: (dataset_id: string) => Promise<Result<any>> = (dataset_id) => {
+  return get(`${prefix}/${dataset_id}`)
+}
+
+/**
+ * 修改数据集信息
+ * @param 参数 
+ * dataset_id, document_id, 
+ * {
+      "name": "string",
+      "desc": true
+    }
+ */
+const putDateset: (dataset_id: string, data: any) => Promise<Result<any>> = (
+  dataset_id,
+  data: any
+) => {
+  return put(`${prefix}/${dataset_id}`, data)
 }
 
 /**
@@ -80,6 +106,32 @@ const getDocument: (dataset_id: string, name?: string) => Promise<Result<any>> =
   name
 ) => {
   return get(`${prefix}/${dataset_id}/document`, name && { name })
+}
+
+/**
+ * 创建文档
+ * @param 参数 
+ * {
+  "name": "string",
+  "paragraphs": [
+    {
+      "content": "string",
+      "title": "string",
+      "problem_list": [
+          {
+            "id": "string",
+              "content": "string"
+          }
+      ]
+    }
+  ]
+}
+ */
+const postDocument: (dataset_id: string, data: any) => Promise<Result<any>> = (
+  dataset_id,
+  data
+) => {
+  return post(`${prefix}/${dataset_id}/document`, data)
 }
 
 /**
@@ -115,8 +167,11 @@ export default {
   getAllDateset,
   delDateset,
   postDateset,
+  getDatesetDetail,
+  putDateset,
   postSplitDocument,
   getDocument,
+  postDocument,
   putDocument,
   delDocument
 }

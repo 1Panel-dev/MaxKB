@@ -44,7 +44,7 @@
   <EditSegmentDialog ref="EditSegmentDialogRef" @updateContent="updateContent" />
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import type { TabsPaneContext } from 'element-plus'
 import EditSegmentDialog from './EditSegmentDialog.vue'
 import { filesize, getImgUrl } from '@/utils/utils'
@@ -65,7 +65,18 @@ const activeName = ref(0)
 const currentPIndex = ref(null) as any
 const currentCIndex = ref(null) as any
 
-const newData = ref(props.data)
+const newData = ref<any[]>([])
+
+watch(
+  () => props.data,
+  (value) => {
+    newData.value = value
+  },
+  {
+    // 初始化立即执行
+    immediate: true
+  }
+)
 
 function editHandle(item: any, index: number, cIndex: number) {
   currentPIndex.value = index
@@ -90,11 +101,11 @@ function updateContent(data: any) {
   emit('update:data', newData.value)
 }
 
-onMounted(() => {})
-
 const handleClick = (tab: TabsPaneContext, event: Event) => {
   // console.log(tab, event)
 }
+
+onMounted(() => {})
 </script>
 <style scoped lang="scss">
 .segment-tabs {

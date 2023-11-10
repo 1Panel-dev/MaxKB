@@ -3,7 +3,9 @@
     <div class="main-calc-height">
       <div class="p-24">
         <div class="flex-between">
-          <el-button type="primary" @click="router.push({ path: '/dataset/upload' })"
+          <el-button
+            type="primary"
+            @click="router.push({ path: '/dataset/upload', query: { id: datasetId } })"
             >上传文档</el-button
           >
           <el-input
@@ -11,6 +13,7 @@
             placeholder="按 文档名称 搜索"
             prefix-icon="Search"
             class="w-240"
+            @change="getList"
           />
         </div>
         <app-table
@@ -22,6 +25,7 @@
           @changePage="handleCurrentChange"
           @cell-mouse-enter="cellMouseEnter"
           @cell-mouse-leave="cellMouseLeave"
+          @creatQuick="creatQuickHandle"
           v-loading="loading"
         >
           <el-table-column prop="name" label="文件名称" min-width="280">
@@ -69,7 +73,7 @@
           </el-table-column>
           <el-table-column prop="name" label="操作" align="center">
             <template #default="{ row }">
-              <span>
+              <span v-if="row.status === 2">
                 <el-tooltip effect="dark" content="刷新" placement="top">
                   <el-button type="primary" text>
                     <el-icon><RefreshRight /></el-icon>
@@ -99,8 +103,9 @@ import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 const router = useRouter()
 const route = useRoute()
-const { params } = route
-const { datasetId } = params as any
+const {
+  params: { datasetId }
+} = route as any
 
 const loading = ref(false)
 const filterText = ref('')
@@ -112,6 +117,21 @@ const paginationConfig = reactive({
   pageSize: 10,
   total: 0
 })
+
+// 快速创建空白文档
+function creatQuickHandle(val: string) {
+  loading.value = true
+  const obj = { name: val }
+  datasetApi
+    .postDocument(datasetId, obj)
+    .then((res) => {
+      getList()
+      MsgSuccess('创建成功')
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
 
 function deleteDocument(row: any) {
   MsgConfirm(
@@ -137,6 +157,7 @@ function deleteDocument(row: any) {
     .catch(() => {})
 }
 
+// 更新名称或状态
 function updateData(documentId: string, data: any) {
   loading.value = true
   datasetApi

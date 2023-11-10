@@ -74,7 +74,7 @@
       </el-col>
 
       <el-col :span="12" class="p-24 border-l">
-        <div>
+        <div v-loading="loading">
           <h4 class="title-decoration-1 mb-8">分段预览</h4>
           <SegmentPreview v-model:data="segmentList" />
         </div>
@@ -116,14 +116,14 @@ function splitDocument() {
       fd.append('file', item?.raw)
     }
   })
-
-  Object.keys(form).forEach((key) => {
-    fd.append(key, form[key])
-  })
-
+  if (radio.value === '2') {
+    Object.keys(form).forEach((key) => {
+      fd.append(key, form[key])
+    })
+  }
   DatasetApi.postSplitDocument(fd)
     .then((res: any) => {
-      segmentList.value = res
+      segmentList.value = res.data
       loading.value = false
     })
     .catch(() => {
@@ -131,7 +131,13 @@ function splitDocument() {
     })
 }
 
-onMounted(() => {})
+onMounted(() => {
+  splitDocument()
+})
+
+defineExpose({
+  segmentList
+})
 </script>
 <style scoped lang="scss">
 .set-rules {

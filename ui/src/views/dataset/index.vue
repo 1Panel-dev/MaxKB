@@ -2,7 +2,13 @@
   <div class="dataset-list-container p-24">
     <div class="flex-between">
       <h3>数据集</h3>
-      <el-input v-model="filterText" placeholder="搜索内容" prefix-icon="Search" class="w-240" />
+      <el-input
+        v-model="pageConfig.name"
+        @change="search"
+        placeholder="按 名称 搜索"
+        prefix-icon="Search"
+        class="w-240"
+      />
     </div>
     <div v-loading.fullscreen.lock="loading">
       <el-row
@@ -54,7 +60,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import datasetApi from '@/api/dataset'
 import type { datasetListRequest } from '@/api/type/dataset'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -63,16 +69,20 @@ import { numberFormat } from '@/utils/utils'
 const router = useRouter()
 
 const loading = ref(false)
-const filterText = ref('')
 const datasetList = ref<any[]>([])
 const disabledScroll = ref(false)
-const pageConfig = ref<datasetListRequest>({
+const pageConfig = reactive<datasetListRequest>({
   current_page: 1,
   page_size: 20,
-  search_text: ''
+  name: ''
 })
 
 function loadDataset() {}
+
+function search() {
+  pageConfig.current_page = 1
+  getList()
+}
 
 function deleteDateset(row: any) {
   MsgConfirm(
@@ -101,9 +111,9 @@ function deleteDateset(row: any) {
 function getList() {
   loading.value = true
   datasetApi
-    .getDateset(pageConfig.value)
+    .getDateset(pageConfig)
     .then((res) => {
-      datasetList.value = res.data
+      datasetList.value = res.data?.records
       loading.value = false
     })
     .catch(() => {

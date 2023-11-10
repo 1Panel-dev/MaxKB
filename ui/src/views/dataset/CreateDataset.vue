@@ -14,26 +14,41 @@
         </el-step>
       </el-steps>
     </template>
-    <div class="create-dataset__main flex">
+    <div class="create-dataset__main flex" v-loading="loading">
       <div class="create-dataset__component">
         <component :is="steps[active].component" :ref="steps[active]?.ref" />
       </div>
     </div>
     <div class="create-dataset__footer text-right border-t">
-      <el-button @click="router.go(-1)">取 消</el-button>
-      <el-button @click="prev" v-if="active === 1">上一步</el-button>
-      <el-button @click="next" type="primary" v-if="active === 0">下一步</el-button>
-      <el-button @click="next" type="primary" v-if="active === 1">开始导入</el-button>
+      <el-button @click="router.go(-1)" :disabled="loading">取 消</el-button>
+      <el-button @click="prev" v-if="active === 1" :disabled="loading">上一步</el-button>
+      <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading"
+        >下一步</el-button
+      >
+      <el-button @click="submit" type="primary" v-if="active === 1" :disabled="loading">
+        开始导入
+      </el-button>
     </div>
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import StepFirst from './step/StepFirst.vue'
 import StepSecond from './step/StepSecond.vue'
+import datasetApi from '@/api/dataset'
+import type { datasetData } from '@/api/type/dataset'
+import { MsgSuccess } from '@/utils/message'
+import useStore from '@/stores'
+const { dataset } = useStore()
+const baseInfo = computed(() => dataset.baseInfo)
 
 const router = useRouter()
+const route = useRoute()
+const {
+  params: { type },
+  query: { id }
+} = route as any
 
 const steps = [
   {
@@ -42,14 +57,16 @@ const steps = [
     component: StepFirst
   },
   {
-    ref: 'SetRulesRef',
+    ref: 'StepSecondRef',
     name: '设置分段规则',
     component: StepSecond
   }
 ]
 
 const StepFirstRef = ref()
+const StepSecondRef = ref()
 
+const loading = ref(false)
 const active = ref(0)
 
 async function next() {
@@ -59,6 +76,39 @@ async function next() {
 }
 const prev = () => {
   active.value = 0
+}
+
+function submit() {
+  loading.value = true
+  const documents = [] as any[]
+  StepSecondRef.value.segmentList.map((item: any) => {
+    documents.push({
+      name: item.name,
+      paragraphs: item.content
+    })
+  })
+  const obj = { ...baseInfo.value, documents } as datasetData
+  if (id) {
+    datasetApi
+      .postDocument(id, documents)
+      .then((res) => {
+        MsgSuccess('提交成功')
+        router.push({ path: `/dataset/${id}/document` })
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  } else {
+    datasetApi
+      .postDateset(obj)
+      .then((res) => {
+        MsgSuccess('提交成功')
+        loading.value = false
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  }
 }
 </script>
 <style lang="scss" scoped>

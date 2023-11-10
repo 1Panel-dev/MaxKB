@@ -10,8 +10,8 @@
             class="w-240 mr-12"
           />
 
-          <el-button type="primary" @click="submitHandle">创建</el-button>
-          <el-button @click="showInput = false">取消</el-button>
+          <el-button type="primary" @click="submitHandle" :disabled="loading">创建</el-button>
+          <el-button @click="showInput = false" :disabled="loading">取消</el-button>
         </div>
         <div v-else @click="quickCreateHandel" class="w-full">
           <el-button type="primary" link>
@@ -38,7 +38,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, computed } from 'vue'
 defineOptions({ name: 'AppTable' })
 
 const props = defineProps({
@@ -53,9 +53,13 @@ const props = defineProps({
 })
 const emit = defineEmits(['changePage', 'sizeChange', 'creatQuick'])
 
+const paginationConfig = computed(() => props.paginationConfig)
+
 const pageSizes = [10, 20, 50, 100]
+
 const quickInputRef = ref()
 
+const loading = ref(false)
 const showInput = ref(false)
 const inputValue = ref('')
 
@@ -66,8 +70,12 @@ watch(showInput, (bool) => {
 })
 
 function submitHandle() {
+  loading.value = true
   emit('creatQuick', inputValue.value)
-  showInput.value = false
+  setTimeout(() => {
+    showInput.value = false
+    loading.value = false
+  }, 200)
 }
 
 function quickCreateHandel() {

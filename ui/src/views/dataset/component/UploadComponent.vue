@@ -48,11 +48,14 @@
   </el-row>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import type { UploadProps } from 'element-plus'
 import { filesize, getImgUrl } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
-const form = reactive({
+import useStore from '@/stores'
+const { dataset } = useStore()
+const documentsFiles = computed(() => dataset.documentsFiles)
+const form = ref({
   fileList: [] as any
 })
 
@@ -60,7 +63,6 @@ const rules = reactive({
   fileList: [{ required: true, message: '请上传文件', trigger: 'change' }]
 })
 const FormRef = ref()
-
 
 // const beforeUploadHandle: UploadProps['beforeUpload'] = (rawFile) => {
 //   const type = fileType(rawFile?.name)
@@ -75,7 +77,7 @@ const FormRef = ref()
 //   return true
 // }
 function deleteFlie(index: number) {
-  form.fileList.splice(index, 1)
+  form.value.fileList.splice(index, 1)
 }
 
 // 表单校验
@@ -85,7 +87,11 @@ function validate() {
     return valid
   })
 }
-onMounted(() => {})
+onMounted(() => {
+  if (documentsFiles.value) {
+    form.value.fileList = documentsFiles.value
+  }
+})
 
 defineExpose({
   validate,
