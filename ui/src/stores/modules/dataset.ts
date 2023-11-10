@@ -14,7 +14,7 @@ const useDatasetStore = defineStore({
     documentsFiles: []
   }),
   actions: {
-    saveBaseInfo(info: datasetData) {
+    saveBaseInfo(info: datasetData | null) {
       this.baseInfo = info
     },
     saveDocumentsFile(file: UploadUserFile[]) {

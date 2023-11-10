@@ -49,7 +49,7 @@ const FormRef = ref()
 watch(
   () => props.data,
   (value) => {
-    if (JSON.stringify(value) !== '{}') {
+    if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
       form.value.desc = value.desc
     }

@@ -57,5 +57,6 @@ defineExpose({
 .upload-document {
   width: 70%;
   margin: 0 auto;
+  margin-bottom: 20px;
 }
 </style>

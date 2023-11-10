@@ -17,7 +17,7 @@ import { computed, useSlots } from 'vue'
 defineOptions({ name: 'LayoutContainer' })
 const slots = useSlots()
 const props = defineProps({
-  header: String,
+  header: String || null,
   backTo: String
 })
 const showBack = computed(() => {

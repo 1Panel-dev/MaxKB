@@ -3,7 +3,7 @@
     <div class="card-header">
       <slot name="header">
         <div class="title flex align-center">
-          <AppAvatar class="mr-12" shape="square" :size="32">
+          <AppAvatar class="mr-12" shape="square" :size="32" v-if="showIcon">
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
           <h4>{{ title }}</h4>
@@ -33,6 +33,10 @@ const props = defineProps({
   description: {
     type: String,
     default: ''
+  },
+  showIcon: {
+    type: Boolean,
+    default: true
   }
 })
 

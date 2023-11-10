@@ -4,22 +4,51 @@
       <el-steps :active="active" finish-status="success" align-center class="create-dataset__steps">
         <el-step v-for="(item, index) in steps" :key="index">
           <template #icon>
-            <div class="app-step">
+            <div class="app-step flex align-center">
               <div class="el-step__icon is-text">
-                <div class="el-step__icon-inner">{{ index + 1 }}</div>
+                <div class="el-step__icon-inner">
+                  <el-icon v-if="active == index + 1" style="margin-top: 1px"><Select /></el-icon>
+                  <span v-else> {{ index + 1 }}</span>
+                </div>
               </div>
-              {{ item.name }}
+              <span class="ml-4">{{ item.name }}</span>
             </div>
           </template>
         </el-step>
       </el-steps>
     </template>
     <div class="create-dataset__main flex" v-loading="loading">
-      <div class="create-dataset__component">
-        <component :is="steps[active].component" :ref="steps[active]?.ref" />
+      <div class="create-dataset__component main-calc-height">
+        <template v-if="steps[active]?.component">
+          <component :is="steps[active].component" :ref="steps[active]?.ref" />
+        </template>
+        <template v-else-if="active === 2">
+          <el-result icon="success" title="🎉 数据集创建成功 🎉">
+            <template #sub-title>
+              <div class="mt-8">
+                <span class="bold">{{ successInfo?.document_count || 0 }}</span>
+                <el-text type="info" class="ml-4">文档</el-text>
+                <el-divider direction="vertical" />
+                <span class="bold">{{ successInfo?.document_list.length || 0 }}</span>
+                <el-text type="info" class="ml-4">分段</el-text>
+                <el-divider direction="vertical" />
+                <span class="bold">{{ toThousands(successInfo?.char_length) || 0 }}</span>
+                <el-text type="info" class="ml-4">字符</el-text>
+              </div>
+            </template>
+            <template #extra>
+              <el-button @click="router.push({ path: `/dataset` })">返回数据集列表</el-button>
+              <el-button
+                type="primary"
+                @click="router.push({ path: `/dataset/${successInfo?.id}/document` })"
+                >前往文档</el-button
+              >
+            </template>
+          </el-result>
+        </template>
       </div>
     </div>
-    <div class="create-dataset__footer text-right border-t">
+    <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
       <el-button @click="router.go(-1)" :disabled="loading">取 消</el-button>
       <el-button @click="prev" v-if="active === 1" :disabled="loading">上一步</el-button>
       <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading"
@@ -39,6 +68,7 @@ import StepSecond from './step/StepSecond.vue'
 import datasetApi from '@/api/dataset'
 import type { datasetData } from '@/api/type/dataset'
 import { MsgSuccess } from '@/utils/message'
+import { toThousands } from '@/utils/utils'
 import useStore from '@/stores'
 const { dataset } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
@@ -46,7 +76,6 @@ const baseInfo = computed(() => dataset.baseInfo)
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { type },
   query: { id }
 } = route as any
 
@@ -68,6 +97,7 @@ const StepSecondRef = ref()
 
 const loading = ref(false)
 const active = ref(0)
+const successInfo = ref<any>(null)
 
 async function next() {
   if (await StepFirstRef.value.onSubmit()) {
@@ -78,6 +108,10 @@ const prev = () => {
   active.value = 0
 }
 
+function clearStore() {
+  dataset.saveBaseInfo(null)
+  dataset.saveDocumentsFile([])
+}
 function submit() {
   loading.value = true
   const documents = [] as any[]
@@ -93,6 +127,7 @@ function submit() {
       .postDocument(id, documents)
       .then((res) => {
         MsgSuccess('提交成功')
+        clearStore()
         router.push({ path: `/dataset/${id}/document` })
       })
       .catch(() => {
@@ -102,7 +137,9 @@ function submit() {
     datasetApi
       .postDateset(obj)
       .then((res) => {
-        MsgSuccess('提交成功')
+        successInfo.value = res.data
+        active.value = 2
+        clearStore()
         loading.value = false
       })
       .catch(() => {
@@ -128,7 +165,6 @@ function submit() {
 
   &__component {
     width: 100%;
-    height: var(--create-dataset-height);
     margin: 0 auto;
     overflow: hidden;
     box-sizing: border-box;

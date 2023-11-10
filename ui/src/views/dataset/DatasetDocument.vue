@@ -26,6 +26,7 @@
           @cell-mouse-enter="cellMouseEnter"
           @cell-mouse-leave="cellMouseLeave"
           @creatQuick="creatQuickHandle"
+          @row-click="rowClickHandle"
           v-loading="loading"
         >
           <el-table-column prop="name" label="文件名称" min-width="280">
@@ -58,7 +59,9 @@
           </el-table-column>
           <el-table-column prop="name" label="启动状态">
             <template #default="{ row }">
-              <el-switch v-model="row.is_active" @change="changeState($event, row)" />
+              <div @click.stop>
+                <el-switch v-model="row.is_active" @change="changeState($event, row)" />
+              </div>
             </template>
           </el-table-column>
           <el-table-column prop="create_time" label="创建时间" width="170">
@@ -82,7 +85,7 @@
               </span>
               <span class="ml-4">
                 <el-tooltip effect="dark" content="删除" placement="top">
-                  <el-button type="primary" text @click="deleteDocument(row)">
+                  <el-button type="primary" text @click.stop="deleteDocument(row)">
                     <el-icon><Delete /></el-icon>
                   </el-button>
                 </el-tooltip>
@@ -117,6 +120,10 @@ const paginationConfig = reactive({
   pageSize: 10,
   total: 0
 })
+
+function rowClickHandle(row: any) {
+  router.push({ path: `/dataset/${datasetId}/${row.id}` })
+}
 
 // 快速创建空白文档
 function creatQuickHandle(val: string) {

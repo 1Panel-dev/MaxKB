@@ -49,6 +49,13 @@ const datasetRouter = {
           component: () => import('@/views/dataset/DatasetSetting.vue')
         }
       ]
+    },
+    {
+      path: '/dataset/:datasetId/:documentId', // 分段详情
+      name: 'DocumentDetail',
+      meta: { activeMenu: '/dataset' },
+      component: () => import('@/views/dataset/DocumentDetail.vue'),
+      hidden: true
     }
   ]
 }

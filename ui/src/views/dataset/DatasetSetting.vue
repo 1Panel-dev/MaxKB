@@ -1,6 +1,6 @@
 <template>
   <LayoutContainer header="设置">
-    <div class="main-calc-height dataset-setting">
+    <div class="dataset-setting">
       <div class="p-24" v-loading="loading">
         <BaseForm ref="BaseFormRef" :data="detail" />
         <div class="text-right">

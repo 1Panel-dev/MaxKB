@@ -162,6 +162,28 @@ const delDocument: (dataset_id: string, document_id: string) => Promise<Result<b
   return del(`${prefix}/${dataset_id}/document/${document_id}`)
 }
 
+/**
+ * 文档详情
+ * @param 参数 dataset_id
+ */
+const getDocumentDetail: (dataset_id: string, document_id: string) => Promise<Result<any>> = (
+  dataset_id,
+  document_id
+) => {
+  return get(`${prefix}/${dataset_id}/document/${document_id}`)
+}
+
+/**
+ * 段落列表
+ * @param 参数 dataset_id
+ */
+const getParagraph: (dataset_id: string, document_id: string) => Promise<Result<any>> = (
+  dataset_id,
+  document_id
+) => {
+  return get(`${prefix}/${dataset_id}/document/${document_id}/paragraph`)
+}
+
 export default {
   getDateset,
   getAllDateset,
@@ -173,5 +195,7 @@ export default {
   getDocument,
   postDocument,
   putDocument,
-  delDocument
+  delDocument,
+  getDocumentDetail,
+  getParagraph
 }
