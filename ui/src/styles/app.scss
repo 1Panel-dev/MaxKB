@@ -19,7 +19,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  color: var(--app-text-color-primary);
+  color: var(--app-text-color);
 }
 
 #app {
@@ -135,7 +135,7 @@ h4 {
   margin-right: calc(var(--app-base-px) + 4px);
 }
 .mr-16 {
-  margin-right: calc(var(--app-base-px) * 3);
+  margin-right: calc(var(--app-base-px) * 2);
 }
 
 .p-8 {
@@ -212,6 +212,7 @@ h4 {
 // 内容部分 自适应高度
 .main-calc-height {
   height: var(--app-main-height);
+  box-sizing: border-box;
 }
 
 // 标题前带竖线样式

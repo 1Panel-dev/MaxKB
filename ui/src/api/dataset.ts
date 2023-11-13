@@ -184,6 +184,43 @@ const getParagraph: (dataset_id: string, document_id: string) => Promise<Result<
   return get(`${prefix}/${dataset_id}/document/${document_id}/paragraph`)
 }
 
+/**
+ * 删除段落
+ * @param 参数 dataset_id, document_id, document_id
+ */
+const delParagraph: (
+  dataset_id: string,
+  document_id: string,
+  paragraph_id: string
+) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id) => {
+  return del(`${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}`)
+}
+
+/**
+ * 修改段落
+ * @param 参数 
+ * dataset_id, document_id, paragraph_id
+ * {
+  "content": "string",
+  "title": "string",
+  "is_active": true,
+  "problem_list": [
+    {
+      "id": "string",
+      "content": "string"
+    }
+  ]
+    }
+ */
+const putParagraph: (
+  dataset_id: string,
+  document_id: string,
+  paragraph_id: string,
+  data: any
+) => Promise<Result<any>> = (dataset_id, document_id, paragraph_id, data: any) => {
+  return put(`${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}`, data)
+}
+
 export default {
   getDateset,
   getAllDateset,
@@ -197,5 +234,7 @@ export default {
   putDocument,
   delDocument,
   getDocumentDetail,
-  getParagraph
+  getParagraph,
+  delParagraph,
+  putParagraph
 }

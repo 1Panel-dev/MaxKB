@@ -135,7 +135,7 @@ onMounted(() => {
   }
   .footer-content {
     .bold {
-      color: var(--app-text-color-primary);
+      color: var(--app-text-color);
     }
   }
 }

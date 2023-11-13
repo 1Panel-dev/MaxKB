@@ -158,7 +158,7 @@ defineExpose({
       height: 100%;
       padding: calc(var(--app-base-px) * 2);
       line-height: 22px;
-      color: var(--app-text-color-primary);
+      color: var(--app-text-color);
     }
     :deep(.el-radio__label) {
       padding-left: 32px;

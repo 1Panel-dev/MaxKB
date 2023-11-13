@@ -110,7 +110,7 @@ onMounted(() => {})
 <style scoped lang="scss">
 .segment-tabs {
   :deep(.el-tabs__item) {
-    background: var(--app-text-color-primary-light-1);
+    background: var(--app-text-color-light-1);
     margin: 4px;
     border-radius: 4px;
     padding: 5px 10px 5px 8px !important;

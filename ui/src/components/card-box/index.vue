@@ -67,9 +67,13 @@ function cardLeave() {
   .card-footer {
     position: absolute;
     bottom: 8px;
+    left: 0;
     min-height: 30px;
     color: var(--app-text-color-secondary);
     font-weight: 400;
+    padding: 0 16px;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 </style>

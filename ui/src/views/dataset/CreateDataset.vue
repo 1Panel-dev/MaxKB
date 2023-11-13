@@ -167,7 +167,6 @@ function submit() {
     width: 100%;
     margin: 0 auto;
     overflow: hidden;
-    box-sizing: border-box;
   }
   &__footer {
     padding: 16px 24px;
