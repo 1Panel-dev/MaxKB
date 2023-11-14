@@ -64,18 +64,18 @@
         </div>
       </el-scrollbar>
     </div>
-    <ParagraphDialog ref="ParagraphDialogRef" :title="title" />
+    <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import datasetApi from '@/api/dataset'
 import ParagraphDialog from './component/ParagraphDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-
-const router = useRouter()
+import useStore from '@/stores'
+const { paragraph } = useStore()
 const route = useRoute()
 const {
   params: { datasetId, documentId }
@@ -94,8 +94,8 @@ function changeState(bool: Boolean, row: any) {
     is_active: bool
   }
   loading.value = true
-  datasetApi
-    .putParagraph(datasetId, documentId, row.id, obj)
+  paragraph
+    .asyncPutParagraph(datasetId, documentId, row.id, obj)
     .then((res) => {
       loading.value = false
     })
@@ -128,7 +128,7 @@ function addParagraph() {
   title.value = '添加分段'
   ParagraphDialogRef.value.open()
 }
-function editParagraph(row: any) { 
+function editParagraph(row: any) {
   title.value = '分段详情'
   ParagraphDialogRef.value.open(row)
 }
@@ -157,6 +157,10 @@ function getParagraphDetail() {
     .catch(() => {
       loading.value = false
     })
+}
+
+function refresh() {
+  getParagraphDetail()
 }
 
 onMounted(() => {

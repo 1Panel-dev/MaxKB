@@ -22,7 +22,7 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, watch } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
 import useStore from '@/stores'
 
 const props = defineProps({
@@ -73,7 +73,12 @@ onMounted(() => {
     form.value = baseInfo.value
   }
 })
-
+onUnmounted(() => {
+  form.value = {
+    name: '',
+    desc: ''
+  }
+})
 defineExpose({
   validate,
   form

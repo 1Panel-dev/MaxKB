@@ -15,6 +15,7 @@
         :gutter="15"
         v-infinite-scroll="loadDataset"
         :infinite-scroll-disabled="disabledScroll"
+        class="app-list-row"
       >
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mt-8">
           <CardAdd title="创建数据集" @click="router.push({ path: '/dataset/create' })" />

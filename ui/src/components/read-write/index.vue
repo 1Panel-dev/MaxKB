@@ -10,7 +10,10 @@
     </slot>
     <slot>
       <div class="flex align-center" v-if="isEdit">
-        <el-input ref="inputRef" v-model="writeValue" placeholder="请输入"></el-input>
+        <div @click.stop>
+          <el-input ref="inputRef" v-model="writeValue" placeholder="请输入" autofocus></el-input>
+        </div>
+
         <span class="ml-4">
           <el-button type="primary" text @click.stop="submit" :disabled="loading">
             <el-icon><Select /></el-icon>
@@ -26,7 +29,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 defineOptions({ name: 'ReadWrite' })
 const props = defineProps({
   data: {
@@ -39,6 +42,7 @@ const props = defineProps({
   }
 })
 const emit = defineEmits(['change'])
+const inputRef = ref()
 const isEdit = ref(false)
 const writeValue = ref('')
 const loading = ref(false)
@@ -61,5 +65,11 @@ function editNameHandle(row: any) {
   writeValue.value = props.data
   isEdit.value = true
 }
+
+onMounted(() => {
+  nextTick(() => {
+    inputRef.value?.focus()
+  })
+})
 </script>
 <style lang="scss" scoped></style>

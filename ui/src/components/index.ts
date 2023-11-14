@@ -10,6 +10,7 @@ import CardAdd from './card-add/index.vue'
 import BackButton from './back-button/index.vue'
 import AppTable from './app-table/index.vue'
 import ReadWrite from './read-write/index.vue'
+import TagEllipsis from './tag-ellipsis/index.vue'
 
 export default {
   install(app: App) {
@@ -24,5 +25,6 @@ export default {
     app.component(BackButton.name, BackButton)
     app.component(AppTable.name, AppTable)
     app.component(ReadWrite.name, ReadWrite)
+    app.component(TagEllipsis.name, TagEllipsis)
   }
 }

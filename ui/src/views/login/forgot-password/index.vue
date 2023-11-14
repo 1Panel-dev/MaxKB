@@ -34,7 +34,7 @@
             </el-input>
             <el-button
               size="large"
-              class="send-email-button ml-10"
+              class="send-email-button ml-16"
               @click="sendEmail"
               :loading="loading"
               >获取验证码</el-button

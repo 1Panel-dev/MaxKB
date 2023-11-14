@@ -1,5 +1,5 @@
 <template>
-  <el-tabs v-model="activeName" class="segment-tabs" @tab-click="handleClick">
+  <el-tabs v-model="activeName" class="paragraph-tabs" @tab-click="handleClick">
     <template v-for="(item, index) in newData" :key="index">
       <el-tab-pane :label="item.name" :name="index">
         <template #label>
@@ -9,7 +9,7 @@
           </div>
         </template>
         <el-scrollbar>
-          <div class="segment-list">
+          <div class="paragraph-list">
             <el-card
               v-for="(child, cIndex) in item.content"
               :key="cIndex"
@@ -41,12 +41,12 @@
       </el-tab-pane>
     </template>
   </el-tabs>
-  <EditSegmentDialog ref="EditSegmentDialogRef" @updateContent="updateContent" />
+  <EditParagraphDialog ref="EditParagraphDialogRef" @updateContent="updateContent" />
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
 import type { TabsPaneContext } from 'element-plus'
-import EditSegmentDialog from './EditSegmentDialog.vue'
+import EditParagraphDialog from './EditParagraphDialog.vue'
 import { filesize, getImgUrl } from '@/utils/utils'
 import { MsgConfirm } from '@/utils/message'
 
@@ -59,7 +59,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:data'])
 
-const EditSegmentDialogRef = ref()
+const EditParagraphDialogRef = ref()
 
 const activeName = ref(0)
 const currentPIndex = ref(null) as any
@@ -81,7 +81,7 @@ watch(
 function editHandle(item: any, index: number, cIndex: number) {
   currentPIndex.value = index
   currentCIndex.value = cIndex
-  EditSegmentDialogRef.value.open(item)
+  EditParagraphDialogRef.value.open(item)
 }
 
 function deleteHandle(item: any, index: number, cIndex: number) {
@@ -108,7 +108,7 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
 onMounted(() => {})
 </script>
 <style scoped lang="scss">
-.segment-tabs {
+.paragraph-tabs {
   :deep(.el-tabs__item) {
     background: var(--app-text-color-light-1);
     margin: 4px;
@@ -134,7 +134,7 @@ onMounted(() => {})
     display: none;
   }
 }
-.segment-list {
+.paragraph-list {
   height: calc(var(--create-dataset-height) - 125px);
 }
 </style>

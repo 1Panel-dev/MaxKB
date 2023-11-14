@@ -8,6 +8,7 @@
             v-model="inputValue"
             placeholder="请输入文档名称"
             class="w-240 mr-12"
+            autofocus
           />
 
           <el-button type="primary" @click="submitHandle" :disabled="loading">创建</el-button>

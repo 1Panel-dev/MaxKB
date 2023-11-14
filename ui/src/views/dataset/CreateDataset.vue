@@ -115,7 +115,7 @@ function clearStore() {
 function submit() {
   loading.value = true
   const documents = [] as any[]
-  StepSecondRef.value.segmentList.map((item: any) => {
+  StepSecondRef.value.paragraphList.map((item: any) => {
     documents.push({
       name: item.name,
       paragraphs: item.content

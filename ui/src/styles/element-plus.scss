@@ -3,7 +3,7 @@
   --el-color-primary-light-9: rgba(51, 112, 255, 0.1);
   --el-menu-item-height: 45px;
   --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
-  --el-border-color: #DEE0E3;
+  --el-border-color: #dee0e3;
 }
 
 .el-button {
@@ -74,17 +74,21 @@
 }
 
 @media only screen and (min-width: 1400px) {
-  .el-col-lg-6 {
-    display: block;
-    max-width: 20.8333333333%;
-    flex: 0 0 20.8333333333%;
+  .app-list-row {
+    .el-col-lg-6 {
+      display: block;
+      max-width: 20.8333333333%;
+      flex: 0 0 20.8333333333%;
+    }
   }
 }
 @media only screen and (min-width: 1920px) {
-  .el-col-xl-4 {
-    display: block;
-    max-width: 16.6666666667%;
-    flex: 0 0 16.6666666667%;
+  .app-list-row {
+    .el-col-xl-4 {
+      display: block;
+      max-width: 16.6666666667%;
+      flex: 0 0 16.6666666667%;
+    }
   }
 }
 

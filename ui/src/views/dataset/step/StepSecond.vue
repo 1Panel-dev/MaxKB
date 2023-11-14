@@ -21,16 +21,13 @@
                       <div class="form-item mb-16">
                         <div class="title flex align-center mb-8">
                           <span style="margin-right: 4px">分段标识</span>
-                          <el-popover
-                            placement="right"
-                            :width="400"
-                            trigger="hover"
+                          <el-tooltip
+                            effect="dark"
                             content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。"
+                            placement="right"
                           >
-                            <template #reference>
-                              <el-icon style="font-size: 16px"><Warning /></el-icon>
-                            </template>
-                          </el-popover>
+                            <el-icon style="font-size: 16px"><Warning /></el-icon>
+                          </el-tooltip>
                         </div>
 
                         <el-select v-model="form.patterns" multiple placeholder="请选择">
@@ -76,7 +73,7 @@
       <el-col :span="12" class="p-24 border-l">
         <div v-loading="loading">
           <h4 class="title-decoration-1 mb-8">分段预览</h4>
-          <SegmentPreview v-model:data="segmentList" />
+          <ParagraphPreview v-model:data="paragraphList" />
         </div>
       </el-col>
     </el-row>
@@ -84,7 +81,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue'
-import SegmentPreview from '@/views/dataset/component/SegmentPreview.vue'
+import ParagraphPreview from '@/views/dataset/component/ParagraphPreview.vue'
 import DatasetApi from '@/api/dataset'
 import useStore from '@/stores'
 const { dataset } = useStore()
@@ -98,7 +95,7 @@ const marks = reactive({
 
 const radio = ref('1')
 const loading = ref(false)
-const segmentList = ref<any[]>([])
+const paragraphList = ref<any[]>([])
 
 const form = reactive<any>({
   patterns: [] as any,
@@ -123,7 +120,7 @@ function splitDocument() {
   }
   DatasetApi.postSplitDocument(fd)
     .then((res: any) => {
-      segmentList.value = res.data
+      paragraphList.value = res.data
       loading.value = false
     })
     .catch(() => {
@@ -136,7 +133,7 @@ onMounted(() => {
 })
 
 defineExpose({
-  segmentList
+  paragraphList
 })
 </script>
 <style scoped lang="scss">

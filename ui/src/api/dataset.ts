@@ -197,6 +197,30 @@ const delParagraph: (
 }
 
 /**
+ * 创建段落
+ * @param 参数 
+ * dataset_id, document_id
+ * {
+  "content": "string",
+  "title": "string",
+  "is_active": true,
+  "problem_list": [
+    {
+      "id": "string",
+      "content": "string"
+    }
+  ]
+    }
+ */
+const postParagraph: (
+  dataset_id: string,
+  document_id: string,
+  data: any
+) => Promise<Result<any>> = (dataset_id, document_id, data: any) => {
+  return post(`${prefix}/${dataset_id}/document/${document_id}/paragraph`, data)
+}
+
+/**
  * 修改段落
  * @param 参数 
  * dataset_id, document_id, paragraph_id
@@ -236,5 +260,6 @@ export default {
   getDocumentDetail,
   getParagraph,
   delParagraph,
-  putParagraph
+  putParagraph,
+  postParagraph
 }

@@ -26,7 +26,7 @@ const datasetRouter = {
       children: [
         {
           path: 'document',
-          name: 'DatasetDocument',
+          name: 'Document',
           meta: {
             icon: 'Document',
             title: '文档',
@@ -34,7 +34,7 @@ const datasetRouter = {
             parentPath: '/dataset/:datasetId',
             parentName: 'DatasetDetail'
           },
-          component: () => import('@/views/dataset/DatasetDocument.vue')
+          component: () => import('@/views/document/index.vue')
         },
         {
           path: 'setting',
@@ -46,15 +46,15 @@ const datasetRouter = {
             parentPath: '/dataset/:datasetId',
             parentName: 'DatasetDetail'
           },
-          component: () => import('@/views/dataset/DatasetSetting.vue')
+          component: () => import('@/views/document/DatasetSetting.vue')
         }
       ]
     },
     {
       path: '/dataset/:datasetId/:documentId', // 分段详情
-      name: 'DocumentDetail',
+      name: 'Paragraph',
       meta: { activeMenu: '/dataset' },
-      component: () => import('@/views/dataset/DocumentDetail.vue'),
+      component: () => import('@/views/paragraph/index.vue'),
       hidden: true
     }
   ]

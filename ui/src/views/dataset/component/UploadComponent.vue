@@ -48,7 +48,7 @@
   </el-row>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onUnmounted, onMounted, computed } from 'vue'
 import type { UploadProps } from 'element-plus'
 import { filesize, getImgUrl } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
@@ -90,6 +90,11 @@ function validate() {
 onMounted(() => {
   if (documentsFiles.value) {
     form.value.fileList = documentsFiles.value
+  }
+})
+onUnmounted(() => {
+  form.value = {
+    fileList: []
   }
 })
 
