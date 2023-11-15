@@ -11,40 +11,34 @@
         <div class="team-member-input">
           <el-input v-model="filterText" placeholder="请输入用户名搜索" prefix-icon="Search" />
         </div>
-        <div class="member-list mt-8" v-loading="loading">
-          <el-scrollbar>
-            <ul v-if="filterMember.length > 0">
-              <template v-for="(item, index) in filterMember" :key="index">
-                <li
-                  @click.prevent="clickMemberHandle(item.id)"
-                  :class="currentUser === item.id ? 'active' : ''"
-                  class="flex-between cursor"
-                >
-                  <div>
-                    <span class="mr-8">{{ item.username }}</span>
-                    <el-tag v-if="isManage(item.type)" class="default-tag">所有者</el-tag>
-                    <el-tag type="warning" v-else>用户</el-tag>
-                  </div>
-                  <span @click.stop>
-                    <el-dropdown trigger="click" v-if="!isManage(item.type)">
-                      <span class="cursor">
-                        <el-icon class="rotate-90"><MoreFilled /></el-icon>
-                      </span>
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item @click.prevent="deleteMember(item)"
-                            >移除</el-dropdown-item
-                          >
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
+        <common-list
+          :data="filterMember"
+          class="mt-8"
+          v-loading="loading"
+          @click="clickMemberHandle"
+        >
+          <template #default="{ row }">
+            <div class="flex-between">
+              <div>
+                <span class="mr-8">{{ row.username }}</span>
+                <el-tag v-if="isManage(row.type)" class="default-tag">所有者</el-tag>
+                <el-tag type="warning" v-else>用户</el-tag>
+              </div>
+              <div @click.stop style="margin-top: 5px">
+                <el-dropdown trigger="click" v-if="!isManage(row.type)">
+                  <span class="cursor">
+                    <el-icon class="rotate-90"><MoreFilled /></el-icon>
                   </span>
-                </li>
-              </template>
-            </ul>
-            <el-empty description="暂无数据" v-else />
-          </el-scrollbar>
-        </div>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item @click.prevent="deleteMember(row)">移除</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
+            </div>
+          </template>
+        </common-list>
       </div>
       <div class="permission-setting flex" v-loading="rLoading">
         <div class="team-manage__table p-24">
@@ -181,9 +175,9 @@ function isManage(type: String) {
   return type === 'manage'
 }
 
-function clickMemberHandle(id: String) {
-  currentUser.value = id
-  MemberPermissions(id)
+function clickMemberHandle(item: any) {
+  currentUser.value = item.id
+  MemberPermissions(item.id)
 }
 function addMember() {
   CreateMemberRef.value?.open()
@@ -223,23 +217,13 @@ onMounted(() => {
   }
   .team-member {
     box-sizing: border-box;
-    width: var(--team-manage-left-width);
-    min-width: var(--team-manage-left-width);
-    .member-list {
-      li {
-        padding: 11px 16px;
-        &.active {
-          background: var(--el-color-primary-light-9);
-          border-radius: 4px;
-          color: var(--el-color-primary);
-        }
-      }
-    }
+    width: var(--setting-left-width);
+    min-width: var(--setting-left-width);
   }
 
   .permission-setting {
     box-sizing: border-box;
-    width: calc(100% - var(--team-manage-left-width));
+    width: calc(100% - var(--setting-left-width));
     flex-direction: column;
   }
 

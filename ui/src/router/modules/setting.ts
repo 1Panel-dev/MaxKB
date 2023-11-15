@@ -16,6 +16,18 @@ const settingRouter = {
         parentName: 'setting'
       },
       component: () => import('@/views/setting/index.vue')
+    },
+    {
+      path: '/template',
+      name: 'template',
+      meta: {
+        icon: 'app-team',
+        title: '模版管理',
+        activeMenu: '/setting',
+        parentPath: '/setting',
+        parentName: 'setting'
+      },
+      component: () => import('@/views/template/index.vue')
     }
   ]
 }

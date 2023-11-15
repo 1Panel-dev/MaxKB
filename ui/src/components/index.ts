@@ -11,6 +11,7 @@ import BackButton from './back-button/index.vue'
 import AppTable from './app-table/index.vue'
 import ReadWrite from './read-write/index.vue'
 import TagEllipsis from './tag-ellipsis/index.vue'
+import CommonList from './common-list/index.vue'
 
 export default {
   install(app: App) {
@@ -26,5 +27,6 @@ export default {
     app.component(AppTable.name, AppTable)
     app.component(ReadWrite.name, ReadWrite)
     app.component(TagEllipsis.name, TagEllipsis)
+    app.component(CommonList.name, CommonList)
   }
 }
