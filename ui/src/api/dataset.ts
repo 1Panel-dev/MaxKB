@@ -186,7 +186,7 @@ const getParagraph: (dataset_id: string, document_id: string) => Promise<Result<
 
 /**
  * 删除段落
- * @param 参数 dataset_id, document_id, document_id
+ * @param 参数 dataset_id, document_id, paragraph_id
  */
 const delParagraph: (
   dataset_id: string,
@@ -245,6 +245,51 @@ const putParagraph: (
   return put(`${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}`, data)
 }
 
+/**
+ * 问题列表
+ * @param 参数 dataset_id，document_id，paragraph_id
+ */
+const getProblem: (dataset_id: string, document_id: string, paragraph_id: string) => Promise<Result<any>> = (
+  dataset_id,
+  document_id,
+  paragraph_id: string,
+) => {
+  return get(`${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem`)
+}
+
+/**
+ * 创建问题
+ * @param 参数 
+ * dataset_id, document_id, paragraph_id
+ * {
+      "id": "string",
+      content": "string"
+    }
+ */
+const postProblem: (
+  dataset_id: string,
+  document_id: string,
+  paragraph_id: string,
+  data: any
+) => Promise<Result<any>> = (dataset_id, document_id, paragraph_id, data: any) => {
+  return post(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem`,
+    data
+  )
+}
+/**
+ * 删除问题
+ * @param 参数 dataset_id, document_id, paragraph_id,problem_id
+ */
+const delProblem: (
+  dataset_id: string,
+  document_id: string,
+  paragraph_id: string,
+  problem_id: string,
+) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id,problem_id) => {
+  return del(`${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}`)
+}
+
 export default {
   getDateset,
   getAllDateset,
@@ -261,5 +306,8 @@ export default {
   getParagraph,
   delParagraph,
   putParagraph,
-  postParagraph
+  postParagraph,
+  getProblem,
+  postProblem,
+  delProblem
 }

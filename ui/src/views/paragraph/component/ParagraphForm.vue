@@ -1,10 +1,12 @@
 <template>
   <el-form ref="paragraphFormRef" :model="form" label-position="top" :rules="rules" @submit.prevent>
     <el-form-item label="分段标题">
-      <el-input v-model="form.title" placeholder="请输入分段标题"> </el-input>
+      <el-input v-if="isEdit" v-model="form.title" placeholder="请输入分段标题"> </el-input>
+      <span v-else>{{ form.title }}</span>
     </el-form-item>
     <el-form-item label="分段内容" prop="content">
       <el-input
+        v-if="isEdit"
         v-model="form.content"
         placeholder="请输入分段内容"
         maxlength="1024"
@@ -13,6 +15,7 @@
         type="textarea"
       >
       </el-input>
+      <span v-else>{{ form.content }}</span>
     </el-form-item>
   </el-form>
 </template>
@@ -24,7 +27,8 @@ const props = defineProps({
   data: {
     type: Object,
     default: () => {}
-  }
+  },
+  isEdit: Boolean
 })
 
 const form = ref<any>({

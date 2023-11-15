@@ -5,7 +5,7 @@
         <el-button @click="addParagraph" type="primary" :disabled="loading"> 添加分段 </el-button>
       </div>
     </template>
-    <div class="document-detail__main p-16">
+    <div class="document-detail__main p-16" v-loading="loading">
       <div class="flex-between p-8">
         <span>{{ paragraphDetail.length }} 段落</span>
         <el-input
@@ -23,7 +23,7 @@
         </el-input>
       </div>
       <el-scrollbar>
-        <div class="document-detail-height" v-loading="loading">
+        <div class="document-detail-height">
           <el-row>
             <el-col
               :xs="24"
