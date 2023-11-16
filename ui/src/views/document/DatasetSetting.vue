@@ -29,7 +29,7 @@ async function submit() {
   if (await BaseFormRef.value?.validate()) {
     loading.value = true
     datasetApi
-      .postDocument(datasetId, BaseFormRef.value.form)
+      .putDateset(datasetId, BaseFormRef.value.form)
       .then((res) => {
         MsgSuccess('保存成功')
         loading.value = false
