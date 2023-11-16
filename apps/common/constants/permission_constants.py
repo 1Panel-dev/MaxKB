@@ -21,6 +21,10 @@ class Group(Enum):
 
     SETTING = "SETTING"
 
+    MODEL = "MODEL"
+
+    TEAM = "TEAM"
+
 
 class Operate(Enum):
     """
@@ -40,16 +44,24 @@ class Operate(Enum):
     USE = "USE"
 
 
+class RoleGroup(Enum):
+    USER = 'USER'
+    APPLICATION_KEY = "APPLICATION_KEY"
+    APPLICATION_ACCESS_TOKEN = "APPLICATION_ACCESS_TOKEN"
+
+
 class Role:
-    def __init__(self, name: str, decs: str):
+    def __init__(self, name: str, decs: str, group: RoleGroup):
         self.name = name
         self.decs = decs
+        self.group = group
 
 
 class RoleConstants(Enum):
-    ADMIN = Role("管理员", "管理员,预制目前不会使用")
-    USER = Role("用户", "用户所有权限")
-    SESSION = Role("会话", decs="只拥有应用会话框接口权限")
+    ADMIN = Role("管理员", "管理员,预制目前不会使用", RoleGroup.USER)
+    USER = Role("用户", "用户所有权限", RoleGroup.USER)
+    APPLICATION_ACCESS_TOKEN = Role("会话", "只拥有应用会话框接口权限", RoleGroup.APPLICATION_ACCESS_TOKEN),
+    APPLICATION_KEY = Role("应用私钥", "应用私钥", RoleGroup.APPLICATION_KEY)
 
 
 class Permission:
@@ -90,8 +102,28 @@ class PermissionConstants(Enum):
     APPLICATION_READ = Permission(group=Group.APPLICATION, operate=Operate.READ,
                                   roles=[RoleConstants.ADMIN, RoleConstants.USER])
 
+    APPLICATION_CREATE = Permission(group=Group.APPLICATION, operate=Operate.CREATE,
+                                    roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
     SETTING_READ = Permission(group=Group.SETTING, operate=Operate.READ,
                               roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    MODEL_READ = Permission(group=Group.MODEL, operate=Operate.READ, roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    MODEL_EDIT = Permission(group=Group.MODEL, operate=Operate.EDIT, roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    MODEL_DELETE = Permission(group=Group.MODEL, operate=Operate.DELETE,
+                              roles=[RoleConstants.ADMIN, RoleConstants.USER])
+    MODEL_CREATE = Permission(group=Group.MODEL, operate=Operate.CREATE,
+                              roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    TEAM_READ = Permission(group=Group.TEAM, operate=Operate.READ, roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    TEAM_CREATE = Permission(group=Group.TEAM, operate=Operate.CREATE, roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    TEAM_DELETE = Permission(group=Group.TEAM, operate=Operate.DELETE, roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    TEAM_EDIT = Permission(group=Group.TEAM, operate=Operate.EDIT, roles=[RoleConstants.ADMIN, RoleConstants.USER])
 
 
 def get_permission_list_by_role(role: RoleConstants):
@@ -110,9 +142,11 @@ class Auth:
      用于存储当前用户的角色和权限
     """
 
-    def __init__(self, role_list: List[RoleConstants], permission_list: List[PermissionConstants]):
+    def __init__(self, role_list: List[RoleConstants], permission_list: List[PermissionConstants | Permission],
+                 **keywords):
         self.role_list = role_list
         self.permission_list = permission_list
+        self.keywords = keywords
 
 
 class CompareConstants(Enum):
@@ -123,7 +157,7 @@ class CompareConstants(Enum):
 
 
 class ViewPermission:
-    def __init__(self, roleList: List[RoleConstants], permissionList: List[PermissionConstants],
+    def __init__(self, roleList: List[RoleConstants], permissionList: List[PermissionConstants | object],
                  compare=CompareConstants.OR):
         self.roleList = roleList
         self.permissionList = permissionList

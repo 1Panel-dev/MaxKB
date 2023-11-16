@@ -19,6 +19,7 @@ from django.db.models import Q
 from drf_yasg import openapi
 from rest_framework import serializers
 
+from common.constants.authentication_type import AuthenticationType
 from common.constants.exception_code_constants import ExceptionCodeConstants
 from common.constants.permission_constants import RoleConstants, get_permission_list_by_role
 from common.exception.app_exception import AppApiException
@@ -66,7 +67,8 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
         :return: 用户Token(认证信息)
         """
         user = self.is_valid()
-        token = signing.dumps({'username': user.username, 'id': str(user.id), 'email': user.email})
+        token = signing.dumps({'username': user.username, 'id': str(user.id), 'email': user.email,
+                               'type': AuthenticationType.USER.value})
         return token
 
     class Meta:

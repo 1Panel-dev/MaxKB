@@ -20,6 +20,17 @@ class AppApiException(Exception):
         self.message = message
 
 
+class NotFound404(AppApiException):
+    """
+       未认证(未登录)异常
+       """
+    status_code = status.HTTP_404_NOT_FOUND
+
+    def __init__(self, code, message):
+        self.code = code
+        self.message = message
+
+
 class AppAuthenticationFailed(AppApiException):
     """
     未认证(未登录)异常

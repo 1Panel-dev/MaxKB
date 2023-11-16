@@ -25,7 +25,8 @@ class Problem(APIView):
                          operation_id="添加段落关联问题",
                          manual_parameters=ProblemSerializers.Create.get_request_params_api(),
                          request_body=ProblemSerializers.Create.get_request_body_api(),
-                         responses=result.get_api_response(ProblemSerializers.Operate.get_response_body_api()))
+                         responses=result.get_api_response(ProblemSerializers.Operate.get_response_body_api()),
+                         tags=["数据集/文档/段落/问题"])
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
@@ -38,7 +39,8 @@ class Problem(APIView):
     @swagger_auto_schema(operation_summary="获取段落问题列表",
                          operation_id="获取段落问题列表",
                          manual_parameters=ProblemSerializers.Query.get_request_params_api(),
-                         responses=result.get_api_array_response(ProblemSerializers.Operate.get_response_body_api()))
+                         responses=result.get_api_array_response(ProblemSerializers.Operate.get_response_body_api()),
+                         tags=["数据集/文档/段落/问题"])
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                 dynamic_tag=k.get('dataset_id')))
@@ -54,7 +56,8 @@ class Problem(APIView):
         @swagger_auto_schema(operation_summary="删除段落问题",
                              operation_id="删除段落问题",
                              manual_parameters=ProblemSerializers.Query.get_request_params_api(),
-                             responses=result.get_default_response())
+                             responses=result.get_default_response(),
+                             tags=["数据集/文档/段落/问题"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))

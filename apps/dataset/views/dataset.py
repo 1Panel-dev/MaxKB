@@ -26,7 +26,8 @@ class Dataset(APIView):
     @swagger_auto_schema(operation_summary="获取数据集列表",
                          operation_id="获取数据集列表",
                          manual_parameters=DataSetSerializers.Query.get_request_params_api(),
-                         responses=result.get_api_array_response(DataSetSerializers.Query.get_response_body_api()))
+                         responses=result.get_api_array_response(DataSetSerializers.Query.get_response_body_api()),
+                         tags=["数据集"])
     @has_permissions(PermissionConstants.DATASET_READ, compare=CompareConstants.AND)
     def get(self, request: Request):
         d = DataSetSerializers.Query(data={**request.query_params, 'user_id': str(request.user.id)})
@@ -37,7 +38,9 @@ class Dataset(APIView):
     @swagger_auto_schema(operation_summary="创建数据集",
                          operation_id="创建数据集",
                          request_body=DataSetSerializers.Create.get_request_body_api(),
-                         responses=get_api_response(DataSetSerializers.Create.get_response_body_api()))
+                         responses=get_api_response(DataSetSerializers.Create.get_response_body_api()),
+                         tags=["数据集"]
+                         )
     @has_permissions(PermissionConstants.DATASET_CREATE, compare=CompareConstants.AND)
     def post(self, request: Request):
         s = DataSetSerializers.Create(data=request.data)
@@ -50,7 +53,8 @@ class Dataset(APIView):
         @action(methods="DELETE", detail=False)
         @swagger_auto_schema(operation_summary="删除数据集", operation_id="删除数据集",
                              manual_parameters=DataSetSerializers.Operate.get_request_params_api(),
-                             responses=result.get_default_response())
+                             responses=result.get_default_response(),
+                             tags=["数据集"])
         @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                                         dynamic_tag=keywords.get('dataset_id')),
                          lambda r, k: Permission(group=Group.DATASET, operate=Operate.DELETE,
@@ -62,7 +66,8 @@ class Dataset(APIView):
         @action(methods="GET", detail=False)
         @swagger_auto_schema(operation_summary="查询数据集详情根据数据集id", operation_id="查询数据集详情根据数据集id",
                              manual_parameters=DataSetSerializers.Operate.get_request_params_api(),
-                             responses=get_api_response(DataSetSerializers.Operate.get_response_body_api()))
+                             responses=get_api_response(DataSetSerializers.Operate.get_response_body_api()),
+                             tags=["数据集"])
         @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.USE,
                                                         dynamic_tag=keywords.get('dataset_id')))
         def get(self, request: Request, dataset_id: str):
@@ -72,7 +77,9 @@ class Dataset(APIView):
         @swagger_auto_schema(operation_summary="修改数据集信息", operation_id="修改数据集信息",
                              manual_parameters=DataSetSerializers.Operate.get_request_params_api(),
                              request_body=DataSetSerializers.Operate.get_request_body_api(),
-                             responses=get_api_response(DataSetSerializers.Operate.get_response_body_api()))
+                             responses=get_api_response(DataSetSerializers.Operate.get_response_body_api()),
+                             tags=["数据集"]
+                             )
         @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                                         dynamic_tag=keywords.get('dataset_id')))
         def put(self, request: Request, dataset_id: str):
@@ -87,7 +94,9 @@ class Dataset(APIView):
                              operation_id="获取数据集分页列表",
                              manual_parameters=get_page_request_params(
                                  DataSetSerializers.Query.get_request_params_api()),
-                             responses=get_page_api_response(DataSetSerializers.Query.get_response_body_api()))
+                             responses=get_page_api_response(DataSetSerializers.Query.get_response_body_api()),
+                             tags=["数据集"]
+                             )
         @has_permissions(PermissionConstants.DATASET_READ, compare=CompareConstants.AND)
         def get(self, request: Request, current_page, page_size):
             d = DataSetSerializers.Query(

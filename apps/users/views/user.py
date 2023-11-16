@@ -7,7 +7,6 @@
     @desc:
 """
 from django.core import cache
-from django.db.models import QuerySet
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
@@ -21,7 +20,6 @@ from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, CompareConstants
 from common.response import result
 from smartdoc.settings import JWT_AUTH
-from users.models.user import User as UserModel
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
     SendEmailSerializer, UserProfile
@@ -36,7 +34,8 @@ class User(APIView):
     @action(methods=['GET'], detail=False)
     @swagger_auto_schema(operation_summary="获取当前用户信息",
                          operation_id="获取当前用户信息",
-                         responses=result.get_api_response(UserProfile.get_response_body_api()))
+                         responses=result.get_api_response(UserProfile.get_response_body_api()),
+                         tags=['用户'])
     @has_permissions(PermissionConstants.USER_READ, compare=CompareConstants.AND)
     def get(self, request: Request):
         return result.success(UserProfile.get_user_profile(request.user))
@@ -58,7 +57,8 @@ class ResetCurrentUserPasswordView(APIView):
                                                                description="密码")
                              }
                          ),
-                         responses=RePasswordSerializer().get_response_body_api())
+                         responses=RePasswordSerializer().get_response_body_api(),
+                         tags=['用户'])
     def post(self, request: Request):
         data = {'email': request.user.email}
         data.update(request.data)
@@ -77,7 +77,8 @@ class SendEmailToCurrentUserView(APIView):
     @permission_classes((AllowAny,))
     @swagger_auto_schema(operation_summary="发送邮件到当前用户",
                          operation_id="发送邮件到当前用户",
-                         responses=SendEmailSerializer().get_response_body_api())
+                         responses=SendEmailSerializer().get_response_body_api(),
+                         tags=['用户'])
     def post(self, request: Request):
         serializer_obj = SendEmailSerializer(data={'email': request.user.email, 'type': "reset_password"})
         if serializer_obj.is_valid(raise_exception=True):
@@ -91,7 +92,8 @@ class Logout(APIView):
     @permission_classes((AllowAny,))
     @swagger_auto_schema(operation_summary="登出",
                          operation_id="登出",
-                         responses=SendEmailSerializer().get_response_body_api())
+                         responses=SendEmailSerializer().get_response_body_api(),
+                         tags=['用户'])
     def post(self, request: Request):
         token_cache.delete(request.META.get('HTTP_AUTHORIZATION', None
                                             ))
@@ -104,7 +106,9 @@ class Login(APIView):
     @swagger_auto_schema(operation_summary="登录",
                          operation_id="登录",
                          request_body=LoginSerializer().get_request_body_api(),
-                         responses=LoginSerializer().get_response_body_api())
+                         responses=LoginSerializer().get_response_body_api(),
+                         security=[],
+                         tags=['用户'])
     def post(self, request: Request):
         login_request = LoginSerializer(data=request.data)
         # 校验请求参数
@@ -121,7 +125,9 @@ class Register(APIView):
     @swagger_auto_schema(operation_summary="用户注册",
                          operation_id="用户注册",
                          request_body=RegisterSerializer().get_request_body_api(),
-                         responses=RegisterSerializer().get_response_body_api())
+                         responses=RegisterSerializer().get_response_body_api(),
+                         security=[],
+                         tags=['用户'])
     def post(self, request: Request):
         serializer_obj = RegisterSerializer(data=request.data)
         if serializer_obj.is_valid(raise_exception=True):
@@ -136,7 +142,9 @@ class RePasswordView(APIView):
     @swagger_auto_schema(operation_summary="修改密码",
                          operation_id="修改密码",
                          request_body=RePasswordSerializer().get_request_body_api(),
-                         responses=RePasswordSerializer().get_response_body_api())
+                         responses=RePasswordSerializer().get_response_body_api(),
+                         security=[],
+                         tags=['用户'])
     def post(self, request: Request):
         serializer_obj = RePasswordSerializer(data=request.data)
         return result.success(serializer_obj.reset_password())
@@ -149,7 +157,9 @@ class CheckCode(APIView):
     @swagger_auto_schema(operation_summary="校验验证码是否正确",
                          operation_id="校验验证码是否正确",
                          request_body=CheckCodeSerializer().get_request_body_api(),
-                         responses=CheckCodeSerializer().get_response_body_api())
+                         responses=CheckCodeSerializer().get_response_body_api(),
+                         security=[],
+                         tags=['用户'])
     def post(self, request: Request):
         return result.success(CheckCodeSerializer(data=request.data).is_valid(raise_exception=True))
 
@@ -160,7 +170,9 @@ class SendEmail(APIView):
     @swagger_auto_schema(operation_summary="发送邮件",
                          operation_id="发送邮件",
                          request_body=SendEmailSerializer().get_request_body_api(),
-                         responses=SendEmailSerializer().get_response_body_api())
+                         responses=SendEmailSerializer().get_response_body_api(),
+                         security=[],
+                         tags=['用户'])
     def post(self, request: Request):
         serializer_obj = SendEmailSerializer(data=request.data)
         if serializer_obj.is_valid(raise_exception=True):

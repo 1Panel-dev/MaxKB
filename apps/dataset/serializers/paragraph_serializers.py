@@ -19,7 +19,7 @@ from common.db.search import page_search
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
-from dataset.models import Paragraph, Problem
+from dataset.models import Paragraph, Problem, Document
 from dataset.serializers.problem_serializers import ProblemInstanceSerializer, ProblemSerializer
 
 
@@ -41,7 +41,7 @@ class ParagraphInstanceSerializer(ApiMixin, serializers.Serializer):
                                       message="段落在1-1024个字符之间")
     ])
 
-    title = serializers.CharField(required=False)
+    title = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     problem_list = ProblemInstanceSerializer(required=False, many=True)
 
@@ -164,6 +164,12 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True)
 
         document_id = serializers.UUIDField(required=True)
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if not QuerySet(Document).filter(id=self.data.get('document_id'),
+                                             dataset_id=self.data.get('dataset_id')).exists():
+                raise AppApiException(500, "文档id不正确")
 
         def save(self, instance: Dict, with_valid=True, with_embedding=True):
             if with_valid:

@@ -7,7 +7,6 @@
     @desc:
 """
 import os
-from concurrent.futures import ThreadPoolExecutor
 
 import django.db.models
 from blinker import signal
@@ -15,22 +14,14 @@ from django.db.models import QuerySet
 
 from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.db.search import native_search, get_dynamics_model
+from common.event.common import poxy
 from common.util.file_util import get_file_content
 from dataset.models import Paragraph, Status, Document
 from embedding.models import SourceType
 from smartdoc.conf import PROJECT_DIR
 
 
-def poxy(poxy_function):
-    def inner(args):
-        ListenerManagement.work_thread_pool.submit(poxy_function, args)
-
-    return inner
-
-
 class ListenerManagement:
-    work_thread_pool = ThreadPoolExecutor(5)
-
     embedding_by_problem_signal = signal("embedding_by_problem")
     embedding_by_paragraph_signal = signal("embedding_by_paragraph")
     embedding_by_dataset_signal = signal("embedding_by_dataset")

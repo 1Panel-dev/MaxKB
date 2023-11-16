@@ -98,13 +98,15 @@ class DataSetSerializers(serializers.ModelSerializer):
 
             query_set_dict['team_member_permission_custom_sql'] = QuerySet(model=get_dynamics_model(
                 {'user_id': models.CharField(),
+                 'team_member_permission.auth_target_type': models.CharField(),
                  'team_member_permission.operate': ArrayField(verbose_name="权限操作列表",
                                                               base_field=models.CharField(max_length=256,
                                                                                           blank=True,
                                                                                           choices=AuthOperate.choices,
                                                                                           default=AuthOperate.USE)
                                                               )})).filter(
-                **{'user_id': user_id, 'team_member_permission.operate__contains': ['USE']})
+                **{'user_id': user_id, 'team_member_permission.operate__contains': ['USE'],
+                   'team_member_permission.auth_target_type': 'DATASET'})
 
             return query_set_dict
 

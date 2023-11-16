@@ -23,7 +23,7 @@ class Embedding(models.Model):
 
     source_id = models.CharField(max_length=128, verbose_name="资源id")
 
-    source_type = models.CharField(verbose_name='资源类型', max_length=1, choices=SourceType.choices,
+    source_type = models.CharField(verbose_name='资源类型', max_length=5, choices=SourceType.choices,
                                    default=SourceType.PROBLEM)
 
     is_active = models.BooleanField(verbose_name="是否可用", max_length=1, default=True)
@@ -36,5 +36,11 @@ class Embedding(models.Model):
 
     embedding = VectorField(verbose_name="向量")
 
+    star_num = models.IntegerField(default=0, verbose_name="点赞数量")
+
+    trample_num = models.IntegerField(default=0,
+                                      verbose_name="点踩数量")
+
     class Meta:
         db_table = "embedding"
+        unique_together = ['source_id', 'source_type']

@@ -17,9 +17,9 @@ application = get_wsgi_application()
 
 
 def post_handler():
-    from common.event.listener_manage import ListenerManagement
-    ListenerManagement().run()
-    ListenerManagement.init_embedding_model_signal.send()
+    from common import event
+    event.run()
+    event.ListenerManagement.init_embedding_model_signal.send()
 
 
 post_handler()

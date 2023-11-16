@@ -54,6 +54,13 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
 
         paragraph_id = serializers.UUIDField(required=True)
 
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if not QuerySet(Paragraph).filter(id=self.data.get('paragraph_id'),
+                                              document_id=self.data.get('document_id'),
+                                              dataset_id=self.data.get('dataset_id')).exists():
+                raise AppApiException(500, "段落id不正确")
+
         def save(self, instance: Dict, with_valid=True, with_embedding=True):
             if with_valid:
                 self.is_valid()

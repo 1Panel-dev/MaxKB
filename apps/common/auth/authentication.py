@@ -35,23 +35,30 @@ def exist_role_by_role_constants(user_role: List[RoleConstants],
     return any(list(map(lambda up: role_list.__contains__(up), user_role)))
 
 
-def exist_permissions_by_view_permission(user_role: List[RoleConstants], user_permission: List[PermissionConstants],
-                                         permission: ViewPermission):
+def exist_permissions_by_view_permission(user_role: List[RoleConstants],
+                                         user_permission: List[PermissionConstants | object],
+                                         permission: ViewPermission, request, **kwargs):
     """
     用户是否存在这些权限
+    :param request:
     :param user_role:        用户角色
     :param user_permission:  用户权限
     :param permission:       所属权限
     :return:                 是否存在 True False
     """
     role_ok = any(list(map(lambda ur: permission.roleList.__contains__(ur), user_role)))
-    permission_ok = any(list(map(lambda up: permission.permissionList.__contains__(up), user_permission)))
+    permission_list = [user_p(request, kwargs) if callable(user_p) else user_p for user_p in
+                       permission.permissionList
+                       ]
+    permission_ok = any(list(map(lambda up: permission_list.__contains__(up),
+                                 user_permission)))
     return role_ok | permission_ok if permission.compare == CompareConstants.OR else role_ok & permission_ok
 
 
-def exist_permissions(user_role: List[RoleConstants], user_permission: List[PermissionConstants], permission):
+def exist_permissions(user_role: List[RoleConstants], user_permission: List[PermissionConstants], permission, request,
+                      **kwargs):
     if isinstance(permission, ViewPermission):
-        return exist_permissions_by_view_permission(user_role, user_permission, permission)
+        return exist_permissions_by_view_permission(user_role, user_permission, permission, request, **kwargs)
     elif isinstance(permission, RoleConstants):
         return exist_role_by_role_constants(user_role, [permission])
     elif isinstance(permission, PermissionConstants):
@@ -64,9 +71,9 @@ def exist_permissions(user_role: List[RoleConstants], user_permission: List[Perm
 def exist(user_role: List[RoleConstants], user_permission: List[PermissionConstants], permission, request, **kwargs):
     if callable(permission):
         p = permission(request, kwargs)
-        return exist_permissions(user_role, user_permission, p)
+        return exist_permissions(user_role, user_permission, p, request)
     else:
-        return exist_permissions(user_role, user_permission, permission)
+        return exist_permissions(user_role, user_permission, permission, request, **kwargs)
 
 
 def has_permissions(*permission, compare=CompareConstants.OR):

@@ -32,9 +32,10 @@ def get_dynamics_model(attr: dict, table_name='dynamics'):
 
 
 def generate_sql_by_query_dict(queryset_dict: Dict[str, QuerySet], select_string: str,
-                               field_replace_dict: None | Dict[str, Dict[str, str]] = None):
+                               field_replace_dict: None | Dict[str, Dict[str, str]] = None, with_table_name=False):
     """
     生成 查询sql
+    :param with_table_name:
     :param queryset_dict: 多条件 查询条件
     :param select_string: 查询sql
     :param field_replace_dict:  需要替换的查询字段,一般不需要传入如果有特殊的需要传入
@@ -45,7 +46,8 @@ def generate_sql_by_query_dict(queryset_dict: Dict[str, QuerySet], select_string
     result_params = []
     for key in queryset_dict.keys():
         value = queryset_dict.get(key)
-        sql, params = compiler_queryset(value, None if field_replace_dict is None else field_replace_dict.get(key))
+        sql, params = compiler_queryset(value, None if field_replace_dict is None else field_replace_dict.get(key),
+                                        with_table_name)
         params_dict = {**params_dict, select_string.index("${" + key + "}"): params}
         select_string = select_string.replace("${" + key + "}", sql)
 
@@ -55,7 +57,7 @@ def generate_sql_by_query_dict(queryset_dict: Dict[str, QuerySet], select_string
 
 
 def generate_sql_by_query(queryset: QuerySet, select_string: str,
-                          field_replace_dict: None | Dict[str, str] = None):
+                          field_replace_dict: None | Dict[str, str] = None, with_table_name=False):
     """
     生成 查询sql
     :param queryset:            查询条件
@@ -63,13 +65,14 @@ def generate_sql_by_query(queryset: QuerySet, select_string: str,
     :param field_replace_dict:  需要替换的查询字段,一般不需要传入如果有特殊的需要传入
     :return:  sql:需要查询的sql params: sql 参数
     """
-    sql, params = compiler_queryset(queryset, field_replace_dict)
+    sql, params = compiler_queryset(queryset, field_replace_dict, with_table_name)
     return select_string + " " + sql, params
 
 
-def compiler_queryset(queryset: QuerySet, field_replace_dict: None | Dict[str, str] = None):
+def compiler_queryset(queryset: QuerySet, field_replace_dict: None | Dict[str, str] = None, with_table_name=False):
     """
     解析 queryset查询对象
+    :param with_table_name:
     :param queryset:            查询对象
     :param field_replace_dict:  需要替换的查询字段,一般不需要传入如果有特殊的需要传入
     :return: sql:需要查询的sql params: sql 参数
@@ -80,15 +83,16 @@ def compiler_queryset(queryset: QuerySet, field_replace_dict: None | Dict[str, s
         field_replace_dict = get_field_replace_dict(queryset)
     app_sql_compiler = AppSQLCompiler(q, using=DEFAULT_DB_ALIAS, connection=compiler.connection,
                                       field_replace_dict=field_replace_dict)
-    sql, params = app_sql_compiler.get_query_str(with_table_name=False)
+    sql, params = app_sql_compiler.get_query_str(with_table_name)
     return sql, params
 
 
 def native_search(queryset: QuerySet | Dict[str, QuerySet], select_string: str,
                   field_replace_dict: None | Dict[str, Dict[str, str]] | Dict[str, str] = None,
-                  with_search_one=False):
+                  with_search_one=False, with_table_name=False):
     """
     复杂查询
+    :param with_table_name:     生成sql是否包含表名
     :param queryset:            查询条件构造器
     :param select_string:       查询前缀 不包括 where limit 等信息
     :param field_replace_dict:  需要替换的字段
@@ -96,9 +100,9 @@ def native_search(queryset: QuerySet | Dict[str, QuerySet], select_string: str,
     :return: 查询结果
     """
     if isinstance(queryset, Dict):
-        exec_sql, exec_params = generate_sql_by_query_dict(queryset, select_string, field_replace_dict)
+        exec_sql, exec_params = generate_sql_by_query_dict(queryset, select_string, field_replace_dict, with_table_name)
     else:
-        exec_sql, exec_params = generate_sql_by_query(queryset, select_string, field_replace_dict)
+        exec_sql, exec_params = generate_sql_by_query(queryset, select_string, field_replace_dict, with_table_name)
     if with_search_one:
         return select_one(exec_sql, exec_params)
     else:
@@ -121,9 +125,11 @@ def page_search(current_page: int, page_size: int, queryset: QuerySet, post_reco
 
 def native_page_search(current_page: int, page_size: int, queryset: QuerySet | Dict[str, QuerySet], select_string: str,
                        field_replace_dict=None,
-                       post_records_handler=lambda r: r):
+                       post_records_handler=lambda r: r,
+                       with_table_name=False):
     """
     复杂分页查询
+    :param with_table_name:
     :param current_page:          当前页
     :param page_size:             每页大小
     :param queryset:              查询条件
@@ -133,9 +139,9 @@ def native_page_search(current_page: int, page_size: int, queryset: QuerySet | D
     :return: 分页结果
     """
     if isinstance(queryset, Dict):
-        exec_sql, exec_params = generate_sql_by_query_dict(queryset, select_string, field_replace_dict)
+        exec_sql, exec_params = generate_sql_by_query_dict(queryset, select_string, field_replace_dict, with_table_name)
     else:
-        exec_sql, exec_params = generate_sql_by_query(queryset, select_string, field_replace_dict)
+        exec_sql, exec_params = generate_sql_by_query(queryset, select_string, field_replace_dict, with_table_name)
     total_sql = "SELECT \"count\"(*) FROM (%s) temp" % exec_sql
     total = select_one(total_sql, exec_params)
     limit_sql = connections[DEFAULT_DB_ALIAS].ops.limit_offset_sql(

@@ -19,7 +19,7 @@ class AppSQLCompiler(SQLCompiler):
             field_replace_dict = {}
         self.field_replace_dict = field_replace_dict
 
-    def get_query_str(self, with_limits=True, with_table_name=True):
+    def get_query_str(self, with_limits=True, with_table_name=False):
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()

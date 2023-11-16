@@ -7,3 +7,4 @@
     @desc:
 """
 from .Team import *
+from .model import *

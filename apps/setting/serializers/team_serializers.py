@@ -233,12 +233,12 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
                         member_permission_list))
             # 分为 APPLICATION DATASET俩组
             groups = itertools.groupby(
-                list(map(lambda m: {**m, 'member_id': member_id,
-                                    'operate': dict(
-                                        map(lambda key: (key, True if m.get('operate') is not None and m.get(
-                                            'operate').__contains__(key) else False),
-                                            [Operate.USE.value, Operate.MANAGE.value]))},
-                         member_permission_list)),
+                sorted(list(map(lambda m: {**m, 'member_id': member_id,
+                                           'operate': dict(
+                                               map(lambda key: (key, True if m.get('operate') is not None and m.get(
+                                                   'operate').__contains__(key) else False),
+                                                   [Operate.USE.value, Operate.MANAGE.value]))},
+                                member_permission_list)), key=lambda x: x.get('type')),
                 key=lambda x: x.get('type'))
             return dict([(key, list(group)) for key, group in groups])
 
