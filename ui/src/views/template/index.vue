@@ -12,7 +12,7 @@
           </template>
         </common-list>
       </div>
-      <div class="template-manage__left p-24">
+      <div class="template-manage__right p-24">
         <h4>全部模型</h4>
       </div>
     </div>
