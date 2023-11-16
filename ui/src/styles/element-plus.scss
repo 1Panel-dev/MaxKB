@@ -1,14 +1,27 @@
 :root {
+  --el-color-primary: #3370ff;
+  --el-color-primary-light-9: rgba(51, 112, 255, 0.1);
   --el-menu-item-height: 45px;
-  --el-text-color-primary: '#1F2329';
+  --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
+  --el-border-color: #dee0e3;
+}
+
+.el-button {
+  padding: 5px 12px;
+  &.is-text {
+    padding: 4px !important;
+    font-size: 16px;
+    max-height: 24px;
+    &:not(.is-disabled):hover {
+      background: var(--app-text-color-light-1);
+    }
+  }
 }
 .el-avatar {
   --el-avatar-bg-color: var(--el-color-primary);
   --el-avatar-size-small: 33px;
+  --el-avatar-border-radius: 8px;
   cursor: pointer;
-}
-.el-popper {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .el-form {
@@ -26,28 +39,20 @@
 }
 
 .el-message-box {
-  padding-bottom: 24px;
-  .app-confirm {
-    .app-confirm-title {
-      color: var(--el-text-color-primary);
-    }
-    .icon {
-      font-size: 24px;
-      color: var(--el-color-warning);
-    }
-    .app-confirm-decription {
-      margin-left: 40px;
-    }
+  --el-messagebox-font-size: 16px;
+  padding: 24px;
+  .el-message-box__header {
+    padding: 0;
   }
 }
 
-
 .el-message-box__content {
-  padding: 24px;
-  color: var(--el-text-color-primary);
+  padding: 24px 0;
+  color: var(--app-text-color);
+  font-weight: 400;
 }
 .el-message-box__btns {
-  padding: 5px 24px 0;
+  padding: 0;
   button {
     min-width: 80px;
     &:nth-child(2) {
@@ -57,46 +62,122 @@
   button.danger {
     background: var(--el-color-danger);
     border: var(--el-color-danger);
+    color: #ffffff;
+  }
+}
+.el-message-box__headerbtn {
+  right: -5px;
+  top: -5px;
+  .el-message-box__close {
+    font-size: 20px;
   }
 }
 
-@media only screen and (min-width: 1200px) {
-  .el-col-lg-5 {
-    display: block;
-    max-width: 25%;
-    flex: 0 0 25%;
-  }
-}
 @media only screen and (min-width: 1400px) {
-  .el-col-lg-5 {
-    display: block;
-    max-width: 20.8333333333%;
-    flex: 0 0 20.8333333333%;
+  .app-list-row {
+    .el-col-lg-6 {
+      display: block;
+      max-width: 20.8333333333%;
+      flex: 0 0 20.8333333333%;
+    }
   }
 }
 @media only screen and (min-width: 1920px) {
-  .el-col-xl-4 {
-    display: block;
-    max-width: 16.6666666667%;
-    flex: 0 0 16.6666666667%;
+  .app-list-row {
+    .el-col-xl-4 {
+      display: block;
+      max-width: 16.6666666667%;
+      flex: 0 0 16.6666666667%;
+    }
   }
 }
 
-// 抽屉样式整体修改
-.el-drawer {
-  .el-drawer__header {
-    padding: 0;
-    margin: 0 24px;
-    height: 56px;
-    border-bottom: 1px solid var(--el-border-color);
-    .el-drawer__title {
-      color: #1f2329;
+.el-card {
+  --el-card-border-radius: 8px;
+  --el-card-padding: calc(var(--app-base-px) * 2);
+}
+.el-dropdown {
+  color: var(--app-text-color);
+}
+
+.el-tag {
+  --el-tag-border-radius: 2px;
+}
+.el-table {
+  --el-table-header-bg-color: var(--app-layout-bg-color);
+  --el-table-text-color: var(--app-text-color);
+  font-weight: 400;
+  thead {
+    color: var(--app-text-color-secondary);
+    th {
       font-weight: 500;
-      font-size: 16px;
-      line-height: 24px;
     }
   }
-  .el-drawer__body {
-    --el-drawer-padding-primary: 24px;
+
+  th.el-table__cell {
+    border-top: var(--el-table-border);
+  }
+  .el-table__cell {
+    padding: 12px 0;
+  }
+  .el-checkbox {
+    height: 23px;
+  }
+}
+
+.el-pagination .el-select .el-input {
+  width: 100px;
+}
+
+// el-steps
+.el-step__icon {
+  background: none;
+}
+.el-step__head.is-process {
+  .el-step__icon {
+    &.is-text {
+      color: #ffffff;
+      border-color: var(--el-color-primary) !important;
+      background: var(--el-color-primary) !important;
+    }
+  }
+}
+
+.el-text {
+  font-weight: 400;
+  &.el-text--info {
+    color: var(--app-text-color-secondary);
+  }
+}
+
+.el-switch {
+  height: auto;
+}
+
+.el-slider {
+  --el-slider-button-size: 14px;
+  --el-slider-height: 4px;
+}
+.el-slider__button {
+  border: solid 1px var(--app-border-color-dark);
+  &.hover {
+    border: solid 2px var(--el-slider-main-bg-color);
+  }
+}
+.el-slider__runway.show-input {
+  margin-right: calc(var(--app-base-px) + 4px);
+}
+.el-slider__input {
+  width: 60px;
+}
+
+.input-with-select {
+  .el-input__wrapper {
+    // border: 1px solid var(--el-border-color);
+    // box-shadow: none!important;
+  }
+
+  .el-input-group__prepend {
+    background-color: var(--el-fill-color-blank);
   }
 }

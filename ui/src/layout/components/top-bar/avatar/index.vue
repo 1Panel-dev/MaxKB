@@ -1,6 +1,15 @@
 <template>
   <el-dropdown trigger="click" type="primary">
-    <AppAvatar :name="user.userInfo?.username" />
+    <div class="flex-center cursor">
+      <AppAvatar>
+        <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+      </AppAvatar>
+      <span class="ml-8">{{ user.userInfo?.username }}</span>
+      <el-icon class="el-icon--right">
+        <CaretBottom />
+      </el-icon>
+    </div>
+
     <template #dropdown>
       <el-dropdown-menu>
         <el-dropdown-item @click="openResetPassword">

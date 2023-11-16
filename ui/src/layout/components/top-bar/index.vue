@@ -1,11 +1,10 @@
 <template>
-  <div class="top-bar-container flex-between border-b">
+  <div class="top-bar-container border-b flex-between">
     <div class="flex-center h-full">
       <div class="app-title-container flex-center">
         <div class="app-title-icon"></div>
-        <div class="app-title-text ml-10">{{ defaultTitle }}</div>
+        <div class="app-title-text app-logo-font">{{ defaultTitle }}</div>
       </div>
-      <el-divider direction="vertical" class="line" />
       <TopMenu></TopMenu>
     </div>
     <div class="avatar">
@@ -25,18 +24,16 @@ const defaultTitle = import.meta.env.VITE_APP_TITLE
   padding: var(--app-header-padding);
 
   .app-title-container {
-    margin-right: 20px;
+    margin-right: 45px;
     .app-title-icon {
       background-image: url('@/assets/logo.png');
       background-size: 100% 100%;
-      width: 40px;
-      height: 40px;
+      width: 34px;
+      height: 34px;
     }
 
     .app-title-text {
-      color: var(--el-color-primary);
-      font-size: 20px;
-      font-weight: 600;
+      font-size: 24px;
     }
   }
   .line {

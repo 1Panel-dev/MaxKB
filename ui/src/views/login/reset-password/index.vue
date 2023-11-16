@@ -1,7 +1,7 @@
 <template>
   <login-layout>
     <LoginContainer>
-      <h4 class="mb-20">修改密码</h4>
+      <h4 class="mb-16">修改密码</h4>
       <el-form
         class="reset-password-form"
         ref="resetPasswordFormRef"
@@ -40,7 +40,7 @@
       <el-button type="primary" class="login-submit-button w-full" @click="resetPassword"
         >确认修改</el-button
       >
-      <div class="operate-container mt-10">
+      <div class="operate-container mt-8">
         <el-button
           class="register"
           @click="router.push('/login')"
@@ -63,6 +63,9 @@ import type { FormInstance, FormRules } from 'element-plus'
 import UserApi from '@/api/user'
 const router = useRouter()
 const route = useRoute()
+const {
+  params: { code, email }
+} = route
 const resetPasswordForm = ref<ResetPasswordRequest>({
   password: '',
   re_password: '',
@@ -71,8 +74,6 @@ const resetPasswordForm = ref<ResetPasswordRequest>({
 })
 
 onMounted(() => {
-  const code = route.params.code
-  const email = route.params.email
   if (code && email) {
     resetPasswordForm.value.code = code as string
     resetPasswordForm.value.email = email as string

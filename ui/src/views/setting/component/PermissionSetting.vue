@@ -1,26 +1,28 @@
 <template>
+  <el-input v-model="filterText" placeholder="搜索" prefix-icon="Search" class="mb-16" />
+
   <el-table :data="data" :max-height="tableHeight">
     <el-table-column prop="name" label="数据集名称" />
     <el-table-column label="管理" align="center">
-      <template #header>
+      <!-- <template #header>
         <el-checkbox
           v-model="allChecked[MANAGE]"
           label="管理"
           @change="handleCheckAllChange($event, MANAGE)"
         />
-      </template>
+      </template> -->
       <template #default="{ row }">
         <el-checkbox v-model="row.operate[MANAGE]" @change="checkedOperateChange(MANAGE, row)" />
       </template>
     </el-table-column>
     <el-table-column label="使用" align="center">
-      <template #header>
+      <!-- <template #header>
         <el-checkbox
           v-model="allChecked[USE]"
           label="使用"
           @change="handleCheckAllChange($event, USE)"
         />
-      </template>
+      </template> -->
       <template #default="{ row }">
         <el-checkbox v-model="row.operate[USE]" @change="checkedOperateChange(USE, row)" />
       </template>
@@ -49,6 +51,8 @@ const allChecked: any = ref({
 
 const tableHeight = ref(0)
 
+const filterText = ref('')
+
 watch(
   () => props.data,
   (val) => {
@@ -74,7 +78,7 @@ function handleCheckAllChange(val: string | number | boolean, Name: string | num
   }
 }
 function checkedOperateChange(Name: string | number, row: any) {
-  if (Name === MANAGE) {
+  if (Name === MANAGE && row.operate[MANAGE]) {
     props.data.map((item: any) => {
       if (item.id === row.id) {
         item.operate[USE] = true

@@ -1,6 +1,8 @@
 <template>
   <div class="main-layout h-full flex">
-    <div class="sidebar-container border-r"><Sidebar /></div>
+    <div class="sidebar-container">
+      <Sidebar />
+    </div>
     <div class="view-container">
       <AppMain />
     </div>
@@ -19,6 +21,6 @@ import { Sidebar, AppMain } from '../components'
   background-color: var(--sidebar-bg-color);
 }
 .view-container {
-  width: 100%;
+  width: calc(100% - var(--sidebar-width));
 }
 </style>

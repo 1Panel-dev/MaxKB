@@ -31,7 +31,7 @@ const router = useRouter()
     }
 
     .message-container {
-        color: var(--app-base-text-color);
+        color: var(--app-text-color);
 
         .title {
             font-size: 50px;

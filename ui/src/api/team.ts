@@ -56,8 +56,9 @@ const putMemberPermissions: (member_id: String, body: any) => Promise<Result<any
   member_id,
   body
 ) => {
-  return put(`${prefix}/${member_id}`, undefined, body)
+  return put(`${prefix}/${member_id}`, body)
 }
+
 
 export default {
   getTeamMember,

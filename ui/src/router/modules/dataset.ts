@@ -11,27 +11,51 @@ const datasetRouter = {
       component: () => import('@/views/dataset/index.vue')
     },
     {
-      path: '/dataset/create',
+      path: '/dataset/:type', // create 或者 upload
       name: 'CreateDataset',
       meta: { activeMenu: '/dataset' },
       component: () => import('@/views/dataset/CreateDataset.vue'),
       hidden: true
     },
     {
-      path: '/dataset/doc',
-      name: 'DatasetDoc',
-      meta: { icon: 'House', title: '文档', activeMenu: '/dataset' },
+      path: '/dataset/:datasetId',
+      name: 'DatasetDetail',
+      meta: { title: '文档', activeMenu: '/dataset' },
       component: Layout,
       hidden: true,
-      redirect: '/dataset/doc',
       children: [
         {
-          path: '/dataset/doc',
-          name: 'DatasetDoc',
-          meta: { icon: 'House', title: '文档' },
-          component: () => import('@/views/dataset/DatasetDoc.vue')
+          path: 'document',
+          name: 'Document',
+          meta: {
+            icon: 'Document',
+            title: '文档',
+            active: 'document',
+            parentPath: '/dataset/:datasetId',
+            parentName: 'DatasetDetail'
+          },
+          component: () => import('@/views/document/index.vue')
+        },
+        {
+          path: 'setting',
+          name: 'DatasetSetting',
+          meta: {
+            icon: 'Setting',
+            title: '设置',
+            active: 'setting',
+            parentPath: '/dataset/:datasetId',
+            parentName: 'DatasetDetail'
+          },
+          component: () => import('@/views/document/DatasetSetting.vue')
         }
       ]
+    },
+    {
+      path: '/dataset/:datasetId/:documentId', // 分段详情
+      name: 'Paragraph',
+      meta: { activeMenu: '/dataset' },
+      component: () => import('@/views/paragraph/index.vue'),
+      hidden: true
     }
   ]
 }

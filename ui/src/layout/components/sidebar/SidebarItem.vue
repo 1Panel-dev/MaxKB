@@ -2,7 +2,11 @@
   <div v-if="!menu.meta || !menu.meta.hidden" class="sidebar-item">
     <el-menu-item ref="subMenu" :index="menu.path" popper-class="sidebar-popper">
       <template #title>
-        <AppIcon v-if="menu.meta && menu.meta.icon" :iconName="menu.meta.icon" />
+        <AppIcon
+          v-if="menu.meta && menu.meta.icon"
+          :iconName="menu.meta.icon"
+          class="sidebar-icon"
+        />
         <span v-if="menu.meta && menu.meta.title">{{ menu.meta.title }}</span>
       </template>
     </el-menu-item>
@@ -19,9 +23,18 @@ defineProps<{
 
 <style scoped lang="scss">
 .sidebar-item {
+  .sidebar-icon {
+    font-size: 20px;
+    margin-top: -2px;
+  }
   .el-menu-item {
-    padding-left: 30px !important;
+    padding: 13px 12px 13px 16px !important;
     font-weight: 500;
+    border-radius: 4px;
+    &:hover {
+      background: none;
+      color: var(--el-menu-active-color);
+    }
   }
 
   .el-menu-item.is-active {

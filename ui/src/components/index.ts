@@ -3,12 +3,15 @@ import AppIcon from './icons/AppIcon.vue'
 import AppAvatar from './app-avatar/index.vue'
 import LoginLayout from './login-layout/index.vue'
 import LoginContainer from './login-container/index.vue'
-import LayoutContent from './content-container/LayoutContent.vue'
+import LayoutContainer from './layout-container/index.vue'
 import TagsInput from './tags-input/index.vue'
 import CardBox from './card-box/index.vue'
 import CardAdd from './card-add/index.vue'
-
-
+import BackButton from './back-button/index.vue'
+import AppTable from './app-table/index.vue'
+import ReadWrite from './read-write/index.vue'
+import TagEllipsis from './tag-ellipsis/index.vue'
+import CommonList from './common-list/index.vue'
 
 export default {
   install(app: App) {
@@ -16,9 +19,14 @@ export default {
     app.component(AppAvatar.name, AppAvatar)
     app.component(LoginLayout.name, LoginLayout)
     app.component(LoginContainer.name, LoginContainer)
-    app.component(LayoutContent.name, LayoutContent)
+    app.component(LayoutContainer.name, LayoutContainer)
     app.component(TagsInput.name, TagsInput)
     app.component(CardBox.name, CardBox)
     app.component(CardAdd.name, CardAdd)
+    app.component(BackButton.name, BackButton)
+    app.component(AppTable.name, AppTable)
+    app.component(ReadWrite.name, ReadWrite)
+    app.component(TagEllipsis.name, TagEllipsis)
+    app.component(CommonList.name, CommonList)
   }
 }

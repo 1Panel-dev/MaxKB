@@ -19,7 +19,5 @@ const topMenuList = computed(() => {
 })
 </script>
 <style lang="scss" scope>
-.top-menu-container {
-  margin-bottom: -1px;
-}
+
 </style>

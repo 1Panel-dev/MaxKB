@@ -1,8 +1,8 @@
 <template>
-  <el-card shadow="hover">
-    <div class="card-add">
-      <AppIcon :iconName="icon" class="add-icon" />
-      <span class="ml-10">{{ title }}</span>
+  <el-card shadow="never" class="card-add">
+    <div class="flex-center">
+      <AppIcon iconName="Plus" class="add-icon p-8" />
+      <span>{{ title }}</span>
     </div>
   </el-card>
 </template>
@@ -12,27 +12,35 @@ defineProps({
   title: {
     type: String,
     default: '标题'
-  },
-  icon: {
-    type: String,
-    default: 'CirclePlusFilled'
   }
 })
 </script>
 <style lang="scss" scoped>
 .card-add {
   width: 100%;
-  min-height: 110px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  font-size: 15px;
+  font-size: 16px;
   cursor: pointer;
+  min-height: var(--card-min-height);
+  border: 1px dashed var(--el-color-primary);
+  background: #eff0f1;
+
+  .add-icon {
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid var(--app-border-color-dark);
+    background: var(--app-layout-bg-color);
+    margin-right: 12px;
+  }
   &:hover {
     color: var(--el-color-primary);
-  }
-  .add-icon {
-    font-size: 16px;
+    background: #ffffff;
+    .add-icon {
+      background: #ffffff;
+      border-color: var(--el-color-primary);
+    }
   }
 }
 </style>

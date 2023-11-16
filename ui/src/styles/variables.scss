@@ -1,17 +1,39 @@
 :root {
-  --el-color-primary: rgba(51, 112, 255, 1);
-  --app-layout-bg-color: #f3f5f6;
-  --app-base-text-color: rgba(31, 35, 41, 1);
-  --app-view-padding: 15px;
+  --app-base-px: 8px;
+  --app-layout-bg-color: #f5f6f7;
+  --app-text-color: #1f2329;
+  --app-text-color-light-1: rgba(31, 35, 41, 0.1);
+  --app-text-color-secondary: #646a73;
+  --app-text-color-disable: #bbbfc4;
+  --app-view-padding: 24px;
   --app-view-bg-color: #ffffff;
-  --hover-bg-color: #fafafa;
+  --app-border-color-dark: #bbbfc4;
+
   /** header 组件 */
   --app-header-height: 56px;
   --app-header-padding: 0 20px;
-  --app-header-bg-color: #ffffff;
+  --app-header-bg-color: linear-gradient(90deg, #ebf1ff 24.34%, #e5fbf8 56.18%, #f2ebfe 90.18%);
+  --app-logo-color: linear-gradient(180deg, #3370ff 0%, #7f3bf5 100%);
+
+  // 计算高度
+  --app-main-height: calc(100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 40px);
+
   /** sidebar 组件 */
   --sidebar-bg-color: #ffffff;
-  --sidebar-width: 198px;
+  --sidebar-width: 240px;
+  /** tag */
+  --tag-deflaut-bg: rgba(51, 112, 255, 0.2);
+  --tag-deflaut-color: #2b5fd9;
+  /** card */
+  --card-width: 330px;
+  --card-min-height: 160px;
+  --card-min-width: 220px;
 
-  --team-manage-left-width : 280px;
+  /** setting */
+  --setting-left-width: 280px;
+
+  /** dataset */
+  --create-dataset-height: calc(
+    100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 70px
+  );
 }

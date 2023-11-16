@@ -1,55 +1,49 @@
 <template>
-  <LayoutContent header="团队管理">
+  <LayoutContainer header="团队管理">
     <div class="team-manage flex main-calc-height">
-      <div class="team-member p-15 border-r">
-        <h4>团队成员</h4>
-        <div class="text-right">
+      <div class="team-member p-8 border-r">
+        <div class="flex-between p-16">
+          <h4>成员</h4>
           <el-button type="primary" link @click="addMember">
-            <AppIcon iconName="app-add-users" class="add-user-icon" />添加成员
+            <AppIcon iconName="app-add-users" class="add-user-icon" />
           </el-button>
         </div>
-        <div class="mt-10">
-          <el-input v-model="filterText" placeholder="请输入用户名搜索" suffix-icon="Search" />
+        <div class="team-member-input">
+          <el-input v-model="filterText" placeholder="请输入用户名搜索" prefix-icon="Search" />
         </div>
-        <div class="member-list mt-10" v-loading="loading">
-          <el-scrollbar>
-            <ul v-if="filterMember.length > 0">
-              <template v-for="(item, index) in filterMember" :key="index">
-                <li
-                  @click.prevent="clickMemberHandle(item.id)"
-                  :class="currentUser === item.id ? 'active' : ''"
-                  class="border-b-light flex-between p-15 cursor"
-                >
-                  <div>
-                    <span class="mr-10">{{ item.username }}</span>
-                    <el-tag effect="dark" v-if="isManage(item.type)">所有者</el-tag>
-                    <el-tag effect="dark" type="warning" v-else>用户</el-tag>
-                  </div>
-                  <span @click.stop>
-                    <el-dropdown trigger="click" v-if="!isManage(item.type)">
-                      <span class="cursor">
-                        <el-icon><MoreFilled /></el-icon>
-                      </span>
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item @click.prevent="deleteMember(item)"
-                            >移除</el-dropdown-item
-                          >
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
+        <common-list
+          :data="filterMember"
+          class="mt-8"
+          v-loading="loading"
+          @click="clickMemberHandle"
+        >
+          <template #default="{ row }">
+            <div class="flex-between">
+              <div>
+                <span class="mr-8">{{ row.username }}</span>
+                <el-tag v-if="isManage(row.type)" class="default-tag">所有者</el-tag>
+                <el-tag type="warning" v-else>用户</el-tag>
+              </div>
+              <div @click.stop style="margin-top: 5px">
+                <el-dropdown trigger="click" v-if="!isManage(row.type)">
+                  <span class="cursor">
+                    <el-icon class="rotate-90"><MoreFilled /></el-icon>
                   </span>
-                </li>
-              </template>
-            </ul>
-            <el-empty description="暂无数据" v-else />
-          </el-scrollbar>
-        </div>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item @click.prevent="deleteMember(row)">移除</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
+            </div>
+          </template>
+        </common-list>
       </div>
       <div class="permission-setting flex" v-loading="rLoading">
-        <div class="team-manage__table p-15">
+        <div class="team-manage__table p-24">
           <h4>权限设置</h4>
-          <el-tabs v-model="activeName" class="demo-tabs">
+          <el-tabs v-model="activeName" class="team-manage__tabs">
             <el-tab-pane
               v-for="item in settingTags"
               :key="item.value"
@@ -61,13 +55,13 @@
           </el-tabs>
         </div>
 
-        <div class="team-manage__footer border-t p-15 flex">
+        <div class="team-manage__footer border-t p-16 flex">
           <el-button type="primary" @click="submitPermissions">保存</el-button>
         </div>
       </div>
     </div>
     <CreateMemberDialog ref="CreateMemberRef" @refresh="refresh" />
-  </LayoutContent>
+  </LayoutContainer>
 </template>
 
 <script lang="ts" setup>
@@ -154,13 +148,15 @@ function MemberPermissions(id: String) {
 }
 
 function deleteMember(row: TeamMember) {
-  MsgConfirm({
-    title: `是否移除成员：${row.username}`,
-    decription: '移除后将会取消成员拥有的数据集和应用权限。',
-    confirmButtonText: '移除',
-  }, {
-    confirmButtonClass: 'danger',
-  })
+  MsgConfirm(
+    `是否移除成员：${row.username}?`,
+    '移除后将会取消成员拥有的数据集和应用权限。',
+
+    {
+      confirmButtonText: '移除',
+      confirmButtonClass: 'danger'
+    }
+  )
     .then(() => {
       loading.value = true
       TeamApi.delTeamMember(row.id)
@@ -179,9 +175,9 @@ function isManage(type: String) {
   return type === 'manage'
 }
 
-function clickMemberHandle(id: String) {
-  currentUser.value = id
-  MemberPermissions(id)
+function clickMemberHandle(item: any) {
+  currentUser.value = item.id
+  MemberPermissions(item.id)
 }
 function addMember() {
   CreateMemberRef.value?.open()
@@ -214,30 +210,30 @@ onMounted(() => {
 <style lang="scss" scoped>
 .team-manage {
   .add-user-icon {
-    margin-right: 5px;
-    font-size: 20px;
+    font-size: 17px;
+  }
+  .team-member-input {
+    padding: 0 calc(var(--app-base-px) * 2);
   }
   .team-member {
     box-sizing: border-box;
-    width: var(--team-manage-left-width);
-    min-width: var(--team-manage-left-width);
-    .member-list {
-      li {
-        &.active {
-          background: var(--el-color-primary-light-9);
-        }
-      }
-    }
+    width: var(--setting-left-width);
+    min-width: var(--setting-left-width);
   }
+
   .permission-setting {
     box-sizing: border-box;
-    width: calc(100% - var(--team-manage-left-width) - 5px);
+    width: calc(100% - var(--setting-left-width));
     flex-direction: column;
   }
-  .team-manage__table {
+
+  &__tabs {
+    margin-top: 10px;
+  }
+  &__table {
     flex: 1;
   }
-  .team-manage__footer {
+  &__footer {
     flex: 0 0 auto;
     justify-content: right;
   }

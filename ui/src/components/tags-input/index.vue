@@ -8,7 +8,7 @@
         :key="index"
         @close="removeTag(item)"
         closable
-        class="mr-10"
+        class="mr-8"
         >{{ item }}
       </el-tag>
     </div>
