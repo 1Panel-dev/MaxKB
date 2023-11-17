@@ -1,7 +1,7 @@
 <template>
   <div class="set-rules">
     <el-row class="set-rules-height">
-      <el-col :span="12" class="p-24">
+      <el-col :span="10" class="p-24">
         <h4 class="title-decoration-1 mb-8">设置分段规则</h4>
         <div>
           <el-scrollbar>
@@ -70,7 +70,7 @@
         </div>
       </el-col>
 
-      <el-col :span="12" class="p-24 border-l">
+      <el-col :span="14" class="p-24 border-l">
         <div v-loading="loading">
           <h4 class="title-decoration-1 mb-8">分段预览</h4>
           <ParagraphPreview v-model:data="paragraphList" />

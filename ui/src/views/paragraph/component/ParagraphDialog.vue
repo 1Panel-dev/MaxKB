@@ -42,7 +42,6 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
 import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 import ProblemComponent from '@/views/paragraph/component/ProblemComponent.vue'
 import datasetApi from '@/api/dataset'
@@ -62,7 +61,7 @@ const {
 const emit = defineEmits(['refresh'])
 
 const ProblemRef = ref()
-const paragraphFormRef = ref<FormInstance>()
+const paragraphFormRef = ref<any>()
 
 const dialogVisible = ref<boolean>(false)
 
