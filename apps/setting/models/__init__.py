@@ -7,3 +7,4 @@
     @desc:
 """
 from .team_management import *
+from .model_management import *

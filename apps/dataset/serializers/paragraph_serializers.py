@@ -20,6 +20,7 @@ from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from dataset.models import Paragraph, Problem, Document
+from dataset.serializers.common_serializers import update_document_char_length
 from dataset.serializers.problem_serializers import ProblemInstanceSerializer, ProblemSerializer
 
 
@@ -123,6 +124,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                     update_problem_list) > 0 else None
 
             _paragraph.save()
+            update_document_char_length(self.data.get('document_id'))
             if 'is_active' in instance and instance.get('is_active') is not None:
                 s = (ListenerManagement.enable_embedding_by_paragraph_signal if instance.get(
                     'is_active') else ListenerManagement.disable_embedding_by_paragraph_signal)
@@ -190,6 +192,8 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                       instance.get('problem_list') if 'problem_list' in instance else [])]
             # 插入問題
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+            # 修改长度
+            update_document_char_length(document_id)
             if with_embedding:
                 ListenerManagement.embedding_by_paragraph_signal.send(str(paragraph.id))
             return ParagraphSerializers.Operate(
@@ -220,6 +224,8 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
 
         title = serializers.CharField(required=False)
 
+        content = serializers.CharField(required=False)
+
         def get_query_set(self):
             query_set = QuerySet(model=Paragraph)
             query_set = query_set.filter(
@@ -227,6 +233,8 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             if 'title' in self.data:
                 query_set = query_set.filter(
                     **{'title__contains': self.data.get('title')})
+            if 'content' in self.data:
+                query_set = query_set.filter(**{'content__contains': self.data.get('content')})
             return query_set
 
         def list(self):
@@ -247,7 +255,12 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                       in_=openapi.IN_QUERY,
                                       type=openapi.TYPE_STRING,
                                       required=False,
-                                      description='标题')
+                                      description='标题'),
+                    openapi.Parameter(name='content',
+                                      in_=openapi.IN_QUERY,
+                                      type=openapi.TYPE_STRING,
+                                      required=False,
+                                      description='内容')
                     ]
 
         @staticmethod

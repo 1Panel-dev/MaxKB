@@ -76,7 +76,9 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                                                                      'source_id': problem.id,
                                                                      'document_id': self.data.get('document_id'),
                                                                      'paragraph_id': self.data.get('paragraph_id'),
-                                                                     'dataset_id': self.data.get('dataset_id')})
+                                                                     'dataset_id': self.data.get('dataset_id'),
+                                                                     'star_num': 0,
+                                                                     'trample_num': 0})
 
             return ProblemSerializers.Operate(
                 data={'dataset_id': self.data.get('dataset_id'), 'document_id': self.data.get('document_id'),

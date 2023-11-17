@@ -52,6 +52,24 @@ class Document(APIView):
         d.is_valid(raise_exception=True)
         return result.success(d.list())
 
+    class Batch(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="批量创建文档",
+                             operation_id="批量创建文档",
+                             request_body=
+                             DocumentSerializers.Batch.get_request_body_api(),
+                             manual_parameters=DocumentSerializers.Create.get_request_params_api(),
+                             responses=result.get_api_array_response(
+                                 DocumentSerializers.Operate.get_response_body_api()),
+                             tags=["数据集/文档"])
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def post(self, request: Request, dataset_id: str):
+            return result.success(DocumentSerializers.Batch(data={'dataset_id': dataset_id}).batch_save(request.data))
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 

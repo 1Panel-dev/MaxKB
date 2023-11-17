@@ -15,7 +15,7 @@ import uuid
 from django.core import validators, signing, cache
 from django.core.mail import send_mail
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from drf_yasg import openapi
 from rest_framework import serializers
 
@@ -395,3 +395,32 @@ class UserSerializer(ApiMixin, serializers.ModelSerializer):
                 'is_active': openapi.Schema(type=openapi.TYPE_STRING, title="是否可用", description="是否可用")
             }
         )
+
+    class Query(ApiMixin, serializers.Serializer):
+        email_or_username = serializers.CharField(required=True)
+
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='email_or_username',
+                                      in_=openapi.IN_QUERY,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description='邮箱或者用户名')]
+
+        @staticmethod
+        def get_response_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['username', 'email', ],
+                properties={
+                    'username': openapi.Schema(type=openapi.TYPE_STRING, title="用户名", description="用户名"),
+                    'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址")
+                }
+            )
+
+        def list(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            email_or_username = self.data.get('email_or_username')
+            return [{'username': user_model.username, 'email': user_model.email} for user_model in
+                    QuerySet(User).filter(Q(username=email_or_username) | Q(email=email_or_username))]

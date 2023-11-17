@@ -27,6 +27,19 @@ def sql_execute(sql: str, params):
         return result
 
 
+def update_execute(sql: str, params):
+    """
+      执行一条sql
+      :param sql:     需要执行的sql
+      :param params:  sql参数
+      :return:        执行结果
+      """
+    with connection.cursor() as cursor:
+        cursor.execute(sql, params)
+        cursor.close()
+        return None
+
+
 def select_list(sql: str, params: List):
     """
     执行sql 查询列表数据

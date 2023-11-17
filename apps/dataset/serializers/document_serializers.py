@@ -201,7 +201,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
         def save(self, instance: Dict, with_valid=False, with_embedding=True, **kwargs):
             if with_valid:
-                DocumentInstanceSerializer(data=instance).is_valid()
+                DocumentInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
             dataset_id = self.data.get('dataset_id')
 
@@ -212,13 +212,14 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                    'char_length': reduce(lambda x, y: x + y,
                                          [len(p.get('content')) for p in instance.get('paragraphs', [])],
                                          0)})
+            # 插入文档
+            document_model.save()
+
             for paragraph in instance.get('paragraphs') if 'paragraphs' in instance else []:
                 ParagraphSerializers.Create(
                     data={'dataset_id': dataset_id, 'document_id': str(document_model.id)}).save(paragraph,
                                                                                                  with_valid=True,
                                                                                                  with_embedding=False)
-            # 插入文档
-            document_model.save()
             if with_embedding:
                 ListenerManagement.embedding_by_document_signal.send(str(document_model.id))
             return DocumentSerializers.Operate(
@@ -283,6 +284,22 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             file_list = self.data.get("file")
             return list(map(lambda f: file_to_paragraph(f, self.data.get("patterns"), self.data.get("with_filter"),
                                                         self.data.get("limit")), file_list))
+
+    class Batch(ApiMixin, serializers.Serializer):
+        dataset_id = serializers.UUIDField(required=True)
+
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(type=openapi.TYPE_ARRAY, items=DocumentSerializers.Create.get_request_body_api())
+
+        def batch_save(self, instance_list: List[Dict], with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            DocumentInstanceSerializer(many=True, data=instance_list).is_valid(raise_exception=True)
+            create_data = {'dataset_id': self.data.get("dataset_id")}
+            return [DocumentSerializers.Create(data=create_data).save(instance,
+                                                                      with_valid=True)
+                    for instance in instance_list]
 
 
 def file_to_paragraph(file, pattern_list: List, with_filter, limit: int):

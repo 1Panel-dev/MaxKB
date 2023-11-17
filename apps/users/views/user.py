@@ -22,7 +22,7 @@ from common.response import result
 from smartdoc.settings import JWT_AUTH
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
-    SendEmailSerializer, UserProfile
+    SendEmailSerializer, UserProfile, UserSerializer
 
 user_cache = cache.caches['user_cache']
 token_cache = cache.caches['token_cache']
@@ -39,6 +39,20 @@ class User(APIView):
     @has_permissions(PermissionConstants.USER_READ, compare=CompareConstants.AND)
     def get(self, request: Request):
         return result.success(UserProfile.get_user_profile(request.user))
+
+    class Query(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取用户列表",
+                             operation_id="获取用户列表",
+                             manual_parameters=UserSerializer.Query.get_request_params_api(),
+                             responses=result.get_api_array_response(UserSerializer.Query.get_response_body_api()),
+                             tags=['用户'])
+        @has_permissions(PermissionConstants.USER_READ, compare=CompareConstants.AND)
+        def get(self, request: Request):
+            return result.success(
+                UserSerializer.Query(data={'email_or_username': request.query_params.get('email_or_username')}).list())
 
 
 class ResetCurrentUserPasswordView(APIView):

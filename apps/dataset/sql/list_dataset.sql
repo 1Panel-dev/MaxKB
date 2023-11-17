@@ -5,6 +5,9 @@ FROM
 	SELECT
 		"temp_dataset".*,
 		"document_temp"."char_length",
+		CASE
+		WHEN
+		"app_dataset_temp"."count" IS NULL THEN 0 ELSE "app_dataset_temp"."count" END AS application_mapping_count,
 		"document_temp".document_count FROM (
 			SELECT dataset.*
 		FROM
@@ -26,5 +29,6 @@ FROM
 			)
 		) temp_dataset
 		LEFT JOIN ( SELECT "count" ( "id" ) AS document_count, "sum" ( "char_length" ) "char_length", dataset_id FROM "document" GROUP BY dataset_id ) "document_temp" ON temp_dataset."id" = "document_temp".dataset_id
+		LEFT JOIN (SELECT "count"("id"),dataset_id FROM application_dataset_mapping GROUP BY dataset_id) app_dataset_temp  ON temp_dataset."id" = "app_dataset_temp".dataset_id
 	) temp
 	${default_sql}
