@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="编辑分段" v-model="dialogVisible" width="600">
-    <ParagraphForm ref="paragraphFormRef" :data="detail" />
+    <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="true"/>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>

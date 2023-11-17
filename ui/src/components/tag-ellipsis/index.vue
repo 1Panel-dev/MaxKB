@@ -16,7 +16,7 @@
 import { ref, computed, useSlots } from 'vue'
 defineOptions({ name: 'TagEllipsis' })
 const slots = useSlots()
-const tooltipContent = slots.default()?.[0].children || ''
+const tooltipContent = slots.default?.()?.[0].children || ''
 const tagLabel = ref()
 const isShowTooltip = computed(() => {
   const containerWeight = tagLabel.value?.scrollWidth

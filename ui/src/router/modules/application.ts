@@ -11,7 +11,7 @@ const applicationRouter = {
       component: () => import('@/views/application/index.vue')
     },
     {
-      path: '/application/create', // create 
+      path: '/application/create',
       name: 'CreateApplication',
       meta: { activeMenu: '/application' },
       component: () => import('@/views/application/CreateApplication.vue'),

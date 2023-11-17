@@ -53,7 +53,7 @@ function cardLeave() {
   font-size: 14px;
   position: relative;
   min-height: var(--card-min-height);
-
+  border: 1px solid #ffffff;
   .description {
     display: -webkit-box;
     -webkit-box-orient: vertical;

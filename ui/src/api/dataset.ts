@@ -75,7 +75,7 @@ const getDatesetDetail: (dataset_id: string) => Promise<Result<any>> = (dataset_
 /**
  * 修改数据集信息
  * @param 参数 
- * dataset_id, document_id, 
+ * dataset_id
  * {
       "name": "string",
       "desc": true
