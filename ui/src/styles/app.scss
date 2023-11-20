@@ -103,6 +103,10 @@ h4 {
   width: 240px;
 }
 
+.mt-4 {
+  margin-top: calc(var(--app-base-px) - 4px);
+}
+
 .mt-8 {
   margin-top: var(--app-base-px);
 }
@@ -127,6 +131,9 @@ h4 {
 }
 .ml-16 {
   margin-left: calc(var(--app-base-px) * 2);
+}
+.mr-4 {
+  margin-right: calc(var(--app-base-px) - 4px);
 }
 .mr-8 {
   margin-right: var(--app-base-px);
@@ -278,6 +285,11 @@ h4 {
   .el-table__body {
     margin-top: 49px;
   }
+}
+
+// 头像渐变背景
+.avatar-gradient {
+  background: var(--app-avatar-gradient-color);
 }
 
 .success {
