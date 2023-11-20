@@ -13,7 +13,7 @@ from typing import List
 import jieba
 
 
-def get_level_block(text, level_content_list, level_content_index):
+def get_level_block(text, level_content_list, level_content_index, cursor):
     """
     从文本中获取块数据
     :param text: 文本
@@ -24,9 +24,10 @@ def get_level_block(text, level_content_list, level_content_index):
     start_content: str = level_content_list[level_content_index].get('content')
     next_content = level_content_list[level_content_index + 1].get("content") if level_content_index + 1 < len(
         level_content_list) else None
-    start_index = text.index(start_content)
-    end_index = text.index(next_content) if next_content is not None else len(text)
-    return text[start_index:end_index].replace(level_content_list[level_content_index]['content'], "")
+    print(len(text), cursor, start_content)
+    start_index = text.index(start_content, cursor)
+    end_index = text.index(next_content, start_index + 1) if next_content is not None else len(text)
+    return text[start_index:end_index].replace(level_content_list[level_content_index]['content'], ""), end_index
 
 
 def to_tree_obj(content, state='title'):
@@ -297,8 +298,9 @@ class SplitModel:
         if len(self.content_level_pattern) == index:
             return
         level_content_list = parse_title_level(text, self.content_level_pattern, index)
+        cursor = 0
         for i in range(len(level_content_list)):
-            block = get_level_block(text, level_content_list, i)
+            block, cursor = get_level_block(text, level_content_list, i, cursor)
             children = self.parse_to_tree(text=block,
                                           index=index + 1)
             if children is not None and len(children) > 0:
@@ -317,6 +319,11 @@ class SplitModel:
                 level_content_list = [*level_content_list, *list(
                     map(lambda row: to_tree_obj(row, 'block'),
                         post_handler_paragraph(other_content, with_filter=self.with_filter, limit=self.limit)))]
+        else:
+            if len(text.strip()) > 0:
+                level_content_list = [*level_content_list, *list(
+                    map(lambda row: to_tree_obj(row, 'block'),
+                        post_handler_paragraph(text, with_filter=self.with_filter, limit=self.limit)))]
         return level_content_list
 
     def parse(self, text: str):
@@ -329,25 +336,29 @@ class SplitModel:
         return result_tree_to_paragraph(result_tree, [], [])
 
 
-split_model_map = {
-    'md': SplitModel(
-        [re.compile("^# .*"), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
-         re.compile("(?<!#)####(?!#).*"), re.compile("(?<!#)#####(?!#).*"),
-         re.compile("(?<!#)#####(?!#).*"),
-         re.compile("(?<! )- .*")]),
-    'default': SplitModel([re.compile("(?<!\n)\n\n.+")])
+default_split_pattern = {
+    'md': [re.compile("^# .*"), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
+           re.compile("(?<!#)####(?!#).*"), re.compile("(?<!#)#####(?!#).*"),
+           re.compile("(?<!#)######(?!#).*"),
+           re.compile("(?<! )- .*")],
+    'default': [re.compile("(?<!\n)\n\n.+")]
 }
 
 
-def get_split_model(filename: str):
+def get_split_model(filename: str, with_filter: bool, limit: int):
     """
     根据文件名称获取分段模型
+    :param limit:        每段大小
+    :param with_filter: 是否过滤特殊字符
     :param filename: 文件名称
     :return: 分段模型
     """
     if filename.endswith(".md"):
-        return split_model_map.get('md')
-    return split_model_map.get("default")
+        pattern_list = default_split_pattern.get('md')
+        return SplitModel(pattern_list, with_filter=with_filter, limit=limit)
+
+    pattern_list = default_split_pattern.get('default')
+    return SplitModel(pattern_list, with_filter=with_filter, limit=limit)
 
 
 def to_title_tree_string(result_tree: List):

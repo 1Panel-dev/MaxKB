@@ -1,7 +1,8 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import type { datasetListRequest, datasetData } from '@/api/type/dataset'
-
+import type { Ref } from 'vue'
+import type { KeyValue } from '@/api/type/common'
 const prefix = '/dataset'
 
 /**
@@ -94,6 +95,17 @@ const putDateset: (dataset_id: string, data: any) => Promise<Result<any>> = (
  */
 const postSplitDocument: (data: any) => Promise<Result<any>> = (data) => {
   return post(`${prefix}/document/split`, data)
+}
+
+/**
+ * 分段标识列表
+ * @param loading 加载器
+ * @returns 分段标识列表
+ */
+const listSplitPattern: (loading?: Ref<boolean>) => Promise<Result<KeyValue<string, string>>> = (
+  loading
+) => {
+  return get(`${prefix}/document/split_pattern`, {}, loading)
 }
 
 /**
@@ -249,11 +261,11 @@ const putParagraph: (
  * 问题列表
  * @param 参数 dataset_id，document_id，paragraph_id
  */
-const getProblem: (dataset_id: string, document_id: string, paragraph_id: string) => Promise<Result<any>> = (
-  dataset_id,
-  document_id,
-  paragraph_id: string,
-) => {
+const getProblem: (
+  dataset_id: string,
+  document_id: string,
+  paragraph_id: string
+) => Promise<Result<any>> = (dataset_id, document_id, paragraph_id: string) => {
   return get(`${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem`)
 }
 
@@ -285,9 +297,11 @@ const delProblem: (
   dataset_id: string,
   document_id: string,
   paragraph_id: string,
-  problem_id: string,
-) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id,problem_id) => {
-  return del(`${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}`)
+  problem_id: string
+) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id, problem_id) => {
+  return del(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}`
+  )
 }
 
 export default {
@@ -309,5 +323,6 @@ export default {
   postParagraph,
   getProblem,
   postProblem,
-  delProblem
+  delProblem,
+  listSplitPattern
 }

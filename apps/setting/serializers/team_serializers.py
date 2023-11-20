@@ -10,9 +10,10 @@ import itertools
 import json
 import os
 import uuid
-from typing import Dict
+from typing import Dict, List
 
 from django.core import cache
+from django.db import transaction
 from django.db.models import QuerySet, Q
 from drf_yasg import openapi
 from rest_framework import serializers
@@ -141,12 +142,22 @@ class UpdateTeamMemberPermissionSerializer(ApiMixin, serializers.Serializer):
 
 
 class TeamMemberSerializer(ApiMixin, serializers.Serializer):
-    team_id = serializers.CharField(required=True)
+    team_id = serializers.UUIDField(required=True)
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
 
-    def get_request_body_api(self):
+    @staticmethod
+    def get_bach_request_body_api():
+        return openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            title="用户id列表",
+            description="用户id列表",
+            items=openapi.Schema(type=openapi.TYPE_STRING)
+        )
+
+    @staticmethod
+    def get_request_body_api():
         return openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=['username_or_email'],
@@ -156,6 +167,37 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
 
             }
         )
+
+    @transaction.atomic
+    def batch_add_member(self, user_id_list: List[str], with_valid=True):
+        """
+        批量添加成员
+        :param user_id_list: 用户id列表
+        :param with_valid:   是否校验
+        :return:  成员列表
+        """
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        use_user_id_list = [str(u.id) for u in QuerySet(User).filter(id__in=user_id_list)]
+
+        team_member_user_id_list = [str(team_member.user_id) for team_member in
+                                    QuerySet(TeamMember).filter(team_id=self.data.get('team_id'))]
+        team_id = self.data.get("team_id")
+        create_team_member_list = [
+            self.to_member_model(add_user_id, team_member_user_id_list, use_user_id_list, team_id) for add_user_id in
+            user_id_list]
+        QuerySet(TeamMember).bulk_create(create_team_member_list) if len(create_team_member_list) > 0 else None
+        return TeamMemberSerializer(
+            data={'team_id': self.data.get("team_id")}).list_member()
+
+    def to_member_model(self, add_user_id, team_member_user_id_list, use_user_id_list, user_id):
+        if use_user_id_list.__contains__(add_user_id):
+            if team_member_user_id_list.__contains__(add_user_id) or user_id == add_user_id:
+                raise AppApiException(500, "团队中已存在当前成员,不要重复添加")
+            else:
+                return TeamMember(team_id=self.data.get("team_id"), user_id=add_user_id)
+        else:
+            raise AppApiException(500, "不存在的用户")
 
     def add_member(self, username_or_email: str, with_valid=True):
         """
@@ -172,10 +214,11 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
             Q(username=username_or_email) | Q(email=username_or_email)).first()
         if user is None:
             raise AppApiException(500, "不存在的用户")
-        if QuerySet(TeamMember).filter(Q(team_id=self.data.get('team_id')) & Q(user=user)).exists():
+        if QuerySet(TeamMember).filter(Q(team_id=self.data.get('team_id')) & Q(user=user)).exists() or self.data.get(
+                "team_id") == str(user.id):
             raise AppApiException(500, "团队中已存在当前成员,不要重复添加")
         TeamMember(team_id=self.data.get("team_id"), user=user).save()
-        return TeamMemberSerializer(data={'team_id': self.data.get("team_id")}).list_member()
+        return self.list_member(with_valid=False)
 
     def list_member(self, with_valid=True):
         """

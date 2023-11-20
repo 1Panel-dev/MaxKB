@@ -30,12 +30,12 @@
                           </el-tooltip>
                         </div>
 
-                        <el-select v-model="form.patterns" multiple placeholder="请选择">
+                        <el-select v-loading="patternLoading" v-model="form.patterns" multiple placeholder="请选择">
                           <el-option
-                            v-for="item in patternsList"
+                            v-for="item in splitPatternList"
                             :key="item"
-                            :label="item"
-                            :value="item"
+                            :label="item.key"
+                            :value="item.value"
                             multiple
                           >
                           </el-option>
@@ -47,7 +47,7 @@
                           v-model="form.limit"
                           show-input
                           :show-input-controls="false"
-                          :min="10"
+                          :min="50"
                           :max="1024"
                         />
                       </div>
@@ -80,30 +80,25 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted, reactive,watch } from 'vue'
 import ParagraphPreview from '@/views/dataset/component/ParagraphPreview.vue'
 import DatasetApi from '@/api/dataset'
 import useStore from '@/stores'
+import type { KeyValue } from '@/api/type/common'
 const { dataset } = useStore()
 const documentsFiles = computed(() => dataset.documentsFiles)
-const patternType = ['空行', '#', '##', '###', '####', '-', '空格', '回车', '句号', '逗号', '分号']
-
-const marks = reactive({
-  10: '10',
-  1024: '1024'
-})
+const splitPatternList = ref<list<KeyValue>>([])
 
 const radio = ref('1')
 const loading = ref(false)
 const paragraphList = ref<any[]>([])
+const patternLoading=ref<boolean>(false)
 
 const form = reactive<any>({
   patterns: [] as any,
   limit: 0,
   with_filter: false
 })
-
-const patternsList = ref<string[]>(patternType)
 
 function splitDocument() {
   loading.value = true
@@ -127,6 +122,18 @@ function splitDocument() {
       loading.value = false
     })
 }
+
+const initSplitPatternList = () => {
+  DatasetApi.listSplitPattern(patternLoading).then(ok=>{
+    splitPatternList.value=ok.data
+  })
+}
+
+watch(radio,()=>{
+  if(radio.value==='2'){
+    initSplitPatternList()
+  }
+})
 
 onMounted(() => {
   splitDocument()

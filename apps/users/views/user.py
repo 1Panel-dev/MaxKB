@@ -17,7 +17,7 @@ from rest_framework.views import Request
 
 from common.auth.authenticate import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, CompareConstants
+from common.constants.permission_constants import PermissionConstants
 from common.response import result
 from smartdoc.settings import JWT_AUTH
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
@@ -36,7 +36,7 @@ class User(APIView):
                          operation_id="获取当前用户信息",
                          responses=result.get_api_response(UserProfile.get_response_body_api()),
                          tags=['用户'])
-    @has_permissions(PermissionConstants.USER_READ, compare=CompareConstants.AND)
+    @has_permissions(PermissionConstants.USER_READ)
     def get(self, request: Request):
         return result.success(UserProfile.get_user_profile(request.user))
 
@@ -49,7 +49,7 @@ class User(APIView):
                              manual_parameters=UserSerializer.Query.get_request_params_api(),
                              responses=result.get_api_array_response(UserSerializer.Query.get_response_body_api()),
                              tags=['用户'])
-        @has_permissions(PermissionConstants.USER_READ, compare=CompareConstants.AND)
+        @has_permissions(PermissionConstants.USER_READ)
         def get(self, request: Request):
             return result.success(
                 UserSerializer.Query(data={'email_or_username': request.query_params.get('email_or_username')}).list())

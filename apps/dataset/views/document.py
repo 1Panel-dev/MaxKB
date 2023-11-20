@@ -118,6 +118,15 @@ class Document(APIView):
             operate.is_valid(raise_exception=True)
             return result.success(operate.delete())
 
+    class SplitPattern(APIView):
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取分段标识列表",
+                             operation_id="获取分段标识列表",
+                             tags=["数据集/文档"],
+                             security=[])
+        def get(self, request: Request):
+            return result.success(DocumentSerializers.SplitPattern.list())
+
     class Split(APIView):
         parser_classes = [MultiPartParser]
 
@@ -128,9 +137,17 @@ class Document(APIView):
                              tags=["数据集/文档"],
                              security=[])
         def post(self, request: Request):
+            split_data = {'file': request.FILES.getlist('file')}
+            request_data = request.data
+            if 'patterns' in request.data and request.data.get('patterns') is not None and len(
+                    request.data.get('patterns')) > 0:
+                split_data.__setitem__('patterns', request_data.getlist('patterns'))
+            if 'limit' in request.data:
+                split_data.__setitem__('limit', request_data.get('limit'))
+            if 'with_filter' in request.data:
+                split_data.__setitem__('with_filter', request_data.get('with_filter'))
             ds = DocumentSerializers.Split(
-                data={'file': request.FILES.getlist('file'),
-                      'patterns': request.data.getlist('patterns[]')})
+                data=split_data)
             ds.is_valid(raise_exception=True)
             return result.success(ds.parse())
 

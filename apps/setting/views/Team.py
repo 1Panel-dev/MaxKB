@@ -40,6 +40,19 @@ class TeamMember(APIView):
         team = TeamMemberSerializer(data={'team_id': str(request.user.id)})
         return result.success((team.add_member(**request.data)))
 
+    class Batch(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="批量添加成员",
+                             operation_id="批量添加成员",
+                             request_body=TeamMemberSerializer.get_bach_request_body_api(),
+                             tags=["团队"])
+        @has_permissions(PermissionConstants.TEAM_CREATE)
+        def post(self, request: Request):
+            return result.success(
+                TeamMemberSerializer(data={'team_id': request.user.id}).batch_add_member(request.data))
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 

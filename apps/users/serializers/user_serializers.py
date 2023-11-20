@@ -411,8 +411,9 @@ class UserSerializer(ApiMixin, serializers.ModelSerializer):
         def get_response_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['username', 'email', ],
+                required=['username', 'email', 'id'],
                 properties={
+                    'id': openapi.Schema(type=openapi.TYPE_STRING, title='用户主键id', description="用户主键id"),
                     'username': openapi.Schema(type=openapi.TYPE_STRING, title="用户名", description="用户名"),
                     'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址")
                 }
@@ -422,5 +423,5 @@ class UserSerializer(ApiMixin, serializers.ModelSerializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             email_or_username = self.data.get('email_or_username')
-            return [{'username': user_model.username, 'email': user_model.email} for user_model in
+            return [{'id': user_model.id, 'username': user_model.username, 'email': user_model.email} for user_model in
                     QuerySet(User).filter(Q(username=email_or_username) | Q(email=email_or_username))]

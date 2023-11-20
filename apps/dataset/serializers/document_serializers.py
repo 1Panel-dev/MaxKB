@@ -250,7 +250,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         with_filter = serializers.BooleanField(required=False)
 
         def is_valid(self, *, raise_exception=True):
-            super().is_valid()
+            super().is_valid(raise_exception=True)
             files = self.data.get('file')
             for f in files:
                 if f.size > 1024 * 1024 * 10:
@@ -282,8 +282,21 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
         def parse(self):
             file_list = self.data.get("file")
-            return list(map(lambda f: file_to_paragraph(f, self.data.get("patterns"), self.data.get("with_filter"),
-                                                        self.data.get("limit")), file_list))
+            return list(
+                map(lambda f: file_to_paragraph(f, self.data.get("patterns", None), self.data.get("with_filter", None),
+                                                self.data.get("limit", None)), file_list))
+
+    class SplitPattern(ApiMixin, serializers.Serializer):
+        @staticmethod
+        def list():
+            return [{'key': "#", 'value': '^# .*'}, {'key': '##', 'value': '(?<!#)## (?!#).*'},
+                    {'key': '###', 'value': "(?<!#)### (?!#).*"}, {'key': '####', 'value': "(?<!#)####(?!#).*"},
+                    {'key': '#####', 'value': "(?<!#)#####(?!#).*"}, {'key': '######', 'value': "(?<!#)######(?!#).*"},
+                    {'key': '-', 'value': '(?<! )- .*'},
+                    {'key': '空格', 'value': '(?<!\\s)\\s(?!\\s)'},
+                    {'key': '分号', 'value': '(?<!；)；(?!；)'}, {'key': '逗号', 'value': '(?<!，)，(?!，)'},
+                    {'key': '句号', 'value': '(?<!。)。(?!。)'}, {'key': '回车', 'value': '(?<!\\n)\\n(?!\\n)'},
+                    {'key': '空行', 'value': '(?<!\\n)\\n\\n(?!\\n)'}]
 
     class Batch(ApiMixin, serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True)
@@ -302,12 +315,12 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     for instance in instance_list]
 
 
-def file_to_paragraph(file, pattern_list: List, with_filter, limit: int):
+def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):
     data = file.read()
-    if pattern_list is None or len(pattern_list) > 0:
+    if pattern_list is not None and len(pattern_list) > 0:
         split_model = SplitModel(pattern_list, with_filter, limit)
     else:
-        split_model = get_split_model(file.name)
+        split_model = get_split_model(file.name, with_filter=with_filter, limit=limit)
     try:
         content = data.decode('utf-8')
     except BaseException as e:
