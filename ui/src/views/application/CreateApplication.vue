@@ -3,9 +3,12 @@
     <el-row>
       <el-col :span="10" class="p-24"> </el-col>
       <el-col :span="14" class="p-24 border-l">
-        <h4 class="title-decoration-1 mb-8">调试预览</h4>
-        <div class="dialog-height">
-          <AiDialog></AiDialog>
+        <h4 class="title-decoration-1 mb-16">调试预览</h4>
+        <div class="dialog-bg">
+          <h4 class="p-24">DataEase 智能客服</h4>
+          <div class="dialog-height">
+            <AiDialog></AiDialog>
+          </div>
         </div>
       </el-col>
     </el-row>
@@ -15,7 +18,13 @@
 import AiDialog from '@/components/ai-dialog/index.vue'
 </script>
 <style lang="scss" scoped>
-.dialog-height {
-  height: calc(var(--app-main-height) - 75px);
+.dialog-bg {
+  border-radius: 8px;
+  background: var(--dialog-bg-gradient-color);
+  overflow: hidden;
+  box-sizing: border-box;
+  .dialog-height {
+    height: calc(var(--app-main-height) - 150px);
+  }
 }
 </style>
