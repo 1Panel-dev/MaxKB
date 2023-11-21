@@ -4,7 +4,9 @@
       <el-col :span="10" class="p-24"> </el-col>
       <el-col :span="14" class="p-24 border-l">
         <h4 class="title-decoration-1 mb-8">调试预览</h4>
-        <AiDialog></AiDialog>
+        <div class="dialog-height">
+          <AiDialog></AiDialog>
+        </div>
       </el-col>
     </el-row>
   </LayoutContainer>
@@ -12,4 +14,8 @@
 <script setup lang="ts">
 import AiDialog from '@/components/ai-dialog/index.vue'
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.dialog-height {
+  height: calc(var(--app-main-height) - 75px);
+}
+</style>

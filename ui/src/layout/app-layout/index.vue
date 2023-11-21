@@ -15,14 +15,22 @@ import { TopBar, AppMain } from '../components'
 <style lang="scss" scoped>
 .app-layout {
   background-color: var(--app-layout-bg-color);
+  height: 100%;
 }
 
 .app-main {
-  height: calc(100vh - var(--app-header-height));
-  padding: 0 !important;
+  position: relative;
+  height: 100%;
+  padding: var(--app-header-height) 0 0 !important;
   box-sizing: border-box;
+  overflow: auto;
 }
 .app-header {
   background: var(--app-header-bg-color);
+  position: fixed;
+  width: 100%;
+  left: 0;
+  top: 0;
+  z-index: 100;
 }
 </style>

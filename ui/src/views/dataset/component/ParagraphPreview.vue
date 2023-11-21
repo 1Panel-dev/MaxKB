@@ -135,6 +135,6 @@ onMounted(() => {})
   }
 }
 .paragraph-list {
-  height: calc(var(--create-dataset-height) - 125px);
+  height: calc(var(--create-dataset-height) - 95px);
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="set-rules">
-    <el-row class="set-rules-height">
+    <el-row>
       <el-col :span="10" class="p-24">
         <h4 class="title-decoration-1 mb-8">设置分段规则</h4>
         <div>
@@ -164,12 +164,8 @@ defineExpose({
 .set-rules {
   width: 100%;
 
-  .set-rules-height {
-    height: var(--create-dataset-height);
-  }
-
   .left-height {
-    max-height: calc(var(--create-dataset-height) - 105px);
+    max-height: calc(var(--create-dataset-height) - 70px);
     overflow-x: hidden;
   }
 
