@@ -9,6 +9,7 @@ urlpatterns = [
     path('dataset/<int:current_page>/<int:page_size>', views.Dataset.Page.as_view(), name="dataset"),
     path('dataset/<str:dataset_id>/document', views.Document.as_view(), name='document'),
     path('dataset/<str:dataset_id>/document/_bach', views.Document.Batch.as_view()),
+    path('dataset/<str:dataset_id>/document/<int:current_page>/<int:page_size>', views.Document.Page.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>', views.Document.Operate.as_view(),
          name="document_operate"),
     path('dataset/document/split', views.Document.Split.as_view(),
