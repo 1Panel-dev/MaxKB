@@ -102,7 +102,7 @@ const postSplitDocument: (data: any) => Promise<Result<any>> = (data) => {
  * @param loading 加载器
  * @returns 分段标识列表
  */
-const listSplitPattern: (loading?: Ref<boolean>) => Promise<Result<KeyValue<string, string>>> = (
+const listSplitPattern: (loading?: Ref<boolean>) => Promise<Result<Array<KeyValue<string, string>>>> = (
   loading
 ) => {
   return get(`${prefix}/document/split_pattern`, {}, loading)
