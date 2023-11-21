@@ -13,29 +13,50 @@
                 </el-radio>
                 <el-radio label="2" size="large" border class="mb-16">
                   <p>高级分段</p>
-                  <el-text type="info">用户可根据文档规范自行设置分段标识符、分段长度以及清洗规则
+                  <el-text type="info"
+                    >用户可根据文档规范自行设置分段标识符、分段长度以及清洗规则
                   </el-text>
                   <el-card shadow="never" class="card-never mt-16" v-if="radio === '2'">
                     <div class="set-rules__form">
                       <div class="form-item mb-16">
                         <div class="title flex align-center mb-8">
                           <span style="margin-right: 4px">分段标识</span>
-                          <el-tooltip effect="dark" content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。" placement="right">
+                          <el-tooltip
+                            effect="dark"
+                            content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。"
+                            placement="right"
+                          >
                             <el-icon style="font-size: 16px">
                               <Warning />
                             </el-icon>
                           </el-tooltip>
                         </div>
 
-                        <el-select v-loading="patternLoading" v-model="form.patterns" multiple placeholder="请选择">
-                          <el-option v-for="item in splitPatternList" :key="item" :label="item.key" :value="item.value"
-                            multiple>
+                        <el-select
+                          v-loading="patternLoading"
+                          v-model="form.patterns"
+                          multiple
+                          placeholder="请选择"
+                        >
+                          <el-option
+                            v-for="item in splitPatternList"
+                            :key="item"
+                            :label="item.key"
+                            :value="item.value"
+                            multiple
+                          >
                           </el-option>
                         </el-select>
                       </div>
                       <div class="form-item mb-16">
                         <div class="title mb-8">分段长度</div>
-                        <el-slider v-model="form.limit" show-input :show-input-controls="false" :min="50" :max="1024" />
+                        <el-slider
+                          v-model="form.limit"
+                          show-input
+                          :show-input-controls="false"
+                          :min="50"
+                          :max="1024"
+                        />
                       </div>
                       <div class="form-item mb-16">
                         <div class="title mb-8">自动清洗</div>
@@ -110,7 +131,7 @@ function splitDocument() {
 }
 
 const initSplitPatternList = () => {
-  DatasetApi.listSplitPattern(patternLoading).then(ok => {
+  DatasetApi.listSplitPattern(patternLoading).then((ok) => {
     splitPatternList.value = ok.data
   })
 }
