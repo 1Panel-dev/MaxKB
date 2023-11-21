@@ -28,6 +28,7 @@
           @creatQuick="creatQuickHandle"
           @row-click="rowClickHandle"
           v-loading="loading"
+          :max-height="tableHeight"
         >
           <el-table-column prop="name" label="文件名称" min-width="280">
             <template #default="{ row }">
@@ -114,6 +115,7 @@ const loading = ref(false)
 const filterText = ref('')
 const documentData = ref<any[]>([])
 const currentMouseId = ref(null)
+const tableHeight = ref(0)
 
 const paginationConfig = reactive({
   currentPage: 1,
@@ -223,6 +225,12 @@ function getList() {
 }
 
 onMounted(() => {
+  tableHeight.value = window.innerHeight - 300
+  window.onresize = () => {
+    return (() => {
+      tableHeight.value = window.innerHeight - 300
+    })()
+  }
   getList()
 })
 </script>

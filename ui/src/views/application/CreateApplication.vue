@@ -1,6 +1,12 @@
 <template>
   <LayoutContainer header="创建应用" back-to="-1">
-    <AiDialog></AiDialog>
+    <el-row>
+      <el-col :span="10" class="p-24"> </el-col>
+      <el-col :span="14" class="p-24 border-l">
+        <h4 class="title-decoration-1 mb-8">调试预览</h4>
+        <AiDialog></AiDialog>
+      </el-col>
+    </el-row>
   </LayoutContainer>
 </template>
 <script setup lang="ts">
