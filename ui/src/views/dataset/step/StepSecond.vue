@@ -80,10 +80,16 @@ const loading = ref(false)
 const paragraphList = ref<any[]>([])
 const patternLoading = ref<boolean>(false)
 
-const form = reactive<any>({
-  patterns: [] as any,
+const form = reactive<{
+  patterns: Array<string>,
+  limit: number,
+  with_filter: boolean,
+  [propName: string]: any
+}>({
+  patterns: [],
   limit: 0,
-  with_filter: false
+  with_filter: false,
+
 })
 
 function splitDocument() {
@@ -96,7 +102,11 @@ function splitDocument() {
   })
   if (radio.value === '2') {
     Object.keys(form).forEach((key) => {
-      fd.append(key, form[key])
+      if (key == 'patterns') {
+        form.patterns.forEach(item => fd.append('patterns', item))
+      } else {
+        fd.append(key, form[key])
+      }
     })
   }
   DatasetApi.postSplitDocument(fd)
