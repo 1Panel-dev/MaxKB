@@ -1,14 +1,17 @@
 <template>
   <div class="ai-dialog">
     <el-scrollbar>
-      <div class="ai-dialog__content flex">
-        <AppAvatar class="avatar-gradient">
-          <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
-        </AppAvatar>
-        <AppAvatar>
-          <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-        </AppAvatar>
-        <div class="ml-8 w-full">
+      <div class="ai-dialog__content">
+        <div class="avatar">
+          <AppAvatar class="avatar-gradient">
+            <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
+          </AppAvatar>
+          <AppAvatar>
+            <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+          </AppAvatar>
+        </div>
+
+        <div class="content ml-8">
           <el-card shadow="always" class="dialog-card">
             <h4>您好，我是 MaxKB 智能小助手</h4>
             <div class="mt-4">
@@ -73,14 +76,21 @@ const inputValue = ref('')
 </script>
 <style lang="scss" scoped>
 .ai-dialog {
-  // min-height: 400px;
-  // height: 100%;
-  height: calc(100% - 10px);
+  min-height: 400px;
+  height: 100%;
+  padding-bottom: 20px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   &__content {
     flex: 1;
+
+    .avatar {
+      float: left;
+    }
+    .content {
+      padding-left: 50px;
+    }
     .problem-button {
       border: none;
       border-radius: 8px;
