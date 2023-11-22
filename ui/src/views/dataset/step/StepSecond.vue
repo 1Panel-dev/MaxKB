@@ -3,7 +3,7 @@
     <el-row>
       <el-col :span="10" class="p-24">
         <h4 class="title-decoration-1 mb-8">设置分段规则</h4>
-        <div>
+        <div class="set-rules__right">
           <el-scrollbar>
             <div class="left-height">
               <el-radio-group v-model="radio" class="set-rules__radio">
@@ -102,15 +102,14 @@ const paragraphList = ref<any[]>([])
 const patternLoading = ref<boolean>(false)
 
 const form = reactive<{
-  patterns: Array<string>,
-  limit: number,
-  with_filter: boolean,
+  patterns: Array<string>
+  limit: number
+  with_filter: boolean
   [propName: string]: any
 }>({
   patterns: [],
   limit: 0,
-  with_filter: false,
-
+  with_filter: false
 })
 
 function splitDocument() {
@@ -124,7 +123,7 @@ function splitDocument() {
   if (radio.value === '2') {
     Object.keys(form).forEach((key) => {
       if (key == 'patterns') {
-        form.patterns.forEach(item => fd.append('patterns', item))
+        form.patterns.forEach((item) => fd.append('patterns', item))
       } else {
         fd.append(key, form[key])
       }

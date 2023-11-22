@@ -1,6 +1,12 @@
 <template>
   <h4 class="title-decoration-1 mb-16">基本信息</h4>
-  <el-form ref="FormRef" :model="form" :rules="rules" label-position="top">
+  <el-form
+    ref="FormRef"
+    :model="form"
+    :rules="rules"
+    label-position="top"
+    require-asterisk-position="right"
+  >
     <el-form-item label="数据集名称" prop="name">
       <el-input
         v-model.trim="form.name"

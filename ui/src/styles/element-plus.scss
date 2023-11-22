@@ -172,8 +172,10 @@
 }
 
 .input-with-select {
-
   .el-input-group__prepend {
     background-color: var(--el-fill-color-blank);
   }
+}
+.el-textarea__inner {
+  font-size: 13px;
 }

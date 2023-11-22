@@ -15,31 +15,23 @@
           <div class="content">
             <el-card shadow="always" class="dialog-card">
               <h4>您好，我是 MaxKB 智能小助手</h4>
-              <div class="mt-4">
-                <el-text type="info">回答用户提出的 MaxKB 产品使用问题</el-text>
+              <div class="mt-4" v-if="data?.prologue">
+                <el-text type="info">{{ data?.prologue }}</el-text>
               </div>
             </el-card>
             <el-card shadow="always" class="dialog-card mt-12">
               <h4 class="mb-8">您可以尝试输入以下问题：</h4>
-              <div class="problem-button cursor">
-                <el-icon><EditPen /></el-icon>
-                DataEase支持哪些类型的数据源？XXXXXXXXXXX
-              </div>
-              <el-button icon="EditPen" class="problem-button">
-                <div>DataEase支持哪些类型的数据源？XXXXXXXXXXX</div>
-              </el-button>
+              <el-space wrap>
+                <div class="problem-button cursor ellipsis-2">
+                  <el-icon><EditPen /></el-icon>
+                  DataEase支持哪些类型的数据源？
+                </div>
+                <div class="problem-button cursor ellipsis-2">
+                  <el-icon><EditPen /></el-icon>
+                  DataEase支持哪些类型的数据源？XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                </div>
+              </el-space>
             </el-card>
-
-            <!-- <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
-          <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
-          <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
-          <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
-          <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
-          <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
-          <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
-          <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
-          <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
-          <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card> -->
           </div>
         </div>
         <div class="item-content mb-16">
@@ -87,8 +79,8 @@
 import { ref } from 'vue'
 const props = defineProps({
   data: {
-    type: Array<any>,
-    default: () => []
+    type: Object,
+    default: () => {}
   }
 })
 const inputValue = ref('')
@@ -122,7 +114,12 @@ const inputValue = ref('')
       border-radius: 8px;
       background: var(--app-layout-bg-color);
       height: 46px;
-      justify-content: left;
+      padding: 0 12px;
+      line-height: 46px;
+      box-sizing: border-box;
+      color: var(--el-text-color-regular);
+      -webkit-line-clamp: 1;
+      word-break: break-all;
       &:hover {
         background: var(--el-color-primary-light-9);
       }

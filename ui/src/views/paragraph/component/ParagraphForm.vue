@@ -1,5 +1,12 @@
 <template>
-  <el-form ref="paragraphFormRef" :model="form" label-position="top" :rules="rules" @submit.prevent>
+  <el-form
+    ref="paragraphFormRef"
+    :model="form"
+    label-position="top"
+    require-asterisk-position="right"
+    :rules="rules"
+    @submit.prevent
+  >
     <el-form-item label="分段标题">
       <el-input v-if="isEdit" v-model="form.title" placeholder="请输入分段标题"> </el-input>
       <span v-else>{{ form.title }}</span>
