@@ -19,17 +19,15 @@
                 <el-text type="info">{{ data?.prologue }}</el-text>
               </div>
             </el-card>
-            <el-card shadow="always" class="dialog-card mt-12">
+            <el-card shadow="always" class="dialog-card mt-12" v-if="data?.example?.length > 0">
               <h4 class="mb-8">您可以尝试输入以下问题：</h4>
               <el-space wrap>
-                <div class="problem-button cursor ellipsis-2">
-                  <el-icon><EditPen /></el-icon>
-                  DataEase支持哪些类型的数据源？
-                </div>
-                <div class="problem-button cursor ellipsis-2">
-                  <el-icon><EditPen /></el-icon>
-                  DataEase支持哪些类型的数据源？XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                </div>
+                <template v-for="(item, index) in data?.example" :key="index">
+                  <div class="problem-button cursor ellipsis-2" v-if="item">
+                    <el-icon><EditPen /></el-icon>
+                    {{ item }}
+                  </div>
+                </template>
               </el-space>
             </el-card>
           </div>

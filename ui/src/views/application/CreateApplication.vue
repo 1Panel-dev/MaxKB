@@ -2,7 +2,7 @@
   <LayoutContainer header="创建应用" back-to="-1" class="create-application">
     <el-row>
       <el-col :span="10">
-        <div class="p-24 mb-16" style="padding-bottom: 0;">
+        <div class="p-24 mb-16" style="padding-bottom: 0">
           <h4 class="title-decoration-1">应用信息</h4>
         </div>
         <div class="scrollbar-height-left">
@@ -14,7 +14,7 @@
               label-position="top"
               require-asterisk-position="right"
               class="p-24"
-              style="padding-top: 0;"
+              style="padding-top: 0"
             >
               <el-form-item label="应用名称" prop="name">
                 <el-input
@@ -35,7 +35,7 @@
                 />
               </el-form-item>
               <el-form-item label="选择模型" prop="model_id">
-                <el-select v-model="applicationForm.model_id" placeholder="请选择模型">
+                <el-select v-model="applicationForm.model_id" placeholder="请选择模型" style="width: 100%;">
                   <el-option label="Zone one" value="shanghai" />
                   <el-option label="Zone two" value="beijing" />
                 </el-select>
@@ -59,28 +59,13 @@
                 <div class="w-full">
                   <el-row :gutter="12">
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mb-8">
-                      <el-card shadow="never">
+                      <el-card class="relate-dataset-card" shadow="never">
                         <div class="flex-between">
                           <div class="flex align-center">
                             <AppAvatar class="mr-12" shape="square" :size="32">
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>
-                            <h4 class="ellipsis-1">DataEase 数据集</h4>
-                          </div>
-                          <el-button text>
-                            <el-icon><Close /></el-icon>
-                          </el-button>
-                        </div>
-                      </el-card>
-                    </el-col>
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mb-8">
-                      <el-card shadow="never">
-                        <div class="flex-between">
-                          <div class="flex align-center">
-                            <AppAvatar class="mr-12" shape="square" :size="32">
-                              <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-                            </AppAvatar>
-                            <h4 class="ellipsis-1">DataEase 数据集</h4>
+                            <div class="ellipsis-1">DataEase 数据集</div>
                           </div>
                           <el-button text>
                             <el-icon><Close /></el-icon>
@@ -129,7 +114,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import AiDialog from '@/components/ai-dialog/index.vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/application'
@@ -158,9 +143,17 @@ const rules = reactive<FormRules<ApplicationFormType>>({
     }
   ]
 })
+
+watch(exampleList.value, () => {
+  applicationForm.example = exampleList.value.filter((v) => v)
+})
 </script>
 <style lang="scss" scoped>
 .create-application {
+  .relate-dataset-card {
+    color: var(--app-text-color);
+    border-radius: 4px;
+  }
   .dialog-bg {
     border-radius: 8px;
     background: var(--dialog-bg-gradient-color);

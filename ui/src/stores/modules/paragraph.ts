@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import datasetApi from '@/api/dataset'
+import paragraphApi from '@/api/paragraph'
 
 const useParagraphStore = defineStore({
   id: 'paragraph',
@@ -7,7 +7,7 @@ const useParagraphStore = defineStore({
   actions: {
     async asyncPutParagraph(datasetId: string, documentId: string, paragraphId: string, data: any) {
       return new Promise((resolve, reject) => {
-        datasetApi
+        paragraphApi
           .putParagraph(datasetId, documentId, paragraphId, data)
           .then((data) => {
             resolve(data)

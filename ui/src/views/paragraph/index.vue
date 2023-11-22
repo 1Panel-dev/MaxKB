@@ -70,7 +70,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import datasetApi from '@/api/dataset'
+import documentApi from '@/api/document'
+import paragraphApi from '@/api/paragraph'
 import ParagraphDialog from './component/ParagraphDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -111,7 +112,7 @@ function deleteParagraph(row: any) {
   })
     .then(() => {
       loading.value = true
-      datasetApi
+      paragraphApi
         .delParagraph(datasetId, documentId, row.id)
         .then(() => {
           MsgSuccess('删除成功')
@@ -135,7 +136,7 @@ function editParagraph(row: any) {
 
 function getDetail() {
   loading.value = true
-  datasetApi
+  documentApi
     .getDocumentDetail(datasetId, documentId)
     .then((res) => {
       documentDetail.value = res.data
@@ -148,7 +149,7 @@ function getDetail() {
 
 function getParagraphDetail() {
   loading.value = true
-  datasetApi
+  paragraphApi
     .getParagraph(datasetId, documentId)
     .then((res) => {
       paragraphDetail.value = res.data

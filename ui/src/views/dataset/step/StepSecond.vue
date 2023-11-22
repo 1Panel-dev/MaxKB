@@ -89,7 +89,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, watch } from 'vue'
 import ParagraphPreview from '@/views/dataset/component/ParagraphPreview.vue'
-import DatasetApi from '@/api/dataset'
+import documentApi from '@/api/document'
 import useStore from '@/stores'
 import type { KeyValue } from '@/api/type/common'
 const { dataset } = useStore()
@@ -129,7 +129,7 @@ function splitDocument() {
       }
     })
   }
-  DatasetApi.postSplitDocument(fd)
+  documentApi.postSplitDocument(fd)
     .then((res: any) => {
       paragraphList.value = res.data
       loading.value = false
@@ -140,7 +140,7 @@ function splitDocument() {
 }
 
 const initSplitPatternList = () => {
-  DatasetApi.listSplitPattern(patternLoading).then((ok) => {
+  documentApi.listSplitPattern(patternLoading).then((ok) => {
     splitPatternList.value = ok.data
   })
 }

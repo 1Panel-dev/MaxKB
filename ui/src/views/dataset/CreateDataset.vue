@@ -67,6 +67,7 @@ import StepFirst from './step/StepFirst.vue'
 import StepSecond from './step/StepSecond.vue'
 import datasetApi from '@/api/dataset'
 import type { datasetData } from '@/api/type/dataset'
+import documentApi from '@/api/document'
 import { MsgSuccess } from '@/utils/message'
 import { toThousands } from '@/utils/utils'
 import useStore from '@/stores'
@@ -123,7 +124,7 @@ function submit() {
   })
   const obj = { ...baseInfo.value, documents } as datasetData
   if (id) {
-    datasetApi
+    documentApi
       .postDocument(id, documents)
       .then((res) => {
         MsgSuccess('提交成功')
