@@ -26,12 +26,12 @@ import { ref, watch } from 'vue'
 defineOptions({ name: 'TagsInput' })
 const props = defineProps({
   tags: {
-    // 多个
+    /* 多个 */
     type: Array<String>,
     default: () => []
   },
   tag: {
-    // 单个
+    /* 单个 */
     type: String,
     default: ''
   },
@@ -40,7 +40,7 @@ const props = defineProps({
     default: '请输入'
   },
   limit: {
-    // 最多生成标签数
+    /* 最多生成标签数 */
     type: Number,
     default: -1
   },

@@ -51,12 +51,13 @@ watch(
     }
   },
   {
-    // 初始化立即执行
     immediate: true
   }
 )
 
-// 表单校验
+/*
+  表单校验
+*/
 function validate() {
   if (!paragraphFormRef.value) return
   return paragraphFormRef.value.validate((valid: any) => {

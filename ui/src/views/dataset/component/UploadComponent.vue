@@ -80,7 +80,9 @@ function deleteFlie(index: number) {
   form.value.fileList.splice(index, 1)
 }
 
-// 表单校验
+/*
+  表单校验
+*/
 function validate() {
   if (!FormRef.value) return
   return FormRef.value.validate((valid: any) => {

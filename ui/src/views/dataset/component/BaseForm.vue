@@ -55,12 +55,13 @@ watch(
     }
   },
   {
-    // 初始化立即执行
     immediate: true
   }
 )
 
-// 表单校验
+/*
+  表单校验
+*/
 function validate() {
   if (!FormRef.value) return
   return FormRef.value.validate((valid: any) => {

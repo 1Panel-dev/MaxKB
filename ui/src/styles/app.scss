@@ -52,18 +52,18 @@ ul {
   padding: 0;
 }
 
-// 滚动条整体部分
+/* 滚动条整体部分 */
 ::-webkit-scrollbar {
   width: 6px; // 纵向滚动条宽度
   height: 6px; // 横向滚动条高度
 }
 
-// 滑块
+/* 滑块 */
 ::-webkit-scrollbar-thumb {
   border-radius: 5px;
 }
 
-// 轨道
+/* 轨道 */
 ::-webkit-scrollbar-track {
   border-radius: 5px;
   background-color: transparent;
@@ -208,7 +208,11 @@ h4 {
   cursor: pointer;
 }
 
-.ellipsis {
+/*
+  超出省略号
+*/
+
+.ellipsis-1 {
   display: inline-block;
   max-width: 100px;
   text-overflow: ellipsis;
@@ -216,13 +220,27 @@ h4 {
   overflow: hidden;
 }
 
-// 内容部分 自适应高度
+/*
+  双行超出省略号，其他行数自定义 -webkit-line-clamp
+*/
+.ellipsis-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/*
+  内容部分 自适应高度
+*/
 .main-calc-height {
   height: var(--app-main-height);
   box-sizing: border-box;
 }
 
-// 标题前带竖线样式
+/*
+  标题前带竖线样式
+*/
 .title-decoration-1 {
   position: relative;
   padding-left: 12px;
@@ -248,24 +266,30 @@ h4 {
   font-weight: 900;
 }
 
-// tag
+/* tag */
 .default-tag {
   background: var(--tag-deflaut-bg);
   color: var(--tag-deflaut-color);
 }
 
-// card 无边框无阴影
+/*
+  card 无边框无阴影 灰色背景
+*/
 .card-never {
   background: var(--app-layout-bg-color);
   border: none;
 }
 
-// 图标旋转90度
+/*
+   图标旋转90度
+*/
 .rotate-90 {
   transform: rotateZ(90deg);
 }
 
-// 表格第一行插入自定义行
+/*
+  表格第一行插入自定义行
+*/
 .table-quick-append {
   background: #ffffff;
   .el-table__append-wrapper {
@@ -291,7 +315,9 @@ h4 {
   }
 }
 
-// 头像渐变背景
+/*
+  头像渐变背景
+*/
 .avatar-gradient {
   background: var(--app-avatar-gradient-color);
 }

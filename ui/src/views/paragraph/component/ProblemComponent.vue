@@ -60,7 +60,6 @@ watch(
     }
   },
   {
-    // 初始化立即执行
     immediate: true
   }
 )

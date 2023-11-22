@@ -6,7 +6,7 @@
           <AppAvatar class="mr-12" shape="square" :size="32" v-if="showIcon">
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
-          <h4 class="ellipsis">{{ title }}</h4>
+          <h4 class="ellipsis-1">{{ title }}</h4>
         </div>
       </slot>
     </div>

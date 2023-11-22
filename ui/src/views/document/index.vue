@@ -127,7 +127,9 @@ function rowClickHandle(row: any) {
   router.push({ path: `/dataset/${datasetId}/${row.id}` })
 }
 
-// 快速创建空白文档
+/*
+  快速创建空白文档
+*/
 function creatQuickHandle(val: string) {
   loading.value = true
   const obj = { name: val }
@@ -166,7 +168,9 @@ function deleteDocument(row: any) {
     .catch(() => {})
 }
 
-// 更新名称或状态
+/*
+  更新名称或状态
+*/
 function updateData(documentId: string, data: any) {
   loading.value = true
   datasetApi

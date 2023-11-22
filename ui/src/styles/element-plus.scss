@@ -129,7 +129,7 @@
   width: 100px;
 }
 
-// el-steps
+/* el-steps */
 .el-step__icon {
   background: none;
 }
@@ -172,10 +172,6 @@
 }
 
 .input-with-select {
-  .el-input__wrapper {
-    // border: 1px solid var(--el-border-color);
-    // box-shadow: none!important;
-  }
 
   .el-input-group__prepend {
     background-color: var(--el-fill-color-blank);

@@ -2,35 +2,35 @@
   <div class="ai-dialog p-24">
     <el-scrollbar>
       <div class="ai-dialog__content">
-        <div class="avatar">
-          <AppAvatar class="avatar-gradient">
-            <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
-          </AppAvatar>
-          <!-- <AppAvatar>
+        <div class="item-content mb-16">
+          <div class="avatar">
+            <AppAvatar class="avatar-gradient">
+              <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
+            </AppAvatar>
+            <!-- <AppAvatar>
             <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
           </AppAvatar> -->
-        </div>
+          </div>
 
-        <div class="content">
-          <el-card shadow="always" class="dialog-card">
-            <h4>您好，我是 MaxKB 智能小助手</h4>
-            <div class="mt-4">
-              <el-text type="info">回答用户提出的 MaxKB 产品使用问题</el-text>
-            </div>
-          </el-card>
-          <el-card shadow="always" class="dialog-card mt-12">
-            <h4 class="mb-8">您可以尝试输入以下问题：</h4>
-            <el-space wrap>
-              <el-button icon="EditPen" class="problem-button">
-                DataEase支持哪些类型的数据源？
-              </el-button>
-              <el-button icon="EditPen" class="problem-button">
+          <div class="content">
+            <el-card shadow="always" class="dialog-card">
+              <h4>您好，我是 MaxKB 智能小助手</h4>
+              <div class="mt-4">
+                <el-text type="info">回答用户提出的 MaxKB 产品使用问题</el-text>
+              </div>
+            </el-card>
+            <el-card shadow="always" class="dialog-card mt-12">
+              <h4 class="mb-8">您可以尝试输入以下问题：</h4>
+              <div class="problem-button cursor">
+                <el-icon><EditPen /></el-icon>
                 DataEase支持哪些类型的数据源？XXXXXXXXXXX
+              </div>
+              <el-button icon="EditPen" class="problem-button">
+                <div>DataEase支持哪些类型的数据源？XXXXXXXXXXX</div>
               </el-button>
-            </el-space>
-          </el-card>
+            </el-card>
 
-          <!-- <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
+            <!-- <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
           <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
           <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
           <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
@@ -40,6 +40,29 @@
           <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
           <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card>
           <el-card shadow="always" class="dialog-card mt-12"> XXXXXXXXX </el-card> -->
+          </div>
+        </div>
+        <div class="item-content mb-16">
+          <div class="avatar">
+            <AppAvatar>
+              <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+            </AppAvatar>
+          </div>
+          <div class="content">
+            <div class="text">
+              XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            </div>
+          </div>
+        </div>
+        <div class="item-content mb-16">
+          <div class="avatar">
+            <AppAvatar class="avatar-gradient">
+              <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
+            </AppAvatar>
+          </div>
+          <div class="content">
+            <el-card shadow="always" class="dialog-card"> XXXXXXXXX </el-card>
+          </div>
         </div>
       </div>
     </el-scrollbar>
@@ -88,6 +111,10 @@ const inputValue = ref('')
     }
     .content {
       padding-left: var(--padding-left);
+    }
+    .text {
+      word-break: break-all;
+      padding: 6px 0;
     }
     .problem-button {
       width: 100%;
