@@ -11,7 +11,14 @@ const prefix_provider = '/provider'
 const getModel: (data?: modelRequest) => Promise<Result<any>> = (data) => {
   return get(`${prefix}`, data)
 }
+/**
+ * 获得供应商列表
+ */
+const getProvider: () => Promise<Result<any>> = () => {
+  return get(`${prefix_provider}`)
+}
 
 export default {
-  getModel
+  getModel,
+  getProvider
 }

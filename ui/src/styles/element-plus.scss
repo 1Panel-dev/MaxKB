@@ -99,6 +99,11 @@
 .el-dropdown {
   color: var(--app-text-color);
 }
+.el-dropdown-menu__item {
+  color: var(--app-text-color);
+  font-weight: 400;
+  padding: 5px 11px;
+}
 
 .el-tag {
   --el-tag-border-radius: 2px;
@@ -179,3 +184,5 @@
 .el-textarea__inner {
   font-size: 13px;
 }
+
+

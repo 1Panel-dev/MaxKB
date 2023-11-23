@@ -270,6 +270,17 @@ h4 {
 .default-tag {
   background: var(--tag-deflaut-bg);
   color: var(--tag-deflaut-color);
+  border: none;
+}
+.success-tag {
+  background: var(--tag-success-bg);
+  color: var(--el-color-success);
+  border: none;
+}
+.warning-tag {
+  background: var(--tag-warning-bg);
+  color: var(--el-color-warning);
+  border: none;
 }
 
 /*

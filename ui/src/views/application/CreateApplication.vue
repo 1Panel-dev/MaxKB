@@ -35,14 +35,20 @@
                 />
               </el-form-item>
               <el-form-item label="选择模型" prop="model_id">
-                <el-select
+                <!-- <el-select
                   v-model="applicationForm.model_id"
                   placeholder="请选择模型"
                   style="width: 100%"
                 >
                   <el-option label="Zone one" value="shanghai" />
                   <el-option label="Zone two" value="beijing" />
-                </el-select>
+                </el-select> -->
+                <el-cascader
+                  v-model="applicationForm.model_id"
+                  :options="modelOptions"
+                  :props="modelProps"
+                  clearable
+                />
               </el-form-item>
 
               <el-form-item label="多轮对话">
@@ -120,7 +126,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import AiDialog from '@/components/ai-dialog/index.vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, FormRules, CascaderProps } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import useStore from '@/stores'
 const { model } = useStore()
@@ -149,14 +155,37 @@ const rules = reactive<FormRules<ApplicationFormType>>({
     }
   ]
 })
+const modelOptions = ref([])
 
 watch(exampleList.value, () => {
   applicationForm.example = exampleList.value.filter((v) => v)
 })
 
+let id = 0
+const modelProps: CascaderProps = {
+  lazy: true,
+  async lazyLoad(node, resolve) {
+    console.log(node)
+    const { level } = node
+    if (level === 0) {
+      let res = await getProvider()
+      resolve(res)
+    }
+    // setTimeout(() => {
+    //   const nodes = Array.from({ length: level + 1 }).map((item) => ({
+    //     value: ++id,
+    //     label: `Option - ${id}`,
+    //     leaf: level >= 2
+    //   }))
+    //   resolve(nodes)
+    // }, 1000)
+  }
+}
+
 function getModel() {
   loading.value = true
-  model.asyncGetModel()
+  model
+    .asyncGetModel()
     .then((res) => {
       loading.value = false
     })
@@ -164,8 +193,20 @@ function getModel() {
       loading.value = false
     })
 }
+function getProvider() {
+  loading.value = true
+  model
+    .asyncGetProvider()
+    .then((res) => {
+      modelOptions.value = res?.data
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
 onMounted(() => {
-  getModel()
+  // getProvider()
 })
 </script>
 <style lang="scss" scoped>
