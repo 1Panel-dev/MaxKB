@@ -48,6 +48,7 @@ class Model(APIView):
 
 
 class Provide(APIView):
+    authentication_classes = [TokenAuth]
     class Exec(APIView):
         authentication_classes = [TokenAuth]
 

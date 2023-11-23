@@ -29,6 +29,8 @@ class ModelSerializer(serializers.Serializer):
 
         model_name = serializers.CharField(required=False)
 
+        provider = serializers.CharField(required=False)
+
         def list(self, with_valid):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -42,6 +44,9 @@ class ModelSerializer(serializers.Serializer):
                 query_params['model_type'] = self.data.get('model_type')
             if self.data.get('model_name') is not None:
                 query_params['model_name'] = self.data.get('model_name')
+            if self.data.get('provider') is not None:
+                query_params['provider'] = self.data.get('provider')
+
             return [ModelSerializer.model_to_dict(model) for model in model_query_set.filter(**query_params)]
 
     class Create(serializers.Serializer):

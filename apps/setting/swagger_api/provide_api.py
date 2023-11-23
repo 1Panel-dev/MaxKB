@@ -26,7 +26,12 @@ class ModelQueryApi(ApiMixin):
                 openapi.Parameter(name='model_name', in_=openapi.IN_QUERY,
                                   type=openapi.TYPE_STRING,
                                   required=False,
-                                  description='基础模型名称')
+                                  description='基础模型名称'),
+                openapi.Parameter(name='provider',
+                                  in_=openapi.IN_QUERY,
+                                  type=openapi.TYPE_STRING,
+                                  required=False,
+                                  description='供应名称')
                 ]
 
 

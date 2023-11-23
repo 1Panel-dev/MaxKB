@@ -7,12 +7,10 @@
     @desc:
 """
 import os
-from typing import Dict, List
+from typing import Dict
 
 from langchain.chat_models import AzureChatOpenAI
-from langchain.chat_models.base import BaseChatModel
-from langchain.schema import HumanMessage, BaseMessage
-from langchain.schema.language_model import LanguageModelInput
+from langchain.schema import HumanMessage
 
 from common import froms
 from common.exception.app_exception import AppApiException
