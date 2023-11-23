@@ -1,6 +1,7 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
-import type { datasetListRequest, datasetData } from '@/api/type/dataset'
+import type { datasetData } from '@/api/type/dataset'
+import type { pageRequest } from '@/api/type/common'
 const prefix = '/dataset'
 
 /**
@@ -11,7 +12,7 @@ const prefix = '/dataset'
               "name": "string",
             }
  */
-const getDateset: (param: datasetListRequest) => Promise<Result<any>> = (param) => {
+const getDateset: (param: pageRequest) => Promise<Result<any>> = (param) => {
   return get(
     `${prefix}/${param.current_page}/${param.page_size}`,
     param.name && { name: param.name }

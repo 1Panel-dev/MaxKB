@@ -6,4 +6,10 @@ interface Dict<V> {
   [propName: string]: V
 }
 
-export type { KeyValue, Dict }
+interface pageRequest {
+  current_page: number
+  page_size: number
+  name: string
+}
+
+export type { KeyValue, Dict, pageRequest }

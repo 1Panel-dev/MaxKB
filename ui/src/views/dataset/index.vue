@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import datasetApi from '@/api/dataset'
-import type { datasetListRequest } from '@/api/type/dataset'
+import type { pageRequest } from '@/api/type/common'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { useRouter } from 'vue-router'
 import { numberFormat } from '@/utils/utils'
@@ -72,7 +72,7 @@ const router = useRouter()
 const loading = ref(false)
 const datasetList = ref<any[]>([])
 const disabledScroll = ref(false)
-const pageConfig = reactive<datasetListRequest>({
+const pageConfig = reactive<pageRequest>({
   current_page: 1,
   page_size: 20,
   name: ''

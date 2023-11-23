@@ -16,6 +16,18 @@ const useModelStore = defineStore({
             reject(error)
           })
       })
+    },
+    async asyncGetProvider() {
+      return new Promise((resolve, reject) => {
+        modelApi
+          .getProvider()
+          .then((res) => {
+            resolve(res)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   }
 })
