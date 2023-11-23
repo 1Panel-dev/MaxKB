@@ -35,7 +35,11 @@
                 />
               </el-form-item>
               <el-form-item label="选择模型" prop="model_id">
-                <el-select v-model="applicationForm.model_id" placeholder="请选择模型" style="width: 100%;">
+                <el-select
+                  v-model="applicationForm.model_id"
+                  placeholder="请选择模型"
+                  style="width: 100%"
+                >
                   <el-option label="Zone one" value="shanghai" />
                   <el-option label="Zone two" value="beijing" />
                 </el-select>
@@ -114,10 +118,12 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, onMounted } from 'vue'
 import AiDialog from '@/components/ai-dialog/index.vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { ApplicationFormType } from '@/api/application'
+import type { ApplicationFormType } from '@/api/type/application'
+import useStore from '@/stores'
+const { model } = useStore()
 
 const applicationFormRef = ref<FormInstance>()
 
@@ -146,6 +152,20 @@ const rules = reactive<FormRules<ApplicationFormType>>({
 
 watch(exampleList.value, () => {
   applicationForm.example = exampleList.value.filter((v) => v)
+})
+
+function getModel() {
+  loading.value = true
+  model.asyncGetModel()
+    .then((res) => {
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+onMounted(() => {
+  getModel()
 })
 </script>
 <style lang="scss" scoped>
