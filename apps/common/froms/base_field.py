@@ -23,10 +23,8 @@ class BaseField:
                  label: str,
                  required: bool = False,
                  default_value: object = None,
-                 relation_show_field_list: List[str] = None,
-                 relation_show_value_list: List[str] = None,
-                 relation_trigger_field_list: List[str] = None,
-                 relation_trigger_value_list: List[str] = None,
+                 relation_show_field_dict: Dict = None,
+                 relation_trigger_field_dict: Dict = None,
                  trigger_type: TriggerType = TriggerType.OPTION_LIST,
                  attrs: Dict[str, object] = None,
                  props_info: Dict[str, object] = None):
@@ -35,10 +33,8 @@ class BaseField:
         :param input_type: 字段
         :param label: 提示
         :param default_value: 默认值
-        :param relation_show_field_list:        指定那些当那些字段有值的时候 当前字段显示
-        :param relation_show_value_list:        指定字段有值 并且值在relation_show_value_list列表中则显示当前字段
-        :param relation_trigger_field_list:     指定那些字段有值的时候 调用当前字段的 执行函数获取optionList数据
-        :param relation_trigger_value_list:     指定那些字段有值 并且值在relation_trigger_value_list列表中 则执行函数获取optionList数据
+        :param relation_show_field_dict:        {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才显示
+        :param relation_trigger_field_dict:     {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才 执行函数获取 数据
         :param trigger_type:                    执行器类型  OPTION_LIST请求Option_list数据 CHILD_FORMS请求子表单
         :param attrs:                           前端attr数据
         :param props_info:                      其他额外信息
@@ -52,10 +48,8 @@ class BaseField:
         self.props_info = props_info
         self.default_value = default_value
         self.input_type = input_type
-        self.relation_show_field_list = [] if relation_show_field_list is None else relation_show_field_list
-        self.relation_show_value_list = [] if relation_show_value_list is None else relation_show_value_list
-        self.relation_trigger_field_list = [] if relation_trigger_field_list is None else relation_trigger_field_list
-        self.relation_trigger_value_field_list = [] if relation_trigger_value_list is None else relation_trigger_value_list
+        self.relation_show_field_dict = {} if relation_show_field_dict is None else relation_show_field_dict
+        self.relation_trigger_field_dict = [] if relation_trigger_field_dict is None else relation_trigger_field_dict
         self.required = required
         self.trigger_type = trigger_type
 
@@ -65,10 +59,8 @@ class BaseField:
             'label': self.label,
             'required': self.required,
             'default_value': self.default_value,
-            'relation_show_field_list': self.relation_show_field_list,
-            'relation_show_value_list': self.relation_show_value_list,
-            'relation_trigger_field_list': self.relation_trigger_field_list,
-            'relation_trigger_value_field_list': self.relation_trigger_value_field_list,
+            'relation_show_field_dict': self.relation_show_field_dict,
+            'relation_trigger_field_dict': self.relation_trigger_field_dict,
             'trigger_type': self.trigger_type.value,
             'attrs': self.attrs,
             'props_info': self.props_info,
@@ -83,8 +75,7 @@ class BaseDefaultOptionField(BaseField):
                  option_list: List[dict],
                  required: bool = False,
                  default_value: object = None,
-                 relation_show_field_list: List[str] = None,
-                 relation_show_value_list: List[str] = None,
+                 relation_show_field_dict: Dict[str, object] = None,
                  attrs: Dict[str, object] = None,
                  props_info: Dict[str, object] = None):
         """
@@ -96,13 +87,12 @@ class BaseDefaultOptionField(BaseField):
         :param option_list:     可选列表
         :param required:        是否必填
         :param default_value:   默认值
-        :param relation_show_field_list:        指定那些当那些字段有值的时候 当前字段显示
-        :param relation_show_value_list:        指定字段有值 并且值在relation_show_value_list列表中则显示当前字段
+        :param relation_show_field_dict:        {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才显示
         :param attrs:                           前端attr数据
         :param props_info:                      其他额外信息
         """
-        super().__init__(input_type, label, required, default_value, relation_show_field_list, relation_show_value_list,
-                         [], [], TriggerType.OPTION_LIST, attrs, props_info)
+        super().__init__(input_type, label, required, default_value, relation_show_field_dict,
+                         {}, TriggerType.OPTION_LIST, attrs, props_info)
         self.text_field = text_field
         self.value_field = value_field
         self.option_list = option_list
@@ -122,10 +112,8 @@ class BaseExecField(BaseField):
                  method: str,
                  required: bool = False,
                  default_value: object = None,
-                 relation_show_field_list: List[str] = None,
-                 relation_show_value_list: List[str] = None,
-                 relation_trigger_field_list: List[str] = None,
-                 relation_trigger_value_list: List[str] = None,
+                 relation_show_field_dict: Dict = None,
+                 relation_trigger_field_dict: Dict = None,
                  trigger_type: TriggerType = TriggerType.OPTION_LIST,
                  attrs: Dict[str, object] = None,
                  props_info: Dict[str, object] = None):
@@ -139,16 +127,15 @@ class BaseExecField(BaseField):
         :param method:      执行供应商函数 method
         :param required:    是否必填
         :param default_value: 默认值
-        :param relation_show_field_list:        指定那些当那些字段有值的时候 当前字段显示
-        :param relation_show_value_list:        指定字段有值 并且值在relation_show_value_list列表中则显示当前字段
-        :param relation_trigger_field_list:     指定那些字段有值的时候 调用当前字段的 执行函数获取optionList数据
-        :param relation_trigger_value_list:     指定那些字段有值 并且值在relation_trigger_value_list列表中 则执行函数获取optionList数据
+        :param relation_show_field_dict:        {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才显示
+        :param relation_trigger_field_dict:     {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才 执行函数获取 数据
         :param trigger_type:                    执行器类型  OPTION_LIST请求Option_list数据 CHILD_FORMS请求子表单
         :param attrs:                           前端attr数据
         :param props_info:                      其他额外信息
         """
-        super().__init__(input_type, label, required, default_value, relation_show_field_list, relation_show_value_list,
-                         relation_trigger_field_list, relation_trigger_value_list, trigger_type, attrs, props_info)
+        super().__init__(input_type, label, required, default_value, relation_show_field_dict,
+                         relation_trigger_field_dict,
+                         trigger_type, attrs, props_info)
         self.text_field = text_field
         self.value_field = value_field
         self.provider = provider

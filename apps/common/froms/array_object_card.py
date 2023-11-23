@@ -2,7 +2,7 @@
 """
     @project: maxkb
     @Author：虎
-    @file： array_card.py
+    @file： array_object_card.py
     @date：2023/10/31 18:03
     @desc:
 """
@@ -24,13 +24,10 @@ class ArrayCard(BaseExecField):
                  method: str,
                  required: bool = False,
                  default_value: object = None,
-                 relation_show_field_list: List[str] = None,
-                 relation_show_value_list: List[str] = None,
-                 relation_trigger_field_list: List[str] = None,
-                 relation_trigger_value_list: List[str] = None,
+                 relation_show_field_dict: Dict = None,
+                 relation_trigger_field_dict: Dict = None,
                  trigger_type: TriggerType = TriggerType.OPTION_LIST,
                  attrs: Dict[str, object] = None,
                  props_info: Dict[str, object] = None):
-        super().__init__("ArrayCard", label, text_field, value_field, provider, method, required, default_value,
-                         relation_show_field_list, relation_show_value_list, relation_trigger_field_list,
-                         relation_trigger_value_list, trigger_type, attrs, props_info)
+        super().__init__("ArrayObjectCard", label, text_field, value_field, provider, method, required, default_value,
+                         relation_show_field_dict, relation_trigger_field_dict, trigger_type, attrs, props_info)
