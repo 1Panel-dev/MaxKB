@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import datasetApi from '@/api/dataset'
+import documentApi from '@/api/document'
 import { toThousands } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -127,11 +127,13 @@ function rowClickHandle(row: any) {
   router.push({ path: `/dataset/${datasetId}/${row.id}` })
 }
 
-// 快速创建空白文档
+/*
+  快速创建空白文档
+*/
 function creatQuickHandle(val: string) {
   loading.value = true
   const obj = { name: val }
-  datasetApi
+  documentApi
     .postDocument(datasetId, obj)
     .then((res) => {
       getList()
@@ -153,7 +155,7 @@ function deleteDocument(row: any) {
   )
     .then(() => {
       loading.value = true
-      datasetApi
+      documentApi
         .delDocument(datasetId, row.id)
         .then(() => {
           MsgSuccess('删除成功')
@@ -166,10 +168,12 @@ function deleteDocument(row: any) {
     .catch(() => {})
 }
 
-// 更新名称或状态
+/*
+  更新名称或状态
+*/
 function updateData(documentId: string, data: any) {
   loading.value = true
-  datasetApi
+  documentApi
     .putDocument(datasetId, documentId, data)
     .then((res) => {
       const index = documentData.value.findIndex((v) => v.id === documentId)
@@ -212,7 +216,7 @@ function handleCurrentChange(val: number) {
 
 function getList() {
   loading.value = true
-  datasetApi
+  documentApi
     .getDocument(datasetId as string, filterText.value)
     .then((res) => {
       documentData.value = res.data

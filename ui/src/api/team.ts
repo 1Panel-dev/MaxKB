@@ -1,7 +1,6 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import type { TeamMember } from '@/api/type/team'
-// import type { Ref } from 'vue'
 
 const prefix = '/team/member'
 

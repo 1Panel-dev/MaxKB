@@ -9,7 +9,8 @@ export function numberFormat(num: number) {
 
 export function filesize(size: number) {
   if (!size) return ''
-  const num = 1024.0 //byte
+  /* byte */
+  const num = 1024.0
 
   if (size < num) return size + 'B'
   if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + 'K' //kb
@@ -18,13 +19,17 @@ export function filesize(size: number) {
   return (size / Math.pow(num, 4)).toFixed(2) + 'T' //T
 }
 
-// 获取文件后缀
+/*
+  获取文件后缀
+*/
 export function fileType(name: string) {
   const suffix = name.split('.')
   return suffix[suffix.length - 1]
 }
 
-// 获得文件对应图片
+/*
+  获得文件对应图片
+*/
 export function getImgUrl(name: string) {
   const type = fileType(name) || 'txt'
   return `/src/assets/${type}-icon.svg`

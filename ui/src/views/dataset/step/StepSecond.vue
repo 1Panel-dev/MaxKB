@@ -1,9 +1,9 @@
 <template>
   <div class="set-rules">
-    <el-row class="set-rules-height">
+    <el-row>
       <el-col :span="10" class="p-24">
         <h4 class="title-decoration-1 mb-8">设置分段规则</h4>
-        <div>
+        <div class="set-rules__right">
           <el-scrollbar>
             <div class="left-height">
               <el-radio-group v-model="radio" class="set-rules__radio">
@@ -89,7 +89,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, watch } from 'vue'
 import ParagraphPreview from '@/views/dataset/component/ParagraphPreview.vue'
-import DatasetApi from '@/api/dataset'
+import documentApi from '@/api/document'
 import useStore from '@/stores'
 import type { KeyValue } from '@/api/type/common'
 const { dataset } = useStore()
@@ -102,15 +102,14 @@ const paragraphList = ref<any[]>([])
 const patternLoading = ref<boolean>(false)
 
 const form = reactive<{
-  patterns: Array<string>,
-  limit: number,
-  with_filter: boolean,
+  patterns: Array<string>
+  limit: number
+  with_filter: boolean
   [propName: string]: any
 }>({
   patterns: [],
   limit: 0,
-  with_filter: false,
-
+  with_filter: false
 })
 
 function splitDocument() {
@@ -124,13 +123,13 @@ function splitDocument() {
   if (radio.value === '2') {
     Object.keys(form).forEach((key) => {
       if (key == 'patterns') {
-        form.patterns.forEach(item => fd.append('patterns', item))
+        form.patterns.forEach((item) => fd.append('patterns', item))
       } else {
         fd.append(key, form[key])
       }
     })
   }
-  DatasetApi.postSplitDocument(fd)
+  documentApi.postSplitDocument(fd)
     .then((res: any) => {
       paragraphList.value = res.data
       loading.value = false
@@ -141,7 +140,7 @@ function splitDocument() {
 }
 
 const initSplitPatternList = () => {
-  DatasetApi.listSplitPattern(patternLoading).then((ok) => {
+  documentApi.listSplitPattern(patternLoading).then((ok) => {
     splitPatternList.value = ok.data
   })
 }
@@ -164,12 +163,8 @@ defineExpose({
 .set-rules {
   width: 100%;
 
-  .set-rules-height {
-    height: var(--create-dataset-height);
-  }
-
   .left-height {
-    max-height: calc(var(--create-dataset-height) - 105px);
+    max-height: calc(var(--create-dataset-height) - 70px);
     overflow-x: hidden;
   }
 

@@ -16,6 +16,7 @@
       :model="memberForm"
       label-position="top"
       :rules="rules"
+      require-asterisk-position="right"
       @submit.prevent
     >
       <el-form-item label="用户名/邮箱" prop="users">

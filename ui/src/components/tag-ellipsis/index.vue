@@ -22,16 +22,16 @@ const isShowTooltip = computed(() => {
   const containerWeight = tagLabel.value?.scrollWidth
   const contentWeight = tagLabel.value?.clientWidth
   if (containerWeight > contentWeight) {
-    // 实际宽度 > 可视宽度
+    /* 实际宽度 > 可视宽度 */
     return true
   } else {
-    // 否则为不溢出
+    /* 否则为不溢出 */
     return false
   }
 })
 </script>
 <style lang="scss" scoped>
-// tag超出省略号
+/* tag超出省略号 */
 .tag-ellipsis {
   border: 1px solid var(--el-border-color);
   color: var(--app-text-color);

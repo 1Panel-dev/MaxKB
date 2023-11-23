@@ -44,7 +44,7 @@ import { ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 import ProblemComponent from '@/views/paragraph/component/ProblemComponent.vue'
-import datasetApi from '@/api/dataset'
+import paragraphApi from '@/api/paragraph'
 import useStore from '@/stores'
 
 const props = defineProps({
@@ -110,7 +110,7 @@ const submitHandle = async () => {
               ...paragraphFormRef.value?.form
             }
           : paragraphFormRef.value?.form
-      datasetApi
+      paragraphApi
         .postParagraph(datasetId, documentId, obj)
         .then((res) => {
           emit('refresh')

@@ -12,7 +12,8 @@ const props = defineProps({
   to: String
 })
 
-const back: any = router.options.history.state.back // 上一层路由
+/* 上一层路由 */
+const back: any = router.options.history.state.back
 function jump() {
   if (props.to === '-1') {
     back ? router.push(back) : router.go(-1)

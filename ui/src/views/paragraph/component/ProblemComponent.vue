@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import datasetApi from '@/api/dataset'
+import paragraphApi from '@/api/paragraph'
 
 const props = defineProps({
   problemId: String
@@ -60,7 +60,6 @@ watch(
     }
   },
   {
-    // 初始化立即执行
     immediate: true
   }
 )
@@ -68,7 +67,7 @@ watch(
 function delProblemHandle(item: any, index: number) {
   loading.value = true
   if (item.id) {
-    datasetApi
+    paragraphApi
       .delProblem(datasetId, documentId, props.problemId || '', item.id)
       .then((res) => {
         getProblemList()
@@ -84,7 +83,7 @@ function delProblemHandle(item: any, index: number) {
 
 function getProblemList() {
   loading.value = true
-  datasetApi
+  paragraphApi
     .getProblem(datasetId, documentId, props.problemId || '')
     .then((res) => {
       problemList.value = res.data
@@ -108,7 +107,7 @@ function addProblemHandle(val: string) {
     }
     loading.value = true
     if (props.problemId) {
-      datasetApi
+      paragraphApi
         .postProblem(datasetId, documentId, props.problemId, obj)
         .then((res) => {
           getProblemList()

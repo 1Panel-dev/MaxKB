@@ -1,6 +1,12 @@
 <template>
   <h4 class="title-decoration-1 mb-16">基本信息</h4>
-  <el-form ref="FormRef" :model="form" :rules="rules" label-position="top">
+  <el-form
+    ref="FormRef"
+    :model="form"
+    :rules="rules"
+    label-position="top"
+    require-asterisk-position="right"
+  >
     <el-form-item label="数据集名称" prop="name">
       <el-input
         v-model.trim="form.name"
@@ -55,12 +61,13 @@ watch(
     }
   },
   {
-    // 初始化立即执行
     immediate: true
   }
 )
 
-// 表单校验
+/*
+  表单校验
+*/
 function validate() {
   if (!FormRef.value) return
   return FormRef.value.validate((valid: any) => {

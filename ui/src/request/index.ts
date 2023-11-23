@@ -17,7 +17,7 @@ const axiosConfig = {
 
 const instance = axios.create(axiosConfig)
 
-// 设置请求拦截器
+/* 设置请求拦截器 */
 instance.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     if (config.headers === undefined) {

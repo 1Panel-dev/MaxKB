@@ -25,11 +25,12 @@ const isCreate = type === 'create'
 const BaseFormRef = ref()
 const UploadComponentRef = ref()
 
-// submit
 const onSubmit = async () => {
   if (isCreate) {
     if ((await BaseFormRef.value?.validate()) && (await UploadComponentRef.value.validate())) {
-      // stores保存数据
+      /*
+        stores保存数据
+      */
       dataset.saveBaseInfo(BaseFormRef.value.form)
       dataset.saveDocumentsFile(UploadComponentRef.value.form.fileList)
       return true
@@ -38,7 +39,9 @@ const onSubmit = async () => {
     }
   } else {
     if (await UploadComponentRef.value.validate()) {
-      // stores保存数据
+      /*
+        stores保存数据
+      */
       dataset.saveDocumentsFile(UploadComponentRef.value.form.fileList)
       return true
     } else {

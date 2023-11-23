@@ -1,6 +1,12 @@
 <template>
   <h4 class="title-decoration-1 mb-8">上传文档</h4>
-  <el-form ref="FormRef" :model="form" :rules="rules" label-position="top">
+  <el-form
+    ref="FormRef"
+    :model="form"
+    :rules="rules"
+    label-position="top"
+    require-asterisk-position="right"
+  >
     <el-form-item prop="fileList">
       <el-upload
         class="w-full"
@@ -80,7 +86,9 @@ function deleteFlie(index: number) {
   form.value.fileList.splice(index, 1)
 }
 
-// 表单校验
+/*
+  表单校验
+*/
 function validate() {
   if (!FormRef.value) return
   return FormRef.value.validate((valid: any) => {

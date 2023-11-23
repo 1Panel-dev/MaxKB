@@ -36,7 +36,7 @@ function clickHandle(row: any, index: number) {
 }
 </script>
 <style lang="scss" scoped>
-// 通用 ui li样式
+/* 通用 ui li样式 */
 .common-list {
   li {
     padding: 11px 16px;
