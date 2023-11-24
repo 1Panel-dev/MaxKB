@@ -26,6 +26,7 @@ defineProps({
   min-height: var(--card-min-height);
   border: 1px dashed var(--el-color-primary);
   background: #eff0f1;
+  border-radius: 8px;
 
   .add-icon {
     font-size: 14px;

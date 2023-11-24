@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer header="创建应用" back-to="-1" class="create-application">
+  <LayoutContainer :header="appId ? '设置' : '创建应用'" back-to="-1" class="create-application">
     <el-row>
       <el-col :span="10">
         <div class="p-24 mb-16" style="padding-bottom: 0">
@@ -34,11 +34,12 @@
                   show-word-limit
                 />
               </el-form-item>
-
-              <div v-html="realatedProvider('model_azure_provider', 'icon')"></div>
-
               <el-form-item label="选择模型" prop="model_id">
-                <el-select v-model="applicationForm.model_id" placeholder="请选择模型">
+                <el-select
+                  v-model="applicationForm.model_id"
+                  placeholder="请选择模型"
+                  style="width: 100%"
+                >
                   <el-option-group
                     v-for="(value, label) in modelOptions"
                     :key="value"
@@ -49,16 +50,30 @@
                       :key="item.id"
                       :label="item.name"
                       :value="item.id"
+                      class="flex-between"
                     >
-                      <div v-html="realatedProvider(label, 'icon')" class="model-icon"></div>
-                      <span>{{ item.name }}</span>
+                      <div class="flex">
+                        <span
+                          v-html="realatedProvider(label, 'icon')"
+                          class="model-icon mr-8"
+                        ></span>
+                        <span>{{ item.name }}</span>
+                      </div>
+                      <el-icon class="check-icon" v-if="item.id === applicationForm.model_id"
+                        ><Check
+                      /></el-icon>
                     </el-option>
                   </el-option-group>
+                  <div class="border-t" style="padding: 8px 11px">
+                    <el-button type="primary" link>
+                      <el-icon class="mr-4"><Plus /></el-icon> 添加模型
+                    </el-button>
+                  </div>
                 </el-select>
               </el-form-item>
 
-              <el-form-item label="多轮对话">
-                <el-switch v-model="applicationForm.multiple_rounds_dialogue" />
+              <el-form-item label="多轮对话" @click.prevent>
+                <el-switch v-model="applicationForm.multiple_rounds_dialogue"></el-switch>
               </el-form-item>
               <el-form-item label="关联数据集">
                 <template #label>
@@ -131,12 +146,20 @@
 </template>
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
 import AiDialog from '@/components/ai-dialog/index.vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
+import type { Provider } from '@/api/type/model'
 import useStore from '@/stores'
 const { model } = useStore()
+
+const router = useRouter()
+const route = useRoute()
+const {
+  params: { appId }
+} = route as any
 
 const applicationFormRef = ref<FormInstance>()
 
@@ -162,8 +185,8 @@ const rules = reactive<FormRules<ApplicationFormType>>({
     }
   ]
 })
-const modelOptions = ref([])
-const providerOptions = ref([])
+const modelOptions = ref<any>(null)
+const providerOptions = ref<Array<Provider>>([])
 
 watch(exampleList.value, () => {
   applicationForm.example = exampleList.value.filter((v) => v)
@@ -173,9 +196,8 @@ function getModel() {
   loading.value = true
   model
     .asyncGetModel()
-    .then((res) => {
+    .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
-      console.log(modelOptions.value)
       loading.value = false
     })
     .catch(() => {
@@ -187,7 +209,7 @@ function getProvider() {
   loading.value = true
   model
     .asyncGetProvider()
-    .then((res) => {
+    .then((res: any) => {
       providerOptions.value = res?.data
       loading.value = false
     })
@@ -196,9 +218,10 @@ function getProvider() {
     })
 }
 
-function realatedProvider(val, attr) {
-  const filterProvider = providerOptions.value.filter((item) => item.provider === val)?.[0]
-  console.log(filterProvider)
+function realatedProvider(val: string | number, attr: string) {
+  const filterProvider: any = providerOptions.value.filter(
+    (item: any) => item.provider === val
+  )?.[0]
   return filterProvider?.[attr] || ''
 }
 
@@ -220,16 +243,17 @@ onMounted(() => {
     box-sizing: border-box;
   }
   .scrollbar-height-left {
-    height: calc(var(--app-main-height) - 100px);
+    height: calc(var(--app-main-height) - 127px);
   }
   .scrollbar-height {
     height: calc(var(--app-main-height) - 150px);
   }
-
 }
 .model-icon {
-    svg {
-      width: 30px;
-    }
-  }
+  width: 20px;
+}
+.check-icon {
+  position: absolute;
+  right: 10px;
+}
 </style>

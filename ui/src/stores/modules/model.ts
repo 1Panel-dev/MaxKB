@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import modelApi from '@/api/model'
-import type { modelRequest } from '@/api/type/model'
+import type { modelRequest, Provider } from '@/api/type/model'
 const useModelStore = defineStore({
   id: 'model',
   state: () => ({}),

@@ -1,5 +1,3 @@
-import { SrvRecord } from 'dns'
-
 interface modelRequest {
   name: string
   model_type: string

@@ -93,7 +93,6 @@
 }
 
 .el-card {
-  --el-card-border-radius: 8px;
   --el-card-padding: calc(var(--app-base-px) * 2);
 }
 .el-dropdown {
@@ -185,4 +184,6 @@
   font-size: 13px;
 }
 
-
+.el-select-group .el-select-dropdown__item {
+  padding-left: 11px;
+}

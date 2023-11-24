@@ -54,6 +54,7 @@ function cardLeave() {
   position: relative;
   min-height: var(--card-min-height);
   border: 1px solid #ffffff;
+  border-radius: 8px;
   .description {
     display: -webkit-box;
     -webkit-box-orient: vertical;

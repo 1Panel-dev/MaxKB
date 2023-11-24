@@ -128,9 +128,9 @@ function getList() {
     .getApplication(pageConfig)
     .then((res) => {
       const list = res.data?.records
-      list.map((item) => {
+      list.map((item: any) => {
         applicationList.value.push({
-          value:item.provider,
+          value: item.provider,
           label: item.name
         })
       })

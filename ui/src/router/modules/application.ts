@@ -14,7 +14,7 @@ const applicationRouter = {
       path: '/application/create',
       name: 'CreateApplication',
       meta: { activeMenu: '/application' },
-      component: () => import('@/views/application/CreateApplication.vue'),
+      component: () => import('@/views/application/CreateAndSetting.vue'),
       hidden: true
     },
     {
@@ -46,7 +46,7 @@ const applicationRouter = {
             parentPath: '/application/:appId',
             parentName: 'ApplicationDetail'
           },
-          component: () => import('@/views/application/AppSetting.vue')
+          component: () => import('@/views/application/CreateAndSetting.vue')
         },
         {
           path: 'dialog',

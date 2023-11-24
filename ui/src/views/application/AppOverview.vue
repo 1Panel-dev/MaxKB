@@ -1,8 +1,76 @@
 <template>
-  <div>
-  概览
-  </div>
+  <LayoutContainer header="概览" back-to="-1">
+    <div class="main-calc-height p-24">
+      <h4 class="title-decoration-1 mb-16">应用信息</h4>
+      <el-card shadow="never" class="overview-card">
+        <div class="title flex align-center">
+          <AppAvatar class="mr-12" shape="square" :size="32">
+            <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+          </AppAvatar>
+          <h4 class="ellipsis-1">应用</h4>
+          <div class="ml-8">
+            <el-tag class="warning-tag">已停用</el-tag>
+            <el-tag class="success-tag">运行中</el-tag>
+          </div>
+        </div>
+        <div class="active-button" @click.stop>
+          <el-switch />
+        </div>
+        <el-row class="mt-16">
+          <el-col :span="12">
+            <el-text type="info">公开访问链接</el-text>
+            <div class="mt-4">
+              <span class="vertical-middle lighter">
+                https:/fit2cloud.com/xlab-fit2cloud/smart-doc/16826
+              </span>
+
+              <el-button type="primary" text>
+                <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+              </el-button>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <el-text type="info">API访问凭据</el-text>
+            <div class="mt-4">
+              <span class="vertical-middle lighter">
+                API Key: OGZmZThlZjYyYzU2MWE1OTlkYTVjZTBi
+              </span>
+
+              <el-button type="primary" text>
+                <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+              </el-button>
+            </div>
+            <div class="mt-4">
+              <span class="vertical-middle lighter"> API Secret: ************** </span>
+              <span>
+                <el-button type="primary" text>
+                  <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+                </el-button>
+              </span>
+              <span>
+                <el-button type="primary" text>
+                  <AppIcon iconName="app-hide-password" />
+                </el-button>
+              </span>
+            </div>
+          </el-col>
+        </el-row>
+        <div class="mt-16">
+          <el-button type="primary"> 演示 </el-button>
+          <el-button> 嵌入第三方 </el-button>
+        </div>
+      </el-card>
+    </div>
+  </LayoutContainer>
 </template>
-<script setup lang="ts">
-</script>
-<style lang="scss" scoped></style>
+<script setup lang="ts"></script>
+<style lang="scss" scoped>
+.overview-card {
+  position: relative;
+  .active-button {
+    position: absolute;
+    right: 16px;
+    top: 21px;
+  }
+}
+</style>
