@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer :header="appId ? '设置' : '创建应用'" back-to="-1" class="create-application">
+  <LayoutContainer :header="id ? '设置' : '创建应用'" back-to="-1" class="create-application">
     <el-row>
       <el-col :span="10">
         <div class="p-24 mb-16" style="padding-bottom: 0">
@@ -79,7 +79,7 @@
                 <template #label>
                   <div class="flex-between">
                     <span>关联数据集</span>
-                    <el-button type="primary" link>
+                    <el-button type="primary" link @click="openDatasetDialog">
                       <el-icon class="mr-4"><Plus /></el-icon> 添加
                     </el-button>
                   </div>
@@ -87,7 +87,7 @@
                 <div>
                   <el-text type="info">关联的数据集展示在这里</el-text>
                 </div>
-                <div class="w-full">
+                <!-- <div class="w-full">
                   <el-row :gutter="12">
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mb-8">
                       <el-card class="relate-dataset-card" shadow="never">
@@ -105,14 +105,14 @@
                       </el-card>
                     </el-col>
                   </el-row>
-                </div>
+                </div> -->
               </el-form-item>
               <el-form-item label="开场白">
                 <el-input
                   v-model="applicationForm.prologue"
                   type="textarea"
                   placeholder="开始对话的欢迎语。您可以这样写：您好，我是 MaxKB 智能小助手，您可以向我提出 MaxKB 产品使用中遇到的任何问题。"
-                  :rows="3"
+                  :rows="4"
                 />
               </el-form-item>
               <el-form-item label="示例">
@@ -128,8 +128,8 @@
           </el-scrollbar>
         </div>
         <div class="text-right border-t p-16">
-          <el-button> 取消 </el-button>
-          <el-button type="primary" :disabled="loading"> 创建 </el-button>
+          <el-button @click="router.push({ path: `/application` })"> 取消 </el-button>
+          <el-button type="primary" @click="submit" :disabled="loading"> 创建 </el-button>
         </div>
       </el-col>
       <el-col :span="14" class="p-24 border-l">
@@ -142,6 +142,7 @@
         </div>
       </el-col>
     </el-row>
+    <AddDatasetDialog ref="AddDatasetDialogRef" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -149,6 +150,7 @@ import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
 import AiDialog from '@/components/ai-dialog/index.vue'
+import AddDatasetDialog from './components/AddDatasetDialog.vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import type { Provider } from '@/api/type/model'
@@ -158,10 +160,11 @@ const { model } = useStore()
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { appId }
+  params: { id }
 } = route as any
 
 const applicationFormRef = ref<FormInstance>()
+const AddDatasetDialogRef = ref()
 
 const loading = ref(false)
 const exampleList = ref(['', ''])
@@ -191,6 +194,46 @@ const providerOptions = ref<Array<Provider>>([])
 watch(exampleList.value, () => {
   applicationForm.example = exampleList.value.filter((v) => v)
 })
+
+function submit() {
+  loading.value = true
+
+  // const documents = [] as any[]
+  // StepSecondRef.value.paragraphList.map((item: any) => {
+  //   documents.push({
+  //     name: item.name,
+  //     paragraphs: item.content
+  //   })
+  // })
+  // const obj = { ...baseInfo.value, documents } as datasetData
+  // if (id) {
+  //   documentApi
+  //     .postDocument(id, documents)
+  //     .then((res) => {
+  //       MsgSuccess('提交成功')
+  //       clearStore()
+  //       router.push({ path: `/dataset/${id}/document` })
+  //     })
+  //     .catch(() => {
+  //       loading.value = false
+  //     })
+  // } else {
+  //   datasetApi
+  //     .postDateset(obj)
+  //     .then((res) => {
+  //       successInfo.value = res.data
+  //       active.value = 2
+  //       clearStore()
+  //       loading.value = false
+  //     })
+  //     .catch(() => {
+  //       loading.value = false
+  //     })
+  // }
+}
+function openDatasetDialog() {
+  AddDatasetDialogRef.value.open()
+}
 
 function getModel() {
   loading.value = true

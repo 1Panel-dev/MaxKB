@@ -18,7 +18,7 @@ const applicationRouter = {
       hidden: true
     },
     {
-      path: '/application/:appId',
+      path: '/application/:id',
       name: 'ApplicationDetail',
       meta: { title: '应用详情', activeMenu: '/application' },
       component: Layout,
@@ -31,7 +31,7 @@ const applicationRouter = {
             icon: 'Document',
             title: '概览',
             active: 'overview',
-            parentPath: '/application/:appId',
+            parentPath: '/application/:id',
             parentName: 'ApplicationDetail'
           },
           component: () => import('@/views/application/AppOverview.vue')
@@ -43,7 +43,7 @@ const applicationRouter = {
             icon: 'Setting',
             title: '设置',
             active: 'setting',
-            parentPath: '/application/:appId',
+            parentPath: '/application/:id',
             parentName: 'ApplicationDetail'
           },
           component: () => import('@/views/application/CreateAndSetting.vue')
@@ -55,7 +55,7 @@ const applicationRouter = {
             icon: 'Setting',
             title: '对话日志',
             active: 'dialog',
-            parentPath: '/application/:appId',
+            parentPath: '/application/:id',
             parentName: 'ApplicationDetail'
           },
           component: () => import('@/views/application/DialogLog.vue')

@@ -1,7 +1,9 @@
 <template>
-  <el-icon class="back-button cursor mr-8" @click="jump">
-    <Back />
-  </el-icon>
+  <el-button class="back-button cursor mr-4" text @click="jump">
+    <el-icon>
+      <Back />
+    </el-icon>
+  </el-button>
 </template>
 
 <script setup lang="ts">
@@ -25,6 +27,6 @@ function jump() {
 
 <style lang="scss">
 .back-button {
-  font-size:20px;
+  font-size: 20px;
 }
 </style>

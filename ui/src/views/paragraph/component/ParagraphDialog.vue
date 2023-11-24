@@ -55,7 +55,7 @@ const { paragraph } = useStore()
 
 const route = useRoute()
 const {
-  params: { datasetId, documentId }
+  params: { id, documentId }
 } = route as any
 
 const emit = defineEmits(['refresh'])
@@ -93,7 +93,7 @@ const submitHandle = async () => {
     loading.value = true
     if (problemId.value) {
       paragraph
-        .asyncPutParagraph(datasetId, documentId, problemId.value, paragraphFormRef.value?.form)
+        .asyncPutParagraph(id, documentId, problemId.value, paragraphFormRef.value?.form)
         .then(() => {
           emit('refresh')
           loading.value = false
@@ -111,7 +111,7 @@ const submitHandle = async () => {
             }
           : paragraphFormRef.value?.form
       paragraphApi
-        .postParagraph(datasetId, documentId, obj)
+        .postParagraph(id, documentId, obj)
         .then((res) => {
           emit('refresh')
           loading.value = false

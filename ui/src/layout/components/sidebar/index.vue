@@ -1,5 +1,8 @@
 <template>
   <div class="sidebar p-8">
+    <div v-if="showBreadcrumb">
+      <AppBreadcrumb />
+    </div>
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu :default-active="activeMenu" router>
         <sidebar-item
@@ -19,8 +22,17 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { getChildRouteListByPathAndName } from '@/router/index'
 import SidebarItem from './SidebarItem.vue'
+import AppBreadcrumb from './AppBreadcrumb.vue'
 
 const route = useRoute()
+
+const showBreadcrumb = computed(() => {
+  const { meta } = route as any
+  return (
+    meta?.activeMenu &&
+    (meta?.activeMenu.includes('dataset') || meta?.activeMenu.includes('application'))
+  )
+})
 
 const subMenuList = computed(() => {
   const { meta } = route

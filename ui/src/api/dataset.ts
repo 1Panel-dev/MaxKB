@@ -21,10 +21,10 @@ const getDateset: (param: pageRequest) => Promise<Result<any>> = (param) => {
 
 /**
  * 获取全部数据集
- * @param 参数 name
+ * @param 参数
  */
-const getAllDateset: (param?: string) => Promise<Result<any[]>> = (param) => {
-  return get(`${prefix}`, param && { name: param })
+const getAllDateset: () => Promise<Result<any[]>> = () => {
+  return get(`${prefix}`)
 }
 
 /**

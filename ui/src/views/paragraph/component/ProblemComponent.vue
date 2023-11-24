@@ -42,7 +42,7 @@ const props = defineProps({
 
 const route = useRoute()
 const {
-  params: { datasetId, documentId }
+  params: { id, documentId }
 } = route as any
 
 const inputRef = ref()
@@ -68,7 +68,7 @@ function delProblemHandle(item: any, index: number) {
   loading.value = true
   if (item.id) {
     paragraphApi
-      .delProblem(datasetId, documentId, props.problemId || '', item.id)
+      .delProblem(id, documentId, props.problemId || '', item.id)
       .then((res) => {
         getProblemList()
       })
@@ -84,7 +84,7 @@ function delProblemHandle(item: any, index: number) {
 function getProblemList() {
   loading.value = true
   paragraphApi
-    .getProblem(datasetId, documentId, props.problemId || '')
+    .getProblem(id, documentId, props.problemId || '')
     .then((res) => {
       problemList.value = res.data
       loading.value = false
@@ -108,7 +108,7 @@ function addProblemHandle(val: string) {
     loading.value = true
     if (props.problemId) {
       paragraphApi
-        .postProblem(datasetId, documentId, props.problemId, obj)
+        .postProblem(id, documentId, props.problemId, obj)
         .then((res) => {
           getProblemList()
           problemValue.value = ''

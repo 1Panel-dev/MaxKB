@@ -18,7 +18,7 @@ import datasetApi from '@/api/dataset'
 import { MsgSuccess } from '@/utils/message'
 const route = useRoute()
 const {
-  params: { datasetId }
+  params: { id }
 } = route as any
 
 const BaseFormRef = ref()
@@ -29,7 +29,7 @@ async function submit() {
   if (await BaseFormRef.value?.validate()) {
     loading.value = true
     datasetApi
-      .putDateset(datasetId, BaseFormRef.value.form)
+      .putDateset(id, BaseFormRef.value.form)
       .then((res) => {
         MsgSuccess('保存成功')
         loading.value = false
@@ -43,7 +43,7 @@ async function submit() {
 function getDetail() {
   loading.value = true
   datasetApi
-    .getDatesetDetail(datasetId)
+    .getDatesetDetail(id)
     .then((res) => {
       detail.value = res.data
       loading.value = false

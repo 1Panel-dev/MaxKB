@@ -326,6 +326,14 @@ h4 {
   }
 }
 
+// checkbox-group 文字在左 input在右
+.app-custom-checkbox-group {
+  line-height: normal;
+  .el-checkbox__label {
+    display: none;
+  }
+}
+
 /*
   头像渐变背景
 */

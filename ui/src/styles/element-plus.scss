@@ -102,6 +102,10 @@
   color: var(--app-text-color);
   font-weight: 400;
   padding: 5px 11px;
+  &:not(.is-disabled):focus {
+    background-color: var(--app-text-color-light-1);
+    color: var(--app-text-color);
+  }
 }
 
 .el-tag {

@@ -79,7 +79,7 @@ import useStore from '@/stores'
 const { paragraph } = useStore()
 const route = useRoute()
 const {
-  params: { datasetId, documentId }
+  params: { id, documentId }
 } = route as any
 
 const ParagraphDialogRef = ref()
@@ -96,7 +96,7 @@ function changeState(bool: Boolean, row: any) {
   }
   loading.value = true
   paragraph
-    .asyncPutParagraph(datasetId, documentId, row.id, obj)
+    .asyncPutParagraph(id, documentId, row.id, obj)
     .then((res) => {
       loading.value = false
     })
@@ -113,7 +113,7 @@ function deleteParagraph(row: any) {
     .then(() => {
       loading.value = true
       paragraphApi
-        .delParagraph(datasetId, documentId, row.id)
+        .delParagraph(id, documentId, row.id)
         .then(() => {
           MsgSuccess('删除成功')
           getParagraphDetail()
@@ -137,7 +137,7 @@ function editParagraph(row: any) {
 function getDetail() {
   loading.value = true
   documentApi
-    .getDocumentDetail(datasetId, documentId)
+    .getDocumentDetail(id, documentId)
     .then((res) => {
       documentDetail.value = res.data
       loading.value = false
@@ -150,7 +150,7 @@ function getDetail() {
 function getParagraphDetail() {
   loading.value = true
   paragraphApi
-    .getParagraph(datasetId, documentId)
+    .getParagraph(id, documentId)
     .then((res) => {
       paragraphDetail.value = res.data
       loading.value = false

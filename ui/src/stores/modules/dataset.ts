@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { datasetData } from '@/api/type/dataset'
 import type { UploadUserFile } from 'element-plus'
+import datasetApi from '@/api/dataset'
 
 export interface datasetStateTypes {
   baseInfo: datasetData | null
@@ -19,6 +20,18 @@ const useDatasetStore = defineStore({
     },
     saveDocumentsFile(file: UploadUserFile[]) {
       this.documentsFiles = file
+    },
+    async asyncGetAllDateset() {
+      return new Promise((resolve, reject) => {
+        datasetApi
+          .getAllDateset()
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   }
 })

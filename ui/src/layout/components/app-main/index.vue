@@ -2,7 +2,7 @@
   <router-view v-slot="{ Component }">
     <transition appear name="fade-transform" mode="out-in">
       <keep-alive :include="cachedViews">
-        <component :is="Component" />
+        <component :is="Component" :key="route.fullPath" />
       </keep-alive>
     </transition>
   </router-view>

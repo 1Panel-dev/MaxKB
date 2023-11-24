@@ -5,7 +5,7 @@
         <div class="flex-between">
           <el-button
             type="primary"
-            @click="router.push({ path: '/dataset/upload', query: { id: datasetId } })"
+            @click="router.push({ path: '/dataset/upload', query: { id: id } })"
             >上传文档</el-button
           >
           <el-input
@@ -108,7 +108,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { datasetId }
+  params: { id }
 } = route as any
 
 const loading = ref(false)
@@ -124,7 +124,7 @@ const paginationConfig = reactive({
 })
 
 function rowClickHandle(row: any) {
-  router.push({ path: `/dataset/${datasetId}/${row.id}` })
+  router.push({ path: `/dataset/${id}/${row.id}` })
 }
 
 /*
@@ -134,7 +134,7 @@ function creatQuickHandle(val: string) {
   loading.value = true
   const obj = { name: val }
   documentApi
-    .postDocument(datasetId, obj)
+    .postDocument(id, obj)
     .then((res) => {
       getList()
       MsgSuccess('创建成功')
@@ -156,7 +156,7 @@ function deleteDocument(row: any) {
     .then(() => {
       loading.value = true
       documentApi
-        .delDocument(datasetId, row.id)
+        .delDocument(id, row.id)
         .then(() => {
           MsgSuccess('删除成功')
           getList()
@@ -174,7 +174,7 @@ function deleteDocument(row: any) {
 function updateData(documentId: string, data: any) {
   loading.value = true
   documentApi
-    .putDocument(datasetId, documentId, data)
+    .putDocument(id, documentId, data)
     .then((res) => {
       const index = documentData.value.findIndex((v) => v.id === documentId)
       documentData.value.splice(index, 1, res.data)
@@ -217,7 +217,7 @@ function handleCurrentChange(val: number) {
 function getList() {
   loading.value = true
   documentApi
-    .getDocument(datasetId as string, filterText.value)
+    .getDocument(id as string, filterText.value)
     .then((res) => {
       documentData.value = res.data
       paginationConfig.total = res.data.length

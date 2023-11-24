@@ -23,7 +23,11 @@
               <h4 class="mb-8">您可以尝试输入以下问题：</h4>
               <el-space wrap>
                 <template v-for="(item, index) in data?.example" :key="index">
-                  <div class="problem-button cursor ellipsis-2" v-if="item">
+                  <div
+                    @click="quickProblemHandel(item)"
+                    class="problem-button cursor ellipsis-2"
+                    v-if="item"
+                  >
                     <el-icon><EditPen /></el-icon>
                     {{ item }}
                   </div>
@@ -64,9 +68,24 @@
           placeholder="请输入"
           :autosize="{ minRows: 1, maxRows: 8 }"
         />
-        <div class="operate">
-          <el-button text class="sent-button" disabled>
-            <AppIcon iconName="app-send"></AppIcon>
+        <div class="operate" v-loading="loading">
+          <el-button
+            text
+            class="sent-button"
+            :disabled="!(inputValue && data?.name && data?.model_id)"
+            @click="chatHandle"
+          >
+            <img
+              v-show="!(inputValue && data?.name && data?.model_id)"
+              src="@/assets/icon_send.svg"
+              alt=""
+            />
+            <img
+              v-show="inputValue && data?.name && data?.model_id"
+              src="@/assets/icon_send_colorful.svg"
+              alt=""
+            />
+            <!-- <AppIcon iconName="app-send"></AppIcon> -->
           </el-button>
         </div>
       </div>
@@ -75,13 +94,39 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
+import applicationApi from '@/api/application'
 const props = defineProps({
   data: {
     type: Object,
     default: () => {}
   }
 })
+const loading = ref(false)
 const inputValue = ref('')
+function quickProblemHandel(val: string) {
+  inputValue.value = val
+}
+function chatHandle() {
+  loading.value = true
+  const obj = {
+    model_id: props.data.model_id,
+    dataset_id_list: props.data.dataset_id_list,
+    multiple_rounds_dialogue: props.data.multiple_rounds_dialogue,
+  }
+  applicationApi
+    .postChatOpen(obj)
+    .then((res) => {
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+
+}
+
+// funcion chatMessage(chatId) {
+//   postChatMessage
+// }
 </script>
 <style lang="scss" scoped>
 .ai-dialog {
@@ -162,10 +207,18 @@ const inputValue = ref('')
         padding: 12px 16px;
       }
       .operate {
-        padding: 10px 12px;
+        padding: 6px 10px;
         .sent-button {
+          max-height: none;
           .el-icon {
             font-size: 24px;
+          }
+        }
+        :deep(.el-loading-spinner) {
+          margin-top: -15px;
+          .circular {
+            width: 31px;
+            height: 31px;
           }
         }
       }
