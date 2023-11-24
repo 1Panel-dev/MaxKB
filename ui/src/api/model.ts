@@ -1,6 +1,7 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
-import type { modelRequest } from '@/api/type/model'
+import { type Ref } from 'vue'
+import type { modelRequest, Provider } from '@/api/type/model'
 const prefix = '/model'
 const prefix_provider = '/provider'
 
@@ -14,8 +15,8 @@ const getModel: (data?: modelRequest) => Promise<Result<any>> = (data) => {
 /**
  * 获得供应商列表
  */
-const getProvider: () => Promise<Result<any>> = () => {
-  return get(`${prefix_provider}`)
+const getProvider: (loading?: Ref<boolean>) => Promise<Result<Array<Provider>>> = (loading) => {
+  return get(`${prefix_provider}`, {}, loading)
 }
 
 export default {

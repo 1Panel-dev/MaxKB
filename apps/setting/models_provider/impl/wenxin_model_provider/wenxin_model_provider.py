@@ -129,6 +129,6 @@ class WenxinModelProvider(IModelProvider):
         raise AppApiException(500, f'不支持的模型:{model_name}')
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='model_wenxin_provider', name='Azure OpenAI', icon=get_file_content(
+        return ModelProvideInfo(provider='model_wenxin_provider', name='千帆大模型', icon=get_file_content(
             os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'wenxin_model_provider', 'icon',
                          'azure_icon_svg')))

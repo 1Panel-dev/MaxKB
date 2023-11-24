@@ -3,10 +3,10 @@
     <div class="template-manage flex main-calc-height">
       <div class="template-manage__left p-8 border-r">
         <h4 class="p-16">供应商</h4>
-        <common-list :data="list" class="mt-8" v-loading="loading" @click="clickHandle">
+        <common-list :data="provider_list" class="mt-8" v-loading="loading" @click="clickHandle">
           <template #default="{ row }">
             <div class="flex">
-              <img src="@/assets/icon_document.svg" alt="" class="mr-8" />
+              <span :innerHTML="row.icon" alt="" style="height: 24px; width: 24px" class="mr-8" />
               <span>{{ row.name }}</span>
             </div>
           </template>
@@ -22,16 +22,19 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, watch } from 'vue'
-const loading = ref(false)
-const list = ref([
-  {
-    name: '1111'
-  }
-])
+import ModelApi from '@/api/model'
+import type { Provider } from '@/api/type/model'
+const loading = ref<boolean>(false)
+
+const provider_list = ref<Array<Provider>>([])
 
 function clickHandle(row: any) {}
 
-onMounted(() => {})
+onMounted(() => {
+  ModelApi.getProvider(loading).then((ok) => {
+    provider_list.value = ok.data
+  })
+})
 </script>
 
 <style lang="scss" scoped>

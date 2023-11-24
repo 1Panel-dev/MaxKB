@@ -1,6 +1,24 @@
+import { SrvRecord } from 'dns'
+
 interface modelRequest {
   name: string
   model_type: string
   model_name: string
 }
-export type { modelRequest }
+
+interface Provider {
+  /**
+   * 供应商代号
+   */
+  provider: string
+  /**
+   * 供应商名称
+   */
+  name: string
+  /**
+   * 供应商icon
+   */
+  icon: string
+}
+
+export type { modelRequest, Provider }
