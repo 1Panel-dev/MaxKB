@@ -127,7 +127,14 @@ function getList() {
   applicationApi
     .getApplication(pageConfig)
     .then((res) => {
-      applicationList.value = res.data?.records
+      const list = res.data?.records
+      list.map((item) => {
+        applicationList.value.push({
+          value:item.provider,
+          label: item.name
+        })
+      })
+
       loading.value = false
     })
     .catch(() => {
