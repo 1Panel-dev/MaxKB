@@ -73,7 +73,7 @@
             text
             class="sent-button"
             :disabled="!(inputValue && data?.name && data?.model_id)"
-            @click="chatHandle"
+            @click="chatMessage"
           >
             <img
               v-show="!(inputValue && data?.name && data?.model_id)"
@@ -103,6 +103,8 @@ const props = defineProps({
 })
 const loading = ref(false)
 const inputValue = ref('')
+const chartOpenId = ref('')
+
 function quickProblemHandel(val: string) {
   inputValue.value = val
 }
@@ -110,7 +112,7 @@ function quickProblemHandel(val: string) {
 /**
  * 对话
  */
-function chatHandle() {
+function getChartOpenId() {
   loading.value = true
   const obj = {
     model_id: props.data.model_id,
@@ -120,27 +122,32 @@ function chatHandle() {
   applicationApi
     .postChatOpen(obj)
     .then((res) => {
-      chatMessage(res.data)
+      chartOpenId.value = res.data
+      chatMessage()
     })
     .catch(() => {
       loading.value = false
     })
 }
 
-function chatMessage(chatId: string) {
-  applicationApi.postChatMessage(chatId, inputValue.value).then(async (response) => {
-    const reader = response.body.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) {
-        loading.value = false
-        break
+function chatMessage() {
+  if (!chartOpenId.value) {
+    getChartOpenId()
+  } else {
+    applicationApi.postChatMessage(chartOpenId.value, inputValue.value).then(async (response) => {
+      const reader = response.body.getReader()
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+          loading.value = false
+          break
+        }
+        const decoder = new TextDecoder('utf-8')
+        const str = decoder.decode(value, { stream: true })
+        console.log('value', JSON.parse(str.replace('data:', '')))
       }
-      const decoder = new TextDecoder('utf-8')
-      const str = decoder.decode(value, { stream: true })
-      console.log('value', JSON.parse(str.replace('data:', '')))
-    }
-  })
+    })
+  }
 }
 </script>
 <style lang="scss" scoped>
