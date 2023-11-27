@@ -1,7 +1,9 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put } from '@/request/index'
+import { get, post, postStream, del, put } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
+import { type Ref } from 'vue'
+
 const prefix = '/application'
 
 /**
@@ -28,7 +30,7 @@ const getApplication: (param: pageRequest) => Promise<Result<any>> = (param) => 
 }
 
 /**
- * 创建数据集
+ * 创建应用
  * @param 参数 
  * {
   "name": "string",
@@ -48,9 +50,8 @@ const postApplication: (data: ApplicationFormType) => Promise<Result<any>> = (da
   return post(`${prefix}`, data)
 }
 
-// 临时对话open
 /**
- * 创建数据集
+ * 获得临时回话Id
  * @param 参数 
  * {
   "model_id": "string",
@@ -63,7 +64,7 @@ const postApplication: (data: ApplicationFormType) => Promise<Result<any>> = (da
 const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data) => {
   return post(`${prefix}/chat/open`, data)
 }
-// 临时对话open
+// 对话
 /**
  * 创建数据集
  * @param 参数 
@@ -76,7 +77,7 @@ const postChatMessage: (chat_id: string, message: string) => Promise<Result<any>
   chat_id,
   message
 ) => {
-  return post(`${prefix}/chat_message/${chat_id}`, { message })
+  return postStream(`${prefix}/chat_message/${chat_id}`, { message })
 }
 export default {
   getAllAppilcation,

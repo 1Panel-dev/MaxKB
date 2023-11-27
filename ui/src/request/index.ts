@@ -39,12 +39,9 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response: any) => {
     if (response.data) {
-      if (response.data.code !== 200 && !(response.data instanceof Blob)) {
+      if (response.status !== 200 && !(response.data instanceof Blob)) {
         MsgError(response.data.message)
       }
-    }
-    if (response.headers['content-type'] === 'application/octet-stream') {
-      return response
     }
     return response
   },
@@ -82,13 +79,10 @@ const promise: (
     request
       .then((response) => {
         // blob类型的返回状态是response.status
-        if (
-          response.data.code === 200 ||
-          (response.data instanceof Blob && response.status === 200)
-        ) {
-          resolve(response.data)
+        if (response.status === 200) {
+          resolve(response?.data || response)
         } else {
-          reject(response.data)
+          reject(response?.data || response)
         }
       })
       .catch((error) => {
@@ -167,6 +161,15 @@ export const del: (
   loading?: NProgress | Ref<boolean>
 ) => Promise<Result<any>> = (url, params, data, loading) => {
   return promise(request({ url: url, method: 'delete', params, data }), loading)
+}
+
+export const postStream: (
+  url: string,
+  data?: unknown,
+  params?: unknown,
+  loading?: NProgress | Ref<boolean>
+) => Promise<Result<any> | any> = (url, data, params, loading) => {
+  return request({ url: url, method: 'post', data, params, responseType: 'stream' })
 }
 
 export const exportExcel: (

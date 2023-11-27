@@ -106,27 +106,45 @@ const inputValue = ref('')
 function quickProblemHandel(val: string) {
   inputValue.value = val
 }
+
+/**
+ * 对话
+ */
 function chatHandle() {
   loading.value = true
   const obj = {
     model_id: props.data.model_id,
     dataset_id_list: props.data.dataset_id_list,
-    multiple_rounds_dialogue: props.data.multiple_rounds_dialogue,
+    multiple_rounds_dialogue: props.data.multiple_rounds_dialogue
   }
   applicationApi
     .postChatOpen(obj)
     .then((res) => {
-      loading.value = false
+      chatMessage(res.data)
     })
     .catch(() => {
       loading.value = false
     })
-
 }
 
-// funcion chatMessage(chatId) {
-//   postChatMessage
-// }
+function chatMessage(chatId: string) {
+  applicationApi
+    .postChatMessage(chatId, inputValue.value)
+    .then((response) => {
+      console.log(response.data)
+      response.data.on('data', (chunk) => {
+        console.log(chunk)
+        // 处理流数据的逻辑
+      })
+
+      // response.data.on('end', () => {
+      //   // 数据接收完成的逻辑
+      // })
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
 </script>
 <style lang="scss" scoped>
 .ai-dialog {
