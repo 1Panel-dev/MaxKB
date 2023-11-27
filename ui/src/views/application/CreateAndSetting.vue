@@ -43,7 +43,7 @@
                   <el-option-group
                     v-for="(value, label) in modelOptions"
                     :key="value"
-                    :label="realatedProvider(label, 'name')"
+                    :label="realatedObject(providerOptions, label, 'provider')?.name"
                   >
                     <el-option
                       v-for="item in value"
@@ -54,7 +54,7 @@
                     >
                       <div class="flex">
                         <span
-                          v-html="realatedProvider(label, 'icon')"
+                          v-html="realatedObject(providerOptions, label, 'provider')?.icon"
                           class="model-icon mr-8"
                         ></span>
                         <span>{{ item.name }}</span>
@@ -84,28 +84,39 @@
                     </el-button>
                   </div>
                 </template>
-                <div>
+                <div v-if="applicationForm.dataset_id_list.length == 0">
                   <el-text type="info">关联的数据集展示在这里</el-text>
                 </div>
-                <!-- <div class="w-full">
+                <div class="w-full" v-else>
                   <el-row :gutter="12">
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mb-8">
+                    <el-col
+                      :xs="24"
+                      :sm="24"
+                      :md="12"
+                      :lg="12"
+                      :xl="12"
+                      class="mb-8"
+                      v-for="(item, index) in applicationForm.dataset_id_list"
+                      :key="index"
+                    >
                       <el-card class="relate-dataset-card" shadow="never">
                         <div class="flex-between">
                           <div class="flex align-center">
                             <AppAvatar class="mr-12" shape="square" :size="32">
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>
-                            <div class="ellipsis-1">DataEase 数据集</div>
+                            <div class="ellipsis-1">
+                              {{ realatedObject(datasetList, item, 'id')?.name }}
+                            </div>
                           </div>
-                          <el-button text>
+                          <el-button text @click="removeDataset(item)">
                             <el-icon><Close /></el-icon>
                           </el-button>
                         </div>
                       </el-card>
                     </el-col>
                   </el-row>
-                </div> -->
+                </div>
               </el-form-item>
               <el-form-item label="开场白">
                 <el-input
@@ -142,7 +153,7 @@
         </div>
       </el-col>
     </el-row>
-    <AddDatasetDialog ref="AddDatasetDialogRef" />
+    <AddDatasetDialog ref="AddDatasetDialogRef" @addData="addDataset" :data="datasetList" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -154,8 +165,9 @@ import AddDatasetDialog from './components/AddDatasetDialog.vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import type { Provider } from '@/api/type/model'
+import { realatedObject } from '@/utils/utils'
 import useStore from '@/stores'
-const { model } = useStore()
+const { model, dataset } = useStore()
 
 const router = useRouter()
 const route = useRoute()
@@ -190,6 +202,7 @@ const rules = reactive<FormRules<ApplicationFormType>>({
 })
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
+const datasetList = ref([])
 
 watch(exampleList.value, () => {
   applicationForm.example = exampleList.value.filter((v) => v)
@@ -231,8 +244,28 @@ function submit() {
   //     })
   // }
 }
+
+function removeDataset(id: String) {
+  applicationForm.dataset_id_list.splice(applicationForm.dataset_id_list.indexOf(id), 1)
+}
+function addDataset(val: Array<string>) {
+  applicationForm.dataset_id_list = val
+}
 function openDatasetDialog() {
-  AddDatasetDialogRef.value.open()
+  AddDatasetDialogRef.value.open(applicationForm.dataset_id_list)
+}
+
+function getDataset() {
+  loading.value = true
+  dataset
+    .asyncGetAllDateset()
+    .then((res: any) => {
+      datasetList.value = res.data
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
 }
 
 function getModel() {
@@ -261,16 +294,10 @@ function getProvider() {
     })
 }
 
-function realatedProvider(val: string | number, attr: string) {
-  const filterProvider: any = providerOptions.value.filter(
-    (item: any) => item.provider === val
-  )?.[0]
-  return filterProvider?.[attr] || ''
-}
-
 onMounted(() => {
   getProvider()
   getModel()
+  getDataset()
 })
 </script>
 <style lang="scss" scoped>
