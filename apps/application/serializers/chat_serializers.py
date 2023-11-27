@@ -27,8 +27,9 @@ from common.util.lock import try_lock, un_lock
 from common.util.rsa_util import decrypt
 from dataset.models import Document, Problem, Paragraph
 from embedding.models import SourceType, Embedding
+from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
-from setting.views import Model
+
 from smartdoc.conf import PROJECT_DIR
 
 chat_cache = cache
