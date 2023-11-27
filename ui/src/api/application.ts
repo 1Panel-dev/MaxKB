@@ -73,11 +73,8 @@ const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data)
     "message": "string",
   }
  */
-const postChatMessage: (chat_id: string, message: string) => Promise<Result<any>> = (
-  chat_id,
-  message
-) => {
-  return postStream(`${prefix}/chat_message/${chat_id}`, { message })
+const postChatMessage: (chat_id: string, message: string) => Promise<any> = (chat_id, message) => {
+  return postStream(`/api/${prefix}/chat_message/${chat_id}`, { message })
 }
 export default {
   getAllAppilcation,

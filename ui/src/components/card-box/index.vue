@@ -3,9 +3,10 @@
     <div class="card-header">
       <slot name="header">
         <div class="title flex align-center">
-          <AppAvatar class="mr-12" shape="square" :size="32" v-if="showIcon">
+          <AppAvatar v-if="!slots.icon && showIcon" class="mr-12" shape="square" :size="32">
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
+          <slot v-else name="icon"> </slot>
           <h4 class="ellipsis-1">{{ title }}</h4>
         </div>
       </slot>
@@ -23,22 +24,27 @@
   </el-card>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, useSlots } from 'vue'
+
+const slots = useSlots()
 defineOptions({ name: 'CardBox' })
-const props = defineProps({
-  title: {
-    type: String,
-    default: '标题'
-  },
-  description: {
-    type: String,
-    default: ''
-  },
-  showIcon: {
-    type: Boolean,
-    default: true
-  }
-})
+const props = withDefaults(
+  defineProps<{
+    /**
+     * 标题
+     */
+    title?: string
+    /**
+     * 描述
+     */
+    description?: string
+    /**
+     * 是否展示icon
+     */
+    showIcon?: boolean
+  }>(),
+  { title: '标题', description: '', showIcon: true }
+)
 
 const show = ref(false)
 function cardEnter() {

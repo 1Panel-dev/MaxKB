@@ -38,6 +38,7 @@ instance.interceptors.request.use(
 //设置响应拦截器
 instance.interceptors.response.use(
   (response: any) => {
+    console.log('instance_response', response)
     if (response.data) {
       if (response.status !== 200 && !(response.data instanceof Blob)) {
         MsgError(response.data.message)
@@ -163,13 +164,27 @@ export const del: (
   return promise(request({ url: url, method: 'delete', params, data }), loading)
 }
 
-export const postStream: (
-  url: string,
-  data?: unknown,
-  params?: unknown,
-  loading?: NProgress | Ref<boolean>
-) => Promise<Result<any> | any> = (url, data, params, loading) => {
-  return request({ url: url, method: 'post', data, params, responseType: 'stream' })
+/**
+ * 流处理
+ * @param url  url地址
+ * @param data 请求body
+ * @returns
+ */
+export const postStream: (url: string, data?: unknown) => Promise<Result<any> | any> = (
+  url,
+  data
+) => {
+  const { user } = useStore()
+  const token = user.getToken()
+  const headers: HeadersInit = { 'Content-Type': 'application/json' }
+  if (token) {
+    headers['AUTHORIZATION'] = `${token}`
+  }
+  return fetch(url, {
+    method: 'POST',
+    body: data ? JSON.stringify(data) : undefined,
+    headers: headers
+  })
 }
 
 export const exportExcel: (

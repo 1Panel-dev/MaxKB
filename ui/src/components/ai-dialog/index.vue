@@ -128,22 +128,19 @@ function chatHandle() {
 }
 
 function chatMessage(chatId: string) {
-  applicationApi
-    .postChatMessage(chatId, inputValue.value)
-    .then((response) => {
-      console.log(response.data)
-      response.data.on('data', (chunk) => {
-        console.log(chunk)
-        // 处理流数据的逻辑
-      })
-
-      // response.data.on('end', () => {
-      //   // 数据接收完成的逻辑
-      // })
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  applicationApi.postChatMessage(chatId, inputValue.value).then(async (response) => {
+    const reader = response.body.getReader()
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) {
+        loading.value = false
+        break
+      }
+      const decoder = new TextDecoder('utf-8')
+      const str = decoder.decode(value, { stream: true })
+      console.log('value', JSON.parse(str.replace('data:', '')))
+    }
+  })
 }
 </script>
 <style lang="scss" scoped>
