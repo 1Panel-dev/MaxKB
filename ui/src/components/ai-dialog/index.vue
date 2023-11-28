@@ -1,15 +1,12 @@
 <template>
   <div class="ai-dialog p-24">
-    <el-scrollbar>
-      <div class="ai-dialog__content">
+    <el-scrollbar ref="scrollDiv">
+      <div ref="dialogScrollbar" class="ai-dialog__content">
         <div class="item-content mb-16">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
               <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
             </AppAvatar>
-            <!-- <AppAvatar>
-            <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-          </AppAvatar> -->
           </div>
 
           <div class="content">
@@ -36,28 +33,35 @@
             </el-card>
           </div>
         </div>
-        <div class="item-content mb-16">
-          <div class="avatar">
-            <AppAvatar>
-              <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-            </AppAvatar>
-          </div>
-          <div class="content">
-            <div class="text">
-              XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        <template v-for="(item, index) in chatList" :key="index">
+          <!-- 问题 -->
+          <div class="item-content mb-16 lighter">
+            <div class="avatar">
+              <AppAvatar>
+                <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+              </AppAvatar>
+            </div>
+            <div class="content">
+              <div class="text">
+                {{ item.problem_text }}
+              </div>
             </div>
           </div>
-        </div>
-        <div class="item-content mb-16">
-          <div class="avatar">
-            <AppAvatar class="avatar-gradient">
-              <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
-            </AppAvatar>
+          <!-- 回答 -->
+          <div class="item-content mb-16 lighter">
+            <div class="avatar">
+              <AppAvatar class="avatar-gradient">
+                <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
+              </AppAvatar>
+            </div>
+            <div class="content">
+              <div class="flex" v-if="!item.answer_text">
+                <el-card shadow="always" class="dialog-card"> {{ '回答中...' }} </el-card>
+              </div>
+              <el-card v-else shadow="always" class="dialog-card"> {{ item.answer_text }} </el-card>
+            </div>
           </div>
-          <div class="content">
-            <el-card shadow="always" class="dialog-card"> XXXXXXXXX </el-card>
-          </div>
-        </div>
+        </template>
       </div>
     </el-scrollbar>
     <div class="ai-dialog__operate p-24">
@@ -67,13 +71,15 @@
           type="textarea"
           placeholder="请输入"
           :autosize="{ minRows: 1, maxRows: 8 }"
+          @keydown.enter="sendChatHandle($event)"
+          :disabled="loading"
         />
         <div class="operate" v-loading="loading">
           <el-button
             text
             class="sent-button"
             :disabled="!(inputValue && data?.name && data?.model_id)"
-            @click="chatHandle"
+            @click="sendChatHandle"
           >
             <img
               v-show="!(inputValue && data?.name && data?.model_id)"
@@ -85,7 +91,6 @@
               src="@/assets/icon_send_colorful.svg"
               alt=""
             />
-            <!-- <AppIcon iconName="app-send"></AppIcon> -->
           </el-button>
         </div>
       </div>
@@ -93,24 +98,44 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick, onUpdated } from 'vue'
 import applicationApi from '@/api/application'
+import type { chatType } from '@/api/type/application'
+import { randomId } from '@/utils/utils'
 const props = defineProps({
   data: {
     type: Object,
     default: () => {}
   }
 })
+
+const scrollDiv = ref()
+const dialogScrollbar = ref()
 const loading = ref(false)
 const inputValue = ref('')
+const chartOpenId = ref('')
+const chatList = ref<chatType[]>([])
+
 function quickProblemHandel(val: string) {
   inputValue.value = val
+}
+
+function sendChatHandle(event: any) {
+  if (!event.ctrlKey) {
+    // 如果没有按下组合键ctrl，则会阻止默认事件
+    event.preventDefault()
+
+    chatMessage()
+  } else {
+    // 如果同时按下ctrl+回车键，则会换行
+    inputValue.value += '\n'
+  }
 }
 
 /**
  * 对话
  */
-function chatHandle() {
+function getChartOpenId() {
   loading.value = true
   const obj = {
     model_id: props.data.model_id,
@@ -120,28 +145,56 @@ function chatHandle() {
   applicationApi
     .postChatOpen(obj)
     .then((res) => {
-      chatMessage(res.data)
+      chartOpenId.value = res.data
+      chatMessage()
     })
     .catch(() => {
       loading.value = false
     })
 }
 
-function chatMessage(chatId: string) {
-  applicationApi.postChatMessage(chatId, inputValue.value).then(async (response) => {
-    const reader = response.body.getReader()
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) {
-        loading.value = false
-        break
+function chatMessage() {
+  loading.value = true
+  if (!chartOpenId.value) {
+    getChartOpenId()
+  } else {
+    applicationApi.postChatMessage(chartOpenId.value, inputValue.value).then(async (response) => {
+      const randomNum = randomId()
+      chatList.value.push({
+        id: randomNum,
+        problem_text: inputValue.value,
+        answer_text: ''
+      })
+      inputValue.value = ''
+      const reader = response.body.getReader()
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+          loading.value = false
+          break
+        }
+        const decoder = new TextDecoder('utf-8')
+        const str = decoder.decode(value, { stream: true })
+        // console.log(JSON?.parse(str.replace('data:', '')))
+        const content = JSON?.parse(str.replace('data:', ''))?.content
+        if (content) {
+          chatList.value[chatList.value.findIndex((v) => v.id === randomNum)].answer_text += content
+        }
       }
-      const decoder = new TextDecoder('utf-8')
-      const str = decoder.decode(value, { stream: true })
-      console.log('value', JSON.parse(str.replace('data:', '')))
-    }
+    })
+  }
+}
+
+// 滚动到底部
+function handleScrollBottom() {
+  nextTick(() => {
+    scrollDiv.value.setScrollTop(dialogScrollbar.value.scrollHeight)
   })
 }
+
+onUpdated(() => {
+  handleScrollBottom()
+})
 </script>
 <style lang="scss" scoped>
 .ai-dialog {
@@ -153,6 +206,7 @@ function chatMessage(chatId: string) {
   position: relative;
   padding-right: 20px;
   padding-top: 0;
+  color: var(--app-text-color);
   &__content {
     width: 99%;
     padding-bottom: 96px;

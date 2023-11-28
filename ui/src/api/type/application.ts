@@ -7,4 +7,9 @@ interface ApplicationFormType {
   example?: string[]
   dataset_id_list: string[]
 }
-export type { ApplicationFormType }
+interface chatType {
+  id: string
+  problem_text: string
+  answer_text: string
+}
+export type { ApplicationFormType, chatType }
