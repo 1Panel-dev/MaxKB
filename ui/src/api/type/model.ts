@@ -65,4 +65,41 @@ interface Model {
    */
   provider: string
 }
-export type { modelRequest, Provider, ListModelRequest, Model }
+interface CreateModelRequest {
+  /**
+   * 模型名
+   */
+  name: string
+  /**
+   * 模型类型
+   */
+  model_type: string
+  /**
+   * 基础模型
+   */
+  model_name: string
+  /**
+   * 认证信息
+   */
+  credential: any
+  /**
+   * 供应商
+   */
+  provider: string
+}
+
+interface BaseModel {
+  /**
+   * 基础模型名称
+   */
+  name: string
+  /**
+   * 基础模型描述
+   */
+  desc: string
+  /**
+   * 基础模型类型
+   */
+  model_type: string
+}
+export type { modelRequest, Provider, ListModelRequest, Model, BaseModel, CreateModelRequest }

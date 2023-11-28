@@ -39,8 +39,8 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            AzureModelProvider().query(model_type, model_name, model_credential,
-                                       message=[HumanMessage(content='valid')])
+            model = AzureModelProvider().get_model(model_type, model_name, model_credential)
+            model([HumanMessage(content='valid')])
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
@@ -69,7 +69,9 @@ model_dict = {
     'gpt-3.5-turbo-0301': ModelInfo('gpt-3.5-turbo-0301', '', ModelTypeConst.LLM, azure_llm_model_credential,
                                     api_version='2023-07-01-preview'),
     'gpt-3.5-turbo-16k-0613': ModelInfo('gpt-3.5-turbo-16k-0613', '', ModelTypeConst.LLM, azure_llm_model_credential,
-                                        api_version='2023-07-01-preview')
+                                        api_version='2023-07-01-preview'),
+    'gpt-4-0613': ModelInfo('gpt-4-0613', '', ModelTypeConst.LLM, azure_llm_model_credential,
+                            api_version='2023-07-01-preview'),
 }
 
 

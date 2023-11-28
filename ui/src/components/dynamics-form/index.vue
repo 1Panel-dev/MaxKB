@@ -6,7 +6,6 @@
     label-suffix=":"
     v-loading="loading"
     v-bind="$attrs"
-    :model="formValue"
   >
     <slot :form_value="formValue"></slot>
     <template v-for="item in formFieldList" :key="item.field">
@@ -34,7 +33,7 @@
 import type { Dict } from '@/api/type/common'
 import FormItem from '@/components/dynamics-form/FormItem.vue'
 import type { FormField } from '@/components/dynamics-form/type'
-import { ref, onMounted, type Ref } from 'vue'
+import { ref, onMounted, watch, type Ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import triggerApi from '@/api/provider'
 import type Result from '@/request/Result'
@@ -51,6 +50,8 @@ const props = withDefaults(
     defaultItemWidth?: string
 
     parent_field?: string
+
+    modelValue?: Dict<any>
   }>(),
   { view: false, defaultItemWidth: '75%', otherParams: () => {} }
 )
@@ -98,8 +99,11 @@ const emit = defineEmits(['update:modelValue'])
  */
 const change = (field: FormField, value: any) => {
   formValue.value[field.field] = value
-  emit('update:modelValue', formValue.value)
 }
+
+watch(formValue.value, () => {
+  emit('update:modelValue', formValue.value)
+})
 
 /**
  * 触发器,用户获取子表单 或者 下拉选项
@@ -143,18 +147,22 @@ const initDefaultData = (formField: FormField) => {
 }
 
 onMounted(() => {
-  if (typeof props.render_data == 'string') {
-    triggerApi.get(props.render_data, {}, loading).then((ok) => {
+  render(props.render_data)
+})
+
+const render = (render_data: string | Array<FormField> | Promise<Result<Array<FormField>>>) => {
+  if (typeof render_data == 'string') {
+    triggerApi.get(render_data, {}, loading).then((ok) => {
       formFieldList.value = ok.data
     })
-  } else if (props.render_data instanceof Array) {
-    formFieldList.value = props.render_data
+  } else if (render_data instanceof Array) {
+    formFieldList.value = render_data
   } else {
-    props.render_data.then((ok) => {
+    render_data.then((ok) => {
       formFieldList.value = ok.data
     })
   }
-})
+}
 /**
  * 校验函数
  */
@@ -169,6 +177,7 @@ const validate = () => {
 defineExpose({
   initDefaultData,
   validate,
+  render,
   ruleFormRef
 })
 </script>

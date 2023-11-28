@@ -7,7 +7,7 @@
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
           <slot v-else name="icon"> </slot>
-          <h4 class="ellipsis-1">{{ title }}</h4>
+          <h4 class="ellipsis-1" style="width: 100%">{{ title }}</h4>
         </div>
       </slot>
     </div>
@@ -59,6 +59,7 @@ function cardLeave() {
   font-size: 14px;
   position: relative;
   min-height: var(--card-min-height);
+  min-width: var(--card-min-width);
   border: 1px solid #ffffff;
   border-radius: 8px;
   .description {
@@ -66,7 +67,7 @@ function cardLeave() {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
-    height: 40px;
+    height: var(--app-card-box-description-height, 40px);
     color: var(--app-text-color-secondary);
     line-height: 22px;
     font-weight: 400;
