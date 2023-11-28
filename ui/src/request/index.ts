@@ -38,7 +38,6 @@ instance.interceptors.request.use(
 //设置响应拦截器
 instance.interceptors.response.use(
   (response: any) => {
-    console.log('instance_response', response)
     if (response.data) {
       if (response.status !== 200 && !(response.data instanceof Blob)) {
         MsgError(response.data.message)

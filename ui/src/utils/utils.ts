@@ -20,6 +20,13 @@ export function filesize(size: number) {
 }
 
 /*
+  随机id
+*/
+export const randomId = function () {
+  return Math.floor(Math.random() * 10000) + ''
+}
+
+/*
   获取文件后缀
 */
 export function fileType(name: string) {
