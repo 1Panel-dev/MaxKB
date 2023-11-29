@@ -4,7 +4,9 @@ import { type Ref } from 'vue'
 
 const useApplicationStore = defineStore({
   id: 'application',
-  state: () => ({}),
+  state: () => ({
+    location: `${window.location.origin}/ui/chat/`
+  }),
   actions: {
     async asyncGetAllApplication() {
       return new Promise((resolve, reject) => {
@@ -23,6 +25,19 @@ const useApplicationStore = defineStore({
       return new Promise((resolve, reject) => {
         applicationApi
           .getApplicationDetail(id, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
+
+    async asyncGetAccessToken(id: string, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        applicationApi
+          .getAccessToken(id, loading)
           .then((data) => {
             resolve(data)
           })

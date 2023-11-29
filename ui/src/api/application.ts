@@ -133,6 +133,29 @@ const getApplicationDataset: (
 ) => Promise<Result<any>> = (applicaiton_id, loading) => {
   return get(`${prefix}/${applicaiton_id}/list_dataset`, undefined, loading)
 }
+
+/**
+ * API_KEY列表
+ * @param 参数 applicaiton_id
+ */
+const getAPIKey: (applicaiton_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  applicaiton_id,
+  loading
+) => {
+  return get(`${prefix}/${applicaiton_id}/api_key`, undefined, loading)
+}
+
+/**
+ * 获取AccessToken
+ * @param 参数 applicaiton_id
+ */
+const getAccessToken: (applicaiton_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  applicaiton_id,
+  loading
+) => {
+  return get(`${prefix}/${applicaiton_id}/access-token`, undefined, loading)
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -142,5 +165,7 @@ export default {
   postChatMessage,
   delApplication,
   getApplicationDetail,
-  getApplicationDataset
+  getApplicationDataset,
+  getAPIKey,
+  getAccessToken
 }
