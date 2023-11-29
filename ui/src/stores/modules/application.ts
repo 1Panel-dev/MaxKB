@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import applicationApi from '@/api/application'
+import { type Ref } from 'vue'
 
 const useApplicationStore = defineStore({
   id: 'application',
@@ -18,10 +19,10 @@ const useApplicationStore = defineStore({
       })
     },
 
-    async asyncGetApplicationDetail(id: string) {
+    async asyncGetApplicationDetail(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         applicationApi
-          .getApplicationDetail(id)
+          .getApplicationDetail(id, loading)
           .then((data) => {
             resolve(data)
           })

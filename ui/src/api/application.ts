@@ -80,6 +80,31 @@ const postApplication: (
 }
 
 /**
+ * 修改应用
+ * @param 参数 
+ * {
+  "name": "string",
+  "desc": "string",
+  "model_id": "string",
+  "multiple_rounds_dialogue": true,
+  "prologue": "string",
+  "example": [
+    "string"
+  ],
+  "dataset_id_list": [
+    "string"
+  ]
+}
+ */
+const putApplication: (
+  applicaiton_id: String,
+  data: ApplicationFormType,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (applicaiton_id, data, loading) => {
+  return put(`${prefix}/${applicaiton_id}`, data, undefined, loading)
+}
+
+/**
  * 删除应用
  * @param 参数 applicaiton_id
  */
@@ -91,15 +116,31 @@ const delApplication: (applicaiton_id: String) => Promise<Result<boolean>> = (ap
  * 应用详情
  * @param 参数 applicaiton_id
  */
-const getApplicationDetail: (applicaiton_id: string) => Promise<Result<any>> = (applicaiton_id) => {
-  return get(`${prefix}/${applicaiton_id}`)
+const getApplicationDetail: (
+  applicaiton_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (applicaiton_id, loading) => {
+  return get(`${prefix}/${applicaiton_id}`, undefined, loading)
+}
+
+/**
+ * 获得当前应用可使用的数据集
+ * @param 参数 applicaiton_id
+ */
+const getApplicationDataset: (
+  applicaiton_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (applicaiton_id, loading) => {
+  return get(`${prefix}/${applicaiton_id}/list_dataset`, undefined, loading)
 }
 export default {
   getAllAppilcation,
   getApplication,
   postApplication,
+  putApplication,
   postChatOpen,
   postChatMessage,
   delApplication,
-  getApplicationDetail
+  getApplicationDetail,
+  getApplicationDataset
 }

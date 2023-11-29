@@ -171,7 +171,7 @@ import type { Provider } from '@/api/type/model'
 import { realatedObject } from '@/utils/utils'
 import { MsgSuccess } from '@/utils/message'
 import useStore from '@/stores'
-const { model, dataset, application } = useStore()
+const { model, dataset, application, user } = useStore()
 
 const router = useRouter()
 const route = useRoute()
@@ -184,7 +184,7 @@ const AddDatasetDialogRef = ref()
 
 const loading = ref(false)
 const exampleList = ref(['', ''])
-const applicationForm = reactive<ApplicationFormType>({
+const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
   model_id: '',
@@ -209,62 +209,63 @@ const providerOptions = ref<Array<Provider>>([])
 const datasetList = ref([])
 
 watch(exampleList.value, () => {
-  applicationForm.example = exampleList.value.filter((v) => v)
+  applicationForm.value.example = exampleList.value.filter((v) => v)
 })
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      applicationApi
-        .postApplication(applicationForm, loading)
-        .then((res) => {
+      if (id) {
+        applicationApi.putApplication(id, applicationForm.value, loading).then((res) => {
+          MsgSuccess('保存成功')
+        })
+      } else {
+        applicationApi.postApplication(applicationForm.value, loading).then((res) => {
           MsgSuccess('创建成功')
           router.push({ path: `/application` })
         })
-        .catch(() => {
-          loading.value = false
-        })
+      }
     } else {
       console.log('error submit!')
     }
   })
 }
 
-function removeDataset(id: String) {
-  applicationForm.dataset_id_list.splice(applicationForm.dataset_id_list.indexOf(id), 1)
+function removeDataset(id: string) {
+  applicationForm.value.dataset_id_list.splice(applicationForm.value.dataset_id_list.indexOf(id), 1)
 }
 function addDataset(val: Array<string>) {
-  applicationForm.dataset_id_list = val
+  applicationForm.value.dataset_id_list = val
 }
 function openDatasetDialog() {
-  AddDatasetDialogRef.value.open(applicationForm.dataset_id_list)
+  AddDatasetDialogRef.value.open(applicationForm.value.dataset_id_list)
 }
 
 function getDetail() {
-  loading.value = true
-  application
-    .asyncGetApplicationDetail(id)
-    .then((res) => {
-      // detail.value = res.data
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  application.asyncGetApplicationDetail(id, loading).then((res: any) => {
+    applicationForm.value = res.data
+    applicationForm.value.model_id = res.data.model
+  })
 }
 
 function getDataset() {
   loading.value = true
-  dataset
-    .asyncGetAllDateset()
-    .then((res: any) => {
+  if (id) {
+    applicationApi.getApplicationDataset(id, loading).then((res) => {
       datasetList.value = res.data
-      loading.value = false
     })
-    .catch(() => {
-      loading.value = false
-    })
+  } else {
+    dataset
+      .asyncGetAllDateset()
+      .then((res: any) => {
+        datasetList.value = res.data?.filter((v) => v.user_id === user.userInfo?.id)
+        loading.value = false
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  }
 }
 
 function getModel() {
@@ -294,12 +295,12 @@ function getProvider() {
 }
 
 onMounted(() => {
-  if (id) {
-    getDetail()
-  }
   getProvider()
   getModel()
   getDataset()
+  if (id) {
+    getDetail()
+  }
 })
 </script>
 <style lang="scss" scoped>

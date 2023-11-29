@@ -55,8 +55,8 @@
               </AppAvatar>
             </div>
             <div class="content">
-              <div class="flex" v-if="!item.answer_text || item.problem_text.length === 0">
-                <el-card shadow="always" class="dialog-card"> {{ '回答中...' }} </el-card>
+              <div class="flex" v-if="!item.answer_text">
+                <el-card shadow="always" class="dialog-card"> 回答中... </el-card>
               </div>
               <el-card v-else shadow="always" class="dialog-card">
                 <MarkdownRenderer :source="item.answer_text"></MarkdownRenderer>
