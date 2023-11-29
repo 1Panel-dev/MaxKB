@@ -55,10 +55,12 @@
               </AppAvatar>
             </div>
             <div class="content">
-              <div class="flex" v-if="!item.answer_text">
+              <div class="flex" v-if="!item.answer_text || item.problem_text.length === 0">
                 <el-card shadow="always" class="dialog-card"> {{ '回答中...' }} </el-card>
               </div>
-              <el-card v-else shadow="always" class="dialog-card"> {{ item.answer_text }} </el-card>
+              <el-card v-else shadow="always" class="dialog-card">
+                <MarkdownRenderer :source="item.answer_text"></MarkdownRenderer>
+              </el-card>
             </div>
           </div>
         </template>
@@ -102,6 +104,7 @@ import { ref, nextTick, onUpdated } from 'vue'
 import applicationApi from '@/api/application'
 import { ChatManage, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
+import MarkdownRenderer from '@/components/markdown-renderer/index.vue'
 const props = defineProps({
   data: {
     type: Object,
