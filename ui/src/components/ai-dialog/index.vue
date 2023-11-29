@@ -100,7 +100,7 @@
 <script setup lang="ts">
 import { ref, nextTick, onUpdated } from 'vue'
 import applicationApi from '@/api/application'
-import type { chatType } from '@/api/type/application'
+import { ChatManage, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 const props = defineProps({
   data: {
@@ -158,27 +158,38 @@ function chatMessage() {
   if (!chartOpenId.value) {
     getChartOpenId()
   } else {
-    applicationApi.postChatMessage(chartOpenId.value, inputValue.value).then(async (response) => {
-      const randomNum = randomId()
+    const problem_text = inputValue.value
+    inputValue.value = ''
+    applicationApi.postChatMessage(chartOpenId.value, problem_text).then(async (response) => {
+      const id = randomId()
       chatList.value.push({
-        id: randomNum,
-        problem_text: inputValue.value,
-        answer_text: ''
+        id: id,
+        problem_text: problem_text,
+        answer_text: '',
+        buffer: []
       })
-      inputValue.value = ''
-      const reader = response.body.getReader()
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) {
-          loading.value = false
-          break
-        }
-        const decoder = new TextDecoder('utf-8')
-        const str = decoder.decode(value, { stream: true })
-        // console.log(JSON?.parse(str.replace('data:', '')))
-        const content = JSON?.parse(str.replace('data:', ''))?.content
-        if (content) {
-          chatList.value[chatList.value.findIndex((v) => v.id === randomNum)].answer_text += content
+      const row = chatList.value.find((item) => item.id === id)
+      if (row) {
+        const chatMange = new ChatManage(row, 50, loading)
+        chatMange.write()
+        const reader = response.body.getReader()
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) {
+            chatMange.close()
+            break
+          }
+          try {
+            const decoder = new TextDecoder('utf-8')
+            const str = decoder.decode(value, { stream: true })
+            if (str && str.startsWith('data:')) {
+              // console.log(JSON?.parse(str.replace('data:', '')))
+              const content = JSON?.parse(str.replace('data:', ''))?.content
+              if (content) {
+                chatMange.append(content)
+              }
+            }
+          } catch (e) {}
         }
       }
     })
