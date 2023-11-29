@@ -61,6 +61,7 @@
               <el-card v-else shadow="always" class="dialog-card">
                 <MarkdownRenderer :source="item.answer_text"></MarkdownRenderer>
               </el-card>
+              <el-button type="primary" link class="mt-8">停止回答</el-button>
             </div>
           </div>
         </template>
@@ -154,7 +155,6 @@ function chatMessage() {
     getChartOpenId()
   } else {
     const problem_text = inputValue.value
-    inputValue.value = ''
     applicationApi.postChatMessage(chartOpenId.value, problem_text).then(async (response) => {
       const id = randomId()
       chatList.value.push({
@@ -163,6 +163,7 @@ function chatMessage() {
         answer_text: '',
         buffer: []
       })
+      inputValue.value = ''
       const row = chatList.value.find((item) => item.id === id)
       if (row) {
         const chatMange = new ChatManage(row, 50, loading)
