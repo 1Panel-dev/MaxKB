@@ -20,16 +20,25 @@
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mt-8">
           <CardAdd title="创建应用" @click="router.push({ path: '/application/create' })" />
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mt-8">
+        <el-col
+          :xs="24"
+          :sm="12"
+          :md="8"
+          :lg="6"
+          :xl="4"
+          v-for="(item, index) in applicationList"
+          :key="index"
+          class="mt-8"
+        >
           <CardBox
-            title="应用"
-            description="XXXXXX"
+            :title="item.name"
+            :description="item.desc"
             class="application-card cursor"
-            @click="router.push({ path: '/application/1/overview' })"
+            @click="router.push({ path: `/application/${item.id}/overview` })"
           >
             <div class="status-tag">
-              <el-tag class="warning-tag">已停用</el-tag>
-              <el-tag class="success-tag">运行中</el-tag>
+              <el-tag v-if="item.status" class="success-tag">运行中</el-tag>
+              <el-tag v-else class="warning-tag">已停用</el-tag>
             </div>
 
             <template #footer>
@@ -41,7 +50,10 @@
                 </el-tooltip>
                 <el-divider direction="vertical" />
                 <el-tooltip effect="dark" content="设置" placement="top">
-                  <el-button text @click.stop>
+                  <el-button
+                    text
+                    @click.stop="router.push({ path: `/application/${item.id}/setting` })"
+                  >
                     <AppIcon iconName="Setting"></AppIcon>
                   </el-button>
                 </el-tooltip>
@@ -56,7 +68,8 @@
                     <template #dropdown>
                       <el-dropdown-menu>
                         <div class="dropdown-custom-switch">
-                          <span>运行中</span><el-switch v-model="state" />
+                          <span>运行中</span>
+                          <!-- <el-switch v-model="item.status"  @change="changeState($event, item)"  /> -->
                         </div>
                         <el-dropdown-item divided>删除</el-dropdown-item>
                       </el-dropdown-menu>
@@ -122,19 +135,27 @@ function search() {
 //       .catch(() => {})
 //   }
 
+// function changeState(bool: Boolean, row: any) {
+//   const obj = {
+//     is_active: bool
+//   }
+//   loading.value = true
+//   applicationApi
+//     .asyncPutParagraph(id, documentId, row.id, obj)
+//     .then((res) => {
+//       loading.value = false
+//     })
+//     .catch(() => {
+//       loading.value = false
+//     })
+// }
+
 function getList() {
   loading.value = true
   applicationApi
     .getApplication(pageConfig)
     .then((res) => {
-      const list = res.data?.records
-      list.map((item: any) => {
-        applicationList.value.push({
-          value: item.provider,
-          label: item.name
-        })
-      })
-
+      applicationList.value = res.data?.records
       loading.value = false
     })
     .catch(() => {

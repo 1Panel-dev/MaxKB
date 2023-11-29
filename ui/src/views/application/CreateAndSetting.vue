@@ -1,6 +1,6 @@
 <template>
   <LayoutContainer :header="id ? '设置' : '创建应用'" back-to="-1" class="create-application">
-    <el-row>
+    <el-row v-loading="loading">
       <el-col :span="10">
         <div class="p-24 mb-16" style="padding-bottom: 0">
           <h4 class="title-decoration-1">应用信息</h4>
@@ -140,7 +140,9 @@
         </div>
         <div class="text-right border-t p-16">
           <el-button @click="router.push({ path: `/application` })"> 取消 </el-button>
-          <el-button type="primary" @click="submit" :disabled="loading"> 创建 </el-button>
+          <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading">
+            创建
+          </el-button>
         </div>
       </el-col>
       <el-col :span="14" class="p-24 border-l">
@@ -162,10 +164,12 @@ import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
 import AiDialog from '@/components/ai-dialog/index.vue'
 import AddDatasetDialog from './components/AddDatasetDialog.vue'
+import applicationApi from '@/api/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import type { Provider } from '@/api/type/model'
 import { realatedObject } from '@/utils/utils'
+import { MsgSuccess } from '@/utils/message'
 import useStore from '@/stores'
 const { model, dataset } = useStore()
 
@@ -208,41 +212,23 @@ watch(exampleList.value, () => {
   applicationForm.example = exampleList.value.filter((v) => v)
 })
 
-function submit() {
-  loading.value = true
-
-  // const documents = [] as any[]
-  // StepSecondRef.value.paragraphList.map((item: any) => {
-  //   documents.push({
-  //     name: item.name,
-  //     paragraphs: item.content
-  //   })
-  // })
-  // const obj = { ...baseInfo.value, documents } as datasetData
-  // if (id) {
-  //   documentApi
-  //     .postDocument(id, documents)
-  //     .then((res) => {
-  //       MsgSuccess('提交成功')
-  //       clearStore()
-  //       router.push({ path: `/dataset/${id}/document` })
-  //     })
-  //     .catch(() => {
-  //       loading.value = false
-  //     })
-  // } else {
-  //   datasetApi
-  //     .postDateset(obj)
-  //     .then((res) => {
-  //       successInfo.value = res.data
-  //       active.value = 2
-  //       clearStore()
-  //       loading.value = false
-  //     })
-  //     .catch(() => {
-  //       loading.value = false
-  //     })
-  // }
+const submit = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      applicationApi
+        .postApplication(applicationForm, loading)
+        .then((res) => {
+          MsgSuccess('创建成功')
+          router.push({ path: `/application` })
+        })
+        .catch(() => {
+          loading.value = false
+        })
+    } else {
+      console.log('error submit!')
+    }
+  })
 }
 
 function removeDataset(id: String) {

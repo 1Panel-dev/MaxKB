@@ -30,6 +30,32 @@ const getApplication: (param: pageRequest) => Promise<Result<any>> = (param) => 
 }
 
 /**
+ * 获得临时回话Id
+ * @param 参数 
+ * {
+  "model_id": "string",
+  "multiple_rounds_dialogue": true,
+  "dataset_id_list": [
+    "string"
+  ]
+}
+ */
+const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data) => {
+  return post(`${prefix}/chat/open`, data)
+}
+/**
+ * 对话
+ * @param 参数 
+ * chat_id: string
+ * {
+    "message": "string",
+  }
+ */
+const postChatMessage: (chat_id: string, message: string) => Promise<any> = (chat_id, message) => {
+  return postStream(`/api/${prefix}/chat_message/${chat_id}`, { message })
+}
+
+/**
  * 创建应用
  * @param 参数 
  * {
@@ -46,36 +72,10 @@ const getApplication: (param: pageRequest) => Promise<Result<any>> = (param) => 
   ]
 }
  */
-const postApplication: (data: ApplicationFormType) => Promise<Result<any>> = (data) => {
-  return post(`${prefix}`, data)
+const postApplication: ( data: ApplicationFormType, loading?: Ref<boolean> ) => Promise<Result<any>> = (data, loading) => {
+  return post(`${prefix}`, data, undefined, loading)
 }
 
-/**
- * 获得临时回话Id
- * @param 参数 
- * {
-  "model_id": "string",
-  "multiple_rounds_dialogue": true,
-  "dataset_id_list": [
-    "string"
-  ]
-}
- */
-const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data) => {
-  return post(`${prefix}/chat/open`, data)
-}
-// 对话
-/**
- * 创建数据集
- * @param 参数 
- * chat_id: string
- * {
-    "message": "string",
-  }
- */
-const postChatMessage: (chat_id: string, message: string) => Promise<any> = (chat_id, message) => {
-  return postStream(`/api/${prefix}/chat_message/${chat_id}`, { message })
-}
 export default {
   getAllAppilcation,
   getApplication,
