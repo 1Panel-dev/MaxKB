@@ -139,9 +139,9 @@
           </el-scrollbar>
         </div>
         <div class="text-right border-t p-16">
-          <el-button @click="router.push({ path: `/application` })"> 取消 </el-button>
+          <el-button v-if="!id" @click="router.push({ path: `/application` })"> 取消 </el-button>
           <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading">
-            创建
+            {{ id ? '保存' : '创建' }}
           </el-button>
         </div>
       </el-col>
@@ -171,7 +171,7 @@ import type { Provider } from '@/api/type/model'
 import { realatedObject } from '@/utils/utils'
 import { MsgSuccess } from '@/utils/message'
 import useStore from '@/stores'
-const { model, dataset } = useStore()
+const { model, dataset, application } = useStore()
 
 const router = useRouter()
 const route = useRoute()
@@ -241,6 +241,19 @@ function openDatasetDialog() {
   AddDatasetDialogRef.value.open(applicationForm.dataset_id_list)
 }
 
+function getDetail() {
+  loading.value = true
+  application
+    .asyncGetApplicationDetail(id)
+    .then((res) => {
+      // detail.value = res.data
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
 function getDataset() {
   loading.value = true
   dataset
@@ -281,6 +294,9 @@ function getProvider() {
 }
 
 onMounted(() => {
+  if (id) {
+    getDetail()
+  }
   getProvider()
   getModel()
   getDataset()

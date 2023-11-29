@@ -72,14 +72,34 @@ const postChatMessage: (chat_id: string, message: string) => Promise<any> = (cha
   ]
 }
  */
-const postApplication: ( data: ApplicationFormType, loading?: Ref<boolean> ) => Promise<Result<any>> = (data, loading) => {
+const postApplication: (
+  data: ApplicationFormType,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (data, loading) => {
   return post(`${prefix}`, data, undefined, loading)
 }
 
+/**
+ * 删除应用
+ * @param 参数 applicaiton_id
+ */
+const delApplication: (applicaiton_id: String) => Promise<Result<boolean>> = (applicaiton_id) => {
+  return del(`${prefix}/${applicaiton_id}`)
+}
+
+/**
+ * 应用详情
+ * @param 参数 applicaiton_id
+ */
+const getApplicationDetail: (applicaiton_id: string) => Promise<Result<any>> = (applicaiton_id) => {
+  return get(`${prefix}/${applicaiton_id}`)
+}
 export default {
   getAllAppilcation,
   getApplication,
   postApplication,
   postChatOpen,
-  postChatMessage
+  postChatMessage,
+  delApplication,
+  getApplicationDetail
 }

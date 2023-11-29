@@ -77,22 +77,9 @@
           :disabled="loading"
         />
         <div class="operate" v-loading="loading">
-          <el-button
-            text
-            class="sent-button"
-            :disabled="!(inputValue && data?.name && data?.model_id)"
-            @click="sendChatHandle"
-          >
-            <img
-              v-show="!(inputValue && data?.name && data?.model_id)"
-              src="@/assets/icon_send.svg"
-              alt=""
-            />
-            <img
-              v-show="inputValue && data?.name && data?.model_id"
-              src="@/assets/icon_send_colorful.svg"
-              alt=""
-            />
+          <el-button text class="sent-button" :disabled="isDisabledChart" @click="sendChatHandle">
+            <img v-show="isDisabledChart" src="@/assets/icon_send.svg" alt="" />
+            <img v-show="!isDisabledChart" src="@/assets/icon_send_colorful.svg" alt="" />
           </el-button>
         </div>
       </div>
@@ -100,7 +87,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, onUpdated } from 'vue'
+import { ref, nextTick, onUpdated, computed } from 'vue'
 import applicationApi from '@/api/application'
 import { ChatManage, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
@@ -119,6 +106,10 @@ const inputValue = ref('')
 const chartOpenId = ref('')
 const chatList = ref<chatType[]>([])
 
+const isDisabledChart = computed(
+  () => !(inputValue.value && props.data?.name && props.data?.model_id)
+)
+
 function quickProblemHandel(val: string) {
   inputValue.value = val
 }
@@ -127,8 +118,9 @@ function sendChatHandle(event: any) {
   if (!event.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
     event.preventDefault()
-
-    chatMessage()
+    if (!isDisabledChart.value) {
+      chatMessage()
+    }
   } else {
     // 如果同时按下ctrl+回车键，则会换行
     inputValue.value += '\n'

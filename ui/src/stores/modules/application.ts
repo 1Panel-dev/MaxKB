@@ -16,6 +16,19 @@ const useApplicationStore = defineStore({
             reject(error)
           })
       })
+    },
+
+    async asyncGetApplicationDetail(id: string) {
+      return new Promise((resolve, reject) => {
+        applicationApi
+          .getApplicationDetail(id)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   }
 })
