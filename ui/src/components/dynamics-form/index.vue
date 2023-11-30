@@ -38,6 +38,9 @@ import type { FormInstance } from 'element-plus'
 import triggerApi from '@/api/provider'
 import type Result from '@/request/Result'
 import _ from 'lodash'
+
+defineOptions({ name: 'dynamicsForm' })
+
 const props = withDefaults(
   defineProps<{
     // 页面渲染数据

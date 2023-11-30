@@ -189,6 +189,10 @@ h4 {
   vertical-align: middle;
 }
 
+.border {
+  border: 1px solid var(--el-border-color);
+}
+
 .border-l {
   border-left: 1px solid var(--el-border-color);
 }

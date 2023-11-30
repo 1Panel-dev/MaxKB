@@ -57,21 +57,24 @@
         </el-row>
         <div class="mt-16">
           <el-button type="primary"> 演示 </el-button>
-          <el-button> 嵌入第三方 </el-button>
+          <el-button @click="openDialog"> 嵌入第三方 </el-button>
         </div>
       </el-card>
     </div>
+    <EmbedDialog ref="EmbedDialogRef" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
+import EmbedDialog from './components/EmbedDialog.vue'
 import useStore from '@/stores'
 const { application } = useStore()
 const router = useRouter()
 const route = useRoute()
 
+const EmbedDialogRef = ref()
 const shareUrl = ref('')
 const detail = ref<any>(null)
 const apiKey = ref<any>(null)
@@ -81,6 +84,9 @@ const {
 
 const loading = ref(false)
 
+function openDialog() {
+  EmbedDialogRef.value.open()
+}
 function getAccessToken() {
   application.asyncGetAccessToken(id, loading).then((res) => {
     shareUrl.value = application.location + res.data

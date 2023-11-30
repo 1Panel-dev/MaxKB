@@ -92,7 +92,6 @@ import { ref, nextTick, onUpdated, computed } from 'vue'
 import applicationApi from '@/api/application'
 import { ChatManage, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
-import MarkdownRenderer from '@/components/markdown-renderer/index.vue'
 const props = defineProps({
   data: {
     type: Object,
