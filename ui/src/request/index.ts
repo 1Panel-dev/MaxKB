@@ -39,8 +39,9 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response: any) => {
     if (response.data) {
-      if (response.status !== 200 && !(response.data instanceof Blob)) {
+      if (response.data.code !== 200 && !(response.data instanceof Blob)) {
         MsgError(response.data.message)
+        return Promise.reject(response.data)
       }
     }
     return response
