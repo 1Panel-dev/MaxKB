@@ -49,3 +49,4 @@ export function realatedObject(list: any, val: string | number, attr: string) {
   const filterData: any = list.filter((item: any) => item[attr] === val)?.[0]
   return filterData || null
 }
+

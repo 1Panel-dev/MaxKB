@@ -7,7 +7,7 @@
           <div class="code border-t p-16">
             <div class="flex-between">
               <span class="bold">复制以下代码进行嵌入</span>
-              <el-button text>
+              <el-button text @click="copyClick(source1)">
                 <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
               </el-button>
             </div>
@@ -23,7 +23,7 @@
           <div class="code border-t p-16">
             <div class="flex-between">
               <span class="bold">复制以下代码进行嵌入</span>
-              <el-button text>
+              <el-button text @click="copyClick(source2)">
                 <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
               </el-button>
             </div>
@@ -38,20 +38,20 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-
+import { copyClick } from '@/utils/clipboard'
+import useStore from '@/stores'
+const { application } = useStore()
 const props = defineProps({
-  data: {
-    type: Array<any>,
-    default: () => []
-  }
+  accessToken: String
 })
 
 const emit = defineEmits(['addData'])
 
 const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
+
 const source1 = ref(`<iframe 
-src="https://udify.app/chatbot/ASkyzvhN5Z1h6k7g"
+src="${application.location + props.accessToken}"
 style="width: 100%; height: 100%;" 
 frameborder="0" 
 allow="microphone">
@@ -59,11 +59,11 @@ allow="microphone">
 `)
 
 const source2 = ref(`<script> window.difyChatbotConfig = { 
-  token: '85FfbbzTpXzzr40X'
+  token: "${props.accessToken}"
  }
  <\/script>
 <script src="https://udify.app/embed.min.js"
- id="85FfbbzTpXzzr40X"
+ id="${props.accessToken}"
  defer>
 <\/script>
 `)

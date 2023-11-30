@@ -45,6 +45,20 @@ const useApplicationStore = defineStore({
             reject(error)
           })
       })
+    },
+
+    async asyncAppAuthentication(token: string, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        applicationApi
+          .postAppAuthentication(token, loading)
+          .then((res) => {
+            localStorage.setItem('accessToken', res.data)
+            resolve(res)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   }
 })

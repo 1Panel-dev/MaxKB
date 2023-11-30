@@ -29,7 +29,7 @@ export default {
     app.component(ReadWrite.name, ReadWrite)
     app.component(TagEllipsis.name, TagEllipsis)
     app.component(CommonList.name, CommonList)
-    app.component(dynamicsForm.name, dynamicsForm)
     app.component(MarkdownRenderer.name, MarkdownRenderer)
+    app.component(dynamicsForm.name, dynamicsForm)
   }
 }

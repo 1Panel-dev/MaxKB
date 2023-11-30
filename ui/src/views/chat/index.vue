@@ -1,13 +1,44 @@
 <template>
   <div class="chat">
     <div class="chat__header">
-      <div class="chat-width"><h2 class="ml-24">111</h2></div>
+      <div class="chat-width">
+        <h2 class="ml-24">{{ applicationDetail?.name }}</h2>
+      </div>
     </div>
-    <div class="chat__main chat-width"><AiDialog></AiDialog></div>
+    <div class="chat__main chat-width" v-loading="loading">
+      <AiDialog :data="applicationDetail" :appId="applicationDetail?.id"></AiDialog>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
+import { reactive, ref, watch, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import AiDialog from '@/components/ai-dialog/index.vue'
+import applicationApi from '@/api/application'
+import useStore from '@/stores'
+const route = useRoute()
+const {
+  params: { accessToken }
+} = route as any
+
+const { application, user } = useStore()
+
+const loading = ref(false)
+const applicationDetail = ref<any>({})
+
+function getAccessToken(token: string) {
+  application.asyncAppAuthentication(token, loading).then((res) => {})
+}
+function getProfile() {
+  applicationApi.getProfile(loading).then((res) => {
+    applicationDetail.value = res.data
+  })
+}
+onMounted(() => {
+  user.changeUserType(2)
+  getAccessToken(accessToken)
+  getProfile()
+})
 </script>
 <style lang="scss" scoped>
 .chat {

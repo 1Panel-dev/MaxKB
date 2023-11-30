@@ -3,6 +3,7 @@ import type { User } from '@/api/type/user'
 import UserApi from '@/api/user'
 
 export interface userStateTypes {
+  userType: number // 1 系统操作者 2 对话用户
   userInfo: User | null
   token: any
 }
@@ -10,6 +11,7 @@ export interface userStateTypes {
 const useUserStore = defineStore({
   id: 'user',
   state: (): userStateTypes => ({
+    userType: 1,
     userInfo: null,
     token: ''
   }),
@@ -18,7 +20,9 @@ const useUserStore = defineStore({
       if (this.token) {
         return this.token
       }
-      return localStorage.getItem('token')
+      return this.userType === 1
+        ? localStorage.getItem('token')
+        : localStorage.getItem('accessToken')
     },
 
     getPermissions() {
@@ -35,7 +39,9 @@ const useUserStore = defineStore({
         return ''
       }
     },
-
+    changeUserType(num: number) {
+      this.userType = num
+    },
     async profile() {
       return UserApi.profile().then((ok) => {
         this.userInfo = ok.data

@@ -44,7 +44,7 @@
             <template #footer>
               <div class="footer-content">
                 <el-tooltip effect="dark" content="演示" placement="top">
-                  <el-button text @click.stop>
+                  <el-button text @click.stop @click="getAccessToken(item.id)">
                     <AppIcon iconName="app-view"></AppIcon>
                   </el-button>
                 </el-tooltip>
@@ -71,7 +71,9 @@
                           <span>运行中</span>
                           <!-- <el-switch v-model="item.status"  @change="changeState($event, item)"  /> -->
                         </div>
-                        <el-dropdown-item divided @click="deleteApplication(item)">删除</el-dropdown-item>
+                        <el-dropdown-item divided @click="deleteApplication(item)"
+                          >删除</el-dropdown-item
+                        >
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -88,8 +90,10 @@
 import { ref, onMounted, reactive } from 'vue'
 import applicationApi from '@/api/application'
 import type { pageRequest } from '@/api/type/common'
-  import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { useRouter } from 'vue-router'
+import useStore from '@/stores'
+const { application } = useStore()
 const router = useRouter()
 
 const loading = ref(false)
@@ -109,29 +113,31 @@ function search() {
   getList()
 }
 
-  function deleteApplication(row: any) {
-    MsgConfirm(
-      `是否删除应用：${row.name} ?`,
-      `删除后该应用将不再提供服务，请谨慎操作。`,
-      {
-        confirmButtonText: '删除',
-        confirmButtonClass: 'danger'
-      }
-    )
-      .then(() => {
-        loading.value = true
-        applicationApi
-          .delApplication(row.id)
-          .then(() => {
-            MsgSuccess('删除成功')
-            getList()
-          })
-          .catch(() => {
-            loading.value = false
-          })
-      })
-      .catch(() => {})
-  }
+function getAccessToken(id: string) {
+  application.asyncGetAccessToken(id, loading).then((res) => {
+    window.open(application.location + res?.data?.access_token)
+  })
+}
+
+function deleteApplication(row: any) {
+  MsgConfirm(`是否删除应用：${row.name} ?`, `删除后该应用将不再提供服务，请谨慎操作。`, {
+    confirmButtonText: '删除',
+    confirmButtonClass: 'danger'
+  })
+    .then(() => {
+      loading.value = true
+      applicationApi
+        .delApplication(row.id)
+        .then(() => {
+          MsgSuccess('删除成功')
+          getList()
+        })
+        .catch(() => {
+          loading.value = false
+        })
+    })
+    .catch(() => {})
+}
 
 // function changeState(bool: Boolean, row: any) {
 //   const obj = {

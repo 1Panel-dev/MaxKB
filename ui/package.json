@@ -32,6 +32,7 @@
     "pinia": "^2.1.6",
     "pinyin-pro": "^3.18.2",
     "vue": "^3.3.4",
+    "vue-clipboard3": "^2.0.0",
     "vue-router": "^4.2.4"
   },
   "devDependencies": {

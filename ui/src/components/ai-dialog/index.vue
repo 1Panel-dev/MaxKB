@@ -107,14 +107,21 @@
 </template>
 <script setup lang="ts">
 import { ref, nextTick, onUpdated, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
+
+const route = useRoute()
+const {
+  params: { accessToken }
+} = route as any
 const props = defineProps({
   data: {
     type: Object,
     default: () => {}
-  }
+  },
+  appId: String
 })
 
 const scrollDiv = ref()
@@ -125,7 +132,7 @@ const chartOpenId = ref('')
 const chatList = ref<chatType[]>([])
 
 const isDisabledChart = computed(
-  () => !(inputValue.value && props.data?.name && props.data?.model_id)
+  () => !(inputValue.value && (props.appId || (props.data?.name && props.data?.model_id)))
 )
 
 function quickProblemHandel(val: string) {
@@ -160,15 +167,27 @@ function getChartOpenId() {
     dataset_id_list: props.data.dataset_id_list,
     multiple_rounds_dialogue: props.data.multiple_rounds_dialogue
   }
-  applicationApi
-    .postChatOpen(obj)
-    .then((res) => {
-      chartOpenId.value = res.data
-      chatMessage()
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  if (props.appId) {
+    applicationApi
+      .getChatOpen(props.appId)
+      .then((res) => {
+        chartOpenId.value = res.data
+        chatMessage()
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  } else {
+    applicationApi
+      .postChatOpen(obj)
+      .then((res) => {
+        chartOpenId.value = res.data
+        chatMessage()
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  }
 }
 function chatMessage() {
   loading.value = true
