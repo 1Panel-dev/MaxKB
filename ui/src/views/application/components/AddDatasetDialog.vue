@@ -1,22 +1,19 @@
 <template>
   <el-dialog title="添加关联数据集" v-model="dialogVisible" width="600">
-    <el-checkbox-group v-model="checkList" class="app-custom-checkbox-group">
-      <el-row :gutter="12" v-loading="loading">
-        <el-col :span="12" v-for="(item, index) in data" :key="index" class="mb-16">
-          <el-card shadow="hover">
-            <div class="title flex-between">
-              <div class="flex align-center">
-                <AppAvatar class="mr-12" shape="square" :size="32">
-                  <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-                </AppAvatar>
-                <h4 class="ellipsis-1">{{ item.name }}</h4>
-              </div>
-              <el-checkbox :label="item.id" />
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </el-checkbox-group>
+    <CardCheckbox value-field="id" :data-list="data" v-model="checkList">
+      <template #default="scope">
+        <div class="title flex-between">
+          <div class="flex align-center">
+            <AppAvatar class="mr-12" shape="square" :size="32">
+              <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+            </AppAvatar>
+            <h4 class="ellipsis-1">{{ scope.name }}</h4>
+          </div>
+          <input type="checkbox" id="check1" :checked="scope.checked" />
+        </div>
+      </template>
+    </CardCheckbox>
+
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
@@ -27,7 +24,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-
+import CardCheckbox from '@/components/card-checkbox/index.vue'
 const props = defineProps({
   data: {
     type: Array<any>,
