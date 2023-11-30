@@ -59,9 +59,27 @@
                 <el-card shadow="always" class="dialog-card"> 回答中... </el-card>
               </div>
               <el-card v-else shadow="always" class="dialog-card">
-                <MarkdownRenderer :source="item.answer_text"></MarkdownRenderer>
+                <MarkdownRenderer
+                  :source="item.answer_text"
+                  :inner_suffix="false"
+                ></MarkdownRenderer>
               </el-card>
-              <el-button type="primary" link class="mt-8">停止回答</el-button>
+              <el-button
+                type="primary"
+                v-if="item.is_stop && !item.write_ed"
+                @click="startChat(item)"
+                link
+                class="mt-8"
+                >继续</el-button
+              >
+              <el-button
+                type="primary"
+                v-else-if="!item.write_ed"
+                @click="stopChat(item)"
+                link
+                class="mt-8"
+                >停止回答</el-button
+              >
             </div>
           </div>
         </template>
@@ -90,7 +108,7 @@
 <script setup lang="ts">
 import { ref, nextTick, onUpdated, computed } from 'vue'
 import applicationApi from '@/api/application'
-import { ChatManage, type chatType } from '@/api/type/application'
+import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 const props = defineProps({
   data: {
@@ -126,7 +144,12 @@ function sendChatHandle(event: any) {
     inputValue.value += '\n'
   }
 }
-
+const stopChat = (chat: chatType) => {
+  ChatManagement.stop(chat.id)
+}
+const startChat = (chat: chatType) => {
+  ChatManagement.write(chat.id)
+}
 /**
  * 对话
  */
@@ -147,41 +170,41 @@ function getChartOpenId() {
       loading.value = false
     })
 }
-
 function chatMessage() {
   loading.value = true
   if (!chartOpenId.value) {
     getChartOpenId()
   } else {
     const problem_text = inputValue.value
+    const id = randomId()
+    chatList.value.push({
+      id: id,
+      problem_text: problem_text,
+      answer_text: '',
+      buffer: [],
+      write_ed: false,
+      is_stop: false
+    })
     applicationApi.postChatMessage(chartOpenId.value, problem_text).then(async (response) => {
-      const id = randomId()
-      chatList.value.push({
-        id: id,
-        problem_text: problem_text,
-        answer_text: '',
-        buffer: []
-      })
       inputValue.value = ''
       const row = chatList.value.find((item) => item.id === id)
       if (row) {
-        const chatMange = new ChatManage(row, 50, loading)
-        chatMange.write()
+        ChatManagement.addChatRecord(row, 50, loading)
+        ChatManagement.write(id)
         const reader = response.body.getReader()
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
-            chatMange.close()
+            ChatManagement.close(id)
             break
           }
           try {
             const decoder = new TextDecoder('utf-8')
             const str = decoder.decode(value, { stream: true })
             if (str && str.startsWith('data:')) {
-              // console.log(JSON?.parse(str.replace('data:', '')))
               const content = JSON?.parse(str.replace('data:', ''))?.content
               if (content) {
-                chatMange.append(content)
+                ChatManagement.append(id, content)
               }
             }
           } catch (e) {}
@@ -301,6 +324,11 @@ onUpdated(() => {
   }
   .dialog-card {
     border: none;
+    display: flex;
+    :deep(.el-card__body) {
+      display: flex;
+      align-items: center;
+    }
   }
 }
 </style>

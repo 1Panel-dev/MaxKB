@@ -1,8 +1,9 @@
 <template>
-  <div v-html="markdownIt.render(source)" />
+  <div v-html="inner" />
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import MarkdownIt from 'markdown-it'
 import MarkdownItAbbr from 'markdown-it-abbr'
 import MarkdownItAnchor from 'markdown-it-anchor'
@@ -31,10 +32,35 @@ markdownIt
   .use(MarkdownItSup)
   .use(MarkdownItTOC)
 
-defineProps({
-  source: {
-    type: String,
-    default: ''
+const props = withDefaults(defineProps<{ source?: string; inner_suffix?: boolean }>(), {
+  source: '',
+  inner_suffix: false
+})
+
+const suffix = '{inner_suffix_' + new Date().getTime() + '}'
+
+const inner = computed(() => {
+  if (props.inner_suffix) {
+    return markdownIt.render(props.source + suffix).replace(suffix, "<span class='loading'></span>")
+  } else {
+    return markdownIt.render(props.source)
   }
 })
 </script>
+<style>
+.loading:after {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+  animation: ellipsis 0.5s infinite;
+  content: '\2026'; /* ascii code for the ellipsis character */
+}
+@keyframes ellipsis {
+  from {
+    width: 2px;
+  }
+  to {
+    width: 20px;
+  }
+}
+</style>
