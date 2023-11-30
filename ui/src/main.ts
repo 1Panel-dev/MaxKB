@@ -10,7 +10,6 @@ import App from './App.vue'
 import router from '@/router'
 import Components from '@/components'
 
-import 'highlight.js/styles/default.css'
 const app = createApp(App)
 app.use(store)
 app.use(directives)

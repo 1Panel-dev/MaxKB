@@ -12,6 +12,9 @@ import MarkdownItTasklists from 'markdown-it-task-lists'
 import MarkdownItSub from 'markdown-it-sub'
 import MarkdownItSup from 'markdown-it-sup'
 import MarkdownItTOC from 'markdown-it-toc-done-right'
+
+defineOptions({ name: 'MarkdownRenderer' })
+
 const markdownIt = MarkdownIt({
   html: true, // 允许HTML语法
   typographer: true, // 启用Typographer插件，可以更好地处理中文字符和标点符号

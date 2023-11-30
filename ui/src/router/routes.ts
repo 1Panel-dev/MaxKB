@@ -22,6 +22,12 @@ export const routes: Array<RouteRecordRaw> = [
   },
 
   {
+    path: '/chat/:accessToken',
+    name: 'Chat',
+    component: () => import('@/views/chat/index.vue')
+  },
+
+  {
     path: '/login',
     name: 'login',
     component: () => import('@/views/login/index.vue')

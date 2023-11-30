@@ -7,10 +7,10 @@
           <AppAvatar class="mr-12" shape="square" :size="32">
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
-          <h4 class="ellipsis-1">应用</h4>
-          <div class="ml-8">
-            <el-tag class="warning-tag">已停用</el-tag>
-            <el-tag class="success-tag">运行中</el-tag>
+          <h4 class="ellipsis-1">{{ detail?.name }}</h4>
+          <div class="ml-8" v-if="detail">
+            <el-tag v-if="detail?.status" class="success-tag">运行中</el-tag>
+            <el-tag v-else class="warning-tag">已停用</el-tag>
           </div>
         </div>
         <div class="active-button" @click.stop>
@@ -21,7 +21,7 @@
             <el-text type="info">公开访问链接</el-text>
             <div class="mt-4">
               <span class="vertical-middle lighter">
-                https:/fit2cloud.com/xlab-fit2cloud/smart-doc/16826
+                {{ shareUrl }}
               </span>
 
               <el-button type="primary" text>
@@ -57,13 +57,59 @@
         </el-row>
         <div class="mt-16">
           <el-button type="primary"> 演示 </el-button>
-          <el-button> 嵌入第三方 </el-button>
+          <el-button @click="openDialog"> 嵌入第三方 </el-button>
         </div>
       </el-card>
     </div>
+    <EmbedDialog ref="EmbedDialogRef" />
   </LayoutContainer>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { reactive, ref, watch, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import applicationApi from '@/api/application'
+import EmbedDialog from './components/EmbedDialog.vue'
+import useStore from '@/stores'
+const { application } = useStore()
+const router = useRouter()
+const route = useRoute()
+
+const EmbedDialogRef = ref()
+const shareUrl = ref('')
+const detail = ref<any>(null)
+const apiKey = ref<any>(null)
+const {
+  params: { id }
+} = route as any
+
+const loading = ref(false)
+
+function openDialog() {
+  EmbedDialogRef.value.open()
+}
+function getAccessToken() {
+  application.asyncGetAccessToken(id, loading).then((res) => {
+    shareUrl.value = application.location + res.data
+  })
+}
+
+function getApiKey() {
+  applicationApi.getAPIKey(id, loading).then((res) => {
+    apiKey.value = res.data
+  })
+}
+
+function getDetail() {
+  application.asyncGetApplicationDetail(id, loading).then((res: any) => {
+    detail.value = res.data
+  })
+}
+onMounted(() => {
+  getDetail()
+  getApiKey()
+  getAccessToken()
+})
+</script>
 <style lang="scss" scoped>
 .overview-card {
   position: relative;

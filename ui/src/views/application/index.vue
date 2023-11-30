@@ -71,7 +71,7 @@
                           <span>运行中</span>
                           <!-- <el-switch v-model="item.status"  @change="changeState($event, item)"  /> -->
                         </div>
-                        <el-dropdown-item divided>删除</el-dropdown-item>
+                        <el-dropdown-item divided @click="deleteApplication(item)">删除</el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -88,9 +88,8 @@
 import { ref, onMounted, reactive } from 'vue'
 import applicationApi from '@/api/application'
 import type { pageRequest } from '@/api/type/common'
-//   import { MsgSuccess, MsgConfirm } from '@/utils/message'
+  import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { useRouter } from 'vue-router'
-//   import { numberFormat } from '@/utils/utils'
 const router = useRouter()
 
 const loading = ref(false)
@@ -102,7 +101,6 @@ const pageConfig = reactive<pageRequest>({
 })
 
 const applicationList = ref<any[]>([])
-const state = ref(false)
 
 function loadDataset() {}
 
@@ -111,29 +109,29 @@ function search() {
   getList()
 }
 
-//   function deleteDateset(row: any) {
-//     MsgConfirm(
-//       `是否删除数据集：${row.name} ?`,
-//       `此数据集关联 ${row.char_length} 个应用，删除后无法恢复，请谨慎操作。`,
-//       {
-//         confirmButtonText: '删除',
-//         confirmButtonClass: 'danger'
-//       }
-//     )
-//       .then(() => {
-//         loading.value = true
-//         datasetApi
-//           .delDateset(row.id)
-//           .then(() => {
-//             MsgSuccess('删除成功')
-//             getList()
-//           })
-//           .catch(() => {
-//             loading.value = false
-//           })
-//       })
-//       .catch(() => {})
-//   }
+  function deleteApplication(row: any) {
+    MsgConfirm(
+      `是否删除应用：${row.name} ?`,
+      `删除后该应用将不再提供服务，请谨慎操作。`,
+      {
+        confirmButtonText: '删除',
+        confirmButtonClass: 'danger'
+      }
+    )
+      .then(() => {
+        loading.value = true
+        applicationApi
+          .delApplication(row.id)
+          .then(() => {
+            MsgSuccess('删除成功')
+            getList()
+          })
+          .catch(() => {
+            loading.value = false
+          })
+      })
+      .catch(() => {})
+  }
 
 // function changeState(bool: Boolean, row: any) {
 //   const obj = {
