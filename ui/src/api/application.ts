@@ -153,7 +153,7 @@ const getAccessToken: (applicaiton_id: string, loading?: Ref<boolean>) => Promis
   applicaiton_id,
   loading
 ) => {
-  return get(`${prefix}/${applicaiton_id}/access-token`, undefined, loading)
+  return get(`${prefix}/${applicaiton_id}/access_token`, undefined, loading)
 }
 
 export default {
