@@ -205,7 +205,7 @@ const activeText = computed(() => {
   color: rgba(100, 106, 115, 1);
   .active {
     margin-left: 3px;
-    color: rgba(51, 112, 255, 1);
+    color: var(--el-color-primary);
   }
 }
 </style>

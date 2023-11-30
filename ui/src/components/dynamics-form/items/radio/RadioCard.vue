@@ -70,8 +70,8 @@ watch(
 
   .active {
     border-radius: 4px;
-    background: rgba(51, 112, 255, 0.1);
-    color: #3370ff;
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
   }
   .item {
     cursor: pointer;
