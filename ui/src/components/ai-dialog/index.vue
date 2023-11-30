@@ -64,22 +64,68 @@
                   :inner_suffix="false"
                 ></MarkdownRenderer>
               </el-card>
-              <el-button
-                type="primary"
-                v-if="item.is_stop && !item.write_ed"
-                @click="startChat(item)"
-                link
-                class="mt-8"
-                >继续</el-button
-              >
-              <el-button
-                type="primary"
-                v-else-if="!item.write_ed"
-                @click="stopChat(item)"
-                link
-                class="mt-8"
-                >停止回答</el-button
-              >
+              <div class="flex-between mt-8">
+                <div>
+                  <el-button
+                    type="primary"
+                    v-if="item.is_stop && !item.write_ed"
+                    @click="startChat(item)"
+                    link
+                    >继续</el-button
+                  >
+                  <el-button type="primary" v-else-if="!item.write_ed" @click="stopChat(item)" link
+                    >停止回答</el-button
+                  >
+                </div>
+
+                <!-- <div v-if="item.write_ed && props.appId">
+                  <el-tooltip effect="dark" content="重新生成" placement="top">
+                    <el-button text @click.stop @click="getAccessToken(item.id)">
+                      <AppIcon iconName="VideoPlay"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                  <el-divider direction="vertical" />
+                  <el-tooltip effect="dark" content="复制" placement="top">
+                    <el-button text @click="copyClick(item.answer_text)">
+                      <AppIcon iconName="app-copy"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                  <el-divider direction="vertical" />
+                  <el-tooltip effect="dark" content="赞同" placement="top">
+                    <el-button
+                      text
+                      @click.stop="router.push({ path: `/application/${item.id}/setting` })"
+                    >
+                      <AppIcon iconName="app-like"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                  <el-tooltip effect="dark" content="取消赞同" placement="top">
+                    <el-button
+                      text
+                      @click.stop="router.push({ path: `/application/${item.id}/setting` })"
+                    >
+                      <AppIcon iconName="app-like-color"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                  <el-divider direction="vertical" />
+                  <el-tooltip effect="dark" content="反对" placement="top">
+                    <el-button
+                      text
+                      @click.stop="router.push({ path: `/application/${item.id}/setting` })"
+                    >
+                      <AppIcon iconName="app-oppose"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                  <el-tooltip effect="dark" content="取消反对" placement="top">
+                    <el-button
+                      text
+                      @click.stop="router.push({ path: `/application/${item.id}/setting` })"
+                    >
+                      <AppIcon iconName="app-oppose-color"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                </div> -->
+              </div>
             </div>
           </div>
         </template>
@@ -111,6 +157,7 @@ import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
+import { copyClick } from '@/utils/clipboard'
 
 const route = useRoute()
 const {
