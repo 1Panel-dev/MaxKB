@@ -2,6 +2,7 @@ import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import type { datasetData } from '@/api/type/dataset'
 import type { pageRequest } from '@/api/type/common'
+import { type Ref } from 'vue'
 const prefix = '/dataset'
 
 /**
@@ -23,8 +24,8 @@ const getDateset: (param: pageRequest) => Promise<Result<any>> = (param) => {
  * 获取全部数据集
  * @param 参数
  */
-const getAllDateset: () => Promise<Result<any[]>> = () => {
-  return get(`${prefix}`)
+const getAllDateset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
+  return get(`${prefix}`, undefined, loading)
 }
 
 /**

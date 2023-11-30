@@ -17,7 +17,7 @@
           <el-switch />
         </div>
         <el-row class="mt-16">
-          <el-col :span="12">
+          <el-col :span="24">
             <el-text type="info">公开访问链接</el-text>
             <div class="mt-4">
               <span class="vertical-middle lighter">
@@ -29,7 +29,7 @@
               </el-button>
             </div>
           </el-col>
-          <el-col :span="12">
+          <!-- <el-col :span="12">
             <el-text type="info">API访问凭据</el-text>
             <div class="mt-4">
               <span class="vertical-middle lighter">
@@ -53,7 +53,7 @@
                 </el-button>
               </span>
             </div>
-          </el-col>
+          </el-col> -->
         </el-row>
         <div class="mt-16">
           <el-button type="primary"> 演示 </el-button>
@@ -89,7 +89,7 @@ function openDialog() {
 }
 function getAccessToken() {
   application.asyncGetAccessToken(id, loading).then((res) => {
-    shareUrl.value = application.location + res.data
+    shareUrl.value = application.location + res?.data?.access_token
   })
 }
 

@@ -191,7 +191,7 @@ defineExpose({ open, close })
   line-height: 24px;
   cursor: pointer;
   &:hover {
-    color: rgba(51, 112, 255, 1);
+    color: var(--el-color-primary);
   }
 }
 .active-breadcrumb {

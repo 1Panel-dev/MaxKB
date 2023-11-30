@@ -1,19 +1,20 @@
 <template>
   <el-dialog title="添加关联数据集" v-model="dialogVisible" width="600">
-    <CardCheckbox value-field="id" :data-list="data" v-model="checkList">
-      <template #default="scope">
-        <div class="title flex-between">
-          <div class="flex align-center">
-            <AppAvatar class="mr-12" shape="square" :size="32">
-              <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-            </AppAvatar>
-            <h4 class="ellipsis-1">{{ scope.name }}</h4>
-          </div>
-          <input type="checkbox" id="check1" :checked="scope.checked" />
-        </div>
-      </template>
-    </CardCheckbox>
-
+    <template #header="{ close, titleId, titleClass }">
+      <div class="my-header flex">
+        <h4 :id="titleId" :class="titleClass">添加关联数据集</h4>
+        <el-button link class="ml-16" @click="refresh">
+          <el-icon class="mr-4"><Refresh /></el-icon>刷新
+        </el-button>
+      </div>
+    </template>
+    <el-row :gutter="12" v-loading="loading">
+      <el-col :span="12" v-for="(item, index) in data" :key="index" class="mb-16">
+        <CardCheckbox value-field="id" :data="item" v-model="checkList">
+          {{ item.name }}
+        </CardCheckbox>
+      </el-col>
+    </el-row>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
@@ -29,19 +30,18 @@ const props = defineProps({
   data: {
     type: Array<any>,
     default: () => []
-  }
+  },
+  loading: Boolean
 })
 
-const emit = defineEmits(['addData'])
+const emit = defineEmits(['addData', 'refresh'])
 
-const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
 const checkList = ref([])
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
     checkList.value = []
-    loading.value = false
   }
 })
 
@@ -52,6 +52,10 @@ const open = (checked: any) => {
 const submitHandle = () => {
   emit('addData', checkList.value)
   dialogVisible.value = false
+}
+
+const refresh = () => {
+  emit('refresh')
 }
 
 defineExpose({ open })

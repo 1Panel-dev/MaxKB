@@ -155,7 +155,14 @@
         </div>
       </el-col>
     </el-row>
-    <AddDatasetDialog ref="AddDatasetDialogRef" @addData="addDataset" :data="datasetList" />
+    {{ datasetLoading }}
+    <AddDatasetDialog
+      ref="AddDatasetDialogRef"
+      @addData="addDataset"
+      :data="datasetList"
+      @refresh="refresh"
+      :loading="datasetLoading"
+    />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -183,6 +190,7 @@ const applicationFormRef = ref<FormInstance>()
 const AddDatasetDialogRef = ref()
 
 const loading = ref(false)
+const datasetLoading = ref(false)
 const exampleList = ref(['', ''])
 const applicationForm = ref<ApplicationFormType>({
   name: '',
@@ -250,21 +258,14 @@ function getDetail() {
 }
 
 function getDataset() {
-  loading.value = true
   if (id) {
-    applicationApi.getApplicationDataset(id, loading).then((res) => {
+    applicationApi.getApplicationDataset(id, datasetLoading).then((res) => {
       datasetList.value = res.data
     })
   } else {
-    dataset
-      .asyncGetAllDateset()
-      .then((res: any) => {
-        datasetList.value = res.data?.filter((v) => v.user_id === user.userInfo?.id)
-        loading.value = false
-      })
-      .catch(() => {
-        loading.value = false
-      })
+    dataset.asyncGetAllDateset(datasetLoading).then((res: any) => {
+      datasetList.value = res.data?.filter((v) => v.user_id === user.userInfo?.id)
+    })
   }
 }
 
@@ -292,6 +293,10 @@ function getProvider() {
     .catch(() => {
       loading.value = false
     })
+}
+
+function refresh() {
+  getDataset()
 }
 
 onMounted(() => {
