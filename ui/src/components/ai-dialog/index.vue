@@ -324,11 +324,6 @@ onUpdated(() => {
   }
   .dialog-card {
     border: none;
-    display: flex;
-    :deep(.el-card__body) {
-      display: flex;
-      align-items: center;
-    }
   }
 }
 </style>
