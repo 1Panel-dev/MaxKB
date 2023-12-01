@@ -2,18 +2,10 @@
   <div class="common-list">
     <el-scrollbar>
       <ul v-if="data.length > 0">
-        <li
-          v-if="slots.prefix"
-          @click="clickHandle()"
-          :class="modelValue === undefined || modelValue === null ? 'active' : ''"
-          class="cursor"
-        >
-          <slot name="prefix"> </slot>
-        </li>
         <template v-for="(item, index) in data" :key="index">
           <li
-            @click.prevent="clickHandle(item)"
-            :class="modelValue === item ? 'active' : ''"
+            @click.prevent="clickHandle(item, index)"
+            :class="current === index ? 'active' : ''"
             class="cursor"
           >
             <slot :row="item" :index="index"> </slot>
@@ -32,8 +24,6 @@ defineOptions({ name: 'CommonList' })
 
 withDefaults(
   defineProps<{
-    modelValue?: any
-
     data: Array<any>
   }>(),
   {
@@ -41,11 +31,13 @@ withDefaults(
   }
 )
 
-const emit = defineEmits(['click', 'update:modelValue'])
+const emit = defineEmits(['click'])
 
-function clickHandle(row?: any) {
+const current = ref(0)
+
+function clickHandle(row: any, index: number) {
+  current.value = index
   emit('click', row)
-  emit('update:modelValue', row)
 }
 </script>
 <style lang="scss" scoped>

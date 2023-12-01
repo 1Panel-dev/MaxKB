@@ -79,51 +79,7 @@
                 </div>
 
                 <!-- <div v-if="item.write_ed && props.appId">
-                  <el-tooltip effect="dark" content="重新生成" placement="top">
-                    <el-button text @click.stop @click="getAccessToken(item.id)">
-                      <AppIcon iconName="VideoPlay"></AppIcon>
-                    </el-button>
-                  </el-tooltip>
-                  <el-divider direction="vertical" />
-                  <el-tooltip effect="dark" content="复制" placement="top">
-                    <el-button text @click="copyClick(item.answer_text)">
-                      <AppIcon iconName="app-copy"></AppIcon>
-                    </el-button>
-                  </el-tooltip>
-                  <el-divider direction="vertical" />
-                  <el-tooltip effect="dark" content="赞同" placement="top">
-                    <el-button
-                      text
-                      @click.stop="router.push({ path: `/application/${item.id}/setting` })"
-                    >
-                      <AppIcon iconName="app-like"></AppIcon>
-                    </el-button>
-                  </el-tooltip>
-                  <el-tooltip effect="dark" content="取消赞同" placement="top">
-                    <el-button
-                      text
-                      @click.stop="router.push({ path: `/application/${item.id}/setting` })"
-                    >
-                      <AppIcon iconName="app-like-color"></AppIcon>
-                    </el-button>
-                  </el-tooltip>
-                  <el-divider direction="vertical" />
-                  <el-tooltip effect="dark" content="反对" placement="top">
-                    <el-button
-                      text
-                      @click.stop="router.push({ path: `/application/${item.id}/setting` })"
-                    >
-                      <AppIcon iconName="app-oppose"></AppIcon>
-                    </el-button>
-                  </el-tooltip>
-                  <el-tooltip effect="dark" content="取消反对" placement="top">
-                    <el-button
-                      text
-                      @click.stop="router.push({ path: `/application/${item.id}/setting` })"
-                    >
-                      <AppIcon iconName="app-oppose-color"></AppIcon>
-                    </el-button>
-                  </el-tooltip>
+                  <OperationButton :data="item" />
                 </div> -->
               </div>
             </div>
@@ -154,10 +110,10 @@
 <script setup lang="ts">
 import { ref, nextTick, onUpdated, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import OperationButton from './OperationButton.vue'
 import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
-import { copyClick } from '@/utils/clipboard'
 
 const route = useRoute()
 const {
@@ -258,6 +214,7 @@ function chatMessage() {
         ChatManagement.addChatRecord(row, 50, loading)
         ChatManagement.write(id)
         const reader = response.body.getReader()
+        /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
@@ -273,7 +230,9 @@ function chatMessage() {
                 ChatManagement.append(id, content)
               }
             }
-          } catch (e) {}
+          } catch (e) {
+            //  console
+          }
         }
       }
     })

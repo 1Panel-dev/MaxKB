@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="添加关联数据集" v-model="dialogVisible" width="600">
-    <template #header="{ close, titleId, titleClass }">
+    <template #header="{ titleId, titleClass }">
       <div class="my-header flex">
         <h4 :id="titleId" :class="titleClass">添加关联数据集</h4>
         <el-button link class="ml-16" @click="refresh">

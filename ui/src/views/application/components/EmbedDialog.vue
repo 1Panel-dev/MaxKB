@@ -8,7 +8,7 @@
             <div class="flex-between">
               <span class="bold">复制以下代码进行嵌入</span>
               <el-button text @click="copyClick(source1)">
-                <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+                <AppIcon iconName="app-copy" ></AppIcon>
               </el-button>
             </div>
             <div class="mt-8">
@@ -24,7 +24,7 @@
             <div class="flex-between">
               <span class="bold">复制以下代码进行嵌入</span>
               <el-button text @click="copyClick(source2)">
-                <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+                <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
             <div class="mt-8">

@@ -25,7 +25,7 @@
               </span>
 
               <el-button type="primary" text @click="copyClick(shareUrl)">
-                <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+                <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
           </el-col>
@@ -37,14 +37,14 @@
               </span>
 
               <el-button type="primary" text>
-                <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+                   <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
             <div class="mt-4">
               <span class="vertical-middle lighter"> API Secret: ************** </span>
               <span>
                 <el-button type="primary" text>
-                  <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+                     <AppIcon iconName="app-copy"></AppIcon>
                 </el-button>
               </span>
               <span>
