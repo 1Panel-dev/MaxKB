@@ -1,13 +1,13 @@
 <template>
   <div>
     <el-tooltip effect="dark" content="重新生成" placement="top">
-      <el-button text @click.stop @click="getAccessToken(item.id)">
+      <el-button text @click.stop>
         <AppIcon iconName="VideoPlay"></AppIcon>
       </el-button>
     </el-tooltip>
     <el-divider direction="vertical" />
     <el-tooltip effect="dark" content="复制" placement="top">
-      <el-button text @click="copyClick(item.answer_text)">
+      <el-button text @click="copyClick(item?.answer_text)">
         <AppIcon iconName="app-copy"></AppIcon>
       </el-button>
     </el-tooltip>

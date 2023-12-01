@@ -109,16 +109,10 @@
 </template>
 <script setup lang="ts">
 import { ref, nextTick, onUpdated, computed } from 'vue'
-import { useRoute } from 'vue-router'
 import OperationButton from './OperationButton.vue'
 import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
-
-const route = useRoute()
-const {
-  params: { accessToken }
-} = route as any
 const props = defineProps({
   data: {
     type: Object,
@@ -210,6 +204,7 @@ function chatMessage() {
     applicationApi.postChatMessage(chartOpenId.value, problem_text).then(async (response) => {
       inputValue.value = ''
       const row = chatList.value.find((item) => item.id === id)
+
       if (row) {
         ChatManagement.addChatRecord(row, 50, loading)
         ChatManagement.write(id)
@@ -226,6 +221,7 @@ function chatMessage() {
             const str = decoder.decode(value, { stream: true })
             if (str && str.startsWith('data:')) {
               const content = JSON?.parse(str.replace('data:', ''))?.content
+
               if (content) {
                 ChatManagement.append(id, content)
               }

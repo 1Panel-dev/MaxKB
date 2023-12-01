@@ -27,7 +27,9 @@ const loading = ref(false)
 const applicationDetail = ref<any>({})
 
 function getAccessToken(token: string) {
-  application.asyncAppAuthentication(token, loading).then((res) => {})
+  application.asyncAppAuthentication(token, loading).then((res) => {
+    getProfile()
+  })
 }
 function getProfile() {
   applicationApi.getProfile(loading).then((res) => {
@@ -37,7 +39,6 @@ function getProfile() {
 onMounted(() => {
   user.changeUserType(2)
   getAccessToken(accessToken)
-  getProfile()
 })
 </script>
 <style lang="scss" scoped>

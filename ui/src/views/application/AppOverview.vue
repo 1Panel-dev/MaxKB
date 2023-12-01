@@ -4,9 +4,14 @@
       <h4 class="title-decoration-1 mb-16">应用信息</h4>
       <el-card shadow="never" class="overview-card">
         <div class="title flex align-center">
-          <AppAvatar class="mr-12" shape="square" :size="32">
-            <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-          </AppAvatar>
+          <AppAvatar
+            v-if="detail?.name"
+            :name="detail?.name"
+            pinyinColor
+            class="mr-12"
+            shape="square"
+            :size="32"
+          />
           <h4 class="ellipsis-1">{{ detail?.name }}</h4>
           <div class="ml-8" v-if="detail">
             <el-tag v-if="detail?.status" class="success-tag">运行中</el-tag>
@@ -61,7 +66,7 @@
         </div>
       </el-card>
     </div>
-    <EmbedDialog ref="EmbedDialogRef" :accessToken="accessToken" />
+    <EmbedDialog ref="EmbedDialogRef"/>
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -87,7 +92,7 @@ const {
 const loading = ref(false)
 
 function openDialog() {
-  EmbedDialogRef.value.open()
+  EmbedDialogRef.value.open(accessToken.value)
 }
 function getAccessToken() {
   application.asyncGetAccessToken(id, loading).then((res) => {

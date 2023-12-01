@@ -3,10 +3,11 @@
     <div class="card-header">
       <slot name="header">
         <div class="title flex align-center">
-          <AppAvatar v-if="!slots.icon && showIcon" class="mr-12" shape="square" :size="32">
-            <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-          </AppAvatar>
-          <slot v-else name="icon"> </slot>
+          <slot name="icon">
+            <AppAvatar v-if="showIcon" class="mr-12" shape="square" :size="32">
+              <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+            </AppAvatar>
+          </slot>
           <h4 class="ellipsis-1" style="width: 100%">{{ title }}</h4>
         </div>
       </slot>

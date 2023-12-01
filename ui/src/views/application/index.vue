@@ -36,6 +36,16 @@
             class="application-card cursor"
             @click="router.push({ path: `/application/${item.id}/overview` })"
           >
+            <template #icon>
+              <AppAvatar
+                v-if="item.name"
+                :name="item.name"
+                pinyinColor
+                class="mr-12"
+                shape="square"
+                :size="32"
+              />
+            </template>
             <div class="status-tag">
               <el-tag v-if="item.status" class="success-tag">运行中</el-tag>
               <el-tag v-else class="warning-tag">已停用</el-tag>

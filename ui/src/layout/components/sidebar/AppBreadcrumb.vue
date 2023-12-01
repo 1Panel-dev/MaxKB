@@ -11,10 +11,19 @@
           <template v-for="(item, index) in list" :key="index">
             <div :class="item.id === id ? 'dropdown-active' : ''">
               <el-dropdown-item :command="item.id">
-                <div class="flex">
-                  <AppAvatar class="mr-12" shape="square" :size="24">
+                <div class="flex align-center">
+                  <AppAvatar
+                    v-if="isApplication"
+                    :name="item.name"
+                    pinyinColor
+                    class="mr-12"
+                    shape="square"
+                    :size="24"
+                  />
+                  <AppAvatar v-else-if="isDataset" class="mr-12" shape="square" :size="24">
                     <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                   </AppAvatar>
+
                   <span class="ellipsis-1"> {{ item?.name }}</span>
                 </div>
               </el-dropdown-item>
