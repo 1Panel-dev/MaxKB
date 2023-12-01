@@ -196,6 +196,31 @@ const postChatMessage: (chat_id: string, message: string) => Promise<any> = (cha
   return postStream(`/api/${prefix}/chat_message/${chat_id}`, { message })
 }
 
+/**
+ * 点赞、点踩
+ * @param 参数 
+ * application_id : string; chat_id : string; chat_record_id : string
+ * {
+    "vote_status": "string", // -1 0 1
+  }
+ */
+const putChatVote: (
+  application_id: string,
+  chat_id: string,
+  chat_record_id: string,
+  vote_status: string,
+  loading?: Ref<boolean>
+) => Promise<any> = (application_id, chat_id, chat_record_id, vote_status, loading) => {
+  return put(
+    `${prefix}/${application_id}/chat/${chat_id}/chat_record/${chat_record_id}/vote`,
+    {
+      vote_status
+    },
+    undefined,
+    loading
+  )
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -210,5 +235,6 @@ export default {
   getAPIKey,
   getAccessToken,
   postAppAuthentication,
-  getProfile
+  getProfile,
+  putChatVote
 }

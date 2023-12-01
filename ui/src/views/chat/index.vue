@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="chat__main chat-width" v-loading="loading">
-      <AiDialog :data="applicationDetail" :appId="applicationDetail?.id"></AiDialog>
+      <AiDialog v-model:data="applicationDetail" :appId="applicationDetail?.id"></AiDialog>
     </div>
   </div>
 </template>

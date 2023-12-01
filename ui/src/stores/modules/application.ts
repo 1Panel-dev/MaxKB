@@ -59,6 +59,9 @@ const useApplicationStore = defineStore({
             reject(error)
           })
       })
+    },
+    async refreshAccessToken(token: string) {
+      this.asyncAppAuthentication(token)
     }
   }
 })

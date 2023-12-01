@@ -155,7 +155,6 @@
         </div>
       </el-col>
     </el-row>
-    {{ datasetLoading }}
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
       @addData="addDataset"
@@ -254,6 +253,11 @@ function getDetail() {
   application.asyncGetApplicationDetail(id, loading).then((res: any) => {
     applicationForm.value = res.data
     applicationForm.value.model_id = res.data.model
+    if (res.data?.example.length === 2) {
+      exampleList.value = res.data?.example
+    } else if (res.data?.example.length === 1) {
+      exampleList.value = [res.data?.example[0], '']
+    }
   })
 }
 
