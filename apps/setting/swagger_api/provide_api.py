@@ -35,6 +35,30 @@ class ModelQueryApi(ApiMixin):
                 ]
 
 
+class ModelEditApi(ApiMixin):
+    @staticmethod
+    def get_request_body_api():
+        return openapi.Schema(type=openapi.TYPE_OBJECT,
+                              title="调用函数所需要的参数",
+                              description="调用函数所需要的参数",
+                              required=['provide', 'model_info'],
+                              properties={
+                                  'name': openapi.Schema(type=openapi.TYPE_STRING,
+                                                         title="模型名称",
+                                                         description="模型名称"),
+                                  'model_type': openapi.Schema(type=openapi.TYPE_STRING,
+                                                               title="供应商",
+                                                               description="供应商"),
+                                  'model_name': openapi.Schema(type=openapi.TYPE_STRING,
+                                                               title="供应商",
+                                                               description="供应商"),
+                                  'credential': openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                               title="模型证书信息",
+                                                               description="模型证书信息")
+                              }
+                              )
+
+
 class ModelCreateApi(ApiMixin):
 
     @staticmethod

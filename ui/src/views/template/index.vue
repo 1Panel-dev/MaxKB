@@ -43,16 +43,14 @@
 
         <el-row :gutter="15" v-for="row in model_split_list">
           <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mt-8" v-for="model in row">
-            <ModelVue :model="model" :provider_list="provider_list"> </ModelVue>
+            <ModelVue @change="list_model" :model="model" :provider_list="provider_list">
+            </ModelVue>
           </el-col>
         </el-row>
       </div>
     </div>
-    <CreateModel
-      ref="createModelRef"
-      @submit="list_model"
-      @change="openCreateModel()"
-    ></CreateModel>
+    <CreateModel ref="createModelRef" @submit="list_model"></CreateModel>
+
     <SelectProvider ref="selectProviderRef" @change="openCreateModel($event)"></SelectProvider>
   </LayoutContainer>
 </template>
@@ -61,6 +59,7 @@
 import { onMounted, ref, computed, watch } from 'vue'
 import ModelApi from '@/api/model'
 import type { Provider, Model } from '@/api/type/model'
+
 import AppIcon from '@/components/icons/AppIcon.vue'
 import ModelVue from '@/views/template/component/Model.vue'
 import { splitArray } from '@/utils/common'

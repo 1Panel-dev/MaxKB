@@ -17,7 +17,7 @@ from common.response import result
 from common.util.common import query_params_to_single_dict
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from setting.serializers.provider_serializers import ProviderSerializer, ModelSerializer
-from setting.swagger_api.provide_api import ProvideApi, ModelCreateApi, ModelQueryApi
+from setting.swagger_api.provide_api import ProvideApi, ModelCreateApi, ModelQueryApi, ModelEditApi
 
 
 class Model(APIView):
@@ -46,9 +46,43 @@ class Model(APIView):
                 data={**query_params_to_single_dict(request.query_params), 'user_id': request.user.id}).list(
                 with_valid=True))
 
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="修改模型",
+                             operation_id="修改模型",
+                             request_body=ModelEditApi.get_request_body_api()
+            , tags=["模型"])
+        @has_permissions(PermissionConstants.MODEL_CREATE)
+        def put(self, request: Request, model_id: str):
+            return result.success(
+                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).edit(request.data,
+                                                                                                str(request.user.id)))
+
+        @action(methods=['DELETE'], detail=False)
+        @swagger_auto_schema(operation_summary="删除模型",
+                             operation_id="删除模型",
+                             responses=result.get_default_response()
+            , tags=["模型"])
+        @has_permissions(PermissionConstants.MODEL_DELETE)
+        def delete(self, request: Request, model_id: str):
+            return result.success(
+                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).delete())
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="查询模型详细信息",
+                             operation_id="查询模型详细信息",
+                             tags=["模型"])
+        @has_permissions(PermissionConstants.MODEL_READ)
+        def get(self, request: Request, model_id: str):
+            return result.success(
+                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).one(with_valid=True))
+
 
 class Provide(APIView):
     authentication_classes = [TokenAuth]
+
     class Exec(APIView):
         authentication_classes = [TokenAuth]
 

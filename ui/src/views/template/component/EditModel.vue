@@ -10,13 +10,8 @@
     <template #header="{ close, titleId, titleClass }">
       <el-breadcrumb separator=">">
         <el-breadcrumb-item
-          ><span @click="toSelectProvider" class="select-provider"
-            >选择供应商</span
-          ></el-breadcrumb-item
-        >
-        <el-breadcrumb-item
           ><span class="active-breadcrumb">{{
-            `添加 ${providerValue?.name} 模型`
+            `修改 ${providerValue?.name} 模型`
           }}</span></el-breadcrumb-item
         >
       </el-breadcrumb>
@@ -71,14 +66,14 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="close">取消</el-button>
-        <el-button type="primary" @click="submit" :loading="loading"> 添加 </el-button>
+        <el-button type="primary" @click="submit" :loading="loading"> 修改 </el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { Provider, BaseModel } from '@/api/type/model'
+import type { Provider, BaseModel, Model } from '@/api/type/model'
 import type { Dict, KeyValue } from '@/api/type/common'
 import ModelApi from '@/api/model'
 import type { FormField } from '@/components/dynamics-form/type'
@@ -92,8 +87,8 @@ const loading = ref<boolean>(false)
 const model_type_loading = ref<boolean>(false)
 const base_model_loading = ref<boolean>(false)
 const model_type_list = ref<Array<KeyValue<string, string>>>([])
-
-const base_model_list = ref<Array<BaseModel>>()
+const modelValue = ref<Model>()
+const base_model_list = ref<Array<BaseModel>>([])
 const model_form_field = ref<Array<FormField>>([])
 const dialogVisible = ref<boolean>(false)
 
@@ -115,12 +110,7 @@ const credential_form_data = ref<Dict<any>>({})
 
 const form_data = computed({
   get: () => {
-    return {
-      ...credential_form_data.value,
-      name: base_form_data.value.name,
-      model_type: base_form_data.value.model_type,
-      model_name: base_form_data.value.model_name
-    }
+    return { ...credential_form_data.value, ...base_form_data.value }
   },
   set: (event: any) => {
     credential_form_data.value = event
@@ -135,57 +125,70 @@ const getModelForm = (model_name: string) => {
       model_name
     ).then((ok) => {
       model_form_field.value = ok.data
-      // 渲染动态表单
-      dynamicsFormRef.value?.render(model_form_field.value, undefined)
+      if (modelValue.value) {
+        console.log(modelValue.value.credential)
+        // 渲染动态表单
+        dynamicsFormRef.value?.render(model_form_field.value, modelValue.value.credential)
+      }
     })
   }
 }
-
-const open = (provider: Provider) => {
-  ModelApi.listModelType(provider.provider, model_type_loading).then((ok) => {
-    model_type_list.value = ok.data
-  })
-  providerValue.value = provider
-  dialogVisible.value = true
-}
-
 const list_base_model = (model_type: any) => {
-  form_data.value.model_name = ''
   if (providerValue.value) {
     ModelApi.listBaseModel(providerValue.value.provider, model_type, base_model_loading).then(
       (ok) => {
         base_model_list.value = ok.data
+        if (!base_model_list.value.some((item) => item.name === form_data.value.model_name)) {
+          form_data.value.model_name = ''
+        }
       }
     )
   }
 }
+const open = (provider: Provider, model: Model) => {
+  modelValue.value = model
+  ModelApi.listModelType(model.provider, model_type_loading).then((ok) => {
+    model_type_list.value = ok.data
+    list_base_model(model.model_type)
+  })
+
+  providerValue.value = provider
+
+  base_form_data.value = {
+    name: model.name,
+    model_type: model.model_type,
+    model_name: model.model_name
+  }
+  form_data.value = model.credential
+  getModelForm(model.model_name)
+  dialogVisible.value = true
+}
+
 const close = () => {
   base_form_data.value = { name: '', model_type: '', model_name: '' }
   credential_form_data.value = {}
   dialogVisible.value = false
 }
+
 const submit = () => {
   dynamicsFormRef.value?.validate().then(() => {
-    if (providerValue.value) {
-      ModelApi.createModel(
+    if (modelValue.value) {
+      ModelApi.updateModel(
+        modelValue.value.id,
         {
           ...base_form_data.value,
-          credential: credential_form_data.value,
-          provider: providerValue.value.provider
+          credential: credential_form_data.value
         },
         loading
       ).then((ok) => {
+        MsgSuccess('修改模型成功')
         close()
-        MsgSuccess('创建模型成功')
         emit('submit')
       })
     }
   })
 }
-const toSelectProvider = () => {
-  close()
-  emit('change')
-}
+
 defineExpose({ open, close })
 </script>
 <style lang="scss" scoped>

@@ -43,7 +43,7 @@ interface Model {
   /**
    * 主键id
    */
-  id: String
+  id: string
   /**
    * 模型名
    */
@@ -88,6 +88,25 @@ interface CreateModelRequest {
   provider: string
 }
 
+interface EditModelRequest {
+  /**
+   * 模型名
+   */
+  name: string
+  /**
+   * 模型类型
+   */
+  model_type: string
+  /**
+   * 基础模型
+   */
+  model_name: string
+  /**
+   * 认证信息
+   */
+  credential: any
+}
+
 interface BaseModel {
   /**
    * 基础模型名称
@@ -102,4 +121,12 @@ interface BaseModel {
    */
   model_type: string
 }
-export type { modelRequest, Provider, ListModelRequest, Model, BaseModel, CreateModelRequest }
+export type {
+  modelRequest,
+  Provider,
+  ListModelRequest,
+  Model,
+  BaseModel,
+  CreateModelRequest,
+  EditModelRequest
+}

@@ -62,10 +62,10 @@ class ApplicationSerializerModel(serializers.ModelSerializer):
 
 class ApplicationSerializer(serializers.Serializer):
     name = serializers.CharField(required=True)
-    desc = serializers.CharField(required=True)
+    desc = serializers.CharField(required=False)
     model_id = serializers.CharField(required=True)
     multiple_rounds_dialogue = serializers.BooleanField(required=True)
-    prologue = serializers.CharField(required=True)
+    prologue = serializers.CharField(required=False)
     example = serializers.ListSerializer(required=False, child=serializers.CharField(required=True))
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
 

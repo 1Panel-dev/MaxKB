@@ -21,8 +21,8 @@ from users.models import User
 class Application(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     name = models.CharField(max_length=128, verbose_name="应用名称")
-    desc = models.CharField(max_length=128, verbose_name="引用描述")
-    prologue = models.CharField(max_length=1024, verbose_name="开场白")
+    desc = models.CharField(max_length=128, verbose_name="引用描述", default="")
+    prologue = models.CharField(max_length=1024, verbose_name="开场白", default="")
     example = ArrayField(verbose_name="示例列表", base_field=models.CharField(max_length=256, blank=True))
     dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
     status = models.BooleanField(default=True, verbose_name="是否发布")

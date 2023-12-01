@@ -104,9 +104,13 @@ const change = (field: FormField, value: any) => {
   formValue.value[field.field] = value
 }
 
-watch(formValue.value, () => {
-  emit('update:modelValue', formValue.value)
-})
+watch(
+  formValue,
+  () => {
+    emit('update:modelValue', formValue.value)
+  },
+  { deep: true }
+)
 
 /**
  * 触发器,用户获取子表单 或者 下拉选项
@@ -150,10 +154,13 @@ const initDefaultData = (formField: FormField) => {
 }
 
 onMounted(() => {
-  render(props.render_data)
+  render(props.render_data, {})
 })
 
-const render = (render_data: string | Array<FormField> | Promise<Result<Array<FormField>>>) => {
+const render = (
+  render_data: string | Array<FormField> | Promise<Result<Array<FormField>>>,
+  data?: Dict<any>
+) => {
   if (typeof render_data == 'string') {
     triggerApi.get(render_data, {}, loading).then((ok) => {
       formFieldList.value = ok.data
@@ -164,6 +171,10 @@ const render = (render_data: string | Array<FormField> | Promise<Result<Array<Fo
     render_data.then((ok) => {
       formFieldList.value = ok.data
     })
+  }
+  if (data) {
+    console.log(data)
+    formValue.value = data
   }
 }
 /**

@@ -8,7 +8,8 @@ import type {
   ListModelRequest,
   Model,
   BaseModel,
-  CreateModelRequest
+  CreateModelRequest,
+  EditModelRequest
 } from '@/api/type/model'
 import type { FormField } from '@/components/dynamics-form/type'
 import type { KeyValue } from './type/common'
@@ -84,11 +85,33 @@ const listBaseModel: (
  * @param loading 加载器
  * @returns
  */
-const createModel: (request: CreateModelRequest, loading?: Ref<boolean>) => Promise<Model> = (
-  request,
+const createModel: (
+  request: CreateModelRequest,
+  loading?: Ref<boolean>
+) => Promise<Result<Model>> = (request, loading) => {
+  return post(`${prefix}`, request, {}, loading)
+}
+
+/**
+ * 修改模型
+ * @param request 請求對象
+ * @param loading 加載器
+ * @returns
+ */
+const updateModel: (
+  model_id: string,
+  request: EditModelRequest,
+  loading?: Ref<boolean>
+) => Promise<Result<Model>> = (model_id, request, loading) => {
+  console.log(request)
+  return put(`${prefix}/${model_id}`, request, {}, loading)
+}
+
+const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  model_id,
   loading
 ) => {
-  return post(`${prefix}`, request, {}, loading)
+  return del(`${prefix}/${model_id}`, {}, loading)
 }
 export default {
   getModel,
@@ -96,5 +119,7 @@ export default {
   getModelCreateForm,
   listModelType,
   listBaseModel,
-  createModel
+  createModel,
+  updateModel,
+  deleteModel
 }

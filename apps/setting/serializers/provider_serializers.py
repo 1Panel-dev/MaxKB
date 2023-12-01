@@ -49,6 +49,49 @@ class ModelSerializer(serializers.Serializer):
 
             return [ModelSerializer.model_to_dict(model) for model in model_query_set.filter(**query_params)]
 
+    class Edit(serializers.Serializer):
+        user_id = serializers.CharField(required=False)
+
+        name = serializers.CharField(required=False)
+
+        model_type = serializers.CharField(required=False)
+
+        model_name = serializers.CharField(required=False)
+
+        credential = serializers.DictField(required=False)
+
+        def is_valid(self, model=None, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            filter_params = {'user_id': self.data.get('user_id')}
+            if 'name' in self.data and self.data.get('name') is not None:
+                filter_params['name'] = self.data.get('name')
+                if QuerySet(Model).exclude(id=model.id).filter(**filter_params).exists():
+                    raise AppApiException(500, f'模型名称【{self.data.get("name")}】已存在')
+
+            ModelSerializer.model_to_dict(model)
+
+            provider = model.provider
+            model_type = self.data.get('model_type')
+            model_name = self.data.get(
+                'model_name')
+            credential = self.data.get('credential')
+
+            model_credential = ModelProvideConstants[provider].value.get_model_credential(model_type,
+                                                                                          model_name)
+            source_model_credential = json.loads(decrypt(model.credential))
+            source_encryption_model_credential = model_credential.encryption_dict(source_model_credential)
+            if credential is not None:
+                for k in source_encryption_model_credential.keys():
+                    if credential[k] == source_encryption_model_credential[k]:
+                        credential[k] = source_model_credential[k]
+                        # 校验模型认证数据
+                model_credential.is_valid(
+                    model_type,
+                    model_name,
+                    credential,
+                    raise_exception=True)
+            return credential
+
     class Create(serializers.Serializer):
         user_id = serializers.CharField(required=True)
 
@@ -89,7 +132,7 @@ class ModelSerializer(serializers.Serializer):
                           credential=encrypt(model_credential_str),
                           provider=provider, model_type=model_type, model_name=model_name)
             model.save()
-            return ModelSerializer.Operate(data={'id': model.id}).one(user_id, with_valid=True)
+            return ModelSerializer.Operate(data={'id': model.id, 'user_id': user_id}).one(with_valid=True)
 
     @staticmethod
     def model_to_dict(model: Model):
@@ -103,11 +146,45 @@ class ModelSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True)
 
-        def one(self, user_id, with_valid=False):
+        user_id = serializers.UUIDField(required=True)
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            model = QuerySet(Model).filter(id=self.data.get("id"), user_id=self.data.get("user_id")).first()
+            if model is None:
+                raise AppApiException(500, '模型不存在')
+
+        def one(self, with_valid=False):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            model = QuerySet(Model).get(id=self.data.get('id'), user_id=user_id)
+            model = QuerySet(Model).get(id=self.data.get('id'), user_id=self.data.get('user_id'))
             return ModelSerializer.model_to_dict(model)
+
+        def delete(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            QuerySet(Model).filter(id=self.data.get('id')).delete()
+            return True
+
+        def edit(self, instance: Dict, user_id: str, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            model = QuerySet(Model).filter(id=self.data.get('id')).first()
+
+            if model is None:
+                raise AppApiException(500, '不存在的id')
+            else:
+                credential = ModelSerializer.Edit(data={**instance, 'user_id': user_id}).is_valid(model=model)
+                update_keys = ['credential', 'name', 'model_type', 'model_name']
+                for update_key in update_keys:
+                    if update_key in instance and instance.get(update_key) is not None:
+                        if update_key == 'credential':
+                            model_credential_str = json.dumps(credential)
+                            model.__setattr__(update_key, encrypt(model_credential_str))
+                        else:
+                            model.__setattr__(update_key, instance.get(update_key))
+            model.save()
+            return self.one(with_valid=False)
 
 
 class ProviderSerializer(serializers.Serializer):
