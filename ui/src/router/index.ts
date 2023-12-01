@@ -7,13 +7,12 @@ import {
   type RouteRecordRaw,
   type RouteRecordName
 } from 'vue-router'
-import useStore from '@/stores';
+import useStore from '@/stores'
 import { routes } from '@/router/routes'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes
 })
-
 
 // 路由前置拦截器
 router.beforeEach(
@@ -22,8 +21,8 @@ router.beforeEach(
       next()
       return
     }
-    const { user } = useStore();
-    const notAuthRouteNameList = ['register', 'login', 'forgot_password', 'reset_password']
+    const { user } = useStore()
+    const notAuthRouteNameList = ['register', 'login', 'forgot_password', 'reset_password', 'Chat']
 
     if (!notAuthRouteNameList.includes(to.name ? to.name.toString() : '')) {
       const token = user.getToken()

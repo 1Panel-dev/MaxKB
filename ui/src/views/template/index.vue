@@ -3,33 +3,31 @@
     <div class="template-manage flex main-calc-height">
       <div class="template-manage__left p-8 border-r">
         <h4 class="p-16">供应商</h4>
+
         <common-list
-          v-model="active_provider"
           :data="provider_list"
           class="mt-8"
           v-loading="loading"
+          @click="clickListHandle"
         >
-          <template #prefix>
-            <div class="flex">
+          <template #default="{ row, index }">
+            <div class="flex" v-if="index === 0">
               <AppIcon
-                style="height: 24px; width: 24px"
                 class="mr-8"
-                :iconName="active_provider ? 'app-all-menu' : 'app-all-menu-active'"
+                style="height: 20px; width: 20px"
+                :iconName="active_provider === row ? 'app-all-menu-active' : 'app-all-menu'"
               ></AppIcon>
               <span>全部模型</span>
             </div>
-          </template>
-          <template #default="{ row }">
-            <div class="flex">
-              <span :innerHTML="row.icon" alt="" style="height: 24px; width: 24px" class="mr-8" />
+            <div class="flex" v-else>
+              <span :innerHTML="row.icon" alt="" style="height: 20px; width: 20px" class="mr-8" />
               <span>{{ row.name }}</span>
             </div>
           </template>
         </common-list>
       </div>
       <div class="template-manage__right p-24" v-loading="list_model_loading">
-        <h3 v-if="active_provider">{{ active_provider.name }}</h3>
-        <h3 v-else>全部模型</h3>
+        <h3>{{ active_provider?.name }}</h3>
         <div class="flex-between mt-8">
           <el-button type="primary" @click="openCreateModel(active_provider)">创建模型</el-button>
           <el-input
@@ -66,6 +64,12 @@ import { splitArray } from '@/utils/common'
 import CreateModel from '@/views/template/component/CreateModel.vue'
 import SelectProvider from '@/views/template/component/SelectProvider.vue'
 
+const allObj = {
+  icon: '',
+  provider: '',
+  name: '全部模型'
+}
+
 const loading = ref<boolean>(false)
 
 const active_provider = ref<Provider>()
@@ -81,8 +85,13 @@ const model_split_list = computed(() => {
 const createModelRef = ref<InstanceType<typeof CreateModel>>()
 const selectProviderRef = ref<InstanceType<typeof SelectProvider>>()
 
+const clickListHandle = (item: Provider) => {
+  active_provider.value = item
+  list_model()
+}
+
 const openCreateModel = (provider?: Provider) => {
-  if (provider) {
+  if (provider && provider.provider) {
     createModelRef.value?.open(provider)
   } else {
     selectProviderRef.value?.open()
@@ -90,19 +99,17 @@ const openCreateModel = (provider?: Provider) => {
 }
 
 const list_model = () => {
-  const params = active_provider.value ? { provider: active_provider.value.provider } : {}
+  const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
   ModelApi.getModel({ ...model_search_form.value, ...params }, list_model_loading).then((ok) => {
     model_list.value = ok.data
   })
 }
 
-watch(active_provider, list_model, {
-  immediate: true
-})
-
 onMounted(() => {
   ModelApi.getProvider(loading).then((ok) => {
-    provider_list.value = [...ok.data]
+    active_provider.value = allObj
+    provider_list.value = [allObj, ...ok.data]
+    list_model()
   })
 })
 </script>

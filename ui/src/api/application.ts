@@ -30,32 +30,6 @@ const getApplication: (param: pageRequest) => Promise<Result<any>> = (param) => 
 }
 
 /**
- * 获得临时回话Id
- * @param 参数 
- * {
-  "model_id": "string",
-  "multiple_rounds_dialogue": true,
-  "dataset_id_list": [
-    "string"
-  ]
-}
- */
-const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data) => {
-  return post(`${prefix}/chat/open`, data)
-}
-/**
- * 对话
- * @param 参数 
- * chat_id: string
- * {
-    "message": "string",
-  }
- */
-const postChatMessage: (chat_id: string, message: string) => Promise<any> = (chat_id, message) => {
-  return postStream(`/api/${prefix}/chat_message/${chat_id}`, { message })
-}
-
-/**
  * 创建应用
  * @param 参数 
  * {
@@ -156,16 +130,85 @@ const getAccessToken: (applicaiton_id: string, loading?: Ref<boolean>) => Promis
   return get(`${prefix}/${applicaiton_id}/access_token`, undefined, loading)
 }
 
+/**
+ * 应用认证
+ * @param 参数 
+ {
+  "access_token": "string"
+}
+ */
+const postAppAuthentication: (access_token: string, loading?: Ref<boolean>) => Promise<any> = (
+  access_token,
+  loading
+) => {
+  return post(`${prefix}/authentication`, { access_token }, undefined, loading)
+}
+
+/**
+ * 对话获取应用相关信息
+ * @param 参数 
+ {
+  "access_token": "string"
+}
+ */
+const getProfile: (loading?: Ref<boolean>) => Promise<any> = (loading) => {
+  return get(`${prefix}/profile`, undefined, loading)
+}
+
+/**
+ * 获得临时回话Id
+ * @param 参数 
+ * {
+  "model_id": "string",
+  "multiple_rounds_dialogue": true,
+  "dataset_id_list": [
+    "string"
+  ]
+}
+ */
+const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data) => {
+  return post(`${prefix}/chat/open`, data)
+}
+
+/**
+ * 正式回话Id
+ * @param 参数 
+ * {
+  "model_id": "string",
+  "multiple_rounds_dialogue": true,
+  "dataset_id_list": [
+    "string"
+  ]
+}
+ */
+const getChatOpen: (applicaiton_id: String) => Promise<Result<any>> = (applicaiton_id) => {
+  return get(`${prefix}/${applicaiton_id}/chat/open`)
+}
+/**
+ * 对话
+ * @param 参数 
+ * chat_id: string
+ * {
+    "message": "string",
+  }
+ */
+const postChatMessage: (chat_id: string, message: string) => Promise<any> = (chat_id, message) => {
+  return postStream(`/api/${prefix}/chat_message/${chat_id}`, { message })
+}
+
 export default {
   getAllAppilcation,
   getApplication,
   postApplication,
   putApplication,
   postChatOpen,
+  getChatOpen,
   postChatMessage,
   delApplication,
   getApplicationDetail,
   getApplicationDataset,
   getAPIKey,
-  getAccessToken
+  getAccessToken,
+  postAppAuthentication,
+  getProfile
 }

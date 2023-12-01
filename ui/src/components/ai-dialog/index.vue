@@ -64,22 +64,24 @@
                   :inner_suffix="false"
                 ></MarkdownRenderer>
               </el-card>
-              <el-button
-                type="primary"
-                v-if="item.is_stop && !item.write_ed"
-                @click="startChat(item)"
-                link
-                class="mt-8"
-                >继续</el-button
-              >
-              <el-button
-                type="primary"
-                v-else-if="!item.write_ed"
-                @click="stopChat(item)"
-                link
-                class="mt-8"
-                >停止回答</el-button
-              >
+              <div class="flex-between mt-8">
+                <div>
+                  <el-button
+                    type="primary"
+                    v-if="item.is_stop && !item.write_ed"
+                    @click="startChat(item)"
+                    link
+                    >继续</el-button
+                  >
+                  <el-button type="primary" v-else-if="!item.write_ed" @click="stopChat(item)" link
+                    >停止回答</el-button
+                  >
+                </div>
+
+                <!-- <div v-if="item.write_ed && props.appId">
+                  <OperationButton :data="item" />
+                </div> -->
+              </div>
             </div>
           </div>
         </template>
@@ -107,6 +109,7 @@
 </template>
 <script setup lang="ts">
 import { ref, nextTick, onUpdated, computed } from 'vue'
+import OperationButton from './OperationButton.vue'
 import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
@@ -114,7 +117,8 @@ const props = defineProps({
   data: {
     type: Object,
     default: () => {}
-  }
+  },
+  appId: String
 })
 
 const scrollDiv = ref()
@@ -125,7 +129,7 @@ const chartOpenId = ref('')
 const chatList = ref<chatType[]>([])
 
 const isDisabledChart = computed(
-  () => !(inputValue.value && props.data?.name && props.data?.model_id)
+  () => !(inputValue.value && (props.appId || (props.data?.name && props.data?.model_id)))
 )
 
 function quickProblemHandel(val: string) {
@@ -160,15 +164,27 @@ function getChartOpenId() {
     dataset_id_list: props.data.dataset_id_list,
     multiple_rounds_dialogue: props.data.multiple_rounds_dialogue
   }
-  applicationApi
-    .postChatOpen(obj)
-    .then((res) => {
-      chartOpenId.value = res.data
-      chatMessage()
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  if (props.appId) {
+    applicationApi
+      .getChatOpen(props.appId)
+      .then((res) => {
+        chartOpenId.value = res.data
+        chatMessage()
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  } else {
+    applicationApi
+      .postChatOpen(obj)
+      .then((res) => {
+        chartOpenId.value = res.data
+        chatMessage()
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  }
 }
 function chatMessage() {
   loading.value = true
@@ -188,10 +204,12 @@ function chatMessage() {
     applicationApi.postChatMessage(chartOpenId.value, problem_text).then(async (response) => {
       inputValue.value = ''
       const row = chatList.value.find((item) => item.id === id)
+
       if (row) {
         ChatManagement.addChatRecord(row, 50, loading)
         ChatManagement.write(id)
         const reader = response.body.getReader()
+        /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
@@ -203,11 +221,14 @@ function chatMessage() {
             const str = decoder.decode(value, { stream: true })
             if (str && str.startsWith('data:')) {
               const content = JSON?.parse(str.replace('data:', ''))?.content
+
               if (content) {
                 ChatManagement.append(id, content)
               }
             }
-          } catch (e) {}
+          } catch (e) {
+            //  console
+          }
         }
       }
     })

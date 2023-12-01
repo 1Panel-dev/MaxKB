@@ -28,7 +28,8 @@ const applicationRouter = {
           path: 'overview',
           name: 'AppOverview',
           meta: {
-            icon: 'Document',
+            icon: 'app-all-menu',
+            iconActive: 'app-all-menu-active',
             title: '概览',
             active: 'overview',
             parentPath: '/application/:id',

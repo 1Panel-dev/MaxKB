@@ -7,8 +7,8 @@
           <div class="code border-t p-16">
             <div class="flex-between">
               <span class="bold">复制以下代码进行嵌入</span>
-              <el-button text>
-                <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+              <el-button text @click="copyClick(source1)">
+                <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
             <div class="mt-8">
@@ -23,8 +23,8 @@
           <div class="code border-t p-16">
             <div class="flex-between">
               <span class="bold">复制以下代码进行嵌入</span>
-              <el-button text>
-                <el-icon style="font-size: 13px"><CopyDocument /></el-icon>
+              <el-button text @click="copyClick(source2)">
+                <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
             <div class="mt-8">
@@ -38,47 +38,44 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { copyClick } from '@/utils/clipboard'
+import useStore from '@/stores'
 
-const props = defineProps({
-  data: {
-    type: Array<any>,
-    default: () => []
-  }
-})
+const { application } = useStore()
 
 const emit = defineEmits(['addData'])
 
-const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
-const source1 = ref(`<iframe 
-src="https://udify.app/chatbot/ASkyzvhN5Z1h6k7g"
+
+const source1 = ref('')
+
+const source2 = ref('')
+
+watch(dialogVisible, (bool) => {
+  if (!bool) {
+    source1.value = ''
+    source2.value = ''
+  }
+})
+
+const open = (val: string) => {
+  source1.value = `<iframe 
+src="${application.location + val}"
 style="width: 100%; height: 100%;" 
 frameborder="0" 
 allow="microphone">
 </iframe>
-`)
-
-const source2 = ref(`<script> window.difyChatbotConfig = { 
-  token: '85FfbbzTpXzzr40X'
+`
+  source2.value = `<script> window.difyChatbotConfig = { 
+  token: "${val}"
  }
  <\/script>
 <script src="https://udify.app/embed.min.js"
- id="85FfbbzTpXzzr40X"
+ id="${val}"
  defer>
 <\/script>
-`)
-
-watch(dialogVisible, (bool) => {
-  if (!bool) {
-    loading.value = false
-  }
-})
-
-const open = (checked: any) => {
+`
   dialogVisible.value = true
-}
-const submitHandle = () => {
-  dialogVisible.value = false
 }
 
 defineExpose({ open })

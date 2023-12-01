@@ -10,6 +10,7 @@
           v-for="(menu, index) in subMenuList"
           :key="index"
           :menu="menu"
+          :activeMenu="activeMenu"
         >
         </sidebar-item>
       </el-menu>
