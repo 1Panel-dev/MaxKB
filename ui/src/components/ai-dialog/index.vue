@@ -1,7 +1,7 @@
 <template>
-  <div class="ai-dialog p-24">
+  <div class="ai-dialog">
     <el-scrollbar ref="scrollDiv">
-      <div ref="dialogScrollbar" class="ai-dialog__content">
+      <div ref="dialogScrollbar" class="ai-dialog__content p-24">
         <div class="item-content mb-16">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
@@ -56,7 +56,9 @@
             </div>
             <div class="content">
               <div class="flex" v-if="!item.answer_text">
-                <el-card shadow="always" class="dialog-card"> 回答中... </el-card>
+                <el-card shadow="always" class="dialog-card">
+                  回答中 <span class="dotting"></span>
+                </el-card>
               </div>
               <el-card v-else shadow="always" class="dialog-card">
                 <MarkdownRenderer
@@ -79,7 +81,12 @@
                 </div>
 
                 <div v-if="item.write_ed && props.appId">
-                  <OperationButton :data="item" :applicationId="appId" :chartId="chartOpenId" />
+                  <OperationButton
+                    :data="item"
+                    :applicationId="appId"
+                    :chartId="chartOpenId"
+                    @regeneration="regenerationChart(item)"
+                  />
                 </div>
               </div>
             </div>
@@ -132,6 +139,7 @@ const scrollDiv = ref()
 const dialogScrollbar = ref()
 const loading = ref(false)
 const inputValue = ref('')
+const problem_text = ref('') //备份问题
 const chartOpenId = ref('')
 const chatList = ref<chatType[]>([])
 
@@ -198,6 +206,7 @@ function getChartOpenId() {
       })
   }
 }
+
 function chatMessage() {
   loading.value = true
   if (!chartOpenId.value) {
@@ -250,6 +259,11 @@ function chatMessage() {
   }
 }
 
+function regenerationChart(item: chatType) {
+  inputValue.value = item.problem_text
+  chatMessage()
+}
+
 // 滚动到底部
 function handleScrollBottom() {
   nextTick(() => {
@@ -269,20 +283,19 @@ onUpdated(() => {
   flex-direction: column;
   box-sizing: border-box;
   position: relative;
-  padding-right: 20px;
-  padding-top: 0;
   color: var(--app-text-color);
   &__content {
-    width: 99%;
+    padding-top: 0;
     padding-bottom: 96px;
-   
+    box-sizing: border-box;
+
     .avatar {
       float: left;
     }
     .content {
       padding-left: var(--padding-left);
       :deep(ol) {
-        margin-left: 16px!important;
+        margin-left: 16px !important;
       }
     }
     .text {
@@ -317,7 +330,6 @@ onUpdated(() => {
     width: 100%;
     box-sizing: border-box;
     z-index: 10;
-    padding-top: 16px;
     &:before {
       background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
       content: '';

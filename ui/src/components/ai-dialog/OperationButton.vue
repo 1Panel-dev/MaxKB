@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-tooltip effect="dark" content="重新生成" placement="top">
-      <el-button text @click.stop>
+      <el-button text @click="regeneration">
         <AppIcon iconName="VideoPlay"></AppIcon>
       </el-button>
     </el-tooltip>
@@ -74,10 +74,14 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:data'])
+const emit = defineEmits(['update:data', 'regeneration'])
 
 const buttonData = ref(props.data)
 const loading = ref(false)
+
+function regeneration() { 
+  emit('regeneration')
+}
 
 function voteHandle(val: string) {
   applicationApi

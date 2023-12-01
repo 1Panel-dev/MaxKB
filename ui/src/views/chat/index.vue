@@ -1,13 +1,14 @@
 <template>
-  <div class="chat">
+  <div class="chat" v-loading="loading">
     <div class="chat__header">
       <div class="chat-width">
         <h2 class="ml-24">{{ applicationDetail?.name }}</h2>
       </div>
     </div>
-    <div class="chat__main chat-width" v-loading="loading">
+    <div class="chat__main chat-width">
       <AiDialog v-model:data="applicationDetail" :appId="applicationDetail?.id"></AiDialog>
     </div>
+    <div class="chat__footer"></div>
   </div>
 </template>
 <script setup lang="ts">
@@ -60,8 +61,26 @@ onMounted(() => {
     padding-top: calc(var(--app-header-height) + 24px);
     height: calc(100vh - var(--app-header-height) - 24px);
   }
+  &__footer {
+    background: #f3f7f9;
+    height: 80px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    &:before {
+      background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
+      content: '';
+      position: absolute;
+      width: 100%;
+      top: -16px;
+      left: 0;
+      height: 16px;
+    }
+  }
   .chat-width {
-    width: 840px;
+    width: 860px;
     margin: 0 auto;
   }
 }
