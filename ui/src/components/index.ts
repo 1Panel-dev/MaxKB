@@ -14,6 +14,8 @@ import TagEllipsis from './tag-ellipsis/index.vue'
 import CommonList from './common-list/index.vue'
 import MarkdownRenderer from './markdown-renderer/index.vue'
 import dynamicsForm from './dynamics-form'
+import CardCheckbox from './card-checkbox/index.vue'
+
 export default {
   install(app: App) {
     app.component(AppIcon.name, AppIcon)
@@ -31,5 +33,6 @@ export default {
     app.component(CommonList.name, CommonList)
     app.use(dynamicsForm)
     app.component(MarkdownRenderer.name, MarkdownRenderer)
+    app.component(CardCheckbox.name, CardCheckbox)
   }
 }

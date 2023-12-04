@@ -27,7 +27,6 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import CardCheckbox from '@/components/card-checkbox/index.vue'
 const props = defineProps({
   data: {
     type: Array<any>,

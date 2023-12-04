@@ -25,52 +25,24 @@
         :autosize="{ minRows: 3 }"
       />
     </el-form-item>
-    <el-form-item v-loading="loading">
-      <template #label
-        ><h4 class="title-decoration-1 mb-16" style="color: var(--app-text-color)">
-          关联应用
-        </h4></template
-      >
-      <el-row justify="space-between" style="width: 100%">
-        <el-col :span="11" v-for="(item, index) in application_list" :key="index" class="mb-16">
-          <CardCheckbox value-field="id" :data="item" v-model="form.application_id_list">
-            <template #icon>
-              <AppAvatar
-                v-if="item.name"
-                :name="item.name"
-                pinyinColor
-                class="mr-12"
-                shape="square"
-                :size="32"
-              />
-            </template>
-            {{ item.name }}
-          </CardCheckbox>
-        </el-col>
-      </el-row>
-    </el-form-item>
   </el-form>
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
 import useStore from '@/stores'
-import DatasetApi from '@/api/dataset'
-import CardCheckbox from '@/components/card-checkbox/index.vue'
-import type { ApplicationFormType } from '@/api/type/application'
+
 const props = defineProps({
   data: {
     type: Object,
     default: () => {}
   }
 })
-const loading = ref<boolean>(false)
 const { dataset } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
-const application_list = ref<Array<ApplicationFormType>>([])
 const form = ref<any>({
   name: '',
   desc: '',
-  application_id_list: []
+
 })
 
 const rules = reactive({
@@ -85,10 +57,6 @@ watch(
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
       form.value.desc = value.desc
-      form.value.application_id_list = value.application_id_list
-      DatasetApi.listUsableApplication(value.id, loading).then((ok) => {
-        application_list.value = ok.data
-      })
     }
   },
   {
