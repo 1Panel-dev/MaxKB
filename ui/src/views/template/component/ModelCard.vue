@@ -1,43 +1,35 @@
 <template>
-  <card-box
-    style="
-      --app-card-box-description-height: 100%;
-      --card-min-height: 153px;
-      --card-min-width: 20px;
-      width: 100%;
-    "
-    :title="model.name"
-  >
+  <card-box :title="model.name" shadow="hover" class="model-card">
     <template #icon>
-      <AppAvatar
-        class="mr-12"
-        shape="square"
-        style="--el-avatar-bg-color: rgba(255, 255, 255, 0)"
-        :size="32"
-      >
-        <span style="height: 24px; width: 24px" :innerHTML="icon"></span
-      ></AppAvatar>
+      <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
     </template>
-    <template #description>
-      <el-descriptions :column="1" label-align="center">
-        <el-descriptions-item label="模型类型" label-class-name="ellipsis-1">
-          <span class="ellipsis-1"> {{ model.model_type }}</span></el-descriptions-item
-        >
-        <el-descriptions-item label="模型名称" label-class-name="ellipsis-1">
-          <span class="ellipsis-1">{{ model.model_name }}</span></el-descriptions-item
-        >
-      </el-descriptions>
-    </template>
+    <div class="border-t mt-16">
+      <ul>
+        <li class="flex mt-16">
+          <el-text type="info">模型类型</el-text>
+          <span class="ellipsis-1 ml-16"> {{ model.model_type }}</span>
+        </li>
+        <li class="flex mt-12">
+          <el-text type="info">模型名称</el-text>
+          <span class="ellipsis-1 ml-16"> {{ model.model_name }}</span>
+        </li>
+      </ul>
+    </div>
+
     <template #mouseEnter>
-      <el-tooltip effect="dark" content="修改" placement="top">
-        <el-button text @click.stop="openEditModel" class="edit-button">
-          <el-icon><Edit /></el-icon> </el-button
-      ></el-tooltip>
-      <el-tooltip effect="dark" content="删除" placement="top">
-        <el-button text @click.stop="deleteModel" class="delete-button">
-          <el-icon><Delete /></el-icon>
-        </el-button>
-      </el-tooltip>
+      <div class="operation-button">
+        <el-tooltip effect="dark" content="修改" placement="top">
+          <el-button text @click.stop="openEditModel">
+            <el-icon><EditPen /></el-icon>
+          </el-button>
+        </el-tooltip>
+
+        <el-tooltip effect="dark" content="删除" placement="top">
+          <el-button text @click.stop="deleteModel">
+            <el-icon><Delete /></el-icon>
+          </el-button>
+        </el-tooltip>
+      </div>
     </template>
     <EditModel ref="eidtModelRef" @submit="emit('change')"></EditModel>
   </card-box>
@@ -77,20 +69,16 @@ const icon = computed(() => {
 })
 </script>
 <style lang="scss" scoped>
-:deep(.el-descriptions__cell) {
-  display: flex;
-  flex-wrap: nowrap;
-}
-.delete-button {
-  position: absolute;
-  right: 12px;
-  top: 18px;
-  height: auto;
-}
-.edit-button {
-  position: absolute;
-  right: 30px;
-  top: 18px;
-  height: auto;
+.model-card {
+  min-height: 153px;
+  .operation-button {
+    position: absolute;
+    right: 12px;
+    top: 18px;
+    height: auto;
+    .el-button + .el-button {
+      margin-left: 4px;
+    }
+  }
 }
 </style>

@@ -11,7 +11,7 @@
       <el-breadcrumb separator=">">
         <el-breadcrumb-item
           ><span class="active-breadcrumb">{{
-            `修改 ${providerValue?.name} 模型`
+            `编辑 ${providerValue?.name} 模型`
           }}</span></el-breadcrumb-item
         >
       </el-breadcrumb>
@@ -22,10 +22,17 @@
       :render_data="model_form_field"
       :model="form_data"
       ref="dynamicsFormRef"
+      label-position="top"
+      require-asterisk-position="right"
     >
       <template #default>
         <el-form-item label="模型名称" prop="name" :rules="base_form_data_rule.name">
-          <el-input v-model="base_form_data.name" />
+          <el-input
+            v-model="base_form_data.name"
+            maxlength="20"
+            show-word-limit
+            placeholder="请给基础模型设置一个名称"
+          />
         </el-form-item>
         <el-form-item label="模型类型" prop="model_type" :rules="base_form_data_rule.model_type">
           <el-select

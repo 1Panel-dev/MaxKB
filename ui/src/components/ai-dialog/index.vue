@@ -11,7 +11,7 @@
 
           <div class="content">
             <el-card shadow="always" class="dialog-card">
-              <h4>您好，我是 {{ data?.name }}</h4>
+              <h4>您好，我是 {{ data?.name || '应用名称'}}</h4>
               <div class="mt-4" v-if="data?.prologue">
                 <el-text type="info">{{ data?.prologue }}</el-text>
               </div>

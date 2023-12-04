@@ -29,6 +29,7 @@
 }
 
 .el-dialog {
+  --el-dialog-title-font-size: 16px;
   .dialog-sub-title {
     color: var(--el-text-color-regular);
     margin: 5px 0;

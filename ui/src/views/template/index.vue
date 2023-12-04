@@ -22,7 +22,7 @@
       </div>
       <div class="template-manage__right p-24" v-loading="list_model_loading">
         <h4>{{ active_provider?.name }}</h4>
-        <div class="flex-between mt-16 mb-8">
+        <div class="flex-between mt-16 mb-16">
           <el-button type="primary" @click="openCreateModel(active_provider)">创建模型</el-button>
           <el-input
             v-model="model_search_form.name"
@@ -32,25 +32,35 @@
             class="w-240"
           />
         </div>
-
-        <el-row :gutter="15" v-for="(row, index) in model_split_list" :key="index">
-          <el-col
-            :xs="24"
-            :sm="24"
-            :md="12"
-            :lg="12"
-            :xl="12"
-            class="mt-8"
-            v-for="(model, i) in row"
-            :key="i"
-          >
-            <ModelCard @change="list_model" :model="model" :provider_list="provider_list">
-            </ModelCard>
-          </el-col>
-        </el-row>
+        <div class="model-list-height">
+          <el-scrollbar>
+            <el-row v-if="model_split_list.length > 0" :gutter="15">
+              <template v-for="(row, index) in model_split_list" :key="index">
+                <el-col
+                  :xs="24"
+                  :sm="24"
+                  :md="12"
+                  :lg="12"
+                  :xl="12"
+                  class="mb-16"
+                  v-for="(model, i) in row"
+                  :key="i"
+                >
+                  <ModelCard @change="list_model" :model="model" :provider_list="provider_list">
+                  </ModelCard>
+                </el-col>
+              </template>
+            </el-row>
+            <el-empty description="暂无数据" v-else />
+          </el-scrollbar>
+        </div>
       </div>
     </div>
-    <CreateModel ref="createModelRef" @submit="list_model"></CreateModel>
+    <CreateModel
+      ref="createModelRef"
+      @submit="list_model"
+      @change="openCreateModel($event)"
+    ></CreateModel>
 
     <SelectProvider ref="selectProviderRef" @change="openCreateModel($event)"></SelectProvider>
   </LayoutContainer>
@@ -124,9 +134,8 @@ onMounted(() => {
     width: var(--setting-left-width);
     min-width: var(--setting-left-width);
   }
-  &__right {
-    width: 100%;
-    overflow: scroll;
+  .model-list-height {
+    height: calc(var(--create-dataset-height) - 70px);
   }
 }
 </style>
