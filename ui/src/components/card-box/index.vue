@@ -1,5 +1,10 @@
 <template>
-  <el-card shadow="always" class="card-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
+  <el-card
+    shadow="always"
+    class="card-box"
+    @mouseenter="cardEnter()"
+    @mouseleave="cardLeave()"
+  >
     <div class="card-header">
       <slot name="header">
         <div class="title flex align-center">
@@ -44,7 +49,7 @@ const props = withDefaults(
      */
     showIcon?: boolean
   }>(),
-  { title: '标题', description: '', showIcon: true }
+  { title: '标题', description: '', showIcon: true, border: true }
 )
 
 const show = ref(false)
@@ -61,7 +66,6 @@ function cardLeave() {
   position: relative;
   min-height: var(--card-min-height);
   min-width: var(--card-min-width);
-  border: 1px solid #ffffff;
   border-radius: 8px;
   .description {
     display: -webkit-box;

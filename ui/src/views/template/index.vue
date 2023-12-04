@@ -2,14 +2,8 @@
   <LayoutContainer header="模版管理">
     <div class="template-manage flex main-calc-height">
       <div class="template-manage__left p-8 border-r">
-        <h4 class="p-16">供应商</h4>
-
-        <common-list
-          :data="provider_list"
-          class="mt-8"
-          v-loading="loading"
-          @click="clickListHandle"
-        >
+        <h4 class="p-16" style="padding-bottom: 8px">供应商</h4>
+        <common-list :data="provider_list" v-loading="loading" @click="clickListHandle">
           <template #default="{ row, index }">
             <div class="flex" v-if="index === 0">
               <AppIcon
@@ -27,8 +21,8 @@
         </common-list>
       </div>
       <div class="template-manage__right p-24" v-loading="list_model_loading">
-        <h3>{{ active_provider?.name }}</h3>
-        <div class="flex-between mt-8">
+        <h4>{{ active_provider?.name }}</h4>
+        <div class="flex-between mt-16 mb-8">
           <el-button type="primary" @click="openCreateModel(active_provider)">创建模型</el-button>
           <el-input
             v-model="model_search_form.name"
@@ -39,10 +33,19 @@
           />
         </div>
 
-        <el-row :gutter="15" v-for="row in model_split_list">
-          <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mt-8" v-for="model in row">
-            <ModelVue @change="list_model" :model="model" :provider_list="provider_list">
-            </ModelVue>
+        <el-row :gutter="15" v-for="(row, index) in model_split_list" :key="index">
+          <el-col
+            :xs="24"
+            :sm="24"
+            :md="12"
+            :lg="12"
+            :xl="12"
+            class="mt-8"
+            v-for="(model, i) in row"
+            :key="i"
+          >
+            <ModelCard @change="list_model" :model="model" :provider_list="provider_list">
+            </ModelCard>
           </el-col>
         </el-row>
       </div>
@@ -59,7 +62,7 @@ import ModelApi from '@/api/model'
 import type { Provider, Model } from '@/api/type/model'
 
 import AppIcon from '@/components/icons/AppIcon.vue'
-import ModelVue from '@/views/template/component/Model.vue'
+import ModelCard from '@/views/template/component/ModelCard.vue'
 import { splitArray } from '@/utils/common'
 import CreateModel from '@/views/template/component/CreateModel.vue'
 import SelectProvider from '@/views/template/component/SelectProvider.vue'
