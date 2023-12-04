@@ -1,10 +1,5 @@
 <template>
-  <el-card
-    shadow="always"
-    class="card-box"
-    @mouseenter="cardEnter()"
-    @mouseleave="cardLeave()"
-  >
+  <el-card shadow="always" class="card-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
     <div class="card-header">
       <slot name="header">
         <div class="title flex align-center">
@@ -17,7 +12,7 @@
         </div>
       </slot>
     </div>
-    <div class="description mt-12">
+    <div class="description mt-12" v-if="$slots.description || description">
       <slot name="description">
         {{ description }}
       </slot>

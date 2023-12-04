@@ -18,7 +18,7 @@
       placement="top"
       v-if="buttonData?.vote_status === '-1'"
     >
-      <el-button text @click="voteHandle('1')" :disabled="loading">
+      <el-button text @click="voteHandle('0')" :disabled="loading">
         <AppIcon iconName="app-like"></AppIcon>
       </el-button>
     </el-tooltip>
@@ -26,7 +26,7 @@
       effect="dark"
       content="取消赞同"
       placement="top"
-      v-if="buttonData?.vote_status === '1'"
+      v-if="buttonData?.vote_status === '0'"
     >
       <el-button text @click="voteHandle('-1')" :disabled="loading">
         <AppIcon iconName="app-like-color"></AppIcon>
@@ -39,7 +39,7 @@
       placement="top"
       v-if="buttonData?.vote_status === '-1'"
     >
-      <el-button text @click="voteHandle('0')" :disabled="loading">
+      <el-button text @click="voteHandle('1')" :disabled="loading">
         <AppIcon iconName="app-oppose"></AppIcon>
       </el-button>
     </el-tooltip>
@@ -47,7 +47,7 @@
       effect="dark"
       content="取消反对"
       placement="top"
-      v-if="buttonData?.vote_status === '0'"
+      v-if="buttonData?.vote_status === '1'"
     >
       <el-button text @click="voteHandle('-1')" :disabled="loading">
         <AppIcon iconName="app-oppose-color"></AppIcon>
