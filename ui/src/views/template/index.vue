@@ -60,13 +60,13 @@
         </div>
       </div>
     </div>
-    <CreateModel
+    <CreateModelDialog
       ref="createModelRef"
       @submit="list_model"
       @change="openCreateModel($event)"
-    ></CreateModel>
+    ></CreateModelDialog>
 
-    <SelectProvider ref="selectProviderRef" @change="openCreateModel($event)"></SelectProvider>
+    <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)"></SelectProviderDialog>
   </LayoutContainer>
 </template>
 
@@ -78,8 +78,8 @@ import type { Provider, Model } from '@/api/type/model'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import ModelCard from '@/views/template/component/ModelCard.vue'
 import { splitArray } from '@/utils/common'
-import CreateModel from '@/views/template/component/CreateModel.vue'
-import SelectProvider from '@/views/template/component/SelectProvider.vue'
+import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
+import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
 
 const allObj = {
   icon: '',
@@ -99,8 +99,8 @@ const model_list = ref<Array<Model>>([])
 const model_split_list = computed(() => {
   return splitArray(model_list.value, 2)
 })
-const createModelRef = ref<InstanceType<typeof CreateModel>>()
-const selectProviderRef = ref<InstanceType<typeof SelectProvider>>()
+const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
+const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 
 const clickListHandle = (item: Provider) => {
   active_provider.value = item
