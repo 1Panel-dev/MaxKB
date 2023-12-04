@@ -11,7 +11,7 @@
 
           <div class="content">
             <el-card shadow="always" class="dialog-card">
-              <h4>您好，我是 {{ data?.name || '应用名称'}}</h4>
+              <h4>您好，我是 {{ data?.name || '应用名称' }}</h4>
               <div class="mt-4" v-if="data?.prologue">
                 <el-text type="info">{{ data?.prologue }}</el-text>
               </div>
@@ -97,6 +97,7 @@
     <div class="ai-dialog__operate p-24">
       <div class="operate-textarea flex">
         <el-input
+          ref="quickInputRef"
           v-model="inputValue"
           type="textarea"
           placeholder="请输入"
@@ -135,11 +136,11 @@ const props = defineProps({
 })
 const { application } = useStore()
 
+const quickInputRef = ref()
 const scrollDiv = ref()
 const dialogScrollbar = ref()
 const loading = ref(false)
 const inputValue = ref('')
-const problem_text = ref('') //备份问题
 const chartOpenId = ref('')
 const chatList = ref<chatType[]>([])
 
@@ -149,6 +150,9 @@ const isDisabledChart = computed(
 
 function quickProblemHandel(val: string) {
   inputValue.value = val
+  nextTick(() => {
+    quickInputRef.value?.focus()
+  })
 }
 
 function sendChatHandle(event: any) {
