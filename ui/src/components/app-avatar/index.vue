@@ -43,11 +43,7 @@ const getAvatarColour = (name: string) => {
   let charIndex = name ? pinyin(name).charAt(0).toUpperCase().charCodeAt(0) - 65 : 0
 
   function getColor() {
-    if (!colours[charIndex]) {
-      charIndex -= 10
-      getColor()
-    }
-    return colours[charIndex]
+    return colours[Math.abs(charIndex % colours.length)]
   }
 
   return getColor()
