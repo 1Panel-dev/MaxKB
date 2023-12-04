@@ -105,10 +105,19 @@
           @keydown.enter="sendChatHandle($event)"
           :disabled="loading"
         />
-        <div class="operate" v-loading="loading">
-          <el-button text class="sent-button" :disabled="isDisabledChart" @click="sendChatHandle">
-            <img v-show="isDisabledChart" src="@/assets/icon_send.svg" alt="" />
-            <img v-show="!isDisabledChart" src="@/assets/icon_send_colorful.svg" alt="" />
+        <div class="operate">
+          <el-button
+            text
+            class="sent-button"
+            :disabled="isDisabledChart || loading"
+            @click="sendChatHandle"
+          >
+            <img v-show="isDisabledChart || loading" src="@/assets/icon_send.svg" alt="" />
+            <img
+              v-show="!isDisabledChart && !loading"
+              src="@/assets/icon_send_colorful.svg"
+              alt=""
+            />
           </el-button>
         </div>
       </div>
