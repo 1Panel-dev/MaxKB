@@ -299,7 +299,7 @@ class ApplicationSerializer(serializers.Serializer):
             if 'dataset_id_list' in instance:
                 dataset_id_list = instance.get('dataset_id_list')
                 # 当前用户可修改关联的数据集列表
-                application_dataset_id_list = [dataset_dict.get('id') for dataset_dict in
+                application_dataset_id_list = [str(dataset_dict.get('id')) for dataset_dict in
                                                self.list_dataset(with_valid=False)]
                 for dataset_id in dataset_id_list:
                     if not application_dataset_id_list.__contains__(dataset_id):

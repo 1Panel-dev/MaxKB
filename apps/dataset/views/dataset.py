@@ -22,6 +22,20 @@ from dataset.serializers.dataset_serializers import DataSetSerializers
 class Dataset(APIView):
     authentication_classes = [TokenAuth]
 
+    class Application(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取数据集可用应用列表",
+                             operation_id="获取数据集可用应用列表",
+                             manual_parameters=DataSetSerializers.Application.get_request_params_api(),
+                             responses=result.get_api_array_response(
+                                 DataSetSerializers.Application.get_response_body_api()),
+                             tags=["数据集"])
+        def get(self, request: Request, dataset_id: str):
+            return result.success(DataSetSerializers.Operate(
+                data={'id': dataset_id, 'user_id': str(request.user.id)}).list_application())
+
     @action(methods=['GET'], detail=False)
     @swagger_auto_schema(operation_summary="获取数据集列表",
                          operation_id="获取数据集列表",
@@ -71,7 +85,8 @@ class Dataset(APIView):
         @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.USE,
                                                         dynamic_tag=keywords.get('dataset_id')))
         def get(self, request: Request, dataset_id: str):
-            return result.success(DataSetSerializers.Operate(data={'id': dataset_id}).one(user_id=request.user.id))
+            return result.success(DataSetSerializers.Operate(data={'id': dataset_id, 'user_id': request.user.id}).one(
+                user_id=request.user.id))
 
         @action(methods="PUT", detail=False)
         @swagger_auto_schema(operation_summary="修改数据集信息", operation_id="修改数据集信息",
@@ -84,7 +99,8 @@ class Dataset(APIView):
                                                         dynamic_tag=keywords.get('dataset_id')))
         def put(self, request: Request, dataset_id: str):
             return result.success(
-                DataSetSerializers.Operate(data={'id': dataset_id}).edit(request.data, user_id=request.user.id))
+                DataSetSerializers.Operate(data={'id': dataset_id, 'user_id': request.user.id}).edit(request.data,
+                                                                                                     user_id=request.user.id))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]

@@ -2,6 +2,7 @@ import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
 import type { datasetData } from '@/api/type/dataset'
 import type { pageRequest } from '@/api/type/common'
+import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
 const prefix = '/dataset'
 
@@ -88,12 +89,24 @@ const putDateset: (dataset_id: string, data: any) => Promise<Result<any>> = (
 ) => {
   return put(`${prefix}/${dataset_id}`, data)
 }
-
+/**
+ * 获取数据集 可关联的应用列表
+ * @param dataset_id
+ * @param loading
+ * @returns
+ */
+const listUsableApplication: (
+  dataset_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<ApplicationFormType>>> = (dataset_id, loading) => {
+  return get(`${prefix}/${dataset_id}/application`, {}, loading)
+}
 export default {
   getDateset,
   getAllDateset,
   delDateset,
   postDateset,
   getDatesetDetail,
-  putDateset
+  putDateset,
+  listUsableApplication
 }
