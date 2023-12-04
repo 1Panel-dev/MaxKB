@@ -162,7 +162,12 @@
       @refresh="refresh"
       :loading="datasetLoading"
     />
-    <SelectProvider ref="selectProviderRef" />
+    <CreateModelDialog
+      ref="createModelRef"
+      @submit="getModel"
+      @change="openCreateModel($event)"
+    ></CreateModelDialog>
+    <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -171,7 +176,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
 import AiDialog from '@/components/ai-dialog/index.vue'
 import AddDatasetDialog from './components/AddDatasetDialog.vue'
-import SelectProvider from '@/views/template/component/SelectProvider.vue'
+import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
+import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
 import applicationApi from '@/api/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
@@ -187,7 +193,8 @@ const {
   params: { id }
 } = route as any
 
-const selectProviderRef = ref<InstanceType<typeof SelectProvider>>()
+const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
+const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 
 const applicationFormRef = ref<FormInstance>()
 const AddDatasetDialogRef = ref()
@@ -243,9 +250,14 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-const openCreateModel = () => {
-  selectProviderRef.value?.open()
+const openCreateModel = (provider?: Provider) => {
+  if (provider && provider.provider) {
+    createModelRef.value?.open(provider)
+  } else {
+    selectProviderRef.value?.open()
+  }
 }
+
 function removeDataset(id: string) {
   applicationForm.value.dataset_id_list.splice(applicationForm.value.dataset_id_list.indexOf(id), 1)
 }
