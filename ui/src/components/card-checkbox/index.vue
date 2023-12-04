@@ -14,7 +14,7 @@
         </slot>
         <slot></slot>
       </div>
-      <input class="checkbox" type="checkbox" id="checkbox" :checked="modelValue.includes(toModelValue)" />
+      <el-checkbox v-bind:modelValue="modelValue.includes(toModelValue)"> </el-checkbox>
     </div>
   </el-card>
 </template>
@@ -86,5 +86,4 @@ const checked = () => {
     }
   }
 }
-
 </style>
