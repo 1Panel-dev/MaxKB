@@ -55,7 +55,7 @@ instance.interceptors.response.use(
       router.push({ name: 'login' })
     }
 
-    if (err.response?.status === 403) {
+    if (err.response?.status === 403 && !err.response.config.url.includes('chat/open')) {
       MsgError(
         err.response.data && err.response.data.message ? err.response.data.message : '没有权限访问'
       )

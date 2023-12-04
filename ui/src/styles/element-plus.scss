@@ -20,7 +20,7 @@
 .el-avatar {
   --el-avatar-bg-color: var(--el-color-primary);
   --el-avatar-size-small: 33px;
-  --el-avatar-border-radius: 8px;
+  --el-avatar-border-radius: 6px;
   cursor: pointer;
 }
 
@@ -110,6 +110,8 @@
 
 .el-tag {
   --el-tag-border-radius: 2px;
+  height: 22px;
+  padding: 0 6px;
 }
 .el-table {
   --el-table-header-bg-color: var(--app-layout-bg-color);

@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia'
-import type { User } from '@/api/type/user'
-import UserApi from '@/api/user'
 
 const useCommonStore = defineStore({
   id: 'common',
@@ -8,7 +6,7 @@ const useCommonStore = defineStore({
     breadcrumb: null
   }),
   actions: {
-    saveBreadcrumb(data) {
+    saveBreadcrumb(data: any) {
       this.breadcrumb = data
     }
   }

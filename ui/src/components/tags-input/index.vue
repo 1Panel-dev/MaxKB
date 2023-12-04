@@ -13,12 +13,12 @@
       </el-tag>
     </div>
     <!-- 输入框 -->
-    <el-input
+    <!-- <el-input
       :validate-event="false"
       v-model="currentval"
       :placeholder="tagsList.length == 0 ? placeholder : ''"
       @keydown.enter="addTags"
-    />
+    /> -->
   </div>
 </template>
 <script setup lang="ts">

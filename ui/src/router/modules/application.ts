@@ -2,7 +2,7 @@ import Layout from '@/layout/main-layout/index.vue'
 const applicationRouter = {
   path: '/application',
   name: 'application',
-  meta: { icon: 'app-applicaiton', title: '应用', permission: 'APPLICATION:READ' },
+  meta: { title: '应用', permission: 'APPLICATION:READ' },
   redirect: '/application',
   children: [
     {

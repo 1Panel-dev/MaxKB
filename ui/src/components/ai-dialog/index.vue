@@ -1,7 +1,7 @@
 <template>
-  <div class="ai-dialog p-24">
+  <div class="ai-dialog">
     <el-scrollbar ref="scrollDiv">
-      <div ref="dialogScrollbar" class="ai-dialog__content">
+      <div ref="dialogScrollbar" class="ai-dialog__content p-24">
         <div class="item-content mb-16">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
@@ -56,7 +56,9 @@
             </div>
             <div class="content">
               <div class="flex" v-if="!item.answer_text">
-                <el-card shadow="always" class="dialog-card"> 回答中... </el-card>
+                <el-card shadow="always" class="dialog-card">
+                  回答中 <span class="dotting"></span>
+                </el-card>
               </div>
               <el-card v-else shadow="always" class="dialog-card">
                 <MarkdownRenderer
@@ -78,9 +80,14 @@
                   >
                 </div>
 
-                <!-- <div v-if="item.write_ed && props.appId">
-                  <OperationButton :data="item" />
-                </div> -->
+                <div v-if="item.write_ed && props.appId">
+                  <OperationButton
+                    :data="item"
+                    :applicationId="appId"
+                    :chartId="chartOpenId"
+                    @regeneration="regenerationChart(item)"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -109,10 +116,16 @@
 </template>
 <script setup lang="ts">
 import { ref, nextTick, onUpdated, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import OperationButton from './OperationButton.vue'
 import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
+import useStore from '@/stores'
+const route = useRoute()
+const {
+  params: { accessToken }
+} = route as any
 const props = defineProps({
   data: {
     type: Object,
@@ -120,11 +133,13 @@ const props = defineProps({
   },
   appId: String
 })
+const { application } = useStore()
 
 const scrollDiv = ref()
 const dialogScrollbar = ref()
 const loading = ref(false)
 const inputValue = ref('')
+const problem_text = ref('') //备份问题
 const chartOpenId = ref('')
 const chatList = ref<chatType[]>([])
 
@@ -171,7 +186,12 @@ function getChartOpenId() {
         chartOpenId.value = res.data
         chatMessage()
       })
-      .catch(() => {
+      .catch((res) => {
+        if (res.response.status === 403) {
+          application.asyncAppAuthentication(accessToken).then(() => {
+            getChartOpenId()
+          })
+        }
         loading.value = false
       })
   } else {
@@ -186,6 +206,7 @@ function getChartOpenId() {
       })
   }
 }
+
 function chatMessage() {
   loading.value = true
   if (!chartOpenId.value) {
@@ -199,7 +220,9 @@ function chatMessage() {
       answer_text: '',
       buffer: [],
       write_ed: false,
-      is_stop: false
+      is_stop: false,
+      record_id: '',
+      vote_status: '-1'
     })
     applicationApi.postChatMessage(chartOpenId.value, problem_text).then(async (response) => {
       inputValue.value = ''
@@ -219,9 +242,10 @@ function chatMessage() {
           try {
             const decoder = new TextDecoder('utf-8')
             const str = decoder.decode(value, { stream: true })
-            if (str && str.startsWith('data:')) {
-              const content = JSON?.parse(str.replace('data:', ''))?.content
 
+            if (str && str.startsWith('data:')) {
+              row.record_id = JSON?.parse(str.replace('data:', '')).id
+              const content = JSON?.parse(str.replace('data:', ''))?.content
               if (content) {
                 ChatManagement.append(id, content)
               }
@@ -233,6 +257,11 @@ function chatMessage() {
       }
     })
   }
+}
+
+function regenerationChart(item: chatType) {
+  inputValue.value = item.problem_text
+  chatMessage()
 }
 
 // 滚动到底部
@@ -254,17 +283,20 @@ onUpdated(() => {
   flex-direction: column;
   box-sizing: border-box;
   position: relative;
-  padding-right: 20px;
-  padding-top: 0;
   color: var(--app-text-color);
   &__content {
-    width: 99%;
+    padding-top: 0;
     padding-bottom: 96px;
+    box-sizing: border-box;
+
     .avatar {
       float: left;
     }
     .content {
       padding-left: var(--padding-left);
+      :deep(ol) {
+        margin-left: 16px !important;
+      }
     }
     .text {
       word-break: break-all;
@@ -298,7 +330,6 @@ onUpdated(() => {
     width: 100%;
     box-sizing: border-box;
     z-index: 10;
-    padding-top: 16px;
     &:before {
       background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
       content: '';

@@ -22,6 +22,8 @@ interface chatType {
    * 是否暂停
    */
   is_stop?: boolean
+  record_id: string
+  vote_status: string
 }
 
 export class ChatRecordManage {
