@@ -24,7 +24,7 @@ const settingRouter = {
       meta: {
         icon: 'app-template',
         iconActive: 'app-template-active',
-        title: '模版管理',
+        title: '模型管理',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting'

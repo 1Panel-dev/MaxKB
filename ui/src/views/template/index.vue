@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer header="模版管理">
+  <LayoutContainer header="模型管理">
     <div class="template-manage flex main-calc-height">
       <div class="template-manage__left p-8 border-r">
         <h4 class="p-16" style="padding-bottom: 8px">供应商</h4>
@@ -20,38 +20,42 @@
           </template>
         </common-list>
       </div>
-      <div class="template-manage__right p-24" v-loading="list_model_loading">
-        <h4>{{ active_provider?.name }}</h4>
-        <div class="flex-between mt-16 mb-16">
-          <el-button type="primary" @click="openCreateModel(active_provider)">创建模型</el-button>
-          <el-input
-            v-model="model_search_form.name"
-            @change="list_model"
-            placeholder="按 名称 搜索"
-            prefix-icon="Search"
-            class="w-240"
-          />
+      <div class="template-manage__right w-full" v-loading="list_model_loading">
+        <div class="p-24 pb-0">
+          <h4>{{ active_provider?.name }}</h4>
+          <div class="flex-between mt-16 mb-16">
+            <el-button type="primary" @click="openCreateModel(active_provider)">创建模型</el-button>
+            <el-input
+              v-model="model_search_form.name"
+              @change="list_model"
+              placeholder="按 名称 搜索"
+              prefix-icon="Search"
+              class="w-240"
+            />
+          </div>
         </div>
         <div class="model-list-height">
           <el-scrollbar>
-            <el-row v-if="model_split_list.length > 0" :gutter="15">
-              <template v-for="(row, index) in model_split_list" :key="index">
-                <el-col
-                  :xs="24"
-                  :sm="24"
-                  :md="12"
-                  :lg="12"
-                  :xl="12"
-                  class="mb-16"
-                  v-for="(model, i) in row"
-                  :key="i"
-                >
-                  <ModelCard @change="list_model" :model="model" :provider_list="provider_list">
-                  </ModelCard>
-                </el-col>
-              </template>
-            </el-row>
-            <el-empty description="暂无数据" v-else />
+            <div class="p-24 pt-0">
+              <el-row v-if="model_split_list.length > 0" :gutter="15">
+                <template v-for="(row, index) in model_split_list" :key="index">
+                  <el-col
+                    :xs="24"
+                    :sm="24"
+                    :md="12"
+                    :lg="12"
+                    :xl="12"
+                    class="mb-16"
+                    v-for="(model, i) in row"
+                    :key="i"
+                  >
+                    <ModelCard @change="list_model" :model="model" :provider_list="provider_list">
+                    </ModelCard>
+                  </el-col>
+                </template>
+              </el-row>
+              <el-empty description="暂无数据" v-else />
+            </div>
           </el-scrollbar>
         </div>
       </div>

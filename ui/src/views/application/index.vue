@@ -1,6 +1,6 @@
 <template>
-  <div class="application-list-container p-24">
-    <div class="flex-between">
+  <div class="application-list-container p-24" style="padding-top: 16px">
+    <div class="flex-between mb-8">
       <h3>应用</h3>
       <el-input
         v-model="pageConfig.name"

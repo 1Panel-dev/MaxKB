@@ -158,6 +158,13 @@ h4 {
   padding: calc(var(--app-base-px) * 3);
 }
 
+.pt-0 {
+  padding-top: 0;
+}
+.pb-0 {
+  padding-bottom: 0;
+}
+
 .flex {
   display: flex;
 }
