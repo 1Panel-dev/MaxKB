@@ -6,34 +6,25 @@
     :close-on-press-escape="false"
     :destroy-on-close="true"
     :before-close="close"
+    title="选择供应商"
   >
-    <template #header="{ close, titleId, titleClass }">
-      <el-breadcrumb separator=">">
-        <el-breadcrumb-item>
-          <span class="active-breadcrumb">选择供应商</span>
-        </el-breadcrumb-item>
-      </el-breadcrumb>
-    </template>
-    <RadioCard class="mb-8" :data_list="list_provider" @update:model-value="go_create"
-      ><template #default="scope">
-        <div class="center">
-          <span
-            :innerHTML="scope.icon"
-            alt=""
-            style="display: inline-block; height: 24px; width: 24px"
-            class="mr-8"
-          />
-          <span>{{ scope.name }}</span>
-        </div>
-      </template></RadioCard
-    >
+    <el-row :gutter="12" v-loading="loading">
+      <el-col :span="12" class="mb-16" v-for="(data, index) in list_provider" :key="index">
+        <el-card shadow="hover" @click="go_create(data)">
+          <div class="flex align-center cursor">
+            <span :innerHTML="data.icon" alt="" style="height: 24px; width: 24px" class="mr-8" />
+            <span>{{ data.name }}</span>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import ModelApi from '@/api/model'
 import type { Provider } from '@/api/type/model'
-import RadioCard from '@/views/template/component/RadioCard.vue'
+
 const loading = ref<boolean>(false)
 const dialogVisible = ref<boolean>(false)
 const list_provider = ref<Array<Provider>>([])
@@ -55,16 +46,4 @@ const go_create = (provider: Provider) => {
 }
 defineExpose({ open, close })
 </script>
-<style lang="scss" scoped>
-.active-breadcrumb {
-  font-size: 16px;
-  color: rgba(31, 35, 41, 1);
-  font-weight: 500;
-  line-height: 24px;
-}
-.center {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-</style>
+<style lang="scss" scoped></style>
