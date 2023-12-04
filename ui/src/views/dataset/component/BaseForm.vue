@@ -26,6 +26,11 @@
       />
     </el-form-item>
     <el-form-item v-loading="loading">
+      <template #label
+        ><h4 class="title-decoration-1 mb-16" style="color: var(--app-text-color)">
+          关联应用
+        </h4></template
+      >
       <el-row justify="space-between" style="width: 100%">
         <el-col :span="11" v-for="(item, index) in application_list" :key="index" class="mb-16">
           <CardCheckbox value-field="id" :data="item" v-model="form.application_id_list">
