@@ -65,7 +65,7 @@
                     </el-option>
                   </el-option-group>
                   <div class="border-t" style="padding: 8px 11px">
-                    <el-button type="primary" link>
+                    <el-button type="primary" link @click="openCreateModel">
                       <el-icon class="mr-4"><Plus /></el-icon> 添加模型
                     </el-button>
                   </div>
@@ -162,6 +162,7 @@
       @refresh="refresh"
       :loading="datasetLoading"
     />
+    <SelectProvider ref="selectProviderRef" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -170,6 +171,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
 import AiDialog from '@/components/ai-dialog/index.vue'
 import AddDatasetDialog from './components/AddDatasetDialog.vue'
+import SelectProvider from '@/views/template/component/SelectProvider.vue'
 import applicationApi from '@/api/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
@@ -184,6 +186,8 @@ const route = useRoute()
 const {
   params: { id }
 } = route as any
+
+const selectProviderRef = ref<InstanceType<typeof SelectProvider>>()
 
 const applicationFormRef = ref<FormInstance>()
 const AddDatasetDialogRef = ref()
@@ -239,6 +243,9 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
+const openCreateModel = () => {
+  selectProviderRef.value?.open()
+}
 function removeDataset(id: string) {
   applicationForm.value.dataset_id_list.splice(applicationForm.value.dataset_id_list.indexOf(id), 1)
 }

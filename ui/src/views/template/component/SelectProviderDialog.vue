@@ -24,7 +24,6 @@
 import { ref } from 'vue'
 import ModelApi from '@/api/model'
 import type { Provider } from '@/api/type/model'
-
 const loading = ref<boolean>(false)
 const dialogVisible = ref<boolean>(false)
 const list_provider = ref<Array<Provider>>([])

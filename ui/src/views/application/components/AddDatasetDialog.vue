@@ -11,7 +11,9 @@
     <el-row :gutter="12" v-loading="loading">
       <el-col :span="12" v-for="(item, index) in data" :key="index" class="mb-16">
         <CardCheckbox value-field="id" :data="item" v-model="checkList">
-          {{ item.name }}
+          <span class="ellipsis-1">
+            {{ item.name }}
+          </span>
         </CardCheckbox>
       </el-col>
     </el-row>

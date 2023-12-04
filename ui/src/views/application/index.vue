@@ -1,6 +1,6 @@
 <template>
   <div class="application-list-container p-24" style="padding-top: 16px">
-    <div class="flex-between mb-8">
+    <div class="flex-between mb-16">
       <h3>应用</h3>
       <el-input
         v-model="pageConfig.name"
@@ -17,7 +17,7 @@
         :infinite-scroll-disabled="disabledScroll"
         class="app-list-row"
       >
-        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mt-8">
+        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
           <CardAdd title="创建应用" @click="router.push({ path: '/application/create' })" />
         </el-col>
         <el-col
@@ -28,7 +28,7 @@
           :xl="4"
           v-for="(item, index) in applicationList"
           :key="index"
-          class="mt-8"
+          class="mb-16"
         >
           <CardBox
             :title="item.name"
