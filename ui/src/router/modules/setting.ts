@@ -11,6 +11,7 @@ const settingRouter = {
       name: 'setting',
       meta: {
         icon: 'app-team',
+        iconActive: 'app-team-active',
         title: '团队管理',
         parentPath: '/setting',
         parentName: 'setting'
@@ -21,7 +22,8 @@ const settingRouter = {
       path: '/template',
       name: 'template',
       meta: {
-        icon: 'app-team',
+        icon: 'app-template',
+        iconActive: 'app-template-active',
         title: '模版管理',
         activeMenu: '/setting',
         parentPath: '/setting',

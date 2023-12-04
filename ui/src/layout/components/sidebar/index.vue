@@ -23,7 +23,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { getChildRouteListByPathAndName } from '@/router/index'
 import SidebarItem from './SidebarItem.vue'
-import AppBreadcrumb from './AppBreadcrumb.vue'
+import AppBreadcrumb from './../breadcrumb/index.vue'
 
 const route = useRoute()
 

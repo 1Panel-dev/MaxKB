@@ -50,7 +50,7 @@
               :label="item.label"
               :name="item.value"
             >
-              <PermissionSetting :data="item.data"></PermissionSetting>
+              <PermissionSetting :data="item.data" :type="item.value"></PermissionSetting>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -71,8 +71,7 @@ import type { TeamMember } from '@/api/type/team'
 import CreateMemberDialog from './component/CreateMemberDialog.vue'
 import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-
-const DATASET = 'DATASET'
+import { DATASET, APPLICATION} from './utils'
 
 const CreateMemberRef = ref<InstanceType<typeof CreateMemberDialog>>()
 const loading = ref(false)
@@ -92,7 +91,7 @@ const settingTags = reactive([
   },
   {
     label: '应用',
-    value: 'application',
+    value: APPLICATION,
     data: [] as any
   }
 ])

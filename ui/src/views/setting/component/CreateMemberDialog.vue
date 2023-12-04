@@ -20,11 +20,24 @@
       @submit.prevent
     >
       <el-form-item label="用户名/邮箱" prop="users">
-        <tags-input
-          v-model:tags="memberForm.users"
-          v-model:tag="memberForm.user"
-          placeholder="请输入成员的用户名或邮箱，若需添加多个成员请使用回车分割。"
-        />
+        <el-select
+          class="custom-select-multiple"
+          v-model="memberForm.users"
+          multiple
+          filterable
+          remote
+          reserve-keyword
+          placeholder="请输入成员的用户名或邮箱"
+          :remote-method="remoteMethod"
+          :loading="loading"
+        >
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -36,10 +49,68 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import TeamApi from '@/api/team'
+
+interface ListItem {
+  value: string
+  label: string
+}
+
+const states = [
+  'Alabama',
+  'Alaska',
+  'Arizona',
+  'Arkansas',
+  'California',
+  'Colorado',
+  'Connecticut',
+  'Delaware',
+  'Florida',
+  'Georgia',
+  'Hawaii',
+  'Idaho',
+  'Illinois',
+  'Indiana',
+  'Iowa',
+  'Kansas',
+  'Kentucky',
+  'Louisiana',
+  'Maine',
+  'Maryland',
+  'Massachusetts',
+  'Michigan',
+  'Minnesota',
+  'Mississippi',
+  'Missouri',
+  'Montana',
+  'Nebraska',
+  'Nevada',
+  'New Hampshire',
+  'New Jersey',
+  'New Mexico',
+  'New York',
+  'North Carolina',
+  'North Dakota',
+  'Ohio',
+  'Oklahoma',
+  'Oregon',
+  'Pennsylvania',
+  'Rhode Island',
+  'South Carolina',
+  'South Dakota',
+  'Tennessee',
+  'Texas',
+  'Utah',
+  'Vermont',
+  'Virginia',
+  'Washington',
+  'West Virginia',
+  'Wisconsin',
+  'Wyoming'
+]
 
 const emit = defineEmits(['refresh'])
 
@@ -49,6 +120,9 @@ const memberForm = ref({
   users: [],
   user: ''
 })
+
+const options = ref<ListItem[]>([])
+const list = ref<ListItem[]>([])
 
 const addMemberFormRef = ref<FormInstance>()
 
@@ -74,6 +148,20 @@ watch(dialogVisible, (bool) => {
   }
 })
 
+const remoteMethod = (query: string) => {
+  if (query) {
+    loading.value = true
+    setTimeout(() => {
+      loading.value = false
+      options.value = list.value.filter((item) => {
+        return item.label.toLowerCase().includes(query.toLowerCase())
+      })
+    }, 200)
+  } else {
+    options.value = []
+  }
+}
+
 const open = () => {
   dialogVisible.value = true
 }
@@ -96,6 +184,27 @@ const submitMember = async (formEl: FormInstance | undefined) => {
   })
 }
 
+onMounted(() => {
+  list.value = states.map((item) => {
+    return { value: `value:${item}`, label: `label:${item}` }
+  })
+})
+
 defineExpose({ open, close })
 </script>
-<style lang="scss" scope></style>
+<style lang="scss" scope>
+.custom-select-multiple {
+  width: 200%;
+  .el-input {
+    min-height: 100px;
+  }
+  .el-select__tags {
+    top: 0;
+    transform: none;
+    padding-top: 8px;
+  }
+  .el-input__wrapper {
+    align-items: start;
+  }
+}
+</style>

@@ -44,7 +44,7 @@ function clickHandle(row: any, index: number) {
 /* 通用 ui li样式 */
 .common-list {
   li {
-    padding: 11px 16px;
+    padding: 10px 16px;
     &.active {
       background: var(--el-color-primary-light-9);
       border-radius: 4px;

@@ -2,7 +2,24 @@
   <el-input v-model="filterText" placeholder="搜索" prefix-icon="Search" class="mb-16" />
 
   <el-table :data="data" :max-height="tableHeight">
-    <el-table-column prop="name" label="数据集名称" />
+    <el-table-column prop="name" :label="isApplication ? '应用名称' : '数据集名称'">
+      <template #default="{ row }">
+        <div class="flex align-center">
+          <AppAvatar
+            v-if="isApplication"
+            :name="row.name"
+            pinyinColor
+            class="mr-12"
+            shape="square"
+            :size="24"
+          />
+          <AppAvatar v-else-if="isDataset" class="mr-12" shape="square" :size="24">
+            <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+          </AppAvatar>
+          <span class="ellipsis-1"> {{ row?.name }}</span>
+        </div>
+      </template>
+    </el-table-column>
     <el-table-column label="管理" align="center">
       <!-- <template #header>
         <el-checkbox
@@ -30,18 +47,20 @@
   </el-table>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-
-const MANAGE = 'MANAGE'
-const USE = 'USE'
+import { ref, onMounted, watch, computed } from 'vue'
+import { MANAGE, USE, DATASET, APPLICATION } from './../utils'
 
 const props = defineProps({
   data: {
     type: Array,
     default: () => []
   },
-  id: String
+  id: String,
+  type: String
 })
+
+const isDataset = computed(() => props.type === DATASET)
+const isApplication = computed(() => props.type === APPLICATION)
 
 const emit = defineEmits(['update:data'])
 const allChecked: any = ref({
