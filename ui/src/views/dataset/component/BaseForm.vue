@@ -29,6 +29,16 @@
       <el-row justify="space-between" style="width: 100%">
         <el-col :span="11" v-for="(item, index) in application_list" :key="index" class="mb-16">
           <CardCheckbox value-field="id" :data="item" v-model="form.application_id_list">
+            <template #icon>
+              <AppAvatar
+                v-if="item.name"
+                :name="item.name"
+                pinyinColor
+                class="mr-12"
+                shape="square"
+                :size="32"
+              />
+            </template>
             {{ item.name }}
           </CardCheckbox>
         </el-col>
