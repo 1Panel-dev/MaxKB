@@ -15,20 +15,22 @@
         </li>
       </ul>
     </div>
-    <div class="operation-button">
-      <el-tooltip effect="dark" content="修改" placement="top">
-        <el-button text @click.stop="openEditModel">
-          <el-icon><EditPen /></el-icon>
-        </el-button>
-      </el-tooltip>
 
-      <el-tooltip effect="dark" content="删除" placement="top">
-        <el-button text @click.stop="deleteModel">
-          <el-icon><Delete /></el-icon>
-        </el-button>
-      </el-tooltip>
-    </div>
-    <template #mouseEnter> </template>
+    <template #mouseEnter>
+      <div class="operation-button">
+        <el-tooltip effect="dark" content="修改" placement="top">
+          <el-button text @click.stop="openEditModel">
+            <el-icon><EditPen /></el-icon>
+          </el-button>
+        </el-tooltip>
+
+        <el-tooltip effect="dark" content="删除" placement="top">
+          <el-button text @click.stop="deleteModel">
+            <el-icon><Delete /></el-icon>
+          </el-button>
+        </el-tooltip>
+      </div>
+    </template>
     <EditModel ref="eidtModelRef" @submit="emit('change')"></EditModel>
   </card-box>
 </template>
