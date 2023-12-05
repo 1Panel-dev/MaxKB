@@ -18,11 +18,10 @@
         </div>
         <app-table
           class="mt-16"
-          :data="documentData"
+          :data="dataList"
           :pagination-config="paginationConfig"
           quick-create
           @sizeChange="handleSizeChange"
-          @changePage="handleCurrentChange"
           @cell-mouse-enter="cellMouseEnter"
           @cell-mouse-leave="cellMouseLeave"
           @creatQuick="creatQuickHandle"
@@ -98,7 +97,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive,computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import documentApi from '@/api/document'
 import { toThousands } from '@/utils/utils'
@@ -120,6 +119,13 @@ const paginationConfig = reactive({
   pageSize: 10,
   total: 0
 })
+
+const dataList = computed(() =>
+documentData.value.slice(
+    (paginationConfig.currentPage - 1) * paginationConfig.pageSize,
+    paginationConfig.currentPage * paginationConfig.pageSize
+  )
+)
 
 function rowClickHandle(row: any) {
   router.push({ path: `/dataset/${id}/${row.id}` })
@@ -205,11 +211,8 @@ function cellMouseLeave() {
   currentMouseId.value = null
 }
 
-function handleSizeChange(val: number) {
-  console.log(`${val} items per page`)
-}
-function handleCurrentChange(val: number) {
-  console.log(`current page: ${val}`)
+function handleSizeChange() {
+  paginationConfig.currentPage = 1
 }
 
 function getList() {

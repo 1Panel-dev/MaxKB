@@ -2,7 +2,7 @@
   <LayoutContainer header="对话日志">
     <div class="p-24">
       <div class="mb-16">
-        <el-select v-model="history_day" class="mr-12">
+        <el-select v-model="history_day" class="mr-12" @change="changeHandle">
           <el-option
             v-for="item in dayOptions"
             :key="item.value"
@@ -14,11 +14,10 @@
       </div>
 
       <app-table
-        :data="tableData"
+        :data="dataList"
         :pagination-config="paginationConfig"
         @sizeChange="handleSizeChange"
-        @changePage="handleCurrentChange"
-
+        v-loading="loading"
       >
         <el-table-column prop="abstract" label="摘要" />
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
@@ -53,7 +52,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
@@ -90,11 +89,20 @@ const tableData = ref([])
 const history_day = ref(7)
 const search = ref('')
 
-function handleSizeChange(val: number) {
-  console.log(`${val} items per page`)
+const dataList = computed(() =>
+  tableData.value.slice(
+    (paginationConfig.currentPage - 1) * paginationConfig.pageSize,
+    paginationConfig.currentPage * paginationConfig.pageSize
+  )
+)
+
+function handleSizeChange() {
+  paginationConfig.currentPage = 1
 }
-function handleCurrentChange(val: number) {
-  console.log(`current page: ${val}`)
+
+function changeHandle(val: number) {
+  history_day.value = val
+  getList()
 }
 
 function getList() {

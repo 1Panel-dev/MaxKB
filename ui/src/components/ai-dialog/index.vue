@@ -103,7 +103,6 @@
           placeholder="请输入"
           :autosize="{ minRows: 1, maxRows: 8 }"
           @keydown.enter="sendChatHandle($event)"
-          :disabled="loading"
         />
         <div class="operate">
           <el-button
@@ -168,7 +167,7 @@ function sendChatHandle(event: any) {
   if (!event.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
     event.preventDefault()
-    if (!isDisabledChart.value) {
+    if (!isDisabledChart.value && !loading.value) {
       chatMessage()
     }
   } else {
@@ -237,8 +236,8 @@ function chatMessage() {
       record_id: '',
       vote_status: '-1'
     })
+    inputValue.value = ''
     applicationApi.postChatMessage(chartOpenId.value, problem_text).then(async (response) => {
-      inputValue.value = ''
       const row = chatList.value.find((item) => item.id === id)
 
       if (row) {
