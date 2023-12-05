@@ -30,7 +30,7 @@
               @change="list_model"
               placeholder="按 名称 搜索"
               prefix-icon="Search"
-              class="w-240"
+              style="max-width: 240px"
             />
           </div>
         </div>
@@ -66,7 +66,10 @@
       @change="openCreateModel($event)"
     ></CreateModelDialog>
 
-    <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)"></SelectProviderDialog>
+    <SelectProviderDialog
+      ref="selectProviderRef"
+      @change="openCreateModel($event)"
+    ></SelectProviderDialog>
   </LayoutContainer>
 </template>
 

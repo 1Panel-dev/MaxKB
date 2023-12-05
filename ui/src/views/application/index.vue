@@ -15,7 +15,6 @@
         :gutter="15"
         v-infinite-scroll="loadDataset"
         :infinite-scroll-disabled="disabledScroll"
-        class="app-list-row"
       >
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
           <CardAdd title="创建应用" @click="router.push({ path: '/application/create' })" />
@@ -79,7 +78,7 @@
                       <el-dropdown-menu>
                         <div class="dropdown-custom-switch">
                           <span>运行中</span>
-                          <!-- <el-switch v-model="item.status"  @change="changeState($event, item)"  /> -->
+                          <!-- <el-switch size="small" v-model="item.status"  @change="changeState($event, item)"  /> -->
                         </div>
                         <el-dropdown-item divided @click="deleteApplication(item)"
                           >删除</el-dropdown-item

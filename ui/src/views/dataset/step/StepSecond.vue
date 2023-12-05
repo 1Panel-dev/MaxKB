@@ -2,21 +2,31 @@
   <div class="set-rules">
     <el-row>
       <el-col :span="10" class="p-24">
-        <h4 class="title-decoration-1 mb-8">设置分段规则</h4>
+        <h4 class="title-decoration-1 mb-16">设置分段规则</h4>
         <div class="set-rules__right">
           <el-scrollbar>
-            <div class="left-height">
+            <div class="left-height" @click.stop>
               <el-radio-group v-model="radio" class="set-rules__radio">
-                <el-radio label="1" size="large" border class="mb-16">
-                  <p>智能分段（推荐)</p>
-                  <el-text type="info">不了解如何设置分段规则推荐使用智能分段</el-text>
-                </el-radio>
-                <el-radio label="2" size="large" border class="mb-16">
-                  <p>高级分段</p>
-                  <el-text type="info"
-                    >用户可根据文档规范自行设置分段标识符、分段长度以及清洗规则
-                  </el-text>
-                  <el-card shadow="never" class="card-never mt-16" v-if="radio === '2'">
+                <el-card shadow="never" class="mb-16" :class="radio === '1' ? 'active' : ''">
+                  <el-radio label="1" size="large">
+                    <p class="mb-4">智能分段（推荐)</p>
+                    <el-text type="info">不了解如何设置分段规则推荐使用智能分段</el-text>
+                  </el-radio>
+                </el-card>
+                <el-card shadow="never" class="mb-16" :class="radio === '2' ? 'active' : ''">
+                  <el-radio label="2" size="large">
+                    <p class="mb-4">高级分段</p>
+                    <el-text type="info"
+                      >用户可根据文档规范自行设置分段标识符、分段长度以及清洗规则
+                    </el-text>
+                  </el-radio>
+
+                  <el-card
+                    v-if="radio === '2'"
+                    shadow="never"
+                    class="card-never mt-16"
+                    style="margin-left: 30px"
+                  >
                     <div class="set-rules__form">
                       <div class="form-item mb-16">
                         <div class="title flex align-center mb-8">
@@ -31,22 +41,17 @@
                             </el-icon>
                           </el-tooltip>
                         </div>
-
-                        <el-select
-                          v-loading="patternLoading"
-                          v-model="form.patterns"
-                          multiple
-                          placeholder="请选择"
-                        >
-                          <el-option
-                            v-for="item in splitPatternList"
-                            :key="item"
-                            :label="item.key"
-                            :value="item.value"
-                            multiple
-                          >
-                          </el-option>
-                        </el-select>
+                        <div @click.stop>
+                          <el-select v-model="form.patterns" multiple placeholder="请选择">
+                            <el-option
+                              v-for="(item, index) in splitPatternList"
+                              :key="index"
+                              :label="item.key"
+                              :value="item.value"
+                            >
+                            </el-option>
+                          </el-select>
+                        </div>
                       </div>
                       <div class="form-item mb-16">
                         <div class="title mb-8">分段长度</div>
@@ -60,14 +65,14 @@
                       </div>
                       <div class="form-item mb-16">
                         <div class="title mb-8">自动清洗</div>
-                        <el-switch v-model="form.with_filter" />
+                        <el-switch size="small" v-model="form.with_filter" />
                         <div style="margin-top: 4px">
                           <el-text type="info">去掉重复多余符号空格、空行、制表符</el-text>
                         </div>
                       </div>
                     </div>
                   </el-card>
-                </el-radio>
+                </el-card>
               </el-radio-group>
             </div>
           </el-scrollbar>
@@ -108,8 +113,8 @@ const form = reactive<{
   [propName: string]: any
 }>({
   patterns: [],
-  limit: 0,
-  with_filter: false
+  limit: 500,
+  with_filter: true
 })
 
 function splitDocument() {
@@ -129,7 +134,8 @@ function splitDocument() {
       }
     })
   }
-  documentApi.postSplitDocument(fd)
+  documentApi
+    .postSplitDocument(fd)
     .then((res: any) => {
       paragraphList.value = res.data
       loading.value = false
@@ -169,25 +175,27 @@ defineExpose({
   }
 
   &__radio {
+    width: 100%;
     display: block;
 
     .el-radio {
       white-space: break-spaces;
       width: 100%;
       height: 100%;
-      padding: calc(var(--app-base-px) * 2);
       line-height: 22px;
       color: var(--app-text-color);
     }
 
     :deep(.el-radio__label) {
-      padding-left: 32px;
+      padding-left: 30px;
       width: 100%;
     }
-
     :deep(.el-radio__input) {
       position: absolute;
-      top: 30px;
+      top: 16px;
+    }
+    .active {
+      border: 1px solid var(--el-color-primary);
     }
   }
 

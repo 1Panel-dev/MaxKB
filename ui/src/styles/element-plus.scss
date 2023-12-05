@@ -74,25 +74,6 @@
   }
 }
 
-// @media only screen and (min-width: 1400px) {
-//   .app-list-row {
-//     .el-col-lg-6 {
-//       display: block;
-//       max-width: 20.8333333333%;
-//       flex: 0 0 20.8333333333%;
-//     }
-//   }
-// }
-// @media only screen and (min-width: 1920px) {
-//   .app-list-row {
-//     .el-col-xl-4 {
-//       display: block;
-//       max-width: 16.6666666667%;
-//       flex: 0 0 16.6666666667%;
-//     }
-//   }
-// }
-
 .el-card {
   --el-card-padding: calc(var(--app-base-px) * 2);
 }
@@ -196,4 +177,8 @@
 
 .el-select-group .el-select-dropdown__item {
   padding-left: 11px;
+}
+
+.el-tabs__header {
+  margin: 0 0 12px;
 }

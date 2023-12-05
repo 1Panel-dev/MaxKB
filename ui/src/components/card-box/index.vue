@@ -1,5 +1,5 @@
 <template>
-  <el-card shadow="always" class="card-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
+  <el-card shadow="hover" class="card-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
     <div class="card-header">
       <slot name="header">
         <div class="title flex align-center">

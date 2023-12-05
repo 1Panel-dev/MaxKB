@@ -23,7 +23,13 @@
           <el-col :span="12">
             <div class="flex">
               <el-text type="info">公开访问链接</el-text>
-              <el-switch class="ml-8" inline-prompt active-text="开" inactive-text="关" />
+              <el-switch
+                class="ml-8"
+                size="small"
+                inline-prompt
+                active-text="开"
+                inactive-text="关"
+              />
             </div>
 
             <div class="mt-4">
@@ -43,7 +49,13 @@
           <el-col :span="12">
             <div class="flex">
               <el-text type="info">API访问凭据</el-text>
-              <el-switch class="ml-8" inline-prompt active-text="开" inactive-text="关" />
+              <el-switch
+                class="ml-8"
+                size="small"
+                inline-prompt
+                active-text="开"
+                inactive-text="关"
+              />
             </div>
             <div class="mt-4">
               <span class="vertical-middle lighter">
@@ -77,7 +89,6 @@ const route = useRoute()
 const {
   params: { id }
 } = route as any
-
 
 const EmbedDialogRef = ref()
 const shareUrl = ref('')

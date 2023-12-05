@@ -71,6 +71,7 @@ const icon = computed(() => {
 <style lang="scss" scoped>
 .model-card {
   min-height: 153px;
+  min-width: auto;
   .operation-button {
     position: absolute;
     right: 12px;

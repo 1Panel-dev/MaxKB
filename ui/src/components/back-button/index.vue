@@ -14,13 +14,16 @@ const props = defineProps({
   to: String
 })
 
+const emit = defineEmits(['click'])
 /* 上一层路由 */
 const back: any = router.options.history.state.back
 function jump() {
   if (props.to === '-1') {
     back ? router.push(back) : router.go(-1)
-  } else {
+  } else if (props.to) {
     router.push(props.to as RouteLocationRaw)
+  } else {
+    emit('click')
   }
 }
 </script>

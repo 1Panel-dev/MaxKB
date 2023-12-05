@@ -116,6 +116,10 @@ h4 {
 .mt-16 {
   margin-top: calc(var(--app-base-px) * 2);
 }
+
+.mb-4 {
+  margin-bottom: calc(var(--app-base-px) - 4px);
+}
 .mb-8 {
   margin-bottom: var(--app-base-px);
 }
@@ -414,5 +418,13 @@ h4 {
   }
   75% {
     border-right-color: transparent;
+  }
+}
+
+
+.file-List-card {
+  border-radius: 4px;
+  .el-card__body {
+    padding: 8px 16px 8px 12px;
   }
 }

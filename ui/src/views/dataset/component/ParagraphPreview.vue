@@ -9,6 +9,10 @@
           </div>
         </template>
         <el-scrollbar>
+          <div class="mb-16">
+            <el-text type="info">{{ item.content.length }} 段落</el-text>
+          </div>
+
           <div class="paragraph-list">
             <el-card
               v-for="(child, cIndex) in item.content"

@@ -1,5 +1,12 @@
 <template>
-  <LayoutContainer header="创建数据集" back-to="-1" class="create-dataset">
+  <LayoutContainer
+    :header="isCreate ? '创建数据集' : '上传文档'"
+    back-to="-1"
+    class="create-dataset"
+  >
+    <template #backButton>
+      <back-button @click="back"></back-button>
+    </template>
     <template #header>
       <el-steps :active="active" finish-status="success" align-center class="create-dataset__steps">
         <el-step v-for="(item, index) in steps" :key="index">
@@ -23,28 +30,7 @@
           <component :is="steps[active].component" :ref="steps[active]?.ref" />
         </template>
         <template v-else-if="active === 2">
-          <el-result icon="success" title="🎉 数据集创建成功 🎉">
-            <template #sub-title>
-              <div class="mt-8">
-                <span class="bold">{{ successInfo?.document_count || 0 }}</span>
-                <el-text type="info" class="ml-4">文档</el-text>
-                <el-divider direction="vertical" />
-                <span class="bold">{{ successInfo?.document_list.length || 0 }}</span>
-                <el-text type="info" class="ml-4">分段</el-text>
-                <el-divider direction="vertical" />
-                <span class="bold">{{ toThousands(successInfo?.char_length) || 0 }}</span>
-                <el-text type="info" class="ml-4">字符</el-text>
-              </div>
-            </template>
-            <template #extra>
-              <el-button @click="router.push({ path: `/dataset` })">返回数据集列表</el-button>
-              <el-button
-                type="primary"
-                @click="router.push({ path: `/dataset/${successInfo?.id}/document` })"
-                >前往文档</el-button
-              >
-            </template>
-          </el-result>
+          <ResultSuccess :data="successInfo" />
         </template>
       </div>
     </div>
@@ -65,11 +51,12 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepFirst from './step/StepFirst.vue'
 import StepSecond from './step/StepSecond.vue'
+import ResultSuccess from './step/ResultSuccess.vue'
 import datasetApi from '@/api/dataset'
 import type { datasetData } from '@/api/type/dataset'
 import documentApi from '@/api/document'
-import { MsgSuccess } from '@/utils/message'
-import { toThousands } from '@/utils/utils'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+
 import useStore from '@/stores'
 const { dataset } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
@@ -77,9 +64,10 @@ const baseInfo = computed(() => dataset.baseInfo)
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { id }
-} = route as any
+  query: { id, type }
+} = route
 
+const isCreate = type === 'create'
 const steps = [
   {
     ref: 'StepFirstRef',
@@ -125,7 +113,7 @@ function submit() {
   const obj = { ...baseInfo.value, documents } as datasetData
   if (id) {
     documentApi
-      .postDocument(id, documents)
+      .postDocument(id as string, documents)
       .then((res) => {
         MsgSuccess('提交成功')
         clearStore()
@@ -146,6 +134,21 @@ function submit() {
       .catch(() => {
         loading.value = false
       })
+  }
+}
+function back() {
+  if (baseInfo.value || StepSecondRef.value?.paragraphList?.length > 0) {
+    MsgConfirm(`提示`, `当前的更改尚未保存，确认退出吗?`, {
+      confirmButtonText: '确认',
+      type: 'warning'
+    })
+      .then(() => {
+        router.go(-1)
+        clearStore()
+      })
+      .catch(() => {})
+  } else {
+    router.go(-1)
   }
 }
 </script>

@@ -97,7 +97,7 @@ const submitHandle = async () => {
         .then(() => {
           emit('refresh')
           loading.value = false
-          dialogVisible.value = false
+          isEdit.value = false
         })
         .catch(() => {
           loading.value = false

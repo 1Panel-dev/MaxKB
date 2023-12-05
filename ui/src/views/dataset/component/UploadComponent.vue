@@ -112,12 +112,7 @@ defineExpose({
 })
 </script>
 <style scoped lang="scss">
-.file-List-card {
-  border-radius: 4px;
-  :deep(.el-card__body) {
-    padding: 8px 16px 8px 12px;
-  }
-}
+
 .upload__decoration {
   font-size: 12px;
   line-height: 20px;

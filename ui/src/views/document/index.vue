@@ -39,7 +39,7 @@
           </el-table-column>
           <el-table-column prop="char_length" label="字符数" align="right">
             <template #default="{ row }">
-              {{ toThousands(row.char_length) }}
+              {{ numberFormat(row.char_length) }}
             </template>
           </el-table-column>
           <el-table-column prop="paragraph_count" label="分段" align="right" />
@@ -56,10 +56,14 @@
               </el-text>
             </template>
           </el-table-column>
-          <el-table-column prop="name" label="启动状态">
+          <el-table-column prop="name" label="启用状态">
             <template #default="{ row }">
               <div @click.stop>
-                <el-switch v-model="row.is_active" @change="changeState($event, row)" />
+                <el-switch
+                  size="small"
+                  v-model="row.is_active"
+                  @change="changeState($event, row)"
+                />
               </div>
             </template>
           </el-table-column>
@@ -97,10 +101,10 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive,computed } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import documentApi from '@/api/document'
-import { toThousands } from '@/utils/utils'
+import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 const router = useRouter()
@@ -121,7 +125,7 @@ const paginationConfig = reactive({
 })
 
 const dataList = computed(() =>
-documentData.value.slice(
+  documentData.value.slice(
     (paginationConfig.currentPage - 1) * paginationConfig.pageSize,
     paginationConfig.currentPage * paginationConfig.pageSize
   )
@@ -175,14 +179,14 @@ function deleteDocument(row: any) {
 /*
   更新名称或状态
 */
-function updateData(documentId: string, data: any) {
+function updateData(documentId: string, data: any, msg: string) {
   loading.value = true
   documentApi
     .putDocument(id, documentId, data)
     .then((res) => {
       const index = documentData.value.findIndex((v) => v.id === documentId)
       documentData.value.splice(index, 1, res.data)
-      MsgSuccess('修改成功')
+      MsgSuccess(msg)
       loading.value = false
     })
     .catch(() => {
@@ -194,14 +198,15 @@ function changeState(bool: Boolean, row: any) {
   const obj = {
     is_active: bool
   }
-  currentMouseId.value && updateData(row.id, obj)
+  const str = bool ? '启用成功' : '禁用成功'
+  currentMouseId.value && updateData(row.id, obj, str)
 }
 
 function editName(val: string) {
   const obj = {
     name: val
   }
-  currentMouseId.value && updateData(currentMouseId.value, obj)
+  currentMouseId.value && updateData(currentMouseId.value, obj, '修改成功')
 }
 
 function cellMouseEnter(row: any) {

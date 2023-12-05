@@ -1,7 +1,7 @@
 <template>
   <LayoutContainer
     :header="id ? '设置' : '创建应用'"
-    :back-to="id ? '' : -1"
+    :back-to="id ? '' : '-1'"
     class="create-application"
   >
     <el-row v-loading="loading">
@@ -68,16 +68,19 @@
                       /></el-icon>
                     </el-option>
                   </el-option-group>
-                  <div class="border-t" style="padding: 8px 11px">
+                  <template #footer>
                     <el-button type="primary" link @click="openCreateModel">
                       <el-icon class="mr-4"><Plus /></el-icon> 添加模型
                     </el-button>
-                  </div>
+                  </template>
                 </el-select>
               </el-form-item>
 
               <el-form-item label="多轮对话" @click.prevent>
-                <el-switch v-model="applicationForm.multiple_rounds_dialogue"></el-switch>
+                <el-switch
+                  size="small"
+                  v-model="applicationForm.multiple_rounds_dialogue"
+                ></el-switch>
               </el-form-item>
               <el-form-item label="关联数据集">
                 <template #label>
@@ -230,9 +233,13 @@ const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 const datasetList = ref([])
 
-watch(exampleList.value, () => {
-  applicationForm.value.example = exampleList.value.filter((v) => v)
-})
+watch(
+  () => exampleList.value,
+  (val) => {
+    applicationForm.value.example = val.filter((v) => v)
+  },
+  { deep: true }
+)
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return

@@ -1,7 +1,9 @@
 <template>
   <div class="content-container">
     <div class="content-container__header flex align-center" v-if="slots.header || header">
-      <back-button :to="backTo" v-if="showBack"></back-button>
+      <slot name="backButton">
+        <back-button :to="backTo" v-if="showBack"></back-button>
+      </slot>
       <h3>{{ header }}</h3>
       <slot name="header"> </slot>
     </div>

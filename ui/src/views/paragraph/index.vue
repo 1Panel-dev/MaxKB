@@ -45,7 +45,11 @@
                 @click="editParagraph(item)"
               >
                 <div class="active-button" @click.stop>
-                  <el-switch v-model="item.is_active" @change="changeState($event, item)" />
+                  <el-switch
+                    v-model="item.is_active"
+                    @change="changeState($event, item)"
+                    size="small"
+                  />
                 </div>
 
                 <template #footer>

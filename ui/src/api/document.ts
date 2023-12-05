@@ -36,7 +36,7 @@ const getDocument: (dataset_id: string, name?: string) => Promise<Result<any>> =
 }
 
 /**
- * 创建文档
+ * 创建批量文档
  * @param 参数 
  * {
   "name": "string",
@@ -58,7 +58,7 @@ const postDocument: (dataset_id: string, data: any) => Promise<Result<any>> = (
   dataset_id,
   data
 ) => {
-  return post(`${prefix}/${dataset_id}/document`, data)
+  return post(`${prefix}/${dataset_id}/document/_bach`, data)
 }
 
 /**
