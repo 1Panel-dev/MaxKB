@@ -116,6 +116,29 @@ class ApplicationApi(ApiMixin):
                 }
             )
 
+    class Edit(ApiMixin):
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['name', 'desc', 'model_id', 'multiple_rounds_dialogue'],
+                properties={
+                    'name': openapi.Schema(type=openapi.TYPE_STRING, title="应用名称", description="应用名称"),
+                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title="应用描述", description="应用描述"),
+                    'model_id': openapi.Schema(type=openapi.TYPE_STRING, title="模型id", description="模型id"),
+                    "multiple_rounds_dialogue": openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否开启多轮对话",
+                                                               description="是否开启多轮对话"),
+                    'prologue': openapi.Schema(type=openapi.TYPE_STRING, title="开场白", description="开场白"),
+                    'example': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING),
+                                              title="示例列表", description="示例列表"),
+                    'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                      items=openapi.Schema(type=openapi.TYPE_STRING),
+                                                      title="关联数据集Id列表", description="关联数据集Id列表"),
+                    'status': openapi.Schema(type=openapi.TYPE_BOOLEAN, title='状态', description="状态")
+
+                }
+            )
+
     class Create(ApiMixin):
         @staticmethod
         def get_request_body_api():

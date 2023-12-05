@@ -133,6 +133,7 @@ class ApplicationSerializer(serializers.Serializer):
         prologue = serializers.CharField(required=False)
         example = serializers.ListSerializer(required=False, child=serializers.CharField(required=True))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
+        status = serializers.BooleanField(required=False)
 
     def is_valid(self, *, user_id=None, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -285,7 +286,7 @@ class ApplicationSerializer(serializers.Serializer):
 
             model = QuerySet(Model).get(id=instance.get('model_id') if 'model_id' in instance else application.model_id)
 
-            update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'example']
+            update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'example', 'status']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     if update_key == 'multiple_rounds_dialogue':

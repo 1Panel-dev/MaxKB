@@ -186,7 +186,7 @@ class Application(APIView):
         @swagger_auto_schema(operation_summary="修改应用",
                              operation_id="修改应用",
                              manual_parameters=ApplicationApi.Operate.get_request_params_api(),
-                             request_body=ApplicationApi.Create.get_request_body_api(),
+                             request_body=ApplicationApi.Edit.get_request_body_api(),
                              responses=result.get_api_array_response(ApplicationApi.get_response_body_api()),
                              tags=['应用'])
         @has_permissions(ViewPermission(
