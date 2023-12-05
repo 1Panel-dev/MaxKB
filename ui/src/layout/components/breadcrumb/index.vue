@@ -84,10 +84,9 @@ const isDataset = computed(() => {
   return meta?.activeMenu.includes('dataset')
 })
 function changeMenu(id: string) {
-  if (isApplication.value) {
-    router.push({ path: `/application/${id}/overview` })
-  } else if (isDataset.value) {
-    router.push({ path: `/dataset/${id}/document` })
+  const lastMatched = route.matched[route.matched.length - 1]
+  if (lastMatched) {
+    router.push({ name: lastMatched.name, params: { id: id } })
   }
 }
 
