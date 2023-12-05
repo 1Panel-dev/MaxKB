@@ -221,6 +221,19 @@ const putChatVote: (
   )
 }
 
+/**
+ * 对话日志
+ * @param 参数 
+ * application_id, history_day
+}
+ */
+const getChatLog: (
+  applicaiton_id: String,
+  history_day: number,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (applicaiton_id, history_day, loading) => {
+  return get(`${prefix}/${applicaiton_id}/chat`, { history_day }, loading)
+}
 export default {
   getAllAppilcation,
   getApplication,
@@ -236,5 +249,6 @@ export default {
   getAccessToken,
   postAppAuthentication,
   getProfile,
-  putChatVote
+  putChatVote,
+  getChatLog
 }

@@ -18,12 +18,14 @@
             <el-tag v-else class="warning-tag">已停用</el-tag>
           </div>
         </div>
-        <div class="active-button" @click.stop>
-          <el-switch />
-        </div>
+
         <el-row class="mt-16">
-          <el-col :span="24">
-            <el-text type="info">公开访问链接</el-text>
+          <el-col :span="12">
+            <div class="flex">
+              <el-text type="info">公开访问链接</el-text>
+              <el-switch class="ml-8" inline-prompt active-text="开" inactive-text="关" />
+            </div>
+
             <div class="mt-4">
               <span class="vertical-middle lighter">
                 {{ shareUrl }}
@@ -33,40 +35,33 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
+            <div class="mt-16">
+              <el-button type="primary"><a :href="shareUrl" target="_blank">演示</a></el-button>
+              <el-button @click="openDialog"> 嵌入第三方 </el-button>
+            </div>
           </el-col>
-          <!-- <el-col :span="12">
-            <el-text type="info">API访问凭据</el-text>
+          <el-col :span="12">
+            <div class="flex">
+              <el-text type="info">API访问凭据</el-text>
+              <el-switch class="ml-8" inline-prompt active-text="开" inactive-text="关" />
+            </div>
             <div class="mt-4">
               <span class="vertical-middle lighter">
                 API Key: OGZmZThlZjYyYzU2MWE1OTlkYTVjZTBi
               </span>
 
               <el-button type="primary" text>
-                   <AppIcon iconName="app-copy"></AppIcon>
+                <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <div class="mt-4">
-              <span class="vertical-middle lighter"> API Secret: ************** </span>
-              <span>
-                <el-button type="primary" text>
-                     <AppIcon iconName="app-copy"></AppIcon>
-                </el-button>
-              </span>
-              <span>
-                <el-button type="primary" text>
-                  <AppIcon iconName="app-hide-password" />
-                </el-button>
-              </span>
+            <div class="mt-16">
+              <el-button @click="openDialog"> 获取密钥 </el-button>
             </div>
-          </el-col> -->
+          </el-col>
         </el-row>
-        <div class="mt-16">
-          <el-button type="primary"><a :href="shareUrl" target="_blank">演示</a></el-button>
-          <el-button @click="openDialog"> 嵌入第三方 </el-button>
-        </div>
       </el-card>
     </div>
-    <EmbedDialog ref="EmbedDialogRef"/>
+    <EmbedDialog ref="EmbedDialogRef" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -79,15 +74,16 @@ import useStore from '@/stores'
 const { application } = useStore()
 const router = useRouter()
 const route = useRoute()
+const {
+  params: { id }
+} = route as any
+
 
 const EmbedDialogRef = ref()
 const shareUrl = ref('')
 const accessToken = ref('')
 const detail = ref<any>(null)
 const apiKey = ref<any>(null)
-const {
-  params: { id }
-} = route as any
 
 const loading = ref(false)
 
@@ -95,7 +91,7 @@ function openDialog() {
   EmbedDialogRef.value.open(accessToken.value)
 }
 function getAccessToken() {
-  application.asyncGetAccessToken(id, loading).then((res) => {
+  application.asyncGetAccessToken(id, loading).then((res: any) => {
     accessToken.value = res?.data?.access_token
     shareUrl.value = application.location + res?.data?.access_token
   })
