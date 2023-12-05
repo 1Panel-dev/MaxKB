@@ -22,7 +22,6 @@
               <div>
                 <span class="mr-8">{{ row.username }}</span>
                 <el-tag v-if="isManage(row.type)" class="default-tag">所有者</el-tag>
-                <el-tag type="warning" v-else>用户</el-tag>
               </div>
               <div @click.stop style="margin-top: 5px">
                 <el-dropdown trigger="click" v-if="!isManage(row.type)">
@@ -71,7 +70,7 @@ import type { TeamMember } from '@/api/type/team'
 import CreateMemberDialog from './component/CreateMemberDialog.vue'
 import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { DATASET, APPLICATION} from './utils'
+import { DATASET, APPLICATION } from './utils'
 
 const CreateMemberRef = ref<InstanceType<typeof CreateMemberDialog>>()
 const loading = ref(false)

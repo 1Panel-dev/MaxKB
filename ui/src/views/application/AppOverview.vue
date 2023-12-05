@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer header="概览" back-to="-1">
+  <LayoutContainer header="概览">
     <div class="main-calc-height p-24">
       <h4 class="title-decoration-1 mb-16">应用信息</h4>
       <el-card shadow="never" class="overview-card">

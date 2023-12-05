@@ -11,7 +11,7 @@
       <el-breadcrumb separator=">">
         <el-breadcrumb-item
           ><span class="active-breadcrumb">{{
-            `编辑 ${providerValue?.name} 模型`
+            `编辑 ${providerValue?.name}`
           }}</span></el-breadcrumb-item
         >
       </el-breadcrumb>

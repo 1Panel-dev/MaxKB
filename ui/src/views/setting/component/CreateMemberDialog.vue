@@ -21,6 +21,7 @@
     >
       <el-form-item label="用户名/邮箱" prop="users">
         <el-select
+          ref="SelectRemoteRef"
           class="custom-select-multiple"
           v-model="memberForm.users"
           multiple
@@ -28,14 +29,16 @@
           remote
           reserve-keyword
           placeholder="请输入成员的用户名或邮箱"
+          no-data-text="用户不存在"
           :remote-method="remoteMethod"
           :loading="loading"
+          @change="changeSelectHandle"
         >
           <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+            v-for="item in userOptions"
+            :key="item?.id"
+            :label="item?.username"
+            :value="item?.id"
           />
         </el-select>
       </el-form-item>
@@ -53,113 +56,53 @@ import { ref, watch, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import TeamApi from '@/api/team'
-
-interface ListItem {
-  value: string
-  label: string
-}
-
-const states = [
-  'Alabama',
-  'Alaska',
-  'Arizona',
-  'Arkansas',
-  'California',
-  'Colorado',
-  'Connecticut',
-  'Delaware',
-  'Florida',
-  'Georgia',
-  'Hawaii',
-  'Idaho',
-  'Illinois',
-  'Indiana',
-  'Iowa',
-  'Kansas',
-  'Kentucky',
-  'Louisiana',
-  'Maine',
-  'Maryland',
-  'Massachusetts',
-  'Michigan',
-  'Minnesota',
-  'Mississippi',
-  'Missouri',
-  'Montana',
-  'Nebraska',
-  'Nevada',
-  'New Hampshire',
-  'New Jersey',
-  'New Mexico',
-  'New York',
-  'North Carolina',
-  'North Dakota',
-  'Ohio',
-  'Oklahoma',
-  'Oregon',
-  'Pennsylvania',
-  'Rhode Island',
-  'South Carolina',
-  'South Dakota',
-  'Tennessee',
-  'Texas',
-  'Utah',
-  'Vermont',
-  'Virginia',
-  'Washington',
-  'West Virginia',
-  'Wisconsin',
-  'Wyoming'
-]
+import UserApi from '@/api/user'
 
 const emit = defineEmits(['refresh'])
 
 const dialogVisible = ref<boolean>(false)
 
 const memberForm = ref({
-  users: [],
-  user: ''
+  users: []
 })
 
-const options = ref<ListItem[]>([])
-const list = ref<ListItem[]>([])
-
+const SelectRemoteRef = ref()
 const addMemberFormRef = ref<FormInstance>()
 
 const loading = ref<boolean>(false)
+const userOptions = ref([])
 
-const validateUsers = (rule: any, value: any, callback: any) => {
-  if (value?.length == 0 && !memberForm.value.user) {
-    callback(new Error('请输入用户名/邮箱'))
-  } else {
-    callback()
-  }
-}
 const rules = ref<FormRules>({
-  users: [{ type: 'array', validator: validateUsers }]
+  users: [
+    {
+      type: 'array',
+      required: true,
+      message: '请输入用户名/邮箱',
+      trigger: 'change'
+    }
+  ]
 })
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
     memberForm.value = {
-      users: [],
-      user: ''
+      users: []
     }
   }
 })
 
 const remoteMethod = (query: string) => {
   if (query) {
-    loading.value = true
     setTimeout(() => {
-      loading.value = false
-      options.value = list.value.filter((item) => {
-        return item.label.toLowerCase().includes(query.toLowerCase())
-      })
+      getUser(query)
     }, 200)
   } else {
-    options.value = []
+    userOptions.value = []
   }
+}
+
+const changeSelectHandle = () => {
+  SelectRemoteRef.value.query = ''
 }
 
 const open = () => {
@@ -170,10 +113,7 @@ const submitMember = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       loading.value = true
-      const submitValue: string = memberForm.value.users?.length
-        ? memberForm.value.users.toString()
-        : memberForm.value.user
-      TeamApi.postCreatTeamMember(submitValue).then(() => {
+      TeamApi.postCreatTeamMember(memberForm.value.users).then(() => {
         MsgSuccess('提交成功')
         emit('refresh')
         dialogVisible.value = false
@@ -184,11 +124,13 @@ const submitMember = async (formEl: FormInstance | undefined) => {
   })
 }
 
-onMounted(() => {
-  list.value = states.map((item) => {
-    return { value: `value:${item}`, label: `label:${item}` }
+const getUser = (val: string) => {
+  UserApi.getUserList(val, loading).then((res) => {
+    userOptions.value = res.data
   })
-})
+}
+
+onMounted(() => {})
 
 defineExpose({ open, close })
 </script>

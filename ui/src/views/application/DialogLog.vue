@@ -75,7 +75,7 @@ const dayOptions = [
     label: '过去90天'
   },
   {
-    value: 188,
+    value: 183,
     label: '过去半年'
   }
 ]

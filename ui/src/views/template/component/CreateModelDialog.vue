@@ -16,7 +16,7 @@
         >
         <el-breadcrumb-item
           ><span class="active-breadcrumb">{{
-            `添加 ${providerValue?.name} 模型`
+            `添加 ${providerValue?.name}`
           }}</span></el-breadcrumb-item
         >
       </el-breadcrumb>

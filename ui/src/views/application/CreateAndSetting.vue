@@ -1,5 +1,9 @@
 <template>
-  <LayoutContainer :header="id ? '设置' : '创建应用'" back-to="-1" class="create-application">
+  <LayoutContainer
+    :header="id ? '设置' : '创建应用'"
+    :back-to="id ? '' : -1"
+    class="create-application"
+  >
     <el-row v-loading="loading">
       <el-col :span="10">
         <div class="p-24 mb-16" style="padding-bottom: 0">

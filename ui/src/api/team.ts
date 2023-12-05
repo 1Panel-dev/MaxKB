@@ -13,10 +13,10 @@ const getTeamMember: () => Promise<Result<TeamMember[]>> = () => {
 
 /**
  * 添加成员
- * @param 参数 { "username_or_email": "string" }
+ * @param 参数 []
  */
-const postCreatTeamMember: (data: String) => Promise<Result<boolean>> = (data) => {
-  return post(`${prefix}`, { username_or_email: data })
+const postCreatTeamMember: (data: Array<String>) => Promise<Result<boolean>> = (data) => {
+  return post(`${prefix}/_batch`, data)
 }
 
 /**
@@ -57,7 +57,6 @@ const putMemberPermissions: (member_id: String, body: any) => Promise<Result<any
 ) => {
   return put(`${prefix}/${member_id}`, body)
 }
-
 
 export default {
   getTeamMember,

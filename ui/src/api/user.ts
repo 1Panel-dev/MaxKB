@@ -112,6 +112,18 @@ const resetPassword: (
   return post('/user/re_password', request, undefined, loading)
 }
 
+/**
+ * 添加团队需要查询用户列表
+ * @param loading 接口加载器
+ * email_or_username
+ */
+const getUserList: (email_or_username: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  email_or_username,
+  loading
+) => {
+  return get('/user/list', { email_or_username }, loading)
+}
+
 export default {
   login,
   register,
@@ -121,5 +133,6 @@ export default {
   resetPassword,
   sendEmailToCurrent,
   resetCurrentUserPassword,
-  logout
+  logout,
+  getUserList
 }
