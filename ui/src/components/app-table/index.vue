@@ -1,6 +1,6 @@
 <template>
   <div class="app-table" :class="quickCreate ? 'table-quick-append' : ''">
-    <el-table v-bind="$attrs">
+    <el-table :max-height="tableHeight" v-bind="$attrs">
       <template #append v-if="quickCreate">
         <div v-if="showInput">
           <el-input
@@ -39,7 +39,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, watch, computed } from 'vue'
+import { ref, nextTick, watch, computed, onMounted } from 'vue'
 defineOptions({ name: 'AppTable' })
 
 const props = defineProps({
@@ -63,6 +63,7 @@ const quickInputRef = ref()
 const loading = ref(false)
 const showInput = ref(false)
 const inputValue = ref('')
+const tableHeight = ref(0)
 
 watch(showInput, (bool) => {
   if (!bool) {
@@ -93,6 +94,15 @@ function handleCurrentChange() {
   emit('changePage')
 }
 defineExpose({})
+
+onMounted(() => {
+  tableHeight.value = window.innerHeight - 300
+  window.onresize = () => {
+    return (() => {
+      tableHeight.value = window.innerHeight - 300
+    })()
+  }
+})
 </script>
 
 <style lang="scss" scoped>
