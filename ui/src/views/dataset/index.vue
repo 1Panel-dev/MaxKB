@@ -50,7 +50,7 @@
                 文档<el-divider direction="vertical" />
                 <span class="bold">{{ numberFormat(item?.char_length) || 0 }}</span>
                 字符<el-divider direction="vertical" />
-                <span class="bold">{{ item?.char_length || 0 }}</span>
+                <span class="bold">{{ item?.application_mapping_count || 0 }}</span>
                 关联应用
               </div>
             </template>
