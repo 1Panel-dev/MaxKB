@@ -61,7 +61,9 @@ class ChatApi(ApiMixin):
                                   in_=openapi.IN_QUERY,
                                   type=openapi.TYPE_NUMBER,
                                   required=True,
-                                  description='历史天数')
+                                  description='历史天数'),
+                openapi.Parameter(name='abstract', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, required=False,
+                                  description="摘要")
                 ]
 
 

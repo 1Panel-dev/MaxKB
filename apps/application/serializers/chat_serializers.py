@@ -36,6 +36,16 @@ chat_cache = cache
 
 
 class ChatSerializers(serializers.Serializer):
+    class Operate(serializers.Serializer):
+        chat_id = serializers.UUIDField(required=True)
+        application_id = serializers.UUIDField(required=True)
+
+        def delete(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            QuerySet(Chat).filter(id=self.data.get('chat_id'), application_id=self.data.get('application_id')).delete()
+            return True
+
     class Query(serializers.Serializer):
         abstract = serializers.CharField(required=False)
         history_day = serializers.IntegerField(required=True)
@@ -48,7 +58,10 @@ class ChatSerializers(serializers.Serializer):
 
         def get_query_set(self):
             end_time = self.get_end_time()
-            return QuerySet(Chat).filter(application_id=self.data.get("application_id"), create_time__gte=end_time)
+            query_dict = {'application_id': self.data.get("application_id"), 'create_time__gte': end_time}
+            if 'abstract' in self.data and self.data.get('abstract') is not None:
+                query_dict['abstract'] = self.data.get('abstract')
+            return QuerySet(Chat).filter(**query_dict)
 
         def list(self, with_valid=True):
             if with_valid:

@@ -90,6 +90,26 @@ class ChatView(APIView):
             data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
                   'user_id': request.user.id}).list())
 
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['DELETE'], detail=False)
+        @swagger_auto_schema(operation_summary="删除对话",
+                             operation_id="删除对话",
+                             tags=["应用/对话日志"])
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND), lambda r, k: Permission(group=Group.APPLICATION, operate=Operate.DELETE,
+                                                                   dynamic_tag=k.get('application_id')),
+            compare=CompareConstants.AND)
+        def delete(self, request: Request, application_id: str, chat_id: str):
+            return result.success(
+                ChatSerializers.Operate(
+                    data={'application_id': application_id, 'user_id': request.user.id,
+                          'chat_id': chat_id}).delete())
+
     class Page(APIView):
         authentication_classes = [TokenAuth]
 
