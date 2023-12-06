@@ -28,6 +28,7 @@ class Application(AppModelMixin):
     status = models.BooleanField(default=True, verbose_name="是否发布")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     model = models.ForeignKey(Model, on_delete=models.DO_NOTHING, db_constraint=False)
+    api_key_is_active = models.BooleanField(verbose_name="api_key是否可用", default=True)
 
     class Meta:
         db_table = "application"
