@@ -1,16 +1,33 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
+import type { pageRequest } from '@/api/type/common'
+import type { Ref } from 'vue'
 const prefix = '/dataset'
 
 /**
  * 段落列表
- * @param 参数 dataset_id
+ * @param 参数 dataset_id document_id
+ * page {
+              "current_page": "string",
+              "page_size": "string",
+            }
+ * param {
+          "title": "string",
+          "content": "string",
+        }
  */
-const getParagraph: (dataset_id: string, document_id: string) => Promise<Result<any>> = (
-  dataset_id,
-  document_id
-) => {
-  return get(`${prefix}/${dataset_id}/document/${document_id}/paragraph`)
+const getParagraph: (
+  dataset_id: string,
+  document_id: string,
+  page: pageRequest,
+  param: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, document_id, page, param, loading) => {
+  return get(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${page.current_page}/${page.page_size}`,
+    param,
+    loading
+  )
 }
 
 /**
@@ -128,5 +145,5 @@ export default {
   postParagraph,
   getProblem,
   postProblem,
-  delProblem,
+  delProblem
 }

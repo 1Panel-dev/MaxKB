@@ -1,7 +1,7 @@
 <template>
-  <div class="ai-dialog">
+  <div class="ai-chat">
     <el-scrollbar ref="scrollDiv">
-      <div ref="dialogScrollbar" class="ai-dialog__content p-24">
+      <div ref="dialogScrollbar" class="ai-chat__content p-24">
         <div class="item-content mb-16">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
@@ -94,7 +94,7 @@
         </template>
       </div>
     </el-scrollbar>
-    <div class="ai-dialog__operate p-24">
+    <div class="ai-chat__operate p-24">
       <div class="operate-textarea flex">
         <el-input
           ref="quickInputRef"
@@ -125,7 +125,7 @@
 </template>
 <script setup lang="ts">
 import { ref, nextTick, onUpdated, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import OperationButton from './OperationButton.vue'
 import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
@@ -288,7 +288,7 @@ onUpdated(() => {
 })
 </script>
 <style lang="scss" scoped>
-.ai-dialog {
+.ai-chat {
   --padding-left: 40px;
   height: 100%;
   display: flex;

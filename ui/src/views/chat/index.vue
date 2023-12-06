@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="chat__main chat-width">
-      <AiDialog v-model:data="applicationDetail" :appId="applicationDetail?.id"></AiDialog>
+      <AiChat v-model:data="applicationDetail" :appId="applicationDetail?.id"></AiChat>
     </div>
     <div class="chat__footer"></div>
   </div>
@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import AiDialog from '@/components/ai-dialog/index.vue'
+import AiChat from '@/components/ai-chat/index.vue'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
 const route = useRoute()

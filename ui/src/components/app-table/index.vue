@@ -26,8 +26,8 @@
     <div class="app-table__pagination mt-16" v-if="$slots.pagination || paginationConfig">
       <slot name="pagination">
         <el-pagination
-          v-model:current-page="paginationConfig.currentPage"
-          v-model:page-size="paginationConfig.pageSize"
+          v-model:current-page="paginationConfig.current_page"
+          v-model:page-size="paginationConfig.page_size"
           :page-sizes="pageSizes"
           :total="paginationConfig.total"
           layout="total, prev, pager, next, sizes"

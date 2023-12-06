@@ -18,10 +18,11 @@
         </div>
         <app-table
           class="mt-16"
-          :data="dataList"
+          :data="documentData"
           :pagination-config="paginationConfig"
           quick-create
           @sizeChange="handleSizeChange"
+          @changePage="getList"
           @cell-mouse-enter="cellMouseEnter"
           @cell-mouse-leave="cellMouseLeave"
           @creatQuick="creatQuickHandle"
@@ -119,17 +120,10 @@ const documentData = ref<any[]>([])
 const currentMouseId = ref(null)
 
 const paginationConfig = reactive({
-  currentPage: 1,
-  pageSize: 10,
+  current_page: 1,
+  page_size: 10,
   total: 0
 })
-
-const dataList = computed(() =>
-  documentData.value.slice(
-    (paginationConfig.currentPage - 1) * paginationConfig.pageSize,
-    paginationConfig.currentPage * paginationConfig.pageSize
-  )
-)
 
 function rowClickHandle(row: any) {
   router.push({ path: `/dataset/${id}/${row.id}` })
@@ -217,20 +211,21 @@ function cellMouseLeave() {
 }
 
 function handleSizeChange() {
-  paginationConfig.currentPage = 1
+  paginationConfig.current_page = 1
+  getList()
 }
 
 function getList() {
-  loading.value = true
   documentApi
-    .getDocument(id as string, filterText.value)
+    .getDocument(
+      id as string,
+      paginationConfig,
+      filterText.value && { name: filterText.value },
+      loading
+    )
     .then((res) => {
-      documentData.value = res.data
-      paginationConfig.total = res.data.length
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
+      documentData.value = res.data.records
+      paginationConfig.total = res.data.total
     })
 }
 

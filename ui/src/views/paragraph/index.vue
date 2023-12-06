@@ -5,14 +5,15 @@
         <el-button @click="addParagraph" type="primary" :disabled="loading"> 添加分段 </el-button>
       </div>
     </template>
-    <div class="document-detail__main p-16" v-loading="loading">
+    <div class="document-detail__main p-16">
       <div class="flex-between p-8">
-        <span>{{ paragraphDetail.length }} 段落</span>
+        <span>{{ pageConfig.total }} 段落</span>
         <el-input
           v-model="search"
           placeholder="搜索"
           class="input-with-select"
           style="width: 260px"
+          @change="searchHandle"
         >
           <template #prepend>
             <el-select v-model="searchType" placeholder="Select" style="width: 80px">
@@ -23,8 +24,9 @@
         </el-input>
       </div>
       <el-scrollbar>
-        <div class="document-detail-height">
-          <el-row>
+        <div class="document-detail-height" v-loading="pageConfig.current_page === 1 && loading">
+          <el-empty v-if="paragraphDetail.length == 0" description="暂无数据" />
+          <el-row v-else v-infinite-scroll="loadDataset" :infinite-scroll-disabled="disabledLoad">
             <el-col
               :xs="24"
               :sm="12"
@@ -37,7 +39,7 @@
             >
               <CardBox
                 shadow="hover"
-                :title="item.title"
+                :title="item.title || '-'"
                 :description="item.content"
                 class="document-card cursor"
                 :class="item.is_active ? '' : 'disabled'"
@@ -65,6 +67,14 @@
               </CardBox>
             </el-col>
           </el-row>
+          <div style="padding: 16px 10px">
+            <el-divider v-if="paragraphDetail.length > 0 && loading">
+              <el-text type="info"> 加载中...</el-text>
+            </el-divider>
+            <el-divider v-if="noMore">
+              <el-text type="info"> 到底啦！</el-text>
+            </el-divider>
+          </div>
         </div>
       </el-scrollbar>
     </div>
@@ -72,7 +82,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import documentApi from '@/api/document'
 import paragraphApi from '@/api/paragraph'
@@ -94,6 +104,30 @@ const title = ref('')
 const search = ref('')
 const searchType = ref('title')
 
+const pageConfig = reactive({
+  current_page: 1,
+  page_size: 20,
+  total: 0
+})
+
+const noMore = computed(
+  () => paragraphDetail.value.length > 0 && paragraphDetail.value.length === pageConfig.total
+)
+const disabledLoad = computed(
+  () => paragraphDetail.value.length > 0 && (loading.value || noMore.value)
+)
+
+function loadDataset() {
+  pageConfig.current_page += 1
+  getParagraphList()
+}
+
+function searchHandle() {
+  pageConfig.current_page = 1
+  paragraphDetail.value = []
+  getParagraphList()
+}
+
 function changeState(bool: Boolean, row: any) {
   const obj = {
     is_active: bool
@@ -110,7 +144,7 @@ function changeState(bool: Boolean, row: any) {
 }
 
 function deleteParagraph(row: any) {
-  MsgConfirm(`是否删除段落：${row.title} ?`, `删除后无法恢复，请谨慎操作。`, {
+  MsgConfirm(`是否删除段落：${row.title || '-'} ?`, `删除后无法恢复，请谨慎操作。`, {
     confirmButtonText: '删除',
     confirmButtonClass: 'danger'
   })
@@ -120,7 +154,7 @@ function deleteParagraph(row: any) {
         .delParagraph(id, documentId, row.id)
         .then(() => {
           MsgSuccess('删除成功')
-          getParagraphDetail()
+          getParagraphList()
         })
         .catch(() => {
           loading.value = false
@@ -151,26 +185,28 @@ function getDetail() {
     })
 }
 
-function getParagraphDetail() {
-  loading.value = true
+function getParagraphList() {
   paragraphApi
-    .getParagraph(id, documentId)
+    .getParagraph(
+      id,
+      documentId,
+      pageConfig,
+      search.value && { [searchType.value]: search.value },
+      loading
+    )
     .then((res) => {
-      paragraphDetail.value = res.data
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
+      paragraphDetail.value = [...paragraphDetail.value, ...res.data.records]
+      pageConfig.total = res.data.total
     })
 }
 
 function refresh() {
-  getParagraphDetail()
+  getParagraphList()
 }
 
 onMounted(() => {
   getDetail()
-  getParagraphDetail()
+  getParagraphList()
 })
 </script>
 <style lang="scss" scoped>

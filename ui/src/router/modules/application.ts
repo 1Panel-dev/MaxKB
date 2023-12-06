@@ -50,16 +50,16 @@ const applicationRouter = {
           component: () => import('@/views/application/CreateAndSetting.vue')
         },
         {
-          path: 'dialog',
-          name: 'DialogLog',
+          path: 'log',
+          name: 'Log',
           meta: {
             icon: 'Setting',
             title: '对话日志',
-            active: 'dialog',
+            active: 'log',
             parentPath: '/application/:id',
             parentName: 'ApplicationDetail'
           },
-          component: () => import('@/views/application/DialogLog.vue')
+          component: () => import('@/views/log/index.vue')
         }
       ]
     },

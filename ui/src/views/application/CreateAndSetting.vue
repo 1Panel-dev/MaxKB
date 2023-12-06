@@ -157,7 +157,7 @@
         <div class="dialog-bg">
           <h4 class="p-24">{{ applicationForm?.name || '应用名称' }}</h4>
           <div class="scrollbar-height">
-            <AiDialog :data="applicationForm"></AiDialog>
+            <AiChat :data="applicationForm"></AiChat>
           </div>
         </div>
       </el-col>
@@ -181,7 +181,7 @@
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
-import AiDialog from '@/components/ai-dialog/index.vue'
+import AiChat from '@/components/ai-chat/index.vue'
 import AddDatasetDialog from './components/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'

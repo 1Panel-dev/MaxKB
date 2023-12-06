@@ -10,16 +10,24 @@
             :value="item.value"
           />
         </el-select>
-        <el-input v-model="search" placeholder="搜索" prefix-icon="Search" style="width: 240px" />
+        <el-input
+          v-model="search"
+          @change="getList"
+          placeholder="搜索"
+          prefix-icon="Search"
+          class="w-240"
+        />
       </div>
 
       <app-table
-        :data="dataList"
+        :data="tableData"
         :pagination-config="paginationConfig"
         @sizeChange="handleSizeChange"
+        @changePage="getList"
+        @row-click="rowClickHandle"
         v-loading="loading"
       >
-        <el-table-column prop="abstract" label="摘要" />
+        <el-table-column prop="abstract" label="摘要" show-overflow-tooltip />
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
         <el-table-column prop="star_num" label="用户反馈" align="right">
           <template #default="{ row }">
@@ -54,7 +62,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import applicationApi from '@/api/application'
+import logApi from '@/api/log'
 import { datetimeFormat } from '@/utils/time'
 const route = useRoute()
 const {
@@ -81,34 +89,40 @@ const dayOptions = [
 ]
 const loading = ref(false)
 const paginationConfig = reactive({
-  currentPage: 1,
-  pageSize: 10,
+  current_page: 1,
+  page_size: 20,
   total: 0
 })
 const tableData = ref([])
+
 const history_day = ref(7)
 const search = ref('')
 
-const dataList = computed(() =>
-  tableData.value.slice(
-    (paginationConfig.currentPage - 1) * paginationConfig.pageSize,
-    paginationConfig.currentPage * paginationConfig.pageSize
-  )
-)
+function rowClickHandle(row: any) {
+  // router.push({ path: `/dataset/${id}/${row.id}` })
+}
 
 function handleSizeChange() {
-  paginationConfig.currentPage = 1
+  paginationConfig.current_page = 1
+  getList()
 }
 
 function changeHandle(val: number) {
   history_day.value = val
+  paginationConfig.current_page = 1
   getList()
 }
 
 function getList() {
-  applicationApi.getChatLog(id as string, history_day.value, loading).then((res) => {
-    tableData.value = res.data
-    paginationConfig.total = res.data.length
+  let obj = {
+    history_day: history_day.value
+  }
+  if (search.value) {
+    obj = { ...object, search: search.value }
+  }
+  logApi.getChatLog(id as string, paginationConfig, obj, loading).then((res) => {
+    tableData.value = res.data.records
+    paginationConfig.total = res.data.total
   })
 }
 

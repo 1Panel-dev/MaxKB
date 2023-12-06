@@ -9,7 +9,6 @@ interface Dict<V> {
 interface pageRequest {
   current_page: number
   page_size: number
-  name: string
 }
 
 export type { KeyValue, Dict, pageRequest }
