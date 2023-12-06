@@ -30,7 +30,7 @@
               :sm="12"
               :md="8"
               :lg="6"
-              :xl="4"
+              :xl="6"
               v-for="(item, index) in paragraphDetail"
               :key="index"
               class="p-8"
