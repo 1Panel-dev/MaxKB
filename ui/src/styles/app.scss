@@ -421,10 +421,15 @@ h4 {
   }
 }
 
-
 .file-List-card {
   border-radius: 4px;
   .el-card__body {
     padding: 8px 16px 8px 12px;
+  }
+}
+
+.custom-divider {
+  .el-divider__text {
+    background: var(--app-layout-bg-color);
   }
 }

@@ -26,7 +26,7 @@
       <el-scrollbar>
         <div class="document-detail-height" v-loading="pageConfig.current_page === 1 && loading">
           <el-empty v-if="paragraphDetail.length == 0" description="暂无数据" />
-          <el-row v-else v-infinite-scroll="loadDataset" :infinite-scroll-disabled="disabledLoad">
+          <el-row v-else v-infinite-scroll="loadDataset" :infinite-scroll-disabled="disabledScroll">
             <el-col
               :xs="24"
               :sm="12"
@@ -111,15 +111,20 @@ const pageConfig = reactive({
 })
 
 const noMore = computed(
-  () => paragraphDetail.value.length > 0 && paragraphDetail.value.length === pageConfig.total
+  () =>
+    paragraphDetail.value.length > 0 &&
+    paragraphDetail.value.length === pageConfig.total &&
+    pageConfig.total > 20
 )
-const disabledLoad = computed(
+const disabledScroll = computed(
   () => paragraphDetail.value.length > 0 && (loading.value || noMore.value)
 )
 
 function loadDataset() {
-  pageConfig.current_page += 1
-  getParagraphList()
+  if (pageConfig.total > pageConfig.page_size) {
+    pageConfig.current_page += 1
+    getParagraphList()
+  }
 }
 
 function searchHandle() {

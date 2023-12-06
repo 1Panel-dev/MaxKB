@@ -16,17 +16,20 @@ const getAllAppilcation: () => Promise<Result<any[]>> = () => {
 
 /**
  * 获取分页应用
- * @param 参数  {
-              "current_page": "string",
-              "page_size": "string",
-              "name": "string",
-            }
+ * page {
+          "current_page": "string",
+          "page_size": "string",
+        }
+ * param {
+          "name": "string",
+        }
  */
-const getApplication: (param: pageRequest) => Promise<Result<any>> = (param) => {
-  return get(
-    `${prefix}/${param.current_page}/${param.page_size}`,
-    param.name && { name: param.name }
-  )
+const getApplication: (
+  page: pageRequest,
+  param: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (page, param, loading) => {
+  return get(`${prefix}/${page.current_page}/${page.page_size}`, param, loading)
 }
 
 /**
@@ -221,7 +224,6 @@ const putChatVote: (
   )
 }
 
-
 export default {
   getAllAppilcation,
   getApplication,
@@ -237,5 +239,5 @@ export default {
   getAccessToken,
   postAppAuthentication,
   getProfile,
-  putChatVote,
+  putChatVote
 }

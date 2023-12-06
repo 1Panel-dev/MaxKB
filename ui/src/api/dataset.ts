@@ -8,17 +8,21 @@ const prefix = '/dataset'
 
 /**
  * 获取分页数据集
- * @param 参数  {
-              "current_page": "string",
-              "page_size": "string",
-              "name": "string",
-            }
+ * @param 参数  
+ * page {
+          "current_page": "string",
+          "page_size": "string",
+        }
+ * param {
+          "name": "string",
+        }
  */
-const getDateset: (param: pageRequest) => Promise<Result<any>> = (param) => {
-  return get(
-    `${prefix}/${param.current_page}/${param.page_size}`,
-    param.name && { name: param.name }
-  )
+const getDateset: (
+  page: pageRequest,
+  param: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (page, param, loading) => {
+  return get(`${prefix}/${page.current_page}/${page.page_size}`, param, loading)
 }
 
 /**

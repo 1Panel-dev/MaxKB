@@ -3,14 +3,14 @@
     <div class="flex-between mb-16">
       <h3>应用</h3>
       <el-input
-        v-model="pageConfig.name"
-        @change="search"
+        v-model="searchValue"
+        @change="searchHandle"
         placeholder="按 名称 搜索"
         prefix-icon="Search"
         class="w-240"
       />
     </div>
-    <div v-loading.fullscreen.lock="loading">
+    <div v-loading.fullscreen.lock="pageConfig.current_page === 1 && loading">
       <el-row
         :gutter="15"
         v-infinite-scroll="loadDataset"
@@ -92,13 +92,20 @@
           </CardBox>
         </el-col>
       </el-row>
+      <div style="padding: 16px 10px">
+        <el-divider class="custom-divider" v-if="applicationList.length > 0 && loading">
+          <el-text type="info"> 加载中...</el-text>
+        </el-divider>
+        <el-divider class="custom-divider" v-if="noMore">
+          <el-text type="info"> 到底啦！</el-text>
+        </el-divider>
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import applicationApi from '@/api/application'
-import type { pageRequest } from '@/api/type/common'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { useRouter } from 'vue-router'
 import useStore from '@/stores'
@@ -106,22 +113,40 @@ const { application } = useStore()
 const router = useRouter()
 
 const loading = ref(false)
-const disabledScroll = ref(false)
-const pageConfig = reactive<pageRequest>({
-  current_page: 1,
-  page_size: 20,
-  name: ''
-})
 
 const applicationList = ref<any[]>([])
 
-function loadDataset() {}
+const pageConfig = reactive({
+  current_page: 1,
+  page_size: 20,
+  total: 0
+})
 
-function search() {
-  pageConfig.current_page = 1
-  getList()
+const searchValue = ref('')
+
+const noMore = computed(
+  () =>
+    applicationList.value.length > 0 &&
+    applicationList.value.length === pageConfig.total &&
+    pageConfig.total > 20
+)
+const disabledScroll = computed(
+  () => applicationList.value.length > 0 && (loading.value || noMore.value)
+)
+
+function loadDataset() {
+  if (pageConfig.total > pageConfig.page_size) {
+    pageConfig.current_page += 1
+    getList()
+  }
 }
 
+function searchHandle() {
+  pageConfig.total = 0
+  pageConfig.current_page = 1
+  applicationList.value = []
+  getList()
+}
 function getAccessToken(id: string) {
   application.asyncGetAccessToken(id, loading).then((res) => {
     window.open(application.location + res?.data?.access_token)
@@ -164,15 +189,11 @@ function deleteApplication(row: any) {
 // }
 
 function getList() {
-  loading.value = true
   applicationApi
-    .getApplication(pageConfig)
+    .getApplication(pageConfig, searchValue.value && { name: searchValue.value }, loading)
     .then((res) => {
-      applicationList.value = res.data?.records
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
+      applicationList.value = [...applicationList.value, ...res.data.records]
+      pageConfig.total = res.data.total
     })
 }
 
