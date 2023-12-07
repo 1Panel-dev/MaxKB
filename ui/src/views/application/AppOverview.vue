@@ -13,14 +13,10 @@
             :size="32"
           />
           <h4 class="ellipsis-1">{{ detail?.name }}</h4>
-          <div class="ml-8" v-if="detail">
-            <el-tag v-if="detail?.status" class="success-tag">运行中</el-tag>
-            <el-tag v-else class="warning-tag">已停用</el-tag>
-          </div>
         </div>
 
-        <el-row class="mt-16">
-          <el-col :span="12">
+        <el-row>
+          <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mt-16">
             <div class="flex">
               <el-text type="info">公开访问链接</el-text>
               <el-switch
@@ -46,7 +42,7 @@
               <el-button @click="openDialog"> 嵌入第三方 </el-button>
             </div>
           </el-col>
-          <el-col :span="12">
+          <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mt-16">
             <div class="flex">
               <el-text type="info">API访问凭据</el-text>
               <el-switch

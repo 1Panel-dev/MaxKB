@@ -45,10 +45,6 @@
                 :size="32"
               />
             </template>
-            <div class="status-tag">
-              <el-tag v-if="item.status" class="success-tag">运行中</el-tag>
-              <el-tag v-else class="warning-tag">已停用</el-tag>
-            </div>
 
             <template #footer>
               <div class="footer-content">
@@ -67,26 +63,11 @@
                   </el-button>
                 </el-tooltip>
                 <el-divider direction="vertical" />
-                <span @click.stop>
-                  <el-dropdown trigger="click" placement="bottom-start">
-                    <span class="el-dropdown-link">
-                      <el-button text>
-                        <AppIcon iconName="MoreFilled"></AppIcon>
-                      </el-button>
-                    </span>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <div class="dropdown-custom-switch">
-                          <span>运行中</span>
-                          <!-- <el-switch size="small" v-model="item.status"  @change="changeState($event, item)"  /> -->
-                        </div>
-                        <el-dropdown-item divided @click="deleteApplication(item)"
-                          >删除</el-dropdown-item
-                        >
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-                </span>
+                <el-tooltip effect="dark" content="删除" placement="top">
+                  <el-button text @click.stop="deleteApplication(item)">
+                    <el-icon><Delete /></el-icon>
+                  </el-button>
+                </el-tooltip>
               </div>
             </template>
           </CardBox>
@@ -173,20 +154,6 @@ function deleteApplication(row: any) {
     .catch(() => {})
 }
 
-// function changeState(bool: Boolean, row: any) {
-//   const obj = {
-//     is_active: bool
-//   }
-//   loading.value = true
-//   applicationApi
-//     .asyncPutParagraph(id, documentId, row.id, obj)
-//     .then((res) => {
-//       loading.value = false
-//     })
-//     .catch(() => {
-//       loading.value = false
-//     })
-// }
 
 function getList() {
   applicationApi

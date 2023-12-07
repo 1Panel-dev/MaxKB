@@ -31,12 +31,17 @@
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
         <el-table-column prop="star_num" label="用户反馈" align="right">
           <template #default="{ row }">
-            <div>
-              <AppIcon iconName="app-like-color"></AppIcon>
-              {{ row.star_num }}
-              <AppIcon iconName="app-oppose-color"></AppIcon>
-              {{ row.trample_num }}
-            </div>
+            <span v-if="!row.trample_num && !row.trample_num"> - </span>
+            <span v-else>
+              <span v-if="row.star_num">
+                <AppIcon iconName="app-like-color"></AppIcon>
+                {{ row.star_num }}
+              </span>
+              <span v-if="row.trample_num" class="ml-4">
+                <AppIcon iconName="app-oppose-color"></AppIcon>
+                {{ row.trample_num }}
+              </span>
+            </span>
           </template>
         </el-table-column>
         <el-table-column prop="mark_sum" label="改进标注" align="right" />
@@ -49,7 +54,7 @@
         <el-table-column label="操作" width="70" align="center">
           <template #default="{ row }">
             <el-tooltip effect="dark" content="删除" placement="top">
-              <el-button type="primary" text>
+              <el-button type="primary" text @click.stop="deleteLog(row)">
                 <el-icon><Delete /></el-icon>
               </el-button>
             </el-tooltip>
@@ -62,6 +67,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import logApi from '@/api/log'
 import { datetimeFormat } from '@/utils/time'
 const route = useRoute()
@@ -102,6 +108,21 @@ function rowClickHandle(row: any) {
   // router.push({ path: `/dataset/${id}/${row.id}` })
 }
 
+function deleteLog(row: any) {
+  MsgConfirm(`是否删除对话：${row.abstract} ?`, `删除后无法恢复，请谨慎操作。`, {
+    confirmButtonText: '删除',
+    confirmButtonClass: 'danger'
+  })
+    .then(() => {
+      loading.value = true
+      logApi.delChatLog(id as string, row.id, loading).then(() => {
+        MsgSuccess('删除成功')
+        getList()
+      })
+    })
+    .catch(() => {})
+}
+
 function handleSizeChange() {
   paginationConfig.current_page = 1
   getList()
@@ -114,11 +135,11 @@ function changeHandle(val: number) {
 }
 
 function getList() {
-  let obj = {
+  let obj: any = {
     history_day: history_day.value
   }
   if (search.value) {
-    obj = { ...object, search: search.value }
+    obj = { ...obj, search: search.value }
   }
   logApi.getChatLog(id as string, paginationConfig, obj, loading).then((res) => {
     tableData.value = res.data.records

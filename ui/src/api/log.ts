@@ -30,6 +30,19 @@ const getChatLog: (
   )
 }
 
+/**
+ * 删除日志
+ * @param 参数 applicaiton_id, chat_id,
+ */
+const delChatLog: (
+  applicaiton_id: string,
+  chat_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (applicaiton_id, chat_id, loading) => {
+  return del(`${prefix}/${applicaiton_id}/document/${chat_id}`, {}, loading)
+}
+
 export default {
-  getChatLog
+  getChatLog,
+  delChatLog
 }
