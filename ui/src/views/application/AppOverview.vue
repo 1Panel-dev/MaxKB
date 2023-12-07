@@ -15,7 +15,7 @@
           <h4 class="ellipsis-1">{{ detail?.name }}</h4>
         </div>
 
-        <el-row>
+        <el-row :gutter="12">
           <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mt-16">
             <div class="flex">
               <el-text type="info">公开访问链接</el-text>
@@ -29,7 +29,7 @@
             </div>
 
             <div class="mt-4">
-              <span class="vertical-middle lighter">
+              <span class="vertical-middle lighter break-all">
                 {{ shareUrl }}
               </span>
 
@@ -45,16 +45,9 @@
           <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mt-16">
             <div class="flex">
               <el-text type="info">API访问凭据</el-text>
-              <el-switch
-                class="ml-8"
-                size="small"
-                inline-prompt
-                active-text="开"
-                inactive-text="关"
-              />
             </div>
             <div class="mt-4">
-              <span class="vertical-middle lighter">
+              <span class="vertical-middle lighter break-all">
                 API Key: OGZmZThlZjYyYzU2MWE1OTlkYTVjZTBi
               </span>
 

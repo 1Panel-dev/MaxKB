@@ -42,7 +42,7 @@
               </AppAvatar>
             </div>
             <div class="content">
-              <div class="text">
+              <div class="text break-all">
                 {{ item.problem_text }}
               </div>
             </div>
@@ -313,7 +313,6 @@ onUpdated(() => {
       }
     }
     .text {
-      word-break: break-all;
       padding: 6px 0;
     }
     .problem-button {
