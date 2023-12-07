@@ -129,8 +129,8 @@ function searchHandle() {
   getList()
 }
 function getAccessToken(id: string) {
-  application.asyncGetAccessToken(id, loading).then((res) => {
-    window.open(application.location + res?.data?.access_token)
+  application.asyncGetAccessToken(id, loading).then((res:any) => {
+      window.open(application.location + res?.data?.access_token)
   })
 }
 

@@ -27,7 +27,7 @@ interface chatType {
 }
 
 export class ChatRecordManage {
-  id?: NodeJS.Timer
+  id?: any
   ms: number
   chat: chatType
   is_close?: boolean
@@ -54,7 +54,9 @@ export class ChatRecordManage {
         this.chat.answer_text = this.chat.answer_text + s
       } else {
         if (this.is_close) {
-          clearInterval(this.id)
+          if(this.id){
+            clearInterval(this.id)
+          }
           this.chat.write_ed = true
           this.write_ed = true
           if (this.loading) {

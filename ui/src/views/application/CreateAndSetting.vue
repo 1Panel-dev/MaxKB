@@ -192,6 +192,7 @@ import type { Provider } from '@/api/type/model'
 import { realatedObject } from '@/utils/utils'
 import { MsgSuccess } from '@/utils/message'
 import useStore from '@/stores'
+import type Result from '@/request/Result'
 const { model, dataset, application, user } = useStore()
 
 const router = useRouter()
@@ -297,8 +298,8 @@ function getDataset() {
       datasetList.value = res.data
     })
   } else {
-    dataset.asyncGetAllDateset(datasetLoading).then((res: any) => {
-      datasetList.value = res.data?.filter((v) => v.user_id === user.userInfo?.id)
+    dataset.asyncGetAllDateset(datasetLoading).then((res:any) => {
+      datasetList.value = res.data?.filter((v:any) => v.user_id === user.userInfo?.id)
     })
   }
 }

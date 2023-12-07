@@ -70,7 +70,7 @@ const SelectRemoteRef = ref()
 const addMemberFormRef = ref<FormInstance>()
 
 const loading = ref<boolean>(false)
-const userOptions = ref([])
+const userOptions = ref<Array<any>>([])
 
 const rules = ref<FormRules>({
   users: [

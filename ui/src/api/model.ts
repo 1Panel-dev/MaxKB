@@ -21,7 +21,7 @@ const prefix_provider = '/provider'
  * @params 参数 name, model_type, model_name
  */
 const getModel: (
-  request: ListModelRequest,
+  request?: ListModelRequest,
   loading?: Ref<boolean>
 ) => Promise<Result<Array<Model>>> = (data, loading) => {
   return get(`${prefix}`, data, loading)

@@ -1,4 +1,4 @@
-import { Dict } from '@/api/type/common'
+import type { Dict } from '@/api/type/common'
 
 interface ViewCardItem {
   /**
