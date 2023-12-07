@@ -37,9 +37,15 @@ const getParagraph: (
 const delParagraph: (
   dataset_id: string,
   document_id: string,
-  paragraph_id: string
-) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id) => {
-  return del(`${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}`)
+  paragraph_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id, loading) => {
+  return del(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}`,
+    undefined,
+    {},
+    loading
+  )
 }
 
 /**

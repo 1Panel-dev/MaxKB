@@ -94,7 +94,7 @@
         </template>
       </div>
     </el-scrollbar>
-    <div class="ai-chat__operate p-24">
+    <div class="ai-chat__operate p-24" v-if="!record">
       <div class="operate-textarea flex">
         <el-input
           ref="quickInputRef"
@@ -131,6 +131,7 @@ import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
+defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
   params: { accessToken }
@@ -140,7 +141,8 @@ const props = defineProps({
     type: Object,
     default: () => {}
   },
-  appId: String
+  appId: String,
+  record: Boolean
 })
 const { application } = useStore()
 

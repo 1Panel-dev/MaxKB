@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import AiChat from '@/components/ai-chat/index.vue'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
 const route = useRoute()

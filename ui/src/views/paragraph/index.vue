@@ -5,7 +5,7 @@
         <el-button @click="addParagraph" type="primary" :disabled="loading"> 添加分段 </el-button>
       </div>
     </template>
-    <div class="document-detail__main p-16">
+    <div class="document-detail__main p-16" v-loading="pageConfig.current_page === 1 && loading">
       <div class="flex-between p-8">
         <span>{{ pageConfig.total }} 段落</span>
         <el-input
@@ -24,7 +24,7 @@
         </el-input>
       </div>
       <el-scrollbar>
-        <div class="document-detail-height" v-loading="pageConfig.current_page === 1 && loading">
+        <div class="document-detail-height">
           <el-empty v-if="paragraphDetail.length == 0" description="暂无数据" />
           <el-row v-else v-infinite-scroll="loadDataset" :infinite-scroll-disabled="disabledScroll">
             <el-col
@@ -114,7 +114,8 @@ const noMore = computed(
   () =>
     paragraphDetail.value.length > 0 &&
     paragraphDetail.value.length === pageConfig.total &&
-    pageConfig.total > 20
+    pageConfig.total > 20 &&
+    !loading.value
 )
 const disabledScroll = computed(
   () => paragraphDetail.value.length > 0 && (loading.value || noMore.value)
@@ -154,16 +155,11 @@ function deleteParagraph(row: any) {
     confirmButtonClass: 'danger'
   })
     .then(() => {
-      loading.value = true
-      paragraphApi
-        .delParagraph(id, documentId, row.id)
-        .then(() => {
-          MsgSuccess('删除成功')
-          getParagraphList()
-        })
-        .catch(() => {
-          loading.value = false
-        })
+      paragraphApi.delParagraph(id, documentId, row.id, loading).then(() => {
+        const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
+        paragraphDetail.value.splice(index, 1)
+        MsgSuccess('删除成功')
+      })
     })
     .catch(() => {})
 }
@@ -205,8 +201,15 @@ function getParagraphList() {
     })
 }
 
-function refresh() {
-  getParagraphList()
+function refresh(data: any) {
+  if (data) {
+    const index = paragraphDetail.value.findIndex((v) => v.id === data.id)
+    paragraphDetail.value.splice(index, 1, data)
+  } else {
+    pageConfig.current_page = 1
+    paragraphDetail.value = []
+    getParagraphList()
+  }
 }
 
 onMounted(() => {

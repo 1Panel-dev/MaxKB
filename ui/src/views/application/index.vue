@@ -109,7 +109,8 @@ const noMore = computed(
   () =>
     applicationList.value.length > 0 &&
     applicationList.value.length === pageConfig.total &&
-    pageConfig.total > 20
+    pageConfig.total > 20 &&
+    !loading.value
 )
 const disabledScroll = computed(
   () => applicationList.value.length > 0 && (loading.value || noMore.value)
@@ -144,8 +145,9 @@ function deleteApplication(row: any) {
       applicationApi
         .delApplication(row.id)
         .then(() => {
+          const index = applicationList.value.findIndex((v) => v.id === row.id)
+          applicationList.value.splice(index, 1)
           MsgSuccess('删除成功')
-          getList()
         })
         .catch(() => {
           loading.value = false
@@ -153,7 +155,6 @@ function deleteApplication(row: any) {
     })
     .catch(() => {})
 }
-
 
 function getList() {
   applicationApi

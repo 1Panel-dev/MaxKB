@@ -182,3 +182,16 @@
 .el-tabs__header {
   margin: 0 0 12px;
 }
+
+.el-drawer {
+  .el-drawer__header {
+    padding: 16px 24px;
+    margin: 0;
+    border-bottom: 1px solid var(--el-border-color);
+    color: var(--app-text-color);
+  }
+  .el-drawer__footer {
+    border-top: 1px solid var(--el-border-color);
+    padding: 16px 24px;
+  }
+}

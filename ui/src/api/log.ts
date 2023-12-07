@@ -39,10 +39,33 @@ const delChatLog: (
   chat_id: string,
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (applicaiton_id, chat_id, loading) => {
-  return del(`${prefix}/${applicaiton_id}/document/${chat_id}`, {}, loading)
+  return del(`${prefix}/${applicaiton_id}/chat/${chat_id}`, undefined, {}, loading)
+}
+
+/**
+ * 日志记录
+ * @param 参数
+ * application_id, chart_id
+ * page {
+          "current_page": "string",
+          "page_size": "string",
+        }
+ */
+const getChatRecordLog: (
+  applicaiton_id: String,
+  chart_id: String,
+  page: pageRequest,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (applicaiton_id, chart_id, page, loading) => {
+  return get(
+    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
+    undefined,
+    loading
+  )
 }
 
 export default {
   getChatLog,
-  delChatLog
+  delChatLog,
+  getChatRecordLog
 }

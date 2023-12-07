@@ -15,6 +15,7 @@ import CommonList from './common-list/index.vue'
 import MarkdownRenderer from './markdown-renderer/index.vue'
 import dynamicsForm from './dynamics-form'
 import CardCheckbox from './card-checkbox/index.vue'
+import AiChat from './ai-chat/index.vue'
 
 export default {
   install(app: App) {
@@ -34,5 +35,6 @@ export default {
     app.use(dynamicsForm)
     app.component(MarkdownRenderer.name, MarkdownRenderer)
     app.component(CardCheckbox.name, CardCheckbox)
+    app.component(AiChat.name, AiChat)
   }
 }

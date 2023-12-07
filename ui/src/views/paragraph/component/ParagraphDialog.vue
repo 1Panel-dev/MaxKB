@@ -94,8 +94,8 @@ const submitHandle = async () => {
     if (problemId.value) {
       paragraph
         .asyncPutParagraph(id, documentId, problemId.value, paragraphFormRef.value?.form)
-        .then(() => {
-          emit('refresh')
+        .then((res: any) => {
+          emit('refresh', res.data)
           loading.value = false
           isEdit.value = false
         })

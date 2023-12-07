@@ -111,7 +111,7 @@ const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<
   model_id,
   loading
 ) => {
-  return del(`${prefix}/${model_id}`, {}, loading)
+  return del(`${prefix}/${model_id}`, undefined, {}, loading)
 }
 export default {
   getModel,

@@ -62,11 +62,13 @@
         </el-table-column>
       </app-table>
     </div>
+    <ChatRecordDrawer ref="ChatRecordRef" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
+import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import logApi from '@/api/log'
 import { datetimeFormat } from '@/utils/time'
@@ -93,6 +95,8 @@ const dayOptions = [
     label: '过去半年'
   }
 ]
+
+const ChatRecordRef = ref()
 const loading = ref(false)
 const paginationConfig = reactive({
   current_page: 1,
@@ -106,6 +110,7 @@ const search = ref('')
 
 function rowClickHandle(row: any) {
   // router.push({ path: `/dataset/${id}/${row.id}` })
+  ChatRecordRef.value.open(row.id)
 }
 
 function deleteLog(row: any) {

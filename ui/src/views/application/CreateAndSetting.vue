@@ -181,7 +181,6 @@
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
-import AiChat from '@/components/ai-chat/index.vue'
 import AddDatasetDialog from './components/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'

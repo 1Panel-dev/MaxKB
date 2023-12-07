@@ -82,7 +82,8 @@ const noMore = computed(
   () =>
     datasetList.value.length > 0 &&
     datasetList.value.length === pageConfig.total &&
-    pageConfig.total > 20
+    pageConfig.total > 20 &&
+    !loading.value
 )
 const disabledScroll = computed(
   () => datasetList.value.length > 0 && (loading.value || noMore.value)
@@ -115,8 +116,9 @@ function deleteDateset(row: any) {
       datasetApi
         .delDateset(row.id)
         .then(() => {
+          const index = datasetList.value.findIndex((v) => v.id === row.id)
+          datasetList.value.splice(index, 1)
           MsgSuccess('删除成功')
-          getList()
         })
         .catch(() => {
           loading.value = false
