@@ -3,7 +3,9 @@
     <div class="flex-center h-full">
       <div class="app-title-container flex-center">
         <div class="app-title-icon"></div>
-        <div class="app-title-text app-logo-font">{{ defaultTitle }}</div>
+        <div class="app-title-text app-logo-font ml-4">
+          {{ defaultTitle }}
+        </div>
       </div>
       <TopMenu></TopMenu>
     </div>
@@ -26,10 +28,11 @@ const defaultTitle = import.meta.env.VITE_APP_TITLE
   .app-title-container {
     margin-right: 45px;
     .app-title-icon {
-      background-image: url('@/assets/logo.png');
+      background-image: url('@/assets/logo.svg');
       background-size: 100% 100%;
-      width: 34px;
-      height: 34px;
+      width: 30px;
+      height: 30px;
+      background-position: center -1px;
     }
 
     .app-title-text {

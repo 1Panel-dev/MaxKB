@@ -25,7 +25,7 @@ const listSplitPattern: (
 }
 
 /**
- * 文档列表
+ * 文档分页列表
  * @param 参数  dataset_id,   
  * page {
               "current_page": "string",
@@ -47,6 +47,13 @@ const getDocument: (
     param,
     loading
   )
+}
+
+const getAllDocument: (dataset_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  dataset_id,
+  loading
+) => {
+  return get(`${prefix}/${dataset_id}/document`, undefined, loading)
 }
 
 /**
@@ -117,6 +124,7 @@ const getDocumentDetail: (dataset_id: string, document_id: string) => Promise<Re
 export default {
   postSplitDocument,
   getDocument,
+  getAllDocument,
   postDocument,
   putDocument,
   delDocument,

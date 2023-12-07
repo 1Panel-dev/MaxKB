@@ -34,6 +34,19 @@ const useApplicationStore = defineStore({
       })
     },
 
+    async asyncGetApplicationDataset(id: string, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        applicationApi
+          .getApplicationDataset(id, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
+
     async asyncGetAccessToken(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         applicationApi

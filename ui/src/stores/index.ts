@@ -7,6 +7,7 @@ import useDatasetStore from './modules/dataset'
 import useParagraphStore from './modules/paragraph'
 import useModelStore from './modules/model'
 import useApplicationStore from './modules/application'
+import useDocumentStore from './modules/document'
 
 const useStore = () => ({
   common: useCommonStore(),
@@ -14,7 +15,8 @@ const useStore = () => ({
   dataset: useDatasetStore(),
   paragraph: useParagraphStore(),
   model: useModelStore(),
-  application: useApplicationStore()
+  application: useApplicationStore(),
+  document: useDocumentStore()
 })
 
 export default useStore

@@ -62,7 +62,7 @@
         </el-table-column>
       </app-table>
     </div>
-    <ChatRecordDrawer ref="ChatRecordRef" />
+    <ChatRecordDrawer ref="ChatRecordRef" :data="detail" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -72,6 +72,8 @@ import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import logApi from '@/api/log'
 import { datetimeFormat } from '@/utils/time'
+import useStore from '@/stores'
+const { application } = useStore()
 const route = useRoute()
 const {
   params: { id }
@@ -107,6 +109,7 @@ const tableData = ref([])
 
 const history_day = ref(7)
 const search = ref('')
+const detail = ref<any>(null)
 
 function rowClickHandle(row: any) {
   // router.push({ path: `/dataset/${id}/${row.id}` })
@@ -152,8 +155,15 @@ function getList() {
   })
 }
 
+function getDetail() {
+  application.asyncGetApplicationDetail(id as string, loading).then((res: any) => {
+    detail.value = res.data
+  })
+}
+
 onMounted(() => {
   getList()
+  getDetail()
 })
 </script>
 <style lang="scss" scoped></style>

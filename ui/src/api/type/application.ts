@@ -23,7 +23,7 @@ interface chatType {
    */
   is_stop?: boolean
   record_id: string
-  vote_status: string
+  vote_status: string,
 }
 
 export class ChatRecordManage {

@@ -22,7 +22,8 @@
                 <template v-for="(item, index) in data?.example" :key="index">
                   <div
                     @click="quickProblemHandel(item)"
-                    class="problem-button cursor ellipsis-2"
+                    class="problem-button ellipsis-2"
+                    :class="log ? 'disabled' : 'cursor'"
                     v-if="item"
                   >
                     <el-icon><EditPen /></el-icon>
@@ -66,7 +67,14 @@
                   :inner_suffix="false"
                 ></MarkdownRenderer>
               </el-card>
-              <div class="flex-between mt-8">
+              <div class="flex-between mt-8" v-if="log">
+                <el-text type="info">
+                  消耗 {{ item?.message_tokens + item?.answer_tokens }} tokens
+                </el-text>
+                <LogOperationButton :data="item" :applicationId="appId" :chartId="item.id" />
+              </div>
+
+              <div class="flex-between mt-8" v-else>
                 <div>
                   <el-button
                     type="primary"
@@ -94,7 +102,7 @@
         </template>
       </div>
     </el-scrollbar>
-    <div class="ai-chat__operate p-24" v-if="!record">
+    <div class="ai-chat__operate p-24" v-if="!log">
       <div class="operate-textarea flex">
         <el-input
           ref="quickInputRef"
@@ -124,8 +132,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, onUpdated, computed } from 'vue'
+import { ref, nextTick, onUpdated, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import LogOperationButton from './LogOperationButton.vue'
 import OperationButton from './OperationButton.vue'
 import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
@@ -142,7 +151,11 @@ const props = defineProps({
     default: () => {}
   },
   appId: String,
-  record: Boolean
+  log: Boolean,
+  record: {
+    type: Array<chatType[]>,
+    default: () => []
+  }
 })
 const { application } = useStore()
 
@@ -152,17 +165,31 @@ const dialogScrollbar = ref()
 const loading = ref(false)
 const inputValue = ref('')
 const chartOpenId = ref('')
-const chatList = ref<chatType[]>([])
+const chatList = ref<any[]>([])
 
 const isDisabledChart = computed(
   () => !(inputValue.value && (props.appId || (props.data?.name && props.data?.model_id)))
 )
 
+watch(
+  () => props.record,
+  (value) => {
+    if (props.log) {
+      chatList.value = value
+    }
+  },
+  {
+    immediate: true
+  }
+)
+
 function quickProblemHandel(val: string) {
-  inputValue.value = val
-  nextTick(() => {
-    quickInputRef.value?.focus()
-  })
+  if (!props.log) {
+    inputValue.value = val
+    nextTick(() => {
+      quickInputRef.value?.focus()
+    })
+  }
 }
 
 function sendChatHandle(event: any) {
@@ -286,7 +313,9 @@ function handleScrollBottom() {
 }
 
 onUpdated(() => {
-  handleScrollBottom()
+  if (!props.log) {
+    handleScrollBottom()
+  }
 })
 </script>
 <style lang="scss" scoped>
@@ -329,6 +358,11 @@ onUpdated(() => {
       word-break: break-all;
       &:hover {
         background: var(--el-color-primary-light-9);
+      }
+      &.disabled {
+        &:hover {
+          background: var(--app-layout-bg-color);
+        }
       }
       :deep(.el-icon) {
         color: var(--el-color-primary);

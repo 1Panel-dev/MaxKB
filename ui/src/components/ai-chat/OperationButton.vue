@@ -71,7 +71,8 @@ const props = defineProps({
   chartId: {
     type: String,
     default: ''
-  }
+  },
+  log: Boolean
 })
 
 const emit = defineEmits(['update:data', 'regeneration'])
@@ -79,7 +80,7 @@ const emit = defineEmits(['update:data', 'regeneration'])
 const buttonData = ref(props.data)
 const loading = ref(false)
 
-function regeneration() { 
+function regeneration() {
   emit('regeneration')
 }
 

@@ -64,8 +64,43 @@ const getChatRecordLog: (
   )
 }
 
+/**
+ * 修改日志内容
+ * @param 参数
+ * application_id, chart_id,  chart_record_id, dataset_id, document_id
+ * data {
+          "title": "string",
+          "content": "string",
+        }
+ */
+const putChatRecordLog: (
+  applicaiton_id: String,
+  chart_id: String,
+  chart_record_id: String,
+  dataset_id: String,
+  document_id: String,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (
+  applicaiton_id,
+  chart_id,
+  chart_record_id,
+  dataset_id,
+  document_id,
+  data,
+  loading
+) => {
+  return put(
+    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${chart_record_id}/dataset/${dataset_id}/document_id/${document_id}/improve`,
+    data,
+    undefined,
+    loading
+  )
+}
+
 export default {
   getChatLog,
   delChatLog,
-  getChatRecordLog
+  getChatRecordLog,
+  putChatRecordLog
 }

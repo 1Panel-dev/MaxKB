@@ -195,3 +195,11 @@
     padding: 16px 24px;
   }
 }
+
+.el-cascader-node {
+  padding-left: 2px;
+}
+.el-cascader-node__prefix {
+  right: 10px;
+  left: auto;
+}
