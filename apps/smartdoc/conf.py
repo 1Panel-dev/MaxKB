@@ -98,6 +98,9 @@ class Config(dict):
 
     }
 
+    def get_debug(self) -> bool:
+        return self.get('DEBUG') if 'DEBUG' in self else True
+
     def get_db_setting(self) -> dict:
         return {
             "NAME": self.get('DB_NAME'),

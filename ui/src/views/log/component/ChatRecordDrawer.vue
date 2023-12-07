@@ -39,14 +39,14 @@ const paginationConfig = reactive({
 
 function closeHandel() {}
 
-function getChatRecord(chatId) {
+function getChatRecord(chatId:string) {
   logApi.getChatRecordLog(id as string, chatId, paginationConfig, loading).then((res) => {
     // tableData.value = res.data.records
     paginationConfig.total = res.data.total
   })
 }
 
-const open = (id) => {
+const open = (id:string) => {
   getChatRecord(id)
   visible.value = true
 }
