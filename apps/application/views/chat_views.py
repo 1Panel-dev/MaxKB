@@ -150,6 +150,8 @@ class ChatView(APIView):
                       'chat_id': chat_id}).list())
 
         class Page(APIView):
+            authentication_classes = [TokenAuth]
+
             @action(methods=['GET'], detail=False)
             @swagger_auto_schema(operation_summary="获取对话记录列表",
                                  operation_id="获取对话记录列表",
