@@ -211,7 +211,6 @@ onMounted(() => {
   window.onresize = () => {
     return (() => {
       tableHeight.value = window.innerHeight - 330
-      console.log(tableHeight.value)
     })()
   }
   getMember()
