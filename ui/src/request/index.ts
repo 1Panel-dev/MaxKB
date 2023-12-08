@@ -141,8 +141,8 @@ export const post: (
  */
 export const put: (
   url: string,
-  params?: unknown,
   data?: unknown,
+  params?: unknown,
   loading?: NProgress | Ref<boolean>
 ) => Promise<Result<any>> = (url, data, params, loading) => {
   return promise(request({ url: url, method: 'put', data, params }), loading)

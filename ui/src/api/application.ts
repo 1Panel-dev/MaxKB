@@ -112,17 +112,6 @@ const getApplicationDataset: (
 }
 
 /**
- * API_KEY列表
- * @param 参数 applicaiton_id
- */
-const getAPIKey: (applicaiton_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  applicaiton_id,
-  loading
-) => {
-  return get(`${prefix}/${applicaiton_id}/api_key`, undefined, loading)
-}
-
-/**
  * 获取AccessToken
  * @param 参数 applicaiton_id
  */
@@ -131,6 +120,21 @@ const getAccessToken: (applicaiton_id: string, loading?: Ref<boolean>) => Promis
   loading
 ) => {
   return get(`${prefix}/${applicaiton_id}/access_token`, undefined, loading)
+}
+
+/**
+ * 修改AccessToken
+ * @param 参数 applicaiton_id
+ * data {
+ *  "is_active": true
+ * }
+ */
+const putAccessToken: (
+  applicaiton_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (applicaiton_id, data, loading) => {
+  return put(`${prefix}/${applicaiton_id}/access_token`, data, undefined, loading)
 }
 
 /**
@@ -235,8 +239,8 @@ export default {
   delApplication,
   getApplicationDetail,
   getApplicationDataset,
-  getAPIKey,
   getAccessToken,
+  putAccessToken,
   postAppAuthentication,
   getProfile,
   putChatVote
