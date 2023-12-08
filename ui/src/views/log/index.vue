@@ -63,17 +63,26 @@
         </el-table-column>
       </app-table>
     </div>
-    <ChatRecordDrawer ref="ChatRecordRef" :data="detail" />
+    <ChatRecordDrawer
+      :next="nextChatRecord"
+      :pre="preChatRecord"
+      ref="ChatRecordRef"
+      v-model:id="currentChatId"
+      :application="detail"
+      :pre_disable="pre_disable"
+      :next_disable="next_disable"
+    />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import logApi from '@/api/log'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
+import type { Dict } from '@/api/type/common'
 const { application } = useStore()
 const route = useRoute()
 const {
@@ -99,6 +108,62 @@ const dayOptions = [
   }
 ]
 
+/**
+ * 下一页
+ */
+const nextChatRecord = () => {
+  let index = tableIndexMap.value[currentChatId.value] + 1
+  if (index >= tableData.value.length) {
+    if (
+      index + (paginationConfig.current_page - 1) * paginationConfig.page_size >=
+      paginationConfig.total - 1
+    ) {
+      MsgError('没有更多了')
+      return
+    }
+    paginationConfig.current_page = paginationConfig.current_page + 1
+    getList().then(() => {
+      index = 0
+      currentChatId.value = tableData.value[index].id
+    })
+  } else {
+    currentChatId.value = tableData.value[index].id
+  }
+}
+const pre_disable = computed(() => {
+  let index = tableIndexMap.value[currentChatId.value] - 1
+  return index < 0 && paginationConfig.current_page <= 1
+})
+
+const next_disable = computed(() => {
+  let index = tableIndexMap.value[currentChatId.value] + 1
+  return (
+    index >= tableData.value.length &&
+    index + (paginationConfig.current_page - 1) * paginationConfig.page_size >=
+      paginationConfig.total - 1
+  )
+})
+/**
+ * 上一页
+ */
+const preChatRecord = () => {
+  let index = tableIndexMap.value[currentChatId.value] - 1
+
+  if (index < 0) {
+    if (paginationConfig.current_page <= 1) {
+      MsgError('到头了')
+      return
+    }
+    paginationConfig.current_page = paginationConfig.current_page - 1
+    getList().then((ok) => {
+      index = paginationConfig.page_size - 1
+      currentChatId.value = tableData.value[index].id
+    })
+  } else {
+    currentChatId.value = tableData.value[index].id
+  }
+}
+
 const ChatRecordRef = ref()
 const loading = ref(false)
 const paginationConfig = reactive({
@@ -107,36 +172,18 @@ const paginationConfig = reactive({
   total: 0
 })
 const tableData = ref<any[]>([])
-
+const tableIndexMap = computed<Dict<number>>(() => {
+  return tableData.value
+    .map((row, index) => ({
+      [row.id]: index
+    }))
+    .reduce((pre, next) => ({ ...pre, ...next }), {})
+})
 const history_day = ref(7)
 const search = ref('')
 const detail = ref<any>(null)
 
-const currentChatId = ref('')
-
-// watch(
-//   () => currentChatId.value,
-//   (val) => {
-//     const index = tableData.value.findIndex((item: any) => item.id === val)
-//     if (isFirst(index)) {
-//       prevChatId.value = ''
-//     } else {
-//       prevChatId.value = tableData.value[index - 1]?.id
-//     }
-//     console.log(isLast(index))
-//     if (isLast(index)) {
-//       nextChatId.value = ''
-//     } else {
-//       if (tableData.value[index + 1]) {
-//         nextChatId.value = tableData.value[index + 1]?.id
-//         // } else {
-//         //   paginationConfig.current_page += 1
-//         //   getList()
-//       }
-//     }
-//   },
-//   { immediate: true }
-// )
+const currentChatId = ref<string>('')
 
 function isFirst(index: number) {
   if (index === 0 && paginationConfig.current_page === 1) {
@@ -160,7 +207,7 @@ function isLast(index: number) {
 
 function rowClickHandle(row: any) {
   currentChatId.value = row.id
-  ChatRecordRef.value.open(row.id)
+  ChatRecordRef.value.open()
 }
 
 const setRowClass = ({ row }: any) => {
@@ -200,7 +247,7 @@ function getList() {
   if (search.value) {
     obj = { ...obj, search: search.value }
   }
-  logApi.getChatLog(id as string, paginationConfig, obj, loading).then((res) => {
+  return logApi.getChatLog(id as string, paginationConfig, obj, loading).then((res) => {
     tableData.value = res.data.records
     if (currentChatId.value) {
       currentChatId.value = tableData.value[0]?.id

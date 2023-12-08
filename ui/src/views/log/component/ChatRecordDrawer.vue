@@ -7,7 +7,7 @@
     class="chat-record-drawer"
   >
     <template #header>
-      <h4>{{ data?.name }}</h4>
+      <h4>{{ application?.name }}</h4>
     </template>
     <div
       v-loading="paginationConfig.current_page === 1 && loading"
@@ -15,7 +15,7 @@
       style="padding: 24px 0"
     >
       <div v-infinite-scroll="loadDataset" :infinite-scroll-disabled="disabledScroll">
-        <AiChat :data="data" :record="recordList" log></AiChat>
+        <AiChat :data="application" :record="recordList" log></AiChat>
       </div>
       <div style="padding: 16px 10px">
         <el-divider class="custom-divider" v-if="recordList.length > 0 && loading">
@@ -28,27 +28,50 @@
     </div>
     <template #footer>
       <div>
-        <el-button>上一条</el-button>
-        <el-button>下一条</el-button>
+        <el-button @click="pre" :disabled="pre_disable != undefined ? pre_disable : false"
+          >上一条</el-button
+        >
+        <el-button @click="next" :disabled="next_disable != undefined ? next_disable : false"
+          >下一条</el-button
+        >
       </div>
     </template>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import logApi from '@/api/log'
 import { type chatType } from '@/api/type/application'
+import { type ApplicationFormType } from '@/api/type/application'
+const props = withDefaults(
+  defineProps<{
+    /**
+     * 应用信息
+     */
+    application?: ApplicationFormType
+    /**
+     * 对话 记录id
+     */
+    id?: string
+    /**
+     * 下一条
+     */
+    next: () => void
+    /**
+     * 上一条
+     */
+    pre: () => void
 
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => {}
-  }
-})
+    pre_disable: boolean
 
-const emit = defineEmits(['changeId', 'close'])
+    next_disable: boolean
+  }>(),
+  {}
+)
+
+defineEmits(['update:id'])
 
 const route = useRoute()
 const {
@@ -57,7 +80,6 @@ const {
 const loading = ref(false)
 const visible = ref(false)
 const recordList = ref<chatType[]>([])
-const currentChatId = ref('')
 
 const paginationConfig = reactive({
   current_page: 1,
@@ -78,10 +100,8 @@ const disabledScroll = computed(
 
 function closeHandel() {
   recordList.value = []
-  currentChatId.value = ''
   paginationConfig.total = 0
   paginationConfig.current_page = 1
-  emit('close')
 }
 
 function loadDataset() {
@@ -92,25 +112,25 @@ function loadDataset() {
 }
 
 function getChatRecord() {
-  logApi
-    .getChatRecordLog(id as string, currentChatId.value, paginationConfig, loading)
-    .then((res) => {
+  if (props.id && visible.value) {
+    logApi.getChatRecordLog(id as string, props.id, paginationConfig, loading).then((res) => {
       paginationConfig.total = res.data.total
       recordList.value = [...recordList.value, ...res.data.records]
     })
+  }
 }
 
-// function nextRecord(id: string) {
-//   currentChatId.value = id
-//   emit('changeId', id)
-//   recordList.value = []
-//   paginationConfig.total = 0
-//   paginationConfig.current_page = 1
-//   getChatRecord()
-// }
+watch(
+  () => props.id,
+  () => {
+    recordList.value = []
+    paginationConfig.total = 0
+    paginationConfig.current_page = 1
+    getChatRecord()
+  }
+)
 
-const open = (id: string) => {
-  currentChatId.value = id
+const open = () => {
   getChatRecord()
   visible.value = true
 }
