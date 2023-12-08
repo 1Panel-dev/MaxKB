@@ -57,7 +57,7 @@
               </el-text>
             </template>
           </el-table-column>
-          <el-table-column prop="name" label="启用状态">
+          <el-table-column label="启用状态">
             <template #default="{ row }">
               <div @click.stop>
                 <el-switch
@@ -78,7 +78,7 @@
               {{ datetimeFormat(row.update_time) }}
             </template>
           </el-table-column>
-          <el-table-column prop="name" label="操作" align="center">
+          <el-table-column label="操作" align="center">
             <template #default="{ row }">
               <span v-if="row.status === 2">
                 <el-tooltip effect="dark" content="刷新" placement="top">

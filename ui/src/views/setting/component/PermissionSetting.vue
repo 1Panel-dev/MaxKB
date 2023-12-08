@@ -1,50 +1,56 @@
 <template>
-  <el-input v-model="filterText" placeholder="搜索" prefix-icon="Search" class="mb-16" />
-
-  <el-table :data="data" :max-height="tableHeight">
-    <el-table-column prop="name" :label="isApplication ? '应用名称' : '数据集名称'">
-      <template #default="{ row }">
-        <div class="flex align-center">
-          <AppAvatar
-            v-if="isApplication"
-            :name="row.name"
-            pinyinColor
-            class="mr-12"
-            shape="square"
-            :size="24"
-          />
-          <AppAvatar v-else-if="isDataset" class="mr-12" shape="square" :size="24">
-            <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-          </AppAvatar>
-          <span class="ellipsis-1"> {{ row?.name }}</span>
-        </div>
-      </template>
-    </el-table-column>
-    <el-table-column label="管理" align="center" width="60">
-      <!-- <template #header>
+  <el-input
+    v-model="filterText"
+    placeholder="搜索"
+    prefix-icon="Search"
+    class="p-24 pt-0 pb-0 mb-16 mt-4"
+  />
+  <div class="p-24 pt-0">
+    <el-table :data="data" :max-height="tableHeight">
+      <el-table-column prop="name" :label="isApplication ? '应用名称' : '数据集名称'">
+        <template #default="{ row }">
+          <div class="flex align-center">
+            <AppAvatar
+              v-if="isApplication"
+              :name="row.name"
+              pinyinColor
+              class="mr-12"
+              shape="square"
+              :size="24"
+            />
+            <AppAvatar v-else-if="isDataset" class="mr-12" shape="square" :size="24">
+              <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+            </AppAvatar>
+            <span class="ellipsis-1"> {{ row?.name }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="管理" align="center" width="60">
+        <!-- <template #header>
         <el-checkbox
           v-model="allChecked[MANAGE]"
           label="管理"
           @change="handleCheckAllChange($event, MANAGE)"
         />
       </template> -->
-      <template #default="{ row }">
-        <el-checkbox v-model="row.operate[MANAGE]" @change="checkedOperateChange(MANAGE, row)" />
-      </template>
-    </el-table-column>
-    <el-table-column label="使用" align="center" width="60">
-      <!-- <template #header>
+        <template #default="{ row }">
+          <el-checkbox v-model="row.operate[MANAGE]" @change="checkedOperateChange(MANAGE, row)" />
+        </template>
+      </el-table-column>
+      <el-table-column label="使用" align="center" width="60">
+        <!-- <template #header>
         <el-checkbox
           v-model="allChecked[USE]"
           label="使用"
           @change="handleCheckAllChange($event, USE)"
         />
       </template> -->
-      <template #default="{ row }">
-        <el-checkbox v-model="row.operate[USE]" @change="checkedOperateChange(USE, row)" />
-      </template>
-    </el-table-column>
-  </el-table>
+        <template #default="{ row }">
+          <el-checkbox v-model="row.operate[USE]" @change="checkedOperateChange(USE, row)" />
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
@@ -56,7 +62,8 @@ const props = defineProps({
     default: () => []
   },
   id: String,
-  type: String
+  type: String,
+  tableHeight: Number
 })
 
 const isDataset = computed(() => props.type === DATASET)
@@ -67,8 +74,6 @@ const allChecked: any = ref({
   [MANAGE]: false,
   [USE]: false
 })
-
-const tableHeight = ref(0)
 
 const filterText = ref('')
 
@@ -113,12 +118,6 @@ function compare(attrs: string | number) {
 }
 
 onMounted(() => {
-  tableHeight.value = window.innerHeight - 300
-  window.onresize = () => {
-    return (() => {
-      tableHeight.value = window.innerHeight - 300
-    })()
-  }
   Object.keys(allChecked.value).map((item) => {
     allChecked.value[item] = compare(item)
   })

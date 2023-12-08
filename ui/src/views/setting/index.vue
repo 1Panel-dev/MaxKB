@@ -40,21 +40,26 @@
         </common-list>
       </div>
       <div class="permission-setting flex" v-loading="rLoading">
-        <div class="team-manage__table p-24">
-          <h4>权限设置</h4>
+        <div class="team-manage__table">
+          <h4 class="p-24 pb-0 mb-4">权限设置</h4>
           <el-tabs v-model="activeName" class="team-manage__tabs">
             <el-tab-pane
-              v-for="item in settingTags"
+              v-for="(item, index) in settingTags"
               :key="item.value"
               :label="item.label"
               :name="item.value"
             >
-              <PermissionSetting :data="item.data" :type="item.value"></PermissionSetting>
+              <PermissionSetting
+                :key="index"
+                :data="item.data"
+                :type="item.value"
+                :tableHeight="tableHeight"
+              ></PermissionSetting>
             </el-tab-pane>
           </el-tabs>
         </div>
 
-        <div class="team-manage__footer border-t p-16 flex">
+        <div class="submit-button">
           <el-button type="primary" @click="submitPermissions">保存</el-button>
         </div>
       </div>
@@ -81,6 +86,7 @@ const currentUser = ref<String>('')
 const filterText = ref('')
 
 const activeName = ref(DATASET)
+const tableHeight = ref(0)
 
 const settingTags = reactive([
   {
@@ -201,6 +207,12 @@ function refresh() {
 }
 
 onMounted(() => {
+  tableHeight.value = window.innerHeight - 330
+  window.onresize = () => {
+    return (() => {
+      tableHeight.value = window.innerHeight - 330
+    })()
+  }
   getMember()
 })
 </script>
@@ -223,17 +235,28 @@ onMounted(() => {
     box-sizing: border-box;
     width: calc(100% - var(--setting-left-width));
     flex-direction: column;
+    position: relative;
+    .submit-button {
+      position: absolute;
+      top: 54px;
+      right: 24px;
+    }
   }
 
   &__tabs {
     margin-top: 10px;
+    :deep(.el-tabs__nav-wrap::after) {
+      height: 1px;
+    }
+    :deep(.el-tabs__nav-scroll) {
+      padding: 0 24px;
+    }
+    :deep(.el-tabs__active-bar) {
+      height: 3px;
+    }
   }
   &__table {
     flex: 1;
-  }
-  &__footer {
-    flex: 0 0 auto;
-    justify-content: right;
   }
 }
 </style>
