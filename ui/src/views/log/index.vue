@@ -26,6 +26,7 @@
         @changePage="getList"
         @row-click="rowClickHandle"
         v-loading="loading"
+        :row-class-name="setRowClass"
       >
         <el-table-column prop="abstract" label="摘要" show-overflow-tooltip />
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
@@ -66,7 +67,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, reactive, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -105,15 +106,65 @@ const paginationConfig = reactive({
   page_size: 20,
   total: 0
 })
-const tableData = ref([])
+const tableData = ref<any[]>([])
 
 const history_day = ref(7)
 const search = ref('')
 const detail = ref<any>(null)
 
+const currentChatId = ref('')
+
+// watch(
+//   () => currentChatId.value,
+//   (val) => {
+//     const index = tableData.value.findIndex((item: any) => item.id === val)
+//     if (isFirst(index)) {
+//       prevChatId.value = ''
+//     } else {
+//       prevChatId.value = tableData.value[index - 1]?.id
+//     }
+//     console.log(isLast(index))
+//     if (isLast(index)) {
+//       nextChatId.value = ''
+//     } else {
+//       if (tableData.value[index + 1]) {
+//         nextChatId.value = tableData.value[index + 1]?.id
+//         // } else {
+//         //   paginationConfig.current_page += 1
+//         //   getList()
+//       }
+//     }
+//   },
+//   { immediate: true }
+// )
+
+function isFirst(index: number) {
+  if (index === 0 && paginationConfig.current_page === 1) {
+    return true
+  } else {
+    return false
+  }
+}
+
+function isLast(index: number) {
+  console.log((paginationConfig.current_page - 1) * paginationConfig.page_size + index + 1)
+  if (
+    (paginationConfig.current_page - 1) * paginationConfig.page_size + index + 1 ===
+    paginationConfig.total
+  ) {
+    return true
+  } else {
+    return false
+  }
+}
+
 function rowClickHandle(row: any) {
-  // router.push({ path: `/dataset/${id}/${row.id}` })
+  currentChatId.value = row.id
   ChatRecordRef.value.open(row.id)
+}
+
+const setRowClass = ({ row }: any) => {
+  return currentChatId.value === row?.id ? 'hightlight' : ''
 }
 
 function deleteLog(row: any) {
@@ -151,6 +202,9 @@ function getList() {
   }
   logApi.getChatLog(id as string, paginationConfig, obj, loading).then((res) => {
     tableData.value = res.data.records
+    if (currentChatId.value) {
+      currentChatId.value = tableData.value[0]?.id
+    }
     paginationConfig.total = res.data.total
   })
 }

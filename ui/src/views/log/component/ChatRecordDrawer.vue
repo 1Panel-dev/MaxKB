@@ -9,7 +9,11 @@
     <template #header>
       <h4>{{ data?.name }}</h4>
     </template>
-    <div v-loading="paginationConfig.current_page === 1 && loading">
+    <div
+      v-loading="paginationConfig.current_page === 1 && loading"
+      class="h-full"
+      style="padding: 24px 0"
+    >
       <div v-infinite-scroll="loadDataset" :infinite-scroll-disabled="disabledScroll">
         <AiChat :data="data" :record="recordList" log></AiChat>
       </div>
@@ -24,8 +28,8 @@
     </div>
     <template #footer>
       <div>
-        <el-button :disabled="loading">上一条</el-button>
-        <el-button :disabled="loading">下一条</el-button>
+        <el-button>上一条</el-button>
+        <el-button>下一条</el-button>
       </div>
     </template>
   </el-drawer>
@@ -43,6 +47,8 @@ const props = defineProps({
     default: () => {}
   }
 })
+
+const emit = defineEmits(['changeId', 'close'])
 
 const route = useRoute()
 const {
@@ -75,6 +81,7 @@ function closeHandel() {
   currentChatId.value = ''
   paginationConfig.total = 0
   paginationConfig.current_page = 1
+  emit('close')
 }
 
 function loadDataset() {
@@ -93,11 +100,21 @@ function getChatRecord() {
     })
 }
 
+// function nextRecord(id: string) {
+//   currentChatId.value = id
+//   emit('changeId', id)
+//   recordList.value = []
+//   paginationConfig.total = 0
+//   paginationConfig.current_page = 1
+//   getChatRecord()
+// }
+
 const open = (id: string) => {
   currentChatId.value = id
   getChatRecord()
   visible.value = true
 }
+
 defineExpose({
   open
 })
@@ -106,7 +123,7 @@ defineExpose({
 .chat-record-drawer {
   .el-drawer__body {
     background: var(--app-layout-bg-color);
-    padding: 24px 0;
+    padding: 0;
   }
 }
 </style>

@@ -115,6 +115,9 @@
   .el-checkbox {
     height: 23px;
   }
+  tr.hightlight {
+    background: var(--el-table-current-row-bg-color);
+  }
 }
 
 .el-pagination .el-select .el-input {

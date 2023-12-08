@@ -159,7 +159,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         )
         .then((res: any) => {
           emit('updateContent', res.data)
-          loading.value = false
+          dialogVisible.value = false
         })
     } else {
       console.log('error submit!', fields)
