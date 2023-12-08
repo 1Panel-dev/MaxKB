@@ -91,6 +91,18 @@ class ApplicationApi(ApiMixin):
                                           description='应用api_key id')
                         ]
 
+            @staticmethod
+            def get_request_body_api():
+                return openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    required=[],
+                    properties={
+                        'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否激活",
+                                                    description="是否激活"),
+
+                    }
+                )
+
     class AccessToken(ApiMixin):
         @staticmethod
         def get_request_params_api():
@@ -134,9 +146,6 @@ class ApplicationApi(ApiMixin):
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
                                                       title="关联数据集Id列表", description="关联数据集Id列表"),
-                    'status': openapi.Schema(type=openapi.TYPE_BOOLEAN, title='状态', description="状态"),
-                    'api_key_is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title='api_key是否可用',
-                                                        default=True)
 
                 }
             )

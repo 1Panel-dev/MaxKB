@@ -20,7 +20,7 @@ class ApplicationApiKey(AppModelMixin):
     secret_key = models.CharField(max_length=1024, verbose_name="秘钥", unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE, verbose_name="应用id")
-
+    is_active = models.BooleanField(default=True, verbose_name="是否开启")
     class Meta:
         db_table = "application_api_key"
 

@@ -25,10 +25,8 @@ class Application(AppModelMixin):
     prologue = models.CharField(max_length=1024, verbose_name="开场白", default="")
     example = ArrayField(verbose_name="示例列表", base_field=models.CharField(max_length=256, blank=True))
     dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
-    status = models.BooleanField(default=True, verbose_name="是否发布")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     model = models.ForeignKey(Model, on_delete=models.DO_NOTHING, db_constraint=False)
-    api_key_is_active = models.BooleanField(verbose_name="api_key是否可用", default=True)
 
     class Meta:
         db_table = "application"

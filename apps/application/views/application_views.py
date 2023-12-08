@@ -77,6 +77,25 @@ class Application(APIView):
         class Operate(APIView):
             authentication_classes = [TokenAuth]
 
+            @action(methods=['PUT'], detail=False)
+            @swagger_auto_schema(operation_summary="修改应用API_KEY",
+                                 operation_id="修改应用API_KEY",
+                                 tags=['应用/API_KEY'],
+                                 manual_parameters=ApplicationApi.ApiKey.Operate.get_request_params_api(),
+                                 request_body=ApplicationApi.ApiKey.Operate.get_request_body_api())
+            @has_permissions(ViewPermission(
+                [RoleConstants.ADMIN, RoleConstants.USER],
+                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
+                                                dynamic_tag=keywords.get('application_id'))],
+                compare=CompareConstants.AND), lambda r, k: Permission(group=Group.APPLICATION, operate=Operate.DELETE,
+                                                                       dynamic_tag=k.get('application_id')),
+                compare=CompareConstants.AND)
+            def put(self, request: Request, application_id: str, api_key_id: str):
+                return result.success(
+                    ApplicationSerializer.ApplicationKeySerializer.Operate(
+                        data={'application_id': application_id, 'user_id': request.user.id,
+                              'api_key_id': api_key_id}).edit(request.data))
+
             @action(methods=['DELETE'], detail=False)
             @swagger_auto_schema(operation_summary="删除应用API_KEY",
                                  operation_id="删除应用API_KEY",

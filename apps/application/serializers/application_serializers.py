@@ -133,8 +133,6 @@ class ApplicationSerializer(serializers.Serializer):
         prologue = serializers.CharField(required=False)
         example = serializers.ListSerializer(required=False, child=serializers.CharField(required=True))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
-        status = serializers.BooleanField(required=False)
-        api_key_is_active = serializers.BooleanField(required=False)
 
     def is_valid(self, *, user_id=None, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -355,6 +353,9 @@ class ApplicationSerializer(serializers.Serializer):
                     application_api_key in
                     QuerySet(ApplicationApiKey).filter(user_id=user_id, application_id=application_id)]
 
+        class Edit(serializers.Serializer):
+            is_active = serializers.BooleanField(required=False)
+
         class Operate(serializers.Serializer):
             application_id = serializers.UUIDField(required=True)
 
@@ -367,3 +368,19 @@ class ApplicationSerializer(serializers.Serializer):
                 application_id = self.data.get('application_id')
                 QuerySet(ApplicationApiKey).filter(id=api_key_id,
                                                    application_id=application_id).delete()
+
+            def edit(self, instance, with_valid=True):
+                if with_valid:
+                    self.is_valid(raise_exception=True)
+                    ApplicationSerializer.Edit(data=instance).is_valid(raise_exception=True)
+
+                if 'is_active' in instance and instance.get('is_active') is not None:
+                    api_key_id = self.data.get("api_key_id")
+                    application_id = self.data.get('application_id')
+                    application_api_key = QuerySet(ApplicationApiKey).filter(id=api_key_id,
+                                                                             application_id=application_id).first()
+                    if application_api_key is None:
+                        raise AppApiException(500, '不存在')
+
+                    application_api_key.is_active = instance.get('is_active')
+                    application_api_key.save()
