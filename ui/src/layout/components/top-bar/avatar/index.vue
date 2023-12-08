@@ -11,13 +11,20 @@
     </div>
 
     <template #dropdown>
-      <el-dropdown-menu>
-        <el-dropdown-item @click="openResetPassword">
-          <AppIcon iconName="Lock"></AppIcon><span style="margin-left: 5px">修改密码</span>
+      <el-dropdown-menu class="avatar-dropdown">
+        <div class="userInfo">
+          <p class="bold mb-4" style="font-size: 14px;">{{ user.userInfo?.username }}</p>
+          <p>
+            <el-text type="info">
+              {{ user.userInfo?.email }}
+            </el-text>
+          </p>
+        </div>
+        <el-dropdown-item class="border-t p-8" @click="openResetPassword">
+          修改密码
         </el-dropdown-item>
-        <el-dropdown-item @click="logout">
-          <AppIcon iconName="app-exit"></AppIcon><span style="margin-left: 5px">退出</span>
-        </el-dropdown-item>
+        <el-dropdown-item class="border-t"> 关于 </el-dropdown-item>
+        <el-dropdown-item class="border-t" @click="logout"> 退出 </el-dropdown-item>
       </el-dropdown-menu>
     </template>
   </el-dropdown>
@@ -43,4 +50,13 @@ const logout = () => {
   })
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.avatar-dropdown {
+  .userInfo {
+    padding: 12px 11px;
+  }
+  :deep(.el-dropdown-menu__item) {
+    padding: 12px 11px;
+  }
+}
+</style>
