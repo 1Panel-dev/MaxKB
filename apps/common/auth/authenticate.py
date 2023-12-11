@@ -41,7 +41,7 @@ class TokenAuth(TokenAuthentication):
                 application_api_key = QuerySet(ApplicationApiKey).filter(secret_key=auth).first()
                 if application_api_key is None:
                     raise AppAuthenticationFailed(500, "secret_key 无效")
-                if not application_api_key.application.api_key_is_active:
+                if not application_api_key.is_active:
                     raise AppAuthenticationFailed(500, "secret_key 无效")
                 permission_list = [Permission(group=Group.APPLICATION,
                                               operate=Operate.USE,

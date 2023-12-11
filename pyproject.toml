@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "smart-doc"
+name = "maxkb"
 version = "0.1.0"
 description = "智能客服系统"
 authors = ["shaohuzhang1 <shaohu.zhang@fit2cloud.com>"]
