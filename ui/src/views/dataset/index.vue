@@ -10,53 +10,50 @@
         class="w-240"
       />
     </div>
-    <div v-loading.fullscreen.lock="pageConfig.current_page === 1 && loading">
-      <el-row
-        :gutter="15"
-        v-infinite-scroll="loadDataset"
-        :infinite-scroll-disabled="disabledScroll"
+    <div v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading">
+      <InfiniteScroll
+        :size="datasetList.length"
+        :total="paginationConfig.total"
+        :page_size="paginationConfig.page_size"
+        v-model:current_page="paginationConfig.current_page"
+        @load="getList"
+        :loading="loading"
       >
-        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
-          <CardAdd title="创建数据集" @click="router.push({ path: '/dataset/create' })" />
-        </el-col>
-        <template v-for="(item, index) in datasetList" :key="index">
+        <el-row :gutter="15">
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
-            <CardBox
-              :title="item.name"
-              :description="item.desc"
-              class="cursor"
-              @click="router.push({ path: `/dataset/${item.id}/document` })"
-            >
-              <template #mouseEnter>
-                <el-tooltip effect="dark" content="删除" placement="top">
-                  <el-button text @click.stop="deleteDateset(item)" class="delete-button">
-                    <el-icon><Delete /></el-icon>
-                  </el-button>
-                </el-tooltip>
-              </template>
-
-              <template #footer>
-                <div class="footer-content">
-                  <span class="bold">{{ item?.document_count || 0 }}</span>
-                  文档<el-divider direction="vertical" />
-                  <span class="bold">{{ numberFormat(item?.char_length) || 0 }}</span>
-                  字符<el-divider direction="vertical" />
-                  <span class="bold">{{ item?.application_mapping_count || 0 }}</span>
-                  关联应用
-                </div>
-              </template>
-            </CardBox>
+            <CardAdd title="创建数据集" @click="router.push({ path: '/dataset/create' })" />
           </el-col>
-        </template>
-      </el-row>
-      <div style="padding: 16px 10px">
-        <el-divider class="custom-divider" v-if="datasetList.length > 0 && loading">
-          <el-text type="info"> 加载中...</el-text>
-        </el-divider>
-        <el-divider class="custom-divider" v-if="noMore">
-          <el-text type="info"> 到底啦！</el-text>
-        </el-divider>
-      </div>
+          <template v-for="(item, index) in datasetList" :key="index">
+            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
+              <CardBox
+                :title="item.name"
+                :description="item.desc"
+                class="cursor"
+                @click="router.push({ path: `/dataset/${item.id}/document` })"
+              >
+                <template #mouseEnter>
+                  <el-tooltip effect="dark" content="删除" placement="top">
+                    <el-button text @click.stop="deleteDateset(item)" class="delete-button">
+                      <el-icon><Delete /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </template>
+
+                <template #footer>
+                  <div class="footer-content">
+                    <span class="bold">{{ item?.document_count || 0 }}</span>
+                    文档<el-divider direction="vertical" />
+                    <span class="bold">{{ numberFormat(item?.char_length) || 0 }}</span>
+                    字符<el-divider direction="vertical" />
+                    <span class="bold">{{ item?.application_mapping_count || 0 }}</span>
+                    关联应用
+                  </div>
+                </template>
+              </CardBox>
+            </el-col>
+          </template>
+        </el-row>
+      </InfiniteScroll>
     </div>
   </div>
 </template>
@@ -70,7 +67,7 @@ const router = useRouter()
 
 const loading = ref(false)
 const datasetList = ref<any[]>([])
-const pageConfig = reactive({
+const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
   total: 0
@@ -81,8 +78,8 @@ const searchValue = ref('')
 const noMore = computed(
   () =>
     datasetList.value.length > 0 &&
-    datasetList.value.length === pageConfig.total &&
-    pageConfig.total > 20 &&
+    datasetList.value.length === paginationConfig.total &&
+    paginationConfig.total > 20 &&
     !loading.value
 )
 const disabledScroll = computed(
@@ -90,14 +87,14 @@ const disabledScroll = computed(
 )
 
 function loadDataset() {
-  if (pageConfig.total > pageConfig.page_size) {
-    pageConfig.current_page += 1
+  if (paginationConfig.total > paginationConfig.page_size) {
+    paginationConfig.current_page += 1
     getList()
   }
 }
 
 function searchHandle() {
-  pageConfig.current_page = 1
+  paginationConfig.current_page = 1
   datasetList.value = []
   getList()
 }
@@ -129,9 +126,9 @@ function deleteDateset(row: any) {
 
 function getList() {
   datasetApi
-    .getDateset(pageConfig, searchValue.value && { name: searchValue.value }, loading)
+    .getDateset(paginationConfig, searchValue.value && { name: searchValue.value }, loading)
     .then((res) => {
-      pageConfig.total = res.data.total
+      paginationConfig.total = res.data.total
       datasetList.value = [...datasetList.value, ...res.data.records]
     })
 }

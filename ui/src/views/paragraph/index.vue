@@ -5,9 +5,12 @@
         <el-button @click="addParagraph" type="primary" :disabled="loading"> 添加分段 </el-button>
       </div>
     </template>
-    <div class="document-detail__main p-16" v-loading="pageConfig.current_page === 1 && loading">
+    <div
+      class="document-detail__main p-16"
+      v-loading="paginationConfig.current_page === 1 && loading"
+    >
       <div class="flex-between p-8">
-        <span>{{ pageConfig.total }} 段落</span>
+        <span>{{ paginationConfig.total }} 段落</span>
         <el-input
           v-model="search"
           placeholder="搜索"
@@ -26,55 +29,58 @@
       <el-scrollbar>
         <div class="document-detail-height">
           <el-empty v-if="paragraphDetail.length == 0" description="暂无数据" />
-          <el-row v-else v-infinite-scroll="loadDataset" :infinite-scroll-disabled="disabledScroll">
-            <el-col
-              :xs="24"
-              :sm="12"
-              :md="8"
-              :lg="6"
-              :xl="6"
-              v-for="(item, index) in paragraphDetail"
-              :key="index"
-              class="p-8"
-            >
-              <CardBox
-                shadow="hover"
-                :title="item.title || '-'"
-                :description="item.content"
-                class="document-card cursor"
-                :class="item.is_active ? '' : 'disabled'"
-                :showIcon="false"
-                @click="editParagraph(item)"
-              >
-                <div class="active-button" @click.stop>
-                  <el-switch
-                    v-model="item.is_active"
-                    @change="changeState($event, item)"
-                    size="small"
-                  />
-                </div>
 
-                <template #footer>
-                  <div class="footer-content flex-between">
-                    <span> {{ numberFormat(item?.content.length) || 0 }} 个 字符 </span>
-                    <el-tooltip effect="dark" content="删除" placement="top">
-                      <el-button text @click.stop="deleteParagraph(item)" class="delete-button">
-                        <el-icon><Delete /></el-icon>
-                      </el-button>
-                    </el-tooltip>
+          <InfiniteScroll
+            v-else
+            :size="paragraphDetail.length"
+            :total="paginationConfig.total"
+            :page_size="paginationConfig.page_size"
+            v-model:current_page="paginationConfig.current_page"
+            @load="getParagraphList"
+            :loading="loading"
+          >
+            <el-row>
+              <el-col
+                :xs="24"
+                :sm="12"
+                :md="8"
+                :lg="6"
+                :xl="6"
+                v-for="(item, index) in paragraphDetail"
+                :key="index"
+                class="p-8"
+              >
+                <CardBox
+                  shadow="hover"
+                  :title="item.title || '-'"
+                  :description="item.content"
+                  class="document-card cursor"
+                  :class="item.is_active ? '' : 'disabled'"
+                  :showIcon="false"
+                  @click="editParagraph(item)"
+                >
+                  <div class="active-button" @click.stop>
+                    <el-switch
+                      v-model="item.is_active"
+                      @change="changeState($event, item)"
+                      size="small"
+                    />
                   </div>
-                </template>
-              </CardBox>
-            </el-col>
-          </el-row>
-          <div style="padding: 16px 10px">
-            <el-divider v-if="paragraphDetail.length > 0 && loading">
-              <el-text type="info"> 加载中...</el-text>
-            </el-divider>
-            <el-divider v-if="noMore">
-              <el-text type="info"> 到底啦！</el-text>
-            </el-divider>
-          </div>
+
+                  <template #footer>
+                    <div class="footer-content flex-between">
+                      <span> {{ numberFormat(item?.content.length) || 0 }} 个 字符 </span>
+                      <el-tooltip effect="dark" content="删除" placement="top">
+                        <el-button text @click.stop="deleteParagraph(item)" class="delete-button">
+                          <el-icon><Delete /></el-icon>
+                        </el-button>
+                      </el-tooltip>
+                    </div>
+                  </template>
+                </CardBox>
+              </el-col>
+            </el-row>
+          </InfiniteScroll>
         </div>
       </el-scrollbar>
     </div>
@@ -104,32 +110,14 @@ const title = ref('')
 const search = ref('')
 const searchType = ref('title')
 
-const pageConfig = reactive({
+const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
   total: 0
 })
 
-const noMore = computed(
-  () =>
-    paragraphDetail.value.length > 0 &&
-    paragraphDetail.value.length === pageConfig.total &&
-    pageConfig.total > 20 &&
-    !loading.value
-)
-const disabledScroll = computed(
-  () => paragraphDetail.value.length > 0 && (loading.value || noMore.value)
-)
-
-function loadDataset() {
-  if (pageConfig.total > pageConfig.page_size) {
-    pageConfig.current_page += 1
-    getParagraphList()
-  }
-}
-
 function searchHandle() {
-  pageConfig.current_page = 1
+  paginationConfig.current_page = 1
   paragraphDetail.value = []
   getParagraphList()
 }
@@ -191,13 +179,13 @@ function getParagraphList() {
     .getParagraph(
       id,
       documentId,
-      pageConfig,
+      paginationConfig,
       search.value && { [searchType.value]: search.value },
       loading
     )
     .then((res) => {
       paragraphDetail.value = [...paragraphDetail.value, ...res.data.records]
-      pageConfig.total = res.data.total
+      paginationConfig.total = res.data.total
     })
 }
 
@@ -206,7 +194,7 @@ function refresh(data: any) {
     const index = paragraphDetail.value.findIndex((v) => v.id === data.id)
     paragraphDetail.value.splice(index, 1, data)
   } else {
-    pageConfig.current_page = 1
+    paginationConfig.current_page = 1
     paragraphDetail.value = []
     getParagraphList()
   }

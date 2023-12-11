@@ -67,7 +67,7 @@
       :next="nextChatRecord"
       :pre="preChatRecord"
       ref="ChatRecordRef"
-      v-model:id="currentChatId"
+      v-model:chartId="currentChatId"
       :application="detail"
       :pre_disable="pre_disable"
       :next_disable="next_disable"
@@ -108,6 +108,27 @@ const dayOptions = [
   }
 ]
 
+const ChatRecordRef = ref()
+const loading = ref(false)
+const paginationConfig = reactive({
+  current_page: 1,
+  page_size: 20,
+  total: 0
+})
+const tableData = ref<any[]>([])
+const tableIndexMap = computed<Dict<number>>(() => {
+  return tableData.value
+    .map((row, index) => ({
+      [row.id]: index
+    }))
+    .reduce((pre, next) => ({ ...pre, ...next }), {})
+})
+const history_day = ref(7)
+const search = ref('')
+const detail = ref<any>(null)
+
+const currentChatId = ref<string>('')
+
 /**
  * 下一页
  */
@@ -118,7 +139,6 @@ const nextChatRecord = () => {
       index + (paginationConfig.current_page - 1) * paginationConfig.page_size >=
       paginationConfig.total - 1
     ) {
-      MsgError('没有更多了')
       return
     }
     paginationConfig.current_page = paginationConfig.current_page + 1
@@ -151,7 +171,6 @@ const preChatRecord = () => {
 
   if (index < 0) {
     if (paginationConfig.current_page <= 1) {
-      MsgError('到头了')
       return
     }
     paginationConfig.current_page = paginationConfig.current_page - 1
@@ -161,47 +180,6 @@ const preChatRecord = () => {
     })
   } else {
     currentChatId.value = tableData.value[index].id
-  }
-}
-
-const ChatRecordRef = ref()
-const loading = ref(false)
-const paginationConfig = reactive({
-  current_page: 1,
-  page_size: 20,
-  total: 0
-})
-const tableData = ref<any[]>([])
-const tableIndexMap = computed<Dict<number>>(() => {
-  return tableData.value
-    .map((row, index) => ({
-      [row.id]: index
-    }))
-    .reduce((pre, next) => ({ ...pre, ...next }), {})
-})
-const history_day = ref(7)
-const search = ref('')
-const detail = ref<any>(null)
-
-const currentChatId = ref<string>('')
-
-function isFirst(index: number) {
-  if (index === 0 && paginationConfig.current_page === 1) {
-    return true
-  } else {
-    return false
-  }
-}
-
-function isLast(index: number) {
-  console.log((paginationConfig.current_page - 1) * paginationConfig.page_size + index + 1)
-  if (
-    (paginationConfig.current_page - 1) * paginationConfig.page_size + index + 1 ===
-    paginationConfig.total
-  ) {
-    return true
-  } else {
-    return false
   }
 }
 
