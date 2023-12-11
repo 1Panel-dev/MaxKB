@@ -14,26 +14,21 @@
       class="h-full"
       style="padding: 24px 0"
     >
-      <div v-infinite-scroll="loadDataset" :infinite-scroll-disabled="disabledScroll">
+      <InfiniteScroll
+        :size="recordList.length"
+        :total="paginationConfig.total"
+        :page_size="paginationConfig.page_size"
+        v-model:current_page="paginationConfig.current_page"
+        @load="getChatRecord"
+        :loading="loading"
+      >
         <AiChat :data="application" :record="recordList" log></AiChat>
-      </div>
-      <div style="padding: 16px 10px">
-        <el-divider class="custom-divider" v-if="recordList.length > 0 && loading">
-          <el-text type="info"> 加载中...</el-text>
-        </el-divider>
-        <el-divider class="custom-divider" v-if="noMore">
-          <el-text type="info"> 到底啦！</el-text>
-        </el-divider>
-      </div>
+      </InfiniteScroll>
     </div>
     <template #footer>
       <div>
-        <el-button @click="pre" :disabled="pre_disable != undefined ? pre_disable : false"
-          >上一条</el-button
-        >
-        <el-button @click="next" :disabled="next_disable != undefined ? next_disable : false"
-          >下一条</el-button
-        >
+        <el-button @click="pre" :disabled="pre_disable || loading">上一条</el-button>
+        <el-button @click="next" :disabled="next_disable || loading">下一条</el-button>
       </div>
     </template>
   </el-drawer>
@@ -54,7 +49,7 @@ const props = withDefaults(
     /**
      * 对话 记录id
      */
-    id?: string
+    chartId?: string
     /**
      * 下一条
      */
@@ -71,7 +66,7 @@ const props = withDefaults(
   {}
 )
 
-defineEmits(['update:id'])
+defineEmits(['update:chartId'])
 
 const route = useRoute()
 const {
@@ -83,20 +78,9 @@ const recordList = ref<chatType[]>([])
 
 const paginationConfig = reactive({
   current_page: 1,
-  page_size: 20,
+  page_size: 10,
   total: 0
 })
-
-const noMore = computed(
-  () =>
-    recordList.value.length > 0 &&
-    recordList.value.length === paginationConfig.total &&
-    paginationConfig.total > 20 &&
-    !loading.value
-)
-const disabledScroll = computed(
-  () => recordList.value.length > 0 && (loading.value || noMore.value)
-)
 
 function closeHandel() {
   recordList.value = []
@@ -104,16 +88,9 @@ function closeHandel() {
   paginationConfig.current_page = 1
 }
 
-function loadDataset() {
-  if (paginationConfig.total > paginationConfig.page_size) {
-    paginationConfig.current_page += 1
-    getChatRecord()
-  }
-}
-
 function getChatRecord() {
-  if (props.id && visible.value) {
-    logApi.getChatRecordLog(id as string, props.id, paginationConfig, loading).then((res) => {
+  if (props.chartId && visible.value) {
+    logApi.getChatRecordLog(id as string, props.chartId, paginationConfig, loading).then((res) => {
       paginationConfig.total = res.data.total
       recordList.value = [...recordList.value, ...res.data.records]
     })
@@ -121,7 +98,7 @@ function getChatRecord() {
 }
 
 watch(
-  () => props.id,
+  () => props.chartId,
   () => {
     recordList.value = []
     paginationConfig.total = 0
@@ -144,6 +121,9 @@ defineExpose({
   .el-drawer__body {
     background: var(--app-layout-bg-color);
     padding: 0;
+  }
+  .el-divider__text {
+    background: var(--app-layout-bg-color);
   }
 }
 </style>

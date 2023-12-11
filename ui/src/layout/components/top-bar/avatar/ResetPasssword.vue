@@ -6,6 +6,7 @@
       :model="resetPasswordForm"
       :rules="rules"
     >
+      <p class="mb-8">新密码</p>
       <el-form-item prop="password">
         <el-input
           type="password"
@@ -13,10 +14,8 @@
           class="input-item"
           v-model="resetPasswordForm.password"
           placeholder="请输入密码"
+          show-password
         >
-          <template #prepend>
-            <el-button icon="Lock" />
-          </template>
         </el-input>
       </el-form-item>
       <el-form-item prop="re_password">
@@ -26,12 +25,11 @@
           class="input-item"
           v-model="resetPasswordForm.re_password"
           placeholder="请输入确认密码"
+          show-password
         >
-          <template #prepend>
-            <el-button icon="Lock" />
-          </template>
         </el-input>
       </el-form-item>
+      <p class="mb-8">使用邮箱</p>
       <el-form-item>
         <el-input
           size="large"
@@ -40,9 +38,6 @@
           v-bind:modelValue="user.userInfo?.email"
           placeholder="请输入邮箱"
         >
-          <template #prepend>
-            <el-button icon="UserFilled" />
-          </template>
         </el-input>
       </el-form-item>
       <el-form-item prop="code">
@@ -53,9 +48,6 @@
             v-model="resetPasswordForm.code"
             placeholder="请输入验证码"
           >
-            <template #prepend>
-              <el-button icon="Key" />
-            </template>
           </el-input>
           <el-button
             size="large"
@@ -69,7 +61,8 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button type="primary" @click="resetPassword"> 修改密码 </el-button>
+        <el-button @click="resetPasswordDialog = false"> 取消 </el-button>
+        <el-button type="primary" @click="resetPassword"> 保存 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -107,8 +100,8 @@ const rules = ref<FormRules<ResetCurrentUserPasswordRequest>>({
     },
     {
       min: 6,
-      max: 30,
-      message: '长度在 6 到 30 个字符',
+      max: 20,
+      message: '长度在 6 到 20 个字符',
       trigger: 'blur'
     }
   ],
@@ -120,8 +113,8 @@ const rules = ref<FormRules<ResetCurrentUserPasswordRequest>>({
     },
     {
       min: 6,
-      max: 30,
-      message: '长度在 6 到 30 个字符',
+      max: 20,
+      message: '长度在 6 到 20 个字符',
       trigger: 'blur'
     },
     {
@@ -152,6 +145,7 @@ const open = () => {
     re_password: ''
   }
   resetPasswordDialog.value = true
+  resetPasswordFormRef.value?.resetFields()
 }
 const resetPassword = () => {
   resetPasswordFormRef.value
