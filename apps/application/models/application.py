@@ -65,8 +65,8 @@ class ChatRecord(AppModelMixin):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
     vote_status = models.CharField(verbose_name='投票', max_length=10, choices=VoteChoices.choices,
                                    default=VoteChoices.UN_VOTE)
-    dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING, verbose_name="数据集", blank=True, null=True)
-    paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, verbose_name="段落id", blank=True, null=True)
+    dataset = models.ForeignKey(DataSet, on_delete=models.SET_NULL, verbose_name="数据集", blank=True, null=True)
+    paragraph = models.ForeignKey(Paragraph, on_delete=models.SET_NULL, verbose_name="段落id", blank=True, null=True)
     source_id = models.UUIDField(max_length=128, verbose_name="资源id 段落/问题 id ", null=True)
     source_type = models.CharField(verbose_name='资源类型', max_length=2, choices=SourceType.choices,
                                    default=SourceType.PROBLEM, blank=True, null=True)

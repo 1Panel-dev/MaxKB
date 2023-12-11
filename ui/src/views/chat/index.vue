@@ -79,7 +79,7 @@ onMounted(() => {
     }
   }
   .chat-width {
-    width: 860px;
+    max-width: var(--app-chat-width, 860px);
     margin: 0 auto;
   }
 }

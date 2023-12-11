@@ -235,7 +235,7 @@ class ApplicationSerializer(serializers.Serializer):
     class ApplicationModel(serializers.ModelSerializer):
         class Meta:
             model = Application
-            fields = ['id', 'name', 'desc', 'prologue', 'example', 'dialogue_number', 'status']
+            fields = ['id', 'name', 'desc', 'prologue', 'example', 'dialogue_number']
 
     class Operate(serializers.Serializer):
         application_id = serializers.UUIDField(required=True)
