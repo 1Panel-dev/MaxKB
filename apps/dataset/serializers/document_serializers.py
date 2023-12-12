@@ -37,7 +37,7 @@ class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
                                                                    message="数据集名称在1-128个字符之间")
                                  ])
 
-    paragraphs = ParagraphInstanceSerializer(required=False, many=True)
+    paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
 
     @staticmethod
     def get_request_body_api():
@@ -204,7 +204,24 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 DocumentInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
             dataset_id = self.data.get('dataset_id')
+            document_paragraph_model = self.get_document_paragraph_model(dataset_id, instance)
+            document_model = document_paragraph_model.get('document')
+            paragraph_model_list = document_paragraph_model.get('paragraph_model_list')
+            problem_model_list = document_paragraph_model.get('problem_model_list')
+            # 插入文档
+            document_model.save()
+            # 批量插入段落
+            QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+            # 批量插入问题
+            QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+            if with_embedding:
+                ListenerManagement.embedding_by_document_signal.send(str(document_model.id))
+            return DocumentSerializers.Operate(
+                data={'dataset_id': dataset_id, 'document_id': str(document_model.id)}).one(
+                with_valid=True)
 
+        @staticmethod
+        def get_document_paragraph_model(dataset_id, instance: Dict):
             document_model = Document(
                 **{'dataset_id': dataset_id,
                    'id': uuid.uuid1(),
@@ -212,19 +229,22 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                    'char_length': reduce(lambda x, y: x + y,
                                          [len(p.get('content')) for p in instance.get('paragraphs', [])],
                                          0)})
-            # 插入文档
-            document_model.save()
 
-            for paragraph in instance.get('paragraphs') if 'paragraphs' in instance else []:
-                ParagraphSerializers.Create(
-                    data={'dataset_id': dataset_id, 'document_id': str(document_model.id)}).save(paragraph,
-                                                                                                 with_valid=True,
-                                                                                                 with_embedding=False)
-            if with_embedding:
-                ListenerManagement.embedding_by_document_signal.send(str(document_model.id))
-            return DocumentSerializers.Operate(
-                data={'dataset_id': dataset_id, 'document_id': str(document_model.id)}).one(
-                with_valid=True)
+            paragraph_model_dict_list = [ParagraphSerializers.Create(
+                data={'dataset_id': dataset_id, 'document_id': str(document_model.id)}).get_paragraph_problem_model(
+                dataset_id, document_model.id, paragraph) for paragraph in (instance.get('paragraphs') if
+                                                                            'paragraphs' in instance else [])]
+
+            paragraph_model_list = []
+            problem_model_list = []
+            for paragraphs in paragraph_model_dict_list:
+                paragraph = paragraphs.get('paragraph')
+                for problem_model in paragraphs.get('problem_model_list'):
+                    problem_model_list.append(problem_model)
+                paragraph_model_list.append(paragraph)
+
+            return {'document': document_model, 'paragraph_model_list': paragraph_model_list,
+                    'problem_model_list': problem_model_list}
 
         @staticmethod
         def get_request_body_api():

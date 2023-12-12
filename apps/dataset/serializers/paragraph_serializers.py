@@ -39,8 +39,8 @@ class ParagraphInstanceSerializer(ApiMixin, serializers.Serializer):
         validators.MaxLengthValidator(limit_value=1024,
                                       message="段落在1-1024个字符之间"),
         validators.MinLengthValidator(limit_value=1,
-                                      message="段落在1-1024个字符之间")
-    ])
+                                      message="段落在1-1024个字符之间"),
+    ], allow_null=True, allow_blank=True)
 
     title = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
@@ -179,17 +179,11 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid()
             dataset_id = self.data.get("dataset_id")
             document_id = self.data.get('document_id')
-
-            paragraph = Paragraph(id=uuid.uuid1(),
-                                  document_id=document_id,
-                                  content=instance.get("content"),
-                                  dataset_id=dataset_id,
-                                  title=instance.get("title") if 'title' in instance else '')
+            paragraph_problem_model = self.get_paragraph_problem_model(dataset_id, document_id, instance)
+            paragraph = paragraph_problem_model.get('paragraph')
+            problem_model_list = paragraph_problem_model.get('problem_model_list')
             # 插入段落
-            paragraph.save()
-            problem_model_list = [Problem(id=uuid.uuid1(), content=problem.get('content'), paragraph_id=paragraph.id,
-                                          document_id=document_id, dataset_id=dataset_id) for problem in (
-                                      instance.get('problem_list') if 'problem_list' in instance else [])]
+            paragraph_problem_model.get('paragraph').save()
             # 插入問題
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
             # 修改长度
@@ -199,6 +193,20 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             return ParagraphSerializers.Operate(
                 data={'paragraph_id': str(paragraph.id), 'dataset_id': dataset_id, 'document_id': document_id}).one(
                 with_valid=True)
+
+        @staticmethod
+        def get_paragraph_problem_model(dataset_id: str, document_id: str, instance: Dict):
+            paragraph = Paragraph(id=uuid.uuid1(),
+                                  document_id=document_id,
+                                  content=instance.get("content"),
+                                  dataset_id=dataset_id,
+                                  title=instance.get("title") if 'title' in instance else '')
+
+            problem_model_list = [Problem(id=uuid.uuid1(), content=problem.get('content'), paragraph_id=paragraph.id,
+                                          document_id=document_id, dataset_id=dataset_id) for problem in (
+                                      instance.get('problem_list') if 'problem_list' in instance else [])]
+
+            return {'paragraph': paragraph, 'problem_model_list': problem_model_list}
 
         @staticmethod
         def get_request_body_api():

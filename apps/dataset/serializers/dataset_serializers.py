@@ -212,12 +212,31 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset_id = uuid.uuid1()
             dataset = DataSet(
                 **{'id': dataset_id, 'name': self.data.get("name"), 'desc': self.data.get('desc'), 'user': user})
+
+            document_model_list = []
+            paragraph_model_list = []
+            problem_model_list = []
+            # 插入文档
+            for document in self.data.get('documents') if 'documents' in self.data else []:
+                document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(dataset_id,
+                                                                                                        document)
+                document_model_list.append(document_paragraph_dict_model.get('document'))
+                for paragraph in document_paragraph_dict_model.get('paragraph_model_list'):
+                    paragraph_model_list.append(paragraph)
+                for problem in document_paragraph_dict_model.get('problem_model_list'):
+                    problem_model_list.append(problem)
+
             # 插入数据集
             dataset.save()
-            for document in self.data.get('documents') if 'documents' in self.data else []:
-                DocumentSerializers.Create(data={'dataset_id': dataset_id}).save(document, with_valid=True,
-                                                                                 with_embedding=False)
+            # 插入文档
+            QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
+            # 批量插入段落
+            QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+            # 批量插入问题
+            QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+            # 发送向量化事件
             ListenerManagement.embedding_by_dataset_signal.send(str(dataset.id))
+            # 响应数据
             return {**DataSetSerializers(dataset).data,
                     'document_list': DocumentSerializers.Query(data={'dataset_id': dataset_id}).list(with_valid=True)}
 
