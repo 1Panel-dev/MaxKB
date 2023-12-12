@@ -29,8 +29,13 @@
 }
 
 .el-form-item {
-  margin-bottom: 24px;
-
+  margin-bottom: 18px;
+  .el-form-item {
+    margin-bottom: 18px;
+    &:last-child {
+      margin-bottom: 0px;
+    }
+  }
 }
 
 .el-dialog {

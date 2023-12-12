@@ -1,5 +1,5 @@
 <template v-loading="_loading">
-  <div style="width: 100%; display: flex; flex-wrap: wrap">
+  <div class="arrt-object-card flex w-full">
     <el-card class="box-card" :style="style" v-for="(item, index) in _data" :key="index">
       <DynamicsForm
         :style="formStyle"
@@ -113,49 +113,45 @@ defineExpose({
 })
 </script>
 <style lang="scss" scoped>
-.box-card {
-  width: 30%;
-  position: relative;
-  margin: 10px;
-  padding-top: 20px;
-}
-.card-add {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  cursor: pointer;
-  min-height: var(--card-min-height);
-  border: 1px dashed var(--el-color-primary);
-  background: #eff0f1;
-  padding-bottom: 20px;
-
-  .add-icon {
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid var(--app-border-color-dark);
-    background: var(--app-layout-bg-color);
-    margin-right: 12px;
+.arrt-object-card {
+  .box-card {
+    width: 30%;
+    position: relative;
+    margin: 10px;
+    padding-top: 20px;
   }
-  &:hover {
-    color: var(--el-color-primary);
-    background: #ffffff;
+  .card-add {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    cursor: pointer;
+    min-height: var(--card-min-height);
+    border: 1px dashed var(--el-color-primary);
+    background: #eff0f1;
+    padding-bottom: 20px;
+
     .add-icon {
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid var(--app-border-color-dark);
+      background: var(--app-layout-bg-color);
+      margin-right: 12px;
+    }
+    &:hover {
+      color: var(--el-color-primary);
       background: #ffffff;
-      border-color: var(--el-color-primary);
+      .add-icon {
+        background: #ffffff;
+        border-color: var(--el-color-primary);
+      }
     }
   }
-}
-:deep(.el-form-item) {
-  &:last-child {
-    margin-bottom: 0px;
+  .delete-button {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    height: auto;
   }
-  margin-bottom: 18px;
-}
-.delete-button {
-  position: absolute;
-  right: 12px;
-  top: 10px;
-  height: auto;
 }
 </style>

@@ -116,6 +116,7 @@ function deleteDateset(row: any) {
           const index = datasetList.value.findIndex((v) => v.id === row.id)
           datasetList.value.splice(index, 1)
           MsgSuccess('删除成功')
+          loading.value = false
         })
         .catch(() => {
           loading.value = false

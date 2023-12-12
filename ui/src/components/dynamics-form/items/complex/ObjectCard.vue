@@ -1,5 +1,5 @@
 <template>
-  <el-card class="box-card" :style="style">
+  <el-card :style="style">
     <DynamicsForm
       :read-only="view"
       :style="formStyle"
@@ -72,11 +72,4 @@ defineExpose({
   validate
 })
 </script>
-<style lang="scss" scoped>
-:deep(.el-form-item) {
-  &:last-child {
-    margin-bottom: 0px;
-  }
-  margin-bottom: 18px;
-}
-</style>
+<style lang="scss" scoped></style>

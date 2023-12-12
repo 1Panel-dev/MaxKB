@@ -3,7 +3,7 @@
     <el-result icon="success" title="🎉 数据集创建成功 🎉">
       <template #sub-title>
         <div class="mt-8">
-          <span class="bold">{{ data?.documment_list.length || 0 }}</span>
+          <span class="bold">{{ data?.document_list.length || 0 }}</span>
           <el-text type="info" class="ml-4">文档</el-text>
           <el-divider direction="vertical" />
           <span class="bold">{{ paragraph_count || 0 }}</span>
