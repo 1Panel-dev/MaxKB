@@ -1,5 +1,11 @@
 <template>
   <div>
+    <el-text type="info">
+      消耗: {{ data?.message_tokens + data?.answer_tokens }} tokens
+      <span class="ml-4">{{ datetimeFormat(data.create_time) }}</span>
+    </el-text>
+  </div>
+  <div>
     <el-tooltip effect="dark" content="修改内容" placement="top">
       <el-button text @click="editContent(data)">
         <el-icon><EditPen /></el-icon>
@@ -26,6 +32,7 @@
 import { reactive, ref, watch, onMounted } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import EditContentDialog from '@/views/log/component/EditContentDialog.vue'
+import { datetimeFormat } from '@/utils/time'
 
 const props = defineProps({
   data: {

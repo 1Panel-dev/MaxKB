@@ -68,9 +68,6 @@
                 ></MarkdownRenderer>
               </el-card>
               <div class="flex-between mt-8" v-if="log">
-                <el-text type="info">
-                  消耗 {{ item?.message_tokens + item?.answer_tokens }} tokens
-                </el-text>
                 <LogOperationButton :data="item" :applicationId="appId" />
               </div>
 
