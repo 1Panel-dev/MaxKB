@@ -123,7 +123,7 @@ class ApplicationSerializer(serializers.Serializer):
                 token_cache.set(token, application_access_token, timeout=JWT_AUTH['JWT_EXPIRATION_DELTA'])
                 return token
             else:
-                raise AppAuthenticationFailed(401, "无效的access_token")
+                raise NotFound404(404, "无效的access_token")
 
     class Edit(serializers.Serializer):
         name = serializers.CharField(required=False)
