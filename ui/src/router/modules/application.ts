@@ -41,7 +41,8 @@ const applicationRouter = {
           path: 'setting', 
           name: 'AppSetting',
           meta: {
-            icon: 'Setting',
+            icon: 'app-setting',
+            iconActive: 'app-setting-active',
             title: '设置',
             active: 'setting',
             parentPath: '/application/:id',
@@ -53,7 +54,8 @@ const applicationRouter = {
           path: 'log',
           name: 'Log',
           meta: {
-            icon: 'Setting',
+            icon: 'app-document',
+            iconActive: 'app-document-active',
             title: '对话日志',
             active: 'log',
             parentPath: '/application/:id',
