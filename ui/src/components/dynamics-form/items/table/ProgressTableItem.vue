@@ -5,7 +5,7 @@
         <el-progress v-bind="$attrs" :percentage="row[value_field]"></el-progress
       ></template>
       <div>
-        <el-row v-for="item in view_card"
+        <el-row v-for="(item, index) in view_card" :key="index"
           ><el-col :span="6">{{ item.title }}</el-col
           ><el-col :span="18"> <span class="value" :innerHTML="value_html(item)"> </span></el-col
         ></el-row>

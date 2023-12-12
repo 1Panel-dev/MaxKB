@@ -89,7 +89,8 @@ const active = ref(0)
 const successInfo = ref<any>(null)
 
 async function next() {
-  if (await StepFirstRef.value.onSubmit()) {
+  console.log(StepFirstRef.value)
+  if (await StepFirstRef.value?.onSubmit()) {
     if (active.value++ > 2) active.value = 0
   }
 }
@@ -104,7 +105,7 @@ function clearStore() {
 function submit() {
   loading.value = true
   const documents = [] as any[]
-  StepSecondRef.value.paragraphList.map((item: any) => {
+  StepSecondRef.value?.paragraphList.map((item: any) => {
     documents.push({
       name: item.name,
       paragraphs: item.content
