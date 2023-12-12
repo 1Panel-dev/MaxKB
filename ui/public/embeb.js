@@ -27,7 +27,7 @@
     </svg>`;
         chat_button = document.createElement("div");
         chat_button.style =
-          "position: absolute;bottom: 40px;right: 20px;cursor: pointer;";
+          "position: fixed;bottom: 40px;right: 20px;cursor: pointer;";
         chat_button.innerHTML = icon;
     
         chat_container = document.createElement("div");
@@ -37,7 +37,7 @@
           height: 600px;
           border: none;
           border-radius: 7px 7px 7px 7px;
-          position: absolute;bottom: 40px;right: 20px`;
+          position: fixed;bottom: 40px;right: 20px`;
         chat_container.style["display"] = "none";
     
         chat = document.createElement("iframe");
