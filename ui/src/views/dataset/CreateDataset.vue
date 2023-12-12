@@ -26,8 +26,14 @@
     </template>
     <div class="create-dataset__main flex" v-loading="loading">
       <div class="create-dataset__component main-calc-height">
-        <template v-if="steps[active]?.component">
+        <!-- <template v-if="steps[active]?.component">
           <component :is="steps[active].component" :ref="steps[active]?.ref" />
+        </template> -->
+        <template v-if="active === 0">
+          <StepFirst ref="StepFirstRef" />
+        </template>
+        <template v-else-if="active === 1">
+          <StepSecond ref="StepSecondRef" />
         </template>
         <template v-else-if="active === 2">
           <ResultSuccess :data="successInfo" />
@@ -47,7 +53,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepFirst from './step/StepFirst.vue'
 import StepSecond from './step/StepSecond.vue'
@@ -89,7 +95,6 @@ const active = ref(0)
 const successInfo = ref<any>(null)
 
 async function next() {
-  console.log(StepFirstRef.value)
   if (await StepFirstRef.value?.onSubmit()) {
     if (active.value++ > 2) active.value = 0
   }
