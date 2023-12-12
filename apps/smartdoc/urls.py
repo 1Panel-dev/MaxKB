@@ -77,7 +77,9 @@ def page_not_found(request, exception):
         file = open(index_path, "r", encoding='utf-8')
         content = file.read()
         file.close()
-        return HttpResponse(content, status=200)
+        if request.path.startswith('/ui/chat/'):
+            return HttpResponse(content, status=200)
+        return HttpResponse(content, status=200, headers={'X-Frame-Options': 'DENY'})
 
 
 handler404 = page_not_found
