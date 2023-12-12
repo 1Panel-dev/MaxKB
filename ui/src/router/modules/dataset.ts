@@ -28,7 +28,8 @@ const datasetRouter = {
           path: 'document',
           name: 'Document',
           meta: {
-            icon: 'Document',
+            icon: 'app-document',
+            iconActive: 'app-document-active',
             title: '文档',
             active: 'document',
             parentPath: '/dataset/:id',
@@ -40,7 +41,8 @@ const datasetRouter = {
           path: 'setting',
           name: 'DatasetSetting',
           meta: {
-            icon: 'Setting',
+            icon: 'app-setting',
+            iconActive: 'app-setting-active',
             title: '设置',
             active: 'setting',
             parentPath: '/dataset/:id',
