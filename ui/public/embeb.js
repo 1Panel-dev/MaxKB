@@ -32,7 +32,7 @@
     
         chat_container = document.createElement("div");
         chat_container.id = "chat_container";
-        chat_container.style.cssText = `position: relative;
+        chat_container.style.cssText = `z-index:10000;position: relative;
           width: 420px;
           height: 600px;
           border: none;
