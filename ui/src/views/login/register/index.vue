@@ -1,7 +1,7 @@
 <template>
   <login-layout>
-    <LoginContainer>
-      <h4 class="mb-16">注册</h4>
+    <LoginContainer subTitle="欢迎使用 MaxKB 管理平台">
+      <h4 class="mb-24">用户注册</h4>
       <el-form class="register-form" :model="registerForm" :rules="rules" ref="registerFormRef">
         <el-form-item prop="username">
           <el-input
@@ -10,9 +10,6 @@
             v-model="registerForm.username"
             placeholder="请输入用户名"
           >
-            <template #prepend>
-              <el-button :icon="UserFilled" />
-            </template>
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
@@ -24,9 +21,6 @@
             placeholder="请输入密码"
             show-password
           >
-            <template #prepend>
-              <el-button :icon="Lock" />
-            </template>
           </el-input>
         </el-form-item>
         <el-form-item prop="repassword">
@@ -38,9 +32,6 @@
             placeholder="请输入确认密码"
             show-password
           >
-            <template #prepend>
-              <el-button :icon="Lock" />
-            </template>
           </el-input>
         </el-form-item>
         <el-form-item prop="email">
@@ -50,9 +41,6 @@
             v-model="registerForm.email"
             placeholder="请输入邮箱"
           >
-            <template #prepend>
-              <el-button :icon="Message" />
-            </template>
           </el-input>
         </el-form-item>
         <el-form-item prop="code">
@@ -63,9 +51,6 @@
               v-model="registerForm.code"
               placeholder="请输入验证码"
             >
-              <template #prepend>
-                <el-button :icon="Key" />
-              </template>
             </el-input>
             <el-button
               size="large"
@@ -77,16 +62,16 @@
           </div>
         </el-form-item>
       </el-form>
-      <el-button type="primary" class="login-submit-button w-full" @click="register"
+      <el-button type="primary" class="login-submit-button w-full mt-4" @click="register"
         >注册</el-button
       >
-      <div class="operate-container mt-8">
+      <div class="operate-container mt-12">
         <el-button
           class="register"
           @click="router.push('/login')"
           link
           type="primary"
-          icon="DArrowLeft"
+          icon="ArrowLeft"
         >
           返回登录
         </el-button>
@@ -128,8 +113,8 @@ const rules = ref<FormRules<RegisterRequest>>({
     },
     {
       min: 6,
-      max: 30,
-      message: '长度在 6 到 30 个字符',
+      max: 20,
+      message: '长度在 6 到 20 个字符',
       trigger: 'blur'
     }
   ],
@@ -141,8 +126,8 @@ const rules = ref<FormRules<RegisterRequest>>({
     },
     {
       min: 6,
-      max: 30,
-      message: '长度在 6 到 30 个字符',
+      max: 20,
+      message: '长度在 6 到 20 个字符',
       trigger: 'blur'
     },
     {

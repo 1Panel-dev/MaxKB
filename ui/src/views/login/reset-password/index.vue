@@ -1,7 +1,7 @@
 <template>
   <login-layout>
-    <LoginContainer>
-      <h4 class="mb-16">修改密码</h4>
+    <LoginContainer subTitle="欢迎使用 MaxKB 管理平台">
+      <h4 class="mb-24">修改密码</h4>
       <el-form
         class="reset-password-form"
         ref="resetPasswordFormRef"
@@ -17,9 +17,6 @@
             placeholder="请输入密码"
             show-password
           >
-            <template #prepend>
-              <el-button icon="Lock" />
-            </template>
           </el-input>
         </el-form-item>
         <el-form-item prop="re_password">
@@ -31,22 +28,19 @@
             placeholder="请输入确认密码"
             show-password
           >
-            <template #prepend>
-              <el-button icon="Lock" />
-            </template>
           </el-input>
         </el-form-item>
       </el-form>
-      <el-button type="primary" class="login-submit-button w-full" @click="resetPassword"
+      <el-button type="primary" class="login-submit-button w-full mt-4" @click="resetPassword"
         >确认修改</el-button
       >
-      <div class="operate-container mt-8">
+      <div class="operate-container mt-12">
         <el-button
           class="register"
           @click="router.push('/login')"
           link
           type="primary"
-          icon="DArrowLeft"
+          icon="ArrowLeft"
         >
           返回登录
         </el-button>
@@ -91,8 +85,8 @@ const rules = ref<FormRules<ResetPasswordRequest>>({
     },
     {
       min: 6,
-      max: 30,
-      message: '长度在 6 到 30 个字符',
+      max: 20,
+      message: '长度在 6 到 20 个字符',
       trigger: 'blur'
     }
   ],
@@ -104,8 +98,8 @@ const rules = ref<FormRules<ResetPasswordRequest>>({
     },
     {
       min: 6,
-      max: 30,
-      message: '长度在 6 到 30 个字符',
+      max: 20,
+      message: '长度在 6 到 20 个字符',
       trigger: 'blur'
     },
     {

@@ -3,13 +3,13 @@
     <el-result icon="success" title="🎉 数据集创建成功 🎉">
       <template #sub-title>
         <div class="mt-8">
-          <span class="bold">{{ data?.document_count || 0 }}</span>
+          <span class="bold">{{ data?.document_list.length || 0 }}</span>
           <el-text type="info" class="ml-4">文档</el-text>
           <el-divider direction="vertical" />
-          <span class="bold">{{ data?.document_list.length || 0 }}</span>
+          <span class="bold">{{ paragraph_count || 0 }}</span>
           <el-text type="info" class="ml-4">分段</el-text>
           <el-divider direction="vertical" />
-          <span class="bold">{{ numberFormat(data?.char_length) || 0 }}</span>
+          <span class="bold">{{ numberFormat(char_length) || 0 }}</span>
           <el-text type="info" class="ml-4">字符</el-text>
         </div>
       </template>
@@ -54,7 +54,8 @@
   </el-scrollbar>
 </template>
 <script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { numberFormat } from '@/utils/utils'
 import { filesize, getImgUrl } from '@/utils/utils'
 const props = defineProps({
@@ -64,6 +65,14 @@ const props = defineProps({
   }
 })
 const router = useRouter()
+const paragraph_count = computed(
+  () => props.data?.document_list.reduce((sum: number, obj: any) => (sum += obj.paragraph_count), 0)
+)
+
+const char_length = computed(
+  () =>
+    props.data?.document_list.reduce((sum: number, obj: any) => (sum += obj.char_length), 0) || 0
+)
 </script>
 <style scoped lang="scss">
 .result-success {

@@ -85,8 +85,11 @@ const putApplication: (
  * 删除应用
  * @param 参数 applicaiton_id
  */
-const delApplication: (applicaiton_id: String) => Promise<Result<boolean>> = (applicaiton_id) => {
-  return del(`${prefix}/${applicaiton_id}`)
+const delApplication: (
+  applicaiton_id: String,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (applicaiton_id, loading) => {
+  return del(`${prefix}/${applicaiton_id}`, undefined, {}, loading)
 }
 
 /**

@@ -37,8 +37,11 @@ const getAllDateset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loadi
  * 删除数据集
  * @param 参数 dataset_id
  */
-const delDateset: (dataset_id: String) => Promise<Result<boolean>> = (dataset_id) => {
-  return del(`${prefix}/${dataset_id}`)
+const delDateset: (dataset_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  dataset_id,
+  loading
+) => {
+  return del(`${prefix}/${dataset_id}`, undefined, {}, loading)
 }
 
 /**

@@ -126,7 +126,9 @@ h4 {
 .mb-16 {
   margin-bottom: calc(var(--app-base-px) * 2);
 }
-
+.mb-24 {
+  margin-bottom: calc(var(--app-base-px) * 3);
+}
 .ml-4 {
   margin-left: calc(var(--app-base-px) - 4px);
 }

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="progress-table-item">
     <el-popover placement="top-start" :title="row[text_field]" :width="200" trigger="hover">
       <template #reference>
         <el-progress v-bind="$attrs" :percentage="row[value_field]"></el-progress
@@ -61,8 +61,10 @@ const view_card = computed(() => {
   line-height: 22px;
   height: 22px;
 }
-.value {
-  float: right;
-  @include valueScss;
+.progress-table-item {
+  .value {
+    float: right;
+    @include valueScss;
+  }
 }
 </style>

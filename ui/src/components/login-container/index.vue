@@ -1,13 +1,17 @@
 <template>
   <div class="login-form-container">
     <div class="login-title">
-      <div class="title flex-center">
-        <div class="logo"></div>
+      <div class="title flex-center mb-8">
+        <div class="logo mr-4"></div>
         <div class="app-logo-font">{{ title || defaultTitle }}</div>
       </div>
-      <div class="sub-title" v-if="subTitle">{{ subTitle }}</div>
+      <div class="sub-title text-center" v-if="subTitle">
+        <el-text type="info">{{ subTitle }}</el-text>
+      </div>
     </div>
-    <slot></slot>
+    <el-card class="login-card">
+      <slot></slot>
+    </el-card>
   </div>
 </template>
 <script setup lang="ts">
@@ -20,27 +24,28 @@ defineProps({
 </script>
 <style lang="scss" scope>
 .login-form-container {
-  width: 420px;
+  width: 480px;
 
   .login-title {
-    margin-bottom: 30px;
+    margin-bottom: 32px;
 
     .title {
-      font-size: 28px;
-      height: 60px;
+      font-size: 32px;
       .logo {
-        background-image: url('@/assets/logo.png');
+        background-image: url('@/assets/logo.svg');
         background-size: 100% 100%;
-        width: 48px;
-        height: 48px;
+        width: 45px;
+        height: 45px;
+        background-position: center -2px;
       }
     }
-
     .sub-title {
-      text-align: center;
-      color: #101010;
-      font-size: 18px;
+      font-size: 16px;
     }
+  }
+  .login-card {
+    border-radius: 8px;
+    padding: 18px;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="table-checkbox">
     <div class="header">
       <div class="title">{{ title }}</div>
 
@@ -186,26 +186,28 @@ const activeText = computed(() => {
 })
 </script>
 <style lang="scss" scoped>
-.header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  .title {
-    color: #1f2329;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 22px;
+.table-checkbox {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    .title {
+      color: #1f2329;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 22px;
+    }
+    .input-with-select {
+      width: 45%;
+    }
   }
-  .input-with-select {
-    width: 45%;
-  }
-}
-.msg {
-  margin-top: 12px;
-  color: rgba(100, 106, 115, 1);
-  .active {
-    margin-left: 3px;
-    color: var(--el-color-primary);
+  .msg {
+    margin-top: 12px;
+    color: rgba(100, 106, 115, 1);
+    .active {
+      margin-left: 3px;
+      color: var(--el-color-primary);
+    }
   }
 }
 </style>
