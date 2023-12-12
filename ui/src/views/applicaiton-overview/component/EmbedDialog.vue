@@ -66,13 +66,12 @@ frameborder="0"
 allow="microphone">
 </iframe>
 `
-  source2.value = `<script> window.difyChatbotConfig = { 
-  token: "${val}"
+  source2.value = `<script> window.maxkbChatConfig = { 
+  token: "${val}",
+  host: "${window.location.host}"
  }
  <\/script>
-<script src="https://udify.app/embed.min.js"
- id="${val}"
- defer>
+<script src="${window.location.origin}/embed.js">
 <\/script>
 `
   dialogVisible.value = true
