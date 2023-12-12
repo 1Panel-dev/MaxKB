@@ -75,24 +75,6 @@ const paginationConfig = reactive({
 
 const searchValue = ref('')
 
-const noMore = computed(
-  () =>
-    datasetList.value.length > 0 &&
-    datasetList.value.length === paginationConfig.total &&
-    paginationConfig.total > 20 &&
-    !loading.value
-)
-const disabledScroll = computed(
-  () => datasetList.value.length > 0 && (loading.value || noMore.value)
-)
-
-function loadDataset() {
-  if (paginationConfig.total > paginationConfig.page_size) {
-    paginationConfig.current_page += 1
-    getList()
-  }
-}
-
 function searchHandle() {
   paginationConfig.current_page = 1
   datasetList.value = []
@@ -109,18 +91,11 @@ function deleteDateset(row: any) {
     }
   )
     .then(() => {
-      loading.value = true
-      datasetApi
-        .delDateset(row.id)
-        .then(() => {
-          const index = datasetList.value.findIndex((v) => v.id === row.id)
-          datasetList.value.splice(index, 1)
-          MsgSuccess('删除成功')
-          loading.value = false
-        })
-        .catch(() => {
-          loading.value = false
-        })
+      datasetApi.delDateset(row.id, loading).then(() => {
+        const index = datasetList.value.findIndex((v) => v.id === row.id)
+        datasetList.value.splice(index, 1)
+        MsgSuccess('删除成功')
+      })
     })
     .catch(() => {})
 }

@@ -102,14 +102,6 @@ const paginationConfig = reactive({
 
 const searchValue = ref('')
 
-const noMore = computed(
-  () =>
-    applicationList.value.length > 0 &&
-    applicationList.value.length === paginationConfig.total &&
-    paginationConfig.total > 20 &&
-    !loading.value
-)
-
 function searchHandle() {
   paginationConfig.total = 0
   paginationConfig.current_page = 1
@@ -128,17 +120,11 @@ function deleteApplication(row: any) {
     confirmButtonClass: 'danger'
   })
     .then(() => {
-      loading.value = true
-      applicationApi
-        .delApplication(row.id)
-        .then(() => {
-          const index = applicationList.value.findIndex((v) => v.id === row.id)
-          applicationList.value.splice(index, 1)
-          MsgSuccess('删除成功')
-        })
-        .catch(() => {
-          loading.value = false
-        })
+      applicationApi.delApplication(row.id, loading).then(() => {
+        const index = applicationList.value.findIndex((v) => v.id === row.id)
+        applicationList.value.splice(index, 1)
+        MsgSuccess('删除成功')
+      })
     })
     .catch(() => {})
 }
