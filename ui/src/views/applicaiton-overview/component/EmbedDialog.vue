@@ -71,7 +71,7 @@ allow="microphone">
   host: "${window.location.host}"
  }
  <\/script>
-<script src="${window.location.origin}/embed.js">
+<script src="${window.location.origin}/ui/embed.js">
 <\/script>
 `
   dialogVisible.value = true
