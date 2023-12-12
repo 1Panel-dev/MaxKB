@@ -1,7 +1,7 @@
 <template>
   <login-layout>
     <LoginContainer>
-      <h4 class="mb-16">忘记密码</h4>
+      <h4 class="mb-24">忘记密码</h4>
       <el-form
         class="register-form"
         ref="resetPasswordFormRef"
@@ -15,9 +15,6 @@
             v-model="CheckEmailForm.email"
             placeholder="请输入邮箱"
           >
-            <template #prepend>
-              <el-button icon="UserFilled" />
-            </template>
           </el-input>
         </el-form-item>
         <el-form-item prop="code">
@@ -28,9 +25,6 @@
               v-model="CheckEmailForm.code"
               placeholder="请输入验证码"
             >
-              <template #prepend>
-                <el-button icon="Key" />
-              </template>
             </el-input>
             <el-button
               size="large"
@@ -42,16 +36,16 @@
           </div>
         </el-form-item>
       </el-form>
-      <el-button type="primary" class="login-submit-button w-full" @click="checkCode"
+      <el-button type="primary" class="login-submit-button w-full mt-4" @click="checkCode"
         >立即验证</el-button
       >
-      <div class="operate-container mt-8">
+      <div class="operate-container mt-12">
         <el-button
           class="register"
           @click="router.push('/login')"
           link
           type="primary"
-          icon="DArrowLeft"
+          icon="ArrowLeft"
         >
           返回登录
         </el-button>
