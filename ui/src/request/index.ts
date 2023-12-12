@@ -47,9 +47,13 @@ instance.interceptors.response.use(
     return response
   },
   (err: any) => {
+    console.log(err)
     if (err.code === 'ECONNABORTED') {
       MsgError(err.message)
       console.error(err)
+    }
+    if (err.response?.status === 404) {
+      router.push('/404 ')
     }
     if (err.response?.status === 401) {
       router.push({ name: 'login' })
