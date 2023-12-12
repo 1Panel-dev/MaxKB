@@ -33,7 +33,7 @@
               <AppAvatar v-if="!node.isLeaf" class="mr-12" shape="square" :size="24">
                 <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
               </AppAvatar>
-              {{ data.name }}
+              <span class="ellipsis-1"> {{ data.name }}</span>
             </span>
           </template>
         </el-cascader>
@@ -42,7 +42,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
-        <el-button type="primary" @click="submitForm(formRef)"> 保存 </el-button>
+        <el-button type="primary" @click="submitForm(formRef)" :loading="loading"> 保存 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -53,7 +53,6 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import logApi from '@/api/log'
 import type { CascaderProps } from 'element-plus'
-
 import useStore from '@/stores'
 
 const { application, document } = useStore()
@@ -70,7 +69,6 @@ const {
   params: { id }
 } = route as any
 
-const emit = defineEmits(['updateContent'])
 
 const formRef = ref()
 
@@ -78,6 +76,7 @@ const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 
 const form = ref<any>({
+  chat_id: '',
   record_id: '',
   problem_text: '',
   title: '',
@@ -95,6 +94,7 @@ const datasetList = ref([])
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
+      chat_id: '',
       record_id: '',
       problem_text: '',
       title: '',
@@ -134,6 +134,7 @@ function getDataset(resolve: any) {
 }
 
 const open = (data: any) => {
+  form.value.chat_id = data.chat
   form.value.record_id = data.id
   form.value.problem_text = data.problem_text
   form.value.content = data.answer_text
@@ -150,7 +151,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       logApi
         .putChatRecordLog(
           id,
-          props.chartId,
+          form.value.chat_id,
           form.value.record_id,
           form.value.document[0],
           form.value.document[1],
@@ -158,7 +159,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           loading
         )
         .then((res: any) => {
-          emit('updateContent', res.data)
           dialogVisible.value = false
         })
     } else {

@@ -19,11 +19,7 @@
     <el-button text disabled v-if="buttonData?.vote_status === '1'">
       <AppIcon iconName="app-oppose-color"></AppIcon>
     </el-button>
-    <EditContentDialog
-      ref="EditContentDialogRef"
-      :chartId="chartId"
-      @updateContent="updateContent"
-    />
+    <EditContentDialog ref="EditContentDialogRef" />
   </div>
 </template>
 <script setup lang="ts">
@@ -37,10 +33,6 @@ const props = defineProps({
     default: () => {}
   },
   applicationId: {
-    type: String,
-    default: ''
-  },
-  chartId: {
     type: String,
     default: ''
   },
@@ -58,8 +50,8 @@ function editContent(data: any) {
   EditContentDialogRef.value.open(data)
 }
 
-function updateContent(data: any) {
-  emit('update:data', data)
-}
+// function updateContent(data: any) {
+//   emit('update:data', data)
+// }
 </script>
 <style lang="scss" scoped></style>

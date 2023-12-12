@@ -1,6 +1,6 @@
 <template>
   <LayoutContainer header="概览">
-    <div class="main-calc-height p-24">
+    <div class="main-calc-height p-24" style="min-width: 600px">
       <h4 class="title-decoration-1 mb-16">应用信息</h4>
       <el-card shadow="never" class="overview-card" v-loading="loading">
         <div class="title flex align-center">
@@ -16,7 +16,7 @@
         </div>
 
         <el-row :gutter="12">
-          <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mt-16">
+          <el-col :span="12" class="mt-16">
             <div class="flex">
               <el-text type="info">公开访问链接</el-text>
               <el-switch
@@ -26,7 +26,7 @@
                 inline-prompt
                 active-text="开"
                 inactive-text="关"
-                @change="changeState"
+                @change="changeState($event)"
               />
             </div>
 
@@ -38,16 +38,20 @@
               <el-button type="primary" text @click="copyClick(shareUrl)">
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
-              <el-button @click="getAccessToken" type="primary" text style="margin-left: 1px">
+              <el-button @click="refreshAccessToken" type="primary" text style="margin-left: 1px">
                 <el-icon><RefreshRight /></el-icon>
               </el-button>
             </div>
             <div>
-              <el-button :disabled="!accessToken?.is_active" type="primary"><a :href="shareUrl" target="_blank">演示</a></el-button>
-              <el-button :disabled="!accessToken?.is_active" @click="openDialog"> 嵌入第三方 </el-button>
+              <el-button :disabled="!accessToken?.is_active" type="primary"
+                ><a :href="shareUrl" target="_blank">演示</a></el-button
+              >
+              <el-button :disabled="!accessToken?.is_active" @click="openDialog">
+                嵌入第三方
+              </el-button>
             </div>
           </el-col>
-          <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mt-16">
+          <el-col :span="12" class="mt-16">
             <div class="flex">
               <el-text type="info">API访问凭据</el-text>
             </div>
@@ -72,7 +76,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
@@ -91,20 +95,33 @@ const apiUrl = window.location.origin + '/doc'
 
 const APIKeyDialogRef = ref()
 const EmbedDialogRef = ref()
-const shareUrl = ref('')
+
 const accessToken = ref<any>({})
 const detail = ref<any>(null)
 
 const loading = ref(false)
 
+const shareUrl = computed(() => application.location + accessToken.value.access_token)
+
+function refreshAccessToken() {
+  const obj = {
+    access_token_reset: true
+  }
+  const str = '刷新成功'
+  updateAccessToken(obj, str)
+}
 function changeState(bool: Boolean) {
   const obj = {
     is_active: bool
   }
   const str = bool ? '启用成功' : '禁用成功'
+  updateAccessToken(obj, str)
+}
+
+function updateAccessToken(obj: any, str: string) {
   applicationApi.putAccessToken(id as string, obj, loading).then((res) => {
+    accessToken.value = res?.data
     MsgSuccess(str)
-    getDetail()
   })
 }
 
@@ -117,7 +134,6 @@ function openDialog() {
 function getAccessToken() {
   application.asyncGetAccessToken(id, loading).then((res: any) => {
     accessToken.value = res?.data
-    shareUrl.value = application.location + res?.data?.access_token
   })
 }
 

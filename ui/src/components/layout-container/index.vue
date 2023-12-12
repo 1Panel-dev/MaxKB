@@ -7,10 +7,11 @@
       <h3>{{ header }}</h3>
       <slot name="header"> </slot>
     </div>
-
-    <div class="content-container__main">
-      <slot></slot>
-    </div>
+    <el-scrollbar>
+      <div class="content-container__main">
+        <slot></slot>
+      </div>
+    </el-scrollbar>
   </div>
 </template>
 
@@ -41,6 +42,7 @@ const showBack = computed(() => {
     background-color: var(--app-view-bg-color);
     border-radius: 4px;
     box-sizing: border-box;
+    min-width: 700px;
   }
 }
 </style>

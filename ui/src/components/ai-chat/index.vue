@@ -71,7 +71,7 @@
                 <el-text type="info">
                   消耗 {{ item?.message_tokens + item?.answer_tokens }} tokens
                 </el-text>
-                <LogOperationButton :data="item" :applicationId="appId" :chartId="item.id" />
+                <LogOperationButton :data="item" :applicationId="appId" />
               </div>
 
               <div class="flex-between mt-8" v-else>

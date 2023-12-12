@@ -13,7 +13,7 @@
     <template #dropdown>
       <el-dropdown-menu class="avatar-dropdown">
         <div class="userInfo">
-          <p class="bold mb-4" style="font-size: 14px;">{{ user.userInfo?.username }}</p>
+          <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.username }}</p>
           <p>
             <el-text type="info">
               {{ user.userInfo?.email }}
@@ -52,6 +52,7 @@ const logout = () => {
 </script>
 <style lang="scss" scoped>
 .avatar-dropdown {
+  min-width: 210px;
   .userInfo {
     padding: 12px 11px;
   }
