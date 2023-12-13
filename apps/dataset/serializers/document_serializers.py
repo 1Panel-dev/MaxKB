@@ -140,6 +140,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             _document.save()
             return self.one()
 
+        def refresh(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id = self.data.get("document_id")
+            ListenerManagement.embedding_by_document_signal.send(document_id)
+            return True
+
         @transaction.atomic
         def delete(self):
             document_id = self.data.get("document_id")

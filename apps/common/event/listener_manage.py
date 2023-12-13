@@ -46,15 +46,21 @@ class ListenerManagement:
         :param paragraph_id: 段落id
         :return: None
         """
-        data_list = native_search(
-            {'problem': QuerySet(get_dynamics_model({'problem.paragraph_id': django.db.models.CharField()})).filter(
-                **{'problem.paragraph_id': paragraph_id}),
-                'paragraph': QuerySet(Paragraph).filter(id=paragraph_id)},
-            select_string=get_file_content(
-                os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
-        # 批量向量化
-        VectorStore.get_embedding_vector().batch_save(data_list)
-        QuerySet(Paragraph).filter(id=paragraph_id).update(**{'status': Status.success.value})
+        status = Status.success
+        try:
+            data_list = native_search(
+                {'problem': QuerySet(get_dynamics_model({'problem.paragraph_id': django.db.models.CharField()})).filter(
+                    **{'problem.paragraph_id': paragraph_id}),
+                    'paragraph': QuerySet(Paragraph).filter(id=paragraph_id)},
+                select_string=get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
+            # 删除段落
+            VectorStore.get_embedding_vector().delete_by_paragraph_id(paragraph_id)
+            # 批量向量化
+            VectorStore.get_embedding_vector().batch_save(data_list)
+        except Exception as e:
+            status = Status.error
+        QuerySet(Paragraph).filter(id=paragraph_id).update(**{'status': status})
 
     @staticmethod
     @poxy
@@ -64,17 +70,23 @@ class ListenerManagement:
         :param document_id: 文档id
         :return: None
         """
-        data_list = native_search(
-            {'problem': QuerySet(get_dynamics_model({'problem.document_id': django.db.models.CharField()})).filter(
-                **{'problem.document_id': document_id}),
-                'paragraph': QuerySet(Paragraph).filter(document_id=document_id)},
-            select_string=get_file_content(
-                os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
-        # 批量向量化
-        VectorStore.get_embedding_vector().batch_save(data_list)
+        status = Status.success
+        try:
+            data_list = native_search(
+                {'problem': QuerySet(get_dynamics_model({'problem.document_id': django.db.models.CharField()})).filter(
+                    **{'problem.document_id': document_id}),
+                    'paragraph': QuerySet(Paragraph).filter(document_id=document_id)},
+                select_string=get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
+            # 删除文档向量数据
+            VectorStore.get_embedding_vector().delete_by_document_id(document_id)
+            # 批量向量化
+            VectorStore.get_embedding_vector().batch_save(data_list)
+        except Exception as e:
+            status = Status.error
         # 修改状态
-        QuerySet(Document).filter(id=document_id).update(**{'status': Status.success.value})
-        QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': Status.success.value})
+        QuerySet(Document).filter(id=document_id).update(**{'status': status})
+        QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': status})
 
     @staticmethod
     @poxy
@@ -84,17 +96,23 @@ class ListenerManagement:
         :param dataset_id: 数据集id
         :return: None
         """
-        data_list = native_search(
-            {'problem': QuerySet(get_dynamics_model({'problem.dataset_id': django.db.models.CharField()})).filter(
-                **{'problem.dataset_id': dataset_id}),
-                'paragraph': QuerySet(Paragraph).filter(dataset_id=dataset_id)},
-            select_string=get_file_content(
-                os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
-        # 批量向量化
-        VectorStore.get_embedding_vector().batch_save(data_list)
+        status = Status.success
+        try:
+            data_list = native_search(
+                {'problem': QuerySet(get_dynamics_model({'problem.dataset_id': django.db.models.CharField()})).filter(
+                    **{'problem.dataset_id': dataset_id}),
+                    'paragraph': QuerySet(Paragraph).filter(dataset_id=dataset_id)},
+                select_string=get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
+            # 删除数据集相关向量数据
+            VectorStore.get_embedding_vector().delete_by_dataset_id(dataset_id)
+            # 批量向量化
+            VectorStore.get_embedding_vector().batch_save(data_list)
+        except Exception as e:
+            status = Status.error
         #  修改文档 以及段落的状态
-        QuerySet(Document).filter(dataset_id=dataset_id).update(**{'status': Status.success.value})
-        QuerySet(Paragraph).filter(dataset_id=dataset_id).update(**{'status': Status.success.value})
+        QuerySet(Document).filter(dataset_id=dataset_id).update(**{'status': status})
+        QuerySet(Paragraph).filter(dataset_id=dataset_id).update(**{'status': status})
 
     @staticmethod
     def delete_embedding_by_document(document_id):

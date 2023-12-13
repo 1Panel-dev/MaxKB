@@ -17,6 +17,7 @@ urlpatterns = [
          name="document_operate"),
     path('dataset/document/split_pattern', views.Document.SplitPattern.as_view(),
          name="document_operate"),
+    path('dataset/<str:dataset_id>/document/<str:document_id>/refresh', views.Document.Refresh.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph', views.Paragraph.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<int:current_page>/<int:page_size>',
          views.Paragraph.Page.as_view(), name='paragraph_page'),

@@ -70,6 +70,24 @@ class Document(APIView):
         def post(self, request: Request, dataset_id: str):
             return result.success(DocumentSerializers.Batch(data={'dataset_id': dataset_id}).batch_save(request.data))
 
+    class Refresh(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="刷新文档向量库",
+                             operation_id="刷新文档向量库",
+                             manual_parameters=DocumentSerializers.Operate.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["数据集/文档"]
+                             )
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def put(self, request: Request, dataset_id: str, document_id: str):
+            return result.success(
+                DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).refresh(
+                ))
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 
