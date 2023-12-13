@@ -93,14 +93,16 @@ class ChatSerializers(serializers.Serializer):
             self.is_valid(raise_exception=True)
             application_id = self.data.get('application_id')
             application = QuerySet(Application).get(id=application_id)
-            model = application.model
+            model = QuerySet(Model).filter(id=application.model_id).first()
             dataset_id_list = [str(row.dataset_id) for row in
                                QuerySet(ApplicationDatasetMapping).filter(
                                    application_id=application_id)]
-            chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
-                                                                               json.loads(
-                                                                                   decrypt(model.credential)),
-                                                                               streaming=True)
+            chat_model = None
+            if model is not None:
+                chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
+                                                                                   json.loads(
+                                                                                       decrypt(model.credential)),
+                                                                                   streaming=True)
 
             chat_id = str(uuid.uuid1())
             chat_cache.set(chat_id,

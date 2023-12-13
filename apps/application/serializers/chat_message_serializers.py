@@ -122,6 +122,7 @@ class ChatMessageSerializer(serializers.Serializer):
                 vector.delete_by_paragraph_id(_value.get('paragraph_id'))
 
         title, content = (None, None) if paragraph is None else (paragraph.title, paragraph.content)
+        _id = str(uuid.uuid1())
 
         embedding_id, dataset_id, document_id, paragraph_id, source_type, source_id = (_value.get(
             'id'), _value.get(
@@ -130,6 +131,26 @@ class ChatMessageSerializer(serializers.Serializer):
             'paragraph_id'), _value.get(
             'source_type'), _value.get(
             'source_id')) if _value is not None else (None, None, None, None, None, None)
+
+        if chat_model is None:
+            def event_block_content(c: str):
+                yield 'data: ' + json.dumps({'chat_id': chat_id, 'id': _id, 'operate': paragraph is not None,
+                                             'content': c if c is not None else '抱歉，根据已知信息无法回答这个问题，请重新描述您的问题或提供更多信息～'}) + "\n\n"
+                chat_info.append_chat_message(
+                    ChatMessage(_id, message, title, content, embedding_id, dataset_id, document_id,
+                                paragraph_id,
+                                source_type,
+                                source_id, c, 0,
+                                0))
+                # 重新设置缓存
+                chat_cache.set(chat_id,
+                               chat_info, timeout=60 * 30)
+
+            r = StreamingHttpResponse(streaming_content=event_block_content(content),
+                                      content_type='text/event-stream;charset=utf-8')
+
+            r['Cache-Control'] = 'no-cache'
+            return r
         # 获取上下文
         history_message = chat_info.get_context_message()
 
@@ -137,8 +158,6 @@ class ChatMessageSerializer(serializers.Serializer):
         chat_message = [*history_message, MessageManagement.get_message(title, content, message)]
         # 对话
         result_data = chat_model.stream(chat_message)
-
-        _id = str(uuid.uuid1())
 
         def event_content(response):
             all_text = ''
