@@ -29,7 +29,7 @@ class ApplicationAccessToken(AppModelMixin):
     """
     应用认证token
     """
-    application = models.ForeignKey(Application, primary_key=True, on_delete=models.CASCADE, verbose_name="应用id")
+    application = models.OneToOneField(Application, primary_key=True, on_delete=models.CASCADE, verbose_name="应用id")
     access_token = models.CharField(max_length=128, verbose_name="用户公开访问 认证token", unique=True)
     is_active = models.BooleanField(default=True, verbose_name="是否开启公开访问")
 

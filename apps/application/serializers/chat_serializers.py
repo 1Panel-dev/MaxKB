@@ -29,7 +29,6 @@ from dataset.models import Document, Problem, Paragraph
 from embedding.models import SourceType, Embedding
 from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
-
 from smartdoc.conf import PROJECT_DIR
 
 chat_cache = cache
@@ -292,7 +291,7 @@ class ChatRecordSerializer(serializers.Serializer):
             problem.save()
             # 插入段落
             paragraph.save()
-            chat_record.improve_problem_id_list.append(problem.id)
+            chat_record.improve_paragraph_id_list.append(paragraph.id)
             # 添加标注
             chat_record.save()
             return True

@@ -74,9 +74,9 @@ class ChatRecord(AppModelMixin):
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)
     problem_text = models.CharField(max_length=1024, verbose_name="问题")
     answer_text = models.CharField(max_length=1024, verbose_name="答案")
-    improve_problem_id_list = ArrayField(verbose_name="改进标注列表",
-                                         base_field=models.UUIDField(max_length=128, blank=True)
-                                         , default=list)
+    improve_paragraph_id_list = ArrayField(verbose_name="改进标注列表",
+                                           base_field=models.UUIDField(max_length=128, blank=True)
+                                           , default=list)
 
     index = models.IntegerField(verbose_name="对话下标")
 
