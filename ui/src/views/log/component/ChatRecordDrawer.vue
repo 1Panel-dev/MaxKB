@@ -1,11 +1,5 @@
 <template>
-  <el-drawer
-    v-model="visible"
-    size="50%"
-    append-to-body
-    @close="closeHandel"
-    class="chat-record-drawer"
-  >
+  <el-drawer v-model="visible" size="50%" @close="closeHandel" class="chat-record-drawer">
     <template #header>
       <h4>{{ application?.name }}</h4>
     </template>
