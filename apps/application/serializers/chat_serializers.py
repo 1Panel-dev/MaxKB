@@ -131,7 +131,9 @@ class ChatSerializers(serializers.Serializer):
         def open(self):
             self.is_valid(raise_exception=True)
             chat_id = str(uuid.uuid1())
-            model = QuerySet(Model).get(user_id=self.data.get('user_id'), id=self.data.get('model_id'))
+            model = QuerySet(Model).filter(user_id=self.data.get('user_id'), id=self.data.get('model_id')).first()
+            if model is None:
+                raise AppApiException(500, "模型不存在")
             dataset_id_list = self.data.get('dataset_id_list')
             chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
                                                                                json.loads(
@@ -250,6 +252,36 @@ class ChatRecordSerializer(serializers.Serializer):
     class ImproveSerializer(serializers.Serializer):
         title = serializers.CharField(required=False)
         content = serializers.CharField(required=True)
+
+    class ParagraphModel(serializers.ModelSerializer):
+        class Meta:
+            model = Paragraph
+            fields = "__all__"
+
+    class ChatRecordImprove(serializers.Serializer):
+        chat_id = serializers.UUIDField(required=True)
+
+        chat_record_id = serializers.UUIDField(required=True)
+
+        def get(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            chat_record_id = self.data.get('chat_record_id')
+            chat_id = self.data.get('chat_id')
+            chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
+            if chat_record is None:
+                raise AppApiException(500, '不存在的对话记录')
+            if chat_record.improve_paragraph_id_list is None or len(chat_record.improve_paragraph_id_list) == 0:
+                return []
+
+            paragraph_model_list = QuerySet(Paragraph).filter(id__in=chat_record.improve_paragraph_id_list)
+            if len(paragraph_model_list) < len(chat_record.improve_paragraph_id_list):
+                paragraph_model_id_list = [str(p.id) for p in paragraph_model_list]
+                chat_record.improve_paragraph_id_list = list(
+                    filter(lambda p_id: paragraph_model_id_list.__contains__(p_id),
+                           chat_record.improve_paragraph_id_list))
+                chat_record.save()
+            return [ChatRecordSerializer.ParagraphModel(p).data for p in paragraph_model_list]
 
     class Improve(serializers.Serializer):
         chat_id = serializers.UUIDField(required=True)

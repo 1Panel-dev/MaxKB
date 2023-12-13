@@ -275,7 +275,8 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
         def get_response_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['id', 'content', 'hit_num', 'star_num', 'trample_num', 'is_active', 'document_id', 'title',
+                required=['id', 'content', 'hit_num', 'star_num', 'trample_num', 'is_active', 'dataset_id',
+                          'document_id', 'title',
                           'create_time', 'update_time'],
                 properties={
                     'id': openapi.Schema(type=openapi.TYPE_STRING, title="id",
@@ -290,6 +291,8 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                                description="点赞数量", default=1),
                     'trample_num': openapi.Schema(type=openapi.TYPE_INTEGER, title="点踩数量",
                                                   description="点踩数", default=1),
+                    'dataset_id': openapi.Schema(type=openapi.TYPE_STRING, title="数据集id",
+                                                 description="数据集id", default='xxx'),
                     'document_id': openapi.Schema(type=openapi.TYPE_STRING, title="文档id",
                                                   description="文档id", default='xxx'),
                     'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用",

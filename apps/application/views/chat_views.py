@@ -13,11 +13,10 @@ from rest_framework.views import APIView
 
 from application.serializers.chat_message_serializers import ChatMessageSerializer
 from application.serializers.chat_serializers import ChatSerializers, ChatRecordSerializer
-from application.swagger_api.chat_api import ChatApi, VoteApi, ChatRecordApi, ImproveApi
+from application.swagger_api.chat_api import ChatApi, VoteApi, ChatRecordApi, ImproveApi, ChatRecordImproveApi
 from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import Permission, Group, Operate, \
     RoleConstants, ViewPermission, CompareConstants
-from common.exception.app_exception import AppAuthenticationFailed
 from common.response import result
 from common.util.common import query_params_to_single_dict
 
@@ -190,6 +189,25 @@ class ChatView(APIView):
                 return result.success(ChatRecordSerializer.Vote(
                     data={'vote_status': request.data.get('vote_status'), 'chat_id': chat_id,
                           'chat_record_id': chat_record_id}).vote())
+
+        class ChatRecordImprove(APIView):
+            authentication_classes = [TokenAuth]
+
+            @action(methods=['GET'], detail=False)
+            @swagger_auto_schema(operation_summary="获取标注段落列表信息",
+                                 operation_id="获取标注段落列表信息",
+                                 manual_parameters=ChatRecordImproveApi.get_request_params_api(),
+                                 responses=result.get_api_response(ChatRecordImproveApi.get_response_body_api()),
+                                 tags=["应用/对话日志/标注"]
+                                 )
+            @has_permissions(
+                ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                               [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                               dynamic_tag=keywords.get('application_id'))]
+                               ))
+            def get(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
+                return result.success(ChatRecordSerializer.ChatRecordImprove(
+                    data={'chat_id': chat_id, 'chat_record_id': chat_record_id}).get())
 
         class Improve(APIView):
             authentication_classes = [TokenAuth]

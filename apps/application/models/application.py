@@ -26,7 +26,7 @@ class Application(AppModelMixin):
     example = ArrayField(verbose_name="示例列表", base_field=models.CharField(max_length=256, blank=True))
     dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    model = models.ForeignKey(Model, on_delete=models.DO_NOTHING, db_constraint=False)
+    model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
 
     class Meta:
         db_table = "application"
