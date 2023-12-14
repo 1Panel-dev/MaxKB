@@ -70,6 +70,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             query_set = query_set.filter(**{'dataset_id': self.data.get("dataset_id")})
             if 'name' in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'name__contains': self.data.get('name')})
+            query_set = query_set.order_by('-create_time')
             return query_set
 
         def list(self, with_valid=False):

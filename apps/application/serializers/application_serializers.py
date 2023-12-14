@@ -62,12 +62,13 @@ class ApplicationSerializerModel(serializers.ModelSerializer):
 
 class ApplicationSerializer(serializers.Serializer):
     name = serializers.CharField(required=True)
-    desc = serializers.CharField(required=False)
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     model_id = serializers.CharField(required=True)
     multiple_rounds_dialogue = serializers.BooleanField(required=True)
-    prologue = serializers.CharField(required=False)
-    example = serializers.ListSerializer(required=False, child=serializers.CharField(required=True))
-    dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
+    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    example = serializers.ListSerializer(required=False, child=serializers.CharField(required=True), allow_null=True)
+    dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
+                                                 allow_null=True)
 
     class AccessTokenSerializer(serializers.Serializer):
         application_id = serializers.UUIDField(required=True)
@@ -166,7 +167,7 @@ class ApplicationSerializer(serializers.Serializer):
             return Application(id=uuid.uuid1(), name=application.get('name'), desc=application.get('desc'),
                                prologue=application.get('prologue'), example=application.get('example'),
                                dialogue_number=3 if application.get('multiple_rounds_dialogue') else 0,
-                               status=True, user_id=user_id, model_id=application.get('model_id'),
+                               user_id=user_id, model_id=application.get('model_id'),
                                )
 
         @staticmethod
@@ -184,12 +185,13 @@ class ApplicationSerializer(serializers.Serializer):
             user_id = self.data.get("user_id")
             query_set_dict = {}
             query_set = QuerySet(model=get_dynamics_model(
-                {'temp_application.name': models.CharField(), 'temp_application.desc': models.CharField()}))
+                {'temp_application.name': models.CharField(), 'temp_application.desc': models.CharField(),
+                 'temp_application.create_time': models.DateTimeField()}))
             if "desc" in self.data and self.data.get('desc') is not None:
                 query_set = query_set.filter(**{'temp_application.desc__contains': self.data.get("desc")})
             if "name" in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'temp_application.name__contains': self.data.get("name")})
-
+            query_set = query_set.order_by("-temp_application.create_time")
             query_set_dict['default_sql'] = query_set
 
             query_set_dict['application_custom_sql'] = QuerySet(model=get_dynamics_model(

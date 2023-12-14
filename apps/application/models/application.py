@@ -23,7 +23,7 @@ class Application(AppModelMixin):
     name = models.CharField(max_length=128, verbose_name="应用名称")
     desc = models.CharField(max_length=128, verbose_name="引用描述", default="")
     prologue = models.CharField(max_length=1024, verbose_name="开场白", default="")
-    example = ArrayField(verbose_name="示例列表", base_field=models.CharField(max_length=256, blank=True))
+    example = ArrayField(verbose_name="示例列表", base_field=models.CharField(max_length=256, blank=True), default={})
     dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
