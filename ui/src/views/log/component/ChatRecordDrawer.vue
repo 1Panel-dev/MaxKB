@@ -1,11 +1,5 @@
 <template>
-  <el-drawer
-    v-model="visible"
-    size="50%"
-    append-to-body
-    @close="closeHandel"
-    class="chat-record-drawer"
-  >
+  <el-drawer v-model="visible" size="50%" @close="closeHandel" class="chat-record-drawer">
     <template #header>
       <h4>{{ application?.name }}</h4>
     </template>
@@ -49,7 +43,7 @@ const props = withDefaults(
     /**
      * 对话 记录id
      */
-    chartId?: string
+    chartId: string
     /**
      * 下一条
      */
@@ -66,7 +60,7 @@ const props = withDefaults(
   {}
 )
 
-defineEmits(['update:chartId'])
+const emit = defineEmits(['update:chartId'])
 
 const route = useRoute()
 const {
@@ -106,6 +100,12 @@ watch(
     getChatRecord()
   }
 )
+
+watch(visible, (bool) => {
+  if (!bool) {
+    emit('update:chartId', '')
+  }
+})
 
 const open = () => {
   getChatRecord()

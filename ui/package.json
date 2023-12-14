@@ -26,6 +26,8 @@
     "markdown-it-sup": "^1.0.0",
     "markdown-it-task-lists": "^2.1.1",
     "markdown-it-toc-done-right": "^4.2.0",
+    "md-editor-v3": "^4.9.0",
+    "medium-zoom": "^1.1.0",
     "mitt": "^3.0.0",
     "npm": "^10.2.4",
     "nprogress": "^0.2.0",
