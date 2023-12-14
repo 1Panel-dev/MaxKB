@@ -1,11 +1,15 @@
 <template>
-  <div class="flex align-center ml-8 mt-8 mb-16">
-    <back-button :to="activeMenu"></back-button>
-    <el-dropdown placement="bottom-start" trigger="click" @command="changeMenu">
-      <span class="el-dropdown-link flex">
-        <span class="ellipsis-1"> {{ currentName }}</span>
-        <el-icon class="el-icon--right"><arrow-down /></el-icon>
-      </span>
+  <div class="flex-between align-center ml-8 mt-8 mb-16">
+    <div class="flex align-center">
+      <back-button :to="activeMenu"></back-button>
+      <span class="ellipsis-1"> {{ currentName }}</span>
+    </div>
+    <el-dropdown placement="top" trigger="click" @command="changeMenu">
+      <div class="el-dropdown-link">
+        <el-button text>
+          <el-icon><CaretBottom /></el-icon>
+        </el-button>
+      </div>
       <template #dropdown>
         <el-dropdown-menu>
           <template v-for="(item, index) in list" :key="index">
