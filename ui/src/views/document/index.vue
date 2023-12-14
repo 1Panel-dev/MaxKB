@@ -127,7 +127,7 @@ const paginationConfig = reactive({
 
 watch(documentData, (list) => {
   let interval
-  if (list.every((item) => item.status === '0')) {
+  if (list.length > 0 && list.every((item) => item.status === '0')) {
     interval = setInterval(() => {
       getList(true)
     }, 6000)

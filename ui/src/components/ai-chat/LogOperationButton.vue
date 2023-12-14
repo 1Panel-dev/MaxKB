@@ -12,34 +12,25 @@
       </el-button>
     </el-tooltip>
     <el-divider direction="vertical" />
-    <el-tooltip effect="dark" content="修改内容" placement="top">
+    <el-tooltip
+      v-if="data.improve_paragraph_id_list.length === 0"
+      effect="dark"
+      content="修改内容"
+      placement="top"
+    >
       <el-button text @click="editContent(data)">
         <el-icon><EditPen /></el-icon>
       </el-button>
     </el-tooltip>
 
-    <!-- <el-divider direction="vertical" />
-    <el-tooltip placement="bottom-start" effect="dark" content="修改内容">
-      <el-popover :width="580" trigger="click">
-        <template #reference>
-          <el-button text>
-            <el-icon><Document /></el-icon>
-          </el-button>
-        </template>
-        <h4>修改内容</h4>
-        <el-input
-          v-model="data.content"
-          placeholder="请输入内容"
-          maxlength="1024"
-          show-word-limit
-          :rows="8"
-          type="textarea"
-        >
-        </el-input>
-      </el-popover>
-    </el-tooltip> -->
+    <el-tooltip v-else effect="dark" content="修改标注" placement="top">
+      <el-button text @click="editContent(data)">
+        <AppIcon iconName="app-document-active" class="primary"></AppIcon>
+      </el-button>
+    </el-tooltip>
+
     <el-divider direction="vertical" v-if="buttonData?.vote_status !== '-1'" />
-    <el-button text disabled>
+    <el-button text disabled v-if="buttonData?.vote_status === '0'">
       <AppIcon iconName="app-like-color"></AppIcon>
     </el-button>
 
