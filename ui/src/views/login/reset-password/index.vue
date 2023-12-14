@@ -1,6 +1,6 @@
 <template>
   <login-layout>
-    <LoginContainer subTitle="欢迎使用 MaxKB 管理平台">
+    <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库">
       <h4 class="mb-24">修改密码</h4>
       <el-form
         class="reset-password-form"

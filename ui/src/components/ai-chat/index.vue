@@ -1,5 +1,5 @@
 <template>
-  <div class="ai-chat">
+  <div class="ai-chat" :class="log ? 'chart-log' : ''">
     <el-scrollbar ref="scrollDiv">
       <div ref="dialogScrollbar" class="ai-chat__content p-24">
         <div class="item-content mb-16">
@@ -324,6 +324,11 @@ onUpdated(() => {
   box-sizing: border-box;
   position: relative;
   color: var(--app-text-color);
+  &.chart-log {
+    .ai-chat__content {
+      padding-bottom: 0;
+    }
+  }
   &__content {
     padding-top: 0;
     padding-bottom: 96px;
