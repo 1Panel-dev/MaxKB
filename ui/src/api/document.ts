@@ -121,6 +121,28 @@ const getDocumentDetail: (dataset_id: string, document_id: string) => Promise<Re
   return get(`${prefix}/${dataset_id}/document/${document_id}`)
 }
 
+/**
+ * 刷新文档向量库
+ * @param 参数 
+ * dataset_id, document_id, 
+ * {
+      "name": "string",
+      "is_active": true
+    }
+ */
+const putDocumentRefresh: (
+  dataset_id: string,
+  document_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, document_id, loading) => {
+  return put(
+    `${prefix}/${dataset_id}/document/${document_id}/refresh`,
+    undefined,
+    undefined,
+    loading
+  )
+}
+
 export default {
   postSplitDocument,
   getDocument,
@@ -129,5 +151,6 @@ export default {
   putDocument,
   delDocument,
   getDocumentDetail,
-  listSplitPattern
+  listSplitPattern,
+  putDocumentRefresh
 }

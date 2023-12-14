@@ -80,14 +80,14 @@
           </el-table-column>
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
-              <span v-if="row.status === 2">
+              <span v-if="row.status === '2'" class="mr-4">
                 <el-tooltip effect="dark" content="刷新" placement="top">
-                  <el-button type="primary" text>
+                  <el-button type="primary" text @click.stop="refreshDocument(row)">
                     <el-icon><RefreshRight /></el-icon>
                   </el-button>
                 </el-tooltip>
               </span>
-              <span class="ml-4">
+              <span>
                 <el-tooltip effect="dark" content="删除" placement="top">
                   <el-button type="primary" text @click.stop="deleteDocument(row)">
                     <el-icon><Delete /></el-icon>
@@ -102,7 +102,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, reactive, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import documentApi from '@/api/document'
 import { numberFormat } from '@/utils/utils'
@@ -124,6 +124,23 @@ const paginationConfig = reactive({
   page_size: 10,
   total: 0
 })
+
+watch(documentData, (list) => {
+  let interval
+  if (list.every((item) => item.status === '0')) {
+    interval = setInterval(() => {
+      getList(true)
+    }, 6000)
+  } else {
+    clearInterval(interval)
+  }
+})
+
+function refreshDocument(row: any) {
+  documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
+    getList()
+  })
+}
 
 function rowClickHandle(row: any) {
   router.push({ path: `/dataset/${id}/${row.id}` })
@@ -215,13 +232,13 @@ function handleSizeChange() {
   getList()
 }
 
-function getList() {
+function getList(bool?: boolean) {
   documentApi
     .getDocument(
       id as string,
       paginationConfig,
       filterText.value && { name: filterText.value },
-      loading
+      bool ? undefined : loading
     )
     .then((res) => {
       documentData.value = res.data.records
