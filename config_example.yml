@@ -8,9 +8,13 @@ EMAIL_HOST_USER:
 EMAIL_HOST_PASSWORD:
 
 # 数据库链接信息
-DB_NAME: smart-doc
+DB_NAME: maxkb
 DB_HOST: localhost
 DB_PORT: 5432
 DB_USER: root
-DB_PASSWORD: xxx
+DB_PASSWORD: xxxxxxx
 DB_ENGINE: django.db.backends.postgresql_psycopg2
+
+DEBUG: false
+
+TIME_ZONE: Asia/Shanghai
