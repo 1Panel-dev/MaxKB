@@ -127,14 +127,7 @@ function changeState(bool: Boolean, row: any) {
     is_active: bool
   }
   loading.value = true
-  paragraph
-    .asyncPutParagraph(id, documentId, row.id, obj)
-    .then((res) => {
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  paragraph.asyncPutParagraph(id, documentId, row.id, obj, loading).then((res) => {})
 }
 
 function deleteParagraph(row: any) {
@@ -143,7 +136,7 @@ function deleteParagraph(row: any) {
     confirmButtonClass: 'danger'
   })
     .then(() => {
-      paragraphApi.delParagraph(id, documentId, row.id, loading).then(() => {
+      paragraph.asyncDelParagraph(id, documentId, row.id, loading).then(() => {
         const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
         paragraphDetail.value.splice(index, 1)
         MsgSuccess('删除成功')

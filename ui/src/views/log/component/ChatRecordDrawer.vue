@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="visible" size="50%" @close="closeHandel" class="chat-record-drawer">
+  <el-drawer v-model="visible" size="600" @close="closeHandel" class="chat-record-drawer">
     <template #header>
       <h4>{{ application?.name }}</h4>
     </template>
@@ -72,7 +72,7 @@ const recordList = ref<chatType[]>([])
 
 const paginationConfig = reactive({
   current_page: 1,
-  page_size: 10,
+  page_size: 20,
   total: 0
 })
 

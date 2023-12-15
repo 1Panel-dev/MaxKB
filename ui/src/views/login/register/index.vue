@@ -1,6 +1,6 @@
 <template>
   <login-layout>
-    <LoginContainer subTitle="欢迎使用 MaxKB 管理平台">
+    <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库">
       <h4 class="mb-24">用户注册</h4>
       <el-form class="register-form" :model="registerForm" :rules="rules" ref="registerFormRef">
         <el-form-item prop="username">

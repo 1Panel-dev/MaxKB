@@ -90,17 +90,12 @@ const open = (data: any) => {
 }
 const submitHandle = async () => {
   if (await paragraphFormRef.value?.validate()) {
-    loading.value = true
     if (problemId.value) {
       paragraph
-        .asyncPutParagraph(id, documentId, problemId.value, paragraphFormRef.value?.form)
+        .asyncPutParagraph(id, documentId, problemId.value, paragraphFormRef.value?.form, loading)
         .then((res: any) => {
           emit('refresh', res.data)
-          loading.value = false
           isEdit.value = false
-        })
-        .catch(() => {
-          loading.value = false
         })
     } else {
       const obj =
@@ -110,16 +105,10 @@ const submitHandle = async () => {
               ...paragraphFormRef.value?.form
             }
           : paragraphFormRef.value?.form
-      paragraphApi
-        .postParagraph(id, documentId, obj)
-        .then((res) => {
-          emit('refresh')
-          loading.value = false
-          dialogVisible.value = false
-        })
-        .catch(() => {
-          loading.value = false
-        })
+      paragraphApi.postParagraph(id, documentId, obj, loading).then((res) => {
+        emit('refresh')
+        dialogVisible.value = false
+      })
     }
   }
 }

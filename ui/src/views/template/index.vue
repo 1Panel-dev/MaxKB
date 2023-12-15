@@ -24,7 +24,7 @@
         <div class="p-24 pb-0">
           <h4>{{ active_provider?.name }}</h4>
           <div class="flex-between mt-16 mb-16">
-            <el-button type="primary" @click="openCreateModel(active_provider)">创建模型</el-button>
+            <el-button type="primary" @click="openCreateModel(active_provider)">添加模型</el-button>
             <el-input
               v-model="model_search_form.name"
               @change="list_model"

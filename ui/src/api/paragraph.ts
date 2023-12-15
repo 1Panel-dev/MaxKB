@@ -67,9 +67,10 @@ const delParagraph: (
 const postParagraph: (
   dataset_id: string,
   document_id: string,
-  data: any
-) => Promise<Result<any>> = (dataset_id, document_id, data: any) => {
-  return post(`${prefix}/${dataset_id}/document/${document_id}/paragraph`, data)
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, document_id, data, loading) => {
+  return post(`${prefix}/${dataset_id}/document/${document_id}/paragraph`, data, undefined, loading)
 }
 
 /**
@@ -92,9 +93,15 @@ const putParagraph: (
   dataset_id: string,
   document_id: string,
   paragraph_id: string,
-  data: any
-) => Promise<Result<any>> = (dataset_id, document_id, paragraph_id, data: any) => {
-  return put(`${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}`, data)
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, document_id, paragraph_id, data, loading) => {
+  return put(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}`,
+    data,
+    undefined,
+    loading
+  )
 }
 
 /**
