@@ -12,6 +12,7 @@ from typing import List, Dict
 from langchain.embeddings import HuggingFaceEmbeddings
 
 from common.config.embedding_config import EmbeddingModel
+from common.util.common import sub_array
 from embedding.models import SourceType
 
 
@@ -80,7 +81,9 @@ class BaseVectorStore(ABC):
         if embedding is None:
             embedding = EmbeddingModel.get_embedding_model()
         self.save_pre_handler()
-        self._batch_save(data_list, embedding)
+        result = sub_array(data_list)
+        for child_array in result:
+            self._batch_save(child_array, embedding)
         return True
 
     @abstractmethod

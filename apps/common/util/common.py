@@ -8,7 +8,20 @@
 """
 import importlib
 from functools import reduce
-from typing import Dict
+from typing import Dict, List
+
+
+def sub_array(array: List, item_num=50):
+    result = []
+    temp = []
+    for item in array:
+        temp.append(item)
+        if len(temp) >= item_num:
+            result.append(temp)
+            temp = []
+    if len(temp) > 0:
+        result.append(temp)
+    return result
 
 
 def query_params_to_single_dict(query_params: Dict):
