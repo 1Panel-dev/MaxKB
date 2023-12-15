@@ -282,13 +282,17 @@ function chatMessage() {
             if (str && str.startsWith('data:')) {
               const split = str.match(/data:.*}\n\n/g)
               if (split) {
-                split.forEach((item_str) => {
-                  row.record_id = JSON?.parse(item_str.replace('data:', '')).id
-                  const content = JSON?.parse(item_str.replace('data:', ''))?.content
+                for (const index in split) {
+                  const chunk = JSON?.parse(split[index].replace('data:', ''))
+                  row.record_id = chunk.id
+                  const content = chunk?.content
                   if (content) {
                     ChatManagement.append(id, content)
                   }
-                })
+                  if (chunk.is_end) {
+                    ChatManagement.close(id)
+                  }
+                }
               }
             }
           } catch (e) {
@@ -297,7 +301,15 @@ function chatMessage() {
           }
           return reader.read().then(write)
         }
-        reader.read().then(write)
+        reader
+          .read()
+          .then(write)
+          .finally((ok: any) => {
+            ChatManagement.close(id)
+          })
+          .catch((e: any) => {
+            ChatManagement.close(id)
+          })
       }
     })
   }

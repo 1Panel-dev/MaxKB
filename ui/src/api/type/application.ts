@@ -57,7 +57,6 @@ export class ChatRecordManage {
           this.chat.write_ed = true
           this.write_ed = true
           if (this.loading) {
-            console.log('停止')
             this.loading.value = false
           }
           if (this.id) {
@@ -76,7 +75,6 @@ export class ChatRecordManage {
     }
   }
   close() {
-    console.log('close')
     this.is_close = true
   }
   append(answer_text_block: string) {

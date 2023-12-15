@@ -165,8 +165,10 @@ class ChatMessageSerializer(serializers.Serializer):
                 for chunk in response:
                     all_text += chunk.content
                     yield 'data: ' + json.dumps({'chat_id': chat_id, 'id': _id, 'operate': paragraph is not None,
-                                                 'content': chunk.content}) + "\n\n"
+                                                 'content': chunk.content, 'is_end': False}) + "\n\n"
 
+                yield 'data: ' + json.dumps({'chat_id': chat_id, 'id': _id, 'operate': paragraph is not None,
+                                             'content': '', 'is_end': True}) + "\n\n"
                 chat_info.append_chat_message(
                     ChatMessage(_id, message, title, content, embedding_id, dataset_id, document_id,
                                 paragraph_id,
