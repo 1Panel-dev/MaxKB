@@ -23,7 +23,7 @@ interface chatType {
    */
   is_stop?: boolean
   record_id: string
-  vote_status: string,
+  vote_status: string
 }
 
 export class ChatRecordManage {
@@ -54,13 +54,14 @@ export class ChatRecordManage {
         this.chat.answer_text = this.chat.answer_text + s
       } else {
         if (this.is_close) {
-          if(this.id){
-            clearInterval(this.id)
-          }
           this.chat.write_ed = true
           this.write_ed = true
           if (this.loading) {
+            console.log('停止')
             this.loading.value = false
+          }
+          if (this.id) {
+            clearInterval(this.id)
           }
         }
       }
@@ -75,6 +76,7 @@ export class ChatRecordManage {
     }
   }
   close() {
+    console.log('close')
     this.is_close = true
   }
   append(answer_text_block: string) {
