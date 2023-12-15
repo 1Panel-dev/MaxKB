@@ -263,7 +263,7 @@ function chatMessage() {
       vote_status: '-1'
     })
     inputValue.value = ''
-    applicationApi.postChatMessage(chartOpenId.value, problem_text).then(async (response) => {
+    applicationApi.postChatMessage(chartOpenId.value, problem_text).then((response) => {
       const row = chatList.value.find((item) => item.id === id)
 
       if (row) {
@@ -271,27 +271,33 @@ function chatMessage() {
         ChatManagement.write(id)
         const reader = response.body.getReader()
         /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) {
-            ChatManagement.close(id)
-            break
-          }
+        const write = ({ done, value }: { done: boolean; value: any }) => {
           try {
+            if (done) {
+              ChatManagement.close(id)
+              return
+            }
             const decoder = new TextDecoder('utf-8')
             const str = decoder.decode(value, { stream: true })
-
             if (str && str.startsWith('data:')) {
-              row.record_id = JSON?.parse(str.replace('data:', '')).id
-              const content = JSON?.parse(str.replace('data:', ''))?.content
-              if (content) {
-                ChatManagement.append(id, content)
+              const split = str.match(/data:.*}\n\n/g)
+              if (split) {
+                split.forEach((item_str) => {
+                  row.record_id = JSON?.parse(item_str.replace('data:', '')).id
+                  const content = JSON?.parse(item_str.replace('data:', ''))?.content
+                  if (content) {
+                    ChatManagement.append(id, content)
+                  }
+                })
               }
             }
           } catch (e) {
+            console.log(e)
             //  console
           }
+          return reader.read().then(write)
         }
+        reader.read().then(write)
       }
     })
   }
