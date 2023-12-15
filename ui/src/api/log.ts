@@ -98,9 +98,28 @@ const putChatRecordLog: (
   )
 }
 
+/**
+ * 获取标注段落列表信息
+ * @param 参数
+ * application_id, chart_id,  chart_record_id
+ */
+const getMarkRecord: (
+  applicaiton_id: String,
+  chart_id: String,
+  chart_record_id: String,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (applicaiton_id, chart_id, chart_record_id, loading) => {
+  return get(
+    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${chart_record_id}/improve`,
+    undefined,
+    loading
+  )
+}
+
 export default {
   getChatLog,
   delChatLog,
   getChatRecordLog,
-  putChatRecordLog
+  putChatRecordLog,
+  getMarkRecord
 }

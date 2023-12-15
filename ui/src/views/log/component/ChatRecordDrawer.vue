@@ -72,7 +72,7 @@ const recordList = ref<chatType[]>([])
 
 const paginationConfig = reactive({
   current_page: 1,
-  page_size: 10,
+  page_size: 20,
   total: 0
 })
 

@@ -24,7 +24,7 @@
     </el-tooltip>
 
     <el-tooltip v-else effect="dark" content="修改标注" placement="top">
-      <el-button text @click="editContent(data)">
+      <el-button text @click="editMark(data)">
         <AppIcon iconName="app-document-active" class="primary"></AppIcon>
       </el-button>
     </el-tooltip>
@@ -38,12 +38,14 @@
       <AppIcon iconName="app-oppose-color"></AppIcon>
     </el-button>
     <EditContentDialog ref="EditContentDialogRef" />
+    <EditMarkDialog ref="EditMarkDialogRef" @refresh="refresh" />
   </div>
 </template>
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import EditContentDialog from '@/views/log/component/EditContentDialog.vue'
+import EditMarkDialog from '@/views/log/component/EditMarkDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 
 const props = defineProps({
@@ -61,6 +63,7 @@ const props = defineProps({
 const emit = defineEmits(['update:data'])
 
 const EditContentDialogRef = ref()
+const EditMarkDialogRef = ref()
 
 const buttonData = ref(props.data)
 const loading = ref(false)
@@ -69,8 +72,13 @@ function editContent(data: any) {
   EditContentDialogRef.value.open(data)
 }
 
-// function updateContent(data: any) {
-//   emit('update:data', data)
-// }
+function editMark(data: any) {
+  EditMarkDialogRef.value.open(data)
+}
+
+function refresh() {
+  buttonData.value.improve_paragraph_id_list = []
+  emit('update:data', buttonData.value)
+}
 </script>
 <style lang="scss" scoped></style>
