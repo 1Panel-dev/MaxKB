@@ -290,7 +290,8 @@ function chatMessage() {
                     ChatManagement.append(id, content)
                   }
                   if (chunk.is_end) {
-                    ChatManagement.close(id)
+                    // 流处理成功 返回成功回调
+                    return Promise.resolve()
                   }
                 }
               }
