@@ -157,7 +157,7 @@ TIME_ZONE = CONFIG.get_time_zone()
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

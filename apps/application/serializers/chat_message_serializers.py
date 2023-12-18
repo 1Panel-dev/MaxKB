@@ -140,7 +140,9 @@ class ChatMessageSerializer(serializers.Serializer):
                     ChatMessage(_id, message, title, content, embedding_id, dataset_id, document_id,
                                 paragraph_id,
                                 source_type,
-                                source_id, c, 0,
+                                source_id,
+                                c if c is not None else '抱歉，根据已知信息无法回答这个问题，请重新描述您的问题或提供更多信息～',
+                                0,
                                 0))
                 # 重新设置缓存
                 chat_cache.set(chat_id,

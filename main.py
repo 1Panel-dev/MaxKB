@@ -48,6 +48,7 @@ def start_services():
 
 
 if __name__ == '__main__':
+    os.environ['TRANSFORMERS_CACHE'] = '/opt/maxkb/model'
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;
