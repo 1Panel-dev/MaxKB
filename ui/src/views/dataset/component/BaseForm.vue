@@ -9,7 +9,7 @@
   >
     <el-form-item label="知识库名称" prop="name">
       <el-input
-        v-model.trim="form.name"
+        v-model="form.name"
         placeholder="请输入知识库名称"
         maxlength="64"
         show-word-limit
@@ -17,7 +17,7 @@
     </el-form-item>
     <el-form-item label="知识库描述" prop="desc">
       <el-input
-        v-model.trim="form.desc"
+        v-model="form.desc"
         type="textarea"
         placeholder="描述知识库的内容，详尽的描述将帮助AI能深入理解该知识库的内容，能更准确的检索到内容，提高该知识库的命中率。"
         maxlength="500"

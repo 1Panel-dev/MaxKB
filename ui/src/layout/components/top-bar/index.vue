@@ -28,11 +28,10 @@ const defaultTitle = import.meta.env.VITE_APP_TITLE
   .app-title-container {
     margin-right: 45px;
     .app-title-icon {
-      background-image: url('@/assets/logo.svg');
+      background-image: url('@/assets/logo.png');
       background-size: 100% 100%;
-      width: 30px;
-      height: 30px;
-      background-position: center -1px;
+      width: 35px;
+      height: 35px;
     }
 
     .app-title-text {

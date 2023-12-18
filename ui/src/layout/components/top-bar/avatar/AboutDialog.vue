@@ -50,11 +50,10 @@ defineExpose({ open })
     font-size: 24px;
   }
   .logo {
-    background-image: url('@/assets/logo.svg');
+    background-image: url('@/assets/logo.png');
     background-size: 100% 100%;
-    width: 32px;
-    height: 32px;
-    background-position: center -2px;
+    width: 35px;
+    height: 35px;
   }
   .about-ui {
     width: 200px;
