@@ -12,8 +12,7 @@ import os.path
 from transformers import GPT2TokenizerFast
 import sentence_transformers
 
-prefix_dir = os.path.join(os.path.dirname(os.path.abspath(os.getcwd())), 'model')
-
+prefix_dir = "/opt/maxkb/model"
 model_config = [
     {
         'download_params': {

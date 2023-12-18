@@ -44,11 +44,11 @@ def perform_db_migrate():
 
 def start_services():
     management.call_command('migrate')
-    management.call_command('runserver',"0.0.0.0:8000")
+    management.call_command('runserver', "0.0.0.0:8000")
 
 
 if __name__ == '__main__':
-    os.environ['TRANSFORMERS_CACHE'] = '/opt/maxkb/model'
+    os.environ['TRANSFORMERS_CACHE'] = '/opt/maxkb/model/base'
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;
