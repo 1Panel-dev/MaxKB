@@ -26,7 +26,7 @@ class Paragraph(APIView):
                          operation_id="段落列表",
                          manual_parameters=ParagraphSerializers.Query.get_request_params_api(),
                          responses=result.get_api_array_response(ParagraphSerializers.Query.get_response_body_api()),
-                         tags=["数据集/文档/段落"]
+                         tags=["知识库/文档/段落"]
                          )
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
@@ -44,7 +44,7 @@ class Paragraph(APIView):
                          manual_parameters=ParagraphSerializers.Create.get_request_params_api(),
                          request_body=ParagraphSerializers.Create.get_request_body_api(),
                          responses=result.get_api_response(ParagraphSerializers.Query.get_response_body_api()),
-                         tags=["数据集/文档/段落"])
+                         tags=["知识库/文档/段落"])
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
@@ -61,7 +61,7 @@ class Paragraph(APIView):
                              manual_parameters=ParagraphSerializers.Operate.get_request_params_api(),
                              request_body=ParagraphSerializers.Operate.get_request_body_api(),
                              responses=result.get_api_response(ParagraphSerializers.Operate.get_response_body_api())
-                             ,tags=["数据集/文档/段落"])
+                             ,tags=["知识库/文档/段落"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -76,7 +76,7 @@ class Paragraph(APIView):
                              operation_id="获取段落详情",
                              manual_parameters=ParagraphSerializers.Operate.get_request_params_api(),
                              responses=result.get_api_response(ParagraphSerializers.Operate.get_response_body_api()),
-                             tags=["数据集/文档/段落"])
+                             tags=["知识库/文档/段落"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -91,7 +91,7 @@ class Paragraph(APIView):
                              operation_id="删除段落",
                              manual_parameters=ParagraphSerializers.Operate.get_request_params_api(),
                              responses=result.get_default_response(),
-                             tags=["数据集/文档/段落"])
+                             tags=["知识库/文档/段落"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -110,7 +110,7 @@ class Paragraph(APIView):
                              manual_parameters=result.get_page_request_params(
                                  ParagraphSerializers.Query.get_request_params_api()),
                              responses=result.get_page_api_response(ParagraphSerializers.Query.get_response_body_api()),
-                             tags=["数据集/文档/段落"])
+                             tags=["知识库/文档/段落"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                     dynamic_tag=k.get('dataset_id')))

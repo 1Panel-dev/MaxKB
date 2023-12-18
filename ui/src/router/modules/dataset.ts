@@ -2,7 +2,7 @@ import Layout from '@/layout/main-layout/index.vue'
 const datasetRouter = {
   path: '/dataset',
   name: 'dataset',
-  meta: { title: '数据集', permission: 'DATASET:READ' },
+  meta: { title: '知识库', permission: 'DATASET:READ' },
   redirect: '/dataset',
   children: [
     {

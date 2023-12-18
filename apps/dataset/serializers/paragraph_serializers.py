@@ -72,9 +72,9 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
     class Operate(ApiMixin, serializers.Serializer):
         # 段落id
         paragraph_id = serializers.UUIDField(required=True)
-        # 数据集id
+        # 知识库id
         dataset_id = serializers.UUIDField(required=True)
-        # 数据集id
+        # 知识库id
         document_id = serializers.UUIDField(required=True)
 
         def is_valid(self, *, raise_exception=True):
@@ -218,7 +218,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                       in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
                                       required=True,
-                                      description='数据集id'),
+                                      description='知识库id'),
                     openapi.Parameter(name='document_id', in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
                                       required=True,
@@ -291,8 +291,8 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                                description="点赞数量", default=1),
                     'trample_num': openapi.Schema(type=openapi.TYPE_INTEGER, title="点踩数量",
                                                   description="点踩数", default=1),
-                    'dataset_id': openapi.Schema(type=openapi.TYPE_STRING, title="数据集id",
-                                                 description="数据集id", default='xxx'),
+                    'dataset_id': openapi.Schema(type=openapi.TYPE_STRING, title="知识库id",
+                                                 description="知识库id", default='xxx'),
                     'document_id': openapi.Schema(type=openapi.TYPE_STRING, title="文档id",
                                                   description="文档id", default='xxx'),
                     'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用",

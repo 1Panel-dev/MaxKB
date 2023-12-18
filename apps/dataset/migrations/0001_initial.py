@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
                 ('id', models.UUIDField(default=uuid.uuid1, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
-                ('name', models.CharField(max_length=150, verbose_name='数据集名称')),
+                ('name', models.CharField(max_length=150, verbose_name='知识库名称')),
                 ('desc', models.CharField(max_length=256, verbose_name='数据库描述')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='users.user', verbose_name='所属用户')),
             ],

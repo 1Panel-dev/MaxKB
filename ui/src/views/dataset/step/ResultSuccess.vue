@@ -1,6 +1,6 @@
 <template>
   <el-scrollbar>
-    <el-result icon="success" title="🎉 数据集创建成功 🎉">
+    <el-result icon="success" title="🎉 知识库创建成功 🎉">
       <template #sub-title>
         <div class="mt-8">
           <span class="bold">{{ data?.document_list.length || 0 }}</span>
@@ -14,7 +14,7 @@
         </div>
       </template>
       <template #extra>
-        <el-button @click="router.push({ path: `/dataset` })">返回数据集列表</el-button>
+        <el-button @click="router.push({ path: `/dataset` })">返回知识库列表</el-button>
         <el-button type="primary" @click="router.push({ path: `/dataset/${data?.id}/document` })"
           >前往文档</el-button
         >

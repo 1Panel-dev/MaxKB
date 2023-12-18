@@ -54,7 +54,7 @@ class BaseVectorStore(ABC):
         """
         插入向量数据
         :param source_id:  资源id
-        :param dataset_id: 数据集id
+        :param dataset_id: 知识库id
         :param text: 文本
         :param source_type: 资源类型
         :param document_id: 文档id

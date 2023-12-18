@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
                 ('improve_paragraph_id_list', django.contrib.postgres.fields.ArrayField(base_field=models.UUIDField(blank=True), default=list, size=None, verbose_name='改进标注列表')),
                 ('index', models.IntegerField(verbose_name='对话下标')),
                 ('chat', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='application.chat')),
-                ('dataset', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='dataset.dataset', verbose_name='数据集')),
+                ('dataset', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='dataset.dataset', verbose_name='知识库')),
                 ('paragraph', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='dataset.paragraph', verbose_name='段落id')),
             ],
             options={

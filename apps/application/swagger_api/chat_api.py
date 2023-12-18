@@ -44,7 +44,7 @@ class ChatApi(ApiMixin):
                     'model_id': openapi.Schema(type=openapi.TYPE_STRING, title="模型id", description="模型id"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
-                                                      title="关联数据集Id列表", description="关联数据集Id列表"),
+                                                      title="关联知识库Id列表", description="关联知识库Id列表"),
                     'multiple_rounds_dialogue': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否开启多轮会话",
                                                                description="是否开启多轮会话")
                 }
@@ -105,7 +105,7 @@ class ImproveApi(ApiMixin):
                                   in_=openapi.IN_PATH,
                                   type=openapi.TYPE_STRING,
                                   required=True,
-                                  description='数据集id'),
+                                  description='知识库id'),
                 openapi.Parameter(name='document_id',
                                   in_=openapi.IN_PATH,
                                   type=openapi.TYPE_STRING,
@@ -201,8 +201,8 @@ class ChatRecordImproveApi(ApiMixin):
                                            description="点赞数量", default=1),
                 'trample_num': openapi.Schema(type=openapi.TYPE_INTEGER, title="点踩数量",
                                               description="点踩数", default=1),
-                'dataset_id': openapi.Schema(type=openapi.TYPE_STRING, title="数据集id",
-                                             description="数据集id", default='xxx'),
+                'dataset_id': openapi.Schema(type=openapi.TYPE_STRING, title="知识库id",
+                                             description="知识库id", default='xxx'),
                 'document_id': openapi.Schema(type=openapi.TYPE_STRING, title="文档id",
                                               description="文档id", default='xxx'),
                 'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用",

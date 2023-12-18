@@ -1,7 +1,7 @@
 <template>
   <div class="dataset-list-container p-24" style="padding-top: 16px">
     <div class="flex-between mb-16">
-      <h3>数据集</h3>
+      <h3>知识库</h3>
       <el-input
         v-model="searchValue"
         @change="searchHandle"
@@ -21,7 +21,7 @@
       >
         <el-row :gutter="15">
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
-            <CardAdd title="创建数据集" @click="router.push({ path: '/dataset/create' })" />
+            <CardAdd title="创建知识库" @click="router.push({ path: '/dataset/create' })" />
           </el-col>
           <template v-for="(item, index) in datasetList" :key="index">
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
@@ -83,8 +83,8 @@ function searchHandle() {
 
 function deleteDateset(row: any) {
   MsgConfirm(
-    `是否删除数据集：${row.name} ?`,
-    `此数据集关联 ${row.char_length} 个应用，删除后无法恢复，请谨慎操作。`,
+    `是否删除知识库：${row.name} ?`,
+    `此知识库关联 ${row.char_length} 个应用，删除后无法恢复，请谨慎操作。`,
     {
       confirmButtonText: '删除',
       confirmButtonClass: 'danger'

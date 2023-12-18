@@ -29,7 +29,7 @@ class Document(APIView):
                          request_body=DocumentSerializers.Create.get_request_body_api(),
                          manual_parameters=DocumentSerializers.Create.get_request_params_api(),
                          responses=result.get_api_response(DocumentSerializers.Operate.get_response_body_api()),
-                         tags=["数据集/文档"])
+                         tags=["知识库/文档"])
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
@@ -42,7 +42,7 @@ class Document(APIView):
                          operation_id="文档列表",
                          manual_parameters=DocumentSerializers.Query.get_request_params_api(),
                          responses=result.get_api_response(DocumentSerializers.Query.get_response_body_api()),
-                         tags=["数据集/文档"])
+                         tags=["知识库/文档"])
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                 dynamic_tag=k.get('dataset_id')))
@@ -63,7 +63,7 @@ class Document(APIView):
                              manual_parameters=DocumentSerializers.Create.get_request_params_api(),
                              responses=result.get_api_array_response(
                                  DocumentSerializers.Operate.get_response_body_api()),
-                             tags=["数据集/文档"])
+                             tags=["知识库/文档"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -78,7 +78,7 @@ class Document(APIView):
                              operation_id="刷新文档向量库",
                              manual_parameters=DocumentSerializers.Operate.get_request_params_api(),
                              responses=result.get_default_response(),
-                             tags=["数据集/文档"]
+                             tags=["知识库/文档"]
                              )
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
@@ -96,7 +96,7 @@ class Document(APIView):
                              operation_id="获取文档详情",
                              manual_parameters=DocumentSerializers.Operate.get_request_params_api(),
                              responses=result.get_api_response(DocumentSerializers.Operate.get_response_body_api()),
-                             tags=["数据集/文档"])
+                             tags=["知识库/文档"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -111,7 +111,7 @@ class Document(APIView):
                              manual_parameters=DocumentSerializers.Operate.get_request_params_api(),
                              request_body=DocumentSerializers.Operate.get_request_body_api(),
                              responses=result.get_api_response(DocumentSerializers.Operate.get_response_body_api()),
-                             tags=["数据集/文档"]
+                             tags=["知识库/文档"]
                              )
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
@@ -127,7 +127,7 @@ class Document(APIView):
                              operation_id="删除文档",
                              manual_parameters=DocumentSerializers.Operate.get_request_params_api(),
                              responses=result.get_default_response(),
-                             tags=["数据集/文档"])
+                             tags=["知识库/文档"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -140,7 +140,7 @@ class Document(APIView):
         @action(methods=['GET'], detail=False)
         @swagger_auto_schema(operation_summary="获取分段标识列表",
                              operation_id="获取分段标识列表",
-                             tags=["数据集/文档"],
+                             tags=["知识库/文档"],
                              security=[])
         def get(self, request: Request):
             return result.success(DocumentSerializers.SplitPattern.list())
@@ -152,7 +152,7 @@ class Document(APIView):
         @swagger_auto_schema(operation_summary="分段文档",
                              operation_id="分段文档",
                              manual_parameters=DocumentSerializers.Split.get_request_params_api(),
-                             tags=["数据集/文档"],
+                             tags=["知识库/文档"],
                              security=[])
         def post(self, request: Request):
             split_data = {'file': request.FILES.getlist('file')}
@@ -173,11 +173,11 @@ class Document(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['GET'], detail=False)
-        @swagger_auto_schema(operation_summary="获取数据集分页列表",
-                             operation_id="获取数据集分页列表",
+        @swagger_auto_schema(operation_summary="获取知识库分页列表",
+                             operation_id="获取知识库分页列表",
                              manual_parameters=DocumentSerializers.Query.get_request_params_api(),
                              responses=result.get_page_api_response(DocumentSerializers.Query.get_response_body_api()),
-                             tags=["数据集/文档"])
+                             tags=["知识库/文档"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                     dynamic_tag=k.get('dataset_id')))

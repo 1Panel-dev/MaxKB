@@ -69,7 +69,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                                   in_=openapi.IN_PATH,
                                   type=openapi.TYPE_STRING,
                                   required=True,
-                                  description='数据集id')
+                                  description='知识库id')
             ]
 
         @staticmethod
@@ -106,17 +106,17 @@ class DataSetSerializers(serializers.ModelSerializer):
         name = serializers.CharField(required=False,
                                      validators=[
                                          validators.MaxLengthValidator(limit_value=20,
-                                                                       message="数据集名称在1-20个字符之间"),
+                                                                       message="知识库名称在1-20个字符之间"),
                                          validators.MinLengthValidator(limit_value=1,
-                                                                       message="数据集名称在1-20个字符之间")
+                                                                       message="知识库名称在1-20个字符之间")
                                      ])
 
         desc = serializers.CharField(required=False,
                                      validators=[
                                          validators.MaxLengthValidator(limit_value=256,
-                                                                       message="数据集名称在1-256个字符之间"),
+                                                                       message="知识库名称在1-256个字符之间"),
                                          validators.MinLengthValidator(limit_value=1,
-                                                                       message="数据集名称在1-256个字符之间")
+                                                                       message="知识库名称在1-256个字符之间")
                                      ])
 
         user_id = serializers.CharField(required=True)
@@ -169,12 +169,12 @@ class DataSetSerializers(serializers.ModelSerializer):
                                       in_=openapi.IN_QUERY,
                                       type=openapi.TYPE_STRING,
                                       required=False,
-                                      description='数据集名称'),
+                                      description='知识库名称'),
                     openapi.Parameter(name='desc',
                                       in_=openapi.IN_QUERY,
                                       type=openapi.TYPE_STRING,
                                       required=False,
-                                      description='数据集描述')
+                                      description='知识库描述')
                     ]
 
         @staticmethod
@@ -188,17 +188,17 @@ class DataSetSerializers(serializers.ModelSerializer):
         name = serializers.CharField(required=True,
                                      validators=[
                                          validators.MaxLengthValidator(limit_value=20,
-                                                                       message="数据集名称在1-20个字符之间"),
+                                                                       message="知识库名称在1-20个字符之间"),
                                          validators.MinLengthValidator(limit_value=1,
-                                                                       message="数据集名称在1-20个字符之间")
+                                                                       message="知识库名称在1-20个字符之间")
                                      ])
 
         desc = serializers.CharField(required=True,
                                      validators=[
                                          validators.MaxLengthValidator(limit_value=256,
-                                                                       message="数据集名称在1-256个字符之间"),
+                                                                       message="知识库名称在1-256个字符之间"),
                                          validators.MinLengthValidator(limit_value=1,
-                                                                       message="数据集名称在1-256个字符之间")
+                                                                       message="知识库名称在1-256个字符之间")
                                      ])
 
         documents = DocumentInstanceSerializer(required=False, many=True)
@@ -226,7 +226,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                 for problem in document_paragraph_dict_model.get('problem_model_list'):
                     problem_model_list.append(problem)
 
-            # 插入数据集
+            # 插入知识库
             dataset.save()
             # 插入文档
             QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
@@ -250,9 +250,9 @@ class DataSetSerializers(serializers.ModelSerializer):
                     'id': openapi.Schema(type=openapi.TYPE_STRING, title="id",
                                          description="id", default="xx"),
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="名称",
-                                           description="名称", default="测试数据集"),
+                                           description="名称", default="测试知识库"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="描述",
-                                           description="描述", default="测试数据集描述"),
+                                           description="描述", default="测试知识库描述"),
                     'user_id': openapi.Schema(type=openapi.TYPE_STRING, title="所属用户id",
                                               description="所属用户id", default="user_xxxx"),
                     'char_length': openapi.Schema(type=openapi.TYPE_STRING, title="字符数",
@@ -278,8 +278,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                 type=openapi.TYPE_OBJECT,
                 required=['name', 'desc'],
                 properties={
-                    'name': openapi.Schema(type=openapi.TYPE_STRING, title="数据集名称", description="数据集名称"),
-                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title="数据集描述", description="数据集描述"),
+                    'name': openapi.Schema(type=openapi.TYPE_STRING, title="知识库名称", description="知识库名称"),
+                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
                     'documents': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档数据", description="文档数据",
                                                 items=DocumentSerializers().Create.get_request_body_api()
                                                 )
@@ -350,7 +350,7 @@ class DataSetSerializers(serializers.ModelSerializer):
 
         def edit(self, dataset: Dict, user_id: str):
             """
-            修改数据集
+            修改知识库
             :param user_id: 用户id
             :param dataset: Dict name desc
             :return:
@@ -364,7 +364,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                 _dataset.desc = dataset.get("desc")
             if 'application_id_list' in dataset and dataset.get('application_id_list') is not None:
                 application_id_list = dataset.get('application_id_list')
-                # 当前用户可修改关联的数据集列表
+                # 当前用户可修改关联的知识库列表
                 application_dataset_id_list = [str(dataset_dict.get('id')) for dataset_dict in
                                                self.list_application(with_valid=False)]
                 for dataset_id in application_id_list:
@@ -391,8 +391,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                 type=openapi.TYPE_OBJECT,
                 required=['name', 'desc'],
                 properties={
-                    'name': openapi.Schema(type=openapi.TYPE_STRING, title="数据集名称", description="数据集名称"),
-                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title="数据集描述", description="数据集描述"),
+                    'name': openapi.Schema(type=openapi.TYPE_STRING, title="知识库名称", description="知识库名称"),
+                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
                     'application_id_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="应用id列表",
                                                           description="应用id列表",
                                                           items=openapi.Schema(type=openapi.TYPE_STRING))
@@ -409,9 +409,9 @@ class DataSetSerializers(serializers.ModelSerializer):
                     'id': openapi.Schema(type=openapi.TYPE_STRING, title="id",
                                          description="id", default="xx"),
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="名称",
-                                           description="名称", default="测试数据集"),
+                                           description="名称", default="测试知识库"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="描述",
-                                           description="描述", default="测试数据集描述"),
+                                           description="描述", default="测试知识库描述"),
                     'user_id': openapi.Schema(type=openapi.TYPE_STRING, title="所属用户id",
                                               description="所属用户id", default="user_xxxx"),
                     'char_length': openapi.Schema(type=openapi.TYPE_STRING, title="字符数",
@@ -434,5 +434,5 @@ class DataSetSerializers(serializers.ModelSerializer):
                                       in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
                                       required=True,
-                                      description='数据集id')
+                                      description='知识库id')
                     ]

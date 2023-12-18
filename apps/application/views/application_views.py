@@ -238,8 +238,8 @@ class Application(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['GET'], detail=False)
-        @swagger_auto_schema(operation_summary="获取当前应用可使用的数据集",
-                             operation_id="获取当前应用可使用的数据集",
+        @swagger_auto_schema(operation_summary="获取当前应用可使用的知识库",
+                             operation_id="获取当前应用可使用的知识库",
                              manual_parameters=ApplicationApi.Operate.get_request_params_api(),
                              responses=result.get_api_array_response(DataSetSerializers.Query.get_response_body_api()),
                              tags=['应用'])

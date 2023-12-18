@@ -23,22 +23,29 @@
         <el-dropdown-item class="border-t p-8" @click="openResetPassword">
           修改密码
         </el-dropdown-item>
-        <el-dropdown-item class="border-t"> 关于 </el-dropdown-item>
+        <el-dropdown-item class="border-t" @click="openAbout"> 关于 </el-dropdown-item>
         <el-dropdown-item class="border-t" @click="logout"> 退出 </el-dropdown-item>
       </el-dropdown-menu>
     </template>
   </el-dropdown>
   <ResetPassword ref="resetPasswordRef"></ResetPassword>
+  <AboutDialog ref="AboutDialogRef"></AboutDialog>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import useStore from '@/stores'
 import { useRouter } from 'vue-router'
 import ResetPassword from './ResetPasssword.vue'
+import AboutDialog from './AboutDialog.vue'
 const { user } = useStore()
 const router = useRouter()
 
+const AboutDialogRef = ref()
 const resetPasswordRef = ref<InstanceType<typeof ResetPassword>>()
+
+const openAbout = () => {
+  AboutDialogRef.value?.open()
+}
 
 const openResetPassword = () => {
   resetPasswordRef.value?.open()

@@ -88,7 +88,7 @@ function editHandle(item: any, index: number, cIndex: number) {
 }
 
 function deleteHandle(item: any, index: number, cIndex: number) {
-  MsgConfirm(`是否删除分段：${item.title || '-'} ?`, `删除后将不会存入数据集，对本地文档无影响。`, {
+  MsgConfirm(`是否删除分段：${item.title || '-'} ?`, `删除后将不会存入知识库，对本地文档无影响。`, {
     confirmButtonText: '删除',
     confirmButtonClass: 'danger'
   })

@@ -32,11 +32,10 @@ defineProps({
     .title {
       font-size: 32px;
       .logo {
-        background-image: url('@/assets/logo.svg');
+        background-image: url('@/assets/logo.png');
         background-size: 100% 100%;
         width: 45px;
         height: 45px;
-        background-position: center -2px;
       }
     }
     .sub-title {

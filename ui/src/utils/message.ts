@@ -39,7 +39,7 @@ export const MsgError = (message: string) => {
 }
 
 /**
- * 删除数据集
+ * 删除知识库
  * @param 参数 message: {title, decription,type}
  */
 

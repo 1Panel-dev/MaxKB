@@ -7,7 +7,7 @@ import { type Ref } from 'vue'
 const prefix = '/dataset'
 
 /**
- * 获取分页数据集
+ * 获取分页知识库
  * @param 参数  
  * page {
           "current_page": "string",
@@ -26,7 +26,7 @@ const getDateset: (
 }
 
 /**
- * 获取全部数据集
+ * 获取全部知识库
  * @param 参数
  */
 const getAllDateset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
@@ -34,7 +34,7 @@ const getAllDateset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loadi
 }
 
 /**
- * 删除数据集
+ * 删除知识库
  * @param 参数 dataset_id
  */
 const delDateset: (dataset_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
@@ -45,7 +45,7 @@ const delDateset: (dataset_id: String, loading?: Ref<boolean>) => Promise<Result
 }
 
 /**
- * 创建数据集
+ * 创建知识库
  * @param 参数 
  * {
   "name": "string",
@@ -74,7 +74,7 @@ const postDateset: (data: datasetData) => Promise<Result<any>> = (data) => {
 }
 
 /**
- * 数据集详情
+ * 知识库详情
  * @param 参数 dataset_id
  */
 const getDatesetDetail: (dataset_id: string) => Promise<Result<any>> = (dataset_id) => {
@@ -82,7 +82,7 @@ const getDatesetDetail: (dataset_id: string) => Promise<Result<any>> = (dataset_
 }
 
 /**
- * 修改数据集信息
+ * 修改知识库信息
  * @param 参数 
  * dataset_id
  * {
@@ -97,7 +97,7 @@ const putDateset: (dataset_id: string, data: any) => Promise<Result<any>> = (
   return put(`${prefix}/${dataset_id}`, data)
 }
 /**
- * 获取数据集 可关联的应用列表
+ * 获取知识库 可关联的应用列表
  * @param dataset_id
  * @param loading
  * @returns

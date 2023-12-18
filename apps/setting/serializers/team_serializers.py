@@ -77,8 +77,8 @@ class UpdateTeamMemberItemPermissionSerializer(ApiMixin, serializers.Serializer)
             type=openapi.TYPE_OBJECT,
             required=['id', 'type', 'operate'],
             properties={
-                'target_id': openapi.Schema(type=openapi.TYPE_STRING, title="数据集/应用id",
-                                            description="数据集或者应用的id"),
+                'target_id': openapi.Schema(type=openapi.TYPE_STRING, title="知识库/应用id",
+                                            description="知识库或者应用的id"),
                 'type': openapi.Schema(type=openapi.TYPE_STRING,
                                        title="类型",
                                        description="DATASET|APPLICATION",
@@ -99,7 +99,7 @@ class UpdateTeamMemberPermissionSerializer(ApiMixin, serializers.Serializer):
                 os.path.join(PROJECT_DIR, "apps", "setting", 'sql', 'check_member_permission_target_exists.sql')),
             [json.dumps(permission_list), user_id, user_id])
         if illegal_target_id_list is not None and len(illegal_target_id_list) > 0:
-            raise AppApiException(500, '不存在的 应用|数据集id[' + str(illegal_target_id_list) + ']')
+            raise AppApiException(500, '不存在的 应用|知识库id[' + str(illegal_target_id_list) + ']')
 
     def update_or_save(self, member_id: str):
         team_member_permission_list = self.data.get("team_member_permission_list")
@@ -264,7 +264,7 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             team_id = self.data.get('team_id')
             member_id = self.data.get("member_id")
-            # 查询当前团队成员所有的数据集和应用的权限 注意 operate为null是为设置权限 默认值都是false
+            # 查询当前团队成员所有的知识库和应用的权限 注意 operate为null是为设置权限 默认值都是false
             member_permission_list = select_list(
                 get_file_content(os.path.join(PROJECT_DIR, "apps", "setting", 'sql', 'get_member_permission.sql')),
                 [team_id, team_id, (member_id if member_id != 'root' else uuid.uuid1())])

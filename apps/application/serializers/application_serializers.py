@@ -51,7 +51,7 @@ class ModelDatasetAssociation(serializers.Serializer):
                                  QuerySet(DataSet).filter(id__in=dataset_id_list, user_id=user_id)]
         for dataset_id in dataset_id_list:
             if not exist_dataset_id_list.__contains__(dataset_id):
-                raise AppApiException(500, f'数据集id不存在【{dataset_id}】')
+                raise AppApiException(500, f'知识库id不存在【{dataset_id}】')
 
 
 class ApplicationSerializerModel(serializers.ModelSerializer):
@@ -301,12 +301,12 @@ class ApplicationSerializer(serializers.Serializer):
 
             if 'dataset_id_list' in instance:
                 dataset_id_list = instance.get('dataset_id_list')
-                # 当前用户可修改关联的数据集列表
+                # 当前用户可修改关联的知识库列表
                 application_dataset_id_list = [str(dataset_dict.get('id')) for dataset_dict in
                                                self.list_dataset(with_valid=False)]
                 for dataset_id in dataset_id_list:
                     if not application_dataset_id_list.__contains__(dataset_id):
-                        raise AppApiException(500, f"未知的数据集id${dataset_id},无法关联")
+                        raise AppApiException(500, f"未知的知识库id${dataset_id},无法关联")
 
                 # 删除已经关联的id
                 QuerySet(ApplicationDatasetMapping).filter(dataset_id__in=application_dataset_id_list,
