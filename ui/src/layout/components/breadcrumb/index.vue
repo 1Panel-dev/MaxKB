@@ -1,11 +1,9 @@
 <template>
-  <div class="flex-between align-center ml-8 mt-8 mb-16">
-    <div class="flex align-center">
-      <back-button :to="activeMenu"></back-button>
-      <span class="ellipsis-1"> {{ currentName }}</span>
-    </div>
-    <el-dropdown placement="top" trigger="click" @command="changeMenu">
-      <div class="el-dropdown-link">
+  <div class="ml-8 mt-8 mb-16 flex">
+    <back-button :to="activeMenu"></back-button>
+    <el-dropdown placement="top" trigger="click" @command="changeMenu" class="w-full" style="display: block;">
+      <div class="flex-between">
+        <div class="ellipsis-1">{{ currentName }}</div>
         <el-button text>
           <el-icon><CaretBottom /></el-icon>
         </el-button>

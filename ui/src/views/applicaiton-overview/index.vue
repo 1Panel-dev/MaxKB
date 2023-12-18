@@ -43,9 +43,10 @@
               </el-button>
             </div>
             <div>
-              <el-button :disabled="!accessToken?.is_active" type="primary"
-                ><a :href="shareUrl" target="_blank">演示</a></el-button
-              >
+              <el-button :disabled="!accessToken?.is_active" type="primary">
+                <a v-if="accessToken?.is_active" :href="shareUrl" target="_blank"> 演示 </a>
+                <span v-else>演示</span>
+              </el-button>
               <el-button :disabled="!accessToken?.is_active" @click="openDialog">
                 嵌入第三方
               </el-button>

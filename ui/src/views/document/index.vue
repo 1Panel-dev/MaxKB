@@ -151,7 +151,7 @@ function rowClickHandle(row: any) {
 */
 function creatQuickHandle(val: string) {
   loading.value = true
-  const obj = { name: val }
+  const obj = [{ name: val }]
   documentApi
     .postDocument(id, obj)
     .then((res) => {

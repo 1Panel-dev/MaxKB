@@ -187,13 +187,13 @@ function addMember() {
   CreateMemberRef.value?.open()
 }
 
-function getMember() {
+function getMember(num: number) {
   loading.value = true
   TeamApi.getTeamMember()
     .then((res) => {
       memberList.value = res.data
       filterMember.value = res.data
-      currentUser.value = memberList.value[0].id
+      currentUser.value = memberList.value[num || 0].id
       MemberPermissions(currentUser.value)
       loading.value = false
     })
@@ -203,7 +203,7 @@ function getMember() {
 }
 
 function refresh() {
-  getMember()
+  getMember(1)
 }
 
 onMounted(() => {
