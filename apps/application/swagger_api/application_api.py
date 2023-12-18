@@ -60,8 +60,8 @@ class ApplicationApi(ApiMixin):
                 'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间", description='修改时间'),
                 'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                   items=openapi.Schema(type=openapi.TYPE_STRING),
-                                                  title="关联数据集Id列表",
-                                                  description="关联数据集Id列表(查询详情的时候返回)")
+                                                  title="关联知识库Id列表",
+                                                  description="关联知识库Id列表(查询详情的时候返回)")
             }
         )
 
@@ -145,7 +145,7 @@ class ApplicationApi(ApiMixin):
                                               title="示例列表", description="示例列表"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
-                                                      title="关联数据集Id列表", description="关联数据集Id列表"),
+                                                      title="关联知识库Id列表", description="关联知识库Id列表"),
 
                 }
             )
@@ -167,7 +167,7 @@ class ApplicationApi(ApiMixin):
                                               title="示例列表", description="示例列表"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
-                                                      title="关联数据集Id列表", description="关联数据集Id列表")
+                                                      title="关联知识库Id列表", description="关联知识库Id列表")
 
                 }
             )

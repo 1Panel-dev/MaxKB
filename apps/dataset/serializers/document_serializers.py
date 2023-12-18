@@ -34,7 +34,7 @@ class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
                                      validators.MaxLengthValidator(limit_value=128,
                                                                    message="文档名称在1-128个字符之间"),
                                      validators.MinLengthValidator(limit_value=1,
-                                                                   message="数据集名称在1-128个字符之间")
+                                                                   message="知识库名称在1-128个字符之间")
                                  ])
 
     paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
@@ -54,7 +54,7 @@ class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
 
 class DocumentSerializers(ApiMixin, serializers.Serializer):
     class Query(ApiMixin, serializers.Serializer):
-        # 数据集id
+        # 知识库id
         dataset_id = serializers.UUIDField(required=True)
 
         name = serializers.CharField(required=False,
@@ -62,7 +62,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                          validators.MaxLengthValidator(limit_value=128,
                                                                        message="文档名称在1-128个字符之间"),
                                          validators.MinLengthValidator(limit_value=1,
-                                                                       message="数据集名称在1-128个字符之间")
+                                                                       message="知识库名称在1-128个字符之间")
                                      ])
 
         def get_query_set(self):
@@ -108,7 +108,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                       in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
                                       required=True,
-                                      description='数据集id'),
+                                      description='知识库id'),
                     openapi.Parameter(name='document_id',
                                       in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
@@ -170,7 +170,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     'id': openapi.Schema(type=openapi.TYPE_STRING, title="id",
                                          description="id", default="xx"),
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="名称",
-                                           description="名称", default="测试数据集"),
+                                           description="名称", default="测试知识库"),
                     'char_length': openapi.Schema(type=openapi.TYPE_INTEGER, title="字符数",
                                                   description="字符数", default=10),
                     'user_id': openapi.Schema(type=openapi.TYPE_STRING, title="用户id", description="用户id"),
@@ -204,7 +204,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
             if not QuerySet(DataSet).filter(id=self.data.get('dataset_id')).exists():
-                raise AppApiException(10000, "数据集id不存在")
+                raise AppApiException(10000, "知识库id不存在")
             return True
 
         def save(self, instance: Dict, with_valid=False, with_embedding=True, **kwargs):
@@ -264,7 +264,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                       in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
                                       required=True,
-                                      description='数据集id')
+                                      description='知识库id')
                     ]
 
     class Split(ApiMixin, serializers.Serializer):

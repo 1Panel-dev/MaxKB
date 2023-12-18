@@ -90,7 +90,7 @@ const tableHeight = ref(0)
 
 const settingTags = reactive([
   {
-    label: '数据集',
+    label: '知识库',
     value: DATASET,
     data: [] as any
   },
@@ -154,7 +154,7 @@ function MemberPermissions(id: String) {
 function deleteMember(row: TeamMember) {
   MsgConfirm(
     `是否移除成员：${row.username}?`,
-    '移除后将会取消成员拥有的数据集和应用权限。',
+    '移除后将会取消成员拥有的知识库和应用权限。',
 
     {
       confirmButtonText: '移除',

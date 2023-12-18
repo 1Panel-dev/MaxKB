@@ -82,17 +82,17 @@
                   v-model="applicationForm.multiple_rounds_dialogue"
                 ></el-switch>
               </el-form-item>
-              <el-form-item label="关联数据集">
+              <el-form-item label="关联知识库">
                 <template #label>
                   <div class="flex-between">
-                    <span>关联数据集</span>
+                    <span>关联知识库</span>
                     <el-button type="primary" link @click="openDatasetDialog">
                       <el-icon class="mr-4"><Plus /></el-icon> 添加
                     </el-button>
                   </div>
                 </template>
                 <div v-if="applicationForm.dataset_id_list.length == 0">
-                  <el-text type="info">关联的数据集展示在这里</el-text>
+                  <el-text type="info">关联的知识库展示在这里</el-text>
                 </div>
                 <div class="w-full" v-else>
                   <el-row :gutter="12">

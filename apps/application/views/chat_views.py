@@ -47,7 +47,7 @@ class ChatView(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['POST'], detail=False)
-        @swagger_auto_schema(operation_summary="获取会话id(根据模型id,数据集列表,是否多轮会话)",
+        @swagger_auto_schema(operation_summary="获取会话id(根据模型id,知识库列表,是否多轮会话)",
                              operation_id="获取会话id",
                              request_body=ChatApi.OpenTempChat.get_request_body_api(),
                              tags=["应用/会话"])

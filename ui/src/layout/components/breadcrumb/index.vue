@@ -42,7 +42,7 @@
           </template>
           <template v-else-if="isDataset">
             <el-button link @click="router.push({ path: '/dataset/create' })">
-              <el-icon class="mr-4"><Plus /></el-icon> 创建数据集
+              <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
             </el-button>
           </template>
         </div>

@@ -92,8 +92,8 @@ class ListenerManagement:
     @poxy
     def embedding_by_dataset(dataset_id):
         """
-        向量化数据集
-        :param dataset_id: 数据集id
+        向量化知识库
+        :param dataset_id: 知识库id
         :return: None
         """
         status = Status.success
@@ -104,7 +104,7 @@ class ListenerManagement:
                     'paragraph': QuerySet(Paragraph).filter(dataset_id=dataset_id)},
                 select_string=get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
-            # 删除数据集相关向量数据
+            # 删除知识库相关向量数据
             VectorStore.get_embedding_vector().delete_by_dataset_id(dataset_id)
             # 批量向量化
             VectorStore.get_embedding_vector().batch_save(data_list)
@@ -148,7 +148,7 @@ class ListenerManagement:
         ListenerManagement.embedding_by_problem_signal.connect(self.embedding_by_problem)
         #  添加向量 根据段落id
         ListenerManagement.embedding_by_paragraph_signal.connect(self.embedding_by_paragraph)
-        #  添加向量 根据数据集id
+        #  添加向量 根据知识库id
         ListenerManagement.embedding_by_dataset_signal.connect(
             self.embedding_by_dataset)
         #  添加向量 根据文档id
@@ -156,7 +156,7 @@ class ListenerManagement:
             self.embedding_by_document)
         # 删除 向量 根据文档
         ListenerManagement.delete_embedding_by_document_signal.connect(self.delete_embedding_by_document)
-        # 删除 向量 根据数据集id
+        # 删除 向量 根据知识库id
         ListenerManagement.delete_embedding_by_dataset_signal.connect(self.delete_embedding_by_dataset)
         # 删除向量 根据段落id
         ListenerManagement.delete_embedding_by_paragraph_signal.connect(

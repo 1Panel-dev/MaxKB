@@ -1,6 +1,6 @@
 <template>
   <LayoutContainer
-    :header="isCreate ? '创建数据集' : '上传文档'"
+    :header="isCreate ? '创建知识库' : '上传文档'"
     back-to="-1"
     class="create-dataset"
   >

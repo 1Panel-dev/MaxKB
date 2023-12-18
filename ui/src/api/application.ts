@@ -104,7 +104,7 @@ const getApplicationDetail: (
 }
 
 /**
- * 获得当前应用可使用的数据集
+ * 获得当前应用可使用的知识库
  * @param 参数 applicaiton_id
  */
 const getApplicationDataset: (

@@ -7,7 +7,7 @@
   />
   <div class="p-24 pt-0">
     <el-table :data="data" :max-height="tableHeight">
-      <el-table-column prop="name" :label="isApplication ? '应用名称' : '数据集名称'">
+      <el-table-column prop="name" :label="isApplication ? '应用名称' : '知识库名称'">
         <template #default="{ row }">
           <div class="flex align-center">
             <AppAvatar
