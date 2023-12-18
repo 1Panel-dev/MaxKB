@@ -127,7 +127,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, onUpdated, computed, watch } from 'vue'
+import { ref, nextTick, onMounted, onUpdated, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import LogOperationButton from './LogOperationButton.vue'
 import OperationButton from './OperationButton.vue'
@@ -272,11 +272,13 @@ function chatMessage() {
         const reader = response.body.getReader()
         /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
         const write = ({ done, value }: { done: boolean; value: any }) => {
+          let scrollInterval
           try {
             if (done) {
               ChatManagement.close(id)
               return
             }
+
             const decoder = new TextDecoder('utf-8')
             const str = decoder.decode(value, { stream: true })
             if (str && str.startsWith('data:')) {
@@ -288,8 +290,12 @@ function chatMessage() {
                   const content = chunk?.content
                   if (content) {
                     ChatManagement.append(id, content)
+                    scrollInterval = setInterval(() => {
+                      handleScrollBottom()
+                    }, 300)
                   }
                   if (chunk.is_end) {
+                    clearInterval(scrollInterval)
                     // 流处理成功 返回成功回调
                     return Promise.resolve()
                   }
