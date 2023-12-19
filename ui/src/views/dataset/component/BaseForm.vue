@@ -13,6 +13,7 @@
         placeholder="请输入知识库名称"
         maxlength="64"
         show-word-limit
+        @blur="form.name = form.name.trim()"
       />
     </el-form-item>
     <el-form-item label="知识库描述" prop="desc">
@@ -23,6 +24,7 @@
         maxlength="500"
         show-word-limit
         :autosize="{ minRows: 3 }"
+        @blur="form.desc = form.desc.trim()"
       />
     </el-form-item>
   </el-form>
@@ -41,8 +43,7 @@ const { dataset } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
 const form = ref<any>({
   name: '',
-  desc: '',
-
+  desc: ''
 })
 
 const rules = reactive({
