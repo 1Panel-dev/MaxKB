@@ -292,7 +292,7 @@ function chatMessage() {
                     ChatManagement.append(id, content)
                     scrollInterval = setInterval(() => {
                       handleScrollBottom()
-                    }, 300)
+                    }, 5000)
                   }
                   if (chunk.is_end) {
                     clearInterval(scrollInterval)
