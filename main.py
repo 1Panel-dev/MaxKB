@@ -48,7 +48,7 @@ def start_services():
 
 
 if __name__ == '__main__':
-    os.environ['TRANSFORMERS_CACHE'] = '/opt/maxkb/model/base'
+    os.environ['HF_HOME'] = '/opt/maxkb/model/base'
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;

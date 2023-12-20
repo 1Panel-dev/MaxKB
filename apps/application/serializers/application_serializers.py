@@ -131,7 +131,7 @@ class ApplicationSerializer(serializers.Serializer):
         desc = serializers.CharField(required=False)
         model_id = serializers.CharField(required=False)
         multiple_rounds_dialogue = serializers.BooleanField(required=False)
-        prologue = serializers.CharField(required=False)
+        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True)
         example = serializers.ListSerializer(required=False, child=serializers.CharField(required=True))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
 
