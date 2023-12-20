@@ -24,7 +24,6 @@ def get_level_block(text, level_content_list, level_content_index, cursor):
     start_content: str = level_content_list[level_content_index].get('content')
     next_content = level_content_list[level_content_index + 1].get("content") if level_content_index + 1 < len(
         level_content_list) else None
-    print(len(text), cursor, start_content)
     start_index = text.index(start_content, cursor)
     end_index = text.index(next_content, start_index + 1) if next_content is not None else len(text)
     return text[start_index:end_index].replace(level_content_list[level_content_index]['content'], ""), end_index
@@ -223,7 +222,6 @@ def result_tree_to_paragraph(result_tree: List[dict], result, parent_chain):
     :return: List[{'problem':'xx','content':'xx'}]
     """
     for item in result_tree:
-        print(item)
         if item.get('state') == 'block':
             result.append({'title': " ".join(parent_chain), 'content': item.get("content")})
         children = item.get("children")
