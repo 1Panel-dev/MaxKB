@@ -1,6 +1,6 @@
  function embedChatbot() { 
    const t = window.maxkbChatConfig
-   if (t && t.token) {
+   if (t && t.token&&t.protocol&&t.host) {
     icon = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56" fill="none">
     <g filter="url(#filter0_d_349_49711)">
     <path d="M8 24C8 12.9543 16.9543 4 28 4H48V44H28C16.9543 44 8 35.0457 8 24Z" fill="url(#paint0_linear_349_49711)"/>
@@ -41,7 +41,8 @@
         chat_container.style["display"] = "none";
     
         chat = document.createElement("iframe");
-        chat.src = `http://${window.maxkbChatConfig.host}/ui/chat/${window.maxkbChatConfig.token}`;
+
+        chat.src = `${window.maxkbChatConfig.protocol}//${window.maxkbChatConfig.host}/ui/chat/${window.maxkbChatConfig.token}`;
         chat.id = "chat";
         chat_container.append(chat);
         chat.style.cssText = `border: none;height:100%;width:100%`;
@@ -83,6 +84,6 @@
           }`
         document.head.append(sty)
         document.body.append(chat_button);
-   } else console.error('difyChatbotConfig is empty or token is not provided')
+   } else console.error('invalid parameter')
  }
  document.body.onload = embedChatbot

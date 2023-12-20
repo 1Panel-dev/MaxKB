@@ -68,7 +68,8 @@ allow="microphone">
 `
   source2.value = `<script> window.maxkbChatConfig = { 
   token: "${val}",
-  host: "${window.location.host}"
+  host: "${window.location.host}",
+  protocol:"${window.location.protocol}"
  }
  <\/script>
 <script src="${window.location.origin}/ui/embeb.js">
