@@ -37,7 +37,7 @@ user_cache = cache.caches['user_cache']
 class LoginSerializer(ApiMixin, serializers.Serializer):
     username = serializers.CharField(required=True,
                                      validators=[
-                                         validators.MaxLengthValidator(limit_value=20,
+                                         validators.MaxLengthValidator(limit_value=1024,
                                                                        message=ExceptionCodeConstants.USERNAME_ERROR.value.message),
                                          validators.MinLengthValidator(limit_value=6,
                                                                        message=ExceptionCodeConstants.USERNAME_ERROR.value.message)
