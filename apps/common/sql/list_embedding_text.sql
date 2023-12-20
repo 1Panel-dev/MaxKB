@@ -20,7 +20,9 @@ SELECT
 	paragraph."id" AS paragraph_id,
 	paragraph.dataset_id AS dataset_id,
 	1 AS source_type,
-	concat_ws(':',concat_ws(',',paragraph.title,paragraph.title,paragraph.title),paragraph."content") AS "text",
+	concat_ws('
+',concat_ws('
+',paragraph.title,paragraph."content"),paragraph.title) AS "text",
 	paragraph.is_active AS is_active,
 	paragraph.star_num as star_num,
 	paragraph.trample_num as trample_num
