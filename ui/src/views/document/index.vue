@@ -238,7 +238,7 @@ function cellMouseLeave() {
 
 function handleSizeChange() {
   paginationConfig.current_page = 1
-  getList()
+  getList(true)
 }
 
 function getList(bool?: boolean) {

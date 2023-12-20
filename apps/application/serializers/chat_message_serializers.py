@@ -135,6 +135,7 @@ class ChatMessageSerializer(serializers.Serializer):
         if chat_model is None:
             def event_block_content(c: str):
                 yield 'data: ' + json.dumps({'chat_id': chat_id, 'id': _id, 'operate': paragraph is not None,
+                                             'is_end': True,
                                              'content': c if c is not None else '抱歉，根据已知信息无法回答这个问题，请重新描述您的问题或提供更多信息～'}) + "\n\n"
                 chat_info.append_chat_message(
                     ChatMessage(_id, message, title, content, embedding_id, dataset_id, document_id,
