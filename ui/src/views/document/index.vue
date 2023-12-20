@@ -102,7 +102,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, watch } from 'vue'
+import { ref, onMounted, reactive, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import documentApi from '@/api/document'
 import { numberFormat } from '@/utils/utils'
@@ -115,6 +115,7 @@ const {
 } = route as any
 
 const loading = ref(false)
+let interval: any
 const filterText = ref('')
 const documentData = ref<any[]>([])
 const currentMouseId = ref(null)
@@ -125,17 +126,25 @@ const paginationConfig = reactive({
   total: 0
 })
 
-watch(documentData, (list) => {
-  let interval
-  if (list.length > 0 && list.every((item) => item.status === '0')) {
-    interval = setInterval(() => {
-      getList(true)
-    }, 6000)
-  } else {
+/**
+ * 初始化轮询
+ */
+const initInterval = () => {
+  interval = setInterval(() => {
+    if (documentData.value.length > 0 && documentData.value.every((item) => item.status === '0')) {
+      getList()
+    }
+  }, 6000)
+}
+
+/**
+ * 关闭轮询
+ */
+const closeInterval = () => {
+  if (interval) {
     clearInterval(interval)
   }
-})
-
+}
 function refreshDocument(row: any) {
   documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
     getList()
@@ -248,6 +257,13 @@ function getList(bool?: boolean) {
 
 onMounted(() => {
   getList()
+  // 初始化定时任务
+  initInterval()
+})
+
+onBeforeUnmount(() => {
+  // 清除定时任务
+  closeInterval()
 })
 </script>
 <style lang="scss" scoped></style>
