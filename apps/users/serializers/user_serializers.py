@@ -321,7 +321,7 @@ class SendEmailSerializer(ApiMixin, serializers.Serializer):
         user_cache.set(code_cache_key_lock, code, timeout=datetime.timedelta(minutes=1))
         try:
             # 发送邮件
-            send_mail(f'【智能客服{"用户注册" if state == "register" else "修改密码"}】',
+            send_mail(f'【MaxKB 智能知识库-{"用户注册" if state == "register" else "修改密码"}】',
                       '',
                       html_message=f'{content.replace("${code}", code)}',
                       from_email=EMAIL_ADDRESS,
