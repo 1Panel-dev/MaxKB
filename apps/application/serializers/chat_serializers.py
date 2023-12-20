@@ -21,6 +21,7 @@ from application.models import Chat, Application, ApplicationDatasetMapping, Vot
 from application.serializers.application_serializers import ModelDatasetAssociation
 from application.serializers.chat_message_serializers import ChatInfo
 from common.db.search import native_search, native_page_search, page_search
+from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
@@ -326,4 +327,5 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_record.improve_paragraph_id_list.append(paragraph.id)
             # 添加标注
             chat_record.save()
+            ListenerManagement.embedding_by_paragraph_signal.send(paragraph.id)
             return True
