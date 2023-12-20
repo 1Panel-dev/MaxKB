@@ -187,7 +187,7 @@ function addMember() {
   CreateMemberRef.value?.open()
 }
 
-function getMember(num: number) {
+function getMember(num?: number) {
   loading.value = true
   TeamApi.getTeamMember()
     .then((res) => {
