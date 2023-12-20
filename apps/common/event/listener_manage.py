@@ -96,23 +96,9 @@ class ListenerManagement:
         :param dataset_id: 知识库id
         :return: None
         """
-        status = Status.success
-        try:
-            data_list = native_search(
-                {'problem': QuerySet(get_dynamics_model({'problem.dataset_id': django.db.models.CharField()})).filter(
-                    **{'problem.dataset_id': dataset_id}),
-                    'paragraph': QuerySet(Paragraph).filter(dataset_id=dataset_id)},
-                select_string=get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
-            # 删除知识库相关向量数据
-            VectorStore.get_embedding_vector().delete_by_dataset_id(dataset_id)
-            # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list)
-        except Exception as e:
-            status = Status.error
-        #  修改文档 以及段落的状态
-        QuerySet(Document).filter(dataset_id=dataset_id).update(**{'status': status})
-        QuerySet(Paragraph).filter(dataset_id=dataset_id).update(**{'status': status})
+        document_list = QuerySet(Document).filter(dataset_id=dataset_id)
+        for document in document_list:
+            ListenerManagement.embedding_by_document(document.id)
 
     @staticmethod
     def delete_embedding_by_document(document_id):

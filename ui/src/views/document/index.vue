@@ -132,7 +132,7 @@ const paginationConfig = reactive({
 const initInterval = () => {
   interval = setInterval(() => {
     if (documentData.value.length > 0 && documentData.value.every((item) => item.status === '0')) {
-      getList()
+      getList(true)
     }
   }, 6000)
 }
@@ -238,7 +238,7 @@ function cellMouseLeave() {
 
 function handleSizeChange() {
   paginationConfig.current_page = 1
-  getList(true)
+  getList()
 }
 
 function getList(bool?: boolean) {
