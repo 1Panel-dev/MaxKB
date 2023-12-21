@@ -328,4 +328,4 @@ class ChatRecordSerializer(serializers.Serializer):
             # 添加标注
             chat_record.save()
             ListenerManagement.embedding_by_paragraph_signal.send(paragraph.id)
-            return True
+            return ChatRecordSerializerModel(chat_record).data
