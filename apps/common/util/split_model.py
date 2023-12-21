@@ -245,7 +245,7 @@ def post_handler_paragraph(content: str, limit: int, with_filter: bool):
         if len(temp_char + split) > limit:
             result.append(temp_char)
             temp_char = ''
-        temp_char = temp_char + split
+        temp_char = temp_char + split + '\n'
     if len(temp_char) > 0:
         result.append(temp_char)
     pattern = "[\\S\\s]{1," + str(limit) + '}'
