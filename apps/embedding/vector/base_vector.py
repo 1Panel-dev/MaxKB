@@ -6,6 +6,7 @@
     @date：2023/10/18 19:16
     @desc:
 """
+import threading
 from abc import ABC, abstractmethod
 from typing import List, Dict
 
@@ -14,6 +15,8 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from common.config.embedding_config import EmbeddingModel
 from common.util.common import sub_array
 from embedding.models import SourceType
+
+lock = threading.Lock()
 
 
 class BaseVectorStore(ABC):
@@ -65,25 +68,37 @@ class BaseVectorStore(ABC):
         :param trample_num  点踩数量
         :return:  bool
         """
-        if embedding is None:
-            embedding = EmbeddingModel.get_embedding_model()
-        self.save_pre_handler()
-        self._save(text, source_type, dataset_id, document_id, paragraph_id, source_id, is_active, star_num,
-                   trample_num, embedding)
+        # 获取锁
+        lock.acquire()
+        try:
+            if embedding is None:
+                embedding = EmbeddingModel.get_embedding_model()
+            self.save_pre_handler()
+            self._save(text, source_type, dataset_id, document_id, paragraph_id, source_id, is_active, star_num,
+                       trample_num, embedding)
+        finally:
+            # 释放锁
+            lock.release()
 
     def batch_save(self, data_list: List[Dict], embedding=None):
-        """
-        批量插入
-        :param data_list: 数据列表
-        :param embedding: 向量化处理器
-        :return: bool
-        """
-        if embedding is None:
-            embedding = EmbeddingModel.get_embedding_model()
-        self.save_pre_handler()
-        result = sub_array(data_list)
-        for child_array in result:
-            self._batch_save(child_array, embedding)
+        # 获取锁
+        lock.acquire()
+        try:
+            """
+            批量插入
+            :param data_list: 数据列表
+            :param embedding: 向量化处理器
+            :return: bool
+            """
+            if embedding is None:
+                embedding = EmbeddingModel.get_embedding_model()
+            self.save_pre_handler()
+            result = sub_array(data_list)
+            for child_array in result:
+                self._batch_save(child_array, embedding)
+        finally:
+            # 释放锁
+            lock.release()
         return True
 
     @abstractmethod

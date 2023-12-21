@@ -6,7 +6,9 @@
     @date：2023/10/20 14:01
     @desc:
 """
+import logging
 import os
+import traceback
 
 import django.db.models
 from blinker import signal
@@ -19,6 +21,9 @@ from common.util.file_util import get_file_content
 from dataset.models import Paragraph, Status, Document
 from embedding.models import SourceType
 from smartdoc.conf import PROJECT_DIR
+
+max_kb_error = logging.getLogger("max_kb_error")
+max_kb = logging.getLogger("max_kb")
 
 
 class ListenerManagement:
@@ -46,6 +51,7 @@ class ListenerManagement:
         :param paragraph_id: 段落id
         :return: None
         """
+        max_kb.info(f"开始--->向量化段落:{paragraph_id}")
         status = Status.success
         try:
             data_list = native_search(
@@ -59,8 +65,11 @@ class ListenerManagement:
             # 批量向量化
             VectorStore.get_embedding_vector().batch_save(data_list)
         except Exception as e:
+            max_kb_error.error(f'向量化段落:{paragraph_id}出现错误{str(e)}{traceback.format_exc()}')
             status = Status.error
-        QuerySet(Paragraph).filter(id=paragraph_id).update(**{'status': status})
+        finally:
+            QuerySet(Paragraph).filter(id=paragraph_id).update(**{'status': status})
+            max_kb.info(f'结束--->向量化段落:{paragraph_id}')
 
     @staticmethod
     @poxy
@@ -70,6 +79,7 @@ class ListenerManagement:
         :param document_id: 文档id
         :return: None
         """
+        max_kb.info(f"开始--->向量化文档:{document_id}")
         status = Status.success
         try:
             data_list = native_search(
@@ -83,10 +93,13 @@ class ListenerManagement:
             # 批量向量化
             VectorStore.get_embedding_vector().batch_save(data_list)
         except Exception as e:
+            max_kb_error.error(f'向量化文档:{document_id}出现错误{str(e)}{traceback.format_exc()}')
             status = Status.error
-        # 修改状态
-        QuerySet(Document).filter(id=document_id).update(**{'status': status})
-        QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': status})
+        finally:
+            # 修改状态
+            QuerySet(Document).filter(id=document_id).update(**{'status': status})
+            QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': status})
+            max_kb.info(f"结束--->向量化文档:{document_id}")
 
     @staticmethod
     @poxy
@@ -96,9 +109,15 @@ class ListenerManagement:
         :param dataset_id: 知识库id
         :return: None
         """
-        document_list = QuerySet(Document).filter(dataset_id=dataset_id)
-        for document in document_list:
-            ListenerManagement.embedding_by_document(document.id)
+        max_kb.info(f"向量化数据集{dataset_id}")
+        try:
+            document_list = QuerySet(Document).filter(dataset_id=dataset_id)
+            for document in document_list:
+                ListenerManagement.embedding_by_document(document.id)
+        except Exception as e:
+            max_kb_error.error(f'向量化数据集:{dataset_id}出现错误{str(e)}{traceback.format_exc()}')
+        finally:
+            max_kb.info(f"结束--->向量化数据集:{dataset_id}")
 
     @staticmethod
     def delete_embedding_by_document(document_id):

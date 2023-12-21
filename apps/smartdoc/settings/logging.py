@@ -5,11 +5,9 @@ import os
 from ..const import PROJECT_DIR, CONFIG
 
 LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'logs')
-QA_BOT_LOG_FILE = os.path.join(LOG_DIR, 'smart_doc.log')
+MAX_KB_LOG_FILE = os.path.join(LOG_DIR, 'max_kb.log')
 DRF_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'drf_exception.log')
 UNEXPECTED_EXCEPTION_LOG_FILE = os.path.join(LOG_DIR, 'unexpected_exception.log')
-ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible.log')
-GUNICORN_LOG_FILE = os.path.join(LOG_DIR, 'gunicorn.log')
 LOG_LEVEL = "DEBUG"
 
 LOGGING = {
@@ -54,16 +52,7 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 100,
             'backupCount': 7,
             'formatter': 'main',
-            'filename': QA_BOT_LOG_FILE,
-        },
-        'ansible_logs': {
-            'encoding': 'utf8',
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'formatter': 'main',
-            'maxBytes': 1024 * 1024 * 100,
-            'backupCount': 7,
-            'filename': ANSIBLE_LOG_FILE,
+            'filename': MAX_KB_LOG_FILE,
         },
         'drf_exception': {
             'encoding': 'utf8',
@@ -115,9 +104,15 @@ LOGGING = {
             'level': LOG_LEVEL,
             'propagate': False,
         },
-        'smartdoc': {
+        'max_kb_error': {
+            'handlers': ['console', 'unexpected_exception'],
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
+        'max_kb': {
             'handlers': ['console', 'file'],
             'level': LOG_LEVEL,
+            'propagate': False,
         },
     }
 }

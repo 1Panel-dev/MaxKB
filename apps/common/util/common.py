@@ -11,7 +11,7 @@ from functools import reduce
 from typing import Dict, List
 
 
-def sub_array(array: List, item_num=30):
+def sub_array(array: List, item_num=10):
     result = []
     temp = []
     for item in array:

@@ -86,4 +86,4 @@
         document.body.append(chat_button);
    } else console.error('invalid parameter')
  }
- document.body.onload = embedChatbot
+window.onload = embedChatbot
