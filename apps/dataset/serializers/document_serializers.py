@@ -21,6 +21,7 @@ from common.db.search import native_search, native_page_search
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
+from common.util.common import post
 from common.util.file_util import get_file_content
 from common.util.split_model import SplitModel, get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem
@@ -207,7 +208,14 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 raise AppApiException(10000, "知识库id不存在")
             return True
 
-        def save(self, instance: Dict, with_valid=False, with_embedding=True, **kwargs):
+        @staticmethod
+        def post_embedding(result, document_id):
+            ListenerManagement.embedding_by_document_signal.send(document_id)
+            return result
+
+        @post(post_function=post_embedding)
+        @transaction.atomic
+        def save(self, instance: Dict, with_valid=False, **kwargs):
             if with_valid:
                 DocumentInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
@@ -222,11 +230,10 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
             # 批量插入问题
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
-            if with_embedding:
-                ListenerManagement.embedding_by_document_signal.send(str(document_model.id))
+            document_id = str(document_model.id)
             return DocumentSerializers.Operate(
-                data={'dataset_id': dataset_id, 'document_id': str(document_model.id)}).one(
-                with_valid=True)
+                data={'dataset_id': dataset_id, 'document_id': document_id}).one(
+                with_valid=True), document_id
 
         @staticmethod
         def get_document_paragraph_model(dataset_id, instance: Dict):
@@ -333,14 +340,43 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         def get_request_body_api():
             return openapi.Schema(type=openapi.TYPE_ARRAY, items=DocumentSerializers.Create.get_request_body_api())
 
+        @staticmethod
+        def post_embedding(document_list):
+            for document_dict in document_list:
+                ListenerManagement.embedding_by_document_signal.send(document_dict.get('id'))
+            return document_list
+
+        @post(post_function=post_embedding)
+        @transaction.atomic
         def batch_save(self, instance_list: List[Dict], with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             DocumentInstanceSerializer(many=True, data=instance_list).is_valid(raise_exception=True)
-            create_data = {'dataset_id': self.data.get("dataset_id")}
-            return [DocumentSerializers.Create(data=create_data).save(instance,
-                                                                      with_valid=True)
-                    for instance in instance_list]
+            dataset_id = self.data.get("dataset_id")
+            document_model_list = []
+            paragraph_model_list = []
+            problem_model_list = []
+            # 插入文档
+            for document in instance_list:
+                document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(dataset_id,
+                                                                                                        document)
+                document_model_list.append(document_paragraph_dict_model.get('document'))
+                for paragraph in document_paragraph_dict_model.get('paragraph_model_list'):
+                    paragraph_model_list.append(paragraph)
+                for problem in document_paragraph_dict_model.get('problem_model_list'):
+                    problem_model_list.append(problem)
+
+            # 插入文档
+            QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
+            # 批量插入段落
+            QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+            # 批量插入问题
+            QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+            # 查询文档
+            query_set = QuerySet(model=Document)
+            query_set = query_set.filter(**{'id__in': [d.id for d in document_model_list]})
+            return native_search(query_set, select_string=get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_document.sql')), with_search_one=False),
 
 
 def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):

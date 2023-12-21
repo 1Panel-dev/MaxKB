@@ -19,6 +19,7 @@ from common.db.search import page_search
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
+from common.util.common import post
 from dataset.models import Paragraph, Problem, Document
 from dataset.serializers.common_serializers import update_document_char_length
 from dataset.serializers.problem_serializers import ProblemInstanceSerializer, ProblemSerializer
@@ -82,6 +83,17 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             if not QuerySet(Paragraph).filter(id=self.data.get('paragraph_id')).exists():
                 raise AppApiException(500, "段落id不存在")
 
+        @staticmethod
+        def post_embedding(paragraph, instance):
+            if 'is_active' in instance and instance.get('is_active') is not None:
+                s = (ListenerManagement.enable_embedding_by_paragraph_signal if instance.get(
+                    'is_active') else ListenerManagement.disable_embedding_by_paragraph_signal)
+                s.send(paragraph.get('id'))
+            else:
+                ListenerManagement.embedding_by_paragraph_signal.send(paragraph.get('id'))
+            return paragraph
+
+        @post(post_embedding)
         @transaction.atomic
         def edit(self, instance: Dict):
             self.is_valid()
@@ -125,11 +137,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
 
             _paragraph.save()
             update_document_char_length(self.data.get('document_id'))
-            if 'is_active' in instance and instance.get('is_active') is not None:
-                s = (ListenerManagement.enable_embedding_by_paragraph_signal if instance.get(
-                    'is_active') else ListenerManagement.disable_embedding_by_paragraph_signal)
-                s.send(self.data.get('paragraph_id'))
-            return self.one()
+            return self.one(), instance
 
         def get_problem_list(self):
             return [ProblemSerializer(problem).data for problem in

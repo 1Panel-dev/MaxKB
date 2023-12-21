@@ -68,17 +68,12 @@ class BaseVectorStore(ABC):
         :param trample_num  点踩数量
         :return:  bool
         """
-        # 获取锁
-        lock.acquire()
-        try:
-            if embedding is None:
-                embedding = EmbeddingModel.get_embedding_model()
-            self.save_pre_handler()
-            self._save(text, source_type, dataset_id, document_id, paragraph_id, source_id, is_active, star_num,
-                       trample_num, embedding)
-        finally:
-            # 释放锁
-            lock.release()
+
+        if embedding is None:
+            embedding = EmbeddingModel.get_embedding_model()
+        self.save_pre_handler()
+        self._save(text, source_type, dataset_id, document_id, paragraph_id, source_id, is_active, star_num,
+                   trample_num, embedding)
 
     def batch_save(self, data_list: List[Dict], embedding=None):
         # 获取锁

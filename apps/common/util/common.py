@@ -43,3 +43,14 @@ def get_exec_method(clazz_: str, method_: str):
     package = ".".join([clazz_split[index] for index in range(len(clazz_split) - 1)])
     package_model = importlib.import_module(package)
     return getattr(getattr(package_model, clazz_name), method_)
+
+
+def post(post_function):
+    def inner(func):
+        def run(*args, **kwargs):
+            result = func(*args, **kwargs)
+            return post_function(*result)
+
+        return run
+
+    return inner

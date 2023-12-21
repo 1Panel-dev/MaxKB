@@ -23,6 +23,7 @@ from common.db.sql_execute import select_list
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
+from common.util.common import post
 from common.util.file_util import get_file_content
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
@@ -207,6 +208,13 @@ class DataSetSerializers(serializers.ModelSerializer):
             super().is_valid(raise_exception=True)
             return True
 
+        @staticmethod
+        def post_embedding_dataset(document_list, dataset_id):
+            # 发送向量化事件
+            ListenerManagement.embedding_by_dataset_signal.send(dataset_id)
+            return document_list
+
+        @post(post_function=post_embedding_dataset)
         @transaction.atomic
         def save(self, user: User):
             dataset_id = uuid.uuid1()
@@ -234,11 +242,11 @@ class DataSetSerializers(serializers.ModelSerializer):
             QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
             # 批量插入问题
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
-            # 发送向量化事件
-            ListenerManagement.embedding_by_dataset_signal.send(str(dataset.id))
+
             # 响应数据
             return {**DataSetSerializers(dataset).data,
-                    'document_list': DocumentSerializers.Query(data={'dataset_id': dataset_id}).list(with_valid=True)}
+                'document_list': DocumentSerializers.Query(data={'dataset_id': dataset_id}).list(
+                    with_valid=True)}, dataset_id
 
         @staticmethod
         def get_response_body_api():

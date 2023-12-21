@@ -6,6 +6,7 @@
     @date：2023/10/20 14:01
     @desc:
 """
+import logging
 
 from blinker import signal
 from django.db.models import QuerySet
@@ -25,9 +26,9 @@ class RecordChatMessageArgs:
 
 class ListenerChatMessage:
     record_chat_message_signal = signal("record_chat_message")
+    update_chat_message_token_signal = signal("update_chat_message_token")
 
     @staticmethod
-    @poxy
     def record_chat_message(args: RecordChatMessageArgs):
         if not QuerySet(Chat).filter(id=args.chat_id).exists():
             Chat(id=args.chat_id, application_id=args.application_id, abstract=args.chat_message.problem).save()
@@ -49,6 +50,18 @@ class ListenerChatMessage:
         except Exception as e:
             print(e)
 
+    @staticmethod
+    @poxy
+    def update_token(chat_message: ChatMessage):
+        if chat_message.chat_model is not None:
+            logging.getLogger("max_kb").info("开始更新token")
+            message_token = chat_message.chat_model.get_num_tokens_from_messages(chat_message.chat_message)
+            answer_token = chat_message.chat_model.get_num_tokens(chat_message.answer)
+            # 修改token数量
+            QuerySet(ChatRecord).filter(id=chat_message.id).update(
+                **{'message_tokens': message_token, 'answer_tokens': answer_token})
+
     def run(self):
         # 记录会话
         ListenerChatMessage.record_chat_message_signal.connect(self.record_chat_message)
+        ListenerChatMessage.update_chat_message_token_signal.connect(self.update_token)

@@ -16,35 +16,35 @@ prefix_dir = "/opt/maxkb/model"
 model_config = [
     {
         'download_params': {
-            'cache_dir': os.path.join(prefix_dir, 'base'),
+            'cache_dir': os.path.join(prefix_dir, 'base/hub'),
             'pretrained_model_name_or_path': 'gpt2'
         },
         'download_function': GPT2TokenizerFast.from_pretrained
     },
     {
         'download_params': {
-            'cache_dir': os.path.join(prefix_dir, 'base'),
+            'cache_dir': os.path.join(prefix_dir, 'base/hub'),
             'pretrained_model_name_or_path': 'gpt2-medium'
         },
         'download_function': GPT2TokenizerFast.from_pretrained
     },
     {
         'download_params': {
-            'cache_dir': os.path.join(prefix_dir, 'base'),
+            'cache_dir': os.path.join(prefix_dir, 'base/hub'),
             'pretrained_model_name_or_path': 'gpt2-large'
         },
         'download_function': GPT2TokenizerFast.from_pretrained
     },
     {
         'download_params': {
-            'cache_dir': os.path.join(prefix_dir, 'base'),
+            'cache_dir': os.path.join(prefix_dir, 'base/hub'),
             'pretrained_model_name_or_path': 'gpt2-xl'
         },
         'download_function': GPT2TokenizerFast.from_pretrained
     },
     {
         'download_params': {
-            'cache_dir': os.path.join(prefix_dir, 'base'),
+            'cache_dir': os.path.join(prefix_dir, 'base/hub'),
             'pretrained_model_name_or_path': 'distilgpt2'
         },
         'download_function': GPT2TokenizerFast.from_pretrained

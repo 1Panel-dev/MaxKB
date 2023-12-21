@@ -45,7 +45,9 @@ class ChatMessage:
                  source_id: str,
                  answer: str,
                  message_tokens: int,
-                 answer_token: int):
+                 answer_token: int,
+                 chat_model=None,
+                 chat_message=None):
         self.id = id
         self.problem = problem
         self.title = title
@@ -59,6 +61,8 @@ class ChatMessage:
         self.answer = answer
         self.message_tokens = message_tokens
         self.answer_token = answer_token
+        self.chat_model = chat_model
+        self.chat_message = chat_message
 
     def get_chat_message(self):
         return MessageManagement.get_message(self.problem, self.paragraph, self.problem)
@@ -85,10 +89,13 @@ class ChatInfo:
     def append_chat_message(self, chat_message: ChatMessage):
         self.chat_message_list.append(chat_message)
         if self.application_id is not None:
+            # 插入数据库
             event.ListenerChatMessage.record_chat_message_signal.send(
                 event.RecordChatMessageArgs(len(self.chat_message_list) - 1, self.chat_id, self.application_id,
                                             chat_message)
             )
+            # 异步更新token
+            event.ListenerChatMessage.update_chat_message_token_signal.send(chat_message)
 
     def get_context_message(self):
         start_index = len(self.chat_message_list) - self.dialogue_number
@@ -176,8 +183,10 @@ class ChatMessageSerializer(serializers.Serializer):
                     ChatMessage(_id, message, title, content, embedding_id, dataset_id, document_id,
                                 paragraph_id,
                                 source_type,
-                                source_id, all_text, chat_model.get_num_tokens_from_messages(chat_message),
-                                chat_model.get_num_tokens(all_text)))
+                                source_id, all_text,
+                                0,
+                                0,
+                                chat_message=chat_message, chat_model=chat_model))
                 # 重新设置缓存
                 chat_cache.set(chat_id,
                                chat_info, timeout=60 * 30)

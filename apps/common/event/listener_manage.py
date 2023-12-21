@@ -109,9 +109,10 @@ class ListenerManagement:
         :param dataset_id: 知识库id
         :return: None
         """
-        max_kb.info(f"向量化数据集{dataset_id}")
+        max_kb.info(f"开始--->向量化数据集:{dataset_id}")
         try:
             document_list = QuerySet(Document).filter(dataset_id=dataset_id)
+            max_kb.info(f"数据集文档:{[d.name for d in document_list]}")
             for document in document_list:
                 ListenerManagement.embedding_by_document(document.id)
         except Exception as e:
