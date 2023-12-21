@@ -131,7 +131,10 @@ const paginationConfig = reactive({
  */
 const initInterval = () => {
   interval = setInterval(() => {
-    if (documentData.value.length > 0 && documentData.value.every((item) => item.status === '0')) {
+    if (
+      documentData.value.length > 0 &&
+      documentData.value.some((item) => item.status === '0' || item.status === '2')
+    ) {
       getList(true)
     }
   }, 6000)
