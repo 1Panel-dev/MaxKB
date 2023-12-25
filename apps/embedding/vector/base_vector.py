@@ -116,6 +116,11 @@ class BaseVectorStore(ABC):
         pass
 
     @abstractmethod
+    def hit_test(self, query_text, dataset_id: list[str], top_number: int, similarity: float,
+                 embedding: HuggingFaceEmbeddings):
+        pass
+
+    @abstractmethod
     def update_by_paragraph_id(self, paragraph_id: str, instance: Dict):
         pass
 

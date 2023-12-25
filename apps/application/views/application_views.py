@@ -19,6 +19,7 @@ from common.constants.permission_constants import CompareConstants, PermissionCo
     ViewPermission, RoleConstants
 from common.exception.app_exception import AppAuthenticationFailed
 from common.response import result
+from common.swagger_api.common_api import CommonApi
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.dataset_serializers import DataSetSerializers
 
@@ -179,6 +180,28 @@ class Application(APIView):
         return result.success(
             ApplicationSerializer.Query(
                 data={**query_params_to_single_dict(request.query_params), 'user_id': request.user.id}).list())
+
+    class HitTest(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods="GET", detail=False)
+        @swagger_auto_schema(operation_summary="命中测试列表", operation_id="命中测试列表",
+                             manual_parameters=CommonApi.HitTestApi.get_request_params_api(),
+                             responses=result.get_api_array_response(CommonApi.HitTestApi.get_response_body_api()),
+                             tags=["应用"])
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN,
+             RoleConstants.APPLICATION_KEY],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationSerializer.HitTest(data={'id': application_id, 'user_id': request.user.id,
+                                                    "query_text": request.query_params.get("query_text"),
+                                                    "top_number": request.query_params.get("top_number"),
+                                                    'similarity': request.query_params.get('similarity')}).hit_test(
+                ))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

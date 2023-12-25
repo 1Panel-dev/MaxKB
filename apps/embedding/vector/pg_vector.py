@@ -15,7 +15,7 @@ from django.db.models import QuerySet
 from langchain.embeddings import HuggingFaceEmbeddings
 
 from common.db.search import native_search, generate_sql_by_query_dict
-from common.db.sql_execute import select_one
+from common.db.sql_execute import select_one, select_list
 from common.util.file_util import get_file_content
 from embedding.models import Embedding, SourceType
 from embedding.vector.base_vector import BaseVectorStore
@@ -67,6 +67,19 @@ class PGVector(BaseVectorStore):
                           range(0, len(text_list))]
         QuerySet(Embedding).bulk_create(embedding_list) if len(embedding_list) > 0 else None
         return True
+
+    def hit_test(self, query_text, dataset_id_list: list[str], top_number: int, similarity: float,
+                 embedding: HuggingFaceEmbeddings):
+        embedding_query = embedding.embed_query(query_text)
+        query_set = QuerySet(Embedding).filter(dataset_id__in=dataset_id_list, is_active=True)
+        exec_sql, exec_params = generate_sql_by_query_dict({'embedding_query': query_set},
+                                                           select_string=get_file_content(
+                                                               os.path.join(PROJECT_DIR, "apps", "embedding", 'sql',
+                                                                            'hit_test.sql')),
+                                                           with_table_name=True)
+        embedding_model = select_list(exec_sql,
+                                      [json.dumps(embedding_query), *exec_params, *exec_params, similarity, top_number])
+        return embedding_model
 
     def search(self, query_text, dataset_id_list: list[str], exclude_document_id_list: list[str],
                exclude_id_list: list[str],

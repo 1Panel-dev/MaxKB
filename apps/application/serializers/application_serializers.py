@@ -9,6 +9,7 @@
 import hashlib
 import os
 import uuid
+from functools import reduce
 from typing import Dict
 
 from django.contrib.postgres.fields import ArrayField
@@ -20,12 +21,14 @@ from rest_framework import serializers
 
 from application.models import Application, ApplicationDatasetMapping
 from application.models.api_key_model import ApplicationAccessToken, ApplicationApiKey
+from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
-from common.exception.app_exception import AppApiException, NotFound404, AppAuthenticationFailed
+from common.exception.app_exception import AppApiException, NotFound404
 from common.util.file_util import get_file_content
 from dataset.models import DataSet
+from dataset.serializers.common_serializers import list_paragraph
 from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -173,6 +176,33 @@ class ApplicationSerializer(serializers.Serializer):
         @staticmethod
         def to_application_dateset_mapping(application_id: str, dataset_id: str):
             return ApplicationDatasetMapping(id=uuid.uuid1(), application_id=application_id, dataset_id=dataset_id)
+
+    class HitTest(serializers.Serializer):
+        id = serializers.CharField(required=True)
+        user_id = serializers.UUIDField(required=False)
+        query_text = serializers.CharField(required=True)
+        top_number = serializers.IntegerField(required=True, max_value=10, min_value=1)
+        similarity = serializers.FloatField(required=True, max_value=1, min_value=0)
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if not QuerySet(Application).filter(id=self.data.get('id')).exists():
+                raise AppApiException(500, '不存在的应用id')
+
+        def hit_test(self):
+            self.is_valid()
+            vector = VectorStore.get_embedding_vector()
+            # 向量库检索
+            hit_list = vector.hit_test(self.data.get('query_text'), [ad.dataset_id for ad in
+                                                                     QuerySet(ApplicationDatasetMapping).filter(
+                                                                         application_id=self.data.get('id'))],
+                                       self.data.get('top_number'),
+                                       self.data.get('similarity'),
+                                       EmbeddingModel.get_embedding_model())
+            hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get('paragraph_id'): hit} for hit in hit_list], {})
+            p_list = list_paragraph([h.get('paragraph_id') for h in hit_list])
+            return [{**p, 'similarity': hit_dict.get(p.get('id')).get('similarity'),
+                     'comprehensive_score': hit_dict.get(p.get('id')).get('comprehensive_score')} for p in p_list]
 
     class Query(serializers.Serializer):
         name = serializers.CharField(required=False)

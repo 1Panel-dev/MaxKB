@@ -16,6 +16,7 @@ from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import PermissionConstants, CompareConstants, Permission, Group, Operate
 from common.response import result
 from common.response.result import get_page_request_params, get_page_api_response, get_api_response
+from common.swagger_api.common_api import CommonApi
 from dataset.serializers.dataset_serializers import DataSetSerializers
 
 
@@ -60,6 +61,24 @@ class Dataset(APIView):
         s = DataSetSerializers.Create(data=request.data)
         s.is_valid(raise_exception=True)
         return result.success(s.save(request.user))
+
+    class HitTest(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods="GET", detail=False)
+        @swagger_auto_schema(operation_summary="命中测试列表", operation_id="命中测试列表",
+                             manual_parameters=CommonApi.HitTestApi.get_request_params_api(),
+                             responses=result.get_api_array_response(CommonApi.HitTestApi.get_response_body_api()),
+                             tags=["知识库"])
+        @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.USE,
+                                                        dynamic_tag=keywords.get('dataset_id')))
+        def get(self, request: Request, dataset_id: str):
+            return result.success(
+                DataSetSerializers.HitTest(data={'id': dataset_id, 'user_id': request.user.id,
+                                                 "query_text": request.query_params.get("query_text"),
+                                                 "top_number": request.query_params.get("top_number"),
+                                                 'similarity': request.query_params.get('similarity')}).hit_test(
+                ))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

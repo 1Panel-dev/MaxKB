@@ -8,6 +8,8 @@
 """
 import os.path
 import uuid
+from functools import reduce
+from itertools import groupby
 from typing import Dict
 
 from django.contrib.postgres.fields import ArrayField
@@ -18,6 +20,7 @@ from drf_yasg import openapi
 from rest_framework import serializers
 
 from application.models import ApplicationDatasetMapping
+from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.db.sql_execute import select_list
 from common.event.listener_manage import ListenerManagement
@@ -26,6 +29,7 @@ from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
 from common.util.file_util import get_file_content
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem
+from dataset.serializers.common_serializers import list_paragraph
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
 from setting.models import AuthOperate
 from smartdoc.conf import PROJECT_DIR
@@ -299,6 +303,30 @@ class DataSetSerializers(serializers.ModelSerializer):
         name = serializers.CharField(required=False)
         desc = serializers.CharField(required=False)
         application_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
+
+    class HitTest(ApiMixin, serializers.Serializer):
+        id = serializers.CharField(required=True)
+        user_id = serializers.UUIDField(required=False)
+        query_text = serializers.CharField(required=True)
+        top_number = serializers.IntegerField(required=True, max_value=10, min_value=1)
+        similarity = serializers.FloatField(required=True, max_value=1, min_value=0)
+
+        def is_valid(self, *, raise_exception=True):
+            super().is_valid(raise_exception=True)
+            if not QuerySet(DataSet).filter(id=self.data.get("id")).exists():
+                raise AppApiException(300, "id不存在")
+
+        def hit_test(self):
+            self.is_valid()
+            vector = VectorStore.get_embedding_vector()
+            # 向量库检索
+            hit_list = vector.hit_test(self.data.get('query_text'), [self.data.get('id')], self.data.get('top_number'),
+                                       self.data.get('similarity'),
+                                       EmbeddingModel.get_embedding_model())
+            hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get('paragraph_id'): hit} for hit in hit_list], {})
+            p_list = list_paragraph([h.get('paragraph_id') for h in hit_list])
+            return [{**p, 'similarity': hit_dict.get(p.get('id')).get('similarity'),
+                     'comprehensive_score': hit_dict.get(p.get('id')).get('comprehensive_score')} for p in p_list]
 
     class Operate(ApiMixin, serializers.Serializer):
         id = serializers.CharField(required=True)
