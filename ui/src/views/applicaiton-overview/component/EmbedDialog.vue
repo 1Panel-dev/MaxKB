@@ -3,7 +3,8 @@
     <el-row :gutter="12">
       <el-col :span="12">
         <div class="border">
-          <img src="@/assets/window1.png" alt="" />
+          <p class="title p-16 bold">全屏模式</p>
+          <img src="@/assets/window1.png" alt="" class="ml-8" />
           <div class="code border-t p-16">
             <div class="flex-between">
               <span class="bold">复制以下代码进行嵌入</span>
@@ -19,7 +20,8 @@
       </el-col>
       <el-col :span="12">
         <div class="border">
-          <img src="@/assets/window2.png" alt="" />
+          <p class="title p-16 bold">浮窗模式</p>
+          <img src="@/assets/window2.png" alt="" class="ml-8" />
           <div class="code border-t p-16">
             <div class="flex-between">
               <span class="bold">复制以下代码进行嵌入</span>
@@ -82,6 +84,10 @@ defineExpose({ open })
 </script>
 <style lang="scss" scope>
 .embed-dialog {
+  .title {
+    color: var(--app-text-color) !important;
+  }
+
   .code {
     color: var(--app-text-color) !important;
     background: var(--app-layout-bg-color);

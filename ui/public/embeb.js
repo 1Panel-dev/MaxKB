@@ -1,6 +1,6 @@
- function embedChatbot() { 
-   const t = window.maxkbChatConfig
-   if (t && t.token&&t.protocol&&t.host) {
+function embedChatbot() {
+  const t = window.maxkbChatConfig
+  if (t && t.token && t.protocol && t.host) {
     icon = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56" fill="none">
     <g filter="url(#filter0_d_349_49711)">
     <path d="M8 24C8 12.9543 16.9543 4 28 4H48V44H28C16.9543 44 8 35.0457 8 24Z" fill="url(#paint0_linear_349_49711)"/>
@@ -24,53 +24,54 @@
     <stop offset="1" stop-color="#3370FF"/>
     </linearGradient>
     </defs>
-    </svg>`;
-        chat_button = document.createElement("div");
-        chat_button.style =
-          "position: fixed;bottom: 40px;right: 20px;cursor: pointer;";
-        chat_button.innerHTML = icon;
-    
-        chat_container = document.createElement("div");
-        chat_container.id = "chat_container";
-        chat_container.style.cssText = `z-index:10000;position: relative;
+    </svg>`
+    chat_button = document.createElement('div')
+    chat_button.style = 'position: fixed;bottom: 30px;right: 0;cursor: pointer;'
+    chat_button.innerHTML = icon
+
+    chat_container = document.createElement('div')
+    chat_container.id = 'chat_container'
+    chat_container.style.cssText = `z-index:10000;position: relative;
           width: 420px;
           height: 600px;
-          border: none;
-          border-radius: 7px 7px 7px 7px;
-          position: fixed;bottom: 40px;right: 20px`;
-        chat_container.style["display"] = "none";
-    
-        chat = document.createElement("iframe");
+          border-radius: 8px;
+          border: 1px solid var(--N300, #DEE0E3);
+          background: linear-gradient(188deg, rgba(235, 241, 255, 0.20) 39.6%, rgba(231, 249, 255, 0.20) 94.3%), #EFF0F1;
+          box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.10);
+          position: fixed;bottom: 20px;right: 45px;overflow: hidden;`
+    chat_container.style['display'] = 'none'
 
-        chat.src = `${window.maxkbChatConfig.protocol}//${window.maxkbChatConfig.host}/ui/chat/${window.maxkbChatConfig.token}`;
-        chat.id = "chat";
-        chat_container.append(chat);
-        chat.style.cssText = `border: none;height:100%;width:100%`;
-    
-        close_button = document.createElement("div");
-    
-        close_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+    chat = document.createElement('iframe')
+
+    chat.src = `${window.maxkbChatConfig.protocol}//${window.maxkbChatConfig.host}/ui/chat/${window.maxkbChatConfig.token}`
+    chat.id = 'chat'
+    chat_container.append(chat)
+    chat.style.cssText = `border: none;height:100%;width:100%`
+
+    close_button = document.createElement('div')
+
+    close_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
     <path d="M9.95317 8.73169L15.5511 3.13376C15.7138 2.97104 15.9776 2.97104 16.1403 3.13376L16.7296 3.72301C16.8923 3.88573 16.8923 4.14955 16.7296 4.31227L11.1317 9.9102L16.7296 15.5081C16.8923 15.6708 16.8923 15.9347 16.7296 16.0974L16.1403 16.6866C15.9776 16.8494 15.7138 16.8494 15.5511 16.6866L9.95317 11.0887L4.35524 16.6866C4.19252 16.8494 3.9287 16.8494 3.76598 16.6866L3.17673 16.0974C3.01401 15.9347 3.01401 15.6708 3.17673 15.5081L8.77465 9.9102L3.17673 4.31227C3.01401 4.14955 3.01401 3.88573 3.17673 3.72301L3.76598 3.13376C3.9287 2.97104 4.19252 2.97104 4.35524 3.13376L9.95317 8.73169Z" fill="#646A73"/>
-    </svg>`;
-        close_button.style.cssText = `position: absolute;
-        top: 10px;
+    </svg>`
+    close_button.style.cssText = `position: absolute;
+        top: 15px;
         right: 10px;
         cursor: pointer;
-        `;
-        close_button.onclick = () => {
-          chat_container.style["display"] = "none";
-          chat_button.style["display"] = "block";
-        };
-        
-        chat_container.append(close_button);
-        document.body.append(chat_container);
-    
-        chat_button.onclick = ($event) => {
-          chat_container.style["display"] = "block";
-          chat_button.style["display"] = "none";
-        };
-        sty=document.createElement("style")
-        sty.innerText=` #chat_container {
+        `
+    close_button.onclick = () => {
+      chat_container.style['display'] = 'none'
+      chat_button.style['display'] = 'block'
+    }
+
+    chat_container.append(close_button)
+    document.body.append(chat_container)
+
+    chat_button.onclick = ($event) => {
+      chat_container.style['display'] = 'block'
+      chat_button.style['display'] = 'block'
+    }
+    sty = document.createElement('style')
+    sty.innerText = ` #chat_container {
             animation: appear .4s ease-in-out;
           }
           @keyframes appear {
@@ -81,9 +82,10 @@
             to {
               height: 600px;
             }
-          }`
-        document.head.append(sty)
-        document.body.append(chat_button);
-   } else console.error('invalid parameter')
- }
+          }
+          `
+    document.head.append(sty)
+    document.body.append(chat_button)
+  } else console.error('invalid parameter')
+}
 window.onload = embedChatbot

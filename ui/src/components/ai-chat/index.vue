@@ -135,7 +135,6 @@ import applicationApi from '@/api/application'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
-import { MdPreview } from 'md-editor-v3'
 import MdRenderer from '@/components/markdown-renderer/MdRenderer.vue'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()

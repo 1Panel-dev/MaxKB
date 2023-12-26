@@ -1,9 +1,5 @@
 <template>
-  <LayoutContainer
-    :header="isCreate ? '创建知识库' : '上传文档'"
-    back-to="-1"
-    class="create-dataset"
-  >
+  <LayoutContainer :header="isCreate ? '创建知识库' : '上传文档'" class="create-dataset">
     <template #backButton>
       <back-button @click="back"></back-button>
     </template>
@@ -70,9 +66,8 @@ const baseInfo = computed(() => dataset.baseInfo)
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { id, type }
+  params: { id, type }
 } = route
-
 const isCreate = type === 'create'
 const steps = [
   {

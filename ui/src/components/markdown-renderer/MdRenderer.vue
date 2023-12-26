@@ -3,7 +3,8 @@
     ref="editorRef"
     editorId="preview-only"
     :modelValue="item"
-    v-for="item in md_view_list"
+    v-for="(item, index) in md_view_list"
+    :key="index"
   />
 </template>
 <script setup lang="ts">

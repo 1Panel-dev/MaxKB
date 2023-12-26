@@ -84,7 +84,7 @@ function searchHandle() {
 function deleteDateset(row: any) {
   MsgConfirm(
     `是否删除知识库：${row.name} ?`,
-    `此知识库关联 ${row.char_length} 个应用，删除后无法恢复，请谨慎操作。`,
+    `此知识库关联 ${row.application_mapping_count} 个应用，删除后无法恢复，请谨慎操作。`,
     {
       confirmButtonText: '删除',
       confirmButtonClass: 'danger'

@@ -39,7 +39,7 @@ onMounted(() => {
   height: 100vh;
 
   .login-image {
-    background: url(@/assets/login.png) no-repeat;
+    background: url(@/assets/login.jpg) no-repeat;
     background-size: 100% 100%;
     width: 100%;
     height: 100%;

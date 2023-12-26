@@ -81,7 +81,7 @@
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
               <span v-if="row.status === '2'" class="mr-4">
-                <el-tooltip effect="dark" content="刷新" placement="top">
+                <el-tooltip effect="dark" content="重试" placement="top">
                   <el-button type="primary" text @click.stop="refreshDocument(row)">
                     <el-icon><RefreshRight /></el-icon>
                   </el-button>

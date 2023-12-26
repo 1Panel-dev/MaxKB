@@ -41,9 +41,10 @@ onMounted(() => {
   getAccessToken(accessToken)
 })
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .chat {
   background-color: var(--app-layout-bg-color);
+  overflow: hidden;
   &__header {
     background: var(--app-header-bg-color);
     position: fixed;
@@ -54,11 +55,11 @@ onMounted(() => {
     height: var(--app-header-height);
     line-height: var(--app-header-height);
     box-sizing: border-box;
-    padding: var(--app-header-padding);
   }
   &__main {
     padding-top: calc(var(--app-header-height) + 24px);
     height: calc(100vh - var(--app-header-height) - 24px);
+    overflow: hidden;
   }
   &__footer {
     background: #f3f7f9;
@@ -68,6 +69,7 @@ onMounted(() => {
     left: 0;
     width: 100%;
     box-sizing: border-box;
+    border-radius: 8px !important;
     &:before {
       background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
       content: '';
