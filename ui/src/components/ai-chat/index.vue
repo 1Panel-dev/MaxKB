@@ -1,6 +1,6 @@
 <template>
   <div class="ai-chat" :class="log ? 'chart-log' : ''">
-    <el-scrollbar ref="scrollDiv">
+    <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
       <div ref="dialogScrollbar" class="ai-chat__content p-24">
         <div class="item-content mb-16">
           <div class="avatar">
@@ -127,7 +127,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onUpdated, computed, watch } from 'vue'
+import { ref, nextTick, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import LogOperationButton from './LogOperationButton.vue'
 import OperationButton from './OperationButton.vue'
@@ -263,16 +263,21 @@ function chatMessage() {
       vote_status: '-1'
     })
     inputValue.value = ''
+    nextTick(() => {
+      scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
+    })
+
     applicationApi.postChatMessage(chartOpenId.value, problem_text).then((response) => {
       const row = chatList.value.find((item) => item.id === id)
-
       if (row) {
         ChatManagement.addChatRecord(row, 50, loading)
         ChatManagement.write(id)
+        nextTick(() => {
+          scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
+        })
         const reader = response.body.getReader()
         /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
         const write = ({ done, value }: { done: boolean; value: any }) => {
-          let scrollInterval
           try {
             if (done) {
               ChatManagement.close(id)
@@ -290,12 +295,8 @@ function chatMessage() {
                   const content = chunk?.content
                   if (content) {
                     ChatManagement.append(id, content)
-                    scrollInterval = setInterval(() => {
-                      handleScrollBottom()
-                    }, 5000)
                   }
                   if (chunk.is_end) {
-                    clearInterval(scrollInterval)
                     // 流处理成功 返回成功回调
                     return Promise.resolve()
                   }
@@ -327,18 +328,44 @@ function regenerationChart(item: chatType) {
   chatMessage()
 }
 
-// 滚动到底部
-function handleScrollBottom() {
-  nextTick(() => {
-    scrollDiv.value.setScrollTop(dialogScrollbar.value.scrollHeight)
-  })
+/**
+ * 滚动条距离最上面的高度
+ */
+const scrollTop = ref(0)
+
+const scorll = ref(true)
+
+const handleScrollTop = ($event: any) => {
+  scrollTop.value = $event.scrollTop
+  if (
+    dialogScrollbar.value.scrollHeight - (scrollTop.value + scrollDiv.value.wrapRef.offsetHeight) <=
+    10
+  ) {
+    scorll.value = true
+  } else {
+    scorll.value = false
+  }
 }
 
-onUpdated(() => {
-  if (!props.log) {
-    handleScrollBottom()
+const handleScroll = () => {
+  if (!props.log && scrollDiv.value) {
+    // 内部高度小于外部高度 就需要出滚动条
+    if (scrollDiv.value.wrapRef.offsetHeight < dialogScrollbar.value.scrollHeight) {
+      // 如果当前滚动条距离最下面的距离在 规定距离 滚动条就跟随
+      if (scorll.value) {
+        scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
+      }
+    }
   }
-})
+}
+
+watch(
+  chatList,
+  () => {
+    handleScroll()
+  },
+  { deep: true, immediate: true }
+)
 </script>
 <style lang="scss" scoped>
 .ai-chat {
