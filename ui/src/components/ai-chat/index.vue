@@ -63,7 +63,7 @@
               </div>
 
               <el-card v-else shadow="always" class="dialog-card">
-                <MdPreview ref="editorRef" editorId="preview-only" :modelValue="item.answer_text" />
+                <MdRenderer :source="item.answer_text"></MdRenderer>
               </el-card>
               <div class="flex-between mt-8" v-if="log">
                 <LogOperationButton :data="item" :applicationId="appId" />
@@ -136,7 +136,7 @@ import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
 import { MdPreview } from 'md-editor-v3'
-
+import MdRenderer from '@/components/markdown-renderer/MdRenderer.vue'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
