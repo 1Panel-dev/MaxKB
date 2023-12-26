@@ -32,7 +32,7 @@
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
         <el-table-column prop="star_num" label="用户反馈" align="right">
           <template #default="{ row }">
-            <span v-if="!row.trample_num && !row.trample_num"> - </span>
+            <span v-if="!row.trample_num && !row.star_num"> - </span>
             <span v-else>
               <span v-if="row.star_num">
                 <AppIcon iconName="app-like-color"></AppIcon>

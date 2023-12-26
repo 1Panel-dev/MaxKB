@@ -1,6 +1,6 @@
 <template>
-  <div class="ai-chat" :class="log ? 'chart-log' : ''">
-    <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
+  <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
+    <el-scrollbar ref="scrollDiv">
       <div ref="dialogScrollbar" class="ai-chat__content p-24">
         <div class="item-content mb-16">
           <div class="avatar">
@@ -156,6 +156,7 @@ const props = defineProps({
 })
 const { application } = useStore()
 
+const aiChatRef = ref()
 const quickInputRef = ref()
 const scrollDiv = ref()
 const dialogScrollbar = ref()
@@ -272,9 +273,6 @@ function chatMessage() {
       if (row) {
         ChatManagement.addChatRecord(row, 50, loading)
         ChatManagement.write(id)
-        nextTick(() => {
-          scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
-        })
         const reader = response.body.getReader()
         /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
         const write = ({ done, value }: { done: boolean; value: any }) => {

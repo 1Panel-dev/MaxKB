@@ -57,7 +57,6 @@ import type { FormInstance, FormRules } from 'element-plus'
 import logApi from '@/api/log'
 import useStore from '@/stores'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-const isEdit = ref(false)
 
 const route = useRoute()
 const {
@@ -74,6 +73,7 @@ const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 
 const form = ref<any>({})
+const isEdit = ref(false)
 
 const rules = reactive<FormRules>({
   content: [{ required: true, message: '请输入内容', trigger: 'blur' }]
@@ -82,6 +82,7 @@ const rules = reactive<FormRules>({
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {}
+    isEdit.value = false
   }
 })
 
