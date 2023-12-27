@@ -7,9 +7,9 @@
     destroy-on-close
   >
     <el-row v-loading="loading">
-      <el-col :span="16" class="p-24">
+      <el-col :span="16">
         <el-scrollbar>
-          <div style="height: 350px">
+          <div class="p-24" style="height: 350px">
             <div class="flex-between mb-16">
               <div class="bold title align-center">分段内容</div>
               <el-button text @click="isEdit = true" v-if="problemId && !isEdit">
@@ -20,8 +20,8 @@
             <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="isEdit" />
           </div>
 
-          <div class="text-right" v-if="problemId && isEdit">
-            <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+          <div class="text-right p-24 pt-0" v-if="problemId && isEdit">
+            <el-button @click.prevent="isEdit = false"> 取消 </el-button>
             <el-button type="primary" :disabled="loading" @click="submitHandle"> 保存 </el-button>
           </div>
         </el-scrollbar>

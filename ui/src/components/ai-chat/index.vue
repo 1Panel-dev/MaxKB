@@ -66,7 +66,7 @@
                 <MdRenderer :source="item.answer_text"></MdRenderer>
               </el-card>
               <div class="flex-between mt-8" v-if="log">
-                <LogOperationButton :data="item" :applicationId="appId" />
+                <LogOperationButton v-model:data="chatList[index]" :applicationId="appId" />
               </div>
 
               <div class="flex-between mt-8" v-else>
