@@ -25,6 +25,8 @@ openai = "^0.28.1"
 tiktoken = "^0.5.1"
 qianfan = "^0.1.1"
 pycryptodome = "^3.19.0"
+beautifulsoup4 = "^4.12.2"
+html2text = "^2020.1.16"
 
 
 [build-system]
