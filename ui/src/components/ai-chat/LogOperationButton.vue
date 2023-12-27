@@ -37,8 +37,8 @@
     <el-button text disabled v-if="buttonData?.vote_status === '1'">
       <AppIcon iconName="app-oppose-color"></AppIcon>
     </el-button>
-    <EditContentDialog ref="EditContentDialogRef" />
-    <EditMarkDialog ref="EditMarkDialogRef" @refresh="refresh" />
+    <EditContentDialog ref="EditContentDialogRef" @refresh="refreshContent" />
+    <EditMarkDialog ref="EditMarkDialogRef" @refresh="refreshMark" />
   </div>
 </template>
 <script setup lang="ts">
@@ -76,8 +76,12 @@ function editMark(data: any) {
   EditMarkDialogRef.value.open(data)
 }
 
-function refresh() {
+function refreshMark() {
   buttonData.value.improve_paragraph_id_list = []
+  emit('update:data', buttonData.value)
+}
+function refreshContent(data: any) {
+  buttonData.value = data
   emit('update:data', buttonData.value)
 }
 </script>

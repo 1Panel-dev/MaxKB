@@ -27,6 +27,7 @@
         @row-click="rowClickHandle"
         v-loading="loading"
         :row-class-name="setRowClass"
+        class="log-table"
       >
         <el-table-column prop="abstract" label="摘要" show-overflow-tooltip />
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
@@ -245,4 +246,8 @@ onMounted(() => {
   getDetail()
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.log-table tr {
+  cursor: pointer;
+}
+</style>

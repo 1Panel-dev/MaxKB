@@ -27,7 +27,12 @@
         </el-input>
       </el-form-item>
       <el-form-item label="保存至文档" prop="document">
-        <el-cascader v-model="form.document" :props="LoadDocument" placeholder="请选择文档" class="w-full">
+        <el-cascader
+          v-model="form.document"
+          :props="LoadDocument"
+          placeholder="请选择文档"
+          class="w-full"
+        >
           <template #default="{ node, data }">
             <span class="flex align-center">
               <AppAvatar v-if="!node.isLeaf" class="mr-12" shape="square" :size="24">
@@ -69,7 +74,7 @@ const {
   params: { id }
 } = route as any
 
-
+const emit = defineEmits(['refresh'])
 const formRef = ref()
 
 const dialogVisible = ref<boolean>(false)
@@ -159,6 +164,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           loading
         )
         .then((res: any) => {
+          emit('refresh', res.data)
           dialogVisible.value = false
         })
     } else {
