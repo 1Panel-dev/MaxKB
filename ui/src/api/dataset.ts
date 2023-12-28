@@ -108,6 +108,22 @@ const listUsableApplication: (
 ) => Promise<Result<Array<ApplicationFormType>>> = (dataset_id, loading) => {
   return get(`${prefix}/${dataset_id}/application`, {}, loading)
 }
+
+/**
+ * 命中测试列表
+ * @param dataset_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getDatasetHitTest: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (dataset_id, data, loading) => {
+  return get(`${prefix}/${dataset_id}/hit_test`, data, loading)
+}
+
 export default {
   getDateset,
   getAllDateset,
@@ -115,5 +131,6 @@ export default {
   postDateset,
   getDatesetDetail,
   putDateset,
-  listUsableApplication
+  listUsableApplication,
+  getDatasetHitTest
 }

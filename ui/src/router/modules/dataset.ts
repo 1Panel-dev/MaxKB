@@ -37,6 +37,18 @@ const datasetRouter = {
           },
           component: () => import('@/views/document/index.vue')
         },
+        // {
+        //   path: 'hit-test',
+        //   name: 'HitTest',
+        //   meta: {
+        //     icon: 'app-hit-test',
+        //     title: '命中测试',
+        //     active: 'hit-test',
+        //     parentPath: '/dataset/:id',
+        //     parentName: 'DatasetDetail'
+        //   },
+        //   component: () => import('@/views/hit-test/index.vue')
+        // },
         {
           path: 'setting',
           name: 'DatasetSetting',
