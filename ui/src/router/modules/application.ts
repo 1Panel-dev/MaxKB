@@ -51,6 +51,18 @@ const applicationRouter = {
           component: () => import('@/views/application/CreateAndSetting.vue')
         },
         {
+          path: 'hit-test',
+          name: 'AppHitTest',
+          meta: {
+            icon: 'app-hit-test',
+            title: '命中测试',
+            active: 'hit-test',
+            parentPath: '/application/:id',
+            parentName: 'ApplicationDetail'
+          },
+          component: () => import('@/views/hit-test/index.vue')
+        },
+        {
           path: 'log',
           name: 'Log',
           meta: {

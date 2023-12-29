@@ -231,6 +231,21 @@ const putChatVote: (
   )
 }
 
+/**
+ * 命中测试列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationHitTest: (
+  application_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, data, loading) => {
+  return get(`${prefix}/${application_id}/hit_test`, data, loading)
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -246,5 +261,6 @@ export default {
   putAccessToken,
   postAppAuthentication,
   getProfile,
-  putChatVote
+  putChatVote,
+  getApplicationHitTest
 }

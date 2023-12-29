@@ -28,7 +28,12 @@
       </el-col>
       <el-col :span="8" class="border-l p-24">
         <!-- 关联问题 -->
-        <ProblemComponent :problemId="problemId" ref="ProblemRef" />
+        <ProblemComponent
+          :problemId="problemId"
+          :docId="document_id"
+          :datasetId="dataset_id"
+          ref="ProblemRef"
+        />
       </el-col>
     </el-row>
     <template #footer v-if="!problemId">
@@ -69,12 +74,16 @@ const loading = ref(false)
 const problemId = ref('')
 const detail = ref<any>({})
 const isEdit = ref(false)
+const document_id = ref('')
+const dataset_id = ref('')
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
     problemId.value = ''
     detail.value = {}
     isEdit.value = false
+    document_id.value = ''
+    dataset_id.value = ''
   }
 })
 
@@ -83,6 +92,8 @@ const open = (data: any) => {
     detail.value.title = data.title
     detail.value.content = data.content
     problemId.value = data.id
+    document_id.value = data.document_id
+    dataset_id.value = data.dataset_id
   } else {
     isEdit.value = true
   }
@@ -92,7 +103,13 @@ const submitHandle = async () => {
   if (await paragraphFormRef.value?.validate()) {
     if (problemId.value) {
       paragraph
-        .asyncPutParagraph(id, documentId, problemId.value, paragraphFormRef.value?.form, loading)
+        .asyncPutParagraph(
+          dataset_id.value,
+          documentId || document_id.value,
+          problemId.value,
+          paragraphFormRef.value?.form,
+          loading
+        )
         .then((res: any) => {
           emit('refresh', res.data)
           isEdit.value = false

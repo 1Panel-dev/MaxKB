@@ -122,7 +122,7 @@ defineExpose({
     background: var(--app-layout-bg-color);
     padding: 0;
   }
-  .el-divider__text {
+  :deep(.el-divider__text) {
     background: var(--app-layout-bg-color);
   }
 }
