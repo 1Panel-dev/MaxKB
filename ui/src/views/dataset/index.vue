@@ -126,5 +126,8 @@ onMounted(() => {
       color: var(--app-text-color);
     }
   }
+  :deep(.el-divider__text) {
+    background: var(--app-layout-bg-color);
+  }
 }
 </style>

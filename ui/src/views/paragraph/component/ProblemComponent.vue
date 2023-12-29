@@ -37,7 +37,9 @@ import { useRoute } from 'vue-router'
 import paragraphApi from '@/api/paragraph'
 
 const props = defineProps({
-  problemId: String
+  problemId: String,
+  docId: String,
+  datasetId: String
 })
 
 const route = useRoute()
@@ -68,7 +70,7 @@ function delProblemHandle(item: any, index: number) {
   loading.value = true
   if (item.id) {
     paragraphApi
-      .delProblem(id, documentId, props.problemId || '', item.id)
+      .delProblem(props.datasetId || id, documentId || props.docId, props.problemId || '', item.id)
       .then((res) => {
         getProblemList()
       })
@@ -84,7 +86,7 @@ function delProblemHandle(item: any, index: number) {
 function getProblemList() {
   loading.value = true
   paragraphApi
-    .getProblem(id, documentId, props.problemId || '')
+    .getProblem(props.datasetId || id, documentId || props.docId, props.problemId || '')
     .then((res) => {
       problemList.value = res.data
       loading.value = false
@@ -108,7 +110,7 @@ function addProblemHandle(val: string) {
     loading.value = true
     if (props.problemId) {
       paragraphApi
-        .postProblem(id, documentId, props.problemId, obj)
+        .postProblem(props.datasetId || id, documentId || props.docId, props.problemId, obj)
         .then((res) => {
           getProblemList()
           problemValue.value = ''

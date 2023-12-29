@@ -8,14 +8,14 @@
         </h3>
       </template>
       <div class="hit-test__main p-16" v-loading="loading">
-        <div class="question-title clearfix">
+        <div class="question-title clearfix" v-if="questionTitle">
           <div class="avatar">
             <AppAvatar>
               <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
             </AppAvatar>
           </div>
           <div class="content">
-            <h4 class="text break-all">111111</h4>
+            <h4 class="text break-all">{{ questionTitle }}</h4>
           </div>
         </div>
         <el-scrollbar>
@@ -41,9 +41,25 @@
                   :showIcon="false"
                   @click="editParagraph(item)"
                 >
+                  <div class="active-button primary">{{ (item.similarity * 100).toFixed(2) }}%</div>
                   <template #footer>
                     <div class="footer-content flex-between">
-                      <span> {{ numberFormat(item?.content.length) || 0 }} 个 字符 </span>
+                      <el-text>
+                        <el-icon>
+                          <Document />
+                        </el-icon>
+                        {{ item?.document_name }}
+                      </el-text>
+                      <div v-if="item.trample_num || item.star_num">
+                        <span v-if="item.star_num">
+                          <AppIcon iconName="app-like-color"></AppIcon>
+                          {{ item.star_num }}
+                        </span>
+                        <span v-if="item.trample_num" class="ml-4">
+                          <AppIcon iconName="app-oppose-color"></AppIcon>
+                          {{ item.trample_num }}
+                        </span>
+                      </div>
                     </div>
                   </template>
                 </CardBox>
@@ -53,7 +69,7 @@
         </el-scrollbar>
       </div>
 
-      <!-- <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" /> -->
+      <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     </LayoutContainer>
     <div class="hit-test__operate p-24 pt-0">
       <el-popover :visible="popoverVisible" placement="top-start" :width="560" trigger="click">
@@ -121,17 +137,13 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import documentApi from '@/api/document'
-import paragraphApi from '@/api/paragraph'
 import datasetApi from '@/api/dataset'
-// import ParagraphDialog from './component/ParagraphDialog.vue'
-import { numberFormat } from '@/utils/utils'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import useStore from '@/stores'
-const { paragraph } = useStore()
+import applicationApi from '@/api/application'
+import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
+
 const route = useRoute()
 const {
-  params: { id, documentId }
+  params: { id }
 } = route as any
 
 const ParagraphDialogRef = ref()
@@ -144,8 +156,18 @@ const formInline = reactive({
   top_number: 5
 })
 const popoverVisible = ref(false)
+const questionTitle = ref('')
 
 const isDisabledChart = computed(() => !inputValue.value)
+
+const isApplication = computed(() => {
+  const { meta } = route as any
+  return meta?.activeMenu.includes('application')
+})
+const isDataset = computed(() => {
+  const { meta } = route as any
+  return meta?.activeMenu.includes('dataset')
+})
 
 function editParagraph(row: any) {
   title.value = '分段详情'
@@ -170,9 +192,19 @@ function getHitTestList() {
     similarity: formInline.similarity / 100,
     top_number: formInline.top_number
   }
-  datasetApi.getDatasetHitTest(id, obj, loading).then((res) => {
-    paragraphDetail.value = res.data
-  })
+  if (isDataset.value) {
+    datasetApi.getDatasetHitTest(id, obj, loading).then((res) => {
+      paragraphDetail.value = res.data
+      questionTitle.value = inputValue.value
+      inputValue.value = ''
+    })
+  } else if (isApplication.value) {
+    applicationApi.getApplicationHitTest(id, obj, loading).then((res) => {
+      paragraphDetail.value = res.data
+      questionTitle.value = inputValue.value
+      inputValue.value = ''
+    })
+  }
 }
 
 function refresh(data: any) {
