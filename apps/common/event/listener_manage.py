@@ -18,12 +18,22 @@ from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.db.search import native_search, get_dynamics_model
 from common.event.common import poxy
 from common.util.file_util import get_file_content
+from common.util.fork import ForkManage
+from common.util.lock import try_lock, un_lock
 from dataset.models import Paragraph, Status, Document
 from embedding.models import SourceType
 from smartdoc.conf import PROJECT_DIR
 
 max_kb_error = logging.getLogger("max_kb_error")
 max_kb = logging.getLogger("max_kb")
+
+
+class SyncWebDatasetArgs:
+    def __init__(self, lock_key: str, url: str, selector: str, handler):
+        self.lock_key = lock_key
+        self.url = url
+        self.selector = selector
+        self.handler = handler
 
 
 class ListenerManagement:
@@ -38,6 +48,7 @@ class ListenerManagement:
     enable_embedding_by_paragraph_signal = signal('enable_embedding_by_paragraph')
     disable_embedding_by_paragraph_signal = signal('disable_embedding_by_paragraph')
     init_embedding_model_signal = signal('init_embedding_model')
+    sync_web_dataset_signal = signal('sync_web_dataset')
 
     @staticmethod
     def embedding_by_problem(args):
@@ -146,6 +157,18 @@ class ListenerManagement:
 
     @staticmethod
     @poxy
+    def sync_web_dataset(args: SyncWebDatasetArgs):
+        if try_lock('sync_web_dataset' + args.lock_key):
+            try:
+                ForkManage(args.url, args.selector.split(" ")).fork(2, set(),
+                                                                    args.handler)
+            except Exception as e:
+                logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+            finally:
+                un_lock('sync_web_dataset' + args.lock_key)
+
+    @staticmethod
+    @poxy
     def init_embedding_model(ags):
         EmbeddingModel.get_embedding_model()
 
@@ -175,3 +198,5 @@ class ListenerManagement:
         ListenerManagement.enable_embedding_by_paragraph_signal.connect(self.enable_embedding_by_paragraph)
         # 初始化向量化模型
         ListenerManagement.init_embedding_model_signal.connect(self.init_embedding_model)
+        # 同步web站点知识库
+        ListenerManagement.sync_web_dataset_signal.connect(self.sync_web_dataset)

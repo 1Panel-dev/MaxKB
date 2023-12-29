@@ -6,11 +6,13 @@
     @date：2023/9/21 16:14
     @desc:
 """
+import logging
 import os.path
+import traceback
 import uuid
 from functools import reduce
-from itertools import groupby
 from typing import Dict
+from urllib.parse import urlparse
 
 from django.contrib.postgres.fields import ArrayField
 from django.core import validators
@@ -23,17 +25,18 @@ from application.models import ApplicationDatasetMapping
 from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.db.sql_execute import select_list
-from common.event.listener_manage import ListenerManagement
+from common.event.listener_manage import ListenerManagement, SyncWebDatasetArgs
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
 from common.util.file_util import get_file_content
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem
+from common.util.fork import ChildLink, Fork, ForkManage
+from common.util.split_model import get_split_model
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type
 from dataset.serializers.common_serializers import list_paragraph
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
 from setting.models import AuthOperate
 from smartdoc.conf import PROJECT_DIR
-from users.models import User
 
 """
 # __exact  精确等于 like ‘aaa’
@@ -187,30 +190,105 @@ class DataSetSerializers(serializers.ModelSerializer):
             return DataSetSerializers.Operate.get_response_body_api()
 
     class Create(ApiMixin, serializers.Serializer):
-        """
-        创建序列化对象
-        """
-        name = serializers.CharField(required=True,
-                                     validators=[
-                                         validators.MaxLengthValidator(limit_value=20,
-                                                                       message="知识库名称在1-20个字符之间"),
-                                         validators.MinLengthValidator(limit_value=1,
-                                                                       message="知识库名称在1-20个字符之间")
-                                     ])
+        user_id = serializers.UUIDField(required=True)
 
-        desc = serializers.CharField(required=True,
-                                     validators=[
-                                         validators.MaxLengthValidator(limit_value=256,
-                                                                       message="知识库名称在1-256个字符之间"),
-                                         validators.MinLengthValidator(limit_value=1,
-                                                                       message="知识库名称在1-256个字符之间")
-                                     ])
+        class CreateBaseSerializers(ApiMixin, serializers.Serializer):
+            """
+            创建通用数据集序列化对象
+            """
+            name = serializers.CharField(required=True,
+                                         validators=[
+                                             validators.MaxLengthValidator(limit_value=20,
+                                                                           message="知识库名称在1-20个字符之间"),
+                                             validators.MinLengthValidator(limit_value=1,
+                                                                           message="知识库名称在1-20个字符之间")
+                                         ])
 
-        documents = DocumentInstanceSerializer(required=False, many=True)
+            desc = serializers.CharField(required=True,
+                                         validators=[
+                                             validators.MaxLengthValidator(limit_value=256,
+                                                                           message="知识库名称在1-256个字符之间"),
+                                             validators.MinLengthValidator(limit_value=1,
+                                                                           message="知识库名称在1-256个字符之间")
+                                         ])
 
-        def is_valid(self, *, raise_exception=False):
-            super().is_valid(raise_exception=True)
-            return True
+            documents = DocumentInstanceSerializer(required=False, many=True)
+
+            def is_valid(self, *, raise_exception=False):
+                super().is_valid(raise_exception=True)
+                return True
+
+        class CreateWebSerializers(serializers.Serializer):
+            """
+            创建web站点序列化对象
+            """
+            name = serializers.CharField(required=True,
+                                         validators=[
+                                             validators.MaxLengthValidator(limit_value=20,
+                                                                           message="知识库名称在1-20个字符之间"),
+                                             validators.MinLengthValidator(limit_value=1,
+                                                                           message="知识库名称在1-20个字符之间")
+                                         ])
+
+            desc = serializers.CharField(required=True,
+                                         validators=[
+                                             validators.MaxLengthValidator(limit_value=256,
+                                                                           message="知识库名称在1-256个字符之间"),
+                                             validators.MinLengthValidator(limit_value=1,
+                                                                           message="知识库名称在1-256个字符之间")
+                                         ])
+            url = serializers.CharField(required=True)
+
+            selector = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+            def is_valid(self, *, raise_exception=False):
+                super().is_valid(raise_exception=True)
+                return True
+
+            @staticmethod
+            def get_response_body_api():
+                return openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    required=['id', 'name', 'desc', 'user_id', 'char_length', 'document_count',
+                              'update_time', 'create_time', 'document_list'],
+                    properties={
+                        'id': openapi.Schema(type=openapi.TYPE_STRING, title="id",
+                                             description="id", default="xx"),
+                        'name': openapi.Schema(type=openapi.TYPE_STRING, title="名称",
+                                               description="名称", default="测试知识库"),
+                        'desc': openapi.Schema(type=openapi.TYPE_STRING, title="描述",
+                                               description="描述", default="测试知识库描述"),
+                        'user_id': openapi.Schema(type=openapi.TYPE_STRING, title="所属用户id",
+                                                  description="所属用户id", default="user_xxxx"),
+                        'char_length': openapi.Schema(type=openapi.TYPE_STRING, title="字符数",
+                                                      description="字符数", default=10),
+                        'document_count': openapi.Schema(type=openapi.TYPE_STRING, title="文档数量",
+                                                         description="文档数量", default=1),
+                        'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间",
+                                                      description="修改时间",
+                                                      default="1970-01-01 00:00:00"),
+                        'create_time': openapi.Schema(type=openapi.TYPE_STRING, title="创建时间",
+                                                      description="创建时间",
+                                                      default="1970-01-01 00:00:00"
+                                                      ),
+                        'document_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档列表",
+                                                        description="文档列表",
+                                                        items=DocumentSerializers.Operate.get_response_body_api())
+                    }
+                )
+
+            @staticmethod
+            def get_request_body_api():
+                return openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    required=['name', 'desc', 'url'],
+                    properties={
+                        'name': openapi.Schema(type=openapi.TYPE_STRING, title="知识库名称", description="知识库名称"),
+                        'desc': openapi.Schema(type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
+                        'url': openapi.Schema(type=openapi.TYPE_STRING, title="web站点url", description="web站点url"),
+                        'selector': openapi.Schema(type=openapi.TYPE_STRING, title="选择器", description="选择器")
+                    }
+                )
 
         @staticmethod
         def post_embedding_dataset(document_list, dataset_id):
@@ -220,16 +298,21 @@ class DataSetSerializers(serializers.ModelSerializer):
 
         @post(post_function=post_embedding_dataset)
         @transaction.atomic
-        def save(self, user: User):
+        def save(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                self.CreateBaseSerializers(data=instance).is_valid()
             dataset_id = uuid.uuid1()
+            user_id = self.data.get('user_id')
+
             dataset = DataSet(
-                **{'id': dataset_id, 'name': self.data.get("name"), 'desc': self.data.get('desc'), 'user': user})
+                **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id})
 
             document_model_list = []
             paragraph_model_list = []
             problem_model_list = []
             # 插入文档
-            for document in self.data.get('documents') if 'documents' in self.data else []:
+            for document in instance.get('documents') if 'documents' in instance else []:
                 document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(dataset_id,
                                                                                                         document)
                 document_model_list.append(document_paragraph_dict_model.get('document'))
@@ -251,6 +334,47 @@ class DataSetSerializers(serializers.ModelSerializer):
             return {**DataSetSerializers(dataset).data,
                 'document_list': DocumentSerializers.Query(data={'dataset_id': dataset_id}).list(
                     with_valid=True)}, dataset_id
+
+        @staticmethod
+        def get_last_url_path(url):
+            parsed_url = urlparse(url)
+            if parsed_url.path is None or len(parsed_url.path) == 0:
+                return url
+            else:
+                return parsed_url.path.split("/")[-1]
+
+        @staticmethod
+        def get_save_handler(dataset_id, selector):
+            def handler(child_link: ChildLink, response: Fork.Response):
+                if response.status == 200:
+                    try:
+                        document_name = child_link.tag.text if child_link.tag is not None and len(
+                            child_link.tag.text.strip()) > 0 else child_link.url
+                        paragraphs = get_split_model('web.md').parse(response.content)
+                        DocumentSerializers.Create(data={'dataset_id': dataset_id}).save(
+                            {'name': document_name, 'paragraphs': paragraphs,
+                             'meta': {'source_url': child_link.url, 'selector': selector},
+                             'type': Type.web}, with_valid=True)
+                    except Exception as e:
+                        logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+
+            return handler
+
+        def save_web(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                self.CreateWebSerializers(data=instance).is_valid(raise_exception=True)
+            user_id = self.data.get('user_id')
+            dataset_id = uuid.uuid1()
+            dataset = DataSet(
+                **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id,
+                   'type': Type.web, 'meta': {'source_url': instance.get('url'), 'selector': instance.get('selector')}})
+            dataset.save()
+            ListenerManagement.sync_web_dataset_signal.send(
+                SyncWebDatasetArgs(str(dataset_id), instance.get('url'), instance.get('selector'),
+                                   self.get_save_handler(dataset_id, instance.get('selector'))))
+            return {**DataSetSerializers(dataset).data,
+                    'document_list': []}
 
         @staticmethod
         def get_response_body_api():
@@ -298,11 +422,42 @@ class DataSetSerializers(serializers.ModelSerializer):
                 }
             )
 
-    class Edit(serializers.Serializer):
+    class MetaSerializer(serializers.Serializer):
+        class WebMeta(serializers.Serializer):
+            source_url = serializers.CharField(required=True)
+            selector = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
+            def is_valid(self, *, raise_exception=False):
+                super().is_valid(raise_exception=True)
+                source_url = self.data.get('source_url')
+                response = Fork(source_url, []).fork()
+                if response.status == 500:
+                    raise AppApiException(500, response.message)
+
+        class BaseMeta(serializers.Serializer):
+            def is_valid(self, *, raise_exception=False):
+                super().is_valid(raise_exception=True)
+
+    class Edit(serializers.Serializer):
         name = serializers.CharField(required=False)
         desc = serializers.CharField(required=False)
+        meta = serializers.DictField(required=False)
         application_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
+
+        @staticmethod
+        def get_dataset_meta_valid_map():
+            dataset_meta_valid_map = {
+                Type.base: DataSetSerializers.MetaSerializer.BaseMeta,
+                Type.web: DataSetSerializers.MetaSerializer.WebMeta
+            }
+            return dataset_meta_valid_map
+
+        def is_valid(self, *, dataset: DataSet = None):
+            super().is_valid(raise_exception=True)
+            if 'meta' in self.data and self.data.get('meta') is not None:
+                dataset_meta_valid_map = self.get_dataset_meta_valid_map()
+                valid_class = dataset_meta_valid_map.get(dataset.type)
+                valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
 
     class HitTest(ApiMixin, serializers.Serializer):
         id = serializers.CharField(required=True)
@@ -392,12 +547,14 @@ class DataSetSerializers(serializers.ModelSerializer):
             :return:
             """
             self.is_valid()
-            DataSetSerializers.Edit(data=dataset).is_valid(raise_exception=True)
             _dataset = QuerySet(DataSet).get(id=self.data.get("id"))
+            DataSetSerializers.Edit(data=dataset).is_valid(dataset=_dataset)
             if "name" in dataset:
                 _dataset.name = dataset.get("name")
             if 'desc' in dataset:
                 _dataset.desc = dataset.get("desc")
+            if 'meta' in dataset:
+                _dataset.meta = dataset.get('meta')
             if 'application_id_list' in dataset and dataset.get('application_id_list') is not None:
                 application_id_list = dataset.get('application_id_list')
                 # 当前用户可修改关联的知识库列表
@@ -429,6 +586,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="知识库名称", description="知识库名称"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
+                    'meta': openapi.Schema(type=openapi.TYPE_OBJECT, title="知识库元数据",
+                                           description="知识库元数据->web:{source_url:xxx,selector:'xxx'},base:{}"),
                     'application_id_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="应用id列表",
                                                           description="应用id列表",
                                                           items=openapi.Schema(type=openapi.TYPE_STRING))

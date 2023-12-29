@@ -23,6 +23,21 @@ from dataset.serializers.dataset_serializers import DataSetSerializers
 class Dataset(APIView):
     authentication_classes = [TokenAuth]
 
+    class CreateWebDataset(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="创建web站点知识库",
+                             operation_id="创建web站点知识库",
+                             request_body=DataSetSerializers.Create.CreateWebSerializers.get_request_body_api(),
+                             responses=get_api_response(
+                                 DataSetSerializers.Create.CreateWebSerializers.get_response_body_api()),
+                             tags=["知识库"]
+                             )
+        @has_permissions(PermissionConstants.DATASET_CREATE, compare=CompareConstants.AND)
+        def post(self, request: Request):
+            return result.success(DataSetSerializers.Create(data={'user_id': request.user.id}).save_web(request.data))
+
     class Application(APIView):
         authentication_classes = [TokenAuth]
 
@@ -58,9 +73,7 @@ class Dataset(APIView):
                          )
     @has_permissions(PermissionConstants.DATASET_CREATE, compare=CompareConstants.AND)
     def post(self, request: Request):
-        s = DataSetSerializers.Create(data=request.data)
-        s.is_valid(raise_exception=True)
-        return result.success(s.save(request.user))
+        return result.success(DataSetSerializers.Create(data={'user_id': request.user.id}).save(request.data))
 
     class HitTest(APIView):
         authentication_classes = [TokenAuth]

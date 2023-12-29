@@ -5,6 +5,7 @@ from . import views
 app_name = "dataset"
 urlpatterns = [
     path('dataset', views.Dataset.as_view(), name="dataset"),
+    path('dataset/web', views.Dataset.CreateWebDataset.as_view()),
     path('dataset/<str:dataset_id>', views.Dataset.Operate.as_view(), name="dataset_key"),
     path('dataset/<str:dataset_id>/application', views.Dataset.Application.as_view()),
     path('dataset/<int:current_page>/<int:page_size>', views.Dataset.Page.as_view(), name="dataset"),

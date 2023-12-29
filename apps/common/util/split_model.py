@@ -277,11 +277,11 @@ def filter_special_char(content: str):
 
 class SplitModel:
 
-    def __init__(self, content_level_pattern, with_filter=True, limit=1024):
+    def __init__(self, content_level_pattern, with_filter=True, limit=4096):
         self.content_level_pattern = content_level_pattern
         self.with_filter = with_filter
-        if limit is None or limit > 1024:
-            limit = 1024
+        if limit is None or limit > 4096:
+            limit = 4096
         if limit < 50:
             limit = 50
         self.limit = limit
@@ -337,13 +337,12 @@ class SplitModel:
 default_split_pattern = {
     'md': [re.compile("^# .*"), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
            re.compile("(?<!#)####(?!#).*"), re.compile("(?<!#)#####(?!#).*"),
-           re.compile("(?<!#)######(?!#).*"),
-           re.compile("(?<! )- .*")],
+           re.compile("(?<!#)######(?!#).*")],
     'default': [re.compile("(?<!\n)\n\n.+")]
 }
 
 
-def get_split_model(filename: str, with_filter: bool, limit: int):
+def get_split_model(filename: str, with_filter: bool = False, limit: int = 4096):
     """
     根据文件名称获取分段模型
     :param limit:        每段大小

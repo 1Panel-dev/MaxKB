@@ -24,7 +24,7 @@ from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
 from common.util.file_util import get_file_content
 from common.util.split_model import SplitModel, get_split_model
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
 
@@ -243,7 +243,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                    'name': instance.get('name'),
                    'char_length': reduce(lambda x, y: x + y,
                                          [len(p.get('content')) for p in instance.get('paragraphs', [])],
-                                         0)})
+                                         0),
+                   'meta': instance.get('meta') if instance.get('meta') is not None else {},
+                   'type': instance.get('type') if instance.get('type') is not None else Type.base})
 
             paragraph_model_dict_list = [ParagraphSerializers.Create(
                 data={'dataset_id': dataset_id, 'document_id': str(document_model.id)}).get_paragraph_problem_model(

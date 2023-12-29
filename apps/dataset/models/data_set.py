@@ -21,6 +21,12 @@ class Status(models.TextChoices):
     error = 2, '导入失败'
 
 
+class Type(models.TextChoices):
+    base = 0, '通用类型'
+
+    web = 1, 'web站点类型'
+
+
 class DataSet(AppModelMixin):
     """
     数据集表
@@ -29,6 +35,10 @@ class DataSet(AppModelMixin):
     name = models.CharField(max_length=150, verbose_name="数据集名称")
     desc = models.CharField(max_length=256, verbose_name="数据库描述")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="所属用户")
+    type = models.CharField(verbose_name='类型', max_length=1, choices=Type.choices,
+                            default=Type.base)
+
+    meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:
         db_table = "dataset"
@@ -46,6 +56,11 @@ class Document(AppModelMixin):
                               default=Status.embedding)
     is_active = models.BooleanField(default=True)
 
+    type = models.CharField(verbose_name='类型', max_length=1, choices=Type.choices,
+                            default=Type.base)
+
+    meta = models.JSONField(verbose_name="元数据", default=dict)
+
     class Meta:
         db_table = "document"
 
@@ -57,7 +72,7 @@ class Paragraph(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, db_constraint=False)
     dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING)
-    content = models.CharField(max_length=1024, verbose_name="段落内容")
+    content = models.CharField(max_length=4096, verbose_name="段落内容")
     title = models.CharField(max_length=256, verbose_name="标题", default="")
     hit_num = models.IntegerField(verbose_name="命中数量", default=0)
     star_num = models.IntegerField(verbose_name="点赞数", default=0)

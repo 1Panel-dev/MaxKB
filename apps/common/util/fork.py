@@ -1,10 +1,19 @@
+import copy
+import logging
 import re
+import traceback
 from functools import reduce
 from typing import List, Set
 import requests
 import html2text as ht
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, ParseResult
+
+
+class ChildLink:
+    def __init__(self, url, tag):
+        self.url = url
+        self.tag = copy.deepcopy(tag)
 
 
 class ForkManage:
@@ -13,30 +22,34 @@ class ForkManage:
         self.selector_list = selector_list
 
     def fork(self, level: int, exclude_link_url: Set[str], fork_handler):
-        self.fork_child(self.base_url, self.selector_list, level, exclude_link_url, fork_handler)
+        self.fork_child(ChildLink(self.base_url, None), self.selector_list, level, exclude_link_url, fork_handler)
 
     @staticmethod
-    def fork_child(base_url: str, selector_list: List[str], level: int, exclude_link_url: Set[str], fork_handler):
+    def fork_child(child_link: ChildLink, selector_list: List[str], level: int, exclude_link_url: Set[str],
+                   fork_handler):
         if level < 0:
             return
-        response = Fork(base_url, selector_list).fork()
-        fork_handler(base_url, response)
+        else:
+            child_url = child_link.url[:-1] if child_link.url.endswith('/') else child_link.url
+            exclude_link_url.add(child_url)
+        response = Fork(child_link.url, selector_list).fork()
+        fork_handler(child_link, response)
         for child_link in response.child_link_list:
-            if not exclude_link_url.__contains__(child_link):
-                exclude_link_url.add(child_link)
+            child_url = child_link.url[:-1] if child_link.url.endswith('/') else child_link.url
+            if not exclude_link_url.__contains__(child_url):
                 ForkManage.fork_child(child_link, selector_list, level - 1, exclude_link_url, fork_handler)
 
 
 class Fork:
     class Response:
-        def __init__(self, html_content: str, child_link_list: List[str], status, message: str):
-            self.html_content = html_content
+        def __init__(self, content: str, child_link_list: List[ChildLink], status, message: str):
+            self.content = content
             self.child_link_list = child_link_list
             self.status = status
             self.message = message
 
         @staticmethod
-        def success(html_content: str, child_link_list: List[str]):
+        def success(html_content: str, child_link_list: List[ChildLink]):
             return Fork.Response(html_content, child_link_list, 200, '')
 
         @staticmethod
@@ -45,13 +58,17 @@ class Fork:
 
     def __init__(self, base_fork_url: str, selector_list: List[str]):
         self.base_fork_url = urljoin(base_fork_url if base_fork_url.endswith("/") else base_fork_url + '/', '.')
-        self.base_fork_url = base_fork_url
+        self.base_fork_url = self.base_fork_url[:-1]
         self.selector_list = selector_list
+        self.urlparse = urlparse(self.base_fork_url)
+        self.base_url = ParseResult(scheme=self.urlparse.scheme, netloc=self.urlparse.netloc, path='', params='',
+                                    query='',
+                                    fragment='').geturl()
 
     def get_child_link_list(self, bf: BeautifulSoup):
-        pattern = "^(?!(http:|https:|tel:/|#|mailto:|javascript:)).*|" + self.base_fork_url
+        pattern = "^((?!(http:|https:|tel:/|#|mailto:|javascript:))|" + self.base_fork_url + ").*"
         link_list = bf.find_all(name='a', href=re.compile(pattern))
-        result = [self.parse_href(link.get('href')) for link in link_list]
+        result = [ChildLink(link.get('href'), link) for link in link_list]
         return result
 
     def get_content_html(self, bf: BeautifulSoup):
@@ -65,23 +82,34 @@ class Fork:
         f = bf.find_all(**params)
         return "\n".join([str(row) for row in f])
 
-    def parse_href(self, href: str):
-        if href.startswith(self.base_fork_url[:-1] if self.base_fork_url.endswith('/') else self.base_fork_url):
-            return href
+    @staticmethod
+    def reset_url(tag, field, base_fork_url):
+        field_value: str = tag[field]
+        if field_value.startswith("/"):
+            result = urlparse(base_fork_url)
+            result_url = ParseResult(scheme=result.scheme, netloc=result.netloc, path=field_value, params='', query='',
+                                     fragment='').geturl()
         else:
-            return urljoin(self.base_fork_url + '/' + (href if href.endswith('/') else href + '/'), ".")
+            result_url = urljoin(
+                base_fork_url + '/' + (field_value if field_value.endswith('/') else field_value + '/'),
+                ".")
+        result_url = result_url[:-1] if result_url.endswith('/') else result_url
+        tag[field] = result_url
 
     def reset_beautiful_soup(self, bf: BeautifulSoup):
-        href_list = bf.find_all(href=re.compile('^(?!(http:|https:|tel:/|#|mailto:|javascript:)).*'))
-        for h in href_list:
-            h['href'] = urljoin(
-                self.base_fork_url + '/' + (h['href'] if h['href'].endswith('/') else h['href'] + '/'),
-                ".")[:-1]
-        src_list = bf.find_all(src=re.compile('^(?!(http:|https:|tel:/|#|mailto:|javascript:)).*'))
-        for s in src_list:
-            s['src'] = urljoin(
-                self.base_fork_url + '/' + (s['src'] if s['src'].endswith('/') else s['src'] + '/'),
-                ".")[:-1]
+        reset_config_list = [
+            {
+                'field': 'href',
+            },
+            {
+                'field': 'src',
+            }
+        ]
+        for reset_config in reset_config_list:
+            field = reset_config.get('field')
+            tag_list = bf.find_all(**{field: re.compile('^(?!(http:|https:|tel:/|#|mailto:|javascript:)).*')})
+            for tag in tag_list:
+                self.reset_url(tag, field, self.base_fork_url)
         return bf
 
     @staticmethod
@@ -92,11 +120,14 @@ class Fork:
 
     def fork(self):
         try:
+            logging.getLogger("max_kb").info(f'fork:{self.base_fork_url}')
             response = requests.get(self.base_fork_url)
             if response.status_code != 200:
-                raise Exception(response.status_code)
+                logging.getLogger("max_kb").error(f"url: {self.base_fork_url} code:{response.status_code}")
+                return Fork.Response.error(f"url: {self.base_fork_url} code:{response.status_code}")
             bf = self.get_beautiful_soup(response)
         except Exception as e:
+            logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
             return Fork.Response.error(str(e))
         bf = self.reset_beautiful_soup(bf)
         link_list = self.get_child_link_list(bf)
@@ -106,7 +137,6 @@ class Fork:
 
 
 def handler(base_url, response: Fork.Response):
-    print(base_url, response.status)
+    print(base_url.url, base_url.tag.text if base_url.tag else None, response.content)
 
-
-ForkManage('https://dataease.io/docs/v2/', ['.md-content']).fork(3, set(), handler)
+# ForkManage('https://bbs.fit2cloud.com/c/de/6', ['.md-content']).fork(3, set(), handler)

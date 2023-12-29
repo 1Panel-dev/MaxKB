@@ -37,7 +37,7 @@ class ParagraphInstanceSerializer(ApiMixin, serializers.Serializer):
     段落实例对象
     """
     content = serializers.CharField(required=True, validators=[
-        validators.MaxLengthValidator(limit_value=1024,
+        validators.MaxLengthValidator(limit_value=4096,
                                       message="段落在1-1024个字符之间"),
         validators.MinLengthValidator(limit_value=1,
                                       message="段落在1-1024个字符之间"),
