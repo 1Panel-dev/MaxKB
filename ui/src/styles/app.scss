@@ -69,6 +69,12 @@ ul {
   background-color: transparent;
 }
 
+.clearfix:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
 h1 {
   font-size: 24px;
 }
@@ -437,4 +443,3 @@ h4 {
     padding: 8px 16px 8px 12px;
   }
 }
-
