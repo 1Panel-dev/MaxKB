@@ -1,6 +1,6 @@
 <template>
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
-    <el-scrollbar ref="scrollDiv">
+    <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
       <div ref="dialogScrollbar" class="ai-chat__content p-24">
         <div class="item-content mb-16">
           <div class="avatar">
