@@ -331,11 +331,12 @@ class SplitModel:
         :return: 解析后数据 {content:段落数据,keywords:[‘段落关键词’],parent_chain:['段落父级链路']}
         """
         result_tree = self.parse_to_tree(text.replace('\r', '\n'), 0)
-        return result_tree_to_paragraph(result_tree, [], [])
+        result = result_tree_to_paragraph(result_tree, [], [])
+        return [{**item, 'title': item.get('title').replace("#", '') if 'title' in item else ''} for item in result]
 
 
 default_split_pattern = {
-    'md': [re.compile("^# .*"), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
+    'md': [re.compile('(?<!#)# (?!#).*'), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
            re.compile("(?<!#)####(?!#).*"), re.compile("(?<!#)#####(?!#).*"),
            re.compile("(?<!#)######(?!#).*")],
     'default': [re.compile("(?<!\n)\n\n.+")]
