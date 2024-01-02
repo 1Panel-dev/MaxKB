@@ -112,7 +112,7 @@
                             <AppAvatar class="mr-12" shape="square" :size="32">
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>
-                            <div class="ellipsis-1">
+                            <div class="ellipsis">
                               {{ realatedObject(datasetList, item, 'id')?.name }}
                             </div>
                           </div>

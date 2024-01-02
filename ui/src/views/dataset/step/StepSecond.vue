@@ -60,7 +60,7 @@
                           show-input
                           :show-input-controls="false"
                           :min="50"
-                          :max="1024"
+                          :max="4096"
                         />
                       </div>
                       <div class="form-item mb-16">

@@ -12,7 +12,7 @@
             shape="square"
             :size="32"
           />
-          <h4 class="ellipsis-1">{{ detail?.name }}</h4>
+          <h4 class="ellipsis">{{ detail?.name }}</h4>
         </div>
 
         <el-row :gutter="12">

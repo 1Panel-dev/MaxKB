@@ -50,3 +50,9 @@ export function realatedObject(list: any, val: string | number, attr: string) {
   return filterData || null
 }
 
+// 排序
+export function arraySort(list: Array<string>, property: any, desc?: boolean) {
+  return list.sort((a: any, b: any) => {
+    return desc ? b[property] - a[property] : a[property] - b[property]
+  })
+}

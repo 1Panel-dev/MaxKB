@@ -15,7 +15,7 @@
         <el-input
           v-model="form.content"
           placeholder="请输入内容"
-          maxlength="1024"
+          maxlength="4096"
           show-word-limit
           :rows="8"
           type="textarea"
@@ -38,7 +38,7 @@
               <AppAvatar v-if="!node.isLeaf" class="mr-12" shape="square" :size="24">
                 <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
               </AppAvatar>
-              <span class="ellipsis-1"> {{ data.name }}</span>
+              <span class="ellipsis"> {{ data.name }}</span>
             </span>
           </template>
         </el-cascader>

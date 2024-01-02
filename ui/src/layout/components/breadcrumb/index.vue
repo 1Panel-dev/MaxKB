@@ -3,7 +3,7 @@
     <back-button :to="activeMenu"></back-button>
     <el-dropdown placement="top" trigger="click" @command="changeMenu" class="w-full" style="display: block;">
       <div class="flex-between">
-        <div class="ellipsis-1">{{ currentName }}</div>
+        <div class="ellipsis">{{ currentName }}</div>
         <el-button text>
           <el-icon><CaretBottom /></el-icon>
         </el-button>
@@ -26,7 +26,7 @@
                     <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                   </AppAvatar>
 
-                  <span class="ellipsis-1"> {{ item?.name }}</span>
+                  <span class="ellipsis"> {{ item?.name }}</span>
                 </div>
               </el-dropdown-item>
             </div>
