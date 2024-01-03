@@ -20,6 +20,7 @@ from drf_yasg import openapi
 from rest_framework import serializers
 
 from common.db.search import native_search, native_page_search
+from common.event.common import work_thread_pool
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
@@ -115,7 +116,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if first.type != Type.web:
                 raise AppApiException(500, "只有web站点类型才支持同步")
 
-        def sync(self, with_valid=True):
+        def sync(self, with_valid=True, with_embedding=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get('document_id')
@@ -146,6 +147,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
                     # 批量插入问题
                     QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+                    # 向量化
+                    if with_embedding:
+                        ListenerManagement.embedding_by_document_signal.send(document_id)
                 else:
                     document.status = Status.error
                     document.save()
@@ -203,10 +207,12 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             document_id = self.data.get("document_id")
             document = QuerySet(Document).filter(id=document_id).first()
             if document.type == Type.web:
-                # 如果是web站点,就是先同步
-                DocumentSerializers.Sync(data={'document_id': document_id}).sync()
+                # 异步同步
+                work_thread_pool.submit(lambda x: DocumentSerializers.Sync(data={'document_id': document_id}).sync(),
+                                        {})
 
-            ListenerManagement.embedding_by_document_signal.send(document_id)
+            else:
+                ListenerManagement.embedding_by_document_signal.send(document_id)
             return True
 
         @transaction.atomic

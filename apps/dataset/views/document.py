@@ -15,6 +15,7 @@ from rest_framework.views import Request
 
 from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import Permission, Group, Operate, PermissionConstants
+from common.event.common import work_thread_pool
 from common.response import result
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.document_serializers import DocumentSerializers
