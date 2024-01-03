@@ -6,7 +6,9 @@
     @date：2023/9/22 13:43
     @desc:
 """
+import logging
 import os
+import traceback
 import uuid
 from functools import reduce
 from typing import List, Dict
@@ -23,8 +25,9 @@ from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
 from common.util.file_util import get_file_content
+from common.util.fork import Fork
 from common.util.split_model import SplitModel, get_split_model
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
 
@@ -100,6 +103,58 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                   title="文档列表", description="文档列表",
                                   items=DocumentSerializers.Operate.get_response_body_api())
 
+    class Sync(ApiMixin, serializers.Serializer):
+        document_id = serializers.UUIDField(required=True)
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            document_id = self.data.get('document_id')
+            first = QuerySet(Document).filter(id=document_id).first()
+            if first is None:
+                raise AppApiException(500, "文档id不存在")
+            if first.type != Type.web:
+                raise AppApiException(500, "只有web站点类型才支持同步")
+
+        def sync(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id = self.data.get('document_id')
+            document = QuerySet(Document).filter(id=document_id).first()
+            try:
+                document.status = Status.embedding
+                document.save()
+                source_url = document.meta.get('source_url')
+                selector_list = document.meta.get('selector').split(" ") if 'selector' in document.meta else []
+                result = Fork(source_url, selector_list).fork()
+                if result.status == 200:
+                    # 删除段落
+                    QuerySet(model=Paragraph).filter(document_id=document_id).delete()
+                    # 删除问题
+                    QuerySet(model=Problem).filter(document_id=document_id).delete()
+                    # 删除向量库
+                    ListenerManagement.delete_embedding_by_document_signal.send(document_id)
+                    paragraphs = get_split_model('web.md').parse(result.content)
+                    document.char_length = reduce(lambda x, y: x + y,
+                                                  [len(p.get('content')) for p in paragraphs],
+                                                  0)
+                    document.save()
+                    document_paragraph_model = DocumentSerializers.Create.get_paragraph_model(document, paragraphs)
+
+                    paragraph_model_list = document_paragraph_model.get('paragraph_model_list')
+                    problem_model_list = document_paragraph_model.get('problem_model_list')
+                    # 批量插入段落
+                    QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+                    # 批量插入问题
+                    QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+                else:
+                    document.status = Status.error
+                    document.save()
+            except Exception as e:
+                logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+                document.status = Status.error
+                document.save()
+            return True
+
     class Operate(ApiMixin, serializers.Serializer):
         document_id = serializers.UUIDField(required=True)
 
@@ -146,6 +201,11 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
+            document = QuerySet(Document).filter(id=document_id).first()
+            if document.type == Type.web:
+                # 如果是web站点,就是先同步
+                DocumentSerializers.Sync(data={'document_id': document_id}).sync()
+
             ListenerManagement.embedding_by_document_signal.send(document_id)
             return True
 
@@ -236,21 +296,11 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 with_valid=True), document_id
 
         @staticmethod
-        def get_document_paragraph_model(dataset_id, instance: Dict):
-            document_model = Document(
-                **{'dataset_id': dataset_id,
-                   'id': uuid.uuid1(),
-                   'name': instance.get('name'),
-                   'char_length': reduce(lambda x, y: x + y,
-                                         [len(p.get('content')) for p in instance.get('paragraphs', [])],
-                                         0),
-                   'meta': instance.get('meta') if instance.get('meta') is not None else {},
-                   'type': instance.get('type') if instance.get('type') is not None else Type.base})
-
+        def get_paragraph_model(document_model, paragraph_list: List):
+            dataset_id = document_model.dataset_id
             paragraph_model_dict_list = [ParagraphSerializers.Create(
                 data={'dataset_id': dataset_id, 'document_id': str(document_model.id)}).get_paragraph_problem_model(
-                dataset_id, document_model.id, paragraph) for paragraph in (instance.get('paragraphs') if
-                                                                            'paragraphs' in instance else [])]
+                dataset_id, document_model.id, paragraph) for paragraph in paragraph_list]
 
             paragraph_model_list = []
             problem_model_list = []
@@ -262,6 +312,21 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
             return {'document': document_model, 'paragraph_model_list': paragraph_model_list,
                     'problem_model_list': problem_model_list}
+
+        @staticmethod
+        def get_document_paragraph_model(dataset_id, instance: Dict):
+            document_model = Document(
+                **{'dataset_id': dataset_id,
+                   'id': uuid.uuid1(),
+                   'name': instance.get('name'),
+                   'char_length': reduce(lambda x, y: x + y,
+                                         [len(p.get('content')) for p in instance.get('paragraphs', [])],
+                                         0),
+                   'meta': instance.get('meta') if instance.get('meta') is not None else {},
+                   'type': instance.get('type') if instance.get('type') is not None else Type.base})
+
+            return DocumentSerializers.Create.get_paragraph_model(document_model, instance.get('paragraphs') if
+            'paragraphs' in instance else [])
 
         @staticmethod
         def get_request_body_api():

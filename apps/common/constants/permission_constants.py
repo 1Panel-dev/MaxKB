@@ -99,6 +99,9 @@ class PermissionConstants(Enum):
     DATASET_READ = Permission(group=Group.DATASET, operate=Operate.READ,
                               roles=[RoleConstants.ADMIN, RoleConstants.USER])
 
+    DATASET_EDIT = Permission(group=Group.DATASET, operate=Operate.EDIT,
+                              roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
     APPLICATION_READ = Permission(group=Group.APPLICATION, operate=Operate.READ,
                                   roles=[RoleConstants.ADMIN, RoleConstants.USER])
 

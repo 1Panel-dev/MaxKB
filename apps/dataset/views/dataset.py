@@ -23,6 +23,24 @@ from dataset.serializers.dataset_serializers import DataSetSerializers
 class Dataset(APIView):
     authentication_classes = [TokenAuth]
 
+    class SyncWeb(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="同步Web站点知识库",
+                             operation_id="同步Web站点知识库",
+                             manual_parameters=DataSetSerializers.SyncWeb.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库"])
+        @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                                        dynamic_tag=keywords.get('dataset_id')),
+                         lambda r, k: Permission(group=Group.DATASET, operate=Operate.DELETE,
+                                                 dynamic_tag=k.get('dataset_id')), compare=CompareConstants.AND)
+        def put(self, request: Request, dataset_id: str):
+            return result.success(DataSetSerializers.SyncWeb(
+                data={'sync_type': request.query_params.get('sync_type'), 'id': dataset_id,
+                      'user_id': str(request.user.id)}).sync())
+
     class CreateWebDataset(APIView):
         authentication_classes = [TokenAuth]
 

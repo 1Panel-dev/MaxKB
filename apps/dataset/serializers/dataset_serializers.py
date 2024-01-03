@@ -8,6 +8,7 @@
 """
 import logging
 import os.path
+import re
 import traceback
 import uuid
 from functools import reduce
@@ -482,6 +483,97 @@ class DataSetSerializers(serializers.ModelSerializer):
             p_list = list_paragraph([h.get('paragraph_id') for h in hit_list])
             return [{**p, 'similarity': hit_dict.get(p.get('id')).get('similarity'),
                      'comprehensive_score': hit_dict.get(p.get('id')).get('comprehensive_score')} for p in p_list]
+
+    class SyncWeb(ApiMixin, serializers.Serializer):
+        id = serializers.CharField(required=True)
+        user_id = serializers.UUIDField(required=False)
+        sync_type = serializers.CharField(required=True, validators=[
+            validators.RegexValidator(regex=re.compile("^replace|complete$"),
+                                      message="replace|complete", code=500)
+        ])
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            first = QuerySet(DataSet).filter(id=self.data.get("id")).first()
+            if first is None:
+                raise AppApiException(300, "id不存在")
+            if first.type != Type.web:
+                raise AppApiException(500, "只有web站点类型才支持同步")
+
+        def sync(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            sync_type = self.data.get('sync_type')
+            dataset_id = self.data.get('id')
+            dataset = QuerySet(DataSet).get(id=dataset_id)
+            self.__getattribute__(sync_type + '_sync')(dataset)
+            return True
+
+        @staticmethod
+        def get_sync_handler(dataset):
+            def handler(child_link: ChildLink, response: Fork.Response):
+                if response.status == 200:
+                    try:
+                        document_name = child_link.tag.text if child_link.tag is not None and len(
+                            child_link.tag.text.strip()) > 0 else child_link.url
+                        paragraphs = get_split_model('web.md').parse(response.content)
+                        first = QuerySet(Document).filter(meta__source_url=child_link.url).first()
+                        if first is not None:
+                            # 如果存在,使用文档同步
+                            DocumentSerializers.Sync(data={'document_id': first.id}).sync()
+                            # 发送向量化指令
+                            ListenerManagement.embedding_by_document_signal.send(first.id)
+                        else:
+                            # 插入
+                            DocumentSerializers.Create(data={'dataset_id': dataset.id}).save(
+                                {'name': document_name, 'paragraphs': paragraphs,
+                                 'meta': {'source_url': child_link.url, 'selector': dataset.meta.get('selector')},
+                                 'type': Type.web}, with_valid=True)
+                    except Exception as e:
+                        logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+
+            return handler
+
+        def replace_sync(self, dataset):
+            """
+            替换同步
+            :return:
+            """
+            url = dataset.meta.get('source_url')
+            selector = dataset.meta.get('selector') if 'selector' in dataset.meta else None
+            ListenerManagement.sync_web_dataset_signal.send(
+                SyncWebDatasetArgs(str(dataset.id), url, selector,
+                                   self.get_sync_handler(dataset)))
+
+        def complete_sync(self, dataset):
+            """
+            完整同步  删掉当前数据集下所有的文档,再进行同步
+            :return:
+            """
+            # 删除文档
+            QuerySet(Document).filter(dataset=dataset).delete()
+            # 删除段落
+            QuerySet(Paragraph).filter(dataset=dataset).delete()
+            # 删除问题
+            QuerySet(Problem).filter(dataset=dataset).delete()
+            # 删除向量
+            ListenerManagement.delete_embedding_by_dataset_signal.send(self.data.get('id'))
+            # 同步
+            self.replace_sync(dataset)
+
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='dataset_id',
+                                      in_=openapi.IN_PATH,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description='知识库id'),
+                    openapi.Parameter(name='sync_type',
+                                      in_=openapi.IN_QUERY,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description='同步类型->replace:替换同步,complete:完整同步')
+                    ]
 
     class Operate(ApiMixin, serializers.Serializer):
         id = serializers.CharField(required=True)
