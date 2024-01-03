@@ -7,11 +7,11 @@
       <ul>
         <li class="flex mt-16">
           <el-text type="info">模型类型</el-text>
-          <span class="ellipsis-1 ml-16"> {{ model.model_type }}</span>
+          <span class="ellipsis ml-16"> {{ model.model_type }}</span>
         </li>
         <li class="flex mt-12">
           <el-text type="info">模型名称</el-text>
-          <span class="ellipsis-1 ml-16"> {{ model.model_name }}</span>
+          <span class="ellipsis ml-16"> {{ model.model_name }}</span>
         </li>
       </ul>
     </div>

@@ -16,7 +16,7 @@
         v-if="isEdit"
         v-model="form.content"
         placeholder="请输入分段内容"
-        maxlength="1024"
+        maxlength="4096"
         show-word-limit
         :rows="8"
         type="textarea"

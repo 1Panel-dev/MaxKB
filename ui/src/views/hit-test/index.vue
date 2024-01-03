@@ -41,6 +41,9 @@
                   :showIcon="false"
                   @click="editParagraph(item)"
                 >
+                  <template #icon>
+                    <AppAvatar :name="index + 1 + ''" class="mr-12 avatar-light" :size="22" />
+                  </template>
                   <div class="active-button primary">{{ (item.similarity * 100).toFixed(2) }}%</div>
                   <template #footer>
                     <div class="footer-content flex-between">
@@ -140,6 +143,7 @@ import { useRoute } from 'vue-router'
 import datasetApi from '@/api/dataset'
 import applicationApi from '@/api/application'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
+import { arraySort } from '@/utils/utils'
 
 const route = useRoute()
 const {
@@ -194,13 +198,13 @@ function getHitTestList() {
   }
   if (isDataset.value) {
     datasetApi.getDatasetHitTest(id, obj, loading).then((res) => {
-      paragraphDetail.value = res.data
+      paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
       questionTitle.value = inputValue.value
       inputValue.value = ''
     })
   } else if (isApplication.value) {
     applicationApi.getApplicationHitTest(id, obj, loading).then((res) => {
-      paragraphDetail.value = res.data
+      paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
       questionTitle.value = inputValue.value
       inputValue.value = ''
     })

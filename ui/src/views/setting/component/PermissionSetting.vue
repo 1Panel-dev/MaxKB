@@ -21,7 +21,7 @@
             <AppAvatar v-else-if="isDataset" class="mr-12" shape="square" :size="24">
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
-            <span class="ellipsis-1"> {{ row?.name }}</span>
+            <span class="ellipsis"> {{ row?.name }}</span>
           </div>
         </template>
       </el-table-column>
