@@ -54,7 +54,7 @@
   </el-row>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onUnmounted, onMounted, computed } from 'vue'
+import { ref, reactive, onUnmounted, onMounted, computed, watch } from 'vue'
 import type { UploadProps } from 'element-plus'
 import { filesize, getImgUrl } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
@@ -82,6 +82,10 @@ const FormRef = ref()
 //   }
 //   return true
 // }
+
+watch(form.value, (value) => {
+  dataset.saveDocumentsFile(value.fileList)
+})
 function deleteFlie(index: number) {
   form.value.fileList.splice(index, 1)
 }
@@ -112,7 +116,6 @@ defineExpose({
 })
 </script>
 <style scoped lang="scss">
-
 .upload__decoration {
   font-size: 12px;
   line-height: 20px;

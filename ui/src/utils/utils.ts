@@ -56,3 +56,11 @@ export function arraySort(list: Array<string>, property: any, desc?: boolean) {
     return desc ? b[property] - a[property] : a[property] - b[property]
   })
 }
+
+// 判断对象里所有属性全部为空
+export function isAllPropertiesEmpty(obj: object) {
+  return Object.values(obj).every(
+    (value) =>
+      value === null || typeof value === 'undefined' || (typeof value === 'string' && !value)
+  )
+}

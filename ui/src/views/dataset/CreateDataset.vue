@@ -3,7 +3,7 @@
     <template #backButton>
       <back-button @click="back"></back-button>
     </template>
-    <template #header>
+    <!-- <template #header>
       <el-steps :active="active" finish-status="success" align-center class="create-dataset__steps">
         <el-step v-for="(item, index) in steps" :key="index">
           <template #icon>
@@ -19,7 +19,7 @@
           </template>
         </el-step>
       </el-steps>
-    </template>
+    </template> -->
     <div class="create-dataset__main flex" v-loading="loading">
       <div class="create-dataset__component main-calc-height">
         <!-- <template v-if="steps[active]?.component">
@@ -40,7 +40,7 @@
       <el-button @click="router.go(-1)" :disabled="loading">取 消</el-button>
       <el-button @click="prev" v-if="active === 1" :disabled="loading">上一步</el-button>
       <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading"
-        >下一步</el-button
+        >创建并导入</el-button
       >
       <el-button @click="submit" type="primary" v-if="active === 1" :disabled="loading">
         开始导入
@@ -49,7 +49,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepFirst from './step/StepFirst.vue'
 import StepSecond from './step/StepSecond.vue'
@@ -62,6 +62,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import useStore from '@/stores'
 const { dataset } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
+const webInfo = computed(() => dataset.webInfo)
 
 const router = useRouter()
 const route = useRoute()
@@ -100,6 +101,7 @@ const prev = () => {
 
 function clearStore() {
   dataset.saveBaseInfo(null)
+  dataset.saveWebInfo(null)
   dataset.saveDocumentsFile([])
 }
 function submit() {
@@ -124,21 +126,15 @@ function submit() {
         loading.value = false
       })
   } else {
-    datasetApi
-      .postDateset(obj)
-      .then((res) => {
-        successInfo.value = res.data
-        active.value = 2
-        clearStore()
-        loading.value = false
-      })
-      .catch(() => {
-        loading.value = false
-      })
+    datasetApi.postDateset(obj, loading).then((res) => {
+      successInfo.value = res.data
+      active.value = 2
+      clearStore()
+    })
   }
 }
 function back() {
-  if (baseInfo.value || StepSecondRef.value?.paragraphList?.length > 0) {
+  if (baseInfo.value || webInfo.value || StepSecondRef.value?.paragraphList?.length > 0) {
     MsgConfirm(`提示`, `当前的更改尚未保存，确认退出吗?`, {
       confirmButtonText: '确认',
       type: 'warning'
@@ -152,6 +148,9 @@ function back() {
     router.go(-1)
   }
 }
+onUnmounted(() => {
+  clearStore()
+})
 </script>
 <style lang="scss" scoped>
 .create-dataset {

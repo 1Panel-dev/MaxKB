@@ -69,8 +69,28 @@ const delDateset: (dataset_id: String, loading?: Ref<boolean>) => Promise<Result
   ]
 }
  */
-const postDateset: (data: datasetData) => Promise<Result<any>> = (data) => {
-  return post(`${prefix}`, data)
+const postDateset: (data: datasetData, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading
+) => {
+  return post(`${prefix}`, data, undefined, loading)
+}
+
+/**
+ * 创建Web知识库
+ * @param 参数 
+ * {
+  "name": "string",
+  "desc": "string",
+  "url": "string",
+  "selector": "string",
+}
+ */
+const postWebDateset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading
+) => {
+  return post(`${prefix}`, data, undefined, loading)
 }
 
 /**
@@ -132,5 +152,6 @@ export default {
   getDatesetDetail,
   putDateset,
   listUsableApplication,
-  getDatasetHitTest
+  getDatasetHitTest,
+  postWebDateset
 }

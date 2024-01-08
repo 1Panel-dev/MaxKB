@@ -32,6 +32,8 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
 import useStore from '@/stores'
+import type { datasetData } from '@/api/type/dataset'
+import { isAllPropertiesEmpty } from '@/utils/utils'
 
 const props = defineProps({
   data: {
@@ -41,7 +43,7 @@ const props = defineProps({
 })
 const { dataset } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
-const form = ref<any>({
+const form = ref<datasetData>({
   name: '',
   desc: ''
 })
@@ -65,6 +67,14 @@ watch(
   }
 )
 
+watch(form.value, (value) => {
+  if (isAllPropertiesEmpty(value)) {
+    dataset.saveBaseInfo(null)
+  } else {
+    dataset.saveBaseInfo(value)
+  }
+})
+
 /*
   表单校验
 */
@@ -86,6 +96,7 @@ onUnmounted(() => {
     desc: ''
   }
 })
+
 defineExpose({
   validate,
   form
