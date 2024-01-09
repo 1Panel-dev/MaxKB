@@ -22,9 +22,6 @@
     </template> -->
     <div class="create-dataset__main flex" v-loading="loading">
       <div class="create-dataset__component main-calc-height">
-        <!-- <template v-if="steps[active]?.component">
-          <component :is="steps[active].component" :ref="steps[active]?.ref" />
-        </template> -->
         <template v-if="active === 0">
           <StepFirst ref="StepFirstRef" />
         </template>
@@ -39,9 +36,9 @@
     <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
       <el-button @click="router.go(-1)" :disabled="loading">取 消</el-button>
       <el-button @click="prev" v-if="active === 1" :disabled="loading">上一步</el-button>
-      <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading"
-        >创建并导入</el-button
-      >
+      <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading">
+        创建并导入
+      </el-button>
       <el-button @click="submit" type="primary" v-if="active === 1" :disabled="loading">
         开始导入
       </el-button>
@@ -70,18 +67,18 @@ const {
   params: { id, type }
 } = route
 const isCreate = type === 'create'
-const steps = [
-  {
-    ref: 'StepFirstRef',
-    name: '上传文档',
-    component: StepFirst
-  },
-  {
-    ref: 'StepSecondRef',
-    name: '设置分段规则',
-    component: StepSecond
-  }
-]
+// const steps = [
+//   {
+//     ref: 'StepFirstRef',
+//     name: '上传文档',
+//     component: StepFirst
+//   },
+//   {
+//     ref: 'StepSecondRef',
+//     name: '设置分段规则',
+//     component: StepSecond
+//   }
+// ]
 
 const StepFirstRef = ref()
 const StepSecondRef = ref()

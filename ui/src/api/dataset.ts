@@ -90,7 +90,7 @@ const postWebDateset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>
   data,
   loading
 ) => {
-  return post(`${prefix}`, data, undefined, loading)
+  return post(`${prefix}/web`, data, undefined, loading)
 }
 
 /**
