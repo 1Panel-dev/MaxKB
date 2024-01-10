@@ -60,7 +60,7 @@ const datasetRouter = {
             parentPath: '/dataset/:id',
             parentName: 'DatasetDetail'
           },
-          component: () => import('@/views/document/DatasetSetting.vue')
+          component: () => import('@/views/dataset/DatasetSetting.vue')
         }
       ]
     },

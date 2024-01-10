@@ -53,7 +53,12 @@
                         </span>
                         <template #dropdown>
                           <el-dropdown-menu>
-                            <el-dropdown-item icon="Refresh"  v-if="item.type === '1'">同步</el-dropdown-item>
+                            <el-dropdown-item
+                              icon="Refresh"
+                              @click.stop="syncDataset(item)"
+                              v-if="item.type === '1'"
+                              >同步</el-dropdown-item
+                            >
                             <el-dropdown-item
                               icon="Setting"
                               @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
@@ -74,16 +79,19 @@
         </el-row>
       </InfiniteScroll>
     </div>
+    <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive, computed } from 'vue'
+import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
 import datasetApi from '@/api/dataset'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { useRouter } from 'vue-router'
 import { numberFormat } from '@/utils/utils'
 const router = useRouter()
 
+const SyncWebDialogRef = ref()
 const loading = ref(false)
 const datasetList = ref<any[]>([])
 const paginationConfig = reactive({
@@ -93,6 +101,15 @@ const paginationConfig = reactive({
 })
 
 const searchValue = ref('')
+
+function refresh(row: any) {
+  const index = datasetList.value.findIndex((v) => v.id === row.id)
+  datasetList.value.splice(index, 1, row)
+}
+
+function syncDataset(row: any) {
+  SyncWebDialogRef.value.open(row.id)
+}
 
 function searchHandle() {
   paginationConfig.current_page = 1

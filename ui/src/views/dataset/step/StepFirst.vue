@@ -4,6 +4,7 @@
       <!-- 基本信息 -->
       <BaseForm ref="BaseFormRef" v-if="isCreate" />
       <el-form
+        v-if="isCreate"
         ref="webFormRef"
         :rules="rules"
         :model="form"

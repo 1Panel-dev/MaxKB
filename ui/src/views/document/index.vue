@@ -3,11 +3,18 @@
     <div class="main-calc-height">
       <div class="p-24">
         <div class="flex-between">
-          <el-button
-            type="primary"
-            @click="router.push({ path: '/dataset/upload', query: { id: id } })"
-            >上传文档</el-button
-          >
+          <div>
+            <el-button
+              v-if="datasetDetail.type === '0'"
+              type="primary"
+              @click="router.push({ path: '/dataset/upload', query: { id: id } })"
+              >上传文档</el-button
+            >
+            <el-button v-if="datasetDetail.type === '1'" type="primary">导入文档</el-button>
+            <!-- <el-button v-if="datasetDetail.type === '1'">批量同步</el-button> -->
+            <el-button>批量删除</el-button>
+          </div>
+
           <el-input
             v-model="filterText"
             placeholder="按 文档名称 搜索"
@@ -20,7 +27,7 @@
           class="mt-16"
           :data="documentData"
           :pagination-config="paginationConfig"
-          quick-create
+          :quick-create="datasetDetail.type === '0'"
           @sizeChange="handleSizeChange"
           @changePage="getList"
           @cell-mouse-enter="cellMouseEnter"
@@ -80,20 +87,49 @@
           </el-table-column>
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
-              <span v-if="row.status === '2'" class="mr-4">
-                <el-tooltip effect="dark" content="重试" placement="top">
+              <div v-if="datasetDetail.type === '0'">
+                <span v-if="row.status === '2'" class="mr-4">
+                  <el-tooltip effect="dark" content="重试" placement="top">
+                    <el-button type="primary" text @click.stop="refreshDocument(row)">
+                      <el-icon><RefreshRight /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </span>
+                <span>
+                  <el-tooltip effect="dark" content="删除" placement="top">
+                    <el-button type="primary" text @click.stop="deleteDocument(row)">
+                      <el-icon><Delete /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </span>
+              </div>
+              <div v-if="datasetDetail.type === '1'">
+                <el-tooltip
+                  effect="dark"
+                  content="同步"
+                  placement="top"
+                  v-if="datasetDetail.type === '1'"
+                >
                   <el-button type="primary" text @click.stop="refreshDocument(row)">
-                    <el-icon><RefreshRight /></el-icon>
+                    <el-icon><Refresh /></el-icon>
                   </el-button>
                 </el-tooltip>
-              </span>
-              <span>
-                <el-tooltip effect="dark" content="删除" placement="top">
-                  <el-button type="primary" text @click.stop="deleteDocument(row)">
-                    <el-icon><Delete /></el-icon>
-                  </el-button>
-                </el-tooltip>
-              </span>
+                <span @click.stop>
+                  <el-dropdown trigger="click">
+                    <span class="el-dropdown-link cursor">
+                      <el-icon><MoreFilled /></el-icon>
+                    </span>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item icon="Setting">设置</el-dropdown-item>
+                        <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
+                          >删除</el-dropdown-item
+                        >
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </span>
+              </div>
             </template>
           </el-table-column>
         </app-table>
@@ -108,17 +144,20 @@ import documentApi from '@/api/document'
 import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import useStore from '@/stores'
 const router = useRouter()
 const route = useRoute()
 const {
   params: { id }
 } = route as any
 
+const { dataset } = useStore()
 const loading = ref(false)
 let interval: any
 const filterText = ref('')
 const documentData = ref<any[]>([])
 const currentMouseId = ref(null)
+const datasetDetail = ref<any>({})
 
 const paginationConfig = reactive({
   current_page: 1,
@@ -258,7 +297,14 @@ function getList(bool?: boolean) {
     })
 }
 
+function getDetail() {
+  dataset.asyncGetDatesetDetail(id, loading).then((res: any) => {
+    datasetDetail.value = res.data
+  })
+}
+
 onMounted(() => {
+  getDetail()
   getList()
   // 初始化定时任务
   initInterval()
