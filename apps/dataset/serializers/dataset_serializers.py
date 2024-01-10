@@ -64,7 +64,7 @@ from smartdoc.conf import PROJECT_DIR
 class DataSetSerializers(serializers.ModelSerializer):
     class Meta:
         model = DataSet
-        fields = ['id', 'name', 'desc', 'create_time', 'update_time']
+        fields = ['id', 'name', 'desc', 'meta', 'create_time', 'update_time']
 
     class Application(ApiMixin, serializers.Serializer):
         user_id = serializers.UUIDField(required=True)
@@ -238,7 +238,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                                              validators.MinLengthValidator(limit_value=1,
                                                                            message="知识库名称在1-256个字符之间")
                                          ])
-            url = serializers.CharField(required=True)
+            source_url = serializers.CharField(required=True)
 
             selector = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
@@ -286,7 +286,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                     properties={
                         'name': openapi.Schema(type=openapi.TYPE_STRING, title="知识库名称", description="知识库名称"),
                         'desc': openapi.Schema(type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
-                        'url': openapi.Schema(type=openapi.TYPE_STRING, title="web站点url", description="web站点url"),
+                        'source_url': openapi.Schema(type=openapi.TYPE_STRING, title="web站点url", description="web站点url"),
                         'selector': openapi.Schema(type=openapi.TYPE_STRING, title="选择器", description="选择器")
                     }
                 )
@@ -369,10 +369,10 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset_id = uuid.uuid1()
             dataset = DataSet(
                 **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id,
-                   'type': Type.web, 'meta': {'source_url': instance.get('url'), 'selector': instance.get('selector')}})
+                   'type': Type.web, 'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector')}})
             dataset.save()
             ListenerManagement.sync_web_dataset_signal.send(
-                SyncWebDatasetArgs(str(dataset_id), instance.get('url'), instance.get('selector'),
+                SyncWebDatasetArgs(str(dataset_id), instance.get('source_url'), instance.get('selector'),
                                    self.get_save_handler(dataset_id, instance.get('selector'))))
             return {**DataSetSerializers(dataset).data,
                     'document_list': []}

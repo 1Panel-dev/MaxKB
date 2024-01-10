@@ -1,5 +1,6 @@
 SELECT
-	*
+	*,
+	to_json(meta) as meta
 FROM
 	(
 	SELECT
