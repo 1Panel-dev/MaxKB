@@ -46,14 +46,14 @@
           <el-input
             v-model="form.url"
             placeholder="请输入 Web 根地址"
-            @blur="form.name = form.url.trim()"
+            @blur="form.url = form.url.trim()"
           />
         </el-form-item>
         <el-form-item label="选择器" v-if="form.type === '1'">
           <el-input
             v-model="form.selector"
             placeholder="请输入选择器"
-            @blur="form.name = form.selector.trim()"
+            @blur="form.selector = form.selector.trim()"
           />
         </el-form-item>
       </el-form>

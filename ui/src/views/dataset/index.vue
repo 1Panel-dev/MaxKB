@@ -31,22 +31,41 @@
                 class="cursor"
                 @click="router.push({ path: `/dataset/${item.id}/document` })"
               >
-                <template #mouseEnter>
-                  <el-tooltip effect="dark" content="删除" placement="top">
-                    <el-button text @click.stop="deleteDateset(item)" class="delete-button">
-                      <el-icon><Delete /></el-icon>
-                    </el-button>
-                  </el-tooltip>
-                </template>
+                <div class="delete-button">
+                  <el-tag v-if="item.type === '0'">通用型</el-tag>
+                  <el-tag v-else-if="item.type === '1'" type="warning">Web 站点</el-tag>
+                </div>
 
                 <template #footer>
-                  <div class="footer-content">
-                    <span class="bold">{{ item?.document_count || 0 }}</span>
-                    文档<el-divider direction="vertical" />
-                    <span class="bold">{{ numberFormat(item?.char_length) || 0 }}</span>
-                    字符<el-divider direction="vertical" />
-                    <span class="bold">{{ item?.application_mapping_count || 0 }}</span>
-                    关联应用
+                  <div class="footer-content flex-between">
+                    <div>
+                      <span class="bold">{{ item?.document_count || 0 }}</span>
+                      文档<el-divider direction="vertical" />
+                      <span class="bold">{{ numberFormat(item?.char_length) || 0 }}</span>
+                      字符<el-divider direction="vertical" />
+                      <span class="bold">{{ item?.application_mapping_count || 0 }}</span>
+                      关联应用
+                    </div>
+                    <div @click.stop>
+                      <el-dropdown trigger="click">
+                        <span class="el-dropdown-link cursor">
+                          <el-icon><MoreFilled /></el-icon>
+                        </span>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item icon="Refresh"  v-if="item.type === '1'">同步</el-dropdown-item>
+                            <el-dropdown-item
+                              icon="Setting"
+                              @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
+                              >设置</el-dropdown-item
+                            >
+                            <el-dropdown-item icon="Delete" @click.stop="deleteDateset(item)"
+                              >删除</el-dropdown-item
+                            >
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
                   </div>
                 </template>
               </CardBox>
