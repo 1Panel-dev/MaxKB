@@ -32,11 +32,11 @@
                 </div>
               </el-card>
             </el-form-item>
-            <el-form-item label="Web 根地址" prop="url" v-if="detail.type === '1'">
+            <el-form-item label="Web 根地址" prop="source_url" v-if="detail.type === '1'">
               <el-input
-                v-model="form.url"
+                v-model="form.source_url"
                 placeholder="请输入 Web 根地址"
-                @blur="form.url = form.url.trim()"
+                @blur="form.source_url = form.source_url.trim()"
               />
             </el-form-item>
             <el-form-item label="选择器" v-if="detail.type === '1'">
@@ -97,12 +97,12 @@ const detail = ref<any>({})
 const application_list = ref<Array<ApplicationFormType>>([])
 const application_id_list = ref([])
 const form = ref<any>({
-  url: '',
+  source_url: '',
   selector: ''
 })
 
 const rules = reactive({
-  url: [{ required: true, message: '请输入 Web 根地址', trigger: 'blur' }]
+  source_url: [{ required: true, message: '请输入 Web 根地址', trigger: 'blur' }]
 })
 
 async function submit() {
@@ -110,10 +110,16 @@ async function submit() {
     await webFormRef.value.validate((valid: any) => {
       if (valid) {
         loading.value = true
-        const obj = {
-          application_id_list: application_id_list.value,
-          ...BaseFormRef.value.form
-        }
+        const obj =
+          detail.value.type === '1'
+            ? {
+                ...BaseFormRef.value.form,
+                ...form.value
+              }
+            : {
+                application_id_list: application_id_list.value,
+                ...BaseFormRef.value.form
+              }
         datasetApi
           .putDateset(id, obj)
           .then((res) => {
@@ -131,6 +137,10 @@ async function submit() {
 function getDetail() {
   dataset.asyncGetDatesetDetail(id, loading).then((res: any) => {
     detail.value = res.data
+    if (detail.value.type === '1') {
+      form.value = res.data.meta
+    }
+
     application_id_list.value = res.data?.application_id_list
     datasetApi.listUsableApplication(id, loading).then((ok) => {
       application_list.value = ok.data

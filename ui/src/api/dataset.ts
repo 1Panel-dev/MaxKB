@@ -82,7 +82,7 @@ const postDateset: (data: datasetData, loading?: Ref<boolean>) => Promise<Result
  * {
   "name": "string",
   "desc": "string",
-  "url": "string",
+  "source_url": "string",
   "selector": "string",
 }
  */
