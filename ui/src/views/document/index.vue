@@ -12,7 +12,7 @@
             >
             <el-button v-if="datasetDetail.type === '1'" type="primary">导入文档</el-button>
             <!-- <el-button v-if="datasetDetail.type === '1'">批量同步</el-button> -->
-            <el-button>批量删除</el-button>
+            <el-button :disabled="multipleSelection.length === 0">批量删除</el-button>
           </div>
 
           <el-input
@@ -24,6 +24,7 @@
           />
         </div>
         <app-table
+          ref="multipleTableRef"
           class="mt-16"
           :data="documentData"
           :pagination-config="paginationConfig"
@@ -34,8 +35,10 @@
           @cell-mouse-leave="cellMouseLeave"
           @creatQuick="creatQuickHandle"
           @row-click="rowClickHandle"
+          @selection-change="handleSelectionChange"
           v-loading="loading"
         >
+          <el-table-column type="selection" width="55" />
           <el-table-column prop="name" label="文件名称" min-width="280">
             <template #default="{ row }">
               <ReadWrite
@@ -140,6 +143,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { ElTable } from 'element-plus'
 import documentApi from '@/api/document'
 import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
@@ -164,6 +168,13 @@ const paginationConfig = reactive({
   page_size: 10,
   total: 0
 })
+
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleSelection = ref<any[]>([])
+
+const handleSelectionChange = (val: any[]) => {
+  multipleSelection.value = val
+}
 
 /**
  * 初始化轮询

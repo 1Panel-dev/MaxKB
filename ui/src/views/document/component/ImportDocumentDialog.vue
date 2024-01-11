@@ -60,6 +60,7 @@ const open = (id: string) => {
 
 const submit = () => {
   dataset.asyncSyncDateset(datasetId.value, method.value, loading).then((res: any) => {
+    // MsgSuccess('删除成功')
     emit('refresh', res.data)
     dialogVisible.value = false
   })
