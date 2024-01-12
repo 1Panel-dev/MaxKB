@@ -126,12 +126,19 @@
                 </div>
               </el-form-item>
               <el-form-item label="开场白">
-                <el-input
+                <MdEditor
+                  class="prologue-md-editor"
+                  v-model="applicationForm.prologue"
+                  :preview="false"
+                  :toolbars="[]"
+                  :footers="[]"
+                />
+                <!-- <el-input
                   v-model="applicationForm.prologue"
                   type="textarea"
                   placeholder="开始对话的欢迎语。您可以这样写：您好，我是 MaxKB 智能小助手，您可以向我提出 MaxKB 产品使用中遇到的任何问题。"
                   :rows="4"
-                />
+                /> -->
               </el-form-item>
               <el-form-item label="示例">
                 <template v-for="(item, index) in exampleList" :key="index">
@@ -184,6 +191,7 @@ import { groupBy } from 'lodash'
 import AddDatasetDialog from './components/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
+import { MdEditor } from 'md-editor-v3'
 import applicationApi from '@/api/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
@@ -214,7 +222,10 @@ const applicationForm = ref<ApplicationFormType>({
   desc: '',
   model_id: '',
   multiple_rounds_dialogue: false,
-  prologue: '',
+  prologue: `您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。
+- MaxKB 主要功能有什么？
+- MaxKB 支持哪些大语言模型？
+- MaxKB 支持哪些文档类型？`,
   example: [],
   dataset_id_list: []
 })
@@ -367,5 +378,8 @@ onMounted(() => {
 .check-icon {
   position: absolute;
   right: 10px;
+}
+.prologue-md-editor {
+  height: 150px;
 }
 </style>
