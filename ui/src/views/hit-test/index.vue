@@ -44,7 +44,7 @@
                   <template #icon>
                     <AppAvatar :name="index + 1 + ''" class="mr-12 avatar-light" :size="22" />
                   </template>
-                  <div class="active-button primary">{{ (item.similarity * 100).toFixed(2) }}%</div>
+                  <div class="active-button primary">{{ item.similarity.toFixed(3) }}</div>
                   <template #footer>
                     <div class="footer-content flex-between">
                       <el-text>
@@ -75,7 +75,7 @@
       <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     </LayoutContainer>
     <div class="hit-test__operate p-24 pt-0">
-      <el-popover :visible="popoverVisible" placement="top-start" :width="560" trigger="click">
+      <el-popover :visible="popoverVisible" placement="top-start" :width="600" trigger="click">
         <template #reference>
           <el-button icon="Setting" class="mb-8" @click="popoverVisible = !popoverVisible"
             >参数设置</el-button
@@ -83,15 +83,16 @@
         </template>
         <div class="flex">
           <div>
-            相似度
+            相似度高于
             <el-input-number
               v-model="formInline.similarity"
-              :min="1"
-              :max="100"
+              :min="0"
+              :max="1"
+              :precision="3"
+              :step="0.1"
               controls-position="right"
               style="width: 100px"
             />
-            %
           </div>
 
           <div class="ml-16">
@@ -156,7 +157,7 @@ const paragraphDetail = ref<any[]>([])
 const title = ref('')
 const inputValue = ref('')
 const formInline = reactive({
-  similarity: 60,
+  similarity: 0.600,
   top_number: 5
 })
 const popoverVisible = ref(false)
@@ -193,7 +194,7 @@ function sendChatHandle(event: any) {
 function getHitTestList() {
   const obj = {
     query_text: inputValue.value,
-    similarity: formInline.similarity / 100,
+    similarity: formInline.similarity,
     top_number: formInline.top_number
   }
   if (isDataset.value) {
