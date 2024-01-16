@@ -152,12 +152,12 @@ const getDatasetHitTest: (
  * @param 参数 dataset_id
  * @query 参数 sync_type // 同步类型->replace:替换同步,complete:完整同步
  */
-const getSyncWebDateset: (
+const putSyncWebDateset: (
   dataset_id: string,
   sync_type: string,
   loading?: Ref<boolean>
 ) => Promise<Result<any>> = (dataset_id, sync_type, loading) => {
-  return get(`${prefix}/${dataset_id}`, { sync_type }, loading)
+  return put(`${prefix}/${dataset_id}/sync_web`, { sync_type }, loading)
 }
 
 export default {
@@ -170,5 +170,5 @@ export default {
   listUsableApplication,
   getDatasetHitTest,
   postWebDateset,
-  getSyncWebDateset
+  putSyncWebDateset
 }
