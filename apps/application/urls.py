@@ -25,6 +25,8 @@ urlpatterns = [
     path('application/<str:application_id>/chat/<chat_id>/chat_record/', views.ChatView.ChatRecord.as_view()),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/<int:current_page>/<int:page_size>',
          views.ChatView.ChatRecord.Page.as_view()),
+    path('application/<str:application_id>/chat/<chat_id>/chat_record/<chat_record_id>',
+         views.ChatView.ChatRecord.Operate.as_view()),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/<str:chat_record_id>/vote',
          views.ChatView.ChatRecord.Vote.as_view(),
          name=''),

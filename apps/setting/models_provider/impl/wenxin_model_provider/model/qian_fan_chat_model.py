@@ -14,12 +14,22 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.load import dumpd
 from langchain.schema import LLMResult
 from langchain.schema.language_model import LanguageModelInput
-from langchain.schema.messages import BaseMessageChunk, BaseMessage, HumanMessage, AIMessage
+from langchain.schema.messages import BaseMessageChunk, BaseMessage, HumanMessage, AIMessage, get_buffer_string
 from langchain.schema.output import ChatGenerationChunk
 from langchain.schema.runnable import RunnableConfig
+from transformers import GPT2TokenizerFast
+
+tokenizer = GPT2TokenizerFast.from_pretrained('gpt2', cache_dir="/opt/maxkb/model/tokenizer", resume_download=False,
+                                              force_download=False)
 
 
 class QianfanChatModel(QianfanChatEndpoint):
+
+    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
+        return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
+
+    def get_num_tokens(self, text: str) -> int:
+        return len(tokenizer.encode(text))
 
     def stream(
             self,
@@ -30,7 +40,7 @@ class QianfanChatModel(QianfanChatEndpoint):
             **kwargs: Any,
     ) -> Iterator[BaseMessageChunk]:
         if len(input) % 2 == 0:
-            input = [HumanMessage(content='占位'), *input]
+            input = [HumanMessage(content='padding'), *input]
         input = [
             HumanMessage(content=input[index].content) if index % 2 == 0 else AIMessage(content=input[index].content)
             for index in range(0, len(input))]

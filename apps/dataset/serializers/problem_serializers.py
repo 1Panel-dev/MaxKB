@@ -24,7 +24,7 @@ from embedding.vector.pg_vector import PGVector
 class ProblemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Problem
-        fields = ['id', 'content', 'hit_num', 'star_num', 'trample_num', 'dataset_id', 'document_id',
+        fields = ['id', 'content', 'dataset_id', 'document_id',
                   'create_time', 'update_time']
 
 
@@ -77,8 +77,8 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                                                                      'document_id': self.data.get('document_id'),
                                                                      'paragraph_id': self.data.get('paragraph_id'),
                                                                      'dataset_id': self.data.get('dataset_id'),
-                                                                     'star_num': 0,
-                                                                     'trample_num': 0})
+
+                                                                     })
 
             return ProblemSerializers.Operate(
                 data={'dataset_id': self.data.get('dataset_id'), 'document_id': self.data.get('document_id'),

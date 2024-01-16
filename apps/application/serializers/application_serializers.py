@@ -63,15 +63,35 @@ class ApplicationSerializerModel(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class DatasetSettingSerializer(serializers.Serializer):
+    top_n = serializers.FloatField(required=True)
+    similarity = serializers.FloatField(required=True, max_value=1, min_value=0)
+    max_paragraph_char_number = serializers.IntegerField(required=True, max_value=10000)
+
+
+class ModelSettingSerializer(serializers.Serializer):
+    prompt = serializers.CharField(required=True, max_length=4096)
+
+
 class ApplicationSerializer(serializers.Serializer):
     name = serializers.CharField(required=True)
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     model_id = serializers.CharField(required=True)
     multiple_rounds_dialogue = serializers.BooleanField(required=True)
     prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    example = serializers.ListSerializer(required=False, child=serializers.CharField(required=True), allow_null=True)
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                  allow_null=True)
+    # 数据集相关设置
+    dataset_setting = DatasetSettingSerializer(required=True)
+    # 模型相关设置
+    model_setting = ModelSettingSerializer(required=True)
+    # 问题补全
+    problem_optimization = serializers.BooleanField(required=True)
+
+    def is_valid(self, *, user_id=None, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        ModelDatasetAssociation(data={'user_id': user_id, 'model_id': self.data.get('model_id'),
+                                      'dataset_id_list': self.data.get('dataset_id_list')}).is_valid()
 
     class AccessTokenSerializer(serializers.Serializer):
         application_id = serializers.UUIDField(required=True)
@@ -135,13 +155,13 @@ class ApplicationSerializer(serializers.Serializer):
         model_id = serializers.CharField(required=False)
         multiple_rounds_dialogue = serializers.BooleanField(required=False)
         prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-        example = serializers.ListSerializer(required=False, child=serializers.CharField(required=True))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
-
-    def is_valid(self, *, user_id=None, raise_exception=False):
-        super().is_valid(raise_exception=True)
-        ModelDatasetAssociation(data={'user_id': user_id, 'model_id': self.data.get('model_id'),
-                                      'dataset_id_list': self.data.get('dataset_id_list')}).is_valid()
+        # 数据集相关设置
+        dataset_setting = serializers.JSONField(required=False, allow_null=True)
+        # 模型相关设置
+        model_setting = serializers.JSONField(required=False, allow_null=True)
+        # 问题补全
+        problem_optimization = serializers.BooleanField(required=False, allow_null=True)
 
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True)
@@ -168,9 +188,12 @@ class ApplicationSerializer(serializers.Serializer):
         @staticmethod
         def to_application_model(user_id: str, application: Dict):
             return Application(id=uuid.uuid1(), name=application.get('name'), desc=application.get('desc'),
-                               prologue=application.get('prologue'), example=application.get('example'),
+                               prologue=application.get('prologue'),
                                dialogue_number=3 if application.get('multiple_rounds_dialogue') else 0,
                                user_id=user_id, model_id=application.get('model_id'),
+                               dataset_setting=application.get('dataset_setting'),
+                               model_setting=application.get('model_setting'),
+                               problem_optimization=application.get('problem_optimization')
                                )
 
         @staticmethod
@@ -267,7 +290,7 @@ class ApplicationSerializer(serializers.Serializer):
     class ApplicationModel(serializers.ModelSerializer):
         class Meta:
             model = Application
-            fields = ['id', 'name', 'desc', 'prologue', 'example', 'dialogue_number']
+            fields = ['id', 'name', 'desc', 'prologue',  'dialogue_number']
 
     class Operate(serializers.Serializer):
         application_id = serializers.UUIDField(required=True)
@@ -317,8 +340,9 @@ class ApplicationSerializer(serializers.Serializer):
 
             model = QuerySet(Model).get(id=instance.get('model_id') if 'model_id' in instance else application.model_id)
 
-            update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'example', 'status',
-                           'api_key_is_active']
+            update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
+                           'dataset_setting', 'model_setting', 'problem_optimization'
+                                                               'api_key_is_active']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     if update_key == 'multiple_rounds_dialogue':

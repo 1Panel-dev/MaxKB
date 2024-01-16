@@ -8,6 +8,7 @@
 """
 from drf_yasg import openapi
 
+from application.swagger_api.application_api import ApplicationApi
 from common.mixins.api_mixin import ApiMixin
 
 
@@ -19,6 +20,7 @@ class ChatApi(ApiMixin):
             required=['message'],
             properties={
                 'message': openapi.Schema(type=openapi.TYPE_STRING, title="问题", description="问题"),
+                're_chat': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="重新生成", default="重新生成")
 
             }
         )
@@ -73,14 +75,19 @@ class ChatApi(ApiMixin):
         def get_request_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['model_id', 'multiple_rounds_dialogue'],
+                required=['model_id', 'multiple_rounds_dialogue', 'dataset_setting', 'model_setting',
+                          'problem_optimization'],
                 properties={
                     'model_id': openapi.Schema(type=openapi.TYPE_STRING, title="模型id", description="模型id"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
                                                       title="关联知识库Id列表", description="关联知识库Id列表"),
                     'multiple_rounds_dialogue': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否开启多轮会话",
-                                                               description="是否开启多轮会话")
+                                                               description="是否开启多轮会话"),
+                    'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
+                    'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
+                    'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="问题优化",
+                                                           description="是否开启问题优化", default=True)
                 }
             )
 

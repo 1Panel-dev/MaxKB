@@ -1,4 +1,4 @@
-SELECT * FROM ( SELECT * FROM application  ${application_custom_sql} UNION
+SELECT *,to_json(dataset_setting) as dataset_setting,to_json(model_setting) as model_setting FROM ( SELECT * FROM application  ${application_custom_sql} UNION
 	SELECT
 		*
 	FROM

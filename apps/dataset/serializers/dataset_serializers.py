@@ -26,12 +26,11 @@ from application.models import ApplicationDatasetMapping
 from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.db.sql_execute import select_list
-from common.event.listener_manage import ListenerManagement, SyncWebDatasetArgs
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
 from common.util.file_util import get_file_content
-from common.util.fork import ChildLink, Fork, ForkManage
+from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type
 from dataset.serializers.common_serializers import list_paragraph
@@ -286,7 +285,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                     properties={
                         'name': openapi.Schema(type=openapi.TYPE_STRING, title="知识库名称", description="知识库名称"),
                         'desc': openapi.Schema(type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
-                        'source_url': openapi.Schema(type=openapi.TYPE_STRING, title="web站点url", description="web站点url"),
+                        'source_url': openapi.Schema(type=openapi.TYPE_STRING, title="web站点url",
+                                                     description="web站点url"),
                         'selector': openapi.Schema(type=openapi.TYPE_STRING, title="选择器", description="选择器")
                     }
                 )
@@ -369,7 +369,8 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset_id = uuid.uuid1()
             dataset = DataSet(
                 **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id,
-                   'type': Type.web, 'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector')}})
+                   'type': Type.web,
+                   'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector')}})
             dataset.save()
             ListenerManagement.sync_web_dataset_signal.send(
                 SyncWebDatasetArgs(str(dataset_id), instance.get('source_url'), instance.get('selector'),

@@ -7,194 +7,181 @@
     @desc:
 """
 import json
-import uuid
 from typing import List
+from uuid import UUID
 
-from django.db.models import QuerySet
-from django.http import StreamingHttpResponse
-from langchain.chat_models.base import BaseChatModel
-from langchain.schema import HumanMessage
-from rest_framework import serializers, status
 from django.core.cache import cache
-from common import event
-from common.config.embedding_config import VectorStore, EmbeddingModel
-from common.response import result
-from dataset.models import Paragraph
-from embedding.models import SourceType
-from setting.models.model_management import Model
+from django.db.models import QuerySet
+from langchain.chat_models.base import BaseChatModel
+from rest_framework import serializers
+
+from application.chat_pipeline.pipeline_manage import PiplineManage
+from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
+from application.chat_pipeline.step.chat_step.impl.base_chat_step import BaseChatStep
+from application.chat_pipeline.step.generate_human_message_step.impl.base_generate_human_message_step import \
+    BaseGenerateHumanMessageStep
+from application.chat_pipeline.step.reset_problem_step.impl.base_reset_problem_step import BaseResetProblemStep
+from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset_step import BaseSearchDatasetStep
+from application.models import ChatRecord, Chat, Application, ApplicationDatasetMapping
+from common.exception.app_exception import AppApiException
+from common.util.rsa_util import decrypt
+from common.util.split_model import flat_map
+from dataset.models import Paragraph, Document
+from setting.models import Model
+from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 
 chat_cache = cache
-
-
-class MessageManagement:
-    @staticmethod
-    def get_message(title: str, content: str, message: str):
-        if content is None:
-            return HumanMessage(content=message)
-        return HumanMessage(content=(
-            f'已知信息：{title}:{content} '
-            '根据上述已知信息，请简洁和专业的来回答用户的问题。已知信息中的图片、链接地址和脚本语言请直接返回。如果无法从已知信息中得到答案，请说 “没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作” 或 “根据已知信息无法回答该问题，建议联系官方技术支持人员”，不允许在答案中添加编造成分，答案请使用中文。'
-            f'问题是：{message}'))
-
-
-class ChatMessage:
-    def __init__(self, id: str, problem: str, title: str, paragraph: str, embedding_id: str, dataset_id: str,
-                 document_id: str,
-                 paragraph_id,
-                 source_type: SourceType,
-                 source_id: str,
-                 answer: str,
-                 message_tokens: int,
-                 answer_token: int,
-                 chat_model=None,
-                 chat_message=None):
-        self.id = id
-        self.problem = problem
-        self.title = title
-        self.paragraph = paragraph
-        self.embedding_id = embedding_id
-        self.dataset_id = dataset_id
-        self.document_id = document_id
-        self.paragraph_id = paragraph_id
-        self.source_type = source_type
-        self.source_id = source_id
-        self.answer = answer
-        self.message_tokens = message_tokens
-        self.answer_token = answer_token
-        self.chat_model = chat_model
-        self.chat_message = chat_message
-
-    def get_chat_message(self):
-        return MessageManagement.get_message(self.problem, self.paragraph, self.problem)
 
 
 class ChatInfo:
     def __init__(self,
                  chat_id: str,
-                 model: Model,
                  chat_model: BaseChatModel,
-                 application_id: str | None,
                  dataset_id_list: List[str],
                  exclude_document_id_list: list[str],
-                 dialogue_number: int):
+                 application: Application):
+        """
+        :param chat_id:                     对话id
+        :param chat_model:                  对话模型
+        :param dataset_id_list:             数据集列表
+        :param exclude_document_id_list:    排除的文档
+        :param application:                 应用信息
+        """
         self.chat_id = chat_id
-        self.application_id = application_id
-        self.model = model
+        self.application = application
         self.chat_model = chat_model
         self.dataset_id_list = dataset_id_list
         self.exclude_document_id_list = exclude_document_id_list
-        self.dialogue_number = dialogue_number
-        self.chat_message_list: List[ChatMessage] = []
+        self.chat_record_list: List[ChatRecord] = []
 
-    def append_chat_message(self, chat_message: ChatMessage):
-        self.chat_message_list.append(chat_message)
-        if self.application_id is not None:
+    def to_base_pipeline_manage_params(self):
+        dataset_setting = self.application.dataset_setting
+        model_setting = self.application.model_setting
+        return {
+            'dataset_id_list': self.dataset_id_list,
+            'exclude_document_id_list': self.exclude_document_id_list,
+            'exclude_paragraph_id_list': [],
+            'top_n': dataset_setting.get('top_n') if 'top_n' in dataset_setting else 3,
+            'similarity': dataset_setting.get('similarity') if 'similarity' in dataset_setting else 0.6,
+            'max_paragraph_char_number': dataset_setting.get(
+                'max_paragraph_char_number') if 'max_paragraph_char_number' in dataset_setting else 5000,
+            'history_chat_record': self.chat_record_list,
+            'chat_id': self.chat_id,
+            'dialogue_number': self.application.dialogue_number,
+            'prompt': model_setting.get(
+                'prompt') if 'prompt' in model_setting else Application.get_default_model_prompt(),
+            'chat_model': self.chat_model,
+            'model_id': self.application.model.id if self.application.model is not None else None,
+            'problem_optimization': self.application.problem_optimization
+
+        }
+
+    def to_pipeline_manage_params(self, problem_text: str, post_response_handler: PostResponseHandler,
+                                  exclude_paragraph_id_list):
+        params = self.to_base_pipeline_manage_params()
+        return {**params, 'problem_text': problem_text, 'post_response_handler': post_response_handler,
+                'exclude_paragraph_id_list': exclude_paragraph_id_list}
+
+    def append_chat_record(self, chat_record: ChatRecord):
+        # 存入缓存中
+        self.chat_record_list.append(chat_record)
+        if self.application.id is not None:
             # 插入数据库
-            event.ListenerChatMessage.record_chat_message_signal.send(
-                event.RecordChatMessageArgs(len(self.chat_message_list) - 1, self.chat_id, self.application_id,
-                                            chat_message)
-            )
-            # 异步更新token
-            event.ListenerChatMessage.update_chat_message_token_signal.send(chat_message)
+            if not QuerySet(Chat).filter(id=self.chat_id).exists():
+                Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text).save()
+            # 插入会话记录
+            chat_record.save()
 
-    def get_context_message(self):
-        start_index = len(self.chat_message_list) - self.dialogue_number
-        return [self.chat_message_list[index].get_chat_message() for index in
-                range(start_index if start_index > 0 else 0, len(self.chat_message_list))]
+
+def get_post_handler(chat_info: ChatInfo):
+    class PostHandler(PostResponseHandler):
+
+        def handler(self,
+                    chat_id: UUID,
+                    chat_record_id,
+                    paragraph_list: List[Paragraph],
+                    problem_text: str,
+                    answer_text,
+                    manage: PiplineManage,
+                    step: BaseChatStep,
+                    padding_problem_text: str = None,
+                    **kwargs):
+            chat_record = ChatRecord(id=chat_record_id,
+                                     chat_id=chat_id,
+                                     paragraph_id_list=[str(p.id) for p in paragraph_list],
+                                     problem_text=problem_text,
+                                     answer_text=answer_text,
+                                     details=manage.get_details(),
+                                     message_tokens=manage.context['message_tokens'],
+                                     answer_tokens=manage.context['answer_tokens'],
+                                     run_time=manage.context['run_time'],
+                                     index=len(chat_info.chat_record_list) + 1)
+            chat_info.append_chat_record(chat_record)
+            # 重新设置缓存
+            chat_cache.set(chat_id,
+                           chat_info, timeout=60 * 30)
+
+    return PostHandler()
 
 
 class ChatMessageSerializer(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True)
 
-    def chat(self, message):
+    def chat(self, message, re_chat: bool):
         self.is_valid(raise_exception=True)
         chat_id = self.data.get('chat_id')
         chat_info: ChatInfo = chat_cache.get(chat_id)
         if chat_info is None:
-            return result.Result(response_status=status.HTTP_404_NOT_FOUND, code=404, message="会话过期")
+            chat_info = self.re_open_chat(chat_id)
+            chat_cache.set(chat_id,
+                           chat_info, timeout=60 * 30)
 
-        chat_model = chat_info.chat_model
-        vector = VectorStore.get_embedding_vector()
-        # 向量库检索
-        _value = vector.search(message, chat_info.dataset_id_list, chat_info.exclude_document_id_list,
-                               [chat_message.embedding_id for chat_message in
-                                (list(filter(lambda row: row.problem == message, chat_info.chat_message_list)))],
-                               True,
-                               EmbeddingModel.get_embedding_model())
-        # 查询段落id详情
-        paragraph = None
-        if _value is not None:
-            paragraph = QuerySet(Paragraph).get(id=_value.get('paragraph_id'))
-            if paragraph is None:
-                vector.delete_by_paragraph_id(_value.get('paragraph_id'))
+        pipline_manage_builder = PiplineManage.builder()
+        # 如果开启了问题优化,则添加上问题优化步骤
+        if chat_info.application.problem_optimization:
+            pipline_manage_builder.append_step(BaseResetProblemStep)
+        # 构建流水线管理器
+        pipline_message = (pipline_manage_builder.append_step(BaseSearchDatasetStep)
+                           .append_step(BaseGenerateHumanMessageStep)
+                           .append_step(BaseChatStep)
+                           .build())
+        exclude_paragraph_id_list = []
+        # 相同问题是否需要排除已经查询到的段落
+        if re_chat:
+            paragraph_id_list = flat_map([row.paragraph_id_list for row in
+                                          filter(lambda chat_record: chat_record == message,
+                                                 chat_info.chat_record_list)])
+            exclude_paragraph_id_list = list(set(paragraph_id_list))
+        # 构建运行参数
+        params = chat_info.to_pipeline_manage_params(message, get_post_handler(chat_info), exclude_paragraph_id_list)
+        # 运行流水线作业
+        pipline_message.run(params)
+        return pipline_message.context['chat_result']
 
-        title, content = (None, None) if paragraph is None else (paragraph.title, paragraph.content)
-        _id = str(uuid.uuid1())
+    @staticmethod
+    def re_open_chat(chat_id: str):
+        chat = QuerySet(Chat).filter(id=chat_id).first()
+        if chat is None:
+            raise AppApiException(500, "会话不存在")
+        application = QuerySet(Application).filter(id=chat.application_id).first()
+        if application is None:
+            raise AppApiException(500, "应用不存在")
+        model = QuerySet(Model).filter(id=application.model_id).first()
+        chat_model = None
+        if model is not None:
+            # 对话模型
+            chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
+                                                                               json.loads(
+                                                                                   decrypt(model.credential)),
+                                                                               streaming=True)
+        # 数据集id列表
+        dataset_id_list = [str(row.dataset_id) for row in
+                           QuerySet(ApplicationDatasetMapping).filter(
+                               application_id=application.id)]
 
-        embedding_id, dataset_id, document_id, paragraph_id, source_type, source_id = (_value.get(
-            'id'), _value.get(
-            'dataset_id'), _value.get(
-            'document_id'), _value.get(
-            'paragraph_id'), _value.get(
-            'source_type'), _value.get(
-            'source_id')) if _value is not None else (None, None, None, None, None, None)
-
-        if chat_model is None:
-            def event_block_content(c: str):
-                yield 'data: ' + json.dumps({'chat_id': chat_id, 'id': _id, 'operate': paragraph is not None,
-                                             'is_end': True,
-                                             'content': c if c is not None else '抱歉，根据已知信息无法回答这个问题，请重新描述您的问题或提供更多信息～'}) + "\n\n"
-                chat_info.append_chat_message(
-                    ChatMessage(_id, message, title, content, embedding_id, dataset_id, document_id,
-                                paragraph_id,
-                                source_type,
-                                source_id,
-                                c if c is not None else '抱歉，根据已知信息无法回答这个问题，请重新描述您的问题或提供更多信息～',
-                                0,
-                                0))
-                # 重新设置缓存
-                chat_cache.set(chat_id,
-                               chat_info, timeout=60 * 30)
-
-            r = StreamingHttpResponse(streaming_content=event_block_content(content),
-                                      content_type='text/event-stream;charset=utf-8')
-
-            r['Cache-Control'] = 'no-cache'
-            return r
-        # 获取上下文
-        history_message = chat_info.get_context_message()
-
-        # 构建会话请求问题
-        chat_message = [*history_message, MessageManagement.get_message(title, content, message)]
-        # 对话
-        result_data = chat_model.stream(chat_message)
-
-        def event_content(response):
-            all_text = ''
-            try:
-                for chunk in response:
-                    all_text += chunk.content
-                    yield 'data: ' + json.dumps({'chat_id': chat_id, 'id': _id, 'operate': paragraph is not None,
-                                                 'content': chunk.content, 'is_end': False}) + "\n\n"
-
-                yield 'data: ' + json.dumps({'chat_id': chat_id, 'id': _id, 'operate': paragraph is not None,
-                                             'content': '', 'is_end': True}) + "\n\n"
-                chat_info.append_chat_message(
-                    ChatMessage(_id, message, title, content, embedding_id, dataset_id, document_id,
-                                paragraph_id,
-                                source_type,
-                                source_id, all_text,
-                                0,
-                                0,
-                                chat_message=chat_message, chat_model=chat_model))
-                # 重新设置缓存
-                chat_cache.set(chat_id,
-                               chat_info, timeout=60 * 30)
-            except Exception as e:
-                yield e
-
-        r = StreamingHttpResponse(streaming_content=event_content(result_data),
-                                  content_type='text/event-stream;charset=utf-8')
-
-        r['Cache-Control'] = 'no-cache'
-        return r
+        # 需要排除的文档
+        exclude_document_id_list = [str(document.id) for document in
+                                    QuerySet(Document).filter(
+                                        dataset_id__in=dataset_id_list,
+                                        is_active=False)]
+        return ChatInfo(chat_id, chat_model, dataset_id_list, exclude_document_id_list, application)

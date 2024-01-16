@@ -83,7 +83,7 @@ def compiler_queryset(queryset: QuerySet, field_replace_dict: None | Dict[str, s
         field_replace_dict = get_field_replace_dict(queryset)
     app_sql_compiler = AppSQLCompiler(q, using=DEFAULT_DB_ALIAS, connection=compiler.connection,
                                       field_replace_dict=field_replace_dict)
-    sql, params = app_sql_compiler.get_query_str(with_table_name)
+    sql, params = app_sql_compiler.get_query_str(with_table_name=with_table_name)
     return sql, params
 
 

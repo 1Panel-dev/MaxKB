@@ -7,10 +7,8 @@
     @desc:
 """
 from .listener_manage import *
-from .listener_chat_message import *
 
 
 def run():
     listener_manage.ListenerManagement().run()
-    listener_chat_message.ListenerChatMessage().run()
     QuerySet(Document).filter(status=Status.embedding).update(**{'status': Status.error})

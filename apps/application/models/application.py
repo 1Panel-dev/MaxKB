@@ -10,12 +10,20 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from langchain.schema import HumanMessage, AIMessage
 
 from common.mixins.app_model_mixin import AppModelMixin
-from dataset.models.data_set import DataSet, Paragraph
-from embedding.models import SourceType
+from dataset.models.data_set import DataSet
 from setting.models.model_management import Model
 from users.models import User
+
+
+def get_dataset_setting_dict():
+    return {'top_n': 3, 'similarity': 0.6, 'max_paragraph_char_number': 5000}
+
+
+def get_model_setting_dict():
+    return {'prompt': Application.get_default_model_prompt()}
 
 
 class Application(AppModelMixin):
@@ -23,10 +31,26 @@ class Application(AppModelMixin):
     name = models.CharField(max_length=128, verbose_name="应用名称")
     desc = models.CharField(max_length=128, verbose_name="引用描述", default="")
     prologue = models.CharField(max_length=1024, verbose_name="开场白", default="")
-    example = ArrayField(verbose_name="示例列表", base_field=models.CharField(max_length=256, blank=True), default=list)
     dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
+    dataset_setting = models.JSONField(verbose_name="数据集参数设置", default=get_dataset_setting_dict)
+    model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
+    problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
+
+    @staticmethod
+    def get_default_model_prompt():
+        return ('已知信息：'
+                '\n{data}'
+                '\n回答要求：'
+                '\n- 如果你不知道答案或者没有从获取答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。'
+                '\n- 避免提及你是从<data></data>中获得的知识。'
+                '\n- 请保持答案与<data></data>中描述的一致。'
+                '\n- 请使用markdown 语法优化答案的格式。'
+                '\n- <data></data>中的图片链接、链接地址和脚本语言请完整返回。'
+                '\n- 请使用与问题相同的语言来回答。'
+                '\n问题：'
+                '\n{question}')
 
     class Meta:
         db_table = "application"
@@ -65,20 +89,28 @@ class ChatRecord(AppModelMixin):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
     vote_status = models.CharField(verbose_name='投票', max_length=10, choices=VoteChoices.choices,
                                    default=VoteChoices.UN_VOTE)
-    dataset = models.ForeignKey(DataSet, on_delete=models.SET_NULL, verbose_name="数据集", blank=True, null=True)
-    paragraph = models.ForeignKey(Paragraph, on_delete=models.SET_NULL, verbose_name="段落id", blank=True, null=True)
-    source_id = models.UUIDField(max_length=128, verbose_name="资源id 段落/问题 id ", null=True)
-    source_type = models.CharField(verbose_name='资源类型', max_length=2, choices=SourceType.choices,
-                                   default=SourceType.PROBLEM, blank=True, null=True)
+    paragraph_id_list = ArrayField(verbose_name="引用段落id列表",
+                                   base_field=models.UUIDField(max_length=128, blank=True)
+                                   , default=list)
+    problem_text = models.CharField(max_length=1024, verbose_name="问题")
+    answer_text = models.CharField(max_length=4096, verbose_name="答案")
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)
-    problem_text = models.CharField(max_length=1024, verbose_name="问题")
-    answer_text = models.CharField(max_length=1024, verbose_name="答案")
+    const = models.IntegerField(verbose_name="总费用", default=0)
+    details = models.JSONField(verbose_name="对话详情", default=dict)
     improve_paragraph_id_list = ArrayField(verbose_name="改进标注列表",
                                            base_field=models.UUIDField(max_length=128, blank=True)
                                            , default=list)
-
+    run_time = models.FloatField(verbose_name="运行时长", default=0)
     index = models.IntegerField(verbose_name="对话下标")
+
+    def get_human_message(self):
+        if 'problem_padding' in self.details:
+            return HumanMessage(content=self.details.get('problem_padding').get('padding_problem_text'))
+        return HumanMessage(content=self.problem_text)
+
+    def get_ai_message(self):
+        return AIMessage(content=self.answer_text)
 
     class Meta:
         db_table = "application_chat_record"

@@ -74,9 +74,6 @@ class Paragraph(AppModelMixin):
     dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING)
     content = models.CharField(max_length=4096, verbose_name="段落内容")
     title = models.CharField(max_length=256, verbose_name="标题", default="")
-    hit_num = models.IntegerField(verbose_name="命中数量", default=0)
-    star_num = models.IntegerField(verbose_name="点赞数", default=0)
-    trample_num = models.IntegerField(verbose_name="点踩数", default=0)
     status = models.CharField(verbose_name='状态', max_length=1, choices=Status.choices,
                               default=Status.embedding)
     is_active = models.BooleanField(default=True)
@@ -94,9 +91,6 @@ class Problem(AppModelMixin):
     dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING, db_constraint=False)
     paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, db_constraint=False)
     content = models.CharField(max_length=256, verbose_name="问题内容")
-    hit_num = models.IntegerField(verbose_name="命中数量", default=0)
-    star_num = models.IntegerField(verbose_name="点赞数", default=0)
-    trample_num = models.IntegerField(verbose_name="点踩数", default=0)
 
     class Meta:
         db_table = "problem"

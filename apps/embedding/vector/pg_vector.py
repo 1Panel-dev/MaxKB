@@ -33,8 +33,6 @@ class PGVector(BaseVectorStore):
 
     def _save(self, text, source_type: SourceType, dataset_id: str, document_id: str, paragraph_id: str, source_id: str,
               is_active: bool,
-              star_num: int,
-              trample_num: int,
               embedding: HuggingFaceEmbeddings):
         text_embedding = embedding.embed_query(text)
         embedding = Embedding(id=uuid.uuid1(),
@@ -44,10 +42,7 @@ class PGVector(BaseVectorStore):
                               paragraph_id=paragraph_id,
                               source_id=source_id,
                               embedding=text_embedding,
-                              source_type=source_type,
-                              star_num=star_num,
-                              trample_num=trample_num
-                              )
+                              source_type=source_type)
         embedding.save()
         return True
 
@@ -61,8 +56,6 @@ class PGVector(BaseVectorStore):
                                     is_active=text_list[index].get('is_active', True),
                                     source_id=text_list[index].get('source_id'),
                                     source_type=text_list[index].get('source_type'),
-                                    star_num=text_list[index].get('star_num'),
-                                    trample_num=text_list[index].get('trample_num'),
                                     embedding=embeddings[index]) for index in
                           range(0, len(text_list))]
         QuerySet(Embedding).bulk_create(embedding_list) if len(embedding_list) > 0 else None
@@ -78,29 +71,27 @@ class PGVector(BaseVectorStore):
                                                                             'hit_test.sql')),
                                                            with_table_name=True)
         embedding_model = select_list(exec_sql,
-                                      [json.dumps(embedding_query), *exec_params, *exec_params, similarity, top_number])
+                                      [json.dumps(embedding_query), *exec_params, similarity, top_number])
         return embedding_model
 
-    def search(self, query_text, dataset_id_list: list[str], exclude_document_id_list: list[str],
-               exclude_id_list: list[str],
-               is_active: bool,
-               embedding: HuggingFaceEmbeddings):
+    def query(self, query_embedding: List[float], dataset_id_list: list[str], exclude_document_id_list: list[str],
+              exclude_paragraph_list: list[str], is_active: bool, top_n: int, similarity: float):
         exclude_dict = {}
         if dataset_id_list is None or len(dataset_id_list) == 0:
-            return None
+            return []
         query_set = QuerySet(Embedding).filter(dataset_id__in=dataset_id_list, is_active=is_active)
-        embedding_query = embedding.embed_query(query_text)
         if exclude_document_id_list is not None and len(exclude_document_id_list) > 0:
             exclude_dict.__setitem__('document_id__in', exclude_document_id_list)
-        if exclude_id_list is not None and len(exclude_id_list) > 0:
-            exclude_dict.__setitem__('id__in', exclude_id_list)
+        if exclude_paragraph_list is not None and len(exclude_paragraph_list) > 0:
+            exclude_dict.__setitem__('paragraph_id__in', exclude_paragraph_list)
         query_set = query_set.exclude(**exclude_dict)
         exec_sql, exec_params = generate_sql_by_query_dict({'embedding_query': query_set},
                                                            select_string=get_file_content(
                                                                os.path.join(PROJECT_DIR, "apps", "embedding", 'sql',
                                                                             'embedding_search.sql')),
                                                            with_table_name=True)
-        embedding_model = select_one(exec_sql, (json.dumps(embedding_query), *exec_params, *exec_params))
+        embedding_model = select_list(exec_sql,
+                                      [json.dumps(query_embedding), *exec_params, similarity, top_n])
         return embedding_model
 
     def update_by_source_id(self, source_id: str, instance: Dict):

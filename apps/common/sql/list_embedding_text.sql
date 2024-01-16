@@ -5,9 +5,7 @@ SELECT
 	problem.dataset_id AS dataset_id,
 	0 AS source_type,
 	problem."content" AS "text",
-	paragraph.is_active AS is_active,
-	problem.star_num as star_num,
-	problem.trample_num as trample_num
+	paragraph.is_active AS is_active
 FROM
 	problem problem
 	LEFT JOIN paragraph paragraph ON paragraph."id" = problem.paragraph_id
@@ -23,9 +21,7 @@ SELECT
 	concat_ws('
 ',concat_ws('
 ',paragraph.title,paragraph."content"),paragraph.title) AS "text",
-	paragraph.is_active AS is_active,
-	paragraph.star_num as star_num,
-	paragraph.trample_num as trample_num
+	paragraph.is_active AS is_active
 FROM
 	paragraph paragraph
 

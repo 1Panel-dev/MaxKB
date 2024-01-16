@@ -6,6 +6,7 @@
     @date：2023/9/21 15:46
     @desc:
 """
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from common.field.vector_field import VectorField
@@ -16,6 +17,7 @@ class SourceType(models.TextChoices):
     """订单类型"""
     PROBLEM = 0, '问题'
     PARAGRAPH = 1, '段落'
+    TITLE = 2, '标题'
 
 
 class Embedding(models.Model):
@@ -36,10 +38,10 @@ class Embedding(models.Model):
 
     embedding = VectorField(verbose_name="向量")
 
-    star_num = models.IntegerField(default=0, verbose_name="点赞数量")
+    keywords = ArrayField(verbose_name="关键词列表",
+                          base_field=models.CharField(max_length=256), default=list)
 
-    trample_num = models.IntegerField(default=0,
-                                      verbose_name="点踩数量")
+    meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:
         db_table = "embedding"

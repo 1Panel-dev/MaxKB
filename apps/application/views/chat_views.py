@@ -71,7 +71,8 @@ class ChatView(APIView):
                                                            dynamic_tag=keywords.get('application_id'))])
         )
         def post(self, request: Request, chat_id: str):
-            return ChatMessageSerializer(data={'chat_id': chat_id}).chat(request.data.get('message'))
+            return ChatMessageSerializer(data={'chat_id': chat_id}).chat(request.data.get('message'), request.data.get(
+                're_chat') if 're_chat' in request.data else False)
 
     @action(methods=['GET'], detail=False)
     @swagger_auto_schema(operation_summary="获取对话列表",
@@ -133,6 +134,27 @@ class ChatView(APIView):
 
     class ChatRecord(APIView):
         authentication_classes = [TokenAuth]
+
+        class Operate(APIView):
+            authentication_classes = [TokenAuth]
+
+            @action(methods=['GET'], detail=False)
+            @swagger_auto_schema(operation_summary="获取对话记录详情",
+                                 operation_id="获取对话记录详情",
+                                 manual_parameters=ChatRecordApi.get_request_params_api(),
+                                 responses=result.get_api_array_response(ChatRecordApi.get_response_body_api()),
+                                 tags=["应用/对话日志"]
+                                 )
+            @has_permissions(
+                ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY],
+                               [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                               dynamic_tag=keywords.get('application_id'))])
+            )
+            def get(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
+                return result.success(ChatRecordSerializer.Operate(
+                    data={'application_id': application_id,
+                          'chat_id': chat_id,
+                          'chat_record_id': chat_record_id}).one())
 
         @action(methods=['GET'], detail=False)
         @swagger_auto_schema(operation_summary="获取对话记录列表",

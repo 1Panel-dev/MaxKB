@@ -99,8 +99,6 @@ class BaseVectorStore(ABC):
     @abstractmethod
     def _save(self, text, source_type: SourceType, dataset_id: str, document_id: str, paragraph_id: str, source_id: str,
               is_active: bool,
-              star_num: int,
-              trample_num: int,
               embedding: HuggingFaceEmbeddings):
         pass
 
@@ -108,11 +106,20 @@ class BaseVectorStore(ABC):
     def _batch_save(self, text_list: List[Dict], embedding: HuggingFaceEmbeddings):
         pass
 
-    @abstractmethod
     def search(self, query_text, dataset_id_list: list[str], exclude_document_id_list: list[str],
-               exclude_id_list: list[str],
+               exclude_paragraph_list: list[str],
                is_active: bool,
                embedding: HuggingFaceEmbeddings):
+        if dataset_id_list is None or len(dataset_id_list) == 0:
+            return []
+        embedding_query = embedding.embed_query(query_text)
+        result = self.query(embedding_query, dataset_id_list, exclude_document_id_list, exclude_paragraph_list,
+                            is_active, 1, 0.65)
+        return result[0]
+
+    @abstractmethod
+    def query(self, query_embedding: List[float], dataset_id_list: list[str], exclude_document_id_list: list[str],
+              exclude_paragraph_list: list[str], is_active: bool, top_n: int, similarity: float):
         pass
 
     @abstractmethod

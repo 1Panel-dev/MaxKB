@@ -58,6 +58,7 @@ class ApplicationApi(ApiMixin):
                 'create_time': openapi.Schema(type=openapi.TYPE_STRING, title="创建时间", description='创建时间'),
 
                 'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间", description='修改时间'),
+
                 'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                   items=openapi.Schema(type=openapi.TYPE_STRING),
                                                   title="关联知识库Id列表",
@@ -133,7 +134,7 @@ class ApplicationApi(ApiMixin):
         def get_request_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['name', 'desc', 'model_id', 'multiple_rounds_dialogue'],
+                required=[],
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="应用名称", description="应用名称"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="应用描述", description="应用描述"),
@@ -141,11 +142,52 @@ class ApplicationApi(ApiMixin):
                     "multiple_rounds_dialogue": openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否开启多轮对话",
                                                                description="是否开启多轮对话"),
                     'prologue': openapi.Schema(type=openapi.TYPE_STRING, title="开场白", description="开场白"),
-                    'example': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING),
-                                              title="示例列表", description="示例列表"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
                                                       title="关联知识库Id列表", description="关联知识库Id列表"),
+                    'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
+                    'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
+                    'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="问题优化",
+                                                           description="是否开启问题优化", default=True)
+
+                }
+            )
+
+    class DatasetSetting(ApiMixin):
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=[''],
+                properties={
+                    'top_n': openapi.Schema(type=openapi.TYPE_NUMBER, title="引用分段数", description="引用分段数",
+                                            default=5),
+                    'similarity': openapi.Schema(type=openapi.TYPE_NUMBER, title='相似度', description="相似度",
+                                                 default=0.6),
+                    'max_paragraph_char_number': openapi.Schema(type=openapi.TYPE_NUMBER, title='最多引用字符数',
+                                                                description="最多引用字符数", default=3000),
+                }
+            )
+
+    class ModelSetting(ApiMixin):
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['prompt'],
+                properties={
+                    'prompt': openapi.Schema(type=openapi.TYPE_STRING, title="提示词", description="提示词",
+                                             default=('已知信息：'
+                                                      '\n{data}'
+                                                      '\n回答要求：'
+                                                      '\n- 如果你不知道答案或者没有从获取答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。'
+                                                      '\n- 避免提及你是从<data></data>中获得的知识。'
+                                                      '\n- 请保持答案与<data></data>中描述的一致。'
+                                                      '\n- 请使用markdown 语法优化答案的格式。'
+                                                      '\n- <data></data>中的图片链接、链接地址和脚本语言请完整返回。'
+                                                      '\n- 请使用与问题相同的语言来回答。'
+                                                      '\n问题：'
+                                                      '\n{question}')),
 
                 }
             )
@@ -155,7 +197,8 @@ class ApplicationApi(ApiMixin):
         def get_request_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['name', 'desc', 'model_id', 'multiple_rounds_dialogue'],
+                required=['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'dataset_setting', 'model_setting',
+                          'problem_optimization'],
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="应用名称", description="应用名称"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="应用描述", description="应用描述"),
@@ -163,11 +206,13 @@ class ApplicationApi(ApiMixin):
                     "multiple_rounds_dialogue": openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否开启多轮对话",
                                                                description="是否开启多轮对话"),
                     'prologue': openapi.Schema(type=openapi.TYPE_STRING, title="开场白", description="开场白"),
-                    'example': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING),
-                                              title="示例列表", description="示例列表"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
-                                                      title="关联知识库Id列表", description="关联知识库Id列表")
+                                                      title="关联知识库Id列表", description="关联知识库Id列表"),
+                    'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
+                    'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
+                    'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="问题优化",
+                                                           description="是否开启问题优化", default=True)
 
                 }
             )

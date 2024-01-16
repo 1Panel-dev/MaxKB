@@ -28,7 +28,7 @@ from dataset.serializers.problem_serializers import ProblemInstanceSerializer, P
 class ParagraphSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paragraph
-        fields = ['id', 'content', 'hit_num', 'star_num', 'trample_num', 'is_active', 'document_id', 'title',
+        fields = ['id', 'content', 'is_active', 'document_id', 'title',
                   'create_time', 'update_time']
 
 

@@ -10,7 +10,8 @@ import datetime
 import json
 import os
 import uuid
-from typing import Dict
+from functools import reduce
+from typing import Dict, List
 
 from django.core.cache import cache
 from django.db import transaction
@@ -18,7 +19,8 @@ from django.db.models import QuerySet
 from rest_framework import serializers
 
 from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord
-from application.serializers.application_serializers import ModelDatasetAssociation
+from application.serializers.application_serializers import ModelDatasetAssociation, DatasetSettingSerializer, \
+    ModelSettingSerializer
 from application.serializers.chat_message_serializers import ChatInfo
 from common.db.search import native_search, native_page_search, page_search
 from common.event import ListenerManagement
@@ -26,8 +28,8 @@ from common.exception.app_exception import AppApiException
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from common.util.rsa_util import decrypt
+from common.util.split_model import flat_map
 from dataset.models import Document, Problem, Paragraph
-from embedding.models import SourceType, Embedding
 from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from smartdoc.conf import PROJECT_DIR
@@ -106,12 +108,12 @@ class ChatSerializers(serializers.Serializer):
 
             chat_id = str(uuid.uuid1())
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id, model, chat_model, application_id, dataset_id_list,
+                           ChatInfo(chat_id, chat_model, dataset_id_list,
                                     [str(document.id) for document in
                                      QuerySet(Document).filter(
                                          dataset_id__in=dataset_id_list,
                                          is_active=False)],
-                                    application.dialogue_number), timeout=60 * 30)
+                                    application), timeout=60 * 30)
             return chat_id
 
     class OpenTempChat(serializers.Serializer):
@@ -122,6 +124,12 @@ class ChatSerializers(serializers.Serializer):
         multiple_rounds_dialogue = serializers.BooleanField(required=True)
 
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
+        # 数据集相关设置
+        dataset_setting = DatasetSettingSerializer(required=True)
+        # 模型相关设置
+        model_setting = ModelSettingSerializer(required=True)
+        # 问题补全
+        problem_optimization = serializers.BooleanField(required=True)
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -140,42 +148,62 @@ class ChatSerializers(serializers.Serializer):
                                                                                json.loads(
                                                                                    decrypt(model.credential)),
                                                                                streaming=True)
+            application = Application(id=None, dialogue_number=3, model=model,
+                                      dataset_setting=self.data.get('dataset_setting'),
+                                      model_setting=self.data.get('model_setting'),
+                                      problem_optimization=self.data.get('problem_optimization'))
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id, model, chat_model, None, dataset_id_list,
+                           ChatInfo(chat_id, chat_model, dataset_id_list,
                                     [str(document.id) for document in
                                      QuerySet(Document).filter(
                                          dataset_id__in=dataset_id_list,
                                          is_active=False)],
-                                    3 if self.data.get('multiple_rounds_dialogue') else 1), timeout=60 * 30)
+                                    application), timeout=60 * 30)
             return chat_id
-
-
-def vote_exec(source_type: SourceType, source_id: str, field: str, post_handler):
-    if source_type == SourceType.PROBLEM:
-        problem = QuerySet(Problem).get(id=source_id)
-        if problem is not None:
-            problem.__setattr__(field, post_handler(problem))
-            problem.save()
-            embedding = QuerySet(Embedding).get(source_id=source_id, source_type=source_type)
-            embedding.__setattr__(field, problem.__getattribute__(field))
-            embedding.save()
-    if source_type == SourceType.PARAGRAPH:
-        paragraph = QuerySet(Paragraph).get(id=source_id)
-        if paragraph is not None:
-            paragraph.__setattr__(field, post_handler(paragraph))
-            paragraph.save()
-            embedding = QuerySet(Embedding).get(source_id=source_id, source_type=source_type)
-            embedding.__setattr__(field, paragraph.__getattribute__(field))
-            embedding.save()
 
 
 class ChatRecordSerializerModel(serializers.ModelSerializer):
     class Meta:
         model = ChatRecord
-        fields = "__all__"
+        fields = ['id', 'chat_id', 'vote_status', 'problem_text', 'answer_text',
+                  'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index']
 
 
 class ChatRecordSerializer(serializers.Serializer):
+    class Operate(serializers.Serializer):
+        chat_id = serializers.UUIDField(required=True)
+
+        chat_record_id = serializers.UUIDField(required=True)
+
+        def one(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            chat_record_id = self.data.get('chat_record_id')
+            chat_id = self.data.get('chat_id')
+            chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
+            dataset_list = []
+            paragraph_list = []
+            if len(chat_record.paragraph_id_list) > 0:
+                paragraph_list = native_search(QuerySet(Paragraph).filter(id__in=chat_record.paragraph_id_list),
+                                               get_file_content(
+                                                   os.path.join(PROJECT_DIR, "apps", "application", 'sql',
+                                                                'list_dataset_paragraph_by_paragraph_id.sql')),
+                                               with_table_name=True)
+                dataset_list = [{'id': dataset_id, 'name': name} for dataset_id, name in reduce(lambda x, y: {**x, **y},
+                                                                                                [{row.get(
+                                                                                                    'dataset_id'): row.get(
+                                                                                                    "dataset_name")} for
+                                                                                                    row in
+                                                                                                    paragraph_list],
+                                                                                                {}).items()]
+
+            return {
+                **ChatRecordSerializerModel(chat_record).data,
+                'padding_problem_text': chat_record.details.get(
+                    'padding_problem_text') if 'problem_padding' in chat_record.details else None,
+                'dataset_list': dataset_list,
+                'paragraph_list': paragraph_list}
+
     class Query(serializers.Serializer):
         application_id = serializers.UUIDField(required=True)
         chat_id = serializers.UUIDField(required=True)
@@ -183,15 +211,57 @@ class ChatRecordSerializer(serializers.Serializer):
         def list(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id'))
             return [ChatRecordSerializerModel(chat_record).data for chat_record in
                     QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id'))]
+
+        def reset_chat_record_list(self, chat_record_list: List[ChatRecord]):
+            paragraph_id_list = flat_map([chat_record.paragraph_id_list for chat_record in chat_record_list])
+            # 去重
+            paragraph_id_list = list(set(paragraph_id_list))
+            paragraph_list = self.search_paragraph(paragraph_id_list)
+            return [self.reset_chat_record(chat_record, paragraph_list) for chat_record in chat_record_list]
+
+        @staticmethod
+        def search_paragraph(paragraph_id_list: List[str]):
+            paragraph_list = []
+            if len(paragraph_id_list) > 0:
+                paragraph_list = native_search(QuerySet(Paragraph).filter(id__in=paragraph_id_list),
+                                               get_file_content(
+                                                   os.path.join(PROJECT_DIR, "apps", "application", 'sql',
+                                                                'list_dataset_paragraph_by_paragraph_id.sql')),
+                                               with_table_name=True)
+            return paragraph_list
+
+        @staticmethod
+        def reset_chat_record(chat_record, all_paragraph_list):
+            paragraph_list = list(
+                filter(lambda paragraph: chat_record.paragraph_id_list.__contains__(str(paragraph.get('id'))),
+                       all_paragraph_list))
+            dataset_list = [{'id': dataset_id, 'name': name} for dataset_id, name in reduce(lambda x, y: {**x, **y},
+                                                                                            [{row.get(
+                                                                                                'dataset_id'): row.get(
+                                                                                                "dataset_name")} for
+                                                                                                row in
+                                                                                                paragraph_list],
+                                                                                            {}).items()]
+            return {
+                **ChatRecordSerializerModel(chat_record).data,
+                'padding_problem_text': chat_record.details.get('problem_padding').get(
+                    'padding_problem_text') if 'problem_padding' in chat_record.details else None,
+                'dataset_list': dataset_list,
+                'paragraph_list': paragraph_list
+            }
 
         def page(self, current_page: int, page_size: int, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            return page_search(current_page, page_size,
+            page = page_search(current_page, page_size,
                                QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by("index"),
-                               post_records_handler=lambda chat_record: ChatRecordSerializerModel(chat_record).data)
+                               post_records_handler=lambda chat_record: chat_record)
+            records = page.get('records')
+            page['records'] = self.reset_chat_record_list(records)
+            return page
 
     class Vote(serializers.Serializer):
         chat_id = serializers.UUIDField(required=True)
@@ -216,38 +286,20 @@ class ChatRecordSerializer(serializers.Serializer):
                     if vote_status == VoteChoices.STAR:
                         # 点赞
                         chat_record_details_model.vote_status = VoteChoices.STAR
-                        # 点赞数量 +1
-                        vote_exec(chat_record_details_model.source_type, chat_record_details_model.source_id,
-                                  'star_num',
-                                  lambda r: r.star_num + 1)
 
                     if vote_status == VoteChoices.TRAMPLE:
                         # 点踩
                         chat_record_details_model.vote_status = VoteChoices.TRAMPLE
-                        # 点踩数量+1
-                        vote_exec(chat_record_details_model.source_type, chat_record_details_model.source_id,
-                                  'trample_num',
-                                  lambda r: r.trample_num + 1)
                     chat_record_details_model.save()
                 else:
                     if vote_status == VoteChoices.UN_VOTE:
                         # 取消点赞
                         chat_record_details_model.vote_status = VoteChoices.UN_VOTE
                         chat_record_details_model.save()
-                        if chat_record_details_model.vote_status == VoteChoices.STAR:
-                            # 点赞数量 -1
-                            vote_exec(chat_record_details_model.source_type, chat_record_details_model.source_id,
-                                      'star_num', lambda r: r.star_num - 1)
-                        if chat_record_details_model.vote_status == VoteChoices.TRAMPLE:
-                            # 点踩数量 -1
-                            vote_exec(chat_record_details_model.source_type, chat_record_details_model.source_id,
-                                      'trample_num', lambda r: r.trample_num - 1)
-
                     else:
                         raise AppApiException(500, "已经投票过,请先取消后再进行投票")
             finally:
                 un_lock(self.data.get('chat_record_id'))
-
             return True
 
     class ImproveSerializer(serializers.Serializer):
