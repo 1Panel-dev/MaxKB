@@ -4,6 +4,7 @@
       <!-- 基本信息 -->
       <BaseForm ref="BaseFormRef" v-if="isCreate" />
       <el-form
+        v-if="isCreate"
         ref="webFormRef"
         :rules="rules"
         :model="form"
@@ -42,11 +43,11 @@
             </el-row>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="Web 根地址" prop="url" v-if="form.type === '1'">
+        <el-form-item label="Web 根地址" prop="source_url" v-if="form.type === '1'">
           <el-input
-            v-model="form.url"
+            v-model="form.source_url"
             placeholder="请输入 Web 根地址"
-            @blur="form.url = form.url.trim()"
+            @blur="form.source_url = form.source_url.trim()"
           />
         </el-form-item>
         <el-form-item label="选择器" v-if="form.type === '1'">
@@ -87,12 +88,12 @@ const loading = ref(false)
 
 const form = ref<any>({
   type: '0',
-  url: '',
+  source_url: '',
   selector: ''
 })
 
 const rules = reactive({
-  url: [{ required: true, message: '请输入 Web 根地址', trigger: 'blur' }]
+  source_url: [{ required: true, message: '请输入 Web 根地址', trigger: 'blur' }]
 })
 
 watch(form.value, (value) => {
@@ -105,7 +106,7 @@ watch(form.value, (value) => {
 
 function radioChange() {
   dataset.saveDocumentsFile([])
-  form.value.url = ''
+  form.value.source_url = ''
   form.value.selector = ''
 }
 

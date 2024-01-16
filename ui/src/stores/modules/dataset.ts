@@ -38,6 +38,30 @@ const useDatasetStore = defineStore({
             reject(error)
           })
       })
+    },
+    async asyncGetDatesetDetail(id: string, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        datasetApi
+          .getDatesetDetail(id, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
+    async asyncSyncDateset(id: string, sync_type: string, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        datasetApi
+          .getSyncWebDateset(id, sync_type, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   }
 })

@@ -14,7 +14,6 @@ import { MdPreview } from 'md-editor-v3'
 const props = withDefaults(defineProps<{ source?: string; inner_suffix?: boolean }>(), {
   source: ''
 })
-
 const md_view_list = computed(() => {
   const temp_source = props.source
   const temp_md_img_list = temp_source.match(/(!\[.*?\]\(img\/.*?\){.*?})|(!\[.*?\]\(img\/.*?\))/g)

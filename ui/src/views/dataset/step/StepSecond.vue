@@ -42,7 +42,14 @@
                           </el-tooltip>
                         </div>
                         <div @click.stop>
-                          <el-select v-model="form.patterns" multiple placeholder="请选择">
+                          <el-select
+                            v-model="form.patterns"
+                            multiple
+                            allow-create
+                            default-first-option
+                            filterable
+                            placeholder="请选择"
+                          >
                             <el-option
                               v-for="(item, index) in splitPatternList"
                               :key="index"

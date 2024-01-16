@@ -82,7 +82,7 @@ const postDateset: (data: datasetData, loading?: Ref<boolean>) => Promise<Result
  * {
   "name": "string",
   "desc": "string",
-  "url": "string",
+  "source_url": "string",
   "selector": "string",
 }
  */
@@ -97,8 +97,11 @@ const postWebDateset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>
  * 知识库详情
  * @param 参数 dataset_id
  */
-const getDatesetDetail: (dataset_id: string) => Promise<Result<any>> = (dataset_id) => {
-  return get(`${prefix}/${dataset_id}`)
+const getDatesetDetail: (dataset_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  dataset_id,
+  loading
+) => {
+  return get(`${prefix}/${dataset_id}`, undefined, loading)
 }
 
 /**
@@ -144,6 +147,19 @@ const getDatasetHitTest: (
   return get(`${prefix}/${dataset_id}/hit_test`, data, loading)
 }
 
+/**
+ * 同步知识库
+ * @param 参数 dataset_id
+ * @query 参数 sync_type // 同步类型->replace:替换同步,complete:完整同步
+ */
+const getSyncWebDateset: (
+  dataset_id: string,
+  sync_type: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, sync_type, loading) => {
+  return get(`${prefix}/${dataset_id}`, { sync_type }, loading)
+}
+
 export default {
   getDateset,
   getAllDateset,
@@ -153,5 +169,6 @@ export default {
   putDateset,
   listUsableApplication,
   getDatasetHitTest,
-  postWebDateset
+  postWebDateset,
+  getSyncWebDateset
 }

@@ -11,12 +11,32 @@
 
           <div class="content">
             <el-card shadow="always" class="dialog-card">
+              <template v-for="(item, index) in prologueList" :key="index">
+                <div
+                  v-if="isMdArray(item)"
+                  @click="quickProblemHandel(item)"
+                  class="problem-button ellipsis-2 mb-8"
+                  :class="log ? 'disabled' : 'cursor'"
+                >
+                  <el-icon><EditPen /></el-icon>
+                  {{ item }}
+                </div>
+                <MdPreview
+                  v-else
+                  class="mb-8"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="item"
+                />
+              </template>
+
+              <!-- {{ prologueList }}
               <h4>您好，我是 {{ data?.name || '应用名称' }}</h4>
               <div class="mt-4" v-if="data?.prologue">
                 <el-text type="info">{{ data?.prologue }}</el-text>
-              </div>
+              </div> -->
             </el-card>
-            <el-card shadow="always" class="dialog-card mt-12" v-if="data?.example?.length > 0">
+            <!-- <el-card shadow="always" class="dialog-card mt-12" v-if="data?.example?.length > 0">
               <h4 class="mb-8">您可以尝试输入以下问题：</h4>
               <el-space wrap>
                 <template v-for="(item, index) in data?.example" :key="index">
@@ -31,7 +51,7 @@
                   </div>
                 </template>
               </el-space>
-            </el-card>
+            </el-card> -->
           </div>
         </div>
         <template v-for="(item, index) in chatList" :key="index">
@@ -136,6 +156,7 @@ import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
 import MdRenderer from '@/components/markdown-renderer/MdRenderer.vue'
+import { MdPreview } from 'md-editor-v3'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
@@ -167,6 +188,13 @@ const chatList = ref<any[]>([])
 const isDisabledChart = computed(
   () => !(inputValue.value && (props.appId || (props.data?.name && props.data?.model_id)))
 )
+
+const prologueList = computed(() => {
+  const temp = props.data?.prologue
+  const lines = temp.split('\n')
+  return lines
+})
+const isMdArray = (val: string) => val.match(/^-\s.*/m)
 
 watch(
   () => props.record,

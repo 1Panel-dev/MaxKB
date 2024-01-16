@@ -12,6 +12,7 @@
         <div class="scrollbar-height-left">
           <el-scrollbar>
             <el-form
+              hide-required-asterisk
               ref="applicationFormRef"
               :model="applicationForm"
               :rules="rules"
@@ -20,7 +21,12 @@
               class="p-24"
               style="padding-top: 0"
             >
-              <el-form-item label="应用名称" prop="name">
+              <el-form-item prop="name">
+                <template #label>
+                  <div class="flex-between">
+                    <span>应用名称 <span class="danger">*</span></span>
+                  </div>
+                </template>
                 <el-input
                   v-model="applicationForm.name"
                   maxlength="64"
@@ -38,10 +44,17 @@
                   show-word-limit
                 />
               </el-form-item>
-              <el-form-item label="选择模型" prop="model_id">
+              <el-form-item prop="model_id">
+                <template #label>
+                  <div class="flex-between">
+                    <span>AI 模型 <span class="danger">*</span></span>
+
+                    <el-button type="primary" link>提示词</el-button>
+                  </div>
+                </template>
                 <el-select
                   v-model="applicationForm.model_id"
-                  placeholder="请选择模型"
+                  placeholder="请选择 AI 模型"
                   style="width: 100%"
                 >
                   <el-option-group
@@ -86,16 +99,90 @@
                 <template #label>
                   <div class="flex-between">
                     <span>关联知识库</span>
-                    <el-button type="primary" link @click="openDatasetDialog">
-                      <el-icon class="mr-4"><Plus /></el-icon> 添加
-                    </el-button>
+
+                    <el-popover :visible="popoverVisible" :width="300" trigger="click">
+                      <template #reference>
+                        <el-button type="primary" link @click="popoverVisible = !popoverVisible"
+                          >参数设置</el-button
+                        >
+                      </template>
+                      <div class="set-rules__form">
+                        <div class="form-item mb-16">
+                          <div class="title flex align-center mb-8">
+                            <span style="margin-right: 4px">相似度</span>
+                            <el-tooltip
+                              effect="dark"
+                              content="相似度越高相关性越强。"
+                              placement="right"
+                            >
+                              <el-icon style="font-size: 16px">
+                                <Warning />
+                              </el-icon>
+                            </el-tooltip>
+                          </div>
+                          <div @click.stop>
+                            高于
+                            <el-input-number
+                              v-model="formInline.similarity"
+                              :min="0"
+                              :max="1"
+                              :precision="3"
+                              :step="0.1"
+                              controls-position="right"
+                              style="width: 100px"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-item mb-16">
+                          <div class="title mb-8">引用分段数</div>
+                          <div @click.stop>
+                            TOP
+                            <el-input-number
+                              v-model="formInline.top_number"
+                              :min="1"
+                              :max="10"
+                              controls-position="right"
+                              style="width: 100px"
+                              size="small"
+                            />
+                            个分段
+                          </div>
+                        </div>
+
+                        <div class="form-item mb-16">
+                          <div class="title mb-8">最多引用字符数</div>
+                          <div class="flex align-center">
+                            <el-slider
+                              v-model="formInline.top_number"
+                              show-input
+                              :show-input-controls="false"
+                              :min="500"
+                              :max="10000"
+                              style="width: 220px"
+                              size="small"
+                            />
+                            <span class="ml-4">个字符</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <el-button @click="popoverVisible = false" size="small">取消</el-button>
+                        <el-button type="primary" @click="popoverVisible = false" size="small"
+                          >确认</el-button
+                        >
+                      </div>
+                    </el-popover>
                   </div>
                 </template>
-                <div v-if="applicationForm.dataset_id_list.length == 0">
-                  <el-text type="info">关联的知识库展示在这里</el-text>
-                </div>
-                <div class="w-full" v-else>
+                <div class="w-full">
                   <el-row :gutter="12">
+                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mb-8">
+                      <CardAdd
+                        title="关联知识库"
+                        @click="openDatasetDialog"
+                        style="min-height: 50px; font-size: 14px"
+                      />
+                    </el-col>
                     <el-col
                       :xs="24"
                       :sm="24"
@@ -126,12 +213,19 @@
                 </div>
               </el-form-item>
               <el-form-item label="开场白">
-                <el-input
+                <MdEditor
+                  class="prologue-md-editor"
+                  v-model="applicationForm.prologue"
+                  :preview="false"
+                  :toolbars="[]"
+                  :footers="[]"
+                />
+                <!-- <el-input
                   v-model="applicationForm.prologue"
                   type="textarea"
                   placeholder="开始对话的欢迎语。您可以这样写：您好，我是 MaxKB 智能小助手，您可以向我提出 MaxKB 产品使用中遇到的任何问题。"
                   :rows="4"
-                />
+                /> -->
               </el-form-item>
               <el-form-item label="示例">
                 <template v-for="(item, index) in exampleList" :key="index">
@@ -184,6 +278,7 @@ import { groupBy } from 'lodash'
 import AddDatasetDialog from './components/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
+import { MdEditor } from 'md-editor-v3'
 import applicationApi from '@/api/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
@@ -214,10 +309,19 @@ const applicationForm = ref<ApplicationFormType>({
   desc: '',
   model_id: '',
   multiple_rounds_dialogue: false,
-  prologue: '',
+  prologue: `您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。
+- MaxKB 主要功能有什么？
+- MaxKB 支持哪些大语言模型？
+- MaxKB 支持哪些文档类型？`,
   example: [],
   dataset_id_list: []
 })
+
+const formInline = reactive({
+  similarity: 0.6,
+  top_number: 5
+})
+const popoverVisible = ref(false)
 
 const rules = reactive<FormRules<ApplicationFormType>>({
   name: [{ required: true, message: '请输入应用名称', trigger: 'blur' }],
@@ -367,5 +471,8 @@ onMounted(() => {
 .check-icon {
   position: absolute;
   right: 10px;
+}
+.prologue-md-editor {
+  height: 150px;
 }
 </style>
