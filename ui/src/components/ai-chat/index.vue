@@ -64,13 +64,30 @@
                 <MdRenderer :source="item.answer_text"></MdRenderer>
                 <div v-if="item.write_ed || log">
                   <el-divider> <el-text type="info">知识来源</el-text> </el-divider>
+                  <div class="mb-8">
+                    <el-space wrap>
+                      <el-button
+                        v-for="(dataset, index) in item.dataset_list"
+                        :key="index"
+                        type="primary"
+                        plain
+                        size="small"
+                        >{{ dataset.name }}</el-button
+                      >
+                    </el-space>
+                  </div>
 
-                  <el-tag type="info" effect="plain">
-                    消耗 tokens: {{ item?.message_tokens + item?.answer_tokens }}
-                  </el-tag>
-                  <el-tag class="ml-8" type="info" effect="plain">
-                    耗时: {{ item.run_time.toFixed(2) }} s
-                  </el-tag>
+                  <div>
+                    <el-button class="mr-8" type="primary" plain size="small"
+                      >引用分段：{{ item.paragraph_list.length }}</el-button
+                    >
+                    <el-tag type="info" effect="plain">
+                      消耗 tokens: {{ item?.message_tokens + item?.answer_tokens }}
+                    </el-tag>
+                    <el-tag class="ml-8" type="info" effect="plain">
+                      耗时: {{ item.run_time.toFixed(2) }} s
+                    </el-tag>
+                  </div>
                 </div>
               </el-card>
               <div class="flex-between mt-8" v-if="log">

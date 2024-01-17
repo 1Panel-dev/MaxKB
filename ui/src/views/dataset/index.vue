@@ -48,9 +48,9 @@
                     </div>
                     <div @click.stop>
                       <el-dropdown trigger="click">
-                        <span class="el-dropdown-link cursor">
+                        <el-button text @click.stop>
                           <el-icon><MoreFilled /></el-icon>
-                        </span>
+                        </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
                             <el-dropdown-item
