@@ -54,7 +54,7 @@ const useDatasetStore = defineStore({
     async asyncSyncDateset(id: string, sync_type: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         datasetApi
-          .getSyncWebDateset(id, sync_type, loading)
+          .putSyncWebDateset(id, sync_type, loading)
           .then((data) => {
             resolve(data)
           })
