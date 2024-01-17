@@ -237,8 +237,9 @@ class ChatRecordSerializer(serializers.Serializer):
         @staticmethod
         def reset_chat_record(chat_record, all_paragraph_list):
             paragraph_list = list(
-                filter(lambda paragraph: chat_record.paragraph_id_list.__contains__(str(paragraph.get('id'))),
-                       all_paragraph_list))
+                filter(
+                    lambda paragraph: chat_record.paragraph_id_list.__contains__(uuid.UUID(str(paragraph.get('id')))),
+                    all_paragraph_list))
             dataset_list = [{'id': dataset_id, 'name': name} for dataset_id, name in reduce(lambda x, y: {**x, **y},
                                                                                             [{row.get(
                                                                                                 'dataset_id'): row.get(
