@@ -75,7 +75,7 @@
       <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     </LayoutContainer>
     <div class="hit-test__operate p-24 pt-0">
-      <el-popover :visible="popoverVisible" placement="top-start" :width="600" trigger="click">
+      <el-popover :visible="popoverVisible" placement="top-start" :width="500" trigger="click">
         <template #reference>
           <el-button icon="Setting" class="mb-8" @click="popoverVisible = !popoverVisible"
             >参数设置</el-button
@@ -106,8 +106,8 @@
             />
             个分段
           </div>
-          <el-button class="ml-16" @click="popoverVisible = false">取消</el-button>
-          <el-button type="primary" @click="popoverVisible = false">确认</el-button>
+          <!-- <el-button class="ml-16" @click="popoverVisible = false">取消</el-button> -->
+          <el-button class="ml-16" type="primary" @click="popoverVisible = false">确认</el-button>
         </div>
       </el-popover>
       <div class="operate-textarea flex">
@@ -157,7 +157,7 @@ const paragraphDetail = ref<any[]>([])
 const title = ref('')
 const inputValue = ref('')
 const formInline = reactive({
-  similarity: 0.600,
+  similarity: 0.6,
   top_number: 5
 })
 const popoverVisible = ref(false)
