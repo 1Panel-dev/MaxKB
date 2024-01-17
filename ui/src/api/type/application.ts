@@ -3,11 +3,19 @@ import { type Ref } from 'vue'
 interface ApplicationFormType {
   name?: string
   desc?: string
-  model_id: string
-  multiple_rounds_dialogue: boolean
+  model_id?: string
+  multiple_rounds_dialogue?: boolean
   prologue?: string
-  example?: string[]
-  dataset_id_list: string[]
+  dataset_id_list?: string[]
+  dataset_setting?: {
+    top_n: number
+    similarity: number
+    max_paragraph_char_number: number
+  }
+  model_setting?: {
+    prompt: string
+  }
+  problem_optimization?: boolean
 }
 interface chatType {
   id: string

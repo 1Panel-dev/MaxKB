@@ -191,7 +191,7 @@ const isDisabledChart = computed(
 
 const prologueList = computed(() => {
   const temp = props.data?.prologue
-  const lines = temp.split('\n')
+  const lines = temp?.split('\n')
   return lines
 })
 const isMdArray = (val: string) => val.match(/^-\s.*/m)
@@ -240,11 +240,7 @@ const startChat = (chat: chatType) => {
  */
 function getChartOpenId() {
   loading.value = true
-  const obj = {
-    model_id: props.data.model_id,
-    dataset_id_list: props.data.dataset_id_list,
-    multiple_rounds_dialogue: props.data.multiple_rounds_dialogue
-  }
+  const obj = props.data
   if (props.appId) {
     applicationApi
       .getChatOpen(props.appId)

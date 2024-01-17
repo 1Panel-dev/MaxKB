@@ -34,20 +34,7 @@ const getApplication: (
 
 /**
  * 创建应用
- * @param 参数 
- * {
-  "name": "string",
-  "desc": "string",
-  "model_id": "string",
-  "multiple_rounds_dialogue": true,
-  "prologue": "string",
-  "example": [
-    "string"
-  ],
-  "dataset_id_list": [
-    "string"
-  ]
-}
+ * @param 参数
  */
 const postApplication: (
   data: ApplicationFormType,
@@ -59,19 +46,7 @@ const postApplication: (
 /**
  * 修改应用
  * @param 参数 
- * {
-  "name": "string",
-  "desc": "string",
-  "model_id": "string",
-  "multiple_rounds_dialogue": true,
-  "prologue": "string",
-  "example": [
-    "string"
-  ],
-  "dataset_id_list": [
-    "string"
-  ]
-}
+
  */
 const putApplication: (
   applicaiton_id: String,
@@ -168,12 +143,7 @@ const getProfile: (loading?: Ref<boolean>) => Promise<any> = (loading) => {
 /**
  * 获得临时回话Id
  * @param 参数 
- * {
-  "model_id": "string",
-  "multiple_rounds_dialogue": true,
-  "dataset_id_list": [
-    "string"
-  ]
+
 }
  */
 const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data) => {

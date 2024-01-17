@@ -42,7 +42,7 @@
             <el-form-item label="选择器" v-if="detail.type === '1'">
               <el-input
                 v-model="form.selector"
-                placeholder="请输入选择器"
+                placeholder="默认为 body，可输入 .classname/#idname/tagname"
                 @blur="form.selector = form.selector.trim()"
               />
             </el-form-item>

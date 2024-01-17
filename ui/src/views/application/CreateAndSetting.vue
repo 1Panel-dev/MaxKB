@@ -49,7 +49,7 @@
                   <div class="flex-between">
                     <span>AI 模型 <span class="danger">*</span></span>
 
-                    <el-button type="primary" link>提示词</el-button>
+                    <el-button type="primary" link @click="promptChange('open')">提示词</el-button>
                   </div>
                 </template>
                 <el-select
@@ -106,8 +106,8 @@
                           >参数设置</el-button
                         >
                       </template>
-                      <div class="set-rules__form">
-                        <div class="form-item mb-16">
+                      <div class="dataset_setting">
+                        <div class="form-item mb-16 p-8">
                           <div class="title flex align-center mb-8">
                             <span style="margin-right: 4px">相似度</span>
                             <el-tooltip
@@ -123,22 +123,23 @@
                           <div @click.stop>
                             高于
                             <el-input-number
-                              v-model="formInline.similarity"
+                              v-model="applicationForm.dataset_setting.similarity"
                               :min="0"
                               :max="1"
                               :precision="3"
                               :step="0.1"
                               controls-position="right"
                               style="width: 100px"
+                              size="small"
                             />
                           </div>
                         </div>
-                        <div class="form-item mb-16">
+                        <div class="form-item mb-16 p-8">
                           <div class="title mb-8">引用分段数</div>
                           <div @click.stop>
                             TOP
                             <el-input-number
-                              v-model="formInline.top_number"
+                              v-model="applicationForm.dataset_setting.top_n"
                               :min="1"
                               :max="10"
                               controls-position="right"
@@ -149,16 +150,16 @@
                           </div>
                         </div>
 
-                        <div class="form-item mb-16">
+                        <div class="form-item mb-16 p-8">
                           <div class="title mb-8">最多引用字符数</div>
                           <div class="flex align-center">
                             <el-slider
-                              v-model="formInline.top_number"
+                              v-model="applicationForm.dataset_setting.max_paragraph_char_number"
                               show-input
                               :show-input-controls="false"
                               :min="500"
                               :max="10000"
-                              style="width: 220px"
+                              style="width: 200px"
                               size="small"
                             />
                             <span class="ml-4">个字符</span>
@@ -166,7 +167,6 @@
                         </div>
                       </div>
                       <div class="text-right">
-                        <el-button @click="popoverVisible = false" size="small">取消</el-button>
                         <el-button type="primary" @click="popoverVisible = false" size="small"
                           >确认</el-button
                         >
@@ -220,21 +220,6 @@
                   :toolbars="[]"
                   :footers="[]"
                 />
-                <!-- <el-input
-                  v-model="applicationForm.prologue"
-                  type="textarea"
-                  placeholder="开始对话的欢迎语。您可以这样写：您好，我是 MaxKB 智能小助手，您可以向我提出 MaxKB 产品使用中遇到的任何问题。"
-                  :rows="4"
-                /> -->
-              </el-form-item>
-              <el-form-item label="示例">
-                <template v-for="(item, index) in exampleList" :key="index">
-                  <el-input
-                    v-model="exampleList[index]"
-                    :placeholder="`用户提问 示例${index + 1}`"
-                    class="mb-8"
-                  />
-                </template>
               </el-form-item>
             </el-form>
           </el-scrollbar>
@@ -256,6 +241,19 @@
         </div>
       </el-col>
     </el-row>
+    <el-dialog v-model="dialogFormVisible" title="提示词">
+      <el-alert type="info" show-icon class="mb-16" :closable="false">
+        <p>通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。</p>
+        <p>可以使用变量：{data} 是携带知识库中已知信息；{question}是用户提出的问题。</p>
+      </el-alert>
+      <el-input v-model="model_setting_prompt" :rows="13" type="textarea" />
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取消</el-button>
+          <el-button type="primary" @click="promptChange('close')"> 确认 </el-button>
+        </span>
+      </template>
+    </el-dialog>
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
       @addData="addDataset"
@@ -274,7 +272,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { groupBy } from 'lodash'
+import { groupBy, cloneDeep } from 'lodash'
 import AddDatasetDialog from './components/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
@@ -295,6 +293,31 @@ const {
   params: { id }
 } = route as any
 
+const defaultPrompt = `已知信息：
+
+{data}
+
+回答要求：
+
+- 请简洁和专业的来回答用户的问题。
+
+- 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。
+
+- 避免提及你是从已知信息中获得的知识。
+
+- 请保证答案与已知信息中描述的一致。
+
+- 请使用 Markdown 语法优化答案的格式。
+
+- 已知信息中的图片、链接地址和脚本语言请直接返回。
+
+- 请使用与问题相同的语言来回答。
+
+问题：
+
+{question}
+    `
+
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
 const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 
@@ -303,7 +326,6 @@ const AddDatasetDialogRef = ref()
 
 const loading = ref(false)
 const datasetLoading = ref(false)
-const exampleList = ref(['', ''])
 const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
@@ -313,14 +335,18 @@ const applicationForm = ref<ApplicationFormType>({
 - MaxKB 主要功能有什么？
 - MaxKB 支持哪些大语言模型？
 - MaxKB 支持哪些文档类型？`,
-  example: [],
-  dataset_id_list: []
+  dataset_id_list: [],
+  dataset_setting: {
+    top_n: 3,
+    similarity: 0.6,
+    max_paragraph_char_number: 5000
+  },
+  model_setting: {
+    prompt: defaultPrompt
+  },
+  problem_optimization: true
 })
 
-const formInline = reactive({
-  similarity: 0.6,
-  top_number: 5
-})
 const popoverVisible = ref(false)
 
 const rules = reactive<FormRules<ApplicationFormType>>({
@@ -336,14 +362,19 @@ const rules = reactive<FormRules<ApplicationFormType>>({
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 const datasetList = ref([])
+const dialogFormVisible = ref(false)
 
-watch(
-  () => exampleList.value,
-  (val) => {
-    applicationForm.value.example = val.filter((v) => v)
-  },
-  { deep: true }
-)
+const model_setting_prompt = ref('')
+
+function promptChange(val: string) {
+  if (val === 'open') {
+    dialogFormVisible.value = true
+    model_setting_prompt.value = applicationForm.value.model_setting.prompt
+  } else if (val === 'close') {
+    dialogFormVisible.value = false
+    applicationForm.value.model_setting.prompt = model_setting_prompt.value
+  }
+}
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -387,11 +418,6 @@ function getDetail() {
   application.asyncGetApplicationDetail(id, loading).then((res: any) => {
     applicationForm.value = res.data
     applicationForm.value.model_id = res.data.model
-    if (res.data?.example.length === 2) {
-      exampleList.value = res.data?.example
-    } else if (res.data?.example.length === 1) {
-      exampleList.value = [res.data?.example[0], '']
-    }
   })
 }
 
@@ -474,5 +500,10 @@ onMounted(() => {
 }
 .prologue-md-editor {
   height: 150px;
+}
+.dataset_setting {
+  .form-item {
+    background: var(--app-layout-bg-color);
+  }
 }
 </style>
