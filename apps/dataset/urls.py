@@ -12,6 +12,7 @@ urlpatterns = [
     path('dataset/<str:dataset_id>/sync_web', views.Dataset.SyncWeb.as_view()),
     path('dataset/<str:dataset_id>/hit_test', views.Dataset.HitTest.as_view()),
     path('dataset/<str:dataset_id>/document', views.Document.as_view(), name='document'),
+    path('dataset/<str:dataset_id>/document/web', views.WebDocument.as_view()),
     path('dataset/<str:dataset_id>/document/_bach', views.Document.Batch.as_view()),
     path('dataset/<str:dataset_id>/document/<int:current_page>/<int:page_size>', views.Document.Page.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>', views.Document.Operate.as_view(),

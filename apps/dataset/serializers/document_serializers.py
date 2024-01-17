@@ -21,7 +21,7 @@ from rest_framework import serializers
 
 from common.db.search import native_search, native_page_search
 from common.event.common import work_thread_pool
-from common.event.listener_manage import ListenerManagement
+from common.event.listener_manage import ListenerManagement, SyncWebDocumentArgs
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
@@ -29,8 +29,26 @@ from common.util.file_util import get_file_content
 from common.util.fork import Fork
 from common.util.split_model import SplitModel, get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status
+from dataset.serializers.common_serializers import BatchSerializer
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
+
+
+class DocumentWebInstanceSerializer(ApiMixin, serializers.Serializer):
+    source_url_list = serializers.ListField(required=True, child=serializers.CharField(required=True))
+    selector = serializers.CharField(required=False)
+
+    @staticmethod
+    def get_request_body_api():
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['source_url_list'],
+            properties={
+                'source_url_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="段落列表", description="段落列表",
+                                                  items=openapi.Schema(type=openapi.TYPE_STRING)),
+                'selector': openapi.Schema(type=openapi.TYPE_STRING, title="文档名称", description="文档名称")
+            }
+        )
 
 
 class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
@@ -121,6 +139,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             document_id = self.data.get('document_id')
             document = QuerySet(Document).filter(id=document_id).first()
+            if document.type != Type.web:
+                return True
             try:
                 document.status = Status.embedding
                 document.save()
@@ -302,6 +322,38 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 with_valid=True), document_id
 
         @staticmethod
+        def get_sync_handler(dataset_id):
+            def handler(source_url: str, selector, response: Fork.Response):
+                if response.status == 200:
+                    try:
+                        paragraphs = get_split_model('web.md').parse(response.content)
+                        # 插入
+                        DocumentSerializers.Create(data={'dataset_id': dataset_id}).save(
+                            {'name': source_url, 'paragraphs': paragraphs,
+                             'meta': {'source_url': source_url, 'selector': selector},
+                             'type': Type.web}, with_valid=True)
+                    except Exception as e:
+                        logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+                else:
+                    Document(name=source_url,
+                             meta={'source_url': source_url, 'selector': selector},
+                             type=Type.web,
+                             char_length=0,
+                             status=Status.error).save()
+
+            return handler
+
+        def save_web(self, instance: Dict, with_valid=True):
+            if with_valid:
+                DocumentWebInstanceSerializer(data=instance).is_valid(raise_exception=True)
+                self.is_valid(raise_exception=True)
+            dataset_id = self.data.get('dataset_id')
+            source_url_list = instance.get('source_url_list')
+            selector = instance.get('selector')
+            args = SyncWebDocumentArgs(source_url_list, selector, self.get_sync_handler(dataset_id))
+            ListenerManagement.sync_web_document_signal.send(args)
+
+        @staticmethod
         def get_paragraph_model(document_model, paragraph_list: List):
             dataset_id = document_model.dataset_id
             paragraph_model_dict_list = [ParagraphSerializers.Create(
@@ -331,8 +383,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                    'meta': instance.get('meta') if instance.get('meta') is not None else {},
                    'type': instance.get('type') if instance.get('type') is not None else Type.base})
 
-            return DocumentSerializers.Create.get_paragraph_model(document_model, instance.get('paragraphs') if
-            'paragraphs' in instance else [])
+            return DocumentSerializers.Create.get_paragraph_model(document_model,
+                                                                  instance.get('paragraphs') if
+                                                                  'paragraphs' in instance else [])
 
         @staticmethod
         def get_request_body_api():
@@ -450,6 +503,27 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             query_set = query_set.filter(**{'id__in': [d.id for d in document_model_list]})
             return native_search(query_set, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_document.sql')), with_search_one=False),
+
+        @staticmethod
+        def _batch_sync(document_id_list: List[str]):
+            for document_id in document_id_list:
+                DocumentSerializers.Sync(data={'document_id': document_id}).sync()
+
+        def batch_sync(self, instance: Dict, with_valid=True):
+            if with_valid:
+                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
+                self.is_valid(raise_exception=True)
+            # 异步同步
+            work_thread_pool.submit(self._batch_sync,
+                                    instance.get('id_list'))
+            return True
+
+        def batch_delete(self, instance: Dict, with_valid=True):
+            if with_valid:
+                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
+                self.is_valid(raise_exception=True)
+            QuerySet(Document).filter(id__in=instance.get('id_list')).delete()
+            return True
 
 
 def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):

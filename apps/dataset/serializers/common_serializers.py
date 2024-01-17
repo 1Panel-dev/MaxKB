@@ -10,9 +10,13 @@ import os
 from typing import List
 
 from django.db.models import QuerySet
+from drf_yasg import openapi
+from rest_framework import serializers
 
 from common.db.search import native_search
 from common.db.sql_execute import update_execute
+from common.exception.app_exception import AppApiException
+from common.mixins.api_mixin import ApiMixin
 from common.util.file_util import get_file_content
 from dataset.models import Paragraph
 from smartdoc.conf import PROJECT_DIR
@@ -29,3 +33,28 @@ def list_paragraph(paragraph_list: List[str]):
         return []
     return native_search(QuerySet(Paragraph).filter(id__in=paragraph_list), get_file_content(
         os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_paragraph.sql')))
+
+
+class BatchSerializer(ApiMixin, serializers.Serializer):
+    id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True))
+
+    def is_valid(self, *, model=None, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        if model is not None:
+            id_list = self.data.get('id_list')
+            model_list = QuerySet(model).filter(id__in=id_list)
+            if len(model_list) != len(id_list):
+                model_id_list = [str(m.id) for m in model_list]
+                error_id_list = list(filter(lambda row_id: not model_id_list.__contains__(row_id), id_list))
+                raise AppApiException(500, f"id不正确:{error_id_list}")
+
+    @staticmethod
+    def get_request_body_api():
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'id_list': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING),
+                                          title="主键id列表",
+                                          description="主键id列表")
+            }
+        )

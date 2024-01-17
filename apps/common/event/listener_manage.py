@@ -9,6 +9,7 @@
 import logging
 import os
 import traceback
+from typing import List
 
 import django.db.models
 from blinker import signal
@@ -18,7 +19,7 @@ from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.db.search import native_search, get_dynamics_model
 from common.event.common import poxy
 from common.util.file_util import get_file_content
-from common.util.fork import ForkManage
+from common.util.fork import ForkManage, Fork
 from common.util.lock import try_lock, un_lock
 from dataset.models import Paragraph, Status, Document
 from embedding.models import SourceType
@@ -36,6 +37,13 @@ class SyncWebDatasetArgs:
         self.handler = handler
 
 
+class SyncWebDocumentArgs:
+    def __init__(self, source_url_list: List[str], selector: str, handler):
+        self.source_url_list = source_url_list
+        self.selector = selector
+        self.handler = handler
+
+
 class ListenerManagement:
     embedding_by_problem_signal = signal("embedding_by_problem")
     embedding_by_paragraph_signal = signal("embedding_by_paragraph")
@@ -49,6 +57,7 @@ class ListenerManagement:
     disable_embedding_by_paragraph_signal = signal('disable_embedding_by_paragraph')
     init_embedding_model_signal = signal('init_embedding_model')
     sync_web_dataset_signal = signal('sync_web_dataset')
+    sync_web_document_signal = signal('sync_web_document')
 
     @staticmethod
     def embedding_by_problem(args):
@@ -157,6 +166,13 @@ class ListenerManagement:
 
     @staticmethod
     @poxy
+    def sync_web_document(args: SyncWebDocumentArgs):
+        for source_url in args.source_url_list:
+            result = Fork(base_fork_url=source_url, selector_list=args.selector.split(' ')).fork()
+            args.handler(source_url, args.selector, result)
+
+    @staticmethod
+    @poxy
     def sync_web_dataset(args: SyncWebDatasetArgs):
         if try_lock('sync_web_dataset' + args.lock_key):
             try:
@@ -200,3 +216,5 @@ class ListenerManagement:
         ListenerManagement.init_embedding_model_signal.connect(self.init_embedding_model)
         # 同步web站点知识库
         ListenerManagement.sync_web_dataset_signal.connect(self.sync_web_dataset)
+        # 同步web站点 文档
+        ListenerManagement.sync_web_document_signal.connect(self.sync_web_document)

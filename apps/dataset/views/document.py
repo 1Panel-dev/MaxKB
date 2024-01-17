@@ -14,11 +14,29 @@ from rest_framework.views import APIView
 from rest_framework.views import Request
 
 from common.auth import TokenAuth, has_permissions
-from common.constants.permission_constants import Permission, Group, Operate, PermissionConstants
-from common.event.common import work_thread_pool
+from common.constants.permission_constants import Permission, Group, Operate
 from common.response import result
 from common.util.common import query_params_to_single_dict
-from dataset.serializers.document_serializers import DocumentSerializers
+from dataset.serializers.common_serializers import BatchSerializer
+from dataset.serializers.document_serializers import DocumentSerializers, DocumentWebInstanceSerializer
+
+
+class WebDocument(APIView):
+    authentication_classes = [TokenAuth]
+
+    @action(methods=['POST'], detail=False)
+    @swagger_auto_schema(operation_summary="创建Web站点文档",
+                         operation_id="创建Web站点文档",
+                         request_body=DocumentWebInstanceSerializer.get_request_body_api(),
+                         manual_parameters=DocumentSerializers.Create.get_request_params_api(),
+                         responses=result.get_api_response(DocumentSerializers.Operate.get_response_body_api()),
+                         tags=["知识库/文档"])
+    @has_permissions(
+        lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                dynamic_tag=k.get('dataset_id')))
+    def post(self, request: Request, dataset_id: str):
+        return result.success(
+            DocumentSerializers.Create(data={'dataset_id': dataset_id}).save_web(request.data, with_valid=True))
 
 
 class Document(APIView):
@@ -70,6 +88,34 @@ class Document(APIView):
                                     dynamic_tag=k.get('dataset_id')))
         def post(self, request: Request, dataset_id: str):
             return result.success(DocumentSerializers.Batch(data={'dataset_id': dataset_id}).batch_save(request.data))
+
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="批量同步文档",
+                             operation_id="批量同步文档",
+                             request_body=
+                             BatchSerializer.get_request_body_api(),
+                             manual_parameters=DocumentSerializers.Create.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库/文档"])
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def put(self, request: Request, dataset_id: str):
+            return result.success(DocumentSerializers.Batch(data={'dataset_id': dataset_id}).batch_sync(request.data))
+
+        @action(methods=['DELETE'], detail=False)
+        @swagger_auto_schema(operation_summary="批量删除文档",
+                             operation_id="批量删除文档",
+                             request_body=
+                             BatchSerializer.get_request_body_api(),
+                             manual_parameters=DocumentSerializers.Create.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库/文档"])
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def delete(self, request: Request, dataset_id: str):
+            return result.success(DocumentSerializers.Batch(data={'dataset_id': dataset_id}).batch_delete(request.data))
 
     class Refresh(APIView):
         authentication_classes = [TokenAuth]
