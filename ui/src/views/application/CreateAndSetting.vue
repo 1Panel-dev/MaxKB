@@ -221,6 +221,19 @@
                   :footers="[]"
                 />
               </el-form-item>
+              <el-form-item @click.prevent>
+                <template #label>
+                  <div class="flex align-center">
+                    <span>问题优化</span>
+                    <el-tooltip effect="dark" content="根据历史聊天优化完善当前问题，更利于匹配知识点。" placement="right">
+                      <el-icon style="font-size: 16px">
+                        <Warning />
+                      </el-icon>
+                    </el-tooltip>
+                  </div>
+                </template>
+                <el-switch size="small" v-model="applicationForm.problem_optimization"></el-switch>
+              </el-form-item>
             </el-form>
           </el-scrollbar>
         </div>

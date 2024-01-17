@@ -157,7 +157,7 @@ const putSyncWebDateset: (
   sync_type: string,
   loading?: Ref<boolean>
 ) => Promise<Result<any>> = (dataset_id, sync_type, loading) => {
-  return put(`${prefix}/${dataset_id}/sync_web`, { sync_type }, loading)
+  return put(`${prefix}/${dataset_id}/sync_web`, undefined, { sync_type }, loading)
 }
 
 export default {

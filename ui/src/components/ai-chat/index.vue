@@ -29,29 +29,7 @@
                   :modelValue="item"
                 />
               </template>
-
-              <!-- {{ prologueList }}
-              <h4>您好，我是 {{ data?.name || '应用名称' }}</h4>
-              <div class="mt-4" v-if="data?.prologue">
-                <el-text type="info">{{ data?.prologue }}</el-text>
-              </div> -->
             </el-card>
-            <!-- <el-card shadow="always" class="dialog-card mt-12" v-if="data?.example?.length > 0">
-              <h4 class="mb-8">您可以尝试输入以下问题：</h4>
-              <el-space wrap>
-                <template v-for="(item, index) in data?.example" :key="index">
-                  <div
-                    @click="quickProblemHandel(item)"
-                    class="problem-button ellipsis-2"
-                    :class="log ? 'disabled' : 'cursor'"
-                    v-if="item"
-                  >
-                    <el-icon><EditPen /></el-icon>
-                    {{ item }}
-                  </div>
-                </template>
-              </el-space>
-            </el-card> -->
           </div>
         </div>
         <template v-for="(item, index) in chatList" :key="index">
@@ -84,6 +62,16 @@
 
               <el-card v-else shadow="always" class="dialog-card">
                 <MdRenderer :source="item.answer_text"></MdRenderer>
+                <div v-if="item.write_ed || log">
+                  <el-divider> <el-text type="info">知识来源</el-text> </el-divider>
+
+                  <el-tag type="info" effect="plain">
+                    消耗 tokens: {{ item?.message_tokens + item?.answer_tokens }}
+                  </el-tag>
+                  <el-tag class="ml-8" type="info" effect="plain">
+                    耗时: {{ item.run_time.toFixed(2) }} s
+                  </el-tag>
+                </div>
               </el-card>
               <div class="flex-between mt-8" v-if="log">
                 <LogOperationButton v-model:data="chatList[index]" :applicationId="appId" />
