@@ -166,7 +166,8 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
     class Meta:
         model = ChatRecord
         fields = ['id', 'chat_id', 'vote_status', 'problem_text', 'answer_text',
-                  'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index']
+                  'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index',
+                  'create_time', 'update_time']
 
 
 class ChatRecordSerializer(serializers.Serializer):
