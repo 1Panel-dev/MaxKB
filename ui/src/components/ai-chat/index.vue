@@ -64,6 +64,13 @@
                 <MdRenderer :source="item.answer_text"></MdRenderer>
                 <div v-if="item.write_ed || log">
                   <el-divider> <el-text type="info">知识来源</el-text> </el-divider>
+
+                  <el-tag type="info" effect="plain">
+                    消耗 tokens: {{ item?.message_tokens + item?.answer_tokens }}
+                  </el-tag>
+                  <el-tag class="ml-8" type="info" effect="plain">
+                    耗时: {{ item.run_time.toFixed(2) }} s
+                  </el-tag>
                 </div>
               </el-card>
               <div class="flex-between mt-8" v-if="log">

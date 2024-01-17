@@ -1,7 +1,6 @@
 <template>
   <div>
     <el-text type="info">
-      消耗: {{ data?.message_tokens + data?.answer_tokens }} tokens
       <span class="ml-4">{{ datetimeFormat(data.create_time) }}</span>
     </el-text>
   </div>
