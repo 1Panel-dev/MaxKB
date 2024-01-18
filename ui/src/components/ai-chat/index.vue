@@ -424,8 +424,11 @@ function regenerationChart(item: chatType) {
 
 function getSourceDetail(row: any) {
   logApi.getRecordDetail(id, chartOpenId.value, row.record_id, loading).then((res) => {
+    const exclude_keys = ['answer_text', 'id']
     Object.keys(res.data).forEach((key) => {
-      row[key] = res.data[key]
+      if (!exclude_keys.includes(key)) {
+        row[key] = res.data[key]
+      }
     })
   })
   return true
