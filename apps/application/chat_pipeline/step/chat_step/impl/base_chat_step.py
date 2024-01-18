@@ -41,8 +41,6 @@ def event_content(response,
             yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
                                          'content': chunk.content, 'is_end': False}) + "\n\n"
 
-        yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                                     'content': '', 'is_end': True}) + "\n\n"
         # 获取token
         request_token = chat_model.get_num_tokens_from_messages(message_list)
         response_token = chat_model.get_num_tokens(all_text)
@@ -56,6 +54,8 @@ def event_content(response,
         manage.context['answer_tokens'] = manage.context['answer_tokens'] + response_token
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text)
+        yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
+                                     'content': '', 'is_end': True}) + "\n\n"
     except Exception as e:
         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
         yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,

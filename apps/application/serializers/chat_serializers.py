@@ -176,12 +176,22 @@ class ChatRecordSerializer(serializers.Serializer):
 
         chat_record_id = serializers.UUIDField(required=True)
 
+        def get_chat_record(self):
+            chat_record_id = self.data.get('chat_record_id')
+            chat_id = self.data.get('chat_id')
+            chat_info: ChatInfo = chat_cache.get(chat_id)
+            chat_record_list = [chat_record for chat_record in chat_info.chat_record_list if
+                                chat_record.id == uuid.UUID(chat_record_id)]
+            if chat_record_list is not None and len(chat_record_list):
+                return chat_record_list[-1]
+            return QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
+
         def one(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            chat_record_id = self.data.get('chat_record_id')
-            chat_id = self.data.get('chat_id')
-            chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
+            chat_record = self.get_chat_record()
+            if chat_record is None:
+                raise AppApiException(500, "对话不存在")
             dataset_list = []
             paragraph_list = []
             if len(chat_record.paragraph_id_list) > 0:
@@ -200,7 +210,7 @@ class ChatRecordSerializer(serializers.Serializer):
 
             return {
                 **ChatRecordSerializerModel(chat_record).data,
-                'padding_problem_text': chat_record.details.get(
+                'padding_problem_text':  chat_record.details.get('problem_padding').get(
                     'padding_problem_text') if 'problem_padding' in chat_record.details else None,
                 'dataset_list': dataset_list,
                 'paragraph_list': paragraph_list}

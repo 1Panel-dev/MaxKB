@@ -160,7 +160,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, computed, watch } from 'vue'
+import { ref, nextTick, computed, watch, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import LogOperationButton from './LogOperationButton.vue'
 import OperationButton from './OperationButton.vue'
@@ -172,6 +172,7 @@ import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
 import MdRenderer from '@/components/markdown-renderer/MdRenderer.vue'
 import { MdPreview } from 'md-editor-v3'
+import { MsgError } from '@/utils/message'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
@@ -288,6 +289,83 @@ function getChartOpenId() {
       })
   }
 }
+/**
+ * 获取一个递归函数,处理流式数据
+ * @param chat    每一条对话记录
+ * @param reader  流数据
+ * @param stream  是否是流式数据
+ */
+const getWrite = (chat: any, reader: any, stream: boolean) => {
+  let tempResult = ''
+  /**
+   *
+   * @param done  是否结束
+   * @param value 值
+   */
+  const write_stream = ({ done, value }: { done: boolean; value: any }) => {
+    try {
+      if (done) {
+        ChatManagement.close(chat.id)
+        return
+      }
+      const decoder = new TextDecoder('utf-8')
+      let str = decoder.decode(value, { stream: true })
+      // 这里解释一下 start 因为数据流返回流并不是按照后端chunk返回 我们希望得到的chunk是data:{xxx}\n\n 但是它获取到的可能是 data:{ -> xxx}\n\n 总而言之就是 fetch不能保证每个chunk都说以data:开始 \n\n结束
+      tempResult += str
+      if (tempResult.endsWith('\n\n')) {
+        str = tempResult
+        tempResult = ''
+      } else {
+        return reader.read().then(write_stream)
+      }
+      // 这里解释一下 end
+      if (str && str.startsWith('data:')) {
+        const split = str.match(/data:.*}\n\n/g)
+        if (split) {
+          for (const index in split) {
+            const chunk = JSON?.parse(split[index].replace('data:', ''))
+            chat.record_id = chunk.id
+            const content = chunk?.content
+            if (content) {
+              ChatManagement.append(chat.id, content)
+            }
+            if (chunk.is_end) {
+              // 流处理成功 返回成功回调
+              return Promise.resolve()
+            }
+          }
+        }
+      }
+    } catch (e) {
+      return Promise.reject(e)
+    }
+    return reader.read().then(write_stream)
+  }
+  /**
+   * 处理 json 响应
+   * @param param0
+   */
+  const write_json = ({ done, value }: { done: boolean; value: any }) => {
+    if (done) {
+      const result_block = JSON.parse(tempResult)
+      if (result_block.code === 500) {
+        return Promise.reject(result_block.message)
+      } else {
+        if (result_block.content) {
+          ChatManagement.append(chat.id, result_block.content)
+        }
+      }
+      ChatManagement.close(chat.id)
+      return
+    }
+    if (value) {
+      const decoder = new TextDecoder('utf-8')
+      tempResult += decoder.decode(value)
+    }
+    return reader.read().then(write_json)
+  }
+  return stream ? write_stream : write_json
+}
 
 function chatMessage() {
   loading.value = true
@@ -295,9 +373,8 @@ function chatMessage() {
     getChartOpenId()
   } else {
     const problem_text = inputValue.value
-    const id = randomId()
-    chatList.value.push({
-      id: id,
+    const chat = reactive({
+      id: randomId(),
       problem_text: problem_text,
       answer_text: '',
       buffer: [],
@@ -306,74 +383,37 @@ function chatMessage() {
       record_id: '',
       vote_status: '-1'
     })
+    chatList.value.push(chat)
     inputValue.value = ''
     nextTick(() => {
+      // 将滚动条滚动到最下面
       scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
     })
-
-    applicationApi.postChatMessage(chartOpenId.value, problem_text).then((response) => {
-      const row = chatList.value.find((item) => item.id === id)
-      if (row) {
-        ChatManagement.addChatRecord(row, 50, loading)
-        ChatManagement.write(id)
+    // 对话
+    applicationApi
+      .postChatMessage(chartOpenId.value, problem_text)
+      .then((response) => {
+        ChatManagement.addChatRecord(chat, 50, loading)
+        ChatManagement.write(chat.id)
         const reader = response.body.getReader()
-        let tempResult = ''
-        /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
-        const write = ({ done, value }: { done: boolean; value: any }) => {
-          try {
-            if (done) {
-              ChatManagement.close(id)
-              return
-            }
-
-            const decoder = new TextDecoder('utf-8')
-            let str = decoder.decode(value, { stream: true })
-            // 这里解释一下 start 因为数据流返回流并不是按照后端chunk返回 我们希望得到的chunk是data:{xxx}\n\n 但是它获取到的可能是 data:{ -> xxx}\n\n 总而言之就是 fetch不能保证每个chunk都说以data:开始 \n\n结束
-            tempResult += str
-            if (tempResult.endsWith('\n\n')) {
-              str = tempResult
-              tempResult = ''
-            } else {
-              return reader.read().then(write)
-            }
-            // 这里解释一下 end
-            if (str && str.startsWith('data:')) {
-              const split = str.match(/data:.*}\n\n/g)
-              if (split) {
-                for (const index in split) {
-                  const chunk = JSON?.parse(split[index].replace('data:', ''))
-                  row.record_id = chunk.id
-                  const content = chunk?.content
-                  if (content) {
-                    ChatManagement.append(id, content)
-                  }
-                  if (chunk.is_end) {
-                    // 流处理成功 返回成功回调
-                    return Promise.resolve()
-                  }
-                }
-              }
-            }
-          } catch (e) {
-            console.log(e)
-            //  console
-          }
-          return reader.read().then(write)
-        }
-        reader
-          .read()
-          .then(write)
-          .then((ok: any) => {
-            getSourceDetail(row)
-          })
-          .finally((ok: any) => {
-            ChatManagement.close(id)
-          })
-          .catch((e: any) => {
-            ChatManagement.close(id)
-          })
-      }
-    })
+        // 处理流数据
+        const write = getWrite(
+          chat,
+          reader,
+          response.headers.get('Content-Type') !== 'application/json'
+        )
+        return reader.read().then(write)
+      })
+      .then(() => {
+        return getSourceDetail(chat)
+      })
+      .finally(() => {
+        ChatManagement.close(chat.id)
+      })
+      .catch((e: any) => {
+        MsgError(e)
+        ChatManagement.close(chat.id)
+      })
   }
 }
 
@@ -382,12 +422,13 @@ function regenerationChart(item: chatType) {
   chatMessage()
 }
 
-function getSourceDetail(row: chatType) {
-  logApi.getRecordDetail(id, row.id, row.record_id, loading).then((res) => {
-    const obj = { row, ...res.data }
-    const index = chatList.value.findIndex((v) => v.id === row.id)
-    chatList.value.splice(index, 1, obj)
+function getSourceDetail(row: any) {
+  logApi.getRecordDetail(id, chartOpenId.value, row.record_id, loading).then((res) => {
+    Object.keys(res.data).forEach((key) => {
+      row[key] = res.data[key]
+    })
   })
+  return true
 }
 
 /**
