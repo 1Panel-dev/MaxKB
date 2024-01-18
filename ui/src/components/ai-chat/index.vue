@@ -62,7 +62,7 @@
 
               <el-card v-else shadow="always" class="dialog-card">
                 <MdRenderer :source="item.answer_text"></MdRenderer>
-                <div v-if="item.write_ed || log">
+                <div v-if="(id && !props.appId && item.write_ed) || log">
                   <el-divider> <el-text type="info">知识来源</el-text> </el-divider>
                   <div class="mb-8">
                     <el-space wrap>
@@ -72,20 +72,26 @@
                         type="primary"
                         plain
                         size="small"
+                        @click="openParagraph(item, dataset.id)"
                         >{{ dataset.name }}</el-button
                       >
                     </el-space>
                   </div>
 
                   <div>
-                    <el-button class="mr-8" type="primary" plain size="small"
-                      >引用分段：{{ item.paragraph_list.length }}</el-button
+                    <el-button
+                      class="mr-8"
+                      type="primary"
+                      plain
+                      size="small"
+                      @click="openParagraph(item)"
+                      >引用分段：{{ item.paragraph_list?.length }}</el-button
                     >
                     <el-tag type="info" effect="plain">
                       消耗 tokens: {{ item?.message_tokens + item?.answer_tokens }}
                     </el-tag>
                     <el-tag class="ml-8" type="info" effect="plain">
-                      耗时: {{ item.run_time.toFixed(2) }} s
+                      耗时: {{ item.run_time?.toFixed(2) }} s
                     </el-tag>
                   </div>
                 </div>
@@ -149,6 +155,8 @@
         </div>
       </div>
     </div>
+    <!-- 知识库引用 dialog -->
+    <ParagraphSourceDialog ref="ParagraphSourceDialogRef" />
   </div>
 </template>
 <script setup lang="ts">
@@ -156,7 +164,9 @@ import { ref, nextTick, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import LogOperationButton from './LogOperationButton.vue'
 import OperationButton from './OperationButton.vue'
+import ParagraphSourceDialog from './ParagraphSourceDialog.vue'
 import applicationApi from '@/api/application'
+import logApi from '@/api/log'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
@@ -165,7 +175,7 @@ import { MdPreview } from 'md-editor-v3'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
-  params: { accessToken }
+  params: { accessToken, id }
 } = route as any
 const props = defineProps({
   data: {
@@ -181,6 +191,7 @@ const props = defineProps({
 })
 const { application } = useStore()
 
+const ParagraphSourceDialogRef = ref()
 const aiChatRef = ref()
 const quickInputRef = ref()
 const scrollDiv = ref()
@@ -212,6 +223,10 @@ watch(
     immediate: true
   }
 )
+
+function openParagraph(row: any, id?: string) {
+  ParagraphSourceDialogRef.value.open(row, id)
+}
 
 function quickProblemHandel(val: string) {
   if (!props.log) {
@@ -348,6 +363,9 @@ function chatMessage() {
         reader
           .read()
           .then(write)
+          .then((ok: any) => {
+            getSourceDetail(row)
+          })
           .finally((ok: any) => {
             ChatManagement.close(id)
           })
@@ -362,6 +380,14 @@ function chatMessage() {
 function regenerationChart(item: chatType) {
   inputValue.value = item.problem_text
   chatMessage()
+}
+
+function getSourceDetail(row: chatType) {
+  logApi.getRecordDetail(id, row.id, row.record_id, loading).then((res) => {
+    const obj = { row, ...res.data }
+    const index = chatList.value.findIndex((v) => v.id === row.id)
+    chatList.value.splice(index, 1, obj)
+  })
 }
 
 /**

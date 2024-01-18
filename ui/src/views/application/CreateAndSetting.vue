@@ -225,7 +225,11 @@
                 <template #label>
                   <div class="flex align-center">
                     <span>问题优化</span>
-                    <el-tooltip effect="dark" content="根据历史聊天优化完善当前问题，更利于匹配知识点。" placement="right">
+                    <el-tooltip
+                      effect="dark"
+                      content="根据历史聊天优化完善当前问题，更利于匹配知识点。"
+                      placement="right"
+                    >
                       <el-icon style="font-size: 16px">
                         <Warning />
                       </el-icon>
@@ -259,7 +263,12 @@
         <p>通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。</p>
         <p>可以使用变量：{data} 是携带知识库中已知信息；{question}是用户提出的问题。</p>
       </el-alert>
-      <el-input v-model="model_setting_prompt" :rows="13" type="textarea" />
+      <el-input
+        v-model="model_setting_prompt"
+        :rows="13"
+        type="textarea"
+        :placeholder="defaultPrompt"
+      />
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -357,7 +366,7 @@ const applicationForm = ref<ApplicationFormType>({
   model_setting: {
     prompt: defaultPrompt
   },
-  problem_optimization: true
+  problem_optimization: false
 })
 
 const popoverVisible = ref(false)

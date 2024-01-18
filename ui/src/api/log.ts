@@ -116,10 +116,29 @@ const getMarkRecord: (
   )
 }
 
+/**
+ * 获取对话记录详情
+ * @param 参数
+ * application_id, chart_id,  chart_record_id
+ */
+const getRecordDetail: (
+  applicaiton_id: String,
+  chart_id: String,
+  chart_record_id: String,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (applicaiton_id, chart_id, chart_record_id, loading) => {
+  return get(
+    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${chart_record_id}`,
+    undefined,
+    loading
+  )
+}
+
 export default {
   getChatLog,
   delChatLog,
   getChatRecordLog,
   putChatRecordLog,
-  getMarkRecord
+  getMarkRecord,
+  getRecordDetail
 }

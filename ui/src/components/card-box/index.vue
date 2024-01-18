@@ -12,7 +12,7 @@
         </div>
       </slot>
     </div>
-    <div class="description pre-line mt-12" v-if="$slots.description || description">
+    <div class="description mt-12" v-if="$slots.description || description">
       <slot name="description">
         {{ description }}
       </slot>
