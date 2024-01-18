@@ -290,7 +290,7 @@ class ApplicationSerializer(serializers.Serializer):
     class ApplicationModel(serializers.ModelSerializer):
         class Meta:
             model = Application
-            fields = ['id', 'name', 'desc', 'prologue',  'dialogue_number']
+            fields = ['id', 'name', 'desc', 'prologue', 'dialogue_number']
 
     class Operate(serializers.Serializer):
         application_id = serializers.UUIDField(required=True)
@@ -341,8 +341,8 @@ class ApplicationSerializer(serializers.Serializer):
             model = QuerySet(Model).get(id=instance.get('model_id') if 'model_id' in instance else application.model_id)
 
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
-                           'dataset_setting', 'model_setting', 'problem_optimization'
-                                                               'api_key_is_active']
+                           'dataset_setting', 'model_setting', 'problem_optimization',
+                           'api_key_is_active']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     if update_key == 'multiple_rounds_dialogue':
