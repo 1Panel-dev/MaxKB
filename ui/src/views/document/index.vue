@@ -10,9 +10,16 @@
               @click="router.push({ path: '/dataset/upload', query: { id: id } })"
               >上传文档</el-button
             >
-            <el-button v-if="datasetDetail.type === '1'" type="primary">导入文档</el-button>
-            <!-- <el-button v-if="datasetDetail.type === '1'">批量同步</el-button> -->
-            <el-button :disabled="multipleSelection.length === 0" @click="deleteMulDocument"
+            <el-button v-if="datasetDetail.type === '1'" type="primary" @click="importDoc"
+              >导入文档</el-button
+            >
+            <el-button
+              @click="syncMulDocument"
+              :disabled="multipleSelection.length === 0"
+              v-if="datasetDetail.type === '1'"
+              >批量同步</el-button
+            >
+            <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
               >批量删除</el-button
             >
           </div>
@@ -126,7 +133,9 @@
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item icon="Setting">设置</el-dropdown-item>
+                        <el-dropdown-item icon="Setting" @click="settingDoc(row)"
+                          >设置</el-dropdown-item
+                        >
                         <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
                           >删除</el-dropdown-item
                         >
@@ -139,6 +148,7 @@
           </el-table-column>
         </app-table>
       </div>
+      <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
     </div>
   </LayoutContainer>
 </template>
@@ -147,6 +157,7 @@ import { ref, onMounted, reactive, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElTable } from 'element-plus'
 import documentApi from '@/api/document'
+import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -171,8 +182,19 @@ const paginationConfig = reactive({
   total: 0
 })
 
+const ImportDocumentDialogRef = ref()
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
+const title = ref('')
+
+function importDoc() {
+  title.value = '导入文档'
+  ImportDocumentDialogRef.value.open()
+}
+function settingDoc(row: any) {
+  title.value = '设置'
+  ImportDocumentDialogRef.value.open(row)
+}
 
 const handleSelectionChange = (val: any[]) => {
   multipleSelection.value = val
@@ -201,9 +223,22 @@ const closeInterval = () => {
   }
 }
 function refreshDocument(row: any) {
-  documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
-    getList()
-  })
+  if (row.type === '1') {
+    MsgConfirm(`确认同步文档?`, `同步将删除已有数据重新获取新数据，请谨慎操作。`, {
+      confirmButtonText: '同步',
+      confirmButtonClass: 'danger'
+    })
+      .then(() => {
+        documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
+          getList()
+        })
+      })
+      .catch(() => {})
+  } else {
+    documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
+      getList()
+    })
+  }
 }
 
 function rowClickHandle(row: any) {
@@ -227,6 +262,19 @@ function creatQuickHandle(val: string) {
     })
 }
 
+function syncMulDocument() {
+  const arr: string[] = []
+  multipleSelection.value.map((v) => {
+    if (v) {
+      arr.push(v.id)
+    }
+  })
+  documentApi.delMulSyncDocument(id, arr, loading).then(() => {
+    MsgSuccess('批量同步成功')
+    getList()
+  })
+}
+
 function deleteMulDocument() {
   const arr: string[] = []
   multipleSelection.value.map((v) => {
@@ -235,7 +283,7 @@ function deleteMulDocument() {
     }
   })
   documentApi.delMulDocument(id, arr, loading).then(() => {
-    MsgSuccess('删除成功')
+    MsgSuccess('批量删除成功')
     getList()
   })
 }
@@ -321,6 +369,11 @@ function getDetail() {
   dataset.asyncGetDatesetDetail(id, loading).then((res: any) => {
     datasetDetail.value = res.data
   })
+}
+
+function refresh() {
+  paginationConfig.current_page = 1
+  getList()
 }
 
 onMounted(() => {

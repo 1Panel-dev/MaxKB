@@ -154,6 +154,37 @@ const putDocumentRefresh: (
   )
 }
 
+/**
+ * 批量同步文档
+ * @param 参数 dataset_id,
+ */
+const delMulSyncDocument: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return put(`${prefix}/${dataset_id}/document/_bach`, { id_list: data }, undefined, loading)
+}
+
+/**
+ * 创建Web站点文档
+ * @param 参数 
+ * {
+    "source_url_list": [
+    "string"
+  ],
+  "selector": "string"
+ }
+}
+ */
+const postWebDocument: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, data, loading) => {
+  return post(`${prefix}/${dataset_id}/document/web`, data, undefined, loading)
+}
+
 export default {
   postSplitDocument,
   getDocument,
@@ -164,5 +195,7 @@ export default {
   delMulDocument,
   getDocumentDetail,
   listSplitPattern,
-  putDocumentRefresh
+  putDocumentRefresh,
+  delMulSyncDocument,
+  postWebDocument
 }

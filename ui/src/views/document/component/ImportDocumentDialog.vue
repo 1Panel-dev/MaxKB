@@ -1,29 +1,36 @@
 <template>
   <el-dialog
-    title="同步知识库"
+    title="导入文档"
     v-model="dialogVisible"
-    width="600px"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :destroy-on-close="true"
   >
-    <p class="mb-8">同步方式</p>
-    <el-radio-group v-model="method" class="card__radio">
-      <el-card shadow="never" class="mb-16" :class="method === 'replace' ? 'active' : ''">
-        <el-radio label="replace" size="large">
-          <p class="mb-4">替换同步</p>
-          <el-text type="info">重新获取 Web 站点文档，覆盖替换本地知识库中的文档</el-text>
-        </el-radio>
-      </el-card>
-
-      <el-card shadow="never" class="mb-16" :class="method === 'complete' ? 'active' : ''">
-        <el-radio label="complete" size="large">
-          <p class="mb-4">整体同步</p>
-          <el-text type="info">先删除本地知识库所有文档，重新获取 Web 站点文档</el-text>
-        </el-radio>
-      </el-card>
-    </el-radio-group>
-    <p class="danger">注意：所有同步都会删除已有数据重新获取新数据，请谨慎操作。</p>
+    <el-form
+      label-position="top"
+      ref="webFormRef"
+      :rules="rules"
+      :model="form"
+      require-asterisk-position="right"
+    >
+      <el-form-item label="文档地址" prop="source_url" v-if="isImport">
+        <el-input
+          v-model="form.source_url"
+          placeholder="请输入文档地址，一行一个，地址不正确文档会导入失败。"
+          :rows="10"
+          type="textarea"
+        />
+      </el-form-item>
+      <el-form-item v-else label="文档地址" prop="source_url">
+        <el-input v-model="form.source_url" placeholder="请输入文档地址" />
+      </el-form-item>
+      <el-form-item label="选择器">
+        <el-input
+          v-model="form.selector"
+          placeholder="默认为 body，可输入 .classname/#idname/tagname"
+        />
+      </el-form-item>
+    </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
@@ -33,56 +40,61 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-
+import { ref, reactive, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import documentApi from '@/api/document'
 import { MsgSuccess } from '@/utils/message'
 
-import useStore from '@/stores'
-const { dataset } = useStore()
+const route = useRoute()
+const {
+  params: { id }
+} = route as any
 
 const emit = defineEmits(['refresh'])
 const loading = ref<boolean>(false)
-const method = ref('replace')
-const datasetId = ref('')
+const isImport = ref<boolean>(false)
+const form = ref<any>({
+  source_url: '',
+  selector: ''
+})
+
+const rules = reactive({
+  source_url: [{ required: true, message: '请输入 Web 根地址', trigger: 'blur' }]
+})
 
 const dialogVisible = ref<boolean>(false)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    method.value = 'replace'
+    form.value = {
+      source_url: '',
+      selector: ''
+    }
+    isImport.value = false
   }
 })
 
-const open = (id: string) => {
-  datasetId.value = id
+const open = (row: any) => {
+  if (row) {
+    isImport.value = false
+  } else {
+    isImport.value = true
+  }
   dialogVisible.value = true
 }
 
 const submit = () => {
-  dataset.asyncSyncDateset(datasetId.value, method.value, loading).then((res: any) => {
-    // MsgSuccess('删除成功')
-    emit('refresh', res.data)
+  const obj = {
+    source_url_list: form.value.source_url.split('\n'),
+    selector: form.value.selector
+  }
+  documentApi.postWebDocument(id, obj, loading).then((res: any) => {
+    MsgSuccess('导入成功')
+    emit('refresh')
     dialogVisible.value = false
   })
 }
 
 defineExpose({ open })
 </script>
-<style lang="scss" scoped>
-.select-provider {
-  font-size: 16px;
-  color: rgba(100, 106, 115, 1);
-  font-weight: 400;
-  line-height: 24px;
-  cursor: pointer;
-  &:hover {
-    color: var(--el-color-primary);
-  }
-}
-.active-breadcrumb {
-  font-size: 16px;
-  color: rgba(31, 35, 41, 1);
-  font-weight: 500;
-  line-height: 24px;
-}
-</style>
+<style lang="scss" scoped></style>
