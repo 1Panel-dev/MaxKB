@@ -10,17 +10,17 @@ from typing import List
 
 from langchain.schema import BaseMessage, HumanMessage
 
+from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.step.generate_human_message_step.i_generate_human_message_step import \
     IGenerateHumanMessageStep
 from application.models import ChatRecord
 from common.util.split_model import flat_map
-from dataset.models import Paragraph
 
 
 class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
 
     def execute(self, problem_text: str,
-                paragraph_list: List[Paragraph],
+                paragraph_list: List[ParagraphPipelineModel],
                 history_chat_record: List[ChatRecord],
                 dialogue_number: int,
                 max_paragraph_char_number: int,
@@ -39,7 +39,7 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
     def to_human_message(prompt: str,
                          problem: str,
                          max_paragraph_char_number: int,
-                         paragraph_list: List[Paragraph]):
+                         paragraph_list: List[ParagraphPipelineModel]):
         if paragraph_list is None or len(paragraph_list) == 0:
             return HumanMessage(content=problem)
         temp_data = ""

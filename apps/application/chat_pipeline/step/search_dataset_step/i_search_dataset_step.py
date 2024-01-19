@@ -11,7 +11,7 @@ from typing import List, Type
 
 from rest_framework import serializers
 
-from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep
+from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PiplineManage
 from dataset.models import Paragraph
 
@@ -39,11 +39,12 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
     def _run(self, manage: PiplineManage):
         paragraph_list = self.execute(**self.context['step_args'])
         manage.context['paragraph_list'] = paragraph_list
+        self.context['paragraph_list'] = paragraph_list
 
     @abstractmethod
     def execute(self, problem_text: str, dataset_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
-                **kwargs) -> List[Paragraph]:
+                **kwargs) -> List[ParagraphPipelineModel]:
         """
         关于 用户和补全问题 说明: 补全问题如果有就使用补全问题去查询 反之就用用户原始问题查询
         :param similarity:                         相关性

@@ -192,28 +192,7 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_record = self.get_chat_record()
             if chat_record is None:
                 raise AppApiException(500, "对话不存在")
-            dataset_list = []
-            paragraph_list = []
-            if len(chat_record.paragraph_id_list) > 0:
-                paragraph_list = native_search(QuerySet(Paragraph).filter(id__in=chat_record.paragraph_id_list),
-                                               get_file_content(
-                                                   os.path.join(PROJECT_DIR, "apps", "application", 'sql',
-                                                                'list_dataset_paragraph_by_paragraph_id.sql')),
-                                               with_table_name=True)
-                dataset_list = [{'id': dataset_id, 'name': name} for dataset_id, name in reduce(lambda x, y: {**x, **y},
-                                                                                                [{row.get(
-                                                                                                    'dataset_id'): row.get(
-                                                                                                    "dataset_name")} for
-                                                                                                    row in
-                                                                                                    paragraph_list],
-                                                                                                {}).items()]
-
-            return {
-                **ChatRecordSerializerModel(chat_record).data,
-                'padding_problem_text':  chat_record.details.get('problem_padding').get(
-                    'padding_problem_text') if 'problem_padding' in chat_record.details else None,
-                'dataset_list': dataset_list,
-                'paragraph_list': paragraph_list}
+            return ChatRecordSerializer.Query.reset_chat_record(chat_record)
 
     class Query(serializers.Serializer):
         application_id = serializers.UUIDField(required=True)
@@ -226,37 +205,22 @@ class ChatRecordSerializer(serializers.Serializer):
             return [ChatRecordSerializerModel(chat_record).data for chat_record in
                     QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id'))]
 
-        def reset_chat_record_list(self, chat_record_list: List[ChatRecord]):
-            paragraph_id_list = flat_map([chat_record.paragraph_id_list for chat_record in chat_record_list])
-            # 去重
-            paragraph_id_list = list(set(paragraph_id_list))
-            paragraph_list = self.search_paragraph(paragraph_id_list)
-            return [self.reset_chat_record(chat_record, paragraph_list) for chat_record in chat_record_list]
-
         @staticmethod
-        def search_paragraph(paragraph_id_list: List[str]):
+        def reset_chat_record(chat_record):
+            dataset_list = []
             paragraph_list = []
-            if len(paragraph_id_list) > 0:
-                paragraph_list = native_search(QuerySet(Paragraph).filter(id__in=paragraph_id_list),
-                                               get_file_content(
-                                                   os.path.join(PROJECT_DIR, "apps", "application", 'sql',
-                                                                'list_dataset_paragraph_by_paragraph_id.sql')),
-                                               with_table_name=True)
-            return paragraph_list
+            if 'search_step' in chat_record.details and chat_record.details.get('search_step').get(
+                    'paragraph_list') is not None:
+                paragraph_list = chat_record.details.get('search_step').get(
+                    'paragraph_list')
+                dataset_list = [{'id': dataset_id, 'name': name} for dataset_id, name in reduce(lambda x, y: {**x, **y},
+                                                                                                [{row.get(
+                                                                                                    'dataset_id'): row.get(
+                                                                                                    "dataset_name")} for
+                                                                                                    row in
+                                                                                                    paragraph_list],
+                                                                                                {}).items()]
 
-        @staticmethod
-        def reset_chat_record(chat_record, all_paragraph_list):
-            paragraph_list = list(
-                filter(
-                    lambda paragraph: chat_record.paragraph_id_list.__contains__(uuid.UUID(str(paragraph.get('id')))),
-                    all_paragraph_list))
-            dataset_list = [{'id': dataset_id, 'name': name} for dataset_id, name in reduce(lambda x, y: {**x, **y},
-                                                                                            [{row.get(
-                                                                                                'dataset_id'): row.get(
-                                                                                                "dataset_name")} for
-                                                                                                row in
-                                                                                                paragraph_list],
-                                                                                            {}).items()]
             return {
                 **ChatRecordSerializerModel(chat_record).data,
                 'padding_problem_text': chat_record.details.get('problem_padding').get(
@@ -270,9 +234,7 @@ class ChatRecordSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             page = page_search(current_page, page_size,
                                QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by("index"),
-                               post_records_handler=lambda chat_record: chat_record)
-            records = page.get('records')
-            page['records'] = self.reset_chat_record_list(records)
+                               post_records_handler=lambda chat_record: self.reset_chat_record(chat_record))
             return page
 
     class Vote(serializers.Serializer):

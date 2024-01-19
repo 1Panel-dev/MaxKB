@@ -89,9 +89,6 @@ class ChatRecord(AppModelMixin):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
     vote_status = models.CharField(verbose_name='投票', max_length=10, choices=VoteChoices.choices,
                                    default=VoteChoices.UN_VOTE)
-    paragraph_id_list = ArrayField(verbose_name="引用段落id列表",
-                                   base_field=models.UUIDField(max_length=128, blank=True)
-                                   , default=list)
     problem_text = models.CharField(max_length=1024, verbose_name="问题")
     answer_text = models.CharField(max_length=4096, verbose_name="答案")
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)

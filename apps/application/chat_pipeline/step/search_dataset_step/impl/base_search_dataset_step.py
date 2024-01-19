@@ -6,20 +6,25 @@
     @date：2024/1/10 10:33
     @desc:
 """
-from typing import List
+import os
+from typing import List, Dict
 
 from django.db.models import QuerySet
 
+from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.step.search_dataset_step.i_search_dataset_step import ISearchDatasetStep
 from common.config.embedding_config import VectorStore, EmbeddingModel
+from common.db.search import native_search
+from common.util.file_util import get_file_content
 from dataset.models import Paragraph
+from smartdoc.conf import PROJECT_DIR
 
 
 class BaseSearchDatasetStep(ISearchDatasetStep):
 
     def execute(self, problem_text: str, dataset_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
-                **kwargs) -> List[Paragraph]:
+                **kwargs) -> List[ParagraphPipelineModel]:
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
         embedding_model = EmbeddingModel.get_embedding_model()
         embedding_value = embedding_model.embed_query(exec_problem_text)
@@ -28,16 +33,35 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
                                       exclude_paragraph_id_list, True, top_n, similarity)
         if embedding_list is None:
             return []
-        return self.list_paragraph([row.get('paragraph_id') for row in embedding_list], vector)
+        paragraph_list = self.list_paragraph([row.get('paragraph_id') for row in embedding_list], vector)
+        return [self.reset_paragraph(paragraph, embedding_list) for paragraph in paragraph_list]
+
+    @staticmethod
+    def reset_paragraph(paragraph: Dict, embedding_list: List) -> ParagraphPipelineModel:
+        filter_embedding_list = [embedding for embedding in embedding_list if
+                                 str(embedding.get('paragraph_id')) == str(paragraph.get('id'))]
+        if filter_embedding_list is not None and len(filter_embedding_list) > 0:
+            find_embedding = filter_embedding_list[-1]
+            return (ParagraphPipelineModel.builder()
+                    .add_paragraph(paragraph)
+                    .add_similarity(find_embedding.get('similarity'))
+                    .add_comprehensive_score(find_embedding.get('comprehensive_score'))
+                    .add_dataset_name(paragraph.get('dataset_name'))
+                    .add_document_name(paragraph.get('document_name'))
+                    .build())
 
     @staticmethod
     def list_paragraph(paragraph_id_list: List, vector):
         if paragraph_id_list is None or len(paragraph_id_list) == 0:
             return []
-        paragraph_list = QuerySet(Paragraph).filter(id__in=paragraph_id_list)
+        paragraph_list = native_search(QuerySet(Paragraph).filter(id__in=paragraph_id_list),
+                                       get_file_content(
+                                           os.path.join(PROJECT_DIR, "apps", "application", 'sql',
+                                                        'list_dataset_paragraph_by_paragraph_id.sql')),
+                                       with_table_name=True)
         # 如果向量库中存在脏数据 直接删除
         if len(paragraph_list) != len(paragraph_id_list):
-            exist_paragraph_list = [str(row.id) for row in paragraph_list]
+            exist_paragraph_list = [row.get('id') for row in paragraph_list]
             for paragraph_id in paragraph_id_list:
                 if not exist_paragraph_list.__contains__(paragraph_id):
                     vector.delete_by_paragraph_id(paragraph_id)
@@ -48,6 +72,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
 
         return {
             'step_type': 'search_step',
+            'paragraph_list': [row.to_dict() for row in self.context['paragraph_list']],
             'run_time': self.context['run_time'],
             'problem_text': step_args.get(
                 'padding_problem_text') if 'padding_problem_text' in step_args else step_args.get('problem_text'),

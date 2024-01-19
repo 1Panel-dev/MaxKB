@@ -18,15 +18,15 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
 from langchain.schema.messages import BaseMessageChunk, HumanMessage
 
+from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PiplineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
-from dataset.models import Paragraph
 
 
 def event_content(response,
                   chat_id,
                   chat_record_id,
-                  paragraph_list: List[Paragraph],
+                  paragraph_list: List[ParagraphPipelineModel],
                   post_response_handler: PostResponseHandler,
                   manage,
                   step,

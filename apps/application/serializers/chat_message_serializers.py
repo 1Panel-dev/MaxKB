@@ -108,7 +108,6 @@ def get_post_handler(chat_info: ChatInfo):
                     **kwargs):
             chat_record = ChatRecord(id=chat_record_id,
                                      chat_id=chat_id,
-                                     paragraph_id_list=[str(p.id) for p in paragraph_list],
                                      problem_text=problem_text,
                                      answer_text=answer_text,
                                      details=manage.get_details(),

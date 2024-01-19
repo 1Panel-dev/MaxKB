@@ -12,7 +12,7 @@ from typing import Type, List
 from langchain.schema import BaseMessage
 from rest_framework import serializers
 
-from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep
+from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PiplineManage
 from application.models import ChatRecord
 from common.field.common import InstanceField
@@ -24,7 +24,7 @@ class IGenerateHumanMessageStep(IBaseChatPipelineStep):
         # 问题
         problem_text = serializers.CharField(required=True)
         # 段落列表
-        paragraph_list = serializers.ListField(child=InstanceField(model_type=Paragraph, required=True))
+        paragraph_list = serializers.ListField(child=InstanceField(model_type=ParagraphPipelineModel, required=True))
         # 历史对答
         history_chat_record = serializers.ListField(child=InstanceField(model_type=ChatRecord, required=True))
         # 多轮对话数量
@@ -46,7 +46,7 @@ class IGenerateHumanMessageStep(IBaseChatPipelineStep):
     @abstractmethod
     def execute(self,
                 problem_text: str,
-                paragraph_list: List[Paragraph],
+                paragraph_list: List[ParagraphPipelineModel],
                 history_chat_record: List[ChatRecord],
                 dialogue_number: int,
                 max_paragraph_char_number: int,

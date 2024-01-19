@@ -13,7 +13,7 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
 from rest_framework import serializers
 
-from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep
+from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PiplineManage
 from common.field.common import InstanceField
 from dataset.models import Paragraph
@@ -41,7 +41,8 @@ class MessageField(serializers.Field):
 
 class PostResponseHandler:
     @abstractmethod
-    def handler(self, chat_id, chat_record_id, paragraph_list: List[Paragraph], problem_text: str, answer_text,
+    def handler(self, chat_id, chat_record_id, paragraph_list: List[ParagraphPipelineModel], problem_text: str,
+                answer_text,
                 manage, step, padding_problem_text: str = None, **kwargs):
         pass
 
