@@ -17,7 +17,6 @@
               class="paragraph-source-card cursor mb-8"
               :class="item.is_active ? '' : 'disabled'"
               :showIcon="false"
-              @click="editParagraph(item)"
             >
               <template #icon>
                 <AppAvatar :name="index + 1 + ''" class="mr-12 avatar-light" :size="22" />
@@ -45,13 +44,11 @@
         </el-form-item>
       </el-form>
     </el-scrollbar>
-    <ParagraphDialog ref="ParagraphDialogRef" title="分段详情" @refresh="refresh" />
   </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
-import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
-
+import { cloneDeep } from 'lodash'
 const emit = defineEmits(['refresh'])
 
 const ParagraphDialogRef = ref()
@@ -64,21 +61,14 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-const open = (data: any) => {
-  detail.value = data
+const open = (data: any, id?: string) => {
+  detail.value = cloneDeep(data)
+  detail.value.paragraph_list = id
+    ? detail.value.paragraph_list.filter((v) => v.dataset_id === id)
+    : detail.value.paragraph_list
   dialogVisible.value = true
 }
 
-function editParagraph(row: any) {
-  ParagraphDialogRef.value.open(row)
-}
-
-function refresh(data: any) {
-  if (data) {
-    const index = detail.value.paragraph_list.findIndex((v) => v.id === data.id)
-    detail.value.paragraph_list.splice(index, 1, data)
-  }
-}
 defineExpose({ open })
 </script>
 <style lang="scss" scoped>
