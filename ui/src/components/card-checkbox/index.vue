@@ -8,7 +8,11 @@
     <div class="flex-between">
       <div class="flex align-center">
         <slot name="icon">
-          <AppAvatar class="mr-12" shape="square" :size="32">
+          <AppAvatar v-if="data.type === '1'" class="mr-8 avatar-purple" shape="square" :size="32">
+            <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+          </AppAvatar>
+
+          <AppAvatar v-else class="mr-12" shape="square" :size="32">
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
         </slot>

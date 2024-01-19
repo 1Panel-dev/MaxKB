@@ -1,9 +1,37 @@
 <template>
   <div class="ml-8 mt-8 mb-16 flex">
     <back-button :to="activeMenu"></back-button>
-    <el-dropdown placement="top" trigger="click" @command="changeMenu" class="w-full" style="display: block;">
+    <el-dropdown
+      placement="top"
+      trigger="click"
+      @command="changeMenu"
+      class="w-full"
+      style="display: block"
+    >
       <div class="flex-between">
-        <div class="ellipsis">{{ currentName }}</div>
+        <div class="flex align-center">
+          <AppAvatar
+            v-if="isApplication"
+            :name="currentName"
+            pinyinColor
+            shape="square"
+            class="mr-8"
+            :size="24"
+          />
+          <AppAvatar
+            v-else-if="isDataset && currentType === '1'"
+            class="mr-8 avatar-purple"
+            shape="square"
+            :size="24"
+          >
+            <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+          </AppAvatar>
+          <AppAvatar v-else class="mr-8" shape="square" :size="24">
+            <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+          </AppAvatar>
+          <div class="ellipsis">{{ currentName }}</div>
+        </div>
+
         <el-button text>
           <el-icon><CaretBottom /></el-icon>
         </el-button>
@@ -22,10 +50,17 @@
                     shape="square"
                     :size="24"
                   />
-                  <AppAvatar v-else-if="isDataset" class="mr-12" shape="square" :size="24">
+                  <AppAvatar
+                    v-else-if="isDataset && item.type === '1'"
+                    class="mr-12 avatar-purple"
+                    shape="square"
+                    :size="24"
+                  >
+                    <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                  </AppAvatar>
+                  <AppAvatar v-else class="mr-12" shape="square" :size="24">
                     <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                   </AppAvatar>
-
                   <span class="ellipsis"> {{ item?.name }}</span>
                 </div>
               </el-dropdown-item>
@@ -75,6 +110,12 @@ const currentName = computed(() => {
     params: { id }
   } = route
   return list.value?.filter((v) => v.id === id)?.[0]?.name
+})
+const currentType = computed(() => {
+  const {
+    params: { id }
+  } = route
+  return list.value?.filter((v) => v.id === id)?.[0]?.type
 })
 
 const isApplication = computed(() => {

@@ -88,15 +88,17 @@ const postDocument: (dataset_id: string, data: any) => Promise<Result<any>> = (
  * dataset_id, document_id, 
  * {
       "name": "string",
-      "is_active": true
+      "is_active": true,
+      "meta": {}
     }
  */
-const putDocument: (dataset_id: string, document_id: string, data: any) => Promise<Result<any>> = (
-  dataset_id,
-  document_id,
-  data: any
-) => {
-  return put(`${prefix}/${dataset_id}/document/${document_id}`, data)
+const putDocument: (
+  dataset_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, document_id, data: any, loading) => {
+  return put(`${prefix}/${dataset_id}/document/${document_id}`, data, undefined, loading)
 }
 
 /**

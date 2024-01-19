@@ -310,18 +310,11 @@ function deleteDocument(row: any) {
   更新名称或状态
 */
 function updateData(documentId: string, data: any, msg: string) {
-  loading.value = true
-  documentApi
-    .putDocument(id, documentId, data)
-    .then((res) => {
-      const index = documentData.value.findIndex((v) => v.id === documentId)
-      documentData.value.splice(index, 1, res.data)
-      MsgSuccess(msg)
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  documentApi.putDocument(id, documentId, data, loading).then((res) => {
+    const index = documentData.value.findIndex((v) => v.id === documentId)
+    documentData.value.splice(index, 1, res.data)
+    MsgSuccess(msg)
+  })
 }
 
 function changeState(bool: Boolean, row: any) {

@@ -196,7 +196,16 @@
                       <el-card class="relate-dataset-card" shadow="never">
                         <div class="flex-between">
                           <div class="flex align-center">
-                            <AppAvatar class="mr-12" shape="square" :size="32">
+                            <AppAvatar
+                              v-if="realatedObject(datasetList, item, 'id')?.type === '1'"
+                              class="mr-8 avatar-purple"
+                              shape="square"
+                              :size="32"
+                            >
+                              <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                            </AppAvatar>
+
+                            <AppAvatar v-else class="mr-12" shape="square" :size="32">
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>
                             <div class="ellipsis">

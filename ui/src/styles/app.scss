@@ -324,6 +324,12 @@ h4 {
   border: none;
 }
 
+.purple-tag {
+  background: #f2ebfe;
+  color: #7f3bf5;
+  border-color: #e0d7f0;
+}
+
 /*
   card 无边框无阴影 灰色背景
 */
@@ -384,6 +390,10 @@ h4 {
 
 .avatar-light {
   background: var(--el-color-primary-light-4);
+}
+
+.avatar-purple {
+  background: #7f3bf5;
 }
 
 .success {

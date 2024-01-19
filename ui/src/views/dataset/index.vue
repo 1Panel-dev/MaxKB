@@ -31,9 +31,22 @@
                 class="cursor"
                 @click="router.push({ path: `/dataset/${item.id}/document` })"
               >
+                <template #icon>
+                  <AppAvatar
+                    v-if="item.type === '1'"
+                    class="mr-8 avatar-purple"
+                    shape="square"
+                    :size="32"
+                  >
+                    <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                  </AppAvatar>
+                  <AppAvatar v-else class="mr-8" shape="square"    :size="32">
+                    <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+                  </AppAvatar>
+                </template>
                 <div class="delete-button">
                   <el-tag v-if="item.type === '0'">通用型</el-tag>
-                  <el-tag v-else-if="item.type === '1'" type="warning">Web 站点</el-tag>
+                  <el-tag class="purple-tag" v-else-if="item.type === '1'" type="warning">Web 站点</el-tag>
                 </div>
 
                 <template #footer>

@@ -35,7 +35,20 @@
         >
           <template #default="{ node, data }">
             <span class="flex align-center">
-              <AppAvatar v-if="!node.isLeaf" class="mr-12" shape="square" :size="24">
+              <AppAvatar
+                v-if="!node.isLeaf && data.type === '1'"
+                class="mr-12 avatar-purple"
+                shape="square"
+                :size="24"
+              >
+                <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+              </AppAvatar>
+              <AppAvatar
+                v-else-if="!node.isLeaf && data.type === '0'"
+                class="mr-12"
+                shape="square"
+                :size="24"
+              >
                 <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
               </AppAvatar>
               <span class="ellipsis"> {{ data.name }}</span>

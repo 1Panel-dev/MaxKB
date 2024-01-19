@@ -57,6 +57,7 @@ const form = ref<any>({
   source_url: '',
   selector: ''
 })
+const documentId = ref('')
 
 const rules = reactive({
   source_url: [{ required: true, message: '请输入 Web 根地址', trigger: 'blur' }]
@@ -76,6 +77,8 @@ watch(dialogVisible, (bool) => {
 
 const open = (row: any) => {
   if (row) {
+    documentId.value = row.id
+    form.value = row.meta
     isImport.value = false
   } else {
     isImport.value = true
@@ -84,15 +87,26 @@ const open = (row: any) => {
 }
 
 const submit = () => {
-  const obj = {
-    source_url_list: form.value.source_url.split('\n'),
-    selector: form.value.selector
+  if (isImport.value) {
+    const obj = {
+      source_url_list: form.value.source_url.split('\n'),
+      selector: form.value.selector
+    }
+    documentApi.postWebDocument(id, obj, loading).then((res: any) => {
+      MsgSuccess('导入成功')
+      emit('refresh')
+      dialogVisible.value = false
+    })
+  } else {
+    const obj = {
+      meta: form.value
+    }
+    documentApi.putDocument(id, documentId.value, obj, loading).then((res) => {
+      MsgSuccess('设置成功')
+      emit('refresh')
+      dialogVisible.value = false
+    })
   }
-  documentApi.postWebDocument(id, obj, loading).then((res: any) => {
-    MsgSuccess('导入成功')
-    emit('refresh')
-    dialogVisible.value = false
-  })
 }
 
 defineExpose({ open })
