@@ -103,22 +103,24 @@ const putDocument: (dataset_id: string, document_id: string, data: any) => Promi
  * 删除文档
  * @param 参数 dataset_id, document_id,
  */
-const delDocument: (dataset_id: string, document_id: string) => Promise<Result<boolean>> = (
-  dataset_id,
-  document_id
-) => {
-  return del(`${prefix}/${dataset_id}/document/${document_id}`)
+const delDocument: (
+  dataset_id: string,
+  document_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, document_id, loading) => {
+  return del(`${prefix}/${dataset_id}/document/${document_id}`, loading)
 }
-// /**
-//  * 批量删除文档
-//  * @param 参数 dataset_id, document_id,
-//  */
-// const delDocument: (dataset_id: string, document_id: string) => Promise<Result<boolean>> = (
-//   dataset_id,
-//   document_id
-// ) => {
-//   return del(`${prefix}/${dataset_id}/document/${document_id}`)
-// }
+/**
+ * 批量删除文档
+ * @param 参数 dataset_id,
+ */
+const delMulDocument: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return del(`${prefix}/${dataset_id}/document/_bach`, undefined, { id_list: data }, loading)
+}
 /**
  * 文档详情
  * @param 参数 dataset_id
@@ -159,6 +161,7 @@ export default {
   postDocument,
   putDocument,
   delDocument,
+  delMulDocument,
   getDocumentDetail,
   listSplitPattern,
   putDocumentRefresh

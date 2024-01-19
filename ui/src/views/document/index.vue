@@ -12,7 +12,9 @@
             >
             <el-button v-if="datasetDetail.type === '1'" type="primary">导入文档</el-button>
             <!-- <el-button v-if="datasetDetail.type === '1'">批量同步</el-button> -->
-            <el-button :disabled="multipleSelection.length === 0">批量删除</el-button>
+            <el-button :disabled="multipleSelection.length === 0" @click="deleteMulDocument"
+              >批量删除</el-button
+            >
           </div>
 
           <el-input
@@ -119,9 +121,9 @@
                 </el-tooltip>
                 <span @click.stop>
                   <el-dropdown trigger="click">
-                    <span class="el-dropdown-link cursor">
+                    <el-button text>
                       <el-icon><MoreFilled /></el-icon>
-                    </span>
+                    </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
                         <el-dropdown-item icon="Setting">设置</el-dropdown-item>
@@ -225,6 +227,19 @@ function creatQuickHandle(val: string) {
     })
 }
 
+function deleteMulDocument() {
+  const arr: string[] = []
+  multipleSelection.value.map((v) => {
+    if (v) {
+      arr.push(v.id)
+    }
+  })
+  documentApi.delMulDocument(id, arr, loading).then(() => {
+    MsgSuccess('删除成功')
+    getList()
+  })
+}
+
 function deleteDocument(row: any) {
   MsgConfirm(
     `是否删除文档：${row.name} ?`,
@@ -235,16 +250,10 @@ function deleteDocument(row: any) {
     }
   )
     .then(() => {
-      loading.value = true
-      documentApi
-        .delDocument(id, row.id)
-        .then(() => {
-          MsgSuccess('删除成功')
-          getList()
-        })
-        .catch(() => {
-          loading.value = false
-        })
+      documentApi.delDocument(id, row.id, loading).then(() => {
+        MsgSuccess('删除成功')
+        getList()
+      })
     })
     .catch(() => {})
 }
