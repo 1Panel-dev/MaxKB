@@ -29,9 +29,30 @@ from common.util.file_util import get_file_content
 from common.util.fork import Fork
 from common.util.split_model import SplitModel, get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status
-from dataset.serializers.common_serializers import BatchSerializer
+from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
+
+
+class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
+    meta = serializers.DictField(required=False)
+    name = serializers.CharField(required=False)
+    is_active = serializers.BooleanField(required=False)
+
+    @staticmethod
+    def get_meta_valid_map():
+        dataset_meta_valid_map = {
+            Type.base: MetaSerializer.BaseMeta,
+            Type.web: MetaSerializer.WebMeta
+        }
+        return dataset_meta_valid_map
+
+    def is_valid(self, *, document: Document = None):
+        super().is_valid(raise_exception=True)
+        if 'meta' in self.data and self.data.get('meta') is not None:
+            dataset_meta_valid_map = self.get_meta_valid_map()
+            valid_class = dataset_meta_valid_map.get(document.type)
+            valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
 
 
 class DocumentWebInstanceSerializer(ApiMixin, serializers.Serializer):
@@ -212,9 +233,11 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
         def edit(self, instance: Dict, with_valid=False):
             if with_valid:
-                self.is_valid()
+                self.is_valid(raise_exception=True)
             _document = QuerySet(Document).get(id=self.data.get("document_id"))
-            update_keys = ['name', 'is_active']
+            if with_valid:
+                DocumentEditInstanceSerializer(data=instance).is_valid(document=_document)
+            update_keys = ['name', 'is_active', 'meta']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     _document.__setattr__(update_key, instance.get(update_key))
@@ -282,6 +305,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="文档名称", description="文档名称"),
                     'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
+                    'meta': openapi.Schema(type=openapi.TYPE_OBJECT, title="文档元数据",
+                                           description="文档元数据->web:{source_url:xxx,selector:'xxx'},base:{}"),
                 }
             )
 

@@ -34,7 +34,7 @@ from common.util.file_util import get_file_content
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type
-from dataset.serializers.common_serializers import list_paragraph
+from dataset.serializers.common_serializers import list_paragraph, MetaSerializer
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
 from setting.models import AuthOperate
 from smartdoc.conf import PROJECT_DIR
@@ -425,22 +425,6 @@ class DataSetSerializers(serializers.ModelSerializer):
                 }
             )
 
-    class MetaSerializer(serializers.Serializer):
-        class WebMeta(serializers.Serializer):
-            source_url = serializers.CharField(required=True)
-            selector = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-
-            def is_valid(self, *, raise_exception=False):
-                super().is_valid(raise_exception=True)
-                source_url = self.data.get('source_url')
-                response = Fork(source_url, []).fork()
-                if response.status == 500:
-                    raise AppApiException(500, response.message)
-
-        class BaseMeta(serializers.Serializer):
-            def is_valid(self, *, raise_exception=False):
-                super().is_valid(raise_exception=True)
-
     class Edit(serializers.Serializer):
         name = serializers.CharField(required=False)
         desc = serializers.CharField(required=False)
@@ -450,8 +434,8 @@ class DataSetSerializers(serializers.ModelSerializer):
         @staticmethod
         def get_dataset_meta_valid_map():
             dataset_meta_valid_map = {
-                Type.base: DataSetSerializers.MetaSerializer.BaseMeta,
-                Type.web: DataSetSerializers.MetaSerializer.WebMeta
+                Type.base: MetaSerializer.BaseMeta,
+                Type.web: MetaSerializer.WebMeta
             }
             return dataset_meta_valid_map
 

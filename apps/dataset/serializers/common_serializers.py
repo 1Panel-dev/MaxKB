@@ -18,6 +18,7 @@ from common.db.sql_execute import update_execute
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.file_util import get_file_content
+from common.util.fork import Fork
 from dataset.models import Paragraph
 from smartdoc.conf import PROJECT_DIR
 
@@ -33,6 +34,23 @@ def list_paragraph(paragraph_list: List[str]):
         return []
     return native_search(QuerySet(Paragraph).filter(id__in=paragraph_list), get_file_content(
         os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_paragraph.sql')))
+
+
+class MetaSerializer(serializers.Serializer):
+    class WebMeta(serializers.Serializer):
+        source_url = serializers.CharField(required=True)
+        selector = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            source_url = self.data.get('source_url')
+            response = Fork(source_url, []).fork()
+            if response.status == 500:
+                raise AppApiException(500, response.message)
+
+    class BaseMeta(serializers.Serializer):
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
 
 
 class BatchSerializer(ApiMixin, serializers.Serializer):
