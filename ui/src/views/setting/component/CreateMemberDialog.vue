@@ -103,6 +103,7 @@ const remoteMethod = (query: string) => {
 
 const changeSelectHandle = () => {
   SelectRemoteRef.value.query = ''
+  SelectRemoteRef.value.blur()
 }
 
 const open = () => {
