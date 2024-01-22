@@ -69,6 +69,7 @@
       :pre="preChatRecord"
       ref="ChatRecordRef"
       v-model:chartId="currentChatId"
+      v-model:currentAbstract="currentAbstract"
       :application="detail"
       :pre_disable="pre_disable"
       :next_disable="next_disable"
@@ -129,6 +130,7 @@ const search = ref('')
 const detail = ref<any>(null)
 
 const currentChatId = ref<string>('')
+const currentAbstract = ref<string>('')
 
 /**
  * 下一页
@@ -146,9 +148,11 @@ const nextChatRecord = () => {
     getList().then(() => {
       index = 0
       currentChatId.value = tableData.value[index].id
+      currentAbstract.value = tableData.value[index].abstract
     })
   } else {
     currentChatId.value = tableData.value[index].id
+    currentAbstract.value = tableData.value[index].abstract
   }
 }
 const pre_disable = computed(() => {
@@ -178,14 +182,17 @@ const preChatRecord = () => {
     getList().then((ok) => {
       index = paginationConfig.page_size - 1
       currentChatId.value = tableData.value[index].id
+      currentAbstract.value = tableData.value[index].abstract
     })
   } else {
     currentChatId.value = tableData.value[index].id
+    currentAbstract.value = tableData.value[index].abstract
   }
 }
 
 function rowClickHandle(row: any) {
   currentChatId.value = row.id
+  currentAbstract.value = row.abstract
   ChatRecordRef.value.open()
 }
 

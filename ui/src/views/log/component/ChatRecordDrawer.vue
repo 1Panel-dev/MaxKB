@@ -1,7 +1,7 @@
 <template>
   <el-drawer v-model="visible" size="60%" @close="closeHandel" class="chat-record-drawer">
     <template #header>
-      <h4>{{ application?.name }}</h4>
+      <h4>{{ currentAbstract }}</h4>
     </template>
     <div
       v-loading="paginationConfig.current_page === 1 && loading"
@@ -44,6 +44,7 @@ const props = withDefaults(
      * 对话 记录id
      */
     chartId: string
+    currentAbstract: string
     /**
      * 下一条
      */
@@ -60,7 +61,7 @@ const props = withDefaults(
   {}
 )
 
-const emit = defineEmits(['update:chartId'])
+const emit = defineEmits(['update:chartId', 'update:currentAbstract'])
 
 const route = useRoute()
 const {
@@ -104,6 +105,7 @@ watch(
 watch(visible, (bool) => {
   if (!bool) {
     emit('update:chartId', '')
+    emit('update:currentAbstract', '')
   }
 })
 
