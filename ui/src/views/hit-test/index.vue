@@ -75,17 +75,15 @@
       <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     </LayoutContainer>
     <div class="hit-test__operate p-24 pt-0">
-      <el-popover :visible="popoverVisible" placement="top-start" :width="500" trigger="click">
+      <el-popover :visible="popoverVisible" placement="top-start" :width="570" trigger="click">
         <template #reference>
-          <el-button icon="Setting" class="mb-8" @click="popoverVisible = !popoverVisible"
-            >参数设置</el-button
-          >
+          <el-button icon="Setting" class="mb-8" @click="settingChange('open')">参数设置</el-button>
         </template>
         <div class="flex">
           <div>
             相似度高于
             <el-input-number
-              v-model="formInline.similarity"
+              v-model="cloneForm.similarity"
               :min="0"
               :max="1"
               :precision="3"
@@ -98,7 +96,7 @@
           <div class="ml-16">
             返回 Top
             <el-input-number
-              v-model="formInline.top_number"
+              v-model="cloneForm.top_number"
               :min="1"
               :max="10"
               controls-position="right"
@@ -106,8 +104,8 @@
             />
             个分段
           </div>
-          <!-- <el-button class="ml-16" @click="popoverVisible = false">取消</el-button> -->
-          <el-button class="ml-16" type="primary" @click="popoverVisible = false">确认</el-button>
+          <el-button class="ml-16" @click="popoverVisible = false">取消</el-button>
+          <el-button class="ml-16" type="primary" @click="settingChange('close')">确认</el-button>
         </div>
       </el-popover>
       <div class="operate-textarea flex">
@@ -141,6 +139,7 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { cloneDeep } from 'lodash'
 import datasetApi from '@/api/dataset'
 import applicationApi from '@/api/application'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
@@ -156,10 +155,13 @@ const loading = ref(false)
 const paragraphDetail = ref<any[]>([])
 const title = ref('')
 const inputValue = ref('')
-const formInline = reactive({
+const formInline = ref({
   similarity: 0.6,
   top_number: 5
 })
+
+const cloneForm = ref<any>({})
+
 const popoverVisible = ref(false)
 const questionTitle = ref('')
 
@@ -173,6 +175,16 @@ const isDataset = computed(() => {
   const { meta } = route as any
   return meta?.activeMenu.includes('dataset')
 })
+
+function settingChange(val: string) {
+  if (val === 'open') {
+    popoverVisible.value = true
+    cloneForm.value = cloneDeep(formInline.value)
+  } else if (val === 'close') {
+    popoverVisible.value = false
+    formInline.value = cloneDeep(cloneForm.value)
+  }
+}
 
 function editParagraph(row: any) {
   title.value = '分段详情'

@@ -102,7 +102,7 @@
 
                     <el-popover :visible="popoverVisible" :width="300" trigger="click">
                       <template #reference>
-                        <el-button type="primary" link @click="popoverVisible = !popoverVisible"
+                        <el-button type="primary" link @click="datasetSettingChange('open')"
                           >参数设置</el-button
                         >
                       </template>
@@ -123,7 +123,7 @@
                           <div @click.stop>
                             高于
                             <el-input-number
-                              v-model="applicationForm.dataset_setting.similarity"
+                              v-model="dataset_setting.similarity"
                               :min="0"
                               :max="1"
                               :precision="3"
@@ -139,7 +139,7 @@
                           <div @click.stop>
                             TOP
                             <el-input-number
-                              v-model="applicationForm.dataset_setting.top_n"
+                              v-model="dataset_setting.top_n"
                               :min="1"
                               :max="10"
                               controls-position="right"
@@ -154,7 +154,7 @@
                           <div class="title mb-8">最多引用字符数</div>
                           <div class="flex align-center">
                             <el-slider
-                              v-model="applicationForm.dataset_setting.max_paragraph_char_number"
+                              v-model="dataset_setting.max_paragraph_char_number"
                               show-input
                               :show-input-controls="false"
                               :min="500"
@@ -167,7 +167,11 @@
                         </div>
                       </div>
                       <div class="text-right">
-                        <el-button type="primary" @click="popoverVisible = false" size="small"
+                        <el-button @click="popoverVisible = false">取消</el-button>
+                        <el-button
+                          type="primary"
+                          @click="datasetSettingChange('close')"
+                          size="small"
                           >确认</el-button
                         >
                       </div>
@@ -267,6 +271,7 @@
         </div>
       </el-col>
     </el-row>
+    <!-- 提示词 -->
     <el-dialog v-model="dialogFormVisible" title="提示词">
       <el-alert type="info" show-icon class="mb-16" :closable="false">
         <p>通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。</p>
@@ -347,8 +352,7 @@ const defaultPrompt = `已知信息：
 问题：
 
 {question}
-    `
-
+`
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
 const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 
@@ -396,6 +400,17 @@ const datasetList = ref([])
 const dialogFormVisible = ref(false)
 
 const model_setting_prompt = ref('')
+const dataset_setting = ref<any>({})
+
+function datasetSettingChange(val: string) {
+  if (val === 'open') {
+    popoverVisible.value = true
+    dataset_setting.value = cloneDeep(applicationForm.value.dataset_setting)
+  } else if (val === 'close') {
+    popoverVisible.value = false
+    applicationForm.value.dataset_setting = cloneDeep(dataset_setting.value)
+  }
+}
 
 function promptChange(val: string) {
   if (val === 'open') {
