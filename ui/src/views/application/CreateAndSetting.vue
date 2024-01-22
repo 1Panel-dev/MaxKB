@@ -450,7 +450,7 @@ const openCreateModel = (provider?: Provider) => {
   }
 }
 
-function removeDataset(id: string) {
+function removeDataset(id: any) {
   applicationForm.value.dataset_id_list.splice(applicationForm.value.dataset_id_list.indexOf(id), 1)
 }
 function addDataset(val: Array<string>) {

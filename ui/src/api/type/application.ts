@@ -7,14 +7,8 @@ interface ApplicationFormType {
   multiple_rounds_dialogue?: boolean
   prologue?: string
   dataset_id_list?: string[]
-  dataset_setting?: {
-    top_n: number
-    similarity: number
-    max_paragraph_char_number: number
-  }
-  model_setting?: {
-    prompt: string
-  }
+  dataset_setting?: any
+  model_setting?: any
   problem_optimization?: boolean
 }
 interface chatType {

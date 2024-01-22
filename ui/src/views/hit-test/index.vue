@@ -206,8 +206,8 @@ function sendChatHandle(event: any) {
 function getHitTestList() {
   const obj = {
     query_text: inputValue.value,
-    similarity: formInline.similarity,
-    top_number: formInline.top_number
+    similarity: formInline.value.similarity,
+    top_number: formInline.value.top_number
   }
   if (isDataset.value) {
     datasetApi.getDatasetHitTest(id, obj, loading).then((res) => {

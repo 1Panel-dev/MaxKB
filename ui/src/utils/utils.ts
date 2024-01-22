@@ -45,7 +45,7 @@ export function getImgUrl(name: string) {
 /*
   从指定数组中过滤出对应的对象
 */
-export function realatedObject(list: any, val: string | number, attr: string) {
+export function realatedObject(list: any, val: any, attr: string) {
   const filterData: any = list.filter((item: any) => item[attr] === val)?.[0]
   return filterData || null
 }
