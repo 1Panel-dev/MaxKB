@@ -13,20 +13,20 @@
             <el-card shadow="always" class="dialog-card">
               <template v-for="(item, index) in prologueList" :key="index">
                 <div
-                  v-if="isMdArray(item)"
-                  @click="quickProblemHandel(item)"
+                  v-if="item.type === 'question'"
+                  @click="quickProblemHandel(item.str)"
                   class="problem-button ellipsis-2 mb-8"
                   :class="log ? 'disabled' : 'cursor'"
                 >
                   <el-icon><EditPen /></el-icon>
-                  {{ item }}
+                  {{ item.str }}
                 </div>
                 <MdPreview
                   v-else
                   class="mb-8"
                   ref="editorRef"
                   editorId="preview-only"
-                  :modelValue="item"
+                  :modelValue="item.str"
                 />
               </template>
             </el-card>
@@ -184,7 +184,7 @@ const props = defineProps({
     type: Object,
     default: () => {}
   },
-  appId: String,
+  appId: String, // 仅分享链接有
   log: Boolean,
   record: {
     type: Array<chatType[]>,
@@ -206,13 +206,26 @@ const chatList = ref<any[]>([])
 const isDisabledChart = computed(
   () => !(inputValue.value && (props.appId || (props.data?.name && props.data?.model_id)))
 )
-
+const isMdArray = (val: string) => val.match(/^-\s.*/m)
 const prologueList = computed(() => {
   const temp = props.data?.prologue
+  let arr: any = []
   const lines = temp?.split('\n')
-  return lines
+  lines.forEach((str: string, index: number) => {
+    if (isMdArray(str)) {
+      arr[index] = {
+        type: 'question',
+        str: str.replace(/^-\s+/, '')
+      }
+    } else {
+      arr[index] = {
+        type: 'md',
+        str
+      }
+    }
+  })
+  return arr
 })
-const isMdArray = (val: string) => val.match(/^-\s.*/m)
 
 watch(
   () => props.data,
@@ -414,7 +427,7 @@ function chatMessage() {
         return reader.read().then(write)
       })
       .then(() => {
-        return getSourceDetail(chat)
+        return !props.appId && getSourceDetail(chat)
       })
       .finally(() => {
         ChatManagement.close(chat.id)

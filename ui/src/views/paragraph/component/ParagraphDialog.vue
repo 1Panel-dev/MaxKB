@@ -93,7 +93,7 @@ const open = (data: any) => {
     detail.value.content = data.content
     problemId.value = data.id
     document_id.value = data.document_id
-    dataset_id.value = data.dataset_id
+    dataset_id.value = data.dataset_id || id
   } else {
     isEdit.value = true
   }

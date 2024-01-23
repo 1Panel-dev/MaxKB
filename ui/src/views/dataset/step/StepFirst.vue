@@ -53,7 +53,7 @@
         <el-form-item label="选择器" v-if="form.type === '1'">
           <el-input
             v-model="form.selector"
-            placeholder="请输入选择器"
+            placeholder="默认为 body，可输入 .classname/#idname/tagname"
             @blur="form.selector = form.selector.trim()"
           />
         </el-form-item>
@@ -71,7 +71,7 @@ import BaseForm from '@/views/dataset/component/BaseForm.vue'
 import UploadComponent from '@/views/dataset/component/UploadComponent.vue'
 import { isAllPropertiesEmpty } from '@/utils/utils'
 import datasetApi from '@/api/dataset'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { MsgError, MsgSuccess } from '@/utils/message'
 import useStore from '@/stores'
 const { dataset } = useStore()
 
@@ -114,12 +114,17 @@ const onSubmit = async () => {
   if (isCreate) {
     if (form.value.type === '0') {
       if ((await BaseFormRef.value?.validate()) && (await UploadComponentRef.value.validate())) {
-        /*
+        if (UploadComponentRef.value.form.fileList.length > 50) {
+          MsgError('每次最多上传50个文件！')
+          return false
+        } else {
+          /*
         stores保存数据
       */
-        dataset.saveBaseInfo(BaseFormRef.value.form)
-        dataset.saveDocumentsFile(UploadComponentRef.value.form.fileList)
-        return true
+          dataset.saveBaseInfo(BaseFormRef.value.form)
+          dataset.saveDocumentsFile(UploadComponentRef.value.form.fileList)
+          return true
+        }
       } else {
         return false
       }

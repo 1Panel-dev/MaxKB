@@ -70,19 +70,6 @@ const rules = reactive({
 })
 const FormRef = ref()
 
-// const beforeUploadHandle: UploadProps['beforeUpload'] = (rawFile) => {
-//   const type = fileType(rawFile?.name)
-//   console.log(type)
-//   if (type !== 'txt' || type !== 'md') {
-//     MsgError('Avatar picture must be JPG format!')
-//     return false
-//   } else if (rawFile.size / 1024 / 1024 > 10) {
-//     MsgError('文件不超过 10MB!')
-//     return false
-//   }
-//   return true
-// }
-
 watch(form.value, (value) => {
   dataset.saveDocumentsFile(value.fileList)
 })
