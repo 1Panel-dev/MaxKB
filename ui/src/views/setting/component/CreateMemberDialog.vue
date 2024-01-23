@@ -114,9 +114,9 @@ const submitMember = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       loading.value = true
-      TeamApi.postCreatTeamMember(memberForm.value.users).then(() => {
+      TeamApi.postCreatTeamMember(memberForm.value.users).then((res) => {
         MsgSuccess('提交成功')
-        emit('refresh')
+        emit('refresh', memberForm.value.users)
         dialogVisible.value = false
       })
     } else {

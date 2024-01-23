@@ -1,7 +1,12 @@
 <template>
   <LayoutContainer :header="documentDetail?.name" back-to="-1" class="document-detail">
     <template #header>
-      <el-text type="info" v-if="documentDetail?.type==='1'">（文档地址：{{ documentDetail?.meta?.source_url }}）</el-text>
+      <el-text type="info" v-if="documentDetail?.type === '1'"
+        >（文档地址：<el-link :href="documentDetail?.meta?.source_url" target="_blank">{{
+          documentDetail?.meta?.source_url
+        }}</el-link
+        >）</el-text
+      >
       <div class="document-detail__header">
         <el-button @click="addParagraph" type="primary" :disabled="loading"> 添加分段 </el-button>
       </div>

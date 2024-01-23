@@ -22,7 +22,7 @@
         type="textarea"
       >
       </el-input>
-      <span v-else>{{ form.content }}</span>
+      <span v-else class="break-all">{{ form.content }}</span>
     </el-form-item>
   </el-form>
 </template>

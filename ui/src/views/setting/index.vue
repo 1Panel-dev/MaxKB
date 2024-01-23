@@ -16,6 +16,7 @@
           class="mt-8"
           v-loading="loading"
           @click="clickMemberHandle"
+          :default-active="currentUser"
         >
           <template #default="{ row }">
             <div class="flex-between">
@@ -187,13 +188,15 @@ function addMember() {
   CreateMemberRef.value?.open()
 }
 
-function getMember(num?: number) {
+function getMember(id?: string) {
   loading.value = true
   TeamApi.getTeamMember()
     .then((res) => {
       memberList.value = res.data
       filterMember.value = res.data
-      currentUser.value = memberList.value[num || 0].id
+
+      const user = (id && memberList.value.find((p) => p.user_id === id)) || null
+      currentUser.value = user ? user.id : memberList.value[0].id
       MemberPermissions(currentUser.value)
       loading.value = false
     })
@@ -202,8 +205,8 @@ function getMember(num?: number) {
     })
 }
 
-function refresh() {
-  getMember(1)
+function refresh(data?: string[]) {
+  getMember(data && data[0])
 }
 
 onMounted(() => {

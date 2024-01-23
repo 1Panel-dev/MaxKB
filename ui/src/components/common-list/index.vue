@@ -22,13 +22,25 @@ import { ref, watch, useSlots } from 'vue'
 const slots = useSlots()
 defineOptions({ name: 'CommonList' })
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     data: Array<any>
+    defaultActive: string
   }>(),
   {
-    data: () => []
+    data: () => [],
+    defaultActive: ''
   }
+)
+
+watch(
+  () => props.defaultActive,
+  (val) => {
+    if (val) {
+      current.value = props.data.findIndex((v) => v.id === val)
+    }
+  },
+  { immediate: true }
 )
 
 const emit = defineEmits(['click'])
