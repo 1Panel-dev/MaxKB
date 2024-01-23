@@ -107,6 +107,9 @@ class PGVector(BaseVectorStore):
         QuerySet(Embedding).filter(document_id=document_id).delete()
         return True
 
+    def delete_bu_document_id_list(self, document_id_list: List[str]):
+        return QuerySet(Embedding).filter(document_id__in=document_id_list).delete()
+
     def delete_by_source_id(self, source_id: str, source_type: str):
         QuerySet(Embedding).filter(source_id=source_id, source_type=source_type).delete()
         return True

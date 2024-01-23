@@ -547,7 +547,12 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
-            QuerySet(Document).filter(id__in=instance.get('id_list')).delete()
+            document_id_list = instance.get("id_list")
+            QuerySet(Document).filter(id__in=document_id_list).delete()
+            QuerySet(Paragraph).filter(document_id__in=document_id_list).delete()
+            QuerySet(Problem).filter(document_id__in=document_id_list).delete()
+            # 删除向量库
+            ListenerManagement.delete_embedding_by_document_list_signal.send(document_id_list)
             return True
 
 

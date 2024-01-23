@@ -9,6 +9,7 @@
 import uuid
 from typing import Dict
 
+from django.db import transaction
 from django.db.models import QuerySet
 from drf_yasg import openapi
 from rest_framework import serializers
@@ -61,6 +62,7 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                                               dataset_id=self.data.get('dataset_id')).exists():
                 raise AppApiException(500, "段落id不正确")
 
+        @transaction.atomic
         def save(self, instance: Dict, with_valid=True, with_embedding=True):
             if with_valid:
                 self.is_valid()

@@ -50,6 +50,7 @@ class ListenerManagement:
     embedding_by_dataset_signal = signal("embedding_by_dataset")
     embedding_by_document_signal = signal("embedding_by_document")
     delete_embedding_by_document_signal = signal("delete_embedding_by_document")
+    delete_embedding_by_document_list_signal = signal("delete_embedding_by_document_list")
     delete_embedding_by_dataset_signal = signal("delete_embedding_by_dataset")
     delete_embedding_by_paragraph_signal = signal("delete_embedding_by_paragraph")
     delete_embedding_by_source_signal = signal("delete_embedding_by_source")
@@ -145,6 +146,10 @@ class ListenerManagement:
         VectorStore.get_embedding_vector().delete_by_document_id(document_id)
 
     @staticmethod
+    def delete_embedding_by_document_list(document_id_list: List[str]):
+        VectorStore.get_embedding_vector().delete_bu_document_id_list(document_id_list)
+
+    @staticmethod
     def delete_embedding_by_dataset(dataset_id):
         VectorStore.get_embedding_vector().delete_by_dataset_id(dataset_id)
 
@@ -201,6 +206,8 @@ class ListenerManagement:
             self.embedding_by_document)
         # 删除 向量 根据文档
         ListenerManagement.delete_embedding_by_document_signal.connect(self.delete_embedding_by_document)
+        # 删除 向量 根据文档id列表
+        ListenerManagement.delete_embedding_by_document_list_signal.connect(self.delete_embedding_by_document_list)
         # 删除 向量 根据知识库id
         ListenerManagement.delete_embedding_by_dataset_signal.connect(self.delete_embedding_by_dataset)
         # 删除向量 根据段落id

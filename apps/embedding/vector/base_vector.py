@@ -51,8 +51,6 @@ class BaseVectorStore(ABC):
 
     def save(self, text, source_type: SourceType, dataset_id: str, document_id: str, paragraph_id: str, source_id: str,
              is_active: bool,
-             star_num: int,
-             trample_num: int,
              embedding=None):
         """
         插入向量数据
@@ -64,16 +62,13 @@ class BaseVectorStore(ABC):
         :param is_active:   是否禁用
         :param embedding:   向量化处理器
         :param paragraph_id 段落id
-        :param star_num     点赞数量
-        :param trample_num  点踩数量
         :return:  bool
         """
 
         if embedding is None:
             embedding = EmbeddingModel.get_embedding_model()
         self.save_pre_handler()
-        self._save(text, source_type, dataset_id, document_id, paragraph_id, source_id, is_active, star_num,
-                   trample_num, embedding)
+        self._save(text, source_type, dataset_id, document_id, paragraph_id, source_id, is_active, embedding)
 
     def batch_save(self, data_list: List[Dict], embedding=None):
         # 获取锁
@@ -141,6 +136,10 @@ class BaseVectorStore(ABC):
 
     @abstractmethod
     def delete_by_document_id(self, document_id: str):
+        pass
+
+    @abstractmethod
+    def delete_bu_document_id_list(self, document_id_list: List[str]):
         pass
 
     @abstractmethod
