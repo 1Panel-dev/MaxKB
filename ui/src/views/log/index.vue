@@ -231,7 +231,7 @@ function getList() {
     history_day: history_day.value
   }
   if (search.value) {
-    obj = { ...obj, search: search.value }
+    obj = { ...obj, abstract: search.value }
   }
   return logApi.getChatLog(id as string, paginationConfig, obj, loading).then((res) => {
     tableData.value = res.data.records
