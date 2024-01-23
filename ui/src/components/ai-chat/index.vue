@@ -215,6 +215,14 @@ const prologueList = computed(() => {
 const isMdArray = (val: string) => val.match(/^-\s.*/m)
 
 watch(
+  () => props.data,
+  () => {
+    chartOpenId.value = ''
+  },
+  { deep: true }
+)
+
+watch(
   () => props.record,
   (value) => {
     if (props.log) {
