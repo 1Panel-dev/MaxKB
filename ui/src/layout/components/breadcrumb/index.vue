@@ -1,5 +1,5 @@
 <template>
-  <div class="breadcrumb ml-8 mt-4 mb-12 flex">
+  <div class="breadcrumb ml-4 mt-4 mb-12 flex">
     <back-button :to="activeMenu" class="mt-4"></back-button>
     <el-dropdown
       placement="top"
@@ -181,7 +181,7 @@ onMounted(() => {
 }
 .breadcrumb {
   .breadcrumb-hover {
-    padding: 4px 4px 4px 0;
+    padding: 4px;
     border-radius: 4px;
     &:hover {
       background: var(--el-color-primary-light-9);
