@@ -507,8 +507,6 @@ class DataSetSerializers(serializers.ModelSerializer):
                         if first is not None:
                             # 如果存在,使用文档同步
                             DocumentSerializers.Sync(data={'document_id': first.id}).sync()
-                            # 发送向量化指令
-                            ListenerManagement.embedding_by_document_signal.send(first.id)
                         else:
                             # 插入
                             DocumentSerializers.Create(data={'dataset_id': dataset.id}).save(
