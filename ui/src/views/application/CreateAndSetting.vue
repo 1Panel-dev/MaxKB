@@ -161,13 +161,14 @@
                               :max="10000"
                               style="width: 200px"
                               size="small"
+                              class="customer-slider"
                             />
                             <span class="ml-4">个字符</span>
                           </div>
                         </div>
                       </div>
                       <div class="text-right">
-                        <el-button @click="popoverVisible = false">取消</el-button>
+                        <el-button size="small" @click="popoverVisible = false">取消</el-button>
                         <el-button
                           type="primary"
                           @click="datasetSettingChange('close')"
@@ -555,6 +556,11 @@ onMounted(() => {
 .dataset_setting {
   .form-item {
     background: var(--app-layout-bg-color);
+  }
+}
+.customer-slider {
+  :deep(.el-input-number.is-without-controls .el-input__wrapper) {
+    padding: 0 !important;
   }
 }
 </style>
