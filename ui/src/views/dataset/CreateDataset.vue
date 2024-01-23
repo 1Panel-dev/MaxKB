@@ -111,6 +111,7 @@ function submit() {
     })
   })
   const obj = { ...baseInfo.value, documents } as datasetData
+  const id = route.query.id
   if (id) {
     documentApi
       .postDocument(id as string, documents)
