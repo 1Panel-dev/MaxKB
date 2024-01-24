@@ -62,7 +62,7 @@ class ChatSerializers(serializers.Serializer):
             end_time = self.get_end_time()
             query_dict = {'application_id': self.data.get("application_id"), 'create_time__gte': end_time}
             if 'abstract' in self.data and self.data.get('abstract') is not None:
-                query_dict['abstract'] = self.data.get('abstract')
+                query_dict['abstract__contains'] = self.data.get('abstract')
             return QuerySet(Chat).filter(**query_dict).order_by("-create_time")
 
         def list(self, with_valid=True):
