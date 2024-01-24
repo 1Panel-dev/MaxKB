@@ -205,12 +205,13 @@ const handleSelectionChange = (val: any[]) => {
  */
 const initInterval = () => {
   interval = setInterval(() => {
-    if (
-      documentData.value.length === 0 ||
-      documentData.value.some((item) => item.status === '0' || item.status === '2')
-    ) {
-      getList(true)
-    }
+    // if (
+    //   documentData.value.length === 0 ||
+    //   documentData.value.some((item) => item.status === '0' || item.status === '2')
+    // ) {
+    //   getList(true)
+    // }
+    getList(true)
   }, 6000)
 }
 

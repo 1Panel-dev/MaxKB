@@ -60,7 +60,7 @@ const form = ref<any>({
 const documentId = ref('')
 
 const rules = reactive({
-  source_url: [{ required: true, message: '请输入 Web 根地址', trigger: 'blur' }]
+  source_url: [{ required: true, message: '请输入文档地址', trigger: 'blur' }]
 })
 
 const dialogVisible = ref<boolean>(false)
