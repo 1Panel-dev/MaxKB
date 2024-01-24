@@ -181,8 +181,8 @@ class ListenerManagement:
     def sync_web_dataset(args: SyncWebDatasetArgs):
         if try_lock('sync_web_dataset' + args.lock_key):
             try:
-                ForkManage(args.url, args.selector.split(" ")).fork(2, set(),
-                                                                    args.handler)
+                ForkManage(args.url, args.selector.split(" ") if args.selector is not None else []).fork(2, set(),
+                                                                                                         args.handler)
             except Exception as e:
                 logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
             finally:

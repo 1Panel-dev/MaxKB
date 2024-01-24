@@ -166,7 +166,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 document.status = Status.embedding
                 document.save()
                 source_url = document.meta.get('source_url')
-                selector_list = document.meta.get('selector').split(" ") if 'selector' in document.meta else []
+                selector_list = document.meta.get('selector').split(
+                    " ") if 'selector' in document.meta and document.meta.get('selector') is not None else []
                 result = Fork(source_url, selector_list).fork()
                 if result.status == 200:
                     # 删除段落
