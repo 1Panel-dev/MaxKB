@@ -16,6 +16,11 @@
       background: var(--app-text-color-light-1);
     }
   }
+  &:focus {
+    color: var(--el-button-text-color);
+    background-color: var(--el-button-bg-color);
+    border-color: var(--el-button-border-color);
+  }
 }
 .el-avatar {
   --el-avatar-bg-color: var(--el-color-primary);
@@ -54,6 +59,10 @@
   padding: 24px;
   .el-message-box__header {
     padding: 0;
+  }
+  .el-message-box__title {
+    word-break: break-all;
+    width: 95%;
   }
 }
 

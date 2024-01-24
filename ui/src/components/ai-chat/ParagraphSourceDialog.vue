@@ -18,7 +18,7 @@
           <el-form-item label="引用分段">
             <template v-for="(item, index) in detail.paragraph_list" :key="index">
               <CardBox
-                shadow="none"
+                shadow="never"
                 :title="item.title || '-'"
                 class="paragraph-source-card cursor mb-8"
                 :class="item.is_active ? '' : 'disabled'"

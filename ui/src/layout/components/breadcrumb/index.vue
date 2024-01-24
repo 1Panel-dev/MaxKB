@@ -69,14 +69,21 @@
         </el-dropdown-menu>
         <div class="border-t" style="padding: 8px 11px; min-width: 200px">
           <template v-if="isApplication">
-            <el-button link @click="router.push({ path: '/application/create' })">
-              <el-icon class="mr-4"><Plus /></el-icon> 创建应用
-            </el-button>
+            <div
+              class="w-full text-left cursor"
+              @click="router.push({ path: '/application/create' })"
+            >
+              <el-button link>
+                <el-icon class="mr-4"><Plus /></el-icon> 创建应用
+              </el-button>
+            </div>
           </template>
           <template v-else-if="isDataset">
-            <el-button link @click="router.push({ path: '/dataset/create' })">
-              <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
-            </el-button>
+            <div class="w-full text-left cursor" @click="router.push({ path: '/dataset/create' })">
+              <el-button link>
+                <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
+              </el-button>
+            </div>
           </template>
         </div>
       </template>

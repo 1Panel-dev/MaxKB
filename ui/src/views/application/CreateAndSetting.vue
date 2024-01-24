@@ -82,9 +82,11 @@
                     </el-option>
                   </el-option-group>
                   <template #footer>
-                    <el-button type="primary" link @click="openCreateModel">
-                      <el-icon class="mr-4"><Plus /></el-icon> 添加模型
-                    </el-button>
+                    <div class="w-full text-left cursor" @click="openCreateModel()">
+                      <el-button type="primary" link>
+                        <el-icon class="mr-4"><Plus /></el-icon> 添加模型
+                      </el-button>
+                    </div>
                   </template>
                 </el-select>
               </el-form-item>
