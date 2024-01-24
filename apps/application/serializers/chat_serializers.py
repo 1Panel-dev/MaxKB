@@ -277,7 +277,7 @@ class ChatRecordSerializer(serializers.Serializer):
             return True
 
     class ImproveSerializer(serializers.Serializer):
-        title = serializers.CharField(required=False)
+        title = serializers.CharField(required=False, allow_null=True, allow_blank=True)
         content = serializers.CharField(required=True)
 
     class ParagraphModel(serializers.ModelSerializer):
