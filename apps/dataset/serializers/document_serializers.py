@@ -57,7 +57,7 @@ class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
 
 class DocumentWebInstanceSerializer(ApiMixin, serializers.Serializer):
     source_url_list = serializers.ListField(required=True, child=serializers.CharField(required=True))
-    selector = serializers.CharField(required=False)
+    selector = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     @staticmethod
     def get_request_body_api():
