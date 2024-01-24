@@ -152,7 +152,7 @@ function getDataset(resolve: any) {
 }
 
 const open = (data: any) => {
-  form.value.chat_id = data.chat
+  form.value.chat_id = data.chat_id
   form.value.record_id = data.id
   form.value.problem_text = data.problem_text
   form.value.content = data.answer_text

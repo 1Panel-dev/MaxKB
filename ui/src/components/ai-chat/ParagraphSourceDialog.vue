@@ -18,7 +18,7 @@
           <el-form-item label="引用分段">
             <template v-for="(item, index) in detail.paragraph_list" :key="index">
               <CardBox
-                shadow="hover"
+                shadow="none"
                 :title="item.title || '-'"
                 :description="item.content"
                 class="paragraph-source-card cursor mb-8"
