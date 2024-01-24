@@ -6,13 +6,28 @@
       <el-tag
         v-for="(item, index) in tagsList"
         :key="index"
-        @close="removeTag(item)"
+        @close="removeTag(index)"
         closable
         class="mr-8"
-        >{{ item }}
+        type="info"
+        >{{ item.username }}
       </el-tag>
     </div>
     <!-- 输入框 -->
+    <el-autocomplete
+      :placeholder="tagsList.length == 0 ? placeholder : ''"
+      :validate-event="false"
+      v-model="currentval"
+      :fetch-suggestions="querySearchAsync"
+      @select="handleSelect"
+      :popper-class="noData ? 'platform-auto-complete' : ''"
+    >
+      <template #default="{ item }">
+        <!-- 解决匹配不到提示无匹配数据 -->
+        <div class="default" v-if="noData">{{ item.default }}</div>
+        <div class="value" v-else>{{ item.username }}</div>
+      </template>
+    </el-autocomplete>
     <!-- <el-input
       :validate-event="false"
       v-model="currentval"
@@ -23,17 +38,13 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import UserApi from '@/api/user'
 defineOptions({ name: 'TagsInput' })
 const props = defineProps({
   tags: {
     /* 多个 */
-    type: Array<String>,
+    type: Array<any>,
     default: () => []
-  },
-  tag: {
-    /* 单个 */
-    type: String,
-    default: ''
   },
   placeholder: {
     type: String,
@@ -43,33 +54,44 @@ const props = defineProps({
     /* 最多生成标签数 */
     type: Number,
     default: -1
-  },
-  reg: {
-    type: String,
-    default: ''
   }
 })
-const emit = defineEmits(['update:tags', 'update:tag'])
+const emit = defineEmits(['update:tags'])
 const currentval = ref('')
-const tagsList = ref<String[]>([])
+const tagsList = ref<any[]>([])
+const noData = ref(false) // 是否匹配到数据了
 
 watch([tagsList, currentval], (val) => {
-  if (val[0]?.length > 0) {
-    emit('update:tags', val[0])
-  } else if (val[1]) {
-    emit('update:tag', val[1])
-  }
+  emit('update:tags', val[0])
 })
 
-function addTags() {
-  const val = currentval.value.trim()
-  if (val) {
-    tagsList.value.push(val)
+const querySearchAsync = (queryString: string, cb: (arg: any) => void) => {
+  if (queryString) {
+    let matchResults
+    UserApi.getUserList(queryString).then((res) => {
+      if (res.data.length === 0) {
+        noData.value = true
+        matchResults = [{ default: '无匹配数据' }]
+      } else {
+        noData.value = false
+        matchResults = res.data
+      }
+      cb(matchResults)
+    })
+  } else {
+    cb([])
+  }
+}
+
+const handleSelect = (item: any) => {
+  if (!tagsList.value.some((obj: any) => obj.id === item.id)) {
+    tagsList.value.push(item)
   }
   currentval.value = ''
 }
-function removeTag(tag: String) {
-  tagsList.value.splice(tagsList.value.indexOf(tag), 1)
+
+function removeTag(index: number) {
+  tagsList.value.splice(index, 1)
 }
 </script>
 <style lang="scss" scoped>
@@ -78,6 +100,9 @@ function removeTag(tag: String) {
   min-height: 70px;
   border: 1px solid var(--el-border-color);
   border-radius: var(--el-border-radius-base);
+  :deep(.el-autocomplete) {
+    width: 100%;
+  }
   :deep(.el-input__wrapper) {
     background: none !important;
     box-shadow: none !important;

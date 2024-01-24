@@ -20,7 +20,6 @@
               <CardBox
                 shadow="none"
                 :title="item.title || '-'"
-                :description="item.content"
                 class="paragraph-source-card cursor mb-8"
                 :class="item.is_active ? '' : 'disabled'"
                 :showIcon="false"
@@ -29,6 +28,11 @@
                   <AppAvatar :name="index + 1 + ''" class="mr-12 avatar-light" :size="22" />
                 </template>
                 <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
+                <template #description>
+                  <el-scrollbar height="90">
+                    {{ item.content }}
+                  </el-scrollbar>
+                </template>
                 <template #footer>
                   <div class="footer-content flex-between">
                     <el-text>
@@ -88,10 +92,6 @@ defineExpose({ open })
 .paragraph-source-card {
   height: 210px;
   width: 100%;
-  :deep(.description) {
-    -webkit-line-clamp: 5 !important;
-    height: 110px !important;
-  }
   .active-button {
     position: absolute;
     right: 16px;

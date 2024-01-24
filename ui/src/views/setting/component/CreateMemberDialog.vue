@@ -20,7 +20,8 @@
       @submit.prevent
     >
       <el-form-item label="用户名/邮箱" prop="users">
-        <el-select
+        <tags-input v-model:tags="memberForm.users" placeholder="请输入成员的用户名或邮箱" />
+        <!-- <el-select
           ref="SelectRemoteRef"
           class="custom-select-multiple"
           v-model="memberForm.users"
@@ -40,13 +41,15 @@
             :label="item?.username"
             :value="item?.id"
           />
-        </el-select>
+        </el-select> -->
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
-        <el-button type="primary" @click="submitMember(addMemberFormRef)"> 添加 </el-button>
+        <el-button type="primary" @click="submitMember(addMemberFormRef)" :loading="loading">
+          添加
+        </el-button>
       </span>
     </template>
   </el-dialog>
@@ -56,7 +59,7 @@ import { ref, watch, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import TeamApi from '@/api/team'
-import UserApi from '@/api/user'
+// import UserApi from '@/api/user'
 
 const emit = defineEmits(['refresh'])
 
@@ -66,11 +69,11 @@ const memberForm = ref({
   users: []
 })
 
-const SelectRemoteRef = ref()
+// const SelectRemoteRef = ref()
 const addMemberFormRef = ref<FormInstance>()
 
 const loading = ref<boolean>(false)
-const userOptions = ref<Array<any>>([])
+// const userOptions = ref<Array<any>>([])
 
 const rules = ref<FormRules>({
   users: [
@@ -88,23 +91,24 @@ watch(dialogVisible, (bool) => {
     memberForm.value = {
       users: []
     }
+    loading.value = false
   }
 })
 
-const remoteMethod = (query: string) => {
-  if (query) {
-    setTimeout(() => {
-      getUser(query)
-    }, 200)
-  } else {
-    userOptions.value = []
-  }
-}
+// const remoteMethod = (query: string) => {
+//   if (query) {
+//     setTimeout(() => {
+//       getUser(query)
+//     }, 200)
+//   } else {
+//     userOptions.value = []
+//   }
+// }
 
-const changeSelectHandle = () => {
-  SelectRemoteRef.value.query = ''
-  SelectRemoteRef.value.blur()
-}
+// const changeSelectHandle = () => {
+//   SelectRemoteRef.value.query = ''
+//   SelectRemoteRef.value.blur()
+// }
 
 const open = () => {
   dialogVisible.value = true
@@ -114,10 +118,12 @@ const submitMember = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       loading.value = true
-      TeamApi.postCreatTeamMember(memberForm.value.users).then((res) => {
+      let idsArray = memberForm.value.users.map((obj: any) => obj.id)
+      TeamApi.postCreatTeamMember(idsArray).then((res) => {
         MsgSuccess('提交成功')
-        emit('refresh', memberForm.value.users)
+        emit('refresh', idsArray)
         dialogVisible.value = false
+        loading.value = false
       })
     } else {
       console.log('error submit!')
@@ -125,11 +131,11 @@ const submitMember = async (formEl: FormInstance | undefined) => {
   })
 }
 
-const getUser = (val: string) => {
-  UserApi.getUserList(val, loading).then((res) => {
-    userOptions.value = res.data
-  })
-}
+// const getUser = (val: string) => {
+//   UserApi.getUserList(val, loading).then((res) => {
+//     userOptions.value.push(res.data)
+//   })
+// }
 
 onMounted(() => {})
 

@@ -216,3 +216,20 @@
   right: 10px;
   left: auto;
 }
+
+// 自动补全增加暂无数据
+.platform-auto-complete {
+  .el-autocomplete-suggestion__wrap {
+    padding: 5px 0;
+    ul li {
+      pointer-events: none; // 阻止可点击事件
+      .default {
+        text-align: center;
+        color: #999;
+      }
+      &:hover {
+        background-color: #fff;
+      }
+    }
+  }
+}

@@ -232,9 +232,9 @@ onMounted(() => {
         color: var(--app-border-color-dark);
       }
     }
-    :deep(.description) {
+    :deep(.content) {
       -webkit-line-clamp: 5 !important;
-      height: 110px;
+      height: 110px !important;
     }
     .active-button {
       position: absolute;

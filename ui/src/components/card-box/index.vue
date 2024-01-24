@@ -12,9 +12,11 @@
         </div>
       </slot>
     </div>
-    <div class="description mt-12" v-if="$slots.description || description">
+    <div class="description break-all mt-12" v-if="$slots.description || description">
       <slot name="description">
-        {{ description }}
+        <div class="content">
+          {{ description }}
+        </div>
       </slot>
     </div>
     <slot />
@@ -63,14 +65,16 @@ function cardLeave() {
   min-width: var(--card-min-width);
   border-radius: 8px;
   .description {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    height: var(--app-card-box-description-height, 40px);
     color: var(--app-text-color-secondary);
     line-height: 22px;
     font-weight: 400;
+    .content {
+      display: -webkit-box;
+      height: var(--app-card-box-description-height, 40px);
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
   }
   .card-footer {
     position: absolute;

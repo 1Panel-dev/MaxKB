@@ -97,7 +97,7 @@ function deleteParagraph() {
 }
 
 function getMark(data: any) {
-  logApi.getMarkRecord(id as string, data.chat, data.id, loading).then((res: any) => {
+  logApi.getMarkRecord(id as string, data.chat_id, data.id, loading).then((res: any) => {
     if (res.data.length > 0) {
       form.value = res.data[0]
     }
