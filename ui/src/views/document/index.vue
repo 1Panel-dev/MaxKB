@@ -13,11 +13,12 @@
             <el-button v-if="datasetDetail.type === '1'" type="primary" @click="importDoc"
               >导入文档</el-button
             >
+            <el-button @click="syncDataset" v-if="datasetDetail.type === '1'">同步知识库</el-button>
             <el-button
               @click="syncMulDocument"
               :disabled="multipleSelection.length === 0"
               v-if="datasetDetail.type === '1'"
-              >批量同步</el-button
+              >同步文档</el-button
             >
             <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
               >批量删除</el-button
@@ -149,6 +150,7 @@
         </app-table>
       </div>
       <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
+      <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
     </div>
   </LayoutContainer>
 </template>
@@ -158,6 +160,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElTable } from 'element-plus'
 import documentApi from '@/api/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
+import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -169,6 +172,8 @@ const {
 } = route as any
 
 const { dataset } = useStore()
+
+const SyncWebDialogRef = ref()
 const loading = ref(false)
 let interval: any
 const filterText = ref('')
@@ -186,6 +191,10 @@ const ImportDocumentDialogRef = ref()
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
 const title = ref('')
+
+function syncDataset() {
+  SyncWebDialogRef.value.open(id)
+}
 
 function importDoc() {
   title.value = '导入文档'
@@ -271,7 +280,7 @@ function syncMulDocument() {
     }
   })
   documentApi.delMulSyncDocument(id, arr, loading).then(() => {
-    MsgSuccess('批量同步成功')
+    MsgSuccess('同步文档成功')
     getList()
   })
 }

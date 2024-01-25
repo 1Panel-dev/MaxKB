@@ -61,7 +61,7 @@ const props = withDefaults(
   {}
 )
 
-const emit = defineEmits(['update:chartId', 'update:currentAbstract'])
+const emit = defineEmits(['update:chartId', 'update:currentAbstract', 'refresh'])
 
 const route = useRoute()
 const {
@@ -106,6 +106,7 @@ watch(visible, (bool) => {
   if (!bool) {
     emit('update:chartId', '')
     emit('update:currentAbstract', '')
+    emit('refresh')
   }
 })
 

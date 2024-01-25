@@ -17,6 +17,7 @@ import dynamicsForm from './dynamics-form'
 import CardCheckbox from './card-checkbox/index.vue'
 import AiChat from './ai-chat/index.vue'
 import InfiniteScroll from './infinite-scroll/index.vue'
+import AutoTooltip from './auto-tooltip/index.vue'
 
 export default {
   install(app: App) {
@@ -38,5 +39,6 @@ export default {
     app.component(CardCheckbox.name, CardCheckbox)
     app.component(AiChat.name, AiChat)
     app.component(InfiniteScroll.name, InfiniteScroll)
+    app.component(AutoTooltip.name, AutoTooltip)
   }
 }
