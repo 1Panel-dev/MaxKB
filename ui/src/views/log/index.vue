@@ -73,6 +73,7 @@
       :application="detail"
       :pre_disable="pre_disable"
       :next_disable="next_disable"
+      @refresh="refresh"
     />
   </LayoutContainer>
 </template>
@@ -246,6 +247,10 @@ function getDetail() {
   application.asyncGetApplicationDetail(id as string, loading).then((res: any) => {
     detail.value = res.data
   })
+}
+
+function refresh() {
+  getList()
 }
 
 onMounted(() => {

@@ -2,7 +2,10 @@
   <div class="cursor">
     <slot name="read">
       <div class="flex align-center" v-if="!isEdit">
-        <span>{{ data }}</span>
+        <auto-tooltip :content="data">
+          {{ data }}
+        </auto-tooltip>
+
         <el-button @click.stop="editNameHandle" text v-if="showEditIcon">
           <el-icon><Edit /></el-icon>
         </el-button>
