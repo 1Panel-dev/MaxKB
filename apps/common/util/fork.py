@@ -9,6 +9,8 @@ import html2text as ht
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse, ParseResult
 
+requests.packages.urllib3.disable_warnings()
+
 
 class ChildLink:
     def __init__(self, url, tag):
@@ -121,7 +123,7 @@ class Fork:
     def fork(self):
         try:
             logging.getLogger("max_kb").info(f'fork:{self.base_fork_url}')
-            response = requests.get(self.base_fork_url)
+            response = requests.get(self.base_fork_url, verify=False)
             if response.status_code != 200:
                 logging.getLogger("max_kb").error(f"url: {self.base_fork_url} code:{response.status_code}")
                 return Fork.Response.error(f"url: {self.base_fork_url} code:{response.status_code}")
