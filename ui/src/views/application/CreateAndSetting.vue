@@ -56,6 +56,7 @@
                   v-model="applicationForm.model_id"
                   placeholder="请选择 AI 模型"
                   style="width: 100%"
+                  popper-class="select-model"
                 >
                   <el-option-group
                     v-for="(value, label) in modelOptions"
@@ -565,4 +566,6 @@ onMounted(() => {
     padding: 0 !important;
   }
 }
+
+
 </style>
