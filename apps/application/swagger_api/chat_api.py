@@ -104,7 +104,13 @@ class ChatApi(ApiMixin):
                                   required=True,
                                   description='历史天数'),
                 openapi.Parameter(name='abstract', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, required=False,
-                                  description="摘要")
+                                  description="摘要"),
+                openapi.Parameter(name='min_star', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, required=False,
+                                  description="最小点赞数"),
+                openapi.Parameter(name='min_trample', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, required=False,
+                                  description="最小点踩数"),
+                openapi.Parameter(name='comparer', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, required=False,
+                                  description="or|and 比较器")
                 ]
 
 

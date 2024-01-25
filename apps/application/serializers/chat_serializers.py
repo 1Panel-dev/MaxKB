@@ -9,20 +9,22 @@
 import datetime
 import json
 import os
+import re
 import uuid
 from functools import reduce
 from typing import Dict, List
 
+from django.core import validators
 from django.core.cache import cache
-from django.db import transaction
-from django.db.models import QuerySet
+from django.db import transaction, models
+from django.db.models import QuerySet, Q
 from rest_framework import serializers
 
 from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord
 from application.serializers.application_serializers import ModelDatasetAssociation, DatasetSettingSerializer, \
     ModelSettingSerializer
 from application.serializers.chat_message_serializers import ChatInfo
-from common.db.search import native_search, native_page_search, page_search
+from common.db.search import native_search, native_page_search, page_search, get_dynamics_model
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.util.file_util import get_file_content
@@ -53,6 +55,12 @@ class ChatSerializers(serializers.Serializer):
         history_day = serializers.IntegerField(required=True)
         user_id = serializers.UUIDField(required=True)
         application_id = serializers.UUIDField(required=True)
+        min_star = serializers.IntegerField(required=False, min_value=0)
+        min_trample = serializers.IntegerField(required=False, min_value=0)
+        comparer = serializers.CharField(required=False, validators=[
+            validators.RegexValidator(regex=re.compile("^and|or$"),
+                                      message="只支持and|or", code=500)
+        ])
 
         def get_end_time(self):
             history_day = self.data.get('history_day')
@@ -60,24 +68,51 @@ class ChatSerializers(serializers.Serializer):
 
         def get_query_set(self):
             end_time = self.get_end_time()
-            query_dict = {'application_id': self.data.get("application_id"), 'create_time__gte': end_time}
+            query_set = QuerySet(model=get_dynamics_model(
+                {'application_id': models.CharField(),
+                 'abstract': models.CharField(),
+                 "star_num": models.IntegerField(),
+                 'trample_num': models.IntegerField(),
+                 'comparer': models.CharField(),
+                 'create_time': models.DateTimeField()}))
+
+            base_query_dict = {'application_id': self.data.get("application_id"), 'create_time__gte': end_time}
             if 'abstract' in self.data and self.data.get('abstract') is not None:
-                query_dict['abstract__contains'] = self.data.get('abstract')
-            return QuerySet(Chat).filter(**query_dict).order_by("-create_time")
+                base_query_dict['abstract__contains'] = self.data.get('abstract')
+            base_condition = Q(**base_query_dict)
+            min_star_query = None
+            min_trample_query = None
+            if 'min_star' in self.data and self.data.get('min_star') is not None:
+                min_star_query = Q(star_num__gte=self.data.get('min_star'))
+            if 'min_trample' in self.data and self.data.get('min_trample') is not None:
+                min_trample_query = Q(trample_num__gte=self.data.get('min_trample'))
+            if min_star_query is not None and min_trample_query is not None:
+                if self.data.get(
+                        'comparer') is not None and self.data.get('comparer') == 'or':
+                    condition = base_condition & (min_star_query | min_trample_query)
+                else:
+                    condition = base_condition & (min_star_query & min_trample_query)
+            elif min_star_query is not None:
+                condition = base_condition & min_star_query
+            elif min_trample_query is not None:
+                condition = base_condition & min_trample_query
+            else:
+                condition = base_condition
+            return query_set.filter(condition).order_by("-create_time")
 
         def list(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             return native_search(self.get_query_set(), select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'list_application_chat.sql')),
-                                 with_table_name=True)
+                                 with_table_name=False)
 
         def page(self, current_page: int, page_size: int, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             return native_page_search(current_page, page_size, self.get_query_set(), select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'list_application_chat.sql')),
-                                      with_table_name=True)
+                                      with_table_name=False)
 
     class OpenChat(serializers.Serializer):
         user_id = serializers.UUIDField(required=True)
