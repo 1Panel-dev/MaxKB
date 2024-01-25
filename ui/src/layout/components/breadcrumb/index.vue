@@ -67,7 +67,7 @@
             </div>
           </template>
         </el-dropdown-menu>
-        <div class="border-t" style="padding: 8px 11px; min-width: 200px">
+        <div class="breadcrumb__footer border-t" style="padding: 8px 11px; min-width: 200px">
           <template v-if="isApplication">
             <div
               class="w-full text-left cursor"
@@ -193,6 +193,11 @@ onMounted(() => {
     &:hover {
       background: var(--el-color-primary-light-9);
       color: var(--el-menu-active-color);
+    }
+  }
+  &__footer {
+    &:hover {
+      background-color: var(--app-text-color-light-1);
     }
   }
 }

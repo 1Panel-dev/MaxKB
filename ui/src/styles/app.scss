@@ -498,3 +498,12 @@ h4 {
     border: 1px solid var(--el-color-primary);
   }
 }
+
+// AI模型选择：添加模型hover样式
+.select-model {
+  .el-select-dropdown__footer {
+    &:hover {
+      background-color: var(--el-fill-color-light);
+    }
+  }
+}

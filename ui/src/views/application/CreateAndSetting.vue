@@ -56,6 +56,7 @@
                   v-model="applicationForm.model_id"
                   placeholder="请选择 AI 模型"
                   style="width: 100%"
+                  popper-class="select-model"
                 >
                   <el-option-group
                     v-for="(value, label) in modelOptions"
@@ -163,7 +164,7 @@
                               :max="10000"
                               style="width: 200px"
                               size="small"
-                              class="customer-slider"
+                              class="custom-slider"
                             />
                             <span class="ml-4">个字符</span>
                           </div>
@@ -560,9 +561,11 @@ onMounted(() => {
     background: var(--app-layout-bg-color);
   }
 }
-.customer-slider {
+.custom-slider {
   :deep(.el-input-number.is-without-controls .el-input__wrapper) {
     padding: 0 !important;
   }
 }
+
+
 </style>
