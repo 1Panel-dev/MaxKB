@@ -38,7 +38,7 @@
               <el-popover :width="170" trigger="click" :visible="popoverVisible">
                 <template #reference>
                   <el-button
-                    :type="(filter.min_star || filter.min_trample) && 'primary'"
+                    :type="filter.min_star || filter.min_trample ? 'primary' : ''"
                     link
                     @click="popoverVisible = !popoverVisible"
                   >
