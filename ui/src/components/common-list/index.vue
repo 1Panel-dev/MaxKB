@@ -19,13 +19,12 @@
 <script setup lang="ts">
 import { ref, watch, useSlots } from 'vue'
 
-const slots = useSlots()
 defineOptions({ name: 'CommonList' })
 
 const props = withDefaults(
   defineProps<{
     data: Array<any>
-    defaultActive: string
+    defaultActive?: string
   }>(),
   {
     data: () => [],

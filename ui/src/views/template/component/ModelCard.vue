@@ -10,7 +10,7 @@
           <span class="ellipsis ml-16"> {{ model.model_type }}</span>
         </li>
         <li class="flex mt-12">
-          <el-text type="info">模型名称</el-text>
+          <el-text type="info">基础模型</el-text>
           <span class="ellipsis ml-16"> {{ model.model_name }}</span>
         </li>
       </ul>
