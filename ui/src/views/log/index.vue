@@ -31,10 +31,71 @@
       >
         <el-table-column prop="abstract" label="摘要" show-overflow-tooltip />
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
-        <el-table-column prop="star_num" label="用户反馈" align="right">
+        <el-table-column prop="star_num" align="right">
+          <template #header="{ row }">
+            <div>
+              <span>用户反馈</span>
+              <el-popover :width="170" trigger="click" :visible="popoverVisible">
+                <template #reference>
+                  <el-button
+                    :type="(filter.min_star || filter.min_trample) && 'primary'"
+                    link
+                    @click="popoverVisible = !popoverVisible"
+                  >
+                    <el-icon><Filter /></el-icon>
+                  </el-button>
+                </template>
+                <div class="filter">
+                  <div class="form-item mb-16">
+                    <div @click.stop>
+                      赞同 >=
+                      <el-input-number
+                        v-model="filter.min_star"
+                        :min="0"
+                        :step="1"
+                        controls-position="right"
+                        style="width: 70px"
+                        size="small"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-item mb-16">
+                    <div @click.stop>
+                      <el-select
+                        v-model="filter.comparer"
+                        size="small"
+                        style="width: 70px"
+                        :teleported="false"
+                      >
+                        <el-option label="and" value="and" />
+                        <el-option label="or" value="or" />
+                      </el-select>
+                    </div>
+                  </div>
+                  <div class="form-item mb-16">
+                    <div @click.stop>
+                      反对 >=
+                      <el-input-number
+                        v-model="filter.min_trample"
+                        :min="0"
+                        :step="1"
+                        controls-position="right"
+                        style="width: 70px"
+                        size="small"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <el-button size="small" @click="filterChange('clear')">清除</el-button>
+                  <el-button type="primary" @click="filterChange" size="small">确认</el-button>
+                </div>
+              </el-popover>
+            </div>
+          </template>
           <template #default="{ row }">
-            <span v-if="!row.trample_num && !row.star_num"> - </span>
-            <span v-else>
+            <span class="mr-8" v-if="!row.trample_num && !row.star_num"> - </span>
+            <span class="mr-8" v-else>
               <span v-if="row.star_num">
                 <AppIcon iconName="app-like-color"></AppIcon>
                 {{ row.star_num }}
@@ -80,6 +141,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { cloneDeep } from 'lodash'
 import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import logApi from '@/api/log'
@@ -132,6 +194,25 @@ const detail = ref<any>(null)
 
 const currentChatId = ref<string>('')
 const currentAbstract = ref<string>('')
+const popoverVisible = ref(false)
+const defaultFilter = {
+  min_star: 0,
+  min_trample: 0,
+  comparer: 'and'
+}
+const filter = ref<any>({
+  min_star: 0,
+  min_trample: 0,
+  comparer: 'and'
+})
+
+function filterChange(val: string) {
+  if (val === 'clear') {
+    filter.value = cloneDeep(defaultFilter)
+  }
+  getList()
+  popoverVisible.value = false
+}
 
 /**
  * 下一页
@@ -229,7 +310,8 @@ function changeHandle(val: number) {
 
 function getList() {
   let obj: any = {
-    history_day: history_day.value
+    history_day: history_day.value,
+    ...filter.value
   }
   if (search.value) {
     obj = { ...obj, abstract: search.value }

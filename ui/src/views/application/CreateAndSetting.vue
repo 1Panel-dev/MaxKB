@@ -566,6 +566,4 @@ onMounted(() => {
     padding: 0 !important;
   }
 }
-
-
 </style>
