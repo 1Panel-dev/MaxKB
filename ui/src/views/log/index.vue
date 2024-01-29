@@ -32,7 +32,7 @@
         <el-table-column prop="abstract" label="摘要" show-overflow-tooltip />
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
         <el-table-column prop="star_num" align="right">
-          <template #header="{ row }">
+          <template #header>
             <div>
               <span>用户反馈</span>
               <el-popover :width="170" trigger="click" :visible="popoverVisible">
