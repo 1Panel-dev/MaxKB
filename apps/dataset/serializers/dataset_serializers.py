@@ -503,7 +503,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                         document_name = child_link.tag.text if child_link.tag is not None and len(
                             child_link.tag.text.strip()) > 0 else child_link.url
                         paragraphs = get_split_model('web.md').parse(response.content)
-                        first = QuerySet(Document).filter(meta__source_url=child_link.url).first()
+                        first = QuerySet(Document).filter(meta__source_url=child_link.url, dataset=dataset).first()
                         if first is not None:
                             # 如果存在,使用文档同步
                             DocumentSerializers.Sync(data={'document_id': first.id}).sync()

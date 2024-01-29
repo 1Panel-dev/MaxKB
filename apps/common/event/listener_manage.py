@@ -17,7 +17,7 @@ from django.db.models import QuerySet
 
 from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.db.search import native_search, get_dynamics_model
-from common.event.common import poxy
+from common.event.common import poxy, embedding_poxy
 from common.util.file_util import get_file_content
 from common.util.fork import ForkManage, Fork
 from common.util.lock import try_lock, un_lock
@@ -65,7 +65,7 @@ class ListenerManagement:
         VectorStore.get_embedding_vector().save(**args)
 
     @staticmethod
-    @poxy
+    @embedding_poxy
     def embedding_by_paragraph(paragraph_id):
         """
         向量化段落 根据段落id
@@ -93,7 +93,7 @@ class ListenerManagement:
             max_kb.info(f'结束--->向量化段落:{paragraph_id}')
 
     @staticmethod
-    @poxy
+    @embedding_poxy
     def embedding_by_document(document_id):
         """
         向量化文档
@@ -123,7 +123,7 @@ class ListenerManagement:
             max_kb.info(f"结束--->向量化文档:{document_id}")
 
     @staticmethod
-    @poxy
+    @embedding_poxy
     def embedding_by_dataset(dataset_id):
         """
         向量化知识库
