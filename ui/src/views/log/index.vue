@@ -35,7 +35,7 @@
           <template #header>
             <div>
               <span>用户反馈</span>
-              <el-popover :width="170" trigger="click" :visible="popoverVisible">
+              <el-popover :width="160" trigger="click" :visible="popoverVisible">
                 <template #reference>
                   <el-button
                     :type="filter.min_star || filter.min_trample ? 'primary' : ''"
@@ -57,19 +57,6 @@
                         style="width: 70px"
                         size="small"
                       />
-                    </div>
-                  </div>
-                  <div class="form-item mb-16">
-                    <div @click.stop>
-                      <el-select
-                        v-model="filter.comparer"
-                        size="small"
-                        style="width: 70px"
-                        :teleported="false"
-                      >
-                        <el-option label="and" value="and" />
-                        <el-option label="or" value="or" />
-                      </el-select>
                     </div>
                   </div>
                   <div class="form-item mb-16">
