@@ -8,11 +8,10 @@
 """
 import json
 import os.path
-
+from pycrawlers import huggingface
 from transformers import GPT2TokenizerFast
-import sentence_transformers
-
-prefix_dir = "/opt/maxkb/model"
+hg = huggingface()
+prefix_dir = "./model"
 model_config = [
     {
         'download_params': {
@@ -51,10 +50,10 @@ model_config = [
     },
     {
         'download_params': {
-            'model_name_or_path': 'shibing624/text2vec-base-chinese',
-            'cache_folder': os.path.join(prefix_dir, 'embedding')
+            'urls': ["https://huggingface.co/shibing624/text2vec-base-chinese/tree/main"],
+            'file_save_paths': [os.path.join(prefix_dir, 'embedding',"shibing624_text2vec-base-chinese")]
         },
-        'download_function': sentence_transformers.SentenceTransformer
+        'download_function': hg.get_batch_data
     }
 
 ]
