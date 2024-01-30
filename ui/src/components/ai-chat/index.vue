@@ -292,7 +292,7 @@ function getChartOpenId() {
         chatMessage()
       })
       .catch((res) => {
-        if (res.response.status === 403) {
+        if (res.response.status === 401) {
           application.asyncAppAuthentication(accessToken).then(() => {
             getChartOpenId()
           })
