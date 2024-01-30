@@ -39,7 +39,7 @@ export function fileType(name: string) {
 */
 export function getImgUrl(name: string) {
   const type = fileType(name) || 'txt'
-  return `../src/assets/${type}-icon.svg`
+  return new URL(`../assets/${type}-icon.svg`, import.meta.url).href
 }
 
 /*
