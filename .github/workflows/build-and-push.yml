@@ -41,15 +41,12 @@ jobs:
             ${DOCKER_IMAGE_TAGS} .
       - name: Set up Docker Buildx
         uses: crazy-max/ghaction-docker-buildx@v3
-      - name: Docker Buildx (build)
-        run: |
-          docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
       - name: Login to Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ github.event.inputs.registryAddress }}
           username: ${{ secrets.FIT2CLOUD_REGISTRY_USERNAME }}
           password: ${{ secrets.FIT2CLOUD_REGISTRY_PASSWORD }}
-      - name: Docker Buildx (push)
+      - name: Docker Buildx (build-and-push)
         run: |
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
