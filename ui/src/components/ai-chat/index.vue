@@ -288,13 +288,12 @@ function getChartOpenId() {
     applicationApi
       .getChatOpen(props.appId)
       .then((res) => {
-        console.log(res)
         chartOpenId.value = res.data
         chatMessage()
       })
       .catch((res) => {
         console.log(res)
-        if (res.code === 401 || res.response.status === 401) {
+        if (res.response.status === 403) {
           application.asyncAppAuthentication(accessToken).then(() => {
             getChartOpenId()
           })
@@ -407,26 +406,33 @@ function chatMessage() {
       record_id: '',
       vote_status: '-1'
     })
-    chatList.value.push(chat)
-    inputValue.value = ''
-    nextTick(() => {
-      // 将滚动条滚动到最下面
-      scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
-    })
     // 对话
     applicationApi
       .postChatMessage(chartOpenId.value, problem_text)
       .then((response) => {
-        ChatManagement.addChatRecord(chat, 50, loading)
-        ChatManagement.write(chat.id)
-        const reader = response.body.getReader()
-        // 处理流数据
-        const write = getWrite(
-          chat,
-          reader,
-          response.headers.get('Content-Type') !== 'application/json'
-        )
-        return reader.read().then(write)
+        console.log(response.status)
+        if (response.status === 401) {
+          application.asyncAppAuthentication(accessToken).then(() => {
+            chatMessage()
+          })
+        } else {
+          chatList.value.push(chat)
+          inputValue.value = ''
+          nextTick(() => {
+            // 将滚动条滚动到最下面
+            scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
+          })
+          ChatManagement.addChatRecord(chat, 50, loading)
+          ChatManagement.write(chat.id)
+          const reader = response.body.getReader()
+          // 处理流数据
+          const write = getWrite(
+            chat,
+            reader,
+            response.headers.get('Content-Type') !== 'application/json'
+          )
+          return reader.read().then(write)
+        }
       })
       .then(() => {
         return !props.appId && getSourceDetail(chat)
