@@ -211,7 +211,7 @@ const prologueList = computed(() => {
   const temp = props.data?.prologue
   let arr: any = []
   const lines = temp?.split('\n')
-  lines.forEach((str: string, index: number) => {
+  lines?.forEach((str: string, index: number) => {
     if (isMdArray(str)) {
       arr[index] = {
         type: 'question',
@@ -288,11 +288,13 @@ function getChartOpenId() {
     applicationApi
       .getChatOpen(props.appId)
       .then((res) => {
+        console.log(res)
         chartOpenId.value = res.data
         chatMessage()
       })
       .catch((res) => {
-        if (res.response.status === 401) {
+        console.log(res)
+        if (res.code === 401 || res.response.status === 401) {
           application.asyncAppAuthentication(accessToken).then(() => {
             getChartOpenId()
           })
