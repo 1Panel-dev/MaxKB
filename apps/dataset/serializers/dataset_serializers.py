@@ -585,7 +585,8 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset = QuerySet(DataSet).get(id=self.data.get("id"))
             return select_list(get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_dataset_application.sql')),
-                [self.data.get('user_id'), dataset.user_id, self.data.get('user_id')])
+                [self.data.get('user_id') if self.data.get('user_id') == str(dataset.user_id) else None,
+                 dataset.user_id, self.data.get('user_id')])
 
         def one(self, user_id, with_valid=True):
             if with_valid:

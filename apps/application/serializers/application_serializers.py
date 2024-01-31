@@ -377,7 +377,7 @@ class ApplicationSerializer(serializers.Serializer):
             application = QuerySet(Application).get(id=self.data.get("application_id"))
             return select_list(get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'list_application_dataset.sql')),
-                [self.data.get('user_id'), application.user_id, self.data.get('user_id')])
+                [self.data.get('user_id') if self.data.get('user_id')==str(application.user_id) else None, application.user_id, self.data.get('user_id')])
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:
