@@ -19,10 +19,10 @@ USER root
 # 创建工作目录
 RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model
 # 拷贝项目
-RUN ls -la
 COPY . /opt/maxkb/app
 COPY --from=vector-model-build model /opt/maxkb/app/model
 COPY --from=web-build ui /opt/maxkb/app/ui
+RUN ls -la /opt/maxkb/app
 # 复制模型
 RUN mv /opt/maxkb/app/model/* /opt/maxkb/model
 RUN ls /opt/maxkb/model
