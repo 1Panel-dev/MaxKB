@@ -45,7 +45,7 @@ jobs:
         run: |
           docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
       - name: Login to Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           registry: ${{ github.event.inputs.registryAddress }}
           username: ${{ secrets.FIT2CLOUD_REGISTRY_USERNAME }}
