@@ -20,6 +20,7 @@ USER root
 RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model
 # 拷贝项目
 COPY . /opt/maxkb/app
+RUN rm -rf /opt/maxkb/app/ui
 COPY --from=vector-model-build model /opt/maxkb/app/model
 COPY --from=web-build ui /opt/maxkb/app/ui
 RUN ls -la /opt/maxkb/app
