@@ -27,7 +27,8 @@ RUN ls -la /opt/maxkb/app
 # 复制模型
 RUN mv /opt/maxkb/app/model/* /opt/maxkb/model
 RUN ls /opt/maxkb/model
-RUN cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer
+# RUN cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer
+RUN ln -sf /opt/maxkb/model/base/hub  /opt/maxkb/model/tokenizer/hub
 # 设置工作目录
 WORKDIR /opt/maxkb/app
 # 更新apt-get包管理器
