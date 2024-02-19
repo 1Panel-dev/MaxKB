@@ -332,6 +332,8 @@ class SplitModel:
         """
         result_tree = self.parse_to_tree(text.replace('\r', '\n'), 0)
         result = result_tree_to_paragraph(result_tree, [], [])
+        # 过滤段落内容不为空字符串的数据
+        result = [item for item in result if 'content' in item and len(item.get('content').strip()) > 0]
         return [{**item, 'title': item.get('title').replace("#", '') if 'title' in item else ''} for item in result]
 
 
