@@ -27,6 +27,7 @@ from application.serializers.chat_message_serializers import ChatInfo
 from common.db.search import native_search, native_page_search, page_search, get_dynamics_model
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
+from common.util.common import post
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from common.util.rsa_util import decrypt
@@ -360,6 +361,13 @@ class ChatRecordSerializer(serializers.Serializer):
                                              dataset_id=self.data.get('dataset_id')).exists():
                 raise AppApiException(500, "文档id不正确")
 
+        @staticmethod
+        def post_embedding_paragraph(chat_record, paragraph_id):
+            # 发送向量化事件
+            ListenerManagement.embedding_by_paragraph_signal.send(paragraph_id)
+            return chat_record
+
+        @post(post_function=post_embedding_paragraph)
         @transaction.atomic
         def improve(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -388,5 +396,4 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_record.improve_paragraph_id_list.append(paragraph.id)
             # 添加标注
             chat_record.save()
-            ListenerManagement.embedding_by_paragraph_signal.send(paragraph.id)
-            return ChatRecordSerializerModel(chat_record).data
+            return ChatRecordSerializerModel(chat_record).data, paragraph.id
