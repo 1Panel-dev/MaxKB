@@ -72,7 +72,8 @@ class ChatView(APIView):
         )
         def post(self, request: Request, chat_id: str):
             return ChatMessageSerializer(data={'chat_id': chat_id}).chat(request.data.get('message'), request.data.get(
-                're_chat') if 're_chat' in request.data else False)
+                're_chat') if 're_chat' in request.data else False, request.data.get(
+                'stream') if 'stream' in request.data else True)
 
     @action(methods=['GET'], detail=False)
     @swagger_auto_schema(operation_summary="获取对话列表",

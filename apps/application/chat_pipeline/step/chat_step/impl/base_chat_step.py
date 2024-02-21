@@ -16,11 +16,12 @@ from typing import List
 from django.http import StreamingHttpResponse
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
-from langchain.schema.messages import BaseMessageChunk, HumanMessage
+from langchain.schema.messages import BaseMessageChunk, HumanMessage, AIMessage
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PiplineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
+from common.response import result
 
 
 def event_content(response,
@@ -71,23 +72,16 @@ class BaseChatStep(IChatStep):
                 paragraph_list=None,
                 manage: PiplineManage = None,
                 padding_problem_text: str = None,
+                stream: bool = True,
                 **kwargs):
-        # 调用模型
-        if chat_model is None:
-            chat_result = iter(
-                [BaseMessageChunk(content=paragraph.title + "\n" + paragraph.content) for paragraph in paragraph_list])
+        if stream:
+            return self.execute_stream(message_list, chat_id, problem_text, post_response_handler, chat_model,
+                                       paragraph_list,
+                                       manage, padding_problem_text)
         else:
-            chat_result = chat_model.stream(message_list)
-
-        chat_record_id = uuid.uuid1()
-        r = StreamingHttpResponse(
-            streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
-                                            post_response_handler, manage, self, chat_model, message_list, problem_text,
-                                            padding_problem_text),
-            content_type='text/event-stream;charset=utf-8')
-
-        r['Cache-Control'] = 'no-cache'
-        return r
+            return self.execute_block(message_list, chat_id, problem_text, post_response_handler, chat_model,
+                                      paragraph_list,
+                                      manage, padding_problem_text)
 
     def get_details(self, manage, **kwargs):
         return {
@@ -109,3 +103,58 @@ class BaseChatStep(IChatStep):
                   message_list]
         result.append({'role': 'ai', 'content': answer_text})
         return result
+
+    def execute_stream(self, message_list: List[BaseMessage],
+                       chat_id,
+                       problem_text,
+                       post_response_handler: PostResponseHandler,
+                       chat_model: BaseChatModel = None,
+                       paragraph_list=None,
+                       manage: PiplineManage = None,
+                       padding_problem_text: str = None):
+        # 调用模型
+        if chat_model is None:
+            chat_result = iter(
+                [BaseMessageChunk(content=paragraph.title + "\n" + paragraph.content) for paragraph in paragraph_list])
+        else:
+            chat_result = chat_model.stream(message_list)
+
+        chat_record_id = uuid.uuid1()
+        r = StreamingHttpResponse(
+            streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
+                                            post_response_handler, manage, self, chat_model, message_list, problem_text,
+                                            padding_problem_text),
+            content_type='text/event-stream;charset=utf-8')
+
+        r['Cache-Control'] = 'no-cache'
+        return r
+
+    def execute_block(self, message_list: List[BaseMessage],
+                      chat_id,
+                      problem_text,
+                      post_response_handler: PostResponseHandler,
+                      chat_model: BaseChatModel = None,
+                      paragraph_list=None,
+                      manage: PiplineManage = None,
+                      padding_problem_text: str = None):
+        # 调用模型
+        if chat_model is None:
+            chat_result = AIMessage(
+                content="\n\n".join([paragraph.title + "\n" + paragraph.content for paragraph in paragraph_list]))
+        else:
+            chat_result = chat_model(message_list)
+        chat_record_id = uuid.uuid1()
+        request_token = chat_model.get_num_tokens_from_messages(message_list)
+        response_token = chat_model.get_num_tokens(chat_result.content)
+        self.context['message_tokens'] = request_token
+        self.context['answer_tokens'] = response_token
+        current_time = time.time()
+        self.context['answer_text'] = chat_result.content
+        self.context['run_time'] = current_time - self.context['start_time']
+        manage.context['run_time'] = current_time - manage.context['start_time']
+        manage.context['message_tokens'] = manage.context['message_tokens'] + request_token
+        manage.context['answer_tokens'] = manage.context['answer_tokens'] + response_token
+        post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
+                                      chat_result.content, manage, self, padding_problem_text)
+        return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
+                               'content': chat_result.content, 'is_end': True})

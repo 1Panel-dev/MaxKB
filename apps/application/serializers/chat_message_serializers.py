@@ -72,15 +72,16 @@ class ChatInfo:
                 'prompt') if 'prompt' in model_setting else Application.get_default_model_prompt(),
             'chat_model': self.chat_model,
             'model_id': self.application.model.id if self.application.model is not None else None,
-            'problem_optimization': self.application.problem_optimization
+            'problem_optimization': self.application.problem_optimization,
+            'stream': True
 
         }
 
     def to_pipeline_manage_params(self, problem_text: str, post_response_handler: PostResponseHandler,
-                                  exclude_paragraph_id_list):
+                                  exclude_paragraph_id_list, stream=True):
         params = self.to_base_pipeline_manage_params()
         return {**params, 'problem_text': problem_text, 'post_response_handler': post_response_handler,
-                'exclude_paragraph_id_list': exclude_paragraph_id_list}
+                'exclude_paragraph_id_list': exclude_paragraph_id_list, 'stream': stream}
 
     def append_chat_record(self, chat_record: ChatRecord):
         # 存入缓存中
@@ -126,7 +127,7 @@ def get_post_handler(chat_info: ChatInfo):
 class ChatMessageSerializer(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True)
 
-    def chat(self, message, re_chat: bool):
+    def chat(self, message, re_chat: bool, stream: bool):
         self.is_valid(raise_exception=True)
         chat_id = self.data.get('chat_id')
         chat_info: ChatInfo = chat_cache.get(chat_id)
@@ -152,7 +153,8 @@ class ChatMessageSerializer(serializers.Serializer):
                                                  chat_info.chat_record_list)])
             exclude_paragraph_id_list = list(set(paragraph_id_list))
         # 构建运行参数
-        params = chat_info.to_pipeline_manage_params(message, get_post_handler(chat_info), exclude_paragraph_id_list)
+        params = chat_info.to_pipeline_manage_params(message, get_post_handler(chat_info), exclude_paragraph_id_list,
+                                                     stream)
         # 运行流水线作业
         pipline_message.run(params)
         return pipline_message.context['chat_result']

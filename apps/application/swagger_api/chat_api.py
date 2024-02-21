@@ -20,7 +20,8 @@ class ChatApi(ApiMixin):
             required=['message'],
             properties={
                 'message': openapi.Schema(type=openapi.TYPE_STRING, title="问题", description="问题"),
-                're_chat': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="重新生成", default="重新生成")
+                're_chat': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="重新生成", default=False),
+                'stream': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="重新生成", default=True)
 
             }
         )

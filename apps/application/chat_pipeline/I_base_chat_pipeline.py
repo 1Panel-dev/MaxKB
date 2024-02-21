@@ -116,10 +116,10 @@ class IBaseChatPipelineStep:
         :return: 执行结果
         """
         start_time = time.time()
+        self.context['start_time'] = start_time
         # 校验参数,
         self.valid_args(manage)
         self._run(manage)
-        self.context['start_time'] = start_time
         self.context['run_time'] = time.time() - start_time
 
     def _run(self, manage):
