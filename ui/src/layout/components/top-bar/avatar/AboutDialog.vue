@@ -9,13 +9,13 @@
       </div>
     </template>
     <ul class="about-ui">
-      <li class="flex">
+      <li class="flex mb-16">
         <span class="label text-right">授权数量：</span><span class="text-center">-</span>
       </li>
-      <li class="flex">
+      <li class="flex mb-16">
         <span class="label text-right">过期时间：</span><span class="text-center">-</span>
       </li>
-      <li class="flex">
+      <li class="flex mb-16">
         <span class="label text-right">版本：</span><span class="text-center">-</span>
       </li>
       <li class="flex">
@@ -65,8 +65,8 @@ defineExpose({ open })
     padding: 24px;
     width: 360px;
     margin: 0 auto;
-    line-height: 30px;
     font-weight: 400;
+    font-size: 16px;
     .label {
       width: 180px;
       text-align: left;
