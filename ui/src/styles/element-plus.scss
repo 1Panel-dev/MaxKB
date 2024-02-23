@@ -5,6 +5,7 @@
   --el-box-shadow-light: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
   --el-border-color: #dee0e3;
   --el-text-color-regular: #1f2329;
+  --el-color-info: #8F959E
 }
 
 .el-button {
@@ -50,9 +51,14 @@
 .el-form-item__label {
   font-weight: 400;
 }
+
 .el-form-item__error {
   position: unset;
   font-size: 14px;
+}
+
+.el-form--label-top .el-form-item .el-form-item__label {
+  padding-right: 0;
 }
 
 .el-dialog {
@@ -183,9 +189,6 @@
 
 .el-text {
   font-weight: 400;
-  &.el-text--info {
-    color: var(--app-text-color-secondary);
-  }
 }
 
 .el-switch {
