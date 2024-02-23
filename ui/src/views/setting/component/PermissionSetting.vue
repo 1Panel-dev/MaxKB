@@ -77,7 +77,7 @@ const allChecked: any = ref({
 
 const filterText = ref('')
 
-const filterData = computed(() => props.data.filter((v) => v.name.includes(filterText.value)))
+const filterData = computed(() => props.data.filter((v: any) => v.name.includes(filterText.value)))
 
 watch(
   () => props.data,
