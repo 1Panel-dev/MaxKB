@@ -8,8 +8,8 @@
   >
     <el-row v-loading="loading">
       <el-col :span="16">
-        <el-scrollbar>
-          <div class="p-24" style="height: 350px">
+        <el-scrollbar height="370" wrap-class="paragraph-scrollbar">
+          <div class="p-24" style="padding-bottom: 8px;">
             <div class="flex-between mb-16">
               <div class="bold title align-center">分段内容</div>
               <el-button text @click="isEdit = true" v-if="problemId && !isEdit">
@@ -19,14 +19,13 @@
 
             <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="isEdit" />
           </div>
-
-          <div class="text-right p-24 pt-0" v-if="problemId && isEdit">
-            <el-button @click.prevent="isEdit = false"> 取消 </el-button>
-            <el-button type="primary" :disabled="loading" @click="submitHandle"> 保存 </el-button>
-          </div>
         </el-scrollbar>
+        <div class="text-right p-24 pt-0" v-if="problemId && isEdit">
+          <el-button @click.prevent="isEdit = false"> 取消 </el-button>
+          <el-button type="primary" :disabled="loading" @click="submitHandle"> 保存 </el-button>
+        </div>
       </el-col>
-      <el-col :span="8" class="border-l p-24">
+      <el-col :span="8" class="border-l">
         <!-- 关联问题 -->
         <ProblemComponent
           :problemId="problemId"
@@ -134,16 +133,22 @@ defineExpose({ open })
 </script>
 <style lang="scss" scope>
 .paragraph-dialog {
+  padding: 0 !important;
+  .el-scrollbar {
+    height: auto !important;
+  }
   .el-dialog__header {
-    padding-bottom: 16px;
+    padding: 16px 24px;
   }
   .el-dialog__body {
     border-top: 1px solid var(--el-border-color);
-    padding: 0 !important;
   }
   .el-dialog__footer {
     padding-top: 16px;
     border-top: 1px solid var(--el-border-color);
+  }
+  .el-dialog__headerbtn {
+    top: 6px;
   }
   .title {
     color: var(--app-text-color);

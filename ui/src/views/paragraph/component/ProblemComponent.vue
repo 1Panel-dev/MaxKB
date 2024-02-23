@@ -1,33 +1,38 @@
 <template>
-  <p class="bold title mb-16">
-    关联问题 <el-divider direction="vertical" />
-    <el-button text @click="addProblem">
-      <el-icon><Plus /></el-icon>
-    </el-button>
+  <p class="bold title p-24" style="padding-bottom: 0">
+    <span class="flex align-center">
+      <span>关联问题</span>
+      <el-divider direction="vertical" class="mr-4"/>
+      <el-button text @click="addProblem">
+        <el-icon><Plus /></el-icon>
+      </el-button>
+    </span>
   </p>
-  <div v-loading="loading" style="height: 350px">
-    <el-scrollbar>
-      <el-input
-        ref="inputRef"
-        v-if="isAddProblem"
-        v-model="problemValue"
-        @change="addProblemHandle"
-        placeholder="请输入问题，回车保存"
-        class="mb-8"
-        autofocus
-      />
+  <div v-loading="loading">
+    <el-scrollbar height="359px">
+      <div class="p-24" style="padding-top: 16px">
+        <el-input
+          ref="inputRef"
+          v-if="isAddProblem"
+          v-model="problemValue"
+          @change="addProblemHandle"
+          placeholder="请输入问题，回车保存"
+          class="mb-8"
+          autofocus
+        />
 
-      <template v-for="(item, index) in problemList" :key="index">
-        <TagEllipsis
-          @close="delProblemHandle(item, index)"
-          class="question-tag"
-          type="info"
-          effect="plain"
-          closable
-        >
-          {{ item.content }}
-        </TagEllipsis>
-      </template>
+        <template v-for="(item, index) in problemList" :key="index">
+          <TagEllipsis
+            @close="delProblemHandle(item, index)"
+            class="question-tag"
+            type="info"
+            effect="plain"
+            closable
+          >
+            {{ item.content }}
+          </TagEllipsis>
+        </template>
+      </div>
     </el-scrollbar>
   </div>
 </template>

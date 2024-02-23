@@ -13,7 +13,7 @@
     </template>
     <div
       class="document-detail__main p-16"
-      v-loading="paginationConfig.current_page === 1 && loading"
+      v-loading="(paginationConfig.current_page === 1 && loading) || changeStateloading"
     >
       <div class="flex-between p-8">
         <span>{{ paginationConfig.total }} 段落</span>
@@ -110,6 +110,7 @@ const {
 
 const ParagraphDialogRef = ref()
 const loading = ref(false)
+const changeStateloading = ref(false)
 const documentDetail = ref<any>({})
 const paragraphDetail = ref<any[]>([])
 const title = ref('')
@@ -132,8 +133,7 @@ function changeState(bool: Boolean, row: any) {
   const obj = {
     is_active: bool
   }
-  loading.value = true
-  paragraph.asyncPutParagraph(id, documentId, row.id, obj, loading).then((res) => {})
+  paragraph.asyncPutParagraph(id, documentId, row.id, obj, changeStateloading).then((res) => {})
 }
 
 function deleteParagraph(row: any) {
