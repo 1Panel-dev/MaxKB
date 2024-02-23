@@ -34,7 +34,11 @@
         />
       </template> -->
         <template #default="{ row }">
-          <el-checkbox v-model="row.operate[MANAGE]" @change="checkedOperateChange(MANAGE, row)" />
+          <el-checkbox
+            :disabled="props.manage"
+            v-model="row.operate[MANAGE]"
+            @change="checkedOperateChange(MANAGE, row)"
+          />
         </template>
       </el-table-column>
       <el-table-column label="使用" align="center" width="60">
@@ -46,7 +50,11 @@
         />
       </template> -->
         <template #default="{ row }">
-          <el-checkbox v-model="row.operate[USE]" @change="checkedOperateChange(USE, row)" />
+          <el-checkbox
+            :disabled="props.manage"
+            v-model="row.operate[USE]"
+            @change="checkedOperateChange(USE, row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -63,7 +71,8 @@ const props = defineProps({
   },
   id: String,
   type: String,
-  tableHeight: Number
+  tableHeight: Number,
+  manage: Boolean
 })
 
 const isDataset = computed(() => props.type === DATASET)

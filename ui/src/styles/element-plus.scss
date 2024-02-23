@@ -60,8 +60,9 @@
   --el-dialog-padding-primary: 24px;
   --el-dialog-content-font-size: 14px;
   .dialog-sub-title {
-    color: var(--app-text-color);
+    color: var(--app-text-color-secondary);
     margin: 5px 0;
+    font-weight: 400;
   }
   .el-dialog__body {
     color: var(--app-text-color);
@@ -226,9 +227,6 @@
 
 .el-input__inner {
   font-size: 14px;
-  // &::placeholder {
-  //   color: #8f959e;
-  // }
 }
 
 .el-input__wrapper {
@@ -253,8 +251,14 @@
 .el-select {
   min-width: 200px;
 }
+.el-select__caret {
+  color: var(--app-text-color-secondary);
+}
 .el-tabs__header {
   margin: 0 0 12px;
+}
+.el-tabs__item {
+  padding: 0 14px;
 }
 
 .el-drawer {

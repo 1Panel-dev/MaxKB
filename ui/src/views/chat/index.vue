@@ -55,6 +55,7 @@ onMounted(() => {
     height: var(--app-header-height);
     line-height: var(--app-header-height);
     box-sizing: border-box;
+    border-bottom: 1px solid rgba(31, 35, 41, 0.15);
   }
   &__main {
     padding-top: calc(var(--app-header-height) + 24px);

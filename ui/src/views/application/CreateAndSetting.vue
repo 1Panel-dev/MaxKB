@@ -241,13 +241,13 @@
               <el-form-item @click.prevent>
                 <template #label>
                   <div class="flex align-center">
-                    <span>问题优化</span>
+                    <span class="mr-4">问题优化</span>
                     <el-tooltip
                       effect="dark"
                       content="根据历史聊天优化完善当前问题，更利于匹配知识点。"
                       placement="right"
                     >
-                      <el-icon style="font-size: 16px">
+                      <el-icon :size="16">
                         <Warning />
                       </el-icon>
                     </el-tooltip>
@@ -334,27 +334,16 @@ const {
 } = route as any
 
 const defaultPrompt = `已知信息：
-
 {data}
-
 回答要求：
-
 - 请简洁和专业的来回答用户的问题。
-
 - 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。
-
 - 避免提及你是从已知信息中获得的知识。
-
 - 请保证答案与已知信息中描述的一致。
-
 - 请使用 Markdown 语法优化答案的格式。
-
 - 已知信息中的图片、链接地址和脚本语言请直接返回。
-
 - 请使用与问题相同的语言来回答。
-
 问题：
-
 {question}
 `
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()

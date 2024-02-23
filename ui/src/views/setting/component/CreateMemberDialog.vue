@@ -5,6 +5,7 @@
     :close-on-click-modal="false"
     :destroy-on-close="true"
     width="600"
+    class="member-dialog"
   >
     <template #header="{ titleId, titleClass }">
       <h4 :id="titleId" :class="titleClass">添加成员</h4>
@@ -142,6 +143,11 @@ onMounted(() => {})
 defineExpose({ open, close })
 </script>
 <style lang="scss" scope>
+.member-dialog {
+  .el-dialog__header {
+    padding-bottom: 19px;
+  }
+}
 .custom-select-multiple {
   width: 200%;
   .el-input {
