@@ -9,7 +9,7 @@
     <el-row v-loading="loading">
       <el-col :span="16">
         <el-scrollbar height="370" wrap-class="paragraph-scrollbar">
-          <div class="p-24" style="padding-bottom: 8px;">
+          <div class="p-24" style="padding-bottom: 8px">
             <div class="flex-between mb-16">
               <div class="bold title align-center">分段内容</div>
               <el-button text @click="isEdit = true" v-if="problemId && !isEdit">
@@ -144,12 +144,10 @@ defineExpose({ open })
     border-top: 1px solid var(--el-border-color);
   }
   .el-dialog__footer {
-    padding-top: 16px;
+    padding: 16px 24px;
     border-top: 1px solid var(--el-border-color);
   }
-  .el-dialog__headerbtn {
-    top: 6px;
-  }
+
   .title {
     color: var(--app-text-color);
   }

@@ -2,7 +2,7 @@
   <LayoutContainer header="对话日志">
     <div class="p-24">
       <div class="mb-16">
-        <el-select v-model="history_day" class="mr-12" @change="changeHandle">
+        <el-select v-model="history_day" class="mr-12 w-240" @change="changeHandle">
           <el-option
             v-for="item in dayOptions"
             :key="item.value"
@@ -87,7 +87,7 @@
                 <AppIcon iconName="app-like-color"></AppIcon>
                 {{ row.star_num }}
               </span>
-              <span v-if="row.trample_num" class="ml-4">
+              <span v-if="row.trample_num" class="ml-8">
                 <AppIcon iconName="app-oppose-color"></AppIcon>
                 {{ row.trample_num }}
               </span>

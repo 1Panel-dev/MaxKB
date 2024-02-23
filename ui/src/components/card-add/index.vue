@@ -24,7 +24,7 @@ defineProps({
   font-size: 16px;
   cursor: pointer;
   min-height: var(--card-min-height);
-  border: 1px dashed var(--el-color-primary);
+  border: 1px dashed var(--el-border-color);
   background: #eff0f1;
   border-radius: 8px;
 
@@ -38,6 +38,7 @@ defineProps({
   &:hover {
     color: var(--el-color-primary);
     background: #ffffff;
+    border: 1px dashed var(--el-color-primary);
     .add-icon {
       background: #ffffff;
       border-color: var(--el-color-primary);

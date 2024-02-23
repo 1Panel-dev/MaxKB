@@ -210,9 +210,7 @@ defineExpose({
   }
 
   &__form {
-    .el-select {
-      width: 100%;
-    }
+
 
     .title {
       font-size: 14px;

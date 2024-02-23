@@ -67,8 +67,11 @@
     color: var(--app-text-color);
   }
 }
+.el-dialog__headerbtn {
+  top: 6px;
+}
 .el-dialog__header {
-  padding-bottom: 8px;
+  padding-bottom: 24px;
 }
 .el-dialog__footer {
   padding-top: 0;
@@ -106,8 +109,8 @@
   }
 }
 .el-message-box__headerbtn {
-  right: -5px;
-  top: -5px;
+  right: 10px;
+  top: 15px;
   .el-message-box__close {
     font-size: 20px;
   }
@@ -247,6 +250,9 @@
   padding-left: 11px;
 }
 
+.el-select {
+  min-width: 200px;
+}
 .el-tabs__header {
   margin: 0 0 12px;
 }

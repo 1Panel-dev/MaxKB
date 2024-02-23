@@ -9,7 +9,7 @@
     </span>
   </p>
   <div v-loading="loading">
-    <el-scrollbar height="359px">
+    <el-scrollbar height="345px">
       <div class="p-24" style="padding-top: 16px">
         <el-input
           ref="inputRef"

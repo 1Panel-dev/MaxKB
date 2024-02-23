@@ -6,7 +6,7 @@
       :model="resetPasswordForm"
       :rules="rules"
     >
-      <p class="mt-16 mb-8 lighter">新密码</p>
+      <p class="mb-8 lighter">新密码</p>
       <el-form-item prop="password" style="margin-bottom: 8px">
         <el-input
           type="password"
