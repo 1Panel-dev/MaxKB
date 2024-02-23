@@ -5,7 +5,7 @@
       <el-input
         v-model="searchValue"
         @change="searchHandle"
-        placeholder="按 名称 搜索"
+        placeholder="按名称搜索"
         prefix-icon="Search"
         class="w-240"
       />

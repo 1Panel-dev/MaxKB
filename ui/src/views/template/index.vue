@@ -28,7 +28,7 @@
             <el-input
               v-model="model_search_form.name"
               @change="list_model"
-              placeholder="按 名称 搜索"
+              placeholder="按名称搜索"
               prefix-icon="Search"
               style="max-width: 240px"
             />

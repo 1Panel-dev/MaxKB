@@ -18,7 +18,9 @@
                 <el-card shadow="never" class="mb-16" :class="form.type === '0' ? 'active' : ''">
                   <el-radio label="0" size="large">
                     <div class="flex align-center">
-                      <el-icon size="32" class="mr-8 info"><Document /></el-icon>
+                      <AppAvatar class="mr-8" shape="square" :size="32">
+                        <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+                      </AppAvatar>
                       <div>
                         <p class="mb-4">通用型</p>
                         <el-text type="info">可以通过上传文件或手动录入方式构建知识库</el-text>
@@ -31,10 +33,12 @@
                 <el-card shadow="never" class="mb-16" :class="form.type === '1' ? 'active' : ''">
                   <el-radio label="1" size="large">
                     <div class="flex align-center">
-                      <el-icon size="32" class="mr-8 info"><Monitor /></el-icon>
+                      <AppAvatar class="mr-8 avatar-purple" shape="square" :size="32">
+                        <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                      </AppAvatar>
                       <div>
                         <p class="mb-4">Web 站点</p>
-                        <el-text type="info"> 通过网站链接同步方式构建知识库 </el-text>
+                        <el-text type="info">通过网站链接同步方式构建知识库 </el-text>
                       </div>
                     </div>
                   </el-radio>
