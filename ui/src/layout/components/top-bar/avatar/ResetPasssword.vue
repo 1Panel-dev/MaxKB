@@ -7,10 +7,9 @@
       :rules="rules"
     >
       <p class="mb-8">新密码</p>
-      <el-form-item prop="password">
+      <el-form-item prop="password" style="margin-bottom: 8px">
         <el-input
           type="password"
-          size="large"
           class="input-item"
           v-model="resetPasswordForm.password"
           placeholder="请输入密码"
@@ -21,7 +20,6 @@
       <el-form-item prop="re_password">
         <el-input
           type="password"
-          size="large"
           class="input-item"
           v-model="resetPasswordForm.re_password"
           placeholder="请输入确认密码"
@@ -30,9 +28,8 @@
         </el-input>
       </el-form-item>
       <p class="mb-8">使用邮箱</p>
-      <el-form-item>
+      <el-form-item style="margin-bottom: 8px">
         <el-input
-          size="large"
           class="input-item"
           :disabled="true"
           v-bind:modelValue="user.userInfo?.email"
@@ -42,18 +39,9 @@
       </el-form-item>
       <el-form-item prop="code">
         <div class="flex-between w-full">
-          <el-input
-            size="large"
-            class="code-input"
-            v-model="resetPasswordForm.code"
-            placeholder="请输入验证码"
-          >
+          <el-input class="code-input" v-model="resetPasswordForm.code" placeholder="请输入验证码">
           </el-input>
-          <el-button
-            size="large"
-            class="send-email-button ml-16"
-            @click="sendEmail"
-            :loading="loading"
+          <el-button class="send-email-button ml-8" @click="sendEmail" :loading="loading"
             >获取验证码</el-button
           >
         </div>

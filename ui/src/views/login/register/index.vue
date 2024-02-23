@@ -1,70 +1,78 @@
 <template>
   <login-layout>
     <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库">
-      <h4 class="mb-24">用户注册</h4>
+      <h2 class="mb-24">用户注册</h2>
       <el-form class="register-form" :model="registerForm" :rules="rules" ref="registerFormRef">
-        <el-form-item prop="username">
-          <el-input
-            size="large"
-            class="input-item"
-            v-model="registerForm.username"
-            placeholder="请输入用户名"
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input
-            type="password"
-            size="large"
-            class="input-item"
-            v-model="registerForm.password"
-            placeholder="请输入密码"
-            show-password
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="repassword">
-          <el-input
-            type="password"
-            size="large"
-            class="input-item"
-            v-model="registerForm.re_password"
-            placeholder="请输入确认密码"
-            show-password
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="email">
-          <el-input
-            size="large"
-            class="input-item"
-            v-model="registerForm.email"
-            placeholder="请输入邮箱"
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="code">
-          <div class="flex-between w-full">
+        <div class="mb-24">
+          <el-form-item prop="username">
             <el-input
               size="large"
-              class="code-input"
-              v-model="registerForm.code"
-              placeholder="请输入验证码"
+              class="input-item"
+              v-model="registerForm.username"
+              placeholder="请输入用户名"
             >
             </el-input>
-            <el-button
+          </el-form-item>
+        </div>
+        <div class="mb-24">
+          <el-form-item prop="password">
+            <el-input
+              type="password"
               size="large"
-              class="send-email-button ml-16"
-              @click="sendEmail"
-              :loading="sendEmailLoading"
-              >获取验证码</el-button
+              class="input-item"
+              v-model="registerForm.password"
+              placeholder="请输入密码"
+              show-password
             >
-          </div>
-        </el-form-item>
+            </el-input>
+          </el-form-item>
+        </div>
+        <div class="mb-24">
+          <el-form-item prop="re_password">
+            <el-input
+              type="password"
+              size="large"
+              class="input-item"
+              v-model="registerForm.re_password"
+              placeholder="请输入确认密码"
+              show-password
+            >
+            </el-input>
+          </el-form-item>
+        </div>
+        <div class="mb-24">
+          <el-form-item prop="email">
+            <el-input
+              size="large"
+              class="input-item"
+              v-model="registerForm.email"
+              placeholder="请输入邮箱"
+            >
+            </el-input>
+          </el-form-item>
+        </div>
+        <div class="mb-24">
+          <el-form-item prop="code">
+            <div class="flex-between w-full">
+              <el-input
+                size="large"
+                class="code-input"
+                v-model="registerForm.code"
+                placeholder="请输入验证码"
+              >
+              </el-input>
+              <el-button
+                size="large"
+                class="send-email-button ml-12"
+                @click="sendEmail"
+                :loading="sendEmailLoading"
+                >获取验证码</el-button
+              >
+            </div>
+          </el-form-item>
+        </div>
       </el-form>
-      <el-button type="primary" class="login-submit-button w-full mt-4" @click="register"
-        >注册</el-button
-      >
+      <el-button size="large" type="primary" class="w-full" @click="register">注册</el-button>
       <div class="operate-container mt-12">
         <el-button
           class="register"
@@ -82,7 +90,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { RegisterRequest } from '@/api/type/user'
-import { UserFilled, Lock, Message, Key } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import UserApi from '@/api/user'
 import { MsgSuccess } from '@/utils/message'
@@ -183,6 +190,4 @@ const sendEmail = () => {
   })
 }
 </script>
-<style lang="scss" scope>
-@import '../index.scss';
-</style>
+<style lang="scss" scope></style>

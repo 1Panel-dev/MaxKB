@@ -1,44 +1,47 @@
 <template>
   <login-layout>
     <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库">
-      <h4 class="mb-24">忘记密码</h4>
+      <h2 class="mb-24">忘记密码</h2>
       <el-form
         class="register-form"
         ref="resetPasswordFormRef"
         :model="CheckEmailForm"
         :rules="rules"
       >
-        <el-form-item prop="email">
-          <el-input
-            size="large"
-            class="input-item"
-            v-model="CheckEmailForm.email"
-            placeholder="请输入邮箱"
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="code">
-          <div class="flex-between w-full">
+        <div class="mb-24">
+          <el-form-item prop="email">
             <el-input
               size="large"
-              class="code-input"
-              v-model="CheckEmailForm.code"
-              placeholder="请输入验证码"
+              class="input-item"
+              v-model="CheckEmailForm.email"
+              placeholder="请输入邮箱"
             >
             </el-input>
-            <el-button
-              size="large"
-              class="send-email-button ml-16"
-              @click="sendEmail"
-              :loading="loading"
-              >获取验证码</el-button
-            >
-          </div>
-        </el-form-item>
+          </el-form-item>
+        </div>
+        <div class="mb-24">
+          <el-form-item prop="code">
+            <div class="flex-between w-full">
+              <el-input
+                size="large"
+                class="code-input"
+                v-model="CheckEmailForm.code"
+                placeholder="请输入验证码"
+              >
+              </el-input>
+              <el-button
+                :disabled="CheckEmailForm.email"
+                size="large"
+                class="send-email-button ml-12"
+                @click="sendEmail"
+                :loading="loading"
+                >获取验证码</el-button
+              >
+            </div>
+          </el-form-item>
+        </div>
       </el-form>
-      <el-button type="primary" class="login-submit-button w-full mt-4" @click="checkCode"
-        >立即验证</el-button
-      >
+      <el-button size="large" type="primary" class="w-full" @click="checkCode">立即验证</el-button>
       <div class="operate-container mt-12">
         <el-button
           class="register"
@@ -107,6 +110,4 @@ const sendEmail = () => {
   })
 }
 </script>
-<style lang="scss" scope>
-@import '../index.scss';
-</style>
+<style lang="scss" scope></style>

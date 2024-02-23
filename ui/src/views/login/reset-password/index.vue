@@ -1,41 +1,46 @@
 <template>
   <login-layout>
     <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库">
-      <h4 class="mb-24">修改密码</h4>
+      <h2 class="mb-24">修改密码</h2>
       <el-form
         class="reset-password-form"
         ref="resetPasswordFormRef"
         :model="resetPasswordForm"
         :rules="rules"
       >
-        <el-form-item prop="password">
-          <el-input
-            type="password"
-            size="large"
-            class="input-item"
-            v-model="resetPasswordForm.password"
-            placeholder="请输入密码"
-            show-password
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="re_password">
-          <el-input
-            type="password"
-            size="large"
-            class="input-item"
-            v-model="resetPasswordForm.re_password"
-            placeholder="请输入确认密码"
-            show-password
-          >
-          </el-input>
-        </el-form-item>
+        <div class="mb-24">
+          <el-form-item prop="password">
+            <el-input
+              type="password"
+              size="large"
+              class="input-item"
+              v-model="resetPasswordForm.password"
+              placeholder="请输入密码"
+              show-password
+            >
+            </el-input>
+          </el-form-item>
+        </div>
+        <div class="mb-24">
+          <el-form-item prop="re_password">
+            <el-input
+              type="password"
+              size="large"
+              class="input-item"
+              v-model="resetPasswordForm.re_password"
+              placeholder="请输入确认密码"
+              show-password
+            >
+            </el-input>
+          </el-form-item>
+        </div>
       </el-form>
-      <el-button type="primary" class="login-submit-button w-full mt-4" @click="resetPassword"
+      <el-button size="large" type="primary" class="w-full" @click="resetPassword"
         >确认修改</el-button
       >
       <div class="operate-container mt-12">
         <el-button
+          size="large"
           class="register"
           @click="router.push('/login')"
           link
@@ -126,6 +131,4 @@ const resetPassword = () => {
     })
 }
 </script>
-<style lang="scss" scope>
-@import '../index.scss';
-</style>
+<style lang="scss" scope></style>

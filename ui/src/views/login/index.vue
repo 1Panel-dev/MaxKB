@@ -9,30 +9,32 @@
         ref="loginFormRef"
         @keyup.enter="login"
       >
-        <el-form-item prop="username">
-          <el-input
-            size="large"
-            class="input-item"
-            v-model="loginForm.username"
-            placeholder="请输入用户名"
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input
-            type="password"
-            size="large"
-            class="input-item"
-            v-model="loginForm.password"
-            placeholder="请输入密码"
-            show-password
-          >
-          </el-input>
-        </el-form-item>
+        <div class="mb-24">
+          <el-form-item prop="username">
+            <el-input
+              size="large"
+              class="input-item"
+              v-model="loginForm.username"
+              placeholder="请输入用户名"
+            >
+            </el-input>
+          </el-form-item>
+        </div>
+        <div class="mb-24">
+          <el-form-item prop="password">
+            <el-input
+              type="password"
+              size="large"
+              class="input-item"
+              v-model="loginForm.password"
+              placeholder="请输入密码"
+              show-password
+            >
+            </el-input>
+          </el-form-item>
+        </div>
       </el-form>
-      <el-button type="primary" class="login-submit-button mt-4 w-full" @click="login"
-        >登录</el-button
-      >
+      <el-button size="large" type="primary" class="w-full" @click="login">登录</el-button>
       <div class="operate-container flex-between mt-12">
         <el-button class="register" @click="router.push('/register')" link type="primary">
           注册
@@ -43,7 +45,7 @@
           link
           type="primary"
         >
-          忘记密码
+          忘记密码?
         </el-button>
       </div>
     </LoginContainer>
@@ -100,6 +102,4 @@ const login = () => {
   })
 }
 </script>
-<style lang="scss" scope>
-@import './index.scss';
-</style>
+<style lang="scss" scope></style>
