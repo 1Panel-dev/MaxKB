@@ -390,34 +390,35 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
   return stream ? write_stream : write_json
 }
 
-function chatMessage() {
+function chatMessage(chat?: any) {
   loading.value = true
   if (!chartOpenId.value) {
     getChartOpenId()
   } else {
-    const problem_text = inputValue.value
-    const chat = reactive({
-      id: randomId(),
-      problem_text: problem_text,
-      answer_text: '',
-      buffer: [],
-      write_ed: false,
-      is_stop: false,
-      record_id: '',
-      vote_status: '-1'
-    })
+    if (!chat) {
+      chat = reactive({
+        id: randomId(),
+        problem_text: inputValue.value,
+        answer_text: '',
+        buffer: [],
+        write_ed: false,
+        is_stop: false,
+        record_id: '',
+        vote_status: '-1'
+      })
+      chatList.value.push(chat)
+      inputValue.value = ''
+    }
     // 对话
     applicationApi
-      .postChatMessage(chartOpenId.value, problem_text)
+      .postChatMessage(chartOpenId.value, chat.problem_text)
       .then((response) => {
         console.log(response.status)
         if (response.status === 401) {
           application.asyncAppAuthentication(accessToken).then(() => {
-            chatMessage()
+            chatMessage(chat)
           })
         } else {
-          chatList.value.push(chat)
-          inputValue.value = ''
           nextTick(() => {
             // 将滚动条滚动到最下面
             scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
@@ -475,7 +476,7 @@ const handleScrollTop = ($event: any) => {
   scrollTop.value = $event.scrollTop
   if (
     dialogScrollbar.value.scrollHeight - (scrollTop.value + scrollDiv.value.wrapRef.offsetHeight) <=
-    10
+    20
   ) {
     scorll.value = true
   } else {
