@@ -44,14 +44,31 @@
                   show-word-limit
                 />
               </el-form-item>
-              <el-form-item prop="model_id">
+              <el-form-item label="提示词" prop="model_setting.prompt">
                 <template #label>
-                  <div class="flex-between">
-                    <span>AI 模型 <span class="danger">*</span></span>
-
-                    <el-button type="primary" link @click="promptChange('open')">提示词</el-button>
+                  <div class="flex align-center">
+                    <div class="flex-between mr-4">
+                      <span>提示词 <span class="danger">*</span></span>
+                    </div>
+                    <el-tooltip effect="dark" placement="right">
+                      <template #content
+                        >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。<br />可以使用变量：{data}
+                        是携带知识库中已知信息；{question}是用户提出的问题。</template
+                      >
+                      <el-icon :size="16">
+                        <Warning />
+                      </el-icon>
+                    </el-tooltip>
                   </div>
                 </template>
+                <el-input
+                  v-model="applicationForm.model_setting.prompt"
+                  :rows="6"
+                  type="textarea"
+                  :placeholder="defaultPrompt"
+                />
+              </el-form-item>
+              <el-form-item label="AI 模型" prop="model_id">
                 <el-select
                   v-model="applicationForm.model_id"
                   placeholder="请选择 AI 模型"
@@ -280,25 +297,7 @@
         </div>
       </el-col>
     </el-row>
-    <!-- 提示词 -->
-    <el-dialog v-model="dialogFormVisible" title="提示词">
-      <el-alert type="info" show-icon class="mb-16" :closable="false">
-        <p>通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。</p>
-        <p>可以使用变量：{data} 是携带知识库中已知信息；{question}是用户提出的问题。</p>
-      </el-alert>
-      <el-input
-        v-model="model_setting_prompt"
-        :rows="13"
-        type="textarea"
-        :placeholder="defaultPrompt"
-      />
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="promptChange('close')"> 确认 </el-button>
-        </span>
-      </template>
-    </el-dialog>
+
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
       @addData="addDataset"
@@ -375,7 +374,7 @@ const applicationForm = ref<ApplicationFormType>({
     max_paragraph_char_number: 5000
   },
   model_setting: {
-    prompt: defaultPrompt
+    prompt: ''
   },
   problem_optimization: false
 })
@@ -390,14 +389,12 @@ const rules = reactive<FormRules<ApplicationFormType>>({
       message: '请选择模型',
       trigger: 'change'
     }
-  ]
+  ],
+  'model_setting.prompt': [{ required: true, message: '请输入提示词', trigger: 'blur' }]
 })
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 const datasetList = ref([])
-const dialogFormVisible = ref(false)
-
-const model_setting_prompt = ref('')
 const dataset_setting = ref<any>({})
 
 function datasetSettingChange(val: string) {
@@ -410,15 +407,6 @@ function datasetSettingChange(val: string) {
   }
 }
 
-function promptChange(val: string) {
-  if (val === 'open') {
-    dialogFormVisible.value = true
-    model_setting_prompt.value = applicationForm.value.model_setting.prompt
-  } else if (val === 'close') {
-    dialogFormVisible.value = false
-    applicationForm.value.model_setting.prompt = model_setting_prompt.value
-  }
-}
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
