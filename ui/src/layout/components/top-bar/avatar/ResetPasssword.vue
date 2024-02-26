@@ -1,12 +1,12 @@
 <template>
   <el-dialog v-model="resetPasswordDialog" title="修改密码">
     <el-form
-      class="reset-password-form"
+      class="reset-password-form mb-24"
       ref="resetPasswordFormRef"
       :model="resetPasswordForm"
       :rules="rules"
     >
-      <p class="mb-8">新密码</p>
+      <p class="mb-8 lighter">新密码</p>
       <el-form-item prop="password" style="margin-bottom: 8px">
         <el-input
           type="password"
@@ -27,7 +27,7 @@
         >
         </el-input>
       </el-form-item>
-      <p class="mb-8">使用邮箱</p>
+      <p class="mb-8 lighter">使用邮箱</p>
       <el-form-item style="margin-bottom: 8px">
         <el-input
           class="input-item"
@@ -48,10 +48,10 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <span class="dialog-footer">
+      <div class="dialog-footer">
         <el-button @click="resetPasswordDialog = false"> 取消 </el-button>
         <el-button type="primary" @click="resetPassword"> 保存 </el-button>
-      </span>
+      </div>
     </template>
   </el-dialog>
 </template>

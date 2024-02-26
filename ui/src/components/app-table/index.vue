@@ -15,7 +15,7 @@
           <el-button @click="showInput = false" :disabled="loading">取消</el-button>
         </div>
         <div v-else @click="quickCreateHandel" class="w-full">
-          <el-button type="primary" link>
+          <el-button type="primary" link class="quich-button">
             <el-icon><Plus /></el-icon>
             <span class="ml-4">快速创建空白文档</span>
           </el-button>
@@ -110,6 +110,11 @@ onMounted(() => {
   &__pagination {
     display: flex;
     justify-content: flex-end;
+  }
+  .quich-button {
+    &:hover {
+      color: var(--el-button-text-color);
+    }
   }
 }
 </style>

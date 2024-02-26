@@ -30,7 +30,7 @@
               />
             </div>
 
-            <div class="mt-4 url-height">
+            <div class="mt-4 mb-16 url-height">
               <span class="vertical-middle lighter break-all">
                 {{ shareUrl }}
               </span>
@@ -56,7 +56,7 @@
             <div class="flex">
               <el-text type="info">API访问凭据</el-text>
             </div>
-            <div class="mt-4 url-height">
+            <div class="mt-4 mb-16 url-height">
               <span class="vertical-middle lighter break-all">
                 {{ apiUrl }}
               </span>
@@ -157,7 +157,7 @@ onMounted(() => {
     top: 21px;
   }
   .url-height {
-    min-height: 50px;
+    // min-height: 50px;
   }
 }
 </style>

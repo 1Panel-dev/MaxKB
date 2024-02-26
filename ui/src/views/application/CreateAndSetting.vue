@@ -102,95 +102,100 @@
                 <template #label>
                   <div class="flex-between">
                     <span>关联知识库</span>
+                    <div>
+                      <el-popover :visible="popoverVisible" :width="300" trigger="click">
+                        <template #reference>
+                          <el-button type="primary" link @click="datasetSettingChange('open')"
+                            ><el-icon class="mr-4"><Operation /></el-icon>参数设置</el-button
+                          >
+                        </template>
+                        <div class="dataset_setting">
+                          <div class="form-item mb-16 p-8">
+                            <div class="title flex align-center mb-8">
+                              <span style="margin-right: 4px">相似度</span>
+                              <el-tooltip
+                                effect="dark"
+                                content="相似度越高相关性越强。"
+                                placement="right"
+                              >
+                                <el-icon style="font-size: 16px">
+                                  <Warning />
+                                </el-icon>
+                              </el-tooltip>
+                            </div>
+                            <div @click.stop>
+                              高于
+                              <el-input-number
+                                v-model="dataset_setting.similarity"
+                                :min="0"
+                                :max="1"
+                                :precision="3"
+                                :step="0.1"
+                                controls-position="right"
+                                style="width: 100px"
+                                size="small"
+                              />
+                            </div>
+                          </div>
+                          <div class="form-item mb-16 p-8">
+                            <div class="title mb-8">引用分段数</div>
+                            <div @click.stop>
+                              TOP
+                              <el-input-number
+                                v-model="dataset_setting.top_n"
+                                :min="1"
+                                :max="10"
+                                controls-position="right"
+                                style="width: 100px"
+                                size="small"
+                              />
+                              个分段
+                            </div>
+                          </div>
 
-                    <el-popover :visible="popoverVisible" :width="300" trigger="click">
-                      <template #reference>
-                        <el-button type="primary" link @click="datasetSettingChange('open')"
-                          >参数设置</el-button
-                        >
-                      </template>
-                      <div class="dataset_setting">
-                        <div class="form-item mb-16 p-8">
-                          <div class="title flex align-center mb-8">
-                            <span style="margin-right: 4px">相似度</span>
-                            <el-tooltip
-                              effect="dark"
-                              content="相似度越高相关性越强。"
-                              placement="right"
-                            >
-                              <el-icon style="font-size: 16px">
-                                <Warning />
-                              </el-icon>
-                            </el-tooltip>
-                          </div>
-                          <div @click.stop>
-                            高于
-                            <el-input-number
-                              v-model="dataset_setting.similarity"
-                              :min="0"
-                              :max="1"
-                              :precision="3"
-                              :step="0.1"
-                              controls-position="right"
-                              style="width: 100px"
-                              size="small"
-                            />
+                          <div class="form-item mb-16 p-8">
+                            <div class="title mb-8">最多引用字符数</div>
+                            <div class="flex align-center">
+                              <el-slider
+                                v-model="dataset_setting.max_paragraph_char_number"
+                                show-input
+                                :show-input-controls="false"
+                                :min="500"
+                                :max="10000"
+                                style="width: 200px"
+                                size="small"
+                                class="custom-slider"
+                              />
+                              <span class="ml-4">个字符</span>
+                            </div>
                           </div>
                         </div>
-                        <div class="form-item mb-16 p-8">
-                          <div class="title mb-8">引用分段数</div>
-                          <div @click.stop>
-                            TOP
-                            <el-input-number
-                              v-model="dataset_setting.top_n"
-                              :min="1"
-                              :max="10"
-                              controls-position="right"
-                              style="width: 100px"
-                              size="small"
-                            />
-                            个分段
-                          </div>
+                        <div class="text-right">
+                          <el-button size="small" @click="popoverVisible = false">取消</el-button>
+                          <el-button
+                            type="primary"
+                            @click="datasetSettingChange('close')"
+                            size="small"
+                            >确认</el-button
+                          >
                         </div>
-
-                        <div class="form-item mb-16 p-8">
-                          <div class="title mb-8">最多引用字符数</div>
-                          <div class="flex align-center">
-                            <el-slider
-                              v-model="dataset_setting.max_paragraph_char_number"
-                              show-input
-                              :show-input-controls="false"
-                              :min="500"
-                              :max="10000"
-                              style="width: 200px"
-                              size="small"
-                              class="custom-slider"
-                            />
-                            <span class="ml-4">个字符</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="text-right">
-                        <el-button size="small" @click="popoverVisible = false">取消</el-button>
-                        <el-button
-                          type="primary"
-                          @click="datasetSettingChange('close')"
-                          size="small"
-                          >确认</el-button
-                        >
-                      </div>
-                    </el-popover>
+                      </el-popover>
+                      <el-button type="primary" link @click="openDatasetDialog"
+                        ><el-icon class="mr-4"><Plus /></el-icon>添加</el-button
+                      >
+                    </div>
                   </div>
                 </template>
                 <div class="w-full">
+                  <el-text type="info">关联的知识库展示在这里</el-text>
                   <el-row :gutter="12">
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mb-8">
+                    <!-- <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mb-8">
                       <CardAdd
                         title="关联知识库"
                         @click="openDatasetDialog"
                         style="min-height: 50px; font-size: 14px"
                       />
-                    </el-col>
+                    </el-col> -->
                     <el-col
                       :xs="24"
                       :sm="24"
@@ -241,13 +246,13 @@
               <el-form-item @click.prevent>
                 <template #label>
                   <div class="flex align-center">
-                    <span>问题优化</span>
+                    <span class="mr-4">问题优化</span>
                     <el-tooltip
                       effect="dark"
                       content="根据历史聊天优化完善当前问题，更利于匹配知识点。"
                       placement="right"
                     >
-                      <el-icon style="font-size: 16px">
+                      <el-icon :size="16">
                         <Warning />
                       </el-icon>
                     </el-tooltip>
@@ -334,27 +339,16 @@ const {
 } = route as any
 
 const defaultPrompt = `已知信息：
-
 {data}
-
 回答要求：
-
 - 请简洁和专业的来回答用户的问题。
-
 - 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。
-
 - 避免提及你是从已知信息中获得的知识。
-
 - 请保证答案与已知信息中描述的一致。
-
 - 请使用 Markdown 语法优化答案的格式。
-
 - 已知信息中的图片、链接地址和脚本语言请直接返回。
-
 - 请使用与问题相同的语言来回答。
-
 问题：
-
 {question}
 `
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()

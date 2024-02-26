@@ -5,7 +5,7 @@
         <div class="item-content mb-16">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
-              <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
+              <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
             </AppAvatar>
           </div>
 
@@ -50,7 +50,7 @@
           <div class="item-content mb-16 lighter">
             <div class="avatar">
               <AppAvatar class="avatar-gradient">
-                <img src="@/assets/icon_robot.svg" style="width: 54%" alt="" />
+                <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
               </AppAvatar>
             </div>
             <div class="content">
@@ -621,6 +621,7 @@ watch(
   }
   .dialog-card {
     border: none;
+    border-radius: 8px;
   }
 }
 </style>

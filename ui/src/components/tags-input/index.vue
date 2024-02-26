@@ -100,6 +100,12 @@ function removeTag(index: number) {
   min-height: 70px;
   border: 1px solid var(--el-border-color);
   border-radius: var(--el-border-radius-base);
+  &:hover {
+    border: 1px solid var(--el-color-primary);
+  }
+  &:focus-within {
+    border: 1px solid var(--el-color-primary);
+  }
   :deep(.el-autocomplete) {
     width: 100%;
   }

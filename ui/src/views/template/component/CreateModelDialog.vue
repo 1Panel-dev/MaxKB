@@ -29,6 +29,7 @@
       ref="dynamicsFormRef"
       label-position="top"
       require-asterisk-position="right"
+      class="mb-24"
     >
       <template #default>
         <el-form-item label="模型名称" prop="name" :rules="base_form_data_rule.name">

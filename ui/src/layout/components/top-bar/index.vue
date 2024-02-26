@@ -1,12 +1,14 @@
 <template>
   <div class="top-bar-container border-b flex-between">
     <div class="flex-center h-full">
-      <div class="app-title-container flex-center">
-        <div class="app-title-icon"></div>
-        <div class="app-title-text app-logo-font ml-4">
-          {{ defaultTitle }}
+      <a href="/">
+        <div class="app-title-container flex-center">
+          <div class="app-title-icon"></div>
+          <div class="app-title-text app-logo-font ml-4">
+            {{ defaultTitle }}
+          </div>
         </div>
-      </div>
+      </a>
       <TopMenu></TopMenu>
     </div>
     <div class="avatar">

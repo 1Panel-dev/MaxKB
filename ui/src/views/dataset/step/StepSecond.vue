@@ -201,15 +201,16 @@ defineExpose({
       position: absolute;
       top: 16px;
     }
+    :deep(.el-radio__input.is-checked + .el-radio__label) {
+      color: var(--app-text-color);
+    }
     .active {
       border: 1px solid var(--el-color-primary);
     }
   }
 
   &__form {
-    .el-select {
-      width: 100%;
-    }
+
 
     .title {
       font-size: 14px;

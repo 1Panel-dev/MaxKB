@@ -55,6 +55,7 @@
                 :data="item.data"
                 :type="item.value"
                 :tableHeight="tableHeight"
+                :manage="isManage(currentType)"
               ></PermissionSetting>
             </el-tab-pane>
           </el-tabs>
@@ -76,7 +77,7 @@ import type { TeamMember } from '@/api/type/team'
 import CreateMemberDialog from './component/CreateMemberDialog.vue'
 import PermissionSetting from './component/PermissionSetting.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { DATASET, APPLICATION } from './utils'
+import { DATASET, APPLICATION, isManage } from './utils'
 
 const CreateMemberRef = ref<InstanceType<typeof CreateMemberDialog>>()
 const loading = ref(false)
@@ -84,6 +85,8 @@ const rLoading = ref(false)
 const memberList = ref<TeamMember[]>([]) // 全部成员
 const filterMember = ref<TeamMember[]>([]) // 搜索过滤后列表
 const currentUser = ref<String>('')
+const currentType = ref<String>('')
+
 const filterText = ref('')
 
 const activeName = ref(DATASET)
@@ -176,12 +179,9 @@ function deleteMember(row: TeamMember) {
     .catch(() => {})
 }
 
-function isManage(type: String) {
-  return type === 'manage'
-}
-
 function clickMemberHandle(item: any) {
   currentUser.value = item.id
+  currentType.value = item.type
   MemberPermissions(item.id)
 }
 function addMember() {
@@ -197,6 +197,7 @@ function getMember(id?: string) {
 
       const user = (id && memberList.value.find((p) => p.user_id === id)) || null
       currentUser.value = user ? user.id : memberList.value[0].id
+      currentType.value = user ? user.type : memberList.value[0].type
       MemberPermissions(currentUser.value)
       loading.value = false
     })

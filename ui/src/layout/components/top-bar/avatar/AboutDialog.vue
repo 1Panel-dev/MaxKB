@@ -9,13 +9,13 @@
       </div>
     </template>
     <ul class="about-ui">
-      <li class="flex">
+      <li class="flex mb-16">
         <span class="label text-right">授权数量：</span><span class="text-center">-</span>
       </li>
-      <li class="flex">
+      <li class="flex mb-16">
         <span class="label text-right">过期时间：</span><span class="text-center">-</span>
       </li>
-      <li class="flex">
+      <li class="flex mb-16">
         <span class="label text-right">版本：</span><span class="text-center">-</span>
       </li>
       <li class="flex">
@@ -39,28 +39,38 @@ defineExpose({ open })
 </script>
 <style lang="scss" scope>
 .about-dialog {
+  padding: 0;
   border-radius: 4px;
+  width: 600px;
   .el-dialog__header {
     background: var(--app-header-bg-color);
     margin-right: 0;
-    height: 45px;
+    height: 140px;
     border-radius: 4px 4px 0 0;
+    box-sizing: border-box;
+  }
+  .el-dialog__title {
+    line-height: 140px;
   }
   .about-title {
-    font-size: 24px;
+    font-size: 40px;
   }
   .logo {
     background-image: url('@/assets/logo.png');
     background-size: 100% 100%;
-    width: 35px;
-    height: 35px;
+    width: 59px;
+    height: 59px;
   }
   .about-ui {
-    width: 200px;
+    padding: 24px;
+    width: 360px;
     margin: 0 auto;
-    line-height: 30px;
-    span {
-      width: 80px;
+    font-weight: 400;
+    font-size: 16px;
+    .label {
+      width: 180px;
+      text-align: left;
+      color: var(--app-text-color-secondary);
     }
   }
 }

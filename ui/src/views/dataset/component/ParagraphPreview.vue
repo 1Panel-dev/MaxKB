@@ -25,7 +25,7 @@
                 <div>
                   <!-- 编辑分段按钮 -->
                   <el-button link @click="editHandle(child, index, cIndex)">
-                    <el-icon><Edit /></el-icon>
+                    <el-icon><EditPen /></el-icon>
                   </el-button>
                   <!-- 删除分段按钮  -->
                   <el-button link @click="deleteHandle(child, index, cIndex)">
@@ -138,6 +138,6 @@ onMounted(() => {})
   }
 }
 .paragraph-list {
-  height: calc(var(--create-dataset-height) - 95px);
+  height: calc(var(--create-dataset-height) - 131px);
 }
 </style>

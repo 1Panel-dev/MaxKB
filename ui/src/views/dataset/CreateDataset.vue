@@ -34,7 +34,7 @@
       </div>
     </div>
     <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
-      <el-button @click="router.go(-1)" :disabled="loading">取 消</el-button>
+      <el-button @click="router.go(-1)" :disabled="loading">取消</el-button>
       <el-button @click="prev" v-if="active === 1" :disabled="loading">上一步</el-button>
       <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading">
         创建并导入

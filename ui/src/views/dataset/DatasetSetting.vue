@@ -15,18 +15,22 @@
             <el-form-item label="知识库类型" required>
               <el-card shadow="never" class="mb-8" v-if="detail.type === '0'">
                 <div class="flex align-center">
-                  <el-icon size="32" class="mr-8 info"><Document /></el-icon>
+                  <AppAvatar class="mr-8" shape="square" :size="32">
+                    <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+                  </AppAvatar>
                   <div>
-                    <p>通用型</p>
+                    <div>通用型</div>
                     <el-text type="info">可以通过上传文件或手动录入方式构建知识库</el-text>
                   </div>
                 </div>
               </el-card>
               <el-card shadow="never" class="mb-8" v-if="detail?.type === '1'">
                 <div class="flex align-center">
-                  <el-icon size="32" class="mr-8 info"><Monitor /></el-icon>
+                  <AppAvatar class="mr-8 avatar-purple" shape="square" :size="32">
+                    <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                  </AppAvatar>
                   <div>
-                    <p>Web 站点</p>
+                    <div>Web 站点</div>
                     <el-text type="info"> 通过网站链接同步方式构建知识库 </el-text>
                   </div>
                 </div>
