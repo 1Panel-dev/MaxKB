@@ -117,6 +117,7 @@ async function submit() {
         const obj =
           detail.value.type === '1'
             ? {
+                application_id_list: application_id_list.value,
                 ...BaseFormRef.value.form,
                 ...form.value
               }
