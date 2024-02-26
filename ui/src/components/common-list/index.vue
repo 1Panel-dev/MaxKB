@@ -18,6 +18,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch, useSlots } from 'vue'
+import empty from '@/assets/empty.png'
 
 defineOptions({ name: 'CommonList' })
 

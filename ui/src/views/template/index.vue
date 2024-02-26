@@ -74,10 +74,10 @@
 </template>
 
 <script lang="ts" setup>
+import { ElMessage } from 'element-plus'
 import { onMounted, ref, computed, watch } from 'vue'
 import ModelApi from '@/api/model'
 import type { Provider, Model } from '@/api/type/model'
-
 import AppIcon from '@/components/icons/AppIcon.vue'
 import ModelCard from '@/views/template/component/ModelCard.vue'
 import { splitArray } from '@/utils/common'

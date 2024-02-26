@@ -55,9 +55,7 @@
                         >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。<br />可以使用变量：{data}
                         是携带知识库中已知信息；{question}是用户提出的问题。</template
                       >
-                      <el-icon :size="16">
-                        <Warning />
-                      </el-icon>
+                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                     </el-tooltip>
                   </div>
                 </template>
@@ -120,14 +118,14 @@
                   <div class="flex-between">
                     <span>关联知识库</span>
                     <div>
-                      <el-popover :visible="popoverVisible" :width="300" trigger="click">
+                      <el-popover :visible="popoverVisible" :width="280" trigger="click">
                         <template #reference>
                           <el-button type="primary" link @click="datasetSettingChange('open')"
-                            ><el-icon class="mr-4"><Operation /></el-icon>参数设置</el-button
+                            ><AppIcon iconName="app-operation" class="mr-4"></AppIcon>参数设置</el-button
                           >
                         </template>
                         <div class="dataset_setting">
-                          <div class="form-item mb-16 p-8">
+                          <div class="form-item mb-16">
                             <div class="title flex align-center mb-8">
                               <span style="margin-right: 4px">相似度</span>
                               <el-tooltip
@@ -135,9 +133,7 @@
                                 content="相似度越高相关性越强。"
                                 placement="right"
                               >
-                                <el-icon style="font-size: 16px">
-                                  <Warning />
-                                </el-icon>
+                                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                               </el-tooltip>
                             </div>
                             <div @click.stop>
@@ -154,7 +150,7 @@
                               />
                             </div>
                           </div>
-                          <div class="form-item mb-16 p-8">
+                          <div class="form-item mb-16">
                             <div class="title mb-8">引用分段数</div>
                             <div @click.stop>
                               TOP
@@ -170,7 +166,7 @@
                             </div>
                           </div>
 
-                          <div class="form-item mb-16 p-8">
+                          <div class="form-item mb-16">
                             <div class="title mb-8">最多引用字符数</div>
                             <div class="flex align-center">
                               <el-slider
@@ -188,11 +184,8 @@
                           </div>
                         </div>
                         <div class="text-right">
-                          <el-button size="small" @click="popoverVisible = false">取消</el-button>
-                          <el-button
-                            type="primary"
-                            @click="datasetSettingChange('close')"
-                            size="small"
+                          <el-button @click="popoverVisible = false">取消</el-button>
+                          <el-button type="primary" @click="datasetSettingChange('close')"
                             >确认</el-button
                           >
                         </div>
@@ -204,8 +197,10 @@
                   </div>
                 </template>
                 <div class="w-full">
-                  <el-text type="info">关联的知识库展示在这里</el-text>
-                  <el-row :gutter="12">
+                  <el-text type="info" v-if="applicationForm.dataset_id_list?.length === 0"
+                    >关联的知识库展示在这里</el-text
+                  >
+                  <el-row :gutter="12" v-else>
                     <!-- <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mb-8">
                       <CardAdd
                         title="关联知识库"
@@ -269,9 +264,7 @@
                       content="根据历史聊天优化完善当前问题，更利于匹配知识点。"
                       placement="right"
                     >
-                      <el-icon :size="16">
-                        <Warning />
-                      </el-icon>
+                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                     </el-tooltip>
                   </div>
                 </template>
@@ -407,7 +400,6 @@ function datasetSettingChange(val: string) {
   }
 }
 
-
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
@@ -539,9 +531,8 @@ onMounted(() => {
   height: 150px;
 }
 .dataset_setting {
-  .form-item {
-    background: var(--app-layout-bg-color);
-  }
+  color: var(--el-text-color-regular);
+  font-weight: 400;
 }
 .custom-slider {
   :deep(.el-input-number.is-without-controls .el-input__wrapper) {

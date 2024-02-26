@@ -75,37 +75,39 @@
       <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     </LayoutContainer>
     <div class="hit-test__operate p-24 pt-0">
-      <el-popover :visible="popoverVisible" placement="top-start" :width="570" trigger="click">
+      <el-popover :visible="popoverVisible" placement="right-end" :width="225" trigger="click">
         <template #reference>
           <el-button icon="Setting" class="mb-8" @click="settingChange('open')">参数设置</el-button>
         </template>
-        <div class="flex">
-          <div>
-            相似度高于
-            <el-input-number
-              v-model="cloneForm.similarity"
-              :min="0"
-              :max="1"
-              :precision="3"
-              :step="0.1"
-              controls-position="right"
-              style="width: 100px"
-            />
-          </div>
 
-          <div class="ml-16">
-            返回 Top
-            <el-input-number
-              v-model="cloneForm.top_number"
-              :min="1"
-              :max="10"
-              controls-position="right"
-              style="width: 100px"
-            />
-            个分段
-          </div>
-          <el-button class="ml-16" @click="popoverVisible = false">取消</el-button>
-          <el-button class="ml-16" type="primary" @click="settingChange('close')">确认</el-button>
+        <div class="mb-16">
+          相似度高于
+          <el-input-number
+            size="small"
+            v-model="cloneForm.similarity"
+            :min="0"
+            :max="1"
+            :precision="3"
+            :step="0.1"
+            controls-position="right"
+            style="width: 100px"
+          />
+        </div>
+        <div class="mb-16">
+          返回 Top
+          <el-input-number
+            size="small"
+            v-model="cloneForm.top_number"
+            :min="1"
+            :max="10"
+            controls-position="right"
+            style="width: 80px"
+          />
+          个分段
+        </div>
+        <div class="text-right">
+          <el-button @click="popoverVisible = false">取消</el-button>
+          <el-button type="primary" @click="settingChange('close')">确认</el-button>
         </div>
       </el-popover>
       <div class="operate-textarea flex">

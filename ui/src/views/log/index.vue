@@ -33,11 +33,12 @@
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
         <el-table-column prop="star_num" align="right">
           <template #header>
-            <div>
+            <div class="flex align-center">
               <span>用户反馈</span>
               <el-popover :width="160" trigger="click" :visible="popoverVisible">
                 <template #reference>
                   <el-button
+                  style="margin-top: -2px;"
                     :type="filter.min_star || filter.min_trample ? 'primary' : ''"
                     link
                     @click="popoverVisible = !popoverVisible"
