@@ -408,6 +408,10 @@ function chatMessage(chat?: any) {
       })
       chatList.value.push(chat)
       inputValue.value = ''
+      nextTick(() => {
+        // 将滚动条滚动到最下面
+        scrollDiv.value.setScrollTop(getMaxHeight())
+      })
     }
     // 对话
     applicationApi
@@ -421,7 +425,7 @@ function chatMessage(chat?: any) {
         } else {
           nextTick(() => {
             // 将滚动条滚动到最下面
-            scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
+            scrollDiv.value.setScrollTop(getMaxHeight())
           })
           ChatManagement.addChatRecord(chat, 50, loading)
           ChatManagement.write(chat.id)
@@ -472,11 +476,14 @@ const scrollTop = ref(0)
 
 const scorll = ref(true)
 
+const getMaxHeight = () => {
+  return dialogScrollbar.value!.scrollHeight
+}
 const handleScrollTop = ($event: any) => {
   scrollTop.value = $event.scrollTop
   if (
     dialogScrollbar.value.scrollHeight - (scrollTop.value + scrollDiv.value.wrapRef.offsetHeight) <=
-    20
+    30
   ) {
     scorll.value = true
   } else {
@@ -490,7 +497,7 @@ const handleScroll = () => {
     if (scrollDiv.value.wrapRef.offsetHeight < dialogScrollbar.value.scrollHeight) {
       // 如果当前滚动条距离最下面的距离在 规定距离 滚动条就跟随
       if (scorll.value) {
-        scrollDiv.value.setScrollTop(Number.MAX_SAFE_INTEGER)
+        scrollDiv.value.setScrollTop(getMaxHeight())
       }
     }
   }
