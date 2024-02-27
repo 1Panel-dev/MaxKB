@@ -167,7 +167,8 @@ const onSubmit = async () => {
 onMounted(() => {})
 
 defineExpose({
-  onSubmit
+  onSubmit,
+  loading
 })
 </script>
 <style scoped lang="scss">

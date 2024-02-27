@@ -38,7 +38,7 @@
     <template #footer v-if="!problemId">
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
-        <el-button type="primary" @click="submitHandle"> 提交 </el-button>
+        <el-button :disabled="loading" type="primary" @click="submitHandle"> 提交 </el-button>
       </span>
     </template>
   </el-dialog>

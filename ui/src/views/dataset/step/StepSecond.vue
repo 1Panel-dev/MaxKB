@@ -36,9 +36,7 @@
                             content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。"
                             placement="right"
                           >
-                            <el-icon style="font-size: 16px">
-                              <Warning />
-                            </el-icon>
+                            <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                           </el-tooltip>
                         </div>
                         <div @click.stop>
@@ -210,8 +208,6 @@ defineExpose({
   }
 
   &__form {
-
-
     .title {
       font-size: 14px;
       font-weight: 400;
