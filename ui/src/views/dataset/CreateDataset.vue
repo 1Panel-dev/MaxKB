@@ -36,7 +36,12 @@
     <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
       <el-button @click="router.go(-1)" :disabled="loading">取消</el-button>
       <el-button @click="prev" v-if="active === 1" :disabled="loading">上一步</el-button>
-      <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading">
+      <el-button
+        @click="next"
+        type="primary"
+        v-if="active === 0"
+        :disabled="loading || StepFirstRef?.loading"
+      >
         创建并导入
       </el-button>
       <el-button @click="submit" type="primary" v-if="active === 1" :disabled="loading">
@@ -84,12 +89,16 @@ const StepFirstRef = ref()
 const StepSecondRef = ref()
 
 const loading = ref(false)
+const disabled = ref(false)
 const active = ref(0)
 const successInfo = ref<any>(null)
 
 async function next() {
+  disabled.value = true
   if (await StepFirstRef.value?.onSubmit()) {
     if (active.value++ > 2) active.value = 0
+  } else {
+    disabled.value = false
   }
 }
 const prev = () => {
