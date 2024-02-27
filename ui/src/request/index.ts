@@ -56,7 +56,11 @@ instance.interceptors.response.use(
       router.push('/404 ')
     }
     if (err.response?.status === 401) {
-      router.push({ name: 'login' })
+      if (err.response.config.url.includes('chat/open')) {
+        router.push('/404 ')
+      } else {
+        router.push({ name: 'login' })
+      }
     }
 
     if (err.response?.status === 403 && !err.response.config.url.includes('chat/open')) {

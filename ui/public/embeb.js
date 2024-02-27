@@ -83,11 +83,11 @@ function embedChatbot() {
           if(is_404){
             document.body.removeChild(chat_container)
             document.body.append(chat_container)
+            
             is_404=false
-          }else{
-            chat_container.style['display']='block'
-          }
-     
+          } 
+          chat_container.style['display']='block'
+           
         }else{
           is_404=true
         }
