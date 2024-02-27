@@ -1,6 +1,15 @@
+function auth(token,protocol,host){
+    const XML=new XMLHttpRequest()
+    XML.open("POST",`${protocol}//${host}/api/application/authentication`,false)
+    XML.setRequestHeader('Content-Type', 'application/json');
+    res=XML.send(JSON.stringify({"access_token":token}))
+    return XML.status==200
+}
+
 function embedChatbot() {
   const t = window.maxkbChatConfig
-  if (t && t.token && t.protocol && t.host) {
+  check=auth(t.token,t.protocol, t.host)
+  if (t && t.token && t.protocol && t.host&& check) {
     icon = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56" fill="none">
     <g filter="url(#filter0_d_349_49711)">
     <path d="M8 24C8 12.9543 16.9543 4 28 4H48V44H28C16.9543 44 8 35.0457 8 24Z" fill="url(#paint0_linear_349_49711)"/>
@@ -59,16 +68,30 @@ function embedChatbot() {
         cursor: pointer;
         `
     close_button.onclick = () => {
-      chat_container.style['display'] = 'none'
-      chat_button.style['display'] = 'block'
+      document.body.removeChild(chat_container)
+      chat_button.style['display']='block'
     }
 
     chat_container.append(close_button)
     document.body.append(chat_container)
-
+    let is_404=false
     chat_button.onclick = ($event) => {
-      chat_container.style['display'] = 'block'
-      chat_button.style['display'] = 'block'
+      if( chat_container.style['display']=='block'){
+        chat_container.style['display']='none'
+      } else {
+        if(auth(t.token,t.protocol, t.host)){
+          if(is_404){
+            document.body.removeChild(chat_container)
+            document.body.append(chat_container)
+            is_404=false
+          }else{
+            chat_container.style['display']='block'
+          }
+     
+        }else{
+          is_404=true
+        }
+      }
     }
     sty = document.createElement('style')
     sty.innerText = ` #chat_container {
