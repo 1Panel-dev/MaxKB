@@ -67,6 +67,11 @@
                 />
               </el-form-item>
               <el-form-item label="AI 模型" prop="model_id">
+                <template #label>
+                  <div class="flex-between">
+                    <span>AI 模型 <span class="danger">*</span></span>
+                  </div>
+                </template>
                 <el-select
                   v-model="applicationForm.model_id"
                   placeholder="请选择 AI 模型"
@@ -367,7 +372,7 @@ const applicationForm = ref<ApplicationFormType>({
     max_paragraph_char_number: 5000
   },
   model_setting: {
-    prompt: ''
+    prompt: defaultPrompt
   },
   problem_optimization: false
 })

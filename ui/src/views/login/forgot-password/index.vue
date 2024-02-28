@@ -30,7 +30,6 @@
               >
               </el-input>
               <el-button
-                :disabled="CheckEmailForm.email"
                 size="large"
                 class="send-email-button ml-12"
                 @click="sendEmail"
