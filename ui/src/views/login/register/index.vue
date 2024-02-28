@@ -62,11 +62,13 @@
               >
               </el-input>
               <el-button
+                :disabled="isDisabled"
                 size="large"
                 class="send-email-button ml-12"
                 @click="sendEmail"
                 :loading="sendEmailLoading"
-                >获取验证码</el-button
+              >
+                {{ isDisabled ? `重新发送（${time}s）` : '获取验证码' }}</el-button
               >
             </div>
           </el-form-item>
@@ -183,6 +185,8 @@ const register = () => {
     })
 }
 const sendEmailLoading = ref<boolean>(false)
+const isDisabled = ref<boolean>(false)
+const time = ref<number>(60)
 /**
  * 发送验证码
  */
@@ -191,9 +195,22 @@ const sendEmail = () => {
     if (v) {
       UserApi.sendEmit(registerForm.value.email, 'register', sendEmailLoading).then(() => {
         MsgSuccess('发送验证码成功')
+        isDisabled.value = true
+        handleTimeChange()
       })
     }
   })
+}
+const handleTimeChange = () => {
+  if (time.value <= 0) {
+    isDisabled.value = false
+    time.value = 60
+  } else {
+    setTimeout(() => {
+      time.value--
+      handleTimeChange()
+    }, 1000)
+  }
 }
 </script>
 <style lang="scss" scope></style>
