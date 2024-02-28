@@ -118,8 +118,8 @@ async function submit() {
           detail.value.type === '1'
             ? {
                 application_id_list: application_id_list.value,
-                ...BaseFormRef.value.form,
-                ...form.value
+                meta: form.value,
+                ...BaseFormRef.value.form
               }
             : {
                 application_id_list: application_id_list.value,
