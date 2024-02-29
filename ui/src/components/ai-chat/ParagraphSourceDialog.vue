@@ -87,6 +87,10 @@ defineExpose({ open })
 </script>
 <style lang="scss">
 .paragraph-source {
+  padding: 0;
+  .el-dialog__header {
+    padding: 24px 24px 0 24px;
+  }
   .el-dialog__body {
     padding: 8px !important;
   }

@@ -9,7 +9,7 @@
   >
     <el-form-item label="分段标题">
       <el-input v-if="isEdit" v-model="form.title" placeholder="请输入分段标题"> </el-input>
-      <span v-else>{{ form.title || '-' }}</span>
+      <span class="lighter" v-else>{{ form.title || '-' }}</span>
     </el-form-item>
     <el-form-item label="分段内容" prop="content">
       <el-input
@@ -22,7 +22,7 @@
         type="textarea"
       >
       </el-input>
-      <span v-else class="break-all">{{ form.content }}</span>
+      <span v-else class="break-all lighter">{{ form.content }}</span>
     </el-form-item>
   </el-form>
 </template>
