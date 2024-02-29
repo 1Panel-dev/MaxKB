@@ -476,7 +476,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
     class SplitPattern(ApiMixin, serializers.Serializer):
         @staticmethod
         def list():
-            return [{'key': "#", 'value': '^# .*'}, {'key': '##', 'value': '(?<!#)## (?!#).*'},
+            return [{'key': "#", 'value': '# .*'}, {'key': '##', 'value': '(?<!#)## (?!#).*'},
                     {'key': '###', 'value': "(?<!#)### (?!#).*"}, {'key': '####', 'value': "(?<!#)####(?!#).*"},
                     {'key': '#####', 'value': "(?<!#)#####(?!#).*"}, {'key': '######', 'value': "(?<!#)######(?!#).*"},
                     {'key': '-', 'value': '(?<! )- .*'},
