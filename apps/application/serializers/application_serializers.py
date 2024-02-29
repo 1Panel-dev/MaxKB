@@ -396,13 +396,20 @@ class ApplicationSerializer(serializers.Serializer):
 
         application_id = serializers.UUIDField(required=True)
 
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            application_id = self.data.get("application_id")
+            application = QuerySet(Application).filter(id=application_id).first()
+            if application is None:
+                raise AppApiException(1001, "应用不存在")
+
         def generate(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            user_id = self.data.get("user_id")
             application_id = self.data.get("application_id")
+            application = QuerySet(Application).filter(id=application_id).first()
             secret_key = 'application-' + hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()
-            application_api_key = ApplicationApiKey(id=uuid.uuid1(), secret_key=secret_key, user_id=user_id,
+            application_api_key = ApplicationApiKey(id=uuid.uuid1(), secret_key=secret_key, user_id=application.user_id,
                                                     application_id=application_id)
             application_api_key.save()
             return ApplicationSerializer.ApplicationKeySerializerModel(application_api_key).data
@@ -410,11 +417,10 @@ class ApplicationSerializer(serializers.Serializer):
         def list(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            user_id = self.data.get("user_id")
             application_id = self.data.get("application_id")
             return [ApplicationSerializer.ApplicationKeySerializerModel(application_api_key).data for
                     application_api_key in
-                    QuerySet(ApplicationApiKey).filter(user_id=user_id, application_id=application_id)]
+                    QuerySet(ApplicationApiKey).filter(application_id=application_id)]
 
         class Edit(serializers.Serializer):
             is_active = serializers.BooleanField(required=False)
