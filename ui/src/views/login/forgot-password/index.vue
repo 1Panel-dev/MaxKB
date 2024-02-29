@@ -29,13 +29,15 @@
                 placeholder="请输入验证码"
               >
               </el-input>
+
               <el-button
-                :disabled="CheckEmailForm.email"
+                :disabled="isDisabled"
                 size="large"
                 class="send-email-button ml-12"
                 @click="sendEmail"
                 :loading="loading"
-                >获取验证码</el-button
+              >
+                {{ isDisabled ? `重新发送（${time}s）` : '获取验证码' }}</el-button
               >
             </div>
           </el-form-item>
@@ -90,6 +92,8 @@ const rules = ref<FormRules<CheckCodeRequest>>({
   code: [{ required: true, message: '请输入验证码' }]
 })
 const loading = ref<boolean>(false)
+const isDisabled = ref<boolean>(false)
+const time = ref<number>(60)
 
 const checkCode = () => {
   resetPasswordFormRef.value
@@ -108,6 +112,17 @@ const sendEmail = () => {
       })
     }
   })
+}
+const handleTimeChange = () => {
+  if (time.value <= 0) {
+    isDisabled.value = false
+    time.value = 60
+  } else {
+    setTimeout(() => {
+      time.value--
+      handleTimeChange()
+    }, 1000)
+  }
 }
 </script>
 <style lang="scss" scope></style>
