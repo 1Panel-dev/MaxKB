@@ -13,7 +13,8 @@ from rest_framework.views import APIView
 from rest_framework.views import Request
 
 from common.auth import TokenAuth, has_permissions
-from common.constants.permission_constants import PermissionConstants, CompareConstants, Permission, Group, Operate
+from common.constants.permission_constants import PermissionConstants, CompareConstants, Permission, Group, Operate, \
+    ViewPermission, RoleConstants
 from common.response import result
 from common.response.result import get_page_request_params, get_page_api_response, get_api_response
 from common.swagger_api.common_api import CommonApi
@@ -32,10 +33,12 @@ class Dataset(APIView):
                              manual_parameters=DataSetSerializers.SyncWeb.get_request_params_api(),
                              responses=result.get_default_response(),
                              tags=["知识库"])
-        @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.MANAGE,
-                                                        dynamic_tag=keywords.get('dataset_id')),
-                         lambda r, k: Permission(group=Group.DATASET, operate=Operate.DELETE,
-                                                 dynamic_tag=k.get('dataset_id')), compare=CompareConstants.AND)
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                            dynamic_tag=keywords.get('dataset_id'))],
+            compare=CompareConstants.AND), PermissionConstants.DATASET_EDIT,
+            compare=CompareConstants.AND)
         def put(self, request: Request, dataset_id: str):
             return result.success(DataSetSerializers.SyncWeb(
                 data={'sync_type': request.query_params.get('sync_type'), 'id': dataset_id,
