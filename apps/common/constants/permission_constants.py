@@ -108,6 +108,12 @@ class PermissionConstants(Enum):
     APPLICATION_CREATE = Permission(group=Group.APPLICATION, operate=Operate.CREATE,
                                     roles=[RoleConstants.ADMIN, RoleConstants.USER])
 
+    APPLICATION_DELETE = Permission(group=Group.APPLICATION, operate=Operate.DELETE,
+                                    roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
+    APPLICATION_EDIT = Permission(group=Group.APPLICATION, operate=Operate.EDIT,
+                                  roles=[RoleConstants.ADMIN, RoleConstants.USER])
+
     SETTING_READ = Permission(group=Group.SETTING, operate=Operate.READ,
                               roles=[RoleConstants.ADMIN, RoleConstants.USER])
 

@@ -68,7 +68,7 @@ class Application(APIView):
                              )
         @has_permissions(ViewPermission(
             [RoleConstants.ADMIN, RoleConstants.USER],
-            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
         def get(self, request: Request, application_id: str):
@@ -88,8 +88,7 @@ class Application(APIView):
                 [RoleConstants.ADMIN, RoleConstants.USER],
                 [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                                 dynamic_tag=keywords.get('application_id'))],
-                compare=CompareConstants.AND), lambda r, k: Permission(group=Group.APPLICATION, operate=Operate.DELETE,
-                                                                       dynamic_tag=k.get('application_id')),
+                compare=CompareConstants.AND), PermissionConstants.APPLICATION_EDIT,
                 compare=CompareConstants.AND)
             def put(self, request: Request, application_id: str, api_key_id: str):
                 return result.success(
@@ -106,8 +105,7 @@ class Application(APIView):
                 [RoleConstants.ADMIN, RoleConstants.USER],
                 [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                                 dynamic_tag=keywords.get('application_id'))],
-                compare=CompareConstants.AND), lambda r, k: Permission(group=Group.APPLICATION, operate=Operate.DELETE,
-                                                                       dynamic_tag=k.get('application_id')),
+                compare=CompareConstants.AND), PermissionConstants.APPLICATION_DELETE,
                 compare=CompareConstants.AND)
             def delete(self, request: Request, application_id: str, api_key_id: str):
                 return result.success(
