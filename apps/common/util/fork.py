@@ -7,7 +7,7 @@ from typing import List, Set
 import requests
 import html2text as ht
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse, ParseResult
+from urllib.parse import urljoin, urlparse, ParseResult, urlsplit, parse_qs
 
 requests.packages.urllib3.disable_warnings()
 
@@ -60,7 +60,11 @@ class Fork:
 
     def __init__(self, base_fork_url: str, selector_list: List[str]):
         self.base_fork_url = urljoin(base_fork_url if base_fork_url.endswith("/") else base_fork_url + '/', '.')
+        parsed = urlsplit(base_fork_url)
+        query = parsed.query
         self.base_fork_url = self.base_fork_url[:-1]
+        if query is not None and len(query) > 0:
+            self.base_fork_url = self.base_fork_url + '?' + query
         self.selector_list = [selector for selector in selector_list if selector is not None and len(selector) > 0]
         self.urlparse = urlparse(self.base_fork_url)
         self.base_url = ParseResult(scheme=self.urlparse.scheme, netloc=self.urlparse.netloc, path='', params='',
