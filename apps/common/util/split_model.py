@@ -8,7 +8,7 @@
 """
 import re
 from functools import reduce
-from typing import List
+from typing import List, Dict
 
 import jieba
 
@@ -334,7 +334,24 @@ class SplitModel:
         result = result_tree_to_paragraph(result_tree, [], [])
         # 过滤段落内容不为空字符串的数据
         result = [item for item in result if 'content' in item and len(item.get('content').strip()) > 0]
-        return [{**item, 'title': item.get('title').replace("#", '') if 'title' in item else ''} for item in result]
+        return [self.post_reset_paragraph(item) for item in result]
+
+    def post_reset_paragraph(self, paragraph: Dict):
+        result = self.filter_title_special_characters(paragraph)
+        result = self.sub_title(result)
+        return result
+
+    @staticmethod
+    def sub_title(paragraph: Dict):
+        if 'title' in paragraph:
+            title = paragraph.get('title')
+            if len(title) > 255:
+                return {**paragraph, 'title': title[0:255], 'content': title[255:len(title)] + paragraph.get('content')}
+        return paragraph
+
+    @staticmethod
+    def filter_title_special_characters(paragraph: Dict):
+        return {**paragraph, 'title': paragraph.get('title').replace("#", '') if 'title' in paragraph else ''}
 
 
 default_split_pattern = {
