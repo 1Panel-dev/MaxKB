@@ -49,6 +49,7 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
+import { cloneDeep } from 'lodash'
 import type { TabsPaneContext } from 'element-plus'
 import EditParagraphDialog from './EditParagraphDialog.vue'
 import { filesize, getImgUrl } from '@/utils/utils'
@@ -100,7 +101,7 @@ function deleteHandle(item: any, index: number, cIndex: number) {
 }
 
 function updateContent(data: any) {
-  newData.value[currentPIndex.value].content[currentCIndex.value] = data
+  newData.value[currentPIndex.value].content[currentCIndex.value] = cloneDeep(data)
   emit('update:data', newData.value)
 }
 
