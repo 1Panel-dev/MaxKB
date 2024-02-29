@@ -461,8 +461,13 @@ class DataSetSerializers(serializers.ModelSerializer):
         def hit_test(self):
             self.is_valid()
             vector = VectorStore.get_embedding_vector()
+            exclude_document_id_list = [str(document.id) for document in
+                                        QuerySet(Document).filter(
+                                            dataset_id=self.data.get('id'),
+                                            is_active=False)]
             # 向量库检索
-            hit_list = vector.hit_test(self.data.get('query_text'), [self.data.get('id')], self.data.get('top_number'),
+            hit_list = vector.hit_test(self.data.get('query_text'), [self.data.get('id')], exclude_document_id_list,
+                                       self.data.get('top_number'),
                                        self.data.get('similarity'),
                                        EmbeddingModel.get_embedding_model())
             hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get('paragraph_id'): hit} for hit in hit_list], {})

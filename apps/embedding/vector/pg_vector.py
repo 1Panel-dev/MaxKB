@@ -61,10 +61,15 @@ class PGVector(BaseVectorStore):
         QuerySet(Embedding).bulk_create(embedding_list) if len(embedding_list) > 0 else None
         return True
 
-    def hit_test(self, query_text, dataset_id_list: list[str], top_number: int, similarity: float,
+    def hit_test(self, query_text, dataset_id_list: list[str], exclude_document_id_list: list[str], top_number: int,
+                 similarity: float,
                  embedding: HuggingFaceEmbeddings):
+        exclude_dict = {}
         embedding_query = embedding.embed_query(query_text)
         query_set = QuerySet(Embedding).filter(dataset_id__in=dataset_id_list, is_active=True)
+        if exclude_document_id_list is not None and len(exclude_document_id_list) > 0:
+            exclude_dict.__setitem__('document_id__in', exclude_document_id_list)
+        query_set = query_set.exclude(**exclude_dict)
         exec_sql, exec_params = generate_sql_by_query_dict({'embedding_query': query_set},
                                                            select_string=get_file_content(
                                                                os.path.join(PROJECT_DIR, "apps", "embedding", 'sql',

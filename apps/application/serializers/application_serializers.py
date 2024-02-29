@@ -27,7 +27,7 @@ from common.db.search import get_dynamics_model, native_search, native_page_sear
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404
 from common.util.file_util import get_file_content
-from dataset.models import DataSet
+from dataset.models import DataSet, Document
 from dataset.serializers.common_serializers import list_paragraph
 from setting.models import AuthOperate
 from setting.models.model_management import Model
@@ -215,10 +215,16 @@ class ApplicationSerializer(serializers.Serializer):
         def hit_test(self):
             self.is_valid()
             vector = VectorStore.get_embedding_vector()
+            dataset_id_list = [ad.dataset_id for ad in
+                               QuerySet(ApplicationDatasetMapping).filter(
+                                   application_id=self.data.get('id'))]
+
+            exclude_document_id_list = [str(document.id) for document in
+                                        QuerySet(Document).filter(
+                                            dataset_id__in=dataset_id_list,
+                                            is_active=False)]
             # 向量库检索
-            hit_list = vector.hit_test(self.data.get('query_text'), [ad.dataset_id for ad in
-                                                                     QuerySet(ApplicationDatasetMapping).filter(
-                                                                         application_id=self.data.get('id'))],
+            hit_list = vector.hit_test(self.data.get('query_text'), dataset_id_list, exclude_document_id_list,
                                        self.data.get('top_number'),
                                        self.data.get('similarity'),
                                        EmbeddingModel.get_embedding_model())
@@ -377,7 +383,8 @@ class ApplicationSerializer(serializers.Serializer):
             application = QuerySet(Application).get(id=self.data.get("application_id"))
             return select_list(get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'list_application_dataset.sql')),
-                [self.data.get('user_id') if self.data.get('user_id')==str(application.user_id) else None, application.user_id, self.data.get('user_id')])
+                [self.data.get('user_id') if self.data.get('user_id') == str(application.user_id) else None,
+                 application.user_id, self.data.get('user_id')])
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:

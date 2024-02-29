@@ -118,7 +118,8 @@ class BaseVectorStore(ABC):
         pass
 
     @abstractmethod
-    def hit_test(self, query_text, dataset_id: list[str], top_number: int, similarity: float,
+    def hit_test(self, query_text, dataset_id: list[str], exclude_document_id_list: list[str], top_number: int,
+                 similarity: float,
                  embedding: HuggingFaceEmbeddings):
         pass
 
