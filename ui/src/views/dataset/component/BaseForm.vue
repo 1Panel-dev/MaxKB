@@ -31,6 +31,7 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import type { datasetData } from '@/api/type/dataset'
 import { isAllPropertiesEmpty } from '@/utils/utils'
@@ -41,6 +42,11 @@ const props = defineProps({
     default: () => {}
   }
 })
+const route = useRoute()
+const {
+  params: { type }
+} = route
+const isCreate = type === 'create'
 const { dataset } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
 const form = ref<datasetData>({
@@ -57,6 +63,7 @@ const FormRef = ref()
 watch(
   () => props.data,
   (value) => {
+    console.log(value)
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
       form.value.desc = value.desc
@@ -71,7 +78,9 @@ watch(form.value, (value) => {
   if (isAllPropertiesEmpty(value)) {
     dataset.saveBaseInfo(null)
   } else {
-    dataset.saveBaseInfo(value)
+    if (isCreate) {
+      dataset.saveBaseInfo(value)
+    }
   }
 })
 
