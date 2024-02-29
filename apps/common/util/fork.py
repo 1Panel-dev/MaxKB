@@ -77,8 +77,8 @@ class Fork:
         if self.selector_list is None or len(self.selector_list) == 0:
             return str(bf)
         params = reduce(lambda x, y: {**x, **y},
-                        [{'class_': selector.replace('.', '')} if selector.startswith('.') else {
-                            'id': selector.replace("#", "") if selector.startswith("#") else {'name': selector}} for
+                        [{'class_': selector.replace('.', '')} if selector.startswith('.') else
+                         {'id': selector.replace("#", "")} if selector.startswith("#") else {'name': selector} for
                          selector in
                          self.selector_list], {})
         f = bf.find_all(**params)
