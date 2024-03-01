@@ -17,6 +17,8 @@
         :auto-upload="false"
         :show-file-list="false"
         accept=".txt, .md"
+        limit="50"
+        :on-exceed="onExceed"
       >
         <img src="@/assets/upload-icon.svg" alt="" />
         <div class="el-upload__text">
@@ -77,6 +79,9 @@ function deleteFlie(index: number) {
   form.value.fileList.splice(index, 1)
 }
 
+const onExceed = () => {
+  MsgError('每次最多上传50个文件')
+}
 /*
   表单校验
 */
@@ -86,6 +91,7 @@ function validate() {
     return valid
   })
 }
+
 onMounted(() => {
   if (documentsFiles.value) {
     form.value.fileList = documentsFiles.value
