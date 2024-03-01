@@ -21,7 +21,7 @@ class Result(JsonResponse):
 
     def __init__(self, code=200, message="成功", data=None, response_status=status.HTTP_200_OK, **kwargs):
         back_info_dict = {"code": code, "message": message, 'data': data}
-        super().__init__(data=back_info_dict, status=response_status)
+        super().__init__(data=back_info_dict, status=response_status, **kwargs)
 
 
 def get_page_request_params(other_request_params=None):
@@ -147,13 +147,13 @@ def get_api_array_response(response_data_schema: openapi.Schema):
                                                               )})
 
 
-def success(data):
+def success(data, **kwargs):
     """
     获取一个成功的响应对象
     :param data: 接口响应数据
     :return: 请求响应对象
     """
-    return Result(data=data)
+    return Result(data=data, **kwargs)
 
 
 def error(message):

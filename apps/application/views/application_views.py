@@ -6,7 +6,7 @@
     @date：2023/10/27 14:56
     @desc:
 """
-
+from django.http import HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -147,6 +147,12 @@ class Application(APIView):
                 ApplicationSerializer.AccessTokenSerializer(data={'application_id': application_id}).one())
 
     class Authentication(APIView):
+        @action(methods=['OPTIONS'], detail=False)
+        def options(self, request, *args, **kwargs):
+            return HttpResponse(headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
+                                         "Access-Control-Allow-Methods": "POST",
+                                         "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}, )
+
         @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary="应用认证",
                              operation_id="应用认证",
@@ -154,8 +160,14 @@ class Application(APIView):
                              tags=["应用/认证"],
                              security=[])
         def post(self, request: Request):
-            return result.success(
-                ApplicationSerializer.Authentication(data={'access_token': request.data.get("access_token")}).auth())
+            response = result.success(
+                ApplicationSerializer.Authentication(data={'access_token': request.data.get("access_token")}).auth(),
+                headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
+                         "Access-Control-Allow-Methods": "POST",
+                         "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}
+            )
+
+            return response
 
     @action(methods=['POST'], detail=False)
     @swagger_auto_schema(operation_summary="创建应用",
