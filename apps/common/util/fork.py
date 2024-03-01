@@ -126,8 +126,13 @@ class Fork:
 
     def fork(self):
         try:
+
+            headers = {
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36'
+            }
+
             logging.getLogger("max_kb").info(f'fork:{self.base_fork_url}')
-            response = requests.get(self.base_fork_url, verify=False)
+            response = requests.get(self.base_fork_url, verify=False, headers=headers)
             if response.status_code != 200:
                 logging.getLogger("max_kb").error(f"url: {self.base_fork_url} code:{response.status_code}")
                 return Fork.Response.error(f"url: {self.base_fork_url} code:{response.status_code}")
