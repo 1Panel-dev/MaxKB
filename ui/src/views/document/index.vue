@@ -163,7 +163,7 @@ import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 const router = useRouter()
 const route = useRoute()
@@ -336,10 +336,15 @@ function changeState(bool: Boolean, row: any) {
 }
 
 function editName(val: string) {
-  const obj = {
-    name: val
+  console.log()
+  if (val) {
+    const obj = {
+      name: val
+    }
+    currentMouseId.value && updateData(currentMouseId.value, obj, '修改成功')
+  } else {
+    MsgError('文件名称不能为空！')
   }
-  currentMouseId.value && updateData(currentMouseId.value, obj, '修改成功')
 }
 
 function cellMouseEnter(row: any) {

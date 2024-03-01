@@ -309,3 +309,8 @@
 .el-radio__input.is-checked + .el-radio__label {
   color: var(--app-text-color);
 }
+
+.el-input-number .el-input__wrapper {
+  padding-left: 15px !important;;
+  padding-right: 42px !important;;
+}

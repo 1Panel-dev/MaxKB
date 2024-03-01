@@ -44,28 +44,7 @@
                   show-word-limit
                 />
               </el-form-item>
-              <el-form-item label="提示词" prop="model_setting.prompt">
-                <template #label>
-                  <div class="flex align-center">
-                    <div class="flex-between mr-4">
-                      <span>提示词 <span class="danger">*</span></span>
-                    </div>
-                    <el-tooltip effect="dark" placement="right">
-                      <template #content
-                        >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。<br />可以使用变量：{data}
-                        是携带知识库中已知信息；{question}是用户提出的问题。</template
-                      >
-                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                    </el-tooltip>
-                  </div>
-                </template>
-                <el-input
-                  v-model="applicationForm.model_setting.prompt"
-                  :rows="6"
-                  type="textarea"
-                  :placeholder="defaultPrompt"
-                />
-              </el-form-item>
+
               <el-form-item label="AI 模型" prop="model_id">
                 <template #label>
                   <div class="flex-between">
@@ -111,7 +90,28 @@
                   </template>
                 </el-select>
               </el-form-item>
-
+              <el-form-item label="提示词" prop="model_setting.prompt">
+                <template #label>
+                  <div class="flex align-center">
+                    <div class="flex-between mr-4">
+                      <span>提示词 <span class="danger">*</span></span>
+                    </div>
+                    <el-tooltip effect="dark" placement="right">
+                      <template #content
+                        >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。<br />可以使用变量：{data}
+                        是携带知识库中已知信息；{question}是用户提出的问题。</template
+                      >
+                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                    </el-tooltip>
+                  </div>
+                </template>
+                <el-input
+                  v-model="applicationForm.model_setting.prompt"
+                  :rows="6"
+                  type="textarea"
+                  :placeholder="defaultPrompt"
+                />
+              </el-form-item>
               <el-form-item label="多轮对话" @click.prevent>
                 <el-switch
                   size="small"
@@ -123,16 +123,17 @@
                   <div class="flex-between">
                     <span>关联知识库</span>
                     <div>
-                      <el-popover :visible="popoverVisible" :width="280" trigger="click">
+                      <el-popover :visible="popoverVisible" :width="214" trigger="click">
                         <template #reference>
                           <el-button type="primary" link @click="datasetSettingChange('open')"
-                            ><AppIcon iconName="app-operation" class="mr-4"></AppIcon>参数设置</el-button
+                            ><AppIcon iconName="app-operation" class="mr-4"></AppIcon
+                            >参数设置</el-button
                           >
                         </template>
                         <div class="dataset_setting">
                           <div class="form-item mb-16">
                             <div class="title flex align-center mb-8">
-                              <span style="margin-right: 4px">相似度</span>
+                              <span style="margin-right: 4px">相似度高于</span>
                               <el-tooltip
                                 effect="dark"
                                 content="相似度越高相关性越强。"
@@ -142,7 +143,6 @@
                               </el-tooltip>
                             </div>
                             <div @click.stop>
-                              高于
                               <el-input-number
                                 v-model="dataset_setting.similarity"
                                 :min="0"
@@ -150,24 +150,20 @@
                                 :precision="3"
                                 :step="0.1"
                                 controls-position="right"
-                                style="width: 100px"
-                                size="small"
+                                style="width: 180px"
                               />
                             </div>
                           </div>
                           <div class="form-item mb-16">
-                            <div class="title mb-8">引用分段数</div>
+                            <div class="title mb-8">引用分段数 TOP</div>
                             <div @click.stop>
-                              TOP
                               <el-input-number
                                 v-model="dataset_setting.top_n"
                                 :min="1"
                                 :max="10"
                                 controls-position="right"
-                                style="width: 100px"
-                                size="small"
+                                style="width: 180px"
                               />
-                              个分段
                             </div>
                           </div>
 
@@ -180,11 +176,9 @@
                                 :show-input-controls="false"
                                 :min="500"
                                 :max="10000"
-                                style="width: 200px"
-                                size="small"
+                                style="width: 180px"
                                 class="custom-slider"
                               />
-                              <span class="ml-4">个字符</span>
                             </div>
                           </div>
                         </div>

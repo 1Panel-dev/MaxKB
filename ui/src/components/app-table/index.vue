@@ -40,6 +40,7 @@
 </template>
 <script setup lang="ts">
 import { ref, nextTick, watch, computed, onMounted } from 'vue'
+import { MsgError } from '@/utils/message'
 defineOptions({ name: 'AppTable' })
 
 const props = defineProps({
@@ -72,12 +73,16 @@ watch(showInput, (bool) => {
 })
 
 function submitHandle() {
-  loading.value = true
-  emit('creatQuick', inputValue.value)
-  setTimeout(() => {
-    showInput.value = false
-    loading.value = false
-  }, 200)
+  if (inputValue.value) {
+    loading.value = true
+    emit('creatQuick', inputValue.value)
+    setTimeout(() => {
+      showInput.value = false
+      loading.value = false
+    }, 200)
+  } else {
+    MsgError('文件名称不能为空！')
+  }
 }
 
 function quickCreateHandel() {
