@@ -75,35 +75,33 @@
       <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     </LayoutContainer>
     <div class="hit-test__operate p-24 pt-0">
-      <el-popover :visible="popoverVisible" placement="right-end" :width="225" trigger="click">
+      <el-popover :visible="popoverVisible" placement="right-end" :width="180" trigger="click">
         <template #reference>
           <el-button icon="Setting" class="mb-8" @click="settingChange('open')">参数设置</el-button>
         </template>
 
         <div class="mb-16">
-          相似度高于
+          <div class="title mb-8">相似度高于</div>
           <el-input-number
-            size="small"
             v-model="cloneForm.similarity"
             :min="0"
             :max="1"
             :precision="3"
             :step="0.1"
             controls-position="right"
-            style="width: 100px"
+            style="width: 145px"
           />
         </div>
         <div class="mb-16">
-          返回 Top
+          <div class="title mb-8">返回分段数 Top</div>
+
           <el-input-number
-            size="small"
             v-model="cloneForm.top_number"
             :min="1"
             :max="10"
             controls-position="right"
-            style="width: 80px"
+            style="width: 145px"
           />
-          个分段
         </div>
         <div class="text-right">
           <el-button @click="popoverVisible = false">取消</el-button>
