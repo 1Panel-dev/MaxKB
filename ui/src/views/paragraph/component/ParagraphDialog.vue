@@ -21,7 +21,7 @@
           </div>
         </el-scrollbar>
         <div class="text-right p-24 pt-0" v-if="problemId && isEdit">
-          <el-button @click.prevent="isEdit = false"> 取消 </el-button>
+          <el-button @click.prevent="cancelEdit"> 取消 </el-button>
           <el-button type="primary" :disabled="loading" @click="submitHandle"> 保存 </el-button>
         </div>
       </el-col>
@@ -46,6 +46,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
+import { cloneDeep } from 'lodash'
 import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 import ProblemComponent from '@/views/paragraph/component/ProblemComponent.vue'
 import paragraphApi from '@/api/paragraph'
@@ -75,6 +76,7 @@ const detail = ref<any>({})
 const isEdit = ref(false)
 const document_id = ref('')
 const dataset_id = ref('')
+const cloneData = ref(null)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -83,13 +85,20 @@ watch(dialogVisible, (bool) => {
     isEdit.value = false
     document_id.value = ''
     dataset_id.value = ''
+    cloneData.value = null
   }
 })
+
+const cancelEdit = () => {
+  isEdit.value = false
+  detail.value = cloneDeep(cloneData.value)
+}
 
 const open = (data: any) => {
   if (data) {
     detail.value.title = data.title
     detail.value.content = data.content
+    cloneData.value = cloneDeep(detail.value)
     problemId.value = data.id
     document_id.value = data.document_id
     dataset_id.value = data.dataset_id || id

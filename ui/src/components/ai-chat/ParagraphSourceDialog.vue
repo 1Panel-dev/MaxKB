@@ -63,6 +63,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { cloneDeep } from 'lodash'
+import { arraySort } from '@/utils/utils'
 const emit = defineEmits(['refresh'])
 
 const ParagraphDialogRef = ref()
@@ -80,6 +81,7 @@ const open = (data: any, id?: string) => {
   detail.value.paragraph_list = id
     ? detail.value.paragraph_list.filter((v: any) => v.dataset_id === id)
     : detail.value.paragraph_list
+  detail.value.paragraph_list = arraySort(detail.value.paragraph_list, 'similarity', true)
   dialogVisible.value = true
 }
 
