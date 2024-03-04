@@ -7,7 +7,7 @@
           <el-button text @click="isEdit = true" v-if="!isEdit">
             <el-icon><EditPen /></el-icon>
           </el-button>
-          <el-button text style="margin-left: 4px" @click="deleteParagraph">
+          <el-button text style="margin-left: 4px" @click="deleteMark">
             <el-icon><Delete /></el-icon>
           </el-button>
           <el-divider direction="vertical" />
@@ -74,6 +74,7 @@ const loading = ref(false)
 
 const form = ref<any>({})
 const isEdit = ref(false)
+const detail = ref<any>({})
 
 const rules = reactive<FormRules>({
   content: [{ required: true, message: '请输入内容', trigger: 'blur' }]
@@ -86,9 +87,17 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-function deleteParagraph() {
-  paragraph
-    .asyncDelParagraph(form.value.dataset, form.value.document, form.value.id, loading)
+function deleteMark() {
+  logApi
+    .delMarkRecord(
+      id as string,
+      detail.value.chat_id,
+      detail.value.id,
+      form.value.dataset,
+      form.value.document,
+      form.value.id,
+      loading
+    )
     .then(() => {
       emit('refresh')
       MsgSuccess('删除成功')
@@ -105,6 +114,7 @@ function getMark(data: any) {
 }
 
 const open = (data: any) => {
+  detail.value = data
   getMark(data)
   dialogVisible.value = true
 }
