@@ -243,7 +243,7 @@ class Application(APIView):
                              tags=['应用'])
         @has_permissions(ViewPermission(
             [RoleConstants.ADMIN, RoleConstants.USER],
-            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
         def put(self, request: Request, application_id: str):
