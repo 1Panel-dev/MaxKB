@@ -57,6 +57,7 @@
                         controls-position="right"
                         style="width: 70px"
                         size="small"
+                        step-strictly
                       />
                     </div>
                   </div>
@@ -70,6 +71,7 @@
                         controls-position="right"
                         style="width: 70px"
                         size="small"
+                        step-strictly
                       />
                     </div>
                   </div>
