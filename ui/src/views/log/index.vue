@@ -33,12 +33,12 @@
         <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
         <el-table-column prop="star_num" align="right">
           <template #header>
-            <div class="flex align-center">
+            <div>
               <span>用户反馈</span>
               <el-popover :width="160" trigger="click" :visible="popoverVisible">
                 <template #reference>
                   <el-button
-                  style="margin-top: -2px;"
+                    style="margin-top: -2px"
                     :type="filter.min_star || filter.min_trample ? 'primary' : ''"
                     link
                     @click="popoverVisible = !popoverVisible"
@@ -102,7 +102,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="70" align="center">
+        <el-table-column label="操作" width="70" align="left">
           <template #default="{ row }">
             <el-tooltip effect="dark" content="删除" placement="top">
               <el-button type="primary" text @click.stop="deleteLog(row)">

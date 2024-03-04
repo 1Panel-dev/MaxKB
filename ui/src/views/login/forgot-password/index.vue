@@ -109,6 +109,8 @@ const sendEmail = () => {
     if (v) {
       UserApi.sendEmit(CheckEmailForm.value.email, 'reset_password', loading).then(() => {
         MsgSuccess('发送验证码成功')
+        isDisabled.value = true
+        handleTimeChange()
       })
     }
   })

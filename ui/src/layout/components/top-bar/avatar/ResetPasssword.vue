@@ -41,8 +41,13 @@
         <div class="flex-between w-full">
           <el-input class="code-input" v-model="resetPasswordForm.code" placeholder="请输入验证码">
           </el-input>
-          <el-button class="send-email-button ml-8" @click="sendEmail" :loading="loading"
-            >获取验证码</el-button
+          <el-button
+            :disabled="isDisabled"
+            class="send-email-button ml-8"
+            @click="sendEmail"
+            :loading="loading"
+          >
+            {{ isDisabled ? `重新发送（${time}s）` : '获取验证码' }}</el-button
           >
         </div>
       </el-form-item>
@@ -77,6 +82,8 @@ const resetPasswordForm = ref<ResetCurrentUserPasswordRequest>({
 const resetPasswordFormRef = ref<FormInstance>()
 
 const loading = ref<boolean>(false)
+const isDisabled = ref<boolean>(false)
+const time = ref<number>(60)
 
 const rules = ref<FormRules<ResetCurrentUserPasswordRequest>>({
   code: [{ required: true, message: '请输入验证码' }],
@@ -123,7 +130,21 @@ const rules = ref<FormRules<ResetCurrentUserPasswordRequest>>({
 const sendEmail = () => {
   UserApi.sendEmailToCurrent(loading).then(() => {
     MsgSuccess('发送验证码成功')
+    isDisabled.value = true
+    handleTimeChange()
   })
+}
+
+const handleTimeChange = () => {
+  if (time.value <= 0) {
+    isDisabled.value = false
+    time.value = 60
+  } else {
+    setTimeout(() => {
+      time.value--
+      handleTimeChange()
+    }, 1000)
+  }
 }
 
 const open = () => {

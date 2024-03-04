@@ -93,7 +93,7 @@
           />
         </div>
         <div class="mb-16">
-          <div class="title mb-8">返回分段数 Top</div>
+          <div class="title mb-8">返回分段数 TOP</div>
 
           <el-input-number
             v-model="cloneForm.top_number"
