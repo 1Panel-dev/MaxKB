@@ -9,6 +9,8 @@ import html2text as ht
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse, ParseResult, urlsplit, parse_qs
 
+from common.exception.app_exception import AppApiException
+
 requests.packages.urllib3.disable_warnings()
 
 
