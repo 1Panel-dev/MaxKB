@@ -54,9 +54,10 @@ class ParagraphInstanceSerializer(ApiMixin, serializers.Serializer):
             type=openapi.TYPE_OBJECT,
             required=['content'],
             properties={
-                'content': openapi.Schema(type=openapi.TYPE_STRING, title="分段内容", description="分段内容"),
+                'content': openapi.Schema(type=openapi.TYPE_STRING, max_length=4096, title="分段内容",
+                                          description="分段内容"),
 
-                'title': openapi.Schema(type=openapi.TYPE_STRING, title="分段标题",
+                'title': openapi.Schema(type=openapi.TYPE_STRING, max_length=256, title="分段标题",
                                         description="分段标题"),
 
                 'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
@@ -69,6 +70,11 @@ class ParagraphInstanceSerializer(ApiMixin, serializers.Serializer):
 
 
 class ParagraphSerializers(ApiMixin, serializers.Serializer):
+    title = serializers.CharField(required=False, max_length=256, error_messages=ErrMessage.char(
+        "分段标题"), allow_null=True, allow_blank=True)
+    content = serializers.CharField(required=True, max_length=4096, error_messages=ErrMessage.char(
+        "分段内容"))
+
     class Operate(ApiMixin, serializers.Serializer):
         # 段落id
         paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
