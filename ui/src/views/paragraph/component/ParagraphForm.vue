@@ -61,6 +61,17 @@ watch(
     immediate: true
   }
 )
+watch(
+  () => props.isEdit,
+  (value) => {
+    if (!value) {
+      paragraphFormRef.value?.clearValidate()
+    }
+  },
+  {
+    immediate: true
+  }
+)
 
 /*
   表单校验
