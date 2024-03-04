@@ -77,7 +77,7 @@ class DatasetSettingSerializer(serializers.Serializer):
 
 
 class ModelSettingSerializer(serializers.Serializer):
-    prompt = serializers.CharField(required=True, max_length=4096, error_messages=ErrMessage.char("提示词"))
+    prompt = serializers.CharField(required=True, max_length=2048, error_messages=ErrMessage.char("提示词"))
 
 
 class ApplicationSerializer(serializers.Serializer):
@@ -87,7 +87,7 @@ class ApplicationSerializer(serializers.Serializer):
                                  error_messages=ErrMessage.char("应用描述"))
     model_id = serializers.CharField(required=True, error_messages=ErrMessage.char("模型"))
     multiple_rounds_dialogue = serializers.BooleanField(required=True, error_messages=ErrMessage.char("多轮对话"))
-    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=1024,
                                      error_messages=ErrMessage.char("开场白"))
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                  allow_null=True, error_messages=ErrMessage.list("关联知识库"))
@@ -168,17 +168,17 @@ class ApplicationSerializer(serializers.Serializer):
         model_id = serializers.CharField(required=False, error_messages=ErrMessage.char("模型"))
         multiple_rounds_dialogue = serializers.BooleanField(required=False,
                                                             error_messages=ErrMessage.boolean("多轮会话"))
-        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=1024,
                                          error_messages=ErrMessage.char("开场白"))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                      error_messages=ErrMessage.list("关联知识库")
                                                      )
         # 数据集相关设置
-        dataset_setting = serializers.JSONField(required=False, allow_null=True,
-                                                error_messages=ErrMessage.json("数据集设置"))
+        dataset_setting = DatasetSettingSerializer(required=False, allow_null=True,
+                                                   error_messages=ErrMessage.json("数据集设置"))
         # 模型相关设置
-        model_setting = serializers.JSONField(required=False, allow_null=True,
-                                              error_messages=ErrMessage.json("模型设置"))
+        model_setting = ModelSettingSerializer(required=False, allow_null=True,
+                                               error_messages=ErrMessage.json("模型设置"))
         # 问题补全
         problem_optimization = serializers.BooleanField(required=False, allow_null=True,
                                                         error_messages=ErrMessage.boolean("问题补全"))
