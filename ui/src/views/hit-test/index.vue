@@ -42,7 +42,8 @@
                   @click="editParagraph(item)"
                 >
                   <template #icon>
-                    <AppAvatar :name="index + 1 + ''" class="mr-12 avatar-light" :size="22" />
+                    <AppAvatar class="mr-12 avatar-light" :size="22">
+                      {{ index + 1 + '' }}</AppAvatar>
                   </template>
                   <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
                   <template #footer>

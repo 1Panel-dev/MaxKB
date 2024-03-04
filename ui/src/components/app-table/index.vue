@@ -7,7 +7,7 @@
             ref="quickInputRef"
             v-model="inputValue"
             placeholder="请输入文档名称"
-            class="w-240 mr-12"
+            class="w-500 mr-12"
             autofocus
           />
 
