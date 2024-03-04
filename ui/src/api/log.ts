@@ -117,6 +117,36 @@ const getMarkRecord: (
 }
 
 /**
+ * 删除标注
+ * @param 参数
+ * application_id, chart_id,  chart_record_id, dataset_id, document_id,paragraph_id
+ */
+const delMarkRecord: (
+  applicaiton_id: String,
+  chart_id: String,
+  chart_record_id: String,
+  dataset_id: String,
+  document_id: String,
+  paragraph_id: String,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (
+  applicaiton_id,
+  chart_id,
+  chart_record_id,
+  dataset_id,
+  document_id,
+  paragraph_id,
+  loading
+) => {
+  return del(
+    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${chart_record_id}/dataset/${dataset_id}/document_id/${document_id}/improve/${paragraph_id}`,
+    undefined,
+    {},
+    loading
+  )
+}
+
+/**
  * 获取对话记录详情
  * @param 参数
  * application_id, chart_id,  chart_record_id
@@ -140,5 +170,6 @@ export default {
   getChatRecordLog,
   putChatRecordLog,
   getMarkRecord,
-  getRecordDetail
+  getRecordDetail,
+  delMarkRecord
 }
