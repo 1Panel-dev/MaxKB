@@ -16,8 +16,8 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        accept=".txt, .md"
-        limit="50"
+        accept=".txt, .md, .csv, .log"
+        :limit="50"
         :on-exceed="onExceed"
       >
         <img src="@/assets/upload-icon.svg" alt="" />
