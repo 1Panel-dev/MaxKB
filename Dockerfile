@@ -9,7 +9,8 @@ FROM node:18-alpine3.18 as web-build
 COPY ui ui
 RUN cd ui && \
     npm install && \
-    npm run build
+    npm run build && \
+    rm -rf ./node_modules
 
 FROM python:3.11-slim
 
@@ -40,7 +41,5 @@ RUN pip3 install poetry
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 # 下载python依赖
 RUN pip3 install --no-cache-dir -r requirements.txt
-# 删除前端依赖
-RUN rm -rf ui/node_modules
 # 启动命令
 CMD ["bash","-c","python /opt/maxkb/app/main.py start"]
