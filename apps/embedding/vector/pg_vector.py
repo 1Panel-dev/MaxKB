@@ -64,6 +64,8 @@ class PGVector(BaseVectorStore):
     def hit_test(self, query_text, dataset_id_list: list[str], exclude_document_id_list: list[str], top_number: int,
                  similarity: float,
                  embedding: HuggingFaceEmbeddings):
+        if dataset_id_list is None or len(dataset_id_list) == 0:
+            return []
         exclude_dict = {}
         embedding_query = embedding.embed_query(query_text)
         query_set = QuerySet(Embedding).filter(dataset_id__in=dataset_id_list, is_active=True)
