@@ -251,13 +251,14 @@ class ChatView(APIView):
                 ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))],
-                               ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
-                                              [lambda r, keywords: Permission(group=Group.APPLICATION,
-                                                                              operate=Operate.MANAGE,
-                                                                              dynamic_tag=keywords.get(
-                                                                                  'dataset_id'))],
-                                              )
-                               ))
+
+                               ), ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                                                 [lambda r, keywords: Permission(group=Group.DATASET,
+                                                                                 operate=Operate.MANAGE,
+                                                                                 dynamic_tag=keywords.get(
+                                                                                     'dataset_id'))],
+                                                 compare=CompareConstants.AND
+                                                 ), compare=CompareConstants.AND)
             def put(self, request: Request, application_id: str, chat_id: str, chat_record_id: str, dataset_id: str,
                     document_id: str):
                 return result.success(ChatRecordSerializer.Improve(
