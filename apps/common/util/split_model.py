@@ -26,7 +26,7 @@ def get_level_block(text, level_content_list, level_content_index, cursor):
         level_content_list) else None
     start_index = text.index(start_content, cursor)
     end_index = text.index(next_content, start_index + 1) if next_content is not None else len(text)
-    return text[start_index:end_index].replace(level_content_list[level_content_index]['content'], ""), end_index
+    return text[start_index:end_index].lstrip(level_content_list[level_content_index]['content']), end_index
 
 
 def to_tree_obj(content, state='title'):
@@ -355,9 +355,9 @@ class SplitModel:
 
 
 default_split_pattern = {
-    'md': [re.compile('(?<!#)# (?!#).*'), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
-           re.compile("(?<!#)####(?!#).*"), re.compile("(?<!#)#####(?!#).*"),
-           re.compile("(?<!#)######(?!#).*")],
+    'md': [re.compile('(?<=^)# .*|(?<=\\n)# .*'), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
+           re.compile("(?<!#)#### (?!#).*"), re.compile("(?<!#)##### (?!#).*"),
+           re.compile("(?<!#)###### (?!#).*")],
     'default': [re.compile("(?<!\n)\n\n.+")]
 }
 
