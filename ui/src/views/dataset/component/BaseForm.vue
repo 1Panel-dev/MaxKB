@@ -21,7 +21,7 @@
         v-model="form.desc"
         type="textarea"
         placeholder="描述知识库的内容，详尽的描述将帮助AI能深入理解该知识库的内容，能更准确的检索到内容，提高该知识库的命中率。"
-        maxlength="500"
+        maxlength="256"
         show-word-limit
         :autosize="{ minRows: 3 }"
         @blur="form.desc = form.desc.trim()"

@@ -40,7 +40,7 @@
                   type="textarea"
                   placeholder="描述该应用的应用场景及用途，如：MaxKB 小助手回答用户提出的 MaxKB 产品使用问题"
                   :rows="3"
-                  maxlength="500"
+                  maxlength="256"
                   show-word-limit
                 />
               </el-form-item>
@@ -109,6 +109,7 @@
                   v-model="applicationForm.model_setting.prompt"
                   :rows="6"
                   type="textarea"
+                  maxlength="2048"
                   :placeholder="defaultPrompt"
                 />
               </el-form-item>
