@@ -34,7 +34,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
-        <el-button type="primary" @click="submit" :loading="loading"> 确定 </el-button>
+        <el-button type="primary" @click="submit(webFormRef)" :loading="loading"> 确定 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -42,6 +42,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import type { FormInstance, FormRules } from 'element-plus'
 import documentApi from '@/api/document'
 import { MsgSuccess } from '@/utils/message'
 
@@ -51,6 +52,7 @@ const {
 } = route as any
 
 const emit = defineEmits(['refresh'])
+const webFormRef = ref()
 const loading = ref<boolean>(false)
 const isImport = ref<boolean>(false)
 const form = ref<any>({
@@ -86,27 +88,34 @@ const open = (row: any) => {
   dialogVisible.value = true
 }
 
-const submit = () => {
-  if (isImport.value) {
-    const obj = {
-      source_url_list: form.value.source_url.split('\n'),
-      selector: form.value.selector
+const submit = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      if (isImport.value) {
+        const obj = {
+          source_url_list: form.value.source_url.split('\n'),
+          selector: form.value.selector
+        }
+        documentApi.postWebDocument(id, obj, loading).then((res: any) => {
+          MsgSuccess('导入成功')
+          emit('refresh')
+          dialogVisible.value = false
+        })
+      } else {
+        const obj = {
+          meta: form.value
+        }
+        documentApi.putDocument(id, documentId.value, obj, loading).then((res) => {
+          MsgSuccess('设置成功')
+          emit('refresh')
+          dialogVisible.value = false
+        })
+      }
+    } else {
+      console.log('error submit!', fields)
     }
-    documentApi.postWebDocument(id, obj, loading).then((res: any) => {
-      MsgSuccess('导入成功')
-      emit('refresh')
-      dialogVisible.value = false
-    })
-  } else {
-    const obj = {
-      meta: form.value
-    }
-    documentApi.putDocument(id, documentId.value, obj, loading).then((res) => {
-      MsgSuccess('设置成功')
-      emit('refresh')
-      dialogVisible.value = false
-    })
-  }
+  })
 }
 
 defineExpose({ open })

@@ -44,7 +44,7 @@
                   <template #icon>
                     <AppAvatar :name="index + 1 + ''" class="mr-12 avatar-light" :size="22" />
                   </template>
-                  <div class="active-button primary">{{ item.similarity.toFixed(3) }}</div>
+                  <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
                   <template #footer>
                     <div class="footer-content flex-between">
                       <el-text>
@@ -93,7 +93,7 @@
           />
         </div>
         <div class="mb-16">
-          <div class="title mb-8">返回分段数 Top</div>
+          <div class="title mb-8">返回分段数 TOP</div>
 
           <el-input-number
             v-model="cloneForm.top_number"
@@ -226,8 +226,9 @@ function getHitTestList() {
 
 function refresh(data: any) {
   if (data) {
-    const index = paragraphDetail.value.findIndex((v) => v.id === data.id)
-    paragraphDetail.value.splice(index, 1, data)
+    const obj = paragraphDetail.value.filter((v) => v.id === data.id)[0]
+    obj.content = data.content
+    obj.title = data.title
   } else {
     paragraphDetail.value = []
     getHitTestList()

@@ -24,7 +24,7 @@
           {{ datetimeFormat(row.create_time) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="80">
+      <el-table-column label="操作" align="left" width="80">
         <template #default="{ row }">
           <el-tooltip effect="dark" content="删除" placement="top">
             <el-button type="primary" text @click="deleteApiKey(row)">
