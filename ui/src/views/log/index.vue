@@ -35,7 +35,7 @@
           <template #header>
             <div>
               <span>用户反馈</span>
-              <el-popover :width="160" trigger="click" :visible="popoverVisible">
+              <el-popover :width="190" trigger="click" :visible="popoverVisible">
                 <template #reference>
                   <el-button
                     style="margin-top: -2px"
@@ -55,7 +55,7 @@
                         :min="0"
                         :step="1"
                         controls-position="right"
-                        style="width: 70px"
+                        style="width: 100px"
                         size="small"
                         step-strictly
                       />
@@ -69,7 +69,7 @@
                         :min="0"
                         :step="1"
                         controls-position="right"
-                        style="width: 70px"
+                        style="width: 100px"
                         size="small"
                         step-strictly
                       />
