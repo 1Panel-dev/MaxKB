@@ -93,12 +93,7 @@ model_dict = {
 
     'Qianfan-Chinese-Llama-2-7B': ModelInfo('Qianfan-Chinese-Llama-2-7B',
                                             '千帆团队在Llama-2-7b基础上的中文增强版本，在CMMLU、C-EVAL等中文知识库上表现优异。',
-                                            ModelTypeConst.LLM, win_xin_llm_model_credential),
-
-    'Qianfan-Chinese-Llama-2-13B': ModelInfo('Qianfan-Chinese-Llama-2-13B',
-                                             '千帆团队在Llama-2-13b基础上的中文增强版本，在CMMLU、C-EVAL等中文知识库上表现优异。',
-                                             ModelTypeConst.LLM, win_xin_llm_model_credential)
-
+                                            ModelTypeConst.LLM, win_xin_llm_model_credential)
 }
 
 
