@@ -9,7 +9,6 @@
 import uuid
 from typing import Dict
 
-from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet
 from drf_yasg import openapi
@@ -20,6 +19,7 @@ from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
+from common.util.field_message import ErrMessage
 from dataset.models import Paragraph, Problem, Document
 from dataset.serializers.common_serializers import update_document_char_length
 from dataset.serializers.problem_serializers import ProblemInstanceSerializer, ProblemSerializer
@@ -36,18 +36,17 @@ class ParagraphInstanceSerializer(ApiMixin, serializers.Serializer):
     """
     段落实例对象
     """
-    content = serializers.CharField(required=True, validators=[
-        validators.MaxLengthValidator(limit_value=4096,
-                                      message="段落在1-1024个字符之间"),
-        validators.MinLengthValidator(limit_value=1,
-                                      message="段落在1-1024个字符之间"),
-    ], allow_null=True, allow_blank=True)
+    content = serializers.CharField(required=True, error_messages=ErrMessage.char("段落内容"),
+                                    max_length=4096,
+                                    min_length=1,
+                                    allow_null=True, allow_blank=True)
 
-    title = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    title = serializers.CharField(required=False, error_messages=ErrMessage.char("段落标题"),
+                                  allow_null=True, allow_blank=True)
 
     problem_list = ProblemInstanceSerializer(required=False, many=True)
 
-    is_active = serializers.BooleanField(required=False)
+    is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char("段落是否可用"))
 
     @staticmethod
     def get_request_body_api():
@@ -72,11 +71,14 @@ class ParagraphInstanceSerializer(ApiMixin, serializers.Serializer):
 class ParagraphSerializers(ApiMixin, serializers.Serializer):
     class Operate(ApiMixin, serializers.Serializer):
         # 段落id
-        paragraph_id = serializers.UUIDField(required=True)
+        paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "段落id"))
         # 知识库id
-        dataset_id = serializers.UUIDField(required=True)
-        # 知识库id
-        document_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "知识库id"))
+        # 文档id
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "文档id"))
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
@@ -171,9 +173,11 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                       description="段落id")]
 
     class Create(ApiMixin, serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "知识库id"))
 
-        document_id = serializers.UUIDField(required=True)
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "文档id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -234,11 +238,14 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                     ]
 
     class Query(ApiMixin, serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "知识库id"))
 
-        document_id = serializers.UUIDField(required=True)
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "文档id"))
 
-        title = serializers.CharField(required=False)
+        title = serializers.CharField(required=False, error_messages=ErrMessage.char(
+            "段落标题"))
 
         content = serializers.CharField(required=False)
 

@@ -8,6 +8,7 @@
 """
 import logging
 import traceback
+from typing import Dict
 
 from rest_framework.exceptions import ValidationError, ErrorDetail, APIException
 from rest_framework.views import exception_handler
@@ -36,7 +37,7 @@ def to_result(key, args, parent_key=None):
 
     return result.Result(500 if isinstance(error_detail.code, str) else error_detail.code,
                          message=f"【{key if parent_key is None else parent_key + '.' + key}】为必填参数" if str(
-                             error_detail) == "This field is required." else f"【{key if parent_key is None else parent_key + '.' + key}】" + error_detail)
+                             error_detail) == "This field is required." else error_detail)
 
 
 def validation_error_to_result(exc: ValidationError):
@@ -46,14 +47,26 @@ def validation_error_to_result(exc: ValidationError):
     :return: 接口响应对象
     """
     try:
-        res = list(map(lambda key: to_result(key, args=exc.args),
-                       exc.args[0].keys() if len(exc.args) > 0 else []))
+        v = find_err_detail(exc.detail)
+        if v is None:
+            return result.error(str(exc.detail))
+        return result.error(str(v))
     except Exception as e:
         return result.error(str(exc.detail))
-    if len(res) > 0:
-        return res[0]
-    else:
-        return result.error("未知异常")
+
+
+def find_err_detail(exc_detail: Dict):
+    if isinstance(exc_detail, dict):
+        keys = exc_detail.keys()
+        for key in keys:
+            _value = exc_detail[key]
+            if isinstance(_value, list):
+                for v in _value:
+                    return v
+            elif isinstance(_value, ErrorDetail):
+                return _value
+            elif isinstance(_value, dict):
+                return find_err_detail(_value)
 
 
 def handle_exception(exc, context):

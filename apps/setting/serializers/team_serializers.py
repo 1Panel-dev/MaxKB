@@ -23,6 +23,7 @@ from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.response.result import get_api_response
+from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from setting.models import TeamMember, TeamMemberPermission
 from smartdoc.conf import PROJECT_DIR
@@ -49,8 +50,8 @@ def get_response_body_api():
 
 
 class TeamMemberPermissionOperate(ApiMixin, serializers.Serializer):
-    USE = serializers.BooleanField(required=True)
-    MANAGE = serializers.BooleanField(required=True)
+    USE = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("使用"))
+    MANAGE = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("管理"))
 
     def get_request_body_api(self):
         return openapi.Schema(type=openapi.TYPE_OBJECT,
@@ -68,8 +69,8 @@ class TeamMemberPermissionOperate(ApiMixin, serializers.Serializer):
 
 
 class UpdateTeamMemberItemPermissionSerializer(ApiMixin, serializers.Serializer):
-    target_id = serializers.CharField(required=True)
-    type = serializers.CharField(required=True)
+    target_id = serializers.CharField(required=True, error_messages=ErrMessage.char("目标id"))
+    type = serializers.CharField(required=True, error_messages=ErrMessage.char("目标类型"))
     operate = TeamMemberPermissionOperate(required=True, many=False)
 
     def get_request_body_api(self):
@@ -142,7 +143,7 @@ class UpdateTeamMemberPermissionSerializer(ApiMixin, serializers.Serializer):
 
 
 class TeamMemberSerializer(ApiMixin, serializers.Serializer):
-    team_id = serializers.UUIDField(required=True)
+    team_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("团队id"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -246,9 +247,9 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
 
     class Operate(ApiMixin, serializers.Serializer):
         # 团队 成员id
-        member_id = serializers.CharField(required=True)
+        member_id = serializers.CharField(required=True, error_messages=ErrMessage.char("成员id"))
         # 团队id
-        team_id = serializers.CharField(required=True)
+        team_id = serializers.CharField(required=True, error_messages=ErrMessage.char("团队id"))
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)

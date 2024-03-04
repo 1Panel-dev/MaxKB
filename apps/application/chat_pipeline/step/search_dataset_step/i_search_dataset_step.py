@@ -13,25 +13,31 @@ from rest_framework import serializers
 
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PiplineManage
+from common.util.field_message import ErrMessage
 from dataset.models import Paragraph
 
 
 class ISearchDatasetStep(IBaseChatPipelineStep):
     class InstanceSerializer(serializers.Serializer):
         # 原始问题文本
-        problem_text = serializers.CharField(required=True)
+        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.char("文档id"))
         # 系统补全问题文本
-        padding_problem_text = serializers.CharField(required=False)
+        padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.char("系统补全问题文本"))
         # 需要查询的数据集id列表
-        dataset_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True))
+        dataset_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
+                                                error_messages=ErrMessage.list("数据集id列表"))
         # 需要排除的文档id
-        exclude_document_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True))
+        exclude_document_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
+                                                         error_messages=ErrMessage.list("排除的文档id列表"))
         # 需要排除向量id
-        exclude_paragraph_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True))
+        exclude_paragraph_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
+                                                          error_messages=ErrMessage.list("排除向量id列表"))
         # 需要查询的条数
-        top_n = serializers.IntegerField(required=True)
+        top_n = serializers.IntegerField(required=True,
+                                         error_messages=ErrMessage.integer("引用分段数"))
         # 相似度 0-1之间
-        similarity = serializers.FloatField(required=True, max_value=1, min_value=0)
+        similarity = serializers.FloatField(required=True, max_value=1, min_value=0,
+                                            error_messages=ErrMessage.float("引用分段数"))
 
     def get_step_serializer(self, manage: PiplineManage) -> Type[InstanceSerializer]:
         return self.InstanceSerializer

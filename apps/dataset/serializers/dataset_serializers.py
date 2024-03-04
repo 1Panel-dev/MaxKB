@@ -30,6 +30,7 @@ from common.event import ListenerManagement, SyncWebDatasetArgs
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
+from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
@@ -67,9 +68,9 @@ class DataSetSerializers(serializers.ModelSerializer):
         fields = ['id', 'name', 'desc', 'meta', 'create_time', 'update_time']
 
     class Application(ApiMixin, serializers.Serializer):
-        user_id = serializers.UUIDField(required=True)
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("用户id"))
 
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("数据集id"))
 
         @staticmethod
         def get_request_params_api():
@@ -113,20 +114,15 @@ class DataSetSerializers(serializers.ModelSerializer):
         查询对象
         """
         name = serializers.CharField(required=False,
-                                     validators=[
-                                         validators.MaxLengthValidator(limit_value=20,
-                                                                       message="知识库名称在1-20个字符之间"),
-                                         validators.MinLengthValidator(limit_value=1,
-                                                                       message="知识库名称在1-20个字符之间")
-                                     ])
+                                     error_messages=ErrMessage.char("知识库名称"),
+                                     max_length=64,
+                                     min_length=1)
 
         desc = serializers.CharField(required=False,
-                                     validators=[
-                                         validators.MaxLengthValidator(limit_value=256,
-                                                                       message="知识库名称在1-256个字符之间"),
-                                         validators.MinLengthValidator(limit_value=1,
-                                                                       message="知识库名称在1-256个字符之间")
-                                     ])
+                                     error_messages=ErrMessage.char("知识库描述"),
+                                     max_length=256,
+                                     min_length=1,
+                                     )
 
         user_id = serializers.CharField(required=True)
 
@@ -191,27 +187,21 @@ class DataSetSerializers(serializers.ModelSerializer):
             return DataSetSerializers.Operate.get_response_body_api()
 
     class Create(ApiMixin, serializers.Serializer):
-        user_id = serializers.UUIDField(required=True)
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("用户id"), )
 
         class CreateBaseSerializers(ApiMixin, serializers.Serializer):
             """
             创建通用数据集序列化对象
             """
             name = serializers.CharField(required=True,
-                                         validators=[
-                                             validators.MaxLengthValidator(limit_value=20,
-                                                                           message="知识库名称在1-20个字符之间"),
-                                             validators.MinLengthValidator(limit_value=1,
-                                                                           message="知识库名称在1-20个字符之间")
-                                         ])
+                                         error_messages=ErrMessage.char("知识库名称"),
+                                         max_length=64,
+                                         min_length=1)
 
             desc = serializers.CharField(required=True,
-                                         validators=[
-                                             validators.MaxLengthValidator(limit_value=256,
-                                                                           message="知识库名称在1-256个字符之间"),
-                                             validators.MinLengthValidator(limit_value=1,
-                                                                           message="知识库名称在1-256个字符之间")
-                                         ])
+                                         error_messages=ErrMessage.char("知识库描述"),
+                                         max_length=256,
+                                         min_length=1)
 
             documents = DocumentInstanceSerializer(required=False, many=True)
 
@@ -224,23 +214,18 @@ class DataSetSerializers(serializers.ModelSerializer):
             创建web站点序列化对象
             """
             name = serializers.CharField(required=True,
-                                         validators=[
-                                             validators.MaxLengthValidator(limit_value=20,
-                                                                           message="知识库名称在1-20个字符之间"),
-                                             validators.MinLengthValidator(limit_value=1,
-                                                                           message="知识库名称在1-20个字符之间")
-                                         ])
+                                         error_messages=ErrMessage.char("知识库名称"),
+                                         max_length=64,
+                                         min_length=1)
 
             desc = serializers.CharField(required=True,
-                                         validators=[
-                                             validators.MaxLengthValidator(limit_value=256,
-                                                                           message="知识库名称在1-256个字符之间"),
-                                             validators.MinLengthValidator(limit_value=1,
-                                                                           message="知识库名称在1-256个字符之间")
-                                         ])
-            source_url = serializers.CharField(required=True)
+                                         error_messages=ErrMessage.char("知识库描述"),
+                                         max_length=256,
+                                         min_length=1)
+            source_url = serializers.CharField(required=True, error_messages=ErrMessage.char("Web 根地址"), )
 
-            selector = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+            selector = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                             error_messages=ErrMessage.char("选择器"))
 
             def is_valid(self, *, raise_exception=False):
                 super().is_valid(raise_exception=True)
@@ -426,10 +411,15 @@ class DataSetSerializers(serializers.ModelSerializer):
             )
 
     class Edit(serializers.Serializer):
-        name = serializers.CharField(required=False)
-        desc = serializers.CharField(required=False)
+        name = serializers.CharField(required=False, max_length=64, min_length=1,
+                                     error_messages=ErrMessage.char("知识库名称"))
+        desc = serializers.CharField(required=False, max_length=256, min_length=1,
+                                     error_messages=ErrMessage.char("知识库描述"))
         meta = serializers.DictField(required=False)
-        application_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
+        application_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True,
+                                                                                                     error_messages=ErrMessage.char(
+                                                                                                         "应用id")),
+                                                         error_messages=ErrMessage.char("应用列表"))
 
         @staticmethod
         def get_dataset_meta_valid_map():
@@ -447,11 +437,13 @@ class DataSetSerializers(serializers.ModelSerializer):
                 valid_class(data=self.data.get('meta')).is_valid(raise_exception=True)
 
     class HitTest(ApiMixin, serializers.Serializer):
-        id = serializers.CharField(required=True)
-        user_id = serializers.UUIDField(required=False)
-        query_text = serializers.CharField(required=True)
-        top_number = serializers.IntegerField(required=True, max_value=10, min_value=1)
-        similarity = serializers.FloatField(required=True, max_value=1, min_value=0)
+        id = serializers.CharField(required=True, error_messages=ErrMessage.char("id"))
+        user_id = serializers.UUIDField(required=False, error_messages=ErrMessage.char("用户id"))
+        query_text = serializers.CharField(required=True, error_messages=ErrMessage.char("查询文本"))
+        top_number = serializers.IntegerField(required=True, max_value=10, min_value=1,
+                                              error_messages=ErrMessage.char("响应Top"))
+        similarity = serializers.FloatField(required=True, max_value=1, min_value=0,
+                                            error_messages=ErrMessage.char("相似度"))
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
@@ -476,11 +468,14 @@ class DataSetSerializers(serializers.ModelSerializer):
                      'comprehensive_score': hit_dict.get(p.get('id')).get('comprehensive_score')} for p in p_list]
 
     class SyncWeb(ApiMixin, serializers.Serializer):
-        id = serializers.CharField(required=True)
-        user_id = serializers.UUIDField(required=False)
-        sync_type = serializers.CharField(required=True, validators=[
+        id = serializers.CharField(required=True, error_messages=ErrMessage.char(
+            "知识库id"))
+        user_id = serializers.UUIDField(required=False, error_messages=ErrMessage.char(
+            "用户id"))
+        sync_type = serializers.CharField(required=True, error_messages=ErrMessage.char(
+            "同步类型"), validators=[
             validators.RegexValidator(regex=re.compile("^replace|complete$"),
-                                      message="replace|complete", code=500)
+                                      message="同步类型只支持:replace|complete", code=500)
         ])
 
         def is_valid(self, *, raise_exception=False):
@@ -565,8 +560,10 @@ class DataSetSerializers(serializers.ModelSerializer):
                     ]
 
     class Operate(ApiMixin, serializers.Serializer):
-        id = serializers.CharField(required=True)
-        user_id = serializers.UUIDField(required=False)
+        id = serializers.CharField(required=True, error_messages=ErrMessage.char(
+            "知识库id"))
+        user_id = serializers.UUIDField(required=False, error_messages=ErrMessage.char(
+            "用户id"))
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)

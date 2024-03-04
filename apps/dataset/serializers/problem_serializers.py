@@ -17,6 +17,7 @@ from rest_framework import serializers
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
+from common.util.field_message import ErrMessage
 from dataset.models import Problem, Paragraph
 from embedding.models import SourceType
 from embedding.vector.pg_vector import PGVector
@@ -30,9 +31,9 @@ class ProblemSerializer(serializers.ModelSerializer):
 
 
 class ProblemInstanceSerializer(ApiMixin, serializers.Serializer):
-    id = serializers.CharField(required=False)
+    id = serializers.CharField(required=False, error_messages=ErrMessage.char("问题id"))
 
-    content = serializers.CharField(required=True)
+    content = serializers.CharField(required=True, error_messages=ErrMessage.char("问题内容"))
 
     @staticmethod
     def get_request_body_api():
@@ -49,11 +50,11 @@ class ProblemInstanceSerializer(ApiMixin, serializers.Serializer):
 
 class ProblemSerializers(ApiMixin, serializers.Serializer):
     class Create(ApiMixin, serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
-        document_id = serializers.UUIDField(required=True)
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
 
-        paragraph_id = serializers.UUIDField(required=True)
+        paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("段落id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -109,11 +110,11 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                                       description='段落id')]
 
     class Query(ApiMixin, serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
-        document_id = serializers.UUIDField(required=True)
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
 
-        paragraph_id = serializers.UUIDField(required=True)
+        paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("段落id"))
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
@@ -157,13 +158,13 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                                     description='段落id')]
 
     class Operate(ApiMixin, serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
-        document_id = serializers.UUIDField(required=True)
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
 
-        paragraph_id = serializers.UUIDField(required=True)
+        paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("段落id"))
 
-        problem_id = serializers.UUIDField(required=True)
+        problem_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("问题id"))
 
         def delete(self, with_valid=False):
             if with_valid:

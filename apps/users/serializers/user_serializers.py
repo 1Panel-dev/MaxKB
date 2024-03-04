@@ -25,6 +25,7 @@ from common.constants.permission_constants import RoleConstants, get_permission_
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.response.result import get_api_response
+from common.util.field_message import ErrMessage
 from common.util.lock import lock
 from setting.models import Team
 from smartdoc.conf import PROJECT_DIR
@@ -36,14 +37,11 @@ user_cache = cache.caches['user_cache']
 
 class LoginSerializer(ApiMixin, serializers.Serializer):
     username = serializers.CharField(required=True,
-                                     validators=[
-                                         validators.MaxLengthValidator(limit_value=1024,
-                                                                       message=ExceptionCodeConstants.USERNAME_ERROR.value.message),
-                                         validators.MinLengthValidator(limit_value=6,
-                                                                       message=ExceptionCodeConstants.USERNAME_ERROR.value.message)
-                                     ])
+                                     error_messages=ErrMessage.char("用户名"),
+                                     max_length=20,
+                                     min_length=6)
 
-    password = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"))
 
     def is_valid(self, *, raise_exception=False):
         """
@@ -99,29 +97,33 @@ class RegisterSerializer(ApiMixin, serializers.Serializer):
     注册请求对象
     """
     email = serializers.EmailField(
+        required=True,
+        error_messages=ErrMessage.char("邮箱"),
         validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
                                               code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
 
     username = serializers.CharField(required=True,
+                                     error_messages=ErrMessage.char("用户名"),
+                                     max_length=20,
+                                     min_length=6,
                                      validators=[
-                                         validators.MaxLengthValidator(limit_value=20,
-                                                                       message=ExceptionCodeConstants.USERNAME_ERROR.value.message),
-                                         validators.MinLengthValidator(limit_value=6,
-                                                                       message=ExceptionCodeConstants.USERNAME_ERROR.value.message),
                                          validators.RegexValidator(regex=re.compile("^[a-zA-Z][a-zA-Z1-9_]{5,20}$"),
                                                                    message="用户名字符数为 6-20 个字符，必须以字母开头，可使用字母、数字、下划线等")
                                      ])
-    password = serializers.CharField(required=True, validators=[validators.RegexValidator(regex=re.compile(
-        "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
-        "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
-        , message="密码长度6-20个字符，必须字母、数字、特殊字符组合")])
+    password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"),
+                                     validators=[validators.RegexValidator(regex=re.compile(
+                                         "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                         "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
+                                         , message="密码长度6-20个字符，必须字母、数字、特殊字符组合")])
 
-    re_password = serializers.CharField(required=True, validators=[validators.RegexValidator(regex=re.compile(
-        "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
-        "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
-        , message="密码长度6-20个字符，必须字母、数字、特殊字符组合")])
+    re_password = serializers.CharField(required=True,
+                                        error_messages=ErrMessage.char("确认密码"),
+                                        validators=[validators.RegexValidator(regex=re.compile(
+                                            "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                            "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
+                                            , message="确认密码长度6-20个字符，必须字母、数字、特殊字符组合")])
 
-    code = serializers.CharField(required=True)
+    code = serializers.CharField(required=True, error_messages=ErrMessage.char("验证码"))
 
     class Meta:
         model = User
@@ -186,14 +188,18 @@ class CheckCodeSerializer(ApiMixin, serializers.Serializer):
      校验验证码
     """
     email = serializers.EmailField(
+        required=True,
+        error_messages=ErrMessage.char("邮箱"),
         validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
                                               code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
-    code = serializers.CharField(required=True)
+    code = serializers.CharField(required=True, error_messages=ErrMessage.char("验证码"))
 
-    type = serializers.CharField(required=True, validators=[
-        validators.RegexValidator(regex=re.compile("^register|reset_password$"),
-                                  message="只支持register|reset_password", code=500)
-    ])
+    type = serializers.CharField(required=True,
+                                 error_messages=ErrMessage.char("类型"),
+                                 validators=[
+                                     validators.RegexValidator(regex=re.compile("^register|reset_password$"),
+                                                               message="类型只支持register|reset_password", code=500)
+                                 ])
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid()
@@ -227,14 +233,16 @@ class CheckCodeSerializer(ApiMixin, serializers.Serializer):
 
 class RePasswordSerializer(ApiMixin, serializers.Serializer):
     email = serializers.EmailField(
+        required=True,
+        error_messages=ErrMessage.char("邮箱"),
         validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
                                               code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
 
-    code = serializers.CharField(required=True)
+    code = serializers.CharField(required=True, error_messages=ErrMessage.char("验证码"))
 
-    password = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"))
 
-    re_password = serializers.CharField(required=True)
+    re_password = serializers.CharField(required=True, error_messages=ErrMessage.char("确认密码"))
 
     class Meta:
         model = User
@@ -281,12 +289,14 @@ class RePasswordSerializer(ApiMixin, serializers.Serializer):
 
 class SendEmailSerializer(ApiMixin, serializers.Serializer):
     email = serializers.EmailField(
+        required=True
+        , error_messages=ErrMessage.char("邮箱"),
         validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
                                               code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
 
-    type = serializers.CharField(required=True, validators=[
+    type = serializers.CharField(required=True, error_messages=ErrMessage.char("类型"), validators=[
         validators.RegexValidator(regex=re.compile("^register|reset_password$"),
-                                  message="只支持register|reset_password", code=500)
+                                  message="类型只支持register|reset_password", code=500)
     ])
 
     class Meta:

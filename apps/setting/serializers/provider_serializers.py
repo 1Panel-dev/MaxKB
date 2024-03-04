@@ -14,6 +14,7 @@ from django.db.models import QuerySet
 from rest_framework import serializers
 
 from common.exception.app_exception import AppApiException
+from common.util.field_message import ErrMessage
 from common.util.rsa_util import encrypt, decrypt
 from setting.models.model_management import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -21,15 +22,16 @@ from setting.models_provider.constants.model_provider_constants import ModelProv
 
 class ModelSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
-        user_id = serializers.UUIDField(required=True)
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
-        name = serializers.CharField(required=False)
+        name = serializers.CharField(required=False, max_length=20, min_length=10,
+                                     error_messages=ErrMessage.char("模型名称"))
 
-        model_type = serializers.CharField(required=False)
+        model_type = serializers.CharField(required=False, error_messages=ErrMessage.char("模型类型"))
 
-        model_name = serializers.CharField(required=False)
+        model_name = serializers.CharField(required=False, error_messages=ErrMessage.char("基础模型"))
 
-        provider = serializers.CharField(required=False)
+        provider = serializers.CharField(required=False, error_messages=ErrMessage.char("供应商"))
 
         def list(self, with_valid):
             if with_valid:
@@ -50,15 +52,16 @@ class ModelSerializer(serializers.Serializer):
             return [ModelSerializer.model_to_dict(model) for model in model_query_set.filter(**query_params)]
 
     class Edit(serializers.Serializer):
-        user_id = serializers.CharField(required=False)
+        user_id = serializers.CharField(required=False, error_messages=ErrMessage.uuid("用户id"))
 
-        name = serializers.CharField(required=False)
+        name = serializers.CharField(required=False, max_length=20, min_length=10,
+                                     error_messages=ErrMessage.char("模型名称"))
 
-        model_type = serializers.CharField(required=False)
+        model_type = serializers.CharField(required=False, error_messages=ErrMessage.char("模型类型"))
 
-        model_name = serializers.CharField(required=False)
+        model_name = serializers.CharField(required=False, error_messages=ErrMessage.char("模型类型"))
 
-        credential = serializers.DictField(required=False)
+        credential = serializers.DictField(required=False, error_messages=ErrMessage.dict("认证信息"))
 
         def is_valid(self, model=None, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -93,17 +96,18 @@ class ModelSerializer(serializers.Serializer):
             return credential
 
     class Create(serializers.Serializer):
-        user_id = serializers.CharField(required=True)
+        user_id = serializers.CharField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
-        name = serializers.CharField(required=True)
+        name = serializers.CharField(required=True, max_length=20, min_length=10,
+                                     error_messages=ErrMessage.char("用户id"))
 
-        provider = serializers.CharField(required=True)
+        provider = serializers.CharField(required=True, error_messages=ErrMessage.char("供应商"))
 
-        model_type = serializers.CharField(required=True)
+        model_type = serializers.CharField(required=True, error_messages=ErrMessage.char("模型类型"))
 
-        model_name = serializers.CharField(required=True)
+        model_name = serializers.CharField(required=True, error_messages=ErrMessage.char("基础模型"))
 
-        credential = serializers.DictField(required=True)
+        credential = serializers.DictField(required=True, error_messages=ErrMessage.dict("认证信息"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -144,9 +148,9 @@ class ModelSerializer(serializers.Serializer):
                     credential)}
 
     class Operate(serializers.Serializer):
-        id = serializers.UUIDField(required=True)
+        id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
 
-        user_id = serializers.UUIDField(required=True)
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -188,9 +192,9 @@ class ModelSerializer(serializers.Serializer):
 
 
 class ProviderSerializer(serializers.Serializer):
-    provider = serializers.CharField(required=True)
+    provider = serializers.CharField(required=True, error_messages=ErrMessage.char("供应商"))
 
-    method = serializers.CharField(required=True)
+    method = serializers.CharField(required=True, error_messages=ErrMessage.char("执行函数名称"))
 
     def exec(self, exec_params: Dict[str, object], with_valid=False):
         if with_valid:

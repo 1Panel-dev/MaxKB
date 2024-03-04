@@ -16,25 +16,29 @@ from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep
 from application.chat_pipeline.pipeline_manage import PiplineManage
 from application.models import ChatRecord
 from common.field.common import InstanceField
+from common.util.field_message import ErrMessage
 from dataset.models import Paragraph
 
 
 class IGenerateHumanMessageStep(IBaseChatPipelineStep):
     class InstanceSerializer(serializers.Serializer):
         # 问题
-        problem_text = serializers.CharField(required=True)
+        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.char("问题"))
         # 段落列表
-        paragraph_list = serializers.ListField(child=InstanceField(model_type=ParagraphPipelineModel, required=True))
+        paragraph_list = serializers.ListField(child=InstanceField(model_type=ParagraphPipelineModel, required=True),
+                                               error_messages=ErrMessage.list("段落列表"))
         # 历史对答
-        history_chat_record = serializers.ListField(child=InstanceField(model_type=ChatRecord, required=True))
+        history_chat_record = serializers.ListField(child=InstanceField(model_type=ChatRecord, required=True),
+                                                    error_messages=ErrMessage.list("历史对答"))
         # 多轮对话数量
-        dialogue_number = serializers.IntegerField(required=True)
+        dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("多轮对话数量"))
         # 最大携带知识库段落长度
-        max_paragraph_char_number = serializers.IntegerField(required=True)
+        max_paragraph_char_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer(
+            "最大携带知识库段落长度"))
         # 模板
-        prompt = serializers.CharField(required=True)
+        prompt = serializers.CharField(required=True, error_messages=ErrMessage.char("提示词"))
         # 补齐问题
-        padding_problem_text = serializers.CharField(required=False)
+        padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.char("补齐问题"))
 
     def get_step_serializer(self, manage: PiplineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer

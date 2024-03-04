@@ -16,6 +16,7 @@ from rest_framework import serializers
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PiplineManage
 from common.field.common import InstanceField
+from common.util.field_message import ErrMessage
 from dataset.models import Paragraph
 
 
@@ -50,21 +51,23 @@ class PostResponseHandler:
 class IChatStep(IBaseChatPipelineStep):
     class InstanceSerializer(serializers.Serializer):
         # 对话列表
-        message_list = serializers.ListField(required=True, child=MessageField(required=True))
+        message_list = serializers.ListField(required=True, child=MessageField(required=True),
+                                             error_messages=ErrMessage.list("对话列表"))
         # 大语言模型
-        chat_model = ModelField()
+        chat_model = ModelField(error_messages=ErrMessage.list("大语言模型"))
         # 段落列表
-        paragraph_list = serializers.ListField()
+        paragraph_list = serializers.ListField(error_messages=ErrMessage.list("段落列表"))
         # 对话id
-        chat_id = serializers.UUIDField(required=True)
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
         # 用户问题
-        problem_text = serializers.CharField(required=True)
+        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.uuid("用户问题"))
         # 后置处理器
-        post_response_handler = InstanceField(model_type=PostResponseHandler)
+        post_response_handler = InstanceField(model_type=PostResponseHandler,
+                                              error_messages=ErrMessage.base("用户问题"))
         # 补全问题
-        padding_problem_text = serializers.CharField(required=False)
+        padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.base("补全问题"))
         # 是否使用流的形式输出
-        stream = serializers.BooleanField(required=False)
+        stream = serializers.BooleanField(required=False, error_messages=ErrMessage.base("流式输出"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)

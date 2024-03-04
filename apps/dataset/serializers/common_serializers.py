@@ -17,6 +17,7 @@ from common.db.search import native_search
 from common.db.sql_execute import update_execute
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
+from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
 from dataset.models import Paragraph
@@ -38,8 +39,9 @@ def list_paragraph(paragraph_list: List[str]):
 
 class MetaSerializer(serializers.Serializer):
     class WebMeta(serializers.Serializer):
-        source_url = serializers.CharField(required=True)
-        selector = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+        source_url = serializers.CharField(required=True, error_messages=ErrMessage.char("文档地址"))
+        selector = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                         error_messages=ErrMessage.char("选择器"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -54,7 +56,8 @@ class MetaSerializer(serializers.Serializer):
 
 
 class BatchSerializer(ApiMixin, serializers.Serializer):
-    id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True))
+    id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
+                                    error_messages=ErrMessage.char("id列表"))
 
     def is_valid(self, *, model=None, raise_exception=False):
         super().is_valid(raise_exception=True)

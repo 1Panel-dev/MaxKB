@@ -28,6 +28,7 @@ from common.db.search import native_search, native_page_search, page_search, get
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.util.common import post
+from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from common.util.rsa_util import decrypt
@@ -42,8 +43,8 @@ chat_cache = cache
 
 class ChatSerializers(serializers.Serializer):
     class Operate(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True)
-        application_id = serializers.UUIDField(required=True)
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
 
         def delete(self, with_valid=True):
             if with_valid:
@@ -52,13 +53,15 @@ class ChatSerializers(serializers.Serializer):
             return True
 
     class Query(serializers.Serializer):
-        abstract = serializers.CharField(required=False)
-        history_day = serializers.IntegerField(required=True)
-        user_id = serializers.UUIDField(required=True)
-        application_id = serializers.UUIDField(required=True)
-        min_star = serializers.IntegerField(required=False, min_value=0)
-        min_trample = serializers.IntegerField(required=False, min_value=0)
-        comparer = serializers.CharField(required=False, validators=[
+        abstract = serializers.CharField(required=False, error_messages=ErrMessage.char("摘要"))
+        history_day = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("历史天数"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+        min_star = serializers.IntegerField(required=False, min_value=0,
+                                            error_messages=ErrMessage.integer("最小点赞数"))
+        min_trample = serializers.IntegerField(required=False, min_value=0,
+                                               error_messages=ErrMessage.integer("最小点踩数"))
+        comparer = serializers.CharField(required=False, error_messages=ErrMessage.char("比较器"), validators=[
             validators.RegexValidator(regex=re.compile("^and|or$"),
                                       message="只支持and|or", code=500)
         ])
@@ -116,9 +119,9 @@ class ChatSerializers(serializers.Serializer):
                                       with_table_name=False)
 
     class OpenChat(serializers.Serializer):
-        user_id = serializers.UUIDField(required=True)
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
-        application_id = serializers.UUIDField(required=True)
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -153,19 +156,21 @@ class ChatSerializers(serializers.Serializer):
             return chat_id
 
     class OpenTempChat(serializers.Serializer):
-        user_id = serializers.UUIDField(required=True)
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
-        model_id = serializers.UUIDField(required=True)
+        model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
 
-        multiple_rounds_dialogue = serializers.BooleanField(required=True)
+        multiple_rounds_dialogue = serializers.BooleanField(required=True,
+                                                            error_messages=ErrMessage.boolean("多轮会话"))
 
-        dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
+        dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
+                                                     error_messages=ErrMessage.list("关联数据集"))
         # 数据集相关设置
         dataset_setting = DatasetSettingSerializer(required=True)
         # 模型相关设置
         model_setting = ModelSettingSerializer(required=True)
         # 问题补全
-        problem_optimization = serializers.BooleanField(required=True)
+        problem_optimization = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("问题补全"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -208,9 +213,9 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
 
 class ChatRecordSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True)
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
 
-        chat_record_id = serializers.UUIDField(required=True)
+        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
 
         def get_chat_record(self):
             chat_record_id = self.data.get('chat_record_id')
@@ -274,11 +279,11 @@ class ChatRecordSerializer(serializers.Serializer):
             return page
 
     class Vote(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True)
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
 
-        chat_record_id = serializers.UUIDField(required=True)
+        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
 
-        vote_status = serializers.ChoiceField(choices=VoteChoices.choices)
+        vote_status = serializers.ChoiceField(choices=VoteChoices.choices, error_messages=ErrMessage.uuid("投标状态"))
 
         @transaction.atomic
         def vote(self, with_valid=True):
@@ -313,8 +318,9 @@ class ChatRecordSerializer(serializers.Serializer):
             return True
 
     class ImproveSerializer(serializers.Serializer):
-        title = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-        content = serializers.CharField(required=True)
+        title = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                      error_messages=ErrMessage.char("段落标题"))
+        content = serializers.CharField(required=True, error_messages=ErrMessage.char("段落内容"))
 
     class ParagraphModel(serializers.ModelSerializer):
         class Meta:
@@ -322,9 +328,9 @@ class ChatRecordSerializer(serializers.Serializer):
             fields = "__all__"
 
     class ChatRecordImprove(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True)
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
 
-        chat_record_id = serializers.UUIDField(required=True)
+        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
 
         def get(self, with_valid=True):
             if with_valid:
@@ -347,13 +353,13 @@ class ChatRecordSerializer(serializers.Serializer):
             return [ChatRecordSerializer.ParagraphModel(p).data for p in paragraph_model_list]
 
     class Improve(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True)
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
 
-        chat_record_id = serializers.UUIDField(required=True)
+        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
 
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
-        document_id = serializers.UUIDField(required=True)
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)

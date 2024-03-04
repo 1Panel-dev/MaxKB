@@ -13,7 +13,6 @@ import uuid
 from functools import reduce
 from typing import List, Dict
 
-from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet
 from drf_yasg import openapi
@@ -25,6 +24,7 @@ from common.event.listener_manage import ListenerManagement, SyncWebDocumentArgs
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
+from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
 from common.util.split_model import SplitModel, get_split_model
@@ -36,8 +36,11 @@ from smartdoc.conf import PROJECT_DIR
 
 class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
     meta = serializers.DictField(required=False)
-    name = serializers.CharField(required=False)
-    is_active = serializers.BooleanField(required=False)
+    name = serializers.CharField(required=False, max_length=128, min_length=1,
+                                 error_messages=ErrMessage.char(
+                                     "文档名称"))
+    is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char(
+        "文档是否可用"))
 
     @staticmethod
     def get_meta_valid_map():
@@ -56,8 +59,14 @@ class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
 
 
 class DocumentWebInstanceSerializer(ApiMixin, serializers.Serializer):
-    source_url_list = serializers.ListField(required=True, child=serializers.CharField(required=True))
-    selector = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    source_url_list = serializers.ListField(required=True,
+                                            child=serializers.CharField(required=True, error_messages=ErrMessage.char(
+                                                "文档地址")),
+                                            error_messages=ErrMessage.char(
+                                                "文档地址列表"))
+    selector = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                     error_messages=ErrMessage.char(
+                                         "选择器"))
 
     @staticmethod
     def get_request_body_api():
@@ -74,12 +83,9 @@ class DocumentWebInstanceSerializer(ApiMixin, serializers.Serializer):
 
 class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
     name = serializers.CharField(required=True,
-                                 validators=[
-                                     validators.MaxLengthValidator(limit_value=128,
-                                                                   message="文档名称在1-128个字符之间"),
-                                     validators.MinLengthValidator(limit_value=1,
-                                                                   message="知识库名称在1-128个字符之间")
-                                 ])
+                                 error_messages=ErrMessage.char("文档名称"),
+                                 max_length=128,
+                                 min_length=1)
 
     paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
 
@@ -99,15 +105,14 @@ class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
 class DocumentSerializers(ApiMixin, serializers.Serializer):
     class Query(ApiMixin, serializers.Serializer):
         # 知识库id
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True,
+                                           error_messages=ErrMessage.char(
+                                               "知识库id"))
 
-        name = serializers.CharField(required=False,
-                                     validators=[
-                                         validators.MaxLengthValidator(limit_value=128,
-                                                                       message="文档名称在1-128个字符之间"),
-                                         validators.MinLengthValidator(limit_value=1,
-                                                                       message="知识库名称在1-128个字符之间")
-                                     ])
+        name = serializers.CharField(required=False, max_length=128,
+                                     min_length=1,
+                                     error_messages=ErrMessage.char(
+                                         "文档名称"))
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
@@ -144,7 +149,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                   items=DocumentSerializers.Operate.get_response_body_api())
 
     class Sync(ApiMixin, serializers.Serializer):
-        document_id = serializers.UUIDField(required=True)
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "文档id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -202,7 +208,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             return True
 
     class Operate(ApiMixin, serializers.Serializer):
-        document_id = serializers.UUIDField(required=True)
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "文档id"))
 
         @staticmethod
         def get_request_params_api():
@@ -312,7 +319,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             )
 
     class Create(ApiMixin, serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
+            "文档id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -427,14 +435,20 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     ]
 
     class Split(ApiMixin, serializers.Serializer):
-        file = serializers.ListField(required=True)
+        file = serializers.ListField(required=True, error_messages=ErrMessage.list(
+            "文件列表"))
 
-        limit = serializers.IntegerField(required=False)
+        limit = serializers.IntegerField(required=False, error_messages=ErrMessage.integer(
+            "分段长度"))
 
         patterns = serializers.ListField(required=False,
-                                         child=serializers.CharField(required=True))
+                                         child=serializers.CharField(required=True, error_messages=ErrMessage.char(
+                                             "分段标识")),
+                                         error_messages=ErrMessage.uuid(
+                                             "分段标识列表"))
 
-        with_filter = serializers.BooleanField(required=False)
+        with_filter = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean(
+            "自动清洗"))
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
@@ -486,7 +500,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     {'key': '空行', 'value': '(?<!\\n)\\n\\n(?!\\n)'}]
 
     class Batch(ApiMixin, serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True)
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
         @staticmethod
         def get_request_body_api():

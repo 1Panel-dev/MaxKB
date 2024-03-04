@@ -17,16 +17,18 @@ from application.chat_pipeline.pipeline_manage import PiplineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import ModelField
 from application.models import ChatRecord
 from common.field.common import InstanceField
+from common.util.field_message import ErrMessage
 
 
 class IResetProblemStep(IBaseChatPipelineStep):
     class InstanceSerializer(serializers.Serializer):
         # 问题文本
-        problem_text = serializers.CharField(required=True)
+        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.float("问题文本"))
         # 历史对答
-        history_chat_record = serializers.ListField(child=InstanceField(model_type=ChatRecord, required=True))
+        history_chat_record = serializers.ListField(child=InstanceField(model_type=ChatRecord, required=True),
+                                                    error_messages=ErrMessage.list("历史对答"))
         # 大语言模型
-        chat_model = ModelField()
+        chat_model = ModelField(error_messages=ErrMessage.base("大语言模型"))
 
     def get_step_serializer(self, manage: PiplineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer
