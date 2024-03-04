@@ -264,3 +264,33 @@ class ChatView(APIView):
                 return result.success(ChatRecordSerializer.Improve(
                     data={'chat_id': chat_id, 'chat_record_id': chat_record_id,
                           'dataset_id': dataset_id, 'document_id': document_id}).improve(request.data))
+
+            class Operate(APIView):
+                authentication_classes = [TokenAuth]
+
+                @action(methods=['DELETE'], detail=False)
+                @swagger_auto_schema(operation_summary="标注",
+                                     operation_id="标注",
+                                     manual_parameters=ImproveApi.get_request_params_api(),
+                                     responses=result.get_api_response(ChatRecordApi.get_response_body_api()),
+                                     tags=["应用/对话日志/标注"]
+                                     )
+                @has_permissions(
+                    ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                                   [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                                   dynamic_tag=keywords.get('application_id'))],
+
+                                   ), ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                                                     [lambda r, keywords: Permission(group=Group.DATASET,
+                                                                                     operate=Operate.MANAGE,
+                                                                                     dynamic_tag=keywords.get(
+                                                                                         'dataset_id'))],
+                                                     compare=CompareConstants.AND
+                                                     ), compare=CompareConstants.AND)
+                def delete(self, request: Request, application_id: str, chat_id: str, chat_record_id: str,
+                           dataset_id: str,
+                           document_id: str, paragraph_id: str):
+                    return result.success(ChatRecordSerializer.Improve.Operate(
+                        data={'chat_id': chat_id, 'chat_record_id': chat_record_id,
+                              'dataset_id': dataset_id, 'document_id': document_id,
+                              'paragraph_id': paragraph_id}).delete())

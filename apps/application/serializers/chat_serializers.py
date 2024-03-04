@@ -34,6 +34,7 @@ from common.util.lock import try_lock, un_lock
 from common.util.rsa_util import decrypt
 from common.util.split_model import flat_map
 from dataset.models import Document, Problem, Paragraph
+from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from smartdoc.conf import PROJECT_DIR
@@ -355,7 +356,7 @@ class ChatRecordSerializer(serializers.Serializer):
     class Improve(serializers.Serializer):
         chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
 
-        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
+        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
 
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
@@ -403,3 +404,36 @@ class ChatRecordSerializer(serializers.Serializer):
             # 添加标注
             chat_record.save()
             return ChatRecordSerializerModel(chat_record).data, paragraph.id
+
+        class Operate(serializers.Serializer):
+            chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
+
+            chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
+
+            dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
+
+            document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
+
+            paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("段落id"))
+
+            def delete(self, with_valid=True):
+                if with_valid:
+                    self.is_valid(raise_exception=True)
+
+                chat_record_id = self.data.get('chat_record_id')
+                chat_id = self.data.get('chat_id')
+                dataset_id = self.data.get('dataset_id')
+                document_id = self.data.get('document_id')
+                paragraph_id = self.data.get('paragraph_id')
+                chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
+                if chat_record is None:
+                    raise AppApiException(500, '不存在的对话记录')
+                if not chat_record.improve_paragraph_id_list.__contains__(uuid.UUID(paragraph_id)):
+                    raise AppApiException(500, f'段落id错误,当前对话记录不存在【{paragraph_id}】段落id')
+                chat_record.improve_paragraph_id_list = [row for row in chat_record.improve_paragraph_id_list if
+                                                         str(row) != paragraph_id]
+                chat_record.save()
+                o = ParagraphSerializers.Operate(
+                    data={"dataset_id": dataset_id, 'document_id': document_id, "paragraph_id": paragraph_id})
+                o.is_valid(raise_exception=True)
+                return o.delete()

@@ -36,6 +36,9 @@ urlpatterns = [
         name=''),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/<str:chat_record_id>/improve',
          views.ChatView.ChatRecord.ChatRecordImprove.as_view()),
-    path('application/chat_message/<str:chat_id>', views.ChatView.Message.as_view())
-
+    path('application/chat_message/<str:chat_id>', views.ChatView.Message.as_view()),
+    path(
+        'application/<str:application_id>/chat/<chat_id>/chat_record/<str:chat_record_id>/dataset/<str:dataset_id>/document_id/<str:document_id>/improve/<str:paragraph_id>',
+        views.ChatView.ChatRecord.Improve.Operate.as_view(),
+        name='')
 ]
