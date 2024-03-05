@@ -13,6 +13,7 @@ from typing import Dict
 from django.db.models import QuerySet
 from rest_framework import serializers
 
+from application.models import Application
 from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
 from common.util.rsa_util import encrypt, decrypt
@@ -166,6 +167,9 @@ class ModelSerializer(serializers.Serializer):
         def delete(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            application_list = QuerySet(Application).filter(model_id=self.data.get('id')).all()
+            if len(application_list) > 0:
+                raise AppApiException(500, f"该模型关联了{len(application_list)} 个应用，无法删除该模型。")
             QuerySet(Model).filter(id=self.data.get('id')).delete()
             return True
 
