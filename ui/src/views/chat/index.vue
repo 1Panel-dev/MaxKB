@@ -6,7 +6,11 @@
       </div>
     </div>
     <div class="chat__main chat-width">
-      <AiChat v-model:data="applicationDetail" :appId="applicationDetail?.id"></AiChat>
+      <AiChat
+        v-model:data="applicationDetail"
+        :available="applicationAvailable"
+        :appId="applicationDetail?.id"
+      ></AiChat>
     </div>
     <div class="chat__footer"></div>
   </div>
@@ -25,16 +29,27 @@ const { application, user } = useStore()
 
 const loading = ref(false)
 const applicationDetail = ref<any>({})
+const applicationAvailable = ref<boolean>(true)
 
 function getAccessToken(token: string) {
-  application.asyncAppAuthentication(token, loading).then((res) => {
-    getProfile()
-  })
+  application
+    .asyncAppAuthentication(token, loading)
+    .then((res) => {
+      getProfile()
+    })
+    .catch(() => {
+      applicationAvailable.value = false
+    })
 }
 function getProfile() {
-  applicationApi.getProfile(loading).then((res) => {
-    applicationDetail.value = res.data
-  })
+  applicationApi
+    .getProfile(loading)
+    .then((res) => {
+      applicationDetail.value = res.data
+    })
+    .catch(() => {
+      applicationAvailable.value = false
+    })
 }
 onMounted(() => {
   user.changeUserType(2)

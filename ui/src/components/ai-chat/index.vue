@@ -2,7 +2,7 @@
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
     <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
       <div ref="dialogScrollbar" class="ai-chat__content p-24">
-        <div class="item-content mb-16">
+        <div class="item-content mb-16" v-if="!props.available || props.data?.prologue">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
               <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
@@ -189,6 +189,11 @@ const props = defineProps({
   record: {
     type: Array<chatType[]>,
     default: () => []
+  },
+  // 应用是否可用
+  available: {
+    type: Boolean,
+    default: true
   }
 })
 const { application } = useStore()
@@ -208,7 +213,9 @@ const isDisabledChart = computed(
 )
 const isMdArray = (val: string) => val.match(/^-\s.*/m)
 const prologueList = computed(() => {
-  const temp = props.data?.prologue
+  const temp = props.available
+    ? props.data?.prologue
+    : '抱歉，当前正在维护，无法提供服务，请稍后再试！'
   let arr: any = []
   const lines = temp?.split('\n')
   lines?.forEach((str: string, index: number) => {
@@ -281,34 +288,36 @@ const startChat = (chat: chatType) => {
 /**
  * 对话
  */
-function getChartOpenId() {
+function getChartOpenId(chat?: any) {
   loading.value = true
   const obj = props.data
   if (props.appId) {
-    applicationApi
+    return applicationApi
       .getChatOpen(props.appId)
       .then((res) => {
         chartOpenId.value = res.data
-        chatMessage()
+        chatMessage(chat)
       })
       .catch((res) => {
-        console.log(res)
         if (res.response.status === 403) {
           application.asyncAppAuthentication(accessToken).then(() => {
             getChartOpenId()
           })
+        } else {
+          loading.value = false
+          return Promise.reject(res)
         }
-        loading.value = false
       })
   } else {
-    applicationApi
+    return applicationApi
       .postChatOpen(obj)
       .then((res) => {
         chartOpenId.value = res.data
-        chatMessage()
+        chatMessage(chat)
       })
-      .catch(() => {
+      .catch((res) => {
         loading.value = false
+        return Promise.reject(res)
       })
   }
 }
@@ -389,39 +398,51 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
   }
   return stream ? write_stream : write_json
 }
-
+const errorWrite = (chat: any) => {
+  ChatManagement.addChatRecord(chat, 50, loading)
+  ChatManagement.write(chat.id)
+  ChatManagement.append(chat.id, '抱歉，当前正在维护，无法提供服务，请稍后再试！')
+  ChatManagement.close(chat.id)
+}
 function chatMessage(chat?: any) {
   loading.value = true
+  if (!chat) {
+    chat = reactive({
+      id: randomId(),
+      problem_text: inputValue.value,
+      answer_text: '',
+      buffer: [],
+      write_ed: false,
+      is_stop: false,
+      record_id: '',
+      vote_status: '-1'
+    })
+    chatList.value.push(chat)
+    inputValue.value = ''
+    nextTick(() => {
+      // 将滚动条滚动到最下面
+      scrollDiv.value.setScrollTop(getMaxHeight())
+    })
+  }
   if (!chartOpenId.value) {
-    getChartOpenId()
+    getChartOpenId(chat).catch((e) => {
+      errorWrite(chat)
+    })
   } else {
-    if (!chat) {
-      chat = reactive({
-        id: randomId(),
-        problem_text: inputValue.value,
-        answer_text: '',
-        buffer: [],
-        write_ed: false,
-        is_stop: false,
-        record_id: '',
-        vote_status: '-1'
-      })
-      chatList.value.push(chat)
-      inputValue.value = ''
-      nextTick(() => {
-        // 将滚动条滚动到最下面
-        scrollDiv.value.setScrollTop(getMaxHeight())
-      })
-    }
     // 对话
     applicationApi
       .postChatMessage(chartOpenId.value, chat.problem_text)
       .then((response) => {
         console.log(response.status)
         if (response.status === 401) {
-          application.asyncAppAuthentication(accessToken).then(() => {
-            chatMessage(chat)
-          })
+          application
+            .asyncAppAuthentication(accessToken)
+            .then(() => {
+              chatMessage(chat)
+            })
+            .catch((err) => {
+              errorWrite(chat)
+            })
         } else {
           nextTick(() => {
             // 将滚动条滚动到最下面
@@ -447,7 +468,6 @@ function chatMessage(chat?: any) {
       })
       .catch((e: any) => {
         MsgError(e)
-        ChatManagement.close(chat.id)
       })
   }
 }

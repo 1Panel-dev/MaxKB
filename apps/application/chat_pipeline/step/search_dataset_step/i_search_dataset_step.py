@@ -20,7 +20,7 @@ from dataset.models import Paragraph
 class ISearchDatasetStep(IBaseChatPipelineStep):
     class InstanceSerializer(serializers.Serializer):
         # 原始问题文本
-        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.char("文档id"))
+        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.char("问题"))
         # 系统补全问题文本
         padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.char("系统补全问题文本"))
         # 需要查询的数据集id列表

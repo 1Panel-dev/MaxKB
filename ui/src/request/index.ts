@@ -53,12 +53,12 @@ instance.interceptors.response.use(
       console.error(err)
     }
     if (err.response?.status === 404) {
-      router.push('/404 ')
+      if (!err.response.config.url.includes('/application/authentication')) {
+        router.push('/404 ')
+      }
     }
     if (err.response?.status === 401) {
-      if (err.response.config.url.includes('chat/open')) {
-        router.push('/404 ')
-      } else {
+      if (!err.response.config.url.includes('chat/open')) {
         router.push({ name: 'login' })
       }
     }
