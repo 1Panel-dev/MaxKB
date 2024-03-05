@@ -33,6 +33,7 @@ from dataset.serializers.common_serializers import list_paragraph
 from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
+from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 from smartdoc.settings import JWT_AUTH
 
@@ -329,6 +330,14 @@ class ApplicationSerializer(serializers.Serializer):
             if not QuerySet(Application).filter(id=self.data.get('application_id')).exists():
                 raise AppApiException(500, '不存在的应用id')
 
+        def list_model(self, with_valid=True):
+            if with_valid:
+                self.is_valid()
+            application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
+            return ModelSerializer.Query(
+                data={'user_id': application.user_id}).list(
+                with_valid=True)
+
         def delete(self, with_valid=True):
             if with_valid:
                 self.is_valid()
@@ -366,7 +375,11 @@ class ApplicationSerializer(serializers.Serializer):
 
             application = QuerySet(Application).get(id=application_id)
 
-            model = QuerySet(Model).get(id=instance.get('model_id') if 'model_id' in instance else application.model_id)
+            model = QuerySet(Model).filter(
+                id=instance.get('model_id') if 'model_id' in instance else application.model_id,
+                user_id=application.user_id).first()
+            if model is None:
+                raise AppApiException(500, "模型不存在")
 
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization',

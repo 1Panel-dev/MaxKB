@@ -27,6 +27,25 @@ from dataset.serializers.dataset_serializers import DataSetSerializers
 class Application(APIView):
     authentication_classes = [TokenAuth]
 
+    class Model(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=["GET"], detail=False)
+        @swagger_auto_schema(operation_summary="获取模型列表",
+                             operation_id="获取模型列表",
+                             tags=["应用"],
+                             manual_parameters=ApplicationApi.ApiKey.get_request_params_api())
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationSerializer.Operate(
+                    data={'application_id': application_id,
+                          'user_id': request.user.id}).list_model())
+
     class Profile(APIView):
         authentication_classes = [TokenAuth]
 
