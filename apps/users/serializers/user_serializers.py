@@ -37,9 +37,7 @@ user_cache = cache.caches['user_cache']
 
 class LoginSerializer(ApiMixin, serializers.Serializer):
     username = serializers.CharField(required=True,
-                                     error_messages=ErrMessage.char("用户名"),
-                                     max_length=20,
-                                     min_length=6)
+                                     error_messages=ErrMessage.char("用户名"))
 
     password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"))
 
@@ -240,9 +238,18 @@ class RePasswordSerializer(ApiMixin, serializers.Serializer):
 
     code = serializers.CharField(required=True, error_messages=ErrMessage.char("验证码"))
 
-    password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"))
+    password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"),
+                                     validators=[validators.RegexValidator(regex=re.compile(
+                                         "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                         "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
+                                         , message="确认密码长度6-20个字符，必须字母、数字、特殊字符组合")])
 
-    re_password = serializers.CharField(required=True, error_messages=ErrMessage.char("确认密码"))
+    re_password = serializers.CharField(required=True, error_messages=ErrMessage.char("确认密码"),
+                                        validators=[validators.RegexValidator(regex=re.compile(
+                                            "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                            "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
+                                            , message="确认密码长度6-20个字符，必须字母、数字、特殊字符组合")]
+                                        )
 
     class Meta:
         model = User
