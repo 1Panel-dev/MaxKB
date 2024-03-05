@@ -8,7 +8,9 @@
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
           </slot>
-          <h4 class="ellipsis-1" style="width: 65%">{{ title }}</h4>
+          <auto-tooltip :content="title" style="width: 65%">
+            {{ title }}
+          </auto-tooltip>
         </div>
       </slot>
     </div>
