@@ -78,6 +78,7 @@ function cardLeave() {
       overflow: hidden;
     }
   }
+
   .card-footer {
     position: absolute;
     bottom: 8px;
