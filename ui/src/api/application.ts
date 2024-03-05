@@ -216,6 +216,20 @@ const getApplicationHitTest: (
   return get(`${prefix}/${application_id}/hit_test`, data, loading)
 }
 
+/**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationModel: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/model`, loading)
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -232,5 +246,6 @@ export default {
   postAppAuthentication,
   getProfile,
   putChatVote,
-  getApplicationHitTest
+  getApplicationHitTest,
+  getApplicationModel
 }
