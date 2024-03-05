@@ -18,7 +18,7 @@ from urllib.parse import urlparse
 from django.contrib.postgres.fields import ArrayField
 from django.core import validators
 from django.db import transaction, models
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from drf_yasg import openapi
 from rest_framework import serializers
 
@@ -291,7 +291,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                 self.CreateBaseSerializers(data=instance).is_valid()
             dataset_id = uuid.uuid1()
             user_id = self.data.get('user_id')
-
+            if QuerySet(DataSet).filter(user_id=user_id, name=instance.get('name')).exists():
+                raise AppApiException(500, "知识库名称重复!")
             dataset = DataSet(
                 **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id})
 
@@ -352,6 +353,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                 self.is_valid(raise_exception=True)
                 self.CreateWebSerializers(data=instance).is_valid(raise_exception=True)
             user_id = self.data.get('user_id')
+            if QuerySet(DataSet).filter(user_id=user_id, name=instance.get('name')).exists():
+                raise AppApiException(500, "知识库名称重复!")
             dataset_id = uuid.uuid1()
             dataset = DataSet(
                 **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id,
@@ -626,6 +629,9 @@ class DataSetSerializers(serializers.ModelSerializer):
             :return:
             """
             self.is_valid()
+            if QuerySet(DataSet).filter(user_id=user_id, name=dataset.get('name')).exclude(
+                    id=self.data.get('id')).exists():
+                raise AppApiException(500, "知识库名称重复!")
             _dataset = QuerySet(DataSet).get(id=self.data.get("id"))
             DataSetSerializers.Edit(data=dataset).is_valid(dataset=_dataset)
             if "name" in dataset:
