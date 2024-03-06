@@ -158,6 +158,8 @@ class ChatSerializers(serializers.Serializer):
     class OpenTempChat(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
+        id = serializers.UUIDField(required=False, allow_null=True,
+                                   error_messages=ErrMessage.uuid("应用id"))
         model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
 
         multiple_rounds_dialogue = serializers.BooleanField(required=True,
@@ -174,14 +176,24 @@ class ChatSerializers(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
+            user_id = self.get_user_id()
             ModelDatasetAssociation(
-                data={'user_id': self.data.get('user_id'), 'model_id': self.data.get('model_id'),
+                data={'user_id': user_id, 'model_id': self.data.get('model_id'),
                       'dataset_id_list': self.data.get('dataset_id_list')}).is_valid()
+            return user_id
+
+        def get_user_id(self):
+            if 'id' in self.data and self.data.get('id') is not None:
+                application = QuerySet(Application).filter(id=self.data.get('id')).first()
+                if application is None:
+                    raise AppApiException(500, "应用不存在")
+                return application.user_id
+            return self.data.get('user_id')
 
         def open(self):
-            self.is_valid(raise_exception=True)
+            user_id = self.is_valid(raise_exception=True)
             chat_id = str(uuid.uuid1())
-            model = QuerySet(Model).filter(user_id=self.data.get('user_id'), id=self.data.get('model_id')).first()
+            model = QuerySet(Model).filter(user_id=user_id, id=self.data.get('model_id')).first()
             if model is None:
                 raise AppApiException(500, "模型不存在")
             dataset_id_list = self.data.get('dataset_id_list')

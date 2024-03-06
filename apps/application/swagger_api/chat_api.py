@@ -79,6 +79,8 @@ class ChatApi(ApiMixin):
                 required=['model_id', 'multiple_rounds_dialogue', 'dataset_setting', 'model_setting',
                           'problem_optimization'],
                 properties={
+                    'id': openapi.Schema(type=openapi.TYPE_STRING, title="应用id",
+                                                     description="应用id,修改的时候传,创建的时候不传"),
                     'model_id': openapi.Schema(type=openapi.TYPE_STRING, title="模型id", description="模型id"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
