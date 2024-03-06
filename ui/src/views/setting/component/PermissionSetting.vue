@@ -31,7 +31,6 @@
             <auto-tooltip :content="row?.name">
               {{ row?.name }}
             </auto-tooltip>
-            <!-- <span class="ellipsis"> {{ row?.name }}</span> -->
           </div>
         </template>
       </el-table-column>
