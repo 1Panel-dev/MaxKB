@@ -41,7 +41,7 @@ class ParagraphInstanceSerializer(ApiMixin, serializers.Serializer):
                                     min_length=1,
                                     allow_null=True, allow_blank=True)
 
-    title = serializers.CharField(required=False, error_messages=ErrMessage.char("段落标题"),
+    title = serializers.CharField(required=False, max_length=256, error_messages=ErrMessage.char("段落标题"),
                                   allow_null=True, allow_blank=True)
 
     problem_list = ProblemInstanceSerializer(required=False, many=True)

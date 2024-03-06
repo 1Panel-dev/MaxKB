@@ -33,7 +33,7 @@ class ProblemSerializer(serializers.ModelSerializer):
 class ProblemInstanceSerializer(ApiMixin, serializers.Serializer):
     id = serializers.CharField(required=False, error_messages=ErrMessage.char("问题id"))
 
-    content = serializers.CharField(required=True, error_messages=ErrMessage.char("问题内容"))
+    content = serializers.CharField(required=True, max_length=256, error_messages=ErrMessage.char("问题内容"))
 
     @staticmethod
     def get_request_body_api():

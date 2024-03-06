@@ -55,18 +55,22 @@ def validation_error_to_result(exc: ValidationError):
         return result.error(str(exc.detail))
 
 
-def find_err_detail(exc_detail: Dict):
+def find_err_detail(exc_detail):
+    if isinstance(exc_detail, ErrorDetail):
+        return exc_detail
     if isinstance(exc_detail, dict):
         keys = exc_detail.keys()
         for key in keys:
             _value = exc_detail[key]
             if isinstance(_value, list):
-                for v in _value:
-                    return v
+                return find_err_detail(_value)
             elif isinstance(_value, ErrorDetail):
                 return _value
             elif isinstance(_value, dict):
                 return find_err_detail(_value)
+    if isinstance(exc_detail, list):
+        for v in exc_detail:
+            return find_err_detail(v)
 
 
 def handle_exception(exc, context):
