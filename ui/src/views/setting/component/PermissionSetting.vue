@@ -17,11 +17,21 @@
               class="mr-12"
               shape="square"
               :size="24"
+              style="flex-shrink: 0"
             />
-            <AppAvatar v-else-if="isDataset" class="mr-12" shape="square" :size="24">
+            <AppAvatar
+              v-else-if="isDataset"
+              class="mr-12"
+              shape="square"
+              :size="24"
+              style="flex-shrink: 0"
+            >
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
-            <span class="ellipsis"> {{ row?.name }}</span>
+            <auto-tooltip :content="row?.name">
+              {{ row?.name }}
+            </auto-tooltip>
+            <!-- <span class="ellipsis"> {{ row?.name }}</span> -->
           </div>
         </template>
       </el-table-column>
