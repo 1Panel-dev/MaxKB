@@ -5,7 +5,7 @@
     effect="dark"
     placement="bottom"
   >
-    <div ref="tagLabel" class="auto-tooltip">
+    <div ref="tagLabel" :class="['auto-tooltip', className]" :style="style">
       <slot></slot>
     </div>
   </el-tooltip>
@@ -13,6 +13,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
 defineOptions({ name: 'AutoTooltip' })
+const props = defineProps({ className: String, style: Object })
 const tagLabel = ref()
 const containerWeight = ref(0)
 const contentWeight = ref(0)

@@ -211,7 +211,7 @@
                     <el-col
                       :xs="24"
                       :sm="24"
-                      :md="12"
+                      :md="24"
                       :lg="12"
                       :xl="12"
                       class="mb-8"
@@ -464,15 +464,27 @@ function getDataset() {
 
 function getModel() {
   loading.value = true
-  model
-    .asyncGetModel()
-    .then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  if (id) {
+    applicationApi
+      .getApplicationModel(id)
+      .then((res: any) => {
+        modelOptions.value = groupBy(res?.data, 'provider')
+        loading.value = false
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  } else {
+    model
+      .asyncGetModel()
+      .then((res: any) => {
+        modelOptions.value = groupBy(res?.data, 'provider')
+        loading.value = false
+      })
+      .catch(() => {
+        loading.value = false
+      })
+  }
 }
 
 function getProvider() {

@@ -1,8 +1,8 @@
 <template>
   <el-tag class="tag-ellipsis flex-between mb-8" effect="plain" v-bind="$attrs">
-    <AutoTooltip :content="tooltipContent">
+    <auto-tooltip :content="tooltipContent">
       <slot></slot>
-    </AutoTooltip>
+    </auto-tooltip>
   </el-tag>
 </template>
 <script setup lang="ts">
