@@ -68,30 +68,13 @@ function embedChatbot() {
         cursor: pointer;
         `
     close_button.onclick = () => {
-      document.body.removeChild(chat_container)
-      chat_button.style['display']='block'
+      chat_container.style['display']='none'
     }
 
     chat_container.append(close_button)
     document.body.append(chat_container)
-    let is_404=false
     chat_button.onclick = ($event) => {
-      if( chat_container.style['display']=='block'){
-        chat_container.style['display']='none'
-      } else {
-        if(auth(t.token,t.protocol, t.host)){
-          if(is_404){
-            document.body.removeChild(chat_container)
-            document.body.append(chat_container)
-            
-            is_404=false
-          } 
-          chat_container.style['display']='block'
-           
-        }else{
-          is_404=true
-        }
-      }
+      chat_container.style['display']=chat_container.style['display']=='block'?'none':'block'
     }
     sty = document.createElement('style')
     sty.innerText = ` #chat_container {
