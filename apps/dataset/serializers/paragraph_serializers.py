@@ -69,6 +69,15 @@ class ParagraphInstanceSerializer(ApiMixin, serializers.Serializer):
         )
 
 
+class EditParagraphSerializers(serializers.Serializer):
+    title = serializers.CharField(required=False, max_length=256, error_messages=ErrMessage.char(
+        "分段标题"), allow_null=True, allow_blank=True)
+    content = serializers.CharField(required=False, max_length=4096, allow_null=True, allow_blank=True,
+                                    error_messages=ErrMessage.char(
+                                        "分段内容"))
+    problem_list = ProblemInstanceSerializer(required=False, many=True)
+
+
 class ParagraphSerializers(ApiMixin, serializers.Serializer):
     title = serializers.CharField(required=False, max_length=256, error_messages=ErrMessage.char(
         "分段标题"), allow_null=True, allow_blank=True)
@@ -105,6 +114,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
         @transaction.atomic
         def edit(self, instance: Dict):
             self.is_valid()
+            EditParagraphSerializers(data=instance).is_valid(raise_exception=True)
             _paragraph = QuerySet(Paragraph).get(id=self.data.get("paragraph_id"))
             update_keys = ['title', 'content', 'is_active']
             for update_key in update_keys:
