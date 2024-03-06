@@ -108,6 +108,7 @@ const open = (data: any) => {
   dialogVisible.value = true
 }
 const submitHandle = async () => {
+  loading.value = true
   if (await paragraphFormRef.value?.validate()) {
     if (problemId.value) {
       paragraph
@@ -119,8 +120,8 @@ const submitHandle = async () => {
           loading
         )
         .then((res: any) => {
-          emit('refresh', res.data)
           isEdit.value = false
+          emit('refresh', res.data)
         })
     } else {
       const obj =
@@ -131,8 +132,8 @@ const submitHandle = async () => {
             }
           : paragraphFormRef.value?.form
       paragraphApi.postParagraph(id, documentId, obj, loading).then((res) => {
-        emit('refresh')
         dialogVisible.value = false
+        emit('refresh')
       })
     }
   }
