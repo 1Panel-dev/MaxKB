@@ -8,7 +8,7 @@
 """
 import types
 from smartdoc.const import CONFIG
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 
 class EmbeddingModel:

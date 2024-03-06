@@ -9,8 +9,7 @@
 import os
 from typing import Dict
 
-from langchain.chat_models import QianfanChatEndpoint
-from langchain.chat_models.baidu_qianfan_endpoint import convert_message_to_dict
+from langchain_community.chat_models import QianfanChatEndpoint
 from langchain.schema import HumanMessage
 
 from common import froms
@@ -39,7 +38,8 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            WenxinModelProvider().get_model(model_type, model_name, model_credential)([HumanMessage(content='valid')])
+            WenxinModelProvider().get_model(model_type, model_name, model_credential).invoke(
+                [HumanMessage(content='valid')])
         except Exception as e:
             if raise_exception:
                 raise AppApiException(500, "校验失败,请检查 api_key secret_key 是否正确")

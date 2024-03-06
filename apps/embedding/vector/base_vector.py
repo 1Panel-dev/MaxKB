@@ -10,7 +10,7 @@ import threading
 from abc import ABC, abstractmethod
 from typing import List, Dict
 
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from common.config.embedding_config import EmbeddingModel
 from common.util.common import sub_array

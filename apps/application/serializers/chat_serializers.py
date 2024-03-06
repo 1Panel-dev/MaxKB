@@ -12,10 +12,10 @@ import os
 import re
 import uuid
 from functools import reduce
-from typing import Dict, List
+from typing import Dict
 
 from django.core import validators
-from django.core.cache import cache
+from django.core.cache import cache, caches
 from django.db import transaction, models
 from django.db.models import QuerySet, Q
 from rest_framework import serializers
@@ -32,14 +32,13 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from common.util.rsa_util import decrypt
-from common.util.split_model import flat_map
 from dataset.models import Document, Problem, Paragraph
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from smartdoc.conf import PROJECT_DIR
 
-chat_cache = cache
+chat_cache = caches['model_cache']
 
 
 class ChatSerializers(serializers.Serializer):

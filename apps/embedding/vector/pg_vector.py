@@ -12,7 +12,7 @@ import uuid
 from typing import Dict, List
 
 from django.db.models import QuerySet
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from common.db.search import native_search, generate_sql_by_query_dict
 from common.db.sql_execute import select_one, select_list

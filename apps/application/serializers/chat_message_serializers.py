@@ -10,7 +10,7 @@ import json
 from typing import List
 from uuid import UUID
 
-from django.core.cache import cache
+from django.core.cache import caches
 from django.db.models import QuerySet
 from langchain.chat_models.base import BaseChatModel
 from rest_framework import serializers
@@ -30,7 +30,7 @@ from dataset.models import Paragraph, Document
 from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 
-chat_cache = cache
+chat_cache = caches['model_cache']
 
 
 class ChatInfo:

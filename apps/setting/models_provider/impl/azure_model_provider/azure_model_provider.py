@@ -9,7 +9,7 @@
 import os
 from typing import Dict
 
-from langchain.chat_models import AzureChatOpenAI
+from langchain_community.chat_models import AzureChatOpenAI
 from langchain.schema import HumanMessage
 
 from common import froms
@@ -40,7 +40,7 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = AzureModelProvider().get_model(model_type, model_name, model_credential)
-            model([HumanMessage(content='valid')])
+            model.invoke([HumanMessage(content='valid')])
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e

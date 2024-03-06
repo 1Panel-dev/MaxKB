@@ -89,6 +89,9 @@ CACHES = {
     "default": {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     },
+    'model_cache': {
+        'BACKEND': 'common.cache.mem_cache.MemCache'
+    },
     # 存储用户信息
     'user_cache': {
         'BACKEND': 'common.cache.file_cache.FileCache',

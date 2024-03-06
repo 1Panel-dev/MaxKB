@@ -142,7 +142,7 @@ class BaseChatStep(IChatStep):
             chat_result = AIMessage(
                 content="\n\n".join([paragraph.title + "\n" + paragraph.content for paragraph in paragraph_list]))
         else:
-            chat_result = chat_model(message_list)
+            chat_result = chat_model.invoke(message_list)
         chat_record_id = uuid.uuid1()
         request_token = chat_model.get_num_tokens_from_messages(message_list)
         response_token = chat_model.get_num_tokens(chat_result.content)

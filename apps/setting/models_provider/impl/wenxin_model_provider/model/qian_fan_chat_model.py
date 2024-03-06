@@ -9,7 +9,7 @@
 from typing import Optional, List, Any, Iterator, cast
 
 from langchain.callbacks.manager import CallbackManager
-from langchain.chat_models import QianfanChatEndpoint
+from langchain_community.chat_models import QianfanChatEndpoint
 from langchain.chat_models.base import BaseChatModel
 from langchain.load import dumpd
 from langchain.schema import LLMResult
