@@ -103,8 +103,7 @@ class ChatView(APIView):
             [RoleConstants.ADMIN, RoleConstants.USER],
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                             dynamic_tag=keywords.get('application_id'))],
-            compare=CompareConstants.AND), lambda r, k: Permission(group=Group.APPLICATION, operate=Operate.DELETE,
-                                                                   dynamic_tag=k.get('application_id')),
+            compare=CompareConstants.AND),
             compare=CompareConstants.AND)
         def delete(self, request: Request, application_id: str, chat_id: str):
             return result.success(
