@@ -29,7 +29,7 @@ def get_model_setting_dict():
 class Application(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     name = models.CharField(max_length=128, verbose_name="应用名称")
-    desc = models.CharField(max_length=128, verbose_name="引用描述", default="")
+    desc = models.CharField(max_length=512, verbose_name="引用描述", default="")
     prologue = models.CharField(max_length=1024, verbose_name="开场白", default="")
     dialogue_number = models.IntegerField(default=0, verbose_name="会话数量")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
