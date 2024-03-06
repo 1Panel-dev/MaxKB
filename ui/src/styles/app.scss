@@ -518,3 +518,15 @@ h4 {
     }
   }
 }
+
+#chat_container {
+  width: 420px;
+  height: 600px;
+}
+@media only screen and (max-width: 768px) {
+  #chat_container {
+    width: 100%;
+    height: 70%;
+    right: 0 !important;
+  }
+}
