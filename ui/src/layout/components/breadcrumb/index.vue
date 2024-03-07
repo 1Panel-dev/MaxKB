@@ -37,55 +37,62 @@
         </el-button>
       </div>
       <template #dropdown>
-        <el-dropdown-menu>
-          <template v-for="(item, index) in list" :key="index">
-            <div :class="item.id === id ? 'dropdown-active' : ''">
-              <el-dropdown-item :command="item.id">
-                <div class="flex align-center">
-                  <AppAvatar
-                    v-if="isApplication"
-                    :name="item.name"
-                    pinyinColor
-                    class="mr-12"
-                    shape="square"
-                    :size="24"
-                  />
-                  <AppAvatar
-                    v-else-if="isDataset && item.type === '1'"
-                    class="mr-12 avatar-purple"
-                    shape="square"
-                    :size="24"
-                  >
-                    <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
-                  </AppAvatar>
-                  <AppAvatar v-else class="mr-12" shape="square" :size="24">
-                    <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-                  </AppAvatar>
-                  <span class="ellipsis"> {{ item?.name }}</span>
+        <el-scrollbar>
+          <div style="max-height: 400px">
+            <el-dropdown-menu>
+              <template v-for="(item, index) in list" :key="index">
+                <div :class="item.id === id ? 'dropdown-active' : ''">
+                  <el-dropdown-item :command="item.id">
+                    <div class="flex align-center">
+                      <AppAvatar
+                        v-if="isApplication"
+                        :name="item.name"
+                        pinyinColor
+                        class="mr-12"
+                        shape="square"
+                        :size="24"
+                      />
+                      <AppAvatar
+                        v-else-if="isDataset && item.type === '1'"
+                        class="mr-12 avatar-purple"
+                        shape="square"
+                        :size="24"
+                      >
+                        <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                      </AppAvatar>
+                      <AppAvatar v-else class="mr-12" shape="square" :size="24">
+                        <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+                      </AppAvatar>
+                      <span class="ellipsis"> {{ item?.name }}</span>
+                    </div>
+                  </el-dropdown-item>
                 </div>
-              </el-dropdown-item>
+              </template>
+            </el-dropdown-menu>
+            <div class="breadcrumb__footer border-t" style="padding: 8px 11px; min-width: 200px">
+              <template v-if="isApplication">
+                <div
+                  class="w-full text-left cursor"
+                  @click="router.push({ path: '/application/create' })"
+                >
+                  <el-button link>
+                    <el-icon class="mr-4"><Plus /></el-icon> 创建应用
+                  </el-button>
+                </div>
+              </template>
+              <template v-else-if="isDataset">
+                <div
+                  class="w-full text-left cursor"
+                  @click="router.push({ path: '/dataset/create' })"
+                >
+                  <el-button link>
+                    <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
+                  </el-button>
+                </div>
+              </template>
             </div>
-          </template>
-        </el-dropdown-menu>
-        <div class="breadcrumb__footer border-t" style="padding: 8px 11px; min-width: 200px">
-          <template v-if="isApplication">
-            <div
-              class="w-full text-left cursor"
-              @click="router.push({ path: '/application/create' })"
-            >
-              <el-button link>
-                <el-icon class="mr-4"><Plus /></el-icon> 创建应用
-              </el-button>
-            </div>
-          </template>
-          <template v-else-if="isDataset">
-            <div class="w-full text-left cursor" @click="router.push({ path: '/dataset/create' })">
-              <el-button link>
-                <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
-              </el-button>
-            </div>
-          </template>
-        </div>
+          </div>
+        </el-scrollbar>
       </template>
     </el-dropdown>
   </div>
