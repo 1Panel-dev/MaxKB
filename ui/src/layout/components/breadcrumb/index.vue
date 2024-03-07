@@ -2,7 +2,7 @@
   <div class="breadcrumb ml-4 mt-4 mb-12 flex">
     <back-button :to="activeMenu" class="mt-4"></back-button>
     <el-dropdown
-      placement="top"
+      placement="bottom"
       trigger="click"
       @command="changeMenu"
       class="w-full"
