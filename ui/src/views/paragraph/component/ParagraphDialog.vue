@@ -22,7 +22,9 @@
         </el-scrollbar>
         <div class="text-right p-24 pt-0" v-if="problemId && isEdit">
           <el-button @click.prevent="cancelEdit"> 取消 </el-button>
-          <el-button type="primary" :disabled="loading" @click="submitHandle"> 保存 </el-button>
+          <el-button type="primary" :disabled="loading" @click="handleDebounceClick">
+            保存
+          </el-button>
         </div>
       </el-col>
       <el-col :span="8" class="border-l">
@@ -38,7 +40,9 @@
     <template #footer v-if="!problemId">
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
-        <el-button :disabled="loading" type="primary" @click="submitHandle"> 提交 </el-button>
+        <el-button :disabled="loading" type="primary" @click="handleDebounceClick">
+          提交
+        </el-button>
       </span>
     </template>
   </el-dialog>
@@ -46,7 +50,8 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, debounce } from 'lodash'
+
 import ParagraphForm from '@/views/paragraph/component/ParagraphForm.vue'
 import ProblemComponent from '@/views/paragraph/component/ProblemComponent.vue'
 import paragraphApi from '@/api/paragraph'
@@ -138,6 +143,9 @@ const submitHandle = async () => {
     }
   }
 }
+const handleDebounceClick = debounce(() => {
+  submitHandle()
+}, 200)
 
 defineExpose({ open })
 </script>
