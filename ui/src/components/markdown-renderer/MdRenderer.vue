@@ -5,15 +5,18 @@
     :modelValue="item"
     v-for="(item, index) in md_view_list"
     :key="index"
+    @onHtmlChanged="onHtmlChanged"
+    class="maxkb-md"
   />
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { MdPreview } from 'md-editor-v3'
 
 const props = withDefaults(defineProps<{ source?: string; inner_suffix?: boolean }>(), {
   source: ''
 })
+const editorRef = ref()
 const md_view_list = computed(() => {
   const temp_source = props.source
   const temp_md_img_list = temp_source.match(/(!\[.*?\]\(img\/.*?\){.*?})|(!\[.*?\]\(img\/.*?\))/g)
@@ -34,5 +37,19 @@ const md_view_list = computed(() => {
   })
   return result
 })
+const onHtmlChanged = () => {
+  appendTarget()
+}
+const appendTarget = () => {
+  nextTick(() => {
+    var item = document.getElementsByClassName('maxkb-md')
+    for (var j = 0; j < item.length; j++) {
+      var aTags = item[j].getElementsByTagName('a')
+      for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+      }
+    }
+  })
+}
 </script>
 <style lang="scss" scoped></style>
