@@ -108,8 +108,8 @@ const open = (data: any) => {
   dialogVisible.value = true
 }
 const submitHandle = async () => {
-  loading.value = true
   if (await paragraphFormRef.value?.validate()) {
+    loading.value = true
     if (problemId.value) {
       paragraph
         .asyncPutParagraph(
