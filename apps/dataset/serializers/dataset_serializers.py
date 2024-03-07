@@ -229,6 +229,10 @@ class DataSetSerializers(serializers.ModelSerializer):
 
             def is_valid(self, *, raise_exception=False):
                 super().is_valid(raise_exception=True)
+                source_url = self.data.get('source_url')
+                response = Fork(source_url, []).fork()
+                if response.status == 500:
+                    raise AppApiException(500, f"url错误,无法解析【{source_url}】")
                 return True
 
             @staticmethod
