@@ -82,6 +82,10 @@ model_dict = {
         'llama2-chinese:13b-maxkb',
         '由于Llama2本身的中文对齐较弱，我们采用中文指令集，对meta-llama/Llama-2-13b-chat-hf进行LoRA微调，使其具备较强的中文对话能力。fi2cloud专用',
         ModelTypeConst.LLM, ollama_llm_model_credential),
+    'baichuan2:13b-chat': ModelInfo(
+        'baichuan2:13b-chat',
+        'Baichuan 2 是百川智能推出的新一代开源大语言模型，采用 2.6 万亿 Tokens 的高质量语料训练，在权威的中文和英文 benchmark 上均取得同尺寸最好的效果',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
 }
 
 
