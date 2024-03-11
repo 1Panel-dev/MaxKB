@@ -132,6 +132,18 @@ class BaseVectorStore(ABC):
         pass
 
     @abstractmethod
+    def update_by_source_ids(self, source_ids: List[str], instance: Dict):
+        pass
+
+    @abstractmethod
+    def embed_documents(self, text_list: List[str]):
+        pass
+
+    @abstractmethod
+    def embed_query(self, text: str):
+        pass
+
+    @abstractmethod
     def delete_by_dataset_id(self, dataset_id: str):
         pass
 
@@ -145,6 +157,10 @@ class BaseVectorStore(ABC):
 
     @abstractmethod
     def delete_by_source_id(self, source_id: str, source_type: str):
+        pass
+
+    @abstractmethod
+    def delete_by_source_ids(self, source_ids: List[str], source_type: str):
         pass
 
     @abstractmethod

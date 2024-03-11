@@ -34,7 +34,7 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping
 from dataset.serializers.common_serializers import list_paragraph, MetaSerializer
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
 from setting.models import AuthOperate
@@ -303,6 +303,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             document_model_list = []
             paragraph_model_list = []
             problem_model_list = []
+            problem_paragraph_mapping_list = []
             # 插入文档
             for document in instance.get('documents') if 'documents' in instance else []:
                 document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(dataset_id,
@@ -312,6 +313,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                     paragraph_model_list.append(paragraph)
                 for problem in document_paragraph_dict_model.get('problem_model_list'):
                     problem_model_list.append(problem)
+                for problem_paragraph_mapping in document_paragraph_dict_model.get('problem_paragraph_mapping_list'):
+                    problem_paragraph_mapping_list.append(problem_paragraph_mapping)
 
             # 插入知识库
             dataset.save()
@@ -321,6 +324,9 @@ class DataSetSerializers(serializers.ModelSerializer):
             QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
             # 批量插入问题
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+            # 批量插入关联问题
+            QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
+                problem_paragraph_mapping_list) > 0 else None
 
             # 响应数据
             return {**DataSetSerializers(dataset).data,

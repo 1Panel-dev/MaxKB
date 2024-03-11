@@ -52,6 +52,73 @@ class Paragraph(APIView):
         return result.success(
             ParagraphSerializers.Create(data={'dataset_id': dataset_id, 'document_id': document_id}).save(request.data))
 
+    class Problem(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="添加关联问题",
+                             operation_id="添加段落关联问题",
+                             manual_parameters=ParagraphSerializers.Problem.get_request_params_api(),
+                             request_body=ParagraphSerializers.Problem.get_request_body_api(),
+                             responses=result.get_api_response(ParagraphSerializers.Problem.get_response_body_api()),
+                             tags=["知识库/文档/段落"])
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def post(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str):
+            return result.success(ParagraphSerializers.Problem(
+                data={"dataset_id": dataset_id, 'document_id': document_id, 'paragraph_id': paragraph_id}).save(
+                request.data, with_valid=True))
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取段落问题列表",
+                             operation_id="获取段落问题列表",
+                             manual_parameters=ParagraphSerializers.Problem.get_request_params_api(),
+                             responses=result.get_api_array_response(
+                                 ParagraphSerializers.Problem.get_response_body_api()),
+                             tags=["知识库/文档/段落"])
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def get(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str):
+            return result.success(ParagraphSerializers.Problem(
+                data={"dataset_id": dataset_id, 'document_id': document_id, 'paragraph_id': paragraph_id}).list(
+                with_valid=True))
+
+        class UnAssociation(APIView):
+            authentication_classes = [TokenAuth]
+
+            @action(methods=['PUT'], detail=False)
+            @swagger_auto_schema(operation_summary="解除关联问题",
+                                 operation_id="解除关联问题",
+                                 manual_parameters=ParagraphSerializers.Association.get_request_params_api(),
+                                 responses=result.get_default_response(),
+                                 tags=["知识库/文档/段落"])
+            @has_permissions(
+                lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                        dynamic_tag=k.get('dataset_id')))
+            def put(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str, problem_id: str):
+                return result.success(ParagraphSerializers.Association(
+                    data={'dataset_id': dataset_id, 'document_id': document_id, 'paragraph_id': paragraph_id,
+                          'problem_id': problem_id}).un_association())
+
+        class Association(APIView):
+            authentication_classes = [TokenAuth]
+
+            @action(methods=['PUT'], detail=False)
+            @swagger_auto_schema(operation_summary="关联问题",
+                                 operation_id="关联问题",
+                                 manual_parameters=ParagraphSerializers.Association.get_request_params_api(),
+                                 responses=result.get_default_response(),
+                                 tags=["知识库/文档/段落"])
+            @has_permissions(
+                lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                        dynamic_tag=k.get('dataset_id')))
+            def put(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str, problem_id: str):
+                return result.success(ParagraphSerializers.Association(
+                    data={'dataset_id': dataset_id, 'document_id': document_id, 'paragraph_id': paragraph_id,
+                          'problem_id': problem_id}).association())
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 
@@ -61,7 +128,7 @@ class Paragraph(APIView):
                              manual_parameters=ParagraphSerializers.Operate.get_request_params_api(),
                              request_body=ParagraphSerializers.Operate.get_request_body_api(),
                              responses=result.get_api_response(ParagraphSerializers.Operate.get_response_body_api())
-                             ,tags=["知识库/文档/段落"])
+            , tags=["知识库/文档/段落"])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))

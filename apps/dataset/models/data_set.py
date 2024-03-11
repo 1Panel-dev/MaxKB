@@ -76,6 +76,7 @@ class Paragraph(AppModelMixin):
     title = models.CharField(max_length=256, verbose_name="标题", default="")
     status = models.CharField(verbose_name='状态', max_length=1, choices=Status.choices,
                               default=Status.embedding)
+    hit_num = models.IntegerField(verbose_name="命中次数", default=0)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -87,10 +88,20 @@ class Problem(AppModelMixin):
     问题表
     """
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
-    document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, db_constraint=False)
     dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING, db_constraint=False)
-    paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, db_constraint=False)
     content = models.CharField(max_length=256, verbose_name="问题内容")
+    hit_num = models.IntegerField(verbose_name="命中次数", default=0)
 
     class Meta:
         db_table = "problem"
+
+
+class ProblemParagraphMapping(AppModelMixin):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
+    dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING, db_constraint=False)
+    document = models.ForeignKey(Document, on_delete=models.DO_NOTHING)
+    problem = models.ForeignKey(Problem, on_delete=models.DO_NOTHING, db_constraint=False)
+    paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, db_constraint=False)
+
+    class Meta:
+        db_table = "problem_paragraph_mapping"

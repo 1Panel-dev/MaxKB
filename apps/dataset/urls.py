@@ -28,7 +28,16 @@ urlpatterns = [
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<paragraph_id>',
          views.Paragraph.Operate.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem',
-         views.Problem.as_view()),
-    path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem/<str:problem_id>',
-         views.Problem.Operate.as_view())
+         views.Paragraph.Problem.as_view()),
+    path(
+        'dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem/<str:problem_id>/un_association',
+        views.Paragraph.Problem.UnAssociation.as_view()),
+    path(
+        'dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem/<str:problem_id>/association',
+        views.Paragraph.Problem.Association.as_view()),
+    path('dataset/<str:dataset_id>/problem', views.Problem.as_view()),
+    path('dataset/<str:dataset_id>/problem/<int:current_page>/<int:page_size>', views.Problem.Page.as_view()),
+    path('dataset/<str:dataset_id>/problem/<str:problem_id>', views.Problem.Operate.as_view()),
+    path('dataset/<str:dataset_id>/problem/<str:problem_id>/paragraph', views.Problem.Paragraph.as_view()),
+
 ]

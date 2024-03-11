@@ -14,6 +14,7 @@ from typing import Dict, List
 from django.db.models import QuerySet
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
+from common.config.embedding_config import EmbeddingModel
 from common.db.search import native_search, generate_sql_by_query_dict
 from common.db.sql_execute import select_one, select_list
 from common.util.file_util import get_file_content
@@ -23,6 +24,20 @@ from smartdoc.conf import PROJECT_DIR
 
 
 class PGVector(BaseVectorStore):
+
+    def delete_by_source_ids(self, source_ids: List[str], source_type: str):
+        QuerySet(Embedding).filter(source_id__in=source_ids, source_type=source_type).delete()
+
+    def update_by_source_ids(self, source_ids: List[str], instance: Dict):
+        QuerySet(Embedding).filter(source_id__in=source_ids).update(**instance)
+
+    def embed_documents(self, text_list: List[str]):
+        embedding = EmbeddingModel.get_embedding_model()
+        return embedding.embed_documents(text_list)
+
+    def embed_query(self, text: str):
+        embedding = EmbeddingModel.get_embedding_model()
+        return embedding.embed_query(text)
 
     def vector_is_create(self) -> bool:
         # 项目启动默认是创建好的 不需要再创建

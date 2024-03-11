@@ -21,7 +21,7 @@ from common.event.common import poxy, embedding_poxy
 from common.util.file_util import get_file_content
 from common.util.fork import ForkManage, Fork
 from common.util.lock import try_lock, un_lock
-from dataset.models import Paragraph, Status, Document
+from dataset.models import Paragraph, Status, Document, ProblemParagraphMapping
 from embedding.models import SourceType
 from smartdoc.conf import PROJECT_DIR
 
@@ -44,6 +44,12 @@ class SyncWebDocumentArgs:
         self.handler = handler
 
 
+class UpdateProblemArgs:
+    def __init__(self, problem_id: str, problem_content: str):
+        self.problem_id = problem_id
+        self.problem_content = problem_content
+
+
 class ListenerManagement:
     embedding_by_problem_signal = signal("embedding_by_problem")
     embedding_by_paragraph_signal = signal("embedding_by_paragraph")
@@ -59,6 +65,8 @@ class ListenerManagement:
     init_embedding_model_signal = signal('init_embedding_model')
     sync_web_dataset_signal = signal('sync_web_dataset')
     sync_web_document_signal = signal('sync_web_document')
+    update_problem_signal = signal('update_problem')
+    delete_embedding_by_source_ids_signal = signal('delete_embedding_by_source_ids')
 
     @staticmethod
     def embedding_by_problem(args):
@@ -76,8 +84,8 @@ class ListenerManagement:
         status = Status.success
         try:
             data_list = native_search(
-                {'problem': QuerySet(get_dynamics_model({'problem.paragraph_id': django.db.models.CharField()})).filter(
-                    **{'problem.paragraph_id': paragraph_id}),
+                {'problem': QuerySet(get_dynamics_model({'paragraph.id': django.db.models.CharField()})).filter(
+                    **{'paragraph.id': paragraph_id}),
                     'paragraph': QuerySet(Paragraph).filter(id=paragraph_id)},
                 select_string=get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
@@ -104,8 +112,9 @@ class ListenerManagement:
         status = Status.success
         try:
             data_list = native_search(
-                {'problem': QuerySet(get_dynamics_model({'problem.document_id': django.db.models.CharField()})).filter(
-                    **{'problem.document_id': document_id}),
+                {'problem': QuerySet(
+                    get_dynamics_model({'paragraph.document_id': django.db.models.CharField()})).filter(
+                    **{'paragraph.document_id': document_id}),
                     'paragraph': QuerySet(Paragraph).filter(document_id=document_id)},
                 select_string=get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
@@ -189,6 +198,17 @@ class ListenerManagement:
                 un_lock('sync_web_dataset' + args.lock_key)
 
     @staticmethod
+    def update_problem(args: UpdateProblemArgs):
+        problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(problem_id=args.problem_id)
+        embed_value = VectorStore.get_embedding_vector().embed_query(args.problem_content)
+        VectorStore.get_embedding_vector().update_by_source_ids([v.id for v in problem_paragraph_mapping_list],
+                                                                {'embedding': embed_value})
+
+    @staticmethod
+    def delete_embedding_by_source_ids(source_ids: List[str]):
+        VectorStore.get_embedding_vector().delete_by_source_ids(source_ids, SourceType.PROBLEM)
+
+    @staticmethod
     @poxy
     def init_embedding_model(ags):
         EmbeddingModel.get_embedding_model()
@@ -225,3 +245,6 @@ class ListenerManagement:
         ListenerManagement.sync_web_dataset_signal.connect(self.sync_web_dataset)
         # 同步web站点 文档
         ListenerManagement.sync_web_document_signal.connect(self.sync_web_document)
+        # 更新问题向量
+        ListenerManagement.update_problem_signal.connect(self.update_problem)
+        ListenerManagement.delete_embedding_by_source_ids_signal.connect(self.delete_embedding_by_source_ids)

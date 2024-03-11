@@ -137,7 +137,7 @@ const postProblem: (
   )
 }
 /**
- * 删除问题
+ * 解除关联问题
  * @param 参数 dataset_id, document_id, paragraph_id,problem_id
  */
 const delProblem: (
@@ -146,8 +146,8 @@ const delProblem: (
   paragraph_id: string,
   problem_id: string
 ) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id, problem_id) => {
-  return del(
-    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}`
+  return put(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}/un_association`
   )
 }
 

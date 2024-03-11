@@ -28,7 +28,7 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
 from common.util.split_model import SplitModel, get_split_model
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status, ProblemParagraphMapping
 from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
@@ -179,7 +179,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     # 删除段落
                     QuerySet(model=Paragraph).filter(document_id=document_id).delete()
                     # 删除问题
-                    QuerySet(model=Problem).filter(document_id=document_id).delete()
+                    QuerySet(model=ProblemParagraphMapping).filter(document_id=document_id).delete()
                     # 删除向量库
                     ListenerManagement.delete_embedding_by_document_signal.send(document_id)
                     paragraphs = get_split_model('web.md').parse(result.content)
@@ -191,10 +191,14 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
                     paragraph_model_list = document_paragraph_model.get('paragraph_model_list')
                     problem_model_list = document_paragraph_model.get('problem_model_list')
+                    problem_paragraph_mapping_list = document_paragraph_model.get('problem_paragraph_mapping_list')
                     # 批量插入段落
                     QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
                     # 批量插入问题
                     QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+                    # 插入关联问题
+                    QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
+                        problem_paragraph_mapping_list) > 0 else None
                     # 向量化
                     if with_embedding:
                         ListenerManagement.embedding_by_document_signal.send(document_id)
@@ -273,7 +277,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             # 删除段落
             QuerySet(model=Paragraph).filter(document_id=document_id).delete()
             # 删除问题
-            QuerySet(model=Problem).filter(document_id=document_id).delete()
+            QuerySet(model=ProblemParagraphMapping).filter(document_id=document_id).delete()
             # 删除向量库
             ListenerManagement.delete_embedding_by_document_signal.send(document_id)
             return True
@@ -344,12 +348,17 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             document_model = document_paragraph_model.get('document')
             paragraph_model_list = document_paragraph_model.get('paragraph_model_list')
             problem_model_list = document_paragraph_model.get('problem_model_list')
+            problem_paragraph_mapping_list = document_paragraph_model.get('problem_paragraph_mapping_list')
+
             # 插入文档
             document_model.save()
             # 批量插入段落
             QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
             # 批量插入问题
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+            # 批量插入关联问题
+            QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
+                problem_paragraph_mapping_list) > 0 else None
             document_id = str(document_model.id)
             return DocumentSerializers.Operate(
                 data={'dataset_id': dataset_id, 'document_id': document_id}).one(
@@ -396,14 +405,18 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
             paragraph_model_list = []
             problem_model_list = []
+            problem_paragraph_mapping_list = []
             for paragraphs in paragraph_model_dict_list:
                 paragraph = paragraphs.get('paragraph')
                 for problem_model in paragraphs.get('problem_model_list'):
                     problem_model_list.append(problem_model)
+                for problem_paragraph_mapping in paragraphs.get('problem_paragraph_mapping_list'):
+                    problem_paragraph_mapping_list.append(problem_paragraph_mapping)
                 paragraph_model_list.append(paragraph)
 
             return {'document': document_model, 'paragraph_model_list': paragraph_model_list,
-                    'problem_model_list': problem_model_list}
+                    'problem_model_list': problem_model_list,
+                    'problem_paragraph_mapping_list': problem_paragraph_mapping_list}
 
         @staticmethod
         def get_document_paragraph_model(dataset_id, instance: Dict):
@@ -523,6 +536,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             document_model_list = []
             paragraph_model_list = []
             problem_model_list = []
+            problem_paragraph_mapping_list = []
             # 插入文档
             for document in instance_list:
                 document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(dataset_id,
@@ -532,6 +546,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     paragraph_model_list.append(paragraph)
                 for problem in document_paragraph_dict_model.get('problem_model_list'):
                     problem_model_list.append(problem)
+                for problem_paragraph_mapping in document_paragraph_dict_model.get('problem_paragraph_mapping_list'):
+                    problem_paragraph_mapping_list.append(problem_paragraph_mapping)
 
             # 插入文档
             QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
@@ -539,6 +555,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
             # 批量插入问题
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+            # 批量插入关联问题
+            QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
+                problem_paragraph_mapping_list) > 0 else None
             # 查询文档
             query_set = QuerySet(model=Document)
             query_set = query_set.filter(**{'id__in': [d.id for d in document_model_list]})
