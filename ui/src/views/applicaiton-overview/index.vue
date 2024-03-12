@@ -75,7 +75,7 @@
     </div>
     <EmbedDialog ref="EmbedDialogRef" />
     <APIKeyDialog ref="APIKeyDialogRef" />
-    <LimitDialog ref="LimitDialogRef" />
+    <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -130,8 +130,8 @@ function updateAccessToken(obj: any, str: string) {
   })
 }
 
-function openLimitDialog() { 
-  LimitDialogRef.value.open()
+function openLimitDialog() {
+  LimitDialogRef.value.open(accessToken.value)
 }
 
 function openAPIKeyDialog() {
@@ -150,6 +150,10 @@ function getDetail() {
   application.asyncGetApplicationDetail(id, loading).then((res: any) => {
     detail.value = res.data
   })
+}
+
+function refresh() {
+  getAccessToken()
 }
 onMounted(() => {
   getDetail()

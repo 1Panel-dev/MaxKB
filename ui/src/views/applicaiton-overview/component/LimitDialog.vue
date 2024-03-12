@@ -1,22 +1,22 @@
 <template>
   <el-dialog title="访问限制" v-model="dialogVisible">
     <el-form label-position="top" ref="limitFormRef" :model="form">
-      <el-form-item label="文档地址" prop="source_url">
+      <el-form-item label="客户端提问限制">
         <el-input-number
-          v-model="form.min_star"
+          v-model="form.access_num"
           :min="0"
           :step="1"
           controls-position="right"
           step-strictly
         />
-        次 / 天
+        <span class="ml-4">次 / 天</span>
       </el-form-item>
       <el-form-item label="白名单" @click.prevent>
-        <el-switch size="small" v-model="form.multiple_rounds_dialogue"></el-switch>
+        <el-switch size="small" v-model="form.white_active"></el-switch>
       </el-form-item>
       <el-form-item>
         <el-input
-          v-model="form.source_url"
+          v-model="form.white_list"
           placeholder="请输入域名或IP地址，一行一个。"
           :rows="10"
           type="textarea"
@@ -36,24 +36,22 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { copyClick } from '@/utils/clipboard'
-import overviewApi from '@/api/application-overview'
-import { datetimeFormat } from '@/utils/time'
+import type { FormInstance, FormRules } from 'element-plus'
+import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import useStore from '@/stores'
+
 const route = useRoute()
 const {
   params: { id }
 } = route
-const { application } = useStore()
 
-const emit = defineEmits(['addData'])
+const emit = defineEmits(['refresh'])
 
 const limitFormRef = ref()
 const form = ref<any>({
-  type: '0',
-  source_url: '',
-  selector: ''
+  access_num: 0,
+  white_active: true,
+  white_list: ''
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -62,18 +60,39 @@ const loading = ref(false)
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
-      type: '0',
-      source_url: '',
-      selector: ''
+      access_num: 0,
+      white_active: true,
+      white_list: ''
     }
   }
 })
 
-const open = () => {
+const open = (data: any) => {
+  form.value.access_num = data.access_num
+  form.value.white_active = data.white_active
+  form.value.white_list = data.white_list?.join('\n')
   dialogVisible.value = true
 }
 
-function submit() {}
+const submit = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      const obj = {
+        white_list: form.value.white_list.split('\n'),
+        white_active: form.value.white_active,
+        access_num: form.value.access_num
+      }
+      applicationApi.putAccessToken(id as string, obj, loading).then((res) => {
+        emit('refresh')
+        MsgSuccess('设置成功')
+        dialogVisible.value = false
+      })
+    } else {
+      console.log('error submit!', fields)
+    }
+  })
+}
 
 defineExpose({ open })
 </script>
