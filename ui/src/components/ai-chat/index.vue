@@ -260,10 +260,11 @@ function openParagraph(row: any, id?: string) {
 
 function quickProblemHandel(val: string) {
   if (!props.log) {
-    inputValue.value = val
-    nextTick(() => {
-      quickInputRef.value?.focus()
-    })
+    // inputValue.value = val
+    // nextTick(() => {
+    //   quickInputRef.value?.focus()
+    // })
+    chatMessage(null, val)
   }
 }
 
@@ -404,12 +405,12 @@ const errorWrite = (chat: any) => {
   ChatManagement.append(chat.id, '抱歉，当前正在维护，无法提供服务，请稍后再试！')
   ChatManagement.close(chat.id)
 }
-function chatMessage(chat?: any) {
+function chatMessage(chat?: any, problem?: string) {
   loading.value = true
   if (!chat) {
     chat = reactive({
       id: randomId(),
-      problem_text: inputValue.value,
+      problem_text: problem ? problem : inputValue.value,
       answer_text: '',
       buffer: [],
       write_ed: false,
