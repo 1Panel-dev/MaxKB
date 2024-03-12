@@ -50,6 +50,7 @@
               <el-button :disabled="!accessToken?.is_active" @click="openDialog">
                 嵌入第三方
               </el-button>
+              <el-button @click="openLimitDialog"> 访问限制 </el-button>
             </div>
           </el-col>
           <el-col :span="12" class="mt-16">
@@ -74,6 +75,7 @@
     </div>
     <EmbedDialog ref="EmbedDialogRef" />
     <APIKeyDialog ref="APIKeyDialogRef" />
+    <LimitDialog ref="LimitDialogRef" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -81,6 +83,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
+import LimitDialog from './component/LimitDialog.vue'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
@@ -94,6 +97,7 @@ const {
 
 const apiUrl = window.location.origin + '/doc'
 
+const LimitDialogRef = ref()
 const APIKeyDialogRef = ref()
 const EmbedDialogRef = ref()
 
@@ -124,6 +128,10 @@ function updateAccessToken(obj: any, str: string) {
     accessToken.value = res?.data
     MsgSuccess(str)
   })
+}
+
+function openLimitDialog() { 
+  LimitDialogRef.value.open()
 }
 
 function openAPIKeyDialog() {
