@@ -111,6 +111,12 @@ class ApplicationSerializer(serializers.Serializer):
             access_token_reset = serializers.BooleanField(required=False,
                                                           error_messages=ErrMessage.boolean("重置Token"))
             is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean("是否开启"))
+            access_num = serializers.IntegerField(required=False, error_messages=ErrMessage.integer("访问次数"))
+            white_active = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean("是否开启白名单"))
+            white_list = serializers.ListSerializer(required=False, child=serializers.CharField(required=True,
+                                                                                                error_messages=ErrMessage.char(
+                                                                                                    "白名单")),
+                                                    error_messages=ErrMessage.list("白名单列表"))
 
         def edit(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -124,6 +130,12 @@ class ApplicationSerializer(serializers.Serializer):
                 application_access_token.is_active = instance.get("is_active")
             if 'access_token_reset' in instance and instance.get('access_token_reset'):
                 application_access_token.access_token = hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]
+            if 'access_num' in instance and instance.get('access_num') is not None:
+                application_access_token.access_num = instance.get("access_num")
+            if 'white_active' in instance and instance.get('white_active') is not None:
+                application_access_token.white_active = instance.get("white_active")
+            if 'white_list' in instance and instance.get('white_list') is not None:
+                application_access_token.white_list = instance.get('white_list')
             application_access_token.save()
             return self.one(with_valid=False)
 
@@ -141,7 +153,11 @@ class ApplicationSerializer(serializers.Serializer):
                 application_access_token.save()
             return {'application_id': application_access_token.application_id,
                     'access_token': application_access_token.access_token,
-                    "is_active": application_access_token.is_active}
+                    "is_active": application_access_token.is_active,
+                    'access_num': application_access_token.access_num,
+                    'white_active': application_access_token.white_active,
+                    'white_list': application_access_token.white_list
+                    }
 
     class Authentication(serializers.Serializer):
         access_token = serializers.CharField(required=True, error_messages=ErrMessage.char("access_token"))

@@ -125,7 +125,12 @@ class ApplicationApi(ApiMixin):
                                                          description="重置Token"),
 
                     'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否激活", description="是否激活"),
-
+                    'access_num': openapi.Schema(type=openapi.TYPE_NUMBER, title="访问次数", description="访问次数"),
+                    'white_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否开启白名单",
+                                                   description="是否开启白名单"),
+                    'white_list': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                 items=openapi.Schema(type=openapi.TYPE_STRING), title="白名单列表",
+                                                 description="白名单列表"),
                 }
             )
 
