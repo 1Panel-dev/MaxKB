@@ -2,13 +2,13 @@
   <el-dialog
     :title="title"
     v-model="dialogVisible"
-    width="800"
+    width="80%"
     class="paragraph-dialog"
     destroy-on-close
   >
     <el-row v-loading="loading">
-      <el-col :span="16">
-        <el-scrollbar height="370" wrap-class="paragraph-scrollbar">
+      <el-col :span="18">
+        <el-scrollbar height="500" wrap-class="paragraph-scrollbar">
           <div class="p-24" style="padding-bottom: 8px">
             <div class="flex-between mb-16">
               <div class="bold title align-center">分段内容</div>
@@ -27,7 +27,7 @@
           </el-button>
         </div>
       </el-col>
-      <el-col :span="8" class="border-l">
+      <el-col :span="6" class="border-l">
         <!-- 关联问题 -->
         <ProblemComponent
           :problemId="problemId"

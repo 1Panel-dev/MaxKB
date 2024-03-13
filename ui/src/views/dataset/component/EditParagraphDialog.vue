@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="编辑分段" v-model="dialogVisible" width="600" destroy-on-close>
+  <el-dialog title="编辑分段" v-model="dialogVisible" width="80%" destroy-on-close>
     <ParagraphForm ref="paragraphFormRef" :data="detail" :isEdit="true" />
     <template #footer>
       <span class="dialog-footer">
