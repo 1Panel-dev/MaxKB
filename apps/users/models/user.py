@@ -17,7 +17,7 @@ from common.db.sql_execute import select_list
 from common.util.file_util import get_file_content
 from smartdoc.conf import PROJECT_DIR
 
-__all__ = ["User", "password_encrypt"]
+__all__ = ["User", "password_encrypt", 'get_user_dynamics_permission']
 
 
 def password_encrypt(raw_password):

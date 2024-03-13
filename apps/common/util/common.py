@@ -6,37 +6,9 @@
     @date：2023/10/16 16:42
     @desc:
 """
-import datetime
 import importlib
-import uuid
 from functools import reduce
 from typing import Dict, List
-
-from django.core import cache
-
-from .rsa_util import encrypt
-
-chat_cache = cache.caches['chat_cache']
-
-
-def set_embed_identity_cookie(request, response):
-    if 'embed_identity' in request.COOKIES:
-        embed_identity = request.COOKIES['embed_identity']
-    else:
-        value = str(uuid.uuid1())
-        embed_identity = encrypt(value)
-        chat_cache.set(value, 0, timeout=getRestSeconds())
-    response.set_cookie("embed_identity", embed_identity, max_age=3600 * 24 * 100, samesite='None',
-                        secure=True)
-    return response
-
-
-def getRestSeconds():
-    now = datetime.datetime.now()
-    today_begin = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
-    tomorrow_begin = today_begin + datetime.timedelta(days=1)
-    rest_seconds = (tomorrow_begin - now).seconds
-    return rest_seconds
 
 
 def sub_array(array: List, item_num=10):

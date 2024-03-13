@@ -15,6 +15,7 @@ from application.serializers.chat_message_serializers import ChatMessageSerializ
 from application.serializers.chat_serializers import ChatSerializers, ChatRecordSerializer
 from application.swagger_api.chat_api import ChatApi, VoteApi, ChatRecordApi, ImproveApi, ChatRecordImproveApi
 from common.auth import TokenAuth, has_permissions
+from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import Permission, Group, Operate, \
     RoleConstants, ViewPermission, CompareConstants
 from common.response import result
@@ -71,11 +72,15 @@ class ChatView(APIView):
                                                            dynamic_tag=keywords.get('application_id'))])
         )
         def post(self, request: Request, chat_id: str):
-            return ChatMessageSerializer(data={'chat_id': chat_id}).chat(request.data.get('message'),
-                                                                         request.data.get(
-                                                                             're_chat') if 're_chat' in request.data else False,
-                                                                         request.data.get(
-                                                                             'stream') if 'stream' in request.data else True)
+            return ChatMessageSerializer(data={'chat_id': chat_id, 'message': request.data.get('message'),
+                                               're_chat': (request.data.get(
+                                                   're_chat') if 're_chat' in request.data else False),
+                                               'stream': (request.data.get(
+                                                   'stream') if 'stream' in request.data else True),
+                                               'application_id': (request.auth.keywords.get(
+                                                   'application_id') if request.auth.client_type == AuthenticationType.APPLICATION_ACCESS_TOKEN.value else None),
+                                               'client_id': request.auth.client_id,
+                                               'client_type': request.auth.client_type}).chat()
 
     @action(methods=['GET'], detail=False)
     @swagger_auto_schema(operation_summary="获取对话列表",

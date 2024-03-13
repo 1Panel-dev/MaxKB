@@ -28,10 +28,8 @@ from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404
-from common.util.common import getRestSeconds, set_embed_identity_cookie
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
-from common.util.rsa_util import encrypt
 from dataset.models import DataSet, Document
 from dataset.serializers.common_serializers import list_paragraph
 from setting.models import AuthOperate
@@ -39,7 +37,6 @@ from setting.models.model_management import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
-from smartdoc.settings import JWT_AUTH
 
 token_cache = cache.caches['token_cache']
 chat_cache = cache.caches['chat_cache']
@@ -114,7 +111,7 @@ class ApplicationSerializer(serializers.Serializer):
         protocol = serializers.CharField(required=True, error_messages=ErrMessage.char("协议"))
         token = serializers.CharField(required=True, error_messages=ErrMessage.char("token"))
 
-        def get_embed(self, request, with_valid=True):
+        def get_embed(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             index_path = os.path.join(PROJECT_DIR, 'apps', "application", 'template', 'embed.js')
@@ -136,7 +133,6 @@ class ApplicationSerializer(serializers.Serializer):
                          application_access_token.white_list),
                      'white_active': 'true' if application_access_token.white_active else 'false'}))
             response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
-            set_embed_identity_cookie(request, response)
             return response
 
     class AccessTokenSerializer(serializers.Serializer):
@@ -197,17 +193,27 @@ class ApplicationSerializer(serializers.Serializer):
     class Authentication(serializers.Serializer):
         access_token = serializers.CharField(required=True, error_messages=ErrMessage.char("access_token"))
 
-        def auth(self, with_valid=True):
+        def auth(self, request, with_valid=True):
+            token = request.META.get('HTTP_AUTHORIZATION', None)
+            token_details = None
+            try:
+                # 校验token
+                if token is not None:
+                    token_details = signing.loads(token)
+            except Exception as e:
+                token = None
             if with_valid:
                 self.is_valid(raise_exception=True)
             access_token = self.data.get("access_token")
             application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
             if application_access_token is not None and application_access_token.is_active:
-                token = signing.dumps({'application_id': str(application_access_token.application_id),
-                                       'user_id': str(application_access_token.application.user.id),
-                                       'access_token': application_access_token.access_token,
-                                       'type': AuthenticationType.APPLICATION_ACCESS_TOKEN.value})
-                token_cache.set(token, application_access_token, timeout=JWT_AUTH['JWT_EXPIRATION_DELTA'])
+                if token is None or (token_details is not None and 'client_id' not in token_details):
+                    client_id = str(uuid.uuid1())
+                    token = signing.dumps({'application_id': str(application_access_token.application_id),
+                                           'user_id': str(application_access_token.application.user.id),
+                                           'access_token': application_access_token.access_token,
+                                           'type': AuthenticationType.APPLICATION_ACCESS_TOKEN.value,
+                                           'client_id': client_id})
                 return token
             else:
                 raise NotFound404(404, "无效的access_token")

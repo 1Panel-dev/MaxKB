@@ -2,7 +2,7 @@
 """
     @project: maxkb
     @Author：虎
-    @file： application_api.py
+    @file： application_key.py
     @date：2023/11/7 10:50
     @desc:
 """

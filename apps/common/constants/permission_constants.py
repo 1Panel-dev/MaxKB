@@ -151,10 +151,12 @@ class Auth:
      用于存储当前用户的角色和权限
     """
 
-    def __init__(self, role_list: List[RoleConstants], permission_list: List[PermissionConstants | Permission],
-                 **keywords):
+    def __init__(self, role_list: List[RoleConstants], permission_list: List[PermissionConstants | Permission]
+                 , client_id, client_type, **keywords):
         self.role_list = role_list
         self.permission_list = permission_list
+        self.client_id = client_id
+        self.client_type = client_type
         self.keywords = keywords
 
 

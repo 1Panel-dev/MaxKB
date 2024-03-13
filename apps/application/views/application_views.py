@@ -37,7 +37,7 @@ class Application(APIView):
         def get(self, request: Request):
             return ApplicationSerializer.Embed(
                 data={'protocol': request.query_params.get('protocol'), 'token': request.query_params.get('token'),
-                      'host': request.query_params.get('host'), }).get_embed(request)
+                      'host': request.query_params.get('host'), }).get_embed()
 
     class Model(APIView):
         authentication_classes = [TokenAuth]
@@ -192,7 +192,8 @@ class Application(APIView):
                              security=[])
         def post(self, request: Request):
             return result.success(
-                ApplicationSerializer.Authentication(data={'access_token': request.data.get("access_token")}).auth(),
+                ApplicationSerializer.Authentication(data={'access_token': request.data.get("access_token")}).auth(
+                    request),
                 headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
                          "Access-Control-Allow-Methods": "POST",
                          "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}

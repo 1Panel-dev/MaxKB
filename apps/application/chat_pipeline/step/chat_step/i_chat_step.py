@@ -68,6 +68,8 @@ class IChatStep(IBaseChatPipelineStep):
         padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.base("补全问题"))
         # 是否使用流的形式输出
         stream = serializers.BooleanField(required=False, error_messages=ErrMessage.base("流式输出"))
+        client_id = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端id"))
+        client_type = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端类型"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -90,5 +92,5 @@ class IChatStep(IBaseChatPipelineStep):
                 chat_model: BaseChatModel = None,
                 paragraph_list=None,
                 manage: PiplineManage = None,
-                padding_problem_text: str = None, stream: bool = True, **kwargs):
+                padding_problem_text: str = None, stream: bool = True, client_id=None, client_type=None, **kwargs):
         pass

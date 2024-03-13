@@ -13,6 +13,7 @@ import traceback
 import uuid
 from typing import List
 
+from django.db.models import QuerySet
 from django.http import StreamingHttpResponse
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
@@ -21,7 +22,18 @@ from langchain.schema.messages import BaseMessageChunk, HumanMessage, AIMessage
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PiplineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
+from application.models.api_key_model import ApplicationPublicAccessClient
+from common.constants.authentication_type import AuthenticationType
 from common.response import result
+
+
+def add_access_num(client_id=None, client_type=None):
+    if client_type == AuthenticationType.APPLICATION_ACCESS_TOKEN.value:
+        application_public_access_client = QuerySet(ApplicationPublicAccessClient).filter(id=client_id).first()
+        if application_public_access_client is not None:
+            application_public_access_client.access_num = application_public_access_client.access_num + 1
+            application_public_access_client.intraday_access_num = application_public_access_client.intraday_access_num + 1
+            application_public_access_client.save()
 
 
 def event_content(response,
@@ -34,7 +46,8 @@ def event_content(response,
                   chat_model,
                   message_list: List[BaseMessage],
                   problem_text: str,
-                  padding_problem_text: str = None):
+                  padding_problem_text: str = None,
+                  client_id=None, client_type=None):
     all_text = ''
     try:
         for chunk in response:
@@ -57,6 +70,7 @@ def event_content(response,
                                       all_text, manage, step, padding_problem_text)
         yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
                                      'content': '', 'is_end': True}) + "\n\n"
+        add_access_num(client_id, client_type)
     except Exception as e:
         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
         yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
@@ -73,15 +87,16 @@ class BaseChatStep(IChatStep):
                 manage: PiplineManage = None,
                 padding_problem_text: str = None,
                 stream: bool = True,
+                client_id=None, client_type=None,
                 **kwargs):
         if stream:
             return self.execute_stream(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                        paragraph_list,
-                                       manage, padding_problem_text)
+                                       manage, padding_problem_text, client_id, client_type)
         else:
             return self.execute_block(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                       paragraph_list,
-                                      manage, padding_problem_text)
+                                      manage, padding_problem_text, client_id, client_type)
 
     def get_details(self, manage, **kwargs):
         return {
@@ -111,7 +126,8 @@ class BaseChatStep(IChatStep):
                        chat_model: BaseChatModel = None,
                        paragraph_list=None,
                        manage: PiplineManage = None,
-                       padding_problem_text: str = None):
+                       padding_problem_text: str = None,
+                       client_id=None, client_type=None):
         # 调用模型
         if chat_model is None:
             chat_result = iter(
@@ -123,7 +139,7 @@ class BaseChatStep(IChatStep):
         r = StreamingHttpResponse(
             streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
                                             post_response_handler, manage, self, chat_model, message_list, problem_text,
-                                            padding_problem_text),
+                                            padding_problem_text, client_id, client_type),
             content_type='text/event-stream;charset=utf-8')
 
         r['Cache-Control'] = 'no-cache'
@@ -136,7 +152,8 @@ class BaseChatStep(IChatStep):
                       chat_model: BaseChatModel = None,
                       paragraph_list=None,
                       manage: PiplineManage = None,
-                      padding_problem_text: str = None):
+                      padding_problem_text: str = None,
+                      client_id=None, client_type=None):
         # 调用模型
         if chat_model is None:
             chat_result = AIMessage(
@@ -156,5 +173,6 @@ class BaseChatStep(IChatStep):
         manage.context['answer_tokens'] = manage.context['answer_tokens'] + response_token
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       chat_result.content, manage, self, padding_problem_text)
+        add_access_num(client_id, client_type)
         return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
                                'content': chat_result.content, 'is_end': True})

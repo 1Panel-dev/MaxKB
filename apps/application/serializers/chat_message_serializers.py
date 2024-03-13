@@ -23,7 +23,9 @@ from application.chat_pipeline.step.generate_human_message_step.impl.base_genera
 from application.chat_pipeline.step.reset_problem_step.impl.base_reset_problem_step import BaseResetProblemStep
 from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset_step import BaseSearchDatasetStep
 from application.models import ChatRecord, Chat, Application, ApplicationDatasetMapping
-from common.exception.app_exception import AppApiException
+from application.models.api_key_model import ApplicationPublicAccessClient, ApplicationAccessToken
+from common.constants.authentication_type import AuthenticationType
+from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed
 from common.util.field_message import ErrMessage
 from common.util.rsa_util import decrypt
 from common.util.split_model import flat_map
@@ -32,7 +34,6 @@ from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 
 chat_cache = caches['model_cache']
-chat_embed_identity_cache = caches['chat_cache']
 
 
 class ChatInfo:
@@ -75,15 +76,16 @@ class ChatInfo:
             'chat_model': self.chat_model,
             'model_id': self.application.model.id if self.application.model is not None else None,
             'problem_optimization': self.application.problem_optimization,
-            'stream': True
+            'stream': True,
 
         }
 
     def to_pipeline_manage_params(self, problem_text: str, post_response_handler: PostResponseHandler,
-                                  exclude_paragraph_id_list, stream=True):
+                                  exclude_paragraph_id_list, client_id: str, client_type, stream=True):
         params = self.to_base_pipeline_manage_params()
         return {**params, 'problem_text': problem_text, 'post_response_handler': post_response_handler,
-                'exclude_paragraph_id_list': exclude_paragraph_id_list, 'stream': stream}
+                'exclude_paragraph_id_list': exclude_paragraph_id_list, 'stream': stream, 'client_id': client_id,
+                'client_type': client_type}
 
     def append_chat_record(self, chat_record: ChatRecord):
         # 存入缓存中
@@ -127,9 +129,37 @@ def get_post_handler(chat_info: ChatInfo):
 
 
 class ChatMessageSerializer(serializers.Serializer):
-    chat_id = serializers.UUIDField(required=True)
+    chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("对话id"))
+    message = serializers.CharField(required=True, error_messages=ErrMessage.char("用户问题"))
+    stream = serializers.BooleanField(required=True, error_messages=ErrMessage.char("是否流式回答"))
+    re_chat = serializers.BooleanField(required=True, error_messages=ErrMessage.char("是否重新回答"))
+    application_id = serializers.UUIDField(required=False, allow_null=True, error_messages=ErrMessage.uuid("应用id"))
+    client_id = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端id"))
+    client_type = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端类型"))
 
-    def chat(self, message, re_chat: bool, stream: bool):
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        if self.data.get('client_type') == AuthenticationType.APPLICATION_ACCESS_TOKEN.value:
+            access_client = QuerySet(ApplicationPublicAccessClient).filter(id=self.data.get('client_id')).first()
+            if access_client is None:
+                access_client = ApplicationPublicAccessClient(id=self.data.get('client_id'),
+                                                              application_id=self.data.get('application_id'),
+                                                              access_num=0,
+                                                              intraday_access_num=0)
+                access_client.save()
+
+            application_access_token = QuerySet(ApplicationAccessToken).filter(
+                application_id=self.data.get('application_id')).first()
+            if application_access_token.access_num <= access_client.intraday_access_num:
+                raise AppChatNumOutOfBoundsFailed(1002, "访问次数超过今日访问量")
+
+    def chat(self):
+        self.is_valid(raise_exception=True)
+        message = self.data.get('message')
+        re_chat = self.data.get('re_chat')
+        stream = self.data.get('stream')
+        client_id = self.data.get('client_id')
+        client_type = self.data.get('client_type')
         self.is_valid(raise_exception=True)
         chat_id = self.data.get('chat_id')
         chat_info: ChatInfo = chat_cache.get(chat_id)
@@ -156,7 +186,7 @@ class ChatMessageSerializer(serializers.Serializer):
             exclude_paragraph_id_list = list(set(paragraph_id_list))
         # 构建运行参数
         params = chat_info.to_pipeline_manage_params(message, get_post_handler(chat_info), exclude_paragraph_id_list,
-                                                     stream)
+                                                     client_id, client_type, stream)
         # 运行流水线作业
         pipline_message.run(params)
         return pipline_message.context['chat_result']

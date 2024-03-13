@@ -10,7 +10,9 @@ from enum import Enum
 
 
 class AuthenticationType(Enum):
-    # 或者
+    # 普通用户
     USER = "USER"
-    # 并且
+    # 公共访问链接
     APPLICATION_ACCESS_TOKEN = "APPLICATION_ACCESS_TOKEN"
+    # key API
+    API_KEY = "API_KEY"
