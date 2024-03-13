@@ -29,7 +29,7 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <div class="mt-8">
+            <div class="mt-8 white-space">
               {{ source2 }}
             </div>
           </div>
@@ -68,13 +68,13 @@ frameborder="0"
 allow="microphone">
 </iframe>
 `
-  source2.value = `<script> window.maxkbChatConfig = { 
-  token: "${val}",
-  host: "${window.location.host}",
-  protocol:"${window.location.protocol}"
- }
- <\/script>
-<script src="${window.location.origin}/ui/embeb.js">
+
+  source2.value = `
+<script src="${
+    window.location.origin
+  }/api/application/embed?protocol=${window.location.protocol.replace(':', '')}&host=${
+    window.location.host
+  }&token=${val}">
 <\/script>
 `
   dialogVisible.value = true
@@ -95,6 +95,9 @@ defineExpose({ open })
     font-size: 13px;
     white-space: pre;
     height: 180px;
+    .white-space {
+      white-space: pre-wrap;
+    }
   }
 }
 </style>

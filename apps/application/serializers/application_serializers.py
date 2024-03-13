@@ -17,6 +17,8 @@ from django.core import cache
 from django.core import signing
 from django.db import transaction, models
 from django.db.models import QuerySet
+from django.http import HttpResponse
+from django.template import Template, Context
 from rest_framework import serializers
 
 from application.models import Application, ApplicationDatasetMapping
@@ -26,8 +28,10 @@ from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404
+from common.util.common import getRestSeconds, set_embed_identity_cookie
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
+from common.util.rsa_util import encrypt
 from dataset.models import DataSet, Document
 from dataset.serializers.common_serializers import list_paragraph
 from setting.models import AuthOperate
@@ -38,6 +42,7 @@ from smartdoc.conf import PROJECT_DIR
 from smartdoc.settings import JWT_AUTH
 
 token_cache = cache.caches['token_cache']
+chat_cache = cache.caches['chat_cache']
 
 
 class ModelDatasetAssociation(serializers.Serializer):
@@ -103,6 +108,31 @@ class ApplicationSerializer(serializers.Serializer):
         super().is_valid(raise_exception=True)
         ModelDatasetAssociation(data={'user_id': user_id, 'model_id': self.data.get('model_id'),
                                       'dataset_id_list': self.data.get('dataset_id_list')}).is_valid()
+
+    class Embed(serializers.Serializer):
+        host = serializers.CharField(required=True, error_messages=ErrMessage.char("主机"))
+        protocol = serializers.CharField(required=True, error_messages=ErrMessage.char("协议"))
+        token = serializers.CharField(required=True, error_messages=ErrMessage.char("token"))
+
+        def get_embed(self, request, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            index_path = os.path.join(PROJECT_DIR, 'apps', "application", 'template', 'embed.js')
+            file = open(index_path, "r", encoding='utf-8')
+            content = file.read()
+            file.close()
+            is_auth = 'true'
+            try:
+                ApplicationSerializer.Authentication(data={'access_token': self.data.get('token')}).auth()
+            except Exception as e:
+                is_auth = 'false'
+            t = Template(content)
+            s = t.render(
+                Context(
+                    {'is_auth': is_auth, 'protocol': 'http', 'host': 'localhost:8000', 'token': '0a8d892c755f1a75'}))
+            response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
+            set_embed_identity_cookie(request, response)
+            return response
 
     class AccessTokenSerializer(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.boolean("应用id"))

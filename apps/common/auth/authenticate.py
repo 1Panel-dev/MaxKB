@@ -6,21 +6,28 @@
     @date：2023/9/4 11:16
     @desc:  认证类
 """
+import datetime
+import traceback
+from urllib.parse import urlparse
 
 from django.core import cache
 from django.core import signing
 from django.db.models import QuerySet
+from ipware import get_client_ip
 from rest_framework.authentication import TokenAuthentication
 
 from application.models.api_key_model import ApplicationAccessToken, ApplicationApiKey
 from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import Auth, get_permission_list_by_role, RoleConstants, Permission, Group, \
     Operate
-from common.exception.app_exception import AppAuthenticationFailed
+from common.exception.app_exception import AppAuthenticationFailed, AppEmbedIdentityFailed, AppChatNumOutOfBoundsFailed
+from common.util.common import getRestSeconds
+from common.util.rsa_util import decrypt
 from smartdoc.settings import JWT_AUTH
 from users.models.user import User, get_user_dynamics_permission
 
 token_cache = cache.caches['token_cache']
+chat_cache = cache.caches['chat_cache']
 
 
 class AnonymousAuthentication(TokenAuthentication):
@@ -80,6 +87,35 @@ class TokenAuth(TokenAuthentication):
                     raise AppAuthenticationFailed(1002, "身份验证信息不正确")
                 if not application_access_token.access_token == auth_details.get('access_token'):
                     raise AppAuthenticationFailed(1002, "身份验证信息不正确")
+                if application_access_token.white_active:
+                    referer = request.META.get('HTTP_REFERER')
+                    if referer is not None:
+                        client_ip = urlparse(referer).hostname
+                    else:
+                        client_ip = get_client_ip(request)
+                    if not application_access_token.white_list.__contains__(client_ip):
+                        raise AppAuthenticationFailed(1002, "身份验证信息不正确")
+                if 'embed_identity' in request.COOKIES and request.path.__contains__('/api/application/chat_message/'):
+                    embed_identity = request.COOKIES['embed_identity']
+                    try:
+                        # 如果无法解密 说明embed_identity并非系统颁发
+                        value = decrypt(embed_identity)
+                    except Exception as e:
+                        raise AppEmbedIdentityFailed(1004, '嵌入cookie不正确')
+                    embed_identity_number = chat_cache.get(value)
+                    if embed_identity_number is not None:
+                        if application_access_token.access_num <= embed_identity_number:
+                            raise AppChatNumOutOfBoundsFailed(1003, '访问次数超过今日访问量')
+                    # 对话次数+1
+                    try:
+                        if not chat_cache.incr(value):
+                            # 如果修改失败则设置为1
+                            chat_cache.set(value, 1,
+                                           timeout=getRestSeconds())
+                    except Exception as e:
+                        # 如果修改失败则设置为1 证明 key不存在
+                        chat_cache.add(value, 1,
+                                       timeout=getRestSeconds())
                 return application_access_token.application.user, Auth(
                     role_list=[RoleConstants.APPLICATION_ACCESS_TOKEN],
                     permission_list=[
@@ -94,4 +130,7 @@ class TokenAuth(TokenAuthentication):
                 raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")
 
         except Exception as e:
+            traceback.format_exc()
+            if isinstance(e, AppEmbedIdentityFailed) or isinstance(e, AppChatNumOutOfBoundsFailed):
+                raise e
             raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")

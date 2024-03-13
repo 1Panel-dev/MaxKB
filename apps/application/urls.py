@@ -6,6 +6,7 @@ app_name = "application"
 urlpatterns = [
     path('application', views.Application.as_view(), name="application"),
     path('application/profile', views.Application.Profile.as_view()),
+    path('application/embed', views.Application.Embed.as_view()),
     path('application/authentication', views.Application.Authentication.as_view()),
     path('application/<str:application_id>/model', views.Application.Model.as_view()),
     path('application/<str:application_id>/hit_test', views.Application.HitTest.as_view()),

@@ -58,7 +58,10 @@ instance.interceptors.response.use(
       }
     }
     if (err.response?.status === 401) {
-      if (!err.response.config.url.includes('chat/open')) {
+      if (
+        !err.response.config.url.includes('chat/open') &&
+        !err.response.config.url.includes('application/profile')
+      ) {
         router.push({ name: 'login' })
       }
     }

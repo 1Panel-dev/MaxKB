@@ -18,7 +18,7 @@ from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import Permission, Group, Operate, \
     RoleConstants, ViewPermission, CompareConstants
 from common.response import result
-from common.util.common import query_params_to_single_dict
+from common.util.common import query_params_to_single_dict, set_embed_identity_cookie
 
 
 class ChatView(APIView):
@@ -71,9 +71,13 @@ class ChatView(APIView):
                                                            dynamic_tag=keywords.get('application_id'))])
         )
         def post(self, request: Request, chat_id: str):
-            return ChatMessageSerializer(data={'chat_id': chat_id}).chat(request.data.get('message'), request.data.get(
-                're_chat') if 're_chat' in request.data else False, request.data.get(
-                'stream') if 'stream' in request.data else True)
+            response = ChatMessageSerializer(data={'chat_id': chat_id}).chat(request.data.get('message'),
+                                                                             request.data.get(
+                                                                                 're_chat') if 're_chat' in request.data else False,
+                                                                             request.data.get(
+                                                                                 'stream') if 'stream' in request.data else True)
+            set_embed_identity_cookie(request, response)
+            return response
 
     @action(methods=['GET'], detail=False)
     @swagger_auto_schema(operation_summary="获取对话列表",

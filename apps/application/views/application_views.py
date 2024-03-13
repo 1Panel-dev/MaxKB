@@ -6,6 +6,7 @@
     @date：2023/10/27 14:56
     @desc:
 """
+
 from django.http import HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
@@ -20,12 +21,23 @@ from common.constants.permission_constants import CompareConstants, PermissionCo
 from common.exception.app_exception import AppAuthenticationFailed
 from common.response import result
 from common.swagger_api.common_api import CommonApi
-from common.util.common import query_params_to_single_dict
+from common.util.common import query_params_to_single_dict, set_embed_identity_cookie
 from dataset.serializers.dataset_serializers import DataSetSerializers
 
 
 class Application(APIView):
     authentication_classes = [TokenAuth]
+
+    class Embed(APIView):
+        @action(methods=["GET"], detail=False)
+        @swagger_auto_schema(operation_summary="获取嵌入js",
+                             operation_id="获取嵌入js",
+                             tags=["应用"],
+                             manual_parameters=ApplicationApi.ApiKey.get_request_params_api())
+        def get(self, request: Request):
+            return ApplicationSerializer.Embed(
+                data={'protocol': request.query_params.get('protocol'), 'token': request.query_params.get('token'),
+                      'host': request.query_params.get('host'), }).get_embed(request)
 
     class Model(APIView):
         authentication_classes = [TokenAuth]
@@ -185,7 +197,7 @@ class Application(APIView):
                          "Access-Control-Allow-Methods": "POST",
                          "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}
             )
-
+            set_embed_identity_cookie(request, response)
             return response
 
     @action(methods=['POST'], detail=False)

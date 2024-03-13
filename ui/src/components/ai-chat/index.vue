@@ -399,10 +399,10 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
   }
   return stream ? write_stream : write_json
 }
-const errorWrite = (chat: any) => {
+const errorWrite = (chat: any, message?: string) => {
   ChatManagement.addChatRecord(chat, 50, loading)
   ChatManagement.write(chat.id)
-  ChatManagement.append(chat.id, '抱歉，当前正在维护，无法提供服务，请稍后再试！')
+  ChatManagement.append(chat.id, message || '抱歉，当前正在维护，无法提供服务，请稍后再试！')
   ChatManagement.close(chat.id)
 }
 function chatMessage(chat?: any, problem?: string) {
@@ -444,6 +444,10 @@ function chatMessage(chat?: any, problem?: string) {
             .catch((err) => {
               errorWrite(chat)
             })
+        } else if (response.status === 460) {
+          return Promise.reject('无法识别用户身份')
+        } else if (response.status === 461) {
+          return Promise.reject('抱歉，您的提问已达到最大限制，请明天再来吧！')
         } else {
           nextTick(() => {
             // 将滚动条滚动到最下面
@@ -468,7 +472,7 @@ function chatMessage(chat?: any, problem?: string) {
         ChatManagement.close(chat.id)
       })
       .catch((e: any) => {
-        MsgError(e)
+        errorWrite(chat, e + '')
       })
   }
 }

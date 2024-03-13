@@ -24,6 +24,7 @@ from application.chat_pipeline.step.reset_problem_step.impl.base_reset_problem_s
 from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset_step import BaseSearchDatasetStep
 from application.models import ChatRecord, Chat, Application, ApplicationDatasetMapping
 from common.exception.app_exception import AppApiException
+from common.util.field_message import ErrMessage
 from common.util.rsa_util import decrypt
 from common.util.split_model import flat_map
 from dataset.models import Paragraph, Document
@@ -31,6 +32,7 @@ from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 
 chat_cache = caches['model_cache']
+chat_embed_identity_cache = caches['chat_cache']
 
 
 class ChatInfo:

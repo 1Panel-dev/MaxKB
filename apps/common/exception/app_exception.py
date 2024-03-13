@@ -51,3 +51,25 @@ class AppUnauthorizedFailed(AppApiException):
     def __init__(self, code, message):
         self.code = code
         self.message = message
+
+
+class AppEmbedIdentityFailed(AppApiException):
+    """
+    嵌入cookie异常
+    """
+    status_code = 460
+
+    def __init__(self, code, message):
+        self.code = code
+        self.message = message
+
+
+class AppChatNumOutOfBoundsFailed(AppApiException):
+    """
+      访问次数超过今日访问量
+    """
+    status_code = 461
+
+    def __init__(self, code, message):
+        self.code = code
+        self.message = message
