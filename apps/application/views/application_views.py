@@ -21,7 +21,7 @@ from common.constants.permission_constants import CompareConstants, PermissionCo
 from common.exception.app_exception import AppAuthenticationFailed
 from common.response import result
 from common.swagger_api.common_api import CommonApi
-from common.util.common import query_params_to_single_dict, set_embed_identity_cookie
+from common.util.common import query_params_to_single_dict
 from dataset.serializers.dataset_serializers import DataSetSerializers
 
 
@@ -191,14 +191,12 @@ class Application(APIView):
                              tags=["应用/认证"],
                              security=[])
         def post(self, request: Request):
-            response = result.success(
+            return result.success(
                 ApplicationSerializer.Authentication(data={'access_token': request.data.get("access_token")}).auth(),
                 headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
                          "Access-Control-Allow-Methods": "POST",
                          "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}
             )
-            set_embed_identity_cookie(request, response)
-            return response
 
     @action(methods=['POST'], detail=False)
     @swagger_auto_schema(operation_summary="创建应用",

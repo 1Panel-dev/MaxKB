@@ -126,10 +126,15 @@ class ApplicationSerializer(serializers.Serializer):
                 ApplicationSerializer.Authentication(data={'access_token': self.data.get('token')}).auth()
             except Exception as e:
                 is_auth = 'false'
+            application_access_token = QuerySet(ApplicationAccessToken).filter(
+                access_token=self.data.get('token')).first()
             t = Template(content)
             s = t.render(
                 Context(
-                    {'is_auth': is_auth, 'protocol': 'http', 'host': 'localhost:8000', 'token': '0a8d892c755f1a75'}))
+                    {'is_auth': is_auth, 'protocol': 'http', 'host': 'localhost:8000', 'token': '0a8d892c755f1a75',
+                     'white_list_str': ",".join(
+                         application_access_token.white_list),
+                     'white_active': 'true' if application_access_token.white_active else 'false'}))
             response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
             set_embed_identity_cookie(request, response)
             return response

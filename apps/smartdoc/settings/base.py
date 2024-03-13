@@ -1,9 +1,9 @@
 import datetime
+import mimetypes
 import os
 from pathlib import Path
 
 from ..const import CONFIG, PROJECT_DIR
-import mimetypes
 
 mimetypes.add_type("text/css", ".css", True)
 mimetypes.add_type("text/javascript", ".js", True)
@@ -46,6 +46,8 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'common.middleware.static_headers_middleware.StaticHeadersMiddleware',
+    'common.middleware.chat_cookie_middleware.ChatCookieMiddleware'
 
 ]
 
