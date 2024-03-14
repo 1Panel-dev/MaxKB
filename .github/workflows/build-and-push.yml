@@ -63,7 +63,7 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          DOCKER_IMAGE=${{ github.event.inputs.registryAddress }}/${{ github.event.inputs.dockerImageName }}
+          DOCKER_IMAGE=ghcr.io/${{ github.event.inputs.dockerImageName }}
           DOCKER_PLATFORMS=linux/amd64
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
           DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
