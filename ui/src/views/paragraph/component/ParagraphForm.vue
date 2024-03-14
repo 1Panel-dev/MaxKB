@@ -31,13 +31,19 @@
         :toolbars="toolbars"
         style="height: 300px"
       />
-      <MdPreview v-else ref="editorRef" editorId="preview-only" :modelValue="form.content" />
+      <MdPreview
+        v-else
+        ref="editorRef"
+        editorId="preview-only"
+        :modelValue="form.content"
+        class="maxkb-md"
+      />
       <!-- <span v-else class="break-all lighter">{{ form.content }}</span> -->
     </el-form-item>
   </el-form>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onUnmounted, watch } from 'vue'
+import { ref, reactive, onUnmounted, watch, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MdEditor, MdPreview } from 'md-editor-v3'
 const props = defineProps({
@@ -76,8 +82,10 @@ const toolbars = [
   'pageFullscreen',
   'preview',
   'htmlPreview',
-  'catalog',
-]
+  'catalog'
+] as any[]
+
+const editorRef = ref()
 
 const form = ref<any>({
   title: '',
@@ -124,6 +132,21 @@ function validate() {
   if (!paragraphFormRef.value) return
   return paragraphFormRef.value.validate((valid: any) => {
     return valid
+  })
+}
+
+const onHtmlChanged = () => {
+  appendTarget()
+}
+const appendTarget = () => {
+  nextTick(() => {
+    var item = document.getElementsByClassName('maxkb-md')
+    for (var j = 0; j < item.length; j++) {
+      var aTags = item[j].getElementsByTagName('a')
+      for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+      }
+    }
   })
 }
 
