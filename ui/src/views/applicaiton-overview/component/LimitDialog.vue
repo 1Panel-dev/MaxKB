@@ -17,7 +17,9 @@
       <el-form-item>
         <el-input
           v-model="form.white_list"
-          placeholder="请输入允许嵌入第三方的源地址，一行一个，如：http://127.0.0.1:5678 或 https://dataease.io"
+          placeholder="请输入允许嵌入第三方的源地址，一行一个，如：
+http://127.0.0.1:5678
+https://dataease.io"
           :rows="10"
           type="textarea"
         />
