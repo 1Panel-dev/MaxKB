@@ -28,7 +28,8 @@
         placeholder="请输入分段内容"
         :maxLength="4096"
         :preview="false"
-        style="height: 300px;"
+        :toolbars="toolbars"
+        style="height: 300px"
       />
       <MdPreview v-else ref="editorRef" editorId="preview-only" :modelValue="form.content" />
       <!-- <span v-else class="break-all lighter">{{ form.content }}</span> -->
@@ -46,6 +47,37 @@ const props = defineProps({
   },
   isEdit: Boolean
 })
+
+const toolbars = [
+  'bold',
+  'underline',
+  'italic',
+  '-',
+  'title',
+  'strikeThrough',
+  'sub',
+  'sup',
+  'quote',
+  'unorderedList',
+  'orderedList',
+  'task',
+  '-',
+  'codeRow',
+  'code',
+  'link',
+  'image',
+  'table',
+  'mermaid',
+  'katex',
+  '-',
+  'revoke',
+  'next',
+  '=',
+  'pageFullscreen',
+  'preview',
+  'htmlPreview',
+  'catalog',
+]
 
 const form = ref<any>({
   title: '',
