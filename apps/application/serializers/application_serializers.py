@@ -127,7 +127,8 @@ class ApplicationSerializer(serializers.Serializer):
             t = Template(content)
             s = t.render(
                 Context(
-                    {'is_auth': is_auth, 'protocol': 'http', 'host': 'localhost:8000', 'token': '0a8d892c755f1a75',
+                    {'is_auth': is_auth, 'protocol': self.data.get('protocol'), 'host': self.data.get('host'),
+                     'token': self.data.get('token'),
                      'white_list_str': ",".join(
                          application_access_token.white_list),
                      'white_active': 'true' if application_access_token.white_active else 'false'}))
