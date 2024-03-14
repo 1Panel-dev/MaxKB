@@ -17,7 +17,7 @@ class StaticHeadersMiddleware(MiddlewareMixin):
         if request.path.startswith('/ui/chat/'):
             access_token = request.path.replace('/ui/chat/', '')
             application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
-            if application_access_token.white_active:
+            if application_access_token is not None and application_access_token.white_active:
                 # 添加自定义的响应头
                 response['Content-Security-Policy'] = f'frame-ancestors {" ".join(application_access_token.white_list)}'
         return response
