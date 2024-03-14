@@ -55,7 +55,14 @@
             </div>
             <div class="content">
               <div class="flex" v-if="!item.answer_text">
-                <el-card shadow="always" class="dialog-card">
+                <el-card
+                  v-if="item.write_ed === undefined || item.write_ed === true"
+                  shadow="always"
+                  class="dialog-card"
+                >
+                  抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。
+                </el-card>
+                <el-card v-else shadow="always" class="dialog-card">
                   回答中 <span class="dotting"></span>
                 </el-card>
               </div>
