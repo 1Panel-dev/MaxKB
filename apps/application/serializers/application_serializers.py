@@ -207,7 +207,9 @@ class ApplicationSerializer(serializers.Serializer):
             access_token = self.data.get("access_token")
             application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
             if application_access_token is not None and application_access_token.is_active:
-                if token is None or (token_details is not None and 'client_id' not in token_details):
+                if token is None or (token_details is not None and 'client_id' not in token_details) or (
+                        token_details is not None and token_details.get(
+                        'access_token') != application_access_token.access_token):
                     client_id = str(uuid.uuid1())
                     token = signing.dumps({'application_id': str(application_access_token.application_id),
                                            'user_id': str(application_access_token.application.user.id),
