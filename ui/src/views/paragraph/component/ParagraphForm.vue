@@ -36,6 +36,7 @@
         ref="editorRef"
         editorId="preview-only"
         :modelValue="form.content"
+        @onHtmlChanged="onHtmlChanged"
         class="maxkb-md"
       />
       <!-- <span v-else class="break-all lighter">{{ form.content }}</span> -->
