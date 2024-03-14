@@ -104,7 +104,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="70" align="left">
+        <!-- <el-table-column label="操作" width="70" align="left">
           <template #default="{ row }">
             <el-tooltip effect="dark" content="删除" placement="top">
               <el-button type="primary" text @click.stop="deleteLog(row)">
@@ -112,7 +112,7 @@
               </el-button>
             </el-tooltip>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </app-table>
     </div>
     <ChatRecordDrawer
