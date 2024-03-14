@@ -1,14 +1,12 @@
 <template>
   <div class="top-bar-container border-b flex-between">
     <div class="flex-center h-full">
-      <a href="/">
-        <div class="app-title-container flex-center">
-          <div class="app-title-icon"></div>
-          <div class="app-title-text app-logo-font ml-4">
-            {{ defaultTitle }}
-          </div>
+      <div class="app-title-container flex-center cursor" @click="router.push('/')">
+        <div class="app-title-icon"></div>
+        <div class="app-title-text app-logo-font ml-4">
+          {{ defaultTitle }}
         </div>
-      </a>
+      </div>
       <TopMenu></TopMenu>
     </div>
     <div class="avatar">
@@ -19,6 +17,8 @@
 <script setup lang="ts">
 import TopMenu from './top-menu/index.vue'
 import Avatar from './avatar/index.vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const defaultTitle = import.meta.env.VITE_APP_TITLE
 </script>
 <style lang="scss">
