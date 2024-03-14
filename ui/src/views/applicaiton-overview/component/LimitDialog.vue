@@ -17,7 +17,7 @@
       <el-form-item>
         <el-input
           v-model="form.white_list"
-          placeholder="请输入域名或IP地址，一行一个。"
+          placeholder="请输入允许嵌入第三方的源地址，一行一个，如：http://127.0.0.1:5678 或 https://dataease.io"
           :rows="10"
           type="textarea"
         />
@@ -70,7 +70,7 @@ watch(dialogVisible, (bool) => {
 const open = (data: any) => {
   form.value.access_num = data.access_num
   form.value.white_active = data.white_active
-  form.value.white_list = data.white_list?.join('\n')
+  form.value.white_list = data.white_list?.length ? data.white_list?.join('\n') : ''
   dialogVisible.value = true
 }
 
@@ -79,7 +79,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       const obj = {
-        white_list: form.value.white_list.split('\n'),
+        white_list: form.value.white_list ? form.value.white_list.split('\n') : [],
         white_active: form.value.white_active,
         access_num: form.value.access_num
       }
