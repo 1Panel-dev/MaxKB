@@ -289,7 +289,7 @@ function embedChatbot() {
   white_list_str='{{white_list_str}}'
   white_list=white_list_str.split(',')
 
-  if ({{is_auth}}&&{{white_active}}?white_list.includes(window.location.origin):true) {
+  if ({{is_auth}}&&({{white_active}}?white_list.includes(window.location.origin):true)) {
     // 初始化maxkb智能小助手
     initMaxkb()
   } else console.error('invalid parameter')

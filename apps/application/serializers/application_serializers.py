@@ -118,11 +118,10 @@ class ApplicationSerializer(serializers.Serializer):
             file = open(index_path, "r", encoding='utf-8')
             content = file.read()
             file.close()
-            is_auth = 'true'
-            try:
-                ApplicationSerializer.Authentication(data={'access_token': self.data.get('token')}).auth()
-            except Exception as e:
-                is_auth = 'false'
+            application_access_token = QuerySet(ApplicationAccessToken).filter(
+                access_token=self.data.get('token')).first()
+
+            is_auth = 'true' if application_access_token is not None and application_access_token.is_active else 'false'
             application_access_token = QuerySet(ApplicationAccessToken).filter(
                 access_token=self.data.get('token')).first()
             t = Template(content)
