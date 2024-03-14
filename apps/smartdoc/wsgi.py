@@ -18,8 +18,10 @@ application = get_wsgi_application()
 
 def post_handler():
     from common import event
+    from common import job
     event.run()
     event.ListenerManagement.init_embedding_model_signal.send()
+    job.run()
 
 
 post_handler()
