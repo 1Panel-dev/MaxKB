@@ -70,11 +70,13 @@ allow="microphone">
 `
 
   source2.value = `
-<script src="${
-    window.location.origin
-  }/api/application/embed?protocol=${window.location.protocol.replace(':', '')}&host=${
-    window.location.host
-  }&token=${val}">
+<script 
+async
+defer
+src="${window.location.origin}/api/application/embed?protocol=${window.location.protocol.replace(
+    ':',
+    ''
+  )}&host=${window.location.host}&token=${val}">
 <\/script>
 `
   dialogVisible.value = true
