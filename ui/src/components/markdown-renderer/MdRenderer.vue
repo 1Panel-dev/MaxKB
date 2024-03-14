@@ -5,7 +5,6 @@
     :modelValue="item"
     v-for="(item, index) in md_view_list"
     :key="index"
-    @onHtmlChanged="onHtmlChanged"
     class="maxkb-md"
   />
 </template>
@@ -37,19 +36,19 @@ const md_view_list = computed(() => {
   })
   return result
 })
-const onHtmlChanged = () => {
-  appendTarget()
-}
-const appendTarget = () => {
-  nextTick(() => {
-    var item = document.getElementsByClassName('maxkb-md')
-    for (var j = 0; j < item.length; j++) {
-      var aTags = item[j].getElementsByTagName('a')
-      for (var i = 0; i < aTags.length; i++) {
-        aTags[i].setAttribute('target', '_blank')
-      }
-    }
-  })
-}
+// const onHtmlChanged = () => {
+//   appendTarget()
+// }
+// const appendTarget = () => {
+//   nextTick(() => {
+//     var item = document.getElementsByClassName('maxkb-md')
+//     for (var j = 0; j < item.length; j++) {
+//       var aTags = item[j].getElementsByTagName('a')
+//       for (var i = 0; i < aTags.length; i++) {
+//         aTags[i].setAttribute('target', '_blank')
+//       }
+//     }
+//   })
+// }
 </script>
 <style lang="scss" scoped></style>

@@ -36,7 +36,6 @@
         ref="editorRef"
         editorId="preview-only"
         :modelValue="form.content"
-        @onHtmlChanged="onHtmlChanged"
         class="maxkb-md"
       />
       <!-- <span v-else class="break-all lighter">{{ form.content }}</span> -->
@@ -136,20 +135,20 @@ function validate() {
   })
 }
 
-const onHtmlChanged = () => {
-  appendTarget()
-}
-const appendTarget = () => {
-  nextTick(() => {
-    var item = document.getElementsByClassName('maxkb-md')
-    for (var j = 0; j < item.length; j++) {
-      var aTags = item[j].getElementsByTagName('a')
-      for (var i = 0; i < aTags.length; i++) {
-        aTags[i].setAttribute('target', '_blank')
-      }
-    }
-  })
-}
+// const onHtmlChanged = () => {
+//   appendTarget()
+// }
+// const appendTarget = () => {
+//   nextTick(() => {
+//     var item = document.getElementsByClassName('maxkb-md')
+//     for (var j = 0; j < item.length; j++) {
+//       var aTags = item[j].getElementsByTagName('a')
+//       for (var i = 0; i < aTags.length; i++) {
+//         aTags[i].setAttribute('target', '_blank')
+//       }
+//     }
+//   })
+// }
 
 onUnmounted(() => {
   form.value = {
