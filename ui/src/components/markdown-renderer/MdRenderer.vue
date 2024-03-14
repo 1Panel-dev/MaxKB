@@ -5,14 +5,20 @@
     :modelValue="item"
     v-for="(item, index) in md_view_list"
     :key="index"
-    @onHtmlChanged="onHtmlChanged"
     class="maxkb-md"
   />
 </template>
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
-import { MdPreview } from 'md-editor-v3'
-
+import { MdPreview, config } from 'md-editor-v3'
+config({
+  markdownItConfig(md: markdownit) {
+    md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+      tokens[idx].attrSet('target', '_blank')
+      return md.renderer.renderToken(tokens, idx, options)
+    }
+  }
+})
 const props = withDefaults(defineProps<{ source?: string; inner_suffix?: boolean }>(), {
   source: ''
 })
@@ -37,19 +43,5 @@ const md_view_list = computed(() => {
   })
   return result
 })
-const onHtmlChanged = () => {
-  appendTarget()
-}
-const appendTarget = () => {
-  nextTick(() => {
-    var item = document.getElementsByClassName('maxkb-md')
-    for (var j = 0; j < item.length; j++) {
-      var aTags = item[j].getElementsByTagName('a')
-      for (var i = 0; i < aTags.length; i++) {
-        aTags[i].setAttribute('target', '_blank')
-      }
-    }
-  })
-}
 </script>
 <style lang="scss" scoped></style>
