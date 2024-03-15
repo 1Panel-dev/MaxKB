@@ -7,7 +7,7 @@ RUN cd ui && \
     npm run build && \
     rm -rf ./node_modules
 
-FROM ghcr.io/maxkb-dev/python-pg:python3.11.8-pg15.6
+FROM ghcr.io/maxkb-dev/python-pg:python3.11.8-pg15.3
 # 创建工作目录
 RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/conf
 VOLUME /opt/maxkb

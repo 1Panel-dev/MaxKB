@@ -1,10 +1,10 @@
-FROM postgres:15.6-bookworm
+FROM postgres:15.3-bullseye
 
 ENV LANG=C.UTF-8
 
 RUN apt-get update
 
-RUN apt-get install postgresql-15-pgvector
+RUN apt-get install -y postgresql-15-pgvector
 
 COPY installer/init.sql /docker-entrypoint-initdb.d
 
@@ -15,7 +15,8 @@ ENV POSTGRES_USER root
 ENV POSTGRES_PASSWORD Password123@postgres
 
 # ---- prepare python env --- #
-# ---- below content is copied from https://github.com/docker-library/python/blob/master/3.11/slim-bookworm/Dockerfile --- #
+# ---- below content is copied https://github.com/docker-library/python/blob/master/3.11/slim-bullseye/Dockerfile --- #
+# ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
 
 # http://bugs.python.org/issue19846
