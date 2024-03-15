@@ -7,27 +7,27 @@ function auth(token, protocol, host) {
 }
  
 const guideHtml=`
-<div class="mask">
-  <div class="content"></div>
+<div class="maxkb-mask">
+  <div class="maxkb-content"></div>
 </div>
-<div class="tips">
-  <div class="close">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<div class="maxkb-tips">
+  <div class="maxkb-close">
+      <svg style="vertical-align: middle;overflow: hidden;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M9.95317 8.73169L15.5511 3.13376C15.7138 2.97104 15.9776 2.97104 16.1403 3.13376L16.7296 3.72301C16.8923 3.88573 16.8923 4.14955 16.7296 4.31227L11.1317 9.9102L16.7296 15.5081C16.8923 15.6708 16.8923 15.9347 16.7296 16.0974L16.1403 16.6866C15.9776 16.8494 15.7138 16.8494 15.5511 16.6866L9.95317 11.0887L4.35524 16.6866C4.19252 16.8494 3.9287 16.8494 3.76598 16.6866L3.17673 16.0974C3.01401 15.9347 3.01401 15.6708 3.17673 15.5081L8.77465 9.9102L3.17673 4.31227C3.01401 4.14955 3.01401 3.88573 3.17673 3.72301L3.76598 3.13376C3.9287 2.97104 4.19252 2.97104 4.35524 3.13376L9.95317 8.73169Z" fill="#ffffff"></path>
           </svg>
   </div>
  
-  <div class="title"> 🌟 遇见问题，不再是障碍！</div>
+  <div class="maxkb-title"> 🌟 遇见问题，不再是障碍！</div>
   <p>你好，我是你的智能小助手。<br/>
       点我，开启高效解答模式，让问题变成过去式。</p>
-  <div class="button">
+  <div class="maxkb-button">
       <button>我知道了</button>
   </div>
-  <span class="arrow" ></span>
+  <span class="maxkb-arrow" ></span>
 </div>
 `
 const chatButtonHtml=
-`<div class="chat_button"><svg style="vertical-align: middle;overflow: hidden;" xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56" fill="none">
+`<div class="maxkb-chat-button"><svg style="vertical-align: middle;overflow: hidden;" xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56" fill="none">
 <g filter="url(#filter0_d_349_49711)">
 <path d="M8 24C8 12.9543 16.9543 4 28 4H48V44H28C16.9543 44 8 35.0457 8 24Z" fill="url(#paint0_linear_349_49711)"/>
 </g>
@@ -56,13 +56,13 @@ const chatButtonHtml=
  
 
 const getChatContainerHtml=(protocol,host,token)=>{
- return `<div id="chat_container">
-<iframe id="chat" src=${protocol}//${host}/ui/chat/${token}></iframe>
-<div class="closeviewport viewportnone"><svg t="1710214539671"  viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"  fill="rgb(100, 106, 115)" width="16" height="16"><path d="M85.333333 384c25.6 0 42.666667-17.066667 42.666667-42.666667V128h213.333333c25.6 0 42.666667-17.066667 42.666667-42.666667s-17.066667-42.666667-42.666667-42.666666H85.333333c-25.6 0-42.666667 17.066667-42.666666 42.666666v256c0 25.6 17.066667 42.666667 42.666666 42.666667zM938.666667 640c-25.6 0-42.666667 17.066667-42.666667 42.666667v213.333333h-213.333333c-25.6 0-42.666667 17.066667-42.666667 42.666667s17.066667 42.666667 42.666667 42.666666h256c25.6 0 42.666667-17.066667 42.666666-42.666666v-256c0-25.6-17.066667-42.666667-42.666666-42.666667zM601.6 401.066667c4.266667 8.533333 12.8 17.066667 21.333333 21.333333 4.266667 4.266667 12.8 4.266667 17.066667 4.266667h256c25.6 0 42.666667-17.066667 42.666667-42.666667s-17.066667-42.666667-42.666667-42.666667h-153.6l226.133333-226.133333c17.066667-17.066667 17.066667-42.666667 0-59.733333-8.533333-8.533333-17.066667-12.8-29.866666-12.8s-21.333333 4.266667-29.866667 12.8L682.666667 281.6V128c0-25.6-17.066667-42.666667-42.666667-42.666667s-42.666667 17.066667-42.666667 42.666667v256c0 4.266667 0 12.8 4.266667 17.066667zM115.2 968.533333L341.333333 742.4V896c0 25.6 17.066667 42.666667 42.666667 42.666667s42.666667-17.066667 42.666667-42.666667v-256c0-4.266667 0-12.8-4.266667-17.066667-4.266667-8.533333-12.8-17.066667-21.333333-21.333333-4.266667-4.266667-12.8-4.266667-17.066667-4.266667H128c-25.6 0-42.666667 17.066667-42.666667 42.666667s17.066667 42.666667 42.666667 42.666667h153.6l-226.133333 226.133333c-17.066667 17.066667-17.066667 42.666667 0 59.733333s42.666667 17.066667 59.733333 0z" p-id="10189"></path></svg></div>
-<div class="openviewport">
-            <svg t="1710150885892"   viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"  fill="rgb(100, 106, 115)" width="16" height="16" ><path d="M85.333333 384c25.6 0 42.666667-17.066667 42.666667-42.666667V128h213.333333c25.6 0 42.666667-17.066667 42.666667-42.666667s-17.066667-42.666667-42.666667-42.666666H85.333333c-25.6 0-42.666667 17.066667-42.666666 42.666666v256c0 25.6 17.066667 42.666667 42.666666 42.666667zM938.666667 640c-25.6 0-42.666667 17.066667-42.666667 42.666667v213.333333h-213.333333c-25.6 0-42.666667 17.066667-42.666667 42.666667s17.066667 42.666667 42.666667 42.666666h256c25.6 0 42.666667-17.066667 42.666666-42.666666v-256c0-25.6-17.066667-42.666667-42.666666-42.666667zM977.066667 68.266667c-4.266667-8.533333-12.8-17.066667-21.333334-21.333334-4.266667-4.266667-12.8-4.266667-17.066666-4.266666h-256c-25.6 0-42.666667 17.066667-42.666667 42.666666s17.066667 42.666667 42.666667 42.666667h153.6l-226.133334 226.133333c-17.066667 17.066667-17.066667 42.666667 0 59.733334 8.533333 8.533333 17.066667 12.8 29.866667 12.8s21.333333-4.266667 29.866667-12.8L896 187.733333V341.333333c0 25.6 17.066667 42.666667 42.666667 42.666667s42.666667-17.066667 42.666666-42.666667V85.333333c0-4.266667 0-12.8-4.266666-17.066666zM354.133333 610.133333L128 836.266667V682.666667c0-25.6-17.066667-42.666667-42.666667-42.666667s-42.666667 17.066667-42.666666 42.666667v256c0 4.266667 0 12.8 4.266666 17.066666 4.266667 8.533333 12.8 17.066667 21.333334 21.333334 4.266667 4.266667 12.8 4.266667 17.066666 4.266666h256c25.6 0 42.666667-17.066667 42.666667-42.666666s-17.066667-42.666667-42.666667-42.666667H187.733333l226.133334-226.133333c17.066667-17.066667 17.066667-42.666667 0-59.733334s-42.666667-17.066667-59.733334 0z" p-id="8645"></path></svg>
+ return `<div id="maxkb-chat-container">
+<iframe id="maxkb-chat" src=${protocol}//${host}/ui/chat/${token}></iframe>
+<div class="maxkb-closeviewport maxkb-viewportnone"><svg style="vertical-align: middle;overflow: hidden;" t="1710214539671"  viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"  fill="rgb(100, 106, 115)" width="16" height="16"><path d="M85.333333 384c25.6 0 42.666667-17.066667 42.666667-42.666667V128h213.333333c25.6 0 42.666667-17.066667 42.666667-42.666667s-17.066667-42.666667-42.666667-42.666666H85.333333c-25.6 0-42.666667 17.066667-42.666666 42.666666v256c0 25.6 17.066667 42.666667 42.666666 42.666667zM938.666667 640c-25.6 0-42.666667 17.066667-42.666667 42.666667v213.333333h-213.333333c-25.6 0-42.666667 17.066667-42.666667 42.666667s17.066667 42.666667 42.666667 42.666666h256c25.6 0 42.666667-17.066667 42.666666-42.666666v-256c0-25.6-17.066667-42.666667-42.666666-42.666667zM601.6 401.066667c4.266667 8.533333 12.8 17.066667 21.333333 21.333333 4.266667 4.266667 12.8 4.266667 17.066667 4.266667h256c25.6 0 42.666667-17.066667 42.666667-42.666667s-17.066667-42.666667-42.666667-42.666667h-153.6l226.133333-226.133333c17.066667-17.066667 17.066667-42.666667 0-59.733333-8.533333-8.533333-17.066667-12.8-29.866666-12.8s-21.333333 4.266667-29.866667 12.8L682.666667 281.6V128c0-25.6-17.066667-42.666667-42.666667-42.666667s-42.666667 17.066667-42.666667 42.666667v256c0 4.266667 0 12.8 4.266667 17.066667zM115.2 968.533333L341.333333 742.4V896c0 25.6 17.066667 42.666667 42.666667 42.666667s42.666667-17.066667 42.666667-42.666667v-256c0-4.266667 0-12.8-4.266667-17.066667-4.266667-8.533333-12.8-17.066667-21.333333-21.333333-4.266667-4.266667-12.8-4.266667-17.066667-4.266667H128c-25.6 0-42.666667 17.066667-42.666667 42.666667s17.066667 42.666667 42.666667 42.666667h153.6l-226.133333 226.133333c-17.066667 17.066667-17.066667 42.666667 0 59.733333s42.666667 17.066667 59.733333 0z" p-id="10189"></path></svg></div>
+<div class="maxkb-openviewport">
+            <svg style="vertical-align: middle;overflow: hidden;" t="1710150885892"   viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"  fill="rgb(100, 106, 115)" width="16" height="16" ><path d="M85.333333 384c25.6 0 42.666667-17.066667 42.666667-42.666667V128h213.333333c25.6 0 42.666667-17.066667 42.666667-42.666667s-17.066667-42.666667-42.666667-42.666666H85.333333c-25.6 0-42.666667 17.066667-42.666666 42.666666v256c0 25.6 17.066667 42.666667 42.666666 42.666667zM938.666667 640c-25.6 0-42.666667 17.066667-42.666667 42.666667v213.333333h-213.333333c-25.6 0-42.666667 17.066667-42.666667 42.666667s17.066667 42.666667 42.666667 42.666666h256c25.6 0 42.666667-17.066667 42.666666-42.666666v-256c0-25.6-17.066667-42.666667-42.666666-42.666667zM977.066667 68.266667c-4.266667-8.533333-12.8-17.066667-21.333334-21.333334-4.266667-4.266667-12.8-4.266667-17.066666-4.266666h-256c-25.6 0-42.666667 17.066667-42.666667 42.666666s17.066667 42.666667 42.666667 42.666667h153.6l-226.133334 226.133333c-17.066667 17.066667-17.066667 42.666667 0 59.733334 8.533333 8.533333 17.066667 12.8 29.866667 12.8s21.333333-4.266667 29.866667-12.8L896 187.733333V341.333333c0 25.6 17.066667 42.666667 42.666667 42.666667s42.666667-17.066667 42.666666-42.666667V85.333333c0-4.266667 0-12.8-4.266666-17.066666zM354.133333 610.133333L128 836.266667V682.666667c0-25.6-17.066667-42.666667-42.666667-42.666667s-42.666667 17.066667-42.666666 42.666667v256c0 4.266667 0 12.8 4.266666 17.066666 4.266667 8.533333 12.8 17.066667 21.333334 21.333334 4.266667 4.266667 12.8 4.266667 17.066666 4.266666h256c25.6 0 42.666667-17.066667 42.666667-42.666666s-17.066667-42.666667-42.666667-42.666667H187.733333l226.133334-226.133333c17.066667-17.066667 17.066667-42.666667 0-59.733334s-42.666667-17.066667-59.733334 0z" p-id="8645"></path></svg>
 </div>
-           <div class="chat_close"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+           <div class="chat_close"><svg style="vertical-align: middle;overflow: hidden;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M9.95317 8.73169L15.5511 3.13376C15.7138 2.97104 15.9776 2.97104 16.1403 3.13376L16.7296 3.72301C16.8923 3.88573 16.8923 4.14955 16.7296 4.31227L11.1317 9.9102L16.7296 15.5081C16.8923 15.6708 16.8923 15.9347 16.7296 16.0974L16.1403 16.6866C15.9776 16.8494 15.7138 16.8494 15.5511 16.6866L9.95317 11.0887L4.35524 16.6866C4.19252 16.8494 3.9287 16.8494 3.76598 16.6866L3.17673 16.0974C3.01401 15.9347 3.01401 15.6708 3.17673 15.5081L8.77465 9.9102L3.17673 4.31227C3.01401 4.14955 3.01401 3.88573 3.17673 3.72301L3.76598 3.13376C3.9287 2.97104 4.19252 2.97104 4.35524 3.13376L9.95317 8.73169Z" fill="#646A73"/>
   </svg>
  </div>`
@@ -73,11 +73,11 @@ const getChatContainerHtml=(protocol,host,token)=>{
  */
 const initGuide=(root)=>{
    root.insertAdjacentHTML("beforeend",guideHtml)
-   const button=root.querySelector(".button")
-   const close_icon=root.querySelector('.close')
+   const button=root.querySelector(".maxkb-button")
+   const close_icon=root.querySelector('.maxkb-close')
    const close_func=()=>{
-     root.removeChild(root.querySelector('.tips'))
-     root.removeChild(root.querySelector('.mask'))
+     root.removeChild(root.querySelector('.maxkb-tips'))
+     root.removeChild(root.querySelector('.maxkb-mask'))
      localStorage.setItem('maxkbMaskTip',true)
    }
    button.onclick=close_func
@@ -89,27 +89,27 @@ const initChat=(root)=>{
   // 添加对话框
   root.insertAdjacentHTML('beforeend',getChatContainerHtml(window.maxkbChatConfig.protocol,window.maxkbChatConfig.host,window.maxkbChatConfig.token))
   // 按钮元素
-  const chat_button=root.querySelector('.chat_button')
+  const chat_button=root.querySelector('.maxkb-chat-button')
   //  对话框元素
-  const chat_container=root.querySelector('#chat_container')
+  const chat_container=root.querySelector('#maxkb-chat-container')
 
-  const viewport=root.querySelector('.openviewport')
-  const closeviewport=root.querySelector('.closeviewport')
+  const viewport=root.querySelector('.maxkb-openviewport')
+  const closeviewport=root.querySelector('.maxkb-closeviewport')
   const close_func=()=>{
     chat_container.style['display']=chat_container.style['display']=='block'?'none':'block'
   }
-  close_icon=chat_container.querySelector('.close')
+  close_icon=chat_container.querySelector('.maxkb-close')
   chat_button.onclick = close_func
   close_icon.onclick=close_func
   const viewport_func=()=>{
-    if(chat_container.classList.contains('enlarge')){
-      chat_container.classList.remove("enlarge");
-      viewport.classList.remove('viewportnone')
-      closeviewport.classList.add('viewportnone')
+    if(chat_container.classList.contains('maxkb-enlarge')){
+      chat_container.classList.remove("maxkb-enlarge");
+      viewport.classList.remove('maxkb-viewportnone')
+      closeviewport.classList.add('maxkb-viewportnone')
     }else{
-      chat_container.classList.add("enlarge");
-      viewport.classList.add('viewportnone')
-      closeviewport.classList.remove('viewportnone')
+      chat_container.classList.add("maxkb-enlarge");
+      viewport.classList.add('maxkb-viewportnone')
+      closeviewport.classList.remove('maxkb-viewportnone')
     }
   }
   viewport.onclick=viewport_func
@@ -139,14 +139,14 @@ function initMaxkbStyle(root){
   style.type='text/css'
   style.innerText=  `
   @scope {/* 放大 */
-  #maxkb .enlarge {
+  #maxkb .maxkb-enlarge {
       width: 50%!important;
       height: 100%!important;
       bottom: 0!important;
       right: 0 !important;
   }
   @media only screen and (max-width: 768px){
-  #maxkb .enlarge {
+  #maxkb .maxkb-enlarge {
       width: 100%!important;
       height: 100%!important;
       right: 0 !important;
@@ -156,7 +156,7 @@ function initMaxkbStyle(root){
   
   /* 引导 */
   
-  #maxkb .mask {
+  #maxkb .maxkb-mask {
       position: fixed;
       z-index: 999;
       background-color: transparent;
@@ -165,7 +165,7 @@ function initMaxkbStyle(root){
       top: 0;
       left: 0;
   }
-  #maxkb .mask .content {
+  #maxkb .maxkb-mask .maxkb-content {
       width: 45px;
       height: 50px;
       box-shadow: 1px 1px 1px 2000px rgba(0,0,0,.6);
@@ -175,7 +175,7 @@ function initMaxkbStyle(root){
       bottom: 42px;
       z-index: 1000;
   }
-  #maxkb .tips {
+  #maxkb .maxkb-tips {
       position: fixed;
       bottom: 30px;
       right: 60px;
@@ -186,7 +186,7 @@ function initMaxkbStyle(root){
       background: #3370FF;
       z-index: 1000;
   }
-  #maxkb .tips .arrow {
+  #maxkb .maxkb-tips .maxkb-arrow {
       position: absolute;
       background: #3370FF;
       width: 10px;
@@ -200,16 +200,16 @@ function initMaxkbStyle(root){
       border-left-color: transparent;
       border-bottom-color: transparent
   }
-  #maxkb .tips .title {
+  #maxkb .maxkb-tips .maxkb-title {
       font-size: 20px;
       font-weight: 500;
       margin-bottom: 8px;
   }
-  #maxkb .tips .button {
+  #maxkb .maxkb-tips .maxkb-button {
       text-align: right;
       margin-top: 24px;
   }
-  #maxkb .tips .button button {
+  #maxkb .maxkb-tips .maxkb-button button {
       border-radius: 4px;
       background: #FFF;
       padding: 3px 12px;
@@ -218,36 +218,36 @@ function initMaxkbStyle(root){
       outline: none;
       border: none;
   }
-  #maxkb .tips .button button::after{
+  #maxkb .maxkb-tips .maxkb-button button::after{
       border: none;
     }
-  #maxkb .tips .close {
+  #maxkb .maxkb-tips .maxkb-close {
       position: absolute;
       right: 20px;
       top: 20px;
       cursor: pointer;
   
   }
-  #chat_container {
+  #maxkb-chat-container {
         width: 420px;
         height: 600px;
         display:none;
       }
   @media only screen and (max-width: 768px) {
-        #chat_container {
+        #maxkb-chat-container {
           width: 100%;
           height: 70%;
           right: 0 !important;
         }
       }
       
-      #maxkb .chat_button{
+      #maxkb .maxkb-chat-button{
         position: fixed;
         bottom: 30px;
         right: 0;
         cursor: pointer;
     }
-    #maxkb #chat_container{
+    #maxkb #maxkb-chat-container{
         z-index:10000;position: relative;
               border-radius: 8px;
               border: 1px solid var(--N300, #DEE0E3);
@@ -255,33 +255,33 @@ function initMaxkbStyle(root){
               box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.10);
               position: fixed;bottom: 20px;right: 45px;overflow: hidden;
     }
-    #maxkb #chat_container .chat_close{
+    #maxkb #maxkb-chat-container .maxkb-chat-close{
         position: absolute;
             top: 15px;
             right: 10px;
             cursor: pointer;
     }
-    #maxkb #chat_container .openviewport{
+    #maxkb #maxkb-chat-container .maxkb-openviewport{
            position: absolute;
             top: 15px;
             right: 50px;
             cursor: pointer;
     }
-    #maxkb #chat_container .closeviewport{
+    #maxkb #maxkb-chat-container .maxkb-closeviewport{
       position: absolute;
       top: 15px;
       right: 50px;
       cursor: pointer;
     }
-    #maxkb #chat_container .viewportnone{
+    #maxkb #maxkb-chat-container .maxkb-viewportnone{
       display:none;
     }
-    #maxkb #chat_container #chat{
+    #maxkb #maxkb-chat-container #maxkb-chat{
      height:100%;
      width:100%;
      border: none;
 }
-    #maxkb #chat_container {
+    #maxkb #maxkb-chat-container {
                 animation: appear .4s ease-in-out;
               }
               @keyframes appear {
