@@ -181,6 +181,7 @@ import useStore from '@/stores'
 import MdRenderer from '@/components/markdown-renderer/MdRenderer.vue'
 import { MdPreview } from 'md-editor-v3'
 import { MsgError } from '@/utils/message'
+import { debounce } from 'lodash'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
@@ -266,14 +267,19 @@ function openParagraph(row: any, id?: string) {
 }
 
 function quickProblemHandel(val: string) {
-  if (!props.log) {
+  if (!props.log && !loading.value) {
     // inputValue.value = val
     // nextTick(() => {
     //   quickInputRef.value?.focus()
     // })
-    chatMessage(null, val)
+
+    handleDebounceClick(val)
   }
 }
+
+const handleDebounceClick = debounce((val) => {
+  chatMessage(null, val)
+}, 200)
 
 function sendChatHandle(event: any) {
   if (!event.ctrlKey) {
