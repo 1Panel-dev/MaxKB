@@ -56,9 +56,12 @@
             @change="getModelForm($event)"
             v-loading="base_model_loading"
             style="width: 100%"
-            v-model="base_form_data.model_name"
+            v-model="form_data.model_name"
             class="m-2"
-            placeholder="请选择模型类型"
+            placeholder="请选择基础模型"
+            filterable
+            allow-create
+            default-first-option
           >
             <el-option
               v-for="item in base_model_list"
@@ -145,9 +148,6 @@ const list_base_model = (model_type: any) => {
     ModelApi.listBaseModel(providerValue.value.provider, model_type, base_model_loading).then(
       (ok) => {
         base_model_list.value = ok.data
-        if (!base_model_list.value.some((item) => item.name === form_data.value.model_name)) {
-          form_data.value.model_name = ''
-        }
       }
     )
   }

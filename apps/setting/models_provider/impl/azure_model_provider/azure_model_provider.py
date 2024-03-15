@@ -93,7 +93,9 @@ class AzureModelProvider(IModelProvider):
         return azure_chat_open_ai
 
     def get_model_credential(self, model_type, model_name):
-        return model_dict.get(model_name).model_credential
+        if model_name in model_dict:
+            return model_dict.get(model_name).model_credential
+        raise AppApiException(500, f'不支持的模型:{model_name}')
 
     def get_model_provide_info(self):
         return ModelProvideInfo(provider='model_azure_provider', name='Azure OpenAI', icon=get_file_content(

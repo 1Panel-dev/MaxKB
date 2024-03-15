@@ -64,7 +64,10 @@
             style="width: 100%"
             v-model="base_form_data.model_name"
             class="m-2"
-            placeholder="请选择模型类型"
+            placeholder="请选择基础模型"
+            filterable
+            allow-create
+            default-first-option
           >
             <el-option
               v-for="item in base_model_list"
