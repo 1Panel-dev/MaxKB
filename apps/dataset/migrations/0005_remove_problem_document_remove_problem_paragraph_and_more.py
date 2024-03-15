@@ -7,11 +7,6 @@ import uuid
 from embedding.models import SourceType
 
 
-def delete_problem_embedding(apps, schema_editor):
-    Embedding = apps.get_model('embedding', 'Embedding')
-    Embedding.objects.filter(source_type=SourceType.PROBLEM).delete()
-
-
 class Migration(migrations.Migration):
     dependencies = [
         ('dataset', '0004_remove_paragraph_hit_num_remove_paragraph_star_num_and_more'),
@@ -55,5 +50,4 @@ class Migration(migrations.Migration):
                 'db_table': 'problem_paragraph_mapping',
             },
         ),
-        migrations.RunPython(delete_problem_embedding)
     ]
