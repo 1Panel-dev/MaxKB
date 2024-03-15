@@ -97,4 +97,4 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
       - name: Docker Buildx (build-and-push)
         run: |
-          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}}
+          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
