@@ -82,7 +82,6 @@ const toolbars = [
   'pageFullscreen',
   'preview',
   'htmlPreview',
-  'catalog'
 ] as any[]
 
 const editorRef = ref()
