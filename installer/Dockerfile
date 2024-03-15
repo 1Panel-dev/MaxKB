@@ -1,4 +1,4 @@
-FROM ghcr.io/maxkb-dev/python-pg:v1.0.0 as vector-model
+FROM ghcr.io/maxkb-dev/vector-model:v1.0.0 as vector-model
 
 FROM node:18-alpine3.18 as web-build
 COPY ui ui
