@@ -1,9 +1,4 @@
-FROM python:3.11-slim as vector-model-build
-COPY installer/install_model.py install_model.py
-RUN pip3 install --upgrade pip setuptools && \
-    pip install pycrawlers && \
-    pip install transformers && \
-    python3 install_model.py
+FROM ghcr.io/maxkb-dev/python-pg:v1.0.0 as vector-model
 
 FROM node:18-alpine3.18 as web-build
 COPY ui ui
@@ -12,30 +7,7 @@ RUN cd ui && \
     npm run build && \
     rm -rf ./node_modules
 
-FROM postgres:15.6-bookworm
-
-ENV LANG=C.UTF-8
-
-RUN apt-get update
-
-RUN apt-get install postgresql-15-pgvector
-
-COPY installer/init.sql /docker-entrypoint-initdb.d
-
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
-
-ENV POSTGRES_USER root
-
-ENV POSTGRES_PASSWORD Password123@postgres
-
-
-# ---- prepare python env --- #
-ENV PATH /usr/local/bin:$PATH
-COPY installer/install-python.sh /install-python.sh
-RUN chmod 755 /install-python.sh; bash -c "/install-python.sh > /dev/null 2>&1" ; rm -f /install-python.sh
-ENV PYTHON_VERSION 3.11.8
-
-# ---- build maxkb --- #
+FROM ghcr.io/maxkb-dev/python-pg:python3.11.8-pg15.6
 # 创建工作目录
 RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/conf
 VOLUME /opt/maxkb
