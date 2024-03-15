@@ -28,9 +28,6 @@ class OllamaLLMModelCredential(BaseForm, BaseModelCredential):
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(500, f'{model_type} 模型类型不支持')
 
-        if model_name not in model_dict:
-            raise AppApiException(500, f'{model_name} 模型名称不支持')
-
         for key in ['api_key']:
             if key not in model_credential:
                 if raise_exception:
@@ -107,7 +104,8 @@ class OllamaModelProvider(IModelProvider):
     def get_model_credential(self, model_type, model_name):
         if model_name in model_dict:
             return model_dict.get(model_name).model_credential
-        raise AppApiException(500, f'不支持的模型:{model_name}')
+        # 如果使用模型不在配置中,则使用默认认证
+        return ollama_llm_model_credential
 
     def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> BaseChatModel:
         return OllamaChatModel(model=model_name, openai_api_base=model_credential.get('api_base'),
