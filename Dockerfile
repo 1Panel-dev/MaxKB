@@ -1,5 +1,5 @@
 FROM python:3.11-slim as vector-model-build
-COPY build/install_model.py install_model.py
+COPY installer/install_model.py install_model.py
 RUN pip3 install --upgrade pip setuptools && \
     pip install pycrawlers && \
     pip install transformers && \
@@ -20,7 +20,7 @@ RUN apt-get update
 
 RUN apt-get install postgresql-15-pgvector
 
-COPY build/init.sql /docker-entrypoint-initdb.d
+COPY installer/init.sql /docker-entrypoint-initdb.d
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
 
@@ -31,7 +31,7 @@ ENV POSTGRES_PASSWORD Password123@postgres
 
 # ---- prepare python env --- #
 ENV PATH /usr/local/bin:$PATH
-COPY build/install-python.sh /install-python.sh
+COPY installer/install-python.sh /install-python.sh
 RUN chmod 755 /install-python.sh; bash -c "/install-python.sh > /dev/null 2>&1" ; rm -f /install-python.sh
 ENV PYTHON_VERSION 3.11.8
 
@@ -41,7 +41,7 @@ RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/
 VOLUME /opt/maxkb
 # 拷贝项目
 COPY . /opt/maxkb/app
-COPY build/config.yaml /opt/maxkb/conf
+COPY installer/config.yaml /opt/maxkb/conf
 RUN rm -rf /opt/maxkb/app/ui /opt/maxkb/app/build
 COPY --from=vector-model-build model /opt/maxkb/app/model
 COPY --from=web-build ui /opt/maxkb/app/ui
@@ -64,7 +64,7 @@ RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 RUN pip3 install --no-cache-dir -r requirements.txt
 EXPOSE 8000
 # 启动命令
-COPY build/run-maxkb.sh /usr/bin/
+COPY installer/run-maxkb.sh /usr/bin/
 RUN chmod 755 /usr/bin/run-maxkb.sh
 ENTRYPOINT ["bash", "-c"]
 CMD [ "/usr/bin/run-maxkb.sh" ]
