@@ -27,7 +27,7 @@ const guideHtml=`
 </div>
 `
 const chatButtonHtml=
-`<div class="chat_button"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56" fill="none">
+`<div class="chat_button"><svg style="vertical-align: middle;overflow: hidden;" xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56" fill="none">
 <g filter="url(#filter0_d_349_49711)">
 <path d="M8 24C8 12.9543 16.9543 4 28 4H48V44H28C16.9543 44 8 35.0457 8 24Z" fill="url(#paint0_linear_349_49711)"/>
 </g>
@@ -62,7 +62,7 @@ const getChatContainerHtml=(protocol,host,token)=>{
 <div class="openviewport">
             <svg t="1710150885892"   viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"  fill="rgb(100, 106, 115)" width="16" height="16" ><path d="M85.333333 384c25.6 0 42.666667-17.066667 42.666667-42.666667V128h213.333333c25.6 0 42.666667-17.066667 42.666667-42.666667s-17.066667-42.666667-42.666667-42.666666H85.333333c-25.6 0-42.666667 17.066667-42.666666 42.666666v256c0 25.6 17.066667 42.666667 42.666666 42.666667zM938.666667 640c-25.6 0-42.666667 17.066667-42.666667 42.666667v213.333333h-213.333333c-25.6 0-42.666667 17.066667-42.666667 42.666667s17.066667 42.666667 42.666667 42.666666h256c25.6 0 42.666667-17.066667 42.666666-42.666666v-256c0-25.6-17.066667-42.666667-42.666666-42.666667zM977.066667 68.266667c-4.266667-8.533333-12.8-17.066667-21.333334-21.333334-4.266667-4.266667-12.8-4.266667-17.066666-4.266666h-256c-25.6 0-42.666667 17.066667-42.666667 42.666666s17.066667 42.666667 42.666667 42.666667h153.6l-226.133334 226.133333c-17.066667 17.066667-17.066667 42.666667 0 59.733334 8.533333 8.533333 17.066667 12.8 29.866667 12.8s21.333333-4.266667 29.866667-12.8L896 187.733333V341.333333c0 25.6 17.066667 42.666667 42.666667 42.666667s42.666667-17.066667 42.666666-42.666667V85.333333c0-4.266667 0-12.8-4.266666-17.066666zM354.133333 610.133333L128 836.266667V682.666667c0-25.6-17.066667-42.666667-42.666667-42.666667s-42.666667 17.066667-42.666666 42.666667v256c0 4.266667 0 12.8 4.266666 17.066666 4.266667 8.533333 12.8 17.066667 21.333334 21.333334 4.266667 4.266667 12.8 4.266667 17.066666 4.266666h256c25.6 0 42.666667-17.066667 42.666667-42.666666s-17.066667-42.666667-42.666667-42.666667H187.733333l226.133334-226.133333c17.066667-17.066667 17.066667-42.666667 0-59.733334s-42.666667-17.066667-59.733334 0z" p-id="8645"></path></svg>
 </div>
-           <div class="close"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+           <div class="chat_close"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M9.95317 8.73169L15.5511 3.13376C15.7138 2.97104 15.9776 2.97104 16.1403 3.13376L16.7296 3.72301C16.8923 3.88573 16.8923 4.14955 16.7296 4.31227L11.1317 9.9102L16.7296 15.5081C16.8923 15.6708 16.8923 15.9347 16.7296 16.0974L16.1403 16.6866C15.9776 16.8494 15.7138 16.8494 15.5511 16.6866L9.95317 11.0887L4.35524 16.6866C4.19252 16.8494 3.9287 16.8494 3.76598 16.6866L3.17673 16.0974C3.01401 15.9347 3.01401 15.6708 3.17673 15.5081L8.77465 9.9102L3.17673 4.31227C3.01401 4.14955 3.01401 3.88573 3.17673 3.72301L3.76598 3.13376C3.9287 2.97104 4.19252 2.97104 4.35524 3.13376L9.95317 8.73169Z" fill="#646A73"/>
   </svg>
  </div>`
@@ -119,10 +119,12 @@ const initChat=(root)=>{
  * 第一次进来的引导提示
  */
 function initMaxkb(){
-  initMaxkbStyle()
+  const maxkb=document.createElement('div')
   const root=document.createElement('div')
   root.id="maxkb"
-  document.body.appendChild(root)
+  initMaxkbStyle(maxkb)
+  maxkb.appendChild(root)
+  document.body.appendChild(maxkb)
   const maxkbMaskTip=localStorage.getItem('maxkbMaskTip')
   if(maxkbMaskTip==null){
     initGuide(root)
@@ -132,10 +134,11 @@ function initMaxkb(){
 
  
 // 初始化全局样式
-function initMaxkbStyle(){
+function initMaxkbStyle(root){
   style=document.createElement('style')
   style.type='text/css'
-  style.innerText=  `/* 放大 */
+  style.innerText=  `
+  @scope {/* 放大 */
   #maxkb .enlarge {
       width: 50%!important;
       height: 100%!important;
@@ -173,7 +176,7 @@ function initMaxkbStyle(){
       z-index: 1000;
   }
   #maxkb .tips {
-      position: absolute;
+      position: fixed;
       bottom: 30px;
       right: 60px;
       padding: 22px 24px 24px;
@@ -252,7 +255,7 @@ function initMaxkbStyle(){
               box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.10);
               position: fixed;bottom: 20px;right: 45px;overflow: hidden;
     }
-    #maxkb #chat_container .close{
+    #maxkb #chat_container .chat_close{
         position: absolute;
             top: 15px;
             right: 10px;
@@ -289,8 +292,8 @@ function initMaxkbStyle(){
                 to {
                   height: 600px;
                 }
-              }`
-  document.head.appendChild(style)
+              }}`
+  root.appendChild(style)
 }
 
 function embedChatbot() {
