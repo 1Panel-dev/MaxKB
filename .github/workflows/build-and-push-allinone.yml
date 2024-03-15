@@ -1,4 +1,4 @@
-name: build-and-push
+name: build-and-push-allinone
 
 on:
   workflow_dispatch:
