@@ -4,7 +4,7 @@ ENV LANG=C.UTF-8
 
 RUN apt-get update
 
-RUN apt-get install postgresql-15-pgvector
+RUN apt-get install -y postgresql-15-pgvector
 
 COPY installer/init.sql /docker-entrypoint-initdb.d
 
