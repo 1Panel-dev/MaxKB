@@ -14,6 +14,8 @@ ENV POSTGRES_USER root
 
 ENV POSTGRES_PASSWORD Password123@postgres
 
+# ---- prepare python env --- #
+# ---- below content is copied from https://github.com/docker-library/python/blob/master/3.11/slim-bookworm/Dockerfile --- #
 ENV PATH /usr/local/bin:$PATH
 
 # http://bugs.python.org/issue19846
