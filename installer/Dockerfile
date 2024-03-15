@@ -14,6 +14,8 @@ VOLUME /opt/maxkb
 # 拷贝项目
 COPY . /opt/maxkb/app
 COPY installer/config.yaml /opt/maxkb/conf
+ENV POSTGRES_USER root
+ENV POSTGRES_PASSWORD Password123@postgres
 RUN rm -rf /opt/maxkb/app/ui /opt/maxkb/app/build
 COPY --from=vector-model model /opt/maxkb/app/model
 COPY --from=web-build ui /opt/maxkb/app/ui

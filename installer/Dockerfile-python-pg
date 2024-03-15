@@ -10,12 +10,9 @@ COPY installer/init.sql /docker-entrypoint-initdb.d
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
 
-ENV POSTGRES_USER root
+# ---- install python --- #
+# ---- below content is copied from https://github.com/docker-library/python/blob/master/3.11/slim-bullseye/Dockerfile --- #
 
-ENV POSTGRES_PASSWORD Password123@postgres
-
-# ---- prepare python env --- #
-# ---- below content is copied https://github.com/docker-library/python/blob/master/3.11/slim-bullseye/Dockerfile --- #
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
 
