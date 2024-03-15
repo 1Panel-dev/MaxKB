@@ -7,6 +7,20 @@ jobs:
   build-and-push-vector-model-to-ghcr:
     runs-on: ubuntu-latest
     steps:
+      - name: Check Disk Space
+        run: df -h
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      - name: Check Disk Space
+        run: df -h
       - name: Checkout
         uses: actions/checkout@v4
         with:

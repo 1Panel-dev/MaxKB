@@ -34,8 +34,8 @@ RUN pip3 install poetry
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 # 下载python依赖
 RUN pip3 install --no-cache-dir -r requirements.txt
-EXPOSE 8000
 # 启动命令
+EXPOSE 8000
 COPY installer/run-maxkb.sh /usr/bin/
 RUN chmod 755 /usr/bin/run-maxkb.sh
 ENTRYPOINT ["bash", "-c"]
