@@ -15,7 +15,7 @@ VOLUME /opt/maxkb
 COPY . /opt/maxkb/app
 COPY installer/config.yaml /opt/maxkb/conf
 RUN rm -rf /opt/maxkb/app/ui /opt/maxkb/app/build
-COPY --from=vector-model-build model /opt/maxkb/app/model
+COPY --from=vector-model model /opt/maxkb/app/model
 COPY --from=web-build ui /opt/maxkb/app/ui
 RUN ls -la /opt/maxkb/app
 # 复制模型
