@@ -12,15 +12,20 @@ jobs:
   build-and-push-fit2cloud-registry:
     runs-on: ubuntu-latest
     steps:
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
+      - name: Check Disk Space
+        run: df -h
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
         with:
-          root-reserve-mb: 35840
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      - name: Check Disk Space
+        run: df -h
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -52,20 +57,25 @@ jobs:
           password: ${{ secrets.FIT2CLOUD_REGISTRY_PASSWORD }}
       - name: Docker Buildx (build-and-push)
         run: |
-          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
+          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile
 
   build-and-push-to-ghcr:
     runs-on: ubuntu-latest
     steps:
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
+      - name: Check Disk Space
+        run: df -h
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
         with:
-          root-reserve-mb: 35840
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      - name: Check Disk Space
+        run: df -h
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -97,4 +107,4 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
       - name: Docker Buildx (build-and-push)
         run: |
-          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
+          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile
