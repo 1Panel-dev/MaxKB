@@ -26,7 +26,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shangh
 
 ENV POSTGRES_USER root
 
-ENV POSTGRES_PASSWORD Password123@mysql
+ENV POSTGRES_PASSWORD Password123@postgres
 
 # ---- prepare python env --- #
 # ---- copy from https://github.com/docker-library/python/blob/master/3.11/slim-bookworm/Dockerfile --- #
