@@ -6,7 +6,6 @@
     @date：2023/9/21 15:46
     @desc:
 """
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from common.field.vector_field import VectorField
@@ -37,9 +36,6 @@ class Embedding(models.Model):
     paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, verbose_name="段落关联", db_constraint=False)
 
     embedding = VectorField(verbose_name="向量")
-
-    keywords = ArrayField(verbose_name="关键词列表",
-                          base_field=models.CharField(max_length=256), default=list)
 
     meta = models.JSONField(verbose_name="元数据", default=dict)
 

@@ -11,6 +11,7 @@ import os
 import uuid
 from typing import Dict, List
 
+from django.contrib.postgres.search import SearchVector
 from django.db.models import QuerySet
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
