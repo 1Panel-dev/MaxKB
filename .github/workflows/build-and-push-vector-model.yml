@@ -2,6 +2,20 @@ name: build-and-push-vector-model
 
 on:
   workflow_dispatch:
+    inputs:
+      dockerImageTag:
+        description: 'Docker Image Tag'
+        default: 'v1.0.0'
+        required: true
+      architecture:
+        description: 'Architecture'
+        required: true
+        default: 'linux/amd64'
+        type: choice
+        options:
+          - linux/amd64
+          - linux/arm64
+          - linux/amd64,linux/arm64
 
 jobs:
   build-and-push-vector-model-to-ghcr:
@@ -29,8 +43,8 @@ jobs:
         id: prepare
         run: |
           DOCKER_IMAGE=ghcr.io/maxkb-dev/vector-model
-          DOCKER_PLATFORMS=linux/amd64,linux/arm64
-          TAG_NAME=v1.0.0
+          DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
+          TAG_NAME=${{ github.event.inputs.dockerImageTag }}
           DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
           echo ::set-output name=docker_image::${DOCKER_IMAGE}
           echo ::set-output name=version::${TAG_NAME}

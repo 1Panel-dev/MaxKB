@@ -10,7 +10,6 @@ RUN cd ui && \
 FROM ghcr.io/maxkb-dev/python-pg:python3.11.8-pg15.3
 # 创建工作目录
 RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/conf
-VOLUME /opt/maxkb
 # 拷贝项目
 COPY . /opt/maxkb/app
 COPY installer/config.yaml /opt/maxkb/conf
@@ -37,6 +36,7 @@ RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 # 下载python依赖
 RUN pip3 install --no-cache-dir -r requirements.txt
 # 启动命令
+VOLUME /opt/maxkb/conf
 EXPOSE 8000
 COPY installer/run-maxkb.sh /usr/bin/
 RUN chmod 755 /usr/bin/run-maxkb.sh
