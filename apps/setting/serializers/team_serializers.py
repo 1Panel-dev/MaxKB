@@ -25,7 +25,7 @@ from common.mixins.api_mixin import ApiMixin
 from common.response.result import get_api_response
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
-from setting.models import TeamMember, TeamMemberPermission
+from setting.models import TeamMember, TeamMemberPermission, Team
 from smartdoc.conf import PROJECT_DIR
 from users.models.user import User
 from users.serializers.user_serializers import UserSerializer

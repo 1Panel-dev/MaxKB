@@ -17,8 +17,8 @@ class ErrMessage:
             'blank': gettext_lazy("【%s】此字段不能为空字符串。" % field),
             'max_length': gettext_lazy("【%s】请确保此字段的字符数不超过 {max_length} 个。" % field),
             'min_length': gettext_lazy("【%s】请确保此字段至少包含 {min_length} 个字符。" % field),
-            'required': gettext_lazy('此字段必填。'),
-            'null': gettext_lazy('此字段不能为null。')
+            'required': gettext_lazy('【%s】此字段必填。' % field),
+            'null': gettext_lazy('【%s】此字段不能为null。' % field)
         }
 
     @staticmethod

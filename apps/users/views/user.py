@@ -17,12 +17,12 @@ from rest_framework.views import Request
 
 from common.auth.authenticate import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants
+from common.constants.permission_constants import PermissionConstants, CompareConstants, ViewPermission, RoleConstants
 from common.response import result
 from smartdoc.settings import JWT_AUTH
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
-    SendEmailSerializer, UserProfile, UserSerializer
+    SendEmailSerializer, UserProfile, UserSerializer, UserManageSerializer, UserInstanceSerializer
 
 user_cache = cache.caches['user_cache']
 token_cache = cache.caches['token_cache']
@@ -191,3 +191,105 @@ class SendEmail(APIView):
         serializer_obj = SendEmailSerializer(data=request.data)
         if serializer_obj.is_valid(raise_exception=True):
             return result.success(serializer_obj.send())
+
+
+class UserManage(APIView):
+    authentication_classes = [TokenAuth]
+
+    @action(methods=['POST'], detail=False)
+    @swagger_auto_schema(operation_summary="添加用户",
+                         operation_id="添加用户",
+                         request_body=UserManageSerializer.UserInstance.get_request_body_api(),
+                         responses=result.get_api_response(UserInstanceSerializer.get_response_body_api()),
+                         tags=["用户管理"]
+                         )
+    @has_permissions(ViewPermission(
+        [RoleConstants.ADMIN],
+        [PermissionConstants.USER_READ],
+        compare=CompareConstants.AND))
+    def post(self, request: Request):
+        return result.success(UserManageSerializer().save(request.data))
+
+    class Page(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取用户分页列表",
+                             operation_id="获取用户分页列表",
+                             tags=["用户管理"],
+                             manual_parameters=UserManageSerializer.Query.get_request_params_api(),
+                             responses=result.get_page_api_response(UserInstanceSerializer.get_response_body_api()),
+                             )
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN],
+            [PermissionConstants.USER_READ],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, current_page, page_size):
+            d = UserManageSerializer.Query(
+                data={'name': request.query_params.get('name', None), 'desc': request.query_params.get("desc", None),
+                      'user_id': str(request.user.id)})
+            return result.success(d.page(current_page, page_size))
+
+    class RePassword(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="修改密码",
+                             operation_id="修改密码",
+                             manual_parameters=UserInstanceSerializer.get_request_params_api(),
+                             request_body=UserManageSerializer.RePasswordInstance.get_request_body_api(),
+                             responses=result.get_default_response(),
+                             tags=["用户管理"])
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN],
+            [PermissionConstants.USER_READ],
+            compare=CompareConstants.AND))
+        def put(self, request: Request, user_id):
+            return result.success(
+                UserManageSerializer.Operate(data={'id': user_id}).re_password(request.data, with_valid=True))
+
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['DELETE'], detail=False)
+        @swagger_auto_schema(operation_summary="删除用户",
+                             operation_id="删除用户",
+                             manual_parameters=UserInstanceSerializer.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["用户管理"])
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN],
+            [PermissionConstants.USER_READ],
+            compare=CompareConstants.AND))
+        def delete(self, request: Request, user_id):
+            return result.success(UserManageSerializer.Operate(data={'id': user_id}).delete(with_valid=True))
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取用户信息",
+                             operation_id="获取用户信息",
+                             manual_parameters=UserInstanceSerializer.get_request_params_api(),
+                             responses=result.get_api_response(UserInstanceSerializer.get_response_body_api()),
+                             tags=["用户管理"]
+                             )
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN],
+            [PermissionConstants.USER_READ],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, user_id):
+            return result.success(UserManageSerializer.Operate(data={'id': user_id}).one(with_valid=True))
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="修改用户信息",
+                             operation_id="修改用户信息",
+                             manual_parameters=UserInstanceSerializer.get_request_params_api(),
+                             request_body=UserManageSerializer.UserEditInstance.get_request_body_api(),
+                             responses=result.get_api_response(UserInstanceSerializer.get_response_body_api()),
+                             tags=["用户管理"]
+                             )
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN],
+            [PermissionConstants.USER_READ],
+            compare=CompareConstants.AND))
+        def put(self, request: Request, user_id):
+            return result.success(
+                UserManageSerializer.Operate(data={'id': user_id}).edit(request.data, with_valid=True))

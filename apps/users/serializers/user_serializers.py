@@ -22,6 +22,7 @@ from rest_framework import serializers
 from common.constants.authentication_type import AuthenticationType
 from common.constants.exception_code_constants import ExceptionCodeConstants
 from common.constants.permission_constants import RoleConstants, get_permission_list_by_role
+from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.response.result import get_api_response
@@ -50,9 +51,9 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
         super().is_valid(raise_exception=True)
         username = self.data.get("username")
         password = password_encrypt(self.data.get("password"))
-        user = self.Meta.model.objects.filter(Q(username=username,
-                                                password=password) | Q(email=username,
-                                                                       password=password)).first()
+        user = QuerySet(User).filter(Q(username=username,
+                                       password=password) | Q(email=username,
+                                                              password=password)).first()
         if user is None:
             raise ExceptionCodeConstants.INCORRECT_USERNAME_AND_PASSWORD.value.to_app_api_exception()
         return user
@@ -142,7 +143,7 @@ class RegisterSerializer(ApiMixin, serializers.Serializer):
         cache_code = user_cache.get(code_cache_key)
         if code != cache_code:
             raise ExceptionCodeConstants.CODE_ERROR.value.to_app_api_exception()
-        u = User.objects.filter(Q(username=username) | Q(email=email)).first()
+        u = QuerySet(User).filter(Q(username=username) | Q(email=email)).first()
         if u is not None:
             if u.email == email:
                 raise ExceptionCodeConstants.EMAIL_IS_EXIST.value.to_app_api_exception()
@@ -274,7 +275,7 @@ class RePasswordSerializer(ApiMixin, serializers.Serializer):
         """
         if self.is_valid():
             email = self.data.get("email")
-            self.Meta.model.objects.filter(email=email).update(
+            QuerySet(User).filter(email=email).update(
                 password=password_encrypt(self.data.get('password')))
             code_cache_key = email + ":reset_password"
             # 删除验证码缓存
@@ -312,7 +313,7 @@ class SendEmailSerializer(ApiMixin, serializers.Serializer):
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=raise_exception)
-        user_exists = self.Meta.model.objects.filter(email=self.data.get('email')).exists()
+        user_exists = QuerySet(User).filter(email=self.data.get('email')).exists()
         if not user_exists and self.data.get('type') == 'reset_password':
             raise ExceptionCodeConstants.EMAIL_IS_NOT_EXIST.value.to_app_api_exception()
         elif user_exists and self.data.get('type') == 'register':
@@ -450,3 +451,255 @@ class UserSerializer(ApiMixin, serializers.ModelSerializer):
             email_or_username = self.data.get('email_or_username')
             return [{'id': user_model.id, 'username': user_model.username, 'email': user_model.email} for user_model in
                     QuerySet(User).filter(Q(username=email_or_username) | Q(email=email_or_username))]
+
+
+class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'phone', 'nick_name']
+
+    @staticmethod
+    def get_response_body_api():
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['id', 'username', 'email', 'password', 'create_time', 'update_time'],
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, title="用户名", description="用户名"),
+                'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址"),
+                'phone': openapi.Schema(type=openapi.TYPE_STRING, title="手机号", description="手机号"),
+                'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="昵称", description="昵称"),
+                'create_time': openapi.Schema(type=openapi.TYPE_STRING, title="创建时间", description="修改时间"),
+                'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间", description="修改时间")
+            }
+        )
+
+    @staticmethod
+    def get_request_params_api():
+        return [openapi.Parameter(name='user_id',
+                                  in_=openapi.IN_PATH,
+                                  type=openapi.TYPE_STRING,
+                                  required=True,
+                                  description='用户名id')
+
+                ]
+
+
+class UserManageSerializer(serializers.Serializer):
+    class Query(ApiMixin, serializers.Serializer):
+        email_or_username = serializers.CharField(required=False, error_messages=ErrMessage.char("邮箱或者用户名"))
+
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='email_or_username',
+                                      in_=openapi.IN_QUERY,
+                                      type=openapi.TYPE_STRING,
+                                      required=False,
+                                      description='邮箱或者用户名')]
+
+        @staticmethod
+        def get_response_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['username', 'email', 'id'],
+                properties={
+                    'id': openapi.Schema(type=openapi.TYPE_STRING, title='用户主键id', description="用户主键id"),
+                    'username': openapi.Schema(type=openapi.TYPE_STRING, title="用户名", description="用户名"),
+                    'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址")
+                }
+            )
+
+        def get_query_set(self):
+            email_or_username = self.data.get('email_or_username')
+            query_set = QuerySet(User)
+            if email_or_username is not None:
+                query_set = query_set.filter(Q(username=email_or_username) | Q(email=email_or_username))
+            return query_set
+
+        def list(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            return [{'id': user_model.id, 'username': user_model.username, 'email': user_model.email} for user_model in
+                    self.get_query_set()]
+
+        def page(self, current_page: int, page_size: int, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            return page_search(current_page, page_size,
+                               self.get_query_set(),
+                               post_records_handler=lambda u: UserInstanceSerializer(u).data)
+
+    class UserInstance(ApiMixin, serializers.Serializer):
+        email = serializers.EmailField(
+            required=True,
+            error_messages=ErrMessage.char("邮箱"),
+            validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
+                                                  code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
+
+        username = serializers.CharField(required=True,
+                                         error_messages=ErrMessage.char("用户名"),
+                                         max_length=20,
+                                         min_length=6,
+                                         validators=[
+                                             validators.RegexValidator(regex=re.compile("^[a-zA-Z][a-zA-Z1-9_]{5,20}$"),
+                                                                       message="用户名字符数为 6-20 个字符，必须以字母开头，可使用字母、数字、下划线等")
+                                         ])
+        password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"),
+                                         validators=[validators.RegexValidator(regex=re.compile(
+                                             "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                             "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
+                                             , message="密码长度6-20个字符，必须字母、数字、特殊字符组合")])
+
+        nick_name = serializers.CharField(required=False, error_messages=ErrMessage.char("昵称"), max_length=56,
+                                          allow_null=True)
+        phone = serializers.CharField(required=False, error_messages=ErrMessage.char("手机号"), max_length=20,
+                                      allow_null=True)
+
+        def is_valid(self, *, raise_exception=True):
+            super().is_valid(raise_exception=True)
+            username = self.data.get('username')
+            email = self.data.get('email')
+            u = QuerySet(User).filter(Q(username=username) | Q(email=email)).first()
+            if u is not None:
+                if u.email == email:
+                    raise ExceptionCodeConstants.EMAIL_IS_EXIST.value.to_app_api_exception()
+                if u.username == username:
+                    raise ExceptionCodeConstants.USERNAME_IS_EXIST.value.to_app_api_exception()
+
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['username', 'email', 'password'],
+                properties={
+                    'username': openapi.Schema(type=openapi.TYPE_STRING, title="用户名", description="用户名"),
+                    'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址"),
+                    'password': openapi.Schema(type=openapi.TYPE_STRING, title="密码", description="密码"),
+                    'phone': openapi.Schema(type=openapi.TYPE_STRING, title="手机号", description="手机号"),
+                    'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="昵称", description="昵称")
+                }
+            )
+
+    class UserEditInstance(ApiMixin, serializers.Serializer):
+        email = serializers.EmailField(
+            required=False,
+            error_messages=ErrMessage.char("邮箱"),
+            validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
+                                                  code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
+
+        nick_name = serializers.CharField(required=False, error_messages=ErrMessage.char("昵称"), max_length=56,
+                                          allow_null=True)
+        phone = serializers.CharField(required=False, error_messages=ErrMessage.char("手机号"), max_length=20,
+                                      allow_null=True)
+        is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char("是否可用"))
+
+        def is_valid(self, *, user_id=None, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if QuerySet(User).filter(email=self.data.get('email')).exclude(id=user_id).exists():
+                raise AppApiException(1004, "邮箱已经被使用")
+
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱"),
+                    'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="昵称", description="昵称"),
+                    'phone': openapi.Schema(type=openapi.TYPE_STRING, title="手机号", description="手机号"),
+                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
+                }
+            )
+
+    class RePasswordInstance(ApiMixin, serializers.Serializer):
+        password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"),
+                                         validators=[validators.RegexValidator(regex=re.compile(
+                                             "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                             "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
+                                             , message="密码长度6-20个字符，必须字母、数字、特殊字符组合")])
+        re_password = serializers.CharField(required=True, error_messages=ErrMessage.char("确认密码"),
+                                            validators=[validators.RegexValidator(regex=re.compile(
+                                                "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                                "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
+                                                , message="确认密码长度6-20个字符，必须字母、数字、特殊字符组合")]
+                                            )
+
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['password', 're_password'],
+                properties={
+                    'password': openapi.Schema(type=openapi.TYPE_STRING, title="密码", description="密码"),
+                    're_password': openapi.Schema(type=openapi.TYPE_STRING, title="确认密码",
+                                                  description="确认密码"),
+                }
+            )
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if self.data.get('password') != self.data.get('re_password'):
+                raise ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.to_app_api_exception()
+
+    @transaction.atomic
+    def save(self, instance, with_valid=True):
+        if with_valid:
+            UserManageSerializer.UserInstance(data=instance).is_valid(raise_exception=True)
+
+        user = User(id=uuid.uuid1(), email=instance.get('email'),
+                    phone="" if instance.get('phone') is None else instance.get('phone'),
+                    nick_name="" if instance.get('nick_name') is None else instance.get('nick_name')
+                    , username=instance.get('username'), password=password_encrypt(instance.get('password')),
+                    role=RoleConstants.USER.name,
+                    is_active=True)
+        user.save()
+        # 初始化用户团队
+        Team(**{'user': user, 'name': user.username + '的团队'}).save()
+        return UserInstanceSerializer(user).data
+
+    class Operate(serializers.Serializer):
+        id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("用户id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if not QuerySet(User).filter(id=self.data.get('id')).exists():
+                raise AppApiException(1004, "用户不存在")
+
+        def delete(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                user = QuerySet(User).filter(id=self.data.get('id')).first()
+                if user.role == RoleConstants.ADMIN.name:
+                    raise AppApiException(1004, "无法删除管理员")
+            QuerySet(User).filter(id=self.data.get('id')).delete()
+            return True
+
+        def edit(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                UserManageSerializer.UserEditInstance(data=instance).is_valid(user_id=self.data.get('id'),
+                                                                              raise_exception=True)
+
+            user = QuerySet(User).filter(id=self.data.get('id')).first()
+            if user.role == RoleConstants.ADMIN.name and 'is_active' in instance and instance.get(
+                    'is_active') is not None:
+                raise AppApiException(1004, "不能修改管理员状态")
+            update_keys = ['email', 'nick_name', 'phone', 'is_active']
+            for update_key in update_keys:
+                if update_key in instance and instance.get(update_key) is not None:
+                    user.__setattr__(update_key, instance.get(update_key))
+            user.save()
+            return UserInstanceSerializer(user).data
+
+        def one(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            user = QuerySet(User).filter(id=self.data.get('id')).first()
+            return UserInstanceSerializer(user).data
+
+        def re_password(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                UserManageSerializer.RePasswordInstance(data=instance).is_valid(raise_exception=True)
+            user = QuerySet(User).filter(id=self.data.get('id')).first()
+            user.password = password_encrypt(instance.get('password'))
+            user.save()
+            return True
