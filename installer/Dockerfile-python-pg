@@ -10,12 +10,9 @@ COPY installer/init.sql /docker-entrypoint-initdb.d
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
 
-ENV POSTGRES_USER root
+# ---- install python --- #
+# ---- below content is copied from https://github.com/docker-library/python/blob/master/3.11/slim-bullseye/Dockerfile --- #
 
-ENV POSTGRES_PASSWORD Password123@postgres
-
-# ---- prepare python env --- #
-# ---- below content is copied https://github.com/docker-library/python/blob/master/3.11/slim-bullseye/Dockerfile --- #
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
 
@@ -155,7 +152,7 @@ RUN set -eux; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends wget; \
+	apt-get install -y --no-install-recommends wget vim; \
 	\
 	wget -O get-pip.py "$PYTHON_GET_PIP_URL"; \
 	echo "$PYTHON_GET_PIP_SHA256 *get-pip.py" | sha256sum -c -; \

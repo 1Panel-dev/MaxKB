@@ -7,6 +7,15 @@ on:
         description: 'Docker Image Tag'
         default: 'v1.0.0'
         required: true
+      architecture:
+        description: 'Architecture'
+        required: true
+        default: 'linux/amd64'
+        type: choice
+        options:
+          - linux/amd64
+          - linux/arm64
+          - linux/amd64,linux/arm64
 
 jobs:
   build-and-push-fit2cloud-registry:
@@ -34,7 +43,7 @@ jobs:
         id: prepare
         run: |
           DOCKER_IMAGE=registry-hkproxy.fit2cloud.com/maxkb/maxkb
-          DOCKER_PLATFORMS=linux/amd64
+          DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
           DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
           echo ::set-output name=docker_image::${DOCKER_IMAGE}
@@ -90,7 +99,7 @@ jobs:
         id: prepare
         run: |
           DOCKER_IMAGE=ghcr.io/maxkb-dev/maxkb
-          DOCKER_PLATFORMS=linux/amd64
+          DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
           DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
           echo ::set-output name=docker_image::${DOCKER_IMAGE}

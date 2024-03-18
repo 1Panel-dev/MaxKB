@@ -2,11 +2,34 @@ name: build-and-push-python-pg
 
 on:
   workflow_dispatch:
-
+    inputs:
+      architecture:
+        description: 'Architecture'
+        required: true
+        default: 'linux/amd64'
+        type: choice
+        options:
+          - linux/amd64
+          - linux/arm64
+          - linux/amd64,linux/arm64
 jobs:
   build-and-push-python-pg-to-ghcr:
     runs-on: ubuntu-latest
     steps:
+      - name: Check Disk Space
+        run: df -h
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      - name: Check Disk Space
+        run: df -h
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -15,7 +38,7 @@ jobs:
         id: prepare
         run: |
           DOCKER_IMAGE=ghcr.io/maxkb-dev/python-pg
-          DOCKER_PLATFORMS=linux/amd64
+          DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=python3.11.8-pg15.3
           DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
           echo ::set-output name=docker_image::${DOCKER_IMAGE}
