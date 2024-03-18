@@ -138,7 +138,7 @@ function initMaxkbStyle(root){
   style=document.createElement('style')
   style.type='text/css'
   style.innerText=  `
-  @scope {/* 放大 */
+  /* 放大 */
   #maxkb .maxkb-enlarge {
       width: 50%!important;
       height: 100%!important;
@@ -292,7 +292,7 @@ function initMaxkbStyle(root){
                 to {
                   height: 600px;
                 }
-              }}`
+              }`
   root.appendChild(style)
 }
 
