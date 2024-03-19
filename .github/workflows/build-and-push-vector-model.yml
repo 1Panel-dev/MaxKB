@@ -51,7 +51,7 @@ jobs:
           echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
             --build-arg VERSION=${TAG_NAME} \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg --no-cache \
+            --build-arg --no-cache --provenance=false \
             --build-arg VCS_REF=${GITHUB_SHA::8} \
             ${DOCKER_IMAGE_TAGS} .
       - name: Set up QEMU
