@@ -4,17 +4,18 @@ FROM node:18-alpine3.18 as web-build
 COPY ui ui
 RUN cd ui && \
     npm install && \
-    npm run build
+    npm run build && \
+    rm -rf ./node_modules
 
 FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11.8-pg15.3
 # 创建工作目录
 RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/conf
 # 拷贝项目
 COPY . /opt/maxkb/app
-RUN rm -rf /opt/maxkb/app/ui/*
+RUN rm -rf /opt/maxkb/app/ui
 COPY installer/config.yaml /opt/maxkb/conf
 COPY --from=vector-model model /opt/maxkb/app/model
-COPY --from=web-build ui/dist /opt/maxkb/app/ui
+COPY --from=web-build ui /opt/maxkb/app/ui
 ENV POSTGRES_USER root
 ENV POSTGRES_PASSWORD Password123@postgres
 WORKDIR /opt/maxkb/app
