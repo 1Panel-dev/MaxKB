@@ -117,6 +117,7 @@ jobs:
           fi
           echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --no-cache \
             ${DOCKER_IMAGE_TAGS} .
+          env
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
