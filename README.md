@@ -23,9 +23,22 @@ docker run -d --name=maxkb -p 8000:8000 ghcr.io/1panel-dev/maxkb
 也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama（Llama 2），30 分钟内即可上线基于本地大模型的知识库问答系统。
 
 
-## UI 展示
 
-TBD
+## UI 展示
+<table style="border-collapse: collapse; border: 1px solid black;">
+  <tr>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/1Panel-dev/MaxKB/assets/80892890/2b893a25-ae46-48da-b6a1-61d23015565e" alt="Demo1"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/1Panel-dev/MaxKB/assets/80892890/3e50e7ff-cdc4-4a37-b430-d84975f11d4e" alt="Demo2"   /></td>
+  </tr>
+  <tr>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/1Panel-dev/MaxKB/assets/80892890/dfdcc03f-ef36-4f75-bb82-797c0f9da1ad" alt="Demo3"   /></td>
+    <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/1Panel-dev/MaxKB/assets/80892890/884a9db1-3f93-4013-bc8f-a3f0dbcfeb2f" alt="Demo4"   /></td>
+  </tr>
+</table>
+
+## 社区交流
+
+[论坛](https://bbs.fit2cloud.com/c/mk/11)
 
 
 ## 技术栈
