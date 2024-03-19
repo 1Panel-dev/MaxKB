@@ -28,7 +28,7 @@ on:
 
 jobs:
   build-and-push-to-fit2cloud-registry:
-    if: contains(${{ github.event.inputs.registry }}, 'fit2cloud')
+    if: ${{  contains(github.event.inputs.registry, 'fit2cloud') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check Disk Space
@@ -55,7 +55,7 @@ jobs:
           DOCKER_IMAGE=registry-hkproxy.fit2cloud.com/maxkb/maxkb
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
-          if [[ TAG_NAME == *dev* ]]; then
+          if [[ ${TAG_NAME} == *dev* ]]; then
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           else
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
@@ -83,7 +83,7 @@ jobs:
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile
 
   build-and-push-to-dockerhub:
-    if: contains(${{ github.event.inputs.registry }}, 'dockerhub')
+    if: ${{  contains(github.event.inputs.registry, 'dockerhub') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check Disk Space
@@ -110,7 +110,7 @@ jobs:
           DOCKER_IMAGE=1panel/maxkb
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
-          if [[ TAG_NAME == *dev* ]]; then
+          if [[ ${TAG_NAME} == *dev* ]]; then
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           else
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
