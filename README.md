@@ -22,9 +22,6 @@ docker run -d --name=maxkb -p 8000:8000 ghcr.io/1panel-dev/maxkb
 
 也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama（Llama 2），30 分钟内即可上线基于本地大模型的知识库问答系统。
 
-## 整体架构
-
-![arch](https://github.com/1Panel-dev/maxkb/assets/52996290/ca786342-8a0a-4921-b847-a96fff9a3e09)
 
 ## UI 展示
 
@@ -36,10 +33,11 @@ TBD
 
 ## 技术栈
 
--   前端：[Vue3.js](https://cn.vuejs.org/)、[Element Plus](https://element-plus.org/zh-CN/)、[TypeScript](https://www.tslang.cn/)
--   后端：[Django](https://www.djangoproject.com/)、[Langchain](https://www.langchain.com/)
--   中间件：[PostgreSQL](https://www.postgresql.org/)  
--   基础设施：[Docker](https://www.docker.com/)
+-   前端：[Vue.js](https://cn.vuejs.org/)
+-   后端：[Django](https://www.djangoproject.com/)
+-   Langchain：[Langchain](https://www.langchain.com/)
+-   向量数据库：[PostgreSQL](https://www.postgresql.org/)
+-   大模型：Azure OpenAI、百度千帆大模型、[Ollama](https://github.com/ollama/ollama)
 
 ## License
 
