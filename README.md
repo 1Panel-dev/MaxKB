@@ -27,9 +27,6 @@ docker run -d --name=maxkb -p 8000:8000 ghcr.io/1panel-dev/maxkb
 
 TBD
 
-## 微信交流群
-
-TBD
 
 ## 技术栈
 
