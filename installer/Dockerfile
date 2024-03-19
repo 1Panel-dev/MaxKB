@@ -21,7 +21,7 @@ ENV POSTGRES_PASSWORD Password123@postgres
 WORKDIR /opt/maxkb/app
 RUN mv /opt/maxkb/app/model/* /opt/maxkb/model && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
-    apt-get install -y curl && \
+    apt-get update && apt-get install -y curl && \
     pip3 install --upgrade pip && \
     pip3 install poetry && \
     poetry export -f requirements.txt --output requirements.txt --without-hashes && \
