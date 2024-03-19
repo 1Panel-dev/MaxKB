@@ -1,4 +1,4 @@
-FROM ghcr.io/maxkb-dev/vector-model:v1.0.0 as vector-model
+FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.0 as vector-model
 
 FROM node:18-alpine3.18 as web-build
 COPY ui ui
@@ -7,7 +7,7 @@ RUN cd ui && \
     npm run build && \
     rm -rf ./node_modules
 
-FROM ghcr.io/maxkb-dev/python-pg:python3.11.8-pg15.3
+FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11.8-pg15.3
 # 创建工作目录
 RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/conf
 # 拷贝项目
