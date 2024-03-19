@@ -10,7 +10,7 @@ on:
       architecture:
         description: 'Architecture'
         required: true
-        default: 'linux/amd64'
+        default: 'linux/amd64,linux/arm64'
         type: choice
         options:
           - linux/amd64
