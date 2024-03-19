@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   const ENV = loadEnv(mode, envDir)
   const proxyConf: Record<string, string | ProxyOptions> = {}
   proxyConf['/api'] = {
-    target: 'http://127.0.0.1:8000',
+    target: 'http://127.0.0.1:8080',
     changeOrigin: true,
     rewrite: (path) => path.replace(ENV.VITE_BASE_PATH, '/')
   }

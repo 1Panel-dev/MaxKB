@@ -29,7 +29,7 @@ RUN mv /opt/maxkb/app/model/* /opt/maxkb/model && \
     rm -rf /var/lib/apt/lists/*
 # 启动命令
 VOLUME /opt/maxkb/conf
-EXPOSE 8000
+EXPOSE 8080
 COPY installer/run-maxkb.sh /usr/bin/
 RUN chmod 755 /usr/bin/run-maxkb.sh
 ENTRYPOINT ["bash", "-c"]
