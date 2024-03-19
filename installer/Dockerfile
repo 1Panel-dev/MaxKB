@@ -4,28 +4,28 @@ FROM node:18-alpine3.18 as web-build
 COPY ui ui
 RUN cd ui && \
     npm install && \
-    npm run build && \
-    rm -rf ./node_modules
+    npm run build
 
 FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11.8-pg15.3
 # 创建工作目录
-RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/conf
+RUN mkdir -p /opt/maxkb/app && /opt/maxkb/app/ui && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/conf
 # 拷贝项目
 COPY . /opt/maxkb/app
 COPY installer/config.yaml /opt/maxkb/conf
 COPY --from=vector-model model /opt/maxkb/app/model
-RUN rm -rf /opt/maxkb/app/ui /opt/maxkb/app/build
-COPY --from=web-build ui /opt/maxkb/app/ui
+COPY --from=web-build ui/dist /opt/maxkb/app/ui
 ENV POSTGRES_USER root
 ENV POSTGRES_PASSWORD Password123@postgres
 WORKDIR /opt/maxkb/app
-RUN mv /opt/maxkb/app/model/* /opt/maxkb/model && \
+RUN rm -rf /opt/maxkb/app/build && \
+    mv /opt/maxkb/app/model/* /opt/maxkb/model && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
     apt-get update && apt-get install -y curl && \
     pip3 install --upgrade pip && \
     pip3 install poetry && \
     poetry export -f requirements.txt --output requirements.txt --without-hashes && \
     pip3 install --no-cache-dir -r requirements.txt && \
+    pip3 cache purge && \
     rm -rf /var/lib/apt/lists/*
 # 启动命令
 VOLUME /opt/maxkb/conf
