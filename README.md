@@ -37,8 +37,8 @@ TBD
 ## 技术栈
 
 -   前端：[Vue3.js](https://cn.vuejs.org/)、[Element Plus](https://element-plus.org/zh-CN/)、[TypeScript](https://www.tslang.cn/)
--   后端：[django](https://www.djangoproject.com/)、[langchain](https://www.langchain.com/)
--   中间件：[postgresql](https://www.postgresql.org/)  
+-   后端：[Django](https://www.djangoproject.com/)、[Langchain](https://www.langchain.com/)
+-   中间件：[PostgreSQL](https://www.postgresql.org/)  
 -   基础设施：[Docker](https://www.docker.com/)
 
 ## License
