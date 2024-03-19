@@ -13,28 +13,20 @@ RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/
 # 拷贝项目
 COPY . /opt/maxkb/app
 COPY installer/config.yaml /opt/maxkb/conf
-ENV POSTGRES_USER root
-ENV POSTGRES_PASSWORD Password123@postgres
-RUN rm -rf /opt/maxkb/app/ui /opt/maxkb/app/build
 COPY --from=vector-model model /opt/maxkb/app/model
 COPY --from=web-build ui /opt/maxkb/app/ui
-RUN ls -la /opt/maxkb/app
-# 复制模型
-RUN mv /opt/maxkb/app/model/* /opt/maxkb/model
-RUN ls /opt/maxkb/model
-RUN cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer
-# 设置工作目录
+ENV POSTGRES_USER root
+ENV POSTGRES_PASSWORD Password123@postgres
 WORKDIR /opt/maxkb/app
-# 更新apt-get包管理器
-RUN apt-get update&&apt-get install -y  curl
-# 更新pip
-RUN pip3 install --upgrade pip
-# 安装 poetry包管理器
-RUN pip3 install poetry
-# 导出依赖
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
-# 下载python依赖
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN rm -rf /opt/maxkb/app/ui /opt/maxkb/app/build && \
+    mv /opt/maxkb/app/model/* /opt/maxkb/model && \
+    cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
+    apt-get install -y curl && \
+    pip3 install --upgrade pip && \
+    pip3 install poetry && \
+    poetry export -f requirements.txt --output requirements.txt --without-hashes && \
+    pip3 install --no-cache-dir -r requirements.txt && \
+    rm -rf /var/lib/apt/lists/*
 # 启动命令
 VOLUME /opt/maxkb/conf
 EXPOSE 8000
