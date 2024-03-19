@@ -1,3 +1,18 @@
+# Mac
+.DS_Store
+*/.DS_Store
+
+# VS Code
+.vscode
+*.project
+*.factorypath
+
+# IntelliJ IDEA
+.idea
+*.iws
+*.iml
+*.ipr
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

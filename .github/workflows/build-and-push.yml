@@ -5,7 +5,7 @@ on:
     inputs:
       dockerImageTag:
         description: 'Docker Image Tag'
-        default: 'v1.0.0'
+        default: 'v1.0.0-dev'
         required: true
       architecture:
         description: 'Architecture'
@@ -16,9 +16,19 @@ on:
           - linux/amd64
           - linux/arm64
           - linux/amd64,linux/arm64
+      registry:
+        description: 'Push To Registry'
+        required: true
+        default: 'dockerhub, fit2cloud-registry'
+        type: choice
+        options:
+          - dockerhub
+          - fit2cloud-registry
+          - dockerhub, fit2cloud-registry
 
 jobs:
-  build-and-push-fit2cloud-registry:
+  build-and-push-to-fit2cloud-registry:
+    if: ${{ contains(github.event.inputs.registry, 'fit2cloud') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check Disk Space
@@ -45,38 +55,35 @@ jobs:
           DOCKER_IMAGE=registry-hkproxy.fit2cloud.com/maxkb/maxkb
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
-          DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
-          echo ::set-output name=docker_image::${DOCKER_IMAGE}
-          echo ::set-output name=version::${TAG_NAME}
-          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
-            --build-arg VERSION=${TAG_NAME} \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg --no-cache \
-            --build-arg VCS_REF=${GITHUB_SHA::8} \
+          if [[ ${TAG_NAME} == *dev* ]]; then
+            DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
+          else
+            DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
+          fi
+          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --no-cache \
             ${DOCKER_IMAGE_TAGS} .
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          config: .github/buildkitd.toml
-      - name: Login to FIT2CLOUD Registry
-        uses: docker/login-action@v3
-        with:
-          registry: registry-hkproxy.fit2cloud.com
-          username: ${{ secrets.FIT2CLOUD_REGISTRY_USERNAME }}
-          password: ${{ secrets.FIT2CLOUD_REGISTRY_PASSWORD }}
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
+      - name: Login to FIT2CLOUD Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry-hkproxy.fit2cloud.com
+          username: ${{ secrets.FIT2CLOUD_REGISTRY_USERNAME }}
+          password: ${{ secrets.FIT2CLOUD_REGISTRY_PASSWORD }}
       - name: Docker Buildx (build-and-push)
         run: |
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile
 
-  build-and-push-to-ghcr:
+  build-and-push-to-dockerhub:
+    if: ${{ contains(github.event.inputs.registry, 'dockerhub') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check Disk Space
@@ -100,30 +107,32 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          DOCKER_IMAGE=ghcr.io/1panel-dev/maxkb
+          DOCKER_IMAGE=1panel/maxkb
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
-          DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
-          echo ::set-output name=docker_image::${DOCKER_IMAGE}
-          echo ::set-output name=version::${TAG_NAME}
-          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
-            --build-arg VERSION=${TAG_NAME} \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg --no-cache --provenance=false \
-            --build-arg VCS_REF=${GITHUB_SHA::8} \
+          if [[ ${TAG_NAME} == *dev* ]]; then
+            DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
+          else
+            DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
+          fi
+          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --no-cache \
             ${DOCKER_IMAGE_TAGS} .
+          env
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          config: .github/buildkitd.toml
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Docker Buildx (build-and-push)
         run: |
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile
