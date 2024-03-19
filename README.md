@@ -26,7 +26,7 @@ MaxKB 应用支持零编码集成到企业第三方系统。
 
 MaxKB 支持一键启动，仅需执行以下命令：
 ```
-docker run --name="maxkb" -p 8000:8000 -d registry.fit2cloud.com/maxkb/maxkb:v1.0.0
+docker run --name="maxkb" -p 8000:8000 -d ghcr.io/1panel-dev/maxkb
 ```
 
 ## 整体架构
