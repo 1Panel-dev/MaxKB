@@ -14,12 +14,12 @@ RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/
 COPY . /opt/maxkb/app
 COPY installer/config.yaml /opt/maxkb/conf
 COPY --from=vector-model model /opt/maxkb/app/model
+RUN rm -rf /opt/maxkb/app/ui /opt/maxkb/app/build
 COPY --from=web-build ui /opt/maxkb/app/ui
 ENV POSTGRES_USER root
 ENV POSTGRES_PASSWORD Password123@postgres
 WORKDIR /opt/maxkb/app
-RUN rm -rf /opt/maxkb/app/ui /opt/maxkb/app/build && \
-    mv /opt/maxkb/app/model/* /opt/maxkb/model && \
+RUN mv /opt/maxkb/app/model/* /opt/maxkb/model && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
     apt-get install -y curl && \
     pip3 install --upgrade pip && \
