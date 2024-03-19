@@ -30,8 +30,7 @@ docker run --name="maxkb" -p 8000:8000 -d registry.fit2cloud.com/maxkb/maxkb:v1.
 ```
 
 ## 整体架构
-
-![整体架构](img/index/arch.jpg)
+![arch](https://github.com/1Panel-dev/maxkb/assets/52996290/ca786342-8a0a-4921-b847-a96fff9a3e09)
 
 ## 实现原理
 
@@ -43,8 +42,10 @@ docker run --name="maxkb" -p 8000:8000 -d registry.fit2cloud.com/maxkb/maxkb:v1.
 - 向量匹配最相似的 TOP N 个文本；
 - 匹配出的文本作为上下文和问题一起添加到 prompt 中；
 - 提交给 LLM 做生成回答。
-  
-![实现原理](<img/index/Implementation principle.png>)
+
+![Implementation principle](https://github.com/1Panel-dev/maxkb/assets/52996290/51956c12-1396-4625-8b29-005ac60ca11d)
+
+
 
 ## 社区
 
