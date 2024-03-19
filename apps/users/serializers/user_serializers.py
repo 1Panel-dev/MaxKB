@@ -14,6 +14,7 @@ import uuid
 
 from django.core import validators, signing, cache
 from django.core.mail import send_mail
+from django.core.mail.backends.smtp import EmailBackend
 from django.db import transaction
 from django.db.models import Q, QuerySet
 from drf_yasg import openapi
@@ -28,9 +29,8 @@ from common.mixins.api_mixin import ApiMixin
 from common.response.result import get_api_response
 from common.util.field_message import ErrMessage
 from common.util.lock import lock
-from setting.models import Team
+from setting.models import Team, SystemSetting, SettingType
 from smartdoc.conf import PROJECT_DIR
-from smartdoc.settings import EMAIL_ADDRESS
 from users.models.user import User, password_encrypt, get_user_dynamics_permission
 
 user_cache = cache.caches['user_cache']
@@ -345,13 +345,25 @@ class SendEmailSerializer(ApiMixin, serializers.Serializer):
         code_cache_key_lock = code_cache_key + "_lock"
         # 设置缓存
         user_cache.set(code_cache_key_lock, code, timeout=datetime.timedelta(minutes=1))
+        system_setting = QuerySet(SystemSetting).filter(type=SettingType.EMAIL.value).first()
+        if system_setting is None:
+            user_cache.delete(code_cache_key_lock)
+            raise AppApiException(1004, "邮箱未设置,请联系管理员设置")
         try:
+            connection = EmailBackend(system_setting.meta.get("email_host"),
+                                      system_setting.meta.get('email_port'),
+                                      system_setting.meta.get('email_host_user'),
+                                      system_setting.meta.get('email_host_password'),
+                                      system_setting.meta.get('email_use_tls'),
+                                      False,
+                                      system_setting.meta.get('email_use_ssl')
+                                      )
             # 发送邮件
             send_mail(f'【MaxKB 智能知识库-{"用户注册" if state == "register" else "修改密码"}】',
                       '',
                       html_message=f'{content.replace("${code}", code)}',
-                      from_email=EMAIL_ADDRESS,
-                      recipient_list=[email], fail_silently=False)
+                      from_email=system_setting.meta.get('from_email'),
+                      recipient_list=[email], fail_silently=False, connection=connection)
         except Exception as e:
             user_cache.delete(code_cache_key_lock)
             raise AppApiException(500, f"{str(e)}邮件发送失败")

@@ -15,6 +15,7 @@ urlpatterns = [
     path('provider/model_form', views.Provide.ModelForm.as_view(),
          name="provider/model_form"),
     path('model', views.Model.as_view(), name='model'),
-    path('model/<str:model_id>', views.Model.Operate.as_view(), name='model/operate')
+    path('model/<str:model_id>', views.Model.Operate.as_view(), name='model/operate'),
+    path('email_setting', views.SystemSetting.Email.as_view(), name='email_setting')
 
 ]
