@@ -1,4 +1,5 @@
-<p align="center"></p>
+
+<p align="center"> <img src= "https://github.com/1Panel-dev/maxkb/assets/52996290/c0694996-0eed-40d8-b369-322bf2a380bf" alt="MaxKB" width="300" />  </p>
         <h3 align="center">基于大语言模型的知识库问答系统</h3>
         <p align="center">
           <a href="https://www.gnu.org/licenses/old-licenses/gpl-3.0"><img src="https://img.shields.io/github/license/1Panel-dev/maxkb?color=%231890FF" alt="License: GPL v3"></a>
