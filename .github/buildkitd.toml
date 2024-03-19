@@ -1,2 +1,2 @@
 [worker.oci]
-max-parallelism = 1
+  max-parallelism=1
