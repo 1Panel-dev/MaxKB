@@ -13,7 +13,6 @@ import os
 import re
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
-import torch.backends
 import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -91,7 +90,7 @@ class Config(dict):
         "EMAIL_HOST_PASSWORD": "",
         # 向量模型
         "EMBEDDING_MODEL_NAME": "shibing624/text2vec-base-chinese",
-        "EMBEDDING_DEVICE": "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu",
+        "EMBEDDING_DEVICE": "cpu",
         "EMBEDDING_MODEL_PATH": os.path.join(PROJECT_DIR, 'models'),
         # 向量库配置
         "VECTOR_STORE_NAME": 'pg_vector'
