@@ -3,20 +3,34 @@ const settingRouter = {
   path: '/setting',
   name: 'setting',
   meta: { icon: 'Setting', title: '系统设置', permission: 'SETTING:READ' },
-  redirect: '/setting',
+  redirect: '/user',
   component: Layout,
   children: [
     {
-      path: '/setting',
-      name: 'setting',
+      path: '/user',
+      name: 'user',
+      meta: {
+        icon: 'User',
+        iconActive: 'UserFilled',
+        title: '用户管理',
+        activeMenu: '/setting',
+        parentPath: '/setting',
+        parentName: 'setting'
+      },
+      component: () => import('@/views/user-manage/index.vue')
+    },
+    {
+      path: '/team',
+      name: 'team',
       meta: {
         icon: 'app-team',
         iconActive: 'app-team-active',
         title: '团队管理',
+        activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting'
       },
-      component: () => import('@/views/setting/index.vue')
+      component: () => import('@/views/team/index.vue')
     },
     {
       path: '/template',
