@@ -19,7 +19,7 @@ diskcache = "^5.6.3"
 pillow = "^10.2.0"
 filetype = "^1.2.0"
 chardet = "^5.2.0"
-torch = { url = "https://download.pytorch.org/whl/cpu/torch-2.2.1%2Bcpu-cp311-cp311-linux_x86_64.whl", markers = "sys_platform == 'linux'"}
+torch = {version = "^2.2.1+cpu", source = "pytorch"}
 sentence-transformers = "^2.2.2"
 blinker = "^1.6.3"
 openai = "^1.13.3"
@@ -35,3 +35,12 @@ django-apscheduler = "^0.6.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+torch = {version = "^2.2.1+cpu", source = "pytorch"}
+torchvision = {version = "^0.17.1+cpu", source = "pytorch"}
+sentence-transformers = "^2.2.0"
+
+[[tool.poetry.source]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
