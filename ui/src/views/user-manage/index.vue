@@ -27,7 +27,12 @@
         <el-table-column label="状态" width="60">
           <template #default="{ row }">
             <div @click.stop>
-              <el-switch size="small" v-model="row.is_active" />
+              <el-switch
+                :disabled="row.role === 'ADMIN'"
+                size="small"
+                v-model="row.is_active"
+                @change="changeState($event, row)"
+              />
             </div>
           </template>
         </el-table-column>
@@ -55,7 +60,12 @@
             </span>
             <span class="mr-4">
               <el-tooltip effect="dark" content="删除" placement="top">
-                <el-button type="primary" text @click.stop="deleteUserManage(row)">
+                <el-button
+                  :disabled="row.role === 'ADMIN'"
+                  type="primary"
+                  text
+                  @click.stop="deleteUserManage(row)"
+                >
                   <el-icon><Delete /></el-icon>
                 </el-button>
               </el-tooltip>
@@ -94,6 +104,17 @@ function searchHandle() {
   paginationConfig.current_page = 1
   tableData.value = []
   getList()
+}
+
+function changeState(bool: Boolean, row: any) {
+  const obj = {
+    is_active: bool
+  }
+  const str = bool ? '启用成功' : '禁用成功'
+  userApi.putUserManage(row.id, obj, loading).then((res) => {
+    getList()
+    MsgSuccess(str)
+  })
 }
 
 function editPwdUser(row: any) {
