@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('setting', '0001_initial'),
     ]
@@ -15,7 +14,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='修改时间')),
-                ('type', models.IntegerField(choices=[('0', '邮箱')], default='0', max_length=5, primary_key=True, serialize=False, verbose_name='设置类型')),
+                ('type', models.IntegerField(choices=[(0, '邮箱'), (1, '私钥秘钥')], default=0, primary_key=True, serialize=False, verbose_name='设置类型')),
                 ('meta', models.JSONField(default=dict, verbose_name='配置数据')),
             ],
             options={

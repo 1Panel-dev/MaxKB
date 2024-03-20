@@ -468,17 +468,21 @@ class UserSerializer(ApiMixin, serializers.ModelSerializer):
 class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone', 'nick_name']
+        fields = ['id', 'username', 'email', 'phone', 'is_active', 'role', 'nick_name', 'create_time', 'update_time']
 
     @staticmethod
     def get_response_body_api():
         return openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            required=['id', 'username', 'email', 'password', 'create_time', 'update_time'],
+            required=['id', 'username', 'email', 'phone', 'is_active', 'role', 'nick_name', 'create_time',
+                      'update_time'],
             properties={
+                'id': openapi.Schema(type=openapi.TYPE_STRING, title="用户id", description="用户id"),
                 'username': openapi.Schema(type=openapi.TYPE_STRING, title="用户名", description="用户名"),
                 'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址"),
                 'phone': openapi.Schema(type=openapi.TYPE_STRING, title="手机号", description="手机号"),
+                'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否激活", description="是否激活"),
+                'role': openapi.Schema(type=openapi.TYPE_STRING, title="角色", description="角色"),
                 'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="昵称", description="昵称"),
                 'create_time': openapi.Schema(type=openapi.TYPE_STRING, title="创建时间", description="修改时间"),
                 'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间", description="修改时间")
@@ -562,9 +566,9 @@ class UserManageSerializer(serializers.Serializer):
                                              , message="密码长度6-20个字符，必须字母、数字、特殊字符组合")])
 
         nick_name = serializers.CharField(required=False, error_messages=ErrMessage.char("昵称"), max_length=56,
-                                          allow_null=True)
+                                          allow_null=True, allow_blank=True)
         phone = serializers.CharField(required=False, error_messages=ErrMessage.char("手机号"), max_length=20,
-                                      allow_null=True)
+                                      allow_null=True, allow_blank=True)
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
@@ -599,9 +603,9 @@ class UserManageSerializer(serializers.Serializer):
                                                   code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
 
         nick_name = serializers.CharField(required=False, error_messages=ErrMessage.char("昵称"), max_length=56,
-                                          allow_null=True)
+                                          allow_null=True, allow_blank=True)
         phone = serializers.CharField(required=False, error_messages=ErrMessage.char("手机号"), max_length=20,
-                                      allow_null=True)
+                                      allow_null=True, allow_blank=True)
         is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char("是否可用"))
 
         def is_valid(self, *, user_id=None, raise_exception=False):

@@ -24,7 +24,7 @@ class SystemSetting(AppModelMixin):
     """
      系统设置
     """
-    type = models.IntegerField(primary_key=True, verbose_name='设置类型', max_length=5, choices=SettingType.choices,
+    type = models.IntegerField(primary_key=True, verbose_name='设置类型', choices=SettingType.choices,
                                default=SettingType.EMAIL)
 
     meta = models.JSONField(verbose_name="配置数据", default=dict)
