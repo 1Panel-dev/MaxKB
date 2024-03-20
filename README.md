@@ -42,9 +42,9 @@ docker run -d --name=maxkb -p 8080:8000 -v /opt/maxkb/data:/var/lib/postgresql/d
 ## 技术栈
 
 -   前端：[Vue.js](https://cn.vuejs.org/)
--   后端：[Django](https://www.djangoproject.com/)
+-   后端：[Python / Django](https://www.djangoproject.com/)
 -   Langchain：[Langchain](https://www.langchain.com/)
--   向量数据库：[PostgreSQL](https://www.postgresql.org/)
+-   向量数据库：[PostgreSQL / pgvector](https://www.postgresql.org/)
 -   大模型：Azure OpenAI、百度千帆大模型、[Ollama](https://github.com/ollama/ollama)
 
 ## License
