@@ -502,7 +502,8 @@ class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):
 
 class UserManageSerializer(serializers.Serializer):
     class Query(ApiMixin, serializers.Serializer):
-        email_or_username = serializers.CharField(required=False, error_messages=ErrMessage.char("邮箱或者用户名"))
+        email_or_username = serializers.CharField(required=False, allow_null=True,
+                                                  error_messages=ErrMessage.char("邮箱或者用户名"))
 
         @staticmethod
         def get_request_params_api():
@@ -528,7 +529,8 @@ class UserManageSerializer(serializers.Serializer):
             email_or_username = self.data.get('email_or_username')
             query_set = QuerySet(User)
             if email_or_username is not None:
-                query_set = query_set.filter(Q(username=email_or_username) | Q(email=email_or_username))
+                query_set = query_set.filter(
+                    Q(username__contains=email_or_username) | Q(email__contains=email_or_username))
             return query_set
 
         def list(self, with_valid=True):

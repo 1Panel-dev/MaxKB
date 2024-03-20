@@ -226,7 +226,7 @@ class UserManage(APIView):
             compare=CompareConstants.AND))
         def get(self, request: Request, current_page, page_size):
             d = UserManageSerializer.Query(
-                data={'name': request.query_params.get('name', None), 'desc': request.query_params.get("desc", None),
+                data={'email_or_username': request.query_params.get('email_or_username', None),
                       'user_id': str(request.user.id)})
             return result.success(d.page(current_page, page_size))
 
