@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-django = "4.1.13"
+django = "5.0.3"
 djangorestframework = "3.14.0"
 drf-yasg = "1.21.7"
 django-filter = "23.2"
