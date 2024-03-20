@@ -22,6 +22,9 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
 
 也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama + Llama 2，30 分钟内即可上线基于本地大模型的知识库问答系统。
 
+-   [使用手册](https://github.com/1Panel-dev/MaxKB/wiki/1-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2)
+-   [论坛求助](https://bbs.fit2cloud.com/c/mk/11)
+
 ## UI 展示
 
 <table style="border-collapse: collapse; border: 1px solid black;">
@@ -34,13 +37,6 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
     <td style="padding: 5px;background-color:#fff;"><img src= "https://github.com/1Panel-dev/MaxKB/assets/80892890/884a9db1-3f93-4013-bc8f-a3f0dbcfeb2f" alt="MaxKB Demo4"   /></td>
   </tr>
 </table>
-
-## 在线文档
-[在线文档](https://github.com/1Panel-dev/MaxKB/wiki/1-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2)
-
-## 社区交流
-
-[论坛](https://bbs.fit2cloud.com/c/mk/11)
 
 ## 技术栈
 
