@@ -11,7 +11,16 @@ import os
 
 from Crypto.Cipher import PKCS1_v1_5 as PKCS1_cipher
 from Crypto.PublicKey import RSA
+from django.db.models import QuerySet
+from django.core import cache
 
+from setting.models import SystemSetting, SettingType
+
+import threading
+
+lock = threading.Lock()
+rsa_cache = cache.caches['default']
+cache_key = "rsa_key"
 # 对密钥加密的密码
 secret_code = "mac_kb_password"
 
@@ -31,15 +40,40 @@ def generate():
 
 
 def get_key_pair():
-    if not os.path.exists("/opt/maxkb/conf/receiver.pem"):
+    rsa_value = rsa_cache.get(cache_key)
+    if rsa_value is None:
+        lock.acquire()
+        rsa_value = rsa_cache.get(cache_key)
+        if rsa_value is not None:
+            return rsa_value
+        try:
+            rsa_value = get_key_pair_by_sql()
+            rsa_cache.set(cache_key, rsa_value)
+        finally:
+            lock.release()
+    return rsa_value
+
+
+def get_key_pair_by_sql():
+    system_setting = QuerySet(SystemSetting).filter(type=SettingType.RSA.value).first()
+    if system_setting is None:
         kv = generate()
-        private_file_out = open("/opt/maxkb/conf/private.pem", "wb")
-        private_file_out.write(kv.get('value'))
-        private_file_out.close()
-        receiver_file_out = open("/opt/maxkb/conf/receiver.pem", "wb")
-        receiver_file_out.write(kv.get('key'))
-        receiver_file_out.close()
-    return {'key': open("/opt/maxkb/conf/receiver.pem").read(), 'value': open("/opt/maxkb/conf/private.pem").read()}
+        system_setting = SystemSetting(type=SettingType.RSA.value,
+                                       meta={'key': kv.get('key').decode(), 'value': kv.get('value').decode()})
+        system_setting.save()
+    return system_setting.meta
+
+
+# def get_key_pair():
+#     if not os.path.exists("/opt/maxkb/conf/receiver.pem"):
+#         kv = generate()
+#         private_file_out = open("/opt/maxkb/conf/private.pem", "wb")
+#         private_file_out.write(kv.get('value'))
+#         private_file_out.close()
+#         receiver_file_out = open("/opt/maxkb/conf/receiver.pem", "wb")
+#         receiver_file_out.write(kv.get('key'))
+#         receiver_file_out.close()
+#     return {'key': open("/opt/maxkb/conf/receiver.pem").read(), 'value': open("/opt/maxkb/conf/private.pem").read()}
 
 
 def encrypt(msg, public_key: str | None = None):

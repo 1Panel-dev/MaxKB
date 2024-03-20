@@ -17,6 +17,8 @@ class SettingType(models.IntegerChoices):
     """系统设置类型"""
     EMAIL = 0, '邮箱'
 
+    RSA = 1, "私钥秘钥"
+
 
 class SystemSetting(AppModelMixin):
     """
