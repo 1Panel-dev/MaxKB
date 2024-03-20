@@ -89,11 +89,11 @@ interface ResetPasswordRequest {
   /**
    * 邮箱
    */
-  email: string
+  email?: string
   /**
    * 验证码
    */
-  code: string
+  code?: string
   /**
    * 密码
    */
