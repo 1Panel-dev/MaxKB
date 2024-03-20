@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer header="团队管理">
+  <LayoutContainer header="团队成员">
     <div class="team-manage flex main-calc-height">
       <div class="team-member p-8 border-r">
         <div class="flex-between p-16">
