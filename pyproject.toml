@@ -36,10 +36,6 @@ django-apscheduler = "^0.6.2"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-torch = {version = "^2.2.1+cpu", source = "pytorch"}
-torchvision = {version = "^0.17.1+cpu", source = "pytorch"}
-sentence-transformers = "^2.2.0"
-
 [[tool.poetry.source]]
 name = "pytorch"
 url = "https://download.pytorch.org/whl/cpu"
