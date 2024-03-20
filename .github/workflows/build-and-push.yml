@@ -14,12 +14,12 @@ on:
         type: choice
         options:
           - linux/amd64
-          - linux/arm64
-          - linux/amd64,linux/arm64
+          #- linux/arm64
+          #- linux/amd64,linux/arm64
       registry:
         description: 'Push To Registry'
         required: true
-        default: 'dockerhub, fit2cloud-registry'
+        default: 'dockerhub'
         type: choice
         options:
           - dockerhub
