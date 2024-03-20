@@ -17,7 +17,7 @@ MaxKB 是一款基于 LLM 大语言模型的知识库问答系统。
 ## 快速开始
 
 ```
-docker run --name=maxkb -p 8080:8000 -v /opt/maxkb/data:/var/lib/postgresql/data -v /opt/maxkb/conf:/opt/maxkb/conf -d 1panel/maxkb
+docker run -d --name=maxkb -p 8080:8000 -v /opt/maxkb/data:/var/lib/postgresql/data 1panel/maxkb
 ```
 
 也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama（Llama 2），30 分钟内即可上线基于本地大模型的知识库问答系统。
