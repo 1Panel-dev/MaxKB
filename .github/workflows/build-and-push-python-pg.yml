@@ -10,8 +10,8 @@ on:
         type: choice
         options:
           - linux/amd64
-          - linux/arm64
-          - linux/amd64,linux/arm64
+          #- linux/arm64
+          #- linux/amd64,linux/arm64
 jobs:
   build-and-push-python-pg-to-ghcr:
     runs-on: ubuntu-latest
