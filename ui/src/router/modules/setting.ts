@@ -1,9 +1,16 @@
+import { hasPermission } from '@/utils/permission/index'
 import Layout from '@/layout/main-layout/index.vue'
+import { Role } from '@/utils/permission/type'
 const settingRouter = {
   path: '/setting',
   name: 'setting',
   meta: { icon: 'Setting', title: '系统设置', permission: 'SETTING:READ' },
-  redirect: '/user',
+  redirect: (to: any) => {
+    if (hasPermission(new Role('ADMIN'), 'AND')) {
+      return '/user'
+    }
+    return '/team'
+  },
   component: Layout,
   children: [
     {
@@ -15,7 +22,8 @@ const settingRouter = {
         title: '用户管理',
         activeMenu: '/setting',
         parentPath: '/setting',
-        parentName: 'setting'
+        parentName: 'setting',
+        permission: new Role('ADMIN')
       },
       component: () => import('@/views/user-manage/index.vue')
     },
