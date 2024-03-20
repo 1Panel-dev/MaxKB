@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer header="模型管理">
+  <LayoutContainer header="模型设置">
     <div class="template-manage flex main-calc-height">
       <div class="template-manage__left p-8 border-r">
         <h4 class="p-16" style="padding-bottom: 8px">供应商</h4>

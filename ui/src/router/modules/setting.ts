@@ -33,7 +33,7 @@ const settingRouter = {
       meta: {
         icon: 'app-team',
         iconActive: 'app-team-active',
-        title: '团队管理',
+        title: '团队成员',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting'
@@ -46,12 +46,25 @@ const settingRouter = {
       meta: {
         icon: 'app-template',
         iconActive: 'app-template-active',
-        title: '模型管理',
+        title: '模型设置',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting'
       },
       component: () => import('@/views/template/index.vue')
+    },
+    {
+      path: '/email',
+      name: 'email',
+      meta: {
+        icon: 'Message',
+        title: '邮箱设置',
+        activeMenu: '/setting',
+        parentPath: '/setting',
+        parentName: 'setting',
+        permission: new Role('ADMIN')
+      },
+      component: () => import('@/views/email/index.vue')
     }
   ]
 }
