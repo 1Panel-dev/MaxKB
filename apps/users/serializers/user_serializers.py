@@ -56,6 +56,8 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
                                                               password=password)).first()
         if user is None:
             raise ExceptionCodeConstants.INCORRECT_USERNAME_AND_PASSWORD.value.to_app_api_exception()
+        if not user.is_active:
+            raise AppApiException(1005, "用户已被禁用,请联系管理员!")
         return user
 
     def get_user_token(self):
