@@ -27,7 +27,7 @@
         <el-table-column label="状态" width="60">
           <template #default="{ row }">
             <div @click.stop>
-              <el-switch size="small" v-model="row.is_active" @change="changeState($event, row)" />
+              <el-switch size="small" v-model="row.is_active" />
             </div>
           </template>
         </el-table-column>
