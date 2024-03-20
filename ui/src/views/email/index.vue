@@ -117,5 +117,8 @@ onMounted(() => {
 .email-setting {
   width: 70%;
   margin: 0 auto;
+  :deep(.el-checkbox__label) {
+    font-weight: 400;
+  }
 }
 </style>
