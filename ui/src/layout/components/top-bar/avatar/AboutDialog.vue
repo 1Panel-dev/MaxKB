@@ -31,7 +31,7 @@
           <span>论坛求助</span>
         </div>
       </el-card>
-      <div class="text-center">当前版本号：{{ PackageJSON.version }}</div>
+      <div class="text-center">当前版本号：{{ version }}</div>
     </div>
     <!-- <ul class="about-ui">
       <li class="flex mb-16">
@@ -52,8 +52,11 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import PackageJSON from '../../../../../package.json'
+import useStore from '@/stores'
 const defaultTitle = import.meta.env.VITE_APP_TITLE
+
+const { user } = useStore()
+const version = user.version
 
 const aboutDialogVisible = ref(false)
 

@@ -128,7 +128,7 @@ const getUserList: (email_or_username: string, loading?: Ref<boolean>) => Promis
  * 获取version
  */
 const getVersion: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-  return get('/api/profile', undefined, loading)
+  return get('/profile', undefined, loading)
 }
 
 export default {

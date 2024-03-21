@@ -47,7 +47,7 @@ const useUserStore = defineStore({
 
     async asyncGetVersion() {
       return UserApi.getVersion().then((ok) => {
-        this.version = ok.data
+        this.version = ok.data?.version || '0.9.0'
       })
     },
 
