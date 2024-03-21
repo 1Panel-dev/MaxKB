@@ -124,6 +124,13 @@ const getUserList: (email_or_username: string, loading?: Ref<boolean>) => Promis
   return get('/user/list', { email_or_username }, loading)
 }
 
+/**
+ * 获取version
+ */
+const getVersion: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get('/profile', undefined, loading)
+}
+
 export default {
   login,
   register,
@@ -134,5 +141,6 @@ export default {
   sendEmailToCurrent,
   resetCurrentUserPassword,
   logout,
-  getUserList
+  getUserList,
+  getVersion
 }

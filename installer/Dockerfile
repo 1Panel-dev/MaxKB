@@ -8,6 +8,10 @@ RUN cd ui && \
     rm -rf ./node_modules
 
 FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11.8-pg15.3
+ARG DOCKER_IMAGE_TAG=dev
+ARG BUILD_AT
+ARG GITHUB_COMMIT
+ENV MAXKB_VERSION ${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_COMMIT})
 # 创建工作目录
 RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/conf
 # 拷贝项目

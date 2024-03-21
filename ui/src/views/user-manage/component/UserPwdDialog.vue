@@ -99,13 +99,13 @@ watch(dialogVisible, (bool) => {
       password: '',
       re_password: ''
     }
-    userFormRef.value?.clearValidate()
   }
 })
 
 const open = (data: any) => {
   userId.value = data.id
   dialogVisible.value = true
+  userFormRef.value?.clearValidate()
 }
 
 const submit = async (formEl: FormInstance | undefined) => {

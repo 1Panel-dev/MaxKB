@@ -6,6 +6,7 @@ export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
   userInfo: User | null
   token: any
+  version?: string
 }
 
 const useUserStore = defineStore({
@@ -13,7 +14,8 @@ const useUserStore = defineStore({
   state: (): userStateTypes => ({
     userType: 1,
     userInfo: null,
-    token: ''
+    token: '',
+    version: ''
   }),
   actions: {
     getToken(): String | null {
@@ -42,9 +44,17 @@ const useUserStore = defineStore({
     changeUserType(num: number) {
       this.userType = num
     },
+
+    async asyncGetVersion() {
+      return UserApi.getVersion().then((ok) => {
+        this.version = ok.data?.version || '-'
+      })
+    },
+
     async profile() {
       return UserApi.profile().then((ok) => {
         this.userInfo = ok.data
+        this.asyncGetVersion()
       })
     },
 

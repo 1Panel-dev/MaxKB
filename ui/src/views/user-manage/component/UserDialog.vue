@@ -12,7 +12,7 @@
         <el-input
           v-model="userForm.username"
           placeholder="请输入用户名"
-          maxlength="64"
+          maxlength="20"
           show-word-limit
         >
         </el-input>
@@ -73,8 +73,16 @@ const userForm = ref<any>({
 })
 
 const rules = reactive({
-  username: [{ required: true, message: '请输入用户名' }],
-  email: [{ required: true, message: '请输入邮箱' }],
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    {
+      min: 6,
+      max: 20,
+      message: '长度在 6 到 20 个字符',
+      trigger: 'blur'
+    }
+  ],
+  email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }],
   password: [
     {
       required: true,
@@ -102,8 +110,8 @@ watch(dialogVisible, (bool) => {
       phone: '',
       nick_name: ''
     }
-    userFormRef.value?.clearValidate()
     isEdit.value = false
+    userFormRef.value?.clearValidate()
   }
 })
 
