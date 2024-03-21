@@ -36,9 +36,9 @@
       </el-form>
       <el-button size="large" type="primary" class="w-full" @click="login">登录</el-button>
       <div class="operate-container flex-between mt-12">
-        <el-button class="register" @click="router.push('/register')" link type="primary">
+        <!-- <el-button class="register" @click="router.push('/register')" link type="primary">
           注册
-        </el-button>
+        </el-button> -->
         <el-button
           class="forgot-password"
           @click="router.push('/forgot_password')"
@@ -79,7 +79,7 @@ const rules = ref<FormRules<LoginRequest>>({
       required: true,
       message: '请输入密码',
       trigger: 'blur'
-    },
+    }
   ]
 })
 const loginFormRef = ref<FormInstance>()
