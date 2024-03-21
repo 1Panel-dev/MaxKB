@@ -712,7 +712,7 @@ class UserManageSerializer(serializers.Serializer):
                     raise AppApiException(1004, "无法删除管理员")
             user_id = self.data.get('id')
 
-            team_member_list = QuerySet(TeamMember).filter(team_id=user_id)
+            team_member_list = QuerySet(TeamMember).filter(Q(user_id=user_id) | Q(team_id=user_id))
             # 删除团队成员权限
             QuerySet(TeamMemberPermission).filter(
                 member_id__in=[team_member.id for team_member in team_member_list]).delete()
