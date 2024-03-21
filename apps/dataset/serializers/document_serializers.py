@@ -578,6 +578,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                     instance.get('id_list'))
             return True
 
+        @transaction.atomic
         def batch_delete(self, instance: Dict, with_valid=True):
             if with_valid:
                 BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
@@ -585,7 +586,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             document_id_list = instance.get("id_list")
             QuerySet(Document).filter(id__in=document_id_list).delete()
             QuerySet(Paragraph).filter(document_id__in=document_id_list).delete()
-            QuerySet(Problem).filter(document_id__in=document_id_list).delete()
+            QuerySet(ProblemParagraphMapping).filter(document_id__in=document_id_list).delete()
             # 删除向量库
             ListenerManagement.delete_embedding_by_document_list_signal.send(document_id_list)
             return True
