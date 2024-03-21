@@ -23,12 +23,9 @@ RUN mv /opt/maxkb/app/model/* /opt/maxkb/model && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
     apt-get update && apt-get install -y curl && \
     pip3 install --upgrade pip && \
-    cat pyproject.toml && \
     if [ "$(uname -m)" = "aarch64" ]; then sed -i '/^torch/d' pyproject.toml; fi && \
-    cat pyproject.toml && \
     pip3 install poetry && \
     poetry export -f requirements.txt --output requirements.txt --without-hashes && \
-    cat requirements.txt && \
     pip3 install --no-cache-dir -r requirements.txt && \
     pip3 cache purge && \
     rm -rf /var/lib/apt/lists/*
