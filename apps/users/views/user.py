@@ -22,10 +22,20 @@ from common.response import result
 from smartdoc.settings import JWT_AUTH
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
-    SendEmailSerializer, UserProfile, UserSerializer, UserManageSerializer, UserInstanceSerializer
+    SendEmailSerializer, UserProfile, UserSerializer, UserManageSerializer, UserInstanceSerializer, SystemSerializer
 
 user_cache = cache.caches['user_cache']
 token_cache = cache.caches['token_cache']
+
+
+class Profile(APIView):
+    @action(methods=['GET'], detail=False)
+    @swagger_auto_schema(operation_summary="获取MaxKB相关信息",
+                         operation_id="获取MaxKB相关信息",
+                         responses=result.get_api_response(SystemSerializer.get_response_body_api()),
+                         tags=['系统参数'])
+    def get(self, request: Request):
+        return result.success(SystemSerializer.get_profile())
 
 
 class User(APIView):

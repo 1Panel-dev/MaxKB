@@ -36,6 +36,23 @@ from users.models.user import User, password_encrypt, get_user_dynamics_permissi
 user_cache = cache.caches['user_cache']
 
 
+class SystemSerializer(ApiMixin, serializers.Serializer):
+    @staticmethod
+    def get_profile():
+        version = os.environ.get('MAXKB_VERSION')
+        return {'version': version}
+
+    @staticmethod
+    def get_response_body_api():
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=[],
+            properties={
+                'version': openapi.Schema(type=openapi.TYPE_STRING, title="系统版本号", description="系统版本号"),
+            }
+        )
+
+
 class LoginSerializer(ApiMixin, serializers.Serializer):
     username = serializers.CharField(required=True,
                                      error_messages=ErrMessage.char("用户名"))
