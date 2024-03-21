@@ -6,9 +6,9 @@
     @date：2023/10/23 16:03
     @desc:
 """
-import types
-from smartdoc.const import CONFIG
 from langchain_community.embeddings import HuggingFaceEmbeddings
+
+from smartdoc.const import CONFIG
 
 
 class EmbeddingModel:

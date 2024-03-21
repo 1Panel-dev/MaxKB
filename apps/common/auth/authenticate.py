@@ -10,19 +10,12 @@ import traceback
 
 from django.core import cache
 from django.core import signing
-from django.db.models import QuerySet
 from rest_framework.authentication import TokenAuthentication
 
-from application.models.api_key_model import ApplicationAccessToken, ApplicationApiKey
 from common.auth.handle.impl.application_key import ApplicationKey
 from common.auth.handle.impl.public_access_token import PublicAccessToken
 from common.auth.handle.impl.user_token import UserToken
-from common.constants.authentication_type import AuthenticationType
-from common.constants.permission_constants import Auth, get_permission_list_by_role, RoleConstants, Permission, Group, \
-    Operate
 from common.exception.app_exception import AppAuthenticationFailed, AppEmbedIdentityFailed, AppChatNumOutOfBoundsFailed
-from smartdoc.settings import JWT_AUTH
-from users.models.user import User, get_user_dynamics_permission
 
 token_cache = cache.caches['token_cache']
 

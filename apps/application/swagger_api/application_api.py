@@ -10,16 +10,6 @@ from drf_yasg import openapi
 
 from common.mixins.api_mixin import ApiMixin
 
-"""
-  name = serializers.CharField(required=True)
-    desc = serializers.CharField(required=True)
-    model_id = serializers.CharField(required=True)
-    multiple_rounds_dialogue = serializers.BooleanField(required=True)
-    prologue = serializers.CharField(required=True)
-    example = serializers.ListSerializer(required=False, child=serializers.CharField(required=True))
-    dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True))
-"""
-
 
 class ApplicationApi(ApiMixin):
     class Authentication(ApiMixin):

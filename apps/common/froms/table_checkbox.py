@@ -6,7 +6,7 @@
     @date：2023/10/31 18:01
     @desc:
 """
-from typing import List, Dict
+from typing import Dict
 
 from common.froms.base_field import TriggerType, BaseExecField
 

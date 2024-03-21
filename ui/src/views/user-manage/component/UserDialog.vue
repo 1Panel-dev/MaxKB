@@ -132,8 +132,6 @@ const submit = async (formEl: FormInstance | undefined) => {
           dialogVisible.value = false
         })
       }
-    } else {
-      console.log('error submit!', fields)
     }
   })
 }

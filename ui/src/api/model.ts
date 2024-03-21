@@ -103,7 +103,6 @@ const updateModel: (
   request: EditModelRequest,
   loading?: Ref<boolean>
 ) => Promise<Result<Model>> = (model_id, request, loading) => {
-  console.log(request)
   return put(`${prefix}/${model_id}`, request, {}, loading)
 }
 

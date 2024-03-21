@@ -414,8 +414,6 @@ const submit = async (formEl: FormInstance | undefined) => {
           router.push({ path: `/application` })
         })
       }
-    } else {
-      console.log('error submit!')
     }
   })
 }

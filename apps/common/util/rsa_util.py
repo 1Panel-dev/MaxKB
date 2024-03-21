@@ -7,16 +7,14 @@
     @desc:
 """
 import base64
-import os
+import threading
 
 from Crypto.Cipher import PKCS1_v1_5 as PKCS1_cipher
 from Crypto.PublicKey import RSA
-from django.db.models import QuerySet
 from django.core import cache
+from django.db.models import QuerySet
 
 from setting.models import SystemSetting, SettingType
-
-import threading
 
 lock = threading.Lock()
 rsa_cache = cache.caches['default']

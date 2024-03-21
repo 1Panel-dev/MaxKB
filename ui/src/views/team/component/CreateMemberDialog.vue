@@ -126,17 +126,9 @@ const submitMember = async (formEl: FormInstance | undefined) => {
         dialogVisible.value = false
         loading.value = false
       })
-    } else {
-      console.log('error submit!')
     }
   })
 }
-
-// const getUser = (val: string) => {
-//   UserApi.getUserList(val, loading).then((res) => {
-//     userOptions.value.push(res.data)
-//   })
-// }
 
 onMounted(() => {})
 

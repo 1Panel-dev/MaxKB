@@ -78,7 +78,6 @@ const show = (field: FormField) => {
     for (const index in keys) {
       const key = keys[index]
       let v = _.get(formValue.value, key)
-      console.log(v, key)
       if (v && v !== undefined && v !== null) {
         let values = field.relation_show_field_dict[key]
         if (values && values.length > 0) {
@@ -173,7 +172,6 @@ const render = (
     })
   }
   if (data) {
-    console.log(data)
     formValue.value = data
   }
 }

@@ -4,12 +4,11 @@ import re
 import traceback
 from functools import reduce
 from typing import List, Set
-import requests
-import html2text as ht
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse, ParseResult, urlsplit, parse_qs
+from urllib.parse import urljoin, urlparse, ParseResult, urlsplit
 
-from common.exception.app_exception import AppApiException
+import html2text as ht
+import requests
+from bs4 import BeautifulSoup
 
 requests.packages.urllib3.disable_warnings()
 

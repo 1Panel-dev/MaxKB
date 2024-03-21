@@ -13,7 +13,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common.auth import TokenAuth, has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.constants.permission_constants import RoleConstants
 from common.response import result
 from setting.serializers.system_setting import SystemSettingSerializer
 from setting.swagger_api.system_setting import SystemSettingEmailApi

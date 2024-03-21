@@ -95,8 +95,6 @@ const submit = async (formEl: FormInstance | undefined, test?: string) => {
           MsgSuccess('设置成功')
         })
       }
-    } else {
-      console.log('error submit!')
     }
   })
 }

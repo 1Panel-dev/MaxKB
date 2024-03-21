@@ -63,7 +63,6 @@ const FormRef = ref()
 watch(
   () => props.data,
   (value) => {
-    console.log(value)
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
       form.value.desc = value.desc
