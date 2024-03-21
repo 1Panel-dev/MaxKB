@@ -32,7 +32,7 @@
         </div>
       </el-card>
     </div>
-    <div class="text-center">当前版本号：{{ version }}</div>
+    <div class="text-center">版本号：{{ version }}</div>
   </el-dialog>
 </template>
 <script setup lang="ts">
