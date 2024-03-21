@@ -8,6 +8,8 @@ RUN cd ui && \
     rm -rf ./node_modules
 
 FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11.8-pg15.3
+ARG MAXKB_VERSION=dev
+ENV MAXKB_VERSION=${MAXKB_VERSION}
 # 创建工作目录
 RUN mkdir -p /opt/maxkb/app && mkdir -p /opt/maxkb/model && mkdir -p /opt/maxkb/conf
 # 拷贝项目
