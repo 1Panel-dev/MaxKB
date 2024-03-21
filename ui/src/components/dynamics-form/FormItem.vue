@@ -132,11 +132,9 @@ onMounted(() => {
       bus.on(key, (v: any) => {
         if (value && value.length > 0) {
           if (value.includes(v)) {
-            console.log('符合情况,即将获取数据', key, v)
             props.trigger(props.formfield, loading)
           }
         } else {
-          console.log('符合情况,即将获取数据', key, v)
           props.trigger(props.formfield, loading)
         }
       })

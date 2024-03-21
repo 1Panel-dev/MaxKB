@@ -336,7 +336,6 @@ function changeState(bool: Boolean, row: any) {
 }
 
 function editName(val: string) {
-  console.log()
   if (val) {
     const obj = {
       name: val

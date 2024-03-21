@@ -47,7 +47,6 @@ instance.interceptors.response.use(
     return response
   },
   (err: any) => {
-    console.log(err)
     if (err.code === 'ECONNABORTED') {
       MsgError(err.message)
       console.error(err)
@@ -218,9 +217,7 @@ export const exportExcel: (
         window.URL.revokeObjectURL(link.href)
       }
     })
-    .catch((e) => {
-      console.log(e)
-    })
+    .catch((e) => {})
 }
 
 /**

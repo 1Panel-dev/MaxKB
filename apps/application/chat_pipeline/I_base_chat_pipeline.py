@@ -8,7 +8,7 @@
 """
 import time
 from abc import abstractmethod
-from typing import Type, Dict
+from typing import Type
 
 from rest_framework import serializers
 

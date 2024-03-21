@@ -6,9 +6,10 @@
     @date：2023/11/15 15:13
     @desc:
 """
-import time
-from django.core import signing
 import hashlib
+import time
+
+from django.core import signing
 from django.core.cache import cache
 
 # alg使用的算法
@@ -75,5 +76,3 @@ def check_token(token):
     return False
 
 
-if __name__ == '__main__':
-    token = create_token('zhangsan', 'lisi')

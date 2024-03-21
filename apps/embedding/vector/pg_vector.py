@@ -11,13 +11,12 @@ import os
 import uuid
 from typing import Dict, List
 
-from django.contrib.postgres.search import SearchVector
 from django.db.models import QuerySet
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from common.config.embedding_config import EmbeddingModel
-from common.db.search import native_search, generate_sql_by_query_dict
-from common.db.sql_execute import select_one, select_list
+from common.db.search import generate_sql_by_query_dict
+from common.db.sql_execute import select_list
 from common.util.file_util import get_file_content
 from embedding.models import Embedding, SourceType
 from embedding.vector.base_vector import BaseVectorStore

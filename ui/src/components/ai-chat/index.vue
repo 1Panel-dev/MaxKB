@@ -447,7 +447,6 @@ function chatMessage(chat?: any, problem?: string) {
     applicationApi
       .postChatMessage(chartOpenId.value, chat.problem_text)
       .then((response) => {
-        console.log(response.status)
         if (response.status === 401) {
           application
             .asyncAppAuthentication(accessToken)

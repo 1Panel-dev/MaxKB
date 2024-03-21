@@ -8,7 +8,6 @@
 """
 import logging
 import traceback
-from typing import Dict
 
 from rest_framework.exceptions import ValidationError, ErrorDetail, APIException
 from rest_framework.views import exception_handler

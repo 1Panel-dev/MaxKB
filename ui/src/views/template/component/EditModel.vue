@@ -136,7 +136,6 @@ const getModelForm = (model_name: string) => {
     ).then((ok) => {
       model_form_field.value = ok.data
       if (modelValue.value) {
-        console.log(modelValue.value.credential)
         // 渲染动态表单
         dynamicsFormRef.value?.render(model_form_field.value, modelValue.value.credential)
       }

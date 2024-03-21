@@ -180,8 +180,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           emit('refresh', res.data)
           dialogVisible.value = false
         })
-    } else {
-      console.log('error submit!', fields)
     }
   })
 }

@@ -105,9 +105,7 @@ function updateContent(data: any) {
   emit('update:data', newData.value)
 }
 
-const handleClick = (tab: TabsPaneContext, event: Event) => {
-  // console.log(tab, event)
-}
+const handleClick = (tab: TabsPaneContext, event: Event) => {}
 
 onMounted(() => {})
 </script>

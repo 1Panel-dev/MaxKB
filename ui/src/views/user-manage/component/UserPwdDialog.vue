@@ -117,8 +117,6 @@ const submit = async (formEl: FormInstance | undefined) => {
         MsgSuccess('修改用户密码成功')
         dialogVisible.value = false
       })
-    } else {
-      console.log('error submit!', fields)
     }
   })
 }

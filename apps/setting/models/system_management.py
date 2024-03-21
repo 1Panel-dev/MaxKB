@@ -6,7 +6,6 @@
     @date：2024/3/19 13:47
     @desc: 邮箱管理
 """
-import uuid
 
 from django.db import models
 
