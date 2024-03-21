@@ -60,7 +60,7 @@ jobs:
           else
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
           fi
-          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --build-arg MAXKB_VERSION="${{ github.event.inputs.dockerImageTag }} (build at $(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M:%S'))" --no-cache \
+          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --build-arg MAXKB_VERSION='"${{ github.event.inputs.dockerImageTag }} (build at $(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M:%S'), commit: ${GITHUB_SHA::8})"' --no-cache \
             ${DOCKER_IMAGE_TAGS} .
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -115,7 +115,7 @@ jobs:
           else
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
           fi
-          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --build-arg MAXKB_VERSION="${{ github.event.inputs.dockerImageTag }} (build at $(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M:%S'))" --no-cache \
+          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --build-arg MAXKB_VERSION='"${{ github.event.inputs.dockerImageTag }} (build at $(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M:%S'), commit: ${GITHUB_SHA::8})"' --no-cache \
             ${DOCKER_IMAGE_TAGS} .
           env
       - name: Set up QEMU
