@@ -32,9 +32,7 @@
         </div>
       </el-card>
     </div>
-    <div class="text-center">
-      当前版本号：v1.0.0-dev (build at 2024-03-21T17:32, commit: 40608781)
-    </div>
+    <div class="text-center">当前版本号：{{ version }}</div>
   </el-dialog>
 </template>
 <script setup lang="ts">
