@@ -588,6 +588,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             self.is_valid()
             dataset = QuerySet(DataSet).get(id=self.data.get("id"))
             QuerySet(Document).filter(dataset=dataset).delete()
+            QuerySet(ProblemParagraphMapping).filter(dataset=dataset).delete()
             QuerySet(Paragraph).filter(dataset=dataset).delete()
             QuerySet(Problem).filter(dataset=dataset).delete()
             dataset.delete()

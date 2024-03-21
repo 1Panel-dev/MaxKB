@@ -67,6 +67,7 @@ class ListenerManagement:
     sync_web_document_signal = signal('sync_web_document')
     update_problem_signal = signal('update_problem')
     delete_embedding_by_source_ids_signal = signal('delete_embedding_by_source_ids')
+    delete_embedding_by_dataset_id_list_signal = signal("delete_embedding_by_dataset_id_list")
 
     @staticmethod
     def embedding_by_problem(args):
@@ -209,6 +210,10 @@ class ListenerManagement:
         VectorStore.get_embedding_vector().delete_by_source_ids(source_ids, SourceType.PROBLEM)
 
     @staticmethod
+    def delete_embedding_by_dataset_id_list(source_ids: List[str]):
+        VectorStore.get_embedding_vector().delete_by_dataset_id_list(source_ids)
+
+    @staticmethod
     @poxy
     def init_embedding_model(ags):
         EmbeddingModel.get_embedding_model()
@@ -248,3 +253,4 @@ class ListenerManagement:
         # 更新问题向量
         ListenerManagement.update_problem_signal.connect(self.update_problem)
         ListenerManagement.delete_embedding_by_source_ids_signal.connect(self.delete_embedding_by_source_ids)
+        ListenerManagement.delete_embedding_by_dataset_id_list_signal.connect(self.delete_embedding_by_dataset_id_list)

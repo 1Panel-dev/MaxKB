@@ -156,6 +156,10 @@ class BaseVectorStore(ABC):
         pass
 
     @abstractmethod
+    def delete_by_dataset_id_list(self, dataset_id_list: List[str]):
+        pass
+
+    @abstractmethod
     def delete_by_source_id(self, source_id: str, source_type: str):
         pass
 

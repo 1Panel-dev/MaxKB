@@ -20,16 +20,19 @@ from django.db.models import Q, QuerySet
 from drf_yasg import openapi
 from rest_framework import serializers
 
+from application.models import Application
 from common.constants.authentication_type import AuthenticationType
 from common.constants.exception_code_constants import ExceptionCodeConstants
 from common.constants.permission_constants import RoleConstants, get_permission_list_by_role
 from common.db.search import page_search
+from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.response.result import get_api_response
 from common.util.field_message import ErrMessage
 from common.util.lock import lock
-from setting.models import Team, SystemSetting, SettingType
+from dataset.models import DataSet, Document, Paragraph, Problem, ProblemParagraphMapping
+from setting.models import Team, SystemSetting, SettingType, Model, TeamMember, TeamMemberPermission
 from smartdoc.conf import PROJECT_DIR
 from users.models.user import User, password_encrypt, get_user_dynamics_permission
 
@@ -700,12 +703,37 @@ class UserManageSerializer(serializers.Serializer):
             if not QuerySet(User).filter(id=self.data.get('id')).exists():
                 raise AppApiException(1004, "用户不存在")
 
+        @transaction.atomic
         def delete(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 user = QuerySet(User).filter(id=self.data.get('id')).first()
                 if user.role == RoleConstants.ADMIN.name:
                     raise AppApiException(1004, "无法删除管理员")
+            user_id = self.data.get('id')
+
+            team_member_list = QuerySet(TeamMember).filter(team_id=user_id)
+            # 删除团队成员权限
+            QuerySet(TeamMemberPermission).filter(
+                member_id__in=[team_member.id for team_member in team_member_list]).delete()
+            # 删除团队成员
+            team_member_list.delete()
+            # 删除应用相关 因为应用相关都是级联删除所以不需要手动删除
+            QuerySet(Application).filter(user_id=self.data.get('id')).delete()
+            # 删除数据集相关
+            dataset_list = QuerySet(DataSet).filter(user_id=self.data.get('id'))
+            dataset_id_list = [str(dataset.id) for dataset in dataset_list]
+            QuerySet(Document).filter(dataset_id__in=dataset_id_list).delete()
+            QuerySet(Paragraph).filter(dataset_id__in=dataset_id_list).delete()
+            QuerySet(ProblemParagraphMapping).filter(dataset_id__in=dataset_id_list).delete()
+            QuerySet(Problem).filter(dataset_id__in=dataset_id_list).delete()
+            ListenerManagement.delete_embedding_by_dataset_id_list_signal.send(dataset_id_list)
+            dataset_list.delete()
+            # 删除团队
+            QuerySet(Team).filter(user_id=self.data.get('id')).delete()
+            # 删除模型
+            QuerySet(Model).filter(user_id=self.data.get('id')).delete()
+            # 删除用户
             QuerySet(User).filter(id=self.data.get('id')).delete()
             return True
 
