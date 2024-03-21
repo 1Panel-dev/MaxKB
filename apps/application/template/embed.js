@@ -164,7 +164,7 @@ function initMaxkbStyle(root){
       border-radius: 50% 0 0 50%;
       position: absolute;
       right: 0;
-      bottom: 42px;
+      bottom: 38px;
       z-index: 1000;
   }
   #maxkb .maxkb-tips {
