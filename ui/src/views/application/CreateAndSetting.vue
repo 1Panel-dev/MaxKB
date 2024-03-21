@@ -126,10 +126,9 @@
                     <div>
                       <el-popover :visible="popoverVisible" :width="214" trigger="click">
                         <template #reference>
-                          <el-button type="primary" link @click="datasetSettingChange('open')"
-                            ><AppIcon iconName="app-operation" class="mr-4"></AppIcon
-                            >参数设置</el-button
-                          >
+                          <el-button type="primary" link @click="datasetSettingChange('open')">
+                            <AppIcon iconName="app-operation" class="mr-4"></AppIcon>参数设置
+                          </el-button>
                         </template>
                         <div class="dataset_setting">
                           <div class="form-item mb-16">

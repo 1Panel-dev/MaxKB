@@ -2,7 +2,7 @@
   <p class="bold title p-24" style="padding-bottom: 0">
     <span class="flex align-center">
       <span>关联问题</span>
-      <el-divider direction="vertical" class="mr-4"/>
+      <el-divider direction="vertical" class="mr-4" />
       <el-button text @click="addProblem">
         <el-icon><Plus /></el-icon>
       </el-button>
@@ -20,7 +20,23 @@
           class="mb-8"
           autofocus
         />
-
+        <!-- <el-select
+          v-if="isAddProblem"
+          v-model="problemValue"
+          filterable
+          allow-create
+          default-first-option
+          :reserve-keyword="false"
+          placeholder="请选择问题"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="item in problemList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select> -->
         <template v-for="(item, index) in problemList" :key="index">
           <TagEllipsis
             @close="delProblemHandle(item, index)"

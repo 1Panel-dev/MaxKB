@@ -8,7 +8,32 @@
         </div>
       </div>
     </template>
-    <ul class="about-ui">
+    <div class="about-ui">
+      <el-card
+        shadow="hover"
+        class="mb-16"
+        @click="toUrl('https://github.com/1Panel-dev/MaxKB/wiki')"
+      >
+        <div class="flex align-center cursor">
+          <AppIcon iconName="app-reading" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
+          <span>用户手册</span>
+        </div>
+      </el-card>
+      <el-card shadow="hover" class="mb-16" @click="toUrl('https://github.com/1Panel-dev/MaxKB')">
+        <div class="flex align-center cursor">
+          <AppIcon iconName="app-github" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
+          <span>项目地址</span>
+        </div>
+      </el-card>
+      <el-card shadow="hover" class="mb-16" @click="toUrl('https://bbs.fit2cloud.com/c/mk/11')">
+        <div class="flex align-center cursor">
+          <AppIcon iconName="app-help" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
+          <span>论坛求助</span>
+        </div>
+      </el-card>
+      <div class="text-center">当前版本号：{{ PackageJSON.version }}</div>
+    </div>
+    <!-- <ul class="about-ui">
       <li class="flex mb-16">
         <span class="label text-right">授权数量：</span><span class="text-center">-</span>
       </li>
@@ -22,17 +47,22 @@
         <span class="label text-right">版本号：</span
         ><span class="text-center">{{ PackageJSON.version }}</span>
       </li>
-    </ul>
+    </ul> -->
   </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import PackageJSON from '../../../../../package.json'
 const defaultTitle = import.meta.env.VITE_APP_TITLE
+
 const aboutDialogVisible = ref(false)
 
 const open = () => {
   aboutDialogVisible.value = true
+}
+
+function toUrl(url: string) {
+  window.open(url, '_blank')
 }
 
 defineExpose({ open })
