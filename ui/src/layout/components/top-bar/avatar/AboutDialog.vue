@@ -31,23 +31,10 @@
           <span>论坛求助</span>
         </div>
       </el-card>
-      <div class="text-center">当前版本号：{{ version }}</div>
     </div>
-    <!-- <ul class="about-ui">
-      <li class="flex mb-16">
-        <span class="label text-right">授权数量：</span><span class="text-center">-</span>
-      </li>
-      <li class="flex mb-16">
-        <span class="label text-right">过期时间：</span><span class="text-center">-</span>
-      </li>
-      <li class="flex mb-16">
-        <span class="label text-right">版本：</span><span class="text-center">-</span>
-      </li>
-      <li class="flex">
-        <span class="label text-right">版本号：</span
-        ><span class="text-center">{{ PackageJSON.version }}</span>
-      </li>
-    </ul> -->
+    <div class="text-center">
+      当前版本号：v1.0.0-dev (build at 2024-03-21T17:32, commit: 40608781)
+    </div>
   </el-dialog>
 </template>
 <script setup lang="ts">
@@ -72,9 +59,10 @@ defineExpose({ open })
 </script>
 <style lang="scss" scope>
 .about-dialog {
-  padding: 0;
+  padding: 0 0 24px 0;
   border-radius: 4px;
   width: 600px;
+  font-weight: 400;
   .el-dialog__header {
     background: var(--app-header-bg-color);
     margin-right: 0;
@@ -95,11 +83,11 @@ defineExpose({ open })
     height: 59px;
   }
   .about-ui {
-    padding: 24px;
     width: 360px;
     margin: 0 auto;
     font-weight: 400;
     font-size: 16px;
+    margin-top: 24px;
     .label {
       width: 180px;
       text-align: left;
