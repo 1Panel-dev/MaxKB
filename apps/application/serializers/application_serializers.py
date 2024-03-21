@@ -142,7 +142,9 @@ class ApplicationSerializer(serializers.Serializer):
             access_token_reset = serializers.BooleanField(required=False,
                                                           error_messages=ErrMessage.boolean("重置Token"))
             is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean("是否开启"))
-            access_num = serializers.IntegerField(required=False, error_messages=ErrMessage.integer("访问次数"))
+            access_num = serializers.IntegerField(required=False, max_value=10000,
+                                                  min_value=0,
+                                                  error_messages=ErrMessage.integer("访问次数"))
             white_active = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean("是否开启白名单"))
             white_list = serializers.ListSerializer(required=False, child=serializers.CharField(required=True,
                                                                                                 error_messages=ErrMessage.char(
@@ -209,7 +211,7 @@ class ApplicationSerializer(serializers.Serializer):
             if application_access_token is not None and application_access_token.is_active:
                 if token is None or (token_details is not None and 'client_id' not in token_details) or (
                         token_details is not None and token_details.get(
-                        'access_token') != application_access_token.access_token):
+                    'access_token') != application_access_token.access_token):
                     client_id = str(uuid.uuid1())
                     token = signing.dumps({'application_id': str(application_access_token.application_id),
                                            'user_id': str(application_access_token.application.user.id),
