@@ -24,6 +24,7 @@ RUN mv /opt/maxkb/app/model/* /opt/maxkb/model && \
     apt-get update && apt-get install -y curl && \
     pip3 install --upgrade pip && \
     pip3 install poetry && \
+    if [ `uname -m` == "aarch64" ]; then sed -i '/^torch/d' pyproject.toml; fi && \
     poetry export -f requirements.txt --output requirements.txt --without-hashes && \
     pip3 install --no-cache-dir -r requirements.txt && \
     pip3 cache purge && \
