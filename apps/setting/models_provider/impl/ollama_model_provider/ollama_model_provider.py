@@ -11,11 +11,8 @@ import os
 from typing import Dict, Iterator
 from urllib.parse import urlparse, ParseResult
 
-import aiohttp
 import requests
-from django.http import StreamingHttpResponse
 from langchain.chat_models.base import BaseChatModel
-from langchain.schema import HumanMessage
 
 from common import froms
 from common.exception.app_exception import AppApiException
@@ -33,11 +30,11 @@ class OllamaLLMModelCredential(BaseForm, BaseModelCredential):
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], raise_exception=False):
         model_type_list = OllamaModelProvider().get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(ValidCode.valid_error, f'{model_type} 模型类型不支持')
+            raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
         try:
             model_list = OllamaModelProvider.get_base_model_list(model_credential.get('api_base'))
         except Exception as e:
-            raise AppApiException(ValidCode.valid_error, "API 域名无效")
+            raise AppApiException(ValidCode.valid_error.value, "API 域名无效")
         exist = [model for model in model_list.get('models') if
                  model.get('model') == model_name or model.get('model').replace(":latest", "") == model_name]
         if len(exist) == 0:
@@ -159,7 +156,7 @@ class OllamaModelProvider(IModelProvider):
     @staticmethod
     def get_base_model_list(api_base):
         base_url = get_base_url(api_base)
-        r = requests.request(method="GET", url=f"{base_url}/api/tags")
+        r = requests.request(method="GET", url=f"{base_url}/api/tags", timeout=5)
         r.raise_for_status()
         return r.json()
 

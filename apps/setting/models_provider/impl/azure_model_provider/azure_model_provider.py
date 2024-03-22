@@ -27,15 +27,15 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], raise_exception=False):
         model_type_list = AzureModelProvider().get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(ValidCode.valid_error, f'{model_type} 模型类型不支持')
+            raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
 
         if model_name not in model_dict:
-            raise AppApiException(ValidCode.valid_error, f'{model_name} 模型名称不支持')
+            raise AppApiException(ValidCode.valid_error.value, f'{model_name} 模型名称不支持')
 
         for key in ['api_base', 'api_key', 'deployment_name']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error, f'{key} 字段为必填字段')
+                    raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
                 else:
                     return False
         try:
@@ -45,7 +45,7 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error, '校验失败,请检查参数是否正确')
+                raise AppApiException(ValidCode.valid_error.value, '校验失败,请检查参数是否正确')
             else:
                 return False
 

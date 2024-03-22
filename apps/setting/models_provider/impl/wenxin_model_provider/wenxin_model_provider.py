@@ -17,7 +17,7 @@ from common.exception.app_exception import AppApiException
 from common.froms import BaseForm
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst, BaseModelCredential, \
-    ModelInfo, IModelProvider
+    ModelInfo, IModelProvider, ValidCode
 from setting.models_provider.impl.wenxin_model_provider.model.qian_fan_chat_model import QianfanChatModel
 from smartdoc.conf import PROJECT_DIR
 
@@ -26,15 +26,15 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], raise_exception=False):
         model_type_list = WenxinModelProvider().get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(500, f'{model_type} 模型类型不支持')
+            raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
 
         if model_name not in model_dict:
-            raise AppApiException(500, f'{model_name} 模型名称不支持')
+            raise AppApiException(ValidCode.valid_error.value, f'{model_name} 模型名称不支持')
 
         for key in ['api_key', 'secret_key']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(500, f'{key} 字段为必填字段')
+                    raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
                 else:
                     return False
         try:
@@ -42,7 +42,7 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
                 [HumanMessage(content='valid')])
         except Exception as e:
             if raise_exception:
-                raise AppApiException(500, "校验失败,请检查 api_key secret_key 是否正确")
+                raise AppApiException(ValidCode.valid_error.value, "校验失败,请检查 api_key secret_key 是否正确")
         return True
 
     def encryption_dict(self, model_info: Dict[str, object]):
