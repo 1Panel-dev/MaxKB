@@ -63,7 +63,7 @@
                     :label="realatedObject(providerOptions, label, 'provider')?.name"
                   >
                     <el-option
-                      v-for="item in value"
+                      v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
                       :key="item.id"
                       :label="item.name"
                       :value="item.id"
@@ -75,6 +75,27 @@
                           class="model-icon mr-8"
                         ></span>
                         <span>{{ item.name }}</span>
+                      </div>
+                      <el-icon class="check-icon" v-if="item.id === applicationForm.model_id"
+                        ><Check
+                      /></el-icon>
+                    </el-option>
+                    <!-- 不可用 -->
+                    <el-option
+                      v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                      class="flex-between"
+                      disabled
+                    >
+                      <div class="flex">
+                        <span
+                          v-html="realatedObject(providerOptions, label, 'provider')?.icon"
+                          class="model-icon mr-8"
+                        ></span>
+                        <span>{{ item.name }}</span>
+                        <span class="danger">（不可用）</span>
                       </div>
                       <el-icon class="check-icon" v-if="item.id === applicationForm.model_id"
                         ><Check
