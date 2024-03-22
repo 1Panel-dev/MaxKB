@@ -15,12 +15,25 @@
         </li>
       </ul>
     </div>
+    <!-- progress -->
+    <div class="progress-mask" v-if="model.status === 'DOWNLOAD'">
+      <!-- <el-progress type="circle" :percentage="progress" />
+      <p>正在下载 <span class="dotting"></span></p> -->
+      <el-progress type="dashboard" :percentage="progress" class="percentage">
+        <template #default="{ percentage }">
+          <span class="percentage-value">{{ percentage }}%</span>
+          <span class="percentage-label">正在下载 <span class="dotting"></span></span>
+        </template>
+      </el-progress>
+    </div>
 
     <template #mouseEnter>
       <div class="operation-button">
         <el-tooltip effect="dark" content="修改" placement="top">
           <el-button text @click.stop="openEditModel">
-            <el-icon><EditPen /></el-icon>
+            <el-icon>
+              <component :is="model.status === 'ERROR' ? 'RefreshRight' : 'EditPen'" />
+            </el-icon>
           </el-button>
         </el-tooltip>
 
@@ -54,7 +67,7 @@ const progress = computed(() => {
       const maxObj = down_model_chunk.reduce((prev: any, current: any) => {
         return (prev.index || 0) > (current.index || 0) ? prev : current
       })
-      return maxObj.progress
+      return maxObj.progress?.toFixed(1)
     }
     return 0
   }
@@ -124,6 +137,34 @@ onBeforeUnmount(() => {
     height: auto;
     .el-button + .el-button {
       margin-left: 4px;
+    }
+  }
+  .progress-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(122, 122, 122, 0.8);
+    width: 100%;
+    height: 100%;
+    z-index: 111;
+    text-align: center;
+    .percentage {
+      top: 50%;
+      transform: translateY(-50%);
+      margin-top: 5px;
+    }
+
+    .percentage-value {
+      display: block;
+      margin-top: 10px;
+      font-size: 28px;
+      color: #ffffff;
+    }
+    .percentage-label {
+      display: block;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #ffffff;
     }
   }
 }
