@@ -155,6 +155,7 @@ const list_base_model = (model_type: any) => {
   }
 }
 const open = (provider: Provider, model: Model) => {
+  modelValue.value=model
   ModelApi.getModelById(model.id, formLoading).then((ok) => {
     modelValue.value = ok.data
     ModelApi.listModelType(model.provider, model_type_loading).then((ok) => {
@@ -176,6 +177,7 @@ const open = (provider: Provider, model: Model) => {
 
 const close = () => {
   base_form_data.value = { name: '', model_type: '', model_name: '' }
+  dynamicsFormRef.value?.ruleFormRef?.resetFields()
   credential_form_data.value = {}
   dialogVisible.value = false
 }

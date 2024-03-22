@@ -45,7 +45,7 @@ class ModelPullManage:
                 status = Status.SUCCESS
             if chunk.get('status') == DownModelChunkStatus.error.value:
                 message = chunk.get("digest")
-        QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": down_model_chunk_list, "message": message},
+        QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": [], "message": message},
                                                    status=status)
 
 
@@ -230,6 +230,7 @@ class ModelSerializer(serializers.Serializer):
                 credential, model_credential = ModelSerializer.Edit(data={**instance, 'user_id': user_id}).is_valid(
                     model=model)
                 try:
+                    model.status = Status.SUCCESS
                     # 校验模型认证数据
                     model_credential.is_valid(
                         model.model_type,
@@ -241,7 +242,6 @@ class ModelSerializer(serializers.Serializer):
                         model.status = Status.DOWNLOAD
                     else:
                         raise e
-                model.status = Status.SUCCESS
                 update_keys = ['credential', 'name', 'model_type', 'model_name']
                 for update_key in update_keys:
                     if update_key in instance and instance.get(update_key) is not None:

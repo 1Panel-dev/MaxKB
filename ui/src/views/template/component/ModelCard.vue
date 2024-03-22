@@ -62,7 +62,7 @@ import type { Provider, Model } from '@/api/type/model'
 import ModelApi from '@/api/model'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/template/component/EditModel.vue'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import {  MsgConfirm } from '@/utils/message'
 
 const props = defineProps<{
   model: Model
@@ -85,6 +85,7 @@ const errMessage = computed(() => {
     }
     return currentModel.value.meta.message
   }
+  return ""
 })
 const progress = computed(() => {
   if (currentModel.value) {
@@ -94,8 +95,11 @@ const progress = computed(() => {
         .filter((chunk: any) => chunk.index > 1)
         .reduce((prev: any, current: any) => {
           return (prev.index || 0) > (current.index || 0) ? prev : current
-        })
-      return maxObj.progress?.toFixed(1)
+        },{progress:0})
+      if(maxObj){
+        return parseFloat(maxObj.progress?.toFixed(1))
+      }
+     return 0
     }
     return 0
   }
@@ -135,6 +139,8 @@ const initInterval = () => {
       ModelApi.getModelMetaById(props.model.id).then((ok) => {
         downModel.value = ok.data
       })
+    }else{
+      downModel.value=undefined
     }
   }, 6000)
 }
