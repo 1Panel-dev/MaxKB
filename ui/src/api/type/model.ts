@@ -1,5 +1,5 @@
 import { store } from '@/stores'
-import { Dict } from './common'
+import type { Dict } from './common'
 interface modelRequest {
   name: string
   model_type: string
