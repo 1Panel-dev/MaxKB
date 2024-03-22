@@ -47,8 +47,9 @@
           @row-click="rowClickHandle"
           @selection-change="handleSelectionChange"
           v-loading="loading"
+          :row-key="(row: any) => row.id"
         >
-          <el-table-column type="selection" width="55" />
+          <el-table-column type="selection" width="55" :reserve-selection="true" />
           <el-table-column prop="name" label="文件名称" min-width="280">
             <template #default="{ row }">
               <ReadWrite
