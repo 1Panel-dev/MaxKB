@@ -152,11 +152,21 @@ class ChatMessageSerializer(serializers.Serializer):
                 application_id=self.data.get('application_id')).first()
             if application_access_token.access_num <= access_client.intraday_access_num:
                 raise AppChatNumOutOfBoundsFailed(1002, "访问次数超过今日访问量")
-        application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
-        if application.model.status == Status.ERROR:
-            raise AppApiException(500, "当前模型不可用")
-        if application.model.status == Status.DOWNLOAD:
-            raise AppApiException(500, "模型正在下载中,请稍后再发起对话")
+            chat_id = self.data.get('chat_id')
+            chat_info: ChatInfo = chat_cache.get(chat_id)
+            if chat_info is None:
+                chat_info = self.re_open_chat(chat_id)
+                chat_cache.set(chat_id,
+                               chat_info, timeout=60 * 30)
+            model = chat_info.application.model
+            model = QuerySet(Model).filter(id=model.id).first()
+            if model is None:
+                raise AppApiException(500, "模型不存在")
+            if model == Status.ERROR:
+                raise AppApiException(500, "当前模型不可用")
+            if model == Status.DOWNLOAD:
+                raise AppApiException(500, "模型正在下载中,请稍后再发起对话")
+            return chat_info
 
     def chat(self):
         self.is_valid(raise_exception=True)
@@ -165,14 +175,7 @@ class ChatMessageSerializer(serializers.Serializer):
         stream = self.data.get('stream')
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
-        self.is_valid(raise_exception=True)
-        chat_id = self.data.get('chat_id')
-        chat_info: ChatInfo = chat_cache.get(chat_id)
-        if chat_info is None:
-            chat_info = self.re_open_chat(chat_id)
-            chat_cache.set(chat_id,
-                           chat_info, timeout=60 * 30)
-
+        chat_info = self.is_valid(raise_exception=True)
         pipline_manage_builder = PiplineManage.builder()
         # 如果开启了问题优化,则添加上问题优化步骤
         if chat_info.application.problem_optimization:
