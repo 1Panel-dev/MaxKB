@@ -30,7 +30,7 @@ from common.util.field_message import ErrMessage
 from common.util.rsa_util import decrypt
 from common.util.split_model import flat_map
 from dataset.models import Paragraph, Document
-from setting.models import Model
+from setting.models import Model, Status
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 
 chat_cache = caches['model_cache']
@@ -152,6 +152,11 @@ class ChatMessageSerializer(serializers.Serializer):
                 application_id=self.data.get('application_id')).first()
             if application_access_token.access_num <= access_client.intraday_access_num:
                 raise AppChatNumOutOfBoundsFailed(1002, "访问次数超过今日访问量")
+        application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
+        if application.model.status == Status.ERROR:
+            raise AppApiException(500, "当前模型不可用")
+        if application.model.status == Status.DOWNLOAD:
+            raise AppApiException(500, "模型正在下载中,请稍后再发起对话")
 
     def chat(self):
         self.is_valid(raise_exception=True)
