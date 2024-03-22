@@ -6,9 +6,14 @@
     @date：2024/3/5 17:23
     @desc:
 """
+import json
 import os
-from typing import Dict
+from typing import Dict, Iterator
+from urllib.parse import urlparse, ParseResult
 
+import aiohttp
+import requests
+from django.http import StreamingHttpResponse
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import HumanMessage
 
@@ -17,29 +22,26 @@ from common.exception.app_exception import AppApiException
 from common.froms import BaseForm
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, \
-    BaseModelCredential
+    BaseModelCredential, DownModelChunk, DownModelChunkStatus, ValidCode
 from setting.models_provider.impl.ollama_model_provider.model.ollama_chat_model import OllamaChatModel
 from smartdoc.conf import PROJECT_DIR
+
+""
 
 
 class OllamaLLMModelCredential(BaseForm, BaseModelCredential):
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], raise_exception=False):
         model_type_list = OllamaModelProvider().get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(500, f'{model_type} 模型类型不支持')
-
-        for key in ['api_key']:
-            if key not in model_credential:
-                if raise_exception:
-                    raise AppApiException(500, f'{key} 字段为必填字段')
-                else:
-                    return False
+            raise AppApiException(ValidCode.valid_error, f'{model_type} 模型类型不支持')
         try:
-            OllamaModelProvider().get_model(model_type, model_name, model_credential).invoke(
-                [HumanMessage(content='valid')])
+            model_list = OllamaModelProvider.get_base_model_list(model_credential.get('api_base'))
         except Exception as e:
-            if raise_exception:
-                raise AppApiException(500, "校验失败,请检查 api_key secret_key 是否正确")
+            raise AppApiException(ValidCode.valid_error, "API 域名无效")
+        exist = [model for model in model_list.get('models') if
+                 model.get('model') == model_name or model.get('model').replace(":latest", "") == model_name]
+        if len(exist) == 0:
+            raise AppApiException(ValidCode.model_not_fount, "模型不存在,请先下载模型")
         return True
 
     def encryption_dict(self, model_info: Dict[str, object]):
@@ -86,6 +88,52 @@ model_dict = {
 }
 
 
+def get_base_url(url: str):
+    parse = urlparse(url)
+    return ParseResult(scheme=parse.scheme, netloc=parse.netloc, path='', params='',
+                       query='',
+                       fragment='').geturl()
+
+
+def convert_to_down_model_chunk(row_str: str, chunk_index: int):
+    row = json.loads(row_str)
+    status = DownModelChunkStatus.unknown
+    digest = ""
+    progress = 100
+    if 'status' in row:
+        digest = row.get('status')
+        if row.get('status') == 'success':
+            status = DownModelChunkStatus.success
+        if row.get('status').__contains__("pulling"):
+            status = DownModelChunkStatus.pulling
+            if 'total' in row and 'completed' in row:
+                progress = (row.get('completed') / row.get('total') * 100)
+    elif 'error' in row:
+        status = DownModelChunkStatus.error
+        digest = row.get('error')
+    return DownModelChunk(status=status, digest=digest, progress=progress, details=row_str, index=chunk_index)
+
+
+def convert(response_stream) -> Iterator[DownModelChunk]:
+    temp = ""
+    index = 0
+    for c in response_stream:
+        index += 1
+        row_content = c.decode()
+        temp += row_content
+        if row_content.endswith('}') or row_content.endswith('\n'):
+            rows = [t for t in temp.split("\n") if len(t) > 0]
+            for row in rows:
+                yield convert_to_down_model_chunk(row, index)
+            temp = ""
+
+    if len(temp) > 0:
+        print(temp)
+        rows = [t for t in temp.split("\n") if len(t) > 0]
+        for row in rows:
+            yield convert_to_down_model_chunk(row, index)
+
+
 class OllamaModelProvider(IModelProvider):
     def get_model_provide_info(self):
         return ModelProvideInfo(provider='model_ollama_provider', name='Ollama', icon=get_file_content(
@@ -113,3 +161,21 @@ class OllamaModelProvider(IModelProvider):
 
     def get_dialogue_number(self):
         return 2
+
+    @staticmethod
+    def get_base_model_list(api_base):
+        base_url = get_base_url(api_base)
+        r = requests.request(method="GET", url=f"{base_url}/api/tags")
+        r.raise_for_status()
+        return r.json()
+
+    def down_model(self, model_type: str, model_name, model_credential: Dict[str, object]) -> Iterator[DownModelChunk]:
+        api_base = model_credential.get('api_base')
+        base_url = get_base_url(api_base)
+        r = requests.request(
+            method="POST",
+            url=f"{base_url}/api/pull",
+            data=json.dumps({"name": model_name}).encode(),
+            stream=True,
+        )
+        return convert(r)

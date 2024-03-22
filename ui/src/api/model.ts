@@ -106,6 +106,31 @@ const updateModel: (
   return put(`${prefix}/${model_id}`, request, {}, loading)
 }
 
+/**
+ * 获取模型详情根据模型id 包括认证信息
+ * @param model_id 模型id
+ * @param loading  加载器
+ * @returns
+ */
+const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
+  model_id,
+  loading
+) => {
+  return get(`${prefix}/${model_id}`, {}, loading)
+}
+/**
+ * 获取模型信息不包括认证信息根据模型id
+ * @param model_id 模型id
+ * @param loading  加载器
+ * @returns
+ */
+const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
+  model_id,
+  loading
+) => {
+  return get(`${prefix}/${model_id}/meta`, {}, loading)
+}
+
 const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   model_id,
   loading
@@ -120,5 +145,7 @@ export default {
   listBaseModel,
   createModel,
   updateModel,
-  deleteModel
+  deleteModel,
+  getModelById,
+  getModelMetaById
 }

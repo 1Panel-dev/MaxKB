@@ -9,9 +9,41 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 from functools import reduce
-from typing import Dict
+from typing import Dict, Iterator
 
 from langchain.chat_models.base import BaseChatModel
+
+from common.exception.app_exception import AppApiException
+
+
+class DownModelChunkStatus(Enum):
+    success = "success"
+    error = "error"
+    pulling = "pulling"
+    unknown = 'unknown'
+
+
+class ValidCode(Enum):
+    valid_error = 500
+    model_not_fount = 404
+
+
+class DownModelChunk:
+    def __init__(self, status: DownModelChunkStatus, digest: str, progress: int, details: str, index: int):
+        self.details = details
+        self.status = status
+        self.digest = digest
+        self.progress = progress
+        self.index = index
+
+    def to_dict(self):
+        return {
+            "details": self.details,
+            "status": self.status.value,
+            "digest": self.digest,
+            "progress": self.progress,
+            "index": self.index
+        }
 
 
 class IModelProvider(ABC):
@@ -39,6 +71,9 @@ class IModelProvider(ABC):
     @abstractmethod
     def get_dialogue_number(self):
         pass
+
+    def down_model(self, model_type: str, model_name, model_credential: Dict[str, object]) -> Iterator[DownModelChunk]:
+        raise AppApiException(500, "当前平台不支持下载模型")
 
 
 class BaseModelCredential(ABC):

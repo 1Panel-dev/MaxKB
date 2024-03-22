@@ -1,4 +1,5 @@
 import { store } from '@/stores'
+import { Dict } from './common'
 interface modelRequest {
   name: string
   model_type: string
@@ -64,6 +65,14 @@ interface Model {
    * 供应商
    */
   provider: string
+  /**
+   * 状态
+   */
+  status: 'SUCCESS' | 'DOWNLOAD' | 'ERROR'
+  /**
+   * 元数据
+   */
+  meta: Dict<any>
 }
 interface CreateModelRequest {
   /**

@@ -37,15 +37,32 @@
 <script setup lang="ts">
 import type { Provider, Model } from '@/api/type/model'
 import ModelApi from '@/api/model'
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/template/component/EditModel.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+
 const props = defineProps<{
   model: Model
   provider_list: Array<Provider>
 }>()
+const downModel = ref<Model>()
+
+const progress = computed(() => {
+  if (downModel.value) {
+    const down_model_chunk = downModel.value.meta['down_model_chunk']
+    if (down_model_chunk) {
+      const maxObj = down_model_chunk.reduce((prev: any, current: any) => {
+        return (prev.index || 0) > (current.index || 0) ? prev : current
+      })
+      return maxObj.progress
+    }
+    return 0
+  }
+  return 0
+})
 const emit = defineEmits(['change'])
 const eidtModelRef = ref<InstanceType<typeof EditModel>>()
+let interval: any
 const deleteModel = () => {
   MsgConfirm(`删除模型 `, `是否删除模型：${props.model.name} ?`, {
     confirmButtonText: '删除',
@@ -66,6 +83,34 @@ const openEditModel = () => {
 }
 const icon = computed(() => {
   return props.provider_list.find((p) => p.provider === props.model.provider)?.icon
+})
+
+/**
+ * 初始化轮询
+ */
+const initInterval = () => {
+  interval = setInterval(() => {
+    if (props.model.status === 'DOWNLOAD') {
+      ModelApi.getModelMetaById(props.model.id).then((ok) => {
+        downModel.value = ok.data
+      })
+    }
+  }, 6000)
+}
+/**
+ * 关闭轮询
+ */
+const closeInterval = () => {
+  if (interval) {
+    clearInterval(interval)
+  }
+}
+onMounted(() => {
+  initInterval()
+})
+onBeforeUnmount(() => {
+  // 清除定时任务
+  closeInterval()
 })
 </script>
 <style lang="scss" scoped>

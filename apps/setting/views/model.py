@@ -34,6 +34,17 @@ class Model(APIView):
             ModelSerializer.Create(data={**request.data, 'user_id': str(request.user.id)}).insert(request.user.id,
                                                                                                   with_valid=True))
 
+    @action(methods=['PUT'], detail=False)
+    @swagger_auto_schema(operation_summary="下载模型,只试用与Ollama平台",
+                         operation_id="下载模型,只试用与Ollama平台",
+                         request_body=ModelCreateApi.get_request_body_api()
+        , tags=["模型"])
+    @has_permissions(PermissionConstants.MODEL_CREATE)
+    def put(self, request: Request):
+        return result.success(
+            ModelSerializer.Create(data={**request.data, 'user_id': str(request.user.id)}).insert(request.user.id,
+                                                                                                  with_valid=True))
+
     @action(methods=['GET'], detail=False)
     @swagger_auto_schema(operation_summary="获取模型列表",
                          operation_id="获取模型列表",
@@ -45,6 +56,18 @@ class Model(APIView):
             ModelSerializer.Query(
                 data={**query_params_to_single_dict(request.query_params), 'user_id': request.user.id}).list(
                 with_valid=True))
+
+    class ModelMeta(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="查询模型meta信息,该接口不携带认证信息",
+                             operation_id="查询模型meta信息,该接口不携带认证信息",
+                             tags=["模型"])
+        @has_permissions(PermissionConstants.MODEL_READ)
+        def get(self, request: Request, model_id: str):
+            return result.success(
+                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).one_meta(with_valid=True))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

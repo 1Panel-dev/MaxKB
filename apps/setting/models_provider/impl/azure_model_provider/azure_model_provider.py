@@ -9,8 +9,8 @@
 import os
 from typing import Dict
 
-from langchain_community.chat_models import AzureChatOpenAI
 from langchain.schema import HumanMessage
+from langchain_community.chat_models import AzureChatOpenAI
 
 from common import froms
 from common.exception.app_exception import AppApiException
@@ -18,7 +18,7 @@ from common.froms import BaseForm
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, BaseModelCredential, \
     ModelInfo, \
-    ModelTypeConst
+    ModelTypeConst, ValidCode
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -27,15 +27,15 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], raise_exception=False):
         model_type_list = AzureModelProvider().get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(500, f'{model_type} 模型类型不支持')
+            raise AppApiException(ValidCode.valid_error, f'{model_type} 模型类型不支持')
 
         if model_name not in model_dict:
-            raise AppApiException(500, f'{model_name} 模型名称不支持')
+            raise AppApiException(ValidCode.valid_error, f'{model_name} 模型名称不支持')
 
         for key in ['api_base', 'api_key', 'deployment_name']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(500, f'{key} 字段为必填字段')
+                    raise AppApiException(ValidCode.valid_error, f'{key} 字段为必填字段')
                 else:
                     return False
         try:
@@ -45,7 +45,7 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
-                raise AppApiException(500, '校验失败,请检查参数是否正确')
+                raise AppApiException(ValidCode.valid_error, '校验失败,请检查参数是否正确')
             else:
                 return False
 

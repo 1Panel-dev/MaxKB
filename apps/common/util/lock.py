@@ -13,13 +13,14 @@ from django.core.cache import caches
 memory_cache = caches['default']
 
 
-def try_lock(key: str):
+def try_lock(key: str, timeout=None):
     """
     获取锁
-    :param key: 获取锁 key
+    :param key:    获取锁 key
+    :param timeout 超时时间
     :return: 是否获取到锁
     """
-    return memory_cache.add(key, 'lock', timeout=timedelta(hours=1).total_seconds())
+    return memory_cache.add(key, 'lock', timeout=timedelta(hours=1).total_seconds() if timeout is not None else timeout)
 
 
 def un_lock(key: str):

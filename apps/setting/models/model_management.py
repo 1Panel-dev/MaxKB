@@ -14,6 +14,15 @@ from common.mixins.app_model_mixin import AppModelMixin
 from users.models import User
 
 
+class Status(models.TextChoices):
+    """系统设置类型"""
+    SUCCESS = "SUCCESS", '成功'
+
+    ERROR = "ERROR", "失败"
+
+    DOWNLOAD = "DOWNLOAD", '下载中'
+
+
 class Model(AppModelMixin):
     """
     模型数据
@@ -21,6 +30,9 @@ class Model(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
 
     name = models.CharField(max_length=128, verbose_name="名称")
+
+    status = models.CharField(max_length=20, verbose_name='设置类型', choices=Status.choices,
+                              default=Status.SUCCESS)
 
     model_type = models.CharField(max_length=128, verbose_name="模型类型")
 
@@ -31,6 +43,8 @@ class Model(AppModelMixin):
     provider = models.CharField(max_length=128, verbose_name='供应商')
 
     credential = models.CharField(max_length=5120, verbose_name="模型认证信息")
+
+    meta = models.JSONField(verbose_name="模型元数据,用于存储下载,或者错误信息", default=dict)
 
     class Meta:
         db_table = "model"

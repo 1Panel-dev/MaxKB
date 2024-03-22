@@ -18,6 +18,7 @@
     </template>
 
     <DynamicsForm
+      v-loading="formLoading"
       v-model="form_data"
       :render_data="model_form_field"
       :model="form_data"
@@ -56,7 +57,7 @@
             @change="getModelForm($event)"
             v-loading="base_model_loading"
             style="width: 100%"
-            v-model="form_data.model_name"
+            v-model="base_form_data.model_name"
             class="m-2"
             placeholder="请选择基础模型"
             filterable
@@ -90,10 +91,12 @@ import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
+
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
 const emit = defineEmits(['change', 'submit'])
 const loading = ref<boolean>(false)
+const formLoading = ref<boolean>(false)
 const model_type_loading = ref<boolean>(false)
 const base_model_loading = ref<boolean>(false)
 const model_type_list = ref<Array<KeyValue<string, string>>>([])
@@ -152,21 +155,22 @@ const list_base_model = (model_type: any) => {
   }
 }
 const open = (provider: Provider, model: Model) => {
-  modelValue.value = model
-  ModelApi.listModelType(model.provider, model_type_loading).then((ok) => {
-    model_type_list.value = ok.data
-    list_base_model(model.model_type)
+  ModelApi.getModelById(model.id, formLoading).then((ok) => {
+    modelValue.value = ok.data
+    ModelApi.listModelType(model.provider, model_type_loading).then((ok) => {
+      model_type_list.value = ok.data
+      list_base_model(model.model_type)
+    })
+    providerValue.value = provider
+
+    base_form_data.value = {
+      name: model.name,
+      model_type: model.model_type,
+      model_name: model.model_name
+    }
+    form_data.value = model.credential
+    getModelForm(model.model_name)
   })
-
-  providerValue.value = provider
-
-  base_form_data.value = {
-    name: model.name,
-    model_type: model.model_type,
-    model_name: model.model_name
-  }
-  form_data.value = model.credential
-  getModelForm(model.model_name)
   dialogVisible.value = true
 }
 

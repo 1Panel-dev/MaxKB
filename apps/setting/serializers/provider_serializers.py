@@ -7,6 +7,8 @@
     @desc:
 """
 import json
+import threading
+import time
 import uuid
 from typing import Dict
 
@@ -17,8 +19,34 @@ from application.models import Application
 from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
 from common.util.rsa_util import encrypt, decrypt
-from setting.models.model_management import Model
+from setting.models.model_management import Model, Status
+from setting.models_provider.base_model_provider import ValidCode, DownModelChunkStatus
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
+
+
+class ModelPullManage:
+
+    @staticmethod
+    def pull(model: Model, credential: Dict):
+        response = ModelProvideConstants[model.provider].value.down_model(model.model_type, model.model_name,
+                                                                          credential)
+        down_model_chunk = {}
+        timestamp = time.time()
+        for chunk in response:
+            down_model_chunk[chunk.digest] = chunk.to_dict()
+            if time.time() - timestamp > 5:
+                QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": list(down_model_chunk.values())})
+                timestamp = time.time()
+        status = Status.ERROR
+        message = ""
+        down_model_chunk_list = list(down_model_chunk.values())
+        for chunk in down_model_chunk_list:
+            if chunk.get('status') == DownModelChunkStatus.success.value:
+                status = Status.SUCCESS
+            if chunk.get('status') == DownModelChunkStatus.error.value:
+                message = chunk.get("digest")
+        QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": down_model_chunk_list, "message": message},
+                                                   status=status)
 
 
 class ModelSerializer(serializers.Serializer):
@@ -50,7 +78,10 @@ class ModelSerializer(serializers.Serializer):
             if self.data.get('provider') is not None:
                 query_params['provider'] = self.data.get('provider')
 
-            return [ModelSerializer.model_to_dict(model) for model in model_query_set.filter(**query_params)]
+            return [
+                {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
+                 'model_name': model.model_name, 'status': model.status, 'meta': model.meta} for model in
+                model_query_set.filter(**query_params)]
 
     class Edit(serializers.Serializer):
         user_id = serializers.CharField(required=False, error_messages=ErrMessage.uuid("用户id"))
@@ -88,13 +119,7 @@ class ModelSerializer(serializers.Serializer):
                 for k in source_encryption_model_credential.keys():
                     if credential[k] == source_encryption_model_credential[k]:
                         credential[k] = source_model_credential[k]
-                        # 校验模型认证数据
-                model_credential.is_valid(
-                    model_type,
-                    model_name,
-                    credential,
-                    raise_exception=True)
-            return credential
+            return credential, model_credential
 
     class Create(serializers.Serializer):
         user_id = serializers.CharField(required=True, error_messages=ErrMessage.uuid("用户id"))
@@ -124,18 +149,28 @@ class ModelSerializer(serializers.Serializer):
                 raise_exception=True)
 
         def insert(self, user_id, with_valid=False):
+            status = Status.SUCCESS
             if with_valid:
-                self.is_valid(raise_exception=True)
+                try:
+                    self.is_valid(raise_exception=True)
+                except AppApiException as e:
+                    if e.code == ValidCode.model_not_fount:
+                        status = Status.DOWNLOAD
+                    else:
+                        raise e
             credential = self.data.get('credential')
             name = self.data.get('name')
             provider = self.data.get('provider')
             model_type = self.data.get('model_type')
             model_name = self.data.get('model_name')
             model_credential_str = json.dumps(credential)
-            model = Model(id=uuid.uuid1(), user_id=user_id, name=name,
+            model = Model(id=uuid.uuid1(), status=status, user_id=user_id, name=name,
                           credential=encrypt(model_credential_str),
                           provider=provider, model_type=model_type, model_name=model_name)
             model.save()
+            if status == Status.DOWNLOAD:
+                thread = threading.Thread(target=ModelPullManage.pull, args=(model, credential))
+                thread.start()
             return ModelSerializer.Operate(data={'id': model.id, 'user_id': user_id}).one(with_valid=True)
 
     @staticmethod
@@ -143,6 +178,8 @@ class ModelSerializer(serializers.Serializer):
         credential = json.loads(decrypt(model.credential))
         return {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
                 'model_name': model.model_name,
+                'status': model.status,
+                'meta': model.meta,
                 'credential': ModelProvideConstants[model.provider].value.get_model_credential(model.model_type,
                                                                                                model.model_name).encryption_dict(
                     credential)}
@@ -164,6 +201,15 @@ class ModelSerializer(serializers.Serializer):
             model = QuerySet(Model).get(id=self.data.get('id'), user_id=self.data.get('user_id'))
             return ModelSerializer.model_to_dict(model)
 
+        def one_meta(self, with_valid=False):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            model = QuerySet(Model).get(id=self.data.get('id'), user_id=self.data.get('user_id'))
+            return {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
+                    'model_name': model.model_name,
+                    'status': model.status,
+                    'meta': model.meta, }
+
         def delete(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -181,7 +227,20 @@ class ModelSerializer(serializers.Serializer):
             if model is None:
                 raise AppApiException(500, '不存在的id')
             else:
-                credential = ModelSerializer.Edit(data={**instance, 'user_id': user_id}).is_valid(model=model)
+                credential, model_credential = ModelSerializer.Edit(data={**instance, 'user_id': user_id}).is_valid(
+                    model=model)
+                try:
+                    # 校验模型认证数据
+                    model_credential.is_valid(
+                        model.model_type,
+                        instance.get("model_name"),
+                        credential,
+                        raise_exception=True)
+                except AppApiException as e:
+                    if e.code == ValidCode.model_not_fount:
+                        model.status = Status.DOWNLOAD
+                    else:
+                        raise e
                 update_keys = ['credential', 'name', 'model_type', 'model_name']
                 for update_key in update_keys:
                     if update_key in instance and instance.get(update_key) is not None:
@@ -191,6 +250,9 @@ class ModelSerializer(serializers.Serializer):
                         else:
                             model.__setattr__(update_key, instance.get(update_key))
             model.save()
+            if model.status == Status.DOWNLOAD:
+                thread = threading.Thread(target=ModelPullManage.pull, args=(model, credential))
+                thread.start()
             return self.one(with_valid=False)
 
 
