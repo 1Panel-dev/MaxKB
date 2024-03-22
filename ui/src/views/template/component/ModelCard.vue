@@ -1,8 +1,20 @@
 <template>
   <card-box :title="model.name" shadow="hover" class="model-card">
-    <template #icon>
-      <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
+    <template #header>
+      <div class="flex align-center">
+        <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
+        <auto-tooltip :content="model.name" style="max-width: 40%">
+          {{ model.name }}
+        </auto-tooltip>
+        <div class="flex align-center" v-if="model.status === 'ERROR'">
+          <el-tag type="danger" class="ml-8">失败</el-tag>
+          <el-tooltip effect="dark" :content="model?.meta?.message" placement="top">
+            <el-icon class="danger ml-4" size="20"><Warning /></el-icon>
+          </el-tooltip>
+        </div>
+      </div>
     </template>
+
     <div class="border-t mt-16">
       <ul>
         <li class="flex mt-16">
