@@ -6,9 +6,9 @@
         <auto-tooltip :content="model.name" style="max-width: 40%">
           {{ model.name }}
         </auto-tooltip>
-        <div class="flex align-center" v-if="model.status === 'ERROR'">
+        <div class="flex align-center" v-if="currentModel.status === 'ERROR'">
           <el-tag type="danger" class="ml-8">失败</el-tag>
-          <el-tooltip effect="dark" :content="model?.meta?.message" placement="top">
+          <el-tooltip effect="dark" :content="errMessage" placement="top">
             <el-icon class="danger ml-4" size="20"><Warning /></el-icon>
           </el-tooltip>
         </div>
@@ -28,9 +28,7 @@
       </ul>
     </div>
     <!-- progress -->
-    <div class="progress-mask" v-if="model.status === 'DOWNLOAD'">
-      <!-- <el-progress type="circle" :percentage="progress" />
-      <p>正在下载 <span class="dotting"></span></p> -->
+    <div class="progress-mask" v-if="currentModel.status === 'DOWNLOAD'">
       <el-progress type="dashboard" :percentage="progress" class="percentage">
         <template #default="{ percentage }">
           <span class="percentage-value">{{ percentage }}%</span>
@@ -44,7 +42,7 @@
         <el-tooltip effect="dark" content="修改" placement="top">
           <el-button text @click.stop="openEditModel">
             <el-icon>
-              <component :is="model.status === 'ERROR' ? 'RefreshRight' : 'EditPen'" />
+              <component :is="currentModel.status === 'ERROR' ? 'RefreshRight' : 'EditPen'" />
             </el-icon>
           </el-button>
         </el-tooltip>
@@ -72,13 +70,31 @@ const props = defineProps<{
 }>()
 const downModel = ref<Model>()
 
-const progress = computed(() => {
+const currentModel = computed(() => {
   if (downModel.value) {
-    const down_model_chunk = downModel.value.meta['down_model_chunk']
+    return downModel.value
+  } else {
+    return props.model
+  }
+})
+
+const errMessage = computed(() => {
+  if (currentModel.value.meta && currentModel.value.meta.message) {
+    if (currentModel.value.meta.message === 'pull model manifest: file does not exist') {
+      return `${currentModel.value.model_name} 模型在Ollama不存在`
+    }
+    return currentModel.value.meta.message
+  }
+})
+const progress = computed(() => {
+  if (currentModel.value) {
+    const down_model_chunk = currentModel.value.meta['down_model_chunk']
     if (down_model_chunk) {
-      const maxObj = down_model_chunk.reduce((prev: any, current: any) => {
-        return (prev.index || 0) > (current.index || 0) ? prev : current
-      })
+      const maxObj = down_model_chunk
+        .filter((chunk: any) => chunk.index > 1)
+        .reduce((prev: any, current: any) => {
+          return (prev.index || 0) > (current.index || 0) ? prev : current
+        })
       return maxObj.progress?.toFixed(1)
     }
     return 0
@@ -115,7 +131,7 @@ const icon = computed(() => {
  */
 const initInterval = () => {
   interval = setInterval(() => {
-    if (props.model.status === 'DOWNLOAD') {
+    if (currentModel.value.status === 'DOWNLOAD') {
       ModelApi.getModelMetaById(props.model.id).then((ok) => {
         downModel.value = ok.data
       })
