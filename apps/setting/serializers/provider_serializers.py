@@ -241,6 +241,7 @@ class ModelSerializer(serializers.Serializer):
                         model.status = Status.DOWNLOAD
                     else:
                         raise e
+                model.status = Status.SUCCESS
                 update_keys = ['credential', 'name', 'model_type', 'model_name']
                 for update_key in update_keys:
                     if update_key in instance and instance.get(update_key) is not None:

@@ -152,21 +152,21 @@ class ChatMessageSerializer(serializers.Serializer):
                 application_id=self.data.get('application_id')).first()
             if application_access_token.access_num <= access_client.intraday_access_num:
                 raise AppChatNumOutOfBoundsFailed(1002, "访问次数超过今日访问量")
-            chat_id = self.data.get('chat_id')
-            chat_info: ChatInfo = chat_cache.get(chat_id)
-            if chat_info is None:
-                chat_info = self.re_open_chat(chat_id)
-                chat_cache.set(chat_id,
-                               chat_info, timeout=60 * 30)
-            model = chat_info.application.model
-            model = QuerySet(Model).filter(id=model.id).first()
-            if model is None:
-                raise AppApiException(500, "模型不存在")
-            if model == Status.ERROR:
-                raise AppApiException(500, "当前模型不可用")
-            if model == Status.DOWNLOAD:
-                raise AppApiException(500, "模型正在下载中,请稍后再发起对话")
-            return chat_info
+        chat_id = self.data.get('chat_id')
+        chat_info: ChatInfo = chat_cache.get(chat_id)
+        if chat_info is None:
+            chat_info = self.re_open_chat(chat_id)
+            chat_cache.set(chat_id,
+                           chat_info, timeout=60 * 30)
+        model = chat_info.application.model
+        model = QuerySet(Model).filter(id=model.id).first()
+        if model is None:
+            raise AppApiException(500, "模型不存在")
+        if model.status == Status.ERROR:
+            raise AppApiException(500, "当前模型不可用")
+        if model.status == Status.DOWNLOAD:
+            raise AppApiException(500, "模型正在下载中,请稍后再发起对话")
+        return chat_info
 
     def chat(self):
         self.is_valid(raise_exception=True)
