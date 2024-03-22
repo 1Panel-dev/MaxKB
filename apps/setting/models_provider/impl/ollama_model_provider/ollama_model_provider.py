@@ -148,7 +148,9 @@ class OllamaModelProvider(IModelProvider):
         return ollama_llm_model_credential
 
     def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> BaseChatModel:
-        return OllamaChatModel(model=model_name, openai_api_base=model_credential.get('api_base'),
+        api_base = model_credential.get('api_base')
+        base_url = get_base_url(api_base)
+        return OllamaChatModel(model=model_name, openai_api_base=(base_url + '/v1'),
                                openai_api_key=model_credential.get('api_key'))
 
     def get_dialogue_number(self):
