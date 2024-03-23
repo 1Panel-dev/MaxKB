@@ -358,7 +358,7 @@ default_split_pattern = {
     'md': [re.compile('(?<=^)# .*|(?<=\\n)# .*'), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
            re.compile("(?<!#)#### (?!#).*"), re.compile("(?<!#)##### (?!#).*"),
            re.compile("(?<!#)###### (?!#).*")],
-    'default': [re.compile("(?<!\n)\n\n.+")]
+    'default': [re.compile("(?<!\n)\n\n+")]
 }
 
 
