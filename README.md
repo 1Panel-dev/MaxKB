@@ -10,9 +10,9 @@
 
 MaxKB 是一款基于 LLM 大语言模型的知识库问答系统。   
 
-- **多模型支持**：支持对接主流的大模型，包括本地私有大模型（如 Llama 2）、Azure OpenAI 和百度千帆大模型等；
 - **开箱即用**：支持直接上传文档、自动爬取在线文档，支持文本自动拆分、向量化，智能问答交互体验好；
-- **无缝嵌入**：支持零编码快速嵌入到第三方业务系统。
+- **无缝嵌入**：支持零编码快速嵌入到第三方业务系统；
+- **多模型支持**：支持对接主流的大模型，包括本地私有大模型（如 Llama 2）、Azure OpenAI 和百度千帆大模型等。
 
 ## 快速开始
 
@@ -20,7 +20,7 @@ MaxKB 是一款基于 LLM 大语言模型的知识库问答系统。
 docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1panel/maxkb
 ```
 
-也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama + Llama 2，30 分钟内即可上线基于本地大模型的知识库问答系统。
+也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama + Llama 2，30 分钟内即可上线基于本地大模型的知识库问答系统，并嵌入到第三方业务系统中。
 
 -   [使用手册](https://github.com/1Panel-dev/MaxKB/wiki/1-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2)
 -   [论坛求助](https://bbs.fit2cloud.com/c/mk/11)
