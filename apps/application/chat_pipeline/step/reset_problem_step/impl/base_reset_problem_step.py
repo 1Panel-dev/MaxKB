@@ -28,8 +28,10 @@ class BaseResetProblemStep(IResetProblemStep):
                            range(start_index if start_index > 0 else 0, len(history_chat_record))]
         message_list = [*flat_map(history_message),
                         HumanMessage(content=prompt.format(**{'question': problem_text}))]
-        response = chat_model(message_list)
-        padding_problem = response.content[response.content.index('<data>') + 6:response.content.index('</data>')]
+        response = chat_model.invoke(message_list)
+        padding_problem = problem_text
+        if response.content.__contains__("<data>") and response.content.__contains__('</data>'):
+            padding_problem = response.content[response.content.index('<data>') + 6:response.content.index('</data>')]
         self.context['message_tokens'] = chat_model.get_num_tokens_from_messages(message_list)
         self.context['answer_tokens'] = chat_model.get_num_tokens(padding_problem)
         return padding_problem
