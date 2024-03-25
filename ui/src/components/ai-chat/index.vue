@@ -141,9 +141,9 @@
         <el-input
           ref="quickInputRef"
           v-model="inputValue"
-          type="textarea"
           placeholder="请输入"
-          :autosize="{ minRows: 1, maxRows: 8 }"
+          :rows="1"
+          type="textarea"
           @keydown.enter="sendChatHandle($event)"
         />
         <div class="operate">
@@ -557,6 +557,7 @@ watch(
   box-sizing: border-box;
   position: relative;
   color: var(--app-text-color);
+  box-sizing: border-box;
   &.chart-log {
     .ai-chat__content {
       padding-bottom: 0;
@@ -637,6 +638,7 @@ watch(
         box-shadow: none;
         resize: none;
         padding: 12px 16px;
+        box-sizing: border-box;
       }
       .operate {
         padding: 6px 10px;
