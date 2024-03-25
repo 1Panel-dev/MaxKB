@@ -6,6 +6,7 @@ from functools import reduce
 from typing import List, Set
 from urllib.parse import urljoin, urlparse, ParseResult, urlsplit
 
+import chardet
 import html2text as ht
 import requests
 from bs4 import BeautifulSoup
@@ -121,7 +122,7 @@ class Fork:
 
     @staticmethod
     def get_beautiful_soup(response):
-        encoding = response.apparent_encoding if response.apparent_encoding is not None else 'utf-8'
+        encoding = response.encoding if response.encoding and response.encoding != 'ISO-8859-1' is not None else response.apparent_encoding
         html_content = response.content.decode(encoding)
         return BeautifulSoup(html_content, "html.parser")
 
