@@ -357,7 +357,7 @@ class SplitModel:
 default_split_pattern = {
     'md': [re.compile('(?<=^)# .*|(?<=\\n)# .*'), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
            re.compile("(?<!#)#### (?!#).*"), re.compile("(?<!#)##### (?!#).*"),
-           re.compile("(?<!#)###### (?!#).*")],
+           re.compile("(?<!#)###### (?!#).*"), re.compile("(?<!\n)\n\n+")],
     'default': [re.compile("(?<!\n)\n\n+")]
 }
 
@@ -374,7 +374,7 @@ def get_split_model(filename: str, with_filter: bool = False, limit: int = 4096)
         pattern_list = default_split_pattern.get('md')
         return SplitModel(pattern_list, with_filter=with_filter, limit=limit)
 
-    pattern_list = default_split_pattern.get('default')
+    pattern_list = default_split_pattern.get('md')
     return SplitModel(pattern_list, with_filter=with_filter, limit=limit)
 
 

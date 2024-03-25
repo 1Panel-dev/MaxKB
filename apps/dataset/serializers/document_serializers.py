@@ -32,6 +32,7 @@ from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type,
 from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
+import chardet
 
 
 class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
@@ -599,7 +600,7 @@ def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):
     else:
         split_model = get_split_model(file.name, with_filter=with_filter, limit=limit)
     try:
-        content = data.decode('utf-8')
+        content = data.decode(chardet.detect(data)['encoding'])
     except BaseException as e:
         return {'name': file.name,
                 'content': []}
