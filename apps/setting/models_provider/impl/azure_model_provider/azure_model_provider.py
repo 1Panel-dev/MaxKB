@@ -121,8 +121,8 @@ class AzureModelProvider(IModelProvider):
         model_info: ModelInfo = model_dict.get(model_name)
         azure_chat_open_ai = AzureChatOpenAI(
             openai_api_base=model_credential.get('api_base'),
-            openai_api_version=model_credential.get(
-                'api_version') if 'api_version' in model_credential else model_info.api_version,
+            openai_api_version=model_info.api_version if model_name in model_dict else model_credential.get(
+                'api_version'),
             deployment_name=model_credential.get('deployment_name'),
             openai_api_key=model_credential.get('api_key'),
             openai_api_type="azure"
