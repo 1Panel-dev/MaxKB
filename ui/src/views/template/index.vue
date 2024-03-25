@@ -49,7 +49,12 @@
                     v-for="(model, i) in row"
                     :key="i"
                   >
-                    <ModelCard @change="list_model" :model="model" :provider_list="provider_list">
+                    <ModelCard
+                      @change="list_model"
+                      :updateModelById="updateModelById"
+                      :model="model"
+                      :provider_list="provider_list"
+                    >
                     </ModelCard>
                   </el-col>
                 </template>
@@ -99,6 +104,13 @@ const provider_list = ref<Array<Provider>>([])
 
 const model_list = ref<Array<Model>>([])
 
+const updateModelById = (model_id: string, model: Model) => {
+  model_list.value
+    .filter((m) => (m.id = model_id))
+    .forEach((m) => {
+      m.status = model.status
+    })
+}
 const model_split_list = computed(() => {
   return splitArray(model_list.value, 2)
 })

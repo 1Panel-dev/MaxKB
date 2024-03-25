@@ -62,11 +62,12 @@ import type { Provider, Model } from '@/api/type/model'
 import ModelApi from '@/api/model'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/template/component/EditModel.vue'
-import {  MsgConfirm } from '@/utils/message'
+import { MsgConfirm } from '@/utils/message'
 
 const props = defineProps<{
   model: Model
   provider_list: Array<Provider>
+  updateModelById: (model_id: string, model: Model) => void
 }>()
 const downModel = ref<Model>()
 
@@ -85,7 +86,7 @@ const errMessage = computed(() => {
     }
     return currentModel.value.meta.message
   }
-  return ""
+  return ''
 })
 const progress = computed(() => {
   if (currentModel.value) {
@@ -93,19 +94,22 @@ const progress = computed(() => {
     if (down_model_chunk) {
       const maxObj = down_model_chunk
         .filter((chunk: any) => chunk.index > 1)
-        .reduce((prev: any, current: any) => {
-          return (prev.index || 0) > (current.index || 0) ? prev : current
-        },{progress:0})
-      if(maxObj){
+        .reduce(
+          (prev: any, current: any) => {
+            return (prev.index || 0) > (current.index || 0) ? prev : current
+          },
+          { progress: 0 }
+        )
+      if (maxObj) {
         return parseFloat(maxObj.progress?.toFixed(1))
       }
-     return 0
+      return 0
     }
     return 0
   }
   return 0
 })
-const emit = defineEmits(['change'])
+const emit = defineEmits(['change', 'update:model'])
 const eidtModelRef = ref<InstanceType<typeof EditModel>>()
 let interval: any
 const deleteModel = () => {
@@ -139,11 +143,15 @@ const initInterval = () => {
       ModelApi.getModelMetaById(props.model.id).then((ok) => {
         downModel.value = ok.data
       })
-    }else{
-      downModel.value=undefined
+    } else {
+      if (downModel.value) {
+        props.updateModelById(props.model.id, downModel.value)
+        downModel.value = undefined
+      }
     }
   }, 6000)
 }
+
 /**
  * 关闭轮询
  */
