@@ -35,10 +35,10 @@ ARG DOCKER_IMAGE_TAG=dev \
     GITHUB_COMMIT
 
 ENV MAXKB_VERSION ${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_COMMIT})
-
+WORKDIR /opt/maxkb/app
+COPY --from=stage-build /opt/maxkb /opt/maxkb
 COPY --from=stage-build /opt/py3 /opt/py3
 COPY --from=web-build ui /opt/maxkb/app/ui
-COPY --from=stage-build /opt/maxkb /opt/maxkb
 COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb/app/model
 
 ENV LANG=en_US.UTF-8 \
