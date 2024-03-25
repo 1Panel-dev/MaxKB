@@ -1,4 +1,10 @@
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 as vector-model
+FROM node:18-bookworm-slim as web-build
+COPY ui ui
+RUN cd ui && \
+    npm install && \
+    npm run build && \
+    rm -rf ./node_modules
 FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11-pg15.6 as stage-build
 
 ARG DEPENDENCIES="                    \
@@ -13,7 +19,7 @@ COPY . /opt/maxkb/app
 RUN mkdir -p /opt/maxkb/app /opt/maxkb/model /opt/maxkb/conf && \
     cp -f /opt/maxkb/app/installer/config.yaml /opt/maxkb/conf && \
     rm -rf /opt/maxkb/app/ui
-
+COPY --from=web-build ui /opt/maxkb/app/ui
 WORKDIR /opt/maxkb/app
 RUN python3 -m venv /opt/py3 && \
     pip install poetry --break-system-packages && \
@@ -21,13 +27,6 @@ RUN python3 -m venv /opt/py3 && \
     . /opt/py3/bin/activate && \
     if [ "$(uname -m)" != "x86_64" ]; then sed -i '/^torch/d' pyproject.toml; fi && \
     poetry install
-
-FROM node:18-bookworm-slim as web-build
-COPY ui ui
-RUN cd ui && \
-    npm install && \
-    npm run build && \
-    rm -rf ./node_modules
 
 FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11-pg15.6
 ARG DOCKER_IMAGE_TAG=dev \
@@ -38,7 +37,6 @@ ENV MAXKB_VERSION ${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_CO
 WORKDIR /opt/maxkb/app
 COPY --from=stage-build /opt/maxkb /opt/maxkb
 COPY --from=stage-build /opt/py3 /opt/py3
-COPY --from=web-build ui /opt/maxkb/app/ui
 COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb/app/model
 
 ENV LANG=en_US.UTF-8 \
