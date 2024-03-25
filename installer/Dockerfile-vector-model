@@ -1,6 +1,10 @@
-FROM python:3.11-slim
+FROM python:3.11-slim-bookworm as vector-model
+
 COPY installer/install_model.py install_model.py
 RUN pip3 install --upgrade pip setuptools && \
     pip install pycrawlers && \
     pip install transformers && \
     python3 install_model.py
+
+FROM scratch
+COPY --from=vector-model model /opt/maxkb/app/model
