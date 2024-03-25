@@ -553,6 +553,7 @@ class UserManageSerializer(serializers.Serializer):
             if email_or_username is not None:
                 query_set = query_set.filter(
                     Q(username__contains=email_or_username) | Q(email__contains=email_or_username))
+            query_set = query_set.order_by("-create_time")
             return query_set
 
         def list(self, with_valid=True):
