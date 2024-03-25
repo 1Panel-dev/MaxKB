@@ -505,7 +505,7 @@ class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):
                 'phone': openapi.Schema(type=openapi.TYPE_STRING, title="手机号", description="手机号"),
                 'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否激活", description="是否激活"),
                 'role': openapi.Schema(type=openapi.TYPE_STRING, title="角色", description="角色"),
-                'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="昵称", description="昵称"),
+                'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="姓名", description="姓名"),
                 'create_time': openapi.Schema(type=openapi.TYPE_STRING, title="创建时间", description="修改时间"),
                 'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间", description="修改时间")
             }
@@ -589,7 +589,7 @@ class UserManageSerializer(serializers.Serializer):
                                              "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~()-+=]{6,20}$")
                                              , message="密码长度6-20个字符，必须字母、数字、特殊字符组合")])
 
-        nick_name = serializers.CharField(required=False, error_messages=ErrMessage.char("昵称"), max_length=56,
+        nick_name = serializers.CharField(required=False, error_messages=ErrMessage.char("姓名"), max_length=64,
                                           allow_null=True, allow_blank=True)
         phone = serializers.CharField(required=False, error_messages=ErrMessage.char("手机号"), max_length=20,
                                       allow_null=True, allow_blank=True)
@@ -615,7 +615,7 @@ class UserManageSerializer(serializers.Serializer):
                     'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址"),
                     'password': openapi.Schema(type=openapi.TYPE_STRING, title="密码", description="密码"),
                     'phone': openapi.Schema(type=openapi.TYPE_STRING, title="手机号", description="手机号"),
-                    'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="昵称", description="昵称")
+                    'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="姓名", description="姓名")
                 }
             )
 
@@ -626,7 +626,7 @@ class UserManageSerializer(serializers.Serializer):
             validators=[validators.EmailValidator(message=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.message,
                                                   code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
 
-        nick_name = serializers.CharField(required=False, error_messages=ErrMessage.char("昵称"), max_length=56,
+        nick_name = serializers.CharField(required=False, error_messages=ErrMessage.char("姓名"), max_length=64,
                                           allow_null=True, allow_blank=True)
         phone = serializers.CharField(required=False, error_messages=ErrMessage.char("手机号"), max_length=20,
                                       allow_null=True, allow_blank=True)
@@ -643,7 +643,7 @@ class UserManageSerializer(serializers.Serializer):
                 type=openapi.TYPE_OBJECT,
                 properties={
                     'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱"),
-                    'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="昵称", description="昵称"),
+                    'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="姓名", description="姓名"),
                     'phone': openapi.Schema(type=openapi.TYPE_STRING, title="手机号", description="手机号"),
                     'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
                 }
