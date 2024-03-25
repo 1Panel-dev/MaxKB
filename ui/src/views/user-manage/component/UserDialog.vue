@@ -8,12 +8,13 @@
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item prop="username" label="用户名">
+      <el-form-item :prop="isEdit ? '' : 'username'" label="用户名">
         <el-input
           v-model="userForm.username"
           placeholder="请输入用户名"
           maxlength="20"
           show-word-limit
+          :disabled="isEdit"
         >
         </el-input>
       </el-form-item>
