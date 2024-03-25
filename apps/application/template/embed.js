@@ -201,7 +201,7 @@ function initMaxkbStyle(root){
       text-align: right;
       margin-top: 24px;
   }
-  #maxkb .maxkb-tips .maxkb-button maxkb-button {
+  #maxkb .maxkb-tips .maxkb-button button {
       border-radius: 4px;
       background: #FFF;
       padding: 3px 12px;
