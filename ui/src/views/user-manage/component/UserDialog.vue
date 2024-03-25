@@ -118,7 +118,12 @@ watch(dialogVisible, (bool) => {
 
 const open = (data: any) => {
   if (data) {
-    userForm.value = cloneDeep(data)
+    userForm.value['id'] = data.id
+    userForm.value.username = data.username
+    userForm.value.email = data.email
+    userForm.value.password = data.password
+    userForm.value.phone = data.phone
+    userForm.value.nick_name = data.nick_name
     isEdit.value = true
   }
   dialogVisible.value = true
