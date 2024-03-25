@@ -9,8 +9,9 @@
 import os
 from typing import Dict
 
-from langchain_community.chat_models import QianfanChatEndpoint
 from langchain.schema import HumanMessage
+from langchain_community.chat_models import QianfanChatEndpoint
+from qianfan import ChatCompletion
 
 from common import froms
 from common.exception.app_exception import AppApiException
@@ -27,10 +28,9 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
         model_type_list = WenxinModelProvider().get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
-
-        if model_name not in model_dict:
-            raise AppApiException(ValidCode.valid_error.value, f'{model_name} 模型名称不支持')
-
+        model_info = [model.lower() for model in ChatCompletion.models()]
+        if not model_info.__contains__(model_name.lower()):
+            raise AppApiException(ValidCode.valid_error.value, f'{model_name} 模型不支持')
         for key in ['api_key', 'secret_key']:
             if key not in model_credential:
                 if raise_exception:
@@ -39,10 +39,9 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             WenxinModelProvider().get_model(model_type, model_name, model_credential).invoke(
-                [HumanMessage(content='valid')])
+                [HumanMessage(content='你好')])
         except Exception as e:
-            if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value, "校验失败,请检查 api_key secret_key 是否正确")
+            raise e
         return True
 
     def encryption_dict(self, model_info: Dict[str, object]):
@@ -121,7 +120,7 @@ class WenxinModelProvider(IModelProvider):
     def get_model_credential(self, model_type, model_name):
         if model_name in model_dict:
             return model_dict.get(model_name).model_credential
-        raise AppApiException(500, f'不支持的模型:{model_name}')
+        return win_xin_llm_model_credential
 
     def get_model_provide_info(self):
         return ModelProvideInfo(provider='model_wenxin_provider', name='千帆大模型', icon=get_file_content(
