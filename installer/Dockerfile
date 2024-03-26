@@ -1,5 +1,5 @@
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 as vector-model
-FROM node:18-bookworm-slim as web-build
+FROM node:18-alpine3.18 as web-build
 COPY ui ui
 RUN cd ui && \
     npm install && \
