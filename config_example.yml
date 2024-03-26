@@ -1,4 +1,4 @@
-# 数据库配置
+# 邮箱配置
 EMAIL_ADDRESS:
 EMAIL_USE_TLS: False
 EMAIL_USE_SSL: True
