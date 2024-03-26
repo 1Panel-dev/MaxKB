@@ -41,7 +41,7 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
                          max_paragraph_char_number: int,
                          paragraph_list: List[ParagraphPipelineModel]):
         if paragraph_list is None or len(paragraph_list) == 0:
-            return HumanMessage(content=problem)
+            return HumanMessage(content=prompt.format(**{'data': "<data></data>", 'question': problem}))
         temp_data = ""
         data_list = []
         for p in paragraph_list:

@@ -1,5 +1,5 @@
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 as vector-model
-FROM node:18-bookworm-slim as web-build
+FROM node:18-alpine3.18 as web-build
 COPY ui ui
 RUN cd ui && \
     npm install && \
@@ -25,7 +25,7 @@ RUN python3 -m venv /opt/py3 && \
     pip install poetry --break-system-packages && \
     poetry config virtualenvs.create false && \
     . /opt/py3/bin/activate && \
-    if [ "$(uname -m)" != "x86_64" ]; then sed -i '/^torch/d' pyproject.toml; fi && \
+    if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "^2.2.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
     poetry install
 
 FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11-pg15.6

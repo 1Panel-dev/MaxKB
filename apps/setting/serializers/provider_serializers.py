@@ -28,25 +28,30 @@ class ModelPullManage:
 
     @staticmethod
     def pull(model: Model, credential: Dict):
-        response = ModelProvideConstants[model.provider].value.down_model(model.model_type, model.model_name,
-                                                                          credential)
-        down_model_chunk = {}
-        timestamp = time.time()
-        for chunk in response:
-            down_model_chunk[chunk.digest] = chunk.to_dict()
-            if time.time() - timestamp > 5:
-                QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": list(down_model_chunk.values())})
-                timestamp = time.time()
-        status = Status.ERROR
-        message = ""
-        down_model_chunk_list = list(down_model_chunk.values())
-        for chunk in down_model_chunk_list:
-            if chunk.get('status') == DownModelChunkStatus.success.value:
-                status = Status.SUCCESS
-            if chunk.get('status') == DownModelChunkStatus.error.value:
-                message = chunk.get("digest")
-        QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": [], "message": message},
-                                                   status=status)
+        try:
+            response = ModelProvideConstants[model.provider].value.down_model(model.model_type, model.model_name,
+                                                                              credential)
+            down_model_chunk = {}
+            timestamp = time.time()
+            for chunk in response:
+                down_model_chunk[chunk.digest] = chunk.to_dict()
+                if time.time() - timestamp > 5:
+                    QuerySet(Model).filter(id=model.id).update(
+                        meta={"down_model_chunk": list(down_model_chunk.values())})
+                    timestamp = time.time()
+            status = Status.ERROR
+            message = ""
+            down_model_chunk_list = list(down_model_chunk.values())
+            for chunk in down_model_chunk_list:
+                if chunk.get('status') == DownModelChunkStatus.success.value:
+                    status = Status.SUCCESS
+                if chunk.get('status') == DownModelChunkStatus.error.value:
+                    message = chunk.get("digest")
+            QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": [], "message": message},
+                                                       status=status)
+        except Exception as e:
+            QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": [], "message": str(e)},
+                                                       status=Status.ERROR)
 
 
 class ModelSerializer(serializers.Serializer):
@@ -81,7 +86,7 @@ class ModelSerializer(serializers.Serializer):
             return [
                 {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
                  'model_name': model.model_name, 'status': model.status, 'meta': model.meta} for model in
-                model_query_set.filter(**query_params)]
+                model_query_set.filter(**query_params).order_by("-create_time")]
 
     class Edit(serializers.Serializer):
         user_id = serializers.CharField(required=False, error_messages=ErrMessage.uuid("用户id"))
