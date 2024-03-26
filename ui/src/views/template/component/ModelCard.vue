@@ -29,12 +29,18 @@
     </div>
     <!-- progress -->
     <div class="progress-mask" v-if="currentModel.status === 'DOWNLOAD'">
-      <el-progress type="dashboard" :percentage="progress" class="percentage">
+      <el-progress
+        type="circle"
+        :width="56"
+        color="#3370ff"
+        :percentage="progress"
+        class="percentage"
+      >
         <template #default="{ percentage }">
           <span class="percentage-value">{{ percentage }}%</span>
-          <span class="percentage-label">正在下载 <span class="dotting"></span></span>
         </template>
       </el-progress>
+      <span class="percentage-label">正在下载 <span class="dotting"></span></span>
     </div>
 
     <template #mouseEnter>
@@ -144,10 +150,7 @@ const initInterval = () => {
         downModel.value = ok.data
       })
     } else {
-      if (downModel.value) {
-        props.updateModelById(props.model.id, downModel.value)
-        downModel.value = undefined
-      }
+      downModel.value = undefined
     }
   }, 6000)
 }
@@ -185,28 +188,27 @@ onBeforeUnmount(() => {
     position: absolute;
     top: 0;
     left: 0;
-    background-color: rgba(122, 122, 122, 0.8);
+    background-color: rgba(255, 255, 255, 0.9);
     width: 100%;
     height: 100%;
-    z-index: 111;
+    z-index: 99;
     text-align: center;
     .percentage {
       top: 50%;
-      transform: translateY(-50%);
-      margin-top: 5px;
+      transform: translateY(-65%);
     }
 
     .percentage-value {
       display: block;
-      margin-top: 10px;
-      font-size: 28px;
-      color: #ffffff;
+      font-size: 12px;
+      color: var(--el-color-primary);
     }
     .percentage-label {
       display: block;
-      margin-top: 10px;
+      margin-top: 45px;
+      margin-left: 10px;
       font-size: 12px;
-      color: #ffffff;
+      color: var(--el-color-primary);
     }
   }
 }
