@@ -81,7 +81,7 @@ class ModelSerializer(serializers.Serializer):
             return [
                 {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
                  'model_name': model.model_name, 'status': model.status, 'meta': model.meta} for model in
-                model_query_set.filter(**query_params)]
+                model_query_set.filter(**query_params).order_by("-create_time")]
 
     class Edit(serializers.Serializer):
         user_id = serializers.CharField(required=False, error_messages=ErrMessage.uuid("用户id"))
