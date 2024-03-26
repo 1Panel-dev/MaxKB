@@ -8,7 +8,8 @@
 *.factorypath
 
 # IntelliJ IDEA
-.idea
+.idea/*
+!.idea/icon.png
 *.iws
 *.iml
 *.ipr
@@ -178,6 +179,5 @@ ui/dist
 apps/static
 models/
 data
-.idea
 .dev
 poetry.lock
