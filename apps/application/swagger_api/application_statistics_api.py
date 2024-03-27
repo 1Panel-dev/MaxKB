@@ -32,13 +32,13 @@ class ApplicationStatisticsApi(ApiMixin):
         def get_response_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['star_num', 'trample_num', 'tokens_sum', 'chat_record_count'],
+                required=['star_num', 'trample_num', 'tokens_num', 'chat_record_count'],
                 properties={
                     'star_num': openapi.Schema(type=openapi.TYPE_NUMBER, title="点赞数量",
                                                description="点赞数量"),
 
                     'trample_num': openapi.Schema(type=openapi.TYPE_NUMBER, title="点踩数量", description="点踩数量"),
-                    'tokens_sum': openapi.Schema(type=openapi.TYPE_NUMBER, title="token使用数量",
+                    'tokens_num': openapi.Schema(type=openapi.TYPE_NUMBER, title="token使用数量",
                                                  description="token使用数量"),
                     'chat_record_count': openapi.Schema(type=openapi.TYPE_NUMBER, title="对话次数",
                                                         description="对话次数"),
