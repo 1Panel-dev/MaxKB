@@ -44,7 +44,7 @@ class PostResponseHandler:
     @abstractmethod
     def handler(self, chat_id, chat_record_id, paragraph_list: List[ParagraphPipelineModel], problem_text: str,
                 answer_text,
-                manage, step, padding_problem_text: str = None, **kwargs):
+                manage, step, padding_problem_text: str = None, client_id=None, **kwargs):
         pass
 
 

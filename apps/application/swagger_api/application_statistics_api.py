@@ -19,12 +19,16 @@ class ApplicationStatisticsApi(ApiMixin):
                                   type=openapi.TYPE_STRING,
                                   required=True,
                                   description='应用id'),
-                openapi.Parameter(name='history_day',
+                openapi.Parameter(name='start_time',
                                   in_=openapi.IN_QUERY,
-                                  type=openapi.TYPE_NUMBER,
+                                  type=openapi.TYPE_STRING,
                                   required=True,
-                                  description='历史天数'),
-
+                                  description='开始时间'),
+                openapi.Parameter(name='end_time',
+                                  in_=openapi.IN_QUERY,
+                                  type=openapi.TYPE_STRING,
+                                  required=True,
+                                  description='结束时间'),
                 ]
 
     class ChatRecordAggregate(ApiMixin):
@@ -42,6 +46,10 @@ class ApplicationStatisticsApi(ApiMixin):
                                                  description="token使用数量"),
                     'chat_record_count': openapi.Schema(type=openapi.TYPE_NUMBER, title="对话次数",
                                                         description="对话次数"),
+                    'customer_num': openapi.Schema(type=openapi.TYPE_NUMBER, title="客户数量",
+                                                   description="客户数量"),
+                    'customer_added_count': openapi.Schema(type=openapi.TYPE_NUMBER, title="客户新增数量",
+                                                           description="客户新增数量"),
                     'day': openapi.Schema(type=openapi.TYPE_STRING,
                                           title="日期",
                                           description="日期,只有查询趋势的时候才有该字段"),

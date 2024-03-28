@@ -67,7 +67,7 @@ def event_content(response,
         manage.context['message_tokens'] = manage.context['message_tokens'] + request_token
         manage.context['answer_tokens'] = manage.context['answer_tokens'] + response_token
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
-                                      all_text, manage, step, padding_problem_text)
+                                      all_text, manage, step, padding_problem_text, client_id)
         yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
                                      'content': '', 'is_end': True}) + "\n\n"
         add_access_num(client_id, client_type)
@@ -172,7 +172,7 @@ class BaseChatStep(IChatStep):
         manage.context['message_tokens'] = manage.context['message_tokens'] + request_token
         manage.context['answer_tokens'] = manage.context['answer_tokens'] + response_token
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
-                                      chat_result.content, manage, self, padding_problem_text)
+                                      chat_result.content, manage, self, padding_problem_text, client_id)
         add_access_num(client_id, client_type)
         return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
                                'content': chat_result.content, 'is_end': True})

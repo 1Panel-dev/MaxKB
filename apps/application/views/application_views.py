@@ -47,8 +47,11 @@ class ApplicationStatistics(APIView):
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationStatisticsSerializer(data={'application_id': application_id,
-                                                      'history_day': request.query_params.get(
-                                                          'history_day')}).get_customer_count())
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_customer_count())
 
     class CustomerCountTrend(APIView):
         authentication_classes = [TokenAuth]
@@ -68,8 +71,11 @@ class ApplicationStatistics(APIView):
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationStatisticsSerializer(data={'application_id': application_id,
-                                                      'history_day': request.query_params.get(
-                                                          'history_day')}).get_customer_count_trend())
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_customer_count_trend())
 
     class ChatRecordAggregate(APIView):
         authentication_classes = [TokenAuth]
@@ -90,8 +96,11 @@ class ApplicationStatistics(APIView):
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationStatisticsSerializer(data={'application_id': application_id,
-                                                      'history_day': request.query_params.get(
-                                                          'history_day')}).get_chat_record_aggregate())
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_chat_record_aggregate())
 
     class ChatRecordAggregateTrend(APIView):
         authentication_classes = [TokenAuth]
@@ -112,8 +121,11 @@ class ApplicationStatistics(APIView):
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationStatisticsSerializer(data={'application_id': application_id,
-                                                      'history_day': request.query_params.get(
-                                                          'history_day')}).get_chat_record_aggregate_trend())
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_chat_record_aggregate_trend())
 
 
 class Application(APIView):
