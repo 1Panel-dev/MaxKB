@@ -196,11 +196,21 @@ function getAppStatistics() {
 }
 
 function refreshAccessToken() {
-  const obj = {
-    access_token_reset: true
-  }
-  const str = '刷新成功'
-  updateAccessToken(obj, str)
+  MsgConfirm(
+    `是否重新生成公共访问链接?`,
+    `重新生成公共访问链接会影响嵌入第三方脚本变更，需要将新脚本重新嵌入第三方，请谨慎操作！`,
+    {
+      confirmButtonText: '确认'
+    }
+  )
+    .then(() => {
+      const obj = {
+        access_token_reset: true
+      }
+      const str = '刷新成功'
+      updateAccessToken(obj, str)
+    })
+    .catch(() => {})
 }
 function changeState(bool: Boolean) {
   const obj = {

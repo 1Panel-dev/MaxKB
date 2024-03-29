@@ -285,7 +285,7 @@ function sendChatHandle(event: any) {
   if (!event.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
     event.preventDefault()
-    if (!isDisabledChart.value && !loading.value) {
+    if (!isDisabledChart.value && !loading.value&&!event.isComposing) {
       chatMessage()
     }
   } else {
