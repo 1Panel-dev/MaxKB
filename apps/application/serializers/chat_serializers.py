@@ -32,7 +32,7 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from common.util.rsa_util import decrypt
-from dataset.models import Document, Problem, Paragraph
+from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -405,12 +405,17 @@ class ChatRecordSerializer(serializers.Serializer):
                                   dataset_id=dataset_id,
                                   title=instance.get("title") if 'title' in instance else '')
 
-            problem = Problem(id=uuid.uuid1(), content=chat_record.problem_text, paragraph_id=paragraph.id,
-                              document_id=document_id, dataset_id=dataset_id)
+            problem = Problem(id=uuid.uuid1(), content=chat_record.problem_text, dataset_id=dataset_id)
+            problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid1(), dataset_id=dataset_id,
+                                                                document_id=document_id,
+                                                                problem_id=problem.id,
+                                                                paragraph_id=paragraph.id)
             # 插入问题
             problem.save()
             # 插入段落
             paragraph.save()
+            # 插入关联问题
+            problem_paragraph_mapping.save()
             chat_record.improve_paragraph_id_list.append(paragraph.id)
             # 添加标注
             chat_record.save()
