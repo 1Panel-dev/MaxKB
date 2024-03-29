@@ -16,7 +16,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        accept=".txt, .md, .csv, .log"
+        accept=".txt, .md, .csv, .log, .doc, .docx, .pdf"
         :limit="50"
         :on-exceed="onExceed"
       >
