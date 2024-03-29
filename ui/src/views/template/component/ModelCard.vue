@@ -150,7 +150,10 @@ const initInterval = () => {
         downModel.value = ok.data
       })
     } else {
-      downModel.value = undefined
+      if (downModel.value) {
+        props.updateModelById(props.model.id, downModel.value)
+        downModel.value = undefined
+      }
     }
   }, 6000)
 }
