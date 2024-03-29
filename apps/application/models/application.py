@@ -69,6 +69,7 @@ class Chat(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     abstract = models.CharField(max_length=256, verbose_name="摘要")
+    client_id = models.UUIDField(verbose_name="客户端id", default=None, null=True)
 
     class Meta:
         db_table = "application_chat"
