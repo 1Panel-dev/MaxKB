@@ -94,6 +94,7 @@ def convert_to_down_model_chunk(row_str: str, chunk_index: int):
         if row.get('status') == 'success':
             status = DownModelChunkStatus.success
         if row.get('status').__contains__("pulling"):
+            progress = 0
             status = DownModelChunkStatus.pulling
             if 'total' in row and 'completed' in row:
                 progress = (row.get('completed') / row.get('total') * 100)
