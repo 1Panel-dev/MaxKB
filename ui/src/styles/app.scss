@@ -105,6 +105,9 @@ h4 {
 .h-full {
   height: 100%;
 }
+.w-120 {
+  width: 120px;
+}
 .w-240 {
   width: 240px;
 }
@@ -204,6 +207,10 @@ h4 {
 
 .align-center {
   align-items: center;
+}
+
+.align-baseline {
+  align-items: baseline;
 }
 
 .text-left {
@@ -424,9 +431,13 @@ h4 {
   color: var(--el-color-info);
 }
 
+.color-secondary {
+  color: var(--app-text-color-secondary);
+}
+
 .app-warning-icon {
   font-size: 16px;
-  color: #646a73;
+  color: var(--app-text-color-secondary);
 }
 
 .dotting {

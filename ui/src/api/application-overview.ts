@@ -55,9 +55,22 @@ const putAPIKey: (
   return put(`${prefix}/${applicaiton_id}/api_key/${api_key_id}`, data, undefined, loading)
 }
 
+/**
+ * 统计
+ * @param 参数 applicaiton_id, data
+ */
+const getStatistics: (
+  applicaiton_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (applicaiton_id, data, loading) => {
+  return get(`${prefix}/${applicaiton_id}/statistics/chat_record_aggregate_trend`, data, loading)
+}
+
 export default {
   getAPIKey,
   postAPIKey,
   delAPIKey,
-  putAPIKey
+  putAPIKey,
+  getStatistics
 }
