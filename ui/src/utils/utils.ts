@@ -64,3 +64,15 @@ export function isAllPropertiesEmpty(obj: object) {
       value === null || typeof value === 'undefined' || (typeof value === 'string' && !value)
   )
 }
+
+// 数组对象中某一属性值的集合
+export function getAttrsArray(array, attr) {
+  return array.map((item) => {
+    return item[attr]
+  })
+}
+
+// 求和
+export function getSum(array) {
+  return array.reduce((totol, item) => totol + item, 0)
+}

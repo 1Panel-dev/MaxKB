@@ -86,3 +86,12 @@ class ErrMessage:
             'required': gettext_lazy('【%s】此字段必填。' % field),
             'null': gettext_lazy('【%s】此字段不能为null。' % field),
         }
+
+    @staticmethod
+    def date(field: str):
+        return {
+            'required': gettext_lazy('【%s】此字段必填。' % field),
+            'null': gettext_lazy('【%s】此字段不能为null。' % field),
+            'invalid': gettext_lazy('【%s】日期格式错误。请改用以下格式之一: {format}。'),
+            'datetime': gettext_lazy('【%s】应为日期，但得到的是日期时间。')
+        }

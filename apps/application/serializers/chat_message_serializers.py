@@ -87,13 +87,14 @@ class ChatInfo:
                 'exclude_paragraph_id_list': exclude_paragraph_id_list, 'stream': stream, 'client_id': client_id,
                 'client_type': client_type}
 
-    def append_chat_record(self, chat_record: ChatRecord):
+    def append_chat_record(self, chat_record: ChatRecord, client_id=None):
         # 存入缓存中
         self.chat_record_list.append(chat_record)
         if self.application.id is not None:
             # 插入数据库
             if not QuerySet(Chat).filter(id=self.chat_id).exists():
-                Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text).save()
+                Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text,
+                     client_id=client_id).save()
             # 插入会话记录
             chat_record.save()
 
@@ -110,6 +111,7 @@ def get_post_handler(chat_info: ChatInfo):
                     manage: PiplineManage,
                     step: BaseChatStep,
                     padding_problem_text: str = None,
+                    client_id=None,
                     **kwargs):
             chat_record = ChatRecord(id=chat_record_id,
                                      chat_id=chat_id,
@@ -120,7 +122,7 @@ def get_post_handler(chat_info: ChatInfo):
                                      answer_tokens=manage.context['answer_tokens'],
                                      run_time=manage.context['run_time'],
                                      index=len(chat_info.chat_record_list) + 1)
-            chat_info.append_chat_record(chat_record)
+            chat_info.append_chat_record(chat_record, client_id)
             # 重新设置缓存
             chat_cache.set(chat_id,
                            chat_info, timeout=60 * 30)

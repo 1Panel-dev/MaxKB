@@ -14,7 +14,9 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.serializers.application_serializers import ApplicationSerializer
+from application.serializers.application_statistics_serializers import ApplicationStatisticsSerializer
 from application.swagger_api.application_api import ApplicationApi
+from application.swagger_api.application_statistics_api import ApplicationStatisticsApi
 from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import CompareConstants, PermissionConstants, Permission, Group, Operate, \
     ViewPermission, RoleConstants
@@ -23,6 +25,107 @@ from common.response import result
 from common.swagger_api.common_api import CommonApi
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.dataset_serializers import DataSetSerializers
+
+
+class ApplicationStatistics(APIView):
+    class CustomerCount(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=["GET"], detail=False)
+        @swagger_auto_schema(operation_summary="用户统计",
+                             operation_id="用户统计",
+                             tags=["应用/统计"],
+                             manual_parameters=ApplicationStatisticsApi.get_request_params_api(),
+                             responses=result.get_api_response(
+                                 ApplicationStatisticsApi.CustomerCount.get_response_body_api())
+                             )
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationStatisticsSerializer(data={'application_id': application_id,
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_customer_count())
+
+    class CustomerCountTrend(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=["GET"], detail=False)
+        @swagger_auto_schema(operation_summary="用户统计趋势",
+                             operation_id="用户统计趋势",
+                             tags=["应用/统计"],
+                             manual_parameters=ApplicationStatisticsApi.get_request_params_api(),
+                             responses=result.get_api_array_response(
+                                 ApplicationStatisticsApi.CustomerCountTrend.get_response_body_api()))
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationStatisticsSerializer(data={'application_id': application_id,
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_customer_count_trend())
+
+    class ChatRecordAggregate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=["GET"], detail=False)
+        @swagger_auto_schema(operation_summary="对话相关统计",
+                             operation_id="对话相关统计",
+                             tags=["应用/统计"],
+                             manual_parameters=ApplicationStatisticsApi.get_request_params_api(),
+                             responses=result.get_api_response(
+                                 ApplicationStatisticsApi.ChatRecordAggregate.get_response_body_api())
+                             )
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationStatisticsSerializer(data={'application_id': application_id,
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_chat_record_aggregate())
+
+    class ChatRecordAggregateTrend(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=["GET"], detail=False)
+        @swagger_auto_schema(operation_summary="对话相关统计趋势",
+                             operation_id="对话相关统计趋势",
+                             tags=["应用/统计"],
+                             manual_parameters=ApplicationStatisticsApi.get_request_params_api(),
+                             responses=result.get_api_array_response(
+                                 ApplicationStatisticsApi.ChatRecordAggregate.get_response_body_api())
+                             )
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationStatisticsSerializer(data={'application_id': application_id,
+                                                      'start_time': request.query_params.get(
+                                                          'start_time'),
+                                                      'end_time': request.query_params.get(
+                                                          'end_time')
+                                                      }).get_chat_record_aggregate_trend())
 
 
 class Application(APIView):

@@ -1,3 +1,13 @@
+import moment from 'moment'
+
+// 当天日期 YYYY-MM-DD
+export const nowDate = moment().format('YYYY-MM-DD')
+
+// 当前时间的前n天
+export function beforeDay(n) {
+  return moment().subtract(n, 'days').format('YYYY-MM-DD')
+}
+
 const getCheckDate = (timestamp: any) => {
   if (!timestamp) return false
   const dt = new Date(timestamp)
