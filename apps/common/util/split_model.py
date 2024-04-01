@@ -351,8 +351,14 @@ class SplitModel:
 
     @staticmethod
     def filter_title_special_characters(paragraph: Dict):
-        return {**paragraph, 'title': paragraph.get('title').replace("#", '') if 'title' in paragraph else ''}
+        title = paragraph.get('title') if 'title' in paragraph else ''
+        for title_special_characters in title_special_characters_list:
+            title = title.replace(title_special_characters, '')
+        return {**paragraph,
+                'title': title}
 
+
+title_special_characters_list = ['#', '\n', '\r', '\\s']
 
 default_split_pattern = {
     'md': [re.compile('(?<=^)# .*|(?<=\\n)# .*'), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
