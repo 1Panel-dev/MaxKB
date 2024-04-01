@@ -285,7 +285,7 @@ function sendChatHandle(event: any) {
   if (!event.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
     event.preventDefault()
-    if (!isDisabledChart.value && !loading.value&&!event.isComposing) {
+    if (!isDisabledChart.value && !loading.value && !event.isComposing) {
       chatMessage()
     }
   } else {
@@ -418,7 +418,7 @@ const errorWrite = (chat: any, message?: string) => {
   ChatManagement.append(chat.id, message || '抱歉，当前正在维护，无法提供服务，请稍后再试！')
   ChatManagement.close(chat.id)
 }
-function chatMessage(chat?: any, problem?: string) {
+function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
   loading.value = true
   if (!chat) {
     chat = reactive({
@@ -443,9 +443,13 @@ function chatMessage(chat?: any, problem?: string) {
       errorWrite(chat)
     })
   } else {
+    const obj = {
+      message: chat.problem_text,
+      re_chat: re_chat || false
+    }
     // 对话
     applicationApi
-      .postChatMessage(chartOpenId.value, chat.problem_text)
+      .postChatMessage(chartOpenId.value, obj)
       .then((response) => {
         if (response.status === 401) {
           application
@@ -491,7 +495,7 @@ function chatMessage(chat?: any, problem?: string) {
 
 function regenerationChart(item: chatType) {
   inputValue.value = item.problem_text
-  chatMessage()
+  chatMessage(null, '', true)
 }
 
 function getSourceDetail(row: any) {

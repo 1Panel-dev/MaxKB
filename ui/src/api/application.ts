@@ -166,14 +166,12 @@ const getChatOpen: (applicaiton_id: String) => Promise<Result<any>> = (applicait
 }
 /**
  * 对话
- * @param 参数 
+ * @param 参数
  * chat_id: string
- * {
-    "message": "string",
-  }
+ * data
  */
-const postChatMessage: (chat_id: string, message: string) => Promise<any> = (chat_id, message) => {
-  return postStream(`/api${prefix}/chat_message/${chat_id}`, { message })
+const postChatMessage: (chat_id: string, data: any) => Promise<any> = (chat_id, message) => {
+  return postStream(`/api${prefix}/chat_message/${chat_id}`, data)
 }
 
 /**

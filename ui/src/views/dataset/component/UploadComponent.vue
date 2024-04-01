@@ -27,7 +27,7 @@
             <em> 选择文件上传 </em>
           </p>
           <div class="upload__decoration">
-            <p>支持格式：TXT、Markdown，每次最多上传50个文件，每个文件不超过 10MB</p>
+            <p>支持格式：TXT、Markdown、PDF、DOC、DOCX，每次最多上传50个文件，每个文件不超过 10MB</p>
             <p>若使用【高级分段】建议上传前规范文件的分段标识</p>
           </div>
         </div>
