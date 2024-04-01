@@ -66,13 +66,13 @@ export function isAllPropertiesEmpty(obj: object) {
 }
 
 // 数组对象中某一属性值的集合
-export function getAttrsArray(array, attr) {
+export function getAttrsArray(array: Array<any>, attr: string) {
   return array.map((item) => {
     return item[attr]
   })
 }
 
 // 求和
-export function getSum(array) {
+export function getSum(array: Array<any>) {
   return array.reduce((totol, item) => totol + item, 0)
 }

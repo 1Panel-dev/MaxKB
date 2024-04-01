@@ -4,7 +4,7 @@ import moment from 'moment'
 export const nowDate = moment().format('YYYY-MM-DD')
 
 // 当前时间的前n天
-export function beforeDay(n) {
+export function beforeDay(n: number | string) {
   return moment().subtract(n, 'days').format('YYYY-MM-DD')
 }
 
