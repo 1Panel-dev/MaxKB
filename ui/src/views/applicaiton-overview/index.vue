@@ -197,8 +197,8 @@ function getAppStatistics() {
 
 function refreshAccessToken() {
   MsgConfirm(
-    `是否重新生成公共访问链接?`,
-    `重新生成公共访问链接会影响嵌入第三方脚本变更，需要将新脚本重新嵌入第三方，请谨慎操作！`,
+    `是否重新生成公开访问链接?`,
+    `重新生成公开访问链接会影响嵌入第三方脚本变更，需要将新脚本重新嵌入第三方，请谨慎操作！`,
     {
       confirmButtonText: '确认'
     }
