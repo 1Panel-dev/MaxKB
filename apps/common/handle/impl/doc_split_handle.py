@@ -22,11 +22,25 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'), re.compile('(?<!#
 
 
 class DocSplitHandle(BaseSplitHandle):
+    @staticmethod
+    def paragraph_to_md(paragraph):
+        psn = paragraph.style.name
+        if psn.startswith('Heading'):
+            try:
+                return "".join(["#" for i in range(int(psn.replace("Heading ", '')))]) + " " + paragraph.text
+            except Exception as e:
+                return paragraph.text
+        return paragraph.text
+
+    def to_md(self, doc):
+        ps = doc.paragraphs
+        return "\n".join([self.paragraph_to_md(para) for para in ps])
+
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer):
         try:
             buffer = get_buffer(file)
             doc = Document(io.BytesIO(buffer))
-            content = "\n".join([para.text for para in doc.paragraphs])
+            content = self.to_md(doc)
             if pattern_list is not None and len(pattern_list) > 0:
                 split_model = SplitModel(pattern_list, with_filter, limit)
             else:
