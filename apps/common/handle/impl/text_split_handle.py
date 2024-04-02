@@ -9,7 +9,7 @@
 import re
 from typing import List
 
-import chardet
+from charset_normalizer import detect
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.util.split_model import SplitModel
@@ -26,7 +26,7 @@ class TextSplitHandle(BaseSplitHandle):
         file_name: str = file.name.lower()
         if file_name.endswith(".md") or file_name.endswith('.txt'):
             return True
-        result = chardet.detect(buffer)
+        result = detect(buffer)
         if result['encoding'] != 'ascii' and result['confidence'] > 0.5:
             return True
         return False
@@ -38,7 +38,7 @@ class TextSplitHandle(BaseSplitHandle):
         else:
             split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
         try:
-            content = buffer.decode(chardet.detect(buffer)['encoding'])
+            content = buffer.decode(detect(buffer)['encoding'])
         except BaseException as e:
             return {'name': file.name,
                     'content': []}

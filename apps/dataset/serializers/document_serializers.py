@@ -30,12 +30,11 @@ from common.util.common import post
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
-from common.util.split_model import SplitModel, get_split_model
+from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status, ProblemParagraphMapping
 from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
-import chardet
 
 
 class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):

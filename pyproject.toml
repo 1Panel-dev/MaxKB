@@ -30,7 +30,6 @@ html2text = "^2024.2.26"
 langchain-openai = "^0.0.8"
 django-ipware = "^6.0.4"
 django-apscheduler = "^0.6.2"
-chardet2 = "^2.0.3"
 pymupdf = "^1.24.0"
 python-docx = "^1.1.0"
 
