@@ -38,6 +38,15 @@ const exportChatLog: (
   exportExcel(applicantion_name, `${prefix}/${applicaiton_id}/chat/export`, param, loading)
 }
 
+const exportChatLog: (
+  applicaiton_id: string,
+  applicantion_name: string,
+  param: any,
+  loading?: Ref<boolean>
+) => void = (applicaiton_id, applicantion_name, param, loading) => {
+  exportExcel(applicantion_name, `${prefix}/${applicaiton_id}/chat/export`, param, loading)
+}
+
 /**
  * 删除日志
  * @param 参数 applicaiton_id, chat_id,

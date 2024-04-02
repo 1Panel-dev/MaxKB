@@ -209,15 +209,16 @@ class ApplicationSerializer(serializers.Serializer):
             access_token = self.data.get("access_token")
             application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
             if application_access_token is not None and application_access_token.is_active:
-                if token is None or (token_details is not None and 'client_id' not in token_details) or (
-                        token_details is not None and token_details.get(
-                    'access_token') != application_access_token.access_token):
+                if token_details is not None and 'client_id' in token_details and token_details.get(
+                        'client_id') is not None:
+                    client_id = token_details.get('client_id')
+                else:
                     client_id = str(uuid.uuid1())
-                    token = signing.dumps({'application_id': str(application_access_token.application_id),
-                                           'user_id': str(application_access_token.application.user.id),
-                                           'access_token': application_access_token.access_token,
-                                           'type': AuthenticationType.APPLICATION_ACCESS_TOKEN.value,
-                                           'client_id': client_id})
+                token = signing.dumps({'application_id': str(application_access_token.application_id),
+                                       'user_id': str(application_access_token.application.user.id),
+                                       'access_token': application_access_token.access_token,
+                                       'type': AuthenticationType.APPLICATION_ACCESS_TOKEN.value,
+                                       'client_id': client_id})
                 return token
             else:
                 raise NotFound404(404, "无效的access_token")

@@ -4,6 +4,7 @@
 <script lang="ts" setup>
 import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts'
+import { numberFormat } from '@/utils/utils'
 const props = defineProps({
   id: {
     type: String,
@@ -57,12 +58,13 @@ function initChart() {
     },
     tooltip: {
       trigger: 'axis',
-      axisPointer: {
-        type: 'cross',
-        label: {
-          backgroundColor: '#6a7985'
-        }
-      }
+      valueFormatter: (value: any) => numberFormat(value)
+      // axisPointer: {
+      //   type: 'cross',
+      //   label: {
+      //     backgroundColor: '#6a7985'
+      //   }
+      // }
     },
     legend: {
       right: 0,
@@ -88,6 +90,11 @@ function initChart() {
       splitLine: {
         lineStyle: {
           color: '#EFF0F1'
+        }
+      },
+      axisLabel: {
+        formatter: (value: any) => {
+          return numberFormat(value)
         }
       }
     },

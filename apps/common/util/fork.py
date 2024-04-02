@@ -4,9 +4,8 @@ import re
 import traceback
 from functools import reduce
 from typing import List, Set
-from urllib.parse import urljoin, urlparse, ParseResult, urlsplit
+from urllib.parse import urljoin, urlparse, ParseResult, urlsplit, urlunparse
 
-import chardet
 import html2text as ht
 import requests
 from bs4 import BeautifulSoup
@@ -44,6 +43,13 @@ class ForkManage:
                 ForkManage.fork_child(child_link, selector_list, level - 1, exclude_link_url, fork_handler)
 
 
+def remove_fragment(url: str) -> str:
+    parsed_url = urlparse(url)
+    modified_url = ParseResult(scheme=parsed_url.scheme, netloc=parsed_url.netloc, path=parsed_url.path,
+                               params=parsed_url.params, query=parsed_url.query, fragment=None)
+    return urlunparse(modified_url)
+
+
 class Fork:
     class Response:
         def __init__(self, content: str, child_link_list: List[ChildLink], status, message: str):
@@ -61,6 +67,7 @@ class Fork:
             return Fork.Response('', [], 500, message)
 
     def __init__(self, base_fork_url: str, selector_list: List[str]):
+        base_fork_url = remove_fragment(base_fork_url)
         self.base_fork_url = urljoin(base_fork_url if base_fork_url.endswith("/") else base_fork_url + '/', '.')
         parsed = urlsplit(base_fork_url)
         query = parsed.query
@@ -74,9 +81,11 @@ class Fork:
                                     fragment='').geturl()
 
     def get_child_link_list(self, bf: BeautifulSoup):
-        pattern = "^((?!(http:|https:|tel:/|#|mailto:|javascript:))|" + self.base_fork_url + ").*"
+        pattern = "^((?!(http:|https:|tel:/|#|mailto:|javascript:))|" + self.base_fork_url + "|/).*"
         link_list = bf.find_all(name='a', href=re.compile(pattern))
-        result = [ChildLink(link.get('href'), link) for link in link_list]
+        result = [ChildLink(link.get('href'), link) if link.get('href').startswith(self.base_url) else ChildLink(
+            self.base_url + link.get('href'), link) for link in link_list]
+        result = [row for row in result if row.url.startswith(self.base_fork_url)]
         return result
 
     def get_content_html(self, bf: BeautifulSoup):
@@ -122,9 +131,18 @@ class Fork:
 
     @staticmethod
     def get_beautiful_soup(response):
-        encoding = response.encoding if response.encoding and response.encoding != 'ISO-8859-1' is not None else response.apparent_encoding
+        encoding = response.encoding if response.encoding is not None and response.encoding != 'ISO-8859-1' else response.apparent_encoding
         html_content = response.content.decode(encoding)
-        return BeautifulSoup(html_content, "html.parser")
+        beautiful_soup = BeautifulSoup(html_content, "html.parser")
+        meta_list = beautiful_soup.find_all('meta')
+        charset_list = [meta.attrs.get('charset') for meta in meta_list if
+                        meta.attrs is not None and 'charset' in meta.attrs]
+        if len(charset_list) > 0:
+            charset = charset_list[0]
+            if charset != encoding:
+                html_content = response.content.decode(charset)
+                return BeautifulSoup(html_content, "html.parser")
+        return beautiful_soup
 
     def fork(self):
         try:
