@@ -14,10 +14,12 @@ import uuid
 from functools import reduce
 from typing import Dict
 
+import xlwt
 from django.core import validators
-from django.core.cache import cache, caches
+from django.core.cache import caches
 from django.db import transaction, models
 from django.db.models import QuerySet, Q
+from django.http import HttpResponse
 from rest_framework import serializers
 
 from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord
@@ -73,16 +75,17 @@ class ChatSerializers(serializers.Serializer):
         def get_query_set(self):
             end_time = self.get_end_time()
             query_set = QuerySet(model=get_dynamics_model(
-                {'application_id': models.CharField(),
-                 'abstract': models.CharField(),
+                {'application_chat.application_id': models.CharField(),
+                 'application_chat.abstract': models.CharField(),
                  "star_num": models.IntegerField(),
                  'trample_num': models.IntegerField(),
                  'comparer': models.CharField(),
-                 'create_time': models.DateTimeField()}))
+                 'application_chat.create_time': models.DateTimeField()}))
 
-            base_query_dict = {'application_id': self.data.get("application_id"), 'create_time__gte': end_time}
+            base_query_dict = {'application_chat.application_id': self.data.get("application_id"),
+                               'application_chat.create_time__gte': end_time}
             if 'abstract' in self.data and self.data.get('abstract') is not None:
-                base_query_dict['abstract__contains'] = self.data.get('abstract')
+                base_query_dict['application_chat.abstract__contains'] = self.data.get('abstract')
             base_condition = Q(**base_query_dict)
             min_star_query = None
             min_trample_query = None
@@ -102,7 +105,7 @@ class ChatSerializers(serializers.Serializer):
                 condition = base_condition & min_trample_query
             else:
                 condition = base_condition
-            return query_set.filter(condition).order_by("-create_time")
+            return query_set.filter(condition).order_by("-application_chat.create_time")
 
         def list(self, with_valid=True):
             if with_valid:
@@ -110,6 +113,54 @@ class ChatSerializers(serializers.Serializer):
             return native_search(self.get_query_set(), select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'list_application_chat.sql')),
                                  with_table_name=False)
+
+        @staticmethod
+        def to_row(row: Dict):
+            details = row.get('details')
+            padding_problem_text = details.get('problem_padding').get(
+                'padding_problem_text') if 'problem_padding' in details and 'padding_problem_text' in details.get(
+                'problem_padding') else ""
+            paragraph_list = details.get('search_step').get(
+                'paragraph_list') if 'search_step' in details and 'paragraph_list' in details.get('search_step') else []
+            improve_paragraph_list = row.get('improve_paragraph_list')
+            vote_status_map = {'-1': '未投票', '0': '赞同', '1': '反对'}
+            return [str(row.get('chat_id')), row.get('abstract'), row.get('problem_text'), padding_problem_text,
+                    row.get('answer_text'), vote_status_map.get(row.get('vote_status')), len(paragraph_list), "\n".join(
+                    [f"{index}、{paragraph_list[index].get('title')}\n{paragraph_list[index].get('content')}" for index
+                     in
+                     range(len(paragraph_list))]),
+                    "\n".join([
+                        f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
+                        for index in range(len(improve_paragraph_list))]),
+                    row.get('message_tokens') + row.get('answer_tokens'), row.get('run_time'),
+                    str(row.get('create_time'))]
+
+        def export(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            data_list = native_search(self.get_query_set(), select_string=get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'export_application_chat.sql')),
+                                      with_table_name=False)
+
+            # 创建工作簿对象
+            workbook = xlwt.Workbook(encoding='utf-8')
+            # 添加工作表
+            worksheet = workbook.add_sheet('Sheet1')
+            data = [
+                ['会话ID', '摘要', '用户问题', '优化后问题', '回答', '用户反馈', '引用分段数', '分段标题+内容',
+                 '标注', '消耗tokens', '耗时（s）', '提问时间'],
+                *[self.to_row(row) for row in data_list]
+            ]
+            # 写入数据到工作表
+            for row_idx, row in enumerate(data):
+                for col_idx, col in enumerate(row):
+                    worksheet.write(row_idx, col_idx, col)
+                # 创建HttpResponse对象返回Excel文件
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="data.xls"'
+
+            workbook.save(response)
+            return response
 
         def page(self, current_page: int, page_size: int, with_valid=True):
             if with_valid:
