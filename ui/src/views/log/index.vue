@@ -17,6 +17,7 @@
           prefix-icon="Search"
           class="w-240"
         />
+        <el-button class="float-right" @click="exportLog">导出</el-button>
       </div>
 
       <app-table
@@ -321,6 +322,18 @@ function getDetail() {
   })
 }
 
+const exportLog = () => {
+  if (detail.value) {
+    let obj: any = {
+      history_day: history_day.value,
+      ...filter.value
+    }
+    if (search.value) {
+      obj = { ...obj, abstract: search.value }
+    }
+    logApi.exportChatLog(detail.value.id, detail.value.name, obj, loading)
+  }
+}
 function refresh() {
   getList()
 }
