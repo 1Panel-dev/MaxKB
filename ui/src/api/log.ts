@@ -29,14 +29,6 @@ const getChatLog: (
     loading
   )
 }
-const exportChatLog: (
-  applicaiton_id: string,
-  applicantion_name: string,
-  param: any,
-  loading?: Ref<boolean>
-) => Promise<void> = (applicaiton_id, applicantion_name, param, loading) => {
-  exportExcel(applicantion_name, `${prefix}/${applicaiton_id}/chat/export`, param, loading)
-}
 
 const exportChatLog: (
   applicaiton_id: string,
