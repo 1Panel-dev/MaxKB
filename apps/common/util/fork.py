@@ -131,7 +131,7 @@ class Fork:
 
     @staticmethod
     def get_beautiful_soup(response):
-        encoding = response.encoding if response.encoding and response.encoding is not 'ISO-8859-1' is not None else response.apparent_encoding
+        encoding = response.encoding if response.encoding is not None and response.encoding != 'ISO-8859-1' else response.apparent_encoding
         html_content = response.content.decode(encoding)
         beautiful_soup = BeautifulSoup(html_content, "html.parser")
         meta_list = beautiful_soup.find_all('meta')
@@ -139,7 +139,7 @@ class Fork:
                         meta.attrs is not None and 'charset' in meta.attrs]
         if len(charset_list) > 0:
             charset = charset_list[0]
-            if charset is not encoding:
+            if charset != encoding:
                 html_content = response.content.decode(charset)
                 return BeautifulSoup(html_content, "html.parser")
         return beautiful_soup

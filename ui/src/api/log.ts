@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put } from '@/request/index'
+import { get, post, del, put, exportExcel } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import { type Ref } from 'vue'
 
@@ -28,6 +28,15 @@ const getChatLog: (
     param,
     loading
   )
+}
+
+const exportChatLog: (
+  applicaiton_id: string,
+  applicantion_name: string,
+  param: any,
+  loading?: Ref<boolean>
+) => void = (applicaiton_id, applicantion_name, param, loading) => {
+  exportExcel(applicantion_name, `${prefix}/${applicaiton_id}/chat/export`, param, loading)
 }
 
 /**
@@ -171,5 +180,6 @@ export default {
   putChatRecordLog,
   getMarkRecord,
   getRecordDetail,
-  delMarkRecord
+  delMarkRecord,
+  exportChatLog
 }

@@ -25,6 +25,25 @@ from common.util.common import query_params_to_single_dict
 class ChatView(APIView):
     authentication_classes = [TokenAuth]
 
+    class Export(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="导出对话",
+                             operation_id="导出对话",
+                             manual_parameters=ChatApi.get_request_params_api(),
+                             tags=["应用/对话日志"]
+                             )
+        @has_permissions(
+            ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY],
+                           [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                           dynamic_tag=keywords.get('application_id'))])
+        )
+        def get(self, request: Request, application_id: str):
+            return ChatSerializers.Query(
+                data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
+                      'user_id': request.user.id}).export()
+
     class Open(APIView):
         authentication_classes = [TokenAuth]
 
