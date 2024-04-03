@@ -38,6 +38,18 @@ const datasetRouter = {
           component: () => import('@/views/document/index.vue')
         },
         {
+          path: 'problem',
+          name: 'Problem',
+          meta: {
+            icon: 'app-problems',
+            title: '问题',
+            active: 'problem',
+            parentPath: '/dataset/:id',
+            parentName: 'DatasetDetail'
+          },
+          component: () => import('@/views/problem/index.vue')
+        },
+        {
           path: 'hit-test',
           name: 'DatasetHitTest',
           meta: {

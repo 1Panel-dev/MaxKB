@@ -6,7 +6,7 @@
           <el-input
             ref="quickInputRef"
             v-model="inputValue"
-            placeholder="请输入文档名称"
+            :placeholder="`请输入${quickCreateName}`"
             class="w-500 mr-12"
             autofocus
           />
@@ -17,7 +17,7 @@
         <div v-else @click="quickCreateHandel" class="w-full">
           <el-button type="primary" link class="quich-button">
             <el-icon><Plus /></el-icon>
-            <span class="ml-4">快速创建空白文档</span>
+            <span class="ml-4">{{ quickCreatePlaceholder }}</span>
           </el-button>
         </div>
       </template>
@@ -51,6 +51,14 @@ const props = defineProps({
   quickCreate: {
     type: Boolean,
     default: false
+  },
+  quickCreateName: {
+    type: String,
+    default: '文档名称'
+  },
+  quickCreatePlaceholder: {
+    type: String,
+    default: '快速创建空白文档'
   }
 })
 const emit = defineEmits(['changePage', 'sizeChange', 'creatQuick'])
@@ -81,7 +89,7 @@ function submitHandle() {
       loading.value = false
     }, 200)
   } else {
-    MsgError('文件名称不能为空！')
+    MsgError(`${props.quickCreateName}不能为空！`)
   }
 }
 

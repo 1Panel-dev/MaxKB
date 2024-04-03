@@ -10,14 +10,14 @@
     <p class="mb-8">同步方式</p>
     <el-radio-group v-model="method" class="card__radio">
       <el-card shadow="never" class="mb-16" :class="method === 'replace' ? 'active' : ''">
-        <el-radio label="replace" size="large">
+        <el-radio value="replace" size="large">
           <p class="mb-4">替换同步</p>
           <el-text type="info">重新获取 Web 站点文档，覆盖替换本地知识库中的文档</el-text>
         </el-radio>
       </el-card>
 
       <el-card shadow="never" class="mb-16" :class="method === 'complete' ? 'active' : ''">
-        <el-radio label="complete" size="large">
+        <el-radio value="complete" size="large">
           <p class="mb-4">整体同步</p>
           <el-text type="info">先删除本地知识库所有文档，重新获取 Web 站点文档</el-text>
         </el-radio>
