@@ -69,14 +69,14 @@
               <div>
                 <span class="mr-4">
                   <el-tooltip effect="dark" content="关联分段" placement="top">
-                    <el-button type="primary" text>
+                    <el-button type="primary" text @click.stop="relateProblem(row)">
                       <el-icon><Connection /></el-icon>
                     </el-button>
                   </el-tooltip>
                 </span>
                 <span>
                   <el-tooltip effect="dark" content="删除" placement="top">
-                    <el-button type="primary" text @click.stop="deleteDocument(row)">
+                    <el-button type="primary" text @click.stop="deleteProblem(row)">
                       <el-icon><Delete /></el-icon>
                     </el-button>
                   </el-tooltip>
@@ -98,6 +98,7 @@
       :next_disable="next_disable"
       @refresh="refresh"
     />
+    <RelateProblemDialog ref="RelateProblemDialogRef" @refresh="refresh" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -107,6 +108,7 @@ import { ElTable } from 'element-plus'
 import problemApi from '@/api/problem'
 import CreateProblemDialog from './component/CreateProblemDialog.vue'
 import DetailProblemDrawer from './component/DetailProblemDrawer.vue'
+import RelateProblemDialog from './component/RelateProblemDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import type { Dict } from '@/api/type/common'
@@ -119,6 +121,7 @@ const {
 
 const { problem } = useStore()
 
+const RelateProblemDialogRef = ref()
 const DetailProblemRef = ref()
 const CreateProblemDialogRef = ref()
 const loading = ref(false)
@@ -147,6 +150,10 @@ const problemIndexMap = computed<Dict<number>>(() => {
 
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
+
+function relateProblem(row: any) {
+  RelateProblemDialogRef.value.open(row)
+}
 
 function createProblem() {
   CreateProblemDialogRef.value.open()
@@ -186,7 +193,7 @@ function deleteMulDocument() {
   // })
 }
 
-function deleteDocument(row: any) {
+function deleteProblem(row: any) {
   MsgConfirm(
     `是否删除问题：${row.content} ?`,
     `删除问题关联的 ${row.paragraph_count} 个分段会被取消关联，请谨慎操作。`,
@@ -299,14 +306,14 @@ function handleSizeChange() {
 }
 
 function getList() {
-  return problemApi
-    .getProblems(
+  return problem
+    .asyncGetProblem(
       id as string,
       paginationConfig,
       filterText.value && { content: filterText.value },
       loading
     )
-    .then((res) => {
+    .then((res: any) => {
       problemData.value = res.data.records
       paginationConfig.total = res.data.total
     })
