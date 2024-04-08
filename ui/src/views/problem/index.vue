@@ -51,9 +51,12 @@
           </el-table-column>
           <el-table-column prop="paragraph_count" label="关联分段数" align="right" min-width="100">
             <template #default="{ row }">
-              <el-link type="primary" @click.stop="rowClickHandle(row)">
+              <el-link type="primary" @click.stop="rowClickHandle(row)" v-if="row.paragraph_count">
                 {{ row.paragraph_count }}
               </el-link>
+              <span v-else>
+                {{ row.paragraph_count }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column prop="create_time" label="创建时间" width="170">
@@ -293,9 +296,11 @@ const preChatRecord = () => {
 }
 
 function rowClickHandle(row: any) {
-  currentClickId.value = row.id
-  currentContent.value = row.content
-  DetailProblemRef.value.open()
+  if (row.paragraph_count) {
+    currentClickId.value = row.id
+    currentContent.value = row.content
+    DetailProblemRef.value.open()
+  }
 }
 
 const setRowClass = ({ row }: any) => {

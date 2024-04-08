@@ -64,7 +64,7 @@ const delMulProblem: (
   data: any,
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
-  return del(`${prefix}/${dataset_id}/problem/_bach`, undefined, data, loading)
+  return del(`${prefix}/${dataset_id}/problem/_batch`, undefined, data, loading)
 }
 
 /**
