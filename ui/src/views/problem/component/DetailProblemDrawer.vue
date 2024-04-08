@@ -78,6 +78,7 @@ import problemApi from '@/api/problem'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import RelateProblemDialog from './RelateProblemDialog.vue'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
+import useStore from '@/stores'
 
 const props = withDefaults(
   defineProps<{
@@ -109,11 +110,26 @@ const {
   params: { id }
 } = route
 
+const { problem } = useStore()
 const RelateProblemDialogRef = ref()
 const ParagraphDialogRef = ref()
 const loading = ref(false)
 const visible = ref(false)
 const paragraphList = ref<any[]>([])
+
+function disassociation(item: any) {
+  problem
+    .asyncDisassociationProblem(
+      item.dataset_id,
+      item.document_id,
+      item.id,
+      props.currentId,
+      loading
+    )
+    .then(() => {
+      getRecord()
+    })
+}
 
 function relateProblem() {
   RelateProblemDialogRef.value.open(props.currentId)

@@ -166,14 +166,18 @@ const associationProblem: (
  * 解除关联问题
  * @param 参数 dataset_id, document_id, paragraph_id,problem_id
  */
-const delProblem: (
+const disassociationProblem: (
   dataset_id: string,
   document_id: string,
   paragraph_id: string,
-  problem_id: string
-) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id, problem_id) => {
+  problem_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id, problem_id, loading) => {
   return put(
-    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}/un_association`
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}/un_association`,
+    {},
+    {},
+    loading
   )
 }
 
@@ -184,6 +188,6 @@ export default {
   postParagraph,
   getProblem,
   postProblem,
-  delProblem,
+  disassociationProblem,
   associationProblem
 }

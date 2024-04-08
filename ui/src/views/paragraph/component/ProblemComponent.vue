@@ -87,19 +87,20 @@ watch(
 )
 
 function delProblemHandle(item: any, index: number) {
-  loading.value = true
   if (item.id) {
-    paragraphApi
-      .delProblem(props.datasetId || id, documentId || props.docId, props.problemId || '', item.id)
-      .then((res) => {
+    problem
+      .asyncDisassociationProblem(
+        props.datasetId || id,
+        documentId || props.docId,
+        props.problemId || '',
+        item.id,
+        loading
+      )
+      .then((res: any) => {
         getProblemList()
-      })
-      .catch(() => {
-        loading.value = false
       })
   } else {
     problemList.value.splice(index, 1)
-    loading.value = false
   }
 }
 
@@ -125,7 +126,7 @@ function addProblem() {
 function addProblemHandle(val: string) {
   if (props.problemId) {
     const api = problemOptions.value.some((option) => option.id === val)
-      ? paragraphApi.associationProblem(
+      ? problem.asyncAssociationProblem(
           props.datasetId || id,
           documentId || props.docId,
           props.problemId,

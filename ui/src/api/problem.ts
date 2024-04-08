@@ -56,6 +56,18 @@ const delProblems: (
 }
 
 /**
+ * 批量删除问题
+ * @param 参数 dataset_id,
+ */
+const delMulProblem: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return del(`${prefix}/${dataset_id}/problem/_bach`, undefined, data, loading)
+}
+
+/**
  * 修改问题
  * @param 参数 
  * dataset_id, problem_id, 
@@ -90,5 +102,6 @@ export default {
   postProblems,
   delProblems,
   putProblems,
-  getDetailProblems
+  getDetailProblems,
+  delMulProblem
 }

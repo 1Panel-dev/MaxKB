@@ -154,7 +154,7 @@ const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
 
 function relateProblem(row: any) {
-  RelateProblemDialogRef.value.open(row)
+  RelateProblemDialogRef.value.open(row.id)
 }
 
 function createProblem() {
@@ -183,16 +183,16 @@ function creatQuickHandle(val: string) {
 }
 
 function deleteMulDocument() {
-  // const arr: string[] = []
-  // multipleSelection.value.map((v) => {
-  //   if (v) {
-  //     arr.push(v.id)
-  //   }
-  // })
-  // documentApi.delMulDocument(id, arr, loading).then(() => {
-  //   MsgSuccess('批量删除成功')
-  //   getList()
-  // })
+  const arr: string[] = []
+  multipleSelection.value.map((v) => {
+    if (v) {
+      arr.push(v.id)
+    }
+  })
+  problemApi.delMulProblem(id, arr, loading).then(() => {
+    MsgSuccess('批量删除成功')
+    getList()
+  })
 }
 
 function deleteProblem(row: any) {
