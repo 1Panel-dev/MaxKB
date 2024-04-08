@@ -4,13 +4,18 @@
       <h4>问题详情</h4>
     </template>
     <div class="paragraph-source-height">
-      <!-- <el-scrollbar>
+      <el-scrollbar>
         <div class="p-16">
           <el-form label-position="top">
-            <el-form-item label="问题">
-              <el-input v-model="detail.problem_text" disabled />
+            <el-form-item label="问题" v-loading="loading">
+              <ReadWrite
+                @change="editName"
+                :data="currentContent"
+                :showEditIcon="true"
+                :maxlength="256"
+              />
             </el-form-item>
-            <el-form-item label="关联分段">
+            <!-- <el-form-item label="关联分段">
               <template v-for="(item, index) in detail.paragraph_list" :key="index">
                 <CardBox
                   shadow="never"
@@ -49,10 +54,10 @@
                   </template>
                 </CardBox>
               </template>
-            </el-form-item>
+            </el-form-item> -->
           </el-form>
         </div>
-      </el-scrollbar> -->
+      </el-scrollbar>
     </div>
     <template #footer>
       <div>
@@ -68,6 +73,7 @@ import { ref, reactive, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import problemApi from '@/api/problem'
 import { type chatType } from '@/api/type/application'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 
 const props = withDefaults(
   defineProps<{
@@ -102,6 +108,20 @@ const loading = ref(false)
 const visible = ref(false)
 const paragraphList = ref<chatType[]>([])
 
+function editName(val: string) {
+  if (val) {
+    const obj = {
+      content: val
+    }
+    problemApi.putProblems(id as string, props.currentId, obj, loading).then(() => {
+      emit('refresh')
+      MsgSuccess('修改成功')
+    })
+  } else {
+    MsgError('问题不能为空！')
+  }
+}
+
 function closeHandel() {
   paragraphList.value = []
 }
@@ -126,7 +146,7 @@ watch(visible, (bool) => {
   if (!bool) {
     emit('update:currentId', '')
     emit('update:currentContent', '')
-    emit('refresh')
+    // emit('refresh')
   }
 })
 

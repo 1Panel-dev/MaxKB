@@ -9,6 +9,8 @@
             :placeholder="`请输入${quickCreateName}`"
             class="w-500 mr-12"
             autofocus
+            :maxlength="quickCreateMaxlength"
+            :show-word-limit="quickCreateMaxlength ? true : false"
           />
 
           <el-button type="primary" @click="submitHandle" :disabled="loading">创建</el-button>
@@ -59,6 +61,10 @@ const props = defineProps({
   quickCreatePlaceholder: {
     type: String,
     default: '快速创建空白文档'
+  },
+  quickCreateMaxlength: {
+    type: Number,
+    default: () => 0
   }
 })
 const emit = defineEmits(['changePage', 'sizeChange', 'creatQuick'])

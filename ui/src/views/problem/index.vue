@@ -26,6 +26,7 @@
           quick-create
           quickCreateName="问题"
           quickCreatePlaceholder="快速创建问题"
+          :quickCreateMaxlength="256"
           @sizeChange="handleSizeChange"
           @changePage="getList"
           @cell-mouse-enter="cellMouseEnter"
@@ -40,11 +41,14 @@
           <el-table-column type="selection" width="55" :reserve-selection="true" />
           <el-table-column prop="content" label="问题" min-width="280">
             <template #default="{ row }">
-              <ReadWrite
-                @change="editName"
-                :data="row.content"
-                :showEditIcon="row.id === currentMouseId"
-              />
+              <div>
+                <ReadWrite
+                  @change="editName"
+                  :data="row.content"
+                  :showEditIcon="row.id === currentMouseId"
+                  :maxlength="256"
+                />
+              </div>
             </template>
           </el-table-column>
           <el-table-column prop="paragraph_count" label="关联分段数" align="right" min-width="100">

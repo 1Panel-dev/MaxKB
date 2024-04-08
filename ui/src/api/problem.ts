@@ -81,7 +81,7 @@ const getDetailProblems: (
   problem_id: string,
   loading?: Ref<boolean>
 ) => Promise<Result<any>> = (dataset_id, problem_id, loading) => {
-  return get(`${prefix}/${dataset_id}/problem/${problem_id}`, undefined, loading)
+  return get(`${prefix}/${dataset_id}/problem/${problem_id}/paragraph`, undefined, loading)
 }
 
 export default {
