@@ -11,15 +11,6 @@
   <div v-loading="loading">
     <el-scrollbar height="345px">
       <div class="p-24" style="padding-top: 16px">
-        <!-- <el-input
-          ref="inputRef"
-          v-if="isAddProblem"
-          v-model="problemValue"
-          @change="addProblemHandle"
-          placeholder="请输入问题，回车保存"
-          class="mb-8"
-          autofocus
-        /> -->
         <el-select
           v-if="isAddProblem"
           v-model="problemValue"
@@ -132,30 +123,30 @@ function addProblem() {
   })
 }
 function addProblemHandle(val: string) {
-  console.log(val)
-  // if (val) {
-  //   const obj = {
-  //     content: val
-  //   }
-  //   loading.value = true
-  //   if (props.problemId) {
-  //     paragraphApi
-  //       .postProblem(props.datasetId || id, documentId || props.docId, props.problemId, obj)
-  //       .then((res) => {
-  //         getProblemList()
-  //         problemValue.value = ''
-  //         isAddProblem.value = false
-  //       })
-  //       .catch(() => {
-  //         loading.value = false
-  //       })
-  //   } else {
-  //     problemList.value.unshift(obj)
-  //     problemValue.value = ''
-  //     isAddProblem.value = false
-  //     loading.value = false
-  //   }
-  // }
+  if (props.problemId) {
+    const api = problemOptions.value.some((option) => option.id === val)
+      ? paragraphApi.associationProblem(
+          props.datasetId || id,
+          documentId || props.docId,
+          props.problemId,
+          val,
+          loading
+        )
+      : paragraphApi.postProblem(
+          props.datasetId || id,
+          documentId || props.docId,
+          props.problemId,
+          {
+            content: val
+          },
+          loading
+        )
+    api.then(() => {
+      getProblemList()
+      problemValue.value = ''
+      isAddProblem.value = false
+    })
+  }
 }
 
 const remoteMethod = (query: string) => {

@@ -218,7 +218,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
         def association(self, with_valid=True, with_embedding=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            problem = QuerySet(Problem).filter(id=self.data.get("problem_id"))
+            problem = QuerySet(Problem).filter(id=self.data.get("problem_id")).first()
             problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid1(),
                                                                 document_id=self.data.get('document_id'),
                                                                 paragraph_id=self.data.get('paragraph_id'),
