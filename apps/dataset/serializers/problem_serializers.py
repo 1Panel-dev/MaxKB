@@ -122,6 +122,8 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             problem_paragraph_mapping = QuerySet(ProblemParagraphMapping).filter(dataset_id=self.data.get("dataset_id"),
                                                                                  problem_id=self.data.get("problem_id"))
+            if problem_paragraph_mapping is None or len(problem_paragraph_mapping)==0:
+                return []
             return native_search(
                 QuerySet(Paragraph).filter(id__in=[row.paragraph_id for row in problem_paragraph_mapping]),
                 select_string=get_file_content(
