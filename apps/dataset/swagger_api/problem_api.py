@@ -36,6 +36,25 @@ class ProblemApi(ApiMixin):
             }
         )
 
+    class BatchOperate(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='dataset_id',
+                                      in_=openapi.IN_PATH,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description='知识库id'),
+                    ]
+
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                title="问题id列表",
+                description="问题id列表",
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(type=openapi.TYPE_STRING)
+            )
+
     class Operate(ApiMixin):
         @staticmethod
         def get_request_params_api():

@@ -70,6 +70,24 @@ class Problem(APIView):
                 data={**query_params_to_single_dict(request.query_params), 'dataset_id': dataset_id,
                       'problem_id': problem_id}).list_paragraph())
 
+    class OperateBatch(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['DELETE'], detail=False)
+        @swagger_auto_schema(operation_summary="批量删除问题",
+                             operation_id="批量删除问题",
+                             request_body=
+                             ProblemApi.BatchOperate.get_request_body_api(),
+                             manual_parameters=ProblemApi.BatchOperate.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库/文档/段落/问题"])
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def delete(self, request: Request, dataset_id: str):
+            return result.success(
+                ProblemSerializers.BatchOperate(data={'dataset_id': dataset_id}).delete(request.data))
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 
