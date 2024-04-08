@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { cloneDeep, debounce } from 'lodash'
+import problemApi from '@/api/problem'
 
 // import paragraphApi from '@/api/paragraph'
 import useStore from '@/stores'
@@ -60,19 +60,28 @@ const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 const documentList = ref([])
 
+// 回显
+const connectParagraph = ref([])
+
 watch(dialogVisible, (bool) => {
   if (!bool) {
     documentList.value = []
   }
 })
 
-const open = (data: any) => {
+const open = (problemId: string) => {
   getDocument()
+  getRecord(problemId)
   dialogVisible.value = true
 }
 function getDocument() {
   document.asyncGetAllDocument(id, loading).then((res: any) => {
     documentList.value = res.data
+  })
+}
+function getRecord(problemId: string) {
+  problemApi.getDetailProblems(id as string, problemId, loading).then((res) => {
+    connectParagraph.value = res.data
   })
 }
 

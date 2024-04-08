@@ -41,14 +41,12 @@
           <el-table-column type="selection" width="55" :reserve-selection="true" />
           <el-table-column prop="content" label="问题" min-width="280">
             <template #default="{ row }">
-              <div>
-                <ReadWrite
-                  @change="editName"
-                  :data="row.content"
-                  :showEditIcon="row.id === currentMouseId"
-                  :maxlength="256"
-                />
-              </div>
+              <ReadWrite
+                @change="editName"
+                :data="row.content"
+                :showEditIcon="row.id === currentMouseId"
+                :maxlength="256"
+              />
             </template>
           </el-table-column>
           <el-table-column prop="paragraph_count" label="关联分段数" align="right" min-width="100">

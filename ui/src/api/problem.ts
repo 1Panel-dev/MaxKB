@@ -35,11 +35,12 @@ const getProblems: (
  * @param 参数 dataset_id
  * data: array[string]
  */
-const postProblems: (dataset_id: string, data: any) => Promise<Result<any>> = (
-  dataset_id,
-  data
-) => {
-  return post(`${prefix}/${dataset_id}/problem`, data)
+const postProblems: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, data, loading) => {
+  return post(`${prefix}/${dataset_id}/problem`, data, undefined, loading)
 }
 
 /**

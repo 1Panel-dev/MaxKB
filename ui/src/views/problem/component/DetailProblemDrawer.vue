@@ -3,11 +3,11 @@
     <template #header>
       <h4>问题详情</h4>
     </template>
-    <div class="paragraph-source-height">
+    <div>
       <el-scrollbar>
-        <div class="p-16">
-          <el-form label-position="top">
-            <el-form-item label="问题" v-loading="loading">
+        <div class="p-8">
+          <el-form label-position="top" v-loading="loading">
+            <el-form-item label="问题">
               <ReadWrite
                 @change="editName"
                 :data="currentContent"
@@ -15,23 +15,30 @@
                 :maxlength="256"
               />
             </el-form-item>
-            <!-- <el-form-item label="关联分段">
-              <template v-for="(item, index) in detail.paragraph_list" :key="index">
+            <el-form-item label="关联分段">
+              <template v-for="(item, index) in paragraphList" :key="index">
                 <CardBox
                   shadow="never"
                   :title="item.title || '-'"
                   class="paragraph-source-card cursor mb-8"
-                  :class="item.is_active ? '' : 'disabled'"
                   :showIcon="false"
                 >
-                  <template #icon>
-                    <AppAvatar class="mr-12 avatar-light" :size="22">
-                      {{ index + 1 + '' }}</AppAvatar
-                    >
-                  </template>
-                  <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
+                  <div class="active-button">
+                    <span class="mr-4">
+                      <el-tooltip effect="dark" content="编辑" placement="top">
+                        <el-button type="primary" text @click.stop="editParagraph(item)">
+                          <el-icon><EditPen /></el-icon>
+                        </el-button>
+                      </el-tooltip>
+                      <el-tooltip effect="dark" content="取消关联" placement="top">
+                        <el-button type="primary" text @click.stop="disassociation(row)">
+                          <AppIcon iconName="app-quxiaoguanlian"></AppIcon>
+                        </el-button>
+                      </el-tooltip>
+                    </span>
+                  </div>
                   <template #description>
-                    <el-scrollbar height="90">
+                    <el-scrollbar height="80">
                       {{ item.content }}
                     </el-scrollbar>
                   </template>
@@ -43,24 +50,20 @@
                         </el-icon>
                         {{ item?.document_name }}
                       </el-text>
-                      <div class="flex align-center">
-                        <AppAvatar class="mr-8" shape="square" :size="18">
-                          <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-                        </AppAvatar>
-
-                        <span class="ellipsis"> {{ item?.dataset_name }}</span>
-                      </div>
                     </div>
                   </template>
                 </CardBox>
               </template>
-            </el-form-item> -->
+            </el-form-item>
           </el-form>
         </div>
       </el-scrollbar>
+      <ParagraphDialog ref="ParagraphDialogRef" title="编辑分段" @refresh="refresh" />
+      <RelateProblemDialog ref="RelateProblemDialogRef" @refresh="refresh" />
     </div>
     <template #footer>
       <div>
+        <el-button @click="relateProblem">关联分段</el-button>
         <el-button @click="pre" :disabled="pre_disable || loading">上一条</el-button>
         <el-button @click="next" :disabled="next_disable || loading">下一条</el-button>
       </div>
@@ -72,7 +75,8 @@
 import { ref, reactive, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import problemApi from '@/api/problem'
-import { type chatType } from '@/api/type/application'
+import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
+import RelateProblemDialog from './RelateProblemDialog.vue'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 
 const props = withDefaults(
@@ -104,9 +108,20 @@ const route = useRoute()
 const {
   params: { id }
 } = route
+
+const RelateProblemDialogRef = ref()
+const ParagraphDialogRef = ref()
 const loading = ref(false)
 const visible = ref(false)
-const paragraphList = ref<chatType[]>([])
+const paragraphList = ref<any[]>([])
+
+function relateProblem() {
+  RelateProblemDialogRef.value.open(props.currentId)
+}
+
+function editParagraph(row: any) {
+  ParagraphDialogRef.value.open(row)
+}
 
 function editName(val: string) {
   if (val) {
@@ -114,6 +129,7 @@ function editName(val: string) {
       content: val
     }
     problemApi.putProblems(id as string, props.currentId, obj, loading).then(() => {
+      emit('update:currentContent', val)
       emit('refresh')
       MsgSuccess('修改成功')
     })
@@ -129,9 +145,13 @@ function closeHandel() {
 function getRecord() {
   if (props.currentId && visible.value) {
     problemApi.getDetailProblems(id as string, props.currentId, loading).then((res) => {
-      paragraphList.value = res.data.records
+      paragraphList.value = res.data
     })
   }
+}
+
+function refresh(data: any) {
+  getRecord()
 }
 
 watch(

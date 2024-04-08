@@ -529,3 +529,14 @@ h4 {
     }
   }
 }
+
+// 段落card
+.paragraph-source-card {
+  height: 210px;
+  width: 100%;
+  .active-button {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+  }
+}
