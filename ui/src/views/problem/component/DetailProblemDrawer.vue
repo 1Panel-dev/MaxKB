@@ -31,7 +31,7 @@
                         </el-button>
                       </el-tooltip>
                       <el-tooltip effect="dark" content="取消关联" placement="top">
-                        <el-button type="primary" text @click.stop="disassociation(row)">
+                        <el-button type="primary" text @click.stop="disassociation(item)">
                           <AppIcon iconName="app-quxiaoguanlian"></AppIcon>
                         </el-button>
                       </el-tooltip>
