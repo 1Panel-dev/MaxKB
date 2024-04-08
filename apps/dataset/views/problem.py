@@ -51,7 +51,7 @@ class Problem(APIView):
     def post(self, request: Request, dataset_id: str):
         return result.success(
             ProblemSerializers.Create(
-                data={'dataset_id': dataset_id, 'problem_list': request.query_params.get('problem_list')}).save())
+                data={'dataset_id': dataset_id, 'problem_list': request.data}).batch())
 
     class Paragraph(APIView):
         authentication_classes = [TokenAuth]
