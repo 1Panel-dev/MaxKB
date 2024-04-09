@@ -16,7 +16,7 @@
             <el-row :gutter="20">
               <el-col :span="12">
                 <el-card shadow="never" class="mb-16" :class="form.type === '0' ? 'active' : ''">
-                  <el-radio label="0" size="large">
+                  <el-radio value="0" size="large">
                     <div class="flex align-center">
                       <AppAvatar class="mr-8" shape="square" :size="32">
                         <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
@@ -31,7 +31,7 @@
               </el-col>
               <el-col :span="12">
                 <el-card shadow="never" class="mb-16" :class="form.type === '1' ? 'active' : ''">
-                  <el-radio label="1" size="large">
+                  <el-radio value="1" size="large">
                     <div class="flex align-center">
                       <AppAvatar class="mr-8 avatar-purple" shape="square" :size="32">
                         <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />

@@ -8,7 +8,7 @@
 """
 import os
 import uuid
-from typing import Dict
+from typing import Dict, List
 
 from django.db import transaction
 from django.db.models import QuerySet
@@ -83,6 +83,7 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                 **{'dataset_id': self.data.get('dataset_id')})
             if 'content' in self.data:
                 query_set = query_set.filter(**{'content__contains': self.data.get('content')})
+            query_set = query_set.order_by("-create_time")
             return query_set
 
         def list(self):
@@ -95,6 +96,22 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             return native_page_search(current_page, page_size, query_set, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_problem.sql')))
 
+    class BatchOperate(serializers.Serializer):
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
+
+        def delete(self, problem_id_list: List, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            dataset_id = self.data.get('dataset_id')
+            problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(
+                dataset_id=dataset_id,
+                problem_id__in=problem_id_list)
+            source_ids = [row.id for row in problem_paragraph_mapping_list]
+            problem_paragraph_mapping_list.delete()
+            QuerySet(Problem).filter(id__in=problem_id_list).delete()
+            ListenerManagement.delete_embedding_by_source_ids_signal.send(source_ids)
+            return True
+
     class Operate(serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
@@ -105,6 +122,8 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             problem_paragraph_mapping = QuerySet(ProblemParagraphMapping).filter(dataset_id=self.data.get("dataset_id"),
                                                                                  problem_id=self.data.get("problem_id"))
+            if problem_paragraph_mapping is None or len(problem_paragraph_mapping)==0:
+                return []
             return native_search(
                 QuerySet(Paragraph).filter(id__in=[row.paragraph_id for row in problem_paragraph_mapping]),
                 select_string=get_file_content(
@@ -123,6 +142,7 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                 dataset_id=self.data.get('dataset_id'),
                 problem_id=self.data.get('problem_id'))
             source_ids = [row.id for row in problem_paragraph_mapping_list]
+            problem_paragraph_mapping_list.delete()
             QuerySet(Problem).filter(id=self.data.get('problem_id')).delete()
             ListenerManagement.delete_embedding_by_source_ids_signal.send(source_ids)
             return True

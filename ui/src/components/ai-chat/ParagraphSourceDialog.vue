@@ -102,13 +102,4 @@ defineExpose({ open })
     height: calc(100vh - 260px);
   }
 }
-.paragraph-source-card {
-  height: 210px;
-  width: 100%;
-  .active-button {
-    position: absolute;
-    right: 16px;
-    top: 16px;
-  }
-}
 </style>

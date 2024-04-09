@@ -8,13 +8,13 @@
             <div class="left-height" @click.stop>
               <el-radio-group v-model="radio" class="set-rules__radio">
                 <el-card shadow="never" class="mb-16" :class="radio === '1' ? 'active' : ''">
-                  <el-radio label="1" size="large">
+                  <el-radio value="1" size="large">
                     <p class="mb-4">智能分段（推荐)</p>
                     <el-text type="info">不了解如何设置分段规则推荐使用智能分段</el-text>
                   </el-radio>
                 </el-card>
                 <el-card shadow="never" class="mb-16" :class="radio === '2' ? 'active' : ''">
-                  <el-radio label="2" size="large">
+                  <el-radio value="2" size="large">
                     <p class="mb-4">高级分段</p>
                     <el-text type="info"
                       >用户可根据文档规范自行设置分段标识符、分段长度以及清洗规则
