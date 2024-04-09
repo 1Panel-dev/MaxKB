@@ -18,13 +18,16 @@
               :default-active="currentDocument"
             >
               <template #default="{ row }">
-                <span class="flex lighter">
+                <span class="flex lighter align-center">
                   <auto-tooltip :content="row.name">
                     {{ row.name }}
                   </auto-tooltip>
-                  <div v-if="associationCount(row.id)" class="ml-4" style="height: 20px">
-                    <el-badge :value="associationCount(row.id)" type="primary" />
-                  </div>
+                  <el-badge
+                    :value="associationCount(row.id)"
+                    type="primary"
+                    v-if="associationCount(row.id)"
+                    class="paragraph-badge ml-4"
+                  />
                 </span>
               </template>
             </common-list>
@@ -247,6 +250,12 @@ defineExpose({ open })
       border-left-color: transparent;
       transform: rotate(35deg);
     }
+  }
+}
+.paragraph-badge {
+  .el-badge__content {
+    height: auto;
+    display: table;
   }
 }
 </style>
