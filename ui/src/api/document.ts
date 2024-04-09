@@ -75,11 +75,12 @@ const getAllDocument: (dataset_id: string, loading?: Ref<boolean>) => Promise<Re
   ]
 }
  */
-const postDocument: (dataset_id: string, data: any) => Promise<Result<any>> = (
-  dataset_id,
-  data
-) => {
-  return post(`${prefix}/${dataset_id}/document/_bach`, data)
+const postDocument: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, data, loading) => {
+  return post(`${prefix}/${dataset_id}/document/_bach`, data, {}, loading)
 }
 
 /**
