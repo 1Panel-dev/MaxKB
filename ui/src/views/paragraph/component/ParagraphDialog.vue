@@ -27,7 +27,7 @@
           </el-button>
         </div>
       </el-col>
-      <el-col :span="6" class="border-l">
+      <el-col :span="6" class="border-l" style="width: 300px;">
         <!-- 关联问题 -->
         <ProblemComponent
           :problemId="problemId"

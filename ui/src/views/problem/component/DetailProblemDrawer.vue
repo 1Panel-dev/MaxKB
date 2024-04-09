@@ -146,7 +146,6 @@ function editName(val: string) {
     }
     problemApi.putProblems(id as string, props.currentId, obj, loading).then(() => {
       emit('update:currentContent', val)
-      emit('refresh')
       MsgSuccess('修改成功')
     })
   } else {
@@ -182,7 +181,7 @@ watch(visible, (bool) => {
   if (!bool) {
     emit('update:currentId', '')
     emit('update:currentContent', '')
-    // emit('refresh')
+    emit('refresh')
   }
 })
 

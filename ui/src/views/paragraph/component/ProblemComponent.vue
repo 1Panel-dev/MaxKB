@@ -23,6 +23,7 @@
           :remote-method="remoteMethod"
           :loading="optionLoading"
           @change="addProblemHandle"
+          class="mb-16"
         >
           <el-option
             v-for="item in problemOptions"
@@ -151,11 +152,7 @@ function addProblemHandle(val: string) {
 }
 
 const remoteMethod = (query: string) => {
-  if (query) {
-    getProblemOption(query)
-  } else {
-    problemOptions.value = []
-  }
+  getProblemOption(query)
 }
 
 function getProblemOption(filterText?: string) {
@@ -186,6 +183,6 @@ defineExpose({
 </script>
 <style scoped lang="scss">
 .question-tag {
-  width: 217px;
+  // width: 217px;
 }
 </style>
