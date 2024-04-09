@@ -27,7 +27,7 @@
           </el-button>
         </div>
       </el-col>
-      <el-col :span="6" class="border-l">
+      <el-col :span="6" class="border-l" style="width: 300px;">
         <!-- 关联问题 -->
         <ProblemComponent
           :problemId="problemId"
@@ -150,24 +150,5 @@ const handleDebounceClick = debounce(() => {
 defineExpose({ open })
 </script>
 <style lang="scss" scope>
-.paragraph-dialog {
-  padding: 0 !important;
-  .el-scrollbar {
-    height: auto !important;
-  }
-  .el-dialog__header {
-    padding: 16px 24px;
-  }
-  .el-dialog__body {
-    border-top: 1px solid var(--el-border-color);
-  }
-  .el-dialog__footer {
-    padding: 16px 24px;
-    border-top: 1px solid var(--el-border-color);
-  }
 
-  .title {
-    color: var(--app-text-color);
-  }
-}
 </style>

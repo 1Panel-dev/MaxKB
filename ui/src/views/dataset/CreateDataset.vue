@@ -58,18 +58,18 @@ import StepSecond from './step/StepSecond.vue'
 import ResultSuccess from './step/ResultSuccess.vue'
 import datasetApi from '@/api/dataset'
 import type { datasetData } from '@/api/type/dataset'
-import documentApi from '@/api/document'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 import useStore from '@/stores'
-const { dataset } = useStore()
+const { dataset, document } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
 const webInfo = computed(() => dataset.webInfo)
 
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { id, type }
+  params: { type },
+  query: { id } // id为datasetID，有id的是上传文档
 } = route
 const isCreate = type === 'create'
 // const steps = [
@@ -112,19 +112,19 @@ function clearStore() {
 }
 function submit() {
   loading.value = true
-  const documents = [] as any[]
+  const data = [] as any
   StepSecondRef.value?.paragraphList.map((item: any) => {
-    documents.push({
+    data.push({
       name: item.name,
       paragraphs: item.content
     })
   })
-  const obj = { ...baseInfo.value, documents } as datasetData
-  const id = route.query.id
+  const obj = { ...baseInfo.value, data } as datasetData
   if (id) {
-    documentApi
-      .postDocument(id as string, documents)
-      .then((res) => {
+    // 上传文档
+    document
+      .asyncPostDocument(id as string, data)
+      .then(() => {
         MsgSuccess('提交成功')
         clearStore()
         router.push({ path: `/dataset/${id}/document` })

@@ -11,16 +11,7 @@
   <div v-loading="loading">
     <el-scrollbar height="345px">
       <div class="p-24" style="padding-top: 16px">
-        <el-input
-          ref="inputRef"
-          v-if="isAddProblem"
-          v-model="problemValue"
-          @change="addProblemHandle"
-          placeholder="请输入问题，回车保存"
-          class="mb-8"
-          autofocus
-        />
-        <!-- <el-select
+        <el-select
           v-if="isAddProblem"
           v-model="problemValue"
           filterable
@@ -28,15 +19,19 @@
           default-first-option
           :reserve-keyword="false"
           placeholder="请选择问题"
-          style="width: 240px"
+          remote
+          :remote-method="remoteMethod"
+          :loading="optionLoading"
+          @change="addProblemHandle"
+          class="mb-16"
         >
           <el-option
-            v-for="item in problemList"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+            v-for="item in problemOptions"
+            :key="item.id"
+            :label="item.content"
+            :value="item.id"
           />
-        </el-select> -->
+        </el-select>
         <template v-for="(item, index) in problemList" :key="index">
           <TagEllipsis
             @close="delProblemHandle(item, index)"
@@ -56,6 +51,7 @@
 import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import paragraphApi from '@/api/paragraph'
+import useStore from '@/stores'
 
 const props = defineProps({
   problemId: String,
@@ -65,15 +61,19 @@ const props = defineProps({
 
 const route = useRoute()
 const {
-  params: { id, documentId }
+  params: { id, documentId } // id为datasetId
 } = route as any
 
+const { problem } = useStore()
 const inputRef = ref()
 const loading = ref(false)
 const isAddProblem = ref(false)
 
 const problemValue = ref('')
 const problemList = ref<any[]>([])
+
+const problemOptions = ref<any[]>([])
+const optionLoading = ref(false)
 
 watch(
   () => props.problemId,
@@ -88,19 +88,20 @@ watch(
 )
 
 function delProblemHandle(item: any, index: number) {
-  loading.value = true
   if (item.id) {
-    paragraphApi
-      .delProblem(props.datasetId || id, documentId || props.docId, props.problemId || '', item.id)
-      .then((res) => {
+    problem
+      .asyncDisassociationProblem(
+        props.datasetId || id,
+        documentId || props.docId,
+        props.problemId || '',
+        item.id,
+        loading
+      )
+      .then((res: any) => {
         getProblemList()
-      })
-      .catch(() => {
-        loading.value = false
       })
   } else {
     problemList.value.splice(index, 1)
-    loading.value = false
   }
 }
 
@@ -124,32 +125,52 @@ function addProblem() {
   })
 }
 function addProblemHandle(val: string) {
-  if (val) {
-    const obj = {
-      content: val
-    }
-    loading.value = true
-    if (props.problemId) {
-      paragraphApi
-        .postProblem(props.datasetId || id, documentId || props.docId, props.problemId, obj)
-        .then((res) => {
-          getProblemList()
-          problemValue.value = ''
-          isAddProblem.value = false
-        })
-        .catch(() => {
-          loading.value = false
-        })
-    } else {
-      problemList.value.unshift(obj)
+  if (props.problemId) {
+    const api = problemOptions.value.some((option) => option.id === val)
+      ? problem.asyncAssociationProblem(
+          props.datasetId || id,
+          documentId || props.docId,
+          props.problemId,
+          val,
+          loading
+        )
+      : paragraphApi.postProblem(
+          props.datasetId || id,
+          documentId || props.docId,
+          props.problemId,
+          {
+            content: val
+          },
+          loading
+        )
+    api.then(() => {
+      getProblemList()
       problemValue.value = ''
       isAddProblem.value = false
-      loading.value = false
-    }
+    })
   }
 }
 
-onMounted(() => {})
+const remoteMethod = (query: string) => {
+  getProblemOption(query)
+}
+
+function getProblemOption(filterText?: string) {
+  return problem
+    .asyncGetProblem(
+      id as string,
+      { current_page: 1, page_size: 100 },
+      filterText && { content: filterText },
+      optionLoading
+    )
+    .then((res: any) => {
+      problemOptions.value = res.data.records
+    })
+}
+
+onMounted(() => {
+  getProblemOption()
+})
 onUnmounted(() => {
   problemList.value = []
   problemValue.value = ''
@@ -162,6 +183,6 @@ defineExpose({
 </script>
 <style scoped lang="scss">
 .question-tag {
-  width: 217px;
+  // width: 217px;
 }
 </style>

@@ -1,20 +1,27 @@
 <template>
-  <div class="cursor">
+  <div class="cursor w-full">
     <slot name="read">
       <div class="flex align-center" v-if="!isEdit">
         <auto-tooltip :content="data">
           {{ data }}
         </auto-tooltip>
 
-        <el-button @click.stop="editNameHandle" text v-if="showEditIcon">
-          <el-icon><Edit /></el-icon>
+        <el-button class="ml-4" @click.stop="editNameHandle" text v-if="showEditIcon">
+          <el-icon><EditPen /></el-icon>
         </el-button>
       </div>
     </slot>
     <slot>
-      <div class="flex align-center" v-if="isEdit">
-        <div @click.stop>
-          <el-input ref="inputRef" v-model="writeValue" placeholder="请输入" autofocus></el-input>
+      <div class="flex align-center" @click.stop v-if="isEdit">
+        <div class="w-full">
+          <el-input
+            ref="inputRef"
+            v-model="writeValue"
+            placeholder="请输入"
+            autofocus
+            :maxlength="maxlength"
+            :show-word-limit="maxlength ? true : false"
+          ></el-input>
         </div>
 
         <span class="ml-4">
@@ -42,6 +49,10 @@ const props = defineProps({
   showEditIcon: {
     type: Boolean,
     default: false
+  },
+  maxlength: {
+    type: Number,
+    default: () => 0
   }
 })
 const emit = defineEmits(['change'])

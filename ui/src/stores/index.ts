@@ -8,6 +8,7 @@ import useParagraphStore from './modules/paragraph'
 import useModelStore from './modules/model'
 import useApplicationStore from './modules/application'
 import useDocumentStore from './modules/document'
+import useProblemStore from './modules/problem'
 
 const useStore = () => ({
   common: useCommonStore(),
@@ -16,7 +17,8 @@ const useStore = () => ({
   paragraph: useParagraphStore(),
   model: useModelStore(),
   application: useApplicationStore(),
-  document: useDocumentStore()
+  document: useDocumentStore(),
+  problem: useProblemStore()
 })
 
 export default useStore

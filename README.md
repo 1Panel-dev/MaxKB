@@ -54,6 +54,10 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
 -   向量数据库：[PostgreSQL / pgvector](https://www.postgresql.org/)
 -   大模型：Azure OpenAI、百度千帆大模型、[Ollama](https://github.com/ollama/ollama)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/MaxKB&type=Date)](https://star-history.com/#1Panel-dev/MaxKB&Date)
+
 ## License
 
 Copyright (c) 2014-2024 飞致云 FIT2CLOUD, All rights reserved.

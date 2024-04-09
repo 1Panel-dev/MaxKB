@@ -129,25 +129,55 @@ const postProblem: (
   dataset_id: string,
   document_id: string,
   paragraph_id: string,
-  data: any
-) => Promise<Result<any>> = (dataset_id, document_id, paragraph_id, data: any) => {
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, document_id, paragraph_id, data: any, loading) => {
   return post(
     `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem`,
-    data
+    data,
+    {},
+    loading
+  )
+}
+/**
+ *
+ * @param dataset_id 数据集id
+ * @param document_id 文档id
+ * @param paragraph_id 段落id
+ * @param problem_id 问题id
+ * @param loading 加载器
+ * @returns
+ */
+const associationProblem: (
+  dataset_id: string,
+  document_id: string,
+  paragraph_id: string,
+  problem_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, document_id, paragraph_id, problem_id, loading) => {
+  return put(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}/association`,
+    {},
+    {},
+    loading
   )
 }
 /**
  * 解除关联问题
  * @param 参数 dataset_id, document_id, paragraph_id,problem_id
  */
-const delProblem: (
+const disassociationProblem: (
   dataset_id: string,
   document_id: string,
   paragraph_id: string,
-  problem_id: string
-) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id, problem_id) => {
+  problem_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, document_id, paragraph_id, problem_id, loading) => {
   return put(
-    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}/un_association`
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/${paragraph_id}/problem/${problem_id}/un_association`,
+    {},
+    {},
+    loading
   )
 }
 
@@ -158,5 +188,6 @@ export default {
   postParagraph,
   getProblem,
   postProblem,
-  delProblem
+  disassociationProblem,
+  associationProblem
 }

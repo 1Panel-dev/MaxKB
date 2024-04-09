@@ -169,10 +169,10 @@ import useStore from '@/stores'
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { id }
+  params: { id } // id为datasetID
 } = route as any
 
-const { dataset } = useStore()
+const { dataset, document } = useStore()
 
 const SyncWebDialogRef = ref()
 const loading = ref(false)
@@ -262,9 +262,9 @@ function rowClickHandle(row: any) {
 function creatQuickHandle(val: string) {
   loading.value = true
   const obj = [{ name: val }]
-  documentApi
-    .postDocument(id, obj)
-    .then((res) => {
+  document
+    .asyncPostDocument(id, obj)
+    .then(() => {
       getList()
       MsgSuccess('创建成功')
     })
