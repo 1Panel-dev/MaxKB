@@ -75,7 +75,9 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      const arr = form.value.data.split('\n')
+      const arr = form.value.data.split('\n').filter(function (item: string) {
+        return item !== ''
+      })
       problem.asyncPostProblem(id, arr, loading).then((res: any) => {
         MsgSuccess('创建成功')
         emit('refresh')

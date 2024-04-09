@@ -43,7 +43,7 @@
         <el-card shadow="never" class="file-List-card">
           <div class="flex-between">
             <div class="flex">
-              <img :src="getImgUrl(item && item?.name)" alt="" />
+              <img :src="getImgUrl(item && item?.name)" alt="" width="40" />
               <div class="ml-8">
                 <p>{{ item && item?.name }}</p>
                 <el-text type="info">{{ filesize(item && item?.size) || '0K' }}</el-text>
@@ -85,9 +85,9 @@ function deleteFlie(index: number) {
 // 上传on-change事件
 const filehandleChange = (file: any, fileList: UploadFiles) => {
   //1、判断文件大小是否合法，文件限制不能大于10M
-  const isLimit = file?.size / 1024 / 1024 < 100
+  const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
-    MsgError('文件大小超过 100MB')
+    MsgError('文件大小超过 10MB')
     fileList.splice(-1, 1) //移除当前超出大小的文件
     return false
   }

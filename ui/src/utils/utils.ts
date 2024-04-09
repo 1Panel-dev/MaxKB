@@ -31,14 +31,16 @@ export const randomId = function () {
 */
 export function fileType(name: string) {
   const suffix = name.split('.')
-  return suffix[suffix.length - 1]
+
+  return suffix[suffix.length - 1] === 'docx' ? 'doc' : suffix[suffix.length - 1]
 }
 
 /*
   获得文件对应图片
 */
 export function getImgUrl(name: string) {
-  const type = fileType(name) || 'txt'
+  const typeList = ['txt', 'pdf', 'doc', 'csv', 'md']
+  const type = typeList.includes(fileType(name)) ? fileType(name) : 'unknow'
   return new URL(`../assets/${type}-icon.svg`, import.meta.url).href
 }
 
