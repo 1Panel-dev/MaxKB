@@ -73,9 +73,7 @@
           </el-row>
 
           <div class="text-right">
-            <el-button @click="submit" v-hasPermission="`DATASET:MANAGE:${id}`" type="primary">
-              保存
-            </el-button>
+            <el-button @click="submit" type="primary"> 保存 </el-button>
           </div>
         </div>
       </el-scrollbar>

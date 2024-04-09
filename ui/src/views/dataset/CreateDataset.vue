@@ -64,6 +64,7 @@ import useStore from '@/stores'
 const { dataset, document } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
 const webInfo = computed(() => dataset.webInfo)
+const documentsFiles = computed(() => dataset.documentsFiles)
 
 const router = useRouter()
 const route = useRoute()
@@ -141,7 +142,7 @@ function submit() {
   }
 }
 function back() {
-  if (baseInfo.value || webInfo.value || StepSecondRef.value?.paragraphList?.length > 0) {
+  if (baseInfo.value || webInfo.value || documentsFiles.value?.length > 0) {
     MsgConfirm(`提示`, `当前的更改尚未保存，确认退出吗?`, {
       confirmButtonText: '确认',
       type: 'warning'
