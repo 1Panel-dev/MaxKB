@@ -18,17 +18,13 @@
               :default-active="currentDocument"
             >
               <template #default="{ row }">
-                <span class="flex-between lighter">
+                <span class="flex lighter">
                   <auto-tooltip :content="row.name">
                     {{ row.name }}
                   </auto-tooltip>
-                  <AppAvatar
-                    v-if="associationCount(row.id)"
-                    :size="17"
-                    style="margin-right: -10px; font-size: 12px"
-                  >
-                    {{ associationCount(row.id) }}</AppAvatar
-                  >
+                  <div v-if="associationCount(row.id)" class="ml-4" style="height: 20px">
+                    <el-badge :value="associationCount(row.id)" type="primary" />
+                  </div>
                 </span>
               </template>
             </common-list>
@@ -159,6 +155,8 @@ function searchHandle() {
 }
 
 function clickDocumentHandle(item: any) {
+  paginationConfig.current_page = 1
+  paragraphList.value = []
   currentDocument.value = item.id
   getParagraphList(item.id)
 }
@@ -209,6 +207,7 @@ watch(dialogVisible, (bool) => {
     currentDocument.value = ''
     search.value = ''
     searchType.value = 'title'
+    emit('refresh')
   }
 })
 

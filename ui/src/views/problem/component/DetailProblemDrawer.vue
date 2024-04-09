@@ -166,7 +166,7 @@ function getRecord() {
   }
 }
 
-function refresh(data: any) {
+function refresh() {
   getRecord()
 }
 
