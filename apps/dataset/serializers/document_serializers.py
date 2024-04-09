@@ -470,8 +470,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             super().is_valid(raise_exception=True)
             files = self.data.get('file')
             for f in files:
-                if f.size > 1024 * 1024 * 10:
-                    raise AppApiException(500, "上传文件最大不能超过10m")
+                if f.size > 1024 * 1024 * 100:
+                    raise AppApiException(500, "上传文件最大不能超过100MB")
 
         @staticmethod
         def get_request_params_api():

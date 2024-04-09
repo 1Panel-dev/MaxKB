@@ -24,12 +24,12 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'), re.compile('(?<!#
 class DocSplitHandle(BaseSplitHandle):
     @staticmethod
     def paragraph_to_md(paragraph):
-        psn = paragraph.style.name
-        if psn.startswith('Heading'):
-            try:
+        try:
+            psn = paragraph.style.name
+            if psn.startswith('Heading'):
                 return "".join(["#" for i in range(int(psn.replace("Heading ", '')))]) + " " + paragraph.text
-            except Exception as e:
-                return paragraph.text
+        except Exception as e:
+            return paragraph.text
         return paragraph.text
 
     def to_md(self, doc):
