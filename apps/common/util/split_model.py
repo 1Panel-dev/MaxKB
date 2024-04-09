@@ -295,7 +295,7 @@ class SplitModel:
         """
         if len(self.content_level_pattern) == index:
             return
-        level_content_list = parse_title_level(text, self.content_level_pattern, index)
+        level_content_list = parse_title_level(text, self.content_level_pattern, 0)
         cursor = 0
         for i in range(len(level_content_list)):
             block, cursor = get_level_block(text, level_content_list, i, cursor)
@@ -313,10 +313,15 @@ class SplitModel:
             if end_index == 0:
                 return level_content_list
             other_content = text[0:end_index]
-            if len(other_content.strip()) > 0:
-                level_content_list = [*level_content_list, *list(
-                    map(lambda row: to_tree_obj(row, 'block'),
-                        post_handler_paragraph(other_content, with_filter=self.with_filter, limit=self.limit)))]
+            children = self.parse_to_tree(text=other_content,
+                                          index=index)
+            if len(children) > 0:
+                level_content_list = [*level_content_list, *children]
+            else:
+                if len(other_content.strip()) > 0:
+                    level_content_list = [*level_content_list, *list(
+                        map(lambda row: to_tree_obj(row, 'block'),
+                            post_handler_paragraph(other_content, with_filter=self.with_filter, limit=self.limit)))]
         else:
             if len(text.strip()) > 0:
                 level_content_list = [*level_content_list, *list(
@@ -330,15 +335,16 @@ class SplitModel:
         :param text: 文本数据
         :return: 解析后数据 {content:段落数据,keywords:[‘段落关键词’],parent_chain:['段落父级链路']}
         """
-        result_tree = self.parse_to_tree(text.replace('\r', '\n'), 0)
+        text = text.replace('\r', '\n')
+        result_tree = self.parse_to_tree(text, 0)
         result = result_tree_to_paragraph(result_tree, [], [])
-        # 过滤段落内容不为空字符串的数据
-        result = [item for item in result if 'content' in item and len(item.get('content').strip()) > 0]
-        return [self.post_reset_paragraph(item) for item in result]
+        return [item for item in [self.post_reset_paragraph(row) for row in result] if
+                'content' in item and len(item.get('content').strip()) > 0]
 
     def post_reset_paragraph(self, paragraph: Dict):
         result = self.filter_title_special_characters(paragraph)
         result = self.sub_title(result)
+        result = self.content_is_null(result)
         return result
 
     @staticmethod
@@ -347,6 +353,15 @@ class SplitModel:
             title = paragraph.get('title')
             if len(title) > 255:
                 return {**paragraph, 'title': title[0:255], 'content': title[255:len(title)] + paragraph.get('content')}
+        return paragraph
+
+    @staticmethod
+    def content_is_null(paragraph: Dict):
+        if 'title' in paragraph:
+            title = paragraph.get('title')
+            content = paragraph.get('content')
+            if (content is None or len(content.strip()) == 0) and (title is not None and len(title) > 0):
+                return {'title': '', 'content': title}
         return paragraph
 
     @staticmethod
@@ -361,9 +376,12 @@ class SplitModel:
 title_special_characters_list = ['#', '\n', '\r', '\\s']
 
 default_split_pattern = {
-    'md': [re.compile('(?<=^)# .*|(?<=\\n)# .*'), re.compile('(?<!#)## (?!#).*'), re.compile("(?<!#)### (?!#).*"),
-           re.compile("(?<!#)#### (?!#).*"), re.compile("(?<!#)##### (?!#).*"),
-           re.compile("(?<!#)###### (?!#).*"), re.compile("(?<!\n)\n\n+")],
+    'md': [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
+           re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),
+           re.compile("(?<=\\n)(?<!#)### (?!#).*|(?<=^)(?<!#)### (?!#).*"),
+           re.compile("(?<=\\n)(?<!#)#### (?!#).*|(?<=^)(?<!#)#### (?!#).*"),
+           re.compile("(?<=\\n)(?<!#)##### (?!#).*|(?<=^)(?<!#)##### (?!#).*"),
+           re.compile("(?<=\\n)(?<!#)###### (?!#).*|(?<=^)(?<!#)###### (?!#).*")],
     'default': [re.compile("(?<!\n)\n\n+")]
 }
 
