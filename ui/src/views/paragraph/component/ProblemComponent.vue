@@ -23,6 +23,7 @@
           :remote-method="remoteMethod"
           :loading="optionLoading"
           @change="addProblemHandle"
+          @blur="isAddProblem = false"
           class="mb-16"
         >
           <el-option
