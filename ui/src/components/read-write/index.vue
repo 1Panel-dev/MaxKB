@@ -21,7 +21,6 @@
             autofocus
             :maxlength="maxlength || '-'"
             :show-word-limit="maxlength ? true : false"
-            @keydown.enter="submit"
           ></el-input>
         </div>
 
@@ -76,7 +75,7 @@ function submit() {
     loading.value = false
   }, 200)
 }
-function editNameHandle(row: any) {
+function editNameHandle() {
   writeValue.value = props.data
   isEdit.value = true
 }
