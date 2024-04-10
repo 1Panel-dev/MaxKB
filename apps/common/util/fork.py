@@ -33,14 +33,16 @@ class ForkManage:
         if level < 0:
             return
         else:
+            child_link.url = remove_fragment(child_link.url)
             child_url = child_link.url[:-1] if child_link.url.endswith('/') else child_link.url
+        if not exclude_link_url.__contains__(child_url):
             exclude_link_url.add(child_url)
-        response = Fork(child_link.url, selector_list).fork()
-        fork_handler(child_link, response)
-        for child_link in response.child_link_list:
-            child_url = child_link.url[:-1] if child_link.url.endswith('/') else child_link.url
-            if not exclude_link_url.__contains__(child_url):
-                ForkManage.fork_child(child_link, selector_list, level - 1, exclude_link_url, fork_handler)
+            response = Fork(child_link.url, selector_list).fork()
+            fork_handler(child_link, response)
+            for child_link in response.child_link_list:
+                child_url = child_link.url[:-1] if child_link.url.endswith('/') else child_link.url
+                if not exclude_link_url.__contains__(child_url):
+                    ForkManage.fork_child(child_link, selector_list, level - 1, exclude_link_url, fork_handler)
 
 
 def remove_fragment(url: str) -> str:
