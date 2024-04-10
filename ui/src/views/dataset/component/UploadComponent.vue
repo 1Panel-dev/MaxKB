@@ -16,7 +16,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        accept=".txt, .md, .csv, .log, .doc, .docx, .pdf"
+        accept=".txt, .md, .csv, .log, .docx, .pdf"
         :limit="50"
         :on-exceed="onExceed"
         :on-change="filehandleChange"
@@ -29,7 +29,7 @@
           </p>
           <div class="upload__decoration">
             <p>
-              支持格式：TXT、Markdown、PDF、DOC、DOCX，每次最多上传50个文件，每个文件不超过 100MB
+              支持格式：TXT、Markdown、PDF、DOCX，每次最多上传50个文件，每个文件不超过 100MB
             </p>
             <p>若使用【高级分段】建议上传前规范文件的分段标识</p>
           </div>
@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import { ref, reactive, onUnmounted, onMounted, computed, watch } from 'vue'
 import type { UploadFile, UploadFiles } from 'element-plus'
-import { filesize, getImgUrl } from '@/utils/utils'
+import { filesize, getImgUrl, isRightType } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
 const { dataset } = useStore()
@@ -89,6 +89,11 @@ const filehandleChange = (file: any, fileList: UploadFiles) => {
   if (!isLimit) {
     MsgError('文件大小超过 100MB')
     fileList.splice(-1, 1) //移除当前超出大小的文件
+    return false
+  }
+  if (!isRightType(file?.name)) {
+    MsgError('文件格式不支持')
+    fileList.splice(-1, 1)
     return false
   }
 }

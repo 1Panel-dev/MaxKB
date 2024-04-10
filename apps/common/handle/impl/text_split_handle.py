@@ -29,7 +29,8 @@ class TextSplitHandle(BaseSplitHandle):
         if file_name.endswith(".md") or file_name.endswith('.txt'):
             return True
         result = detect(buffer)
-        if result['encoding'] != 'ascii' and result['confidence'] > 0.5:
+        if result['encoding'] is not None and result['confidence'] is not None and result['encoding'] != 'ascii' and \
+                result['confidence'] > 0.5:
             return True
         return False
 
