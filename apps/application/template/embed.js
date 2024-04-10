@@ -19,7 +19,7 @@ const guideHtml=`
 </div>
 `
 const chatButtonHtml=
-`<div class="maxkb-chat-button" ><svg width="48" height="56" viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+`<div class="maxkb-chat-button" ><svg style="vertical-align: middle;overflow: hidden;" width="48" height="56" viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_d_349_49711)">
 <path d="M8 24C8 12.9543 16.9543 4 28 4H48V44H28C16.9543 44 8 35.0457 8 24Z" fill="url(#paint0_linear_349_49711)"/>
 </g>
