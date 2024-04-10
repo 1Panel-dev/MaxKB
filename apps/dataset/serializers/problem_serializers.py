@@ -60,13 +60,14 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             problem_list = self.data.get('problem_list')
+            problem_list = list(set(problem_list))
             dataset_id = self.data.get('dataset_id')
             exists_problem_content_list = [problem.content for problem in
                                            QuerySet(Problem).filter(dataset_id=dataset_id,
                                                                     content__in=problem_list)]
             problem_instance_list = [Problem(id=uuid.uuid1(), dataset_id=dataset_id, content=problem_content) for
                                      problem_content in
-                                     self.data.get('problem_list') if
+                                     problem_list if
                                      (not exists_problem_content_list.__contains__(problem_content) if
                                       len(exists_problem_content_list) > 0 else True)]
 
@@ -122,7 +123,7 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             problem_paragraph_mapping = QuerySet(ProblemParagraphMapping).filter(dataset_id=self.data.get("dataset_id"),
                                                                                  problem_id=self.data.get("problem_id"))
-            if problem_paragraph_mapping is None or len(problem_paragraph_mapping)==0:
+            if problem_paragraph_mapping is None or len(problem_paragraph_mapping) == 0:
                 return []
             return native_search(
                 QuerySet(Paragraph).filter(id__in=[row.paragraph_id for row in problem_paragraph_mapping]),
