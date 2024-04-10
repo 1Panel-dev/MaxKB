@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import { ref, reactive, onUnmounted, onMounted, computed, watch } from 'vue'
 import type { UploadFile, UploadFiles } from 'element-plus'
-import { filesize, getImgUrl } from '@/utils/utils'
+import { filesize, getImgUrl, isRightType } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
 const { dataset } = useStore()
@@ -89,6 +89,11 @@ const filehandleChange = (file: any, fileList: UploadFiles) => {
   if (!isLimit) {
     MsgError('文件大小超过 100MB')
     fileList.splice(-1, 1) //移除当前超出大小的文件
+    return false
+  }
+  if (!isRightType(file?.name)) {
+    MsgError('文件格式不支持')
+    fileList.splice(-1, 1)
     return false
   }
 }
