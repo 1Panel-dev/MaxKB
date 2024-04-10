@@ -11,6 +11,7 @@
         <el-scrollbar height="500" wrap-class="paragraph-scrollbar">
           <div class="bold title align-center p-24 pb-0">选择文档</div>
           <div class="p-8" style="padding-bottom: 8px">
+            <el-input v-model="filterDoc" placeholder="按 文档名称 搜索" prefix-icon="Search" />
             <common-list
               :data="documentList"
               class="mt-8"
@@ -107,6 +108,7 @@ const dialogVisible = ref<boolean>(false)
 
 const loading = ref(false)
 const documentList = ref<any[]>([])
+const cloneDocumentList = ref<any[]>([])
 const paragraphList = ref<any[]>([])
 const currentProblemId = ref<String>('')
 
@@ -116,6 +118,7 @@ const associationParagraph = ref<any[]>([])
 const currentDocument = ref<String>('')
 const search = ref('')
 const searchType = ref('title')
+const filterDoc = ref('')
 
 const paginationConfig = reactive({
   current_page: 1,
@@ -166,8 +169,9 @@ function clickDocumentHandle(item: any) {
 
 function getDocument() {
   document.asyncGetAllDocument(id, loading).then((res: any) => {
+    cloneDocumentList.value = res.data
     documentList.value = res.data
-    currentDocument.value = documentList.value?.length > 0 ? documentList.value[0].id : ''
+    currentDocument.value = cloneDocumentList.value?.length > 0 ? cloneDocumentList.value[0].id : ''
     getParagraphList(currentDocument.value)
   })
 }
@@ -204,6 +208,7 @@ function isAssociation(paragraphId: String) {
 watch(dialogVisible, (bool) => {
   if (!bool) {
     documentList.value = []
+    cloneDocumentList.value = []
     paragraphList.value = []
     associationParagraph.value = []
 
@@ -212,6 +217,14 @@ watch(dialogVisible, (bool) => {
     searchType.value = 'title'
     emit('refresh')
   }
+})
+
+watch(filterDoc, (val) => {
+  paragraphList.value = []
+  documentList.value = val
+    ? cloneDocumentList.value.filter((item) => item.name.includes(val))
+    : cloneDocumentList.value
+  currentDocument.value = documentList.value?.length > 0 ? documentList.value[0].id : ''
 })
 
 const open = (problemId: string) => {
