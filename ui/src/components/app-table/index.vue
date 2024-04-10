@@ -46,6 +46,9 @@ import { ref, nextTick, watch, computed, onMounted } from 'vue'
 import { MsgError } from '@/utils/message'
 defineOptions({ name: 'AppTable' })
 
+import useStore from '@/stores'
+const { common } = useStore()
+
 const props = defineProps({
   paginationConfig: {
     type: Object,
@@ -66,7 +69,8 @@ const props = defineProps({
   quickCreateMaxlength: {
     type: Number,
     default: () => 0
-  }
+  },
+  storeKey: String
 })
 const emit = defineEmits(['changePage', 'sizeChange', 'creatQuick'])
 
@@ -109,9 +113,15 @@ function quickCreateHandel() {
 
 function handleSizeChange() {
   emit('sizeChange')
+  if (props.storeKey) {
+    common.savePage(props.storeKey, props.paginationConfig)
+  }
 }
 function handleCurrentChange() {
   emit('changePage')
+  if (props.storeKey) {
+    common.savePage(props.storeKey, props.paginationConfig)
+  }
 }
 defineExpose({})
 

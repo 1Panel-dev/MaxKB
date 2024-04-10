@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import type { pageRequest } from '@/api/type/common'
 
 export interface commonTypes {
   breadcrumb: any
@@ -12,14 +11,14 @@ const useCommonStore = defineStore({
   state: (): commonTypes => ({
     breadcrumb: null,
     // 搜索和分页缓存
-    paginationConfig: null,
-    search: null
+    paginationConfig: {},
+    search: {}
   }),
   actions: {
     saveBreadcrumb(data: any) {
       this.breadcrumb = data
     },
-    savePage(val: string, data: pageRequest) {
+    savePage(val: string, data: any) {
       this.paginationConfig[val] = data
     },
     saveCondition(val: string, data: any) {
