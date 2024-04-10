@@ -6,7 +6,7 @@
     <div>
       <el-scrollbar>
         <div class="p-8">
-          <el-form label-position="top" v-loading="loading">
+          <el-form label-position="top" v-loading="loading" @submit.prevent>
             <el-form-item label="问题">
               <ReadWrite
                 @change="editName"
