@@ -11,14 +11,18 @@ import re
 from typing import List
 
 from docx import Document
+from docx.table import Table
+from docx.text.paragraph import Paragraph
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.util.split_model import SplitModel
 
-default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'), re.compile('(?<!#)## (?!#).*'),
-                        re.compile("(?<!#)### (?!#).*"),
-                        re.compile("(?<!#)#### (?!#).*"), re.compile("(?<!#)##### (?!#).*"),
-                        re.compile("(?<!#)###### (?!#).*"), re.compile("(?<!\n)\n\n+")]
+default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
+                        re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),
+                        re.compile("(?<=\\n)(?<!#)### (?!#).*|(?<=^)(?<!#)### (?!#).*"),
+                        re.compile("(?<=\\n)(?<!#)#### (?!#).*|(?<=^)(?<!#)#### (?!#).*"),
+                        re.compile("(?<=\\n)(?<!#)##### (?!#).*|(?<=^)(?<!#)##### (?!#).*"),
+                        re.compile("(?<=\\n)(?<!#)###### (?!#).*|(?<=^)(?<!#)###### (?!#).*")]
 
 
 class DocSplitHandle(BaseSplitHandle):
@@ -32,9 +36,31 @@ class DocSplitHandle(BaseSplitHandle):
             return paragraph.text
         return paragraph.text
 
+    @staticmethod
+    def table_to_md(table):
+        rows = table.rows
+        # 创建 Markdown 格式的表格
+        md_table = '| ' + ' | '.join([cell.text.replace("\n", '</br>') for cell in rows[0].cells]) + ' |\n'
+        md_table += '| ' + ' | '.join(['---' for i in range(len(rows[0].cells))]) + ' |\n'
+        for row in rows[1:]:
+            md_table += '| ' + ' | '.join([cell.text.replace("\n", '</br>') for cell in row.cells]) + ' |\n'
+        return md_table
+
     def to_md(self, doc):
-        ps = doc.paragraphs
-        return "\n".join([self.paragraph_to_md(para) for para in ps])
+        elements = []
+        for element in doc.element.body:
+            if element.tag.endswith('tbl'):
+                # 处理表格
+                table = Table(element, doc)
+                elements.append(table)
+            elif element.tag.endswith('p'):
+                # 处理段落
+                paragraph = Paragraph(element, doc)
+                elements.append(paragraph)
+
+        return "\n".join(
+            [self.paragraph_to_md(element) if isinstance(element, Paragraph) else self.table_to_md(element) for element
+             in elements])
 
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer):
         try:

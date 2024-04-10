@@ -14,10 +14,12 @@ from charset_normalizer import detect
 from common.handle.base_split_handle import BaseSplitHandle
 from common.util.split_model import SplitModel
 
-default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'), re.compile('(?<!#)## (?!#).*'),
-                        re.compile("(?<!#)### (?!#).*"),
-                        re.compile("(?<!#)#### (?!#).*"), re.compile("(?<!#)##### (?!#).*"),
-                        re.compile("(?<!#)###### (?!#).*"), re.compile("(?<!\n)\n\n+")]
+default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
+                        re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),
+                        re.compile("(?<=\\n)(?<!#)### (?!#).*|(?<=^)(?<!#)### (?!#).*"),
+                        re.compile("(?<=\\n)(?<!#)#### (?!#).*|(?<=^)(?<!#)#### (?!#).*"),
+                        re.compile("(?<=\\n)(?<!#)##### (?!#).*|(?<=^)(?<!#)##### (?!#).*"),
+                        re.compile("(?<=\\n)(?<!#)###### (?!#).*|(?<=^)(?<!#)###### (?!#).*")]
 
 
 class TextSplitHandle(BaseSplitHandle):

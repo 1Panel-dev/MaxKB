@@ -19,7 +19,7 @@
             v-model="writeValue"
             placeholder="请输入"
             autofocus
-            :maxlength="maxlength"
+            :maxlength="maxlength || '-'"
             :show-word-limit="maxlength ? true : false"
           ></el-input>
         </div>
@@ -75,7 +75,7 @@ function submit() {
     loading.value = false
   }, 200)
 }
-function editNameHandle(row: any) {
+function editNameHandle() {
   writeValue.value = props.data
   isEdit.value = true
 }

@@ -6,7 +6,7 @@
     <div>
       <el-scrollbar>
         <div class="p-8">
-          <el-form label-position="top" v-loading="loading">
+          <el-form label-position="top" v-loading="loading" @submit.prevent>
             <el-form-item label="问题">
               <ReadWrite
                 @change="editName"
@@ -18,18 +18,13 @@
             <el-form-item label="关联分段">
               <template v-for="(item, index) in paragraphList" :key="index">
                 <CardBox
-                  shadow="never"
                   :title="item.title || '-'"
                   class="paragraph-source-card cursor mb-8"
                   :showIcon="false"
+                  @click.stop="editParagraph(item)"
                 >
                   <div class="active-button">
                     <span class="mr-4">
-                      <el-tooltip effect="dark" content="编辑" placement="top">
-                        <el-button type="primary" text @click.stop="editParagraph(item)">
-                          <el-icon><EditPen /></el-icon>
-                        </el-button>
-                      </el-tooltip>
                       <el-tooltip effect="dark" content="取消关联" placement="top">
                         <el-button type="primary" text @click.stop="disassociation(item)">
                           <AppIcon iconName="app-quxiaoguanlian"></AppIcon>

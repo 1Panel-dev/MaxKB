@@ -48,6 +48,7 @@
           @selection-change="handleSelectionChange"
           v-loading="loading"
           :row-key="(row: any) => row.id"
+          :storeKey="storeKey"
         >
           <el-table-column type="selection" width="55" :reserve-selection="true" />
           <el-table-column prop="name" label="文件名称" min-width="280">
@@ -156,8 +157,8 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, onBeforeUnmount } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { useRouter, useRoute, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { ElTable } from 'element-plus'
 import documentApi from '@/api/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
@@ -172,7 +173,24 @@ const {
   params: { id } // id为datasetID
 } = route as any
 
-const { dataset, document } = useStore()
+const { common, dataset, document } = useStore()
+
+const storeKey = 'documents'
+
+onBeforeRouteUpdate((to: any, from: any) => {
+  common.savePage(storeKey, null)
+  common.saveCondition(storeKey, null)
+})
+onBeforeRouteLeave((to: any, from: any) => {
+  if (to.name !== 'Paragraph') {
+    common.savePage(storeKey, null)
+    common.saveCondition(storeKey, null)
+  } else {
+    common.saveCondition(storeKey, filterText.value)
+  }
+})
+const beforePagination = computed(() => common.paginationConfig[storeKey])
+const beforeSearch = computed(() => common.search[storeKey])
 
 const SyncWebDialogRef = ref()
 const loading = ref(false)
@@ -182,7 +200,7 @@ const documentData = ref<any[]>([])
 const currentMouseId = ref(null)
 const datasetDetail = ref<any>({})
 
-const paginationConfig = reactive({
+const paginationConfig = ref({
   current_page: 1,
   page_size: 10,
   total: 0
@@ -355,7 +373,7 @@ function cellMouseLeave() {
 }
 
 function handleSizeChange() {
-  paginationConfig.current_page = 1
+  paginationConfig.value.current_page = 1
   getList()
 }
 
@@ -363,13 +381,13 @@ function getList(bool?: boolean) {
   documentApi
     .getDocument(
       id as string,
-      paginationConfig,
+      paginationConfig.value,
       filterText.value && { name: filterText.value },
       bool ? undefined : loading
     )
     .then((res) => {
       documentData.value = res.data.records
-      paginationConfig.total = res.data.total
+      paginationConfig.value.total = res.data.total
     })
 }
 
@@ -380,12 +398,18 @@ function getDetail() {
 }
 
 function refresh() {
-  paginationConfig.current_page = 1
+  paginationConfig.value.current_page = 1
   getList()
 }
 
 onMounted(() => {
   getDetail()
+  if (beforePagination.value) {
+    paginationConfig.value = beforePagination.value
+  }
+  if (beforeSearch.value) {
+    filterText.value = beforeSearch.value
+  }
   getList()
   // 初始化定时任务
   initInterval()

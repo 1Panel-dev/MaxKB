@@ -113,18 +113,18 @@ function clearStore() {
 }
 function submit() {
   loading.value = true
-  const data = [] as any
+  const documents = [] as any
   StepSecondRef.value?.paragraphList.map((item: any) => {
-    data.push({
+    documents.push({
       name: item.name,
       paragraphs: item.content
     })
   })
-  const obj = { ...baseInfo.value, data } as datasetData
+  const obj = { ...baseInfo.value, documents } as datasetData
   if (id) {
     // 上传文档
     document
-      .asyncPostDocument(id as string, data)
+      .asyncPostDocument(id as string, documents)
       .then(() => {
         MsgSuccess('提交成功')
         clearStore()
