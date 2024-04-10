@@ -9,7 +9,7 @@
             :placeholder="`请输入${quickCreateName}`"
             class="w-500 mr-12"
             autofocus
-            :maxlength="quickCreateMaxlength"
+            :maxlength="quickCreateMaxlength || '-'"
             :show-word-limit="quickCreateMaxlength ? true : false"
             @keydown.enter="submitHandle"
           />

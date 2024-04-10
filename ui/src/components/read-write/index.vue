@@ -19,8 +19,9 @@
             v-model="writeValue"
             placeholder="请输入"
             autofocus
-            :maxlength="maxlength"
+            :maxlength="maxlength || '-'"
             :show-word-limit="maxlength ? true : false"
+            @keydown.enter="submit"
           ></el-input>
         </div>
 
