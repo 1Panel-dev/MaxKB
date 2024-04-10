@@ -29,7 +29,7 @@
           </p>
           <div class="upload__decoration">
             <p>
-              支持格式：TXT、Markdown、PDF、DOC、DOCX，每次最多上传50个文件，每个文件不超过 10MB
+              支持格式：TXT、Markdown、PDF、DOC、DOCX，每次最多上传50个文件，每个文件不超过 100MB
             </p>
             <p>若使用【高级分段】建议上传前规范文件的分段标识</p>
           </div>
@@ -85,9 +85,9 @@ function deleteFlie(index: number) {
 // 上传on-change事件
 const filehandleChange = (file: any, fileList: UploadFiles) => {
   //1、判断文件大小是否合法，文件限制不能大于10M
-  const isLimit = file?.size / 1024 / 1024 < 10
+  const isLimit = file?.size / 1024 / 1024 < 100
   if (!isLimit) {
-    MsgError('文件大小超过 10MB')
+    MsgError('文件大小超过 100MB')
     fileList.splice(-1, 1) //移除当前超出大小的文件
     return false
   }
