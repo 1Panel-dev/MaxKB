@@ -5,7 +5,7 @@ on:
     inputs:
       dockerImageTag:
         description: 'Docker Image Tag'
-        default: 'v1.0.0-dev'
+        default: 'v1.1.0-dev'
         required: true
       architecture:
         description: 'Architecture'

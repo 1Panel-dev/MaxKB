@@ -37,7 +37,7 @@ ENV MAXKB_VERSION ${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_CO
 WORKDIR /opt/maxkb/app
 COPY --from=stage-build /opt/maxkb /opt/maxkb
 COPY --from=stage-build /opt/py3 /opt/py3
-COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb/app/model
+COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb/model
 
 ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
@@ -45,8 +45,7 @@ ENV LANG=en_US.UTF-8 \
 ENV POSTGRES_USER root
 ENV POSTGRES_PASSWORD Password123@postgres
 
-RUN mv /opt/maxkb/app/model/* /opt/maxkb/model && \
-    chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
+RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
     cp -f /opt/maxkb/app/installer/run-maxkb.sh /usr/bin/run-maxkb.sh && \
     cp -f /opt/maxkb/app/installer/init.sql /docker-entrypoint-initdb.d
