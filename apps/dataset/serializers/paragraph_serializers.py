@@ -437,6 +437,9 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 ParagraphSerializers.Create.or_get(exists_problem_list, problem.get('content'), dataset_id) for
                 problem in (
                     instance.get('problem_list') if 'problem_list' in instance else [])]
+            # 问题去重
+            problem_model_list = [x for i, x in enumerate(problem_model_list) if
+                                  len([item for item in problem_model_list[:i] if item.content == x.content]) <= 0]
 
             problem_paragraph_mapping_list = [
                 ProblemParagraphMapping(id=uuid.uuid1(), document_id=document_id, problem_id=problem_model.id,
