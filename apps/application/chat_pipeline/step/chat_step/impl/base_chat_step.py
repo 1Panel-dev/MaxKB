@@ -84,7 +84,7 @@ class BaseChatStep(IChatStep):
                 post_response_handler: PostResponseHandler,
                 chat_model: BaseChatModel = None,
                 paragraph_list=None,
-                manage:  = None,
+                manage: PipelineManage = None,
                 padding_problem_text: str = None,
                 stream: bool = True,
                 client_id=None, client_type=None,
@@ -125,7 +125,7 @@ class BaseChatStep(IChatStep):
                        post_response_handler: PostResponseHandler,
                        chat_model: BaseChatModel = None,
                        paragraph_list=None,
-                       manage:  = None,
+                       manage: PipelineManage = None,
                        padding_problem_text: str = None,
                        client_id=None, client_type=None):
         # 调用模型
@@ -151,7 +151,7 @@ class BaseChatStep(IChatStep):
                       post_response_handler: PostResponseHandler,
                       chat_model: BaseChatModel = None,
                       paragraph_list=None,
-                      manage:  = None,
+                      manage: PipelineManage = None,
                       padding_problem_text: str = None,
                       client_id=None, client_type=None):
         # 调用模型
