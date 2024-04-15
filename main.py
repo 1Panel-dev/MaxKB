@@ -18,7 +18,7 @@ django.setup()
 def collect_static():
     """
      收集静态文件到指定目录
-     本项目主要是将前段vue/dist的前段项目放到静态目录下面
+     本项目主要是将前端vue/dist的前段项目放到静态目录下面
     :return:
     """
     logging.info("Collect static files")
