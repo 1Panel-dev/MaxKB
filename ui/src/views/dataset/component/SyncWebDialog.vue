@@ -59,7 +59,7 @@ const open = (id: string) => {
 }
 
 const submit = () => {
-  dataset.asyncSyncDateset(datasetId.value, method.value, loading).then((res: any) => {
+  dataset.asyncSyncDataset(datasetId.value, method.value, loading).then((res: any) => {
     emit('refresh', res.data)
     dialogVisible.value = false
   })

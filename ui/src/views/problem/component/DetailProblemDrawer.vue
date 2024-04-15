@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="visible" size="60%" @close="closeHandel">
+  <el-drawer v-model="visible" size="60%" @close="closeHandle">
     <template #header>
       <h4>问题详情</h4>
     </template>
@@ -148,7 +148,7 @@ function editName(val: string) {
   }
 }
 
-function closeHandel() {
+function closeHandle() {
   paragraphList.value = []
 }
 

@@ -60,7 +60,7 @@
                   <el-option-group
                     v-for="(value, label) in modelOptions"
                     :key="value"
-                    :label="realatedObject(providerOptions, label, 'provider')?.name"
+                    :label="relatedObject(providerOptions, label, 'provider')?.name"
                   >
                     <el-option
                       v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
@@ -71,7 +71,7 @@
                     >
                       <div class="flex">
                         <span
-                          v-html="realatedObject(providerOptions, label, 'provider')?.icon"
+                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
                           class="model-icon mr-8"
                         ></span>
                         <span>{{ item.name }}</span>
@@ -91,7 +91,7 @@
                     >
                       <div class="flex">
                         <span
-                          v-html="realatedObject(providerOptions, label, 'provider')?.icon"
+                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
                           class="model-icon mr-8"
                         ></span>
                         <span>{{ item.name }}</span>
@@ -242,7 +242,7 @@
                         <div class="flex-between">
                           <div class="flex align-center">
                             <AppAvatar
-                              v-if="realatedObject(datasetList, item, 'id')?.type === '1'"
+                              v-if="relatedObject(datasetList, item, 'id')?.type === '1'"
                               class="mr-8 avatar-purple"
                               shape="square"
                               :size="32"
@@ -254,7 +254,7 @@
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>
                             <div class="ellipsis">
-                              {{ realatedObject(datasetList, item, 'id')?.name }}
+                              {{ relatedObject(datasetList, item, 'id')?.name }}
                             </div>
                           </div>
                           <el-button text @click="removeDataset(item)">
@@ -338,7 +338,7 @@ import applicationApi from '@/api/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import type { Provider } from '@/api/type/model'
-import { realatedObject } from '@/utils/utils'
+import { relatedObject } from '@/utils/utils'
 import { MsgSuccess } from '@/utils/message'
 import useStore from '@/stores'
 
@@ -474,7 +474,7 @@ function getDataset() {
       datasetList.value = res.data
     })
   } else {
-    dataset.asyncGetAllDateset(datasetLoading).then((res: any) => {
+    dataset.asyncGetAllDataset(datasetLoading).then((res: any) => {
       datasetList.value = res.data?.filter((v: any) => v.user_id === user.userInfo?.id)
     })
   }

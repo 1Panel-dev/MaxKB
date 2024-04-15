@@ -76,8 +76,8 @@ const statisticsType = computed(() => [
     ],
     option: {
       title: '用户总数',
-      xDatas: getAttrsArray(props.data, 'day'),
-      yDatas: [
+      xData: getAttrsArray(props.data, 'day'),
+      yData: [
         {
           name: '用户总数',
           type: 'line',
@@ -102,8 +102,8 @@ const statisticsType = computed(() => [
     sum: [getSum(getAttrsArray(props.data, 'chat_record_count') || 0)],
     option: {
       title: '提问次数',
-      xDatas: getAttrsArray(props.data, 'day'),
-      yDatas: [
+      xData: getAttrsArray(props.data, 'day'),
+      yData: [
         {
           type: 'line',
           data: getAttrsArray(props.data, 'chat_record_count')
@@ -120,8 +120,8 @@ const statisticsType = computed(() => [
     sum: [getSum(getAttrsArray(props.data, 'tokens_num') || 0)],
     option: {
       title: 'Tokens 总数',
-      xDatas: getAttrsArray(props.data, 'day'),
-      yDatas: [
+      xData: getAttrsArray(props.data, 'day'),
+      yData: [
         {
           type: 'line',
           data: getAttrsArray(props.data, 'tokens_num')
@@ -141,8 +141,8 @@ const statisticsType = computed(() => [
     ],
     option: {
       title: '用户满意度',
-      xDatas: getAttrsArray(props.data, 'day'),
-      yDatas: [
+      xData: getAttrsArray(props.data, 'day'),
+      yData: [
         {
           name: '赞同',
           type: 'line',

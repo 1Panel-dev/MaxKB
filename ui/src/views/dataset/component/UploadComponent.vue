@@ -49,7 +49,7 @@
                 <el-text type="info">{{ filesize(item && item?.size) || '0K' }}</el-text>
               </div>
             </div>
-            <el-button text @click="deleteFlie(index)">
+            <el-button text @click="deleteFile(index)">
               <el-icon><Delete /></el-icon>
             </el-button>
           </div>
@@ -78,7 +78,7 @@ const FormRef = ref()
 watch(form.value, (value) => {
   dataset.saveDocumentsFile(value.fileList)
 })
-function deleteFlie(index: number) {
+function deleteFile(index: number) {
   form.value.fileList.splice(index, 1)
 }
 

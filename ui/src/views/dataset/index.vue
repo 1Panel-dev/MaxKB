@@ -79,7 +79,7 @@
                               @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
                               >设置</el-dropdown-item
                             >
-                            <el-dropdown-item icon="Delete" @click.stop="deleteDateset(item)"
+                            <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)"
                               >删除</el-dropdown-item
                             >
                           </el-dropdown-menu>
@@ -131,7 +131,7 @@ function searchHandle() {
   getList()
 }
 
-function deleteDateset(row: any) {
+function deleteDataset(row: any) {
   MsgConfirm(
     `是否删除知识库：${row.name} ?`,
     `此知识库关联 ${row.application_mapping_count} 个应用，删除后无法恢复，请谨慎操作。`,
@@ -141,7 +141,7 @@ function deleteDateset(row: any) {
     }
   )
     .then(() => {
-      datasetApi.delDateset(row.id, loading).then(() => {
+      datasetApi.delDataset(row.id, loading).then(() => {
         const index = datasetList.value.findIndex((v) => v.id === row.id)
         datasetList.value.splice(index, 1)
         MsgSuccess('删除成功')
@@ -152,7 +152,7 @@ function deleteDateset(row: any) {
 
 function getList() {
   datasetApi
-    .getDateset(paginationConfig, searchValue.value && { name: searchValue.value }, loading)
+    .getDataset(paginationConfig, searchValue.value && { name: searchValue.value }, loading)
     .then((res) => {
       paginationConfig.total = res.data.total
       datasetList.value = [...datasetList.value, ...res.data.records]

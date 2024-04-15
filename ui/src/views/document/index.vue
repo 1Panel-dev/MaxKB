@@ -392,7 +392,7 @@ function getList(bool?: boolean) {
 }
 
 function getDetail() {
-  dataset.asyncGetDatesetDetail(id, loading).then((res: any) => {
+  dataset.asyncGetDatasetDetail(id, loading).then((res: any) => {
     datasetDetail.value = res.data
   })
 }
