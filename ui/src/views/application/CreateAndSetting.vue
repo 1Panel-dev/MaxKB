@@ -54,7 +54,7 @@
                 <el-select
                   v-model="applicationForm.model_id"
                   placeholder="请选择 AI 模型"
-                  style="width: 100%"
+                  class="w-full"
                   popper-class="select-model"
                 >
                   <el-option-group
