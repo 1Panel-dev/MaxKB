@@ -2,27 +2,26 @@
 """
     @project: maxkb
     @Author：虎
-    @file： multi_select.py
-    @date：2023/10/31 18:00
+    @file： object_card.py
+    @date：2023/10/31 18:02
     @desc:
 """
-from typing import List, Dict
+from typing import Dict
 
-from common.froms.base_field import BaseExecField, TriggerType
+from common.forms.base_field import BaseExecField, TriggerType
 
 
-class MultiSelect(BaseExecField):
+class ObjectCard(BaseExecField):
     """
-    下拉单选
+    收集对象子表卡片
     """
 
     def __init__(self,
                  label: str,
                  text_field: str,
                  value_field: str,
-                 option_list: List[str:object],
-                 provider: str = None,
-                 method: str = None,
+                 provider: str,
+                 method: str,
                  required: bool = False,
                  default_value: object = None,
                  relation_show_field_dict: Dict = None,
@@ -30,9 +29,5 @@ class MultiSelect(BaseExecField):
                  trigger_type: TriggerType = TriggerType.OPTION_LIST,
                  attrs: Dict[str, object] = None,
                  props_info: Dict[str, object] = None):
-        super().__init__("MultiSelect", label, text_field, value_field, provider, method, required, default_value,
+        super().__init__("ObjectCard", label, text_field, value_field, provider, method, required, default_value,
                          relation_show_field_dict, relation_trigger_field_dict, trigger_type, attrs, props_info)
-        self.option_list = option_list
-
-    def to_dict(self):
-        return {**super().to_dict(), 'option_list': self.option_list}

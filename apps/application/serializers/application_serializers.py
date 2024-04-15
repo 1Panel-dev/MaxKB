@@ -257,7 +257,7 @@ class ApplicationSerializer(serializers.Serializer):
             application_model = ApplicationSerializer.Create.to_application_model(user_id, application)
             dataset_id_list = application.get('dataset_id_list', [])
             application_dataset_mapping_model_list = [
-                ApplicationSerializer.Create.to_application_dateset_mapping(application_model.id, dataset_id) for
+                ApplicationSerializer.Create.to_application_dataset_mapping(application_model.id, dataset_id) for
                 dataset_id in dataset_id_list]
             # 插入应用
             application_model.save()
@@ -280,7 +280,7 @@ class ApplicationSerializer(serializers.Serializer):
                                )
 
         @staticmethod
-        def to_application_dateset_mapping(application_id: str, dataset_id: str):
+        def to_application_dataset_mapping(application_id: str, dataset_id: str):
             return ApplicationDatasetMapping(id=uuid.uuid1(), application_id=application_id, dataset_id=dataset_id)
 
     class HitTest(serializers.Serializer):
