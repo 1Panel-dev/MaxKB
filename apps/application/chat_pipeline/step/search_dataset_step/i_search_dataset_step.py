@@ -12,7 +12,7 @@ from typing import List, Type
 from rest_framework import serializers
 
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
-from application.chat_pipeline.pipeline_manage import PiplineManage
+from application.chat_pipeline.pipeline_manage import PipelineManage
 from common.util.field_message import ErrMessage
 from dataset.models import Paragraph
 
@@ -39,10 +39,10 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
         similarity = serializers.FloatField(required=True, max_value=1, min_value=0,
                                             error_messages=ErrMessage.float("引用分段数"))
 
-    def get_step_serializer(self, manage: PiplineManage) -> Type[InstanceSerializer]:
+    def get_step_serializer(self, manage: PipelineManage) -> Type[InstanceSerializer]:
         return self.InstanceSerializer
 
-    def _run(self, manage: PiplineManage):
+    def _run(self, manage: PipelineManage):
         paragraph_list = self.execute(**self.context['step_args'])
         manage.context['paragraph_list'] = paragraph_list
         self.context['paragraph_list'] = paragraph_list
