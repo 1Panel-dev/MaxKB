@@ -174,7 +174,7 @@ class ConfigManager:
         return True
 
     def load_from_yml(self):
-        for i in ['config_example.yml', 'config.yaml']:
+        for i in ['config_example.yml', 'config.yaml', 'config.yml']:
             if not os.path.isfile(os.path.join(self.root_path, i)):
                 continue
             loaded = self.from_yaml(i)
@@ -197,7 +197,7 @@ class ConfigManager:
 
             Error: No config file found.
 
-            You can run `cp config_example.yml config_example.yml`, and edit it.
+            You can run `cp config_example.yml config.yml`, and edit it.
             """
             raise ImportError(msg)
         return config
