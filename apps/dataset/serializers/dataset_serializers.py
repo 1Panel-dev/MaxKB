@@ -547,12 +547,12 @@ class DataSetSerializers(serializers.ModelSerializer):
             完整同步  删掉当前数据集下所有的文档,再进行同步
             :return:
             """
+            # 删除关联问题
+            QuerySet(ProblemParagraphMapping).filter(dataset=dataset).delete()
             # 删除文档
             QuerySet(Document).filter(dataset=dataset).delete()
             # 删除段落
             QuerySet(Paragraph).filter(dataset=dataset).delete()
-            # 删除问题
-            QuerySet(Problem).filter(dataset=dataset).delete()
             # 删除向量
             ListenerManagement.delete_embedding_by_dataset_signal.send(self.data.get('id'))
             # 同步
