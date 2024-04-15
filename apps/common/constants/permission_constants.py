@@ -11,7 +11,7 @@ from typing import List
 
 class Group(Enum):
     """
-    权限组 一个组一般对应前段一个菜单
+    权限组 一个组一般对应前端一个菜单
     """
     USER = "USER"
 
