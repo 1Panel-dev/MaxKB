@@ -79,5 +79,5 @@ export function getAttrsArray(array: Array<any>, attr: string) {
 
 // 求和
 export function getSum(array: Array<any>) {
-  return array.reduce((totol, item) => totol + item, 0)
+  return array.reduce((total, item) => total + item, 0)
 }
