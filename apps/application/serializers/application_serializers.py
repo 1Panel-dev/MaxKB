@@ -332,9 +332,9 @@ class ApplicationSerializer(serializers.Serializer):
                 {'temp_application.name': models.CharField(), 'temp_application.desc': models.CharField(),
                  'temp_application.create_time': models.DateTimeField()}))
             if "desc" in self.data and self.data.get('desc') is not None:
-                query_set = query_set.filter(**{'temp_application.desc__contains': self.data.get("desc")})
+                query_set = query_set.filter(**{'temp_application.desc__icontains': self.data.get("desc")})
             if "name" in self.data and self.data.get('name') is not None:
-                query_set = query_set.filter(**{'temp_application.name__contains': self.data.get("name")})
+                query_set = query_set.filter(**{'temp_application.name__icontains': self.data.get("name")})
             query_set = query_set.order_by("-temp_application.create_time")
             query_set_dict['default_sql'] = query_set
 

@@ -85,7 +85,7 @@ class ChatSerializers(serializers.Serializer):
             base_query_dict = {'application_chat.application_id': self.data.get("application_id"),
                                'application_chat.create_time__gte': end_time}
             if 'abstract' in self.data and self.data.get('abstract') is not None:
-                base_query_dict['application_chat.abstract__contains'] = self.data.get('abstract')
+                base_query_dict['application_chat.abstract__icontains'] = self.data.get('abstract')
             base_condition = Q(**base_query_dict)
             min_star_query = None
             min_trample_query = None
