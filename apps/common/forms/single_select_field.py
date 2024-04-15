@@ -8,7 +8,7 @@
 """
 from typing import List, Dict
 
-from common.froms.base_field import TriggerType, BaseExecField
+from common.forms.base_field import TriggerType, BaseExecField
 
 
 class SingleSelect(BaseExecField):

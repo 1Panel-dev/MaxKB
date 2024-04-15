@@ -2,18 +2,18 @@
 """
     @project: maxkb
     @Author：虎
-    @file： table_radio.py
-    @date：2023/10/31 18:01
+    @file： tab_card.py
+    @date：2023/10/31 18:03
     @desc:
 """
 from typing import Dict
 
-from common.froms.base_field import TriggerType, BaseExecField
+from common.forms.base_field import BaseExecField, TriggerType
 
 
-class TableRadio(BaseExecField):
+class TabCard(BaseExecField):
     """
-    table 单选
+    收集 Tab类型数据 tab1:{},tab2:{}
     """
 
     def __init__(self,
@@ -29,5 +29,5 @@ class TableRadio(BaseExecField):
                  trigger_type: TriggerType = TriggerType.OPTION_LIST,
                  attrs: Dict[str, object] = None,
                  props_info: Dict[str, object] = None):
-        super().__init__("TableRadio", label, text_field, value_field, provider, method, required, default_value,
+        super().__init__("TabCard", label, text_field, value_field, provider, method, required, default_value,
                          relation_show_field_dict, relation_trigger_field_dict, trigger_type, attrs, props_info)

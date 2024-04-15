@@ -8,7 +8,7 @@
 """
 from typing import List, Dict
 
-from common.froms.base_field import BaseExecField, TriggerType
+from common.forms.base_field import BaseExecField, TriggerType
 
 
 class Radio(BaseExecField):
@@ -30,7 +30,7 @@ class Radio(BaseExecField):
                  trigger_type: TriggerType = TriggerType.OPTION_LIST,
                  attrs: Dict[str, object] = None,
                  props_info: Dict[str, object] = None):
-        super().__init__("Radio", label, text_field, value_field, provider, method, required, default_value,
+        super().__init__("RadioCard", label, text_field, value_field, provider, method, required, default_value,
                          relation_show_field_dict, relation_trigger_field_dict, trigger_type, attrs, props_info)
         self.option_list = option_list
 

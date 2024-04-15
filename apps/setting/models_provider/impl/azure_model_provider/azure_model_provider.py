@@ -12,9 +12,9 @@ from typing import Dict
 from langchain.schema import HumanMessage
 from langchain_community.chat_models.azure_openai import AzureChatOpenAI
 
-from common import froms
+from common import forms
 from common.exception.app_exception import AppApiException
-from common.froms import BaseForm
+from common.forms import BaseForm
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, BaseModelCredential, \
     ModelInfo, \
@@ -51,11 +51,11 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
-    api_base = froms.TextInputField('API 域名', required=True)
+    api_base = forms.TextInputField('API 域名', required=True)
 
-    api_key = froms.PasswordInputField("API Key", required=True)
+    api_key = forms.PasswordInputField("API Key", required=True)
 
-    deployment_name = froms.TextInputField("部署名", required=True)
+    deployment_name = forms.TextInputField("部署名", required=True)
 
 
 class DefaultAzureLLMModelCredential(BaseForm, BaseModelCredential):
@@ -87,13 +87,13 @@ class DefaultAzureLLMModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
-    api_version = froms.TextInputField("api_version", required=True)
+    api_version = forms.TextInputField("api_version", required=True)
 
-    api_base = froms.TextInputField('API 域名', required=True)
+    api_base = forms.TextInputField('API 域名', required=True)
 
-    api_key = froms.PasswordInputField("API Key", required=True)
+    api_key = forms.PasswordInputField("API Key", required=True)
 
-    deployment_name = froms.TextInputField("部署名", required=True)
+    deployment_name = forms.TextInputField("部署名", required=True)
 
 
 azure_llm_model_credential = AzureLLMModelCredential()
