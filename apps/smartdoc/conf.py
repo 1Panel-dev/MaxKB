@@ -193,11 +193,12 @@ class ConfigManager:
         if manager.load_from_yml():
             config = manager.config
         else:
-            msg = """
+            msg = f"""
 
             Error: No config file found.
 
-            You can run `cp config_example.yml config.yml`, and edit it.
+            You can run `cp config_example.yml {root_path}/config.yml`, and edit it.
+
             """
             raise ImportError(msg)
         return config

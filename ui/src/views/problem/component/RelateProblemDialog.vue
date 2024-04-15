@@ -172,7 +172,7 @@ function getDocument() {
     cloneDocumentList.value = res.data
     documentList.value = res.data
     currentDocument.value = cloneDocumentList.value?.length > 0 ? cloneDocumentList.value[0].id : ''
-    getParagraphList(currentDocument.value)
+    currentDocument.value && getParagraphList(currentDocument.value)
   })
 }
 

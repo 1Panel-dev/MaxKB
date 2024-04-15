@@ -6,6 +6,8 @@
     "composite": true,
     "moduleResolution": "node",
     "baseUrl": ".",
+    "target": "esnext", // 使用ES最新语法
+    "module": "esnext", // 使用ES模块语法
     "paths": {
       "@/*": ["./src/*"]
     }
