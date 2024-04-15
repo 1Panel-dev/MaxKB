@@ -20,7 +20,7 @@ from langchain.schema import BaseMessage
 from langchain.schema.messages import BaseMessageChunk, HumanMessage, AIMessage
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
-from application.chat_pipeline.pipeline_manage import PiplineManage
+from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
 from application.models.api_key_model import ApplicationPublicAccessClient
 from common.constants.authentication_type import AuthenticationType
@@ -84,7 +84,7 @@ class BaseChatStep(IChatStep):
                 post_response_handler: PostResponseHandler,
                 chat_model: BaseChatModel = None,
                 paragraph_list=None,
-                manage: PiplineManage = None,
+                manage:  = None,
                 padding_problem_text: str = None,
                 stream: bool = True,
                 client_id=None, client_type=None,
@@ -125,7 +125,7 @@ class BaseChatStep(IChatStep):
                        post_response_handler: PostResponseHandler,
                        chat_model: BaseChatModel = None,
                        paragraph_list=None,
-                       manage: PiplineManage = None,
+                       manage:  = None,
                        padding_problem_text: str = None,
                        client_id=None, client_type=None):
         # 调用模型
@@ -151,7 +151,7 @@ class BaseChatStep(IChatStep):
                       post_response_handler: PostResponseHandler,
                       chat_model: BaseChatModel = None,
                       paragraph_list=None,
-                      manage: PiplineManage = None,
+                      manage:  = None,
                       padding_problem_text: str = None,
                       client_id=None, client_type=None):
         # 调用模型

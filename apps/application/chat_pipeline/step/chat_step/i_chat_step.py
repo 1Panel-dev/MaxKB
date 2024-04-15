@@ -14,7 +14,7 @@ from langchain.schema import BaseMessage
 from rest_framework import serializers
 
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
-from application.chat_pipeline.pipeline_manage import PiplineManage
+from application.chat_pipeline.pipeline_manage import PipelineManage
 from common.field.common import InstanceField
 from common.util.field_message import ErrMessage
 from dataset.models import Paragraph
@@ -78,10 +78,10 @@ class IChatStep(IBaseChatPipelineStep):
                 if not isinstance(message, BaseMessage):
                     raise Exception("message 类型错误")
 
-    def get_step_serializer(self, manage: PiplineManage) -> Type[serializers.Serializer]:
+    def get_step_serializer(self, manage: PipelineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer
 
-    def _run(self, manage: PiplineManage):
+    def _run(self, manage: PipelineManage):
         chat_result = self.execute(**self.context['step_args'], manage=manage)
         manage.context['chat_result'] = chat_result
 
@@ -91,6 +91,6 @@ class IChatStep(IBaseChatPipelineStep):
                 post_response_handler: PostResponseHandler,
                 chat_model: BaseChatModel = None,
                 paragraph_list=None,
-                manage: PiplineManage = None,
+                manage: PipelineManage = None,
                 padding_problem_text: str = None, stream: bool = True, client_id=None, client_type=None, **kwargs):
         pass

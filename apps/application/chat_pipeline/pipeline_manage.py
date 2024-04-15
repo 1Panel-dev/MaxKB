@@ -13,7 +13,7 @@ from typing import List, Type, Dict
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep
 
 
-class PiplineManage:
+class PipelineManage:
     def __init__(self, step_list: List[Type[IBaseChatPipelineStep]]):
         # 步骤执行器
         self.step_list = [step() for step in step_list]
@@ -42,4 +42,4 @@ class PiplineManage:
             return self
 
         def build(self):
-            return PiplineManage(step_list=self.step_list)
+            return PipelineManage(step_list=self.step_list)

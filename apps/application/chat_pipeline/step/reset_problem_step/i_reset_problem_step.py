@@ -13,7 +13,7 @@ from langchain.chat_models.base import BaseChatModel
 from rest_framework import serializers
 
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep
-from application.chat_pipeline.pipeline_manage import PiplineManage
+from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import ModelField
 from application.models import ChatRecord
 from common.field.common import InstanceField
@@ -30,10 +30,10 @@ class IResetProblemStep(IBaseChatPipelineStep):
         # 大语言模型
         chat_model = ModelField(error_messages=ErrMessage.base("大语言模型"))
 
-    def get_step_serializer(self, manage: PiplineManage) -> Type[serializers.Serializer]:
+    def get_step_serializer(self, manage: PipelineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer
 
-    def _run(self, manage: PiplineManage):
+    def _run(self, manage: PipelineManage):
         padding_problem = self.execute(**self.context.get('step_args'))
         # 用户输入问题
         source_problem_text = self.context.get('step_args').get('problem_text')
