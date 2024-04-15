@@ -13,7 +13,7 @@ from langchain.schema import BaseMessage
 from rest_framework import serializers
 
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
-from application.chat_pipeline.pipeline_manage import PiplineManage
+from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.models import ChatRecord
 from common.field.common import InstanceField
 from common.util.field_message import ErrMessage
@@ -40,10 +40,10 @@ class IGenerateHumanMessageStep(IBaseChatPipelineStep):
         # 补齐问题
         padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.char("补齐问题"))
 
-    def get_step_serializer(self, manage: PiplineManage) -> Type[serializers.Serializer]:
+    def get_step_serializer(self, manage: PipelineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer
 
-    def _run(self, manage: PiplineManage):
+    def _run(self, manage: PipelineManage):
         message_list = self.execute(**self.context['step_args'])
         manage.context['message_list'] = message_list
 
