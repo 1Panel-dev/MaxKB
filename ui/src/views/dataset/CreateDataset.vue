@@ -3,23 +3,6 @@
     <template #backButton>
       <back-button @click="back"></back-button>
     </template>
-    <!-- <template #header>
-      <el-steps :active="active" finish-status="success" align-center class="create-dataset__steps">
-        <el-step v-for="(item, index) in steps" :key="index">
-          <template #icon>
-            <div class="app-step flex align-center">
-              <div class="el-step__icon is-text">
-                <div class="el-step__icon-inner">
-                  <el-icon v-if="active == index + 1" style="margin-top: 1px"><Select /></el-icon>
-                  <span v-else> {{ index + 1 }}</span>
-                </div>
-              </div>
-              <span class="ml-4">{{ item.name }}</span>
-            </div>
-          </template>
-        </el-step>
-      </el-steps>
-    </template> -->
     <div class="create-dataset__main flex" v-loading="loading">
       <div class="create-dataset__component main-calc-height">
         <template v-if="active === 0">

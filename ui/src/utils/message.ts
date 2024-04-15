@@ -40,26 +40,26 @@ export const MsgError = (message: string) => {
 
 /**
  * 删除知识库
- * @param 参数 message: {title, decription,type}
+ * @param 参数 message: {title, description,type}
  */
 
-export const MsgConfirm = (title: string, decription: string, options?: any) => {
+export const MsgConfirm = (title: string, description: string, options?: any) => {
   const defaultOptions: Object = {
     showCancelButton: true,
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     ...options
   }
-  return ElMessageBox.confirm(decription, title, defaultOptions)
+  return ElMessageBox.confirm(description, title, defaultOptions)
 }
 
-// export const MsgConfirm = ({ title, decription }: any, options?: any) => {
+// export const MsgConfirm = ({ title, description }: any, options?: any) => {
 //   const message: any = h('div', { class: 'app-confirm' }, [
 //     h('h4', { class: 'app-confirm-title flex align-center' }, [
 //       h(ElIcon, { class: 'icon' }, [h(WarningFilled)]),
 //       h('span', { class: 'ml-16' }, title)
 //     ]),
-//     h('div', { class: 'app-confirm-decription mt-8' }, decription)
+//     h('div', { class: 'app-confirm-description mt-8' }, description)
 //   ])
 
 //   const defaultOptions: Object = {
