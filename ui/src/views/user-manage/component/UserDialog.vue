@@ -53,10 +53,9 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import { cloneDeep } from 'lodash'
+import type { FormInstance } from 'element-plus'
 import userApi from '@/api/user-manage'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess } from '@/utils/message'
 
 const props = defineProps({
   title: String

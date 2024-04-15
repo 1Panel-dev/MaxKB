@@ -39,9 +39,8 @@
 import { ref, reactive, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ResetPasswordRequest } from '@/api/type/user'
-import { cloneDeep } from 'lodash'
 import userApi from '@/api/user-manage'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits(['refresh'])
 
