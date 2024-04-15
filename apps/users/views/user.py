@@ -88,8 +88,7 @@ class ResetCurrentUserPasswordView(APIView):
         data.update(request.data)
         serializer_obj = RePasswordSerializer(data=data)
         if serializer_obj.reset_password():
-            token_cache.delete(request.META.get('HTTP_AUTHORIZATION', None
-                                                ))
+            token_cache.delete(request.META.get('HTTP_AUTHORIZATION'))
             return result.success(True)
         return result.error("修改密码失败")
 
@@ -119,8 +118,7 @@ class Logout(APIView):
                          responses=SendEmailSerializer().get_response_body_api(),
                          tags=['用户'])
     def post(self, request: Request):
-        token_cache.delete(request.META.get('HTTP_AUTHORIZATION', None
-                                            ))
+        token_cache.delete(request.META.get('HTTP_AUTHORIZATION'))
         return result.success(True)
 
 
