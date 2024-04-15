@@ -180,4 +180,3 @@ apps/static
 models/
 data
 .dev
-poetry.lock
