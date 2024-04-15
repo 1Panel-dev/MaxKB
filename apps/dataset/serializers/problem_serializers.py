@@ -83,7 +83,7 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             query_set = query_set.filter(
                 **{'dataset_id': self.data.get('dataset_id')})
             if 'content' in self.data:
-                query_set = query_set.filter(**{'content__contains': self.data.get('content')})
+                query_set = query_set.filter(**{'content__icontains': self.data.get('content')})
             query_set = query_set.order_by("-create_time")
             return query_set
 

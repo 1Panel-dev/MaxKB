@@ -494,9 +494,9 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 **{'dataset_id': self.data.get('dataset_id'), 'document_id': self.data.get("document_id")})
             if 'title' in self.data:
                 query_set = query_set.filter(
-                    **{'title__contains': self.data.get('title')})
+                    **{'title__icontains': self.data.get('title')})
             if 'content' in self.data:
-                query_set = query_set.filter(**{'content__contains': self.data.get('content')})
+                query_set = query_set.filter(**{'content__icontains': self.data.get('content')})
             return query_set
 
         def list(self):
