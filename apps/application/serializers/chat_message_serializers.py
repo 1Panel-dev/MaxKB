@@ -15,7 +15,7 @@ from django.db.models import QuerySet
 from langchain.chat_models.base import BaseChatModel
 from rest_framework import serializers
 
-from application.chat_pipeline.pipeline_manage import PiplineManage
+from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
 from application.chat_pipeline.step.chat_step.impl.base_chat_step import BaseChatStep
 from application.chat_pipeline.step.generate_human_message_step.impl.base_generate_human_message_step import \
@@ -108,7 +108,7 @@ def get_post_handler(chat_info: ChatInfo):
                     paragraph_list: List[Paragraph],
                     problem_text: str,
                     answer_text,
-                    manage: PiplineManage,
+                    manage: PipelineManage,
                     step: BaseChatStep,
                     padding_problem_text: str = None,
                     client_id=None,
@@ -178,7 +178,7 @@ class ChatMessageSerializer(serializers.Serializer):
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
         chat_info = self.is_valid(raise_exception=True)
-        pipline_manage_builder = PiplineManage.builder()
+        pipline_manage_builder = PipelineManage.builder()
         # 如果开启了问题优化,则添加上问题优化步骤
         if chat_info.application.problem_optimization:
             pipline_manage_builder.append_step(BaseResetProblemStep)
