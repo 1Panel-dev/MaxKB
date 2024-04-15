@@ -149,6 +149,15 @@ function addProblemHandle(val: string) {
       problemValue.value = ''
       isAddProblem.value = false
     })
+  } else {
+    const problem = problemOptions.value.find((option) => option.id === val)
+    const content = problem ? problem.content : val
+    if (!problemList.value.some((item) => item.content === content)) {
+      problemList.value.push({ content: content })
+    }
+
+    problemValue.value = ''
+    isAddProblem.value = false
   }
 }
 
