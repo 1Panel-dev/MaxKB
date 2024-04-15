@@ -6,7 +6,7 @@ import { type Ref } from 'vue'
 const prefix = '/application'
 /**
  * 对话日志
- * @param 参数 
+ * @param 参数
  * application_id, history_day
  * page  {
               "current_page": "string",
@@ -18,37 +18,37 @@ const prefix = '/application'
             }
  */
 const getChatLog: (
-  applicaiton_id: String,
+  application_id: String,
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, page, param, loading) => {
+) => Promise<Result<any>> = (application_id, page, param, loading) => {
   return get(
-    `${prefix}/${applicaiton_id}/chat/${page.current_page}/${page.page_size}`,
+    `${prefix}/${application_id}/chat/${page.current_page}/${page.page_size}`,
     param,
     loading
   )
 }
 
 const exportChatLog: (
-  applicaiton_id: string,
-  applicantion_name: string,
+  application_id: string,
+  application_name: string,
   param: any,
   loading?: Ref<boolean>
-) => void = (applicaiton_id, applicantion_name, param, loading) => {
-  exportExcel(applicantion_name, `${prefix}/${applicaiton_id}/chat/export`, param, loading)
+) => void = (application_id, application_name, param, loading) => {
+  exportExcel(application_name, `${prefix}/${application_id}/chat/export`, param, loading)
 }
 
 /**
  * 删除日志
- * @param 参数 applicaiton_id, chat_id,
+ * @param 参数 application_id, chat_id,
  */
 const delChatLog: (
-  applicaiton_id: string,
+  application_id: string,
   chat_id: string,
   loading?: Ref<boolean>
-) => Promise<Result<boolean>> = (applicaiton_id, chat_id, loading) => {
-  return del(`${prefix}/${applicaiton_id}/chat/${chat_id}`, undefined, {}, loading)
+) => Promise<Result<boolean>> = (application_id, chat_id, loading) => {
+  return del(`${prefix}/${application_id}/chat/${chat_id}`, undefined, {}, loading)
 }
 
 /**
@@ -61,13 +61,13 @@ const delChatLog: (
         }
  */
 const getChatRecordLog: (
-  applicaiton_id: String,
+  application_id: String,
   chart_id: String,
   page: pageRequest,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, chart_id, page, loading) => {
+) => Promise<Result<any>> = (application_id, chart_id, page, loading) => {
   return get(
-    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
     undefined,
     loading
   )
@@ -83,7 +83,7 @@ const getChatRecordLog: (
         }
  */
 const putChatRecordLog: (
-  applicaiton_id: String,
+  application_id: String,
   chart_id: String,
   chart_record_id: String,
   dataset_id: String,
@@ -91,7 +91,7 @@ const putChatRecordLog: (
   data: any,
   loading?: Ref<boolean>
 ) => Promise<Result<any>> = (
-  applicaiton_id,
+  application_id,
   chart_id,
   chart_record_id,
   dataset_id,
@@ -100,7 +100,7 @@ const putChatRecordLog: (
   loading
 ) => {
   return put(
-    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${chart_record_id}/dataset/${dataset_id}/document_id/${document_id}/improve`,
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/dataset/${dataset_id}/document_id/${document_id}/improve`,
     data,
     undefined,
     loading
@@ -113,13 +113,13 @@ const putChatRecordLog: (
  * application_id, chart_id,  chart_record_id
  */
 const getMarkRecord: (
-  applicaiton_id: String,
+  application_id: String,
   chart_id: String,
   chart_record_id: String,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, chart_id, chart_record_id, loading) => {
+) => Promise<Result<any>> = (application_id, chart_id, chart_record_id, loading) => {
   return get(
-    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${chart_record_id}/improve`,
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/improve`,
     undefined,
     loading
   )
@@ -131,7 +131,7 @@ const getMarkRecord: (
  * application_id, chart_id,  chart_record_id, dataset_id, document_id,paragraph_id
  */
 const delMarkRecord: (
-  applicaiton_id: String,
+  application_id: String,
   chart_id: String,
   chart_record_id: String,
   dataset_id: String,
@@ -139,7 +139,7 @@ const delMarkRecord: (
   paragraph_id: String,
   loading?: Ref<boolean>
 ) => Promise<Result<any>> = (
-  applicaiton_id,
+  application_id,
   chart_id,
   chart_record_id,
   dataset_id,
@@ -148,7 +148,7 @@ const delMarkRecord: (
   loading
 ) => {
   return del(
-    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${chart_record_id}/dataset/${dataset_id}/document_id/${document_id}/improve/${paragraph_id}`,
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}/dataset/${dataset_id}/document_id/${document_id}/improve/${paragraph_id}`,
     undefined,
     {},
     loading
@@ -161,13 +161,13 @@ const delMarkRecord: (
  * application_id, chart_id,  chart_record_id
  */
 const getRecordDetail: (
-  applicaiton_id: String,
+  application_id: String,
   chart_id: String,
   chart_record_id: String,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, chart_id, chart_record_id, loading) => {
+) => Promise<Result<any>> = (application_id, chart_id, chart_record_id, loading) => {
   return get(
-    `${prefix}/${applicaiton_id}/chat/${chart_id}/chat_record/${chart_record_id}`,
+    `${prefix}/${application_id}/chat/${chart_id}/chat_record/${chart_record_id}`,
     undefined,
     loading
   )
