@@ -48,7 +48,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
       - name: Prepare
         id: prepare
         run: |
@@ -104,7 +104,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
       - name: Prepare
         id: prepare
         run: |
