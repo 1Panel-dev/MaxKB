@@ -49,70 +49,70 @@ const postApplication: (
 
  */
 const putApplication: (
-  applicaiton_id: String,
+  application_id: String,
   data: ApplicationFormType,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, data, loading) => {
-  return put(`${prefix}/${applicaiton_id}`, data, undefined, loading)
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return put(`${prefix}/${application_id}`, data, undefined, loading)
 }
 
 /**
  * 删除应用
- * @param 参数 applicaiton_id
+ * @param 参数 application_id
  */
 const delApplication: (
-  applicaiton_id: String,
+  application_id: String,
   loading?: Ref<boolean>
-) => Promise<Result<boolean>> = (applicaiton_id, loading) => {
-  return del(`${prefix}/${applicaiton_id}`, undefined, {}, loading)
+) => Promise<Result<boolean>> = (application_id, loading) => {
+  return del(`${prefix}/${application_id}`, undefined, {}, loading)
 }
 
 /**
  * 应用详情
- * @param 参数 applicaiton_id
+ * @param 参数 application_id
  */
 const getApplicationDetail: (
-  applicaiton_id: string,
+  application_id: string,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, loading) => {
-  return get(`${prefix}/${applicaiton_id}`, undefined, loading)
+) => Promise<Result<any>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}`, undefined, loading)
 }
 
 /**
  * 获得当前应用可使用的知识库
- * @param 参数 applicaiton_id
+ * @param 参数 application_id
  */
 const getApplicationDataset: (
-  applicaiton_id: string,
+  application_id: string,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, loading) => {
-  return get(`${prefix}/${applicaiton_id}/list_dataset`, undefined, loading)
+) => Promise<Result<any>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/list_dataset`, undefined, loading)
 }
 
 /**
  * 获取AccessToken
- * @param 参数 applicaiton_id
+ * @param 参数 application_id
  */
-const getAccessToken: (applicaiton_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  applicaiton_id,
+const getAccessToken: (application_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  application_id,
   loading
 ) => {
-  return get(`${prefix}/${applicaiton_id}/access_token`, undefined, loading)
+  return get(`${prefix}/${application_id}/access_token`, undefined, loading)
 }
 
 /**
  * 修改AccessToken
- * @param 参数 applicaiton_id
+ * @param 参数 application_id
  * data {
  *  "is_active": true
  * }
  */
 const putAccessToken: (
-  applicaiton_id: string,
+  application_id: string,
   data: any,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, data, loading) => {
-  return put(`${prefix}/${applicaiton_id}/access_token`, data, undefined, loading)
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return put(`${prefix}/${application_id}/access_token`, data, undefined, loading)
 }
 
 /**
@@ -161,8 +161,8 @@ const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data)
   ]
 }
  */
-const getChatOpen: (applicaiton_id: String) => Promise<Result<any>> = (applicaiton_id) => {
-  return get(`${prefix}/${applicaiton_id}/chat/open`)
+const getChatOpen: (application_id: String) => Promise<Result<any>> = (application_id) => {
+  return get(`${prefix}/${application_id}/chat/open`)
 }
 /**
  * 对话

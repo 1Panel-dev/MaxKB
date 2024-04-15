@@ -304,7 +304,7 @@ function rowClickHandle(row: any) {
 }
 
 const setRowClass = ({ row }: any) => {
-  return currentClickId.value === row?.id ? 'hightlight' : ''
+  return currentClickId.value === row?.id ? 'highlight' : ''
 }
 
 function handleSizeChange() {

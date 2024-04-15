@@ -34,8 +34,8 @@ function initChart() {
     myChart = echarts.init(document.getElementById(props.id))
   }
   const series: any = []
-  if (props.option?.yDatas?.length) {
-    props.option?.yDatas.forEach((item: any, index: number) => {
+  if (props.option?.yData?.length) {
+    props.option?.yData.forEach((item: any, index: number) => {
       series.push({
         itemStyle: {
           color: color[index]
@@ -83,7 +83,7 @@ function initChart() {
     },
     xAxis: {
       type: 'category',
-      data: props.option.xDatas
+      data: props.option.xData
     },
     yAxis: {
       type: 'value',

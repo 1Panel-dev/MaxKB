@@ -14,7 +14,7 @@
               <template v-for="(item, index) in prologueList" :key="index">
                 <div
                   v-if="item.type === 'question'"
-                  @click="quickProblemHandel(item.str)"
+                  @click="quickProblemHandle(item.str)"
                   class="problem-button ellipsis-2 mb-8"
                   :class="log ? 'disabled' : 'cursor'"
                 >
@@ -266,7 +266,7 @@ function openParagraph(row: any, id?: string) {
   ParagraphSourceDialogRef.value.open(row, id)
 }
 
-function quickProblemHandel(val: string) {
+function quickProblemHandle(val: string) {
   if (!props.log && !loading.value) {
     // inputValue.value = val
     // nextTick(() => {

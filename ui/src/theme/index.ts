@@ -86,10 +86,10 @@ class Theme {
   /**
    * 转换外推数据
    * @param setting    设置
-   * @param inferDatas 外推数据
+   * @param inferData 外推数据
    */
-  mapInferData = (setting: ThemeSetting, inferDatas: Array<InferData>) => {
-    return inferDatas
+  mapInferData = (setting: ThemeSetting, inferData: Array<InferData>) => {
+    return inferData
       .map((itemData) => {
         return this.mapInferMainStyle(setting, itemData)
       })
@@ -173,7 +173,7 @@ class Theme {
    *
    * @param setting    主题设置
    * @param keyValue   主题键值对数据
-   * @param inferDatas 外推数据
+   * @param inferData 外推数据
    * @returns 合并后的键值对数据
    */
   tokeyValueStyle = () => {

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Start postgress
+# Start postgresql
 docker-entrypoint.sh postgres &
 sleep 10
-# Wait postgress
+# Wait postgresql
 until pg_isready --host=127.0.0.1; do sleep 1 && echo "waiting for postgres"; done
 
 # Start MaxKB
