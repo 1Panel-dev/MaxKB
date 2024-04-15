@@ -35,7 +35,7 @@
 import { ref } from 'vue'
 import useStore from '@/stores'
 import { useRouter } from 'vue-router'
-import ResetPassword from './ResetPasssword.vue'
+import ResetPassword from './ResetPassword.vue'
 import AboutDialog from './AboutDialog.vue'
 const { user } = useStore()
 const router = useRouter()
