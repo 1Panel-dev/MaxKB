@@ -44,9 +44,8 @@
           <el-select
             v-loading="model_type_loading"
             @change="list_base_model($event)"
-            style="width: 100%"
             v-model="base_form_data.model_type"
-            class="m-2"
+            class="w-full m-2"
             placeholder="请选择模型类型"
           >
             <el-option
@@ -61,9 +60,8 @@
           <el-select
             @change="getModelForm($event)"
             v-loading="base_model_loading"
-            style="width: 100%"
             v-model="base_form_data.model_name"
-            class="m-2"
+            class="w-full m-2"
             placeholder="请选择基础模型"
             filterable
             allow-create
