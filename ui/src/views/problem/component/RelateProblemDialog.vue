@@ -157,7 +157,7 @@ function associationClick(item: any) {
 function searchHandle() {
   paginationConfig.current_page = 1
   paragraphList.value = []
-  getParagraphList(currentDocument.value)
+  currentDocument.value && getParagraphList(currentDocument.value)
 }
 
 function clickDocumentHandle(item: any) {
