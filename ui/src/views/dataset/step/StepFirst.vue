@@ -137,7 +137,7 @@ const onSubmit = async () => {
         await webFormRef.value.validate((valid: any) => {
           if (valid) {
             const obj = { ...BaseFormRef.value.form, ...form.value }
-            datasetApi.postWebDateset(obj, loading).then((res) => {
+            datasetApi.postWebDataset(obj, loading).then((res) => {
               MsgSuccess('提交成功')
               dataset.saveBaseInfo(null)
               dataset.saveWebInfo(null)

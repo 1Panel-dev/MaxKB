@@ -117,7 +117,7 @@ function submit() {
         loading.value = false
       })
   } else {
-    datasetApi.postDateset(obj, loading).then((res) => {
+    datasetApi.postDataset(obj, loading).then((res) => {
       successInfo.value = res.data
       active.value = 2
       clearStore()

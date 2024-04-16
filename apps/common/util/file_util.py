@@ -9,8 +9,6 @@
 
 
 def get_file_content(path):
-    file = open(path, "r",
-                encoding='utf-8')
-    content = file.read()
-    file.close()
+    with open(path, "r", encoding='utf-8') as file:
+        content = file.read()
     return content

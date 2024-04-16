@@ -6,7 +6,7 @@
     @date：2023/11/1 16:04
     @desc:
 """
-from common.froms import BaseField
+from common.forms import BaseField
 
 
 class BaseForm:

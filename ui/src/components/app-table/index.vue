@@ -17,7 +17,7 @@
           <el-button type="primary" @click="submitHandle" :disabled="loading">创建</el-button>
           <el-button @click="showInput = false" :disabled="loading">取消</el-button>
         </div>
-        <div v-else @click="quickCreateHandel" class="w-full">
+        <div v-else @click="quickCreateHandle" class="w-full">
           <el-button type="primary" link class="quich-button">
             <el-icon><Plus /></el-icon>
             <span class="ml-4">{{ quickCreatePlaceholder }}</span>
@@ -104,7 +104,7 @@ function submitHandle() {
   }
 }
 
-function quickCreateHandel() {
+function quickCreateHandle() {
   showInput.value = true
   nextTick(() => {
     quickInputRef.value?.focus()

@@ -14,9 +14,9 @@ from urllib.parse import urlparse, ParseResult
 import requests
 from langchain.chat_models.base import BaseChatModel
 
-from common import froms
+from common import forms
 from common.exception.app_exception import AppApiException
-from common.froms import BaseForm
+from common.forms import BaseForm
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, \
     BaseModelCredential, DownModelChunk, DownModelChunkStatus, ValidCode
@@ -51,8 +51,8 @@ class OllamaLLMModelCredential(BaseForm, BaseModelCredential):
         self.api_key = model_info.get('api_key')
         return self
 
-    api_base = froms.TextInputField('API 域名', required=True)
-    api_key = froms.PasswordInputField('API Key', required=True)
+    api_base = forms.TextInputField('API 域名', required=True)
+    api_key = forms.PasswordInputField('API Key', required=True)
 
 
 ollama_llm_model_credential = OllamaLLMModelCredential()

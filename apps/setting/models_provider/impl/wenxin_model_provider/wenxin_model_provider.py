@@ -13,9 +13,9 @@ from langchain.schema import HumanMessage
 from langchain_community.chat_models import QianfanChatEndpoint
 from qianfan import ChatCompletion
 
-from common import froms
+from common import forms
 from common.exception.app_exception import AppApiException
-from common.froms import BaseForm
+from common.forms import BaseForm
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst, BaseModelCredential, \
     ModelInfo, IModelProvider, ValidCode
@@ -55,9 +55,9 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
         self.secret_key = model_info.get('secret_key')
         return self
 
-    api_key = froms.PasswordInputField('API Key', required=True)
+    api_key = forms.PasswordInputField('API Key', required=True)
 
-    secret_key = froms.PasswordInputField("Secret Key", required=True)
+    secret_key = forms.PasswordInputField("Secret Key", required=True)
 
 
 win_xin_llm_model_credential = WenxinLLMModelCredential()

@@ -270,7 +270,7 @@ function rowClickHandle(row: any) {
 }
 
 const setRowClass = ({ row }: any) => {
-  return currentChatId.value === row?.id ? 'hightlight' : ''
+  return currentChatId.value === row?.id ? 'highlight' : ''
 }
 
 function deleteLog(row: any) {

@@ -11,6 +11,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: () => import('@/layout/app-layout/index.vue'),
     redirect: '/application',
     children: [
+      // TODO 待处理
       // {
       //   path: '/first',
       //   name: 'first',

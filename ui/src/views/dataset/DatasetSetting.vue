@@ -126,7 +126,7 @@ async function submit() {
                 ...BaseFormRef.value.form
               }
         datasetApi
-          .putDateset(id, obj)
+          .putDataset(id, obj)
           .then((res) => {
             MsgSuccess('保存成功')
             loading.value = false
@@ -140,7 +140,7 @@ async function submit() {
 }
 
 function getDetail() {
-  dataset.asyncGetDatesetDetail(id, loading).then((res: any) => {
+  dataset.asyncGetDatasetDetail(id, loading).then((res: any) => {
     detail.value = res.data
     if (detail.value.type === '1') {
       form.value = res.data.meta

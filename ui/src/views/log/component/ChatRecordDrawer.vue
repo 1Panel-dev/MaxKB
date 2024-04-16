@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="visible" size="60%" @close="closeHandel" class="chat-record-drawer">
+  <el-drawer v-model="visible" size="60%" @close="closeHandle" class="chat-record-drawer">
     <template #header>
       <h4>{{ currentAbstract }}</h4>
     </template>
@@ -77,7 +77,7 @@ const paginationConfig = reactive({
   total: 0
 })
 
-function closeHandel() {
+function closeHandle() {
   recordList.value = []
   paginationConfig.total = 0
   paginationConfig.current_page = 1
