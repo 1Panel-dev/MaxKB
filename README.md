@@ -1,5 +1,5 @@
 <p align="center"><img src= "https://github.com/1Panel-dev/maxkb/assets/52996290/c0694996-0eed-40d8-b369-322bf2a380bf" alt="MaxKB" width="300" /></p>
-<h3 align="center">基于 LLM 大语言模型的知识库问答系统</h3>
+<h3 align="center">Knowledge Based Question Answering System Based on LLM (Large Language Model)</h3>
 <p align="center">
   <a href="https://www.gnu.org/licenses/old-licenses/gpl-3.0"><img src="https://img.shields.io/github/license/1Panel-dev/maxkb?color=%231890FF" alt="License: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/maxkb?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/maxkb&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
@@ -9,32 +9,31 @@
 </p>
 <hr/>
 
-MaxKB 是一款基于 LLM 大语言模型的知识库问答系统。MaxKB = Max Knowledge Base，旨在成为企业的最强大脑。
+MaxKB is a knowledge based question answering system based on the LLM (Large Language Model). MaxKB = Max Knowledge Base, aiming to become the most powerful brain of the enterprise.
 
-- **开箱即用**：支持直接上传文档、自动爬取在线文档，支持文本自动拆分、向量化，智能问答交互体验好；
-- **无缝嵌入**：支持零编码快速嵌入到第三方业务系统；
-- **多模型支持**：支持对接主流的大模型，包括本地私有大模型（如 Llama 2）、Azure OpenAI 和百度千帆大模型等。
+- **Out-of-the-box**: Supports direct uploading of documents, automatic crawling of online documents, automatic text splitting and vectorization, and a good intelligent Q&A interactive experience;
+- **Seamless Embedding**: Supports rapid embedding into third-party business systems with zero coding;
+- **Multi-model support**: Supports docking with mainstream large models, including local private large models (such as Llama 2), Azure OpenAI, and Baidu Qianfan large models.
 
-## 快速开始
+## Quick start
 
 ```
 docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1panel/maxkb
 
-# 用户名: admin
-# 密码: MaxKB@123..
+# Username: admin
+# Password: MaxKB@123..
 ```
+You can also quickly deploy MaxKB + Ollama + Llama 2 through [1Panel App Store](https://apps.fit2cloud.com/1panel). A knowledge base question and answer system based on a local large model can be launched within 30 minutes and embedded into in third-party business systems.
 
-你也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama + Llama 2，30 分钟内即可上线基于本地大模型的知识库问答系统，并嵌入到第三方业务系统中。
+You can also experience it online：[DataEase Little Helper](https://dataease.io/docs/v2/)，It is based on MaxKB. The intelligent question and answer system built has been embedded in DataEase products and online documents.
 
-你也可以在线体验：[DataEase 小助手](https://dataease.io/docs/v2/)，它是基于 MaxKB 搭建的智能问答系统，已经嵌入到 DataEase 产品及在线文档中。
+If you have more questions, you can check the user manual or communicate with us through the forum.
 
-如你有更多问题，可以查看使用手册，或者通过论坛与我们交流。
+-   [Manual](https://github.com/1Panel-dev/MaxKB/wiki/1-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2)
+-   [Forum Help](https://bbs.fit2cloud.com/c/mk/11)
+-   [Demo Video](https://www.bilibili.com/video/BV1BE421M7YM/)
 
--   [使用手册](https://github.com/1Panel-dev/MaxKB/wiki/1-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2)
--   [论坛求助](https://bbs.fit2cloud.com/c/mk/11)
--   [演示视频](https://www.bilibili.com/video/BV1BE421M7YM/)
-
-## UI 展示
+## UI Exhibit
 
 <table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
@@ -47,13 +46,13 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
   </tr>
 </table>
 
-## 技术栈
+## Technology Stack
 
--   前端：[Vue.js](https://cn.vuejs.org/)
--   后端：[Python / Django](https://www.djangoproject.com/)
+-   Front End：[Vue.js](https://cn.vuejs.org/)
+-   Back End：[Python / Django](https://www.djangoproject.com/)
 -   LangChain：[LangChain](https://www.langchain.com/)
--   向量数据库：[PostgreSQL / pgvector](https://www.postgresql.org/)
--   大模型：Azure OpenAI、百度千帆大模型、[Ollama](https://github.com/ollama/ollama)
+-   Vector Database：[PostgreSQL / pgvector](https://www.postgresql.org/)
+-   Large Language Model (LLM)：Azure OpenAI, Baidu Qianfan Large Model, [Ollama](https://github.com/ollama/ollama)
 
 ## Star History
 
