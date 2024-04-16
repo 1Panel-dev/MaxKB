@@ -217,7 +217,7 @@ const chartOpenId = ref('')
 const chatList = ref<any[]>([])
 
 const isDisabledChart = computed(
-  () => !(inputValue.value && (props.appId || (props.data?.name && props.data?.model_id)))
+  () => !(inputValue.value.trim() && (props.appId || (props.data?.name && props.data?.model_id)))
 )
 const isMdArray = (val: string) => val.match(/^-\s.*/m)
 const prologueList = computed(() => {
@@ -286,7 +286,9 @@ function sendChatHandle(event: any) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
     event.preventDefault()
     if (!isDisabledChart.value && !loading.value && !event.isComposing) {
-      chatMessage()
+      if (inputValue.value.trim()) {
+        chatMessage()
+      }
     }
   } else {
     // 如果同时按下ctrl+回车键，则会换行
@@ -423,7 +425,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
   if (!chat) {
     chat = reactive({
       id: randomId(),
-      problem_text: problem ? problem : inputValue.value,
+      problem_text: problem ? problem : inputValue.value.trim(),
       answer_text: '',
       buffer: [],
       write_ed: false,
