@@ -62,6 +62,9 @@
                 >
                   抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。
                 </el-card>
+                <el-card v-else-if="item.is_stop" shadow="always" class="dialog-card">
+                  已停止回答  
+                </el-card>
                 <el-card v-else shadow="always" class="dialog-card">
                   回答中 <span class="dotting"></span>
                 </el-card>
@@ -434,6 +437,8 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
       vote_status: '-1'
     })
     chatList.value.push(chat)
+    ChatManagement.addChatRecord(chat, 50, loading)
+    ChatManagement.write(chat.id)
     inputValue.value = ''
     nextTick(() => {
       // 将滚动条滚动到最下面
@@ -471,8 +476,6 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
             // 将滚动条滚动到最下面
             scrollDiv.value.setScrollTop(getMaxHeight())
           })
-          ChatManagement.addChatRecord(chat, 50, loading)
-          ChatManagement.write(chat.id)
           const reader = response.body.getReader()
           // 处理流数据
           const write = getWrite(
