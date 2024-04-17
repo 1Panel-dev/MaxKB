@@ -73,6 +73,7 @@ class OpenAIModelProvider(IModelProvider):
 
     def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> ChatOpenAI:
         azure_chat_open_ai = ChatOpenAI(
+            model=model_name,
             openai_api_base=model_credential.get('api_base'),
             openai_api_key=model_credential.get('api_key')
         )
