@@ -247,7 +247,7 @@ function initMaxkbStyle(root){
     #maxkb #maxkb-chat-container{
         z-index:10000;position: relative;
               border-radius: 8px;
-              border: 1px solid var(--N300, #DEE0E3);
+              border: 1px solid #ffffff;
               background: linear-gradient(188deg, rgba(235, 241, 255, 0.20) 39.6%, rgba(231, 249, 255, 0.20) 94.3%), #EFF0F1;
               box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.10);
               position: fixed;bottom: 20px;right: 45px;overflow: hidden;
