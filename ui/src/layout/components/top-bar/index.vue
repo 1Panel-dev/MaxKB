@@ -14,24 +14,24 @@
       <el-tooltip effect="dark" content="项目地址" placement="top">
         <AppIcon
           iconName="app-github"
-          class="cursor mr-16 ml-8"
-          style="font-size: 24px"
+          class="cursor color-secondary mr-8 ml-8"
+          style="font-size: 20px"
           @click="toUrl('https://github.com/1Panel-dev/MaxKB')"
         ></AppIcon>
       </el-tooltip>
       <el-tooltip effect="dark" content="用户手册" placement="top">
         <AppIcon
           iconName="app-reading"
-          class="cursor mr-16 ml-8"
-          style="font-size: 24px"
+          class="cursor color-secondary mr-8 ml-8"
+          style="font-size: 20px"
           @click="toUrl('https://github.com/1Panel-dev/MaxKB/wiki')"
         ></AppIcon>
       </el-tooltip>
       <el-tooltip effect="dark" content="论坛求助" placement="top">
         <AppIcon
           iconName="app-help"
-          class="cursor mr-16 ml-8"
-          style="font-size: 24px"
+          class="cursor color-secondary mr-16 ml-8"
+          style="font-size: 20px"
           @click="toUrl('https://bbs.fit2cloud.com/c/mk/11')"
         ></AppIcon>
       </el-tooltip>
