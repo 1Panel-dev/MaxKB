@@ -61,7 +61,9 @@ const logout = () => {
 }
 
 onMounted(() => {
-  UserPwdDialogRef.value.open(user.userInfo)
+  if (user.userInfo?.is_edit_password) {
+    UserPwdDialogRef.value.open(user.userInfo)
+  }
 })
 </script>
 <style lang="scss" scoped>
