@@ -10,7 +10,6 @@ import os
 from typing import Dict
 
 from langchain.schema import HumanMessage
-from langchain_openai import ChatOpenAI
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -19,6 +18,7 @@ from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, BaseModelCredential, \
     ModelInfo, \
     ModelTypeConst, ValidCode
+from setting.models_provider.impl.openai_model_provider.model.openai_chat_model import OpenAIChatModel
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -71,8 +71,8 @@ class OpenAIModelProvider(IModelProvider):
     def get_dialogue_number(self):
         return 3
 
-    def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> ChatOpenAI:
-        azure_chat_open_ai = ChatOpenAI(
+    def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> OpenAIChatModel:
+        azure_chat_open_ai = OpenAIChatModel(
             model=model_name,
             openai_api_base=model_credential.get('api_base'),
             openai_api_key=model_credential.get('api_key')
