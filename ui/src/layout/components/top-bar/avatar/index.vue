@@ -30,16 +30,19 @@
   </el-dropdown>
   <ResetPassword ref="resetPasswordRef"></ResetPassword>
   <AboutDialog ref="AboutDialogRef"></AboutDialog>
+  <UserPwdDialog ref="UserPwdDialogRef" />
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import useStore from '@/stores'
 import { useRouter } from 'vue-router'
 import ResetPassword from './ResetPassword.vue'
 import AboutDialog from './AboutDialog.vue'
+import UserPwdDialog from '@/views/user-manage/component/UserPwdDialog.vue'
 const { user } = useStore()
 const router = useRouter()
 
+const UserPwdDialogRef = ref()
 const AboutDialogRef = ref()
 const resetPasswordRef = ref<InstanceType<typeof ResetPassword>>()
 
@@ -56,6 +59,10 @@ const logout = () => {
     router.push({ name: 'login' })
   })
 }
+
+onMounted(() => {
+  UserPwdDialogRef.value.open(user.userInfo)
+})
 </script>
 <style lang="scss" scoped>
 .avatar-dropdown {
