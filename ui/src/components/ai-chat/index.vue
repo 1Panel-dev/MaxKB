@@ -63,7 +63,7 @@
                   抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。
                 </el-card>
                 <el-card v-else-if="item.is_stop" shadow="always" class="dialog-card">
-                  已停止回答  
+                  已停止回答
                 </el-card>
                 <el-card v-else shadow="always" class="dialog-card">
                   回答中 <span class="dotting"></span>
@@ -147,6 +147,7 @@
           placeholder="请输入"
           :rows="1"
           type="textarea"
+          :maxlength="1024"
           @keydown.enter="sendChatHandle($event)"
         />
         <div class="operate">
