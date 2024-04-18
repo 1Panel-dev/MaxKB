@@ -418,7 +418,8 @@ class UserProfile(ApiMixin):
         permission_list = get_user_dynamics_permission(str(user.id))
         permission_list += [p.value for p in get_permission_list_by_role(RoleConstants[user.role])]
         return {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role,
-                'permissions': [str(p) for p in permission_list]}
+                'permissions': [str(p) for p in permission_list],
+                'is_edit_password': user.password == 'd880e722c47a34d8e9fce789fc62389d' if user.role == 'ADMIN' else False}
 
     @staticmethod
     def get_response_body_api():
