@@ -51,19 +51,23 @@ export class ChatRecordManage {
       this.loading.value = true
     }
     this.id = setInterval(() => {
-      const s = this.chat.buffer.shift()
-      if (s !== undefined) {
-        this.chat.answer_text = this.chat.answer_text + s
+      if (this.chat.buffer.length > 20) {
+        this.chat.answer_text =
+          this.chat.answer_text + this.chat.buffer.splice(0, this.chat.buffer.length - 20).join('')
+      } else if (this.is_close) {
+        this.chat.answer_text = this.chat.answer_text + this.chat.buffer.join('')
+        this.chat.write_ed = true
+        this.write_ed = true
+        if (this.loading) {
+          this.loading.value = false
+        }
+        if (this.id) {
+          clearInterval(this.id)
+        }
       } else {
-        if (this.is_close) {
-          this.chat.write_ed = true
-          this.write_ed = true
-          if (this.loading) {
-            this.loading.value = false
-          }
-          if (this.id) {
-            clearInterval(this.id)
-          }
+        const s = this.chat.buffer.shift()
+        if (s !== undefined) {
+          this.chat.answer_text = this.chat.answer_text + s
         }
       }
     }, this.ms)

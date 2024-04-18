@@ -20,7 +20,8 @@
         </div>
         <el-scrollbar>
           <div class="hit-test-height">
-            <el-empty v-if="paragraphDetail.length == 0" description="暂无数据" />
+            <el-empty v-if="first" :image="emptyImg" description="命中段落显示在这里" />
+            <el-empty v-else-if="paragraphDetail.length == 0" description="没有命中的分段" />
             <el-row v-else>
               <el-col
                 :xs="24"
@@ -43,7 +44,8 @@
                 >
                   <template #icon>
                     <AppAvatar class="mr-12 avatar-light" :size="22">
-                      {{ index + 1 + '' }}</AppAvatar>
+                      {{ index + 1 + '' }}</AppAvatar
+                    >
                   </template>
                   <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
                   <template #footer>
@@ -145,6 +147,7 @@ import datasetApi from '@/api/dataset'
 import applicationApi from '@/api/application'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import { arraySort } from '@/utils/utils'
+import emptyImg from '@/assets/hit-test-empty.png'
 
 const route = useRoute()
 const {
@@ -160,6 +163,9 @@ const formInline = ref({
   similarity: 0.6,
   top_number: 5
 })
+
+// 第一次加载
+const first = ref(true)
 
 const cloneForm = ref<any>({})
 
@@ -215,12 +221,14 @@ function getHitTestList() {
       paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
       questionTitle.value = inputValue.value
       inputValue.value = ''
+      first.value = false
     })
   } else if (isApplication.value) {
     applicationApi.getApplicationHitTest(id, obj, loading).then((res) => {
       paragraphDetail.value = res.data && arraySort(res.data, 'comprehensive_score', true)
       questionTitle.value = inputValue.value
       inputValue.value = ''
+      first.value = false
     })
   }
 }
