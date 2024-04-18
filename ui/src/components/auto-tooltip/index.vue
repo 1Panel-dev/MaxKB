@@ -4,6 +4,7 @@
     :disabled="!(containerWeight > contentWeight)"
     effect="dark"
     placement="bottom"
+    popper-class="auto-tooltip-popper"
   >
     <div ref="tagLabel" :class="['auto-tooltip', className]" :style="style">
       <slot></slot>
