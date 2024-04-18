@@ -7,64 +7,64 @@ const prefix = '/application'
 
 /**
  * API_KEY列表
- * @param 参数 applicaiton_id
+ * @param 参数 application_id
  */
-const getAPIKey: (applicaiton_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  applicaiton_id,
+const getAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  application_id,
   loading
 ) => {
-  return get(`${prefix}/${applicaiton_id}/api_key`, undefined, loading)
+  return get(`${prefix}/${application_id}/api_key`, undefined, loading)
 }
 
 /**
  * 新增API_KEY
- * @param 参数 applicaiton_id
+ * @param 参数 application_id
  */
-const postAPIKey: (applicaiton_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  applicaiton_id,
+const postAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  application_id,
   loading
 ) => {
-  return post(`${prefix}/${applicaiton_id}/api_key`, {}, undefined, loading)
+  return post(`${prefix}/${application_id}/api_key`, {}, undefined, loading)
 }
 
 /**
  * 删除API_KEY
- * @param 参数 applicaiton_id api_key_id
+ * @param 参数 application_id api_key_id
  */
 const delAPIKey: (
-  applicaiton_id: String,
+  application_id: String,
   api_key_id: String,
   loading?: Ref<boolean>
-) => Promise<Result<boolean>> = (applicaiton_id, api_key_id, loading) => {
-  return del(`${prefix}/${applicaiton_id}/api_key/${api_key_id}`, undefined, undefined, loading)
+) => Promise<Result<boolean>> = (application_id, api_key_id, loading) => {
+  return del(`${prefix}/${application_id}/api_key/${api_key_id}`, undefined, undefined, loading)
 }
 
 /**
  * 修改API_KEY
- * @param 参数 applicaiton_id,api_key_id
+ * @param 参数 application_id,api_key_id
  * data {
  *   is_active: boolean
  * }
  */
 const putAPIKey: (
-  applicaiton_id: string,
+  application_id: string,
   api_key_id: String,
   data: any,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, api_key_id, data, loading) => {
-  return put(`${prefix}/${applicaiton_id}/api_key/${api_key_id}`, data, undefined, loading)
+) => Promise<Result<any>> = (application_id, api_key_id, data, loading) => {
+  return put(`${prefix}/${application_id}/api_key/${api_key_id}`, data, undefined, loading)
 }
 
 /**
  * 统计
- * @param 参数 applicaiton_id, data
+ * @param 参数 application_id, data
  */
 const getStatistics: (
-  applicaiton_id: string,
+  application_id: string,
   data: any,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (applicaiton_id, data, loading) => {
-  return get(`${prefix}/${applicaiton_id}/statistics/chat_record_aggregate_trend`, data, loading)
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return get(`${prefix}/${application_id}/statistics/chat_record_aggregate_trend`, data, loading)
 }
 
 export default {

@@ -178,12 +178,12 @@ class ChatMessageSerializer(serializers.Serializer):
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
         chat_info = self.is_valid(raise_exception=True)
-        pipline_manage_builder = PipelineManage.builder()
+        pipeline_manage_builder = PipelineManage.builder()
         # 如果开启了问题优化,则添加上问题优化步骤
         if chat_info.application.problem_optimization:
-            pipline_manage_builder.append_step(BaseResetProblemStep)
+            pipeline_manage_builder.append_step(BaseResetProblemStep)
         # 构建流水线管理器
-        pipline_message = (pipline_manage_builder.append_step(BaseSearchDatasetStep)
+        pipeline_message = (pipeline_manage_builder.append_step(BaseSearchDatasetStep)
                            .append_step(BaseGenerateHumanMessageStep)
                            .append_step(BaseChatStep)
                            .build())
@@ -198,8 +198,8 @@ class ChatMessageSerializer(serializers.Serializer):
         params = chat_info.to_pipeline_manage_params(message, get_post_handler(chat_info), exclude_paragraph_id_list,
                                                      client_id, client_type, stream)
         # 运行流水线作业
-        pipline_message.run(params)
-        return pipline_message.context['chat_result']
+        pipeline_message.run(params)
+        return pipeline_message.context['chat_result']
 
     @staticmethod
     def re_open_chat(chat_id: str):

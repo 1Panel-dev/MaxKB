@@ -17,7 +17,7 @@ const prefix = '/dataset'
           "name": "string",
         }
  */
-const getDateset: (
+const getDataset: (
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>
@@ -29,7 +29,7 @@ const getDateset: (
  * 获取全部知识库
  * @param 参数
  */
-const getAllDateset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
+const getAllDataset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
   return get(`${prefix}`, undefined, loading)
 }
 
@@ -37,7 +37,7 @@ const getAllDateset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loadi
  * 删除知识库
  * @param 参数 dataset_id
  */
-const delDateset: (dataset_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+const delDataset: (dataset_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   dataset_id,
   loading
 ) => {
@@ -69,7 +69,7 @@ const delDateset: (dataset_id: String, loading?: Ref<boolean>) => Promise<Result
   ]
 }
  */
-const postDateset: (data: datasetData, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const postDataset: (data: datasetData, loading?: Ref<boolean>) => Promise<Result<any>> = (
   data,
   loading
 ) => {
@@ -86,7 +86,7 @@ const postDateset: (data: datasetData, loading?: Ref<boolean>) => Promise<Result
   "selector": "string",
 }
  */
-const postWebDateset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const postWebDataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
   data,
   loading
 ) => {
@@ -97,7 +97,7 @@ const postWebDateset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>
  * 知识库详情
  * @param 参数 dataset_id
  */
-const getDatesetDetail: (dataset_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const getDatasetDetail: (dataset_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   dataset_id,
   loading
 ) => {
@@ -113,7 +113,7 @@ const getDatesetDetail: (dataset_id: string, loading?: Ref<boolean>) => Promise<
       "desc": true
     }
  */
-const putDateset: (dataset_id: string, data: any) => Promise<Result<any>> = (
+const putDataset: (dataset_id: string, data: any) => Promise<Result<any>> = (
   dataset_id,
   data: any
 ) => {
@@ -152,7 +152,7 @@ const getDatasetHitTest: (
  * @param 参数 dataset_id
  * @query 参数 sync_type // 同步类型->replace:替换同步,complete:完整同步
  */
-const putSyncWebDateset: (
+const putSyncWebDataset: (
   dataset_id: string,
   sync_type: string,
   loading?: Ref<boolean>
@@ -161,14 +161,14 @@ const putSyncWebDateset: (
 }
 
 export default {
-  getDateset,
-  getAllDateset,
-  delDateset,
-  postDateset,
-  getDatesetDetail,
-  putDateset,
+  getDataset,
+  getAllDataset,
+  delDataset,
+  postDataset,
+  getDatasetDetail,
+  putDataset,
   listUsableApplication,
   getDatasetHitTest,
-  postWebDateset,
-  putSyncWebDateset
+  postWebDataset,
+  putSyncWebDataset
 }

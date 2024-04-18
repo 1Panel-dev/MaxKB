@@ -14,7 +14,7 @@
         :parent_field="formField.field + '.' + index"
       ></DynamicsForm>
       <el-tooltip effect="dark" content="删除" placement="top">
-        <el-button text @click.stop="deleteDateset(item)" class="delete-button">
+        <el-button text @click.stop="deleteDataset(item)" class="delete-button">
           <el-icon><Delete /></el-icon>
         </el-button>
       </el-tooltip>
@@ -46,7 +46,7 @@ const props = defineProps<{
 const render_data = () => {
   return Promise.resolve(Result.success(props.formField.children as Array<FormField>))
 }
-const deleteDateset = (item: any) => {
+const deleteDataset = (item: any) => {
   _data.value = _data.value.filter((row) => row !== item)
 }
 const emit = defineEmits(['update:modelValue', 'change'])

@@ -9,6 +9,7 @@
   >
     <el-form-item prop="fileList">
       <el-upload
+        :webkitdirectory="false"
         class="w-full"
         drag
         multiple
@@ -19,18 +20,18 @@
         accept=".txt, .md, .csv, .log, .docx, .pdf"
         :limit="50"
         :on-exceed="onExceed"
-        :on-change="filehandleChange"
+        :on-change="fileHandleChange"
+        @click.prevent="handlePreview(false)"
       >
         <img src="@/assets/upload-icon.svg" alt="" />
         <div class="el-upload__text">
           <p>
-            将文件拖拽至此区域或
-            <em> 选择文件上传 </em>
+            拖拽文件至此上传或
+            <em class="hover" @click.prevent="handlePreview(false)"> 选择文件 </em>
+            <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>
-              支持格式：TXT、Markdown、PDF、DOCX，每次最多上传50个文件，每个文件不超过 100MB
-            </p>
+            <p>支持格式：TXT、Markdown、PDF、DOCX，每次最多上传50个文件，每个文件不超过 100MB</p>
             <p>若使用【高级分段】建议上传前规范文件的分段标识</p>
           </div>
         </div>
@@ -49,7 +50,7 @@
                 <el-text type="info">{{ filesize(item && item?.size) || '0K' }}</el-text>
               </div>
             </div>
-            <el-button text @click="deleteFlie(index)">
+            <el-button text @click="deleteFile(index)">
               <el-icon><Delete /></el-icon>
             </el-button>
           </div>
@@ -59,7 +60,7 @@
   </el-row>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onUnmounted, onMounted, computed, watch } from 'vue'
+import { ref, reactive, onUnmounted, onMounted, computed, watch, nextTick } from 'vue'
 import type { UploadFile, UploadFiles } from 'element-plus'
 import { filesize, getImgUrl, isRightType } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
@@ -78,12 +79,12 @@ const FormRef = ref()
 watch(form.value, (value) => {
   dataset.saveDocumentsFile(value.fileList)
 })
-function deleteFlie(index: number) {
+function deleteFile(index: number) {
   form.value.fileList.splice(index, 1)
 }
 
 // 上传on-change事件
-const filehandleChange = (file: any, fileList: UploadFiles) => {
+const fileHandleChange = (file: any, fileList: UploadFiles) => {
   //1、判断文件大小是否合法，文件限制不能大于10M
   const isLimit = file?.size / 1024 / 1024 < 100
   if (!isLimit) {
@@ -101,6 +102,17 @@ const filehandleChange = (file: any, fileList: UploadFiles) => {
 const onExceed = () => {
   MsgError('每次最多上传50个文件')
 }
+
+const handlePreview = (bool: boolean) => {
+  let inputDom: any = null
+  nextTick(() => {
+    if (document.querySelector('.el-upload__input') != null) {
+      inputDom = document.querySelector('.el-upload__input')
+      inputDom.webkitdirectory = bool
+    }
+  })
+}
+
 /*
   表单校验
 */
@@ -132,5 +144,10 @@ defineExpose({
   font-size: 12px;
   line-height: 20px;
   color: var(--el-text-color-secondary);
+}
+.el-upload__text {
+  .hover:hover {
+    color: var(--el-color-primary-light-5);
+  }
 }
 </style>

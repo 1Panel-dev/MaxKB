@@ -2,18 +2,18 @@
 """
     @project: maxkb
     @Author：虎
-    @file： object_card.py
-    @date：2023/10/31 18:02
+    @file： array_object_card.py
+    @date：2023/10/31 18:03
     @desc:
 """
 from typing import Dict
 
-from common.froms.base_field import BaseExecField, TriggerType
+from common.forms.base_field import BaseExecField, TriggerType
 
 
-class ObjectCard(BaseExecField):
+class ArrayCard(BaseExecField):
     """
-    收集对象子表卡片
+    收集List[Object]
     """
 
     def __init__(self,
@@ -29,5 +29,5 @@ class ObjectCard(BaseExecField):
                  trigger_type: TriggerType = TriggerType.OPTION_LIST,
                  attrs: Dict[str, object] = None,
                  props_info: Dict[str, object] = None):
-        super().__init__("ObjectCard", label, text_field, value_field, provider, method, required, default_value,
+        super().__init__("ArrayObjectCard", label, text_field, value_field, provider, method, required, default_value,
                          relation_show_field_dict, relation_trigger_field_dict, trigger_type, attrs, props_info)

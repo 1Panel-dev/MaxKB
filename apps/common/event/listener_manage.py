@@ -215,7 +215,7 @@ class ListenerManagement:
 
     @staticmethod
     @poxy
-    def init_embedding_model(ags):
+    def init_embedding_model(ages):
         EmbeddingModel.get_embedding_model()
 
     def run(self):

@@ -150,7 +150,7 @@ function changeMenu(id: string) {
 function getDataset() {
   loading.value = true
   dataset
-    .asyncGetAllDateset()
+    .asyncGetAllDataset()
     .then((res: any) => {
       list.value = res.data
       common.saveBreadcrumb(list.value)

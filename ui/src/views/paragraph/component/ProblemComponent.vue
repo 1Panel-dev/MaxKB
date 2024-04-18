@@ -25,13 +25,17 @@
           @change="addProblemHandle"
           @blur="isAddProblem = false"
           class="mb-16"
+          popper-class="select-popper"
+          :popper-append-to-body="false"
         >
           <el-option
             v-for="item in problemOptions"
             :key="item.id"
             :label="item.content"
             :value="item.id"
-          />
+          >
+            {{ item.content }}
+          </el-option>
         </el-select>
         <template v-for="(item, index) in problemList" :key="index">
           <TagEllipsis

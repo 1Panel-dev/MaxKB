@@ -27,10 +27,10 @@ const useDatasetStore = defineStore({
     saveDocumentsFile(file: UploadUserFile[]) {
       this.documentsFiles = file
     },
-    async asyncGetAllDateset(loading?: Ref<boolean>) {
+    async asyncGetAllDataset(loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         datasetApi
-          .getAllDateset(loading)
+          .getAllDataset(loading)
           .then((data) => {
             resolve(data)
           })
@@ -39,10 +39,10 @@ const useDatasetStore = defineStore({
           })
       })
     },
-    async asyncGetDatesetDetail(id: string, loading?: Ref<boolean>) {
+    async asyncGetDatasetDetail(id: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         datasetApi
-          .getDatesetDetail(id, loading)
+          .getDatasetDetail(id, loading)
           .then((data) => {
             resolve(data)
           })
@@ -51,10 +51,10 @@ const useDatasetStore = defineStore({
           })
       })
     },
-    async asyncSyncDateset(id: string, sync_type: string, loading?: Ref<boolean>) {
+    async asyncSyncDataset(id: string, sync_type: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         datasetApi
-          .putSyncWebDateset(id, sync_type, loading)
+          .putSyncWebDataset(id, sync_type, loading)
           .then((data) => {
             resolve(data)
           })
