@@ -196,7 +196,7 @@ class ApplicationSerializer(serializers.Serializer):
         access_token = serializers.CharField(required=True, error_messages=ErrMessage.char("access_token"))
 
         def auth(self, request, with_valid=True):
-            token = request.META.get('HTTP_AUTHORIZATION', None)
+            token = request.META.get('HTTP_AUTHORIZATION')
             token_details = None
             try:
                 # 校验token

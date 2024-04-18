@@ -336,6 +336,7 @@ class SplitModel:
         :return: 解析后数据 {content:段落数据,keywords:[‘段落关键词’],parent_chain:['段落父级链路']}
         """
         text = text.replace('\r', '\n')
+        text = text.replace("\0", '')
         result_tree = self.parse_to_tree(text, 0)
         result = result_tree_to_paragraph(result_tree, [], [])
         return [item for item in [self.post_reset_paragraph(row) for row in result] if

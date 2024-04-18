@@ -62,6 +62,9 @@
                 >
                   抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。
                 </el-card>
+                <el-card v-else-if="item.is_stop" shadow="always" class="dialog-card">
+                  已停止回答
+                </el-card>
                 <el-card v-else shadow="always" class="dialog-card">
                   回答中 <span class="dotting"></span>
                 </el-card>
@@ -144,6 +147,7 @@
           placeholder="请输入"
           :rows="1"
           type="textarea"
+          :maxlength="1024"
           @keydown.enter="sendChatHandle($event)"
         />
         <div class="operate">
@@ -217,7 +221,7 @@ const chartOpenId = ref('')
 const chatList = ref<any[]>([])
 
 const isDisabledChart = computed(
-  () => !(inputValue.value && (props.appId || (props.data?.name && props.data?.model_id)))
+  () => !(inputValue.value.trim() && (props.appId || (props.data?.name && props.data?.model_id)))
 )
 const isMdArray = (val: string) => val.match(/^-\s.*/m)
 const prologueList = computed(() => {
@@ -286,7 +290,9 @@ function sendChatHandle(event: any) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
     event.preventDefault()
     if (!isDisabledChart.value && !loading.value && !event.isComposing) {
-      chatMessage()
+      if (inputValue.value.trim()) {
+        chatMessage()
+      }
     }
   } else {
     // 如果同时按下ctrl+回车键，则会换行
@@ -423,7 +429,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
   if (!chat) {
     chat = reactive({
       id: randomId(),
-      problem_text: problem ? problem : inputValue.value,
+      problem_text: problem ? problem : inputValue.value.trim(),
       answer_text: '',
       buffer: [],
       write_ed: false,
@@ -432,6 +438,8 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
       vote_status: '-1'
     })
     chatList.value.push(chat)
+    ChatManagement.addChatRecord(chat, 50, loading)
+    ChatManagement.write(chat.id)
     inputValue.value = ''
     nextTick(() => {
       // 将滚动条滚动到最下面
@@ -469,8 +477,6 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
             // 将滚动条滚动到最下面
             scrollDiv.value.setScrollTop(getMaxHeight())
           })
-          ChatManagement.addChatRecord(chat, 50, loading)
-          ChatManagement.write(chat.id)
           const reader = response.body.getReader()
           // 处理流数据
           const write = getWrite(
