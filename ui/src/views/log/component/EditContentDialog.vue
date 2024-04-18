@@ -74,36 +74,6 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <!-- <el-form-item label="保存至文档" prop="document_id">
-        <el-cascader
-          v-model="form.document"
-          :props="LoadDocument"
-          placeholder="请选择文档"
-          class="w-full"
-        >
-          <template #default="{ node, data }">
-            <span class="flex align-center">
-              <AppAvatar
-                v-if="!data.dataset_id && data.type === '1'"
-                class="mr-12 avatar-purple"
-                shape="square"
-                :size="24"
-              >
-                <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
-              </AppAvatar>
-              <AppAvatar
-                v-else-if="!data.dataset_id && data.type === '0'"
-                class="mr-12"
-                shape="square"
-                :size="24"
-              >
-                <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-              </AppAvatar>
-              <span class="ellipsis"> {{ data.name }}</span>
-            </span>
-          </template>
-        </el-cascader>
-      </el-form-item> -->
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -118,7 +88,6 @@ import { ref, watch, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import logApi from '@/api/log'
-import type { CascaderProps } from 'element-plus'
 import useStore from '@/stores'
 
 const { application, document } = useStore()
@@ -178,20 +147,6 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-// const LoadDocument: CascaderProps = {
-//   lazy: true,
-//   value: 'id',
-//   label: 'name',
-//   leaf: 'dataset_id',
-//   lazyLoad(node, resolve: any) {
-//     const { level, data } = node
-//     if (data?.id) {
-//       getDocument(data?.id as string, resolve)
-//     } else {
-//       getDataset(resolve)
-//     }
-//   }
-// }
 
 function changeDataset(id: string) {
   form.value.document_id = ''
@@ -201,14 +156,12 @@ function changeDataset(id: string) {
 function getDocument(id: string) {
   document.asyncGetAllDocument(id, loading).then((res: any) => {
     documentList.value = res.data
-    // resolve(datasetList.value)
   })
 }
 
 function getDataset() {
   application.asyncGetApplicationDataset(id, loading).then((res: any) => {
     datasetList.value = res.data
-    // resolve(datasetList.value)
   })
 }
 
