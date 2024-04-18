@@ -11,6 +11,7 @@ from enum import Enum
 from setting.models_provider.impl.azure_model_provider.azure_model_provider import AzureModelProvider
 from setting.models_provider.impl.ollama_model_provider.ollama_model_provider import OllamaModelProvider
 from setting.models_provider.impl.openai_model_provider.openai_model_provider import OpenAIModelProvider
+from setting.models_provider.impl.qwen_model_provider.qwen_model_provider import QwenModelProvider
 from setting.models_provider.impl.wenxin_model_provider.wenxin_model_provider import WenxinModelProvider
 from setting.models_provider.impl.kimi_model_provider.kimi_model_provider import KimiModelProvider
 
@@ -21,3 +22,4 @@ class ModelProvideConstants(Enum):
     model_ollama_provider = OllamaModelProvider()
     model_openai_provider = OpenAIModelProvider()
     model_kimi_provider = KimiModelProvider()
+    model_qwen_provider = QwenModelProvider()
