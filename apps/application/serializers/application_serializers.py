@@ -8,12 +8,13 @@
 """
 import hashlib
 import os
+import re
 import uuid
 from functools import reduce
 from typing import Dict
 
 from django.contrib.postgres.fields import ArrayField
-from django.core import cache
+from django.core import cache, validators
 from django.core import signing
 from django.db import transaction, models
 from django.db.models import QuerySet
@@ -32,6 +33,7 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from dataset.models import DataSet, Document
 from dataset.serializers.common_serializers import list_paragraph
+from embedding.models import SearchMode
 from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -77,6 +79,10 @@ class DatasetSettingSerializer(serializers.Serializer):
                                         error_messages=ErrMessage.float("相识度"))
     max_paragraph_char_number = serializers.IntegerField(required=True, min_value=500, max_value=10000,
                                                          error_messages=ErrMessage.integer("最多引用字符数"))
+    search_mode = serializers.CharField(required=True, validators=[
+        validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
+                                  message="类型只支持register|reset_password", code=500)
+    ], error_messages=ErrMessage.char("检索模式"))
 
 
 class ModelSettingSerializer(serializers.Serializer):
@@ -291,6 +297,10 @@ class ApplicationSerializer(serializers.Serializer):
                                               error_messages=ErrMessage.integer("topN"))
         similarity = serializers.FloatField(required=True, max_value=1, min_value=0,
                                             error_messages=ErrMessage.float("相关度"))
+        search_mode = serializers.CharField(required=True, validators=[
+            validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
+                                      message="类型只支持register|reset_password", code=500)
+        ], error_messages=ErrMessage.char("检索模式"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -312,6 +322,7 @@ class ApplicationSerializer(serializers.Serializer):
             hit_list = vector.hit_test(self.data.get('query_text'), dataset_id_list, exclude_document_id_list,
                                        self.data.get('top_number'),
                                        self.data.get('similarity'),
+                                       SearchMode(self.data.get('search_mode')),
                                        EmbeddingModel.get_embedding_model())
             hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get('paragraph_id'): hit} for hit in hit_list], {})
             p_list = list_paragraph([h.get('paragraph_id') for h in hit_list])

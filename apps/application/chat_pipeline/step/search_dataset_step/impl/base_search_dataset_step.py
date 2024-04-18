@@ -17,6 +17,7 @@ from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.db.search import native_search
 from common.util.file_util import get_file_content
 from dataset.models import Paragraph
+from embedding.models import SearchMode
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -24,13 +25,14 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
 
     def execute(self, problem_text: str, dataset_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
+                search_mode: str = None,
                 **kwargs) -> List[ParagraphPipelineModel]:
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
         embedding_model = EmbeddingModel.get_embedding_model()
         embedding_value = embedding_model.embed_query(exec_problem_text)
         vector = VectorStore.get_embedding_vector()
-        embedding_list = vector.query(embedding_value, dataset_id_list, exclude_document_id_list,
-                                      exclude_paragraph_id_list, True, top_n, similarity)
+        embedding_list = vector.query(exec_problem_text, embedding_value, dataset_id_list, exclude_document_id_list,
+                                      exclude_paragraph_id_list, True, top_n, similarity, SearchMode(search_mode))
         if embedding_list is None:
             return []
         paragraph_list = self.list_paragraph([row.get('paragraph_id') for row in embedding_list], vector)

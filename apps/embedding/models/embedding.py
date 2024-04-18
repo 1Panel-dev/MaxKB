@@ -10,6 +10,7 @@ from django.db import models
 
 from common.field.vector_field import VectorField
 from dataset.models.data_set import Document, Paragraph, DataSet
+from django.contrib.postgres.search import SearchVectorField
 
 
 class SourceType(models.TextChoices):
@@ -17,6 +18,12 @@ class SourceType(models.TextChoices):
     PROBLEM = 0, '问题'
     PARAGRAPH = 1, '段落'
     TITLE = 2, '标题'
+
+
+class SearchMode(models.TextChoices):
+    embedding = 'embedding'
+    keywords = 'keywords'
+    blend = 'blend'
 
 
 class Embedding(models.Model):
@@ -36,6 +43,8 @@ class Embedding(models.Model):
     paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, verbose_name="段落关联", db_constraint=False)
 
     embedding = VectorField(verbose_name="向量")
+
+    search_vector = SearchVectorField(verbose_name="分词", default="")
 
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
