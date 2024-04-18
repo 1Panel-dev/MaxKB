@@ -323,4 +323,11 @@
 // select下拉框
 .select-popper {
   max-width: 300px;
+  .el-select-dropdown__wrap {
+    max-width: 300px;
+  }
+}
+
+.auto-tooltip-popper {
+  max-width: 500px;
 }
