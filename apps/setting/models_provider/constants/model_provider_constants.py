@@ -14,6 +14,7 @@ from setting.models_provider.impl.openai_model_provider.openai_model_provider im
 from setting.models_provider.impl.qwen_model_provider.qwen_model_provider import QwenModelProvider
 from setting.models_provider.impl.wenxin_model_provider.wenxin_model_provider import WenxinModelProvider
 from setting.models_provider.impl.kimi_model_provider.kimi_model_provider import KimiModelProvider
+from setting.models_provider.impl.zhipu_model_provider.zhipu_model_provider import ZhiPuModelProvider
 
 
 class ModelProvideConstants(Enum):
@@ -23,3 +24,4 @@ class ModelProvideConstants(Enum):
     model_openai_provider = OpenAIModelProvider()
     model_kimi_provider = KimiModelProvider()
     model_qwen_provider = QwenModelProvider()
+    model_zhipu_provider = ZhiPuModelProvider()
