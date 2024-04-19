@@ -13,7 +13,7 @@ MaxKB 是一款基于 LLM 大语言模型的知识库问答系统。MaxKB = Max 
 
 - **开箱即用**：支持直接上传文档、自动爬取在线文档，支持文本自动拆分、向量化，智能问答交互体验好；
 - **无缝嵌入**：支持零编码快速嵌入到第三方业务系统；
-- **多模型支持**：支持对接主流的大模型，包括本地私有大模型（如 Llama 2）、Azure OpenAI 和百度千帆大模型等。
+- **多模型支持**：支持对接主流的大模型，包括本地私有大模型（如 Llama 2、Llama 3）、通义千问、OpenAI、Azure OpenAI、Kimi 和百度千帆大模型等。
 
 ## 快速开始
 
@@ -53,7 +53,7 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
 -   后端：[Python / Django](https://www.djangoproject.com/)
 -   LangChain：[LangChain](https://www.langchain.com/)
 -   向量数据库：[PostgreSQL / pgvector](https://www.postgresql.org/)
--   大模型：Azure OpenAI、百度千帆大模型、[Ollama](https://github.com/ollama/ollama)
+-   大模型：Azure OpenAI、OpenAI、百度千帆大模型、[Ollama](https://github.com/ollama/ollama)、通义千问、Kimi
 
 ## Star History
 
