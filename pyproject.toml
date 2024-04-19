@@ -33,6 +33,9 @@ pymupdf = "1.24.1"
 python-docx = "^1.1.0"
 xlwt = "^1.3.0"
 dashscope = "^1.17.0"
+zhipuai = "^2.0.1"
+httpx = "^0.27.0"
+httpx-sse = "^0.4.0"
 
 [build-system]
 requires = ["poetry-core"]
