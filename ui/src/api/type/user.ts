@@ -19,6 +19,10 @@ interface User {
    * 用户权限
    */
   permissions: Array<string>
+  /**
+   * 是否需要修改密码
+   */
+  is_edit_password?: boolean
 }
 
 interface LoginRequest {
