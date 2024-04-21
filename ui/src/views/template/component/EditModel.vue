@@ -10,7 +10,7 @@
     <template #header="{ close, titleId, titleClass }">
       <el-breadcrumb separator=">">
         <el-breadcrumb-item
-          ><span class="active-breadcrumb">{{
+        ><span class="active-breadcrumb">{{
             `编辑 ${providerValue?.name}`
           }}</span></el-breadcrumb-item
         >
@@ -27,7 +27,18 @@
       require-asterisk-position="right"
     >
       <template #default>
-        <el-form-item label="模型名称" prop="name" :rules="base_form_data_rule.name">
+        <el-form-item prop="name" :rules="base_form_data_rule.name">
+          <template #label>
+            <span>模型名称</span>
+            <el-tooltip effect="light" placement="right">
+              <el-icon style="margin-left: 4px;">
+                <QuestionFilled />
+              </el-icon>
+              <template #content>
+                <p>MaxKB 中自定义的模型名称</p>
+              </template>
+            </el-tooltip>
+          </template>
           <el-input
             v-model="base_form_data.name"
             maxlength="20"
@@ -35,7 +46,18 @@
             placeholder="请给基础模型设置一个名称"
           />
         </el-form-item>
-        <el-form-item label="模型类型" prop="model_type" :rules="base_form_data_rule.model_type">
+        <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
+          <template #label>
+            <span>模型类型</span>
+            <el-tooltip effect="light" placement="right">
+              <el-icon style="margin-left: 4px;">
+                <QuestionFilled />
+              </el-icon>
+              <template #content>
+                <p>大语言模型</p>
+              </template>
+            </el-tooltip>
+          </template>
           <el-select
             v-loading="model_type_loading"
             @change="list_base_model($event)"
@@ -49,9 +71,22 @@
               :label="item.key"
               :value="item.value"
             ></el-option
-          ></el-select>
+            >
+          </el-select>
         </el-form-item>
-        <el-form-item label="基础模型" prop="model_name" :rules="base_form_data_rule.model_name">
+        <el-form-item prop="model_name" :rules="base_form_data_rule.model_name">
+          <template #label>
+            <span>基础模型</span>
+            <el-tooltip effect="light" placement="right">
+              <el-icon style="margin-left: 4px;">
+                <QuestionFilled />
+              </el-icon>
+              <template #content>
+                <p>为供应商的 LLM 模型，支持自定义输入</p>
+                <p>下拉选项是 OpenAI 常用的一些大语言模型如：gpt-3.5-turbo-0613、gpt-3.5-turbo、gpt-4 等</p>
+              </template>
+            </el-tooltip>
+          </template>
           <el-select
             @change="getModelForm($event)"
             v-loading="base_model_loading"
@@ -68,7 +103,8 @@
               :label="item.name"
               :value="item.name"
             ></el-option
-          ></el-select>
+            >
+          </el-select>
         </el-form-item>
       </template>
     </DynamicsForm>
@@ -89,6 +125,7 @@ import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
+import { QuestionFilled } from '@element-plus/icons-vue'
 
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
@@ -153,7 +190,7 @@ const list_base_model = (model_type: any) => {
   }
 }
 const open = (provider: Provider, model: Model) => {
-  modelValue.value=model
+  modelValue.value = model
   ModelApi.getModelById(model.id, formLoading).then((ok) => {
     modelValue.value = ok.data
     ModelApi.listModelType(model.provider, model_type_loading).then((ok) => {
@@ -208,10 +245,12 @@ defineExpose({ open, close })
   font-weight: 400;
   line-height: 24px;
   cursor: pointer;
+
   &:hover {
     color: var(--el-color-primary);
   }
 }
+
 .active-breadcrumb {
   font-size: 16px;
   color: rgba(31, 35, 41, 1);
