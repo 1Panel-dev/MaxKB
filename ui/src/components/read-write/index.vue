@@ -21,6 +21,8 @@
             autofocus
             :maxlength="maxlength || '-'"
             :show-word-limit="maxlength ? true : false"
+            @blur="isEdit = false"
+            @keyup.enter="submit"
           ></el-input>
         </div>
 
@@ -64,6 +66,10 @@ const loading = ref(false)
 watch(isEdit, (bool) => {
   if (!bool) {
     writeValue.value = ''
+  } else {
+    nextTick(() => {
+      inputRef.value?.focus()
+    })
   }
 })
 
@@ -80,10 +86,6 @@ function editNameHandle() {
   isEdit.value = true
 }
 
-onMounted(() => {
-  nextTick(() => {
-    inputRef.value?.focus()
-  })
-})
+onMounted(() => {})
 </script>
 <style lang="scss" scoped></style>
