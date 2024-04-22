@@ -11,20 +11,21 @@ import uuid
 from typing import List
 
 import jieba
+from jieba import analyse
 
 from common.util.split_model import group_by
 
-jieba_word_list_cache = ['word' + str(i) for i in range(100)]
+jieba_word_list_cache = [chr(item) for item in range(38, 84)]
 
 for jieba_word in jieba_word_list_cache:
-    jieba.add_word(jieba_word)
+    jieba.add_word('#' + jieba_word + '#')
 # r"(?i)\b(?:https?|ftp|tcp|file)://[^\s]+\b",
 # 某些不分词数据
-word_pattern_list = [r"v\d.\d.\d",
-                     r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}",
-                     r'"([^"]*)"']
+# r'"([^"]*)"'
+word_pattern_list = [r"v\d+.\d+.\d+",
+                     r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}"]
 
-remove_chars = '\n , :\''
+remove_chars = '\n , :\'<>！@#￥%……&*（）!@#$%^&*()： ；，/"./-'
 
 
 def get_word_list(text: str):
@@ -45,13 +46,13 @@ def get_word_list(text: str):
 
 def replace_word(word_dict, text: str):
     for key in word_dict:
-        text = text.replace(word_dict[key], key)
+        text = re.sub('(?<!#)' + word_dict[key] + '(?!#)', key, text)
     return text
 
 
 def get_word_key(text: str, use_word_list):
     for j_word in jieba_word_list_cache:
-        if not text.__contains__(j_word) and use_word_list.__contains__(j_word):
+        if not text.__contains__(j_word) and not use_word_list.__contains__(j_word):
             return j_word
     j_word = str(uuid.uuid1())
     jieba.add_word(j_word)
@@ -62,7 +63,7 @@ def to_word_dict(word_list: List, text: str):
     word_dict = {}
     for word in word_list:
         key = get_word_key(text, set(word_dict))
-        word_dict[key] = word
+        word_dict['#' + key + '#'] = word
     return word_dict
 
 
@@ -83,10 +84,10 @@ def to_ts_vector(text: str):
     # 分词
     result = jieba.tokenize(text, mode='search')
     result_ = [{'word': get_key_by_word_dict(item[0], word_dict), 'index': item[1]} for item in result]
-
     result_group = group_by(result_, lambda r: r['word'])
     return " ".join(
-        [f"{key.lower()}:{','.join([str(item['index'] + 1) for item in result_group[key]])}" for key in result_group if
+        [f"{key.lower()}:{','.join([str(item['index'] + 1) for item in result_group[key]][:20])}" for key in
+         result_group if
          not remove_chars.__contains__(key) and len(key.strip()) >= 0])
 
 
@@ -97,7 +98,8 @@ def to_query(text: str):
     word_dict = to_word_dict(word_list, text)
     # 替换字符串
     text = replace_word(word_dict, text)
-    result = " ".join([get_key_by_word_dict(word, word_dict) for word in jieba.lcut(text) if
+    extract_tags = analyse.extract_tags(text, topK=5, withWeight=True, allowPOS=('ns', 'n', 'vn', 'v', 'eng'))
+    result = " ".join([get_key_by_word_dict(word, word_dict) for word, score in extract_tags if
                        not remove_chars.__contains__(word)])
     # 删除词库
     for word in word_list:
