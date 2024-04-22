@@ -10,7 +10,7 @@
     <template #header="{ close, titleId, titleClass }">
       <el-breadcrumb separator=">">
         <el-breadcrumb-item
-        ><span class="active-breadcrumb">{{
+          ><span class="active-breadcrumb">{{
             `编辑 ${providerValue?.name}`
           }}</span></el-breadcrumb-item
         >
@@ -29,15 +29,17 @@
       <template #default>
         <el-form-item prop="name" :rules="base_form_data_rule.name">
           <template #label>
-            <span>模型名称</span>
-            <el-tooltip effect="light" placement="right">
-              <el-icon style="margin-left: 4px;">
-                <QuestionFilled />
-              </el-icon>
-              <template #content>
-                <p>MaxKB 中自定义的模型名称</p>
-              </template>
-            </el-tooltip>
+            <div class="flex align-center" style="display: inline-flex">
+              <div class="flex-between mr-4">
+                <span>模型名称 </span>
+              </div>
+              <el-tooltip effect="dark" placement="right">
+                <template #content>
+                  <p>MaxKB 中自定义的模型名称</p>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
           </template>
           <el-input
             v-model="base_form_data.name"
@@ -49,14 +51,6 @@
         <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
           <template #label>
             <span>模型类型</span>
-            <el-tooltip effect="light" placement="right">
-              <el-icon style="margin-left: 4px;">
-                <QuestionFilled />
-              </el-icon>
-              <template #content>
-                <p>大语言模型</p>
-              </template>
-            </el-tooltip>
           </template>
           <el-select
             v-loading="model_type_loading"
@@ -70,22 +64,26 @@
               :key="item.value"
               :label="item.key"
               :value="item.value"
-            ></el-option
-            >
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item prop="model_name" :rules="base_form_data_rule.model_name">
           <template #label>
-            <span>基础模型</span>
-            <el-tooltip effect="light" placement="right">
-              <el-icon style="margin-left: 4px;">
-                <QuestionFilled />
-              </el-icon>
-              <template #content>
-                <p>为供应商的 LLM 模型，支持自定义输入</p>
-                <p>下拉选项是 OpenAI 常用的一些大语言模型如：gpt-3.5-turbo-0613、gpt-3.5-turbo、gpt-4 等</p>
-              </template>
-            </el-tooltip>
+            <div class="flex align-center" style="display: inline-flex">
+              <div class="flex-between mr-4">
+                <span>基础模型 </span>
+              </div>
+              <el-tooltip effect="dark" placement="right">
+                <template #content>
+                  <p>为供应商的 LLM 模型，支持自定义输入</p>
+                  <p>
+                    下拉选项是 OpenAI
+                    常用的一些大语言模型如：gpt-3.5-turbo-0613、gpt-3.5-turbo、gpt-4 等
+                  </p>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
           </template>
           <el-select
             @change="getModelForm($event)"
@@ -102,8 +100,7 @@
               :key="item.name"
               :label="item.name"
               :value="item.name"
-            ></el-option
-            >
+            ></el-option>
           </el-select>
         </el-form-item>
       </template>
@@ -126,6 +123,7 @@ import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import { QuestionFilled } from '@element-plus/icons-vue'
+import AppIcon from '@/components/icons/AppIcon.vue'
 
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
