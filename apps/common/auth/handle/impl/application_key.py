@@ -34,7 +34,7 @@ class ApplicationKey(AuthBaseHandle):
         return application_api_key.user, Auth(role_list=[RoleConstants.APPLICATION_KEY],
                                               permission_list=permission_list,
                                               application_id=application_api_key.application_id,
-                                              client_id=token,
+                                              client_id=str(application_api_key.id),
                                               client_type=AuthenticationType.API_KEY.value)
 
     def support(self, request, token: str, get_token_details):
