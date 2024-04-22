@@ -31,12 +31,14 @@ def save_keywords(apps, schema_editor):
                                                                                             'paragraph')
         embedding_update_list = [update_embedding_search_vector(embedding, paragraph_list) for embedding
                                  in embedding_list]
-        child_array = sub_array(embedding_update_list, 20)
+        child_array = sub_array(embedding_update_list, 50)
         for c in child_array:
             try:
                 embedding.objects.using(db_alias).bulk_update(c, ['search_vector'])
             except Exception as e:
                 print(e)
+        document.status = Status.success
+        document.save()
 
 
 class Migration(migrations.Migration):
