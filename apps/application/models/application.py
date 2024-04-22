@@ -19,7 +19,7 @@ from users.models import User
 
 
 def get_dataset_setting_dict():
-    return {'top_n': 3, 'similarity': 0.6, 'max_paragraph_char_number': 5000}
+    return {'top_n': 3, 'similarity': 0.6, 'max_paragraph_char_number': 5000, 'search_mode': 'embedding'}
 
 
 def get_model_setting_dict():

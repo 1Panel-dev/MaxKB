@@ -33,6 +33,13 @@ class CommonApi:
                                       default=0.6,
                                       required=True,
                                       description='相关性'),
+                    openapi.Parameter(name='search_mode',
+                                      in_=openapi.IN_QUERY,
+                                      type=openapi.TYPE_STRING,
+                                      default="embedding",
+                                      required=True,
+                                      description='检索模式embedding|keywords|blend'
+                                      )
                     ]
 
         @staticmethod

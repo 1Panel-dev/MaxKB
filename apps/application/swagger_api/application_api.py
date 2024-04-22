@@ -161,6 +161,8 @@ class ApplicationApi(ApiMixin):
                                                  default=0.6),
                     'max_paragraph_char_number': openapi.Schema(type=openapi.TYPE_NUMBER, title='最多引用字符数',
                                                                 description="最多引用字符数", default=3000),
+                    'search_mode': openapi.Schema(type=openapi.TYPE_STRING, title='检索模式',
+                                                  description="embedding|keywords|blend", default='embedding'),
                 }
             )
 
