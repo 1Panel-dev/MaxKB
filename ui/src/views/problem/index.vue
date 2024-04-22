@@ -42,7 +42,7 @@
           <el-table-column prop="content" label="问题" min-width="280">
             <template #default="{ row }">
               <ReadWrite
-                @change="editName"
+                @change="editName($event, row.id)"
                 :data="row.content"
                 :showEditIcon="row.id === currentMouseId"
                 :maxlength="256"
@@ -121,7 +121,7 @@ import useStore from '@/stores'
 
 const route = useRoute()
 const {
-  params: { id }
+  params: { id } // 知识库id
 } = route as any
 
 const { problem } = useStore()
@@ -216,12 +216,12 @@ function deleteProblem(row: any) {
     .catch(() => {})
 }
 
-function editName(val: string) {
+function editName(val: string, problemId: string) {
   if (val) {
     const obj = {
       content: val
     }
-    problemApi.putProblems(id, currentMouseId.value, obj, loading).then(() => {
+    problemApi.putProblems(id, problemId, obj, loading).then(() => {
       getList()
       MsgSuccess('修改成功')
     })
