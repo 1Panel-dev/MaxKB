@@ -154,7 +154,9 @@ class ApplicationApi(ApiMixin):
                     'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
                     'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
                     'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="问题优化",
-                                                           description="是否开启问题优化", default=True)
+                                                           description="是否开启问题优化", default=True),
+                    'icon': openapi.Schema(type=openapi.TYPE_STRING, title="icon",
+                                           description="icon", default="/ui/favicon.ico")
 
                 }
             )

@@ -252,6 +252,7 @@ class ApplicationSerializer(serializers.Serializer):
         # 问题补全
         problem_optimization = serializers.BooleanField(required=False, allow_null=True,
                                                         error_messages=ErrMessage.boolean("问题补全"))
+        icon = serializers.CharField(required=False, allow_null=True, error_messages=ErrMessage.char("icon图标"))
 
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
@@ -477,7 +478,7 @@ class ApplicationSerializer(serializers.Serializer):
 
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization',
-                           'api_key_is_active']
+                           'api_key_is_active', 'icon']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     if update_key == 'multiple_rounds_dialogue':
