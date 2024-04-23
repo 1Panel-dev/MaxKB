@@ -5,7 +5,7 @@ import type {
   UpdateInferData,
   UpdateKeyValueData
 } from './type'
-import tinycolor from '@ctrl/tinycolor'
+import { TinyColor } from '@ctrl/tinycolor'
 // 引入默认推断数据
 import inferData from './defaultInferData'
 // 引入默认keyValue数据
@@ -119,7 +119,7 @@ class Theme {
                   l.toString()
                 )
                 return {
-                  [varName]: tinycolor(inferData.value)
+                  [varName]: new TinyColor(inferData.value)
                     .mix(key === 'light' ? this.colorWhite : this.colorBlack, l * 10)
                     .toHexString()
                 }
