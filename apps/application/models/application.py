@@ -37,6 +37,7 @@ class Application(AppModelMixin):
     dataset_setting = models.JSONField(verbose_name="数据集参数设置", default=get_dataset_setting_dict)
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
+    icon = models.CharField(max_length=256, verbose_name="应用icon", default="/ui/favicon.ico")
 
     @staticmethod
     def get_default_model_prompt():

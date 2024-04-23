@@ -12,6 +12,17 @@ from common.mixins.api_mixin import ApiMixin
 
 
 class ApplicationApi(ApiMixin):
+    class EditApplicationIcon(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [
+                openapi.Parameter(name='file',
+                                  in_=openapi.IN_FORM,
+                                  type=openapi.TYPE_FILE,
+                                  required=True,
+                                  description='上传文件')
+            ]
+
     class Authentication(ApiMixin):
         @staticmethod
         def get_request_body_api():
@@ -143,7 +154,9 @@ class ApplicationApi(ApiMixin):
                     'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
                     'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
                     'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="问题优化",
-                                                           description="是否开启问题优化", default=True)
+                                                           description="是否开启问题优化", default=True),
+                    'icon': openapi.Schema(type=openapi.TYPE_STRING, title="icon",
+                                           description="icon", default="/ui/favicon.ico")
 
                 }
             )

@@ -105,3 +105,12 @@ class ProblemParagraphMapping(AppModelMixin):
 
     class Meta:
         db_table = "problem_paragraph_mapping"
+
+
+class Image(AppModelMixin):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
+    image = models.BinaryField(verbose_name="图片数据")
+    image_name = models.CharField(max_length=256, verbose_name="图片名称", default="")
+
+    class Meta:
+        db_table = "image"
