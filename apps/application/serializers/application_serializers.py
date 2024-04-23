@@ -393,7 +393,7 @@ class ApplicationSerializer(serializers.Serializer):
     class ApplicationModel(serializers.ModelSerializer):
         class Meta:
             model = Application
-            fields = ['id', 'name', 'desc', 'prologue', 'dialogue_number']
+            fields = ['id', 'name', 'desc', 'prologue', 'dialogue_number', 'dataset_setting']
 
     class Operate(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
