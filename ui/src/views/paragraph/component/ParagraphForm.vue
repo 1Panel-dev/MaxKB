@@ -30,6 +30,7 @@
         :preview="false"
         :toolbars="toolbars"
         style="height: 300px"
+        @onUploadImg="onUploadImg"
       />
       <MdPreview
         v-else
@@ -46,6 +47,7 @@
 import { ref, reactive, onUnmounted, watch, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MdEditor, MdPreview } from 'md-editor-v3'
+import imageApi from '@/api/image'
 const props = defineProps({
   data: {
     type: Object,
@@ -81,7 +83,7 @@ const toolbars = [
   '=',
   'pageFullscreen',
   'preview',
-  'htmlPreview',
+  'htmlPreview'
 ] as any[]
 
 const editorRef = ref()
@@ -134,20 +136,25 @@ function validate() {
   })
 }
 
-// const onHtmlChanged = () => {
-//   appendTarget()
-// }
-// const appendTarget = () => {
-//   nextTick(() => {
-//     var item = document.getElementsByClassName('maxkb-md')
-//     for (var j = 0; j < item.length; j++) {
-//       var aTags = item[j].getElementsByTagName('a')
-//       for (var i = 0; i < aTags.length; i++) {
-//         aTags[i].setAttribute('target', '_blank')
-//       }
-//     }
-//   })
-// }
+const onUploadImg = async (files: any, callback: any) => {
+  const res = await Promise.all(
+    files.map((file: any) => {
+      return new Promise((rev, rej) => {
+        const fd = new FormData()
+        fd.append('file', file)
+
+        imageApi
+          .postImage(fd)
+          .then((res: any) => {
+            rev(res)
+          })
+          .catch((error) => rej(error))
+      })
+    })
+  )
+
+  callback(res.map((item) => item.data))
+}
 
 onUnmounted(() => {
   form.value = {
