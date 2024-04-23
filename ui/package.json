@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@ctrl/tinycolor": "^4.1.0",
     "axios": "^0.28.0",
     "cropperjs": "^1.6.2",
     "echarts": "^5.5.0",
