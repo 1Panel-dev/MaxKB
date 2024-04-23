@@ -78,7 +78,11 @@ class ChatInfo:
             'problem_optimization': self.application.problem_optimization,
             'stream': True,
             'search_mode': self.application.dataset_setting.get(
-                'search_mode') if 'search_mode' in self.application.dataset_setting else 'embedding'
+                'search_mode') if 'search_mode' in self.application.dataset_setting else 'embedding',
+            'no_references_setting': self.application.dataset_setting.get(
+                'no_references_setting') if 'no_references_setting' in self.application.dataset_setting else {
+                'status': 'ai_questioning',
+                'value': '{question}'}
 
         }
 
