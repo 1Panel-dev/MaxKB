@@ -364,15 +364,15 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
       let str = decoder.decode(value, { stream: true })
       // 这里解释一下 start 因为数据流返回流并不是按照后端chunk返回 我们希望得到的chunk是data:{xxx}\n\n 但是它获取到的可能是 data:{ -> xxx}\n\n 总而言之就是 fetch不能保证每个chunk都说以data:开始 \n\n结束
       tempResult += str
-      if (tempResult.endsWith('\n\n')) {
-        str = tempResult
-        tempResult = ''
+      const split = tempResult.match(/data:.*}\n\n/g)
+      if (split) {
+        str = split.join('')
+        tempResult = tempResult.replace(str, '')
       } else {
         return reader.read().then(write_stream)
       }
       // 这里解释一下 end
       if (str && str.startsWith('data:')) {
-        const split = str.match(/data:.*}\n\n/g)
         if (split) {
           for (const index in split) {
             const chunk = JSON?.parse(split[index].replace('data:', ''))
