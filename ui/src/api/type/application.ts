@@ -10,6 +10,7 @@ interface ApplicationFormType {
   dataset_setting?: any
   model_setting?: any
   problem_optimization?: boolean
+  icon?: string | undefined
 }
 interface chatType {
   id: string

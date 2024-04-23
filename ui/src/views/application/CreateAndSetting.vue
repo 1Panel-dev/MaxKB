@@ -350,7 +350,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       if (id) {
-        applicationApi.putApplication(id, applicationForm.value, loading).then((res) => {
+        application.asyncPutApplication(id, applicationForm.value, loading).then((res) => {
           MsgSuccess('保存成功')
         })
       } else {

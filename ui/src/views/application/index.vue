@@ -41,12 +41,21 @@
             >
               <template #icon>
                 <AppAvatar
-                  v-if="item.name"
-                  :name="item.name"
-                  pinyinColor
-                  class="mr-12"
+                  v-if="isAppIcon(item?.icon)"
                   shape="square"
                   :size="32"
+                  style="background: none"
+                  class="mr-8"
+                >
+                  <img :src="item?.icon" alt="" />
+                </AppAvatar>
+                <AppAvatar
+                  v-else-if="item?.name"
+                  :name="item?.name"
+                  pinyinColor
+                  shape="square"
+                  :size="32"
+                  class="mr-8"
                 />
               </template>
 
@@ -85,6 +94,7 @@
 import { ref, onMounted, reactive, computed } from 'vue'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { isAppIcon } from '@/utils/application'
 import { useRouter } from 'vue-router'
 import useStore from '@/stores'
 const { application } = useStore()

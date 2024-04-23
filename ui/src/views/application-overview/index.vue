@@ -5,14 +5,37 @@
         <h4 class="title-decoration-1 mb-16">应用信息</h4>
         <el-card shadow="never" class="overview-card" v-loading="loading">
           <div class="title flex align-center">
-            <AppAvatar
-              v-if="detail?.name"
-              :name="detail?.name"
-              pinyinColor
-              class="mr-12"
-              shape="square"
-              :size="32"
-            />
+            <div
+              class="edit-avatar mr-12"
+              @mouseenter="showEditIcon = true"
+              @mouseleave="showEditIcon = false"
+            >
+              <AppAvatar
+                v-if="isAppIcon(detail?.icon)"
+                shape="square"
+                :size="32"
+                style="background: none"
+              >
+                <img :src="detail?.icon" alt="" />
+              </AppAvatar>
+              <AppAvatar
+                v-else-if="detail?.name"
+                :name="detail?.name"
+                pinyinColor
+                shape="square"
+                :size="32"
+              />
+              <AppAvatar
+                v-if="showEditIcon"
+                shape="square"
+                class="edit-mask"
+                :size="32"
+                @click="openEditAvatar"
+              >
+                <el-icon><EditPen /></el-icon>
+              </AppAvatar>
+            </div>
+
             <h4>{{ detail?.name }}</h4>
           </div>
 
@@ -102,6 +125,7 @@
     <EmbedDialog ref="EmbedDialogRef" />
     <APIKeyDialog ref="APIKeyDialogRef" />
     <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -110,14 +134,14 @@ import { useRoute } from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
+import EditAvatarDialog from './component/EditAvatarDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
 import applicationApi from '@/api/application'
 import overviewApi from '@/api/application-overview'
 import { nowDate, beforeDay } from '@/utils/time'
-
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-
 import { copyClick } from '@/utils/clipboard'
+import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 const { application } = useStore()
 const route = useRoute()
@@ -127,6 +151,7 @@ const {
 
 const apiUrl = window.location.origin + '/doc'
 
+const EditAvatarDialogRef = ref()
 const LimitDialogRef = ref()
 const APIKeyDialogRef = ref()
 const EmbedDialogRef = ref()
@@ -174,6 +199,12 @@ const daterange = ref({
 
 const statisticsLoading = ref(false)
 const statisticsData = ref([])
+
+const showEditIcon = ref(false)
+
+function openEditAvatar() {
+  EditAvatarDialogRef.value.open(detail.value)
+}
 
 function changeDayHandle(val: number | string) {
   if (val !== 'other') {
@@ -252,6 +283,11 @@ function getDetail() {
 function refresh() {
   getAccessToken()
 }
+
+function refreshIcon() {
+  getDetail()
+}
+
 onMounted(() => {
   getDetail()
   getAccessToken()
@@ -265,6 +301,15 @@ onMounted(() => {
     position: absolute;
     right: 16px;
     top: 21px;
+  }
+
+  .edit-avatar {
+    position: relative;
+    .edit-mask {
+      position: absolute;
+      left: 0;
+      background: rgba(0, 0, 0, 0.4);
+    }
   }
 }
 </style>
