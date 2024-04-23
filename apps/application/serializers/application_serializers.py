@@ -380,6 +380,7 @@ class ApplicationSerializer(serializers.Serializer):
         def reset_application(application: Dict):
             application['multiple_rounds_dialogue'] = True if application.get('dialogue_number') > 0 else False
             del application['dialogue_number']
+            application['dataset_setting'] = {**application['dataset_setting'], 'search_mode': 'embedding'}
             return application
 
         def page(self, current_page: int, page_size: int, with_valid=True):
