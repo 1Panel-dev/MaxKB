@@ -29,9 +29,10 @@ from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404
+from common.field.common import UploadedImageField
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
-from dataset.models import DataSet, Document
+from dataset.models import DataSet, Document, Image
 from dataset.serializers.common_serializers import list_paragraph
 from embedding.models import SearchMode
 from setting.models import AuthOperate
@@ -380,7 +381,8 @@ class ApplicationSerializer(serializers.Serializer):
         def reset_application(application: Dict):
             application['multiple_rounds_dialogue'] = True if application.get('dialogue_number') > 0 else False
             del application['dialogue_number']
-            application['dataset_setting'] = {**application['dataset_setting'], 'search_mode': 'embedding'}
+            if 'dataset_setting' in application:
+                application['dataset_setting'] = {**application['dataset_setting'], 'search_mode': 'embedding'}
             return application
 
         def page(self, current_page: int, page_size: int, with_valid=True):
@@ -393,7 +395,25 @@ class ApplicationSerializer(serializers.Serializer):
     class ApplicationModel(serializers.ModelSerializer):
         class Meta:
             model = Application
-            fields = ['id', 'name', 'desc', 'prologue', 'dialogue_number']
+            fields = ['id', 'name', 'desc', 'prologue', 'dialogue_number', 'icon']
+
+    class IconOperate(serializers.Serializer):
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        image = UploadedImageField(required=True, error_messages=ErrMessage.image("图片"))
+
+        def edit(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            application = QuerySet(Application).filter(id=self.data.get('application_id')).first()
+            if application is None:
+                raise AppApiException(500, '不存在的应用id')
+            image_id = uuid.uuid1()
+            image = Image(id=image_id, image=self.data.get('image').read(), image_name=self.data.get('image').name)
+            image.save()
+            application.icon = f'/api/image/{image_id}'
+            application.save()
+            return {**ApplicationSerializer.Query.reset_application(ApplicationSerializerModel(application).data)}
 
     class Operate(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))

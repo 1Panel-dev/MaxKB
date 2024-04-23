@@ -10,3 +10,4 @@ from .dataset import *
 from .document import *
 from .paragraph import *
 from .problem import *
+from .image import *

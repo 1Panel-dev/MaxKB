@@ -12,6 +12,17 @@ from common.mixins.api_mixin import ApiMixin
 
 
 class ApplicationApi(ApiMixin):
+    class EditApplicationIcon(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [
+                openapi.Parameter(name='file',
+                                  in_=openapi.IN_FORM,
+                                  type=openapi.TYPE_FILE,
+                                  required=True,
+                                  description='上传文件')
+            ]
+
     class Authentication(ApiMixin):
         @staticmethod
         def get_request_body_api():
