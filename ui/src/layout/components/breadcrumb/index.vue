@@ -18,6 +18,7 @@
             class="mr-8"
             :size="24"
           />
+
           <AppAvatar
             v-else-if="isDataset && currentType === '1'"
             class="mr-8 avatar-purple"

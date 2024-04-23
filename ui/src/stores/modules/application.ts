@@ -75,6 +75,19 @@ const useApplicationStore = defineStore({
     },
     async refreshAccessToken(token: string) {
       this.asyncAppAuthentication(token)
+    },
+    // 修改应用
+    async asyncPutApplication(id: string, data: any, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        applicationApi
+          .putApplication(id, data, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   }
 })

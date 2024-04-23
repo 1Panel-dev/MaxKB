@@ -67,10 +67,24 @@ const getStatistics: (
   return get(`${prefix}/${application_id}/statistics/chat_record_aggregate_trend`, data, loading)
 }
 
+/**
+ * 修改应用icon
+ * @param 参数 application_id
+ * data: file
+ */
+const putAppIcon: (
+  application_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return put(`${prefix}/${application_id}/edit_icon`, data, undefined, loading)
+}
+
 export default {
   getAPIKey,
   postAPIKey,
   delAPIKey,
   putAPIKey,
-  getStatistics
+  getStatistics,
+  putAppIcon
 }
