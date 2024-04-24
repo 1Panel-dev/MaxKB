@@ -6,7 +6,7 @@
     @date：2024/1/10 17:50
     @desc:
 """
-from typing import List
+from typing import List, Dict
 
 from langchain.schema import BaseMessage, HumanMessage
 
@@ -26,22 +26,31 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
                 max_paragraph_char_number: int,
                 prompt: str,
                 padding_problem_text: str = None,
+                no_references_setting=None,
                 **kwargs) -> List[BaseMessage]:
+        prompt = prompt if no_references_setting.get('status') == 'designated_answer' else no_references_setting.get(
+            'value')
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
         start_index = len(history_chat_record) - dialogue_number
         history_message = [[history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
                            for index in
                            range(start_index if start_index > 0 else 0, len(history_chat_record))]
         return [*flat_map(history_message),
-                self.to_human_message(prompt, exec_problem_text, max_paragraph_char_number, paragraph_list)]
+                self.to_human_message(prompt, exec_problem_text, max_paragraph_char_number, paragraph_list,
+                                      no_references_setting)]
 
     @staticmethod
     def to_human_message(prompt: str,
                          problem: str,
                          max_paragraph_char_number: int,
-                         paragraph_list: List[ParagraphPipelineModel]):
+                         paragraph_list: List[ParagraphPipelineModel],
+                         no_references_setting: Dict):
         if paragraph_list is None or len(paragraph_list) == 0:
-            return HumanMessage(content=prompt.format(**{'data': "<data></data>", 'question': problem}))
+            if no_references_setting.get('status') == 'ai_questioning':
+                return HumanMessage(
+                    content=no_references_setting.get('value').format(**{'question': problem}))
+            else:
+                return HumanMessage(content=prompt.format(**{'data': "", 'question': problem}))
         temp_data = ""
         data_list = []
         for p in paragraph_list:

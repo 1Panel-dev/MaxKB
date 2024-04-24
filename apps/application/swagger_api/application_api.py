@@ -176,6 +176,18 @@ class ApplicationApi(ApiMixin):
                                                                 description="最多引用字符数", default=3000),
                     'search_mode': openapi.Schema(type=openapi.TYPE_STRING, title='检索模式',
                                                   description="embedding|keywords|blend", default='embedding'),
+                    'no_references_setting': openapi.Schema(type=openapi.TYPE_OBJECT, title='检索模式',
+                                                            required=['status', 'value'],
+                                                            properties={
+                                                                'status': openapi.Schema(type=openapi.TYPE_STRING,
+                                                                                         title="状态",
+                                                                                         description="ai作答:ai_questioning,指定回答:designated_answer",
+                                                                                         default='ai_questioning'),
+                                                                'value': openapi.Schema(type=openapi.TYPE_STRING,
+                                                                                        title="值",
+                                                                                        description="ai作答:就是题词,指定回答:就是指定回答内容",
+                                                                                        default='{question}'),
+                                                            }),
                 }
             )
 

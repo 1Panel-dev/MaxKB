@@ -17,7 +17,8 @@ from django.db.models import QuerySet
 from django.http import StreamingHttpResponse
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
-from langchain.schema.messages import BaseMessageChunk, HumanMessage, AIMessage
+from langchain.schema.messages import HumanMessage, AIMessage
+from langchain_core.messages import AIMessageChunk
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PipelineManage
@@ -47,7 +48,8 @@ def event_content(response,
                   message_list: List[BaseMessage],
                   problem_text: str,
                   padding_problem_text: str = None,
-                  client_id=None, client_type=None):
+                  client_id=None, client_type=None,
+                  is_ai_chat: bool = None):
     all_text = ''
     try:
         for chunk in response:
@@ -56,8 +58,12 @@ def event_content(response,
                                          'content': chunk.content, 'is_end': False}) + "\n\n"
 
         # 获取token
-        request_token = chat_model.get_num_tokens_from_messages(message_list)
-        response_token = chat_model.get_num_tokens(all_text)
+        if is_ai_chat:
+            request_token = chat_model.get_num_tokens_from_messages(message_list)
+            response_token = chat_model.get_num_tokens(all_text)
+        else:
+            request_token = 0
+            response_token = 0
         step.context['message_tokens'] = request_token
         step.context['answer_tokens'] = response_token
         current_time = time.time()
@@ -88,15 +94,16 @@ class BaseChatStep(IChatStep):
                 padding_problem_text: str = None,
                 stream: bool = True,
                 client_id=None, client_type=None,
+                no_references_setting=None,
                 **kwargs):
         if stream:
             return self.execute_stream(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                        paragraph_list,
-                                       manage, padding_problem_text, client_id, client_type)
+                                       manage, padding_problem_text, client_id, client_type, no_references_setting)
         else:
             return self.execute_block(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                       paragraph_list,
-                                      manage, padding_problem_text, client_id, client_type)
+                                      manage, padding_problem_text, client_id, client_type, no_references_setting)
 
     def get_details(self, manage, **kwargs):
         return {
@@ -127,19 +134,26 @@ class BaseChatStep(IChatStep):
                        paragraph_list=None,
                        manage: PipelineManage = None,
                        padding_problem_text: str = None,
-                       client_id=None, client_type=None):
+                       client_id=None, client_type=None,
+                       no_references_setting=None):
+        is_ai_chat = False
         # 调用模型
         if chat_model is None:
             chat_result = iter(
-                [BaseMessageChunk(content=paragraph.title + "\n" + paragraph.content) for paragraph in paragraph_list])
+                [AIMessageChunk(content=paragraph.title + "\n" + paragraph.content) for paragraph in paragraph_list])
         else:
-            chat_result = chat_model.stream(message_list)
+            if (paragraph_list is None or len(paragraph_list) == 0) and no_references_setting.get(
+                    'status') == 'designated_answer':
+                chat_result = iter([AIMessageChunk(content=no_references_setting.get('value'))])
+            else:
+                chat_result = chat_model.stream(message_list)
+                is_ai_chat = True
 
         chat_record_id = uuid.uuid1()
         r = StreamingHttpResponse(
             streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
                                             post_response_handler, manage, self, chat_model, message_list, problem_text,
-                                            padding_problem_text, client_id, client_type),
+                                            padding_problem_text, client_id, client_type, is_ai_chat),
             content_type='text/event-stream;charset=utf-8')
 
         r['Cache-Control'] = 'no-cache'
@@ -153,16 +167,26 @@ class BaseChatStep(IChatStep):
                       paragraph_list=None,
                       manage: PipelineManage = None,
                       padding_problem_text: str = None,
-                      client_id=None, client_type=None):
+                      client_id=None, client_type=None, no_references_setting=None):
+        is_ai_chat = False
         # 调用模型
         if chat_model is None:
             chat_result = AIMessage(
                 content="\n\n".join([paragraph.title + "\n" + paragraph.content for paragraph in paragraph_list]))
         else:
-            chat_result = chat_model.invoke(message_list)
+            if (paragraph_list is None or len(paragraph_list) == 0) and no_references_setting.get(
+                    'status') == 'designated_answer':
+                chat_result = AIMessage(content=no_references_setting.get('value'))
+            else:
+                chat_result = chat_model.invoke(message_list)
+                is_ai_chat = True
         chat_record_id = uuid.uuid1()
-        request_token = chat_model.get_num_tokens_from_messages(message_list)
-        response_token = chat_model.get_num_tokens(chat_result.content)
+        if is_ai_chat:
+            request_token = chat_model.get_num_tokens_from_messages(message_list)
+            response_token = chat_model.get_num_tokens(chat_result.content)
+        else:
+            request_token = 0
+            response_token = 0
         self.context['message_tokens'] = request_token
         self.context['answer_tokens'] = response_token
         current_time = time.time()
