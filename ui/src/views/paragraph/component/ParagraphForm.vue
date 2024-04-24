@@ -22,7 +22,7 @@
         type="textarea"
       > 
      </el-input>-->
-      <MdEditor
+      <MarkdownEditor
         v-if="isEdit"
         v-model="form.content"
         placeholder="请输入分段内容"
@@ -46,7 +46,8 @@
 <script setup lang="ts">
 import { ref, reactive, onUnmounted, watch, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { MdEditor, MdPreview } from 'md-editor-v3'
+import { MdPreview } from 'md-editor-v3'
+import MarkdownEditor from '@/components/markdown-editor/index.vue'
 import imageApi from '@/api/image'
 const props = defineProps({
   data: {
