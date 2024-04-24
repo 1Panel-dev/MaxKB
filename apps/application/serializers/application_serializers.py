@@ -73,6 +73,18 @@ class ApplicationSerializerModel(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class NoReferencesChoices(models.TextChoices):
+    """订单类型"""
+    ai_questioning = 'ai_questioning', 'ai回答'
+    designated_answer = 'designated_answer', '指定回答'
+
+
+class NoReferencesSetting(serializers.Serializer):
+    status = serializers.ChoiceField(required=True, choices=NoReferencesChoices.choices,
+                                     error_messages=ErrMessage.char("无引用状态"))
+    value = serializers.CharField(required=True, error_messages=ErrMessage.char("提示词"))
+
+
 class DatasetSettingSerializer(serializers.Serializer):
     top_n = serializers.FloatField(required=True, max_value=100, min_value=1,
                                    error_messages=ErrMessage.float("引用分段数"))
@@ -84,6 +96,8 @@ class DatasetSettingSerializer(serializers.Serializer):
         validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
                                   message="类型只支持register|reset_password", code=500)
     ], error_messages=ErrMessage.char("检索模式"))
+
+    no_references_setting = NoReferencesSetting(required=True, error_messages=ErrMessage.base("未引用分段设置"))
 
 
 class ModelSettingSerializer(serializers.Serializer):
@@ -383,7 +397,9 @@ class ApplicationSerializer(serializers.Serializer):
             application['multiple_rounds_dialogue'] = True if application.get('dialogue_number') > 0 else False
             del application['dialogue_number']
             if 'dataset_setting' in application:
-                application['dataset_setting'] = {**application['dataset_setting'], 'search_mode': 'embedding'}
+                application['dataset_setting'] = {'search_mode': 'embedding', 'no_references_setting': {
+                    'status': 'ai_questioning',
+                    'value': '{question}'}, **application['dataset_setting']}
             return application
 
         def page(self, current_page: int, page_size: int, with_valid=True):

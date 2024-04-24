@@ -15,9 +15,9 @@ from rest_framework import serializers
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.models import ChatRecord
+from application.serializers.application_serializers import NoReferencesSetting
 from common.field.common import InstanceField
 from common.util.field_message import ErrMessage
-from dataset.models import Paragraph
 
 
 class IGenerateHumanMessageStep(IBaseChatPipelineStep):
@@ -39,6 +39,8 @@ class IGenerateHumanMessageStep(IBaseChatPipelineStep):
         prompt = serializers.CharField(required=True, error_messages=ErrMessage.char("提示词"))
         # 补齐问题
         padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.char("补齐问题"))
+        # 未查询到引用分段
+        no_references_setting = NoReferencesSetting(required=True, error_messages=ErrMessage.base("无引用分段设置"))
 
     def get_step_serializer(self, manage: PipelineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer
@@ -56,6 +58,7 @@ class IGenerateHumanMessageStep(IBaseChatPipelineStep):
                 max_paragraph_char_number: int,
                 prompt: str,
                 padding_problem_text: str = None,
+                no_references_setting=None,
                 **kwargs) -> List[BaseMessage]:
         """
 
@@ -67,6 +70,7 @@ class IGenerateHumanMessageStep(IBaseChatPipelineStep):
         :param prompt:                     模板
         :param padding_problem_text        用户修改文本
         :param kwargs:                     其他参数
+        :param no_references_setting:     无引用分段设置
         :return:
         """
         pass

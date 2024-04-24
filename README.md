@@ -33,6 +33,9 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
 -   [使用手册](https://github.com/1Panel-dev/MaxKB/wiki/1-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2)
 -   [论坛求助](https://bbs.fit2cloud.com/c/mk/11)
 -   [演示视频](https://www.bilibili.com/video/BV1BE421M7YM/)
+-   技术交流群     
+      <image height="150px" width="150px" src="https://github.com/1Panel-dev/MaxKB/assets/52996290/a4f6303d-9667-4be0-bc2d-0110af782f67"/>
+
 
 ## UI 展示
 

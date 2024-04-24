@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="设置 Logo" v-model="dialogVisible">
-    <el-radio-group v-model="radioType" class="card__block mb-16">
+    <el-radio-group v-model="radioType" class="radio-block mb-16">
       <div>
         <el-radio value="default">
           <p>默认 Logo</p>
@@ -14,7 +14,7 @@
           />
         </el-radio>
       </div>
-      <div>
+      <div class="mt-8">
         <el-radio value="custom">
           <p>自定义上传</p>
           <div class="flex mt-8">
@@ -126,16 +126,4 @@ function submit() {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope>
-.card__block {
-  width: 100%;
-  display: block;
-  .el-radio {
-    align-items: flex-start;
-    height: 100%;
-  }
-  .el-radio__inner {
-    margin-top: 3px;
-  }
-}
-</style>
+<style lang="scss" scope></style>
