@@ -54,7 +54,7 @@
           <el-table-column prop="name" label="文件名称" min-width="280">
             <template #default="{ row }">
               <ReadWrite
-                @change="editName"
+                @change="editName($event, row.id)"
                 :data="row.name"
                 :showEditIcon="row.id === currentMouseId"
               />
@@ -354,12 +354,12 @@ function changeState(bool: Boolean, row: any) {
   currentMouseId.value && updateData(row.id, obj, str)
 }
 
-function editName(val: string) {
+function editName(val: string, id: string) {
   if (val) {
     const obj = {
       name: val
     }
-    currentMouseId.value && updateData(currentMouseId.value, obj, '修改成功')
+    updateData(id, obj, '修改成功')
   } else {
     MsgError('文件名称不能为空！')
   }

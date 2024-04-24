@@ -14,7 +14,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from common.config.embedding_config import EmbeddingModel
 from common.util.common import sub_array
-from embedding.models import SourceType
+from embedding.models import SourceType, SearchMode
 
 lock = threading.Lock()
 
@@ -113,13 +113,16 @@ class BaseVectorStore(ABC):
         return result[0]
 
     @abstractmethod
-    def query(self, query_embedding: List[float], dataset_id_list: list[str], exclude_document_id_list: list[str],
-              exclude_paragraph_list: list[str], is_active: bool, top_n: int, similarity: float):
+    def query(self, query_text:str,query_embedding: List[float],  dataset_id_list: list[str],
+              exclude_document_id_list: list[str],
+              exclude_paragraph_list: list[str], is_active: bool, top_n: int, similarity: float,
+              search_mode: SearchMode):
         pass
 
     @abstractmethod
     def hit_test(self, query_text, dataset_id: list[str], exclude_document_id_list: list[str], top_number: int,
                  similarity: float,
+                 search_mode: SearchMode,
                  embedding: HuggingFaceEmbeddings):
         pass
 

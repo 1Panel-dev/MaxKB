@@ -78,11 +78,47 @@
       <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     </LayoutContainer>
     <div class="hit-test__operate p-24 pt-0">
-      <el-popover :visible="popoverVisible" placement="right-end" :width="180" trigger="click">
+      <el-popover :visible="popoverVisible" placement="right-end" :width="500" trigger="click">
         <template #reference>
           <el-button icon="Setting" class="mb-8" @click="settingChange('open')">参数设置</el-button>
         </template>
-
+        <div class="mb-16">
+          <div class="title mb-8">检索模式</div>
+          <el-radio-group v-model="cloneForm.search_mode" class="card__radio">
+            <el-card
+              shadow="never"
+              class="mb-16"
+              :class="cloneForm.search_mode === 'embedding' ? 'active' : ''"
+            >
+              <el-radio value="embedding" size="large">
+                <p class="mb-4">向量检索</p>
+                <el-text type="info">通过向量距离计算与用户问题最相似的文本分段</el-text>
+              </el-radio>
+            </el-card>
+            <el-card
+              shadow="never"
+              class="mb-16"
+              :class="cloneForm.search_mode === 'keywords' ? 'active' : ''"
+            >
+              <el-radio value="keywords" size="large">
+                <p class="mb-4">全文检索</p>
+                <el-text type="info">通过关键词检索，返回包含关键词最多的文本分段</el-text>
+              </el-radio>
+            </el-card>
+            <el-card
+              shadow="never"
+              class="mb-16"
+              :class="cloneForm.search_mode === 'blend' ? 'active' : ''"
+            >
+              <el-radio value="blend" size="large">
+                <p class="mb-4">混合检索</p>
+                <el-text type="info"
+                  >同时执行全文检索和向量检索，再进行重排序，从两类查询结果中选择匹配用户问题的最佳结果</el-text
+                >
+              </el-radio>
+            </el-card>
+          </el-radio-group>
+        </div>
         <div class="mb-16">
           <div class="title mb-8">相似度高于</div>
           <el-input-number
@@ -92,7 +128,6 @@
             :precision="3"
             :step="0.1"
             controls-position="right"
-            style="width: 145px"
           />
         </div>
         <div class="mb-16">
@@ -103,7 +138,6 @@
             :min="1"
             :max="10"
             controls-position="right"
-            style="width: 145px"
           />
         </div>
         <div class="text-right">
@@ -161,7 +195,8 @@ const title = ref('')
 const inputValue = ref('')
 const formInline = ref({
   similarity: 0.6,
-  top_number: 5
+  top_number: 5,
+  search_mode: 'embedding'
 })
 
 // 第一次加载
@@ -213,8 +248,7 @@ function sendChatHandle(event: any) {
 function getHitTestList() {
   const obj = {
     query_text: inputValue.value,
-    similarity: formInline.value.similarity,
-    top_number: formInline.value.top_number
+    ...formInline.value
   }
   if (isDataset.value) {
     datasetApi.getDatasetHitTest(id, obj, loading).then((res) => {

@@ -8,12 +8,13 @@
 """
 import hashlib
 import os
+import re
 import uuid
 from functools import reduce
 from typing import Dict
 
 from django.contrib.postgres.fields import ArrayField
-from django.core import cache
+from django.core import cache, validators
 from django.core import signing
 from django.db import transaction, models
 from django.db.models import QuerySet
@@ -28,10 +29,12 @@ from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404
+from common.field.common import UploadedImageField
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
-from dataset.models import DataSet, Document
+from dataset.models import DataSet, Document, Image
 from dataset.serializers.common_serializers import list_paragraph
+from embedding.models import SearchMode
 from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -77,6 +80,10 @@ class DatasetSettingSerializer(serializers.Serializer):
                                         error_messages=ErrMessage.float("相识度"))
     max_paragraph_char_number = serializers.IntegerField(required=True, min_value=500, max_value=10000,
                                                          error_messages=ErrMessage.integer("最多引用字符数"))
+    search_mode = serializers.CharField(required=True, validators=[
+        validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
+                                  message="类型只支持register|reset_password", code=500)
+    ], error_messages=ErrMessage.char("检索模式"))
 
 
 class ModelSettingSerializer(serializers.Serializer):
@@ -245,6 +252,7 @@ class ApplicationSerializer(serializers.Serializer):
         # 问题补全
         problem_optimization = serializers.BooleanField(required=False, allow_null=True,
                                                         error_messages=ErrMessage.boolean("问题补全"))
+        icon = serializers.CharField(required=False, allow_null=True, error_messages=ErrMessage.char("icon图标"))
 
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
@@ -291,6 +299,10 @@ class ApplicationSerializer(serializers.Serializer):
                                               error_messages=ErrMessage.integer("topN"))
         similarity = serializers.FloatField(required=True, max_value=1, min_value=0,
                                             error_messages=ErrMessage.float("相关度"))
+        search_mode = serializers.CharField(required=True, validators=[
+            validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
+                                      message="类型只支持register|reset_password", code=500)
+        ], error_messages=ErrMessage.char("检索模式"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -312,6 +324,7 @@ class ApplicationSerializer(serializers.Serializer):
             hit_list = vector.hit_test(self.data.get('query_text'), dataset_id_list, exclude_document_id_list,
                                        self.data.get('top_number'),
                                        self.data.get('similarity'),
+                                       SearchMode(self.data.get('search_mode')),
                                        EmbeddingModel.get_embedding_model())
             hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get('paragraph_id'): hit} for hit in hit_list], {})
             p_list = list_paragraph([h.get('paragraph_id') for h in hit_list])
@@ -369,6 +382,8 @@ class ApplicationSerializer(serializers.Serializer):
         def reset_application(application: Dict):
             application['multiple_rounds_dialogue'] = True if application.get('dialogue_number') > 0 else False
             del application['dialogue_number']
+            if 'dataset_setting' in application:
+                application['dataset_setting'] = {**application['dataset_setting'], 'search_mode': 'embedding'}
             return application
 
         def page(self, current_page: int, page_size: int, with_valid=True):
@@ -381,7 +396,25 @@ class ApplicationSerializer(serializers.Serializer):
     class ApplicationModel(serializers.ModelSerializer):
         class Meta:
             model = Application
-            fields = ['id', 'name', 'desc', 'prologue', 'dialogue_number']
+            fields = ['id', 'name', 'desc', 'prologue', 'dialogue_number', 'icon']
+
+    class IconOperate(serializers.Serializer):
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        image = UploadedImageField(required=True, error_messages=ErrMessage.image("图片"))
+
+        def edit(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            application = QuerySet(Application).filter(id=self.data.get('application_id')).first()
+            if application is None:
+                raise AppApiException(500, '不存在的应用id')
+            image_id = uuid.uuid1()
+            image = Image(id=image_id, image=self.data.get('image').read(), image_name=self.data.get('image').name)
+            image.save()
+            application.icon = f'/api/image/{image_id}'
+            application.save()
+            return {**ApplicationSerializer.Query.reset_application(ApplicationSerializerModel(application).data)}
 
     class Operate(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
@@ -445,7 +478,7 @@ class ApplicationSerializer(serializers.Serializer):
 
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization',
-                           'api_key_is_active']
+                           'api_key_is_active', 'icon']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     if update_key == 'multiple_rounds_dialogue':

@@ -12,6 +12,17 @@ from common.mixins.api_mixin import ApiMixin
 
 
 class ApplicationApi(ApiMixin):
+    class EditApplicationIcon(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [
+                openapi.Parameter(name='file',
+                                  in_=openapi.IN_FORM,
+                                  type=openapi.TYPE_FILE,
+                                  required=True,
+                                  description='上传文件')
+            ]
+
     class Authentication(ApiMixin):
         @staticmethod
         def get_request_body_api():
@@ -143,7 +154,9 @@ class ApplicationApi(ApiMixin):
                     'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
                     'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
                     'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="问题优化",
-                                                           description="是否开启问题优化", default=True)
+                                                           description="是否开启问题优化", default=True),
+                    'icon': openapi.Schema(type=openapi.TYPE_STRING, title="icon",
+                                           description="icon", default="/ui/favicon.ico")
 
                 }
             )
@@ -161,6 +174,8 @@ class ApplicationApi(ApiMixin):
                                                  default=0.6),
                     'max_paragraph_char_number': openapi.Schema(type=openapi.TYPE_NUMBER, title='最多引用字符数',
                                                                 description="最多引用字符数", default=3000),
+                    'search_mode': openapi.Schema(type=openapi.TYPE_STRING, title='检索模式',
+                                                  description="embedding|keywords|blend", default='embedding'),
                 }
             )
 

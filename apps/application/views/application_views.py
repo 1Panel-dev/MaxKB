@@ -10,6 +10,7 @@
 from django.http import HttpResponse
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -130,6 +131,28 @@ class ApplicationStatistics(APIView):
 
 class Application(APIView):
     authentication_classes = [TokenAuth]
+
+    class EditIcon(APIView):
+        authentication_classes = [TokenAuth]
+        parser_classes = [MultiPartParser]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="修改应用icon",
+                             operation_id="修改应用icon",
+                             tags=['应用'],
+                             manual_parameters=ApplicationApi.EditApplicationIcon.get_request_params_api(),
+                             request_body=ApplicationApi.Operate.get_request_body_api())
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND), PermissionConstants.APPLICATION_EDIT,
+            compare=CompareConstants.AND)
+        def put(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationSerializer.IconOperate(
+                    data={'application_id': application_id, 'user_id': request.user.id,
+                          'image': request.FILES.get('file')}).edit(request.data))
 
     class Embed(APIView):
         @action(methods=["GET"], detail=False)
@@ -343,7 +366,8 @@ class Application(APIView):
                 ApplicationSerializer.HitTest(data={'id': application_id, 'user_id': request.user.id,
                                                     "query_text": request.query_params.get("query_text"),
                                                     "top_number": request.query_params.get("top_number"),
-                                                    'similarity': request.query_params.get('similarity')}).hit_test(
+                                                    'similarity': request.query_params.get('similarity'),
+                                                    'search_mode': request.query_params.get('search_mode')}).hit_test(
                 ))
 
     class Operate(APIView):

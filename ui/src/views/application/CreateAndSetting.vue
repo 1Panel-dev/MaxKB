@@ -145,74 +145,12 @@
                   <div class="flex-between">
                     <span>关联知识库</span>
                     <div>
-                      <el-popover :visible="popoverVisible" :width="214" trigger="click">
-                        <template #reference>
-                          <el-button type="primary" link @click="datasetSettingChange('open')">
-                            <AppIcon iconName="app-operation" class="mr-4"></AppIcon>参数设置
-                          </el-button>
-                        </template>
-                        <div class="dataset_setting">
-                          <div class="form-item mb-16">
-                            <div class="title flex align-center mb-8">
-                              <span style="margin-right: 4px">相似度高于</span>
-                              <el-tooltip
-                                effect="dark"
-                                content="相似度越高相关性越强。"
-                                placement="right"
-                              >
-                                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                              </el-tooltip>
-                            </div>
-                            <div @click.stop>
-                              <el-input-number
-                                v-model="dataset_setting.similarity"
-                                :min="0"
-                                :max="1"
-                                :precision="3"
-                                :step="0.1"
-                                controls-position="right"
-                                style="width: 180px"
-                              />
-                            </div>
-                          </div>
-                          <div class="form-item mb-16">
-                            <div class="title mb-8">引用分段数 TOP</div>
-                            <div @click.stop>
-                              <el-input-number
-                                v-model="dataset_setting.top_n"
-                                :min="1"
-                                :max="10"
-                                controls-position="right"
-                                style="width: 180px"
-                              />
-                            </div>
-                          </div>
-
-                          <div class="form-item mb-16">
-                            <div class="title mb-8">最多引用字符数</div>
-                            <div class="flex align-center">
-                              <el-slider
-                                v-model="dataset_setting.max_paragraph_char_number"
-                                show-input
-                                :show-input-controls="false"
-                                :min="500"
-                                :max="10000"
-                                style="width: 180px"
-                                class="custom-slider"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div class="text-right">
-                          <el-button @click="popoverVisible = false">取消</el-button>
-                          <el-button type="primary" @click="datasetSettingChange('close')"
-                            >确认</el-button
-                          >
-                        </div>
-                      </el-popover>
-                      <el-button type="primary" link @click="openDatasetDialog"
-                        ><el-icon class="mr-4"><Plus /></el-icon>添加</el-button
-                      >
+                      <el-button type="primary" link @click="openParamSettingDialog">
+                        <AppIcon iconName="app-operation" class="mr-4"></AppIcon>参数设置
+                      </el-button>
+                      <el-button type="primary" link @click="openDatasetDialog">
+                        <el-icon class="mr-4"><Plus /></el-icon>添加
+                      </el-button>
                     </div>
                   </div>
                 </template>
@@ -221,13 +159,6 @@
                     >关联的知识库展示在这里</el-text
                   >
                   <el-row :gutter="12" v-else>
-                    <!-- <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mb-8">
-                      <CardAdd
-                        title="关联知识库"
-                        @click="openDatasetDialog"
-                        style="min-height: 50px; font-size: 14px"
-                      />
-                    </el-col> -->
                     <el-col
                       :xs="24"
                       :sm="24"
@@ -311,6 +242,7 @@
       </el-col>
     </el-row>
 
+    <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
       @addData="addDataset"
@@ -318,6 +250,8 @@
       @refresh="refresh"
       :loading="datasetLoading"
     />
+
+    <!-- 添加模版 -->
     <CreateModelDialog
       ref="createModelRef"
       @submit="getModel"
@@ -329,7 +263,8 @@
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { groupBy, cloneDeep } from 'lodash'
+import { groupBy } from 'lodash'
+import ParamSettingDialog from './components/ParamSettingDialog.vue'
 import AddDatasetDialog from './components/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
@@ -363,6 +298,8 @@ const defaultPrompt = `已知信息：
 问题：
 {question}
 `
+
+const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
 const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 
@@ -384,15 +321,14 @@ const applicationForm = ref<ApplicationFormType>({
   dataset_setting: {
     top_n: 3,
     similarity: 0.6,
-    max_paragraph_char_number: 5000
+    max_paragraph_char_number: 5000,
+    search_mode: 'embedding'
   },
   model_setting: {
     prompt: defaultPrompt
   },
   problem_optimization: false
 })
-
-const popoverVisible = ref(false)
 
 const rules = reactive<FormRules<ApplicationFormType>>({
   name: [{ required: true, message: '请输入应用名称', trigger: 'blur' }],
@@ -408,24 +344,13 @@ const rules = reactive<FormRules<ApplicationFormType>>({
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 const datasetList = ref([])
-const dataset_setting = ref<any>({})
-
-function datasetSettingChange(val: string) {
-  if (val === 'open') {
-    popoverVisible.value = true
-    dataset_setting.value = cloneDeep(applicationForm.value.dataset_setting)
-  } else if (val === 'close') {
-    popoverVisible.value = false
-    applicationForm.value.dataset_setting = cloneDeep(dataset_setting.value)
-  }
-}
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
       if (id) {
-        applicationApi.putApplication(id, applicationForm.value, loading).then((res) => {
+        application.asyncPutApplication(id, applicationForm.value, loading).then((res) => {
           MsgSuccess('保存成功')
         })
       } else {
@@ -436,6 +361,14 @@ const submit = async (formEl: FormInstance | undefined) => {
       }
     }
   })
+}
+
+const openParamSettingDialog = () => {
+  ParamSettingDialogRef.value?.open(applicationForm.value.dataset_setting)
+}
+
+function refreshParam(data: any) {
+  applicationForm.value.dataset_setting = data
 }
 
 const openCreateModel = (provider?: Provider) => {
@@ -559,14 +492,5 @@ onMounted(() => {
 }
 .prologue-md-editor {
   height: 150px;
-}
-.dataset_setting {
-  color: var(--el-text-color-regular);
-  font-weight: 400;
-}
-.custom-slider {
-  :deep(.el-input-number.is-without-controls .el-input__wrapper) {
-    padding: 0 !important;
-  }
 }
 </style>

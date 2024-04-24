@@ -77,6 +77,8 @@ class ChatInfo:
             'model_id': self.application.model.id if self.application.model is not None else None,
             'problem_optimization': self.application.problem_optimization,
             'stream': True,
+            'search_mode': self.application.dataset_setting.get(
+                'search_mode') if 'search_mode' in self.application.dataset_setting else 'embedding'
 
         }
 
@@ -184,9 +186,9 @@ class ChatMessageSerializer(serializers.Serializer):
             pipeline_manage_builder.append_step(BaseResetProblemStep)
         # 构建流水线管理器
         pipeline_message = (pipeline_manage_builder.append_step(BaseSearchDatasetStep)
-                           .append_step(BaseGenerateHumanMessageStep)
-                           .append_step(BaseChatStep)
-                           .build())
+                            .append_step(BaseGenerateHumanMessageStep)
+                            .append_step(BaseChatStep)
+                            .build())
         exclude_paragraph_id_list = []
         # 相同问题是否需要排除已经查询到的段落
         if re_chat:

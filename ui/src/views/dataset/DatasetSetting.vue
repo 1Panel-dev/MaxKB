@@ -59,12 +59,21 @@
               <CardCheckbox value-field="id" :data="item" v-model="application_id_list">
                 <template #icon>
                   <AppAvatar
-                    v-if="item.name"
-                    :name="item.name"
-                    pinyinColor
-                    class="mr-12"
+                    v-if="isAppIcon(item?.icon)"
                     shape="square"
                     :size="32"
+                    style="background: none"
+                    class="mr-12"
+                  >
+                    <img :src="item?.icon" alt="" />
+                  </AppAvatar>
+                  <AppAvatar
+                    v-else-if="item?.name"
+                    :name="item?.name"
+                    pinyinColor
+                    shape="square"
+                    :size="32"
+                    class="mr-12"
                   />
                 </template>
                 {{ item.name }}
@@ -87,6 +96,7 @@ import BaseForm from '@/views/dataset/component/BaseForm.vue'
 import datasetApi from '@/api/dataset'
 import type { ApplicationFormType } from '@/api/type/application'
 import { MsgSuccess } from '@/utils/message'
+import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 const route = useRoute()
 const {
