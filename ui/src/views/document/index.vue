@@ -133,13 +133,20 @@
               {{ datetimeFormat(row.update_time) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="left">
+          <el-table-column label="操作" align="left" width="110">
             <template #default="{ row }">
               <div v-if="datasetDetail.type === '0'">
                 <span v-if="row.status === '2'" class="mr-4">
                   <el-tooltip effect="dark" content="重试" placement="top">
                     <el-button type="primary" text @click.stop="refreshDocument(row)">
                       <el-icon><RefreshRight /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </span>
+                <span class="mr-4">
+                  <el-tooltip effect="dark" content="设置" placement="top">
+                    <el-button type="primary" text @click.stop="settingDoc(row)">
+                      <el-icon><Setting /></el-icon>
                     </el-button>
                   </el-tooltip>
                 </span>
