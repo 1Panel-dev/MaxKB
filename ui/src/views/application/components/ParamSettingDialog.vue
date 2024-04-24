@@ -159,7 +159,7 @@ const form = ref<any>({
   max_paragraph_char_number: 5000,
   no_references_setting: {
     status: 'ai_questioning',
-    value: ''
+    value: '{question}'
   }
 })
 
