@@ -71,14 +71,65 @@
                 class="custom-slider"
               />
             </el-form-item>
+            <el-form-item label="无引用知识库分段时">
+              <el-form
+                label-position="top"
+                ref="noReferencesformRef"
+                :model="noReferencesform"
+                :rules="noReferencesRules"
+                class="w-full"
+                :hide-required-asterisk="true"
+              >
+                <el-radio-group
+                  v-model="form.no_references_setting.status"
+                  class="radio-block mb-16"
+                >
+                  <div>
+                    <el-radio value="ai_questioning">
+                      <p>继续向 AI 模型提问</p>
+                      <el-form-item
+                        v-if="form.no_references_setting.status === 'ai_questioning'"
+                        label="提示词"
+                        prop="ai_questioning"
+                      >
+                        <el-input
+                          v-model="noReferencesform.ai_questioning"
+                          :rows="2"
+                          type="textarea"
+                          maxlength="2048"
+                          :placeholder="defaultValue['ai_questioning']"
+                        />
+                      </el-form-item>
+                    </el-radio>
+                  </div>
+                  <div class="mt-8">
+                    <el-radio value="designated_answer">
+                      <p>指定回答内容</p>
+                      <el-form-item
+                        v-if="form.no_references_setting.status === 'designated_answer'"
+                        prop="designated_answer"
+                      >
+                        <el-input
+                          v-model="noReferencesform.designated_answer"
+                          :rows="2"
+                          type="textarea"
+                          maxlength="2048"
+                          :placeholder="defaultValue['designated_answer']"
+                        />
+                      </el-form-item>
+                    </el-radio>
+                  </div>
+                </el-radio-group>
+              </el-form>
+            </el-form-item>
           </el-form>
         </div>
       </el-scrollbar>
     </div>
     <template #footer>
-      <span class="dialog-footer">
+      <span class="dialog-footer p-16">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
-        <el-button type="primary" @click="submit(paramFormRef)" :loading="loading">
+        <el-button type="primary" @click="submit(noReferencesformRef)" :loading="loading">
           保存
         </el-button>
       </span>
@@ -86,18 +137,40 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-
+import { ref, watch, reactive } from 'vue'
+import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const emit = defineEmits(['refresh'])
 
 const paramFormRef = ref()
+const noReferencesformRef = ref()
+
+const defaultValue = {
+  ai_questioning: '{question}',
+  designated_answer:
+    '你好，我是 MaxKB 小助手，我的知识库只包含了 MaxKB 产品相关知识，请重新描述您的问题。'
+}
+
 const form = ref<any>({
   search_mode: 'embedding',
   top_n: 3,
   similarity: 0.6,
-  max_paragraph_char_number: 5000
+  max_paragraph_char_number: 5000,
+  no_references_setting: {
+    status: 'ai_questioning',
+    value: ''
+  }
+})
+
+const noReferencesform = ref<any>({
+  ai_questioning: defaultValue['ai_questioning'],
+  designated_answer: defaultValue['designated_answer']
+})
+
+const noReferencesRules = reactive<FormRules<any>>({
+  ai_questioning: [{ required: true, message: '请输入提示词', trigger: 'blur' }],
+  designated_answer: [{ required: true, message: '请输入内容', trigger: 'blur' }]
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -109,13 +182,24 @@ watch(dialogVisible, (bool) => {
       search_mode: 'embedding',
       top_n: 3,
       similarity: 0.6,
-      max_paragraph_char_number: 5000
+      max_paragraph_char_number: 5000,
+      no_references_setting: {
+        status: 'ai_questioning',
+        value: ''
+      }
     }
+    noReferencesform.value = {
+      ai_questioning: defaultValue['ai_questioning'],
+      designated_answer: defaultValue['designated_answer']
+    }
+    noReferencesformRef.value?.clearValidate()
   }
 })
 
 const open = (data: any) => {
-  form.value = { ...form.value, ...data }
+  form.value = { ...form.value, ...cloneDeep(data) }
+  noReferencesform.value[form.value.no_references_setting.status] =
+    form.value.no_references_setting.value
   dialogVisible.value = true
 }
 
@@ -123,6 +207,8 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
+      form.value.no_references_setting.value =
+        noReferencesform.value[form.value.no_references_setting.status]
       emit('refresh', form.value)
       dialogVisible.value = false
     }
@@ -133,7 +219,7 @@ defineExpose({ open })
 </script>
 <style lang="scss" scope>
 .param-dialog {
-  padding: 8px;
+  padding: 8px 8px 24px 8px;
   .el-dialog__header {
     padding: 16px 16px 0 16px;
   }
