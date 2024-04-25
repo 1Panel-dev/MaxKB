@@ -31,6 +31,7 @@
               placeholder="按名称搜索"
               prefix-icon="Search"
               style="max-width: 240px"
+              clearable
             />
           </div>
         </div>

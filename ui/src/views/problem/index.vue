@@ -16,6 +16,7 @@
             prefix-icon="Search"
             class="w-240"
             @change="getList"
+            clearable
           />
         </div>
         <app-table

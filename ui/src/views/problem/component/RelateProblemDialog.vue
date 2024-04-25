@@ -11,7 +11,12 @@
         <el-scrollbar height="500" wrap-class="paragraph-scrollbar">
           <div class="bold title align-center p-24 pb-0">选择文档</div>
           <div class="p-8" style="padding-bottom: 8px">
-            <el-input v-model="filterDoc" placeholder="按 文档名称 搜索" prefix-icon="Search" />
+            <el-input
+              v-model="filterDoc"
+              placeholder="按 文档名称 搜索"
+              prefix-icon="Search"
+              clearable
+            />
             <common-list
               :data="documentList"
               class="mt-8"

@@ -4,6 +4,7 @@
     placeholder="搜索"
     prefix-icon="Search"
     class="p-24 pt-0 pb-0 mb-16 mt-4"
+    clearable
   />
   <div class="p-24 pt-0">
     <el-table :data="filterData" :max-height="tableHeight">

@@ -9,7 +9,12 @@
           </el-button>
         </div>
         <div class="team-member-input">
-          <el-input v-model="filterText" placeholder="请输入用户名搜索" prefix-icon="Search" />
+          <el-input
+            v-model="filterText"
+            placeholder="请输入用户名搜索"
+            prefix-icon="Search"
+            clearable
+          />
         </div>
         <common-list
           :data="filterMember"

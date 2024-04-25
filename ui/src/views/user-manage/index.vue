@@ -9,6 +9,7 @@
           placeholder="搜索"
           prefix-icon="Search"
           class="w-240"
+          clearable
         />
       </div>
 

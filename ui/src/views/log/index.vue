@@ -16,6 +16,7 @@
           placeholder="搜索"
           prefix-icon="Search"
           class="w-240"
+          clearable
         />
         <el-button class="float-right" @click="exportLog">导出</el-button>
       </div>
