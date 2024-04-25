@@ -45,5 +45,6 @@ class PublicAccessToken(AuthBaseHandle):
                                application_access_token.application_id))],
             application_id=application_access_token.application_id,
             client_id=auth_details.get('client_id'),
-            client_type=AuthenticationType.APPLICATION_ACCESS_TOKEN.value
+            client_type=AuthenticationType.APPLICATION_ACCESS_TOKEN.value,
+            current_role=RoleConstants.APPLICATION_ACCESS_TOKEN
         )
