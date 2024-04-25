@@ -84,7 +84,11 @@
         </template>
         <div class="mb-16">
           <div class="title mb-8">检索模式</div>
-          <el-radio-group v-model="cloneForm.search_mode" class="card__radio">
+          <el-radio-group
+            v-model="cloneForm.search_mode"
+            class="card__radio"
+            @change="changeHandle"
+          >
             <el-card
               shadow="never"
               class="mb-16"
@@ -119,27 +123,35 @@
             </el-card>
           </el-radio-group>
         </div>
-        <div class="mb-16">
-          <div class="title mb-8">相似度高于</div>
-          <el-input-number
-            v-model="cloneForm.similarity"
-            :min="0"
-            :max="1"
-            :precision="3"
-            :step="0.1"
-            controls-position="right"
-          />
-        </div>
-        <div class="mb-16">
-          <div class="title mb-8">返回分段数 TOP</div>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <div class="mb-16">
+              <div class="title mb-8">相似度高于</div>
+              <el-input-number
+                v-model="cloneForm.similarity"
+                :min="0"
+                :max="1"
+                :precision="3"
+                :step="0.1"
+                controls-position="right"
+                class="w-full"
+              />
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="mb-16">
+              <div class="title mb-8">返回分段数 TOP</div>
+              <el-input-number
+                v-model="cloneForm.top_number"
+                :min="1"
+                :max="10"
+                controls-position="right"
+                class="w-full"
+              />
+            </div>
+          </el-col>
+        </el-row>
 
-          <el-input-number
-            v-model="cloneForm.top_number"
-            :min="1"
-            :max="10"
-            controls-position="right"
-          />
-        </div>
         <div class="text-right">
           <el-button @click="popoverVisible = false">取消</el-button>
           <el-button type="primary" @click="settingChange('close')">确认</el-button>
@@ -217,6 +229,14 @@ const isDataset = computed(() => {
   const { meta } = route as any
   return meta?.activeMenu.includes('dataset')
 })
+
+function changeHandle(val: string) {
+  if (val === 'keywords') {
+    cloneForm.value.similarity = 0
+  } else {
+    cloneForm.value.similarity = 0.6
+  }
+}
 
 function settingChange(val: string) {
   if (val === 'open') {

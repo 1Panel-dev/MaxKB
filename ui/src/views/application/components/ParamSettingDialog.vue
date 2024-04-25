@@ -1,11 +1,17 @@
 <template>
-  <el-dialog title="参数设置" class="param-dialog" v-model="dialogVisible" style="width: 550px">
+  <el-dialog
+    align-center
+    title="参数设置"
+    class="param-dialog"
+    v-model="dialogVisible"
+    style="width: 550px"
+  >
     <div class="dialog-max-height">
-      <el-scrollbar>
+      <el-scrollbar always>
         <div class="p-16">
           <el-form label-position="top" ref="paramFormRef" :model="form">
             <el-form-item label="检索模式">
-              <el-radio-group v-model="form.search_mode" class="card__radio">
+              <el-radio-group v-model="form.search_mode" class="card__radio" @change="changeHandle">
                 <el-card
                   shadow="never"
                   class="mb-16"
@@ -26,11 +32,7 @@
                     <el-text type="info">通过关键词检索，返回包含关键词最多的文本分段</el-text>
                   </el-radio>
                 </el-card>
-                <el-card
-                  shadow="never"
-                  class="mb-16"
-                  :class="form.search_mode === 'blend' ? 'active' : ''"
-                >
+                <el-card shadow="never" :class="form.search_mode === 'blend' ? 'active' : ''">
                   <el-radio value="blend" size="large">
                     <p class="mb-4">混合检索</p>
                     <el-text type="info"
@@ -40,27 +42,41 @@
                 </el-card>
               </el-radio-group>
             </el-form-item>
-            <el-form-item>
-              <template #label>
-                <div class="flex align-center">
-                  <span class="mr-4">相似度高于</span>
-                  <el-tooltip effect="dark" content="相似度越高相关性越强。" placement="right">
-                    <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                  </el-tooltip>
-                </div>
-              </template>
-              <el-input-number
-                v-model="form.similarity"
-                :min="0"
-                :max="1"
-                :precision="3"
-                :step="0.1"
-                controls-position="right"
-              />
-            </el-form-item>
-            <el-form-item label="引用分段数 TOP">
-              <el-input-number v-model="form.top_n" :min="1" :max="10" controls-position="right" />
-            </el-form-item>
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item>
+                  <template #label>
+                    <div class="flex align-center">
+                      <span class="mr-4">相似度高于</span>
+                      <el-tooltip effect="dark" content="相似度越高相关性越强。" placement="right">
+                        <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                      </el-tooltip>
+                    </div>
+                  </template>
+                  <el-input-number
+                    v-model="form.similarity"
+                    :min="0"
+                    :max="1"
+                    :precision="3"
+                    :step="0.1"
+                    controls-position="right"
+                    class="w-full"
+                  />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="引用分段数 TOP">
+                  <el-input-number
+                    v-model="form.top_n"
+                    :min="1"
+                    :max="10"
+                    controls-position="right"
+                    class="w-full"
+                  />
+                </el-form-item>
+              </el-col>
+            </el-row>
+
             <el-form-item label="最多引用字符数">
               <el-slider
                 v-model="form.max_paragraph_char_number"
@@ -215,6 +231,14 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
+function changeHandle(val: string) {
+  if (val === 'keywords') {
+    form.value.similarity = 0
+  } else {
+    form.value.similarity = 0.6
+  }
+}
+
 defineExpose({ open })
 </script>
 <style lang="scss" scope>
@@ -227,7 +251,7 @@ defineExpose({ open })
     padding: 0 !important;
   }
   .dialog-max-height {
-    height: calc(100vh - 260px);
+    height: calc(100vh - 180px);
   }
   .custom-slider {
     .el-input-number.is-without-controls .el-input__wrapper {
