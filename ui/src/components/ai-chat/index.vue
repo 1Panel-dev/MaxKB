@@ -379,6 +379,7 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
         if (split) {
           for (const index in split) {
             const chunk = JSON?.parse(split[index].replace('data:', ''))
+            chat.chat_id = chunk.chat_id
             chat.record_id = chunk.id
             const content = chunk?.content
             if (content) {
@@ -509,7 +510,7 @@ function regenerationChart(item: chatType) {
 
 function getSourceDetail(row: any) {
   logApi
-    .getRecordDetail(id || props.appId, chartOpenId.value, row.record_id, loading)
+    .getRecordDetail(id || props.appId, row.chat_id, row.record_id, loading)
     .then((res) => {
       const exclude_keys = ['answer_text', 'id']
       Object.keys(res.data).forEach((key) => {
