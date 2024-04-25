@@ -27,6 +27,7 @@ from application.models.api_key_model import ApplicationAccessToken
 from application.serializers.application_serializers import ModelDatasetAssociation, DatasetSettingSerializer, \
     ModelSettingSerializer
 from application.serializers.chat_message_serializers import ChatInfo
+from common.constants.permission_constants import RoleConstants
 from common.db.search import native_search, native_page_search, page_search, get_dynamics_model
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
@@ -281,13 +282,13 @@ class ChatRecordSerializer(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
         chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
 
-        def is_valid(self, *, raise_exception=False):
+        def is_valid(self, *, current_role=None, raise_exception=False):
             super().is_valid(raise_exception=True)
             application_access_token = QuerySet(ApplicationAccessToken).filter(
                 application_id=self.data.get('application_id')).first()
             if application_access_token is None:
                 raise AppApiException(500, '不存在的应用认证信息')
-            if not application_access_token.show_source:
+            if not application_access_token.show_source and current_role == RoleConstants.APPLICATION_ACCESS_TOKEN.value:
                 raise AppApiException(500, '未开启显示知识来源')
 
         def get_chat_record(self):
@@ -301,9 +302,9 @@ class ChatRecordSerializer(serializers.Serializer):
                     return chat_record_list[-1]
             return QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
 
-        def one(self, with_valid=True):
+        def one(self, current_role: RoleConstants, with_valid=True):
             if with_valid:
-                self.is_valid(raise_exception=True)
+                self.is_valid(current_role=current_role, raise_exception=True)
             chat_record = self.get_chat_record()
             if chat_record is None:
                 raise AppApiException(500, "对话不存在")

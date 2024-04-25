@@ -35,7 +35,9 @@ class ApplicationKey(AuthBaseHandle):
                                               permission_list=permission_list,
                                               application_id=application_api_key.application_id,
                                               client_id=str(application_api_key.id),
-                                              client_type=AuthenticationType.API_KEY.value)
+                                              client_type=AuthenticationType.API_KEY.value,
+                                              current_role=RoleConstants.APPLICATION_KEY
+                                              )
 
     def support(self, request, token: str, get_token_details):
         return str(token).startswith("application-")

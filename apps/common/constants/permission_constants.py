@@ -152,12 +152,13 @@ class Auth:
     """
 
     def __init__(self, role_list: List[RoleConstants], permission_list: List[PermissionConstants | Permission]
-                 , client_id, client_type, **keywords):
+                 , client_id, client_type, current_role: RoleConstants, **keywords):
         self.role_list = role_list
         self.permission_list = permission_list
         self.client_id = client_id
         self.client_type = client_type
         self.keywords = keywords
+        self.current_role = current_role
 
 
 class CompareConstants(Enum):

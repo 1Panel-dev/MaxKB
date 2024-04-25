@@ -43,4 +43,5 @@ class UserToken(AuthBaseHandle):
         return user, Auth(role_list=[rule],
                           permission_list=permission_list,
                           client_id=str(user.id),
-                          client_type=AuthenticationType.USER.value)
+                          client_type=AuthenticationType.USER.value,
+                          current_role=rule)

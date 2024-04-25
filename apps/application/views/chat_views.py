@@ -181,7 +181,7 @@ class ChatView(APIView):
                 return result.success(ChatRecordSerializer.Operate(
                     data={'application_id': application_id,
                           'chat_id': chat_id,
-                          'chat_record_id': chat_record_id}).one())
+                          'chat_record_id': chat_record_id}).one(request.auth.current_role))
 
         @action(methods=['GET'], detail=False)
         @swagger_auto_schema(operation_summary="获取对话记录列表",
