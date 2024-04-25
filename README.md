@@ -13,7 +13,7 @@ MaxKB 是一款基于 LLM 大语言模型的知识库问答系统。MaxKB = Max 
 
 - **开箱即用**：支持直接上传文档、自动爬取在线文档，支持文本自动拆分、向量化，智能问答交互体验好；
 - **无缝嵌入**：支持零编码快速嵌入到第三方业务系统；
-- **多模型支持**：支持对接主流的大模型，包括本地私有大模型（如 Llama 2、Llama 3）、通义千问、OpenAI、Azure OpenAI、Kimi 和百度千帆大模型等。
+- **多模型支持**：支持对接主流的大模型，包括 Ollama 本地私有大模型（如 Llama 2、Llama 3、qwen）、通义千问、OpenAI、Azure OpenAI、Kimi、智谱 AI、讯飞星火和百度千帆大模型等。
 
 ## 快速开始
 
@@ -31,8 +31,8 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
 如你有更多问题，可以查看使用手册，或者通过论坛与我们交流。
 
 -   [使用手册](https://github.com/1Panel-dev/MaxKB/wiki/1-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2)
--   [论坛求助](https://bbs.fit2cloud.com/c/mk/11)
 -   [演示视频](https://www.bilibili.com/video/BV1BE421M7YM/)
+-   [论坛求助](https://bbs.fit2cloud.com/c/mk/11)
 -   技术交流群     
       <image height="150px" width="150px" src="https://github.com/1Panel-dev/MaxKB/assets/52996290/a4f6303d-9667-4be0-bc2d-0110af782f67"/>
 
@@ -56,7 +56,7 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
 -   后端：[Python / Django](https://www.djangoproject.com/)
 -   LangChain：[LangChain](https://www.langchain.com/)
 -   向量数据库：[PostgreSQL / pgvector](https://www.postgresql.org/)
--   大模型：Azure OpenAI、OpenAI、百度千帆大模型、[Ollama](https://github.com/ollama/ollama)、通义千问、Kimi
+-   大模型：Azure OpenAI、OpenAI、百度千帆大模型、[Ollama](https://github.com/ollama/ollama)、通义千问、Kimi、智谱 AI、讯飞星火
 
 ## Star History
 
