@@ -23,6 +23,7 @@
           class="input-with-select"
           style="width: 260px"
           @change="searchHandle"
+          clearable
         >
           <template #prepend>
             <el-select v-model="searchType" placeholder="Select" style="width: 80px">
