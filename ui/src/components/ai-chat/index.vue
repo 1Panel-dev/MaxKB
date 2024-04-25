@@ -53,6 +53,7 @@
                 <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
               </AppAvatar>
             </div>
+
             <div class="content">
               <div class="flex" v-if="!item.answer_text">
                 <el-card
@@ -72,7 +73,9 @@
 
               <el-card v-else shadow="always" class="dialog-card">
                 <MdRenderer :source="item.answer_text"></MdRenderer>
-                <div v-if="(id && !props.appId && item.write_ed) || log">
+                <div
+                  v-if="(id && item.write_ed) || (props.data?.show_source && item.write_ed) || log"
+                >
                   <el-divider> <el-text type="info">知识来源</el-text> </el-divider>
                   <div class="mb-8">
                     <el-space wrap>
@@ -271,7 +274,7 @@ function openParagraph(row: any, id?: string) {
 }
 
 function quickProblemHandle(val: string) {
-  if (!props.log && !loading.value) {
+  if (!props.log && !loading.value && props.data?.name && props.data?.model_id) {
     // inputValue.value = val
     // nextTick(() => {
     //   quickInputRef.value?.focus()
@@ -488,7 +491,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
         }
       })
       .then(() => {
-        return !props.appId && getSourceDetail(chat)
+        return (id || props.data?.show_source) && getSourceDetail(chat)
       })
       .finally(() => {
         ChatManagement.close(chat.id)
@@ -505,14 +508,16 @@ function regenerationChart(item: chatType) {
 }
 
 function getSourceDetail(row: any) {
-  logApi.getRecordDetail(id, chartOpenId.value, row.record_id, loading).then((res) => {
-    const exclude_keys = ['answer_text', 'id']
-    Object.keys(res.data).forEach((key) => {
-      if (!exclude_keys.includes(key)) {
-        row[key] = res.data[key]
-      }
+  logApi
+    .getRecordDetail(id || props.appId, chartOpenId.value, row.record_id, loading)
+    .then((res) => {
+      const exclude_keys = ['answer_text', 'id']
+      Object.keys(res.data).forEach((key) => {
+        if (!exclude_keys.includes(key)) {
+          row[key] = res.data[key]
+        }
+      })
     })
-  })
   return true
 }
 
