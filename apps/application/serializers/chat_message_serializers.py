@@ -196,9 +196,11 @@ class ChatMessageSerializer(serializers.Serializer):
         exclude_paragraph_id_list = []
         # 相同问题是否需要排除已经查询到的段落
         if re_chat:
-            paragraph_id_list = flat_map([row.paragraph_id_list for row in
-                                          filter(lambda chat_record: chat_record == message,
-                                                 chat_info.chat_record_list)])
+            paragraph_id_list = flat_map(
+                [[paragraph.get('id') for paragraph in chat_record.details['search_step']['paragraph_list']] for
+                 chat_record in chat_info.chat_record_list if
+                 chat_record.problem_text == message and 'search_step' in chat_record.details and 'paragraph_list' in
+                 chat_record.details['search_step']])
             exclude_paragraph_id_list = list(set(paragraph_id_list))
         # 构建运行参数
         params = chat_info.to_pipeline_manage_params(message, get_post_handler(chat_info), exclude_paragraph_id_list,

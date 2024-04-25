@@ -27,6 +27,11 @@ class Type(models.TextChoices):
     web = 1, 'web站点类型'
 
 
+class HitHandlingMethod(models.TextChoices):
+    optimization = 'optimization', '模型优化'
+    directly_return = 'directly_return', '直接返回'
+
+
 class DataSet(AppModelMixin):
     """
     数据集表
@@ -58,6 +63,9 @@ class Document(AppModelMixin):
 
     type = models.CharField(verbose_name='类型', max_length=1, choices=Type.choices,
                             default=Type.base)
+    hit_handling_method = models.CharField(verbose_name='命中处理方式', max_length=20,
+                                           choices=HitHandlingMethod.choices,
+                                           default=HitHandlingMethod.optimization)
 
     meta = models.JSONField(verbose_name="元数据", default=dict)
 

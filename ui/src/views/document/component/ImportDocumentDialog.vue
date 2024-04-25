@@ -21,14 +21,33 @@
           type="textarea"
         />
       </el-form-item>
-      <el-form-item v-else label="文档地址" prop="source_url">
+      <el-form-item v-else-if="documentType === '1'" label="文档地址" prop="source_url">
         <el-input v-model="form.source_url" placeholder="请输入文档地址" />
       </el-form-item>
-      <el-form-item label="选择器">
+      <el-form-item label="选择器" v-if="documentType === '1'">
         <el-input
           v-model="form.selector"
           placeholder="默认为 body，可输入 .classname/#idname/tagname"
         />
+      </el-form-item>
+      <el-form-item v-if="!isImport">
+        <template #label>
+          <div class="flex align-center">
+            <span class="mr-4">命中处理方式</span>
+            <el-tooltip
+              effect="dark"
+              content="用户提问时，命中文档下的分段时按照设置的方式进行处理。"
+              placement="right"
+            >
+              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+            </el-tooltip>
+          </div>
+        </template>
+        <el-radio-group v-model="form.hit_handling_method">
+          <template v-for="(value, key) of hitHandlingMethod" :key="key">
+            <el-radio :value="key">{{ value }}</el-radio>
+          </template>
+        </el-radio-group>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -45,6 +64,7 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import documentApi from '@/api/document'
 import { MsgSuccess } from '@/utils/message'
+import { hitHandlingMethod } from '../utils'
 
 const route = useRoute()
 const {
@@ -57,9 +77,11 @@ const loading = ref<boolean>(false)
 const isImport = ref<boolean>(false)
 const form = ref<any>({
   source_url: '',
-  selector: ''
+  selector: '',
+  hit_handling_method: ''
 })
 const documentId = ref('')
+const documentType = ref<string | number>('') //文档类型：1: web文档；0:普通文档
 
 const rules = reactive({
   source_url: [{ required: true, message: '请输入文档地址', trigger: 'blur' }]
@@ -71,16 +93,19 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       source_url: '',
-      selector: ''
+      selector: '',
+      hit_handling_method: ''
     }
     isImport.value = false
+    documentType.value = ''
   }
 })
 
 const open = (row: any) => {
   if (row) {
+    documentType.value = row.type
     documentId.value = row.id
-    form.value = row.meta
+    form.value = { hit_handling_method: row.hit_handling_method, ...row.meta }
     isImport.value = false
   } else {
     isImport.value = true
@@ -104,7 +129,11 @@ const submit = async (formEl: FormInstance | undefined) => {
         })
       } else {
         const obj = {
-          meta: form.value
+          hit_handling_method: form.value.hit_handling_method,
+          meta: {
+            source_url: form.value.source_url,
+            selector: form.value.selector
+          }
         }
         documentApi.putDocument(id, documentId.value, obj, loading).then((res) => {
           MsgSuccess('设置成功')

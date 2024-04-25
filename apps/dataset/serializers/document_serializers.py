@@ -8,11 +8,13 @@
 """
 import logging
 import os
+import re
 import traceback
 import uuid
 from functools import reduce
 from typing import List, Dict
 
+from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet
 from drf_yasg import openapi
@@ -42,6 +44,12 @@ class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
     name = serializers.CharField(required=False, max_length=128, min_length=1,
                                  error_messages=ErrMessage.char(
                                      "文档名称"))
+    hit_handling_method = serializers.CharField(required=False, validators=[
+        validators.RegexValidator(regex=re.compile("^optimization|directly_return$"),
+                                  message="类型只支持optimization|directly_return",
+                                  code=500)
+    ], error_messages=ErrMessage.char("命中处理方式"))
+
     is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char(
         "文档是否可用"))
 
@@ -116,12 +124,15 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                      min_length=1,
                                      error_messages=ErrMessage.char(
                                          "文档名称"))
+        hit_handling_method = serializers.CharField(required=False, error_messages=ErrMessage.char("命中处理方式"))
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
             query_set = query_set.filter(**{'dataset_id': self.data.get("dataset_id")})
             if 'name' in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'name__icontains': self.data.get('name')})
+            if 'hit_handling_method' in self.data and self.data.get('hit_handling_method') is not None:
+                query_set = query_set.filter(**{'hit_handling_method': self.data.get('hit_handling_method')})
             query_set = query_set.order_by('-create_time')
             return query_set
 
@@ -143,7 +154,11 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                       in_=openapi.IN_QUERY,
                                       type=openapi.TYPE_STRING,
                                       required=False,
-                                      description='文档名称')]
+                                      description='文档名称'),
+                    openapi.Parameter(name='hit_handling_method', in_=openapi.IN_QUERY,
+                                      type=openapi.TYPE_STRING,
+                                      required=False,
+                                      description='文档命中处理方式')]
 
         @staticmethod
         def get_response_body_api():
@@ -252,7 +267,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             _document = QuerySet(Document).get(id=self.data.get("document_id"))
             if with_valid:
                 DocumentEditInstanceSerializer(data=instance).is_valid(document=_document)
-            update_keys = ['name', 'is_active', 'meta']
+            update_keys = ['name', 'is_active', 'hit_handling_method', 'meta']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     _document.__setattr__(update_key, instance.get(update_key))
@@ -320,6 +335,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="文档名称", description="文档名称"),
                     'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
+                    'hit_handling_method': openapi.Schema(type=openapi.TYPE_STRING, title="命中处理方式",
+                                                          description="ai优化:optimization,直接返回:directly_return"),
                     'meta': openapi.Schema(type=openapi.TYPE_OBJECT, title="文档元数据",
                                            description="文档元数据->web:{source_url:xxx,selector:'xxx'},base:{}"),
                 }
