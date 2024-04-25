@@ -28,7 +28,7 @@ from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
-from common.exception.app_exception import AppApiException, NotFound404
+from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed
 from common.field.common import UploadedImageField
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
@@ -170,7 +170,9 @@ class ApplicationSerializer(serializers.Serializer):
             white_list = serializers.ListSerializer(required=False, child=serializers.CharField(required=True,
                                                                                                 error_messages=ErrMessage.char(
                                                                                                     "白名单")),
-                                                    error_messages=ErrMessage.list("白名单列表"))
+                                                    error_messages=ErrMessage.list("白名单列表")),
+            show_source = serializers.BooleanField(required=False,
+                                                   error_messages=ErrMessage.boolean("是否显示知识来源"))
 
         def edit(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -190,6 +192,8 @@ class ApplicationSerializer(serializers.Serializer):
                 application_access_token.white_active = instance.get("white_active")
             if 'white_list' in instance and instance.get('white_list') is not None:
                 application_access_token.white_list = instance.get('white_list')
+            if 'show_source' in instance and instance.get('show_source') is not None:
+                application_access_token.show_source = instance.get('show_source')
             application_access_token.save()
             return self.one(with_valid=False)
 
@@ -210,7 +214,8 @@ class ApplicationSerializer(serializers.Serializer):
                     "is_active": application_access_token.is_active,
                     'access_num': application_access_token.access_num,
                     'white_active': application_access_token.white_active,
-                    'white_list': application_access_token.white_list
+                    'white_list': application_access_token.white_list,
+                    'show_source': application_access_token.show_source
                     }
 
     class Authentication(serializers.Serializer):
@@ -474,8 +479,12 @@ class ApplicationSerializer(serializers.Serializer):
                 self.is_valid()
             application_id = self.data.get("application_id")
             application = QuerySet(Application).get(id=application_id)
+            application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application.id).first()
+            if application_access_token is None:
+                raise AppUnauthorizedFailed(500, "非法用户")
             return ApplicationSerializer.Query.reset_application(
-                ApplicationSerializer.ApplicationModel(application).data)
+                {**ApplicationSerializer.ApplicationModel(application).data,
+                 'show_source': application_access_token.show_source})
 
         def edit(self, instance: Dict, with_valid=True):
             if with_valid:

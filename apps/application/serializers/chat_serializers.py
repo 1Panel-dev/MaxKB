@@ -23,6 +23,7 @@ from django.http import HttpResponse
 from rest_framework import serializers
 
 from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord
+from application.models.api_key_model import ApplicationAccessToken
 from application.serializers.application_serializers import ModelDatasetAssociation, DatasetSettingSerializer, \
     ModelSettingSerializer
 from application.serializers.chat_message_serializers import ChatInfo
@@ -277,17 +278,27 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
 class ChatRecordSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
-
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
         chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            application_access_token = QuerySet(ApplicationAccessToken).filter(
+                application_id=self.data.get('application_id')).first()
+            if application_access_token is None:
+                raise AppApiException(500, '不存在的应用认证信息')
+            if not application_access_token.show_source:
+                raise AppApiException(500, '未开启显示知识来源')
 
         def get_chat_record(self):
             chat_record_id = self.data.get('chat_record_id')
             chat_id = self.data.get('chat_id')
             chat_info: ChatInfo = chat_cache.get(chat_id)
-            chat_record_list = [chat_record for chat_record in chat_info.chat_record_list if
-                                chat_record.id == uuid.UUID(chat_record_id)]
-            if chat_record_list is not None and len(chat_record_list):
-                return chat_record_list[-1]
+            if chat_info is not None:
+                chat_record_list = [chat_record for chat_record in chat_info.chat_record_list if
+                                    chat_record.id == uuid.UUID(chat_record_id)]
+                if chat_record_list is not None and len(chat_record_list):
+                    return chat_record_list[-1]
             return QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
 
         def one(self, with_valid=True):

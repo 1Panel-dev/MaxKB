@@ -39,6 +39,7 @@ class ApplicationAccessToken(AppModelMixin):
     white_list = ArrayField(verbose_name="白名单列表",
                             base_field=models.CharField(max_length=128, blank=True)
                             , default=list)
+    show_source = models.BooleanField(default=False, verbose_name="是否显示知识来源")
 
     class Meta:
         db_table = "application_access_token"
