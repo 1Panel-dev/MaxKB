@@ -90,6 +90,39 @@
               </div>
             </template>
           </el-table-column>
+          <el-table-column width="150">
+            <template #header>
+              <div>
+                <span>命中处理方式</span>
+                <el-dropdown trigger="click" @command="dropdownHandle">
+                  <el-button style="margin-top: 1px" link :type="filterMethod ? 'primary' : ''">
+                    <el-icon><Filter /></el-icon>
+                  </el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu style="width: 100px">
+                      <el-dropdown-item
+                        :class="filterMethod ? '' : 'is-active'"
+                        command=""
+                        class="justify-center"
+                        >全部</el-dropdown-item
+                      >
+                      <template v-for="(value, key) of hitHandlingMethod" :key="key">
+                        <el-dropdown-item
+                          :class="filterMethod === key ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="key"
+                          >{{ value }}</el-dropdown-item
+                        >
+                      </template>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
+            </template>
+            <template #default="{ row }">
+              {{ hitHandlingMethod[row.hit_handling_method] }}
+            </template>
+          </el-table-column>
           <el-table-column prop="create_time" label="创建时间" width="170">
             <template #default="{ row }">
               {{ datetimeFormat(row.create_time) }}
@@ -100,13 +133,20 @@
               {{ datetimeFormat(row.update_time) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="left">
+          <el-table-column label="操作" align="left" width="110">
             <template #default="{ row }">
               <div v-if="datasetDetail.type === '0'">
                 <span v-if="row.status === '2'" class="mr-4">
                   <el-tooltip effect="dark" content="重试" placement="top">
                     <el-button type="primary" text @click.stop="refreshDocument(row)">
                       <el-icon><RefreshRight /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </span>
+                <span class="mr-4">
+                  <el-tooltip effect="dark" content="设置" placement="top">
+                    <el-button type="primary" text @click.stop="settingDoc(row)">
+                      <el-icon><Setting /></el-icon>
                     </el-button>
                   </el-tooltip>
                 </span>
@@ -165,6 +205,7 @@ import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
+import { hitHandlingMethod } from './utils'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 const router = useRouter()
@@ -186,7 +227,10 @@ onBeforeRouteLeave((to: any, from: any) => {
     common.savePage(storeKey, null)
     common.saveCondition(storeKey, null)
   } else {
-    common.saveCondition(storeKey, filterText.value)
+    common.saveCondition(storeKey, {
+      filterText: filterText.value,
+      filterMethod: filterMethod.value
+    })
   }
 })
 const beforePagination = computed(() => common.paginationConfig[storeKey])
@@ -196,6 +240,7 @@ const SyncWebDialogRef = ref()
 const loading = ref(false)
 let interval: any
 const filterText = ref('')
+const filterMethod = ref<string | number>('')
 const documentData = ref<any[]>([])
 const currentMouseId = ref(null)
 const datasetDetail = ref<any>({})
@@ -210,6 +255,11 @@ const ImportDocumentDialogRef = ref()
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
 const title = ref('')
+
+function dropdownHandle(val: string) {
+  filterMethod.value = val
+  getList()
+}
 
 function syncDataset() {
   SyncWebDialogRef.value.open(id)
@@ -378,13 +428,12 @@ function handleSizeChange() {
 }
 
 function getList(bool?: boolean) {
+  const param = {
+    ...(filterText.value && { name: filterText.value }),
+    ...(filterMethod.value && { hit_handling_method: filterMethod.value })
+  }
   documentApi
-    .getDocument(
-      id as string,
-      paginationConfig.value,
-      filterText.value && { name: filterText.value },
-      bool ? undefined : loading
-    )
+    .getDocument(id as string, paginationConfig.value, param, bool ? undefined : loading)
     .then((res) => {
       documentData.value = res.data.records
       paginationConfig.value.total = res.data.total
@@ -408,7 +457,8 @@ onMounted(() => {
     paginationConfig.value = beforePagination.value
   }
   if (beforeSearch.value) {
-    filterText.value = beforeSearch.value
+    filterText.value = beforeSearch.value['filterText']
+    filterMethod.value = beforeSearch.value['filterMethod']
   }
   getList()
   // 初始化定时任务
