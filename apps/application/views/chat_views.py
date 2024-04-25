@@ -172,7 +172,8 @@ class ChatView(APIView):
                                  tags=["应用/对话日志"]
                                  )
             @has_permissions(
-                ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY],
+                ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY,
+                                RoleConstants.APPLICATION_ACCESS_TOKEN],
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))])
             )

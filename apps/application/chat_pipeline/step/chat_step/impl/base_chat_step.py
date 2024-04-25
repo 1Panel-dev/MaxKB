@@ -154,6 +154,7 @@ class BaseChatStep(IChatStep):
                         chat_result = iter(directly_return_chunk_list)
                     else:
                         chat_result = chat_model.stream(message_list)
+                        is_ai_chat = True
                 else:
                     chat_result = chat_model.stream(message_list)
                     is_ai_chat = True
@@ -187,8 +188,18 @@ class BaseChatStep(IChatStep):
                     'status') == 'designated_answer':
                 chat_result = AIMessage(content=no_references_setting.get('value'))
             else:
-                chat_result = chat_model.invoke(message_list)
-                is_ai_chat = True
+                if paragraph_list is not None and len(paragraph_list) > 0:
+                    directly_return_chunk_list = [AIMessageChunk(content=paragraph.title + "\n" + paragraph.content)
+                                                  for paragraph in paragraph_list if
+                                                  paragraph.hit_handling_method == 'directly_return']
+                    if directly_return_chunk_list is not None and len(directly_return_chunk_list) > 0:
+                        chat_result = iter(directly_return_chunk_list)
+                    else:
+                        chat_result = chat_model.invoke(message_list)
+                        is_ai_chat = True
+                else:
+                    chat_result = chat_model.invoke(message_list)
+                    is_ai_chat = True
         chat_record_id = uuid.uuid1()
         if is_ai_chat:
             request_token = chat_model.get_num_tokens_from_messages(message_list)

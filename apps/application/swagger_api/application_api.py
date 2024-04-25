@@ -132,6 +132,8 @@ class ApplicationApi(ApiMixin):
                     'white_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                  items=openapi.Schema(type=openapi.TYPE_STRING), title="白名单列表",
                                                  description="白名单列表"),
+                    'show_source': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否显示知识来源",
+                                                  description="是否显示知识来源"),
                 }
             )
 
