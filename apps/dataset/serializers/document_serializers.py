@@ -131,6 +131,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             dataset_id = self.data.get('dataset_id')
             target_dataset_id = self.data.get('target_dataset_id')
+            dataset = QuerySet(DataSet).filter(id=dataset_id).first()
+            target_dataset = QuerySet(DataSet).filter(id=target_dataset_id).first()
             document_id_list = self.data.get('document_id_list')
             document_list = QuerySet(Document).filter(dataset_id=dataset_id, id__in=document_id_list)
             paragraph_list = QuerySet(Paragraph).filter(dataset_id=dataset_id, document_id__in=document_id_list)
@@ -155,7 +157,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             QuerySet(Problem).bulk_create(create_problem_list)
             # 修改mapping
             QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list, ['problem_id', 'dataset_id'])
-            document_list.update(dataset_id=target_dataset_id)
+            # 修改文档
+            if dataset.type == Type.base.value and target_dataset.type == Type.web.value:
+                document_list.update(dataset_id=target_dataset_id, type=Type.web,
+                                     meta={'source_url': '', 'selector': ''})
+            elif target_dataset.type == Type.base.value and dataset.type == Type.web.value:
+                document_list.update(dataset_id=target_dataset_id, type=Type.base,
+                                     meta={})
             paragraph_list.update(dataset_id=target_dataset_id)
             ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
                 [problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list],
