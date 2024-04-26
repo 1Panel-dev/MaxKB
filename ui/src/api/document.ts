@@ -188,6 +188,24 @@ const postWebDocument: (
   return post(`${prefix}/${dataset_id}/document/web`, data, undefined, loading)
 }
 
+/**
+ * 批量迁移文档
+ * @param 参数 dataset_id,target_dataset_id,
+ */
+const putMigrateMulDocument: (
+  dataset_id: string,
+  target_dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, target_dataset_id, data, loading) => {
+  return put(
+    `${prefix}/${dataset_id}/document/migrate/${target_dataset_id}`,
+    data,
+    undefined,
+    loading
+  )
+}
+
 export default {
   postSplitDocument,
   getDocument,
@@ -200,5 +218,6 @@ export default {
   listSplitPattern,
   putDocumentRefresh,
   delMulSyncDocument,
-  postWebDocument
+  postWebDocument,
+  putMigrateMulDocument
 }
