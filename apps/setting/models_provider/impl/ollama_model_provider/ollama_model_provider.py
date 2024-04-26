@@ -73,7 +73,11 @@ model_dict = {
     'llama2-chinese:13b': ModelInfo(
         'llama2-chinese:13b',
         '由于Llama2本身的中文对齐较弱，我们采用中文指令集，对meta-llama/Llama-2-13b-chat-hf进行LoRA微调，使其具备较强的中文对话能力。',
-        ModelTypeConst.LLM, ollama_llm_model_credential)
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'qwen-14b': ModelInfo(
+        'qwen:14b',
+        'qwen 1.5 14b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
 }
 
 
