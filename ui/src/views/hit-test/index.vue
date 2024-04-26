@@ -130,7 +130,7 @@
               <el-input-number
                 v-model="cloneForm.similarity"
                 :min="0"
-                :max="1"
+                :max="cloneForm.search_mode === 'blend' ? 2 : 1"
                 :precision="3"
                 :step="0.1"
                 controls-position="right"
