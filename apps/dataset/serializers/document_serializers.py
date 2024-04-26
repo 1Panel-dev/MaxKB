@@ -33,7 +33,7 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
 from common.util.split_model import get_split_model
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status, ProblemParagraphMapping
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status, ProblemParagraphMapping, Image
 from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
@@ -627,9 +627,13 @@ default_split_handle = TextSplitHandle()
 split_handles = [DocSplitHandle(), PdfSplitHandle(), default_split_handle]
 
 
+def save_image(image_list):
+    QuerySet(Image).bulk_create(image_list)
+
+
 def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):
     get_buffer = FileBufferHandle().get_buffer
     for split_handle in split_handles:
         if split_handle.support(file, get_buffer):
-            return split_handle.handle(file, pattern_list, with_filter, limit, get_buffer)
-    return default_split_handle.handle(file, pattern_list, with_filter, limit, get_buffer)
+            return split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, save_image)
+    return default_split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, save_image)
