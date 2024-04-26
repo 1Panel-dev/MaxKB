@@ -32,7 +32,6 @@
               action="#"
               :auto-upload="false"
               :show-file-list="false"
-              :limit="1"
               accept="image/*"
               :on-change="onChange"
             >

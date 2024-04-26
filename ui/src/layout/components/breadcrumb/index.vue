@@ -11,8 +11,17 @@
       <div class="breadcrumb-hover flex-between cursor">
         <div class="flex align-center">
           <AppAvatar
-            v-if="isApplication"
-            :name="currentName"
+            v-if="isApplication && isAppIcon(current?.icon)"
+            shape="square"
+            :size="24"
+            style="background: none"
+            class="mr-8"
+          >
+            <img :src="current?.icon" alt="" />
+          </AppAvatar>
+          <AppAvatar
+            v-else-if="isApplication"
+            :name="current?.name"
             pinyinColor
             shape="square"
             class="mr-8"
@@ -20,7 +29,7 @@
           />
 
           <AppAvatar
-            v-else-if="isDataset && currentType === '1'"
+            v-else-if="isDataset && current?.type === '1'"
             class="mr-8 avatar-purple"
             shape="square"
             :size="24"
@@ -30,7 +39,7 @@
           <AppAvatar v-else class="mr-8" shape="square" :size="24">
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
-          <div class="ellipsis">{{ currentName }}</div>
+          <div class="ellipsis">{{ current?.name }}</div>
         </div>
 
         <el-button text>
@@ -46,7 +55,16 @@
                   <el-dropdown-item :command="item.id">
                     <div class="flex align-center">
                       <AppAvatar
-                        v-if="isApplication"
+                        v-if="isApplication && isAppIcon(item?.icon)"
+                        shape="square"
+                        :size="24"
+                        style="background: none"
+                        class="mr-8"
+                      >
+                        <img :src="item?.icon" alt="" />
+                      </AppAvatar>
+                      <AppAvatar
+                        v-else-if="isApplication"
                         :name="item.name"
                         pinyinColor
                         class="mr-12"
@@ -102,6 +120,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
+import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 const { common, dataset, application } = useStore()
 const route = useRoute()
@@ -120,18 +139,18 @@ const loading = ref(false)
 
 const breadcrumbData = computed(() => common.breadcrumb)
 
-const currentName = computed(() => {
+const current = computed(() => {
   const {
     params: { id }
   } = route
-  return list.value?.filter((v) => v.id === id)?.[0]?.name
+  return list.value?.filter((v) => v.id === id)?.[0]
 })
-const currentType = computed(() => {
-  const {
-    params: { id }
-  } = route
-  return list.value?.filter((v) => v.id === id)?.[0]?.type
-})
+// const current = computed(() => {
+//   const {
+//     params: { id }
+//   } = route
+//   return list.value?.filter((v) => v.id === id)?.[0]?.type
+// })
 
 const isApplication = computed(() => {
   const { meta } = route as any
