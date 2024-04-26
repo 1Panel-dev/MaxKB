@@ -30,7 +30,7 @@ def number_to_text(pdf_document, page_number):
 
 
 class PdfSplitHandle(BaseSplitHandle):
-    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer):
+    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer,save_image):
         try:
             buffer = get_buffer(file)
             pdf_document = fitz.open(file.name, buffer)
