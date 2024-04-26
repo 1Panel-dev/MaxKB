@@ -20,6 +20,9 @@
               v-if="datasetDetail.type === '1'"
               >同步文档</el-button
             >
+            <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0"
+              >批量迁移</el-button
+            >
             <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
               >批量删除</el-button
             >
@@ -91,7 +94,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column width="150">
+          <el-table-column width="130">
             <template #header>
               <div>
                 <span>命中处理方式</span>
@@ -124,12 +127,12 @@
               {{ hitHandlingMethod[row.hit_handling_method] }}
             </template>
           </el-table-column>
-          <el-table-column prop="create_time" label="创建时间" width="170">
+          <el-table-column prop="create_time" label="创建时间" width="175">
             <template #default="{ row }">
               {{ datetimeFormat(row.create_time) }}
             </template>
           </el-table-column>
-          <el-table-column prop="update_time" label="更新时间" width="170">
+          <el-table-column prop="update_time" label="更新时间" width="175">
             <template #default="{ row }">
               {{ datetimeFormat(row.update_time) }}
             </template>
@@ -151,12 +154,23 @@
                     </el-button>
                   </el-tooltip>
                 </span>
-                <span>
-                  <el-tooltip effect="dark" content="删除" placement="top">
-                    <el-button type="primary" text @click.stop="deleteDocument(row)">
-                      <el-icon><Delete /></el-icon>
+                <span @click.stop>
+                  <el-dropdown trigger="click">
+                    <el-button text>
+                      <el-icon><MoreFilled /></el-icon>
                     </el-button>
-                  </el-tooltip>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item @click="openDatasetDialog(row)">
+                          <AppIcon iconName="app-migrate"></AppIcon>
+                          迁移</el-dropdown-item
+                        >
+                        <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
+                          >删除</el-dropdown-item
+                        >
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
                 </span>
               </div>
               <div v-if="datasetDetail.type === '1'">
@@ -180,6 +194,10 @@
                         <el-dropdown-item icon="Setting" @click="settingDoc(row)"
                           >设置</el-dropdown-item
                         >
+                        <el-dropdown-item @click="openDatasetDialog(row)">
+                          <AppIcon iconName="app-migrate"></AppIcon>
+                          迁移</el-dropdown-item
+                        >
                         <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
                           >删除</el-dropdown-item
                         >
@@ -194,6 +212,8 @@
       </div>
       <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
       <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
+      <!-- 选择知识库 -->
+      <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refresh" />
     </div>
   </LayoutContainer>
 </template>
@@ -204,6 +224,7 @@ import { ElTable } from 'element-plus'
 import documentApi from '@/api/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
+import SelectDatasetDialog from './component/SelectDatasetDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
 import { hitHandlingMethod } from './utils'
@@ -257,6 +278,23 @@ const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
 const title = ref('')
 
+const SelectDatasetDialogRef = ref()
+
+function openDatasetDialog(row?: any) {
+  const arr: string[] = []
+  if (row) {
+    arr.push(row.id)
+  } else {
+    multipleSelection.value.map((v) => {
+      if (v) {
+        arr.push(v.id)
+      }
+    })
+  }
+
+  SelectDatasetDialogRef.value.open(arr)
+}
+
 function dropdownHandle(val: string) {
   filterMethod.value = val
   getList()
@@ -284,12 +322,6 @@ const handleSelectionChange = (val: any[]) => {
  */
 const initInterval = () => {
   interval = setInterval(() => {
-    // if (
-    //   documentData.value.length === 0 ||
-    //   documentData.value.some((item) => item.status === '0' || item.status === '2')
-    // ) {
-    //   getList(true)
-    // }
     getList(true)
   }, 6000)
 }
@@ -304,20 +336,29 @@ const closeInterval = () => {
 }
 function refreshDocument(row: any) {
   if (row.type === '1') {
-    MsgConfirm(`确认同步文档?`, `同步将删除已有数据重新获取新数据，请谨慎操作。`, {
-      confirmButtonText: '同步',
-      confirmButtonClass: 'danger'
-    })
-      .then(() => {
-        documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
-          getList()
-        })
+    if (row.meta?.source_url) {
+      MsgConfirm(`确认同步文档?`, `同步将删除已有数据重新获取新数据，请谨慎操作。`, {
+        confirmButtonText: '同步',
+        confirmButtonClass: 'danger'
       })
-      .catch(() => {})
+        .then(() => {
+          documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
+            getList()
+          })
+        })
+        .catch(() => {})
+    } else {
+      MsgConfirm(`提示`, `无法同步，请先去设置文档 URL地址`, {
+        confirmButtonText: '确认',
+        type: 'warning'
+      })
+        .then(() => {})
+        .catch(() => {})
+    }
   } else {
-    documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
-      getList()
-    })
+    // documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
+    //   getList()
+    // })
   }
 }
 

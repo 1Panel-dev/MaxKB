@@ -50,6 +50,12 @@ class UpdateProblemArgs:
         self.problem_content = problem_content
 
 
+class UpdateEmbeddingDatasetIdArgs:
+    def __init__(self, source_id_list: List[str], target_dataset_id: str):
+        self.source_id_list = source_id_list
+        self.target_dataset_id = target_dataset_id
+
+
 class ListenerManagement:
     embedding_by_problem_signal = signal("embedding_by_problem")
     embedding_by_paragraph_signal = signal("embedding_by_paragraph")
@@ -204,6 +210,11 @@ class ListenerManagement:
         embed_value = VectorStore.get_embedding_vector().embed_query(args.problem_content)
         VectorStore.get_embedding_vector().update_by_source_ids([v.id for v in problem_paragraph_mapping_list],
                                                                 {'embedding': embed_value})
+
+    @staticmethod
+    def update_embedding_dataset_id(args: UpdateEmbeddingDatasetIdArgs):
+        VectorStore.get_embedding_vector().update_by_source_ids(args.source_id_list,
+                                                                {'dataset_id': args.target_dataset_id})
 
     @staticmethod
     def delete_embedding_by_source_ids(source_ids: List[str]):
