@@ -319,7 +319,7 @@ class ChatRecordSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id'))
             return [ChatRecordSerializerModel(chat_record).data for chat_record in
-                    QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id'))]
+                    QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by("create_time")]
 
         @staticmethod
         def reset_chat_record(chat_record):
@@ -349,7 +349,7 @@ class ChatRecordSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             page = page_search(current_page, page_size,
-                               QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by("index"),
+                               QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by("create_time"),
                                post_records_handler=lambda chat_record: self.reset_chat_record(chat_record))
             return page
 
