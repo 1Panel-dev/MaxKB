@@ -22,7 +22,7 @@ from rest_framework import serializers
 
 from common.db.search import native_search, native_page_search
 from common.event.common import work_thread_pool
-from common.event.listener_manage import ListenerManagement, SyncWebDocumentArgs
+from common.event.listener_manage import ListenerManagement, SyncWebDocumentArgs, UpdateEmbeddingDatasetIdArgs
 from common.exception.app_exception import AppApiException
 from common.handle.impl.doc_split_handle import DocSplitHandle
 from common.handle.impl.pdf_split_handle import PdfSplitHandle
@@ -114,6 +114,98 @@ class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
 
 
 class DocumentSerializers(ApiMixin, serializers.Serializer):
+    class Migrate(ApiMixin, serializers.Serializer):
+        dataset_id = serializers.UUIDField(required=True,
+                                           error_messages=ErrMessage.char(
+                                               "知识库id"))
+        target_dataset_id = serializers.UUIDField(required=True,
+                                                  error_messages=ErrMessage.char(
+                                                      "目标知识库id"))
+        document_id_list = serializers.ListField(required=True, error_messages=ErrMessage.char("文档列表"),
+                                                 child=serializers.UUIDField(required=True,
+                                                                             error_messages=ErrMessage.uuid("文档id")))
+
+        @transaction.atomic
+        def migrate(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            dataset_id = self.data.get('dataset_id')
+            target_dataset_id = self.data.get('target_dataset_id')
+            document_id_list = self.data.get('document_id_list')
+            document_list = QuerySet(Document).filter(dataset_id=dataset_id, id__in=document_id_list)
+            paragraph_list = QuerySet(Paragraph).filter(dataset_id=dataset_id, document_id__in=document_id_list)
+
+            problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(paragraph__in=paragraph_list)
+            problem_list = QuerySet(Problem).filter(
+                id__in=[problem_paragraph_mapping.problem_id for problem_paragraph_mapping in
+                        problem_paragraph_mapping_list])
+            target_problem_list = list(
+                QuerySet(Problem).filter(content__in=[problem.content for problem in problem_list],
+                                         dataset_id=target_dataset_id))
+            target_handle_problem_list = [
+                self.get_target_dataset_problem(target_dataset_id, problem_paragraph_mapping,
+                                                problem_list, target_problem_list) for
+                problem_paragraph_mapping
+                in
+                problem_paragraph_mapping_list]
+
+            create_problem_list = [problem for problem, is_create in target_handle_problem_list if
+                                   is_create is not None and is_create]
+            # 插入问题
+            QuerySet(Problem).bulk_create(create_problem_list)
+            # 修改mapping
+            QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list, ['problem_id', 'dataset_id'])
+            document_list.update(dataset_id=target_dataset_id)
+            paragraph_list.update(dataset_id=target_dataset_id)
+            ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
+                [problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list],
+                target_dataset_id))
+
+        @staticmethod
+        def get_target_dataset_problem(target_dataset_id: str,
+                                       problem_paragraph_mapping,
+                                       source_problem_list,
+                                       target_problem_list):
+            source_problem_list = [source_problem for source_problem in source_problem_list if
+                                   source_problem.id == problem_paragraph_mapping.problem_id]
+            problem_paragraph_mapping.dataset_id = target_dataset_id
+            if len(source_problem_list) > 0:
+                problem_content = source_problem_list[-1].content
+                problem_list = [problem for problem in target_problem_list if problem.content == problem_content]
+                if len(problem_list) > 0:
+                    problem = problem_list[-1]
+                    problem_paragraph_mapping.problem_id = problem.id
+                    return problem, False
+                else:
+                    problem = Problem(id=uuid.uuid1(), dataset_id=target_dataset_id, content=problem_content)
+                    target_problem_list.append(problem)
+                    problem_paragraph_mapping.problem_id = problem.id
+                    return problem, True
+            return None
+
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='dataset_id',
+                                      in_=openapi.IN_PATH,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description='知识库id'),
+                    openapi.Parameter(name='target_dataset_id',
+                                      in_=openapi.IN_PATH,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description='目标知识库id')
+                    ]
+
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(type=openapi.TYPE_STRING),
+                title='文档id列表',
+                description="文档id列表"
+            )
+
     class Query(ApiMixin, serializers.Serializer):
         # 知识库id
         dataset_id = serializers.UUIDField(required=True,

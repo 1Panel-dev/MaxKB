@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.views import Request
 
 from common.auth import TokenAuth, has_permissions
-from common.constants.permission_constants import Permission, Group, Operate
+from common.constants.permission_constants import Permission, Group, Operate, CompareConstants
 from common.response import result
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.common_serializers import BatchSerializer
@@ -133,6 +133,32 @@ class Document(APIView):
         def put(self, request: Request, dataset_id: str, document_id: str):
             return result.success(
                 DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).refresh(
+                ))
+
+    class Migrate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="批量迁移文档",
+                             operation_id="批量迁移文档",
+                             manual_parameters=DocumentSerializers.Migrate.get_request_params_api(),
+                             request_body=DocumentSerializers.Migrate.get_request_body_api(),
+                             responses=result.get_api_response(DocumentSerializers.Operate.get_response_body_api()),
+                             tags=["知识库/文档"]
+                             )
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')),
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('target_dataset_id')),
+            compare=CompareConstants.AND
+        )
+        def put(self, request: Request, dataset_id: str, target_dataset_id: str):
+            return result.success(
+                DocumentSerializers.Migrate(
+                    data={'dataset_id': dataset_id, 'target_dataset_id': target_dataset_id,
+                          'document_id_list': request.data}).migrate(
+
                 ))
 
     class Operate(APIView):
