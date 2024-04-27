@@ -9,7 +9,7 @@ import directives from '@/directives'
 import App from './App.vue'
 import router from '@/router'
 import Components from '@/components'
-
+import i18n from './locales';
 const app = createApp(App)
 app.use(store)
 app.use(directives)
@@ -24,5 +24,6 @@ app.use(ElementPlus, {
 app.use(theme)
 
 app.use(router)
+app.use(i18n);
 app.use(Components)
 app.mount('#app')
