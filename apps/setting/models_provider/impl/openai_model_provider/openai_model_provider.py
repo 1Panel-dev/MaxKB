@@ -57,12 +57,39 @@ class OpenAILLMModelCredential(BaseForm, BaseModelCredential):
 openai_llm_model_credential = OpenAILLMModelCredential()
 
 model_dict = {
-    'gpt-3.5-turbo': ModelInfo('gpt-3.5-turbo', '', ModelTypeConst.LLM, openai_llm_model_credential,
+    'gpt-3.5-turbo': ModelInfo('gpt-3.5-turbo', '最新的gpt-3.5-turbo，随OpenAI调整而更新', ModelTypeConst.LLM,
+                               openai_llm_model_credential,
                                ),
-    'gpt-3.5-turbo-0613': ModelInfo('gpt-3.5-turbo-0613', '', ModelTypeConst.LLM, openai_llm_model_credential,
+    'gpt-3.5-turbo-0125': ModelInfo('gpt-3.5-turbo-0125',
+                                    '2024年1月25日的gpt-3.5-turbo快照，支持上下文长度16,385 tokens', ModelTypeConst.LLM,
+                                    openai_llm_model_credential,
                                     ),
-    'gpt-4': ModelInfo('gpt-4', '', ModelTypeConst.LLM, openai_llm_model_credential,
-                       )
+    'gpt-3.5-turbo-1106': ModelInfo('gpt-3.5-turbo-1106',
+                                    '2023年11月6日的gpt-3.5-turbo快照，支持上下文长度16,385 tokens', ModelTypeConst.LLM,
+                                    openai_llm_model_credential,
+                                    ),
+    'gpt-3.5-turbo-0613': ModelInfo('gpt-3.5-turbo-0613',
+                                    '[Legacy] 2023年6月13日的gpt-3.5-turbo快照，将于2024年6月13日弃用',
+                                    ModelTypeConst.LLM, openai_llm_model_credential,
+                                    ),
+    'gpt-4': ModelInfo('gpt-4', '最新的gpt-4，随OpenAI调整而更新', ModelTypeConst.LLM, openai_llm_model_credential,
+                       ),
+    'gpt-4-turbo': ModelInfo('gpt-4-turbo', '最新的gpt-4-turbo，随OpenAI调整而更新', ModelTypeConst.LLM,
+                             openai_llm_model_credential,
+                             ),
+    'gpt-4-turbo-preview': ModelInfo('gpt-4-turbo-preview', '最新的gpt-4-turbo-preview，随OpenAI调整而更新',
+                                     ModelTypeConst.LLM, openai_llm_model_credential,
+                                     ),
+    'gpt-4-turbo-2024-04-09': ModelInfo('gpt-4-turbo-2024-04-09',
+                                        '2024年4月9日的gpt-4-turbo快照，支持上下文长度128,000 tokens',
+                                        ModelTypeConst.LLM, openai_llm_model_credential,
+                                        ),
+    'gpt-4-0125-preview': ModelInfo('gpt-4-0125-preview', '2024年1月25日的gpt-4-turbo快照，支持上下文长度128,000 tokens',
+                                    ModelTypeConst.LLM, openai_llm_model_credential,
+                                    ),
+    'gpt-4-1106-preview': ModelInfo('gpt-4-1106-preview', '2023年11月6日的gpt-4-turbo快照，支持上下文长度128,000 tokens',
+                                    ModelTypeConst.LLM, openai_llm_model_credential,
+                                    ),
 }
 
 
