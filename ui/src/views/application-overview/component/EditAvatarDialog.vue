@@ -35,7 +35,7 @@
               accept="image/*"
               :on-change="onChange"
             >
-              <el-button icon="Upload">上传</el-button>
+              <el-button icon="Upload" :disabled="radioType !== 'custom'">上传</el-button>
             </el-upload>
           </div>
           <div class="el-upload__tip info mt-16">
