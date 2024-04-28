@@ -142,7 +142,7 @@ class BaseChatStep(IChatStep):
                 'status') == 'designated_answer':
             return iter([AIMessageChunk(content=no_references_setting.get('value'))]), False
         if chat_model is None:
-            return iter([AIMessageChunk('抱歉，没有在知识库中查询到相关信息。')]), False
+            return iter([AIMessageChunk('抱歉，没有配置 AI 模型，无法优化引用分段，请先去应用中设置 AI 模型。')]), False
         else:
             return chat_model.stream(message_list), True
 
@@ -185,7 +185,7 @@ class BaseChatStep(IChatStep):
                 'status') == 'designated_answer':
             return AIMessage(no_references_setting.get('value')), False
         if chat_model is None:
-            return AIMessage('抱歉，没有在知识库中查询到相关信息。'), False
+            return AIMessage('抱歉，没有配置 AI 模型，无法优化引用分段，请先去应用中设置 AI 模型。'), False
         else:
             return chat_model.invoke(message_list), True
 
