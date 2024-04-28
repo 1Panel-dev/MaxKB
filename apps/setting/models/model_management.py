@@ -42,7 +42,7 @@ class Model(AppModelMixin):
 
     provider = models.CharField(max_length=128, verbose_name='供应商')
 
-    credential = models.CharField(max_length=5120, verbose_name="模型认证信息")
+    credential = models.CharField(max_length=102400, verbose_name="模型认证信息")
 
     meta = models.JSONField(verbose_name="模型元数据,用于存储下载,或者错误信息", default=dict)
 
