@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@ctrl/tinycolor": "^4.1.0",
+    "@vueuse/core": "^10.9.0",
     "axios": "^0.28.0",
     "cropperjs": "^1.6.2",
     "echarts": "^5.5.0",
@@ -42,6 +43,7 @@
     "screenfull": "^6.0.2",
     "vue": "^3.3.4",
     "vue-clipboard3": "^2.0.0",
+    "vue-i18n": "^9.13.1",
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
