@@ -56,7 +56,7 @@ export class ChatRecordManage {
         this.chat.answer_text =
           this.chat.answer_text + this.chat.buffer.splice(0, this.chat.buffer.length - 20).join('')
       } else if (this.is_close) {
-        this.chat.answer_text = this.chat.answer_text + this.chat.buffer.join('')
+        this.chat.answer_text = this.chat.answer_text + this.chat.buffer.splice(0).join('')
         this.chat.write_ed = true
         this.write_ed = true
         if (this.loading) {
