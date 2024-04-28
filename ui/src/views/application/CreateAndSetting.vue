@@ -48,7 +48,7 @@
               <el-form-item label="AI 模型" prop="model_id">
                 <template #label>
                   <div class="flex-between">
-                    <span>AI 模型 <span class="danger">*</span></span>
+                    <span>AI 模型 </span>
                   </div>
                 </template>
                 <el-select
@@ -56,6 +56,7 @@
                   placeholder="请选择 AI 模型"
                   class="w-full"
                   popper-class="select-model"
+                  :clearable="true"
                 >
                   <el-option-group
                     v-for="(value, label) in modelOptions"
@@ -338,7 +339,7 @@ const rules = reactive<FormRules<ApplicationFormType>>({
   name: [{ required: true, message: '请输入应用名称', trigger: 'blur' }],
   model_id: [
     {
-      required: true,
+      required: false,
       message: '请选择模型',
       trigger: 'change'
     }
