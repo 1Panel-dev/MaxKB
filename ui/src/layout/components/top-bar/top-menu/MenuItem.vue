@@ -1,13 +1,17 @@
 <template>
-  <div
-    class="menu-item-container flex-center h-full"
-    :class="isActive ? 'active' : ''"
-    @click="router.push({ name: menu.name })"
-  >
+  <div class="menu-item-container flex-center h-full" :class="isActive ? 'active' : ''"
+    @click="router.push({ name: menu.name })">
     <!-- <div class="icon">
       <AppIcon :iconName="menu.meta ? (menu.meta.icon as string) : '404'" />
     </div> -->
-    <div class="title">{{ menu.meta?.title }}</div>
+    <div class="title">
+      {{
+        $te(`layout.topbar.MenuItem.${String(props.menu.name)}`)
+          ? $t(`layout.topbar.MenuItem.${String(props.menu.name)}`)
+          : menu.meta?.title
+      }}
+    </div>
+
   </div>
 </template>
 <script setup lang="ts">
@@ -31,11 +35,13 @@ const isActive = computed(() => {
   cursor: pointer;
   font-size: 16px;
   position: relative;
+
   .icon {
     font-size: 15px;
     margin-right: 5px;
     margin-top: 2px;
   }
+
   &:hover {
     color: var(--el-color-primary);
   }
@@ -43,6 +49,7 @@ const isActive = computed(() => {
 
 .active {
   color: var(--el-color-primary);
+
   &::after {
     position: absolute;
     bottom: 0;
