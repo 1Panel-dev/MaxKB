@@ -167,9 +167,11 @@ class ChatMessageSerializer(serializers.Serializer):
             chat_cache.set(chat_id,
                            chat_info, timeout=60 * 30)
         model = chat_info.application.model
+        if model is None:
+            return chat_info
         model = QuerySet(Model).filter(id=model.id).first()
         if model is None:
-            raise AppApiException(500, "模型不存在")
+            return chat_info
         if model.status == Status.ERROR:
             raise AppApiException(500, "当前模型不可用")
         if model.status == Status.DOWNLOAD:

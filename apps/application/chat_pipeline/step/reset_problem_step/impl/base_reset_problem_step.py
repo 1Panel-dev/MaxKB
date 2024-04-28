@@ -22,6 +22,8 @@ prompt = (
 class BaseResetProblemStep(IResetProblemStep):
     def execute(self, problem_text: str, history_chat_record: List[ChatRecord] = None, chat_model: BaseChatModel = None,
                 **kwargs) -> str:
+        if chat_model is None:
+            return problem_text
         start_index = len(history_chat_record) - 3
         history_message = [[history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
                            for index in
