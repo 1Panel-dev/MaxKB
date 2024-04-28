@@ -19,6 +19,7 @@ from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, BaseModelCredential, \
     ModelInfo, \
     ModelTypeConst, ValidCode
+from setting.models_provider.impl.azure_model_provider.model.azure_chat_model import AzureChatModel
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -119,8 +120,8 @@ class AzureModelProvider(IModelProvider):
 
     def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> AzureChatOpenAI:
         model_info: ModelInfo = model_dict.get(model_name)
-        azure_chat_open_ai = AzureChatOpenAI(
-            openai_api_base=model_credential.get('api_base'),
+        azure_chat_open_ai = AzureChatModel(
+            azure_endpoint=model_credential.get('api_base'),
             openai_api_version=model_info.api_version if model_name in model_dict else model_credential.get(
                 'api_version'),
             deployment_name=model_credential.get('deployment_name'),
