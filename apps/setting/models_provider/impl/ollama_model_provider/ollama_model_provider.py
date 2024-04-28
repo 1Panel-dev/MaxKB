@@ -74,9 +74,49 @@ model_dict = {
         'llama2-chinese:13b',
         '由于Llama2本身的中文对齐较弱，我们采用中文指令集，对meta-llama/Llama-2-13b-chat-hf进行LoRA微调，使其具备较强的中文对话能力。',
         ModelTypeConst.LLM, ollama_llm_model_credential),
-    'qwen-14b': ModelInfo(
+    'llama3:8b': ModelInfo(
+        'llama3:8b',
+        'Meta Llama 3：迄今为止最有能力的公开产品LLM。8亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'llama3:70b': ModelInfo(
+        'llama3:70b',
+        'Meta Llama 3：迄今为止最有能力的公开产品LLM。70亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'qwen:0.5b': ModelInfo(
+        'qwen:0.5b',
+        'qwen 1.5 0.5b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。0.5亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'qwen:1.8b': ModelInfo(
+        'qwen:1.8b',
+        'qwen 1.5 1.8b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。1.8亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'qwen:4b': ModelInfo(
+        'qwen:4b',
+        'qwen 1.5 4b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。4亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'qwen:7b': ModelInfo(
+        'qwen:7b',
+        'qwen 1.5 7b 相较于以往版本，模型与人类偏好的对齐程度以及多语1言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。7亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'qwen:14b': ModelInfo(
         'qwen:14b',
-        'qwen 1.5 14b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。',
+        'qwen 1.5 14b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。14亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'qwen:32b': ModelInfo(
+        'qwen:32b',
+        'qwen 1.5 32b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。32亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'qwen:72b': ModelInfo(
+        'qwen:72b',
+        'qwen 1.5 72b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。72亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'qwen:110b': ModelInfo(
+        'qwen:110b',
+        'qwen 1.5 110b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。110亿参数。',
+        ModelTypeConst.LLM, ollama_llm_model_credential),
+    'phi3': ModelInfo(
+        'phi3',
+        'Phi-3 Mini是Microsoft的3.8B参数，轻量级，最先进的开放模型。',
         ModelTypeConst.LLM, ollama_llm_model_credential),
 }
 

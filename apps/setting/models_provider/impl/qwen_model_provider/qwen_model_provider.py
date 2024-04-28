@@ -18,6 +18,7 @@ from common.forms import BaseForm
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst, BaseModelCredential, \
     ModelInfo, IModelProvider, ValidCode
+from setting.models_provider.impl.qwen_model_provider.model.qwen_chat_model import QwenChatModel
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -66,7 +67,7 @@ class QwenModelProvider(IModelProvider):
         return 3
 
     def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> ChatTongyi:
-        chat_tong_yi = ChatTongyi(
+        chat_tong_yi = QwenChatModel(
             model_name=model_name,
             dashscope_api_key=model_credential.get('api_key')
         )

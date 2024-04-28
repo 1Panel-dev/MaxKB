@@ -11,19 +11,7 @@ from typing import List
 from langchain_core.messages import BaseMessage, get_buffer_string
 from langchain_openai import ChatOpenAI
 
-
-class TokenizerManage:
-    tokenizer = None
-
-    @staticmethod
-    def get_tokenizer():
-        from transformers import GPT2TokenizerFast
-        if TokenizerManage.tokenizer is None:
-            TokenizerManage.tokenizer = GPT2TokenizerFast.from_pretrained('gpt2',
-                                                                          cache_dir="/opt/maxkb/model/tokenizer",
-                                                                          resume_download=False,
-                                                                          force_download=False)
-        return TokenizerManage.tokenizer
+from common.config.tokenizer_manage_config import TokenizerManage
 
 
 class OpenAIChatModel(ChatOpenAI):

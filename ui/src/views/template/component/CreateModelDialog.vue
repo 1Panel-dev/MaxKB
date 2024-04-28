@@ -81,11 +81,8 @@
               </div>
               <el-tooltip effect="dark" placement="right">
                 <template #content>
-                  <p>为供应商的 LLM 模型，支持自定义输入</p>
-                  <p>
-                    下拉选项是 OpenAI
-                    常用的一些大语言模型如：gpt-3.5-turbo-0613、gpt-3.5-turbo、gpt-4 等
-                  </p>
+                  <p>若下拉选项没有列出想要添加的LLM模型，自定义输入模型名称后回车即可</p>
+                  <p>注意，基础模型需要与供应商的模型名称一致</p>
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -101,12 +98,21 @@
             allow-create
             default-first-option
           >
-            <el-option
-              v-for="item in base_model_list"
-              :key="item.name"
-              :label="item.name"
-              :value="item.name"
-            ></el-option>
+            <el-option v-for="item in base_model_list" :key="item.name" :value="item.name">
+              <template #default>
+                <div class="flex align-center" style="display: inline-flex">
+                  <div class="flex-between mr-4">
+                    <span>{{ item.name }} </span>
+                  </div>
+                  <el-tooltip effect="dark" placement="right" v-if="item.desc">
+                    <template #content>
+                      <p>{{ item.desc }}</p>
+                    </template>
+                    <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                  </el-tooltip>
+                </div>
+              </template>
+            </el-option>
           </el-select>
         </el-form-item>
       </template>
@@ -204,6 +210,7 @@ const list_base_model = (model_type: any) => {
     )
   }
 }
+
 const close = () => {
   base_form_data.value = { name: '', model_type: '', model_name: '' }
   credential_form_data.value = {}
