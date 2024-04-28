@@ -206,6 +206,20 @@ const putMigrateMulDocument: (
   )
 }
 
+/**
+ * 批量修改命中方式
+ * @param dataset_id 知识库id
+ * @param data       {id_list:[],hit_handling_method:'directly_return|optimization'}
+ * @param loading
+ * @returns
+ */
+const batchEditHitHandling: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return put(`${prefix}/${dataset_id}/document/batch_hit_handling`, data, undefined, loading)
+}
 export default {
   postSplitDocument,
   getDocument,
@@ -219,5 +233,6 @@ export default {
   putDocumentRefresh,
   delMulSyncDocument,
   postWebDocument,
-  putMigrateMulDocument
+  putMigrateMulDocument,
+  batchEditHitHandling
 }
