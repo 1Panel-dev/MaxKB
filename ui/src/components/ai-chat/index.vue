@@ -274,12 +274,7 @@ function openParagraph(row: any, id?: string) {
 }
 
 function quickProblemHandle(val: string) {
-  if (!props.log && !loading.value && props.data?.name && props.data?.model_id) {
-    // inputValue.value = val
-    // nextTick(() => {
-    //   quickInputRef.value?.focus()
-    // })
-
+  if (!loading.value && props.data?.name) {
     handleDebounceClick(val)
   }
 }
