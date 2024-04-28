@@ -1,16 +1,31 @@
 <template>
-  <el-dialog v-model="dialogVisible" width="600px" :close-on-click-modal="false" :close-on-press-escape="false"
-    :destroy-on-close="true" :before-close="close">
+  <el-dialog
+    v-model="dialogVisible"
+    width="600px"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+    :destroy-on-close="true"
+    :before-close="close"
+  >
     <template #header="{ close, titleId, titleClass }">
       <el-breadcrumb separator=">">
-        <el-breadcrumb-item><span class="active-breadcrumb">{{
-          `编辑 ${providerValue?.name}`
-            }}</span></el-breadcrumb-item>
+        <el-breadcrumb-item
+          ><span class="active-breadcrumb">{{
+            `编辑 ${providerValue?.name}`
+          }}</span></el-breadcrumb-item
+        >
       </el-breadcrumb>
     </template>
 
-    <DynamicsForm v-loading="formLoading" v-model="form_data" :render_data="model_form_field" :model="form_data"
-      ref="dynamicsFormRef" label-position="top" require-asterisk-position="right">
+    <DynamicsForm
+      v-loading="formLoading"
+      v-model="form_data"
+      :render_data="model_form_field"
+      :model="form_data"
+      ref="dynamicsFormRef"
+      label-position="top"
+      require-asterisk-position="right"
+    >
       <template #default>
         <el-form-item prop="name" :rules="base_form_data_rule.name">
           <template #label>
@@ -26,16 +41,30 @@
               </el-tooltip>
             </div>
           </template>
-          <el-input v-model="base_form_data.name" maxlength="20" show-word-limit placeholder="请给基础模型设置一个名称" />
+          <el-input
+            v-model="base_form_data.name"
+            maxlength="20"
+            show-word-limit
+            placeholder="请给基础模型设置一个名称"
+          />
         </el-form-item>
         <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
           <template #label>
             <span>模型类型</span>
           </template>
-          <el-select v-loading="model_type_loading" @change="list_base_model($event)"
-            v-model="base_form_data.model_type" class="w-full m-2" placeholder="请选择模型类型">
-            <el-option v-for="item in model_type_list" :key="item.value" :label="item.key"
-              :value="item.value"></el-option>
+          <el-select
+            v-loading="model_type_loading"
+            @change="list_base_model($event)"
+            v-model="base_form_data.model_type"
+            class="w-full m-2"
+            placeholder="请选择模型类型"
+          >
+            <el-option
+              v-for="item in model_type_list"
+              :key="item.value"
+              :label="item.key"
+              :value="item.value"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item prop="model_name" :rules="base_form_data_rule.model_name">
@@ -46,17 +75,23 @@
               </div>
               <el-tooltip effect="dark" placement="right">
                 <template #content>
-                  <p>为供应商的 LLM 模型，支持自定义输入</p>
-                  <p>
-                    下拉选项是常用的一些大语言模型如：gpt-3.5-turbo、gpt-4 等
-                  </p>
+                  <p>若下拉选项没有列出想要添加的LLM模型，自定义输入模型名称后回车即可</p>
+                  <p>注意，基础模型需要与供应商的模型名称一致</p>
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
             </div>
           </template>
-          <el-select @change="getModelForm($event)" v-loading="base_model_loading" v-model="base_form_data.model_name"
-            class="w-full m-2" placeholder="请选择基础模型" filterable allow-create default-first-option>
+          <el-select
+            @change="getModelForm($event)"
+            v-loading="base_model_loading"
+            v-model="base_form_data.model_name"
+            class="w-full m-2"
+            placeholder="请选择基础模型"
+            filterable
+            allow-create
+            default-first-option
+          >
             <el-option v-for="item in base_model_list" :key="item.name" :value="item.name">
               <template #default>
                 <div class="flex align-center" style="display: inline-flex">
