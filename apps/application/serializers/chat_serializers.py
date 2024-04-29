@@ -35,7 +35,7 @@ from common.util.common import post
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
-from common.util.rsa_util import decrypt
+from common.util.rsa_util import rsa_long_decrypt
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
@@ -195,7 +195,8 @@ class ChatSerializers(serializers.Serializer):
             if model is not None:
                 chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
                                                                                    json.loads(
-                                                                                       decrypt(model.credential)),
+                                                                                       rsa_long_decrypt(
+                                                                                           model.credential)),
                                                                                    streaming=True)
 
             chat_id = str(uuid.uuid1())
@@ -252,7 +253,8 @@ class ChatSerializers(serializers.Serializer):
                 model = QuerySet(Model).filter(user_id=user_id, id=self.data.get('model_id')).first()
                 chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
                                                                                    json.loads(
-                                                                                       decrypt(model.credential)),
+                                                                                       rsa_long_decrypt(
+                                                                                           model.credential)),
                                                                                    streaming=True)
             else:
                 model = None
