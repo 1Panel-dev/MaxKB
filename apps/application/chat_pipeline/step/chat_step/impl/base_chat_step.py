@@ -59,8 +59,12 @@ def event_content(response,
 
         # 获取token
         if is_ai_chat:
-            request_token = chat_model.get_num_tokens_from_messages(message_list)
-            response_token = chat_model.get_num_tokens(all_text)
+            try:
+                request_token = chat_model.get_num_tokens_from_messages(message_list)
+                response_token = chat_model.get_num_tokens(all_text)
+            except Exception as e:
+                request_token = 0
+                response_token = 0
         else:
             request_token = 0
             response_token = 0

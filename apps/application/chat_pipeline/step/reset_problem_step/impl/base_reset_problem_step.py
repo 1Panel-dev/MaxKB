@@ -37,8 +37,14 @@ class BaseResetProblemStep(IResetProblemStep):
                                    response.content.index('<data>') + 6:response.content.index('</data>')]
             if padding_problem_data is not None and len(padding_problem_data.strip()) > 0:
                 padding_problem = padding_problem_data
-        self.context['message_tokens'] = chat_model.get_num_tokens_from_messages(message_list)
-        self.context['answer_tokens'] = chat_model.get_num_tokens(padding_problem)
+        try:
+            request_token = chat_model.get_num_tokens_from_messages(message_list)
+            response_token = chat_model.get_num_tokens(padding_problem)
+        except Exception as e:
+            request_token = 0
+            response_token = 0
+        self.context['message_tokens'] = request_token
+        self.context['answer_tokens'] = response_token
         return padding_problem
 
     def get_details(self, manage, **kwargs):
