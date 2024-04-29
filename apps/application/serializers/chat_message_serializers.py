@@ -27,7 +27,7 @@ from application.models.api_key_model import ApplicationPublicAccessClient, Appl
 from common.constants.authentication_type import AuthenticationType
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed
 from common.util.field_message import ErrMessage
-from common.util.rsa_util import decrypt
+from common.util.rsa_util import rsa_long_decrypt
 from common.util.split_model import flat_map
 from dataset.models import Paragraph, Document
 from setting.models import Model, Status
@@ -225,7 +225,7 @@ class ChatMessageSerializer(serializers.Serializer):
             # 对话模型
             chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
                                                                                json.loads(
-                                                                                   decrypt(model.credential)),
+                                                                                   rsa_long_decrypt(model.credential)),
                                                                                streaming=True)
         # 数据集id列表
         dataset_id_list = [str(row.dataset_id) for row in
