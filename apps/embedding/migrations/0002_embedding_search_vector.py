@@ -18,27 +18,30 @@ def update_embedding_search_vector(embedding, paragraph_list):
 
 
 def save_keywords(apps, schema_editor):
-    document = apps.get_model("dataset", "Document")
-    embedding = apps.get_model("embedding", "Embedding")
-    paragraph = apps.get_model('dataset', 'Paragraph')
-    db_alias = schema_editor.connection.alias
-    document_list = document.objects.using(db_alias).all()
-    for document in document_list:
-        document.status = Status.embedding
-        document.save()
-        paragraph_list = paragraph.objects.using(db_alias).filter(document=document).all()
-        embedding_list = embedding.objects.using(db_alias).filter(document=document).values('id', 'search_vector',
-                                                                                            'paragraph')
-        embedding_update_list = [update_embedding_search_vector(embedding, paragraph_list) for embedding
-                                 in embedding_list]
-        child_array = sub_array(embedding_update_list, 50)
-        for c in child_array:
-            try:
-                embedding.objects.using(db_alias).bulk_update(c, ['search_vector'])
-            except Exception as e:
-                print(e)
-        document.status = Status.success
-        document.save()
+    try:
+        document = apps.get_model("dataset", "Document")
+        embedding = apps.get_model("embedding", "Embedding")
+        paragraph = apps.get_model('dataset', 'Paragraph')
+        db_alias = schema_editor.connection.alias
+        document_list = document.objects.using(db_alias).all()
+        for document in document_list:
+            document.status = Status.embedding
+            document.save()
+            paragraph_list = paragraph.objects.using(db_alias).filter(document=document).all()
+            embedding_list = embedding.objects.using(db_alias).filter(document=document).values('id', 'search_vector',
+                                                                                                'paragraph')
+            embedding_update_list = [update_embedding_search_vector(embedding, paragraph_list) for embedding
+                                     in embedding_list]
+            child_array = sub_array(embedding_update_list, 50)
+            for c in child_array:
+                try:
+                    embedding.objects.using(db_alias).bulk_update(c, ['search_vector'])
+                except Exception as e:
+                    print(e)
+            document.status = Status.success
+            document.save()
+    except Exception as e:
+        print(e)
 
 
 class Migration(migrations.Migration):
