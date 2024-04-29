@@ -142,7 +142,7 @@ class BaseChatStep(IChatStep):
                                       paragraph.hit_handling_method == 'directly_return']
         if directly_return_chunk_list is not None and len(directly_return_chunk_list) > 0:
             return iter(directly_return_chunk_list), False
-        elif no_references_setting.get(
+        elif len(paragraph_list) == 0 and no_references_setting.get(
                 'status') == 'designated_answer':
             return iter([AIMessageChunk(content=no_references_setting.get('value'))]), False
         if chat_model is None:
@@ -185,7 +185,7 @@ class BaseChatStep(IChatStep):
                                       paragraph.hit_handling_method == 'directly_return']
         if directly_return_chunk_list is not None and len(directly_return_chunk_list) > 0:
             return directly_return_chunk_list[0], False
-        elif no_references_setting.get(
+        elif len(paragraph_list) == 0 and no_references_setting.get(
                 'status') == 'designated_answer':
             return AIMessage(no_references_setting.get('value')), False
         if chat_model is None:
