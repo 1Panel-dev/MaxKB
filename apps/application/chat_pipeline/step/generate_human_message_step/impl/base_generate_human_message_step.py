@@ -28,7 +28,7 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
                 padding_problem_text: str = None,
                 no_references_setting=None,
                 **kwargs) -> List[BaseMessage]:
-        prompt = prompt if no_references_setting.get('status') == 'designated_answer' else no_references_setting.get(
+        prompt = prompt if (paragraph_list is not None and len(paragraph_list) > 0) else no_references_setting.get(
             'value')
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
         start_index = len(history_chat_record) - dialogue_number
