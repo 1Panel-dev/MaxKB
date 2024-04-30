@@ -371,9 +371,9 @@ function refreshDocument(row: any) {
         .catch(() => {})
     }
   } else {
-    // documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
-    //   getList()
-    // })
+    documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
+      getList()
+    })
   }
 }
 
