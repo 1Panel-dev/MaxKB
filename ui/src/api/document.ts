@@ -10,7 +10,7 @@ const prefix = '/dataset'
  * @param 参数  file:file,limit:number,patterns:array,with_filter:boolean
  */
 const postSplitDocument: (data: any) => Promise<Result<any>> = (data) => {
-  return post(`${prefix}/document/split`, data)
+  return post(`${prefix}/document/split`, data, undefined, undefined, 1000 * 60 * 60)
 }
 
 /**
@@ -80,7 +80,7 @@ const postDocument: (
   data: any,
   loading?: Ref<boolean>
 ) => Promise<Result<any>> = (dataset_id, data, loading) => {
-  return post(`${prefix}/${dataset_id}/document/_bach`, data, {}, loading)
+  return post(`${prefix}/${dataset_id}/document/_bach`, data, {}, loading, 1000 * 60 * 5)
 }
 
 /**
