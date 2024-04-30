@@ -165,7 +165,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 document_list.update(dataset_id=target_dataset_id, type=Type.base,
                                      meta={})
             else:
-                document_list.update(dataset_id=target_dataset_id, type=Type.base)
+                document_list.update(dataset_id=target_dataset_id)
             paragraph_list.update(dataset_id=target_dataset_id)
             ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
                 [problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list],
