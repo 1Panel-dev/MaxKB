@@ -164,6 +164,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             elif target_dataset.type == Type.base.value and dataset.type == Type.web.value:
                 document_list.update(dataset_id=target_dataset_id, type=Type.base,
                                      meta={})
+            else:
+                document_list.update(dataset_id=target_dataset_id, type=Type.base)
             paragraph_list.update(dataset_id=target_dataset_id)
             ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
                 [problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list],
