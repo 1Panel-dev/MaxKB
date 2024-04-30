@@ -512,9 +512,7 @@ class ApplicationSerializer(serializers.Serializer):
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     if update_key == 'multiple_rounds_dialogue':
-                        application.__setattr__('dialogue_number',
-                                                0 if not instance.get(update_key) else ModelProvideConstants[
-                                                    model.provider].value.get_dialogue_number())
+                        application.__setattr__('dialogue_number', 0 if not instance.get(update_key) else 3)
                     else:
                         application.__setattr__(update_key, instance.get(update_key))
             application.save()
