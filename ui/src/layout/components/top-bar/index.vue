@@ -19,7 +19,7 @@
           @click="toUrl('https://github.com/1Panel-dev/MaxKB')"
         ></AppIcon>
       </el-tooltip>
-      <el-tooltip effect="dark" :content="$t('layout.topbar.handbook')" placement="top">
+      <el-tooltip effect="dark" :content="$t('layout.topbar.wiki')" placement="top">
         <AppIcon
           iconName="app-reading"
           class="cursor color-secondary mr-8 ml-8"
@@ -35,7 +35,7 @@
           @click="toUrl('https://bbs.fit2cloud.com/c/mk/11')"
         ></AppIcon>
       </el-tooltip>
-      <el-dropdown v-if="true" trigger="click" type="primary">
+      <el-dropdown v-if="false" trigger="click" type="primary">
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
