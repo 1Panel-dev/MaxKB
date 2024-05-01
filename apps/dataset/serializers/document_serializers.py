@@ -164,6 +164,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             elif target_dataset.type == Type.base.value and dataset.type == Type.web.value:
                 document_list.update(dataset_id=target_dataset_id, type=Type.base,
                                      meta={})
+            else:
+                document_list.update(dataset_id=target_dataset_id)
             paragraph_list.update(dataset_id=target_dataset_id)
             ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
                 [problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list],
@@ -712,6 +714,19 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             # 删除向量库
             ListenerManagement.delete_embedding_by_document_list_signal.send(document_id_list)
             return True
+
+        def batch_edit_hit_handling(self, instance: Dict, with_valid=True):
+            if with_valid:
+                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
+                hit_handling_method = instance.get('hit_handling_method')
+                if hit_handling_method is None:
+                    raise AppApiException(500, '命中处理方式必填')
+                if hit_handling_method != 'optimization' and hit_handling_method != 'directly_return':
+                    raise AppApiException(500, '命中处理方式必须为directly_return|optimization')
+                self.is_valid(raise_exception=True)
+            document_id_list = instance.get("id_list")
+            hit_handling_method = instance.get('hit_handling_method')
+            QuerySet(Document).filter(id__in=document_id_list).update(hit_handling_method=hit_handling_method)
 
 
 class FileBufferHandle:

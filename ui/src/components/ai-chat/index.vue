@@ -224,7 +224,7 @@ const chartOpenId = ref('')
 const chatList = ref<any[]>([])
 
 const isDisabledChart = computed(
-  () => !(inputValue.value.trim() && (props.appId || (props.data?.name && props.data?.model_id)))
+  () => !(inputValue.value.trim() && (props.appId || props.data?.name))
 )
 const isMdArray = (val: string) => val.match(/^-\s.*/m)
 const prologueList = computed(() => {
@@ -274,12 +274,7 @@ function openParagraph(row: any, id?: string) {
 }
 
 function quickProblemHandle(val: string) {
-  if (!props.log && !loading.value && props.data?.name && props.data?.model_id) {
-    // inputValue.value = val
-    // nextTick(() => {
-    //   quickInputRef.value?.focus()
-    // })
-
+  if (!loading.value && props.data?.name) {
     handleDebounceClick(val)
   }
 }
@@ -509,16 +504,14 @@ function regenerationChart(item: chatType) {
 }
 
 function getSourceDetail(row: any) {
-  logApi
-    .getRecordDetail(id || props.appId, row.chat_id, row.record_id, loading)
-    .then((res) => {
-      const exclude_keys = ['answer_text', 'id']
-      Object.keys(res.data).forEach((key) => {
-        if (!exclude_keys.includes(key)) {
-          row[key] = res.data[key]
-        }
-      })
+  logApi.getRecordDetail(id || props.appId, row.chat_id, row.record_id, loading).then((res) => {
+    const exclude_keys = ['answer_text', 'id']
+    Object.keys(res.data).forEach((key) => {
+      if (!exclude_keys.includes(key)) {
+        row[key] = res.data[key]
+      }
     })
+  })
   return true
 }
 

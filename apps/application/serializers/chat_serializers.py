@@ -35,7 +35,7 @@ from common.util.common import post
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
-from common.util.rsa_util import decrypt
+from common.util.rsa_util import rsa_long_decrypt
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
@@ -195,7 +195,8 @@ class ChatSerializers(serializers.Serializer):
             if model is not None:
                 chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
                                                                                    json.loads(
-                                                                                       decrypt(model.credential)),
+                                                                                       rsa_long_decrypt(
+                                                                                           model.credential)),
                                                                                    streaming=True)
 
             chat_id = str(uuid.uuid1())
@@ -213,7 +214,8 @@ class ChatSerializers(serializers.Serializer):
 
         id = serializers.UUIDField(required=False, allow_null=True,
                                    error_messages=ErrMessage.uuid("应用id"))
-        model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
+        model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                         error_messages=ErrMessage.uuid("模型id"))
 
         multiple_rounds_dialogue = serializers.BooleanField(required=True,
                                                             error_messages=ErrMessage.boolean("多轮会话"))
@@ -246,14 +248,18 @@ class ChatSerializers(serializers.Serializer):
         def open(self):
             user_id = self.is_valid(raise_exception=True)
             chat_id = str(uuid.uuid1())
-            model = QuerySet(Model).filter(user_id=user_id, id=self.data.get('model_id')).first()
-            if model is None:
-                raise AppApiException(500, "模型不存在")
+            model_id = self.data.get('model_id')
+            if model_id is not None and len(model_id) > 0:
+                model = QuerySet(Model).filter(user_id=user_id, id=self.data.get('model_id')).first()
+                chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
+                                                                                   json.loads(
+                                                                                       rsa_long_decrypt(
+                                                                                           model.credential)),
+                                                                                   streaming=True)
+            else:
+                model = None
+                chat_model = None
             dataset_id_list = self.data.get('dataset_id_list')
-            chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
-                                                                               json.loads(
-                                                                                   decrypt(model.credential)),
-                                                                               streaming=True)
             application = Application(id=None, dialogue_number=3, model=model,
                                       dataset_setting=self.data.get('dataset_setting'),
                                       model_setting=self.data.get('model_setting'),

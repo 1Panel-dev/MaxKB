@@ -28,7 +28,7 @@ class IResetProblemStep(IBaseChatPipelineStep):
         history_chat_record = serializers.ListField(child=InstanceField(model_type=ChatRecord, required=True),
                                                     error_messages=ErrMessage.list("历史对答"))
         # 大语言模型
-        chat_model = ModelField(error_messages=ErrMessage.base("大语言模型"))
+        chat_model = ModelField(required=False, allow_null=True, error_messages=ErrMessage.base("大语言模型"))
 
     def get_step_serializer(self, manage: PipelineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer

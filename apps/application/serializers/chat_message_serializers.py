@@ -27,7 +27,7 @@ from application.models.api_key_model import ApplicationPublicAccessClient, Appl
 from common.constants.authentication_type import AuthenticationType
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed
 from common.util.field_message import ErrMessage
-from common.util.rsa_util import decrypt
+from common.util.rsa_util import rsa_long_decrypt
 from common.util.split_model import flat_map
 from dataset.models import Paragraph, Document
 from setting.models import Model, Status
@@ -138,7 +138,7 @@ def get_post_handler(chat_info: ChatInfo):
 
 class ChatMessageSerializer(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("对话id"))
-    message = serializers.CharField(required=True, error_messages=ErrMessage.char("用户问题"))
+    message = serializers.CharField(required=True, error_messages=ErrMessage.char("用户问题"), max_length=1024)
     stream = serializers.BooleanField(required=True, error_messages=ErrMessage.char("是否流式回答"))
     re_chat = serializers.BooleanField(required=True, error_messages=ErrMessage.char("是否重新回答"))
     application_id = serializers.UUIDField(required=False, allow_null=True, error_messages=ErrMessage.uuid("应用id"))
@@ -167,9 +167,11 @@ class ChatMessageSerializer(serializers.Serializer):
             chat_cache.set(chat_id,
                            chat_info, timeout=60 * 30)
         model = chat_info.application.model
+        if model is None:
+            return chat_info
         model = QuerySet(Model).filter(id=model.id).first()
         if model is None:
-            raise AppApiException(500, "模型不存在")
+            return chat_info
         if model.status == Status.ERROR:
             raise AppApiException(500, "当前模型不可用")
         if model.status == Status.DOWNLOAD:
@@ -223,7 +225,7 @@ class ChatMessageSerializer(serializers.Serializer):
             # 对话模型
             chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
                                                                                json.loads(
-                                                                                   decrypt(model.credential)),
+                                                                                   rsa_long_decrypt(model.credential)),
                                                                                streaming=True)
         # 数据集id列表
         dataset_id_list = [str(row.dataset_id) for row in

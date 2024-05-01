@@ -73,7 +73,7 @@ const postDataset: (data: datasetData, loading?: Ref<boolean>) => Promise<Result
   data,
   loading
 ) => {
-  return post(`${prefix}`, data, undefined, loading)
+  return post(`${prefix}`, data, undefined, loading, 1000 * 60 * 5)
 }
 
 /**

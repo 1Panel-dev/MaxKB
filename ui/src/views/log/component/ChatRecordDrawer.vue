@@ -1,7 +1,7 @@
 <template>
   <el-drawer v-model="visible" size="60%" @close="closeHandle" class="chat-record-drawer">
     <template #header>
-      <h4>{{ currentAbstract }}</h4>
+      <h4 class="single-line">{{ currentAbstract }}</h4>
     </template>
     <div
       v-loading="paginationConfig.current_page === 1 && loading"
@@ -120,6 +120,11 @@ defineExpose({
 })
 </script>
 <style lang="scss">
+.single-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .chat-record-drawer {
   .el-drawer__body {
     background: var(--app-layout-bg-color);

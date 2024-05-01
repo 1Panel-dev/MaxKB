@@ -59,8 +59,12 @@ def event_content(response,
 
         # 获取token
         if is_ai_chat:
-            request_token = chat_model.get_num_tokens_from_messages(message_list)
-            response_token = chat_model.get_num_tokens(all_text)
+            try:
+                request_token = chat_model.get_num_tokens_from_messages(message_list)
+                response_token = chat_model.get_num_tokens(all_text)
+            except Exception as e:
+                request_token = 0
+                response_token = 0
         else:
             request_token = 0
             response_token = 0
@@ -126,6 +130,26 @@ class BaseChatStep(IChatStep):
         result.append({'role': 'ai', 'content': answer_text})
         return result
 
+    @staticmethod
+    def get_stream_result(message_list: List[BaseMessage],
+                          chat_model: BaseChatModel = None,
+                          paragraph_list=None,
+                          no_references_setting=None):
+        if paragraph_list is None:
+            paragraph_list = []
+        directly_return_chunk_list = [AIMessageChunk(content=paragraph.content)
+                                      for paragraph in paragraph_list if
+                                      paragraph.hit_handling_method == 'directly_return']
+        if directly_return_chunk_list is not None and len(directly_return_chunk_list) > 0:
+            return iter(directly_return_chunk_list), False
+        elif len(paragraph_list) == 0 and no_references_setting.get(
+                'status') == 'designated_answer':
+            return iter([AIMessageChunk(content=no_references_setting.get('value'))]), False
+        if chat_model is None:
+            return iter([AIMessageChunk('抱歉，没有配置 AI 模型，无法优化引用分段，请先去应用中设置 AI 模型。')]), False
+        else:
+            return chat_model.stream(message_list), True
+
     def execute_stream(self, message_list: List[BaseMessage],
                        chat_id,
                        problem_text,
@@ -136,29 +160,8 @@ class BaseChatStep(IChatStep):
                        padding_problem_text: str = None,
                        client_id=None, client_type=None,
                        no_references_setting=None):
-        is_ai_chat = False
-        # 调用模型
-        if chat_model is None:
-            chat_result = iter(
-                [AIMessageChunk(content=paragraph.title + "\n" + paragraph.content) for paragraph in paragraph_list])
-        else:
-            if (paragraph_list is None or len(paragraph_list) == 0) and no_references_setting.get(
-                    'status') == 'designated_answer':
-                chat_result = iter([AIMessageChunk(content=no_references_setting.get('value'))])
-            else:
-                if paragraph_list is not None and len(paragraph_list) > 0:
-                    directly_return_chunk_list = [AIMessageChunk(content=paragraph.title + "\n" + paragraph.content)
-                                                  for paragraph in paragraph_list if
-                                                  paragraph.hit_handling_method == 'directly_return']
-                    if directly_return_chunk_list is not None and len(directly_return_chunk_list) > 0:
-                        chat_result = iter(directly_return_chunk_list)
-                    else:
-                        chat_result = chat_model.stream(message_list)
-                        is_ai_chat = True
-                else:
-                    chat_result = chat_model.stream(message_list)
-                    is_ai_chat = True
-
+        chat_result, is_ai_chat = self.get_stream_result(message_list, chat_model, paragraph_list,
+                                                         no_references_setting)
         chat_record_id = uuid.uuid1()
         r = StreamingHttpResponse(
             streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
@@ -169,6 +172,27 @@ class BaseChatStep(IChatStep):
         r['Cache-Control'] = 'no-cache'
         return r
 
+    @staticmethod
+    def get_block_result(message_list: List[BaseMessage],
+                         chat_model: BaseChatModel = None,
+                         paragraph_list=None,
+                         no_references_setting=None):
+        if paragraph_list is None:
+            paragraph_list = []
+
+        directly_return_chunk_list = [AIMessage(content=paragraph.content)
+                                      for paragraph in paragraph_list if
+                                      paragraph.hit_handling_method == 'directly_return']
+        if directly_return_chunk_list is not None and len(directly_return_chunk_list) > 0:
+            return directly_return_chunk_list[0], False
+        elif len(paragraph_list) == 0 and no_references_setting.get(
+                'status') == 'designated_answer':
+            return AIMessage(no_references_setting.get('value')), False
+        if chat_model is None:
+            return AIMessage('抱歉，没有配置 AI 模型，无法优化引用分段，请先去应用中设置 AI 模型。'), False
+        else:
+            return chat_model.invoke(message_list), True
+
     def execute_block(self, message_list: List[BaseMessage],
                       chat_id,
                       problem_text,
@@ -178,28 +202,8 @@ class BaseChatStep(IChatStep):
                       manage: PipelineManage = None,
                       padding_problem_text: str = None,
                       client_id=None, client_type=None, no_references_setting=None):
-        is_ai_chat = False
         # 调用模型
-        if chat_model is None:
-            chat_result = AIMessage(
-                content="\n\n".join([paragraph.title + "\n" + paragraph.content for paragraph in paragraph_list]))
-        else:
-            if (paragraph_list is None or len(paragraph_list) == 0) and no_references_setting.get(
-                    'status') == 'designated_answer':
-                chat_result = AIMessage(content=no_references_setting.get('value'))
-            else:
-                if paragraph_list is not None and len(paragraph_list) > 0:
-                    directly_return_chunk_list = [AIMessageChunk(content=paragraph.title + "\n" + paragraph.content)
-                                                  for paragraph in paragraph_list if
-                                                  paragraph.hit_handling_method == 'directly_return']
-                    if directly_return_chunk_list is not None and len(directly_return_chunk_list) > 0:
-                        chat_result = iter(directly_return_chunk_list)
-                    else:
-                        chat_result = chat_model.invoke(message_list)
-                        is_ai_chat = True
-                else:
-                    chat_result = chat_model.invoke(message_list)
-                    is_ai_chat = True
+        chat_result, is_ai_chat = self.get_block_result(message_list, chat_model, paragraph_list, no_references_setting)
         chat_record_id = uuid.uuid1()
         if is_ai_chat:
             request_token = chat_model.get_num_tokens_from_messages(message_list)

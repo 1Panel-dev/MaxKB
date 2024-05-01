@@ -21,10 +21,13 @@
               >同步文档</el-button
             >
             <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0"
-              >批量迁移</el-button
+              >迁移</el-button
+            >
+            <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0"
+              >设置</el-button
             >
             <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
-              >批量删除</el-button
+              >删除</el-button
             >
           </div>
 
@@ -212,6 +215,10 @@
       </div>
       <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
       <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
+      <BatchEditDocumentDialog
+        ref="batchEditDocumentDialogRef"
+        @refresh="refresh"
+      ></BatchEditDocumentDialog>
       <!-- 选择知识库 -->
       <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refresh" />
     </div>
@@ -225,6 +232,7 @@ import documentApi from '@/api/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
 import SelectDatasetDialog from './component/SelectDatasetDialog.vue'
+import BatchEditDocumentDialog from './component/BatchEditDocumentDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
 import { hitHandlingMethod } from './utils'
@@ -257,7 +265,7 @@ onBeforeRouteLeave((to: any, from: any) => {
 })
 const beforePagination = computed(() => common.paginationConfig[storeKey])
 const beforeSearch = computed(() => common.search[storeKey])
-
+const batchEditDocumentDialogRef = ref<InstanceType<typeof BatchEditDocumentDialog>>()
 const SyncWebDialogRef = ref()
 const loading = ref(false)
 let interval: any
@@ -317,6 +325,13 @@ const handleSelectionChange = (val: any[]) => {
   multipleSelection.value = val
 }
 
+function openBatchEditDocument() {
+  const arr: string[] = multipleSelection.value.map((v) => v.id)
+  if (batchEditDocumentDialogRef) {
+    batchEditDocumentDialogRef?.value?.open(arr)
+  }
+}
+
 /**
  * 初始化轮询
  */
@@ -356,9 +371,9 @@ function refreshDocument(row: any) {
         .catch(() => {})
     }
   } else {
-    // documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
-    //   getList()
-    // })
+    documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
+      getList()
+    })
   }
 }
 

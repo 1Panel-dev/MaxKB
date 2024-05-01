@@ -251,7 +251,7 @@ defineExpose({ open })
     padding: 0 !important;
   }
   .dialog-max-height {
-    height: calc(100vh - 180px);
+    height: 550px;
   }
   .custom-slider {
     .el-input-number.is-without-controls .el-input__wrapper {

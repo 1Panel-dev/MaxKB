@@ -18,7 +18,7 @@ from rest_framework import serializers
 from application.models import Application
 from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
-from common.util.rsa_util import encrypt, decrypt
+from common.util.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from setting.models.model_management import Model, Status
 from setting.models_provider.base_model_provider import ValidCode, DownModelChunkStatus
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -118,7 +118,7 @@ class ModelSerializer(serializers.Serializer):
 
             model_credential = ModelProvideConstants[provider].value.get_model_credential(model_type,
                                                                                           model_name)
-            source_model_credential = json.loads(decrypt(model.credential))
+            source_model_credential = json.loads(rsa_long_decrypt(model.credential))
             source_encryption_model_credential = model_credential.encryption_dict(source_model_credential)
             if credential is not None:
                 for k in source_encryption_model_credential.keys():
@@ -170,7 +170,7 @@ class ModelSerializer(serializers.Serializer):
             model_name = self.data.get('model_name')
             model_credential_str = json.dumps(credential)
             model = Model(id=uuid.uuid1(), status=status, user_id=user_id, name=name,
-                          credential=encrypt(model_credential_str),
+                          credential=rsa_long_encrypt(model_credential_str),
                           provider=provider, model_type=model_type, model_name=model_name)
             model.save()
             if status == Status.DOWNLOAD:
@@ -180,7 +180,7 @@ class ModelSerializer(serializers.Serializer):
 
     @staticmethod
     def model_to_dict(model: Model):
-        credential = json.loads(decrypt(model.credential))
+        credential = json.loads(rsa_long_decrypt(model.credential))
         return {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
                 'model_name': model.model_name,
                 'status': model.status,
@@ -252,7 +252,7 @@ class ModelSerializer(serializers.Serializer):
                     if update_key in instance and instance.get(update_key) is not None:
                         if update_key == 'credential':
                             model_credential_str = json.dumps(credential)
-                            model.__setattr__(update_key, encrypt(model_credential_str))
+                            model.__setattr__(update_key, rsa_long_encrypt(model_credential_str))
                         else:
                             model.__setattr__(update_key, instance.get(update_key))
             model.save()
