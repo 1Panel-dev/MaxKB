@@ -1,18 +1,18 @@
 <template>
-  <el-dialog v-model="resetPasswordDialog" title="修改密码">
+  <el-dialog v-model="resetPasswordDialog" :title="$t('layout.topbar.avatar.resetPassword')">
     <el-form
       class="reset-password-form mb-24"
       ref="resetPasswordFormRef"
       :model="resetPasswordForm"
       :rules="rules"
     >
-      <p class="mb-8 lighter">新密码</p>
+      <p class="mb-8 lighter">{{ $t("layout.topbar.avatar.dialog.newPassword") }}</p>
       <el-form-item prop="password" style="margin-bottom: 8px">
         <el-input
           type="password"
           class="input-item"
           v-model="resetPasswordForm.password"
-          placeholder="请输入密码"
+          :placeholder="$t('layout.topbar.avatar.dialog.enterPassword')"
           show-password
         >
         </el-input>
@@ -22,24 +22,24 @@
           type="password"
           class="input-item"
           v-model="resetPasswordForm.re_password"
-          placeholder="请输入确认密码"
+          :placeholder="$t('layout.topbar.avatar.dialog.confirmPassword')"
           show-password
         >
         </el-input>
       </el-form-item>
-      <p class="mb-8 lighter">使用邮箱</p>
+      <p class="mb-8 lighter">{{ $t("layout.topbar.avatar.dialog.useEmail") }}</p>
       <el-form-item style="margin-bottom: 8px">
         <el-input
           class="input-item"
           :disabled="true"
           v-bind:modelValue="user.userInfo?.email"
-          placeholder="请输入邮箱"
+          :placeholder="$t('layout.topbar.avatar.dialog.enterEmail')"
         >
         </el-input>
       </el-form-item>
       <el-form-item prop="code">
         <div class="flex-between w-full">
-          <el-input class="code-input" v-model="resetPasswordForm.code" placeholder="请输入验证码">
+          <el-input class="code-input" v-model="resetPasswordForm.code" :placeholder="$t('layout.topbar.avatar.dialog.enterVerificationCode')">
           </el-input>
           <el-button
             :disabled="isDisabled"
@@ -47,15 +47,15 @@
             @click="sendEmail"
             :loading="loading"
           >
-            {{ isDisabled ? `重新发送（${time}s）` : '获取验证码' }}</el-button
-          >
+            {{ isDisabled ? $t('layout.topbar.avatar.dialog.resend', { time }) : $t('layout.topbar.avatar.dialog.getVerificationCode') }}
+          </el-button>
         </div>
       </el-form-item>
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="resetPasswordDialog = false"> 取消 </el-button>
-        <el-button type="primary" @click="resetPassword"> 保存 </el-button>
+        <el-button @click="resetPasswordDialog = false">{{ $t('layout.topbar.avatar.dialog.cancel') }}</el-button>
+        <el-button type="primary" @click="resetPassword"> {{ $t('layout.topbar.avatar.dialog.save') }} </el-button>
       </div>
     </template>
   </el-dialog>
@@ -68,6 +68,7 @@ import { MsgSuccess } from '@/utils/message'
 import UserApi from '@/api/user'
 import useStore from '@/stores'
 import { useRouter } from 'vue-router'
+import { t } from '@/locales'
 const router = useRouter()
 const { user } = useStore()
 
@@ -86,36 +87,37 @@ const isDisabled = ref<boolean>(false)
 const time = ref<number>(60)
 
 const rules = ref<FormRules<ResetCurrentUserPasswordRequest>>({
-  code: [{ required: true, message: '请输入验证码' }],
+  // @ts-ignore
+  code: [{ required: true, message: t('layout.topbar.avatar.dialog.enterVerificationCode'), trigger: 'blur' }],
   password: [
     {
       required: true,
-      message: '请输入密码',
+      message: t('layout.topbar.avatar.dialog.enterPassword'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: '长度在 6 到 20 个字符',
+      message: t('layout.topbar.avatar.dialog.passwordLength'),
       trigger: 'blur'
     }
   ],
   re_password: [
     {
       required: true,
-      message: '请输入确认密码',
+      message: t('layout.topbar.avatar.dialog.confirmPassword'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: '长度在 6 到 20 个字符',
+      message: t('layout.topbar.avatar.dialog.passwordLength'),
       trigger: 'blur'
     },
     {
       validator: (rule, value, callback) => {
         if (resetPasswordForm.value.password != resetPasswordForm.value.re_password) {
-          callback(new Error('密码不一致'))
+          callback(new Error(t('layout.topbar.avatar.dialog.passwordMismatch')))
         } else {
           callback()
         }
@@ -129,7 +131,7 @@ const rules = ref<FormRules<ResetCurrentUserPasswordRequest>>({
  */
 const sendEmail = () => {
   UserApi.sendEmailToCurrent(loading).then(() => {
-    MsgSuccess('发送验证码成功')
+    MsgSuccess(t('verificationCodeSentSuccess'))
     isDisabled.value = true
     handleTimeChange()
   })
@@ -174,5 +176,7 @@ const close = () => {
 }
 
 defineExpose({ open, close })
+
+
 </script>
 <style lang="scss" scope></style>

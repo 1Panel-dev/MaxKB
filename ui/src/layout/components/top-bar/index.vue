@@ -19,7 +19,7 @@
           @click="toUrl('https://github.com/1Panel-dev/MaxKB')"
         ></AppIcon>
       </el-tooltip>
-      <el-tooltip effect="dark" :content="$t('layout.topbar.handbook')" placement="top">
+      <el-tooltip effect="dark" :content="$t('layout.topbar.wiki')" placement="top">
         <AppIcon
           iconName="app-reading"
           class="cursor color-secondary mr-8 ml-8"
