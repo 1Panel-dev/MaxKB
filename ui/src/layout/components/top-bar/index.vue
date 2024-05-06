@@ -51,7 +51,6 @@
           iconName="app-translate"
           class="cursor color-secondary mr-16 ml-8"
           style="font-size: 20px"
-          @click=""
         >
         </AppIcon>
       </el-dropdown>
