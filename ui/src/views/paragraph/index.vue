@@ -8,7 +8,16 @@
         >）</el-text
       >
       <div class="document-detail__header">
-        <el-button @click="addParagraph" type="primary" :disabled="loading"> 添加分段 </el-button>
+        <el-button @click="isBatch = true" v-if="isBatch === false"> 批量选择 </el-button>
+        <el-button @click="isBatch = false" v-if="isBatch === true"> 取消选择 </el-button>
+        <el-button
+          @click="addParagraph"
+          type="primary"
+          :disabled="loading"
+          v-if="isBatch === false"
+        >
+          添加分段
+        </el-button>
       </div>
     </template>
     <div
@@ -57,7 +66,28 @@
                 :key="index"
                 class="p-8"
               >
+                <!-- 批量操作card -->
                 <CardBox
+                  v-if="isBatch === true"
+                  shadow="hover"
+                  :title="item.title || '-'"
+                  :description="item.content"
+                  class="document-card cursor"
+                  :class="multipleSelection.includes(item.id) ? 'selected' : ''"
+                  :showIcon="false"
+                  @click="selectHandle(item.id)"
+                >
+                  <div class="active-button" @click.stop></div>
+
+                  <template #footer>
+                    <div class="footer-content flex-between">
+                      <span> {{ numberFormat(item?.content.length) || 0 }} 个 字符 </span>
+                    </div>
+                  </template>
+                </CardBox>
+                <!-- 非批量操作card -->
+                <CardBox
+                  v-else
                   shadow="hover"
                   :title="item.title || '-'"
                   :description="item.content"
@@ -90,6 +120,13 @@
           </InfiniteScroll>
         </div>
       </el-scrollbar>
+
+      <div class="mul-operation border-t w-full" v-if="isBatch === true">
+        <el-button :disabled="multipleSelection.length === 0"> 迁移 </el-button>
+
+        <el-button :disabled="multipleSelection.length === 0"> 删除 </el-button>
+        <span class="ml-8"> 已选 {{ multipleSelection.length }} 项 </span>
+      </div>
     </div>
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
   </LayoutContainer>
@@ -118,11 +155,23 @@ const title = ref('')
 const search = ref('')
 const searchType = ref('title')
 
+// 批量操作
+const isBatch = ref(false)
+const multipleSelection = ref<any[]>([])
+
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
   total: 0
 })
+
+function selectHandle(id: string) {
+  if (multipleSelection.value.includes(id)) {
+    multipleSelection.value.splice(multipleSelection.value.indexOf(id), 1)
+  } else {
+    multipleSelection.value.push(id)
+  }
+}
 
 function searchHandle() {
   paginationConfig.current_page = 1
@@ -219,6 +268,12 @@ onMounted(() => {
     height: 210px;
     background: var(--app-layout-bg-color);
     border: 1px solid var(--app-layout-bg-color);
+    &.selected {
+      background: #ffffff;
+      &:hover {
+        background: #ffffff;
+      }
+    }
     &:hover {
       background: #ffffff;
       border: 1px solid var(--el-border-color);
@@ -241,6 +296,19 @@ onMounted(() => {
       position: absolute;
       right: 16px;
       top: 16px;
+    }
+  }
+
+  &__main {
+    position: relative;
+    box-sizing: border-box;
+    .mul-operation {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      padding: 16px 24px;
+      box-sizing: border-box;
+      background: #ffffff;
     }
   }
 }

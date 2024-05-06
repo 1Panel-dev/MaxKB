@@ -573,3 +573,33 @@ h4 {
     color: var(--app-text-color);
   }
 }
+
+// card 选中样式
+.selected {
+  border: 1px solid var(--el-color-primary) !important;
+  &:before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: 14px solid var(--el-color-primary);
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+  }
+
+  &:after {
+    content: '';
+    width: 3px;
+    height: 6px;
+    position: absolute;
+    right: 5px;
+    top: 2px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-left-color: transparent;
+    transform: rotate(35deg);
+  }
+  &:hover {
+    border: 1px solid var(--el-color-primary);
+  }
+}

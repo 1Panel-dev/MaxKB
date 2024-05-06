@@ -80,7 +80,7 @@
                   :title="item.title || '-'"
                   :description="item.content"
                   class="paragraph-card cursor mb-16"
-                  :class="isAssociation(item.id) ? 'active' : ''"
+                  :class="isAssociation(item.id) ? 'selected' : ''"
                   :showIcon="false"
                   @click="associationClick(item)"
                 >
@@ -244,31 +244,6 @@ defineExpose({ open })
 <style lang="scss" scope>
 .paragraph-card {
   position: relative;
-  &.active {
-    border: 1px solid var(--el-color-primary);
-    &:before {
-      content: '';
-      position: absolute;
-      right: 0;
-      top: 0;
-      border: 14px solid var(--el-color-primary);
-      border-bottom-color: transparent;
-      border-left-color: transparent;
-    }
-
-    &:after {
-      content: '';
-      width: 3px;
-      height: 6px;
-      position: absolute;
-      right: 5px;
-      top: 2px;
-      border: 2px solid #fff;
-      border-top-color: transparent;
-      border-left-color: transparent;
-      transform: rotate(35deg);
-    }
-  }
 }
 .paragraph-badge {
   .el-badge__content {
