@@ -12,9 +12,10 @@ from rest_framework.views import APIView
 from rest_framework.views import Request
 
 from common.auth import TokenAuth, has_permissions
-from common.constants.permission_constants import Permission, Group, Operate
+from common.constants.permission_constants import Permission, Group, Operate, CompareConstants
 from common.response import result
 from common.util.common import query_params_to_single_dict
+from dataset.serializers.common_serializers import BatchSerializer
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 
 
@@ -167,6 +168,50 @@ class Paragraph(APIView):
                 data={"dataset_id": dataset_id, 'document_id': document_id, "paragraph_id": paragraph_id})
             o.is_valid(raise_exception=True)
             return result.success(o.delete())
+
+    class Batch(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['DELETE'], detail=False)
+        @swagger_auto_schema(operation_summary="批量删除段落",
+                             operation_id="批量删除段落",
+                             request_body=
+                             BatchSerializer.get_request_body_api(),
+                             manual_parameters=ParagraphSerializers.Create.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库/文档/段落"])
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def delete(self, request: Request, dataset_id: str, document_id: str):
+            return result.success(ParagraphSerializers.Batch(
+                data={"dataset_id": dataset_id, 'document_id': document_id}).batch_delete(request.data))
+
+    class BatchMigrate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="批量迁移段落",
+                             operation_id="批量迁移段落",
+                             manual_parameters=ParagraphSerializers.Migrate.get_request_params_api(),
+                             request_body=ParagraphSerializers.Migrate.get_request_body_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库/文档/段落"]
+                             )
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')),
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('target_dataset_id')),
+            compare=CompareConstants.AND
+        )
+        def put(self, request: Request, dataset_id: str, target_dataset_id: str, document_id: str, target_document_id):
+            return result.success(
+                ParagraphSerializers.Migrate(
+                    data={'dataset_id': dataset_id, 'target_dataset_id': target_dataset_id,
+                          'document_id': document_id,
+                          'target_document_id': target_document_id,
+                          'paragraph_id_list': request.data}).migrate())
 
     class Page(APIView):
         authentication_classes = [TokenAuth]

@@ -25,6 +25,10 @@ urlpatterns = [
     path('dataset/<str:dataset_id>/document/migrate/<str:target_dataset_id>', views.Document.Migrate.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/refresh', views.Document.Refresh.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph', views.Paragraph.as_view()),
+    path(
+        'dataset/<str:dataset_id>/document/<str:document_id>/paragraph/migrate/dataset/<str:target_dataset_id>/document/<str:target_document_id>',
+        views.Paragraph.BatchMigrate.as_view()),
+    path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/_batch', views.Paragraph.Batch.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<int:current_page>/<int:page_size>',
          views.Paragraph.Page.as_view(), name='paragraph_page'),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<paragraph_id>',

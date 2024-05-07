@@ -56,6 +56,12 @@ class UpdateEmbeddingDatasetIdArgs:
         self.target_dataset_id = target_dataset_id
 
 
+class UpdateEmbeddingDocumentIdArgs:
+    def __init__(self, source_id_list: List[str], target_document_id: str):
+        self.source_id_list = source_id_list
+        self.target_document_id = target_document_id
+
+
 class ListenerManagement:
     embedding_by_problem_signal = signal("embedding_by_problem")
     embedding_by_paragraph_signal = signal("embedding_by_paragraph")
@@ -217,8 +223,17 @@ class ListenerManagement:
                                                                 {'dataset_id': args.target_dataset_id})
 
     @staticmethod
+    def update_embedding_document_id(args: UpdateEmbeddingDocumentIdArgs):
+        VectorStore.get_embedding_vector().update_by_source_ids(args.source_id_list,
+                                                                {'document_id': args.target_document_id})
+
+    @staticmethod
     def delete_embedding_by_source_ids(source_ids: List[str]):
         VectorStore.get_embedding_vector().delete_by_source_ids(source_ids, SourceType.PROBLEM)
+
+    @staticmethod
+    def delete_embedding_by_paragraph_ids(paragraph_ids: List[str]):
+        VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_ids)
 
     @staticmethod
     def delete_embedding_by_dataset_id_list(source_ids: List[str]):

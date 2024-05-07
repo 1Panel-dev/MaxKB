@@ -139,6 +139,9 @@ class PGVector(BaseVectorStore):
     def delete_by_paragraph_id(self, paragraph_id: str):
         QuerySet(Embedding).filter(paragraph_id=paragraph_id).delete()
 
+    def delete_by_paragraph_ids(self, paragraph_ids: List[str]):
+        QuerySet(Embedding).filter(paragraph_id__in=paragraph_ids).delete()
+
 
 class ISearch(ABC):
     @abstractmethod
