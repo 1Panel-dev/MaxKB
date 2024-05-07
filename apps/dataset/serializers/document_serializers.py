@@ -387,6 +387,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                         {})
 
             else:
+                if document.status != Status.embedding.value:
+                    document.status = Status.embedding
+                    document.save()
                 ListenerManagement.embedding_by_document_signal.send(document_id)
             return True
 
