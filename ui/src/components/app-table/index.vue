@@ -12,6 +12,7 @@
             :maxlength="quickCreateMaxlength || '-'"
             :show-word-limit="quickCreateMaxlength ? true : false"
             @keydown.enter="submitHandle"
+            clearable
           />
 
           <el-button type="primary" @click="submitHandle" :disabled="loading">创建</el-button>
