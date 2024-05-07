@@ -49,6 +49,24 @@ const delParagraph: (
 }
 
 /**
+ * 批量删除段落
+ * @param 参数 dataset_id, document_id
+ */
+const delMulParagraph: (
+  dataset_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, document_id, data, loading) => {
+  return del(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/_batch`,
+    undefined,
+    { id_list: data },
+    loading
+  )
+}
+
+/**
  * 创建段落
  * @param 参数 
  * dataset_id, document_id
@@ -189,5 +207,6 @@ export default {
   getProblem,
   postProblem,
   disassociationProblem,
-  associationProblem
+  associationProblem,
+  delMulParagraph
 }

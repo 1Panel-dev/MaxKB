@@ -9,7 +9,7 @@
       >
       <div class="document-detail__header">
         <el-button @click="isBatch = true" v-if="isBatch === false"> 批量选择 </el-button>
-        <el-button @click="isBatch = false" v-if="isBatch === true"> 取消选择 </el-button>
+        <el-button @click="cancelSelectedHandle" v-if="isBatch === true"> 取消选择 </el-button>
         <el-button
           @click="addParagraph"
           type="primary"
@@ -124,7 +124,9 @@
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
         <el-button :disabled="multipleSelection.length === 0"> 迁移 </el-button>
 
-        <el-button :disabled="multipleSelection.length === 0"> 删除 </el-button>
+        <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
+          删除
+        </el-button>
         <span class="ml-8"> 已选 {{ multipleSelection.length }} 项 </span>
       </div>
     </div>
@@ -164,6 +166,23 @@ const paginationConfig = reactive({
   page_size: 20,
   total: 0
 })
+
+function deleteMulParagraph() {
+  paragraphApi
+    .delMulParagraph(id, documentId, multipleSelection.value, changeStateloading)
+    .then(() => {
+      paragraphDetail.value = paragraphDetail.value.filter(
+        (v) => !multipleSelection.value.includes(v.id)
+      )
+      multipleSelection.value = []
+      MsgSuccess('批量删除成功')
+    })
+}
+
+function cancelSelectedHandle() {
+  isBatch.value = false
+  multipleSelection.value = []
+}
 
 function selectHandle(id: string) {
   if (multipleSelection.value.includes(id)) {
