@@ -122,7 +122,9 @@
       </el-scrollbar>
 
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
-        <el-button :disabled="multipleSelection.length === 0"> 迁移 </el-button>
+        <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog">
+          迁移
+        </el-button>
 
         <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
           删除
@@ -131,6 +133,7 @@
       </div>
     </div>
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
+    <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -139,6 +142,7 @@ import { useRoute } from 'vue-router'
 import documentApi from '@/api/document'
 import paragraphApi from '@/api/paragraph'
 import ParagraphDialog from './component/ParagraphDialog.vue'
+import SelectDocumentDialog from './component/SelectDocumentDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
@@ -148,6 +152,7 @@ const {
   params: { id, documentId }
 } = route as any
 
+const SelectDocumentDialogRef = ref()
 const ParagraphDialogRef = ref()
 const loading = ref(false)
 const changeStateloading = ref(false)
@@ -167,16 +172,38 @@ const paginationConfig = reactive({
   total: 0
 })
 
+function refreshMigrateParagraph() {
+  paragraphDetail.value = paragraphDetail.value.filter(
+    (v) => !multipleSelection.value.includes(v.id)
+  )
+  multipleSelection.value = []
+  MsgSuccess('迁移删除成功')
+}
+
+function openSelectDocumentDialog() {
+  SelectDocumentDialogRef.value.open(multipleSelection.value)
+}
 function deleteMulParagraph() {
-  paragraphApi
-    .delMulParagraph(id, documentId, multipleSelection.value, changeStateloading)
+  MsgConfirm(
+    `是否批量删除 ${multipleSelection.value.length} 个分段?`,
+    `删除后无法恢复，请谨慎操作。`,
+    {
+      confirmButtonText: '删除',
+      confirmButtonClass: 'danger'
+    }
+  )
     .then(() => {
-      paragraphDetail.value = paragraphDetail.value.filter(
-        (v) => !multipleSelection.value.includes(v.id)
-      )
-      multipleSelection.value = []
-      MsgSuccess('批量删除成功')
+      paragraphApi
+        .delMulParagraph(id, documentId, multipleSelection.value, changeStateloading)
+        .then(() => {
+          paragraphDetail.value = paragraphDetail.value.filter(
+            (v) => !multipleSelection.value.includes(v.id)
+          )
+          multipleSelection.value = []
+          MsgSuccess('批量删除成功')
+        })
     })
+    .catch(() => {})
 }
 
 function cancelSelectedHandle() {

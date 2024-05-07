@@ -123,6 +123,33 @@ const putParagraph: (
 }
 
 /**
+ * 批量迁移段落
+ * @param 参数 dataset_id,target_dataset_id,
+ */
+const putMigrateMulParagraph: (
+  dataset_id: string,
+  document_id: string,
+  target_dataset_id: string,
+  target_document_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (
+  dataset_id,
+  document_id,
+  target_dataset_id,
+  target_document_id,
+  data,
+  loading
+) => {
+  return put(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/migrate/dataset/${target_dataset_id}/document/${target_document_id}`,
+    data,
+    undefined,
+    loading
+  )
+}
+
+/**
  * 问题列表
  * @param 参数 dataset_id，document_id，paragraph_id
  */
@@ -208,5 +235,6 @@ export default {
   postProblem,
   disassociationProblem,
   associationProblem,
-  delMulParagraph
+  delMulParagraph,
+  putMigrateMulParagraph
 }
