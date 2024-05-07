@@ -23,11 +23,12 @@
             :show-word-limit="maxlength ? true : false"
             @blur="isEdit = false"
             @keyup.enter="submit"
+            clearable
           ></el-input>
         </div>
 
         <span class="ml-4">
-          <el-button type="primary" text @click.stop="submit" :disabled="loading">
+          <el-button type="primary" text @mousedown="submit" :disabled="loading">
             <el-icon><Select /></el-icon>
           </el-button>
         </span>
