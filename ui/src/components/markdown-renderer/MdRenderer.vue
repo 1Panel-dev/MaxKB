@@ -9,10 +9,10 @@
   />
 </template>
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { MdPreview, config } from 'md-editor-v3'
 config({
-  markdownItConfig(md: markdownit) {
+  markdownItConfig(md) {
     md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
       tokens[idx].attrSet('target', '_blank')
       return md.renderer.renderToken(tokens, idx, options)
