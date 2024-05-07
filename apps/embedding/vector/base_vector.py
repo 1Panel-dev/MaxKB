@@ -131,6 +131,10 @@ class BaseVectorStore(ABC):
         pass
 
     @abstractmethod
+    def update_by_paragraph_ids(self, paragraph_ids: str, instance: Dict):
+        pass
+
+    @abstractmethod
     def update_by_source_id(self, source_id: str, instance: Dict):
         pass
 

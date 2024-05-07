@@ -334,9 +334,11 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                     # 修改mapping
                     QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list,
                                                                   ['document_id'])
+                # 修改向量段落信息
                 ListenerManagement.update_embedding_document_id(UpdateEmbeddingDocumentIdArgs(
                     [paragraph.id for paragraph in paragraph_list],
-                    target_document_id))
+                    target_document_id, target_dataset_id))
+                # 修改段落信息
                 paragraph_list.update(document_id=target_document_id)
             # 不同数据集迁移
             else:
@@ -362,14 +364,11 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 # 修改mapping
                 QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list,
                                                               ['problem_id', 'dataset_id', 'document_id'])
+                # 修改向量段落信息
                 ListenerManagement.update_embedding_document_id(UpdateEmbeddingDocumentIdArgs(
-                    [*[problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list]
-                        , *[paragraph.id for paragraph in paragraph_list]],
-                    target_document_id))
-                ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
-                    [*[problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list]
-                        , *[paragraph.id for paragraph in paragraph_list]],
-                    target_dataset_id))
+                    [paragraph.id for paragraph in paragraph_list],
+                    target_document_id, target_dataset_id))
+                # 修改段落信息
                 paragraph_list.update(dataset_id=target_dataset_id, document_id=target_document_id)
 
         @staticmethod
