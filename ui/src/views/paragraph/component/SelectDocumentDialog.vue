@@ -126,7 +126,7 @@ function getDocument(id: string) {
 
 function getDataset() {
   dataset.asyncGetAllDataset(loading).then((res: any) => {
-    datasetList.value = res.data?.filter((v: any) => v.id !== id)
+    datasetList.value = res.data
   })
 }
 

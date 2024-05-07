@@ -15,7 +15,7 @@ from drf_yasg import openapi
 from rest_framework import serializers
 
 from common.db.search import page_search
-from common.event.listener_manage import ListenerManagement, UpdateEmbeddingDocumentIdArgs
+from common.event.listener_manage import ListenerManagement, UpdateEmbeddingDocumentIdArgs, UpdateEmbeddingDatasetIdArgs
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
@@ -325,7 +325,6 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(paragraph__in=paragraph_list)
             # 同数据集迁移
             if target_dataset_id == dataset_id:
-                paragraph_list.update(document_id=target_document_id)
                 if len(problem_paragraph_mapping_list):
                     problem_paragraph_mapping_list = [
                         self.update_problem_paragraph_mapping(target_document_id,
@@ -338,6 +337,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 ListenerManagement.update_embedding_document_id(UpdateEmbeddingDocumentIdArgs(
                     [paragraph.id for paragraph in paragraph_list],
                     target_document_id))
+                paragraph_list.update(document_id=target_document_id)
             # 不同数据集迁移
             else:
                 problem_list = QuerySet(Problem).filter(
@@ -362,11 +362,15 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 # 修改mapping
                 QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list,
                                                               ['problem_id', 'dataset_id', 'document_id'])
-                paragraph_list.update(dataset_id=target_dataset_id, document_id=target_document_id)
                 ListenerManagement.update_embedding_document_id(UpdateEmbeddingDocumentIdArgs(
                     [*[problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list]
                         , *[paragraph.id for paragraph in paragraph_list]],
                     target_document_id))
+                ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
+                    [*[problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list]
+                        , *[paragraph.id for paragraph in paragraph_list]],
+                    target_dataset_id))
+                paragraph_list.update(dataset_id=target_dataset_id, document_id=target_document_id)
 
         @staticmethod
         def update_problem_paragraph_mapping(target_document_id: str, problem_paragraph_mapping):
