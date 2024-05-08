@@ -166,10 +166,12 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                      meta={})
             else:
                 document_list.update(dataset_id=target_dataset_id)
-            paragraph_list.update(dataset_id=target_dataset_id)
+            # 修改向量信息
             ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
-                [problem_paragraph_mapping.id for problem_paragraph_mapping in problem_paragraph_mapping_list],
+                [paragraph.id for paragraph in paragraph_list],
                 target_dataset_id))
+            # 修改段落信息
+            paragraph_list.update(dataset_id=target_dataset_id)
 
         @staticmethod
         def get_target_dataset_problem(target_dataset_id: str,

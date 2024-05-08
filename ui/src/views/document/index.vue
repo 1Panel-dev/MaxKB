@@ -20,15 +20,15 @@
               v-if="datasetDetail.type === '1'"
               >同步文档</el-button
             >
-            <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0"
-              >迁移</el-button
-            >
-            <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0"
-              >设置</el-button
-            >
-            <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
-              >删除</el-button
-            >
+            <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0">
+              迁移
+            </el-button>
+            <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0">
+              设置
+            </el-button>
+            <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0">
+              删除
+            </el-button>
           </div>
 
           <el-input
@@ -327,9 +327,7 @@ const handleSelectionChange = (val: any[]) => {
 
 function openBatchEditDocument() {
   const arr: string[] = multipleSelection.value.map((v) => v.id)
-  if (batchEditDocumentDialogRef) {
-    batchEditDocumentDialogRef?.value?.open(arr)
-  }
+  batchEditDocumentDialogRef?.value?.open(arr)
 }
 
 /**

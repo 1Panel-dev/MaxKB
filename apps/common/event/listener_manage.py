@@ -51,8 +51,15 @@ class UpdateProblemArgs:
 
 
 class UpdateEmbeddingDatasetIdArgs:
-    def __init__(self, source_id_list: List[str], target_dataset_id: str):
-        self.source_id_list = source_id_list
+    def __init__(self, paragraph_id_list: List[str], target_dataset_id: str):
+        self.paragraph_id_list = paragraph_id_list
+        self.target_dataset_id = target_dataset_id
+
+
+class UpdateEmbeddingDocumentIdArgs:
+    def __init__(self, paragraph_id_list: List[str], target_document_id: str, target_dataset_id: str):
+        self.paragraph_id_list = paragraph_id_list
+        self.target_document_id = target_document_id
         self.target_dataset_id = target_dataset_id
 
 
@@ -213,12 +220,22 @@ class ListenerManagement:
 
     @staticmethod
     def update_embedding_dataset_id(args: UpdateEmbeddingDatasetIdArgs):
-        VectorStore.get_embedding_vector().update_by_source_ids(args.source_id_list,
-                                                                {'dataset_id': args.target_dataset_id})
+        VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
+                                                                   {'dataset_id': args.target_dataset_id})
+
+    @staticmethod
+    def update_embedding_document_id(args: UpdateEmbeddingDocumentIdArgs):
+        VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
+                                                                   {'document_id': args.target_document_id,
+                                                                    'dataset_id': args.target_dataset_id})
 
     @staticmethod
     def delete_embedding_by_source_ids(source_ids: List[str]):
         VectorStore.get_embedding_vector().delete_by_source_ids(source_ids, SourceType.PROBLEM)
+
+    @staticmethod
+    def delete_embedding_by_paragraph_ids(paragraph_ids: List[str]):
+        VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_ids)
 
     @staticmethod
     def delete_embedding_by_dataset_id_list(source_ids: List[str]):

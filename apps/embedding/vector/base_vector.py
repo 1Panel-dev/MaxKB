@@ -113,7 +113,7 @@ class BaseVectorStore(ABC):
         return result[0]
 
     @abstractmethod
-    def query(self, query_text:str,query_embedding: List[float],  dataset_id_list: list[str],
+    def query(self, query_text: str, query_embedding: List[float], dataset_id_list: list[str],
               exclude_document_id_list: list[str],
               exclude_paragraph_list: list[str], is_active: bool, top_n: int, similarity: float,
               search_mode: SearchMode):
@@ -128,6 +128,10 @@ class BaseVectorStore(ABC):
 
     @abstractmethod
     def update_by_paragraph_id(self, paragraph_id: str, instance: Dict):
+        pass
+
+    @abstractmethod
+    def update_by_paragraph_ids(self, paragraph_ids: str, instance: Dict):
         pass
 
     @abstractmethod
@@ -172,4 +176,8 @@ class BaseVectorStore(ABC):
 
     @abstractmethod
     def delete_by_paragraph_id(self, paragraph_id: str):
+        pass
+
+    @abstractmethod
+    def delete_by_paragraph_ids(self, paragraph_ids: List[str]):
         pass

@@ -119,6 +119,9 @@ class PGVector(BaseVectorStore):
     def update_by_paragraph_id(self, paragraph_id: str, instance: Dict):
         QuerySet(Embedding).filter(paragraph_id=paragraph_id).update(**instance)
 
+    def update_by_paragraph_ids(self, paragraph_id: str, instance: Dict):
+        QuerySet(Embedding).filter(paragraph_id__in=paragraph_id).update(**instance)
+
     def delete_by_dataset_id(self, dataset_id: str):
         QuerySet(Embedding).filter(dataset_id=dataset_id).delete()
 
@@ -138,6 +141,9 @@ class PGVector(BaseVectorStore):
 
     def delete_by_paragraph_id(self, paragraph_id: str):
         QuerySet(Embedding).filter(paragraph_id=paragraph_id).delete()
+
+    def delete_by_paragraph_ids(self, paragraph_ids: List[str]):
+        QuerySet(Embedding).filter(paragraph_id__in=paragraph_ids).delete()
 
 
 class ISearch(ABC):

@@ -8,7 +8,20 @@
         >）</el-text
       >
       <div class="document-detail__header">
-        <el-button @click="addParagraph" type="primary" :disabled="loading"> 添加分段 </el-button>
+        <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
+          批量选择
+        </el-button>
+        <el-button @click="batchSelectedHandle(false)" v-if="isBatch === true">
+          取消选择
+        </el-button>
+        <el-button
+          @click="addParagraph"
+          type="primary"
+          :disabled="loading"
+          v-if="isBatch === false"
+        >
+          添加分段
+        </el-button>
       </div>
     </template>
     <div
@@ -57,7 +70,28 @@
                 :key="index"
                 class="p-8"
               >
+                <!-- 批量操作card -->
                 <CardBox
+                  v-if="isBatch === true"
+                  shadow="hover"
+                  :title="item.title || '-'"
+                  :description="item.content"
+                  class="document-card cursor"
+                  :class="multipleSelection.includes(item.id) ? 'selected' : ''"
+                  :showIcon="false"
+                  @click="selectHandle(item.id)"
+                >
+                  <div class="active-button" @click.stop></div>
+
+                  <template #footer>
+                    <div class="footer-content flex-between">
+                      <span> {{ numberFormat(item?.content.length) || 0 }} 个 字符 </span>
+                    </div>
+                  </template>
+                </CardBox>
+                <!-- 非批量操作card -->
+                <CardBox
+                  v-else
                   shadow="hover"
                   :title="item.title || '-'"
                   :description="item.content"
@@ -77,11 +111,25 @@
                   <template #footer>
                     <div class="footer-content flex-between">
                       <span> {{ numberFormat(item?.content.length) || 0 }} 个 字符 </span>
-                      <el-tooltip effect="dark" content="删除" placement="top">
-                        <el-button text @click.stop="deleteParagraph(item)" class="delete-button">
-                          <el-icon><Delete /></el-icon>
-                        </el-button>
-                      </el-tooltip>
+
+                      <span @click.stop>
+                        <el-dropdown trigger="click">
+                          <el-button text>
+                            <el-icon><MoreFilled /></el-icon>
+                          </el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item @click="openSelectDocumentDialog(item)">
+                                <AppIcon iconName="app-migrate"></AppIcon>
+                                迁移</el-dropdown-item
+                              >
+                              <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(item)"
+                                >删除</el-dropdown-item
+                              >
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </span>
                     </div>
                   </template>
                 </CardBox>
@@ -90,8 +138,20 @@
           </InfiniteScroll>
         </div>
       </el-scrollbar>
+
+      <div class="mul-operation border-t w-full" v-if="isBatch === true">
+        <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog">
+          迁移
+        </el-button>
+
+        <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
+          删除
+        </el-button>
+        <span class="ml-8"> 已选 {{ multipleSelection.length }} 项 </span>
+      </div>
     </div>
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
+    <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -100,6 +160,7 @@ import { useRoute } from 'vue-router'
 import documentApi from '@/api/document'
 import paragraphApi from '@/api/paragraph'
 import ParagraphDialog from './component/ParagraphDialog.vue'
+import SelectDocumentDialog from './component/SelectDocumentDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
@@ -109,6 +170,7 @@ const {
   params: { id, documentId }
 } = route as any
 
+const SelectDocumentDialogRef = ref()
 const ParagraphDialogRef = ref()
 const loading = ref(false)
 const changeStateloading = ref(false)
@@ -118,11 +180,65 @@ const title = ref('')
 const search = ref('')
 const searchType = ref('title')
 
+// 批量操作
+const isBatch = ref(false)
+const multipleSelection = ref<any[]>([])
+
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
   total: 0
 })
+
+function refreshMigrateParagraph() {
+  paragraphDetail.value = paragraphDetail.value.filter(
+    (v) => !multipleSelection.value.includes(v.id)
+  )
+  multipleSelection.value = []
+  MsgSuccess('迁移删除成功')
+}
+
+function openSelectDocumentDialog(row?: any) {
+  if (row) {
+    multipleSelection.value = [row.id]
+  }
+  SelectDocumentDialogRef.value.open(multipleSelection.value)
+}
+function deleteMulParagraph() {
+  MsgConfirm(
+    `是否批量删除 ${multipleSelection.value.length} 个分段?`,
+    `删除后无法恢复，请谨慎操作。`,
+    {
+      confirmButtonText: '删除',
+      confirmButtonClass: 'danger'
+    }
+  )
+    .then(() => {
+      paragraphApi
+        .delMulParagraph(id, documentId, multipleSelection.value, changeStateloading)
+        .then(() => {
+          paragraphDetail.value = paragraphDetail.value.filter(
+            (v) => !multipleSelection.value.includes(v.id)
+          )
+          multipleSelection.value = []
+          MsgSuccess('批量删除成功')
+        })
+    })
+    .catch(() => {})
+}
+
+function batchSelectedHandle(bool: boolean) {
+  isBatch.value = bool
+  multipleSelection.value = []
+}
+
+function selectHandle(id: string) {
+  if (multipleSelection.value.includes(id)) {
+    multipleSelection.value.splice(multipleSelection.value.indexOf(id), 1)
+  } else {
+    multipleSelection.value.push(id)
+  }
+}
 
 function searchHandle() {
   paginationConfig.current_page = 1
@@ -219,6 +335,12 @@ onMounted(() => {
     height: 210px;
     background: var(--app-layout-bg-color);
     border: 1px solid var(--app-layout-bg-color);
+    &.selected {
+      background: #ffffff;
+      &:hover {
+        background: #ffffff;
+      }
+    }
     &:hover {
       background: #ffffff;
       border: 1px solid var(--el-border-color);
@@ -241,6 +363,19 @@ onMounted(() => {
       position: absolute;
       right: 16px;
       top: 16px;
+    }
+  }
+
+  &__main {
+    position: relative;
+    box-sizing: border-box;
+    .mul-operation {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      padding: 16px 24px;
+      box-sizing: border-box;
+      background: #ffffff;
     }
   }
 }
