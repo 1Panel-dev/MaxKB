@@ -107,11 +107,25 @@
                   <template #footer>
                     <div class="footer-content flex-between">
                       <span> {{ numberFormat(item?.content.length) || 0 }} 个 字符 </span>
-                      <el-tooltip effect="dark" content="删除" placement="top">
-                        <el-button text @click.stop="deleteParagraph(item)" class="delete-button">
-                          <el-icon><Delete /></el-icon>
-                        </el-button>
-                      </el-tooltip>
+
+                      <span @click.stop>
+                        <el-dropdown trigger="click">
+                          <el-button text>
+                            <el-icon><MoreFilled /></el-icon>
+                          </el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item @click="openSelectDocumentDialog(item)">
+                                <AppIcon iconName="app-migrate"></AppIcon>
+                                迁移</el-dropdown-item
+                              >
+                              <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(item)"
+                                >删除</el-dropdown-item
+                              >
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </span>
                     </div>
                   </template>
                 </CardBox>
@@ -180,8 +194,14 @@ function refreshMigrateParagraph() {
   MsgSuccess('迁移删除成功')
 }
 
-function openSelectDocumentDialog() {
-  SelectDocumentDialogRef.value.open(multipleSelection.value)
+function openSelectDocumentDialog(row?: any) {
+  let arr: string[] = []
+  if (row) {
+    arr.push(row.id)
+  } else {
+    arr = multipleSelection.value
+  }
+  SelectDocumentDialogRef.value.open(arr)
 }
 function deleteMulParagraph() {
   MsgConfirm(
