@@ -8,8 +8,12 @@
         >）</el-text
       >
       <div class="document-detail__header">
-        <el-button @click="isBatch = true" v-if="isBatch === false"> 批量选择 </el-button>
-        <el-button @click="cancelSelectedHandle" v-if="isBatch === true"> 取消选择 </el-button>
+        <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
+          批量选择
+        </el-button>
+        <el-button @click="batchSelectedHandle(false)" v-if="isBatch === true">
+          取消选择
+        </el-button>
         <el-button
           @click="addParagraph"
           type="primary"
@@ -223,8 +227,8 @@ function deleteMulParagraph() {
     .catch(() => {})
 }
 
-function cancelSelectedHandle() {
-  isBatch.value = false
+function batchSelectedHandle(bool: boolean) {
+  isBatch.value = bool
   multipleSelection.value = []
 }
 
