@@ -45,7 +45,11 @@
       </el-tab-pane>
     </template>
   </el-tabs>
-  <EditParagraphDialog ref="EditParagraphDialogRef" @updateContent="updateContent" />
+  <EditParagraphDialog
+    ref="EditParagraphDialogRef"
+    @updateContent="updateContent"
+    :isConnect="isConnect"
+  />
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
@@ -59,7 +63,8 @@ const props = defineProps({
   data: {
     type: Array<any>,
     default: () => []
-  }
+  },
+  isConnect: Boolean
 })
 
 const emit = defineEmits(['update:data'])

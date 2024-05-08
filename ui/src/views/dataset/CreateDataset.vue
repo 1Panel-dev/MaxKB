@@ -98,6 +98,11 @@ function submit() {
   loading.value = true
   const documents = [] as any
   StepSecondRef.value?.paragraphList.map((item: any) => {
+    if (!StepSecondRef.value?.checkedConnect) {
+      item.content.map((v: any) => {
+        delete v['problem_list']
+      })
+    }
     documents.push({
       name: item.name,
       paragraphs: item.content
