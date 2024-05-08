@@ -26,6 +26,13 @@
       </el-table-column>
       <el-table-column label="操作" align="left" width="80">
         <template #default="{ row }">
+          <span class="mr-4">
+            <el-tooltip effect="dark" content="设置" placement="top">
+              <el-button type="primary" text @click.stop="settingApiKey(row)">
+                <el-icon><Setting /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </span>
           <el-tooltip effect="dark" content="删除" placement="top">
             <el-button type="primary" text @click="deleteApiKey(row)">
               <el-icon><Delete /></el-icon>
@@ -34,6 +41,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <SettingAPIKeyDialog ref="SettingAPIKeyDialogRef" @refresh="refresh" />
   </el-dialog>
 </template>
 <script setup lang="ts">
@@ -41,17 +49,17 @@ import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import overviewApi from '@/api/application-overview'
+import SettingAPIKeyDialog from './SettingAPIKeyDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import useStore from '@/stores'
 const route = useRoute()
 const {
   params: { id }
 } = route
-const { application } = useStore()
 
 const emit = defineEmits(['addData'])
 
+const SettingAPIKeyDialogRef = ref()
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 const apiKey = ref<any>(null)
@@ -61,6 +69,10 @@ watch(dialogVisible, (bool) => {
     apiKey.value = null
   }
 })
+
+function settingApiKey(row: any) {
+  SettingAPIKeyDialogRef.value.open(row)
+}
 
 function deleteApiKey(row: any) {
   MsgConfirm(
@@ -106,6 +118,10 @@ function getApiKeyList() {
   overviewApi.getAPIKey(id as string, loading).then((res) => {
     apiKey.value = res.data
   })
+}
+
+function refresh() {
+  getApiKeyList()
 }
 
 defineExpose({ open })
