@@ -52,6 +52,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
                     .add_dataset_name(paragraph.get('dataset_name'))
                     .add_document_name(paragraph.get('document_name'))
                     .add_hit_handling_method(paragraph.get('hit_handling_method'))
+                    .add_directly_return_similarity(paragraph.get('directly_return_similarity'))
                     .build())
 
     @staticmethod
@@ -83,7 +84,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         hit_handling_method_paragraph = [paragraph for paragraph in paragraph_list if
                                          (paragraph.get(
                                              'hit_handling_method') == 'directly_return' and BaseSearchDatasetStep.get_similarity(
-                                             paragraph, embedding_list) > paragraph.get(
+                                             paragraph, embedding_list) >= paragraph.get(
                                              'directly_return_similarity'))]
         if len(hit_handling_method_paragraph) > 0:
             # 找到评分最高的
