@@ -101,7 +101,10 @@ class ApplicationApi(ApiMixin):
                     properties={
                         'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否激活",
                                                     description="是否激活"),
-
+                        'allow_cross_domain': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否允许跨域",
+                                                             description="是否允许跨域"),
+                        'cross_domain_list': openapi.Schema(type=openapi.TYPE_ARRAY, title='跨域列表',
+                                                            items=openapi.Schema(type=openapi.TYPE_STRING))
                     }
                 )
 

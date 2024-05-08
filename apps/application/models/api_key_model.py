@@ -22,6 +22,10 @@ class ApplicationApiKey(AppModelMixin):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE, verbose_name="应用id")
     is_active = models.BooleanField(default=True, verbose_name="是否开启")
+    allow_cross_domain = models.BooleanField(default=False, verbose_name="是否允许跨域")
+    cross_domain_list = ArrayField(verbose_name="跨域列表",
+                                   base_field=models.CharField(max_length=128, blank=True)
+                                   , default=list)
 
     class Meta:
         db_table = "application_api_key"
