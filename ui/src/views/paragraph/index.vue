@@ -195,13 +195,10 @@ function refreshMigrateParagraph() {
 }
 
 function openSelectDocumentDialog(row?: any) {
-  let arr: string[] = []
   if (row) {
-    arr.push(row.id)
-  } else {
-    arr = multipleSelection.value
+    multipleSelection.value = [row.id]
   }
-  SelectDocumentDialogRef.value.open(arr)
+  SelectDocumentDialogRef.value.open(multipleSelection.value)
 }
 function deleteMulParagraph() {
   MsgConfirm(
