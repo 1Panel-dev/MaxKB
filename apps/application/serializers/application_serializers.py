@@ -586,7 +586,7 @@ class ApplicationSerializer(serializers.Serializer):
                                                           error_messages=ErrMessage.boolean("是否允许跨域"))
 
             cross_domain_list = serializers.ListSerializer(required=False,
-                                                           child=serializers.UUIDField(required=True,
+                                                           child=serializers.CharField(required=True,
                                                                                        error_messages=ErrMessage.char(
                                                                                            "跨域列表")),
                                                            error_messages=ErrMessage.char("跨域地址"))
