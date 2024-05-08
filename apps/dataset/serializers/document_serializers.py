@@ -50,7 +50,13 @@ class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
                                   code=500)
     ], error_messages=ErrMessage.char("命中处理方式"))
 
-    is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char(
+    directly_return_similarity = serializers.FloatField(required=False,
+                                                        max_value=2,
+                                                        min_value=0,
+                                                        error_messages=ErrMessage.float(
+                                                            "直接返回分数"))
+
+    is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean(
         "文档是否可用"))
 
     @staticmethod
@@ -371,7 +377,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             _document = QuerySet(Document).get(id=self.data.get("document_id"))
             if with_valid:
                 DocumentEditInstanceSerializer(data=instance).is_valid(document=_document)
-            update_keys = ['name', 'is_active', 'hit_handling_method', 'meta']
+            update_keys = ['name', 'is_active', 'hit_handling_method', 'directly_return_similarity', 'meta']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     _document.__setattr__(update_key, instance.get(update_key))
@@ -444,6 +450,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
                     'hit_handling_method': openapi.Schema(type=openapi.TYPE_STRING, title="命中处理方式",
                                                           description="ai优化:optimization,直接返回:directly_return"),
+                    'directly_return_similarity': openapi.Schema(type=openapi.TYPE_NUMBER, title="直接返回分数",
+                                                                 default=0.9),
                     'meta': openapi.Schema(type=openapi.TYPE_OBJECT, title="文档元数据",
                                            description="文档元数据->web:{source_url:xxx,selector:'xxx'},base:{}"),
                 }
@@ -731,7 +739,11 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             document_id_list = instance.get("id_list")
             hit_handling_method = instance.get('hit_handling_method')
-            QuerySet(Document).filter(id__in=document_id_list).update(hit_handling_method=hit_handling_method)
+            directly_return_similarity = instance.get('directly_return_similarity')
+            update_dict = {'hit_handling_method': hit_handling_method}
+            if directly_return_similarity is not None:
+                update_dict['directly_return_similarity'] = directly_return_similarity
+            QuerySet(Document).filter(id__in=document_id_list).update(**update_dict)
 
 
 class FileBufferHandle:

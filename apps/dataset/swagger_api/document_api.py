@@ -22,6 +22,7 @@ class DocumentApi(ApiMixin):
                                               title="主键id列表",
                                               description="主键id列表"),
                     'hit_handling_method': openapi.Schema(type=openapi.TYPE_STRING, title="命中处理方式",
-                                                          description="directly_return|optimization")
+                                                          description="directly_return|optimization"),
+                    'directly_return_similarity': openapi.Schema(type=openapi.TYPE_NUMBER, title="直接返回相似度")
                 }
             )

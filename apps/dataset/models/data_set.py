@@ -66,6 +66,7 @@ class Document(AppModelMixin):
     hit_handling_method = models.CharField(verbose_name='命中处理方式', max_length=20,
                                            choices=HitHandlingMethod.choices,
                                            default=HitHandlingMethod.optimization)
+    directly_return_similarity = models.FloatField(verbose_name='直接回答相似度', default=0.9)
 
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
