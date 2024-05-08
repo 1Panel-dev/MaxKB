@@ -37,7 +37,6 @@ from dataset.serializers.common_serializers import list_paragraph
 from embedding.models import SearchMode
 from setting.models import AuthOperate
 from setting.models.model_management import Model
-from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 
@@ -583,6 +582,15 @@ class ApplicationSerializer(serializers.Serializer):
         class Edit(serializers.Serializer):
             is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean("是否可用"))
 
+            allow_cross_domain = serializers.BooleanField(required=False,
+                                                          error_messages=ErrMessage.boolean("是否允许跨域"))
+
+            cross_domain_list = serializers.ListSerializer(required=False,
+                                                           child=serializers.CharField(required=True,
+                                                                                       error_messages=ErrMessage.char(
+                                                                                           "跨域列表")),
+                                                           error_messages=ErrMessage.char("跨域地址"))
+
         class Operate(serializers.Serializer):
             application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
 
@@ -599,15 +607,17 @@ class ApplicationSerializer(serializers.Serializer):
             def edit(self, instance, with_valid=True):
                 if with_valid:
                     self.is_valid(raise_exception=True)
-                    ApplicationSerializer.Edit(data=instance).is_valid(raise_exception=True)
-
+                    ApplicationSerializer.ApplicationKeySerializer.Edit(data=instance).is_valid(raise_exception=True)
+                api_key_id = self.data.get("api_key_id")
+                application_id = self.data.get('application_id')
+                application_api_key = QuerySet(ApplicationApiKey).filter(id=api_key_id,
+                                                                         application_id=application_id).first()
+                if application_api_key is None:
+                    raise AppApiException(500, '不存在')
                 if 'is_active' in instance and instance.get('is_active') is not None:
-                    api_key_id = self.data.get("api_key_id")
-                    application_id = self.data.get('application_id')
-                    application_api_key = QuerySet(ApplicationApiKey).filter(id=api_key_id,
-                                                                             application_id=application_id).first()
-                    if application_api_key is None:
-                        raise AppApiException(500, '不存在')
-
                     application_api_key.is_active = instance.get('is_active')
-                    application_api_key.save()
+                if 'allow_cross_domain' in instance and instance.get('allow_cross_domain') is not None:
+                    application_api_key.allow_cross_domain = instance.get('allow_cross_domain')
+                if 'cross_domain_list' in instance and instance.get('cross_domain_list') is not None:
+                    application_api_key.cross_domain_list = instance.get('cross_domain_list')
+                application_api_key.save()
