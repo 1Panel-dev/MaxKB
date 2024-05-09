@@ -85,10 +85,11 @@ def to_ts_vector(text: str):
     # 替换字符串
     text = replace_word(word_dict, text)
     # 分词
-    result = jieba.posseg.lcut(text, HMM=True, use_paddle=True)
+    filter_word = jieba.analyse.extract_tags(text, topK=100)
+    result = jieba.lcut(text, HMM=True, use_paddle=True)
     # 过滤标点符号
-    result = [item for item in result if not jieba_remove_flag_list.__contains__(item.flag)]
-    result_ = [{'word': get_key_by_word_dict(result[index].word, word_dict), 'index': index} for index in
+    result = [item for item in result if filter_word.__contains__(item) and len(item) < 10]
+    result_ = [{'word': get_key_by_word_dict(result[index], word_dict), 'index': index} for index in
                range(len(result))]
     result_group = group_by(result_, lambda r: r['word'])
     return " ".join(
