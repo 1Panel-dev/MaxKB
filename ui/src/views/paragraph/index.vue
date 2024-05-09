@@ -140,7 +140,7 @@
       </el-scrollbar>
 
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
-        <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog">
+        <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog()">
           迁移
         </el-button>
 
