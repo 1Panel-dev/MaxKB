@@ -75,7 +75,9 @@ const submit = async (formEl: FormInstance | undefined) => {
       const obj = {
         allow_cross_domain: form.value.allow_cross_domain,
         cross_domain_list: form.value.cross_domain_list
-          ? form.value.cross_domain_list.split('\n')
+          ? form.value.cross_domain_list.split('\n').filter(function (item: string) {
+              return item !== ''
+            })
           : []
       }
       overviewApi.putAPIKey(id as string, APIKeyId.value, obj, loading).then((res) => {
