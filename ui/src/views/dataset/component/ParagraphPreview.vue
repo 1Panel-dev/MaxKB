@@ -8,14 +8,13 @@
             <span class="ml-4">{{ item?.name }}</span>
           </div>
         </template>
-        <el-scrollbar>
+        <el-scrollbar ref="scrollRef" :key="index">
           <div class="mb-16">
             <el-text type="info">{{ item.content.length }} 段落</el-text>
           </div>
-
-          <div class="paragraph-list">
+          <div class="paragraph-list" v-infinite-scroll="loadScroll">
             <el-card
-              v-for="(child, cIndex) in item.content"
+              v-for="(child, cIndex) in scrollData"
               :key="cIndex"
               shadow="never"
               class="card-never mb-16"
@@ -52,7 +51,7 @@
   />
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { TabsPaneContext } from 'element-plus'
 import EditParagraphDialog from './EditParagraphDialog.vue'
@@ -70,6 +69,7 @@ const props = defineProps({
 const emit = defineEmits(['update:data'])
 
 const EditParagraphDialogRef = ref()
+const scrollRef = ref()
 
 const activeName = ref(0)
 const currentPIndex = ref(null) as any
@@ -77,15 +77,40 @@ const currentCIndex = ref(null) as any
 
 const newData = ref<any[]>([])
 
+// 滚动加载数据
+const paginationConfig = reactive({
+  current_page: 1,
+  page_size: 20
+})
+
+const scrollData = ref<any[]>([])
+
 watch(
   () => props.data,
   (value) => {
     newData.value = value
+    paginationConfig.current_page = 1
+    nextTick(() => {
+      scrollRef.value?.[activeName.value]?.scrollTo(0, 0)
+    })
+    scrollData.value = newData.value[activeName.value]?.content.slice(0, paginationConfig.page_size)
   },
   {
     immediate: true
   }
 )
+
+function loadScroll() {
+  if (newData.value[activeName.value]?.content.length > scrollData.value.length) {
+    paginationConfig.current_page += 1
+    scrollData.value.push(
+      ...newData.value[activeName.value].content.slice(
+        (paginationConfig.current_page - 1) * paginationConfig.page_size,
+        paginationConfig.current_page * paginationConfig.page_size
+      )
+    )
+  }
+}
 
 function editHandle(item: any, index: number, cIndex: number) {
   currentPIndex.value = index
@@ -100,6 +125,7 @@ function deleteHandle(item: any, index: number, cIndex: number) {
   })
     .then(() => {
       newData.value[index].content.splice(cIndex, 1)
+      scrollData.value.splice(cIndex, 1)
       emit('update:data', newData.value)
     })
     .catch(() => {})
@@ -107,10 +133,14 @@ function deleteHandle(item: any, index: number, cIndex: number) {
 
 function updateContent(data: any) {
   newData.value[currentPIndex.value].content[currentCIndex.value] = cloneDeep(data)
+  scrollData.value[currentCIndex.value] = cloneDeep(data)
   emit('update:data', newData.value)
 }
 
-const handleClick = (tab: TabsPaneContext, event: Event) => {}
+const handleClick = (tab: TabsPaneContext, event: Event) => {
+  paginationConfig.current_page = 1
+  scrollData.value = newData.value[Number(tab.index)]?.content.slice(0, paginationConfig.page_size)
+}
 
 onMounted(() => {})
 </script>
