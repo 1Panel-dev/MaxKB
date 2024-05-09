@@ -1,6 +1,6 @@
 <template>
   <el-tabs v-model="activeName" class="paragraph-tabs">
-    <template v-for="(item, index) in newData" :key="index">
+    <template v-for="(item, index) in data" :key="index">
       <el-tab-pane :label="item.name" :name="index">
         <template #label>
           <div class="flex-center">
@@ -21,11 +21,11 @@
   </el-tabs>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref } from 'vue'
 import { getImgUrl } from '@/utils/utils'
 import ParagraphList from './ParagraphList.vue'
 
-const props = defineProps({
+defineProps({
   data: {
     type: Array<any>,
     default: () => []
@@ -33,23 +33,7 @@ const props = defineProps({
   isConnect: Boolean
 })
 
-const emit = defineEmits(['update:data'])
-
 const activeName = ref(0)
-
-const newData = ref<any[]>([])
-
-watch(
-  () => props.data,
-  (value) => {
-    newData.value = value
-  },
-  {
-    immediate: true
-  }
-)
-
-onMounted(() => {})
 </script>
 <style scoped lang="scss">
 .paragraph-tabs {
