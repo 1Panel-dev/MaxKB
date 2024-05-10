@@ -4,7 +4,7 @@
       :size="paragraph_list.length"
       :total="modelValue.length"
       :page_size="page_size"
-      v-bind:current_page="current_page"
+      v-model:current_page="current_page"
       @load="next()"
       :loading="loading"
     >

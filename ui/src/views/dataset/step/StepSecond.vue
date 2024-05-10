@@ -217,7 +217,7 @@ defineExpose({
   width: 100%;
 
   .left-height {
-    max-height: calc(var(--create-dataset-height) - 70px);
+    max-height: calc(var(--create-dataset-height) - 110px);
     overflow-x: hidden;
   }
 

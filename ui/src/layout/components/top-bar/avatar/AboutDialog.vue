@@ -32,7 +32,7 @@
         </div>
       </el-card>
     </div>
-    <div class="text-center">{{ $t("layout.topbar.version") }}:{{ version }}</div>
+    <div class="text-center">{{ $t("layout.topbar.avatar.version") }}:{{ version }}</div>
   </el-dialog>
 </template>
 <script setup lang="ts">
