@@ -56,7 +56,7 @@ const disabledScroll = computed(() => props.size > 0 && (props.loading || noMore
 function loadDataset() {
   if (props.total > props.page_size) {
     current.value += 1
-    emit('update:current_page', current)
+    emit('update:current_page', current.value)
     emit('load')
   }
 }
