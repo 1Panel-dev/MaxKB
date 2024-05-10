@@ -48,11 +48,12 @@
             <el-radio :value="key">{{ value }} </el-radio>
           </template>
         </el-radio-group>
-        <div
-          v-if="form.hit_handling_method === 'directly_return'"
-          class="lighter"
-          style="margin-left: 21px"
-        >
+      </el-form-item>
+      <el-form-item
+        prop="directly_return_similarity"
+        v-if="!isImport && form.hit_handling_method === 'directly_return'"
+      >
+        <div class="lighter w-full" style="margin-top: -20px">
           <span>相似度高于</span>
           <el-input-number
             v-model="form.directly_return_similarity"
@@ -107,7 +108,8 @@ const documentType = ref<string | number>('') //文档类型：1: web文档；0:
 const documentList = ref<Array<string>>([])
 
 const rules = reactive({
-  source_url: [{ required: true, message: '请输入文档地址', trigger: 'blur' }]
+  source_url: [{ required: true, message: '请输入文档地址', trigger: 'blur' }],
+  directly_return_similarity: [{ required: true, message: '请输入相似度', trigger: 'blur' }]
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -164,7 +166,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (documentId.value) {
           const obj = {
             hit_handling_method: form.value.hit_handling_method,
-            directly_return_similarity: form.value.directly_return_similarity,
+            directly_return_similarity: form.value.directly_return_similarity || 0.9,
             meta: {
               source_url: form.value.source_url,
               selector: form.value.selector
