@@ -10,7 +10,6 @@ import os
 from typing import Dict
 
 from langchain.schema import HumanMessage
-from langchain_community.chat_models.azure_openai import AzureChatOpenAI
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -22,7 +21,7 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
 from setting.models_provider.impl.azure_model_provider.model.azure_chat_model import AzureChatModel
 from smartdoc.conf import PROJECT_DIR
 
-
+"""
 class AzureLLMModelCredential(BaseForm, BaseModelCredential):
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], raise_exception=False):
@@ -52,11 +51,12 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
-    api_base = forms.TextInputField('API 域名', required=True)
+    api_base = forms.TextInputField('API 版本 (api_version)', required=True)
 
-    api_key = forms.PasswordInputField("API Key", required=True)
+    api_key = forms.PasswordInputField("API Key（API 密钥）", required=True)
 
-    deployment_name = forms.TextInputField("部署名", required=True)
+    deployment_name = forms.TextInputField("部署名（deployment_name）", required=True)
+"""
 
 
 class DefaultAzureLLMModelCredential(BaseForm, BaseModelCredential):
@@ -88,28 +88,23 @@ class DefaultAzureLLMModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
-    api_version = forms.TextInputField("api_version", required=True)
+    api_version = forms.TextInputField("API 版本 (api_version)", required=True)
 
-    api_base = forms.TextInputField('API 域名', required=True)
+    api_base = forms.TextInputField('API 域名 (azure_endpoint)', required=True)
 
-    api_key = forms.PasswordInputField("API Key", required=True)
+    api_key = forms.PasswordInputField("API Key (api_key)", required=True)
 
-    deployment_name = forms.TextInputField("部署名", required=True)
+    deployment_name = forms.TextInputField("部署名 (deployment_name)", required=True)
 
 
-azure_llm_model_credential = AzureLLMModelCredential()
+# azure_llm_model_credential: AzureLLMModelCredential = AzureLLMModelCredential()
 
 base_azure_llm_model_credential = DefaultAzureLLMModelCredential()
 
 model_dict = {
-    'gpt-3.5-turbo-0613': ModelInfo('gpt-3.5-turbo-0613', '', ModelTypeConst.LLM, azure_llm_model_credential,
-                                    api_version='2023-07-01-preview'),
-    'gpt-3.5-turbo-0301': ModelInfo('gpt-3.5-turbo-0301', '', ModelTypeConst.LLM, azure_llm_model_credential,
-                                    api_version='2023-07-01-preview'),
-    'gpt-3.5-turbo-16k-0613': ModelInfo('gpt-3.5-turbo-16k-0613', '', ModelTypeConst.LLM, azure_llm_model_credential,
-                                        api_version='2023-07-01-preview'),
-    'gpt-4-0613': ModelInfo('gpt-4-0613', '', ModelTypeConst.LLM, azure_llm_model_credential,
-                            api_version='2023-07-01-preview'),
+    'deployment_name': ModelInfo('Azure OpenAI', '具体的基础模型由部署名决定', ModelTypeConst.LLM,
+                                 base_azure_llm_model_credential, api_version='2024-02-15-preview'
+                                 )
 }
 
 
@@ -118,12 +113,11 @@ class AzureModelProvider(IModelProvider):
     def get_dialogue_number(self):
         return 3
 
-    def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> AzureChatOpenAI:
+    def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> AzureChatModel:
         model_info: ModelInfo = model_dict.get(model_name)
         azure_chat_open_ai = AzureChatModel(
             azure_endpoint=model_credential.get('api_base'),
-            openai_api_version=model_info.api_version if model_name in model_dict else model_credential.get(
-                'api_version'),
+            openai_api_version=model_credential.get('api_version', '2024-02-15-preview'),
             deployment_name=model_credential.get('deployment_name'),
             openai_api_key=model_credential.get('api_key'),
             openai_api_type="azure"
