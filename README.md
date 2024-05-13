@@ -36,7 +36,6 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
 -   技术交流群     
       <image height="150px" width="150px" src="https://github.com/1Panel-dev/MaxKB/assets/52996290/a4f6303d-9667-4be0-bc2d-0110af782f67"/>
 
-
 ## UI 展示
 
 <table style="border-collapse: collapse; border: 1px solid black;">
@@ -62,13 +61,14 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data 1pa
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/MaxKB&type=Date)](https://star-history.com/#1Panel-dev/MaxKB&Date)
 
-## 我们的其他开源产品
+## 我们的其他明星开源项目
 
-- [JumpServer](https://github.com/jumpserver/jumpserver/) - 广受欢迎的开源堡垒机
-- [DataEase](https://github.com/dataease/dataease/) - 人人可用的开源数据可视化分析工具
-- [MeterSphere](https://github.com/metersphere/metersphere/) - 一站式开源自动化测试平台
 - [1Panel](https://github.com/1panel-dev/1panel/) - 现代化、开源的 Linux 服务器运维管理面板
 - [Halo](https://github.com/halo-dev/halo/) - 强大易用的开源建站工具
+- [JumpServer](https://github.com/jumpserver/jumpserver/) - 广受欢迎的开源堡垒机
+- [DataEase](https://github.com/dataease/dataease/) - 人人可用的开源数据可视化分析工具
+- [MeterSphere](https://github.com/metersphere/metersphere/) - 现代化、开源的测试管理及接口测试工具
+
 
 ## License
 
