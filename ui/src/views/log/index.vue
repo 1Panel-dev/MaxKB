@@ -264,7 +264,10 @@ const preChatRecord = () => {
   }
 }
 
-function rowClickHandle(row: any) {
+function rowClickHandle(row: any, column?: any) {
+  if (column && column.type === 'selection') {
+    return
+  }
   currentChatId.value = row.id
   currentAbstract.value = row.abstract
   ChatRecordRef.value.open()
