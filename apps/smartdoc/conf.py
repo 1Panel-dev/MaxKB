@@ -89,7 +89,7 @@ class Config(dict):
         "EMAIL_HOST_USER": "",
         "EMAIL_HOST_PASSWORD": "",
         # 向量模型
-        "EMBEDDING_MODEL_NAME": "shibing624/text2vec-base-chinese",
+        "EMBEDDING_MODEL_NAME": "shibing624/text-embedding-ada-002",
         "EMBEDDING_DEVICE": "cpu",
         "EMBEDDING_MODEL_PATH": os.path.join(PROJECT_DIR, 'models'),
         # 向量库配置
