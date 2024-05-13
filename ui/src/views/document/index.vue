@@ -216,7 +216,7 @@
       <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
       <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
       <!-- 选择知识库 -->
-      <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refresh" />
+      <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
     </div>
   </LayoutContainer>
 </template>
@@ -418,6 +418,7 @@ function deleteMulDocument() {
   })
   documentApi.delMulDocument(id, arr, loading).then(() => {
     MsgSuccess('批量删除成功')
+    multipleTableRef.value?.clearSelection()
     getList()
   })
 }
@@ -499,6 +500,11 @@ function getDetail() {
   dataset.asyncGetDatasetDetail(id, loading).then((res: any) => {
     datasetDetail.value = res.data
   })
+}
+
+function refreshMigrate() {
+  multipleTableRef.value?.clearSelection()
+  getList()
 }
 
 function refresh() {
