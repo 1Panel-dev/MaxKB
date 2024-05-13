@@ -296,7 +296,10 @@ const preChatRecord = () => {
   }
 }
 
-function rowClickHandle(row: any) {
+function rowClickHandle(row: any, column?: any) {
+  if (column && column.type === 'selection') {
+    return
+  }
   if (row.paragraph_count) {
     currentClickId.value = row.id
     currentContent.value = row.content

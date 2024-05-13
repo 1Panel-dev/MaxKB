@@ -371,7 +371,11 @@ function refreshDocument(row: any) {
   }
 }
 
-function rowClickHandle(row: any) {
+function rowClickHandle(row: any, column: any) {
+  if (column && column.type === 'selection') {
+    return
+  }
+
   router.push({ path: `/dataset/${id}/${row.id}` })
 }
 
