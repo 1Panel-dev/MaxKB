@@ -195,6 +195,7 @@ function deleteMulDocument() {
   })
   problemApi.delMulProblem(id, arr, loading).then(() => {
     MsgSuccess('批量删除成功')
+    multipleTableRef.value?.clearSelection()
     getList()
   })
 }
