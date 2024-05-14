@@ -29,7 +29,6 @@ const useParagraphStore = defineStore({
       datasetId: string,
       documentId: string,
       paragraphId: string,
-      data: any,
       loading?: Ref<boolean>
     ) {
       return new Promise((resolve, reject) => {

@@ -9,6 +9,7 @@ import useModelStore from './modules/model'
 import useApplicationStore from './modules/application'
 import useDocumentStore from './modules/document'
 import useProblemStore from './modules/problem'
+import useLogStore from './modules/log'
 
 const useStore = () => ({
   common: useCommonStore(),
@@ -18,7 +19,8 @@ const useStore = () => ({
   model: useModelStore(),
   application: useApplicationStore(),
   document: useDocumentStore(),
-  problem: useProblemStore()
+  problem: useProblemStore(),
+  log: useLogStore()
 })
 
 export default useStore

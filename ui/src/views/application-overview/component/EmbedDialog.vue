@@ -69,8 +69,7 @@ allow="microphone">
 </iframe>
 `
 
-  source2.value = `
-<script 
+  source2.value = `<script 
 async
 defer
 src="${window.location.origin}/api/application/embed?protocol=${window.location.protocol.replace(

@@ -128,6 +128,9 @@ h4 {
 .mt-16 {
   margin-top: calc(var(--app-base-px) * 2);
 }
+.mt-20 {
+  margin-top: calc(var(--app-base-px) * 2 + 4px);
+}
 
 .mb-4 {
   margin-bottom: calc(var(--app-base-px) - 4px);

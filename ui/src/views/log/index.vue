@@ -140,7 +140,7 @@ import logApi from '@/api/log'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import type { Dict } from '@/api/type/common'
-const { application } = useStore()
+const { application, log } = useStore()
 const route = useRoute()
 const {
   params: { id }
@@ -311,7 +311,7 @@ function getList() {
   if (search.value) {
     obj = { ...obj, abstract: search.value }
   }
-  return logApi.getChatLog(id as string, paginationConfig, obj, loading).then((res) => {
+  return log.asyncGetChatLog(id as string, paginationConfig, obj, loading).then((res: any) => {
     tableData.value = res.data.records
     if (currentChatId.value) {
       currentChatId.value = tableData.value[0]?.id

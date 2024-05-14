@@ -1,19 +1,17 @@
 <template>
   <div class="common-list">
-    <el-scrollbar>
-      <ul v-if="data.length > 0">
-        <template v-for="(item, index) in data" :key="index">
-          <li
-            @click.prevent="clickHandle(item, index)"
-            :class="current === index ? 'active' : ''"
-            class="cursor"
-          >
-            <slot :row="item" :index="index"> </slot>
-          </li>
-        </template>
-      </ul>
-      <el-empty description="暂无数据" v-else />
-    </el-scrollbar>
+    <ul v-if="data.length > 0">
+      <template v-for="(item, index) in data" :key="index">
+        <li
+          @click.prevent="clickHandle(item, index)"
+          :class="current === index ? 'active' : ''"
+          class="cursor"
+        >
+          <slot :row="item" :index="index"> </slot>
+        </li>
+      </template>
+    </ul>
+    <el-empty description="暂无数据" v-else />
   </div>
 </template>
 <script setup lang="ts">
