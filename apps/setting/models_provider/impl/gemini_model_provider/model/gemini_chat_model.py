@@ -1,20 +1,20 @@
-# coding=utf-8
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 """
-    @project: maxkb
-    @Author：虎
-    @file： azure_chat_model.py
-    @date：2024/4/28 11:45
-    @desc:
+@Project ：MaxKB 
+@File    ：gemini_chat_model.py
+@Author  ：Brian Yang
+@Date    ：5/13/24 7:40 AM 
 """
 from typing import List
 
 from langchain_core.messages import BaseMessage, get_buffer_string
-from langchain_openai import AzureChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
 
 
-class AzureChatModel(AzureChatOpenAI):
+class GeminiChatModel(ChatGoogleGenerativeAI):
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
         try:
             return super().get_num_tokens_from_messages(messages)
