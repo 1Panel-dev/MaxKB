@@ -70,7 +70,6 @@
       ref="createModelRef"
       @submit="list_model"
       @change="openCreateModel($event)"
-      :key="dialogState.createModelDialogKey"
     ></CreateModelDialog>
 
     <SelectProviderDialog
@@ -81,8 +80,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ElMessage } from 'element-plus'
-import { onMounted, ref, computed, reactive } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import ModelApi from '@/api/model'
 import type { Provider, Model } from '@/api/type/model'
 import AppIcon from '@/components/icons/AppIcon.vue'
@@ -129,7 +127,6 @@ const openCreateModel = (provider?: Provider) => {
     createModelRef.value?.open(provider)
   } else {
     selectProviderRef.value?.open()
-    refreshCreateModelDialogKey() // 更新key
   }
 }
 
@@ -138,16 +135,6 @@ const list_model = () => {
   ModelApi.getModel({ ...model_search_form.value, ...params }, list_model_loading).then((ok) => {
     model_list.value = ok.data
   })
-}
-
-// 添加一个响应式的state来存储dialog的key
-const dialogState = reactive({
-  createModelDialogKey: Date.now() // 初始值为当前的时间戳
-})
-
-// 更新dialogState.createModelDialogKey的函数
-const refreshCreateModelDialogKey = () => {
-  dialogState.createModelDialogKey = Date.now() // 更新为新的时间戳
 }
 
 onMounted(() => {
