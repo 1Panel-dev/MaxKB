@@ -35,7 +35,7 @@ class OllamaLLMModelCredential(BaseForm, BaseModelCredential):
             model_list = OllamaModelProvider.get_base_model_list(model_credential.get('api_base'))
         except Exception as e:
             raise AppApiException(ValidCode.valid_error.value, "API 域名无效")
-        exist = [model for model in model_list.get('models') if
+        exist = [model for model in (model_list.get('models') if model_list.get('models') is not None else []) if
                  model.get('model') == model_name or model.get('model').replace(":latest", "") == model_name]
         if len(exist) == 0:
             raise AppApiException(ValidCode.model_not_fount, "模型不存在,请先下载模型")
