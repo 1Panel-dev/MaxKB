@@ -1,45 +1,18 @@
 <template>
   <div class="chat" v-loading="loading">
     <div class="chat__header">
-      <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
-    </div>
-    <div class="flex">
-      <div class="chat__left">
-        <div class="p-24 pb-0">
-          <el-button class="add-button w-full primary">
-            <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
-          </el-button>
-          <p class="mt-20 mb-8">历史记录</p>
-        </div>
-        <div class="chat-list-height pt-0">
-          <el-scrollbar>
-            <div class="p-8 pt-0">
-              <common-list
-                :data="chatLogeData"
-                class="mt-8"
-                v-loading="loading"
-                @click="clickMemberHandle"
-              >
-                <template #default="{ row }">
-                  <auto-tooltip :content="row.abstract">
-                    {{ row.abstract }}
-                  </auto-tooltip>
-                </template>
-              </common-list>
-            </div>
-            <div class="gradient-divider lighter mt-8"><span>仅显示最近 20 条对话</span></div>
-          </el-scrollbar>
-        </div>
+      <div class="chat-width">
+        <h2 class="ml-24">{{ applicationDetail?.name }}</h2>
       </div>
-      <div class="chat__right w-full">
-        <AiChat
-          v-model:data="applicationDetail"
-          :available="applicationAvailable"
-          :appId="applicationDetail?.id"
-        ></AiChat>
-      </div>
-      <div class="chat__footer"></div>
     </div>
+    <div class="chat__main chat-width">
+      <AiChat
+        v-model:data="applicationDetail"
+        :available="applicationAvailable"
+        :appId="applicationDetail?.id"
+      ></AiChat>
+    </div>
+    <div class="chat__footer"></div>
   </div>
 </template>
 <script setup lang="ts">
@@ -74,7 +47,6 @@ function getProfile() {
     .getProfile(loading)
     .then((res) => {
       applicationDetail.value = res.data
-      getChatLog(applicationDetail.value.id)
     })
     .catch(() => {
       applicationAvailable.value = false
@@ -116,32 +88,19 @@ onMounted(() => {
     box-sizing: border-box;
     border-bottom: 1px solid var(--el-border-color);
   }
-  &__left {
-    padding-top: calc(var(--app-header-height) - 8px);
-
-    background: #ffffff;
-    width: 280px;
-    .add-button {
-      border: 1px solid var(--el-color-primary);
-    }
-    .chat-list-height {
-      height: calc(100vh - var(--app-header-height) - 160px);
-    }
-  }
-  &__right {
-    width: calc(100% - 280px);
+  &__main {
     padding-top: calc(var(--app-header-height) + 24px);
-    height: calc(100vh - var(--app-header-height) - 30px);
+    height: calc(100vh - var(--app-header-height) - 24px);
     overflow: hidden;
-    position: relative;
   }
+
   &__footer {
     background: #f3f7f9;
     height: 80px;
     position: absolute;
     bottom: 0;
-    left: 280px;
-    width: calc(100% - 280px);
+    left: 0;
+    width: 100%;
     box-sizing: border-box;
     border-radius: 8px !important;
     &:before {
