@@ -134,7 +134,6 @@ import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
-import { QuestionFilled } from '@element-plus/icons-vue'
 
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
@@ -214,6 +213,7 @@ const list_base_model = (model_type: any) => {
 const close = () => {
   base_form_data.value = { name: '', model_type: '', model_name: '' }
   credential_form_data.value = {}
+  model_form_field.value = []
   dialogVisible.value = false
 }
 const submit = () => {
