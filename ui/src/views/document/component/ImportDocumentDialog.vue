@@ -143,6 +143,7 @@ const open = (row: any, list: Array<string>) => {
     documentList.value = list
   } else {
     // 导入
+    documentType.value = '1'
     isImport.value = true
   }
   dialogVisible.value = true
