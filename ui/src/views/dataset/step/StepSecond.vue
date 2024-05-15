@@ -136,10 +136,10 @@ function changeHandle(val: boolean) {
     const list = paragraphList.value
     list.map((item: any) => {
       item.content.map((v: any) => {
-        v['problem_list'] = v.title
+        v['problem_list'] = v.title.trim()
           ? [
               {
-                content: v.title
+                content: v.title.trim()
               }
             ]
           : []
@@ -173,17 +173,17 @@ function splitDocument() {
       if (checkedConnect.value) {
         list.map((item: any) => {
           item.content.map((v: any) => {
-            v['problem_list'] = v.title
+            v['problem_list'] = v.title.trim()
               ? [
                   {
-                    content: v.title
+                    content: v.title.trim()
                   }
                 ]
               : []
           })
         })
       }
-      paragraphList.value = res.data
+      paragraphList.value = list
       loading.value = false
     })
     .catch(() => {

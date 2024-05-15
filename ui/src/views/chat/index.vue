@@ -135,6 +135,7 @@ onMounted(() => {
     overflow: hidden;
     position: relative;
   }
+
   &__footer {
     background: #f3f7f9;
     height: 80px;

@@ -21,7 +21,11 @@
           type="textarea"
         />
       </el-form-item>
-      <el-form-item v-else-if="documentType === '1'" label="文档地址" prop="source_url">
+      <el-form-item
+        v-else-if="!isImport && documentType === '1'"
+        label="文档地址"
+        prop="source_url"
+      >
         <el-input v-model="form.source_url" placeholder="请输入文档地址" />
       </el-form-item>
       <el-form-item label="选择器" v-if="documentType === '1'">
@@ -124,6 +128,7 @@ watch(dialogVisible, (bool) => {
     }
     isImport.value = false
     documentType.value = ''
+    documentId.value = ''
     documentList.value = []
   }
 })
@@ -142,7 +147,8 @@ const open = (row: any, list: Array<string>) => {
     // 批量设置
     documentList.value = list
   } else {
-    // 导入
+    // 导入 只有web文档类型
+    documentType.value = '1'
     isImport.value = true
   }
   dialogVisible.value = true
@@ -181,7 +187,7 @@ const submit = async (formEl: FormInstance | undefined) => {
           // 批量设置
           const obj = {
             hit_handling_method: form.value.hit_handling_method,
-            directly_return_similarity: form.value.directly_return_similarity,
+            directly_return_similarity: form.value.directly_return_similarity || 0.9,
             id_list: documentList.value
           }
           documentApi.batchEditHitHandling(id, obj, loading).then((res: any) => {

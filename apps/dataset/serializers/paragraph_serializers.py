@@ -15,7 +15,7 @@ from drf_yasg import openapi
 from rest_framework import serializers
 
 from common.db.search import page_search
-from common.event.listener_manage import ListenerManagement, UpdateEmbeddingDocumentIdArgs, UpdateEmbeddingDatasetIdArgs
+from common.event.listener_manage import ListenerManagement, UpdateEmbeddingDocumentIdArgs
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
@@ -284,6 +284,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             paragraph_id_list = instance.get("id_list")
             QuerySet(Paragraph).filter(id__in=paragraph_id_list).delete()
             QuerySet(ProblemParagraphMapping).filter(paragraph_id__in=paragraph_id_list).delete()
+            update_document_char_length(self.data.get('document_id'))
             # 删除向量库
             ListenerManagement.delete_embedding_by_paragraph_ids(paragraph_id_list)
             return True
@@ -370,6 +371,8 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                     target_document_id, target_dataset_id))
                 # 修改段落信息
                 paragraph_list.update(dataset_id=target_dataset_id, document_id=target_document_id)
+            update_document_char_length(document_id)
+            update_document_char_length(target_document_id)
 
         @staticmethod
         def update_problem_paragraph_mapping(target_document_id: str, problem_paragraph_mapping):
@@ -527,6 +530,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             paragraph_id = self.data.get('paragraph_id')
             QuerySet(Paragraph).filter(id=paragraph_id).delete()
             QuerySet(ProblemParagraphMapping).filter(paragraph_id=paragraph_id).delete()
+            update_document_char_length(self.data.get('document_id'))
             ListenerManagement.delete_embedding_by_paragraph_signal.send(paragraph_id)
 
         @staticmethod

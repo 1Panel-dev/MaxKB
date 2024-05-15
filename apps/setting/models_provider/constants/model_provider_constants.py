@@ -17,6 +17,7 @@ from setting.models_provider.impl.kimi_model_provider.kimi_model_provider import
 from setting.models_provider.impl.xf_model_provider.xf_model_provider import XunFeiModelProvider
 from setting.models_provider.impl.zhipu_model_provider.zhipu_model_provider import ZhiPuModelProvider
 from setting.models_provider.impl.deepseek_model_provider.deepseek_model_provider import DeepSeekModelProvider
+from setting.models_provider.impl.gemini_model_provider.gemini_model_provider import GeminiModelProvider
 
 
 class ModelProvideConstants(Enum):
@@ -29,3 +30,4 @@ class ModelProvideConstants(Enum):
     model_zhipu_provider = ZhiPuModelProvider()
     model_xf_provider = XunFeiModelProvider()
     model_deepseek_provider = DeepSeekModelProvider()
+    model_gemini_provider = GeminiModelProvider()
