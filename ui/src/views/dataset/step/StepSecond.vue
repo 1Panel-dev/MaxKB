@@ -183,7 +183,7 @@ function splitDocument() {
           })
         })
       }
-      paragraphList.value = res.data
+      paragraphList.value = list
       loading.value = false
     })
     .catch(() => {
