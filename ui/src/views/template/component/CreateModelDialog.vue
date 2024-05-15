@@ -214,6 +214,7 @@ const close = () => {
   base_form_data.value = { name: '', model_type: '', model_name: '' }
   credential_form_data.value = {}
   model_form_field.value = []
+  base_model_list.value = []
   dialogVisible.value = false
 }
 const submit = () => {
