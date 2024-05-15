@@ -95,9 +95,9 @@ function delProblemHandle(item: any, index: number) {
   detail.value.problem_list.splice(index, 1)
 }
 function addProblemHandle() {
-  if (problemValue.value) {
+  if (problemValue.value.trim()) {
     detail.value?.problem_list?.push({
-      content: problemValue.value
+      content: problemValue.value.trim()
     })
     problemValue.value = ''
     isAddProblem.value = false
