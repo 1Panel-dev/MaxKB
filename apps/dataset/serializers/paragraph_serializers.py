@@ -372,6 +372,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 # 修改段落信息
                 paragraph_list.update(dataset_id=target_dataset_id, document_id=target_document_id)
             update_document_char_length(document_id)
+            update_document_char_length(target_document_id)
 
         @staticmethod
         def update_problem_paragraph_mapping(target_document_id: str, problem_paragraph_mapping):
