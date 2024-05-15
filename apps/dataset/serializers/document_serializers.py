@@ -549,9 +549,25 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     problem_paragraph_mapping_list.append(problem_paragraph_mapping)
                 paragraph_model_list.append(paragraph)
 
+            problem_model_list, problem_paragraph_mapping_list = DocumentSerializers.Create.reset_problem_model(
+                problem_model_list, problem_paragraph_mapping_list)
+
             return {'document': document_model, 'paragraph_model_list': paragraph_model_list,
                     'problem_model_list': problem_model_list,
                     'problem_paragraph_mapping_list': problem_paragraph_mapping_list}
+
+        @staticmethod
+        def reset_problem_model(problem_model_list, problem_paragraph_mapping_list):
+            new_problem_model_list = [x for i, x in enumerate(problem_model_list) if
+                                      len([item for item in problem_model_list[:i] if item.content == x.content]) <= 0]
+
+            for new_problem_model in new_problem_model_list:
+                old_model_list = [problem.id for problem in problem_model_list if
+                                  problem.content == new_problem_model.content]
+                for problem_paragraph_mapping in problem_paragraph_mapping_list:
+                    if old_model_list.__contains__(problem_paragraph_mapping.problem_id):
+                        problem_paragraph_mapping.problem_id = new_problem_model.id
+            return new_problem_model_list, problem_paragraph_mapping_list
 
         @staticmethod
         def get_document_paragraph_model(dataset_id, instance: Dict):

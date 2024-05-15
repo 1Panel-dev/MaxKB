@@ -316,7 +316,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                     problem_model_list.append(problem)
                 for problem_paragraph_mapping in document_paragraph_dict_model.get('problem_paragraph_mapping_list'):
                     problem_paragraph_mapping_list.append(problem_paragraph_mapping)
-
+            problem_model_list, problem_paragraph_mapping_list = DocumentSerializers.Create.reset_problem_model(
+                problem_model_list, problem_paragraph_mapping_list)
             # 插入知识库
             dataset.save()
             # 插入文档
