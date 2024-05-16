@@ -243,11 +243,11 @@ const { common, dataset, document } = useStore()
 
 const storeKey = 'documents'
 
-onBeforeRouteUpdate((to: any, from: any) => {
+onBeforeRouteUpdate(() => {
   common.savePage(storeKey, null)
   common.saveCondition(storeKey, null)
 })
-onBeforeRouteLeave((to: any, from: any) => {
+onBeforeRouteLeave((to: any) => {
   if (to.name !== 'Paragraph') {
     common.savePage(storeKey, null)
     common.saveCondition(storeKey, null)
@@ -351,7 +351,7 @@ function refreshDocument(row: any) {
         confirmButtonClass: 'danger'
       })
         .then(() => {
-          documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
+          documentApi.putDocumentRefresh(row.dataset_id, row.id).then(() => {
             getList()
           })
         })
@@ -365,7 +365,7 @@ function refreshDocument(row: any) {
         .catch(() => {})
     }
   } else {
-    documentApi.putDocumentRefresh(row.dataset_id, row.id).then((res) => {
+    documentApi.putDocumentRefresh(row.dataset_id, row.id).then(() => {
       getList()
     })
   }

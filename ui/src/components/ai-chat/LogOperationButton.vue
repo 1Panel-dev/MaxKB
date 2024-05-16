@@ -41,7 +41,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
+import { ref } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import EditContentDialog from '@/views/log/component/EditContentDialog.vue'
 import EditMarkDialog from '@/views/log/component/EditMarkDialog.vue'
@@ -65,7 +65,6 @@ const EditContentDialogRef = ref()
 const EditMarkDialogRef = ref()
 
 const buttonData = ref(props.data)
-const loading = ref(false)
 
 function editContent(data: any) {
   EditContentDialogRef.value.open(data)

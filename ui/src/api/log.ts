@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put, exportExcel } from '@/request/index'
+import { get, del, put, exportExcel } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import { type Ref } from 'vue'
 

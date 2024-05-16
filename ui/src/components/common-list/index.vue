@@ -15,7 +15,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch, useSlots } from 'vue'
+import { ref, watch } from 'vue'
 
 defineOptions({ name: 'CommonList' })
 
@@ -30,6 +30,8 @@ const props = withDefaults(
   }
 )
 
+const current = ref<Number | String>(0)
+
 watch(
   () => props.defaultActive,
   (val) => {
@@ -42,8 +44,6 @@ watch(
 
 const emit = defineEmits(['click'])
 
-const current = ref(0)
-
 function clickHandle(row: any, index: number) {
   current.value = index
   emit('click', row)
@@ -54,10 +54,12 @@ function clickHandle(row: any, index: number) {
 .common-list {
   li {
     padding: 10px 16px;
+    font-weight: 400;
     &.active {
       background: var(--el-color-primary-light-9);
       border-radius: 4px;
       color: var(--el-color-primary);
+      font-weight: 500;
     }
   }
 }

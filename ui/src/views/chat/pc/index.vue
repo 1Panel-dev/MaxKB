@@ -1,20 +1,26 @@
 <template>
-  <div class="chat" v-loading="loading">
-    <div class="chat__header">
+  <div class="chat-pc" v-loading="loading">
+    <div class="chat-pc__header">
       <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
     </div>
     <div class="flex">
-      <div class="chat__left">
+      <div class="chat-pc__left">
         <div class="p-24 pb-0">
-          <el-button class="add-button w-full primary">
+          <el-button class="add-button w-full primary" @click="newChat">
             <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
           </el-button>
           <p class="mt-20 mb-8">历史记录</p>
         </div>
-        <div class="chat-list-height pt-0">
+        <div class="left-height pt-0">
           <el-scrollbar>
             <div class="p-8 pt-0">
-              <common-list :data="chatLogeData" class="mt-8" v-loading="loading">
+              <common-list
+                :data="chatLogeData"
+                class="mt-8"
+                v-loading="loading"
+                :defaultActive="currentId"
+                @click="clickListHandle"
+              >
                 <template #default="{ row }">
                   <auto-tooltip :content="row.abstract">
                     {{ row.abstract }}
@@ -26,20 +32,22 @@
           </el-scrollbar>
         </div>
       </div>
-      <div class="chat__right w-full">
-        <AiChat
-          v-model:data="applicationDetail"
-          :available="applicationAvailable"
-          :appId="applicationDetail?.id"
-        ></AiChat>
+      <div class="chat-pc__right">
+        <div class="right-height">
+          <AiChat
+            v-model:data="applicationDetail"
+            :available="applicationAvailable"
+            :appId="applicationDetail?.id"
+            :record="currentRecordList"
+          ></AiChat>
+        </div>
       </div>
-      <div class="chat__footer"></div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { reactive, ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
 const route = useRoute()
@@ -47,7 +55,6 @@ const route = useRoute()
 const {
   params: { accessToken }
 } = route as any
-console.log(route)
 
 const { application, user, log } = useStore()
 
@@ -56,10 +63,20 @@ const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
 const chatLogeData = ref<any[]>([])
 
+const paginationConfig = reactive({
+  current_page: 1,
+  page_size: 20,
+  total: 0
+})
+
+const currentChatId = ref('')
+const currentRecordList = ref<any>([])
+const currentId = ref('0')
+
 function getAccessToken(token: string) {
   application
     .asyncAppAuthentication(token, loading)
-    .then((res) => {
+    .then(() => {
       getProfile()
     })
     .catch(() => {
@@ -78,6 +95,17 @@ function getProfile() {
     })
 }
 
+function newChat() {
+  paginationConfig.current_page = 1
+  currentRecordList.value = []
+
+  chatLogeData.value.unshift({
+    id: 'new',
+    abstract: '新的对话'
+  })
+  currentId.value = 'new'
+}
+
 function getChatLog(id: string) {
   const page = {
     current_page: 1,
@@ -92,13 +120,31 @@ function getChatLog(id: string) {
   })
 }
 
+function getChatRecord() {
+  log
+    .asyncChatRecordLog(applicationDetail.value.id, currentChatId.value, paginationConfig, loading)
+    .then((res: any) => {
+      paginationConfig.total = res.data.total
+      currentRecordList.value = [...currentRecordList.value, ...res.data.records]
+    })
+}
+const clickListHandle = (item: any) => {
+  paginationConfig.current_page = 1
+  currentRecordList.value = []
+  currentChatId.value = item.chat_id
+  currentId.value = item.id
+  if (currentChatId.value) {
+    getChatRecord()
+  }
+}
+
 onMounted(() => {
   user.changeUserType(2)
   getAccessToken(accessToken)
 })
 </script>
 <style lang="scss">
-.chat {
+.chat-pc {
   background-color: var(--app-layout-bg-color);
   overflow: hidden;
   &__header {
@@ -121,37 +167,21 @@ onMounted(() => {
     .add-button {
       border: 1px solid var(--el-color-primary);
     }
-    .chat-list-height {
-      height: calc(100vh - var(--app-header-height) - 160px);
+    .left-height {
+      height: calc(100vh - var(--app-header-height) - 135px);
     }
   }
   &__right {
     width: calc(100% - 280px);
     padding-top: calc(var(--app-header-height) + 24px);
-    height: calc(100vh - var(--app-header-height) - 30px);
+
     overflow: hidden;
     position: relative;
-  }
-
-  &__footer {
-    background: #f3f7f9;
-    height: 80px;
-    position: absolute;
-    bottom: 0;
-    left: 280px;
-    width: calc(100% - 280px);
-    box-sizing: border-box;
-    border-radius: 8px !important;
-    &:before {
-      background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
-      content: '';
-      position: absolute;
-      width: 100%;
-      top: -16px;
-      left: 0;
-      height: 16px;
+    .right-height {
+      height: calc(100vh - var(--app-header-height) - 24px);
     }
   }
+
   .gradient-divider {
     position: relative;
     text-align: center;
