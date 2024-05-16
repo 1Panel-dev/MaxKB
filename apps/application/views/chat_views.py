@@ -13,7 +13,8 @@ from rest_framework.views import APIView
 
 from application.serializers.chat_message_serializers import ChatMessageSerializer
 from application.serializers.chat_serializers import ChatSerializers, ChatRecordSerializer
-from application.swagger_api.chat_api import ChatApi, VoteApi, ChatRecordApi, ImproveApi, ChatRecordImproveApi
+from application.swagger_api.chat_api import ChatApi, VoteApi, ChatRecordApi, ImproveApi, ChatRecordImproveApi, \
+    ChatClientHistoryApi
 from common.auth import TokenAuth, has_permissions
 from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import Permission, Group, Operate, \
@@ -136,6 +137,28 @@ class ChatView(APIView):
                 ChatSerializers.Operate(
                     data={'application_id': application_id, 'user_id': request.user.id,
                           'chat_id': chat_id}).delete())
+
+    class ClientChatHistoryPage(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="分页获取客户端对话列表",
+                             operation_id="分页获取客户端对话列表",
+                             manual_parameters=result.get_page_request_params(
+                                 ChatClientHistoryApi.get_request_params_api()),
+                             responses=result.get_page_api_response(ChatApi.get_response_body_api()),
+                             tags=["应用/对话日志"]
+                             )
+        @has_permissions(
+            ViewPermission([RoleConstants.APPLICATION_ACCESS_TOKEN],
+                           [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                           dynamic_tag=keywords.get('application_id'))])
+        )
+        def get(self, request: Request, application_id: str, current_page: int, page_size: int):
+            return result.success(ChatSerializers.ClientChatHistory(
+                data={'client_id': request.auth.client_id, 'application_id': application_id}).page(
+                current_page=current_page,
+                page_size=page_size))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]

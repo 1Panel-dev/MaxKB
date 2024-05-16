@@ -56,6 +56,18 @@ class ChatSerializers(serializers.Serializer):
             QuerySet(Chat).filter(id=self.data.get('chat_id'), application_id=self.data.get('application_id')).delete()
             return True
 
+    class ClientChatHistory(serializers.Serializer):
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+        client_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("客户端id"))
+
+        def page(self, current_page: int, page_size: int, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            queryset = QuerySet(Chat).filter(client_id=self.data.get('client_id'),
+                                             application_id=self.data.get('application_id'))
+            queryset = queryset.order_by('-create_time')
+            return page_search(current_page, page_size, queryset, lambda row: ChatSerializerModel(row).data)
+
     class Query(serializers.Serializer):
         abstract = serializers.CharField(required=False, error_messages=ErrMessage.char("摘要"))
         history_day = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("历史天数"))
@@ -280,6 +292,12 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
         fields = ['id', 'chat_id', 'vote_status', 'problem_text', 'answer_text',
                   'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index',
                   'create_time', 'update_time']
+
+
+class ChatSerializerModel(serializers.ModelSerializer):
+    class Meta:
+        model = Chat
+        fields = ['id', 'application_id', 'abstract', 'client_id']
 
 
 class ChatRecordSerializer(serializers.Serializer):

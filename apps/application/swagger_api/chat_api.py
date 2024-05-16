@@ -12,6 +12,17 @@ from application.swagger_api.application_api import ApplicationApi
 from common.mixins.api_mixin import ApiMixin
 
 
+class ChatClientHistoryApi(ApiMixin):
+    @staticmethod
+    def get_request_params_api():
+        return [openapi.Parameter(name='application_id',
+                                  in_=openapi.IN_PATH,
+                                  type=openapi.TYPE_STRING,
+                                  required=True,
+                                  description='应用id')
+                ]
+
+
 class ChatApi(ApiMixin):
     @staticmethod
     def get_request_body_api():
@@ -80,7 +91,7 @@ class ChatApi(ApiMixin):
                           'problem_optimization'],
                 properties={
                     'id': openapi.Schema(type=openapi.TYPE_STRING, title="应用id",
-                                                     description="应用id,修改的时候传,创建的时候不传"),
+                                         description="应用id,修改的时候传,创建的时候不传"),
                     'model_id': openapi.Schema(type=openapi.TYPE_STRING, title="模型id", description="模型id"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
