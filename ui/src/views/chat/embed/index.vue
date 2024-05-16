@@ -16,8 +16,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { reactive, ref, watch, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
 const route = useRoute()
@@ -25,11 +25,12 @@ const {
   params: { accessToken }
 } = route as any
 
-const { application, user } = useStore()
+const { application, user, log } = useStore()
 
 const loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
+const chatLogeData = ref<any[]>([])
 
 function getAccessToken(token: string) {
   application
@@ -50,6 +51,20 @@ function getProfile() {
     .catch(() => {
       applicationAvailable.value = false
     })
+}
+
+function getChatLog(id: string) {
+  const page = {
+    current_page: 1,
+    page_size: 20
+  }
+  const param = {
+    history_day: 183
+  }
+
+  log.asyncGetChatLog(id, page, param, loading).then((res: any) => {
+    chatLogeData.value = res.data.records
+  })
 }
 
 onMounted(() => {
@@ -96,6 +111,29 @@ onMounted(() => {
       top: -16px;
       left: 0;
       height: 16px;
+    }
+  }
+  .gradient-divider {
+    position: relative;
+    text-align: center;
+    color: var(--el-color-info);
+    ::before {
+      content: '';
+      width: 17%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(222, 224, 227, 0) 0%, #dee0e3 100%);
+      position: absolute;
+      left: 16px;
+      top: 50%;
+    }
+    ::after {
+      content: '';
+      width: 17%;
+      height: 1px;
+      background: linear-gradient(90deg, #dee0e3 0%, rgba(222, 224, 227, 0) 100%);
+      position: absolute;
+      right: 16px;
+      top: 50%;
     }
   }
   .chat-width {
