@@ -50,12 +50,14 @@
         <div class="right-height">
           <!-- 对话 -->
           <AiChat
+            ref="AiChatRef"
             v-model:data="applicationDetail"
             :available="applicationAvailable"
             :appId="applicationDetail?.id"
             :record="currentRecordList"
             :chatId="currentChatId"
             @refresh="refresh"
+            @scroll="handleScroll"
           ></AiChat>
         </div>
       </div>
@@ -63,7 +65,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
@@ -80,6 +82,7 @@ const newObj = {
   abstract: '新建对话'
 }
 
+const AiChatRef = ref()
 const loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
@@ -94,6 +97,13 @@ const paginationConfig = reactive({
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
 const currentChatName = ref('新建对话')
+
+function handleScroll(event: any) {
+  if (event.scrollTop === 0 && paginationConfig.total > currentRecordList.value.length) {
+    paginationConfig.current_page += 1
+    getChatRecord()
+  }
+}
 
 function getAccessToken(token: string) {
   application
@@ -150,7 +160,13 @@ function getChatRecord() {
       list.map((v: any) => {
         v['write_ed'] = true
       })
-      currentRecordList.value = [...currentRecordList.value, ...list]
+      currentRecordList.value = [...list, ...currentRecordList.value]
+      if (paginationConfig.current_page === 1) {
+        nextTick(() => {
+          // 将滚动条滚动到最下面
+          AiChatRef.value.setScrollBottom()
+        })
+      }
     })
 }
 const clickListHandle = (item: any) => {
@@ -210,6 +226,7 @@ onMounted(() => {
     }
     .right-height {
       height: calc(100vh - var(--app-header-height) * 2 - 24px);
+      overflow: scroll;
     }
   }
 

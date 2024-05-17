@@ -213,7 +213,7 @@ const props = defineProps({
   } // 历史记录Id
 })
 
-const emit = defineEmits(['refresh'])
+const emit = defineEmits(['refresh', 'scroll'])
 
 const { application } = useStore()
 
@@ -564,6 +564,7 @@ const handleScrollTop = ($event: any) => {
   } else {
     scorll.value = false
   }
+  emit('scroll', $event)
 }
 
 const handleScroll = () => {
@@ -578,6 +579,11 @@ const handleScroll = () => {
   }
 }
 
+function setScrollBottom() {
+  // 将滚动条滚动到最下面
+  scrollDiv.value.setScrollTop(getMaxHeight())
+}
+
 watch(
   chatList,
   () => {
@@ -585,6 +591,10 @@ watch(
   },
   { deep: true, immediate: true }
 )
+
+defineExpose({
+  setScrollBottom
+})
 </script>
 <style lang="scss" scoped>
 .ai-chat {
