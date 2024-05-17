@@ -34,7 +34,7 @@ const applicationAvailable = ref<boolean>(true)
 function getAccessToken(token: string) {
   application
     .asyncAppAuthentication(token, loading)
-    .then((res) => {
+    .then(() => {
       getProfile()
     })
     .catch(() => {

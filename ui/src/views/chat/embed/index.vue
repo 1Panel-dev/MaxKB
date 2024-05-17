@@ -1,23 +1,23 @@
 <template>
-  <div class="chat" v-loading="loading">
-    <div class="chat__header">
+  <div class="chat-embed" v-loading="loading">
+    <div class="chat-embed__header">
       <div class="chat-width">
         <h2 class="ml-24">{{ applicationDetail?.name }}</h2>
       </div>
     </div>
-    <div class="chat__main chat-width">
+    <div class="chat-embed__main chat-width">
       <AiChat
         v-model:data="applicationDetail"
         :available="applicationAvailable"
         :appId="applicationDetail?.id"
       ></AiChat>
     </div>
-    <div class="chat__footer"></div>
+    <!-- <div class="chat__footer"></div> -->
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
 const route = useRoute()
@@ -35,7 +35,7 @@ const chatLogeData = ref<any[]>([])
 function getAccessToken(token: string) {
   application
     .asyncAppAuthentication(token, loading)
-    .then((res) => {
+    .then(() => {
       getProfile()
     })
     .catch(() => {
@@ -73,7 +73,7 @@ onMounted(() => {
 })
 </script>
 <style lang="scss">
-.chat {
+.chat-embed {
   background-color: var(--app-layout-bg-color);
   overflow: hidden;
   &__header {

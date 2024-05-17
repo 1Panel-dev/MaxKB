@@ -5,7 +5,7 @@ const settingRouter = {
   path: '/setting',
   name: 'setting',
   meta: { icon: 'Setting', title: '系统设置', permission: 'SETTING:READ' },
-  redirect: (to: any) => {
+  redirect: () => {
     if (hasPermission(new Role('ADMIN'), 'AND')) {
       return '/user'
     }

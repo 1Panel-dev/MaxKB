@@ -92,13 +92,6 @@ import useStore from '@/stores'
 
 const { application, document } = useStore()
 
-const props = defineProps({
-  chartId: {
-    type: String,
-    default: ''
-  }
-})
-
 const route = useRoute()
 const {
   params: { id }
@@ -147,7 +140,6 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-
 function changeDataset(id: string) {
   form.value.document_id = ''
   getDocument(id)
@@ -176,7 +168,7 @@ const open = (data: any) => {
 }
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  await formEl.validate((valid) => {
     if (valid) {
       const obj = {
         title: form.value.title,

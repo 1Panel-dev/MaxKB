@@ -56,7 +56,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
+import { ref } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
 const props = defineProps({
@@ -68,7 +68,7 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  chartId: {
+  chatId: {
     type: String,
     default: ''
   },
@@ -86,8 +86,8 @@ function regeneration() {
 
 function voteHandle(val: string) {
   applicationApi
-    .putChatVote(props.applicationId, props.chartId, props.data.record_id, val, loading)
-    .then((res) => {
+    .putChatVote(props.applicationId, props.chatId, props.data.record_id, val, loading)
+    .then(() => {
       buttonData.value['vote_status'] = val
       emit('update:data', buttonData.value)
     })

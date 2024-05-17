@@ -2,7 +2,7 @@
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
     <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
       <div ref="dialogScrollbar" class="ai-chat__content p-24">
-        <div class="item-content mb-16" v-if="!props.available || props.data?.prologue">
+        <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
               <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
@@ -132,7 +132,7 @@
                   <OperationButton
                     :data="item"
                     :applicationId="appId"
-                    :chartId="chartOpenId"
+                    :chatId="chartOpenId"
                     @regeneration="regenerationChart(item)"
                   />
                 </div>
@@ -187,7 +187,6 @@ import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
 import MdRenderer from '@/components/markdown-renderer/MdRenderer.vue'
 import { MdPreview } from 'md-editor-v3'
-import { MsgError } from '@/utils/message'
 import { debounce } from 'lodash'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
@@ -260,9 +259,7 @@ watch(
 watch(
   () => props.record,
   (value) => {
-    if (props.log) {
-      chatList.value = value
-    }
+    chatList.value = value
   },
   {
     immediate: true
@@ -446,7 +443,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
     })
   }
   if (!chartOpenId.value) {
-    getChartOpenId(chat).catch((e) => {
+    getChartOpenId(chat).catch(() => {
       errorWrite(chat)
     })
   } else {
@@ -464,7 +461,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
             .then(() => {
               chatMessage(chat)
             })
-            .catch((err) => {
+            .catch(() => {
               errorWrite(chat)
             })
         } else if (response.status === 460) {

@@ -92,7 +92,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { isAppIcon } from '@/utils/application'
@@ -121,7 +121,7 @@ function searchHandle() {
 }
 function getAccessToken(id: string) {
   application.asyncGetAccessToken(id, loading).then((res: any) => {
-    window.open(application.location + res?.data?.access_token)
+    window.open(application.location + res?.data?.access_token + '?mode=pc')
   })
 }
 
