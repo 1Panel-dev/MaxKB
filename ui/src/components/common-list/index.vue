@@ -11,7 +11,9 @@
         </li>
       </template>
     </ul>
-    <el-empty description="暂无数据" v-else />
+    <slot name="empty" v-else>
+      <el-empty description="暂无数据" />
+    </slot>
   </div>
 </template>
 <script setup lang="ts">

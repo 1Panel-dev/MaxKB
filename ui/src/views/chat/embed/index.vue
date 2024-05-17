@@ -1,8 +1,8 @@
 <template>
-  <div class="chat-embed" v-loading="loading">
+  <div class="chat-embed" v-loading="loading" @click="closePopover($event)">
     <div class="chat-embed__header">
       <div class="chat-width">
-        <h2 class="ml-24">{{ applicationDetail?.name }}</h2>
+        <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
       </div>
     </div>
     <div class="chat-embed__main chat-width">
@@ -10,13 +10,56 @@
         v-model:data="applicationDetail"
         :available="applicationAvailable"
         :appId="applicationDetail?.id"
+        :record="currentRecordList"
+        :chatId="currentChatId"
       ></AiChat>
     </div>
-    <!-- <div class="chat__footer"></div> -->
+
+    <el-button type="primary" link class="new-chat-button" @click="newChat">
+      <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
+    </el-button>
+    <!-- 历史记录弹出层 -->
+    <div @click.prevent.stop="show = !show" class="chat-popover-button cursor color-secondary">
+      <AppIcon iconName="app-history-outlined"></AppIcon>
+    </div>
+
+    <el-collapse-transition>
+      <div v-show="show" class="chat-popover w-full" id="chat-popover">
+        <div class="border-b p-16-24">
+          <span>历史记录</span>
+        </div>
+
+        <el-scrollbar>
+          <div class="p-8">
+            <common-list
+              :data="chatLogeData"
+              v-loading="loading"
+              :defaultActive="currentChatId"
+              @click="clickListHandle"
+            >
+              <template #default="{ row }">
+                <auto-tooltip :content="row.abstract">
+                  {{ row.abstract }}
+                </auto-tooltip>
+              </template>
+              <template #empty>
+                <div class="text-center">
+                  <el-text type="info">暂无历史记录</el-text>
+                </div>
+              </template>
+            </common-list>
+          </div>
+          <div v-if="chatLogeData.length" class="gradient-divider lighter mt-8">
+            <span>仅显示最近 20 条对话</span>
+          </div>
+        </el-scrollbar>
+      </div>
+    </el-collapse-transition>
+    <div class="chat-popover-mask" v-show="show"></div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
@@ -31,6 +74,31 @@ const loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
 const chatLogeData = ref<any[]>([])
+const show = ref(false)
+
+const paginationConfig = reactive({
+  current_page: 1,
+  page_size: 20,
+  total: 0
+})
+
+const currentRecordList = ref<any>([])
+const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
+
+function closePopover(event: any) {
+  const popover = document.getElementById('chat-popover')
+  if (popover) {
+    if (!popover.contains(event.target)) {
+      show.value = false
+    }
+  }
+}
+
+function newChat() {
+  paginationConfig.current_page = 1
+  currentRecordList.value = []
+  currentChatId.value = 'new'
+}
 
 function getAccessToken(token: string) {
   application
@@ -47,6 +115,7 @@ function getProfile() {
     .getProfile(loading)
     .then((res) => {
       applicationDetail.value = res.data
+      getChatLog(applicationDetail.value.id)
     })
     .catch(() => {
       applicationAvailable.value = false
@@ -62,6 +131,29 @@ function getChatLog(id: string) {
   log.asyncGetChatLogClient(id, page, loading).then((res: any) => {
     chatLogeData.value = res.data.records
   })
+}
+
+function getChatRecord() {
+  log
+    .asyncChatRecordLog(applicationDetail.value.id, currentChatId.value, paginationConfig, loading)
+    .then((res: any) => {
+      paginationConfig.total = res.data.total
+      const list = res.data.records
+      list.map((v: any) => {
+        v['write_ed'] = true
+      })
+      currentRecordList.value = [...currentRecordList.value, ...list]
+    })
+}
+
+const clickListHandle = (item: any) => {
+  paginationConfig.current_page = 1
+  currentRecordList.value = []
+  currentChatId.value = item.id
+  if (currentChatId.value !== 'new') {
+    getChatRecord()
+  }
+  show.value = false
 }
 
 onMounted(() => {
@@ -90,25 +182,37 @@ onMounted(() => {
     height: calc(100vh - var(--app-header-height) - 24px);
     overflow: hidden;
   }
-
-  &__footer {
-    background: #f3f7f9;
-    height: 80px;
+  .new-chat-button {
     position: absolute;
+    bottom: 84px;
+    left: 18px;
+    z-index: 11;
+  }
+  // 历史对话弹出层
+  .chat-popover {
+    position: absolute;
+    top: var(--app-header-height);
+    background: #ffffff;
+    padding-bottom: 24px;
+    z-index: 2009;
+  }
+  .chat-popover-button {
+    z-index: 2009;
+    position: absolute;
+    top: 16px;
+    right: 85px;
+    font-size: 22px;
+  }
+  .chat-popover-mask {
+    background-color: var(--el-overlay-color-lighter);
     bottom: 0;
+    height: 100%;
     left: 0;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 8px !important;
-    &:before {
-      background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
-      content: '';
-      position: absolute;
-      width: 100%;
-      top: -16px;
-      left: 0;
-      height: 16px;
-    }
+    overflow: auto;
+    position: fixed;
+    right: 0;
+    top: var(--app-header-height);
+    z-index: 2008;
   }
   .gradient-divider {
     position: relative;

@@ -26,9 +26,16 @@
                     {{ row.abstract }}
                   </auto-tooltip>
                 </template>
+                <template #empty>
+                  <div class="text-center">
+                    <el-text type="info">暂无历史记录</el-text>
+                  </div>
+                </template>
               </common-list>
             </div>
-            <div class="gradient-divider lighter mt-8"><span>仅显示最近 20 条对话</span></div>
+            <div v-if="chatLogeData.length" class="gradient-divider lighter mt-8">
+              <span>仅显示最近 20 条对话</span>
+            </div>
           </el-scrollbar>
         </div>
       </div>
@@ -41,6 +48,7 @@
           </span>
         </div>
         <div class="right-height">
+          <!-- 对话 -->
           <AiChat
             v-model:data="applicationDetail"
             :available="applicationAvailable"
