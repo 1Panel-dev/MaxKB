@@ -4,7 +4,7 @@
       <template v-for="(item, index) in data" :key="index">
         <li
           @click.prevent="clickHandle(item, index)"
-          :class="current === index ? 'active' : ''"
+          :class="current === item[props.valueKey] ? 'active' : ''"
           class="cursor"
         >
           <slot :row="item" :index="index"> </slot>
@@ -23,10 +23,12 @@ const props = withDefaults(
   defineProps<{
     data: Array<any>
     defaultActive?: string
+    valueKey?: string // 唯一标识的键名
   }>(),
   {
     data: () => [],
-    defaultActive: ''
+    defaultActive: '',
+    valueKey: 'id'
   }
 )
 
@@ -35,9 +37,7 @@ const current = ref<Number | String>(0)
 watch(
   () => props.defaultActive,
   (val) => {
-    if (val) {
-      current.value = props.data.findIndex((v) => v.id === val)
-    }
+    current.value = val
   },
   { immediate: true }
 )
@@ -45,7 +45,7 @@ watch(
 const emit = defineEmits(['click'])
 
 function clickHandle(row: any, index: number) {
-  current.value = index
+  current.value = row[props.valueKey]
   emit('click', row)
 }
 </script>

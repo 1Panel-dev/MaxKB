@@ -3,7 +3,13 @@
     <div class="template-manage flex main-calc-height">
       <div class="template-manage__left p-8 border-r">
         <h4 class="p-16" style="padding-bottom: 8px">供应商</h4>
-        <common-list :data="provider_list" v-loading="loading" @click="clickListHandle">
+        <common-list
+          :data="provider_list"
+          v-loading="loading"
+          @click="clickListHandle"
+          value-key="provider"
+          default-active=""
+        >
           <template #default="{ row, index }">
             <div class="flex" v-if="index === 0">
               <AppIcon

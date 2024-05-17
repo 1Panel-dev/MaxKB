@@ -141,7 +141,6 @@ const clickListHandle = (item: any) => {
 }
 
 function refresh(id: string) {
-  console.log(id)
   getChatLog(applicationDetail.value.id)
   currentChatId.value = id
 }
