@@ -4,7 +4,7 @@
       <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
     </div>
     <div class="flex">
-      <div class="chat-pc__left">
+      <div class="chat-pc__left border-r">
         <div class="p-24 pb-0">
           <el-button class="add-button w-full primary" @click="newChat">
             <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
@@ -33,6 +33,13 @@
         </div>
       </div>
       <div class="chat-pc__right">
+        <div class="right-header border-b mb-24 p-16-24 flex-between">
+          <h4>{{ currentChatName }}</h4>
+          <span v-if="currentRecordList.length" class="flex align-center">
+            <AppIcon iconName="app-chat-record" class="info mr-8" style="font-size: 16px"></AppIcon>
+            <span class="lighter"> {{ currentRecordList.length }} 条提问 </span>
+          </span>
+        </div>
         <div class="right-height">
           <AiChat
             v-model:data="applicationDetail"
@@ -60,6 +67,11 @@ const {
 
 const { application, user, log } = useStore()
 
+const newObj = {
+  id: 'new',
+  abstract: '新建对话'
+}
+
 const loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
@@ -73,6 +85,7 @@ const paginationConfig = reactive({
 
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
+const currentChatName = ref('新建对话')
 
 function getAccessToken(token: string) {
   application
@@ -100,16 +113,13 @@ function newChat() {
   if (!chatLogeData.value.some((v) => v.id === 'new')) {
     paginationConfig.current_page = 1
     currentRecordList.value = []
-
-    chatLogeData.value.unshift({
-      id: 'new',
-      abstract: '新的对话'
-    })
+    chatLogeData.value.unshift(newObj)
   } else {
     paginationConfig.current_page = 1
     currentRecordList.value = []
   }
   currentChatId.value = 'new'
+  currentChatName.value = '新建对话'
 }
 
 function getChatLog(id: string) {
@@ -139,6 +149,7 @@ const clickListHandle = (item: any) => {
   paginationConfig.current_page = 1
   currentRecordList.value = []
   currentChatId.value = item.id
+  currentChatName.value = item.abstract
   if (currentChatId.value !== 'new') {
     getChatRecord()
   }
@@ -172,7 +183,6 @@ onMounted(() => {
   }
   &__left {
     padding-top: calc(var(--app-header-height) - 8px);
-
     background: #ffffff;
     width: 280px;
     .add-button {
@@ -184,12 +194,14 @@ onMounted(() => {
   }
   &__right {
     width: calc(100% - 280px);
-    padding-top: calc(var(--app-header-height) + 24px);
-
+    padding-top: calc(var(--app-header-height));
     overflow: hidden;
     position: relative;
+    .right-header {
+      background: #ffffff;
+    }
     .right-height {
-      height: calc(100vh - var(--app-header-height) - 24px);
+      height: calc(100vh - var(--app-header-height) * 2 - 24px);
     }
   }
 

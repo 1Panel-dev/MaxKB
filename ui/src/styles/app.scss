@@ -184,6 +184,9 @@ h4 {
 .p-24 {
   padding: calc(var(--app-base-px) * 3);
 }
+.p-16-24 {
+  padding: calc(var(--app-base-px) * 2) calc(var(--app-base-px) * 3);
+}
 
 .pt-0 {
   padding-top: 0;
