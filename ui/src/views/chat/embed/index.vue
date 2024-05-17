@@ -58,11 +58,8 @@ function getChatLog(id: string) {
     current_page: 1,
     page_size: 20
   }
-  const param = {
-    history_day: 183
-  }
 
-  log.asyncGetChatLog(id, page, param, loading).then((res: any) => {
+  log.asyncGetChatLogClient(id, page, loading).then((res: any) => {
     chatLogeData.value = res.data.records
   })
 }

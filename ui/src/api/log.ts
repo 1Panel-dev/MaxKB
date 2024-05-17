@@ -173,6 +173,18 @@ const getRecordDetail: (
   )
 }
 
+const getChatLogClient: (
+  application_id: String,
+  page: pageRequest,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, page, loading) => {
+  return get(
+    `${prefix}/${application_id}/chat/client/${page.current_page}/${page.page_size}`,
+    null,
+    loading
+  )
+}
+
 export default {
   getChatLog,
   delChatLog,
@@ -181,5 +193,6 @@ export default {
   getMarkRecord,
   getRecordDetail,
   delMarkRecord,
-  exportChatLog
+  exportChatLog,
+  getChatLogClient
 }

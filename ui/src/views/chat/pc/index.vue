@@ -18,7 +18,7 @@
                 :data="chatLogeData"
                 class="mt-8"
                 v-loading="loading"
-                :defaultActive="currentId"
+                :defaultActive="currentChatId"
                 @click="clickListHandle"
               >
                 <template #default="{ row }">
@@ -39,6 +39,8 @@
             :available="applicationAvailable"
             :appId="applicationDetail?.id"
             :record="currentRecordList"
+            :chatId="currentChatId"
+            @refresh="refresh"
           ></AiChat>
         </div>
       </div>
@@ -69,9 +71,8 @@ const paginationConfig = reactive({
   total: 0
 })
 
-const currentChatId = ref('')
 const currentRecordList = ref<any>([])
-const currentId = ref('0')
+const currentChatId = ref('0') // 当前历史记录Id 默认为'0'
 
 function getAccessToken(token: string) {
   application
@@ -96,14 +97,19 @@ function getProfile() {
 }
 
 function newChat() {
-  paginationConfig.current_page = 1
-  currentRecordList.value = []
+  if (!chatLogeData.value.some((v) => v.id === 'new')) {
+    paginationConfig.current_page = 1
+    currentRecordList.value = []
 
-  chatLogeData.value.unshift({
-    id: 'new',
-    abstract: '新的对话'
-  })
-  currentId.value = 'new'
+    chatLogeData.value.unshift({
+      id: 'new',
+      abstract: '新的对话'
+    })
+  } else {
+    paginationConfig.current_page = 1
+    currentRecordList.value = []
+  }
+  currentChatId.value = 'new'
 }
 
 function getChatLog(id: string) {
@@ -111,11 +117,8 @@ function getChatLog(id: string) {
     current_page: 1,
     page_size: 20
   }
-  const param = {
-    history_day: 183
-  }
 
-  log.asyncGetChatLog(id, page, param, loading).then((res: any) => {
+  log.asyncGetChatLogClient(id, page, loading).then((res: any) => {
     chatLogeData.value = res.data.records
   })
 }
@@ -131,11 +134,16 @@ function getChatRecord() {
 const clickListHandle = (item: any) => {
   paginationConfig.current_page = 1
   currentRecordList.value = []
-  currentChatId.value = item.chat_id
-  currentId.value = item.id
-  if (currentChatId.value) {
+  currentChatId.value = item.id
+  if (currentChatId.value !== 'new') {
     getChatRecord()
   }
+}
+
+function refresh(id: string) {
+  console.log(id)
+  getChatLog(applicationDetail.value.id)
+  currentChatId.value = id
 }
 
 onMounted(() => {

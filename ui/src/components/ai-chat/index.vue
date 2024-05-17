@@ -73,9 +73,7 @@
 
               <el-card v-else shadow="always" class="dialog-card">
                 <MdRenderer :source="item.answer_text"></MdRenderer>
-                <div
-                  v-if="(id && item.write_ed) || (props.data?.show_source && item.write_ed) || log"
-                >
+                <div v-if="showSource(item)">
                   <el-divider> <el-text type="info">知识来源</el-text> </el-divider>
                   <div class="mb-8">
                     <el-space wrap>
@@ -208,8 +206,15 @@ const props = defineProps({
   available: {
     type: Boolean,
     default: true
-  }
+  },
+  chatId: {
+    type: String,
+    default: ''
+  } // 历史记录Id
 })
+
+const emit = defineEmits(['refresh'])
+
 const { application } = useStore()
 
 const ParagraphSourceDialogRef = ref()
@@ -249,6 +254,18 @@ const prologueList = computed(() => {
 })
 
 watch(
+  () => props.chatId,
+  (val) => {
+    if (val && val !== 'new') {
+      chartOpenId.value = val
+    } else {
+      chartOpenId.value = ''
+    }
+  },
+  { deep: true }
+)
+
+watch(
   () => props.data,
   () => {
     chartOpenId.value = ''
@@ -265,6 +282,18 @@ watch(
     immediate: true
   }
 )
+
+function showSource(row: any) {
+  if (props.log) {
+    return true
+  } else if (row.write_ed) {
+    if (id || props.data?.show_source) {
+      return true
+    }
+  } else {
+    return false
+  }
+}
 
 function openParagraph(row: any, id?: string) {
   ParagraphSourceDialogRef.value.open(row, id)
@@ -484,6 +513,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
         }
       })
       .then(() => {
+        if (props.chatId === 'new') {
+          emit('refresh', chartOpenId.value)
+        }
         return (id || props.data?.show_source) && getSourceDetail(chat)
       })
       .finally(() => {
