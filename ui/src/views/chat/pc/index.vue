@@ -72,7 +72,7 @@ const paginationConfig = reactive({
 })
 
 const currentRecordList = ref<any>([])
-const currentChatId = ref('0') // 当前历史记录Id 默认为'0'
+const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
 
 function getAccessToken(token: string) {
   application
@@ -128,7 +128,11 @@ function getChatRecord() {
     .asyncChatRecordLog(applicationDetail.value.id, currentChatId.value, paginationConfig, loading)
     .then((res: any) => {
       paginationConfig.total = res.data.total
-      currentRecordList.value = [...currentRecordList.value, ...res.data.records]
+      const list = res.data.records
+      list.map((v: any) => {
+        v['write_ed'] = true
+      })
+      currentRecordList.value = [...currentRecordList.value, ...list]
     })
 }
 const clickListHandle = (item: any) => {
