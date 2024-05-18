@@ -36,7 +36,7 @@
                   <el-radio value="blend" size="large">
                     <p class="mb-4">{{$t('views.application.applicationForm.dialogues.hybridSearch')}}</p>
                     <el-text type="info"
-                      >{{$t('views.application.applicationForm.dialogues.hybridSearcTooltip')}}</el-text
+                      >{{$t('views.application.applicationForm.dialogues.hybridSearchTooltip')}}</el-text
                     >
                   </el-radio>
                 </el-card>
