@@ -1,12 +1,12 @@
 import en from 'element-plus/es/locale/lang/en';
 import components from './components';
 import layout from './layout';
-import pages from './pages';
+import views from './views';
 
 export default {
     lang: 'English',
     layout,
-    pages,
+    views,
     components,
     en,
 };
