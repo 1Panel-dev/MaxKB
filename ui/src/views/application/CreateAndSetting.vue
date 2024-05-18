@@ -1,13 +1,13 @@
 <template>
   <LayoutContainer
-    :header="id ? '设置' : '创建应用'"
+    :header="id ? $t('views.application.applicationForm.title.edit'): $t('views.application.applicationForm.title.create')"
     :back-to="id ? '' : '-1'"
     class="create-application"
   >
     <el-row v-loading="loading">
       <el-col :span="10">
         <div class="p-24 mb-16" style="padding-bottom: 0">
-          <h4 class="title-decoration-1">应用信息</h4>
+          <h4 class="title-decoration-1">{{$t('views.application.applicationForm.title.info')}}</h4>
         </div>
         <div class="scrollbar-height-left">
           <el-scrollbar>
@@ -24,36 +24,36 @@
               <el-form-item prop="name">
                 <template #label>
                   <div class="flex-between">
-                    <span>应用名称 <span class="danger">*</span></span>
+                    <span>{{$t('views.application.applicationForm.form.appName.label')}} <span class="danger">*</span></span>
                   </div>
                 </template>
                 <el-input
                   v-model="applicationForm.name"
                   maxlength="64"
-                  placeholder="请输入应用名称"
+                  :placeholder="$t('views.application.applicationForm.form.appName.placeholder')"
                   show-word-limit
                 />
               </el-form-item>
-              <el-form-item label="应用描述">
+              <el-form-item :label="$t('views.application.applicationForm.form.appDescription.label')">
                 <el-input
                   v-model="applicationForm.desc"
                   type="textarea"
-                  placeholder="描述该应用的应用场景及用途，如：MaxKB 小助手回答用户提出的 MaxKB 产品使用问题"
+                  :placeholder="$t('views.application.applicationForm.form.appDescription.placeholder')"
                   :rows="3"
                   maxlength="256"
                   show-word-limit
                 />
               </el-form-item>
 
-              <el-form-item label="AI 模型" prop="model_id">
+              <el-form-item :label="$t('views.application.applicationForm.form.aiModel.label')" prop="model_id">
                 <template #label>
                   <div class="flex-between">
-                    <span>AI 模型 </span>
+                    <span>{{$t('views.application.applicationForm.form.aiModel.label')}}</span>
                   </div>
                 </template>
                 <el-select
                   v-model="applicationForm.model_id"
-                  placeholder="请选择 AI 模型"
+                  :placeholder="$t('views.application.applicationForm.form.aiModel.placeholder')"
                   class="w-full"
                   popper-class="select-model"
                   :clearable="true"
@@ -96,7 +96,7 @@
                           class="model-icon mr-8"
                         ></span>
                         <span>{{ item.name }}</span>
-                        <span class="danger">（不可用）</span>
+                        <span class="danger">{{$t('views.application.applicationForm.form.aiModel.unavailable')}}</span>
                       </div>
                       <el-icon class="check-icon" v-if="item.id === applicationForm.model_id"
                         ><Check
@@ -106,22 +106,21 @@
                   <template #footer>
                     <div class="w-full text-left cursor" @click="openCreateModel()">
                       <el-button type="primary" link>
-                        <el-icon class="mr-4"><Plus /></el-icon> 添加模型
+                        <el-icon class="mr-4"><Plus /></el-icon> {{$t('views.application.applicationForm.form.addModel')}}
                       </el-button>
                     </div>
                   </template>
                 </el-select>
               </el-form-item>
-              <el-form-item label="提示词" prop="model_setting.prompt">
+              <el-form-item :label="$t('views.application.applicationForm.form.prompt.label')" prop="model_setting.prompt">
                 <template #label>
                   <div class="flex align-center">
                     <div class="flex-between mr-4">
-                      <span>提示词 <span class="danger">*</span></span>
+                      <span>{{$t('views.application.applicationForm.form.prompt.label')}} <span class="danger">*</span></span>
                     </div>
                     <el-tooltip effect="dark" placement="right">
                       <template #content
-                        >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。<br />可以使用变量：{data}
-                        是携带知识库中已知信息；{question}是用户提出的问题。</template
+                        >{{$t('views.application.applicationForm.form.prompt.tooltip')}}</template
                       >
                       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                     </el-tooltip>
@@ -135,29 +134,29 @@
                   :placeholder="defaultPrompt"
                 />
               </el-form-item>
-              <el-form-item label="多轮对话" @click.prevent>
+              <el-form-item :label="$t('views.application.applicationForm.form.multipleRoundsDialogue')" @click.prevent>
                 <el-switch
                   size="small"
                   v-model="applicationForm.multiple_rounds_dialogue"
                 ></el-switch>
               </el-form-item>
-              <el-form-item label="关联知识库">
+              <el-form-item label="$t('views.application.applicationForm.form.relatedKnowledgeBase')">
                 <template #label>
                   <div class="flex-between">
-                    <span>关联知识库</span>
+                    <span>{{$t('views.application.applicationForm.form.relatedKnowledgeBase')}}</span>
                     <div>
                       <el-button type="primary" link @click="openParamSettingDialog">
-                        <AppIcon iconName="app-operation" class="mr-4"></AppIcon>参数设置
+                        <AppIcon iconName="app-operation" class="mr-4"></AppIcon>{{$t('views.application.applicationForm.form.paramSetting')}}
                       </el-button>
                       <el-button type="primary" link @click="openDatasetDialog">
-                        <el-icon class="mr-4"><Plus /></el-icon>添加
+                        <el-icon class="mr-4"><Plus /></el-icon>{{$t('views.application.applicationForm.form.add')}}
                       </el-button>
                     </div>
                   </div>
                 </template>
                 <div class="w-full">
                   <el-text type="info" v-if="applicationForm.dataset_id_list?.length === 0"
-                    >关联的知识库展示在这里</el-text
+                    >{{$t('views.application.applicationForm.form.relatedKnowledgeBaseWhere')}}</el-text
                   >
                   <el-row :gutter="12" v-else>
                     <el-col
@@ -198,7 +197,7 @@
                   </el-row>
                 </div>
               </el-form-item>
-              <el-form-item label="开场白">
+              <el-form-item :label="$t('views.application.applicationForm.form.prologue')">
                 <MdEditor
                   class="prologue-md-editor"
                   v-model="applicationForm.prologue"
@@ -210,10 +209,10 @@
               <el-form-item @click.prevent>
                 <template #label>
                   <div class="flex align-center">
-                    <span class="mr-4">问题优化</span>
+                    <span class="mr-4">{{$t('views.application.applicationForm.form.problemOptimization.label')}}</span>
                     <el-tooltip
                       effect="dark"
-                      content="根据历史聊天优化完善当前问题，更利于匹配知识点。"
+                      :content="$t('views.application.applicationForm.form.problemOptimization.tooltip')"
                       placement="right"
                     >
                       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
@@ -226,16 +225,16 @@
           </el-scrollbar>
         </div>
         <div class="text-right border-t p-16">
-          <el-button v-if="!id" @click="router.push({ path: `/application` })"> 取消 </el-button>
+          <el-button v-if="!id" @click="router.push({ path: `/application` })">{{$t('views.application.applicationForm.buttons.cancel')}} </el-button>
           <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading">
-            {{ id ? '保存' : '创建' }}
+            {{ id ? $t('views.application.applicationForm.buttons.save') : $t('views.application.applicationForm.buttons.create') }}
           </el-button>
         </div>
       </el-col>
       <el-col :span="14" class="p-24 border-l">
-        <h4 class="title-decoration-1 mb-16">调试预览</h4>
+        <h4 class="title-decoration-1 mb-16">{{$t('views.application.applicationForm.form.apptest')}}</h4>
         <div class="dialog-bg">
-          <h4 class="p-24">{{ applicationForm?.name || '应用名称' }}</h4>
+          <h4 class="p-24">{{ applicationForm?.name || $t('views.application.applicationForm.form.appName.label') }}</h4>
           <div class="scrollbar-height">
             <AiChat :data="applicationForm"></AiChat>
           </div>
@@ -277,7 +276,7 @@ import type { Provider } from '@/api/type/model'
 import { relatedObject } from '@/utils/utils'
 import { MsgSuccess } from '@/utils/message'
 import useStore from '@/stores'
-
+import { t } from '@/locales'
 const { model, dataset, application, user } = useStore()
 
 const router = useRouter()
@@ -285,20 +284,8 @@ const route = useRoute()
 const {
   params: { id }
 } = route as any
-
-const defaultPrompt = `已知信息：
-{data}
-回答要求：
-- 请使用简洁且专业的语言来回答用户的问题。
-- 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。
-- 避免提及你是从已知信息中获得的知识。
-- 请保证答案与已知信息中描述的一致。
-- 请使用 Markdown 语法优化答案的格式。
-- 已知信息中的图片、链接地址和脚本语言请直接返回。
-- 请使用与问题相同的语言来回答。
-问题：
-{question}
-`
+ // @ts-ignore
+const defaultPrompt =t('views.application.prompt.defaultPrompt')
 
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
@@ -314,10 +301,7 @@ const applicationForm = ref<ApplicationFormType>({
   desc: '',
   model_id: '',
   multiple_rounds_dialogue: false,
-  prologue: `您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。
-- MaxKB 主要功能有什么？
-- MaxKB 支持哪些大语言模型？
-- MaxKB 支持哪些文档类型？`,
+  prologue: t('views.application.prompt.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
     top_n: 3,
@@ -336,15 +320,15 @@ const applicationForm = ref<ApplicationFormType>({
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({
-  name: [{ required: true, message: '请输入应用名称', trigger: 'blur' }],
+  name: [{ required: true, message:  t('views.application.applicationForm.appName.placeholder'), trigger: 'blur' }],
   model_id: [
     {
       required: false,
-      message: '请选择模型',
+      message: t('views.application.applicationForm.aiModel.placeholder'),
       trigger: 'change'
     }
   ],
-  'model_setting.prompt': [{ required: true, message: '请输入提示词', trigger: 'blur' }]
+  'model_setting.prompt': [{ required: true, message:t('views.application.applicationForm.prompt.placeholder'), trigger: 'blur' }]
 })
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
@@ -356,11 +340,11 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (valid) {
       if (id) {
         application.asyncPutApplication(id, applicationForm.value, loading).then((res) => {
-          MsgSuccess('保存成功')
+          MsgSuccess(t('views.application.buttons.saveSuccess'))
         })
       } else {
         applicationApi.postApplication(applicationForm.value, loading).then((res) => {
-          MsgSuccess('创建成功')
+          MsgSuccess(t('views.application.buttons.createSuccess'))
           router.push({ path: `/application` })
         })
       }
