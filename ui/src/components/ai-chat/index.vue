@@ -2,7 +2,7 @@
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
     <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
       <div ref="dialogScrollbar" class="ai-chat__content p-24">
-        <div class="item-content mb-16" v-if="!props.available || props.data?.prologue">
+        <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
               <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
@@ -73,9 +73,7 @@
 
               <el-card v-else shadow="always" class="dialog-card">
                 <MdRenderer :source="item.answer_text"></MdRenderer>
-                <div
-                  v-if="(id && item.write_ed) || (props.data?.show_source && item.write_ed) || log"
-                >
+                <div v-if="showSource(item)">
                   <el-divider> <el-text type="info">知识来源</el-text> </el-divider>
                   <div class="mb-8">
                     <el-space wrap>
@@ -132,7 +130,7 @@
                   <OperationButton
                     :data="item"
                     :applicationId="appId"
-                    :chartId="chartOpenId"
+                    :chatId="chartOpenId"
                     @regeneration="regenerationChart(item)"
                   />
                 </div>
@@ -187,7 +185,6 @@ import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
 import MdRenderer from '@/components/markdown-renderer/MdRenderer.vue'
 import { MdPreview } from 'md-editor-v3'
-import { MsgError } from '@/utils/message'
 import { debounce } from 'lodash'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
@@ -209,8 +206,15 @@ const props = defineProps({
   available: {
     type: Boolean,
     default: true
-  }
+  },
+  chatId: {
+    type: String,
+    default: ''
+  } // 历史记录Id
 })
+
+const emit = defineEmits(['refresh', 'scroll'])
+
 const { application } = useStore()
 
 const ParagraphSourceDialogRef = ref()
@@ -250,6 +254,18 @@ const prologueList = computed(() => {
 })
 
 watch(
+  () => props.chatId,
+  (val) => {
+    if (val && val !== 'new') {
+      chartOpenId.value = val
+    } else {
+      chartOpenId.value = ''
+    }
+  },
+  { deep: true }
+)
+
+watch(
   () => props.data,
   () => {
     chartOpenId.value = ''
@@ -260,14 +276,24 @@ watch(
 watch(
   () => props.record,
   (value) => {
-    if (props.log) {
-      chatList.value = value
-    }
+    chatList.value = value
   },
   {
     immediate: true
   }
 )
+
+function showSource(row: any) {
+  if (props.log) {
+    return true
+  } else if (row.write_ed) {
+    if (id || props.data?.show_source) {
+      return true
+    }
+  } else {
+    return false
+  }
+}
 
 function openParagraph(row: any, id?: string) {
   ParagraphSourceDialogRef.value.open(row, id)
@@ -446,7 +472,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
     })
   }
   if (!chartOpenId.value) {
-    getChartOpenId(chat).catch((e) => {
+    getChartOpenId(chat).catch(() => {
       errorWrite(chat)
     })
   } else {
@@ -464,7 +490,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
             .then(() => {
               chatMessage(chat)
             })
-            .catch((err) => {
+            .catch(() => {
               errorWrite(chat)
             })
         } else if (response.status === 460) {
@@ -487,6 +513,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
         }
       })
       .then(() => {
+        if (props.chatId === 'new') {
+          emit('refresh', chartOpenId.value)
+        }
         return (id || props.data?.show_source) && getSourceDetail(chat)
       })
       .finally(() => {
@@ -535,6 +564,7 @@ const handleScrollTop = ($event: any) => {
   } else {
     scorll.value = false
   }
+  emit('scroll', { ...$event, dialogScrollbar: dialogScrollbar.value, scrollDiv: scrollDiv.value })
 }
 
 const handleScroll = () => {
@@ -549,6 +579,11 @@ const handleScroll = () => {
   }
 }
 
+function setScrollBottom() {
+  // 将滚动条滚动到最下面
+  scrollDiv.value.setScrollTop(getMaxHeight())
+}
+
 watch(
   chatList,
   () => {
@@ -556,6 +591,10 @@ watch(
   },
   { deep: true, immediate: true }
 )
+
+defineExpose({
+  setScrollBottom
+})
 </script>
 <style lang="scss" scoped>
 .ai-chat {

@@ -30,6 +30,8 @@ urlpatterns = [
     path('application/<int:current_page>/<int:page_size>', views.Application.Page.as_view(), name='application_page'),
     path('application/<str:application_id>/chat/open', views.ChatView.Open.as_view()),
     path("application/chat/open", views.ChatView.OpenTemp.as_view()),
+    path("application/<str:application_id>/chat/client/<int:current_page>/<int:page_size>",
+         views.ChatView.ClientChatHistoryPage.as_view()),
     path('application/<str:application_id>/chat/export', views.ChatView.Export.as_view(), name='export'),
     path('application/<str:application_id>/chat', views.ChatView.as_view(), name='chats'),
     path('application/<str:application_id>/chat/<int:current_page>/<int:page_size>', views.ChatView.Page.as_view()),

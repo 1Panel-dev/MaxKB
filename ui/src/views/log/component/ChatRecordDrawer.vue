@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import logApi from '@/api/log'
 import { type chatType } from '@/api/type/application'
@@ -43,7 +43,7 @@ const props = withDefaults(
     /**
      * 对话 记录id
      */
-    chartId: string
+    chatId: string
     currentAbstract: string
     /**
      * 下一条
@@ -61,7 +61,7 @@ const props = withDefaults(
   {}
 )
 
-const emit = defineEmits(['update:chartId', 'update:currentAbstract', 'refresh'])
+const emit = defineEmits(['update:chatId', 'update:currentAbstract', 'refresh'])
 
 const route = useRoute()
 const {
@@ -84,8 +84,8 @@ function closeHandle() {
 }
 
 function getChatRecord() {
-  if (props.chartId && visible.value) {
-    logApi.getChatRecordLog(id as string, props.chartId, paginationConfig, loading).then((res) => {
+  if (props.chatId && visible.value) {
+    logApi.getChatRecordLog(id as string, props.chatId, paginationConfig, loading).then((res) => {
       paginationConfig.total = res.data.total
       recordList.value = [...recordList.value, ...res.data.records]
     })
@@ -93,7 +93,7 @@ function getChatRecord() {
 }
 
 watch(
-  () => props.chartId,
+  () => props.chatId,
   () => {
     recordList.value = []
     paginationConfig.total = 0
@@ -104,7 +104,7 @@ watch(
 
 watch(visible, (bool) => {
   if (!bool) {
-    emit('update:chartId', '')
+    emit('update:chatId', '')
     emit('update:currentAbstract', '')
     emit('refresh')
   }

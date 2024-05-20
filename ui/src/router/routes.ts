@@ -10,16 +10,7 @@ export const routes: Array<RouteRecordRaw> = [
     name: 'home',
     component: () => import('@/layout/app-layout/index.vue'),
     redirect: '/application',
-    children: [
-      // TODO 待处理
-      // {
-      //   path: '/first',
-      //   name: 'first',
-      //   meta: { icon: 'House', title: '首页' },
-      //   component: () => import('@/views/first/index.vue')
-      // },
-      ...rolesRoutes
-    ]
+    children: [...rolesRoutes]
   },
 
   {

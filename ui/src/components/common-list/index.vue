@@ -4,18 +4,20 @@
       <template v-for="(item, index) in data" :key="index">
         <li
           @click.prevent="clickHandle(item, index)"
-          :class="current === index ? 'active' : ''"
+          :class="current === item[props.valueKey] ? 'active' : ''"
           class="cursor"
         >
           <slot :row="item" :index="index"> </slot>
         </li>
       </template>
     </ul>
-    <el-empty description="暂无数据" v-else />
+    <slot name="empty" v-else>
+      <el-empty description="暂无数据" />
+    </slot>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch, useSlots } from 'vue'
+import { ref, watch } from 'vue'
 
 defineOptions({ name: 'CommonList' })
 
@@ -23,29 +25,29 @@ const props = withDefaults(
   defineProps<{
     data: Array<any>
     defaultActive?: string
+    valueKey?: string // 唯一标识的键名
   }>(),
   {
     data: () => [],
-    defaultActive: ''
+    defaultActive: '',
+    valueKey: 'id'
   }
 )
+
+const current = ref<Number | String>(0)
 
 watch(
   () => props.defaultActive,
   (val) => {
-    if (val) {
-      current.value = props.data.findIndex((v) => v.id === val)
-    }
+    current.value = val
   },
   { immediate: true }
 )
 
 const emit = defineEmits(['click'])
 
-const current = ref(0)
-
 function clickHandle(row: any, index: number) {
-  current.value = index
+  current.value = row[props.valueKey]
   emit('click', row)
 }
 </script>
@@ -54,10 +56,12 @@ function clickHandle(row: any, index: number) {
 .common-list {
   li {
     padding: 10px 16px;
+    font-weight: 400;
     &.active {
       background: var(--el-color-primary-light-9);
       border-radius: 4px;
       color: var(--el-color-primary);
+      font-weight: 500;
     }
   }
 }

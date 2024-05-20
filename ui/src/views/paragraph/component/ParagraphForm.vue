@@ -12,16 +12,6 @@
       <span class="lighter" v-else>{{ form.title || '-' }}</span>
     </el-form-item>
     <el-form-item label="分段内容" prop="content">
-      <!-- <el-input
-        v-if="isEdit"
-        v-model="form.content"
-        placeholder="请输入分段内容"
-        maxlength="4096"
-        show-word-limit
-        :rows="8"
-        type="textarea"
-      > 
-     </el-input>-->
       <MarkdownEditor
         v-if="isEdit"
         v-model="form.content"
@@ -39,12 +29,11 @@
         :modelValue="form.content"
         class="maxkb-md"
       />
-      <!-- <span v-else class="break-all lighter">{{ form.content }}</span> -->
     </el-form-item>
   </el-form>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onUnmounted, watch, nextTick } from 'vue'
+import { ref, reactive, onUnmounted, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MdPreview } from 'md-editor-v3'
 import MarkdownEditor from '@/components/markdown-editor/index.vue'

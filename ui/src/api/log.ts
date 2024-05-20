@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put, exportExcel } from '@/request/index'
+import { get, del, put, exportExcel } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import { type Ref } from 'vue'
 
@@ -64,11 +64,12 @@ const getChatRecordLog: (
   application_id: String,
   chart_id: String,
   page: pageRequest,
-  loading?: Ref<boolean>
-) => Promise<Result<any>> = (application_id, chart_id, page, loading) => {
+  loading?: Ref<boolean>,
+  order_asc?: boolean
+) => Promise<Result<any>> = (application_id, chart_id, page, loading, order_asc) => {
   return get(
     `${prefix}/${application_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
-    undefined,
+    { order_asc: order_asc !== undefined ? order_asc : true },
     loading
   )
 }
@@ -173,6 +174,18 @@ const getRecordDetail: (
   )
 }
 
+const getChatLogClient: (
+  application_id: String,
+  page: pageRequest,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, page, loading) => {
+  return get(
+    `${prefix}/${application_id}/chat/client/${page.current_page}/${page.page_size}`,
+    null,
+    loading
+  )
+}
+
 export default {
   getChatLog,
   delChatLog,
@@ -181,5 +194,6 @@ export default {
   getMarkRecord,
   getRecordDetail,
   delMarkRecord,
-  exportChatLog
+  exportChatLog,
+  getChatLogClient
 }
