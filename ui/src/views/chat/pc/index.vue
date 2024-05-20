@@ -90,7 +90,7 @@ const chatLogeData = ref<any[]>([])
 
 const paginationConfig = reactive({
   current_page: 1,
-  page_size: 20,
+  page_size: 3,
   total: 0
 })
 
@@ -100,8 +100,11 @@ const currentChatName = ref('新建对话')
 
 function handleScroll(event: any) {
   if (event.scrollTop === 0 && paginationConfig.total > currentRecordList.value.length) {
+    const histry_height = event.dialogScrollbar.offsetHeight
     paginationConfig.current_page += 1
-    getChatRecord()
+    getChatRecord().then(() => {
+      event.scrollDiv.setScrollTop(event.dialogScrollbar.offsetHeight - histry_height)
+    })
   }
 }
 
@@ -152,15 +155,23 @@ function getChatLog(id: string) {
 }
 
 function getChatRecord() {
-  log
-    .asyncChatRecordLog(applicationDetail.value.id, currentChatId.value, paginationConfig, loading)
+  return log
+    .asyncChatRecordLog(
+      applicationDetail.value.id,
+      currentChatId.value,
+      paginationConfig,
+      loading,
+      false
+    )
     .then((res: any) => {
       paginationConfig.total = res.data.total
       const list = res.data.records
       list.map((v: any) => {
         v['write_ed'] = true
       })
-      currentRecordList.value = [...list, ...currentRecordList.value]
+      currentRecordList.value = [...list, ...currentRecordList.value].sort((a, b) =>
+        a.create_time.localeCompare(b.create_time)
+      )
       if (paginationConfig.current_page === 1) {
         nextTick(() => {
           // 将滚动条滚动到最下面

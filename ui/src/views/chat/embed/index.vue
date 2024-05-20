@@ -135,14 +135,22 @@ function getChatLog(id: string) {
 
 function getChatRecord() {
   log
-    .asyncChatRecordLog(applicationDetail.value.id, currentChatId.value, paginationConfig, loading)
+    .asyncChatRecordLog(
+      applicationDetail.value.id,
+      currentChatId.value,
+      paginationConfig,
+      loading,
+      false
+    )
     .then((res: any) => {
       paginationConfig.total = res.data.total
       const list = res.data.records
       list.map((v: any) => {
         v['write_ed'] = true
       })
-      currentRecordList.value = [...currentRecordList.value, ...list]
+      currentRecordList.value = [...list, ...currentRecordList.value].sort((a, b) =>
+        a.create_time.localeCompare(b.create_time)
+      )
     })
 }
 

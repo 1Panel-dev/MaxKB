@@ -23,11 +23,12 @@ const useLogStore = defineStore({
       id: string,
       chatId: string,
       page: pageRequest,
-      loading?: Ref<boolean>
+      loading?: Ref<boolean>,
+      order_asc?: boolean
     ) {
       return new Promise((resolve, reject) => {
         logApi
-          .getChatRecordLog(id, chatId, page, loading)
+          .getChatRecordLog(id, chatId, page, loading, order_asc)
           .then((data) => {
             resolve(data)
           })

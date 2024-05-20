@@ -564,7 +564,7 @@ const handleScrollTop = ($event: any) => {
   } else {
     scorll.value = false
   }
-  emit('scroll', $event)
+  emit('scroll', { ...$event, dialogScrollbar: dialogScrollbar.value, scrollDiv: scrollDiv.value })
 }
 
 const handleScroll = () => {

@@ -221,7 +221,7 @@ class ChatView(APIView):
         def get(self, request: Request, application_id: str, chat_id: str):
             return result.success(ChatRecordSerializer.Query(
                 data={'application_id': application_id,
-                      'chat_id': chat_id}).list())
+                      'chat_id': chat_id, 'order_asc': request.query_params.get('order_asc')}).list())
 
         class Page(APIView):
             authentication_classes = [TokenAuth]
@@ -242,7 +242,8 @@ class ChatView(APIView):
             def get(self, request: Request, application_id: str, chat_id: str, current_page: int, page_size: int):
                 return result.success(ChatRecordSerializer.Query(
                     data={'application_id': application_id,
-                          'chat_id': chat_id}).page(current_page, page_size))
+                          'chat_id': chat_id, 'order_asc': request.query_params.get('order_asc')}).page(current_page,
+                                                                                                        page_size))
 
         class Vote(APIView):
             authentication_classes = [TokenAuth]
