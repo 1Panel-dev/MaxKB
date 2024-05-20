@@ -41,7 +41,7 @@ from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 
 token_cache = cache.caches['token_cache']
-chat_cache = cache.caches['chat_cache']
+chat_cache = cache.caches['model_cache']
 
 
 class ModelDatasetAssociation(serializers.Serializer):
@@ -532,6 +532,7 @@ class ApplicationSerializer(serializers.Serializer):
                 QuerySet(ApplicationDatasetMapping).bulk_create(
                     [ApplicationDatasetMapping(application_id=application_id, dataset_id=dataset_id) for dataset_id in
                      dataset_id_list]) if len(dataset_id_list) > 0 else None
+            chat_cache.clear_by_application_id(application_id)
             return self.one(with_valid=False)
 
         def list_dataset(self, with_valid=True):
