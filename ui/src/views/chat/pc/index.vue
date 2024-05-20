@@ -90,7 +90,7 @@ const chatLogeData = ref<any[]>([])
 
 const paginationConfig = reactive({
   current_page: 1,
-  page_size: 3,
+  page_size: 20,
   total: 0
 })
 
@@ -99,7 +99,11 @@ const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
 const currentChatName = ref('新建对话')
 
 function handleScroll(event: any) {
-  if (event.scrollTop === 0 && paginationConfig.total > currentRecordList.value.length) {
+  if (
+    currentChatId.value !== 'new' &&
+    event.scrollTop === 0 &&
+    paginationConfig.total > currentRecordList.value.length
+  ) {
     const history_height = event.dialogScrollbar.offsetHeight
     paginationConfig.current_page += 1
     getChatRecord().then(() => {

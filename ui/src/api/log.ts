@@ -67,7 +67,6 @@ const getChatRecordLog: (
   loading?: Ref<boolean>,
   order_asc?: boolean
 ) => Promise<Result<any>> = (application_id, chart_id, page, loading, order_asc) => {
-  console.log(order_asc)
   return get(
     `${prefix}/${application_id}/chat/${chart_id}/chat_record/${page.current_page}/${page.page_size}`,
     { order_asc: order_asc !== undefined ? order_asc : true },

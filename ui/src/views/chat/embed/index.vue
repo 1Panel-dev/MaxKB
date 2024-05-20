@@ -7,11 +7,14 @@
     </div>
     <div class="chat-embed__main chat-width">
       <AiChat
+        ref="AiChatRef"
         v-model:data="applicationDetail"
         :available="applicationAvailable"
         :appId="applicationDetail?.id"
         :record="currentRecordList"
         :chatId="currentChatId"
+        @refresh="refresh"
+        @scroll="handleScroll"
       ></AiChat>
     </div>
 
@@ -59,7 +62,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
@@ -70,6 +73,7 @@ const {
 
 const { application, user, log } = useStore()
 
+const AiChatRef = ref()
 const loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
@@ -84,6 +88,20 @@ const paginationConfig = reactive({
 
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
+
+function handleScroll(event: any) {
+  if (
+    currentChatId.value !== 'new' &&
+    event.scrollTop === 0 &&
+    paginationConfig.total > currentRecordList.value.length
+  ) {
+    const history_height = event.dialogScrollbar.offsetHeight
+    paginationConfig.current_page += 1
+    getChatRecord().then(() => {
+      event.scrollDiv.setScrollTop(event.dialogScrollbar.offsetHeight - history_height)
+    })
+  }
+}
 
 function closePopover(event: any) {
   const popover = document.getElementById('chat-popover')
@@ -134,7 +152,7 @@ function getChatLog(id: string) {
 }
 
 function getChatRecord() {
-  log
+  return log
     .asyncChatRecordLog(
       applicationDetail.value.id,
       currentChatId.value,
@@ -151,6 +169,12 @@ function getChatRecord() {
       currentRecordList.value = [...list, ...currentRecordList.value].sort((a, b) =>
         a.create_time.localeCompare(b.create_time)
       )
+      if (paginationConfig.current_page === 1) {
+        nextTick(() => {
+          // 将滚动条滚动到最下面
+          AiChatRef.value.setScrollBottom()
+        })
+      }
     })
 }
 
@@ -162,6 +186,11 @@ const clickListHandle = (item: any) => {
     getChatRecord()
   }
   show.value = false
+}
+
+function refresh(id: string) {
+  getChatLog(applicationDetail.value.id)
+  currentChatId.value = id
 }
 
 onMounted(() => {
