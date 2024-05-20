@@ -97,6 +97,7 @@ const initChat=(root)=>{
   const closeviewport=root.querySelector('.maxkb-closeviewport')
   const close_func=()=>{
     chat_container.style['display']=chat_container.style['display']=='block'?'none':'block'
+    chat_button.style['display']=chat_container.style['display']=='block'?'none':'block'
   }
   close_icon=chat_container.querySelector('.maxkb-chat-close')
   chat_button.onclick = close_func
