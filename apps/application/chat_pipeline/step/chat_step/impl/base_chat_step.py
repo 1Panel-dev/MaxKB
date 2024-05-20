@@ -37,6 +37,17 @@ def add_access_num(client_id=None, client_type=None):
             application_public_access_client.save()
 
 
+def write_context(step, manage, request_token, response_token, all_text):
+    step.context['message_tokens'] = request_token
+    step.context['answer_tokens'] = response_token
+    current_time = time.time()
+    step.context['answer_text'] = all_text
+    step.context['run_time'] = current_time - step.context['start_time']
+    manage.context['run_time'] = current_time - manage.context['start_time']
+    manage.context['message_tokens'] = manage.context['message_tokens'] + request_token
+    manage.context['answer_tokens'] = manage.context['answer_tokens'] + response_token
+
+
 def event_content(response,
                   chat_id,
                   chat_record_id,
@@ -68,14 +79,7 @@ def event_content(response,
         else:
             request_token = 0
             response_token = 0
-        step.context['message_tokens'] = request_token
-        step.context['answer_tokens'] = response_token
-        current_time = time.time()
-        step.context['answer_text'] = all_text
-        step.context['run_time'] = current_time - step.context['start_time']
-        manage.context['run_time'] = current_time - manage.context['start_time']
-        manage.context['message_tokens'] = manage.context['message_tokens'] + request_token
-        manage.context['answer_tokens'] = manage.context['answer_tokens'] + response_token
+        write_context(step, manage, request_token, response_token, all_text)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text, client_id)
         yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
@@ -83,8 +87,13 @@ def event_content(response,
         add_access_num(client_id, client_type)
     except Exception as e:
         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+        all_text = '异常' + str(e)
+        write_context(step, manage, 0, 0, all_text)
+        post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
+                                      all_text, manage, step, padding_problem_text, client_id)
+        add_access_num(client_id, client_type)
         yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                                     'content': '异常' + str(e), 'is_end': True}) + "\n\n"
+                                     'content': all_text, 'is_end': True}) + "\n\n"
 
 
 class BaseChatStep(IChatStep):
@@ -202,25 +211,28 @@ class BaseChatStep(IChatStep):
                       manage: PipelineManage = None,
                       padding_problem_text: str = None,
                       client_id=None, client_type=None, no_references_setting=None):
-        # 调用模型
-        chat_result, is_ai_chat = self.get_block_result(message_list, chat_model, paragraph_list, no_references_setting)
         chat_record_id = uuid.uuid1()
-        if is_ai_chat:
-            request_token = chat_model.get_num_tokens_from_messages(message_list)
-            response_token = chat_model.get_num_tokens(chat_result.content)
-        else:
-            request_token = 0
-            response_token = 0
-        self.context['message_tokens'] = request_token
-        self.context['answer_tokens'] = response_token
-        current_time = time.time()
-        self.context['answer_text'] = chat_result.content
-        self.context['run_time'] = current_time - self.context['start_time']
-        manage.context['run_time'] = current_time - manage.context['start_time']
-        manage.context['message_tokens'] = manage.context['message_tokens'] + request_token
-        manage.context['answer_tokens'] = manage.context['answer_tokens'] + response_token
-        post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
-                                      chat_result.content, manage, self, padding_problem_text, client_id)
-        add_access_num(client_id, client_type)
-        return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                               'content': chat_result.content, 'is_end': True})
+        # 调用模型
+        try:
+            chat_result, is_ai_chat = self.get_block_result(message_list, chat_model, paragraph_list,
+                                                            no_references_setting)
+            if is_ai_chat:
+                request_token = chat_model.get_num_tokens_from_messages(message_list)
+                response_token = chat_model.get_num_tokens(chat_result.content)
+            else:
+                request_token = 0
+                response_token = 0
+            write_context(self, manage, request_token, response_token, chat_result.content)
+            post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
+                                          chat_result.content, manage, self, padding_problem_text, client_id)
+            add_access_num(client_id, client_type)
+            return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
+                                   'content': chat_result.content, 'is_end': True})
+        except Exception as e:
+            all_text = '异常' + str(e)
+            write_context(self, manage, 0, 0, all_text)
+            post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
+                                          all_text, manage, self, padding_problem_text, client_id)
+            add_access_num(client_id, client_type)
+            return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
+                                   'content': all_text, 'is_end': True})
