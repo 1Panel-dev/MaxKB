@@ -17,7 +17,7 @@
               <common-list
                 :data="chatLogeData"
                 class="mt-8"
-                v-loading="loading"
+                v-loading="left_loading"
                 :defaultActive="currentChatId"
                 @click="clickListHandle"
               >
@@ -44,7 +44,7 @@
           <h4>{{ currentChatName }}</h4>
           <span v-if="currentRecordList.length" class="flex align-center">
             <AppIcon iconName="app-chat-record" class="info mr-8" style="font-size: 16px"></AppIcon>
-            <span class="lighter"> {{ currentRecordList.length }} 条提问 </span>
+            <span class="lighter"> {{ paginationConfig.total }} 条提问 </span>
           </span>
         </div>
         <div class="right-height">
@@ -84,6 +84,7 @@ const newObj = {
 
 const AiChatRef = ref()
 const loading = ref(false)
+const left_loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
 const chatLogeData = ref<any[]>([])
@@ -153,7 +154,7 @@ function getChatLog(id: string) {
     page_size: 20
   }
 
-  log.asyncGetChatLogClient(id, page, loading).then((res: any) => {
+  log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
     chatLogeData.value = res.data.records
   })
 }
@@ -185,12 +186,14 @@ function getChatRecord() {
     })
 }
 const clickListHandle = (item: any) => {
-  paginationConfig.current_page = 1
-  currentRecordList.value = []
-  currentChatId.value = item.id
-  currentChatName.value = item.abstract
-  if (currentChatId.value !== 'new') {
-    getChatRecord()
+  if (item.id !== currentChatId.value) {
+    paginationConfig.current_page = 1
+    currentRecordList.value = []
+    currentChatId.value = item.id
+    currentChatName.value = item.abstract
+    if (currentChatId.value !== 'new') {
+      getChatRecord()
+    }
   }
 }
 

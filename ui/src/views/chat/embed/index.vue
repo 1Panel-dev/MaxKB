@@ -36,7 +36,7 @@
           <div class="p-8">
             <common-list
               :data="chatLogeData"
-              v-loading="loading"
+              v-loading="left_loading"
               :defaultActive="currentChatId"
               @click="clickListHandle"
             >
@@ -75,6 +75,7 @@ const { application, user, log } = useStore()
 
 const AiChatRef = ref()
 const loading = ref(false)
+const left_loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
 const chatLogeData = ref<any[]>([])
@@ -146,7 +147,7 @@ function getChatLog(id: string) {
     page_size: 20
   }
 
-  log.asyncGetChatLogClient(id, page, loading).then((res: any) => {
+  log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
     chatLogeData.value = res.data.records
   })
 }
@@ -179,13 +180,15 @@ function getChatRecord() {
 }
 
 const clickListHandle = (item: any) => {
-  paginationConfig.current_page = 1
-  currentRecordList.value = []
-  currentChatId.value = item.id
-  if (currentChatId.value !== 'new') {
-    getChatRecord()
+  if (item.id !== currentChatId.value) {
+    paginationConfig.current_page = 1
+    currentRecordList.value = []
+    currentChatId.value = item.id
+    if (currentChatId.value !== 'new') {
+      getChatRecord()
+    }
+    show.value = false
   }
-  show.value = false
 }
 
 function refresh(id: string) {
