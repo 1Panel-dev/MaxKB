@@ -100,10 +100,10 @@ const currentChatName = ref('新建对话')
 
 function handleScroll(event: any) {
   if (event.scrollTop === 0 && paginationConfig.total > currentRecordList.value.length) {
-    const histry_height = event.dialogScrollbar.offsetHeight
+    const history_height = event.dialogScrollbar.offsetHeight
     paginationConfig.current_page += 1
     getChatRecord().then(() => {
-      event.scrollDiv.setScrollTop(event.dialogScrollbar.offsetHeight - histry_height)
+      event.scrollDiv.setScrollTop(event.dialogScrollbar.offsetHeight - history_height)
     })
   }
 }
