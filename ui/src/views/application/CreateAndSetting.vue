@@ -402,11 +402,11 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (valid) {
       if (id) {
         application.asyncPutApplication(id, applicationForm.value, loading).then((res) => {
-          MsgSuccess(t('views.application.buttons.saveSuccess'))
+          MsgSuccess(t('views.application.applicationForm.buttons.saveSuccess'))
         })
       } else {
         applicationApi.postApplication(applicationForm.value, loading).then((res) => {
-          MsgSuccess(t('views.application.buttons.createSuccess'))
+          MsgSuccess(t('views.application.applicationForm.buttons.createSuccess'))
           router.push({ path: `/application` })
         })
       }
