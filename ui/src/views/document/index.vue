@@ -143,17 +143,10 @@
           <el-table-column label="操作" align="left" width="110">
             <template #default="{ row }">
               <div v-if="datasetDetail.type === '0'">
-                <span v-if="row.status === '2'" class="mr-4">
-                  <el-tooltip effect="dark" content="重试" placement="top">
+                <span class="mr-4">
+                  <el-tooltip effect="dark" content="重新向量化" placement="top">
                     <el-button type="primary" text @click.stop="refreshDocument(row)">
                       <el-icon><RefreshRight /></el-icon>
-                    </el-button>
-                  </el-tooltip>
-                </span>
-                <span class="mr-4">
-                  <el-tooltip effect="dark" content="设置" placement="top">
-                    <el-button type="primary" text @click.stop="settingDoc(row)">
-                      <el-icon><Setting /></el-icon>
                     </el-button>
                   </el-tooltip>
                 </span>
@@ -164,10 +157,14 @@
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
+                        <el-dropdown-item @click="settingDoc(row)">
+                          <el-icon><Setting /></el-icon>
+                          设置
+                        </el-dropdown-item>
                         <el-dropdown-item @click="openDatasetDialog(row)">
                           <AppIcon iconName="app-migrate"></AppIcon>
-                          迁移</el-dropdown-item
-                        >
+                          迁移
+                        </el-dropdown-item>
                         <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
                           >删除</el-dropdown-item
                         >
