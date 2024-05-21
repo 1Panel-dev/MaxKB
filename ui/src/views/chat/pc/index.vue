@@ -7,7 +7,10 @@
       <div class="chat-pc__left border-r">
         <div class="p-24 pb-0">
           <el-button class="add-button w-full primary" @click="newChat">
-            <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
+            <el-icon>
+              <Plus />
+            </el-icon>
+            <span class="ml-4">新建对话</span>
           </el-button>
           <p class="mt-20 mb-8">历史记录</p>
         </div>
@@ -46,6 +49,20 @@
           </h4>
 
           <span v-if="currentRecordList.length" class="flex align-center">
+            <el-dropdown class="mr-8">
+                <AppIcon
+                  iconName="takeaway-box"
+                  class="info mr-8"
+                  style="font-size: 16px"
+                  title="导出聊天记录"
+                ></AppIcon>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="exportMarkdown">导出 Markdown</el-dropdown-item>
+                  <el-dropdown-item @click="exportHTML">导出 HTML</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
             <AppIcon iconName="app-chat-record" class="info mr-8" style="font-size: 16px"></AppIcon>
             <span class="lighter"> {{ paginationConfig.total }} 条提问 </span>
           </span>
@@ -70,8 +87,11 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
+import { marked } from 'marked'
+import { saveAs } from 'file-saver'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
+
 const route = useRoute()
 
 const {
@@ -126,6 +146,7 @@ function getAccessToken(token: string) {
       applicationAvailable.value = false
     })
 }
+
 function getProfile() {
   applicationApi
     .getProfile(loading)
@@ -188,6 +209,7 @@ function getChatRecord() {
       }
     })
 }
+
 const clickListHandle = (item: any) => {
   if (item.id !== currentChatId.value) {
     paginationConfig.current_page = 1
@@ -205,6 +227,28 @@ function refresh(id: string) {
   currentChatId.value = id
 }
 
+async function exportMarkdown(): Promise<void> {
+  const suggestedName: string = `${currentChatId.value}.md`
+  const markdownContent: string = currentRecordList.value.map((record: any) =>
+    `# ${record.problem_text}\n\n${record.answer_text}\n\n`
+  ).join('\n')
+
+  const blob: Blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' })
+  saveAs(blob, suggestedName)
+}
+
+async function exportHTML(): Promise<void> {
+  const suggestedName: string = `${currentChatId.value}.html`
+  const markdownContent: string = currentRecordList.value.map((record: any) =>
+    `# ${record.problem_text}\n\n${record.answer_text}\n\n`
+  ).join('\n')
+  const htmlContent: any = marked(markdownContent)
+
+  const blob: Blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' })
+  saveAs(blob, suggestedName)
+}
+
+
 onMounted(() => {
   user.changeUserType(2)
   getAccessToken(accessToken)
@@ -214,6 +258,7 @@ onMounted(() => {
 .chat-pc {
   background-color: var(--app-layout-bg-color);
   overflow: hidden;
+
   &__header {
     background: var(--app-header-bg-color);
     position: fixed;
@@ -226,25 +271,31 @@ onMounted(() => {
     box-sizing: border-box;
     border-bottom: 1px solid var(--el-border-color);
   }
+
   &__left {
     padding-top: calc(var(--app-header-height) - 8px);
     background: #ffffff;
     width: 280px;
+
     .add-button {
       border: 1px solid var(--el-color-primary);
     }
+
     .left-height {
       height: calc(100vh - var(--app-header-height) - 135px);
     }
   }
+
   &__right {
     width: calc(100% - 280px);
     padding-top: calc(var(--app-header-height));
     overflow: hidden;
     position: relative;
+
     .right-header {
       background: #ffffff;
     }
+
     .right-height {
       height: calc(100vh - var(--app-header-height) * 2 - 24px);
       overflow: scroll;
@@ -255,6 +306,7 @@ onMounted(() => {
     position: relative;
     text-align: center;
     color: var(--el-color-info);
+
     ::before {
       content: '';
       width: 17%;
@@ -264,6 +316,7 @@ onMounted(() => {
       left: 16px;
       top: 50%;
     }
+
     ::after {
       content: '';
       width: 17%;
@@ -274,6 +327,7 @@ onMounted(() => {
       top: 50%;
     }
   }
+
   .chat-width {
     max-width: var(--app-chat-width, 860px);
     margin: 0 auto;
