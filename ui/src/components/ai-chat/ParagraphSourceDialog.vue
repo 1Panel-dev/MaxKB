@@ -34,7 +34,11 @@
                   <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
                   <template #description>
                     <el-scrollbar height="90">
-                      {{ item.content }}
+                      <MdPreview
+                        ref="editorRef"
+                        editorId="preview-only"
+                        :modelValue="item.content"
+                      />
                     </el-scrollbar>
                   </template>
                   <template #footer>
@@ -67,6 +71,7 @@
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { cloneDeep } from 'lodash'
 import { arraySort } from '@/utils/utils'
+import { MdPreview } from 'md-editor-v3'
 const emit = defineEmits(['refresh'])
 
 const ParagraphDialogRef = ref()
@@ -109,6 +114,12 @@ defineExpose({ open })
 @media only screen and (max-width: 768px) {
   .paragraph-source {
     width: 90% !important;
+    .footer-content {
+      display: block;
+    }
+    .paragraph-source-card {
+      height: 225px;
+    }
   }
 }
 </style>
