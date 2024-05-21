@@ -75,7 +75,7 @@
                 <MdRenderer :source="item.answer_text"></MdRenderer>
                 <div v-if="showSource(item)">
                   <el-divider> <el-text type="info">知识来源</el-text> </el-divider>
-                  <div class="mb-8">
+                  <div>
                     <el-space wrap>
                       <el-button
                         v-for="(dataset, index) in item.dataset_list"
@@ -91,7 +91,7 @@
 
                   <div>
                     <el-button
-                      class="mr-8"
+                      class="mr-8 mt-8"
                       type="primary"
                       plain
                       size="small"
@@ -99,10 +99,10 @@
                       :disabled="!item.paragraph_list || item.paragraph_list?.length === 0"
                       >引用分段：{{ item.paragraph_list?.length || 0 }}</el-button
                     >
-                    <el-tag type="info" effect="plain">
+                    <el-tag type="info" effect="plain" class="mr-8 mt-8">
                       消耗 tokens: {{ item?.message_tokens + item?.answer_tokens }}
                     </el-tag>
-                    <el-tag class="ml-8" type="info" effect="plain">
+                    <el-tag type="info" effect="plain" class="mt-8">
                       耗时: {{ item.run_time?.toFixed(2) }} s
                     </el-tag>
                   </div>
@@ -125,15 +125,14 @@
                     >停止回答</el-button
                   >
                 </div>
-
-                <div v-if="item.write_ed && props.appId">
-                  <OperationButton
-                    :data="item"
-                    :applicationId="appId"
-                    :chatId="chartOpenId"
-                    @regeneration="regenerationChart(item)"
-                  />
-                </div>
+              </div>
+              <div v-if="item.write_ed && props.appId" class="flex-between">
+                <OperationButton
+                  :data="item"
+                  :applicationId="appId"
+                  :chatId="chartOpenId"
+                  @regeneration="regenerationChart(item)"
+                />
               </div>
             </div>
           </div>

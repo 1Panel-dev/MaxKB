@@ -41,13 +41,16 @@
       </div>
       <div class="chat-pc__right">
         <div class="right-header border-b mb-24 p-16-24 flex-between">
-          <h4>{{ currentChatName }}</h4>
+          <h4 class="ellipsis-1" style="width: 70%">
+            {{ currentChatName }}
+          </h4>
+
           <span v-if="currentRecordList.length" class="flex align-center">
             <AppIcon iconName="app-chat-record" class="info mr-8" style="font-size: 16px"></AppIcon>
             <span class="lighter"> {{ paginationConfig.total }} 条提问 </span>
           </span>
         </div>
-        <div class="right-height">
+        <div class="right-height chat-width">
           <!-- 对话 -->
           <AiChat
             ref="AiChatRef"
