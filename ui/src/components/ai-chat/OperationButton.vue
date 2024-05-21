@@ -1,5 +1,10 @@
 <template>
   <div>
+    <el-text type="info">
+      <span class="ml-4">{{ datetimeFormat(data.create_time) }}</span>
+    </el-text>
+  </div>
+  <div>
     <el-tooltip effect="dark" content="重新生成" placement="top">
       <el-button text @click="regeneration">
         <AppIcon iconName="VideoPlay"></AppIcon>
@@ -59,6 +64,7 @@
 import { ref } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
+import { datetimeFormat } from '@/utils/time'
 const props = defineProps({
   data: {
     type: Object,
