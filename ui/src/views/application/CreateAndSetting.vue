@@ -1,13 +1,19 @@
 <template>
   <LayoutContainer
-    :header="id ? $t('views.application.applicationForm.title.edit'): $t('views.application.applicationForm.title.create')"
+    :header="
+      id
+        ? $t('views.application.applicationForm.title.edit')
+        : $t('views.application.applicationForm.title.create')
+    "
     :back-to="id ? '' : '-1'"
     class="create-application"
   >
     <el-row v-loading="loading">
       <el-col :span="10">
         <div class="p-24 mb-16" style="padding-bottom: 0">
-          <h4 class="title-decoration-1">{{$t('views.application.applicationForm.title.info')}}</h4>
+          <h4 class="title-decoration-1">
+            {{ $t('views.application.applicationForm.title.info') }}
+          </h4>
         </div>
         <div class="scrollbar-height-left">
           <el-scrollbar>
@@ -24,7 +30,10 @@
               <el-form-item prop="name">
                 <template #label>
                   <div class="flex-between">
-                    <span>{{$t('views.application.applicationForm.form.appName.label')}} <span class="danger">*</span></span>
+                    <span
+                      >{{ $t('views.application.applicationForm.form.appName.label') }}
+                      <span class="danger">*</span></span
+                    >
                   </div>
                 </template>
                 <el-input
@@ -34,21 +43,28 @@
                   show-word-limit
                 />
               </el-form-item>
-              <el-form-item :label="$t('views.application.applicationForm.form.appDescription.label')">
+              <el-form-item
+                :label="$t('views.application.applicationForm.form.appDescription.label')"
+              >
                 <el-input
                   v-model="applicationForm.desc"
                   type="textarea"
-                  :placeholder="$t('views.application.applicationForm.form.appDescription.placeholder')"
+                  :placeholder="
+                    $t('views.application.applicationForm.form.appDescription.placeholder')
+                  "
                   :rows="3"
                   maxlength="256"
                   show-word-limit
                 />
               </el-form-item>
 
-              <el-form-item :label="$t('views.application.applicationForm.form.aiModel.label')" prop="model_id">
+              <el-form-item
+                :label="$t('views.application.applicationForm.form.aiModel.label')"
+                prop="model_id"
+              >
                 <template #label>
                   <div class="flex-between">
-                    <span>{{$t('views.application.applicationForm.form.aiModel.label')}}</span>
+                    <span>{{ $t('views.application.applicationForm.form.aiModel.label') }}</span>
                   </div>
                 </template>
                 <el-select
@@ -96,7 +112,9 @@
                           class="model-icon mr-8"
                         ></span>
                         <span>{{ item.name }}</span>
-                        <span class="danger">{{$t('views.application.applicationForm.form.aiModel.unavailable')}}</span>
+                        <span class="danger">{{
+                          $t('views.application.applicationForm.form.aiModel.unavailable')
+                        }}</span>
                       </div>
                       <el-icon class="check-icon" v-if="item.id === applicationForm.model_id"
                         ><Check
@@ -106,22 +124,29 @@
                   <template #footer>
                     <div class="w-full text-left cursor" @click="openCreateModel()">
                       <el-button type="primary" link>
-                        <el-icon class="mr-4"><Plus /></el-icon> {{$t('views.application.applicationForm.form.addModel')}}
+                        <el-icon class="mr-4"><Plus /></el-icon>
+                        {{ $t('views.application.applicationForm.form.addModel') }}
                       </el-button>
                     </div>
                   </template>
                 </el-select>
               </el-form-item>
-              <el-form-item :label="$t('views.application.applicationForm.form.prompt.label')" prop="model_setting.prompt">
+              <el-form-item
+                :label="$t('views.application.applicationForm.form.prompt.label')"
+                prop="model_setting.prompt"
+              >
                 <template #label>
                   <div class="flex align-center">
                     <div class="flex-between mr-4">
-                      <span>{{$t('views.application.applicationForm.form.prompt.label')}} <span class="danger">*</span></span>
+                      <span
+                        >{{ $t('views.application.applicationForm.form.prompt.label') }}
+                        <span class="danger">*</span></span
+                      >
                     </div>
                     <el-tooltip effect="dark" placement="right">
-                      <template #content
-                        >{{$t('views.application.applicationForm.form.prompt.tooltip')}}</template
-                      >
+                      <template #content>{{
+                        $t('views.application.applicationForm.form.prompt.tooltip')
+                      }}</template>
                       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                     </el-tooltip>
                   </div>
@@ -134,30 +159,39 @@
                   :placeholder="defaultPrompt"
                 />
               </el-form-item>
-              <el-form-item :label="$t('views.application.applicationForm.form.multipleRoundsDialogue')" @click.prevent>
+              <el-form-item
+                :label="$t('views.application.applicationForm.form.multipleRoundsDialogue')"
+                @click.prevent
+              >
                 <el-switch
                   size="small"
                   v-model="applicationForm.multiple_rounds_dialogue"
                 ></el-switch>
               </el-form-item>
-              <el-form-item label="$t('views.application.applicationForm.form.relatedKnowledgeBase')">
+              <el-form-item
+                label="$t('views.application.applicationForm.form.relatedKnowledgeBase')"
+              >
                 <template #label>
                   <div class="flex-between">
-                    <span>{{$t('views.application.applicationForm.form.relatedKnowledgeBase')}}</span>
+                    <span>{{
+                      $t('views.application.applicationForm.form.relatedKnowledgeBase')
+                    }}</span>
                     <div>
                       <el-button type="primary" link @click="openParamSettingDialog">
-                        <AppIcon iconName="app-operation" class="mr-4"></AppIcon>{{$t('views.application.applicationForm.form.paramSetting')}}
+                        <AppIcon iconName="app-operation" class="mr-4"></AppIcon
+                        >{{ $t('views.application.applicationForm.form.paramSetting') }}
                       </el-button>
                       <el-button type="primary" link @click="openDatasetDialog">
-                        <el-icon class="mr-4"><Plus /></el-icon>{{$t('views.application.applicationForm.form.add')}}
+                        <el-icon class="mr-4"><Plus /></el-icon
+                        >{{ $t('views.application.applicationForm.form.add') }}
                       </el-button>
                     </div>
                   </div>
                 </template>
                 <div class="w-full">
-                  <el-text type="info" v-if="applicationForm.dataset_id_list?.length === 0"
-                    >{{$t('views.application.applicationForm.form.relatedKnowledgeBaseWhere')}}</el-text
-                  >
+                  <el-text type="info" v-if="applicationForm.dataset_id_list?.length === 0">{{
+                    $t('views.application.applicationForm.form.relatedKnowledgeBaseWhere')
+                  }}</el-text>
                   <el-row :gutter="12" v-else>
                     <el-col
                       :xs="24"
@@ -209,10 +243,14 @@
               <el-form-item @click.prevent>
                 <template #label>
                   <div class="flex align-center">
-                    <span class="mr-4">{{$t('views.application.applicationForm.form.problemOptimization.label')}}</span>
+                    <span class="mr-4">{{
+                      $t('views.application.applicationForm.form.problemOptimization.label')
+                    }}</span>
                     <el-tooltip
                       effect="dark"
-                      :content="$t('views.application.applicationForm.form.problemOptimization.tooltip')"
+                      :content="
+                        $t('views.application.applicationForm.form.problemOptimization.tooltip')
+                      "
                       placement="right"
                     >
                       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
@@ -225,16 +263,28 @@
           </el-scrollbar>
         </div>
         <div class="text-right border-t p-16">
-          <el-button v-if="!id" @click="router.push({ path: `/application` })">{{$t('views.application.applicationForm.buttons.cancel')}} </el-button>
+          <el-button v-if="!id" @click="router.push({ path: `/application` })"
+            >{{ $t('views.application.applicationForm.buttons.cancel') }}
+          </el-button>
           <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading">
-            {{ id ? $t('views.application.applicationForm.buttons.save') : $t('views.application.applicationForm.buttons.create') }}
+            {{
+              id
+                ? $t('views.application.applicationForm.buttons.save')
+                : $t('views.application.applicationForm.buttons.create')
+            }}
           </el-button>
         </div>
       </el-col>
       <el-col :span="14" class="p-24 border-l">
-        <h4 class="title-decoration-1 mb-16">{{$t('views.application.applicationForm.form.apptest')}}</h4>
+        <h4 class="title-decoration-1 mb-16">
+          {{ $t('views.application.applicationForm.form.apptest') }}
+        </h4>
         <div class="dialog-bg">
-          <h4 class="p-24">{{ applicationForm?.name || $t('views.application.applicationForm.form.appName.label') }}</h4>
+          <h4 class="p-24">
+            {{
+              applicationForm?.name || $t('views.application.applicationForm.form.appName.label')
+            }}
+          </h4>
           <div class="scrollbar-height">
             <AiChat :data="applicationForm"></AiChat>
           </div>
@@ -284,8 +334,8 @@ const route = useRoute()
 const {
   params: { id }
 } = route as any
- // @ts-ignore
-const defaultPrompt =t('views.application.prompt.defaultPrompt')
+// @ts-ignore
+const defaultPrompt = t('views.application.prompt.defaultPrompt')
 
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
@@ -320,15 +370,27 @@ const applicationForm = ref<ApplicationFormType>({
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({
-  name: [{ required: true, message:  t('views.application.applicationForm.appName.placeholder'), trigger: 'blur' }],
+  name: [
+    {
+      required: true,
+      message: t('views.application.applicationForm.form.appName.placeholder'),
+      trigger: 'blur'
+    }
+  ],
   model_id: [
     {
       required: false,
-      message: t('views.application.applicationForm.aiModel.placeholder'),
+      message: t('views.application.applicationForm.form.aiModel.placeholder'),
       trigger: 'change'
     }
   ],
-  'model_setting.prompt': [{ required: true, message:t('views.application.applicationForm.prompt.placeholder'), trigger: 'blur' }]
+  'model_setting.prompt': [
+    {
+      required: true,
+      message: t('views.application.applicationForm.form.prompt.placeholder'),
+      trigger: 'blur'
+    }
+  ]
 })
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
