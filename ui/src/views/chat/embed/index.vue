@@ -32,7 +32,7 @@
           <span>历史记录</span>
         </div>
 
-        <el-scrollbar>
+        <el-scrollbar max-height="300">
           <div class="p-8">
             <common-list
               :data="chatLogeData"
@@ -166,6 +166,7 @@ function getChatRecord() {
       const list = res.data.records
       list.map((v: any) => {
         v['write_ed'] = true
+        v['record_id'] = v.id
       })
       currentRecordList.value = [...list, ...currentRecordList.value].sort((a, b) =>
         a.create_time.localeCompare(b.create_time)

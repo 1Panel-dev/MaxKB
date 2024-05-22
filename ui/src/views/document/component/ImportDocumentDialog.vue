@@ -86,7 +86,7 @@ import { useRoute } from 'vue-router'
 import type { FormInstance } from 'element-plus'
 import documentApi from '@/api/document'
 import { MsgSuccess } from '@/utils/message'
-import { hitHandlingMethod } from '../utils'
+import { hitHandlingMethod } from '@/enums/document'
 
 const route = useRoute()
 const {

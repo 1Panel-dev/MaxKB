@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-pc" v-loading="loading">
+  <div class="chat-pc" :class="classObj" v-loading="loading">
     <div class="chat-pc__header">
       <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
     </div>
@@ -82,15 +82,24 @@
         </div>
       </div>
     </div>
+
+    <div class="collapse">
+      <el-button size="small" @click="isCollapse = !isCollapse">
+        <el-icon> <component :is="isCollapse ? 'Fold' : 'Expand'" /></el-icon>
+      </el-button>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, onMounted, nextTick } from 'vue'
+import { reactive, ref, onMounted, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
+
+import useResize from '@/layout/hooks/useResize'
+useResize()
 
 const route = useRoute()
 
@@ -98,7 +107,17 @@ const {
   params: { accessToken }
 } = route as any
 
-const { application, user, log } = useStore()
+const { application, user, log, common } = useStore()
+
+const isCollapse = ref(false)
+
+const classObj = computed(() => {
+  return {
+    mobile: common.isMobile(),
+    hideLeft: !isCollapse.value,
+    openLeft: isCollapse.value
+  }
+})
 
 const newObj = {
   id: 'new',
@@ -170,6 +189,9 @@ function newChat() {
   }
   currentChatId.value = 'new'
   currentChatName.value = '新建对话'
+  if (common.isMobile()) {
+    isCollapse.value = false
+  }
 }
 
 function getChatLog(id: string) {
@@ -197,6 +219,7 @@ function getChatRecord() {
       const list = res.data.records
       list.map((v: any) => {
         v['write_ed'] = true
+        v['record_id'] = v.id
       })
       currentRecordList.value = [...list, ...currentRecordList.value].sort((a, b) =>
         a.create_time.localeCompare(b.create_time)
@@ -219,6 +242,9 @@ const clickListHandle = (item: any) => {
     if (currentChatId.value !== 'new') {
       getChatRecord()
     }
+  }
+  if (common.isMobile()) {
+    isCollapse.value = false
   }
 }
 
@@ -298,7 +324,6 @@ onMounted(() => {
 
     .right-height {
       height: calc(100vh - var(--app-header-height) * 2 - 24px);
-      overflow: scroll;
     }
   }
 
@@ -331,6 +356,45 @@ onMounted(() => {
   .chat-width {
     max-width: var(--app-chat-width, 860px);
     margin: 0 auto;
+  }
+  .collapse {
+    display: none;
+  }
+}
+// 适配移动端
+.mobile {
+  .chat-pc {
+    &__right {
+      width: 100%;
+    }
+    &__left {
+      display: none;
+      width: 0;
+    }
+  }
+  .collapse {
+    display: block;
+    position: fixed;
+    bottom: 90px;
+    z-index: 99;
+  }
+  &.openLeft {
+    .chat-pc {
+      &__left {
+        display: block;
+        position: fixed;
+        width: 100%;
+        z-index: 99;
+        height: calc(100vh - var(--app-header-height) + 6px);
+      }
+    }
+    .collapse {
+      display: block;
+      position: absolute;
+      bottom: 90px;
+      right: 0;
+      z-index: 99;
+    }
   }
 }
 </style>

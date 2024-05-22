@@ -60,7 +60,6 @@ import { ref, watch, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import TeamApi from '@/api/team'
-// import UserApi from '@/api/user'
 
 const emit = defineEmits(['refresh'])
 
@@ -70,11 +69,9 @@ const memberForm = ref({
   users: []
 })
 
-// const SelectRemoteRef = ref()
 const addMemberFormRef = ref<FormInstance>()
 
 const loading = ref<boolean>(false)
-// const userOptions = ref<Array<any>>([])
 
 const rules = ref<FormRules>({
   users: [
@@ -95,21 +92,6 @@ watch(dialogVisible, (bool) => {
     loading.value = false
   }
 })
-
-// const remoteMethod = (query: string) => {
-//   if (query) {
-//     setTimeout(() => {
-//       getUser(query)
-//     }, 200)
-//   } else {
-//     userOptions.value = []
-//   }
-// }
-
-// const changeSelectHandle = () => {
-//   SelectRemoteRef.value.query = ''
-//   SelectRemoteRef.value.blur()
-// }
 
 const open = () => {
   dialogVisible.value = true

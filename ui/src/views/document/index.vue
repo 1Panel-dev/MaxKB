@@ -127,7 +127,7 @@
               </div>
             </template>
             <template #default="{ row }">
-              {{ hitHandlingMethod[row.hit_handling_method] }}
+              {{ hitHandlingMethod[row.hit_handling_method as keyof typeof hitHandlingMethod] }}
             </template>
           </el-table-column>
           <el-table-column prop="create_time" label="创建时间" width="175">
@@ -227,7 +227,7 @@ import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
 import SelectDatasetDialog from './component/SelectDatasetDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { datetimeFormat } from '@/utils/time'
-import { hitHandlingMethod } from './utils'
+import { hitHandlingMethod } from '@/enums/document'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 const router = useRouter()
