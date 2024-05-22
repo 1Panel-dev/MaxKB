@@ -69,7 +69,7 @@
                   <el-input-number
                     v-model="form.top_n"
                     :min="1"
-                    :max="10"
+                    :max="100"
                     controls-position="right"
                     class="w-full"
                   />
