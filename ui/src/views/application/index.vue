@@ -1,7 +1,7 @@
 <template>
   <div class="application-list-container p-24" style="padding-top: 16px">
     <div class="flex-between mb-16">
-      <h3>{{$t('views.application.applicationList.title')}}</h3>
+      <h3>{{ $t('views.application.applicationList.title') }}</h3>
       <el-input
         v-model="searchValue"
         @change="searchHandle"
@@ -22,7 +22,10 @@
       >
         <el-row :gutter="15">
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
-            <CardAdd :title="$t('views.application.applicationList.card.createApplication')" @click="router.push({ path: '/application/create' })" />
+            <CardAdd
+              :title="$t('views.application.applicationList.card.createApplication')"
+              @click="router.push({ path: '/application/create' })"
+            />
           </el-col>
           <el-col
             :xs="24"
@@ -62,13 +65,21 @@
 
               <template #footer>
                 <div class="footer-content">
-                  <el-tooltip effect="dark" :content="$t('views.application.applicationList.card.demo')" placement="top">
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.application.applicationList.card.demo')"
+                    placement="top"
+                  >
                     <el-button text @click.stop @click="getAccessToken(item.id)">
                       <AppIcon iconName="app-view"></AppIcon>
                     </el-button>
                   </el-tooltip>
                   <el-divider direction="vertical" />
-                  <el-tooltip effect="dark" :content="$t('views.application.applicationList.card.setting')" placement="top">
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.application.applicationList.card.setting')"
+                    placement="top"
+                  >
                     <el-button
                       text
                       @click.stop="router.push({ path: `/application/${item.id}/setting` })"
@@ -77,7 +88,11 @@
                     </el-button>
                   </el-tooltip>
                   <el-divider direction="vertical" />
-                  <el-tooltip effect="dark" :content="$t('views.application.applicationList.card.delete.tooltip')" placement="top">
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.application.applicationList.card.delete.tooltip')"
+                    placement="top"
+                  >
                     <el-button text @click.stop="deleteApplication(item)">
                       <el-icon><Delete /></el-icon>
                     </el-button>
@@ -122,7 +137,7 @@ function searchHandle() {
 }
 function getAccessToken(id: string) {
   application.asyncGetAccessToken(id, loading).then((res: any) => {
-    window.open(application.location + res?.data?.access_token + '?mode=pc')
+    window.open(application.location + res?.data?.access_token)
   })
 }
 
@@ -130,11 +145,13 @@ function deleteApplication(row: any) {
   MsgConfirm(
     // @ts-ignore
     `${t('views.application.applicationList.card.delete.confirmTitle')}：${row.name} ?`,
-    t('views.application.applicationList.card.delete.confirmMessage'), {
+    t('views.application.applicationList.card.delete.confirmMessage'),
+    {
       confirmButtonText: t('views.application.applicationList.card.delete.confirmButton'),
       cancelButtonText: t('views.application.applicationList.card.delete.cancelButton'),
       confirmButtonClass: 'danger'
-    })
+    }
+  )
     .then(() => {
       applicationApi.delApplication(row.id, loading).then(() => {
         const index = applicationList.value.findIndex((v) => v.id === row.id)
