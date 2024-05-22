@@ -234,22 +234,35 @@ const prologueList = computed(() => {
   const temp = props.available
     ? props.data?.prologue
     : '抱歉，当前正在维护，无法提供服务，请稍后再试！'
-  let arr: any = []
   const lines = temp?.split('\n')
-  lines?.forEach((str: string, index: number) => {
-    if (isMdArray(str)) {
-      arr[index] = {
-        type: 'question',
-        str: str.replace(/^-\s+/, '')
+  return lines
+    .reduce((pre_array: Array<any>, current: string, index: number) => {
+      const currentObj = isMdArray(current)
+        ? {
+            type: 'question',
+            str: current.replace(/^-\s+/, ''),
+            index: index
+          }
+        : {
+            type: 'md',
+            str: current,
+            index: index
+          }
+      if (pre_array.length > 0) {
+        const pre = pre_array[pre_array.length - 1]
+        if (!isMdArray(current) && pre.type == 'md') {
+          pre.str = [pre.str, current].join('\n')
+          pre.index = index
+          return pre_array
+        } else {
+          pre_array.push(currentObj)
+        }
+      } else {
+        pre_array.push(currentObj)
       }
-    } else {
-      arr[index] = {
-        type: 'md',
-        str
-      }
-    }
-  })
-  return arr
+      return pre_array
+    }, [])
+    .sort((pre: any, next: any) => pre.index - next.index)
 })
 
 watch(
