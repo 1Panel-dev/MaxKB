@@ -48,14 +48,14 @@
             {{ currentChatName }}
           </h4>
 
-          <span v-if="currentRecordList.length" class="flex align-center">
+          <span class="flex align-center" v-if="currentRecordList.length">
             <el-dropdown class="mr-8">
-                <AppIcon
-                  iconName="takeaway-box"
-                  class="info mr-8"
-                  style="font-size: 16px"
-                  title="导出聊天记录"
-                ></AppIcon>
+              <AppIcon
+                iconName="takeaway-box"
+                class="info mr-8"
+                style="font-size: 16px"
+                title="导出聊天记录"
+              ></AppIcon>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click="exportMarkdown">导出 Markdown</el-dropdown-item>
@@ -63,8 +63,15 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <AppIcon iconName="app-chat-record" class="info mr-8" style="font-size: 16px"></AppIcon>
-            <span class="lighter"> {{ paginationConfig.total }} 条提问 </span>
+            <AppIcon
+              v-if="paginationConfig.total"
+              iconName="app-chat-record"
+              class="info mr-8"
+              style="font-size: 16px"
+            ></AppIcon>
+            <span v-if="paginationConfig.total" class="lighter">
+              {{ paginationConfig.total }} 条提问
+            </span>
           </span>
         </div>
         <div class="right-height chat-width">
@@ -84,7 +91,7 @@
     </div>
 
     <div class="collapse">
-      <el-button size="small" @click="isCollapse = !isCollapse">
+      <el-button @click="isCollapse = !isCollapse">
         <el-icon> <component :is="isCollapse ? 'Fold' : 'Expand'" /></el-icon>
       </el-button>
     </div>
@@ -131,7 +138,7 @@ const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
 const chatLogeData = ref<any[]>([])
 
-const paginationConfig = reactive({
+const paginationConfig = ref({
   current_page: 1,
   page_size: 20,
   total: 0
@@ -145,10 +152,10 @@ function handleScroll(event: any) {
   if (
     currentChatId.value !== 'new' &&
     event.scrollTop === 0 &&
-    paginationConfig.total > currentRecordList.value.length
+    paginationConfig.value.total > currentRecordList.value.length
   ) {
     const history_height = event.dialogScrollbar.offsetHeight
-    paginationConfig.current_page += 1
+    paginationConfig.value.current_page += 1
     getChatRecord().then(() => {
       event.scrollDiv.setScrollTop(event.dialogScrollbar.offsetHeight - history_height)
     })
@@ -180,11 +187,13 @@ function getProfile() {
 
 function newChat() {
   if (!chatLogeData.value.some((v) => v.id === 'new')) {
-    paginationConfig.current_page = 1
+    paginationConfig.value.current_page = 1
+    paginationConfig.value.total = 0
     currentRecordList.value = []
     chatLogeData.value.unshift(newObj)
   } else {
-    paginationConfig.current_page = 1
+    paginationConfig.value.current_page = 1
+    paginationConfig.value.total = 0
     currentRecordList.value = []
   }
   currentChatId.value = 'new'
@@ -194,7 +203,7 @@ function newChat() {
   }
 }
 
-function getChatLog(id: string) {
+function getChatLog(id: string, refresh?: boolean) {
   const page = {
     current_page: 1,
     page_size: 20
@@ -202,6 +211,9 @@ function getChatLog(id: string) {
 
   log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
     chatLogeData.value = res.data.records
+    if (refresh) {
+      currentChatName.value = chatLogeData.value[0].abstract
+    }
   })
 }
 
@@ -210,12 +222,12 @@ function getChatRecord() {
     .asyncChatRecordLog(
       applicationDetail.value.id,
       currentChatId.value,
-      paginationConfig,
+      paginationConfig.value,
       loading,
       false
     )
     .then((res: any) => {
-      paginationConfig.total = res.data.total
+      paginationConfig.value.total = res.data.total
       const list = res.data.records
       list.map((v: any) => {
         v['write_ed'] = true
@@ -224,7 +236,7 @@ function getChatRecord() {
       currentRecordList.value = [...list, ...currentRecordList.value].sort((a, b) =>
         a.create_time.localeCompare(b.create_time)
       )
-      if (paginationConfig.current_page === 1) {
+      if (paginationConfig.value.current_page === 1) {
         nextTick(() => {
           // 将滚动条滚动到最下面
           AiChatRef.value.setScrollBottom()
@@ -235,7 +247,8 @@ function getChatRecord() {
 
 const clickListHandle = (item: any) => {
   if (item.id !== currentChatId.value) {
-    paginationConfig.current_page = 1
+    paginationConfig.value.current_page = 1
+    paginationConfig.value.total = 0
     currentRecordList.value = []
     currentChatId.value = item.id
     currentChatName.value = item.abstract
@@ -249,15 +262,15 @@ const clickListHandle = (item: any) => {
 }
 
 function refresh(id: string) {
-  getChatLog(applicationDetail.value.id)
+  getChatLog(applicationDetail.value.id, true)
   currentChatId.value = id
 }
 
 async function exportMarkdown(): Promise<void> {
   const suggestedName: string = `${currentChatId.value}.md`
-  const markdownContent: string = currentRecordList.value.map((record: any) =>
-    `# ${record.problem_text}\n\n${record.answer_text}\n\n`
-  ).join('\n')
+  const markdownContent: string = currentRecordList.value
+    .map((record: any) => `# ${record.problem_text}\n\n${record.answer_text}\n\n`)
+    .join('\n')
 
   const blob: Blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' })
   saveAs(blob, suggestedName)
@@ -265,15 +278,14 @@ async function exportMarkdown(): Promise<void> {
 
 async function exportHTML(): Promise<void> {
   const suggestedName: string = `${currentChatId.value}.html`
-  const markdownContent: string = currentRecordList.value.map((record: any) =>
-    `# ${record.problem_text}\n\n${record.answer_text}\n\n`
-  ).join('\n')
+  const markdownContent: string = currentRecordList.value
+    .map((record: any) => `# ${record.problem_text}\n\n${record.answer_text}\n\n`)
+    .join('\n')
   const htmlContent: any = marked(markdownContent)
 
   const blob: Blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' })
   saveAs(blob, suggestedName)
 }
-
 
 onMounted(() => {
   user.changeUserType(2)
@@ -317,9 +329,11 @@ onMounted(() => {
     padding-top: calc(var(--app-header-height));
     overflow: hidden;
     position: relative;
+    box-sizing: border-box;
 
     .right-header {
       background: #ffffff;
+      box-sizing: border-box;
     }
 
     .right-height {
@@ -366,6 +380,9 @@ onMounted(() => {
   .chat-pc {
     &__right {
       width: 100%;
+      .right-height {
+        height: calc(100vh - var(--app-header-height) * 2 - 24px - env(safe-area-inset-bottom));
+      }
     }
     &__left {
       display: none;
