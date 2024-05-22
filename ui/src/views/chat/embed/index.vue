@@ -32,7 +32,7 @@
           <span>历史记录</span>
         </div>
 
-        <el-scrollbar>
+        <el-scrollbar max-height="300">
           <div class="p-8">
             <common-list
               :data="chatLogeData"
