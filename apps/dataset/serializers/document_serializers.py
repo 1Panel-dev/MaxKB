@@ -17,6 +17,7 @@ from typing import List, Dict
 from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet
+from django.http import HttpResponse
 from drf_yasg import openapi
 from rest_framework import serializers
 
@@ -26,9 +27,11 @@ from common.event.listener_manage import ListenerManagement, SyncWebDocumentArgs
 from common.exception.app_exception import AppApiException
 from common.handle.impl.doc_split_handle import DocSplitHandle
 from common.handle.impl.pdf_split_handle import PdfSplitHandle
+from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
+from common.handle.impl.qa.excel_parse_qa_handle import ExcelParseQAHandle
 from common.handle.impl.text_split_handle import TextSplitHandle
 from common.mixins.api_mixin import ApiMixin
-from common.util.common import post
+from common.util.common import post, flat_map
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
@@ -37,6 +40,17 @@ from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type,
 from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
+
+parse_qa_handle_list = [ExcelParseQAHandle(), CsvParseQAHandle()]
+
+
+class FileBufferHandle:
+    buffer = None
+
+    def get_buffer(self, file):
+        if self.buffer is None:
+            self.buffer = file.read()
+        return self.buffer
 
 
 class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
@@ -86,16 +100,19 @@ class DocumentWebInstanceSerializer(ApiMixin, serializers.Serializer):
                                          "选择器"))
 
     @staticmethod
-    def get_request_body_api():
-        return openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['source_url_list'],
-            properties={
-                'source_url_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="段落列表", description="段落列表",
-                                                  items=openapi.Schema(type=openapi.TYPE_STRING)),
-                'selector': openapi.Schema(type=openapi.TYPE_STRING, title="文档名称", description="文档名称")
-            }
-        )
+    def get_request_params_api():
+        return [openapi.Parameter(name='file',
+                                  in_=openapi.IN_FORM,
+                                  type=openapi.TYPE_ARRAY,
+                                  items=openapi.Items(type=openapi.TYPE_FILE),
+                                  required=True,
+                                  description='上传文件'),
+                openapi.Parameter(name='dataset_id',
+                                  in_=openapi.IN_PATH,
+                                  type=openapi.TYPE_STRING,
+                                  required=True,
+                                  description='知识库id'),
+                ]
 
 
 class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
@@ -119,7 +136,48 @@ class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
         )
 
 
+class DocumentInstanceQASerializer(ApiMixin, serializers.Serializer):
+    file_list = serializers.ListSerializer(required=True,
+                                           error_messages=ErrMessage.list("文件列表"),
+                                           child=serializers.FileField(required=True,
+                                                                       error_messages=ErrMessage.file("文件")))
+
+
 class DocumentSerializers(ApiMixin, serializers.Serializer):
+    class Export(ApiMixin, serializers.Serializer):
+        type = serializers.CharField(required=True, validators=[
+            validators.RegexValidator(regex=re.compile("^csv|excel$"),
+                                      message="模版类型只支持excel|csv",
+                                      code=500)
+        ], error_messages=ErrMessage.char("模版类型"))
+
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='type',
+                                      in_=openapi.IN_QUERY,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description='导出模板类型csv|excel'),
+
+                    ]
+
+        def export(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+
+            if self.data.get('type') == 'csv':
+                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', 'csv_template.csv'), "rb")
+                content = file.read()
+                file.close()
+                return HttpResponse(content, status=200, headers={'Content-Type': 'text/cxv',
+                                                                  'Content-Disposition': 'attachment; filename="csv_template.csv"'})
+            elif self.data.get('type') == 'excel':
+                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', 'excel_template.xlsx'), "rb")
+                content = file.read()
+                file.close()
+                return HttpResponse(content, status=200, headers={'Content-Type': 'application/vnd.ms-excel',
+                                                                  'Content-Disposition': 'attachment; filename="excel_template.xlsx"'})
+
     class Migrate(ApiMixin, serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True,
                                            error_messages=ErrMessage.char(
@@ -471,6 +529,22 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         def post_embedding(result, document_id):
             ListenerManagement.embedding_by_document_signal.send(document_id)
             return result
+
+        @staticmethod
+        def parse_qa_file(file):
+            for parse_qa_handle in parse_qa_handle_list:
+                get_buffer = FileBufferHandle().get_buffer
+                if parse_qa_handle.support(file, get_buffer):
+                    return parse_qa_handle.handle(file, get_buffer)
+            raise AppApiException(500, '不支持的文件格式')
+
+        def save_qa(self, instance: Dict, with_valid=True):
+            if with_valid:
+                DocumentInstanceQASerializer(data=instance).is_valid(raise_exception=True)
+                self.is_valid(raise_exception=True)
+            file_list = instance.get('file_list')
+            document_list = flat_map([self.parse_qa_file(file) for file in file_list])
+            return DocumentSerializers.Batch(data={'dataset_id': self.data.get('dataset_id')}).batch_save(document_list)
 
         @post(post_function=post_embedding)
         @transaction.atomic

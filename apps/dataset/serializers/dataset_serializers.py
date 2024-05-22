@@ -18,7 +18,7 @@ from urllib.parse import urlparse
 from django.contrib.postgres.fields import ArrayField
 from django.core import validators
 from django.db import transaction, models
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet
 from drf_yasg import openapi
 from rest_framework import serializers
 
@@ -29,7 +29,7 @@ from common.db.sql_execute import select_list
 from common.event import ListenerManagement, SyncWebDatasetArgs
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
-from common.util.common import post
+from common.util.common import post, flat_map
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import ChildLink, Fork
@@ -210,6 +210,75 @@ class DataSetSerializers(serializers.ModelSerializer):
                 super().is_valid(raise_exception=True)
                 return True
 
+        class CreateQASerializers(serializers.Serializer):
+            """
+            创建web站点序列化对象
+            """
+            name = serializers.CharField(required=True,
+                                         error_messages=ErrMessage.char("知识库名称"),
+                                         max_length=64,
+                                         min_length=1)
+
+            desc = serializers.CharField(required=True,
+                                         error_messages=ErrMessage.char("知识库描述"),
+                                         max_length=256,
+                                         min_length=1)
+
+            file_list = serializers.ListSerializer(required=True,
+                                                   error_messages=ErrMessage.list("文件列表"),
+                                                   child=serializers.FileField(required=True,
+                                                                               error_messages=ErrMessage.file("文件")))
+
+            @staticmethod
+            def get_request_params_api():
+                return [openapi.Parameter(name='file',
+                                          in_=openapi.IN_FORM,
+                                          type=openapi.TYPE_ARRAY,
+                                          items=openapi.Items(type=openapi.TYPE_FILE),
+                                          required=True,
+                                          description='上传文件'),
+                        openapi.Parameter(name='name',
+                                          in_=openapi.IN_FORM,
+                                          required=True,
+                                          type=openapi.TYPE_STRING, title="知识库名称", description="知识库名称"),
+                        openapi.Parameter(name='desc',
+                                          in_=openapi.IN_FORM,
+                                          required=True,
+                                          type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
+                        ]
+
+            @staticmethod
+            def get_response_body_api():
+                return openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    required=['id', 'name', 'desc', 'user_id', 'char_length', 'document_count',
+                              'update_time', 'create_time', 'document_list'],
+                    properties={
+                        'id': openapi.Schema(type=openapi.TYPE_STRING, title="id",
+                                             description="id", default="xx"),
+                        'name': openapi.Schema(type=openapi.TYPE_STRING, title="名称",
+                                               description="名称", default="测试知识库"),
+                        'desc': openapi.Schema(type=openapi.TYPE_STRING, title="描述",
+                                               description="描述", default="测试知识库描述"),
+                        'user_id': openapi.Schema(type=openapi.TYPE_STRING, title="所属用户id",
+                                                  description="所属用户id", default="user_xxxx"),
+                        'char_length': openapi.Schema(type=openapi.TYPE_STRING, title="字符数",
+                                                      description="字符数", default=10),
+                        'document_count': openapi.Schema(type=openapi.TYPE_STRING, title="文档数量",
+                                                         description="文档数量", default=1),
+                        'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间",
+                                                      description="修改时间",
+                                                      default="1970-01-01 00:00:00"),
+                        'create_time': openapi.Schema(type=openapi.TYPE_STRING, title="创建时间",
+                                                      description="创建时间",
+                                                      default="1970-01-01 00:00:00"
+                                                      ),
+                        'document_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档列表",
+                                                        description="文档列表",
+                                                        items=DocumentSerializers.Operate.get_response_body_api())
+                    }
+                )
+
         class CreateWebSerializers(serializers.Serializer):
             """
             创建web站点序列化对象
@@ -287,6 +356,15 @@ class DataSetSerializers(serializers.ModelSerializer):
             # 发送向量化事件
             ListenerManagement.embedding_by_dataset_signal.send(dataset_id)
             return document_list
+
+        def save_qa(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                self.CreateQASerializers(data=instance).is_valid()
+            file_list = instance.get('file_list')
+            document_list = flat_map([DocumentSerializers.Create.parse_qa_file(file) for file in file_list])
+            dataset_instance = {'name': instance.get('name'), 'desc': instance.get('desc'), 'documents': document_list}
+            return self.save(dataset_instance, with_valid=True)
 
         @post(post_function=post_embedding_dataset)
         @transaction.atomic
