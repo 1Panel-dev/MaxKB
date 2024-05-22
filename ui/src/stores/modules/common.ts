@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia'
+import { DeviceType } from '@/enums/common'
 
 export interface commonTypes {
   breadcrumb: any
   paginationConfig: any | null
   search: any
+  device: string
 }
 
 const useCommonStore = defineStore({
@@ -12,7 +14,8 @@ const useCommonStore = defineStore({
     breadcrumb: null,
     // 搜索和分页缓存
     paginationConfig: {},
-    search: {}
+    search: {},
+    device: DeviceType.Desktop
   }),
   actions: {
     saveBreadcrumb(data: any) {
@@ -23,6 +26,12 @@ const useCommonStore = defineStore({
     },
     saveCondition(val: string, data: any) {
       this.search[val] = data
+    },
+    toggleDevice(value: DeviceType) {
+      this.device = value
+    },
+    isMobile() {
+      return this.device === DeviceType.Mobile
     }
   }
 })
