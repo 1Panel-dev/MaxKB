@@ -43,7 +43,7 @@ export function getImgUrl(name: string) {
 }
 // 是否是白名单后缀
 export function isRightType(name: string) {
-  const typeList = ['txt', 'pdf', 'docx', 'csv', 'md']
+  const typeList = ['txt', 'pdf', 'docx', 'csv', 'md', 'html']
   return typeList.includes(fileType(name))
 }
 
