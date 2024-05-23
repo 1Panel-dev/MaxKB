@@ -1,13 +1,16 @@
 <template>
-  <LayoutContainer :header="documentDetail?.name" back-to="-1" class="document-detail">
+  <LayoutContainer back-to="-1" class="document-detail">
     <template #header>
-      <el-text type="info" v-if="documentDetail?.type === '1'"
-        >（文档地址：<el-link :href="documentDetail?.meta?.source_url" target="_blank">{{
-          documentDetail?.meta?.source_url
-        }}</el-link
-        >）</el-text
-      >
-      <div class="document-detail__header">
+      <div style="width: 80%">
+        <h3 style="display: inline-block">{{ documentDetail?.name }}</h3>
+        <el-text type="info" v-if="documentDetail?.type === '1'"
+          >（文档地址：<el-link :href="documentDetail?.meta?.source_url" target="_blank">{{
+            documentDetail?.meta?.source_url
+          }}</el-link
+          >）
+        </el-text>
+      </div>
+      <div class="header-button">
         <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
           批量选择
         </el-button>
@@ -323,7 +326,7 @@ onMounted(() => {
 </script>
 <style lang="scss" scoped>
 .document-detail {
-  &__header {
+  .header-button {
     position: absolute;
     right: calc(var(--app-base-px) * 3);
   }
