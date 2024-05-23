@@ -18,7 +18,7 @@ from urllib.parse import urlparse
 from django.contrib.postgres.fields import ArrayField
 from django.core import validators
 from django.db import transaction, models
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet
 from drf_yasg import openapi
 from rest_framework import serializers
 
@@ -601,6 +601,11 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset.delete()
             ListenerManagement.delete_embedding_by_dataset_signal.send(self.data.get('id'))
             return True
+
+        def re_embedding(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            ListenerManagement.embedding_by_dataset_signal.send(self.data.get('id'))
 
         def list_application(self, with_valid=True):
             if with_valid:

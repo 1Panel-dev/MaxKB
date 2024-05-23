@@ -123,6 +123,8 @@ class ListenerManagement:
         :return: None
         """
         max_kb.info(f"开始--->向量化文档:{document_id}")
+        QuerySet(Document).filter(id=document_id).update(**{'status': Status.embedding})
+        QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': Status.embedding})
         status = Status.success
         try:
             data_list = native_search(

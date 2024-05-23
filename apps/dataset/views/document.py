@@ -136,6 +136,24 @@ class Document(APIView):
         def delete(self, request: Request, dataset_id: str):
             return result.success(DocumentSerializers.Batch(data={'dataset_id': dataset_id}).batch_delete(request.data))
 
+    class SyncWeb(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="同步web站点类型",
+                             operation_id="同步web站点类型",
+                             manual_parameters=DocumentSerializers.Operate.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库/文档"]
+                             )
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def put(self, request: Request, dataset_id: str, document_id: str):
+            return result.success(
+                DocumentSerializers.Sync(data={'document_id': document_id, 'dataset_id': dataset_id}).sync(
+                ))
+
     class Refresh(APIView):
         authentication_classes = [TokenAuth]
 

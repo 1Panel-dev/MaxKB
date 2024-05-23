@@ -389,18 +389,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
-            document = QuerySet(Document).filter(id=document_id).first()
-            if document.type == Type.web:
-                # 异步同步
-                work_thread_pool.submit(lambda x: DocumentSerializers.Sync(data={'document_id': document_id}).sync(),
-                                        {})
-
-            else:
-                if document.status != Status.embedding.value:
-                    document.status = Status.embedding
-                    document.save()
-                ListenerManagement.embedding_by_document_signal.send(document_id)
-            return True
+            ListenerManagement.embedding_by_document_signal.send(document_id)
 
         @transaction.atomic
         def delete(self):
