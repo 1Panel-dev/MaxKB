@@ -45,6 +45,18 @@ def get_exec_method(clazz_: str, method_: str):
     return getattr(getattr(package_model, clazz_name), method_)
 
 
+def flat_map(array: List[List]):
+    """
+    将二位数组转为一维数组
+    :param array: 二维数组
+    :return: 一维数组
+    """
+    result = []
+    for e in array:
+        result += e
+    return result
+
+
 def post(post_function):
     def inner(func):
         def run(*args, **kwargs):

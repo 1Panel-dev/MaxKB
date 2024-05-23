@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put } from '@/request/index'
+import { get, post, del, put, exportExcel } from '@/request/index'
 import type { Ref } from 'vue'
 import type { KeyValue } from '@/api/type/common'
 import type { pageRequest } from '@/api/type/common'
@@ -189,6 +189,20 @@ const postWebDocument: (
 }
 
 /**
+ * 导入QA文档
+ * @param 参数 
+ * file
+}
+ */
+const postQADocument: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, data, loading) => {
+  return post(`${prefix}/${dataset_id}/document/qa`, data, undefined, loading)
+}
+
+/**
  * 批量迁移文档
  * @param 参数 dataset_id,target_dataset_id,
  */
@@ -220,6 +234,19 @@ const batchEditHitHandling: (
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
   return put(`${prefix}/${dataset_id}/document/batch_hit_handling`, data, undefined, loading)
 }
+
+/**
+ * 获得QA模版
+ * @param 参数 fileName,type,
+ */
+const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>) => void = (
+  fileName,
+  type,
+  loading
+) => {
+  return exportExcel(fileName, `${prefix}/document/template/export`, { type }, loading)
+}
+
 export default {
   postSplitDocument,
   getDocument,
@@ -234,5 +261,7 @@ export default {
   delMulSyncDocument,
   postWebDocument,
   putMigrateMulDocument,
-  batchEditHitHandling
+  batchEditHitHandling,
+  exportQATemplate,
+  postQADocument
 }
