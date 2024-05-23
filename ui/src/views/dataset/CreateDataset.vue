@@ -98,13 +98,9 @@ async function next() {
         })
       } else {
         // QA知识库创建
-        if (baseInfo.value) {
-          Object.keys(baseInfo.value).forEach((key) => {
-            if (baseInfo.value && baseInfo.value[key]) {
-              fd.append(key, baseInfo.value[key])
-            }
-          })
-        }
+        fd.append('name', baseInfo.value?.name as string)
+        fd.append('desc', baseInfo.value?.desc as string)
+
         datasetApi.postQADataset(fd, loading).then((res) => {
           successInfo.value = res.data
           active.value = 2
