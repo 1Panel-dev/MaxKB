@@ -26,6 +26,7 @@ from common.event.common import work_thread_pool
 from common.event.listener_manage import ListenerManagement, SyncWebDocumentArgs, UpdateEmbeddingDatasetIdArgs
 from common.exception.app_exception import AppApiException
 from common.handle.impl.doc_split_handle import DocSplitHandle
+from common.handle.impl.html_split_handle import HTMLSplitHandle
 from common.handle.impl.pdf_split_handle import PdfSplitHandle
 from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
 from common.handle.impl.qa.xls_parse_qa_handle import XlsParseQAHandle
@@ -849,7 +850,7 @@ class FileBufferHandle:
 
 
 default_split_handle = TextSplitHandle()
-split_handles = [DocSplitHandle(), PdfSplitHandle(), default_split_handle]
+split_handles = [HTMLSplitHandle(), DocSplitHandle(), PdfSplitHandle(), default_split_handle]
 
 
 def save_image(image_list):

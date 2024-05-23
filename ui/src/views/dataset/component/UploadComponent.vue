@@ -58,7 +58,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        accept=".txt, .md, .csv, .log, .docx, .pdf"
+        accept=".txt, .md, .csv, .log, .docx, .pdf, .html"
         :limit="50"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
@@ -72,7 +72,9 @@
             <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>支持格式：TXT、Markdown、PDF、DOCX，每次最多上传50个文件，每个文件不超过 100MB</p>
+            <p>
+              支持格式：TXT、Markdown、PDF、DOCX、HTML 每次最多上传50个文件，每个文件不超过 100MB
+            </p>
             <p>若使用【高级分段】建议上传前规范文件的分段标识</p>
           </div>
         </div>
