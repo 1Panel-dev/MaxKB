@@ -21,7 +21,12 @@
         :toolbars="toolbars"
         style="height: 300px"
         @onUploadImg="onUploadImg"
-      />
+        :footers="footers"
+      >
+        <template #defFooters>
+          <span style="margin-left: -6px;">/ 4096</span>
+        </template>
+      </MarkdownEditor>
       <MdPreview
         v-else
         ref="editorRef"
@@ -75,6 +80,8 @@ const toolbars = [
   'preview',
   'htmlPreview'
 ] as any[]
+
+const footers = ['markdownTotal', 0, '=', 1, 'scrollSwitch']
 
 const editorRef = ref()
 
