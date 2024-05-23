@@ -380,9 +380,6 @@ onMounted(() => {
   .chat-pc {
     &__right {
       width: 100%;
-      .right-height {
-        height: calc(100vh - var(--app-header-height) * 2 - 24px - env(safe-area-inset-bottom));
-      }
     }
     &__left {
       display: none;
