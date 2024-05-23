@@ -110,6 +110,7 @@ watch(form.value, (value) => {
 
 function radioChange() {
   dataset.saveDocumentsFile([])
+  dataset.saveDocumentsType('')
   form.value.source_url = ''
   form.value.selector = ''
 }
@@ -126,6 +127,7 @@ const onSubmit = async () => {
         stores保存数据
       */
           dataset.saveBaseInfo(BaseFormRef.value.form)
+          dataset.saveDocumentsType(UploadComponentRef.value.form.fileType)
           dataset.saveDocumentsFile(UploadComponentRef.value.form.fileList)
           return true
         }
@@ -156,6 +158,7 @@ const onSubmit = async () => {
       /*
         stores保存数据
       */
+      dataset.saveDocumentsType(UploadComponentRef.value.form.fileType)
       dataset.saveDocumentsFile(UploadComponentRef.value.form.fileList)
       return true
     } else {

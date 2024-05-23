@@ -94,6 +94,22 @@ const postWebDataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>
 }
 
 /**
+ * 创建QA知识库
+  * @param 参数 formData
+ * {
+  "file": "file",
+  "name": "string",
+  "desc": "string",
+  }
+ */
+const postQADataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading
+) => {
+  return post(`${prefix}/qa`, data, undefined, loading)
+}
+
+/**
  * 知识库详情
  * @param 参数 dataset_id
  */
@@ -170,5 +186,6 @@ export default {
   listUsableApplication,
   getDatasetHitTest,
   postWebDataset,
+  postQADataset,
   putSyncWebDataset
 }

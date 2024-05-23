@@ -37,14 +37,20 @@ export function fileType(name: string) {
 /*
   获得文件对应图片
 */
+const typeList: any = {
+  txt: ['txt', 'pdf', 'docx', 'csv', 'md'],
+  QA: ['xlsx', 'csv']
+}
+
 export function getImgUrl(name: string) {
-  const type = isRightType(name) ? fileType(name) : 'unknow'
+  const list = Object.values(typeList).flat()
+
+  const type = list.includes(fileType(name)) ? fileType(name) : 'unknow'
   return new URL(`../assets/${type}-icon.svg`, import.meta.url).href
 }
 // 是否是白名单后缀
-export function isRightType(name: string) {
-  const typeList = ['txt', 'pdf', 'docx', 'csv', 'md']
-  return typeList.includes(fileType(name))
+export function isRightType(name: string, type: string) {
+  return typeList[type].includes(fileType(name))
 }
 
 /*
