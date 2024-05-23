@@ -39,6 +39,7 @@ httpx-sse = "^0.4.0"
 websocket-client = "^1.7.0"
 langchain-google-genai = "^1.0.3"
 openpyxl = "^3.1.2"
+xlrd = "^2.0.1"
 
 [build-system]
 requires = ["poetry-core"]

@@ -28,7 +28,8 @@ from common.exception.app_exception import AppApiException
 from common.handle.impl.doc_split_handle import DocSplitHandle
 from common.handle.impl.pdf_split_handle import PdfSplitHandle
 from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
-from common.handle.impl.qa.excel_parse_qa_handle import ExcelParseQAHandle
+from common.handle.impl.qa.xls_parse_qa_handle import XlsParseQAHandle
+from common.handle.impl.qa.xlsx_parse_qa_handle import XlsxParseQAHandle
 from common.handle.impl.text_split_handle import TextSplitHandle
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post, flat_map
@@ -41,7 +42,7 @@ from dataset.serializers.common_serializers import BatchSerializer, MetaSerializ
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
 
-parse_qa_handle_list = [ExcelParseQAHandle(), CsvParseQAHandle()]
+parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle()]
 
 
 class FileBufferHandle:
@@ -787,6 +788,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 problem_paragraph_mapping_list) > 0 else None
             # 查询文档
             query_set = QuerySet(model=Document)
+            if len(document_model_list) == 0:
+                return [],
             query_set = query_set.filter(**{'id__in': [d.id for d in document_model_list]})
             return native_search(query_set, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_document.sql')), with_search_one=False),

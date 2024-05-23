@@ -39,7 +39,7 @@ export function fileType(name: string) {
 */
 const typeList: any = {
   txt: ['txt', 'pdf', 'docx', 'csv', 'md'],
-  QA: ['xlsx', 'csv']
+  QA: ['xlsx', 'csv', 'xls']
 }
 
 export function getImgUrl(name: string) {

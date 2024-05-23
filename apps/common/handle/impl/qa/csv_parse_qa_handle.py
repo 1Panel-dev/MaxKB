@@ -9,6 +9,8 @@
 import csv
 import io
 
+from charset_normalizer import detect
+
 from common.handle.base_parse_qa_handle import BaseParseQAHandle
 
 
@@ -30,9 +32,12 @@ class CsvParseQAHandle(BaseParseQAHandle):
 
     def handle(self, file, get_buffer):
         buffer = get_buffer(file)
-        reader = csv.reader(io.TextIOWrapper(io.BytesIO(buffer)))
-        title_row_list = reader.__next__()
-        title_row_index_dict = {}
+        reader = csv.reader(io.TextIOWrapper(io.BytesIO(buffer), encoding=detect(buffer)['encoding']))
+        try:
+            title_row_list = reader.__next__()
+        except Exception as e:
+            return []
+        title_row_index_dict = {'title': 0, 'content': 1, 'problem_list': 2}
         for index in range(len(title_row_list)):
             title_row = title_row_list[index]
             if title_row.startswith('分段标题'):

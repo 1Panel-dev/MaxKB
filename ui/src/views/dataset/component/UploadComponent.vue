@@ -37,7 +37,7 @@
             <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>当前支持 XLSX / CSV 格式的文档</p>
+            <p>当前支持 XLSX / XLS / CSV 格式的文档</p>
             <p>每次最多上传50个文件，每个文件不超过 100MB</p>
           </div>
         </div>
@@ -102,7 +102,7 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, onUnmounted, onMounted, computed, watch, nextTick } from 'vue'
-import type { UploadFile, UploadFiles } from 'element-plus'
+import type { UploadFiles } from 'element-plus'
 import { filesize, getImgUrl, isRightType } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
 import documentApi from '@/api/document'
@@ -126,7 +126,7 @@ watch(form.value, (value) => {
 })
 
 function downloadTemplate(type: string) {
-  documentApi.exportQATemplate(`${type}模版`, type)
+  documentApi.exportQATemplate(`${type}模版.${type == 'csv' ? type : 'xlsx'}`, type)
 }
 
 function radioChange() {
