@@ -523,8 +523,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
         @staticmethod
         def parse_qa_file(file):
+            get_buffer = FileBufferHandle().get_buffer
             for parse_qa_handle in parse_qa_handle_list:
-                get_buffer = FileBufferHandle().get_buffer
                 if parse_qa_handle.support(file, get_buffer):
                     return parse_qa_handle.handle(file, get_buffer)
             raise AppApiException(500, '不支持的文件格式')
