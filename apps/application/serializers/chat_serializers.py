@@ -426,6 +426,9 @@ class ChatRecordSerializer(serializers.Serializer):
                                       error_messages=ErrMessage.char("段落标题"))
         content = serializers.CharField(required=True, error_messages=ErrMessage.char("段落内容"))
 
+        problem_text = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                             error_messages=ErrMessage.char("问题"))
+
     class ParagraphModel(serializers.ModelSerializer):
         class Meta:
             model = Paragraph
@@ -496,8 +499,9 @@ class ChatRecordSerializer(serializers.Serializer):
                                   content=instance.get("content"),
                                   dataset_id=dataset_id,
                                   title=instance.get("title") if 'title' in instance else '')
-
-            problem = Problem(id=uuid.uuid1(), content=chat_record.problem_text, dataset_id=dataset_id)
+            problem_text = instance.get('problem_text') if instance.get(
+                'problem_text') is not None else chat_record.problem_text
+            problem = Problem(id=uuid.uuid1(), content=problem_text, dataset_id=dataset_id)
             problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid1(), dataset_id=dataset_id,
                                                                 document_id=document_id,
                                                                 problem_id=problem.id,

@@ -9,7 +9,7 @@
       @submit.prevent
     >
       <el-form-item label="关联问题">
-        <span>{{ form.problem_text }}</span>
+        <el-input v-model="form.problem_text" placeholder="关联问题"> </el-input>
       </el-form-item>
       <el-form-item label="内容" prop="content">
         <el-input
@@ -172,7 +172,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     if (valid) {
       const obj = {
         title: form.value.title,
-        content: form.value.content
+        content: form.value.content,
+        problem_text: form.value.problem_text
       }
       logApi
         .putChatRecordLog(
