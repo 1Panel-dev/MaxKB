@@ -176,6 +176,17 @@ const putSyncWebDataset: (
   return put(`${prefix}/${dataset_id}/sync_web`, undefined, { sync_type }, loading)
 }
 
+/**
+ * 重新向量化知识库
+ * @param 参数 dataset_id
+ */
+const putReEmbeddingDataset: (
+  dataset_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, loading) => {
+  return put(`${prefix}/${dataset_id}/re_embedding`, undefined, undefined, loading)
+}
+
 export default {
   getDataset,
   getAllDataset,
@@ -186,6 +197,9 @@ export default {
   listUsableApplication,
   getDatasetHitTest,
   postWebDataset,
+  putSyncWebDataset,
+  putReEmbeddingDataset,
   postQADataset,
   putSyncWebDataset
+
 }

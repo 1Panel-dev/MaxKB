@@ -680,6 +680,11 @@ class DataSetSerializers(serializers.ModelSerializer):
             ListenerManagement.delete_embedding_by_dataset_signal.send(self.data.get('id'))
             return True
 
+        def re_embedding(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            ListenerManagement.embedding_by_dataset_signal.send(self.data.get('id'))
+
         def list_application(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)

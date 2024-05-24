@@ -137,12 +137,8 @@ const getDocumentDetail: (dataset_id: string, document_id: string) => Promise<Re
 
 /**
  * 刷新文档向量库
- * @param 参数 
- * dataset_id, document_id, 
- * {
-      "name": "string",
-      "is_active": true
-    }
+ * @param 参数
+ * dataset_id, document_id,
  */
 const putDocumentRefresh: (
   dataset_id: string,
@@ -155,6 +151,19 @@ const putDocumentRefresh: (
     undefined,
     loading
   )
+}
+
+/**
+ * 同步web站点类型
+ * @param 参数
+ * dataset_id, document_id,
+ */
+const putDocumentSync: (
+  dataset_id: string,
+  document_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, document_id, loading) => {
+  return put(`${prefix}/${dataset_id}/document/${document_id}/sync`, undefined, undefined, loading)
 }
 
 /**
@@ -258,6 +267,7 @@ export default {
   getDocumentDetail,
   listSplitPattern,
   putDocumentRefresh,
+  putDocumentSync,
   delMulSyncDocument,
   postWebDocument,
   putMigrateMulDocument,

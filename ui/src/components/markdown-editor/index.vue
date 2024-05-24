@@ -1,5 +1,9 @@
 <template>
-  <MdEditor noIconfont v-bind="$attrs" />
+  <MdEditor noIconfont v-bind="$attrs">
+    <template #defFooters>
+      <slot name="defFooters"> </slot>
+    </template>
+  </MdEditor>
 </template>
 
 <script setup lang="ts">
