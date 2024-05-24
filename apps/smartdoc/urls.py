@@ -19,26 +19,13 @@ import os
 from django.http import HttpResponse
 from django.urls import path, re_path, include
 from django.views import static
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework import permissions, status
+from rest_framework import status
 
-from common.auth import AnonymousAuthentication
+from application.urls import urlpatterns as application_urlpatterns
+from common.init.init_doc import init_doc
 from common.response.result import Result
 from smartdoc import settings
 from smartdoc.conf import PROJECT_DIR
-
-schema_view = get_schema_view(
-
-    openapi.Info(
-        title="Python API",
-        default_version='v1',
-        description="智能客服平台",
-    ),
-    public=True,
-    permission_classes=[permissions.AllowAny],
-    authentication_classes=[AnonymousAuthentication]
-)
 
 urlpatterns = [
     path("api/", include("users.urls")),
@@ -83,10 +70,4 @@ def page_not_found(request, exception):
 
 
 handler404 = page_not_found
-
-urlpatterns += [
-    re_path(r'^doc(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
-            name='schema-json'),  # 导出
-    path('doc/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-]
+init_doc(urlpatterns, application_urlpatterns)

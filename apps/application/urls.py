@@ -5,7 +5,7 @@ from . import views
 app_name = "application"
 urlpatterns = [
     path('application', views.Application.as_view(), name="application"),
-    path('application/profile', views.Application.Profile.as_view()),
+    path('application/profile', views.Application.Profile.as_view(), name='application/profile'),
     path('application/embed', views.Application.Embed.as_view()),
     path('application/authentication', views.Application.Authentication.as_view()),
     path('application/<str:application_id>/edit_icon', views.Application.EditIcon.as_view()),
@@ -28,7 +28,7 @@ urlpatterns = [
     path('application/<str:application_id>/access_token', views.Application.AccessToken.as_view(),
          name='application/access_token'),
     path('application/<int:current_page>/<int:page_size>', views.Application.Page.as_view(), name='application_page'),
-    path('application/<str:application_id>/chat/open', views.ChatView.Open.as_view()),
+    path('application/<str:application_id>/chat/open', views.ChatView.Open.as_view(), name='application/open'),
     path("application/chat/open", views.ChatView.OpenTemp.as_view()),
     path("application/<str:application_id>/chat/client/<int:current_page>/<int:page_size>",
          views.ChatView.ClientChatHistoryPage.as_view()),
@@ -50,7 +50,7 @@ urlpatterns = [
         name=''),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/<str:chat_record_id>/improve',
          views.ChatView.ChatRecord.ChatRecordImprove.as_view()),
-    path('application/chat_message/<str:chat_id>', views.ChatView.Message.as_view()),
+    path('application/chat_message/<str:chat_id>', views.ChatView.Message.as_view(), name='application/message'),
     path(
         'application/<str:application_id>/chat/<chat_id>/chat_record/<str:chat_record_id>/dataset/<str:dataset_id>/document_id/<str:document_id>/improve/<str:paragraph_id>',
         views.ChatView.ChatRecord.Improve.Operate.as_view(),
