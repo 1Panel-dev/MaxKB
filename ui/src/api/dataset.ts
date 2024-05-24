@@ -199,7 +199,5 @@ export default {
   postWebDataset,
   putSyncWebDataset,
   putReEmbeddingDataset,
-  postQADataset,
-  putSyncWebDataset
-
+  postQADataset
 }
