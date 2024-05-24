@@ -82,9 +82,9 @@
                 <el-text type="info">API访问凭据</el-text>
               </div>
               <div class="mt-4 mb-16 url-height">
-                <span class="vertical-middle lighter break-all">
+                <a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
                   {{ apiUrl }}
-                </span>
+                </a>
 
                 <el-button type="primary" text @click="copyClick(apiUrl)">
                   <AppIcon iconName="app-copy"></AppIcon>
@@ -149,7 +149,7 @@ const {
   params: { id }
 } = route as any
 
-const apiUrl = window.location.origin + '/doc'
+const apiUrl = window.location.origin + '/doc/chat'
 
 const EditAvatarDialogRef = ref()
 const LimitDialogRef = ref()
