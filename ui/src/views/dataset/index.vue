@@ -75,6 +75,13 @@
                               v-if="item.type === '1'"
                               >同步</el-dropdown-item
                             >
+                            <el-dropdown-item @click="reEmbeddingDataset(item)">
+                              <AppIcon
+                                iconName="app-document-refresh"
+                                style="font-size: 16px"
+                              ></AppIcon>
+                              重新向量化</el-dropdown-item
+                            >
                             <el-dropdown-item
                               icon="Setting"
                               @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
@@ -118,8 +125,12 @@ const paginationConfig = reactive({
 
 const searchValue = ref('')
 
-function refresh(row: any) {
+function refresh() {
   MsgSuccess('同步任务发送成功')
+}
+
+function reEmbeddingDataset(row: any) {
+  datasetApi.putReEmbeddingDataset(row.id).then(() => {})
 }
 
 function syncDataset(row: any) {
