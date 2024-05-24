@@ -65,11 +65,13 @@ def find_err_detail(exc_detail):
                 return find_err_detail(_value)
             elif isinstance(_value, ErrorDetail):
                 return _value
-            elif isinstance(_value, dict):
+            elif isinstance(_value, dict) and len(_value.keys()) > 0:
                 return find_err_detail(_value)
     if isinstance(exc_detail, list):
         for v in exc_detail:
-            return find_err_detail(v)
+            r = find_err_detail(v)
+            if r is not None:
+                return r
 
 
 def handle_exception(exc, context):
