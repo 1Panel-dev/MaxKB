@@ -145,7 +145,10 @@
                     </div>
                     <el-tooltip effect="dark" placement="right">
                       <template #content>{{
-                        $t('views.application.applicationForm.form.prompt.tooltip')
+                        $t('views.application.applicationForm.form.prompt.tooltip', {
+                          data: '{data}',
+                          question: '{question}'
+                        })
                       }}</template>
                       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                     </el-tooltip>
