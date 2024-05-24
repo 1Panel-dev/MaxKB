@@ -113,7 +113,7 @@ class ApplicationSerializer(serializers.Serializer):
     model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      error_messages=ErrMessage.char("模型"))
     multiple_rounds_dialogue = serializers.BooleanField(required=True, error_messages=ErrMessage.char("多轮对话"))
-    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=1024,
+    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                      error_messages=ErrMessage.char("开场白"))
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                  allow_null=True, error_messages=ErrMessage.list("关联知识库"))
@@ -260,7 +260,7 @@ class ApplicationSerializer(serializers.Serializer):
                                          error_messages=ErrMessage.char("模型"))
         multiple_rounds_dialogue = serializers.BooleanField(required=False,
                                                             error_messages=ErrMessage.boolean("多轮会话"))
-        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=1024,
+        prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                          error_messages=ErrMessage.char("开场白"))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
                                                      error_messages=ErrMessage.list("关联知识库")
