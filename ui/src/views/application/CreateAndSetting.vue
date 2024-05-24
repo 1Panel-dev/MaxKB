@@ -335,7 +335,10 @@ const {
   params: { id }
 } = route as any
 // @ts-ignore
-const defaultPrompt = t('views.application.prompt.defaultPrompt')
+const defaultPrompt = t('views.application.prompt.defaultPrompt', {
+  data: '{data}',
+  question: '{question}'
+})
 
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
