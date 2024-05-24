@@ -40,6 +40,7 @@ import StepFirst from './step/StepFirst.vue'
 import StepSecond from './step/StepSecond.vue'
 import ResultSuccess from './step/ResultSuccess.vue'
 import datasetApi from '@/api/dataset'
+import documentApi from '@/api/document'
 import type { datasetData } from '@/api/type/dataset'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
@@ -48,6 +49,7 @@ const { dataset, document } = useStore()
 const baseInfo = computed(() => dataset.baseInfo)
 const webInfo = computed(() => dataset.webInfo)
 const documentsFiles = computed(() => dataset.documentsFiles)
+const documentsType = computed(() => dataset.documentsType)
 
 const router = useRouter()
 const route = useRoute()
@@ -80,7 +82,33 @@ const successInfo = ref<any>(null)
 async function next() {
   disabled.value = true
   if (await StepFirstRef.value?.onSubmit()) {
-    if (active.value++ > 2) active.value = 0
+    if (documentsType.value === 'QA') {
+      let fd = new FormData()
+      documentsFiles.value.forEach((item: any) => {
+        if (item?.raw) {
+          fd.append('file', item?.raw)
+        }
+      })
+      if (id) {
+        // QA文档上传
+        documentApi.postQADocument(id as string, fd, loading).then((res) => {
+          MsgSuccess('提交成功')
+          clearStore()
+          router.push({ path: `/dataset/${id}/document` })
+        })
+      } else {
+        // QA知识库创建
+        fd.append('name', baseInfo.value?.name as string)
+        fd.append('desc', baseInfo.value?.desc as string)
+
+        datasetApi.postQADataset(fd, loading).then((res) => {
+          successInfo.value = res.data
+          active.value = 2
+        })
+      }
+    } else {
+      if (active.value++ > 2) active.value = 0
+    }
   } else {
     disabled.value = false
   }
@@ -93,6 +121,7 @@ function clearStore() {
   dataset.saveBaseInfo(null)
   dataset.saveWebInfo(null)
   dataset.saveDocumentsFile([])
+  dataset.saveDocumentsType('')
 }
 function submit() {
   loading.value = true

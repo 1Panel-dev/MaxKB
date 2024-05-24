@@ -7,7 +7,48 @@
     label-position="top"
     require-asterisk-position="right"
   >
-    <el-form-item prop="fileList">
+    <el-form-item>
+      <el-radio-group v-model="form.fileType" @change="radioChange">
+        <el-radio value="txt">文本文件</el-radio>
+        <el-radio value="QA">QA 问答对</el-radio>
+      </el-radio-group>
+    </el-form-item>
+    <el-form-item prop="fileList" v-if="form.fileType === 'QA'">
+      <el-upload
+        :webkitdirectory="false"
+        class="w-full mb-4"
+        drag
+        multiple
+        v-model:file-list="form.fileList"
+        action="#"
+        :auto-upload="false"
+        :show-file-list="false"
+        accept=".xlsx, .xls, .csv"
+        :limit="50"
+        :on-exceed="onExceed"
+        :on-change="fileHandleChange"
+        @click.prevent="handlePreview(false)"
+      >
+        <img src="@/assets/upload-icon.svg" alt="" />
+        <div class="el-upload__text">
+          <p>
+            拖拽文件至此上传或
+            <em class="hover" @click.prevent="handlePreview(false)"> 选择文件 </em>
+            <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
+          </p>
+          <div class="upload__decoration">
+            <p>当前支持 XLSX / XLS / CSV 格式的文档</p>
+            <p>每次最多上传50个文件，每个文件不超过 100MB</p>
+          </div>
+        </div>
+      </el-upload>
+      <el-button type="primary" link @click="downloadTemplate('excel')">
+        下载 Excel 模板
+      </el-button>
+      <el-divider direction="vertical" />
+      <el-button type="primary" link @click="downloadTemplate('csv')"> 下载 CSV 模板 </el-button>
+    </el-form-item>
+    <el-form-item prop="fileList" v-else>
       <el-upload
         :webkitdirectory="false"
         class="w-full"
@@ -63,13 +104,16 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, onUnmounted, onMounted, computed, watch, nextTick } from 'vue'
-import type { UploadFile, UploadFiles } from 'element-plus'
+import type { UploadFiles } from 'element-plus'
 import { filesize, getImgUrl, isRightType } from '@/utils/utils'
 import { MsgError } from '@/utils/message'
+import documentApi from '@/api/document'
 import useStore from '@/stores'
 const { dataset } = useStore()
 const documentsFiles = computed(() => dataset.documentsFiles)
+const documentsType = computed(() => dataset.documentsType)
 const form = ref({
+  fileType: 'txt',
   fileList: [] as any
 })
 
@@ -79,22 +123,32 @@ const rules = reactive({
 const FormRef = ref()
 
 watch(form.value, (value) => {
+  dataset.saveDocumentsType(value.fileType)
   dataset.saveDocumentsFile(value.fileList)
 })
+
+function downloadTemplate(type: string) {
+  documentApi.exportQATemplate(`${type}模版.${type == 'csv' ? type : 'xlsx'}`, type)
+}
+
+function radioChange() {
+  form.value.fileList = []
+}
+
 function deleteFile(index: number) {
   form.value.fileList.splice(index, 1)
 }
 
 // 上传on-change事件
 const fileHandleChange = (file: any, fileList: UploadFiles) => {
-  //1、判断文件大小是否合法，文件限制不能大于10M
+  //1、判断文件大小是否合法，文件限制不能大于100M
   const isLimit = file?.size / 1024 / 1024 < 100
   if (!isLimit) {
     MsgError('文件大小超过 100MB')
     fileList.splice(-1, 1) //移除当前超出大小的文件
     return false
   }
-  if (!isRightType(file?.name)) {
+  if (!isRightType(file?.name, form.value.fileType)) {
     MsgError('文件格式不支持')
     fileList.splice(-1, 1)
     return false
@@ -126,12 +180,16 @@ function validate() {
 }
 
 onMounted(() => {
+  if (documentsType.value) {
+    form.value.fileType = documentsType.value
+  }
   if (documentsFiles.value) {
     form.value.fileList = documentsFiles.value
   }
 })
 onUnmounted(() => {
   form.value = {
+    fileType: 'txt',
     fileList: []
   }
 })

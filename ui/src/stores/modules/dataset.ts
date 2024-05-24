@@ -7,6 +7,7 @@ import { type Ref } from 'vue'
 export interface datasetStateTypes {
   baseInfo: datasetData | null
   webInfo: any
+  documentsType: string
   documentsFiles: UploadUserFile[]
 }
 
@@ -15,6 +16,7 @@ const useDatasetStore = defineStore({
   state: (): datasetStateTypes => ({
     baseInfo: null,
     webInfo: null,
+    documentsType: '',
     documentsFiles: []
   }),
   actions: {
@@ -23,6 +25,9 @@ const useDatasetStore = defineStore({
     },
     saveWebInfo(info: any) {
       this.webInfo = info
+    },
+    saveDocumentsType(val: string) {
+      this.documentsType = val
     },
     saveDocumentsFile(file: UploadUserFile[]) {
       this.documentsFiles = file
