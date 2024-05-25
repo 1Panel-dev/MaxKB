@@ -57,6 +57,7 @@
 import { ref, computed, onMounted } from 'vue'
 import AppCharts from '@/components/app-charts/index.vue'
 import { getAttrsArray, getSum, numberFormat } from '@/utils/utils'
+import { t } from '@/locales'
 const props = defineProps({
   data: {
     type: Array,
@@ -66,7 +67,8 @@ const props = defineProps({
 const statisticsType = computed(() => [
   {
     id: 'customerCharts',
-    name: '用户总数',
+    // @ts-ignore
+    name: t('views.applicationOverview.monitor.charts.customerTotal'),
     icon: 'app-user',
     background: '#EBF1FF',
     color: '#3370FF',
@@ -75,17 +77,17 @@ const statisticsType = computed(() => [
       getSum(getAttrsArray(props.data, 'customer_added_count') || 0)
     ],
     option: {
-      title: '用户总数',
+      title: t('views.applicationOverview.monitor.charts.customerTotal'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
-          name: '用户总数',
+          name: t('views.applicationOverview.monitor.charts.customerTotal'),
           type: 'line',
           area: true,
           data: getAttrsArray(props.data, 'customer_num')
         },
         {
-          name: '用户新增数',
+          name:  t('views.applicationOverview.monitor.charts.customerNew'),
           type: 'line',
           area: true,
           data: getAttrsArray(props.data, 'customer_added_count')
@@ -95,13 +97,13 @@ const statisticsType = computed(() => [
   },
   {
     id: 'chatRecordCharts',
-    name: '提问次数',
+    name:  t('views.applicationOverview.monitor.charts.queryCount'),
     icon: 'app-question',
     background: '#FFF3E5',
     color: '#FF8800',
     sum: [getSum(getAttrsArray(props.data, 'chat_record_count') || 0)],
     option: {
-      title: '提问次数',
+      title: t('views.applicationOverview.monitor.charts.queryCount'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
@@ -113,13 +115,13 @@ const statisticsType = computed(() => [
   },
   {
     id: 'tokensCharts',
-    name: 'Tokens 总数',
+    name: t('views.applicationOverview.monitor.charts.tokensTotal'),
     icon: 'app-tokens',
     background: '#E5FBF8',
     color: '#00D6B9',
     sum: [getSum(getAttrsArray(props.data, 'tokens_num') || 0)],
     option: {
-      title: 'Tokens 总数',
+      title: t('views.applicationOverview.monitor.charts.tokensTotal'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
@@ -131,7 +133,7 @@ const statisticsType = computed(() => [
   },
   {
     id: 'starCharts',
-    name: '用户满意度',
+    name: t('views.applicationOverview.monitor.charts.userSatisfaction'),
     icon: 'app-user-stars',
     background: '#FEEDEC',
     color: '#F54A45',
@@ -140,16 +142,16 @@ const statisticsType = computed(() => [
       getSum(getAttrsArray(props.data, 'trample_num') || 0)
     ],
     option: {
-      title: '用户满意度',
+      title: t('views.applicationOverview.monitor.charts.userSatisfaction'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
-          name: '赞同',
+          name: t('views.applicationOverview.monitor.charts.approval'),
           type: 'line',
           data: getAttrsArray(props.data, 'star_num')
         },
         {
-          name: '反对',
+          name: t('views.applicationOverview.monitor.charts.disapproval'),
           type: 'line',
           data: getAttrsArray(props.data, 'trample_num')
         }

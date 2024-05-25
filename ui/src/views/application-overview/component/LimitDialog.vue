@@ -1,10 +1,10 @@
 <template>
-  <el-dialog title="访问限制" v-model="dialogVisible">
+  <el-dialog :title="$t('views.applicationOverview.appInfo.LimitDialog.dialogTitle')" v-model="dialogVisible">
     <el-form label-position="top" ref="limitFormRef" :model="form">
-      <el-form-item label="显示知识来源" @click.prevent>
+      <el-form-item :label="$t('views.applicationOverview.appInfo.LimitDialog.showSourceLabel')" @click.prevent>
         <el-switch size="small" v-model="form.show_source"></el-switch>
       </el-form-item>
-      <el-form-item label="客户端提问限制">
+      <el-form-item :label="$t('views.applicationOverview.appInfo.LimitDialog.clientQueryLimitLabel')">
         <el-input-number
           v-model="form.access_num"
           :min="0"
@@ -12,17 +12,15 @@
           controls-position="right"
           step-strictly
         />
-        <span class="ml-4">次 / 天</span>
+        <span class="ml-4">{{$t('views.applicationOverview.appInfo.LimitDialog.timesDays')}}</span>
       </el-form-item>
-      <el-form-item label="白名单" @click.prevent>
+      <el-form-item :label="$t('views.applicationOverview.appInfo.LimitDialog.whitelistLabel')" @click.prevent>
         <el-switch size="small" v-model="form.white_active"></el-switch>
       </el-form-item>
       <el-form-item>
         <el-input
           v-model="form.white_list"
-          placeholder="请输入允许嵌入第三方的源地址，一行一个，如：
-http://127.0.0.1:5678
-https://dataease.io"
+          :placeholder="$t('views.applicationOverview.appInfo.LimitDialog.whitelistPlaceholder')"
           :rows="10"
           type="textarea"
         />
@@ -30,9 +28,9 @@ https://dataease.io"
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+        <el-button @click.prevent="dialogVisible = false">{{$t('views.applicationOverview.appInfo.LimitDialog.cancelButtonText')}} </el-button>
         <el-button type="primary" @click="submit(limitFormRef)" :loading="loading">
-          保存
+          {{$t('views.applicationOverview.appInfo.LimitDialog.saveButtonText')}}
         </el-button>
       </span>
     </template>
@@ -44,6 +42,7 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
 
 const route = useRoute()
 const {
@@ -94,7 +93,8 @@ const submit = async (formEl: FormInstance | undefined) => {
       }
       applicationApi.putAccessToken(id as string, obj, loading).then((res) => {
         emit('refresh')
-        MsgSuccess('设置成功')
+        // @ts-ignore
+        MsgSuccess(t('views.applicationOverview.appInfo.LimitDialog.settingSuccessMessage'))
         dialogVisible.value = false
       })
     }
