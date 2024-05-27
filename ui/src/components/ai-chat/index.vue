@@ -357,7 +357,7 @@ function getChartOpenId(chat?: any) {
       .catch((res) => {
         if (res.response.status === 403) {
           application.asyncAppAuthentication(accessToken).then(() => {
-            getChartOpenId()
+            getChartOpenId(chat)
           })
         } else {
           loading.value = false
