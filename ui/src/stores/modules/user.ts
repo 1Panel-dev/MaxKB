@@ -35,7 +35,7 @@ const useUserStore = defineStore({
           return result
         }
       }
-      return null
+      return localStorage.getItem('accessToken')
     },
 
     getPermissions() {
