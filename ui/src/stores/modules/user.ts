@@ -24,7 +24,7 @@ const useUserStore = defineStore({
       }
       return this.userType === 1
         ? localStorage.getItem('token')
-        : localStorage.getItem('accessToken')
+        : sessionStorage.getItem('accessToken')
     },
 
     getPermissions() {
