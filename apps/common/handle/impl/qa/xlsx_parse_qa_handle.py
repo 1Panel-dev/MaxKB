@@ -26,13 +26,13 @@ def handle_sheet(file_name, sheet):
     paragraph_list = []
     for row in rows:
         content = get_row_value(row, title_row_index_dict, 'content')
-        if content is None:
+        if content is None or content.value is None:
             continue
         problem = get_row_value(row, title_row_index_dict, 'problem_list')
-        problem = str(problem.value) if problem is not None else ''
+        problem = str(problem.value) if problem is not None and problem.value is not None else ''
         problem_list = [{'content': p[0:255]} for p in problem.split('\n') if len(p.strip()) > 0]
         title = get_row_value(row, title_row_index_dict, 'title')
-        title = str(title.value) if title is not None else ''
+        title = str(title.value) if title is not None and title.value is not None else ''
         content = content.value
         paragraph_list.append({'title': title[0:255],
                                'content': content[0:4096],
