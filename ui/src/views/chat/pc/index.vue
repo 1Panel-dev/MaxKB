@@ -49,20 +49,6 @@
           </h4>
 
           <span class="flex align-center" v-if="currentRecordList.length">
-            <el-dropdown class="mr-8">
-              <AppIcon
-                iconName="takeaway-box"
-                class="info mr-8"
-                style="font-size: 16px"
-                title="导出聊天记录"
-              ></AppIcon>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="exportMarkdown">导出 Markdown</el-dropdown-item>
-                  <el-dropdown-item @click="exportHTML">导出 HTML</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
             <AppIcon
               v-if="paginationConfig.total"
               iconName="app-chat-record"
@@ -72,6 +58,17 @@
             <span v-if="paginationConfig.total" class="lighter">
               {{ paginationConfig.total }} 条提问
             </span>
+            <el-dropdown class="ml-8">
+              <el-tooltip effect="dark" content="导出聊天记录" placement="top">
+                <AppIcon iconName="app-export" class="cursor"></AppIcon>
+              </el-tooltip>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="exportMarkdown">导出 Markdown</el-dropdown-item>
+                  <el-dropdown-item @click="exportHTML">导出 HTML</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </span>
         </div>
         <div class="right-height chat-width">
