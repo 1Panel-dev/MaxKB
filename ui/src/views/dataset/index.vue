@@ -89,8 +89,7 @@
                               设置</el-dropdown-item
                             >
                             <el-dropdown-item @click.stop="export_dataset(item)">
-                              <AppIcon iconName="app-export" style="font-size: 16px"></AppIcon
-                              >导出</el-dropdown-item
+                              <AppIcon iconName="app-export"></AppIcon>导出</el-dropdown-item
                             >
                             <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)"
                               >删除</el-dropdown-item
