@@ -31,6 +31,8 @@ def get_title_row_index_dict(title_row_list):
         title_row_index_dict['problem_list'] = 2
     for index in range(len(title_row_list)):
         title_row = title_row_list[index]
+        if title_row is None:
+            title_row = ''
         if title_row.startswith('分段标题'):
             title_row_index_dict['title'] = index
         if title_row.startswith('分段内容'):
