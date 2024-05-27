@@ -1,8 +1,8 @@
 <template>
-  <LayoutContainer header="概览">
+  <LayoutContainer :header="$t('views.applicationOverview.title')">
     <el-scrollbar>
       <div class="main-calc-height p-24">
-        <h4 class="title-decoration-1 mb-16">应用信息</h4>
+        <h4 class="title-decoration-1 mb-16">{{$t('views.applicationOverview.appInfo.header')}}</h4>
         <el-card shadow="never" class="overview-card" v-loading="loading">
           <div class="title flex align-center">
             <div
@@ -42,14 +42,14 @@
           <el-row :gutter="12">
             <el-col :span="12" class="mt-16">
               <div class="flex">
-                <el-text type="info">公开访问链接</el-text>
+                <el-text type="info">{{$t('views.applicationOverview.appInfo.publicAccessLink')}}</el-text>
                 <el-switch
                   v-model="accessToken.is_active"
                   class="ml-8"
                   size="small"
                   inline-prompt
-                  active-text="开"
-                  inactive-text="关"
+                  :active-text="$t('views.applicationOverview.appInfo.openText')"
+                  :inactive-text="$t('views.applicationOverview.appInfo.closeText')"
                   @change="changeState($event)"
                 />
               </div>
@@ -68,18 +68,18 @@
               </div>
               <div>
                 <el-button :disabled="!accessToken?.is_active" type="primary">
-                  <a v-if="accessToken?.is_active" :href="shareUrl" target="_blank"> 演示 </a>
-                  <span v-else>演示</span>
+                  <a v-if="accessToken?.is_active" :href="shareUrl" target="_blank"> {{$t('views.applicationOverview.appInfo.demo')}} </a>
+                  <span v-else> {{$t('views.applicationOverview.appInfo.demo')}}</span>
                 </el-button>
                 <el-button :disabled="!accessToken?.is_active" @click="openDialog">
-                  嵌入第三方
+                  {{$t('views.applicationOverview.appInfo.embedThirdParty')}}
                 </el-button>
-                <el-button @click="openLimitDialog"> 访问限制 </el-button>
+                <el-button @click="openLimitDialog">  {{$t('views.applicationOverview.appInfo.accessRestrictions')}} </el-button>
               </div>
             </el-col>
             <el-col :span="12" class="mt-16">
               <div class="flex">
-                <el-text type="info">API访问凭据</el-text>
+                <el-text type="info">{{$t('views.applicationOverview.appInfo.apiAccessCredentials')}} </el-text>
               </div>
               <div class="mt-4 mb-16 url-height">
                 <a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
@@ -91,12 +91,12 @@
                 </el-button>
               </div>
               <div>
-                <el-button @click="openAPIKeyDialog"> API Key </el-button>
+                <el-button @click="openAPIKeyDialog">{{$t('views.applicationOverview.appInfo.apiKey')}}</el-button>
               </div>
             </el-col>
           </el-row>
         </el-card>
-        <h4 class="title-decoration-1 mt-16 mb-16">监控统计</h4>
+        <h4 class="title-decoration-1 mt-16 mb-16">{{$t('views.applicationOverview.monitor.monitoringStatistics')}}</h4>
         <div class="mb-16">
           <el-select v-model="history_day" class="mr-12 w-120" @change="changeDayHandle">
             <el-option
@@ -110,8 +110,8 @@
             v-if="history_day === 'other'"
             v-model="daterangeValue"
             type="daterange"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间"
+            :start-placeholder="$t('views.applicationOverview.monitor.startDatePlaceholder')"
+            :end-placeholder="$t('views.applicationOverview.monitor.endDatePlaceholder')"
             format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
             @change="changeDayRangeHandle"
@@ -143,6 +143,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
+import { t } from '@/locales'
 const { application } = useStore()
 const route = useRoute()
 const {
@@ -166,23 +167,24 @@ const shareUrl = computed(() => application.location + accessToken.value.access_
 const dayOptions = [
   {
     value: 7,
-    label: '过去7天'
+    // @ts-ignore
+    label: t('views.applicationOverview.monitor.pastDayOptions.past7Days')  // 使用 t 方法来国际化显示文本
   },
   {
     value: 30,
-    label: '过去30天'
+    label: t('views.applicationOverview.monitor.pastDayOptions.past30Days')
   },
   {
     value: 90,
-    label: '过去90天'
+    label: t('views.applicationOverview.monitor.pastDayOptions.past90Days')
   },
   {
     value: 183,
-    label: '过去半年'
+    label: t('views.applicationOverview.monitor.pastDayOptions.past183Days')
   },
   {
     value: 'other',
-    label: '自定义'
+    label: t('views.applicationOverview.monitor.pastDayOptions.other')
   }
 ]
 
@@ -228,17 +230,19 @@ function getAppStatistics() {
 
 function refreshAccessToken() {
   MsgConfirm(
-    `是否重新生成公开访问链接?`,
-    `重新生成公开访问链接会影响嵌入第三方脚本变更，需要将新脚本重新嵌入第三方，请谨慎操作！`,
+    t('views.applicationOverview.appInfo.refreshToken.msgConfirm1'),
+    t('views.applicationOverview.appInfo.refreshToken.msgConfirm2'),
     {
-      confirmButtonText: '确认'
+      confirmButtonText: t('views.applicationOverview.appInfo.refreshToken.confirm'),
+      cancelButtonText:t('views.applicationOverview.appInfo.refreshToken.cancel')
     }
   )
     .then(() => {
       const obj = {
         access_token_reset: true
       }
-      const str = '刷新成功'
+       // @ts-ignore
+      const str = t('views.applicationOverview.appInfo.refreshToken.refreshSuccess')
       updateAccessToken(obj, str)
     })
     .catch(() => {})
@@ -247,7 +251,7 @@ function changeState(bool: Boolean) {
   const obj = {
     is_active: bool
   }
-  const str = bool ? '启用成功' : '禁用成功'
+  const str = bool ? t('views.applicationOverview.appInfo.changeState.enableSuccess') : t('views.applicationOverview.appInfo.changeState.disableSuccess')
   updateAccessToken(obj, str)
 }
 

@@ -1,16 +1,13 @@
 <template>
-  <el-dialog title="设置" v-model="dialogVisible">
+  <el-dialog :title="$t('views.applicationOverview.appInfo.SettingAPIKeyDialog.dialogTitle')" v-model="dialogVisible">
     <el-form label-position="top" ref="settingFormRef" :model="form">
-      <el-form-item label="允许跨域地址" @click.prevent>
+      <el-form-item :label="$t('views.applicationOverview.appInfo.SettingAPIKeyDialog.allowCrossDomainLabel')" @click.prevent>
         <el-switch size="small" v-model="form.allow_cross_domain"></el-switch>
       </el-form-item>
       <el-form-item>
         <el-input
           v-model="form.cross_domain_list"
-          placeholder="请输入允许的跨域地址，开启后不输入跨域地址则不限制。
-跨域地址一行一个，如：
-http://127.0.0.1:5678 
-https://dataease.io"
+          :placeholder="$t('views.applicationOverview.appInfo.SettingAPIKeyDialog.crossDomainPlaceholder')"
           :rows="10"
           type="textarea"
         />
@@ -18,9 +15,9 @@ https://dataease.io"
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+        <el-button @click.prevent="dialogVisible = false">{{$t('views.applicationOverview.appInfo.SettingAPIKeyDialog.cancelButtonText')}}</el-button>
         <el-button type="primary" @click="submit(settingFormRef)" :loading="loading">
-          保存
+          {{$t('views.applicationOverview.appInfo.SettingAPIKeyDialog.saveButtonText')}}
         </el-button>
       </span>
     </template>
@@ -32,6 +29,7 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import overviewApi from '@/api/application-overview'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
 const route = useRoute()
 const {
   params: { id }
@@ -82,7 +80,8 @@ const submit = async (formEl: FormInstance | undefined) => {
       }
       overviewApi.putAPIKey(id as string, APIKeyId.value, obj, loading).then((res) => {
         emit('refresh')
-        MsgSuccess('设置成功')
+        //@ts-ignore
+        MsgSuccess(t('views.applicationOverview.appInfo.SettingAPIKeyDialog.successMessage'))
         dialogVisible.value = false
       })
     }
