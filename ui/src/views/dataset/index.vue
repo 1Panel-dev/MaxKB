@@ -130,7 +130,9 @@ function refresh() {
 }
 
 function reEmbeddingDataset(row: any) {
-  datasetApi.putReEmbeddingDataset(row.id).then(() => {})
+  datasetApi.putReEmbeddingDataset(row.id).then(() => {
+    MsgSuccess('提交成功')
+  })
 }
 
 function syncDataset(row: any) {
