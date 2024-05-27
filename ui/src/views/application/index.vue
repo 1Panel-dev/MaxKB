@@ -144,7 +144,7 @@ function getAccessToken(id: string) {
 function deleteApplication(row: any) {
   MsgConfirm(
     // @ts-ignore
-    `${t('views.application.applicationList.card.delete.confirmTitle')}：${row.name} ?`,
+    `${t('views.application.applicationList.card.delete.confirmTitle')}${row.name} ?`,
     t('views.application.applicationList.card.delete.confirmMessage'),
     {
       confirmButtonText: t('views.application.applicationList.card.delete.confirmButton'),
