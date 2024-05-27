@@ -500,7 +500,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
           application
             .asyncAppAuthentication(accessToken)
             .then(() => {
-              chatMessage(chat)
+              chatMessage(chat, problem)
             })
             .catch(() => {
               errorWrite(chat)
