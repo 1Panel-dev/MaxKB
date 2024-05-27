@@ -7,6 +7,7 @@ export interface userStateTypes {
   userInfo: User | null
   token: any
   version?: string
+  accessToken?: string
 }
 
 const useUserStore = defineStore({
@@ -15,16 +16,26 @@ const useUserStore = defineStore({
     userType: 1,
     userInfo: null,
     token: '',
-    version: ''
+    version: '',
+    accessToken: ''
   }),
   actions: {
     getToken(): String | null {
       if (this.token) {
         return this.token
       }
-      return this.userType === 1
-        ? localStorage.getItem('token')
-        : sessionStorage.getItem('accessToken')
+      return this.userType === 1 ? localStorage.getItem('token') : this.getAccessToken()
+    },
+    getAccessToken() {
+      const accessTokenObjStr = localStorage.getItem('accessTokenObj')
+      if (accessTokenObjStr && this.accessToken) {
+        const accessTokenObj = JSON.parse(accessTokenObjStr)
+        const result = accessTokenObj[this.accessToken]
+        if (result) {
+          return result
+        }
+      }
+      return null
     },
 
     getPermissions() {
@@ -43,6 +54,9 @@ const useUserStore = defineStore({
     },
     changeUserType(num: number) {
       this.userType = num
+    },
+    setAccessToken(accessToken: string) {
+      this.accessToken = accessToken
     },
 
     async asyncGetVersion() {
