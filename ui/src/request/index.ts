@@ -211,8 +211,13 @@ export const exportExcel: (
   url: string,
   params: any,
   loading?: NProgress | Ref<boolean>
-) => void = (fileName: string, url: string, params: any, loading?: NProgress | Ref<boolean>) => {
-  promise(request({ url: url, method: 'get', params, responseType: 'blob' }), loading)
+) => Promise<any> = (
+  fileName: string,
+  url: string,
+  params: any,
+  loading?: NProgress | Ref<boolean>
+) => {
+  return promise(request({ url: url, method: 'get', params, responseType: 'blob' }), loading)
     .then((res: any) => {
       if (res) {
         const blob = new Blob([res], {
@@ -225,6 +230,7 @@ export const exportExcel: (
         //释放内存
         window.URL.revokeObjectURL(link.href)
       }
+      return true
     })
     .catch((e) => {})
 }

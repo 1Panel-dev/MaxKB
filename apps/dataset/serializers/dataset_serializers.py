@@ -12,13 +12,15 @@ import re
 import traceback
 import uuid
 from functools import reduce
-from typing import Dict
+from typing import Dict, List
 from urllib.parse import urlparse
 
+import xlwt
 from django.contrib.postgres.fields import ArrayField
 from django.core import validators
 from django.db import transaction, models
 from django.db.models import QuerySet
+from django.http import HttpResponse
 from drf_yasg import openapi
 from rest_framework import serializers
 
@@ -667,6 +669,50 @@ class DataSetSerializers(serializers.ModelSerializer):
             super().is_valid(raise_exception=True)
             if not QuerySet(DataSet).filter(id=self.data.get("id")).exists():
                 raise AppApiException(300, "id不存在")
+
+        def export_excel(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_list = QuerySet(Document).filter(dataset_id=self.data.get('id'))
+            paragraph_list = native_search(QuerySet(Paragraph).filter(dataset_id=self.data.get("id")), get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_paragraph_document_name.sql')))
+            problem_mapping_list = native_search(
+                QuerySet(ProblemParagraphMapping).filter(dataset_id=self.data.get("id")), get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True)
+            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(paragraph_list, problem_mapping_list,
+                                                                                 document_list)
+            workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="dataset.xls"'
+            workbook.save(response)
+            return response
+
+        @staticmethod
+        def merge_problem(paragraph_list: List[Dict], problem_mapping_list: List[Dict]):
+            result = {}
+            document_dict = {}
+
+            for paragraph in paragraph_list:
+                problem_list = [problem_mapping.get('content') for problem_mapping in problem_mapping_list if
+                                problem_mapping.get('paragraph_id') == paragraph.get('id')]
+                document_sheet = result.get(paragraph.get('document_id'))
+                d = document_dict.get(paragraph.get('document_name'))
+                if d is None:
+                    document_dict[paragraph.get('document_name')] = {paragraph.get('document_id')}
+                else:
+                    d.add(paragraph.get('document_id'))
+
+                if document_sheet is None:
+                    result[paragraph.get('document_id')] = [[paragraph.get('title'), paragraph.get('content'),
+                                                             '\n'.join(problem_list)]]
+                else:
+                    document_sheet.append([paragraph.get('title'), paragraph.get('content'), '\n'.join(problem_list)])
+            result_document_dict = {}
+            for d_name in document_dict:
+                for index, d_id in enumerate(document_dict.get(d_name)):
+                    result_document_dict[d_id] = d_name if index == 0 else d_name + str(index)
+            return result, result_document_dict
 
         @transaction.atomic
         def delete(self):

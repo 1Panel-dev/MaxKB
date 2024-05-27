@@ -152,6 +152,19 @@ class Dataset(APIView):
             return result.success(
                 DataSetSerializers.Operate(data={'id': dataset_id, 'user_id': request.user.id}).re_embedding())
 
+    class Export(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods="GET", detail=False)
+        @swagger_auto_schema(operation_summary="导出知识库", operation_id="导出知识库",
+                             manual_parameters=DataSetSerializers.Operate.get_request_params_api(),
+                             tags=["知识库"]
+                             )
+        @has_permissions(lambda r, keywords: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                                        dynamic_tag=keywords.get('dataset_id')))
+        def get(self, request: Request, dataset_id: str):
+            return DataSetSerializers.Operate(data={'id': dataset_id, 'user_id': request.user.id}).export_excel()
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 
