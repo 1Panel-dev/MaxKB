@@ -14,12 +14,14 @@ import uuid
 from functools import reduce
 from typing import List, Dict
 
+import xlwt
 from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpResponse
 from drf_yasg import openapi
 from rest_framework import serializers
+from xlwt import Utils
 
 from common.db.search import native_search, native_page_search
 from common.event.common import work_thread_pool
@@ -422,6 +424,85 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             document_id = self.data.get('document_id')
             if not QuerySet(Document).filter(id=document_id).exists():
                 raise AppApiException(500, "文档id不存在")
+
+        def export(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document = QuerySet(Document).filter(id=self.data.get("document_id")).first()
+            paragraph_list = native_search(QuerySet(Paragraph).filter(document_id=self.data.get("document_id")),
+                                           get_file_content(
+                                               os.path.join(PROJECT_DIR, "apps", "dataset", 'sql',
+                                                            'list_paragraph_document_name.sql')))
+            problem_mapping_list = native_search(
+                QuerySet(ProblemParagraphMapping).filter(document_id=self.data.get("document_id")), get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True)
+            data_dict, document_dict = self.merge_problem(paragraph_list, problem_mapping_list, [document])
+            workbook = self.get_workbook(data_dict, document_dict)
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = f'attachment; filename="data.xls"'
+            workbook.save(response)
+            return response
+
+        @staticmethod
+        def get_workbook(data_dict, document_dict):
+            # 创建工作簿对象
+            workbook = xlwt.Workbook(encoding='utf-8')
+            for sheet_id in data_dict:
+                # 添加工作表
+                worksheet = workbook.add_sheet(document_dict.get(sheet_id))
+                data = [
+                    ['分段标题（选填）', '分段内容（必填，问题答案，最长不超过4096个字符）', '问题（选填，单元格内一行一个）'],
+                    *data_dict.get(sheet_id)
+                ]
+                # 写入数据到工作表
+                for row_idx, row in enumerate(data):
+                    for col_idx, col in enumerate(row):
+                        worksheet.write(row_idx, col_idx, col)
+                    # 创建HttpResponse对象返回Excel文件
+            return workbook
+
+        @staticmethod
+        def merge_problem(paragraph_list: List[Dict], problem_mapping_list: List[Dict], document_list):
+            result = {}
+            document_dict = {}
+
+            for paragraph in paragraph_list:
+                problem_list = [problem_mapping.get('content') for problem_mapping in problem_mapping_list if
+                                problem_mapping.get('paragraph_id') == paragraph.get('id')]
+                document_sheet = result.get(paragraph.get('document_id'))
+                document_name = DocumentSerializers.Operate.reset_document_name(paragraph.get('document_name'))
+                d = document_dict.get(document_name)
+                if d is None:
+                    document_dict[document_name] = {paragraph.get('document_id')}
+                else:
+                    d.add(paragraph.get('document_id'))
+
+                if document_sheet is None:
+                    result[paragraph.get('document_id')] = [[paragraph.get('title'), paragraph.get('content'),
+                                                             '\n'.join(problem_list)]]
+                else:
+                    document_sheet.append([paragraph.get('title'), paragraph.get('content'), '\n'.join(problem_list)])
+            for document in document_list:
+                if document.id not in result:
+                    document_name = DocumentSerializers.Operate.reset_document_name(document.name)
+                    result[document.id] = [[]]
+                    d = document_dict.get(document_name)
+                    if d is None:
+                        document_dict[document_name] = {document.id}
+                    else:
+                        d.add(document.id)
+            result_document_dict = {}
+            for d_name in document_dict:
+                for index, d_id in enumerate(document_dict.get(d_name)):
+                    result_document_dict[d_id] = d_name if index == 0 else d_name + str(index)
+            return result, result_document_dict
+
+        @staticmethod
+        def reset_document_name(document_name):
+            if document_name is None or not Utils.valid_sheet_name(document_name):
+                return "Sheet"
+            return document_name.strip()
 
         def one(self, with_valid=False):
             if with_valid:

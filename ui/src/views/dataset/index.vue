@@ -85,7 +85,12 @@
                             <el-dropdown-item
                               icon="Setting"
                               @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
-                              >设置</el-dropdown-item
+                            >
+                              设置</el-dropdown-item
+                            >
+                            <el-dropdown-item @click.stop="export_dataset(item)">
+                              <AppIcon iconName="app-export" style="font-size: 16px"></AppIcon
+                              >导出</el-dropdown-item
                             >
                             <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)"
                               >删除</el-dropdown-item
@@ -143,6 +148,11 @@ function searchHandle() {
   paginationConfig.current_page = 1
   datasetList.value = []
   getList()
+}
+const export_dataset = (item: any) => {
+  datasetApi.exportDataset(item.name, item.id, loading).then((ok) => {
+    MsgSuccess('导出成功')
+  })
 }
 
 function deleteDataset(row: any) {

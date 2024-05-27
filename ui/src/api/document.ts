@@ -256,6 +256,28 @@ const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>)
   return exportExcel(fileName, `${prefix}/document/template/export`, { type }, loading)
 }
 
+/**
+ * 导出文档
+ * @param document_name 文档名称
+ * @param dataset_id    数据集id
+ * @param document_id   文档id
+ * @param loading       加载器
+ * @returns
+ */
+const exportDocument: (
+  document_name: string,
+  dataset_id: string,
+  document_id: string,
+  loading?: Ref<boolean>
+) => Promise<any> = (document_name, dataset_id, document_id, loading) => {
+  return exportExcel(
+    document_name + '.xls',
+    `${prefix}/${dataset_id}/document/${document_id}/export`,
+    {},
+    loading
+  )
+}
+
 export default {
   postSplitDocument,
   getDocument,
@@ -273,5 +295,6 @@ export default {
   putMigrateMulDocument,
   batchEditHitHandling,
   exportQATemplate,
-  postQADocument
+  postQADocument,
+  exportDocument
 }
