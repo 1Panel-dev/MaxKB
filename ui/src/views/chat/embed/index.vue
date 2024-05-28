@@ -199,7 +199,6 @@ function refresh(id: string) {
 
 onMounted(() => {
   user.changeUserType(2)
-  user.setAccessToken(accessToken)
   getAccessToken(accessToken)
 })
 </script>
