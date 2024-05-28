@@ -137,22 +137,22 @@ class AppNodeModel extends HtmlNodeModel {
 
     const anchors: any = []
     if (input) {
-      input.forEach((feild: any, index: any) => {
+      input.forEach((field: any, index: any) => {
         anchors.push({
           x: x - width / 2 + 10,
           y: y - height / 2 + this.baseHeight + 35 + index * 24,
-          id: `${id}_${feild.key}_left`,
+          id: `${id}_${field.key}_left`,
           edgeAddable: false,
           type: 'left'
         })
       })
     }
     if (output) {
-      output.forEach((feild: any, index: any) => {
+      output.forEach((field: any, index: any) => {
         anchors.push({
           x: x + width / 2 - 10,
           y: y - height / 2 + this.baseHeight + this.inputContainerHeight + 30 + index * 24,
-          id: `${id}_${feild.key}_right`,
+          id: `${id}_${field.key}_right`,
           type: 'right'
         })
       })

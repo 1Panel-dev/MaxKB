@@ -1,5 +1,5 @@
 <template>
-  <NodeContaner :nodeModel="nodeModel">
+  <NodeContainer :nodeModel="nodeModel">
     <el-form
       :model="chat_data"
       label-position="top"
@@ -18,10 +18,10 @@
         <el-input v-model="chat_data.name" />
       </el-form-item>
     </el-form>
-  </NodeContaner>
+  </NodeContainer>
 </template>
 <script setup lang="ts">
-import NodeContaner from '@/flow/common/node-container/index.vue'
+import NodeContainer from '@/work-flow/common/node-container/index.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 

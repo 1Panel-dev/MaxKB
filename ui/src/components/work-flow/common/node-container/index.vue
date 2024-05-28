@@ -7,13 +7,13 @@
       </div>
       <div class="input-container" v-resize="resetInputContainer">
         <el-divider> </el-divider>
-        <div v-for="item in nodeModel.properties.input" class="step-feild">
+        <div v-for="item in nodeModel.properties.input" class="step-field">
           <span>{{ item.key }}</span>
         </div>
       </div>
-      <div class="outout-container" v-resize="resetOutputContainer">
+      <div class="output-container" v-resize="resetOutputContainer">
         <el-divider> </el-divider>
-        <div v-for="item in nodeModel.properties.output" class="out-step-feild">
+        <div v-for="item in nodeModel.properties.output" class="out-step-field">
           <span>{{ item.key }}</span>
         </div>
       </div>
@@ -23,20 +23,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 const height = ref<{
-  stepContanerHeight: number
+  stepContainerHeight: number
   inputContainerHeight: number
   outputContainerHeight: number
 }>({
-  stepContanerHeight: 0,
+  stepContainerHeight: 0,
   inputContainerHeight: 0,
   outputContainerHeight: 0
 })
 
 const resizeStepContainer = (wh: any) => {
   if (wh.height) {
-    height.value.stepContanerHeight = wh.height
+    height.value.stepContainerHeight = wh.height
     props.nodeModel.setHeight(
-      height.value.stepContanerHeight,
+      height.value.stepContainerHeight,
       height.value.inputContainerHeight,
       height.value.outputContainerHeight
     )
@@ -47,7 +47,7 @@ const resetOutputContainer = (wh: { height: number; width: number }) => {
   if (wh.height) {
     height.value.outputContainerHeight = wh.height
     props.nodeModel.setHeight(
-      height.value.stepContanerHeight,
+      height.value.stepContainerHeight,
       height.value.inputContainerHeight,
       height.value.outputContainerHeight
     )
@@ -58,7 +58,7 @@ const resetInputContainer = (wh: { height: number; width: number }) => {
   if (wh.height) {
     height.value.inputContainerHeight = wh.height
     props.nodeModel.setHeight(
-      height.value.stepContanerHeight,
+      height.value.stepContainerHeight,
       height.value.inputContainerHeight,
       height.value.outputContainerHeight
     )
@@ -118,7 +118,7 @@ const props = defineProps<{
   background: #f5f5f5;
 }
 
-.step-feild {
+.step-field {
   display: flex;
   justify-content: space-between;
   height: 24px;
@@ -127,10 +127,10 @@ const props = defineProps<{
   line-height: 24px;
 }
 
-.feild-type {
+.field-type {
   color: #9f9c9f;
 }
-.out-step-feild {
+.out-step-field {
   display: flex;
   justify-content: space-between;
   height: 24px;
