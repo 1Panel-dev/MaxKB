@@ -15,7 +15,9 @@
         :chatId="currentChatId"
         @refresh="refresh"
         @scroll="handleScroll"
-      ></AiChat>
+        class="AiChat-embed"
+      >
+      </AiChat>
     </div>
 
     <el-button type="primary" link class="new-chat-button" @click="newChat">
@@ -225,7 +227,7 @@ onMounted(() => {
   }
   .new-chat-button {
     position: absolute;
-    bottom: 84px;
+    bottom: 80px;
     left: 18px;
     z-index: 11;
   }
@@ -281,6 +283,14 @@ onMounted(() => {
   .chat-width {
     max-width: var(--app-chat-width, 860px);
     margin: 0 auto;
+  }
+  .AiChat-embed {
+    .ai-chat__operate {
+      padding-top: 38px;
+    }
+    .ai-chat__content {
+      padding-bottom: 104px
+    }
   }
 }
 </style>
