@@ -59,9 +59,7 @@
               {{ paginationConfig.total }} 条提问
             </span>
             <el-dropdown class="ml-8">
-              <el-tooltip effect="dark" content="导出聊天记录" placement="top">
-                <AppIcon iconName="app-export" class="cursor"></AppIcon>
-              </el-tooltip>
+              <AppIcon iconName="app-export" class="cursor" title="导出聊天记录"></AppIcon>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click="exportMarkdown">导出 Markdown</el-dropdown-item>
