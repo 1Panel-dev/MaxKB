@@ -1,12 +1,3 @@
-# 邮箱配置
-EMAIL_ADDRESS:
-EMAIL_USE_TLS: False
-EMAIL_USE_SSL: True
-EMAIL_HOST: smtp.qq.com
-EMAIL_PORT: 465
-EMAIL_HOST_USER:
-EMAIL_HOST_PASSWORD:
-
 # 数据库链接信息
 DB_NAME: maxkb
 DB_HOST: localhost

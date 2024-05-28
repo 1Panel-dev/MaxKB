@@ -178,7 +178,7 @@ class ConfigManager:
 
                    Error: No config file found.
 
-                   You can run `cp installer/config.yaml {self.root_path}/config.yml`, and edit it.
+                   You can run `cp config_example.yml {self.root_path}/config.yml`, and edit it.
 
                    """
         raise ImportError(msg)
