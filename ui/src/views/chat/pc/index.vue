@@ -286,7 +286,6 @@ async function exportHTML(): Promise<void> {
 
 onMounted(() => {
   user.changeUserType(2)
-  user.setAccessToken(accessToken)
   getAccessToken(accessToken)
 })
 </script>
