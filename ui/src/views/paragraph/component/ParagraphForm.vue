@@ -8,7 +8,14 @@
     @submit.prevent
   >
     <el-form-item label="分段标题">
-      <el-input v-if="isEdit" v-model="form.title" placeholder="请输入分段标题"> </el-input>
+      <el-input
+        v-if="isEdit"
+        v-model="form.title"
+        placeholder="请输入分段标题"
+        maxlength="256"
+        show-word-limit
+      >
+      </el-input>
       <span class="lighter" v-else>{{ form.title || '-' }}</span>
     </el-form-item>
     <el-form-item label="分段内容" prop="content">
@@ -24,7 +31,7 @@
         :footers="footers"
       >
         <template #defFooters>
-          <span style="margin-left: -6px;">/ 4096</span>
+          <span style="margin-left: -6px">/ 4096</span>
         </template>
       </MarkdownEditor>
       <MdPreview
