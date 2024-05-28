@@ -5,7 +5,7 @@
     </el-text>
   </div>
   <div>
-    <el-tooltip effect="dark" content="重新生成" placement="top">
+    <el-tooltip effect="dark" content="换个答案" placement="top">
       <el-button text @click="regeneration">
         <AppIcon iconName="VideoPlay"></AppIcon>
       </el-button>
