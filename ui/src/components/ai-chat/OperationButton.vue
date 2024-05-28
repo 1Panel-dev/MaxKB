@@ -6,7 +6,7 @@
   </div>
   <div>
     <el-tooltip effect="dark" content="换个答案" placement="top">
-      <el-button text @click="regeneration">
+      <el-button :disabled="chat_loading" text @click="regeneration">
         <AppIcon iconName="VideoPlay"></AppIcon>
       </el-button>
     </el-tooltip>
@@ -77,6 +77,9 @@ const props = defineProps({
   chatId: {
     type: String,
     default: ''
+  },
+  chat_loading: {
+    type: Boolean
   },
   log: Boolean
 })

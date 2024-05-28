@@ -131,6 +131,7 @@
                   :data="item"
                   :applicationId="appId"
                   :chatId="chartOpenId"
+                  :chat_loading="loading"
                   @regeneration="regenerationChart(item)"
                 />
               </div>
@@ -541,7 +542,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
 
 function regenerationChart(item: chatType) {
   inputValue.value = item.problem_text
-  chatMessage(null, '', true)
+  if (!loading.value) {
+    chatMessage(null, '', true)
+  }
 }
 
 function getSourceDetail(row: any) {
