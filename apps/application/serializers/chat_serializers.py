@@ -422,11 +422,11 @@ class ChatRecordSerializer(serializers.Serializer):
             return True
 
     class ImproveSerializer(serializers.Serializer):
-        title = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+        title = serializers.CharField(required=False, max_length=256, allow_null=True, allow_blank=True,
                                       error_messages=ErrMessage.char("段落标题"))
         content = serializers.CharField(required=True, error_messages=ErrMessage.char("段落内容"))
 
-        problem_text = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+        problem_text = serializers.CharField(required=False, max_length=256, allow_null=True, allow_blank=True,
                                              error_messages=ErrMessage.char("问题"))
 
     class ParagraphModel(serializers.ModelSerializer):
