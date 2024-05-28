@@ -61,7 +61,7 @@ export default {
         LimitDialog: {
             dialogTitle: 'Access Restrictions',
             showSourceLabel: 'Show Source',
-            clientQueryLimitLabel: 'Client Query Limit',
+            clientQueryLimitLabel: 'Each Client Query Limit',
             timesDays: 'Times/Day',
             whitelistLabel: 'Whitelist',
             whitelistPlaceholder: 'Please enter allowed third-party source addresses, one per line, such as:\nhttp://127.0.0.1:5678\nhttps://dataease.io',
