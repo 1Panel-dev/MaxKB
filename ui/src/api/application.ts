@@ -7,15 +7,15 @@ import { type Ref } from 'vue'
 const prefix = '/application'
 
 /**
- * 获取全部应用
- * @param 参数
+ * 獲取全部應用
+ * @param 參數
  */
 const getAllAppilcation: () => Promise<Result<any[]>> = () => {
   return get(`${prefix}`)
 }
 
 /**
- * 获取分页应用
+ * 獲取分頁應用
  * page {
           "current_page": "string",
           "page_size": "string",
@@ -33,8 +33,8 @@ const getApplication: (
 }
 
 /**
- * 创建应用
- * @param 参数
+ * 創建應用
+ * @param 參數
  */
 const postApplication: (
   data: ApplicationFormType,
@@ -44,8 +44,8 @@ const postApplication: (
 }
 
 /**
- * 修改应用
- * @param 参数 
+ * 修改應用
+ * @param 參數 
 
  */
 const putApplication: (
@@ -57,8 +57,8 @@ const putApplication: (
 }
 
 /**
- * 删除应用
- * @param 参数 application_id
+ * 刪除應用
+ * @param 參數 application_id
  */
 const delApplication: (
   application_id: String,
@@ -68,8 +68,8 @@ const delApplication: (
 }
 
 /**
- * 应用详情
- * @param 参数 application_id
+ * 應用詳情
+ * @param 參數 application_id
  */
 const getApplicationDetail: (
   application_id: string,
@@ -79,8 +79,8 @@ const getApplicationDetail: (
 }
 
 /**
- * 获得当前应用可使用的知识库
- * @param 参数 application_id
+ * 獲得當前應用可使用的知識庫
+ * @param 參數 application_id
  */
 const getApplicationDataset: (
   application_id: string,
@@ -90,8 +90,8 @@ const getApplicationDataset: (
 }
 
 /**
- * 获取AccessToken
- * @param 参数 application_id
+ * 獲取AccessToken
+ * @param 參數 application_id
  */
 const getAccessToken: (application_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   application_id,
@@ -102,7 +102,7 @@ const getAccessToken: (application_id: string, loading?: Ref<boolean>) => Promis
 
 /**
  * 修改AccessToken
- * @param 参数 application_id
+ * @param 參數 application_id
  * data {
  *  "is_active": true
  * }
@@ -116,8 +116,8 @@ const putAccessToken: (
 }
 
 /**
- * 应用认证
- * @param 参数 
+ * 應用認證
+ * @param 參數 
  {
   "access_token": "string"
 }
@@ -130,8 +130,8 @@ const postAppAuthentication: (access_token: string, loading?: Ref<boolean>) => P
 }
 
 /**
- * 对话获取应用相关信息
- * @param 参数 
+ * 對話獲取應用相關信息
+ * @param 參數 
  {
   "access_token": "string"
 }
@@ -141,8 +141,8 @@ const getProfile: (loading?: Ref<boolean>) => Promise<any> = (loading) => {
 }
 
 /**
- * 获得临时回话Id
- * @param 参数 
+ * 獲得臨時回話Id
+ * @param 參數 
 
 }
  */
@@ -151,8 +151,8 @@ const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data)
 }
 
 /**
- * 正式回话Id
- * @param 参数 
+ * 正式回話Id
+ * @param 參數 
  * {
   "model_id": "string",
   "multiple_rounds_dialogue": true,
@@ -165,8 +165,8 @@ const getChatOpen: (application_id: String) => Promise<Result<any>> = (applicati
   return get(`${prefix}/${application_id}/chat/open`)
 }
 /**
- * 对话
- * @param 参数
+ * 對話
+ * @param 參數
  * chat_id: string
  * data
  */
@@ -175,8 +175,8 @@ const postChatMessage: (chat_id: string, data: any) => Promise<any> = (chat_id, 
 }
 
 /**
- * 点赞、点踩
- * @param 参数 
+ * 點讚、點踩
+ * @param 參數 
  * application_id : string; chat_id : string; chat_record_id : string
  * {
     "vote_status": "string", // -1 0 1
@@ -200,7 +200,7 @@ const putChatVote: (
 }
 
 /**
- * 命中测试列表
+ * 命中測試列表
  * @param application_id
  * @param loading
  * @query  { query_text: string, top_number: number, similarity: number }
@@ -215,7 +215,7 @@ const getApplicationHitTest: (
 }
 
 /**
- * 获取当前用户可使用的模型列表
+ * 獲取當前用戶可使用的模型列表
  * @param application_id
  * @param loading
  * @query  { query_text: string, top_number: number, similarity: number }

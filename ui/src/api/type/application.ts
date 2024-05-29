@@ -18,11 +18,11 @@ interface chatType {
   answer_text: string
   buffer: Array<String>
   /**
-   * 是否写入结束
+   * 是否寫入結束
    */
   write_ed?: boolean
   /**
-   * 是否暂停
+   * 是否暫停
    */
   is_stop?: boolean
   record_id: string
@@ -104,8 +104,8 @@ export class ChatManagement {
     }
   }
   /**
-   * 持续从缓存区 写出数据
-   * @param chatRecordId 对话记录id
+   * 持續從緩存區 寫出數據
+   * @param chatRecordId 對話記錄id
    */
   static write(chatRecordId: string) {
     const chatRecord = this.chatMessageContainer[chatRecordId]
@@ -114,8 +114,8 @@ export class ChatManagement {
     }
   }
   /**
-   * 等待所有数据输出完毕后 才会关闭流
-   * @param chatRecordId 对话记录id
+   * 等待所有數據輸出完畢後 才會關閉流
+   * @param chatRecordId 對話記錄id
    * @returns boolean
    */
   static close(chatRecordId: string) {
@@ -125,8 +125,8 @@ export class ChatManagement {
     }
   }
   /**
-   * 停止输出 立即关闭定时任务输出
-   * @param chatRecordId 对话记录id
+   * 停止輸出 立即關閉定時任務輸出
+   * @param chatRecordId 對話記錄id
    * @returns boolean
    */
   static stop(chatRecordId: string) {
@@ -136,8 +136,8 @@ export class ChatManagement {
     }
   }
   /**
-   * 判断是否输出完成
-   * @param chatRecordId 对话记录id
+   * 判斷是否輸出完成
+   * @param chatRecordId 對話記錄id
    * @returns boolean
    */
   static isClose(chatRecordId: string) {
@@ -145,8 +145,8 @@ export class ChatManagement {
     return chatRecord ? chatRecord.is_close && chatRecord.write_ed : false
   }
   /**
-   * 判断是否停止输出
-   * @param chatRecordId 对话记录id
+   * 判斷是否停止輸出
+   * @param chatRecordId 對話記錄id
    * @returns
    */
   static isStop(chatRecordId: string) {
@@ -154,7 +154,7 @@ export class ChatManagement {
     return chatRecord ? chatRecord.is_stop : false
   }
   /**
-   * 清除无用数据 也就是被close掉的和stop的数据
+   * 清除無用數據 也就是被close掉的和stop的數據
    */
   static clean() {
     for (const key in Object.keys(this.chatMessageContainer)) {

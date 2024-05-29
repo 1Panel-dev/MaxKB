@@ -8,41 +8,41 @@ interface modelRequest {
 
 interface Provider {
   /**
-   * 供应商代号
+   * 供應商代號
    */
   provider: string
   /**
-   * 供应商名称
+   * 供應商名稱
    */
   name: string
   /**
-   * 供应商icon
+   * 供應商icon
    */
   icon: string
 }
 
 interface ListModelRequest {
   /**
-   * 模型名称
+   * 模型名稱
    */
   name?: string
   /**
-   * 模型类型
+   * 模型類型
    */
   model_type?: string
   /**
-   * 基础模型名称
+   * 基礎模型名稱
    */
   model_name?: string
   /**
-   * 供应商
+   * 供應商
    */
   provider?: string
 }
 
 interface Model {
   /**
-   * 主键id
+   * 主鍵id
    */
   id: string
   /**
@@ -50,27 +50,27 @@ interface Model {
    */
   name: string
   /**
-   * 模型类型
+   * 模型類型
    */
   model_type: string
   /**
-   * 基础模型
+   * 基礎模型
    */
   model_name: string
   /**
-   * 认证信息
+   * 認證信息
    */
   credential: any
   /**
-   * 供应商
+   * 供應商
    */
   provider: string
   /**
-   * 状态
+   * 狀態
    */
   status: 'SUCCESS' | 'DOWNLOAD' | 'ERROR'
   /**
-   * 元数据
+   * 元數據
    */
   meta: Dict<any>
 }
@@ -80,19 +80,19 @@ interface CreateModelRequest {
    */
   name: string
   /**
-   * 模型类型
+   * 模型類型
    */
   model_type: string
   /**
-   * 基础模型
+   * 基礎模型
    */
   model_name: string
   /**
-   * 认证信息
+   * 認證信息
    */
   credential: any
   /**
-   * 供应商
+   * 供應商
    */
   provider: string
 }
@@ -103,30 +103,30 @@ interface EditModelRequest {
    */
   name: string
   /**
-   * 模型类型
+   * 模型類型
    */
   model_type: string
   /**
-   * 基础模型
+   * 基礎模型
    */
   model_name: string
   /**
-   * 认证信息
+   * 認證信息
    */
   credential: any
 }
 
 interface BaseModel {
   /**
-   * 基础模型名称
+   * 基礎模型名稱
    */
   name: string
   /**
-   * 基础模型描述
+   * 基礎模型描述
    */
   desc: string
   /**
-   * 基础模型类型
+   * 基礎模型類型
    */
   model_type: string
 }
