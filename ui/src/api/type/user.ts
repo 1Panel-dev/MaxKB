@@ -1,109 +1,109 @@
 interface User {
   /**
-   * 用户id
+   * 用戶id
    */
   id: string
   /**
-   * 用户名
+   * 用戶名
    */
   username: string
   /**
-   * 邮箱
+   * 郵箱
    */
   email: string
   /**
-   * 用户角色
+   * 用戶角色
    */
   role: string
   /**
-   * 用户权限
+   * 用戶權限
    */
   permissions: Array<string>
   /**
-   * 是否需要修改密码
+   * 是否需要修改密碼
    */
   is_edit_password?: boolean
 }
 
 interface LoginRequest {
   /**
-   * 用户名
+   * 用戶名
    */
   username: string
   /**
-   * 密码
+   * 密碼
    */
   password: string
 }
 
 interface RegisterRequest {
   /**
-   * 用户名
+   * 用戶名
    */
   username: string
   /**
-   * 密码
+   * 密碼
    */
   password: string
   /**
-   * 确定密码
+   * 確定密碼
    */
   re_password: string
   /**
-   * 邮箱
+   * 郵箱
    */
   email: string
   /**
-   * 验证码
+   * 驗證碼
    */
   code: string
 }
 
 interface CheckCodeRequest {
   /**
-   * 邮箱
+   * 郵箱
    */
   email: string
   /**
-   *验证码
+   *驗證碼
    */
   code: string
   /**
-   * 类型
+   * 類型
    */
   type: 'register' | 'reset_password'
 }
 
 interface ResetCurrentUserPasswordRequest {
   /**
-   * 验证码
+   * 驗證碼
    */
   code: string
   /**
-   *密码
+   *密碼
    */
   password: string
   /**
-   * 确认密码
+   * 確認密碼
    */
   re_password: string
 }
 
 interface ResetPasswordRequest {
   /**
-   * 邮箱
+   * 郵箱
    */
   email?: string
   /**
-   * 验证码
+   * 驗證碼
    */
   code?: string
   /**
-   * 密码
+   * 密碼
    */
   password: string
   /**
-   * 确认密码
+   * 確認密碼
    */
   re_password: string
 }

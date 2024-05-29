@@ -7,7 +7,7 @@ const prefix = '/application'
 
 /**
  * API_KEY列表
- * @param 参数 application_id
+ * @param 參數 application_id
  */
 const getAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   application_id,
@@ -18,7 +18,7 @@ const getAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Res
 
 /**
  * 新增API_KEY
- * @param 参数 application_id
+ * @param 參數 application_id
  */
 const postAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   application_id,
@@ -28,8 +28,8 @@ const postAPIKey: (application_id: string, loading?: Ref<boolean>) => Promise<Re
 }
 
 /**
- * 删除API_KEY
- * @param 参数 application_id api_key_id
+ * 刪除API_KEY
+ * @param 參數 application_id api_key_id
  */
 const delAPIKey: (
   application_id: String,
@@ -41,7 +41,7 @@ const delAPIKey: (
 
 /**
  * 修改API_KEY
- * @param 参数 application_id,api_key_id
+ * @param 參數 application_id,api_key_id
  * data {
  *   is_active: boolean
  * }
@@ -56,8 +56,8 @@ const putAPIKey: (
 }
 
 /**
- * 统计
- * @param 参数 application_id, data
+ * 統計
+ * @param 參數 application_id, data
  */
 const getStatistics: (
   application_id: string,
@@ -68,8 +68,8 @@ const getStatistics: (
 }
 
 /**
- * 修改应用icon
- * @param 参数 application_id
+ * 修改應用icon
+ * @param 參數 application_id
  * data: file
  */
 const putAppIcon: (

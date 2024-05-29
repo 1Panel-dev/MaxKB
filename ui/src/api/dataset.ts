@@ -7,8 +7,8 @@ import { type Ref } from 'vue'
 const prefix = '/dataset'
 
 /**
- * 获取分页知识库
- * @param 参数  
+ * 獲取分頁知識庫
+ * @param 參數  
  * page {
           "current_page": "string",
           "page_size": "string",
@@ -26,16 +26,16 @@ const getDataset: (
 }
 
 /**
- * 获取全部知识库
- * @param 参数
+ * 獲取全部知識庫
+ * @param 參數
  */
 const getAllDataset: (loading?: Ref<boolean>) => Promise<Result<any[]>> = (loading) => {
   return get(`${prefix}`, undefined, loading)
 }
 
 /**
- * 删除知识库
- * @param 参数 dataset_id
+ * 刪除知識庫
+ * @param 參數 dataset_id
  */
 const delDataset: (dataset_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   dataset_id,
@@ -45,8 +45,8 @@ const delDataset: (dataset_id: String, loading?: Ref<boolean>) => Promise<Result
 }
 
 /**
- * 创建知识库
- * @param 参数 
+ * 創建知識庫
+ * @param 參數 
  * {
   "name": "string",
   "desc": "string",
@@ -77,8 +77,8 @@ const postDataset: (data: datasetData, loading?: Ref<boolean>) => Promise<Result
 }
 
 /**
- * 创建Web知识库
- * @param 参数 
+ * 創建Web知識庫
+ * @param 參數 
  * {
   "name": "string",
   "desc": "string",
@@ -94,8 +94,8 @@ const postWebDataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>
 }
 
 /**
- * 创建QA知识库
-  * @param 参数 formData
+ * 創建QA知識庫
+  * @param 參數 formData
  * {
   "file": "file",
   "name": "string",
@@ -110,8 +110,8 @@ const postQADataset: (data: any, loading?: Ref<boolean>) => Promise<Result<any>>
 }
 
 /**
- * 知识库详情
- * @param 参数 dataset_id
+ * 知識庫詳情
+ * @param 參數 dataset_id
  */
 const getDatasetDetail: (dataset_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   dataset_id,
@@ -121,8 +121,8 @@ const getDatasetDetail: (dataset_id: string, loading?: Ref<boolean>) => Promise<
 }
 
 /**
- * 修改知识库信息
- * @param 参数 
+ * 修改知識庫信息
+ * @param 參數 
  * dataset_id
  * {
       "name": "string",
@@ -136,7 +136,7 @@ const putDataset: (dataset_id: string, data: any) => Promise<Result<any>> = (
   return put(`${prefix}/${dataset_id}`, data)
 }
 /**
- * 获取知识库 可关联的应用列表
+ * 獲取知識庫 可關聯的應用列表
  * @param dataset_id
  * @param loading
  * @returns
@@ -149,7 +149,7 @@ const listUsableApplication: (
 }
 
 /**
- * 命中测试列表
+ * 命中測試列表
  * @param dataset_id
  * @param loading
  * @query  { query_text: string, top_number: number, similarity: number }
@@ -164,9 +164,9 @@ const getDatasetHitTest: (
 }
 
 /**
- * 同步知识库
- * @param 参数 dataset_id
- * @query 参数 sync_type // 同步类型->replace:替换同步,complete:完整同步
+ * 同步知識庫
+ * @param 參數 dataset_id
+ * @query 參數 sync_type // 同步類型->replace:替換同步,complete:完整同步
  */
 const putSyncWebDataset: (
   dataset_id: string,
@@ -177,8 +177,8 @@ const putSyncWebDataset: (
 }
 
 /**
- * 重新向量化知识库
- * @param 参数 dataset_id
+ * 重新向量化知識庫
+ * @param 參數 dataset_id
  */
 const putReEmbeddingDataset: (
   dataset_id: string,
@@ -188,9 +188,9 @@ const putReEmbeddingDataset: (
 }
 
 /**
- * 导出知识库
- * @param dataset_name 知识库名称
- * @param dataset_id   知识库id
+ * 導出知識庫
+ * @param dataset_name 知識庫名稱
+ * @param dataset_id   知識庫id
  * @returns
  */
 const exportDataset: (

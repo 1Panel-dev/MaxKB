@@ -17,8 +17,8 @@ const prefix = '/model'
 const prefix_provider = '/provider'
 
 /**
- * 获得模型列表
- * @params 参数 name, model_type, model_name
+ * 獲得模型列表
+ * @params 參數 name, model_type, model_name
  */
 const getModel: (
   request?: ListModelRequest,
@@ -28,14 +28,14 @@ const getModel: (
 }
 
 /**
- * 获得供应商列表
+ * 獲得供應商列表
  */
 const getProvider: (loading?: Ref<boolean>) => Promise<Result<Array<Provider>>> = (loading) => {
   return get(`${prefix_provider}`, {}, loading)
 }
 
 /**
- * 获取模型创建表单
+ * 獲取模型創建表單
  * @param provider
  * @param model_type
  * @param model_name
@@ -52,10 +52,10 @@ const getModelCreateForm: (
 }
 
 /**
- * 获取模型类型列表
- * @param provider 供应商
- * @param loading  加载器
- * @returns 模型类型列表
+ * 獲取模型類型列表
+ * @param provider 供應商
+ * @param loading  加載器
+ * @returns 模型類型列表
  */
 const listModelType: (
   provider: string,
@@ -65,7 +65,7 @@ const listModelType: (
 }
 
 /**
- * 获取基础模型列表
+ * 獲取基礎模型列表
  * @param provider
  * @param model_type
  * @param loading
@@ -80,9 +80,9 @@ const listBaseModel: (
 }
 
 /**
- * 创建模型
- * @param request 请求对象
- * @param loading 加载器
+ * 創建模型
+ * @param request 請求對象
+ * @param loading 加載器
  * @returns
  */
 const createModel: (
@@ -107,9 +107,9 @@ const updateModel: (
 }
 
 /**
- * 获取模型详情根据模型id 包括认证信息
+ * 獲取模型詳情根據模型id 包括認證信息
  * @param model_id 模型id
- * @param loading  加载器
+ * @param loading  加載器
  * @returns
  */
 const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
@@ -119,9 +119,9 @@ const getModelById: (model_id: string, loading?: Ref<boolean>) => Promise<Result
   return get(`${prefix}/${model_id}`, {}, loading)
 }
 /**
- * 获取模型信息不包括认证信息根据模型id
+ * 獲取模型信息不包括認證信息根據模型id
  * @param model_id 模型id
- * @param loading  加载器
+ * @param loading  加載器
  * @returns
  */
 const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Result<Model>> = (
