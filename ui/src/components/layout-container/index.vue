@@ -5,7 +5,7 @@
         <back-button :to="backTo" v-if="showBack"></back-button>
       </slot>
       <slot name="header">
-        <h3>{{ header }}</h3>
+        <h4>{{ header }}</h4>
       </slot>
     </div>
     <el-scrollbar>

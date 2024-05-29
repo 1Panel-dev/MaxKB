@@ -1,7 +1,7 @@
 <template>
   <div class="application-list-container p-24" style="padding-top: 16px">
     <div class="flex-between mb-16">
-      <h3>{{ $t('views.application.applicationList.title') }}</h3>
+      <h4>{{ $t('views.application.applicationList.title') }}</h4>
       <el-input
         v-model="searchValue"
         @change="searchHandle"

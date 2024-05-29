@@ -80,9 +80,9 @@ const applicationRouter = {
     // 创建编排
     {
       path: '/application/workflow',
-      name: 'CreateApplication',
+      name: 'ApplicationWorkflow',
       meta: { activeMenu: '/application' },
-      component: () => import('@/views/application/CreateAndSetting.vue'),
+      component: () => import('@/views/application-workflow/index.vue'),
       hidden: true
     },
   ]

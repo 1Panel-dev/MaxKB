@@ -2,10 +2,10 @@
   <div class="hit-test">
     <LayoutContainer>
       <template #header>
-        <h3>
+        <h4>
           命中测试
           <el-text type="info" class="ml-4">针对用户提问调试段落匹配情况，保障回答效果。</el-text>
-        </h3>
+        </h4>
       </template>
       <div class="hit-test__main p-16" v-loading="loading">
         <div class="question-title clearfix" v-if="questionTitle">

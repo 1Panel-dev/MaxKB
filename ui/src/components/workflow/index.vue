@@ -1,17 +1,18 @@
 <template>
-  <button @click="validate">点击校验</button>
-  <button @click="getGraphData">点击获取流程数据</button>
-  <div className="helloworld-app sql" style="height: 100vh; width: 100vw" id="container"></div>
+  <!-- <button @click="validate">点击校验</button>
+  <button @click="getGraphData">点击获取流程数据</button> -->
+  <div className="helloworld-app sql" style="height: 100%; width: 100%" id="container"></div>
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
 import { ref, onMounted } from 'vue'
-import AiChatNode from '@/workflow/nodes/ai-chat-node/index.ts'
-import AppEdge from '@/workflow/common/edge/index'
-import { AppMenu } from '@/workflow/common/menu/index'
+import AiChatNode from './nodes/ai-chat-node/index.ts'
+import AppEdge from './common/edge/index'
+import { AppMenu } from './common/menu/index'
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
 
+defineOptions({ name: 'WorkFlow' })
 LogicFlow.use(AppMenu)
 
 const graphData = {
@@ -86,6 +87,17 @@ onMounted(() => {
   const container: any = document.querySelector('#container')
   if (container) {
     lf.value = new LogicFlow({
+      background: {
+        backgroundColor: '#f5f6f7'
+      },
+      grid: {
+        size: 10,
+        type: 'dot',
+        config: {
+          color: '#DEE0E3',
+          thickness: 1
+        }
+      },
       keyboard: {
         enabled: true,
         shortcuts: [

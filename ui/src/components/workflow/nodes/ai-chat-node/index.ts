@@ -1,5 +1,5 @@
-import ChatNodeVue from '@/workflow/nodes/ai-chat-node/index.vue'
-import { AppNode, AppNodeModel } from '@/workflow/common/app-node/index'
+import ChatNodeVue from './index.vue'
+import { AppNode, AppNodeModel } from '@/components/workflow/common/app-node/index'
 class ChatNode extends AppNode {
   constructor(props: any) {
     super(props, ChatNodeVue)
