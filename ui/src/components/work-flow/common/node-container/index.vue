@@ -7,13 +7,17 @@
       </div>
       <div class="input-container" v-resize="resetInputContainer">
         <el-divider> </el-divider>
-        <div v-for="item in nodeModel.properties.input" class="step-field">
+        <div v-for="(item, index) in nodeModel.properties.input" :key="index" class="step-field">
           <span>{{ item.key }}</span>
         </div>
       </div>
       <div class="output-container" v-resize="resetOutputContainer">
         <el-divider> </el-divider>
-        <div v-for="item in nodeModel.properties.output" class="out-step-field">
+        <div
+          v-for="(item, index) in nodeModel.properties.output"
+          :key="index"
+          class="out-step-field"
+        >
           <span>{{ item.key }}</span>
         </div>
       </div>
