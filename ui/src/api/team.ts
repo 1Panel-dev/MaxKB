@@ -5,40 +5,40 @@ import type { TeamMember } from '@/api/type/team'
 const prefix = '/team/member'
 
 /**
- * 获取团队成员列表
+ * 獲取團隊成員列表
  */
 const getTeamMember: () => Promise<Result<TeamMember[]>> = () => {
   return get(`${prefix}`)
 }
 
 /**
- * 添加成员
- * @param 参数 []
+ * 添加成員
+ * @param 參數 []
  */
 const postCreatTeamMember: (data: Array<String>) => Promise<Result<boolean>> = (data) => {
   return post(`${prefix}/_batch`, data)
 }
 
 /**
- * 删除成员
- * @param 参数 member_id
+ * 刪除成員
+ * @param 參數 member_id
  */
 const delTeamMember: (member_id: String) => Promise<Result<boolean>> = (member_id) => {
   return del(`${prefix}/${member_id}`)
 }
 
 /**
- * 获取成员权限
- * @param 参数 member_id
+ * 獲取成員權限
+ * @param 參數 member_id
  */
 const getMemberPermissions: (member_id: String) => Promise<Result<any>> = (member_id) => {
   return get(`${prefix}/${member_id}`)
 }
 
 /**
- * 获取成员权限
- * @param 参数 member_id
- * @param 参数 {
+ * 獲取成員權限
+ * @param 參數 member_id
+ * @param 參數 {
           "team_member_permission_list": [
             {
               "target_id": "string",

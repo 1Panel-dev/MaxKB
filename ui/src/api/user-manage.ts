@@ -5,13 +5,13 @@ import { type Ref } from 'vue'
 
 const prefix = '/user_manage'
 /**
- * 用户分页列表
- * @param 参数 
+ * 用戶分頁列表
+ * @param 參數 
  * page  {
               "current_page": "string",
               "page_size": "string",
             }
- * @query 参数 
+ * @query 參數 
    email_or_username: string
  */
 const getUserManage: (
@@ -27,8 +27,8 @@ const getUserManage: (
 }
 
 /**
- * 删除用户
- * @param 参数 user_id,
+ * 刪除用戶
+ * @param 參數 user_id,
  */
 const delUserManage: (user_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   user_id,
@@ -38,7 +38,7 @@ const delUserManage: (user_id: string, loading?: Ref<boolean>) => Promise<Result
 }
 
 /**
- * 创建用户
+ * 創建用戶
  */
 const postUserManage: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
   data,
@@ -48,7 +48,7 @@ const postUserManage: (data: any, loading?: Ref<boolean>) => Promise<Result<any>
 }
 
 /**
- * 编辑用户
+ * 編輯用戶
  */
 const putUserManage: (
   user_id: string,
@@ -58,7 +58,7 @@ const putUserManage: (
   return put(`${prefix}/${user_id}`, data, undefined, loading)
 }
 /**
- * 修改用户密码
+ * 修改用戶密碼
  */
 const putUserManagePassword: (
   user_id: string,

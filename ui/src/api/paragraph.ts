@@ -6,7 +6,7 @@ const prefix = '/dataset'
 
 /**
  * 段落列表
- * @param 参数 dataset_id document_id
+ * @param 參數 dataset_id document_id
  * page {
               "current_page": "string",
               "page_size": "string",
@@ -31,8 +31,8 @@ const getParagraph: (
 }
 
 /**
- * 删除段落
- * @param 参数 dataset_id, document_id, paragraph_id
+ * 刪除段落
+ * @param 參數 dataset_id, document_id, paragraph_id
  */
 const delParagraph: (
   dataset_id: string,
@@ -49,8 +49,8 @@ const delParagraph: (
 }
 
 /**
- * 批量删除段落
- * @param 参数 dataset_id, document_id
+ * 批量刪除段落
+ * @param 參數 dataset_id, document_id
  */
 const delMulParagraph: (
   dataset_id: string,
@@ -67,8 +67,8 @@ const delMulParagraph: (
 }
 
 /**
- * 创建段落
- * @param 参数 
+ * 創建段落
+ * @param 參數 
  * dataset_id, document_id
  * {
   "content": "string",
@@ -93,7 +93,7 @@ const postParagraph: (
 
 /**
  * 修改段落
- * @param 参数 
+ * @param 參數 
  * dataset_id, document_id, paragraph_id
  * {
   "content": "string",
@@ -123,8 +123,8 @@ const putParagraph: (
 }
 
 /**
- * 批量迁移段落
- * @param 参数 dataset_id,target_dataset_id,
+ * 批量遷移段落
+ * @param 參數 dataset_id,target_dataset_id,
  */
 const putMigrateMulParagraph: (
   dataset_id: string,
@@ -150,8 +150,8 @@ const putMigrateMulParagraph: (
 }
 
 /**
- * 问题列表
- * @param 参数 dataset_id，document_id，paragraph_id
+ * 問題列表
+ * @param 參數 dataset_id，document_id，paragraph_id
  */
 const getProblem: (
   dataset_id: string,
@@ -162,8 +162,8 @@ const getProblem: (
 }
 
 /**
- * 创建问题
- * @param 参数 
+ * 創建問題
+ * @param 參數 
  * dataset_id, document_id, paragraph_id
  * {
       "id": "string",
@@ -186,11 +186,11 @@ const postProblem: (
 }
 /**
  *
- * @param dataset_id 数据集id
- * @param document_id 文档id
+ * @param dataset_id 數據集id
+ * @param document_id 文檔id
  * @param paragraph_id 段落id
- * @param problem_id 问题id
- * @param loading 加载器
+ * @param problem_id 問題id
+ * @param loading 加載器
  * @returns
  */
 const associationProblem: (
@@ -208,8 +208,8 @@ const associationProblem: (
   )
 }
 /**
- * 解除关联问题
- * @param 参数 dataset_id, document_id, paragraph_id,problem_id
+ * 解除關聯問題
+ * @param 參數 dataset_id, document_id, paragraph_id,problem_id
  */
 const disassociationProblem: (
   dataset_id: string,
