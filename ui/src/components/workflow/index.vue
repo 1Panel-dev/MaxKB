@@ -6,9 +6,9 @@
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
 import { ref, onMounted } from 'vue'
-import AiChatNode from '@/work-flow/nodes/ai-chat-node/index.ts'
-import AppEdge from '@/work-flow/common/edge/index'
-import { AppMenu } from '@/work-flow/common/menu/index'
+import AiChatNode from '@/workflow/nodes/ai-chat-node/index.ts'
+import AppEdge from '@/workflow/common/edge/index'
+import { AppMenu } from '@/workflow/common/menu/index'
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
 

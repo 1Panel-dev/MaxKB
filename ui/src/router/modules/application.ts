@@ -77,6 +77,14 @@ const applicationRouter = {
         }
       ]
     },
+    // 创建编排
+    {
+      path: '/application/workflow',
+      name: 'CreateApplication',
+      meta: { activeMenu: '/application' },
+      component: () => import('@/views/application/CreateAndSetting.vue'),
+      hidden: true
+    },
   ]
 }
 
