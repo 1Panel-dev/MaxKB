@@ -2,6 +2,7 @@
   <el-avatar
     :size="30"
     :style="{ background: props.pinyinColor && getAvatarColour(firstUserName) }"
+    style="flex-shrink: 0"
     v-bind="$attrs"
   >
     <slot> {{ firstUserName }} </slot>

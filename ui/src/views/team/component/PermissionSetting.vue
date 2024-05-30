@@ -18,15 +18,8 @@
               class="mr-12"
               shape="square"
               :size="24"
-              style="flex-shrink: 0"
             />
-            <AppAvatar
-              v-else-if="isDataset"
-              class="mr-12"
-              shape="square"
-              :size="24"
-              style="flex-shrink: 0"
-            >
+            <AppAvatar v-else-if="isDataset" class="mr-12" shape="square" :size="24">
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
             <auto-tooltip :content="row?.name">

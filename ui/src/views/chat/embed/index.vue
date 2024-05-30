@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-embed" v-loading="loading" @click="closePopover($event)">
+  <div class="chat-embed" v-loading="loading">
     <div class="chat-embed__header">
       <div class="chat-width">
         <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
@@ -27,7 +27,7 @@
     </div>
 
     <el-collapse-transition>
-      <div v-show="show" class="chat-popover w-full" id="chat-popover">
+      <div v-show="show" class="chat-popover w-full" v-click-outside="clickoutside">
         <div class="border-b p-16-24">
           <span>历史记录</span>
         </div>
@@ -104,13 +104,8 @@ function handleScroll(event: any) {
   }
 }
 
-function closePopover(event: any) {
-  const popover = document.getElementById('chat-popover')
-  if (popover) {
-    if (!popover.contains(event.target)) {
-      show.value = false
-    }
-  }
+function clickoutside() {
+  show.value = false
 }
 
 function newChat() {
