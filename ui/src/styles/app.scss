@@ -92,6 +92,11 @@ h4 {
   font-size: 16px;
 }
 
+h5 {
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .bold {
   font-weight: 600;
 }
@@ -186,6 +191,9 @@ h4 {
 }
 .p-24 {
   padding: calc(var(--app-base-px) * 3);
+}
+.p-8-12 {
+  padding: calc(var(--app-base-px)) calc(var(--app-base-px) + 4px);
 }
 .p-16-24 {
   padding: calc(var(--app-base-px) * 2) calc(var(--app-base-px) * 3);

@@ -6,14 +6,25 @@
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
 import { ref, onMounted } from 'vue'
-import AiChatNode from './nodes/ai-chat-node/index.ts'
+import AiChatNode from './nodes/ai-chat-node/index'
 import AppEdge from './common/edge/index'
 import { AppMenu } from './common/menu/index'
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
 
 defineOptions({ name: 'WorkFlow' })
-LogicFlow.use(AppMenu)
+
+type ShapeItem = {
+  type?: string
+  text?: string
+  icon?: string
+  label?: string
+  className?: string
+  disabled?: boolean
+  properties?: Record<string, any>
+  callback?: (lf: LogicFlow, container: HTMLElement) => void
+}
+// LogicFlow.use(AppMenu)
 
 const graphData = {
   nodes: [
@@ -151,6 +162,23 @@ const validate = () => {
 const getGraphData = () => {
   console.log(JSON.stringify(lf.value.getGraphData()))
 }
+
+const onmousedown = (shapeItem: ShapeItem) => {
+  if (shapeItem.type) {
+    lf.value.dnd.startDrag({
+      type: shapeItem.type,
+      properties: shapeItem.properties,
+      icon: shapeItem.icon,
+    })
+  }
+  if (shapeItem.callback) {
+    shapeItem.callback(lf.value)
+  }
+}
+
+defineExpose({
+  onmousedown
+})
 </script>
 <style lang="scss">
 .lf-dnd-text {

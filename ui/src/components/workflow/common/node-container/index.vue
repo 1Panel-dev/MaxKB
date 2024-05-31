@@ -1,18 +1,19 @@
 <template>
-  <div class="container">
-    <div class="step-container" :class="`step-color-${Math.ceil(Math.random() * 4)}`">
+  <div class="workflow-node-container p-16">
+    <div class="step-container p-16">
       <div v-resize="resizeStepContainer">
-        <div class="step-name">{{ nodeModel.properties.stepName }}</div>
-        <div style="padding: 10px"><slot></slot></div>
+        <div class="flex align-center mb-16">
+          <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
+          <h4>{{ nodeModel.properties.stepName }}</h4>
+        </div>
+        <div><slot></slot></div>
       </div>
       <div class="input-container" v-resize="resetInputContainer">
-        <el-divider> </el-divider>
         <div v-for="(item, index) in nodeModel.properties.input" :key="index" class="step-field">
           <span>{{ item.key }}</span>
         </div>
       </div>
       <div class="output-container" v-resize="resetOutputContainer">
-        <el-divider> </el-divider>
         <div
           v-for="(item, index) in nodeModel.properties.output"
           :key="index"
@@ -26,6 +27,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
+import { iconComponent } from '../../menu-data'
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
@@ -73,53 +75,20 @@ const props = defineProps<{
   nodeModel: any
 }>()
 </script>
-<style lang="scss">
-.el-divider--horizontal {
-  margin: 0;
-}
-.container {
-  box-sizing: border-box;
-  padding: 10px;
-}
-.step-container {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 30%);
-}
-
-.step-container::before {
-  display: block;
-  width: 100%;
-  height: 8px;
-  background: #d79b00;
-  content: '';
-}
-
-.step-container.step-color-1::before {
-  background: #9673a6;
-}
-
-.step-container.step-color-2::before {
-  background: #dae8fc;
-}
-
-.step-container.step-color-3::before {
-  background: #82b366;
-}
-
-.step-container.step-color-4::before {
-  background: #f8cecc;
-}
-
-.step-name {
-  height: 28px;
-  font-size: 14px;
-  line-height: 28px;
-  text-align: center;
-  background: #f5f5f5;
+<style lang="scss" scoped>
+.workflow-node-container {
+  .step-container {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 9px;
+    box-shadow: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
+    &:hover {
+      box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+    }
+  }
 }
 
 .step-field {

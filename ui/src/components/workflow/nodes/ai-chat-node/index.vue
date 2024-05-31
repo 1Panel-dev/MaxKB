@@ -1,40 +1,43 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <el-form
-      @submit.prevent
-      :model="chat_data"
-      label-position="top"
-      require-asterisk-position="right"
-      class="mb-24"
-      label-width="auto"
-      ref="aiChatNodeFormRef"
-    >
-      <el-form-item
-        label="模型"
-        prop="model"
-        :rules="{
-          message: '模型不能为空',
-          trigger: 'blur',
-          required: true
-        }"
+    <h5 class="title-decoration-1 mb-8">节点设置</h5>
+    <el-card shadow="never" class="card-never">
+      <el-form
+        @submit.prevent
+        :model="chat_data"
+        label-position="top"
+        require-asterisk-position="right"
+        class="mb-24"
+        label-width="auto"
+        ref="aiChatNodeFormRef"
       >
-        <el-select v-model="chat_data.model" placeholder="请选择模型">
-          <el-option label="Zone one" value="shanghai" />
-          <el-option label="Zone two" value="beijing" />
-        </el-select>
-      </el-form-item>
-      <el-form-item
-        label="提示词"
-        :rules="{
-          message: '提示词不能为空',
-          trigger: 'blur',
-          required: true
-        }"
-        prop="name"
-      >
-        <el-input v-model="chat_data.name" @focus="handleFocus" />
-      </el-form-item>
-    </el-form>
+        <el-form-item
+          label="模型"
+          prop="model"
+          :rules="{
+            message: '模型不能为空',
+            trigger: 'blur',
+            required: true
+          }"
+        >
+          <el-select v-model="chat_data.model" placeholder="请选择模型">
+            <el-option label="Zone one" value="shanghai" />
+            <el-option label="Zone two" value="beijing" />
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          label="提示词"
+          :rules="{
+            message: '提示词不能为空',
+            trigger: 'blur',
+            required: true
+          }"
+          prop="name"
+        >
+          <el-input v-model="chat_data.name" @focus="handleFocus" />
+        </el-form-item>
+      </el-form>
+    </el-card>
   </NodeContainer>
 </template>
 <script setup lang="ts">

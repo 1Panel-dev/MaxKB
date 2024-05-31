@@ -16,32 +16,48 @@
     <!-- 下拉框 -->
     <el-collapse-transition>
       <div v-show="showPopover" class="workflow-dropdown-menu border">
-        <p class="title">基础组件</p>
-        <div class="flex p-16">
-          <AppAvatar class="mr-8 mt-4" shape="square" :size="32">
-            <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-          </AppAvatar>
-          <div class="pre-line">
-            <div>通用型</div>
-            <el-text type="info" size="small">可以通过上传文件或手动录入方式构建知识库</el-text>
+        <h5 class="title">基础组件</h5>
+        <template v-for="(item, index) in shapeList" :key="index">
+          <div class="workflow-dropdown-item cursor flex p-8-12" @mousedown="onmousedown(item)">
+            <component :is="iconComponent(item.icon)" class="mr-8 mt-4" />
+            <div class="pre-line">
+              <div>{{ item.label }}</div>
+              <el-text type="info" size="small">{{ item.text }}</el-text>
+            </div>
           </div>
-        </div>
+        </template>
       </div>
     </el-collapse-transition>
     <div class="workflow-main">
-      <workflow />
+      <workflow ref="workflowRef" />
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-
 import Workflow from '@/components/workflow/index.vue'
+import { shapeList, iconComponent } from '@/components/workflow/menu-data'
+type ShapeItem = {
+  type?: string
+  text?: string
+  icon?: string
+  label?: string
+  className?: string
+  disabled?: boolean
+  properties?: Record<string, any>
+  callback?: (lf: LogicFlow, container: HTMLElement) => void
+}
+
+const workflowRef = ref()
 
 const showPopover = ref(false)
 
 function clickoutside() {
   showPopover.value = false
+}
+
+function onmousedown(item: ShapeItem) {
+  workflowRef.value?.onmousedown(item)
 }
 
 onMounted(() => {})
@@ -58,19 +74,28 @@ onBeforeUnmount(() => {})
     height: calc(100vh - var(--app-header-height) - 70px);
   }
   .workflow-dropdown-menu {
+    -moz-user-select: none; /* Firefox */
+    -webkit-user-select: none; /* WebKit内核 */
+    -ms-user-select: none; /* IE10及以后 */
+    -khtml-user-select: none; /* 早期浏览器 */
+    -o-user-select: none; /* Opera */
+    user-select: none; /* CSS3属性 */
     position: absolute;
     top: 110px;
     right: 24px;
     z-index: 99;
     width: 240px;
-    box-shadow: 0px 4px 8px 0px #1f23291a;
+    box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
     background: #ffffff;
     border-radius: 4px;
 
     .title {
-      font-size: 14px;
-      font-weight: 500;
-      padding: 8px 12px 0;
+      padding: 8px 12px 4px;
+    }
+    .workflow-dropdown-item {
+      &:hover {
+        background: var(--app-text-color-light-1);
+      }
     }
   }
 }

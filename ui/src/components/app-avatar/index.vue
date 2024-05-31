@@ -17,6 +17,7 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  //是否用拼音字母颜色
   pinyinColor: {
     type: Boolean,
     default: false
