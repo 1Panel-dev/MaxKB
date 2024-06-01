@@ -6,8 +6,8 @@ import type { pageRequest } from '@/api/type/common'
 const prefix = '/dataset'
 
 /**
- * 文档分页列表
- * @param 参数  dataset_id,   
+ * 文檔分頁列表
+ * @param 參數  dataset_id,   
  * page {
               "current_page": "string",
               "page_size": "string",
@@ -31,8 +31,8 @@ const getProblems: (
 }
 
 /**
- * 创建问题
- * @param 参数 dataset_id
+ * 創建問題
+ * @param 參數 dataset_id
  * data: array[string]
  */
 const postProblems: (
@@ -44,8 +44,8 @@ const postProblems: (
 }
 
 /**
- * 删除问题
- * @param 参数 dataset_id, problem_id,
+ * 刪除問題
+ * @param 參數 dataset_id, problem_id,
  */
 const delProblems: (
   dataset_id: string,
@@ -56,8 +56,8 @@ const delProblems: (
 }
 
 /**
- * 批量删除问题
- * @param 参数 dataset_id,
+ * 批量刪除問題
+ * @param 參數 dataset_id,
  */
 const delMulProblem: (
   dataset_id: string,
@@ -68,8 +68,8 @@ const delMulProblem: (
 }
 
 /**
- * 修改问题
- * @param 参数 
+ * 修改問題
+ * @param 參數 
  * dataset_id, problem_id, 
  * {
       "content": "string",
@@ -85,8 +85,8 @@ const putProblems: (
 }
 
 /**
- * 问题详情
- * @param 参数
+ * 問題詳情
+ * @param 參數
  * dataset_id, problem_id,
  */
 const getDetailProblems: (

@@ -1,0 +1,8 @@
+[
+
+    {
+      "key": "ctrl+1",
+      "command": "extension.zhConversion.convertToTaiwan",
+      "when": "editorTextFocus"
+    }
+  ]
