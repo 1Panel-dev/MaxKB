@@ -70,7 +70,6 @@ onBeforeUnmount(() => {})
     background: #ffffff;
   }
   .workflow-main {
-    width: 100vw;
     height: calc(100vh - var(--app-header-height) - 70px);
   }
   .workflow-dropdown-menu {

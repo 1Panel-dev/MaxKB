@@ -1,13 +1,18 @@
 <template>
   <!-- <button @click="validate">点击校验</button>
   <button @click="getGraphData">点击获取流程数据</button> -->
-  <div className="helloworld-app sql" style="height: 100%; width: 100%" id="container"></div>
+  <div className="workflow-app" id="container">
+    <!-- 辅助工具栏 -->
+    <Control class="control" v-if="lf" :lf="lf"></Control>
+  </div>
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
 import { ref, onMounted } from 'vue'
 import AppEdge from './common/edge/index'
+import Control from './common/NodeControl.vue'
 import { AppMenu } from './common/menu/index'
+
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
@@ -31,7 +36,7 @@ const graphData = {
     {
       id: '92a94b25-453d-4a00-aa26-9fed9b487e08',
       type: 'base-node',
-      x: 0,
+      x: 180,
       y: 250,
       properties: {
         height: 200,
@@ -49,8 +54,8 @@ const graphData = {
     {
       id: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd4',
       type: 'start-node',
-      x: 0,
-      y: 753,
+      x: 180,
+      y: 623,
       properties: {
         height: 200,
         stepName: '开始',
@@ -155,7 +160,7 @@ onMounted(() => {
 
     lf.value.render(graphData)
 
-    lf.value.translateCenter()
+    // lf.value.translate(0, 0)
   }
 })
 const validate = () => {
@@ -185,13 +190,24 @@ defineExpose({
 })
 </script>
 <style lang="scss">
-.lf-dnd-text {
-  width: 200px;
+.workflow-app {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  .control {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    z-index: 2;
+  }
 }
-.lf-dnd-shape {
-  height: 50px;
-}
-.lf-node-selected {
-  border: 1px solid #000;
-}
+// .lf-dnd-text {
+//   width: 200px;
+// }
+// .lf-dnd-shape {
+//   height: 50px;
+// }
+// .lf-node-selected {
+//   border: 1px solid #000;
+// }
 </style>

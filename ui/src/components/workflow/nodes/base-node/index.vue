@@ -52,6 +52,7 @@ import NodeContainer from '@/components/workflow/common/node-container/index.vue
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { MdEditor } from 'md-editor-v3'
+const props = defineProps<{ nodeModel: any }>()
 
 const chat_data = computed({
   get: () => {
@@ -71,7 +72,7 @@ const chat_data = computed({
     props.nodeModel.properties.node_data = value
   }
 })
-const props = defineProps<{ nodeModel: any }>()
+
 const handleFocus = () => {
   props.nodeModel.isSelected = false
 }

@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { iconComponent } from '../../menu-data'
+
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
