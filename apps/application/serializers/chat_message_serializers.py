@@ -179,13 +179,12 @@ class ChatMessageSerializer(serializers.Serializer):
         return chat_info
 
     def chat(self):
-        self.is_valid(raise_exception=True)
+        chat_info = self.is_valid(raise_exception=True)
         message = self.data.get('message')
         re_chat = self.data.get('re_chat')
         stream = self.data.get('stream')
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
-        chat_info = self.is_valid(raise_exception=True)
         pipeline_manage_builder = PipelineManage.builder()
         # 如果开启了问题优化,则添加上问题优化步骤
         if chat_info.application.problem_optimization:
