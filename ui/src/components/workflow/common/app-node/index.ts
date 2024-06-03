@@ -1,6 +1,6 @@
 import Components from '@/components'
 import ElementPlus from 'element-plus'
-import { HtmlNode, HtmlNodeModel } from '@logicflow/core'
+import { HtmlNode, HtmlNodeModel, BaseEdge } from '@logicflow/core'
 import { createApp, h } from 'vue'
 import directives from '@/directives'
 
@@ -80,6 +80,7 @@ class AppNodeModel extends HtmlNodeModel {
     }
     return style
   }
+
   setHeight(height: number, inputContainerHeight: number, outputContainerHeight: number) {
     this.height = height + inputContainerHeight + outputContainerHeight + 100
     this.baseHeight = height
@@ -96,7 +97,7 @@ class AppNodeModel extends HtmlNodeModel {
     })
   }
   setAttributes() {
-    this.width = 500
+    this.width = 340
 
     const circleOnlyAsTarget = {
       message: '只允许从右边的锚点连出',

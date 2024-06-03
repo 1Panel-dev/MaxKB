@@ -1,5 +1,5 @@
 const icons: any = import.meta.glob('./icons/**.vue', { eager: true })
-function iconComponent(name) {
+function iconComponent(name: string) {
   const url = `./icons/${name}.vue`
   return icons[url]?.default || null
 }
