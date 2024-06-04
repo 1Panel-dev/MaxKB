@@ -6,7 +6,31 @@
           <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
           <h4>{{ nodeModel.properties.stepName }}</h4>
         </div>
-        <div><slot></slot></div>
+        <div>
+          <slot></slot>
+          <template v-if="props.nodeModel.properties.fields?.length > 0">
+            <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
+            <template v-for="(item, index) in props.nodeModel.properties.fields" :key="index">
+              <div
+                class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
+                @mouseenter="showicon = index"
+                @mouseleave="showicon = null"
+              >
+                <span>{{ item.label }} {{ '{' + item.value + '}' }}</span>
+                <el-tooltip
+                  effect="dark"
+                  content="复制参数"
+                  placement="top"
+                  v-if="showicon === index"
+                >
+                  <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
+                    <AppIcon iconName="app-copy"></AppIcon>
+                  </el-button>
+                </el-tooltip>
+              </div>
+            </template>
+          </template>
+        </div>
       </div>
     </div>
   </div>
@@ -14,7 +38,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { iconComponent } from '../icons/utils'
-
+import { copyClick } from '@/utils/clipboard'
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
@@ -24,6 +48,8 @@ const height = ref<{
   inputContainerHeight: 0,
   outputContainerHeight: 0
 })
+
+const showicon = ref<number | null>(null)
 
 const resizeStepContainer = (wh: any) => {
   if (wh.height) {
