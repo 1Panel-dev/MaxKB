@@ -8,7 +8,7 @@
         </div>
         <div><slot></slot></div>
       </div>
-      <div class="input-container" v-resize="resetInputContainer">
+      <!-- <div class="input-container" v-resize="resetInputContainer">
         <div v-for="(item, index) in nodeModel.properties.input" :key="index" class="step-field">
           <span>{{ item.key }}</span>
         </div>
@@ -21,7 +21,7 @@
         >
           <span>{{ item.key }}</span>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

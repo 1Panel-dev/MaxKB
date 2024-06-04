@@ -1,5 +1,5 @@
 <template>
-  <NodeContainer :nodeModel="nodeModel" style="width: 320px">
+  <NodeContainer :nodeModel="nodeModel">
     <el-form
       @submit.prevent
       :model="chat_data"
@@ -7,7 +7,7 @@
       require-asterisk-position="right"
       class="mb-24"
       label-width="auto"
-      ref="aiChatNodeFormRef"
+      ref="baseNodeFormRef"
     >
       <el-form-item
         label="应用名称"
@@ -76,10 +76,10 @@ const chat_data = computed({
 const handleFocus = () => {
   props.nodeModel.isSelected = false
 }
-const aiChatNodeFormRef = ref<FormInstance>()
+const baseNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
-  aiChatNodeFormRef.value?.validate()
+  baseNodeFormRef.value?.validate()
 }
 
 onMounted(() => {

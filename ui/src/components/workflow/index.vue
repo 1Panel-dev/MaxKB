@@ -11,8 +11,6 @@ import LogicFlow from '@logicflow/core'
 import { ref, onMounted } from 'vue'
 import AppEdge from './common/edge/index'
 import Control from './common/NodeControl.vue'
-import { AppMenu } from './common/menu/index'
-
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
@@ -29,7 +27,6 @@ type ShapeItem = {
   properties?: Record<string, any>
   callback?: (lf: LogicFlow, container: HTMLElement) => void
 }
-// LogicFlow.use(AppMenu)
 
 const graphData = {
   nodes: [
@@ -56,6 +53,19 @@ const graphData = {
       type: 'start-node',
       x: 180,
       y: 623,
+      properties: {
+        height: 200,
+        stepName: '开始',
+        // input: [{ key: '输入' }],
+        output: [{ key: '输出' }]
+        // node_data: { model: 'shanghai', name: '222222' }
+      }
+    },
+    {
+      id: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd4',
+      type: 'search-dataset-node',
+      x: 500,
+      y: 250,
       properties: {
         height: 200,
         stepName: '开始',
@@ -108,6 +118,7 @@ onMounted(() => {
   const container: any = document.querySelector('#container')
   if (container) {
     lf.value = new LogicFlow({
+      textEdit: false,
       background: {
         backgroundColor: '#f5f6f7'
       },

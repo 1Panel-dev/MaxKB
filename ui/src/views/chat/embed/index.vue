@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-embed" v-loading="loading">
+  <div class="chat-embed layout-bg" v-loading="loading">
     <div class="chat-embed__header">
       <div class="chat-width">
         <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
@@ -200,7 +200,6 @@ onMounted(() => {
 </script>
 <style lang="scss">
 .chat-embed {
-  background-color: var(--app-layout-bg-color);
   overflow: hidden;
   &__header {
     background: var(--app-header-bg-color);

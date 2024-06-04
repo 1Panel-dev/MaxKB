@@ -1,9 +1,9 @@
 <template>
   <div>
     <el-button-group>
-      <el-button type="plain" size="small" @click="$_zoomIn">放大</el-button>
-      <el-button type="plain" size="small" @click="$_zoomOut">缩小</el-button>
-      <el-button type="plain" size="small" @click="$_reset">还原(大小&定位)</el-button>
+      <el-button size="small" @click="$_zoomIn">放大</el-button>
+      <el-button size="small" @click="$_zoomOut">缩小</el-button>
+      <el-button size="small" @click="$_reset">还原(大小&定位)</el-button>
     </el-button-group>
   </div>
 </template>

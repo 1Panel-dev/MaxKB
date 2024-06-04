@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="aboutDialogVisible" class="about-dialog">
+  <el-dialog v-model="aboutDialogVisible" class="about-dialog border-r-4">
     <template #header="{ titleId, titleClass }">
       <div class="flex-center">
         <div class="logo mr-4"></div>
@@ -57,7 +57,6 @@ defineExpose({ open })
 <style lang="scss" scope>
 .about-dialog {
   padding: 0 0 24px 0;
-  border-radius: 4px;
   width: 600px;
   font-weight: 400;
   .el-dialog__header {

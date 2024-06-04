@@ -69,7 +69,7 @@ const validate = () => {
 }
 
 onMounted(() => {
-  props.nodeModel.validate = validate
+  set(props.nodeModel, 'validate', validate)
 })
 </script>
 <style lang="scss" scoped></style>

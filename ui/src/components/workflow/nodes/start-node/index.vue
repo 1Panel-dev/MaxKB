@@ -1,16 +1,15 @@
 <template>
-  <NodeContainer :nodeModel="nodeModel" class="start-node" style="width: 320px">
+  <NodeContainer :nodeModel="nodeModel" class="start-node">
     <h5 class="title-decoration-1 mb-8">全局变量</h5>
-    <div class="text-bg p-8-12 mb-8">当前时 {time}</div>
+    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">当前时 {time}</div>
     <h5 class="title-decoration-1 mb-8">参数输出</h5>
-    <div class="text-bg p-8-12 mb-8">用户问题 {question}</div>
+    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">用户问题 {question}</div>
   </NodeContainer>
 </template>
 <script setup lang="ts">
 import NodeContainer from '@/components/workflow/common/node-container/index.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
-import { MdEditor } from 'md-editor-v3'
 
 // const chat_data = computed({
 //   get: () => {
@@ -44,11 +43,4 @@ onMounted(() => {
   props.nodeModel.validate = validate
 })
 </script>
-<style lang="scss" scoped>
-.start-node {
-  .text-bg {
-    background: var(--app-layout-bg-color);
-    border-radius: 4px;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

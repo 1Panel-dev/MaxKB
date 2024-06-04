@@ -206,7 +206,7 @@
                       v-for="(item, index) in applicationForm.dataset_id_list"
                       :key="index"
                     >
-                      <el-card class="relate-dataset-card" shadow="never">
+                      <el-card class="relate-dataset-card border-r-4" shadow="never">
                         <div class="flex-between">
                           <div class="flex align-center">
                             <AppAvatar
@@ -218,7 +218,7 @@
                               <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
                             </AppAvatar>
 
-                            <AppAvatar v-else class="mr-12" shape="square" :size="32">
+                            <AppAvatar v-else class="mr-8" shape="square" :size="32">
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>
                             <div class="ellipsis">
@@ -525,7 +525,6 @@ onMounted(() => {
 .create-application {
   .relate-dataset-card {
     color: var(--app-text-color);
-    border-radius: 4px;
   }
   .dialog-bg {
     border-radius: 8px;

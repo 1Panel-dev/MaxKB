@@ -37,7 +37,7 @@
                   shadow="hover"
                   :title="item.title || '-'"
                   :description="item.content"
-                  class="document-card cursor"
+                  class="document-card layout-bg layout-bg cursor "
                   :class="item.is_active ? '' : 'disabled'"
                   :showIcon="false"
                   @click="editParagraph(item)"
@@ -362,7 +362,6 @@ onMounted(() => {})
   }
   .document-card {
     height: 210px;
-    background: var(--app-layout-bg-color);
     border: 1px solid var(--app-layout-bg-color);
     &:hover {
       background: #ffffff;

@@ -1,8 +1,10 @@
 import Components from '@/components'
 import ElementPlus from 'element-plus'
+import * as ElementPlusIcons from '@element-plus/icons-vue'
 import { HtmlNode, HtmlNodeModel, BaseEdge } from '@logicflow/core'
 import { createApp, h } from 'vue'
 import directives from '@/directives'
+import i18n from '@/locales'
 
 class AppNode extends HtmlNode {
   isMounted
@@ -24,6 +26,10 @@ class AppNode extends HtmlNode {
     this.app.use(ElementPlus)
     this.app.use(Components)
     this.app.use(directives)
+    this.app.use(i18n)
+    for (const [key, component] of Object.entries(ElementPlusIcons)) {
+      this.app.component(key, component)
+    }
   }
 
   setHtml(rootEl: HTMLElement) {
@@ -31,7 +37,7 @@ class AppNode extends HtmlNode {
       this.isMounted = true
       const node = document.createElement('div')
       rootEl.appendChild(node)
-      this.app.mount(node)
+      this.app?.mount(node)
     } else {
       if (this.r && this.r.component) {
         this.r.component.props.properties = this.props.model.getProperties()

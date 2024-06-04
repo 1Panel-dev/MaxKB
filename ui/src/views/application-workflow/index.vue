@@ -15,7 +15,7 @@
     </div>
     <!-- 下拉框 -->
     <el-collapse-transition>
-      <div v-show="showPopover" class="workflow-dropdown-menu border">
+      <div v-show="showPopover" class="workflow-dropdown-menu border border-r-4">
         <h5 class="title">基础组件</h5>
         <template v-for="(item, index) in shapeList" :key="index">
           <div class="workflow-dropdown-item cursor flex p-8-12" @mousedown="onmousedown(item)">
@@ -37,16 +37,6 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import Workflow from '@/components/workflow/index.vue'
 import { shapeList, iconComponent } from '@/components/workflow/menu-data'
-type ShapeItem = {
-  type?: string
-  text?: string
-  icon?: string
-  label?: string
-  className?: string
-  disabled?: boolean
-  properties?: Record<string, any>
-  callback?: (lf: LogicFlow, container: HTMLElement) => void
-}
 
 const workflowRef = ref()
 
@@ -56,7 +46,7 @@ function clickoutside() {
   showPopover.value = false
 }
 
-function onmousedown(item: ShapeItem) {
+function onmousedown(item: any) {
   workflowRef.value?.onmousedown(item)
 }
 
@@ -86,7 +76,6 @@ onBeforeUnmount(() => {})
     width: 240px;
     box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
     background: #ffffff;
-    border-radius: 4px;
 
     .title {
       padding: 8px 12px 4px;
