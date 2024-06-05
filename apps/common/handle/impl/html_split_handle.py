@@ -37,13 +37,8 @@ def get_encoding(buffer):
 
 class HTMLSplitHandle(BaseSplitHandle):
     def support(self, file, get_buffer):
-        buffer = get_buffer(file)
         file_name: str = file.name.lower()
         if file_name.endswith(".html"):
-            return True
-        result = detect(buffer)
-        if result['encoding'] is not None and result['confidence'] is not None and result['encoding'] != 'ascii' and \
-                result['confidence'] > 0.5:
             return True
         return False
 

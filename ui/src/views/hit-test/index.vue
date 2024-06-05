@@ -144,7 +144,7 @@
               <el-input-number
                 v-model="cloneForm.top_number"
                 :min="1"
-                :max="10"
+                :max="100"
                 controls-position="right"
                 class="w-full"
               />

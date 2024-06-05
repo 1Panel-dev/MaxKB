@@ -1,4 +1,4 @@
-import { watch, onBeforeMount, onMounted, onBeforeUnmount } from 'vue'
+import { nextTick, onBeforeMount, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import { DeviceType } from '@/enums/common'
@@ -9,7 +9,7 @@ const WIDTH = 600
 export default () => {
   const { common } = useStore()
   const _isMobile = () => {
-    const rect = document.body.getBoundingClientRect()
+    const rect = document.body?.getBoundingClientRect()
     return rect.width - 1 < WIDTH
   }
 
@@ -25,9 +25,11 @@ export default () => {
   })
 
   onMounted(() => {
-    if (_isMobile()) {
-      common.toggleDevice(DeviceType.Mobile)
-    }
+    nextTick(() => {
+      if (_isMobile()) {
+        common.toggleDevice(DeviceType.Mobile)
+      }
+    })
   })
 
   onBeforeUnmount(() => {
