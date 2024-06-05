@@ -25,7 +25,7 @@ type ShapeItem = {
   className?: string
   disabled?: boolean
   properties?: Record<string, any>
-  callback?: (lf: LogicFlow, container: HTMLElement) => void
+  callback?: (lf: LogicFlow, container?: HTMLElement) => void
 }
 
 const graphData = {
@@ -52,24 +52,24 @@ const graphData = {
       id: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd4',
       type: 'start-node',
       x: 180,
-      y: 623,
+      y: 723,
       properties: {
         height: 200,
         stepName: '开始',
-        // input: [{ key: '输入' }],
+        input: [{ key: '输入' }],
         output: [{ key: '输出' }]
         // node_data: { model: 'shanghai', name: '222222' }
       }
     },
     {
-      id: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd4',
+      id: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd5',
       type: 'search-dataset-node',
-      x: 500,
+      x: 600,
       y: 250,
       properties: {
         height: 200,
-        stepName: '开始',
-        // input: [{ key: '输入' }],
+        stepName: '知识库检索',
+        input: [{ key: '输入' }],
         output: [{ key: '输出' }]
         // node_data: { model: 'shanghai', name: '222222' }
       }
@@ -207,8 +207,8 @@ defineExpose({
   position: relative;
   .control {
     position: absolute;
-    bottom: 50px;
-    right: 50px;
+    bottom: 24px;
+    left: 24px;
     z-index: 2;
   }
 }

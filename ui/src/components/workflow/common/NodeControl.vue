@@ -3,7 +3,7 @@
     <el-button-group>
       <el-button size="small" @click="$_zoomIn">放大</el-button>
       <el-button size="small" @click="$_zoomOut">缩小</el-button>
-      <el-button size="small" @click="$_reset">还原(大小&定位)</el-button>
+      <el-button size="small" @click="$_reset">适应</el-button>
     </el-button-group>
   </div>
 </template>
@@ -23,6 +23,7 @@ function $_zoomOut() {
 function $_reset() {
   props.lf?.resetZoom()
   props.lf?.resetTranslate()
+  props.lf?.fitView()
 }
 </script>
 <style scoped></style>

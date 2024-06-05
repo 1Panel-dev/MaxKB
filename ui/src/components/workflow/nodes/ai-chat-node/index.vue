@@ -41,6 +41,7 @@
   </NodeContainer>
 </template>
 <script setup lang="ts">
+import { set } from 'lodash'
 import NodeContainer from '@/components/workflow/common/node-container/index.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'

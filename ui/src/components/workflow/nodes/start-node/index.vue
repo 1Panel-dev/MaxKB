@@ -11,36 +11,6 @@ import NodeContainer from '@/components/workflow/common/node-container/index.vue
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 
-// const chat_data = computed({
-//   get: () => {
-//     if (props.nodeModel.properties.node_data) {
-//       return props.nodeModel.properties.node_data
-//     } else {
-//       props.nodeModel.properties.node_data = {
-//         name: '',
-//         desc: '',
-//         prologue:
-//           '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
-//       }
-//     }
-//     return props.nodeModel.properties.node_data
-//   },
-//   set: (value) => {
-//     props.nodeModel.properties.node_data = value
-//   }
-// })
 const props = defineProps<{ nodeModel: any }>()
-const handleFocus = () => {
-  props.nodeModel.isSelected = false
-}
-const aiChatNodeFormRef = ref<FormInstance>()
-
-const validate = () => {
-  aiChatNodeFormRef.value?.validate()
-}
-
-onMounted(() => {
-  props.nodeModel.validate = validate
-})
 </script>
 <style lang="scss" scoped></style>

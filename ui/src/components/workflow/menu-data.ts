@@ -31,11 +31,11 @@ const shapeList = [
   {
     type: 'search-dataset-node',
     text: '关联知识库，查找与问题相关的分段',
-    label: '知识检索',
+    label: '知识库检索',
     icon: 'search-dataset-node-icon',
     properties: {
       height: '',
-      stepName: '知识检索',
+      stepName: '知识库检索',
       input: [
         {
           key: '输入'

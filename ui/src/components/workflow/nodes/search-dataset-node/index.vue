@@ -108,6 +108,8 @@ const {
 
 const props = defineProps<{ nodeModel: any }>()
 
+console.log(props.nodeModel)
+
 const form = {
   dataset_id_list: [],
   dataset_setting: {
@@ -156,7 +158,9 @@ function addDataset(val: Array<string>) {
 }
 
 function openDatasetDialog() {
-  AddDatasetDialogRef.value.open(form_data.value.dataset_id_list)
+  if (AddDatasetDialogRef.value) {
+    AddDatasetDialogRef.value.open(form_data.value.dataset_id_list)
+  }
 }
 
 function getDataset() {
