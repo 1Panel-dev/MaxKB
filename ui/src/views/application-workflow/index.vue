@@ -6,6 +6,8 @@
         <h4>创建应用</h4>
       </div>
       <div>
+        <button @click="validate">点击校验</button>
+        <button @click="getGraphData">点击获取流程数据</button>
         <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
           添加组件
         </el-button>
@@ -19,9 +21,9 @@
         <h5 class="title">基础组件</h5>
         <template v-for="(item, index) in shapeList" :key="index">
           <div class="workflow-dropdown-item cursor flex p-8-12" @mousedown="onmousedown(item)">
-            <component :is="iconComponent(item.icon)" class="mr-8 mt-4" />
+            <component :is="iconComponent(item.icon)" class="mr-8 mt-4" :size="32" />
             <div class="pre-line">
-              <div>{{ item.label }}</div>
+              <div class="lighter">{{ item.label }}</div>
               <el-text type="info" size="small">{{ item.text }}</el-text>
             </div>
           </div>
@@ -50,6 +52,13 @@ function onmousedown(item: any) {
   workflowRef.value?.onmousedown(item)
 }
 
+function validate() {
+  workflowRef.value?.validate()
+}
+function getGraphData() {
+  workflowRef.value?.getGraphData()
+}
+
 onMounted(() => {})
 
 onBeforeUnmount(() => {})
@@ -76,9 +85,10 @@ onBeforeUnmount(() => {})
     width: 240px;
     box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
     background: #ffffff;
+    padding-bottom: 8px;
 
     .title {
-      padding: 8px 12px 4px;
+      padding: 12px 12px 4px;
     }
     .workflow-dropdown-item {
       &:hover {

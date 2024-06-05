@@ -108,8 +108,6 @@ const {
 
 const props = defineProps<{ nodeModel: any }>()
 
-console.log(props.nodeModel)
-
 const form = {
   dataset_id_list: [],
   dataset_setting: {

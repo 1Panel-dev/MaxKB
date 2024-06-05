@@ -7,10 +7,15 @@
   </NodeContainer>
 </template>
 <script setup lang="ts">
+import { set } from 'lodash'
 import NodeContainer from '@/components/workflow/common/node-container/index.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps<{ nodeModel: any }>()
+
+// onMounted(() => {
+//   set(props.nodeModel, 'validate', validate)
+// })
 </script>
 <style lang="scss" scoped></style>

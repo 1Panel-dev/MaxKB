@@ -47,6 +47,26 @@ const shapeList = [
         }
       ]
     }
+  },
+  {
+    type: 'condition-node',
+    text: '根据不同条件执行不同的节点',
+    label: '判断器',
+    icon: 'condition-node-icon',
+    properties: {
+      width: 600,
+      stepName: '判断器',
+      input: [
+        {
+          key: '输入'
+        }
+      ],
+      output: [
+        {
+          key: '输出'
+        }
+      ]
+    }
   }
 ]
 

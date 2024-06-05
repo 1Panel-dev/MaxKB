@@ -1,12 +1,12 @@
-import ChatNodeVue from './index.vue'
+import ConditioNodeVue from './index.vue'
 import { AppNode, AppNodeModel } from '@/components/workflow/common/app-node/index'
-class ChatNode extends AppNode {
+class ConditioNode extends AppNode {
   constructor(props: any) {
-    super(props, ChatNodeVue)
+    super(props, ConditioNodeVue)
   }
 }
 export default {
-  type: 'start-node',
+  type: 'condition-node',
   model: AppNodeModel,
-  view: ChatNode
+  view: ConditioNode
 }

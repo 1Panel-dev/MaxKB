@@ -1,7 +1,7 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
     <h5 class="title-decoration-1 mb-8">节点设置</h5>
-    <el-card shadow="never" class="card-never">
+    <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
         :model="chat_data"

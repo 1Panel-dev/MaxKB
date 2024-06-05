@@ -1,46 +1,168 @@
 <template>
   <NodeContainer :nodeModel="nodeModel" class="start-node">
-    <h5 class="title-decoration-1 mb-8">全局变量</h5>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">当前时 {time}</div>
-    <h5 class="title-decoration-1 mb-8">参数输出</h5>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">用户问题 {question}</div>
+    <el-form
+      :model="form_data"
+      label-position="top"
+      require-asterisk-position="right"
+      label-width="auto"
+      ref="ConditionNodeFormRef"
+    >
+      <template v-for="(item, index) in form_data.branch" :key="index">
+        <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
+          <p class="lighter mb-8">{{ judgeLabel(index) }}</p>
+          <template v-for="(condition, cIndex) in item.conditions" :key="cIndex">
+            <el-row :gutter="8">
+              <el-col :span="11">
+                <el-form-item
+                  :prop="'branch.' + index + '.conditions' + cIndex + '.field'"
+                  :rules="{
+                    required: true,
+                    message: '请选择变量',
+                    trigger: 'change'
+                  }"
+                >
+                  <el-select
+                    class="w-full"
+                    v-model="condition.field"
+                    placeholder="请选择变量"
+                    clearable
+                  >
+                    <el-option label="Zone one" value="shanghai" />
+                    <el-option label="Zone two" value="beijing" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item
+                  :prop="'branch.' + index + '.conditions' + cIndex + '.compare'"
+                  :rules="{
+                    required: true,
+                    message: '请选择条件',
+                    trigger: 'change'
+                  }"
+                >
+                  <el-select v-model="condition.compare" placeholder="请选择条件" clearable>
+                    <el-option label="Zone one" value="shanghai" />
+                    <el-option label="Zone two" value="beijing" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item
+                  :prop="'branch.' + index + '.conditions' + cIndex + '.value'"
+                  :rules="{
+                    required: true,
+                    message: '请输入值',
+                    trigger: 'blur'
+                  }"
+                >
+                  <el-input v-model="condition.value" placeholder="请输入值" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="1">
+                <el-button link type="info" class="mt-4" @click="deleteCondition(index, cIndex)">
+                  <el-icon><Delete /></el-icon>
+                </el-button>
+              </el-col>
+            </el-row>
+          </template>
+          <el-button link type="primary" @click="addCondition(index)">
+            <el-icon class="mr-4"><Plus /></el-icon> 添加条件
+          </el-button>
+        </el-card>
+      </template>
+      <el-button link type="primary" @click="addBranch">
+        <el-icon class="mr-4"><Plus /></el-icon> 添加分支
+      </el-button>
+    </el-form>
   </NodeContainer>
 </template>
 <script setup lang="ts">
+import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/components/workflow/common/node-container/index.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
+const props = defineProps<{ nodeModel: any }>()
+const form = {
+  branch: [
+    {
+      conditions: [
+        {
+          field: { node_id: 'xxx', fields: '' },
+          compare: '',
+          value: ''
+        }
+      ],
+      id: 'xxxx',
+      condition: 'and'
+    }
+  ]
+}
 
-const condition_data = computed({
+const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
       return props.nodeModel.properties.node_data
     } else {
-      props.nodeModel.properties.node_data = {
-        name: '',
-        desc: '',
-        prologue:
-          '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
-      }
+      set(props.nodeModel.properties, 'node_data', form)
     }
     return props.nodeModel.properties.node_data
   },
   set: (value) => {
-    props.nodeModel.properties.node_data = value
+    set(props.nodeModel.properties, 'node_data', value)
   }
 })
-const props = defineProps<{ nodeModel: any }>()
-const handleFocus = () => {
-  props.nodeModel.isSelected = false
-}
-const aiChatNodeFormRef = ref<FormInstance>()
+
+const ConditionNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
-  aiChatNodeFormRef.value?.validate()
+  ConditionNodeFormRef.value?.validate()
+}
+
+const judgeLabel = (index: number) => {
+  if (index === 0) {
+    return 'IF'
+  } else if (index === form_data.value.branch.length - 1) {
+    return 'ELSE'
+  } else {
+    return 'ELSE IF ' + index
+  }
+}
+
+function addBranch() {
+  const list = cloneDeep(props.nodeModel.properties.node_data.branch)
+  list.push({
+    conditions: [
+      {
+        field: { node_id: 'xxx', fields: '' },
+        compare: '',
+        value: ''
+      }
+    ],
+    id: 'xxxx',
+    condition: 'and'
+  })
+  set(props.nodeModel.properties.node_data, 'branch', list)
+}
+
+function addCondition(index: number) {
+  const list = cloneDeep(props.nodeModel.properties.node_data.branch)
+  list[index]['conditions'].push({
+    field: { node_id: 'xxx', fields: '' },
+    compare: '',
+    value: ''
+  })
+  set(props.nodeModel.properties.node_data, 'branch', list)
+}
+
+function deleteCondition(index: number, cIndex: number) {
+  const list = cloneDeep(props.nodeModel.properties.node_data.branch)
+  list[index]['conditions'].splice(cIndex, 1)
+  set(props.nodeModel.properties.node_data, 'branch', list)
 }
 
 onMounted(() => {
-  props.nodeModel.validate = validate
+  set(props.nodeModel, 'validate', validate)
 })
 </script>
 <style lang="scss" scoped></style>

@@ -1,10 +1,7 @@
 <template>
-  <!-- <button @click="validate">点击校验</button>
-  <button @click="getGraphData">点击获取流程数据</button> -->
-  <div className="workflow-app" id="container">
-    <!-- 辅助工具栏 -->
-    <Control class="control" v-if="lf" :lf="lf"></Control>
-  </div>
+  <div className="workflow-app" id="container"></div>
+  <!-- 辅助工具栏 -->
+  <Control class="workflow-control" v-if="lf" :lf="lf"></Control>
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
@@ -73,6 +70,20 @@ const graphData = {
         output: [{ key: '输出' }]
         // node_data: { model: 'shanghai', name: '222222' }
       }
+    },
+    {
+      id: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
+      type: 'condition-node',
+      x: 600,
+      y: 850,
+      properties: {
+        height: 200,
+        width: 600,
+        stepName: '判断器',
+        input: [{ key: '输入' }],
+        output: [{ key: '输出' }]
+        // node_data: { model: 'shanghai', name: '222222' }
+      }
     }
   ]
   // edges: [
@@ -130,32 +141,32 @@ onMounted(() => {
           thickness: 1
         }
       },
-      keyboard: {
-        enabled: true,
-        shortcuts: [
-          {
-            keys: ['backspace'],
-            callback: () => {
-              const elements = lf.value.getSelectElements(true)
-              if (
-                (elements.edges && elements.edges.length > 0) ||
-                (elements.nodes && elements.nodes.length > 0)
-              ) {
-                const r = window.confirm('确定要删除吗？')
-                if (r) {
-                  lf.value.clearSelectElements()
-                  elements.edges.forEach((edge: any) => {
-                    lf.value.deleteEdge(edge.id)
-                  })
-                  elements.nodes.forEach((node: any) => {
-                    lf.value.deleteNode(node.id)
-                  })
-                }
-              }
-            }
-          }
-        ]
-      },
+      // keyboard: {
+      //   enabled: true,
+      //   shortcuts: [
+      //     {
+      //       keys: ['backspace'],
+      //       callback: () => {
+      //         const elements = lf.value.getSelectElements(true)
+      //         if (
+      //           (elements.edges && elements.edges.length > 0) ||
+      //           (elements.nodes && elements.nodes.length > 0)
+      //         ) {
+      //           const r = window.confirm('确定要删除吗？')
+      //           if (r) {
+      //             lf.value.clearSelectElements()
+      //             elements.edges.forEach((edge: any) => {
+      //               lf.value.deleteEdge(edge.id)
+      //             })
+      //             elements.nodes.forEach((node: any) => {
+      //               lf.value.deleteNode(node.id)
+      //             })
+      //           }
+      //         }
+      //       }
+      //     }
+      //   ]
+      // },
       isSilentMode: false,
       container: container
     })
@@ -176,7 +187,7 @@ onMounted(() => {
 })
 const validate = () => {
   lf.value.graphModel.nodes.forEach((element: any) => {
-    element.validate()
+    element?.validate?.()
   })
 }
 const getGraphData = () => {
@@ -197,7 +208,9 @@ const onmousedown = (shapeItem: ShapeItem) => {
 }
 
 defineExpose({
-  onmousedown
+  onmousedown,
+  validate,
+  getGraphData
 })
 </script>
 <style lang="scss">
@@ -205,12 +218,12 @@ defineExpose({
   width: 100%;
   height: 100%;
   position: relative;
-  .control {
-    position: absolute;
-    bottom: 24px;
-    left: 24px;
-    z-index: 2;
-  }
+}
+.workflow-control {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  z-index: 2;
 }
 // .lf-dnd-text {
 //   width: 200px;
