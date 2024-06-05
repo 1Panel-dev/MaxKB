@@ -8,7 +8,7 @@
 """
 import hashlib
 
-from django.urls import re_path, path
+from django.urls import re_path, path, URLPattern
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
@@ -46,11 +46,15 @@ def init_chat_doc(application_urlpatterns, patterns):
         public=True,
         permission_classes=[permissions.AllowAny],
         authentication_classes=[AnonymousAuthentication],
-        patterns=[url for url in patterns if
-                  url.name is not None and ['application/message', 'application/open',
-                                            'application/profile'].__contains__(
-                      url.name)]
+        patterns=[
+            URLPattern(pattern='api/' + str(url.pattern), callback=url.callback, default_args=url.default_args,
+                       name=url.name)
+            for url in patterns if
+            url.name is not None and ['application/message', 'application/open',
+                                      'application/profile'].__contains__(
+                url.name)]
     )
+
     application_urlpatterns += [
         path('doc/chat/', chat_schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
         path('redoc/chat/', chat_schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
