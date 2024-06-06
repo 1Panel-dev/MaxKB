@@ -19,7 +19,7 @@
     <el-collapse-transition>
       <div v-show="showPopover" class="workflow-dropdown-menu border border-r-4">
         <h5 class="title">基础组件</h5>
-        <template v-for="(item, index) in shapeList" :key="index">
+        <template v-for="(item, index) in menuNodes" :key="index">
           <div class="workflow-dropdown-item cursor flex p-8-12" @mousedown="onmousedown(item)">
             <component :is="iconComponent(item.icon)" class="mr-8 mt-4" :size="32" />
             <div class="pre-line">
@@ -37,8 +37,9 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-import Workflow from '@/components/workflow/index.vue'
-import { shapeList, iconComponent } from '@/components/workflow/menu-data'
+import Workflow from '@/workflow/index.vue'
+import { menuNodes } from '@/workflow/common/data.ts'
+import { iconComponent } from '@/workflow/icons/utils.ts'
 
 const workflowRef = ref()
 

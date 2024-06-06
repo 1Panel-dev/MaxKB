@@ -94,7 +94,7 @@
 <script setup lang="ts">
 import { set } from 'lodash'
 import { app } from '@/main'
-import NodeContainer from '@/components/workflow/common/node-container/index.vue'
+import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import AddDatasetDialog from '@/views/application/components/AddDatasetDialog.vue'
 import ParamSettingDialog from '@/views/application/components/ParamSettingDialog.vue'
 import type { FormInstance } from 'element-plus'

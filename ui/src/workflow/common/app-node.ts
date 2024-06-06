@@ -51,7 +51,7 @@ class AppNodeModel extends HtmlNodeModel {
    * 给model自定义添加字段方法
    */
   addField(item: any) {
-    this.properties.fields.unshift(item)
+    this.properties.output.unshift(item)
     this.setAttributes()
     // 为了保持节点顶部位置不变，在节点变化后，对节点进行一个位移,位移距离为添加高度的一半。
     this.move(0, 24 / 2)

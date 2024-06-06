@@ -34,7 +34,7 @@
           }"
           prop="name"
         >
-          <el-input v-model="chat_data.name" @focus="handleFocus" />
+          <el-input v-model="chat_data.name" />
         </el-form-item>
       </el-form>
     </el-card>
@@ -42,7 +42,7 @@
 </template>
 <script setup lang="ts">
 import { set } from 'lodash'
-import NodeContainer from '@/components/workflow/common/node-container/index.vue'
+import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 
@@ -60,9 +60,7 @@ const chat_data = computed({
   }
 })
 const props = defineProps<{ nodeModel: any }>()
-const handleFocus = () => {
-  props.nodeModel.isSelected = false
-}
+
 const aiChatNodeFormRef = ref<FormInstance>()
 
 const validate = () => {

@@ -6,6 +6,10 @@
       require-asterisk-position="right"
       label-width="auto"
       ref="ConditionNodeFormRef"
+      @keydown.stop
+      @submit.prevent
+      @click.stop
+      @mousedown.stop
     >
       <template v-for="(item, index) in form_data.branch" :key="index">
         <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
@@ -26,7 +30,7 @@
                     v-model="condition.field"
                     placeholder="请选择变量"
                     clearable
-                    @visible-change="changeHandle"
+                    @visible-change="changeHandle()"
                   >
                     <el-option label="Zone one" value="shanghai" />
                     <el-option label="Zone two" value="beijing" />
@@ -80,7 +84,7 @@
 </template>
 <script setup lang="ts">
 import { cloneDeep, set } from 'lodash'
-import NodeContainer from '@/components/workflow/common/node-container/index.vue'
+import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { randomId } from '@/utils/utils'
@@ -118,7 +122,7 @@ const form_data = computed({
 const ConditionNodeFormRef = ref<FormInstance>()
 
 function changeHandle() {
-  console.log(props.nodeModel)
+  console.log(props.nodeModel.graphModel.getNodeIncomingNode(props.nodeModel.id))
 }
 
 const validate = () => {
@@ -137,7 +141,7 @@ const judgeLabel = (index: number) => {
 
 function addBranch() {
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
-  list.push({
+  const obj = {
     conditions: [
       {
         field: { node_id: 'xxx', fields: '' },
@@ -147,7 +151,9 @@ function addBranch() {
     ],
     id: randomId(),
     condition: 'and'
-  })
+  }
+  list.push(obj)
+  props.nodeModel.addField({ key: obj.id })
   set(props.nodeModel.properties.node_data, 'branch', list)
 }
 

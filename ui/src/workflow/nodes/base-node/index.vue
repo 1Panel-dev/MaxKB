@@ -23,7 +23,6 @@
           maxlength="64"
           placeholder="请输入应用名称"
           show-word-limit
-          @focus="handleFocus"
         />
       </el-form-item>
       <el-form-item label="应用描述">
@@ -34,7 +33,6 @@
           type="textarea"
           maxlength="256"
           show-word-limit
-          @focus="handleFocus"
         />
       </el-form-item>
       <el-form-item label="开场白">
@@ -51,7 +49,7 @@
 </template>
 <script setup lang="ts">
 import { set } from 'lodash'
-import NodeContainer from '@/components/workflow/common/node-container/index.vue'
+import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { MdEditor } from 'md-editor-v3'
@@ -76,9 +74,6 @@ const chat_data = computed({
   }
 })
 
-const handleFocus = () => {
-  set(props.nodeModel, 'isSelected', false)
-}
 const baseNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
@@ -86,7 +81,6 @@ const validate = () => {
 }
 
 onMounted(() => {
-  
   set(props.nodeModel, 'validate', validate)
 })
 </script>

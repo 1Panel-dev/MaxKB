@@ -27,7 +27,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import { iconComponent } from '../../menu-data'
+import { iconComponent } from '../icons/utils'
 
 const height = ref<{
   stepContainerHeight: number
