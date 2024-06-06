@@ -76,6 +76,14 @@
             </el-row>
           </div>
         </el-form-item>
+        <el-form-item label="检索问题输入">
+          <NodeCascader
+            :nodeModel="nodeModel"
+            class="w-full"
+            placeholder="请选择检索问题输入"
+            v-model="form_data.fields"
+          />
+        </el-form-item>
       </el-form>
     </el-card>
     <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
@@ -95,8 +103,10 @@
 import { set } from 'lodash'
 import { app } from '@/main'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import AddDatasetDialog from '@/views/application/components/AddDatasetDialog.vue'
 import ParamSettingDialog from '@/views/application/components/ParamSettingDialog.vue'
+
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { relatedObject } from '@/utils/utils'
@@ -115,7 +125,8 @@ const form = {
     similarity: 0.6,
     max_paragraph_char_number: 5000,
     search_mode: 'embedding'
-  }
+  },
+  fields: []
 }
 
 const form_data = computed({
@@ -123,7 +134,7 @@ const form_data = computed({
     if (props.nodeModel.properties.node_data) {
       return props.nodeModel.properties.node_data
     } else {
-      set(props.nodeModel.properties, 'node_data', form)
+      set(props.nodeModel.properties, 'node_data', form.value)
     }
     return props.nodeModel.properties.node_data
   },

@@ -20,21 +20,18 @@
                 <el-form-item
                   :prop="'branch.' + index + '.conditions' + cIndex + '.field'"
                   :rules="{
+                    type: Array,
                     required: true,
                     message: '请选择变量',
                     trigger: 'change'
                   }"
                 >
-                  <el-select
+                  <NodeCascader
+                    :nodeModel="nodeModel"
                     class="w-full"
-                    v-model="condition.field"
                     placeholder="请选择变量"
-                    clearable
-                    @visible-change="changeHandle()"
-                  >
-                    <el-option label="Zone one" value="shanghai" />
-                    <el-option label="Zone two" value="beijing" />
-                  </el-select>
+                    v-model="condition.field"
+                  />
                 </el-form-item>
               </el-col>
               <el-col :span="6">
@@ -85,6 +82,7 @@
 <script setup lang="ts">
 import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { randomId } from '@/utils/utils'
@@ -94,7 +92,7 @@ const form = {
     {
       conditions: [
         {
-          field: { node_id: 'xxx', fields: '' },
+          field: [],
           compare: '',
           value: ''
         }
@@ -121,10 +119,6 @@ const form_data = computed({
 
 const ConditionNodeFormRef = ref<FormInstance>()
 
-function changeHandle() {
-  console.log(props.nodeModel.graphModel.getNodeIncomingNode(props.nodeModel.id))
-}
-
 const validate = () => {
   ConditionNodeFormRef.value?.validate()
 }
@@ -144,7 +138,7 @@ function addBranch() {
   const obj = {
     conditions: [
       {
-        field: { node_id: 'xxx', fields: '' },
+        field: [],
         compare: '',
         value: ''
       }

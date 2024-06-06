@@ -39,6 +39,16 @@ const graphData = {
         stepName: '知识库检索',
         input: [{ key: '输入' }],
         output: [{ key: '输出' }],
+        fields: [
+          {
+            label: '检索结果',
+            value: 'data'
+          },
+          {
+            label: '满足直接回答的分段内容',
+            value: 'paragraph'
+          }
+        ],
         node_data: {
           dataset_id_list: [],
           dataset_setting: {
@@ -64,17 +74,17 @@ const graphData = {
         node_data: {
           branch: [
             {
-              conditions: [{ field: { node_id: 'xxx', fields: '' }, compare: '', value: '' }],
+              conditions: [{ field: [], compare: '', value: '' }],
               id: '2391',
               condition: 'and'
             },
             {
-              conditions: [{ field: { node_id: 'xxx', fields: '' }, compare: '', value: '' }],
+              conditions: [{ field: [], compare: '', value: '' }],
               id: '1143',
               condition: 'and'
             },
             {
-              conditions: [{ field: { node_id: 'xxx', fields: '' }, compare: '', value: '' }],
+              conditions: [{ field: [], compare: '', value: '' }],
               id: '9208',
               condition: 'and'
             }
