@@ -1,0 +1,56 @@
+# coding=utf-8
+"""
+    @project: maxkb
+    @Author：虎
+    @file： i_search_dataset_node.py
+    @date：2024/6/3 17:52
+    @desc:
+"""
+import re
+from typing import Type
+
+from django.core import validators
+from rest_framework import serializers
+
+from application.flow.i_step_node import INode, ReferenceAddressSerializer, NodeResult
+from common.util.field_message import ErrMessage
+
+
+class SearchDatasetStepNodeSerializer(serializers.Serializer):
+    # 需要查询的数据集id列表
+    dataset_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
+                                            error_messages=ErrMessage.list("数据集id列表"))
+    # 需要查询的条数
+    top_n = serializers.IntegerField(required=True,
+                                     error_messages=ErrMessage.integer("引用分段数"))
+    # 相似度 0-1之间
+    similarity = serializers.FloatField(required=True, max_value=2, min_value=0,
+                                        error_messages=ErrMessage.float("引用分段数"))
+    search_mode = serializers.CharField(required=True, validators=[
+        validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
+                                  message="类型只支持register|reset_password", code=500)
+    ], error_messages=ErrMessage.char("检索模式"))
+
+    question_reference_address = ReferenceAddressSerializer(required=False,
+                                                            error_messages=ErrMessage.char("问题应用地址"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+
+
+class ISearchDatasetStepNode(INode):
+    type = 'search-dataset-node'
+
+    def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
+        return SearchDatasetStepNodeSerializer
+
+    def _run(self):
+        question = self.workflow_manage.get_reference_field(
+            self.node_params_serializer.data.get('question_reference_address').get('node_id'),
+            self.node_params_serializer.data.get('question_reference_address').get('fields'))
+        return self.execute(**self.node_params_serializer.data, question=question, exclude_paragraph_id_list=[])
+
+    def execute(self, dataset_id_list, top_n, similarity, search_mode, question_reference_address, question,
+                exclude_paragraph_id_list=None,
+                **kwargs) -> NodeResult:
+        pass
