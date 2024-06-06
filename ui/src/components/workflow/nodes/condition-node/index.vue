@@ -26,6 +26,7 @@
                     v-model="condition.field"
                     placeholder="请选择变量"
                     clearable
+                    @visible-change="changeHandle"
                   >
                     <el-option label="Zone one" value="shanghai" />
                     <el-option label="Zone two" value="beijing" />
@@ -82,6 +83,7 @@ import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/components/workflow/common/node-container/index.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
+import { randomId } from '@/utils/utils'
 const props = defineProps<{ nodeModel: any }>()
 const form = {
   branch: [
@@ -93,7 +95,7 @@ const form = {
           value: ''
         }
       ],
-      id: 'xxxx',
+      id: randomId(),
       condition: 'and'
     }
   ]
@@ -114,6 +116,10 @@ const form_data = computed({
 })
 
 const ConditionNodeFormRef = ref<FormInstance>()
+
+function changeHandle() {
+  console.log(props.nodeModel)
+}
 
 const validate = () => {
   ConditionNodeFormRef.value?.validate()
@@ -139,7 +145,7 @@ function addBranch() {
         value: ''
       }
     ],
-    id: 'xxxx',
+    id: randomId(),
     condition: 'and'
   })
   set(props.nodeModel.properties.node_data, 'branch', list)
@@ -158,6 +164,9 @@ function addCondition(index: number) {
 function deleteCondition(index: number, cIndex: number) {
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
   list[index]['conditions'].splice(cIndex, 1)
+  if (list[index]['conditions'].length === 0) {
+    list.splice(index, 1)
+  }
   set(props.nodeModel.properties.node_data, 'branch', list)
 }
 
