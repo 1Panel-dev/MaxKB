@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-pc" :class="classObj" v-loading="loading">
+  <div class="chat-pc layout-bg" :class="classObj" v-loading="loading">
     <div class="chat-pc__header">
       <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
     </div>
@@ -59,9 +59,7 @@
               {{ paginationConfig.total }} 条提问
             </span>
             <el-dropdown class="ml-8">
-              <el-tooltip effect="dark" content="导出聊天记录" placement="top">
-                <AppIcon iconName="app-export" class="cursor"></AppIcon>
-              </el-tooltip>
+              <AppIcon iconName="app-export" class="cursor" title="导出聊天记录"></AppIcon>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click="exportMarkdown">导出 Markdown</el-dropdown-item>
@@ -286,13 +284,11 @@ async function exportHTML(): Promise<void> {
 
 onMounted(() => {
   user.changeUserType(2)
-  user.setAccessToken(accessToken)
   getAccessToken(accessToken)
 })
 </script>
 <style lang="scss">
 .chat-pc {
-  background-color: var(--app-layout-bg-color);
   overflow: hidden;
 
   &__header {

@@ -1,8 +1,10 @@
 import Components from '@/components'
 import ElementPlus from 'element-plus'
-import { HtmlNode, HtmlNodeModel } from '@logicflow/core'
+import * as ElementPlusIcons from '@element-plus/icons-vue'
+import { HtmlNode, HtmlNodeModel, BaseEdge } from '@logicflow/core'
 import { createApp, h } from 'vue'
 import directives from '@/directives'
+import i18n from '@/locales'
 
 class AppNode extends HtmlNode {
   isMounted
@@ -24,6 +26,10 @@ class AppNode extends HtmlNode {
     this.app.use(ElementPlus)
     this.app.use(Components)
     this.app.use(directives)
+    this.app.use(i18n)
+    for (const [key, component] of Object.entries(ElementPlusIcons)) {
+      this.app.component(key, component)
+    }
   }
 
   setHtml(rootEl: HTMLElement) {
@@ -31,7 +37,7 @@ class AppNode extends HtmlNode {
       this.isMounted = true
       const node = document.createElement('div')
       rootEl.appendChild(node)
-      this.app.mount(node)
+      this.app?.mount(node)
     } else {
       if (this.r && this.r.component) {
         this.r.component.props.properties = this.props.model.getProperties()
@@ -45,7 +51,7 @@ class AppNodeModel extends HtmlNodeModel {
    * 给model自定义添加字段方法
    */
   addField(item: any) {
-    this.properties.fields.unshift(item)
+    this.properties.output.unshift(item)
     this.setAttributes()
     // 为了保持节点顶部位置不变，在节点变化后，对节点进行一个位移,位移距离为添加高度的一半。
     this.move(0, 24 / 2)
@@ -80,6 +86,7 @@ class AppNodeModel extends HtmlNodeModel {
     }
     return style
   }
+
   setHeight(height: number, inputContainerHeight: number, outputContainerHeight: number) {
     this.height = height + inputContainerHeight + outputContainerHeight + 100
     this.baseHeight = height
@@ -96,7 +103,7 @@ class AppNodeModel extends HtmlNodeModel {
     })
   }
   setAttributes() {
-    this.width = 500
+    this.width = this.properties?.width || 340
 
     const circleOnlyAsTarget = {
       message: '只允许从右边的锚点连出',

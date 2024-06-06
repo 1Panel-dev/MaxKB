@@ -273,6 +273,9 @@ h5 {
 .border-b-light {
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
+.border-r-4 {
+  border-radius: 4px;
+}
 
 .cursor {
   cursor: pointer;
@@ -458,6 +461,14 @@ h5 {
 
 .color-secondary {
   color: var(--app-text-color-secondary);
+}
+
+.layout-bg {
+  background: var(--app-layout-bg-color);
+}
+
+.white-bg {
+  background: #ffffff;
 }
 
 .app-warning-icon {

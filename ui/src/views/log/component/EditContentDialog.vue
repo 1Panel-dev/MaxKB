@@ -9,7 +9,13 @@
       @submit.prevent
     >
       <el-form-item label="关联问题">
-        <el-input v-model="form.problem_text" placeholder="关联问题"> </el-input>
+        <el-input
+          v-model="form.problem_text"
+          placeholder="关联问题"
+          maxlength="256"
+          show-word-limit
+        >
+        </el-input>
       </el-form-item>
       <el-form-item label="内容" prop="content">
         <el-input
@@ -23,7 +29,12 @@
         </el-input>
       </el-form-item>
       <el-form-item label="标题">
-        <el-input v-model="form.title" placeholder="请给当前内容设置一个标题，以便管理查看">
+        <el-input
+          show-word-limit
+          v-model="form.title"
+          placeholder="请给当前内容设置一个标题，以便管理查看"
+          maxlength="256"
+        >
         </el-input>
       </el-form-item>
       <el-form-item label="选择知识库" prop="dataset_id">

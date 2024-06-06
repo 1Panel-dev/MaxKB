@@ -1,13 +1,22 @@
 <template>
-  <el-dialog :title="$t('views.applicationOverview.appInfo.EmbedDialog.embedDialogTitle')" v-model="dialogVisible" width="900" class="embed-dialog">
+  <el-dialog
+    :title="$t('views.applicationOverview.appInfo.EmbedDialog.embedDialogTitle')"
+    v-model="dialogVisible"
+    width="900"
+    class="embed-dialog"
+  >
     <el-row :gutter="12">
       <el-col :span="12">
         <div class="border">
-          <p class="title p-16 bold">{{$t('views.applicationOverview.appInfo.EmbedDialog.embedDialogTitle')}}</p>
+          <p class="title p-16 bold">
+            {{ $t('views.applicationOverview.appInfo.EmbedDialog.fullscreenModeTitle') }}
+          </p>
           <img src="@/assets/window1.png" alt="" class="ml-8" />
-          <div class="code border-t p-16">
+          <div class="code layout-bg border-t p-16">
             <div class="flex-between">
-              <span class="bold">{{$t('views.applicationOverview.appInfo.EmbedDialog.fullscreenModeTitle')}}</span>
+              <span class="bold">{{
+                $t('views.applicationOverview.appInfo.EmbedDialog.copyInstructions')
+              }}</span>
               <el-button text @click="copyClick(source1)">
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
@@ -20,11 +29,15 @@
       </el-col>
       <el-col :span="12">
         <div class="border">
-          <p class="title p-16 bold">{{$t('views.applicationOverview.appInfo.EmbedDialog.floatingModeTitle')}}</p>
+          <p class="title p-16 bold">
+            {{ $t('views.applicationOverview.appInfo.EmbedDialog.floatingModeTitle') }}
+          </p>
           <img src="@/assets/window2.png" alt="" class="ml-8" />
           <div class="code border-t p-16">
             <div class="flex-between">
-              <span class="bold">{{$t('views.applicationOverview.appInfo.EmbedDialog.copyInstructions')}}</span>
+              <span class="bold">{{
+                $t('views.applicationOverview.appInfo.EmbedDialog.copyInstructions')
+              }}</span>
               <el-button text @click="copyClick(source2)">
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
@@ -91,7 +104,7 @@ defineExpose({ open })
 
   .code {
     color: var(--app-text-color) !important;
-    background: var(--app-layout-bg-color);
+
     font-weight: 400;
     font-size: 13px;
     white-space: pre;

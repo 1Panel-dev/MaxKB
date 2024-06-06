@@ -13,6 +13,7 @@ import os
 import re
 from importlib import import_module
 from urllib.parse import urljoin, urlparse
+
 import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -75,25 +76,18 @@ class DoesNotExist(Exception):
 class Config(dict):
     defaults = {
         # 数据库相关配置
-        "DB_HOST": "",
-        "DB_PORT": "",
-        "DB_USER": "",
-        "DB_PASSWORD": "",
+        "DB_HOST": "127.0.0.1",
+        "DB_PORT": 5432,
+        "DB_USER": "root",
+        "DB_PASSWORD": "Password123@postgres",
         "DB_ENGINE": "django.db.backends.postgresql_psycopg2",
-        # 邮件相关配置
-        "EMAIL_ADDRESS": "",
-        "EMAIL_USE_TLS": False,
-        "EMAIL_USE_SSL": True,
-        "EMAIL_HOST": "",
-        "EMAIL_PORT": 465,
-        "EMAIL_HOST_USER": "",
-        "EMAIL_HOST_PASSWORD": "",
         # 向量模型
         "EMBEDDING_MODEL_NAME": "shibing624/text2vec-base-chinese",
         "EMBEDDING_DEVICE": "cpu",
         "EMBEDDING_MODEL_PATH": os.path.join(PROJECT_DIR, 'models'),
         # 向量库配置
-        "VECTOR_STORE_NAME": 'pg_vector'
+        "VECTOR_STORE_NAME": 'pg_vector',
+        "DEBUG": False
 
     }
 
@@ -180,8 +174,36 @@ class ConfigManager:
             loaded = self.from_yaml(i)
             if loaded:
                 return True
+        msg = f"""
 
-        return False
+                   Error: No config file found.
+
+                   You can run `cp config_example.yml {self.root_path}/config.yml`, and edit it.
+
+                   """
+        raise ImportError(msg)
+
+    def load_from_env(self):
+        keys = os.environ.keys()
+        config = {key.replace('MAXKB_', ''): os.environ.get(key) for key in keys if key.startswith('MAXKB_')}
+        if len(config.keys()) <= 1:
+            msg = f"""
+
+                             Error: No config env found.
+
+                             Please set environment variables
+                                MAXKB_CONFIG_TYPE: 配置文件读取方式 FILE: 使用配置文件配置  ENV: 使用ENV配置
+                                MAXKB_DB_NAME: 数据库名称
+                                MAXKB_DB_HOST: 数据库主机
+                                MAXKB_DB_PORT: 数据库端口
+                                MAXKB_DB_USER: 数据库用户名
+                                MAXKB_DB_PASSWORD: 数据库密码
+                                MAXKB_EMBEDDING_MODEL_PATH: 向量模型目录
+                                MAXKB_EMBEDDING_MODEL_NAME: 向量模型名称
+                             """
+            raise ImportError(msg)
+        self.from_mapping(config)
+        return True
 
     @classmethod
     def load_user_config(cls, root_path=None, config_class=None):
@@ -190,15 +212,10 @@ class ConfigManager:
         if not root_path:
             root_path = PROJECT_DIR
         manager = cls(root_path=root_path)
-        if manager.load_from_yml():
-            config = manager.config
+        config_type = os.environ.get('MAXKB_CONFIG_TYPE')
+        if config_type is None or config_type != 'ENV':
+            manager.load_from_yml()
         else:
-            msg = f"""
-
-            Error: No config file found.
-
-            You can run `cp config_example.yml {root_path}/config.yml`, and edit it.
-
-            """
-            raise ImportError(msg)
+            manager.load_from_env()
+        config = manager.config
         return config

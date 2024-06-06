@@ -1,10 +1,18 @@
 <template>
-  <el-dialog :title="$t('views.application.applicationForm.dialogues.addDataset')" v-model="dialogVisible" width="600">
+  <el-dialog
+    :title="$t('views.application.applicationForm.dialogues.addDataset')"
+    v-model="dialogVisible"
+    width="600"
+    append-to-body
+  >
     <template #header="{ titleId, titleClass }">
       <div class="my-header flex">
-        <h4 :id="titleId" :class="titleClass">{{$t('views.application.applicationForm.dialogues.addDataset')}}</h4>
+        <h4 :id="titleId" :class="titleClass">
+          {{ $t('views.application.applicationForm.dialogues.addDataset') }}
+        </h4>
         <el-button link class="ml-16" @click="refresh">
-          <el-icon class="mr-4"><Refresh /></el-icon>{{$t('views.application.applicationForm.dialogues.refresh')}}
+          <el-icon class="mr-4"><Refresh /></el-icon
+          >{{ $t('views.application.applicationForm.dialogues.refresh') }}
         </el-button>
       </div>
     </template>
@@ -19,8 +27,12 @@
     </el-row>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> {{$t('views.application.applicationForm.buttons.cancel')}} </el-button>
-        <el-button type="primary" @click="submitHandle"> {{$t('views.application.applicationForm.buttons.confirm')}} </el-button>
+        <el-button @click.prevent="dialogVisible = false">
+          {{ $t('views.application.applicationForm.buttons.cancel') }}
+        </el-button>
+        <el-button type="primary" @click="submitHandle">
+          {{ $t('views.application.applicationForm.buttons.confirm') }}
+        </el-button>
       </span>
     </template>
   </el-dialog>

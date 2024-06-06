@@ -6,6 +6,8 @@
         <h4>创建应用</h4>
       </div>
       <div>
+        <button @click="validate">点击校验</button>
+        <button @click="getGraphData">点击获取流程数据</button>
         <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
           添加组件
         </el-button>
@@ -15,13 +17,13 @@
     </div>
     <!-- 下拉框 -->
     <el-collapse-transition>
-      <div v-show="showPopover" class="workflow-dropdown-menu border">
+      <div v-show="showPopover" class="workflow-dropdown-menu border border-r-4">
         <h5 class="title">基础组件</h5>
-        <template v-for="(item, index) in shapeList" :key="index">
+        <template v-for="(item, index) in menuNodes" :key="index">
           <div class="workflow-dropdown-item cursor flex p-8-12" @mousedown="onmousedown(item)">
-            <component :is="iconComponent(item.icon)" class="mr-8 mt-4" />
+            <component :is="iconComponent(item.icon)" class="mr-8 mt-4" :size="32" />
             <div class="pre-line">
-              <div>{{ item.label }}</div>
+              <div class="lighter">{{ item.label }}</div>
               <el-text type="info" size="small">{{ item.text }}</el-text>
             </div>
           </div>
@@ -35,18 +37,9 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-import Workflow from '@/components/workflow/index.vue'
-import { shapeList, iconComponent } from '@/components/workflow/menu-data'
-type ShapeItem = {
-  type?: string
-  text?: string
-  icon?: string
-  label?: string
-  className?: string
-  disabled?: boolean
-  properties?: Record<string, any>
-  callback?: (lf: LogicFlow, container: HTMLElement) => void
-}
+import Workflow from '@/workflow/index.vue'
+import { menuNodes } from '@/workflow/common/data.ts'
+import { iconComponent } from '@/workflow/icons/utils.ts'
 
 const workflowRef = ref()
 
@@ -56,8 +49,15 @@ function clickoutside() {
   showPopover.value = false
 }
 
-function onmousedown(item: ShapeItem) {
+function onmousedown(item: any) {
   workflowRef.value?.onmousedown(item)
+}
+
+function validate() {
+  workflowRef.value?.validate()
+}
+function getGraphData() {
+  workflowRef.value?.getGraphData()
 }
 
 onMounted(() => {})
@@ -70,7 +70,6 @@ onBeforeUnmount(() => {})
     background: #ffffff;
   }
   .workflow-main {
-    width: 100vw;
     height: calc(100vh - var(--app-header-height) - 70px);
   }
   .workflow-dropdown-menu {
@@ -87,10 +86,10 @@ onBeforeUnmount(() => {})
     width: 240px;
     box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
     background: #ffffff;
-    border-radius: 4px;
+    padding-bottom: 8px;
 
     .title {
-      padding: 8px 12px 4px;
+      padding: 12px 12px 4px;
     }
     .workflow-dropdown-item {
       &:hover {

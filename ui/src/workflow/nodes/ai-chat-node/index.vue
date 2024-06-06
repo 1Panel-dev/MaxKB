@@ -1,7 +1,7 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
     <h5 class="title-decoration-1 mb-8">节点设置</h5>
-    <el-card shadow="never" class="card-never">
+    <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
         :model="chat_data"
@@ -34,14 +34,15 @@
           }"
           prop="name"
         >
-          <el-input v-model="chat_data.name" @focus="handleFocus" />
+          <el-input v-model="chat_data.name" />
         </el-form-item>
       </el-form>
     </el-card>
   </NodeContainer>
 </template>
 <script setup lang="ts">
-import NodeContainer from '@/components/workflow/common/node-container/index.vue'
+import { set } from 'lodash'
+import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 
@@ -59,9 +60,7 @@ const chat_data = computed({
   }
 })
 const props = defineProps<{ nodeModel: any }>()
-const handleFocus = () => {
-  props.nodeModel.isSelected = false
-}
+
 const aiChatNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
@@ -69,7 +68,7 @@ const validate = () => {
 }
 
 onMounted(() => {
-  props.nodeModel.validate = validate
+  set(props.nodeModel, 'validate', validate)
 })
 </script>
 <style lang="scss" scoped></style>

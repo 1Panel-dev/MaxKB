@@ -317,9 +317,9 @@ class ApplicationSerializer(serializers.Serializer):
         id = serializers.CharField(required=True, error_messages=ErrMessage.uuid("应用id"))
         user_id = serializers.UUIDField(required=False, error_messages=ErrMessage.uuid("用户id"))
         query_text = serializers.CharField(required=True, error_messages=ErrMessage.char("查询文本"))
-        top_number = serializers.IntegerField(required=True, max_value=10, min_value=1,
+        top_number = serializers.IntegerField(required=True, max_value=100, min_value=1,
                                               error_messages=ErrMessage.integer("topN"))
-        similarity = serializers.FloatField(required=True, max_value=1, min_value=0,
+        similarity = serializers.FloatField(required=True, max_value=2, min_value=0,
                                             error_messages=ErrMessage.float("相关度"))
         search_mode = serializers.CharField(required=True, validators=[
             validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),

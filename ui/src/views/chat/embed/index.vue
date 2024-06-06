@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-embed" v-loading="loading">
+  <div class="chat-embed layout-bg" v-loading="loading">
     <div class="chat-embed__header">
       <div class="chat-width">
         <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
@@ -15,7 +15,9 @@
         :chatId="currentChatId"
         @refresh="refresh"
         @scroll="handleScroll"
-      ></AiChat>
+        class="AiChat-embed"
+      >
+      </AiChat>
     </div>
 
     <el-button type="primary" link class="new-chat-button" @click="newChat">
@@ -194,13 +196,11 @@ function refresh(id: string) {
 
 onMounted(() => {
   user.changeUserType(2)
-  user.setAccessToken(accessToken)
   getAccessToken(accessToken)
 })
 </script>
 <style lang="scss">
 .chat-embed {
-  background-color: var(--app-layout-bg-color);
   overflow: hidden;
   &__header {
     background: var(--app-header-bg-color);
@@ -221,7 +221,7 @@ onMounted(() => {
   }
   .new-chat-button {
     position: absolute;
-    bottom: 84px;
+    bottom: 80px;
     left: 18px;
     z-index: 11;
   }
@@ -277,6 +277,14 @@ onMounted(() => {
   .chat-width {
     max-width: var(--app-chat-width, 860px);
     margin: 0 auto;
+  }
+  .AiChat-embed {
+    .ai-chat__operate {
+      padding-top: 38px;
+    }
+    .ai-chat__content {
+      padding-bottom: 104px
+    }
   }
 }
 </style>

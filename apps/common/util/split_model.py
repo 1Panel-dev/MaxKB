@@ -163,7 +163,7 @@ def parse_level(text, pattern: str):
     :param pattern:  正则
     :return: 符合正则的文本
     """
-    level_content_list = list(map(to_tree_obj, re_findall(pattern, text)))
+    level_content_list = list(map(to_tree_obj, [r[0:255] for r in re_findall(pattern, text) if r is not None]))
     return list(map(filter_special_symbol, level_content_list))
 
 
