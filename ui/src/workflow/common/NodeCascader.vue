@@ -1,13 +1,18 @@
 <template>
   <el-cascader :options="options" @visible-change="visibleChange" v-bind="$attrs" separator=" > ">
     <template #default="{ node, data }">
-      <span>{{ data.label }}</span>
+      <span class="flex align-center">
+        <component :is="iconComponent(`${data.type}-icon`)" class="mr-8" :size="18" />{{
+          data.label
+        }}</span
+      >
     </template>
   </el-cascader>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { iconComponent } from '../icons/utils'
 const props = defineProps<{
   nodeModel: any
 }>()
@@ -29,6 +34,7 @@ function getIncomingNode(id: string) {
         options.value.unshift({
           value: item.id,
           label: item.properties.stepName,
+          type: item.type,
           children: item.properties?.fields || []
         })
       }
