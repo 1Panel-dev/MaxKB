@@ -27,6 +27,7 @@ defineProps({
   border: 1px dashed var(--el-border-color);
   background: #eff0f1;
   border-radius: 8px;
+  box-sizing: border-box;
 
   .add-icon {
     font-size: 14px;
