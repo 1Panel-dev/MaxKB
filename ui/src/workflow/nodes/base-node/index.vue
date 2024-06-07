@@ -55,17 +55,18 @@ import { ref, computed, onMounted } from 'vue'
 import { MdEditor } from 'md-editor-v3'
 const props = defineProps<{ nodeModel: any }>()
 
+const form = {
+  name: '',
+  desc: '',
+  prologue:
+    '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
+}
 const chat_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
       return props.nodeModel.properties.node_data
     } else {
-      props.nodeModel.properties.node_data = {
-        name: '',
-        desc: '',
-        prologue:
-          '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
-      }
+      set(props.nodeModel.properties, 'node_data', form)
     }
     return props.nodeModel.properties.node_data
   },

@@ -134,7 +134,7 @@ const form_data = computed({
     if (props.nodeModel.properties.node_data) {
       return props.nodeModel.properties.node_data
     } else {
-      set(props.nodeModel.properties, 'node_data', form.value)
+      set(props.nodeModel.properties, 'node_data', form)
     }
     return props.nodeModel.properties.node_data
   },

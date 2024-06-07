@@ -1,11 +1,17 @@
 <template>
-  <div>
-    <el-button-group>
-      <el-button size="small" @click="zoomIn">放大</el-button>
-      <el-button size="small" @click="zoomOut">缩小</el-button>
-      <el-button size="small" @click="fitView">适应</el-button>
-    </el-button-group>
-  </div>
+  <el-card shadow="always" style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px">
+    <el-button link @click="zoomOut">
+      <el-icon :size="16" title="缩小"><ZoomOut /></el-icon>
+    </el-button>
+    <el-button link @click="zoomIn">
+      <el-icon :size="16" title="放大"><ZoomIn /></el-icon>
+    </el-button>
+
+    <el-divider direction="vertical" />
+    <el-button link @click="zoomIn">
+      <AppIcon iconName="app-fitview" title="适应"></AppIcon>
+    </el-button>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +28,7 @@ function zoomOut() {
 function fitView() {
   props.lf?.resetZoom()
   props.lf?.resetTranslate()
-  // props.lf?.fitView()
+  props.lf?.fitView()
 }
 </script>
 <style scoped></style>

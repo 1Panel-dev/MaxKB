@@ -122,6 +122,9 @@ h5 {
 .w-500 {
   width: 500px;
 }
+.max-w-200 {
+  max-width: 200px;
+}
 
 .mt-4 {
   margin-top: calc(var(--app-base-px) - 4px);
@@ -566,6 +569,13 @@ h5 {
     &:hover {
       background-color: var(--el-fill-color-light);
     }
+  }
+  .model-icon {
+    width: 20px;
+  }
+  .check-icon {
+    position: absolute;
+    right: 10px;
   }
 }
 

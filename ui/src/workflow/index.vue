@@ -101,8 +101,7 @@ const graphData = {
         height: '',
         stepName: 'AI 对话',
         input: [{ key: '输入' }],
-        output: [{ key: '输出' }],
-        node_data: { model: '', name: '' }
+        output: [{ key: '输出' }]
       }
     },
     {
@@ -114,8 +113,7 @@ const graphData = {
         height: '',
         stepName: 'AI 对话',
         input: [{ key: '输入' }],
-        output: [{ key: '输出' }],
-        node_data: { model: '', name: '' }
+        output: [{ key: '输出' }]
       }
     },
     {
@@ -127,8 +125,7 @@ const graphData = {
         height: '',
         stepName: 'AI 对话',
         input: [{ key: '输入' }],
-        output: [{ key: '输出' }],
-        node_data: { model: '', name: '' }
+        output: [{ key: '输出' }]
       }
     }
   ],

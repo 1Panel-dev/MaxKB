@@ -97,6 +97,7 @@
                   是携带知识库中已知信息；{question} 是用户提出的问题。</template
                 >
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                <el-icon><EditPen /></el-icon>
               </el-tooltip>
             </div>
           </template>
@@ -119,7 +120,7 @@
       </el-form>
     </el-card>
     <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">AI 回答内容 {content}</div>
+    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">用户问题 {question}</div>
     <!-- 添加模版 -->
     <CreateModelDialog
       ref="createModelRef"

@@ -539,13 +539,7 @@ onMounted(() => {
     height: calc(var(--app-main-height) - 150px);
   }
 }
-.model-icon {
-  width: 20px;
-}
-.check-icon {
-  position: absolute;
-  right: 10px;
-}
+
 .prologue-md-editor {
   height: 150px;
 }

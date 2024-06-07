@@ -6,6 +6,7 @@
     :close-on-press-escape="false"
     :destroy-on-close="true"
     :before-close="close"
+    append-to-body
   >
     <template #header="{ close, titleId, titleClass }">
       <el-breadcrumb separator=">">

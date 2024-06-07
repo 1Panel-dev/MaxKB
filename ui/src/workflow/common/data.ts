@@ -14,7 +14,8 @@ export const baseNodes = [
       node_data: {
         name: '',
         desc: '',
-        prologue: ''
+        prologue:
+          '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
       }
     }
   },
@@ -95,6 +96,32 @@ export const menuNodes = [
     }
   },
   {
+    type: 'question-node',
+    text: '根据历史聊天记录优化完善当前问题，更利于匹配知识库分段',
+    label: '问题优化',
+    icon: 'question-node-icon',
+    properties: {
+      height: '',
+      stepName: '问题优化',
+      input: [
+        {
+          key: ''
+        }
+      ],
+      output: [
+        {
+          key: ''
+        }
+      ],
+      fields: [
+        {
+          label: '用户问题',
+          value: 'question'
+        }
+      ]
+    }
+  },
+  {
     type: 'condition-node',
     text: '根据不同条件执行不同的节点',
     label: '判断器',
@@ -110,6 +137,26 @@ export const menuNodes = [
       output: [
         {
           key: '输出'
+        }
+      ]
+    }
+  },
+  {
+    type: 'reply-node',
+    text: '指定回复内容，引用变量会转换为字符串进行输出',
+    label: '指定回复',
+    icon: 'reply-node-icon',
+    properties: {
+      height: '',
+      stepName: '指定回复',
+      input: [
+        {
+          key: ''
+        }
+      ],
+      output: [
+        {
+          key: ''
         }
       ]
     }
