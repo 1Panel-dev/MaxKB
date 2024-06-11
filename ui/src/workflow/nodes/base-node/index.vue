@@ -2,7 +2,7 @@
   <NodeContainer :nodeModel="nodeModel">
     <el-form
       @submit.prevent
-      :model="chat_data"
+      :model="form_data"
       label-position="top"
       require-asterisk-position="right"
       class="mb-24"
@@ -19,7 +19,7 @@
         }"
       >
         <el-input
-          v-model="chat_data.name"
+          v-model="form_data.name"
           maxlength="64"
           placeholder="请输入应用名称"
           show-word-limit
@@ -27,7 +27,7 @@
       </el-form-item>
       <el-form-item label="应用描述">
         <el-input
-          v-model="chat_data.desc"
+          v-model="form_data.desc"
           placeholder="请输入应用描述"
           :rows="3"
           type="textarea"
@@ -38,7 +38,7 @@
       <el-form-item label="开场白">
         <MdEditor
           style="height: 150px"
-          v-model="chat_data.prologue"
+          v-model="form_data.prologue"
           :preview="false"
           :toolbars="[]"
           :footers="[]"
@@ -61,7 +61,7 @@ const form = {
   prologue:
     '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
 }
-const chat_data = computed({
+const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
       return props.nodeModel.properties.node_data

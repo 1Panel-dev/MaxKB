@@ -4,12 +4,12 @@
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
-        :model="chat_data"
+        :model="form_data"
         label-position="top"
         require-asterisk-position="right"
         class="mb-24"
         label-width="auto"
-        ref="aiChatNodeFormRef"
+        ref="questionNodeFormRef"
       >
         <el-form-item
           label="AI 模型"
@@ -21,7 +21,7 @@
           }"
         >
           <el-select
-            v-model="chat_data.model_id"
+            v-model="form_data.model_id"
             placeholder="请选择 AI 模型"
             class="w-full"
             popper-class="select-model"
@@ -46,7 +46,7 @@
                   ></span>
                   <span>{{ item.name }}</span>
                 </div>
-                <el-icon class="check-icon" v-if="item.id === chat_data.model_id"
+                <el-icon class="check-icon" v-if="item.id === form_data.model_id"
                   ><Check
                 /></el-icon>
               </el-option>
@@ -67,7 +67,7 @@
                   <span>{{ item.name }}</span>
                   <span class="danger">（不可用）</span>
                 </div>
-                <el-icon class="check-icon" v-if="item.id === chat_data.model_id"
+                <el-icon class="check-icon" v-if="item.id === form_data.model_id"
                   ><Check
                 /></el-icon>
               </el-option>
@@ -83,7 +83,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="角色设定">
-          <el-input v-model="chat_data.system" placeholder="角色设定" />
+          <el-input v-model="form_data.system" placeholder="角色设定" />
         </el-form-item>
         <el-form-item label="提示词" prop="prompt">
           <template #label>
@@ -102,7 +102,7 @@
             </div>
           </template>
           <el-input
-            v-model="chat_data.prompt"
+            v-model="form_data.prompt"
             :rows="6"
             type="textarea"
             maxlength="2048"
@@ -111,7 +111,7 @@
         </el-form-item>
         <el-form-item label="历史聊天记录">
           <el-input-number
-            v-model="chat_data.dialogue_number"
+            v-model="form_data.dialogue_number"
             :min="0"
             controls-position="right"
             class="w-full"
@@ -158,7 +158,7 @@ const form = {
   dialogue_number: 1
 }
 
-const chat_data = computed({
+const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
       return props.nodeModel.properties.node_data
@@ -173,7 +173,7 @@ const chat_data = computed({
 })
 const props = defineProps<{ nodeModel: any }>()
 
-const aiChatNodeFormRef = ref<FormInstance>()
+const questionNodeFormRef = ref<FormInstance>()
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
 const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 
@@ -181,7 +181,7 @@ const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 
 const validate = () => {
-  aiChatNodeFormRef.value?.validate()
+  questionNodeFormRef.value?.validate()
 }
 
 function getModel() {
