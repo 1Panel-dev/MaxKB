@@ -56,9 +56,9 @@ class AppNodeModel extends HtmlNodeModel {
     // 为了保持节点顶部位置不变，在节点变化后，对节点进行一个位移,位移距离为添加高度的一半。
     this.move(0, 24 / 2)
     // 更新节点连接边的path
-    this.incoming.edges.forEach((egde: any) => {
+    this.incoming.edges.forEach((edge: any) => {
       // 调用自定义的更新方案
-      egde.updatePathByAnchor()
+      edge.updatePathByAnchor()
     })
     this.outgoing.edges.forEach((edge: any) => {
       // 调用自定义的更新方案

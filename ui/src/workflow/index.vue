@@ -121,7 +121,7 @@ const graphData = {
       }
     },
     {
-      id: 'ede4a9c9-e2fa-40ac-9215-2e1ad04f09c5',
+      id: '0004a9c9-e2fa-40ac-9215-2e1ad04f09c5',
       type: 'ai-chat-node',
       x: 1360,
       y: 1300,
@@ -206,7 +206,7 @@ const graphData = {
       id: 'cc52ab90-58e7-4f54-9660-d9fb16f776ea',
       type: 'app-edge',
       sourceNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
-      targetNodeId: 'ede4a9c9-e2fa-40ac-9215-2e1ad04f09c5',
+      targetNodeId: '0004a9c9-e2fa-40ac-9215-2e1ad04f09c5',
       startPoint: { x: 1100, y: 1016.75 },
       endPoint: { x: 1200, y: 1413 },
       properties: {},
@@ -217,7 +217,7 @@ const graphData = {
         { x: 1200, y: 1413 }
       ],
       sourceAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6_输出_right',
-      targetAnchorId: 'ede4a9c9-e2fa-40ac-9215-2e1ad04f09c5_输入_left'
+      targetAnchorId: '0004a9c9-e2fa-40ac-9215-2e1ad04f09c5_输入_left'
     }
   ]
 }

@@ -134,10 +134,6 @@ const props = defineProps<{
   stroke: #999;
 }
 
-.incomming-anchor {
-  stroke: #d79b00;
-}
-
 .outgoing-anchor {
   stroke: #82b366;
 }

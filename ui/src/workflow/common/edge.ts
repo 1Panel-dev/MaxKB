@@ -4,9 +4,9 @@ class CustomEdge2 extends BezierEdge {}
 
 class CustomEdgeModel2 extends BezierEdgeModel {
   getArrowStyle() {
-    return { offet: 0 }
+    return { offset: 0 }
   }
-  
+
   getEdgeStyle() {
     const style = super.getEdgeStyle()
 
