@@ -54,9 +54,10 @@ def replace_word(word_dict, text: str):
 
 
 def get_word_key(text: str, use_word_list):
-    for j_word in jieba_word_list_cache:
-        if not text.__contains__(j_word) and not use_word_list.__contains__(j_word):
-            return j_word
+    j_word = next((j for j in jieba_word_list_cache if j not in text and all(j not in used for used in use_word_list)),
+                  None)
+    if j_word:
+        return j_word
     j_word = str(uuid.uuid1())
     jieba.add_word(j_word)
     return j_word
