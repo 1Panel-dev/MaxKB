@@ -56,7 +56,8 @@ const graphData = {
             similarity: 0.6,
             max_paragraph_char_number: 5000,
             search_mode: 'embedding'
-          }
+          },
+          question_reference_address: []
         }
       }
     },
@@ -76,16 +77,19 @@ const graphData = {
             {
               conditions: [{ field: [], compare: '', value: '' }],
               id: '2391',
+              type: 'IF',
               condition: 'and'
             },
             {
               conditions: [{ field: [], compare: '', value: '' }],
               id: '1143',
+              type: 'IF ELSE 1',
               condition: 'and'
             },
             {
               conditions: [{ field: [], compare: '', value: '' }],
               id: '9208',
+              type: 'ELSE',
               condition: 'and'
             }
           ]

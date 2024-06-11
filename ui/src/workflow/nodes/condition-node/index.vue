@@ -13,7 +13,17 @@
     >
       <template v-for="(item, index) in form_data.branch" :key="index">
         <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
-          <p class="lighter">{{ judgeLabel(index) }}</p>
+          <div class="flex-between lighter">
+            {{ item.type }}
+            <div class="info" v-if="item.conditions.length > 1">
+              <span>符合以下</span>
+              <el-select v-model="item.condition" size="small" style="width: 60px; margin: 0 8px">
+                <el-option label="所有" value="and" />
+                <el-option label="任一" value="or" />
+              </el-select>
+              <span>条件</span>
+            </div>
+          </div>
           <div v-if="index !== form_data.branch.length - 1" class="mt-8">
             <template v-for="(condition, cIndex) in item.conditions" :key="cIndex">
               <el-row :gutter="8">
@@ -45,8 +55,9 @@
                     }"
                   >
                     <el-select v-model="condition.compare" placeholder="请选择条件" clearable>
-                      <el-option label="Zone one" value="shanghai" />
-                      <el-option label="Zone two" value="beijing" />
+                      <template v-for="(item, index) in compareList" :key="index">
+                        <el-option :label="item.label" :value="item.value" />
+                      </template>
                     </el-select>
                   </el-form-item>
                 </el-col>
@@ -63,7 +74,13 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="1">
-                  <el-button link type="info" class="mt-4" @click="deleteCondition(index, cIndex)">
+                  <el-button
+                    :disabled="index === 0 && cIndex === 0"
+                    link
+                    type="info"
+                    class="mt-4"
+                    @click="deleteCondition(index, cIndex)"
+                  >
                     <el-icon><Delete /></el-icon>
                   </el-button>
                 </el-col>
@@ -94,6 +111,7 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { randomId } from '@/utils/utils'
+import { compareList } from '@/workflow/common/data'
 const props = defineProps<{ nodeModel: any }>()
 const form = {
   branch: [
@@ -106,11 +124,13 @@ const form = {
         }
       ],
       id: randomId(),
+      type: 'IF',
       condition: 'and'
     },
     {
       conditions: [],
       id: randomId(),
+      type: 'ELSE',
       condition: 'and'
     }
   ]
@@ -136,15 +156,15 @@ const validate = () => {
   ConditionNodeFormRef.value?.validate()
 }
 
-const judgeLabel = (index: number) => {
-  if (index === 0) {
-    return 'IF'
-  } else if (index === form_data.value.branch.length - 1) {
-    return 'ELSE'
-  } else {
-    return 'ELSE IF ' + index
-  }
-}
+// const judgeLabel = (index: number) => {
+//   if (index === 0) {
+//     return 'IF'
+//   } else if (index === form_data.value.branch.length - 1) {
+//     return 'ELSE'
+//   } else {
+//     return 'ELSE IF ' + index
+//   }
+// }
 
 function addBranch() {
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
@@ -156,6 +176,7 @@ function addBranch() {
         value: ''
       }
     ],
+    type: 'ELSE IF ' + (list.length - 1),
     id: randomId(),
     condition: 'and'
   }

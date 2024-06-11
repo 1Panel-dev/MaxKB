@@ -81,7 +81,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             placeholder="请选择检索问题输入"
-            v-model="form_data.fields"
+            v-model="form_data.question_reference_address"
           />
         </el-form-item>
       </el-form>
@@ -126,7 +126,7 @@ const form = {
     max_paragraph_char_number: 5000,
     search_mode: 'embedding'
   },
-  fields: []
+  question_reference_address: []
 }
 
 const form_data = computed({

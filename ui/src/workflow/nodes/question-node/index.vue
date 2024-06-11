@@ -83,9 +83,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="角色设定">
-          <el-input v-model="chat_data.role" placeholder="角色设定" />
+          <el-input v-model="chat_data.system" placeholder="角色设定" />
         </el-form-item>
-        <el-form-item label="提示词" prop="model_setting.prompt">
+        <el-form-item label="提示词" prop="prompt">
           <template #label>
             <div class="flex align-center">
               <div class="flex-between mr-4">
@@ -102,7 +102,7 @@
             </div>
           </template>
           <el-input
-            v-model="chat_data.model_setting.prompt"
+            v-model="chat_data.prompt"
             :rows="6"
             type="textarea"
             maxlength="2048"
@@ -111,8 +111,8 @@
         </el-form-item>
         <el-form-item label="历史聊天记录">
           <el-input-number
-            v-model="chat_data.record"
-            :min="1"
+            v-model="chat_data.dialogue_number"
+            :min="0"
             controls-position="right"
             class="w-full"
           />
@@ -153,11 +153,9 @@ const defaultPrompt =
   '已知信息：\n{data}\n回答要求：\n- 请使用简洁且专业的语言来回答用户的问题。\n- 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。\n- 避免提及你是从已知信息中获得的知识。\n- 请保证答案与已知信息中描述的一致。\n- 请使用 Markdown 语法优化答案的格式。\n- 已知信息中的图片、链接地址和脚本语言请直接返回。\n- 请使用与问题相同的语言来回答。\n问题：\n{question}'
 const form = {
   model_id: '',
-  role: '',
-  model_setting: {
-    prompt: defaultPrompt
-  },
-  record: 1
+  system: '',
+  prompt: defaultPrompt,
+  dialogue_number: 1
 }
 
 const chat_data = computed({

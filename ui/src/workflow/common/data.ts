@@ -162,3 +162,17 @@ export const menuNodes = [
     }
   }
 ]
+
+export const compareList = [
+  { value: 'contain', label: '包含' },
+  { value: 'eq', label: '等于' },
+  { value: 'ge', label: '大于等于' },
+  { value: 'gt', label: '大于' },
+  { value: 'le', label: '小于等于' },
+  { value: 'len_eq', label: '长度等于' },
+  { value: 'len_ge', label: '长度大于等于' },
+  { value: 'len_gt', label: '长度大于' },
+  { value: 'len_le', label: '长度小于等于' },
+  { value: 'len_lt', label: '长度小于' },
+  { value: 'lt', label: '小于' }
+]

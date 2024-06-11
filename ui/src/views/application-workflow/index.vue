@@ -38,8 +38,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import Workflow from '@/workflow/index.vue'
-import { menuNodes } from '@/workflow/common/data.ts'
-import { iconComponent } from '@/workflow/icons/utils.ts'
+import { menuNodes } from '@/workflow/common/data'
+import { iconComponent } from '@/workflow/icons/utils'
 
 const workflowRef = ref()
 
