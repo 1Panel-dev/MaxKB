@@ -88,7 +88,7 @@
         <el-form-item label="提示词" prop="prompt">
           <template #label>
             <div class="flex align-center">
-              <div class="flex-between mr-4">
+              <div class="mr-4">
                 <span>提示词<span class="danger">*</span></span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
