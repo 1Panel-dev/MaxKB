@@ -1,5 +1,5 @@
 <template>
-  <NodeContainer :nodeModel="nodeModel" class="start-node">
+  <NodeContainer :nodeModel="nodeModel">
     <el-form
       :model="form_data"
       label-position="top"
@@ -15,7 +15,7 @@
         <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
           <p class="lighter mb-8">{{ judgeLabel(index) }}</p>
           <template v-for="(condition, cIndex) in item.conditions" :key="cIndex">
-            <el-row :gutter="8">
+            <el-row :gutter="8" v-if="index !== form_data.branch.length - 1">
               <el-col :span="11">
                 <el-form-item
                   :prop="'branch.' + index + '.conditions' + cIndex + '.field'"
@@ -68,7 +68,12 @@
               </el-col>
             </el-row>
           </template>
-          <el-button link type="primary" @click="addCondition(index)">
+          <el-button
+            link
+            type="primary"
+            @click="addCondition(index)"
+            v-if="index !== form_data.branch.length - 1"
+          >
             <el-icon class="mr-4"><Plus /></el-icon> 添加条件
           </el-button>
         </el-card>
@@ -97,6 +102,11 @@ const form = {
           value: ''
         }
       ],
+      id: randomId(),
+      condition: 'and'
+    },
+    {
+      conditions: [],
       id: randomId(),
       condition: 'and'
     }

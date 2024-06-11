@@ -1,5 +1,5 @@
 import ConditioNodeVue from './index.vue'
-import { AppNode, AppNodeModel } from '@/workflow/common/app-node.ts'
+import { AppNode, AppNodeModel } from '@/workflow/common/app-node'
 class ConditioNode extends AppNode {
   constructor(props: any) {
     super(props, ConditioNodeVue)

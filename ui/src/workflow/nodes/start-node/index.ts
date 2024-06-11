@@ -1,12 +1,12 @@
-import ChatNodeVue from './index.vue'
-import { AppNode, AppNodeModel } from '@/workflow/common/app-node.ts'
-class ChatNode extends AppNode {
+import StartNodeVue from './index.vue'
+import { AppNode, AppNodeModel } from '@/workflow/common/app-node'
+class StartNode extends AppNode {
   constructor(props: any) {
-    super(props, ChatNodeVue)
+    super(props, StartNodeVue)
   }
 }
 export default {
   type: 'start-node',
   model: AppNodeModel,
-  view: ChatNode
+  view: StartNode
 }
