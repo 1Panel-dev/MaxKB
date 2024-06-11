@@ -15,7 +15,7 @@ from langchain_core.messages import BaseMessage
 
 from application.flow import tools
 from application.flow.i_step_node import NodeResult, INode
-from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
+from application.flow.step_node.question_node.i_question_node import IQuestionNode
 from common.util.rsa_util import rsa_long_decrypt
 from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -71,8 +71,6 @@ def get_to_response_write_context(node_variable: Dict, node: INode):
         node.context['message_tokens'] = message_tokens
         node.context['answer_tokens'] = answer_tokens
         node.context['answer'] = answer
-        node.context['history_message'] = node_variable['history_message']
-        node.context['question'] = node_variable['question']
 
     return _write_context
 
@@ -113,7 +111,7 @@ def to_response(chat_id, chat_record_id, node_variable: Dict, workflow_variable:
     return tools.to_response(chat_id, chat_record_id, response, workflow, _write_context, post_handler)
 
 
-class BaseChatNode(IChatNode):
+class BaseQuestionNode(IQuestionNode):
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 **kwargs) -> NodeResult:
         model = QuerySet(Model).filter(id=model_id).first()
@@ -127,6 +125,7 @@ class BaseChatNode(IChatNode):
         if stream:
             r = chat_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
+                               'get_to_response_write_context': get_to_response_write_context,
                                'history_message': history_message, 'question': question}, {},
                               _write_context=write_context_stream,
                               _to_response=to_stream_response)

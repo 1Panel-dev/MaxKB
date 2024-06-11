@@ -22,7 +22,7 @@ from smartdoc.conf import PROJECT_DIR
 
 
 class BaseSearchDatasetNode(ISearchDatasetStepNode):
-    def execute(self, dataset_id_list, top_n, similarity, search_mode, question_reference_address, question,
+    def execute(self, dataset_id_list, dataset_setting, question,
                 exclude_paragraph_id_list=None,
                 **kwargs) -> NodeResult:
         embedding_model = EmbeddingModel.get_embedding_model()
@@ -33,7 +33,8 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
                                         dataset_id__in=dataset_id_list,
                                         is_active=False)]
         embedding_list = vector.query(question, embedding_value, dataset_id_list, exclude_document_id_list,
-                                      exclude_paragraph_id_list, True, top_n, similarity, SearchMode(search_mode))
+                                      exclude_paragraph_id_list, True, dataset_setting.get('top_n'),
+                                      dataset_setting.get('similarity'), SearchMode(dataset_setting.get('search_mode')))
         if embedding_list is None:
             return NodeResult({'paragraph_list': [], 'is_hit_handling_method': []}, {})
         paragraph_list = self.list_paragraph(embedding_list, vector)
@@ -71,3 +72,11 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
                 if not exist_paragraph_list.__contains__(paragraph_id):
                     vector.delete_by_paragraph_id(paragraph_id)
         return paragraph_list
+
+    def get_details(self, index: int, **kwargs):
+        return {
+            "index": index,
+            'run_time': self.context.get('run_time'),
+            'paragraph_list': self.context.get('paragraph_list'),
+            'type': self.node.type
+        }

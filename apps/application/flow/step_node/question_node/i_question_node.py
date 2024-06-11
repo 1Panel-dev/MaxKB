@@ -14,7 +14,7 @@ from application.flow.i_step_node import INode, NodeResult
 from common.util.field_message import ErrMessage
 
 
-class ChatNodeSerializer(serializers.Serializer):
+class QuestionNodeSerializer(serializers.Serializer):
     model_id = serializers.CharField(required=True, error_messages=ErrMessage.char("模型id"))
     system = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                    error_messages=ErrMessage.char("角色设定"))
@@ -23,11 +23,11 @@ class ChatNodeSerializer(serializers.Serializer):
     dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("多轮对话数量"))
 
 
-class IChatNode(INode):
-    type = 'ai-chat-node'
+class IQuestionNode(INode):
+    type = 'question-node'
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
-        return ChatNodeSerializer
+        return QuestionNodeSerializer
 
     def _run(self):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)

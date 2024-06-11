@@ -10,10 +10,8 @@ from typing import List, Dict
 
 from langchain_core.prompts import PromptTemplate
 
-from application.flow.i_step_node import INode, WorkFlowPostHandler
-from application.flow.step_node.ai_chat_step_node.impl.base_chat_node import BaseChatNode
-from application.flow.step_node.search_dataset_node.impl.base_search_dataset_node import BaseSearchDatasetNode
-from application.flow.step_node.start_node.impl.base_start_node import BaseStartStepNode
+from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
+from application.flow.step_node import get_node
 
 
 class Edge:
@@ -52,41 +50,36 @@ class Flow:
         return Flow(nodes, edges)
 
 
-flow_node_dict = {
-    'start-node': BaseStartStepNode,
-    'search-dataset-node': BaseSearchDatasetNode,
-    'chat-node': BaseChatNode
-}
-
-
 class WorkflowManage:
     def __init__(self, flow: Flow, params):
         self.params = params
         self.flow = flow
         self.context = {}
-        self.node_dict = {}
-        self.runtime_nodes = []
+        self.node_context = []
         self.current_node = None
+        self.current_result = None
 
     def run(self):
         """
         运行工作流
         """
-        while self.has_next_node():
+        while self.has_next_node(self.current_result):
             self.current_node = self.get_next_node()
-            self.node_dict[self.current_node.id] = self.current_node
-            result = self.current_node.run()
-            if self.has_next_node():
-                result.write_context(self.current_node, self)
+            self.node_context.append(self.current_node)
+            self.current_result = self.current_node.run()
+            if self.has_next_node(self.current_result):
+                self.current_result.write_context(self.current_node, self)
             else:
-                r = result.to_response(self.params['chat_id'], self.params['chat_record_id'], self.current_node, self,
-                                       WorkFlowPostHandler(client_id=self.params['client_id'], chat_info=None,
-                                                           client_type='ss'))
+                r = self.current_result.to_response(self.params['chat_id'], self.params['chat_record_id'],
+                                                    self.current_node, self,
+                                                    WorkFlowPostHandler(client_id=self.params['client_id'],
+                                                                        chat_info=None,
+                                                                        client_type='APPLICATION_ACCESS_TOKEN'))
                 for row in r:
                     print(row)
         print(self)
 
-    def has_next_node(self):
+    def has_next_node(self, node_result: NodeResult | None):
         """
         是否有下一个可运行的节点
         """
@@ -94,13 +87,24 @@ class WorkflowManage:
             if self.get_start_node() is not None:
                 return True
         else:
-            for edge in self.flow.edges:
-                if edge.sourceNodeId == self.current_node.id:
-                    return True
+            if node_result is not None and node_result.is_assertion_result():
+                for edge in self.flow.edges:
+                    if (edge.sourceNodeId == self.current_node.id and
+                            f"{edge.sourceNodeId}_{node_result.node_variable.get('branch_id')}_right" == edge.sourceAnchorId):
+                        return True
+            else:
+                for edge in self.flow.edges:
+                    if edge.sourceNodeId == self.current_node.id:
+                        return True
         return False
 
     def get_runtime_details(self):
-        return {}
+        details_result = {}
+        for index in range(len(self.node_context)):
+            node = self.node_context[index]
+            details = node.get_details({'index': index})
+            details_result[node.id] = details
+        return details_result
 
     def get_next_node(self):
         """
@@ -108,8 +112,7 @@ class WorkflowManage:
         """
         if self.current_node is None:
             node = self.get_start_node()
-            node_instance = flow_node_dict[node.type](node.id, node.properties.get('node_data'),
-                                                      self.params, self.context)
+            node_instance = get_node(node.type)(node, self.params, self.context)
             return node_instance
         for edge in self.flow.edges:
             if edge.sourceNodeId == self.current_node.id:
@@ -138,8 +141,9 @@ class WorkflowManage:
         context = {
             'global': self.context,
         }
-        for key in self.node_dict:
-            context[key] = self.node_dict[key].context
+
+        for node in self.node_context:
+            context[node.id] = node.context
         value = prompt_template.format(context=context)
         return value
 
@@ -148,18 +152,22 @@ class WorkflowManage:
         获取启动节点
         @return:
         """
-        return self.flow.nodes[0]
+        start_node_list = [node for node in self.flow.nodes if node.type == 'start-node']
+        return start_node_list[0]
 
     def get_node_cls_by_id(self, node_id):
         for node in self.flow.nodes:
             if node.id == node_id:
-                node_instance = flow_node_dict[node.type](node.id, node.properties.get('node_data'),
-                                                          self.params, self)
+                node_instance = get_node(node.type)(node,
+                                                    self.params, self)
                 return node_instance
         return None
 
     def get_node_by_id(self, node_id):
-        return self.node_dict[node_id]
+        for node in self.node_context:
+            if node.id == node_id:
+                return node
+        return None
 
     def get_node_reference(self, reference_address: Dict):
         node = self.get_node_by_id(reference_address.get('node_id'))

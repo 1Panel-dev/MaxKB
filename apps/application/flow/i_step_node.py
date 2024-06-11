@@ -41,15 +41,18 @@ class WorkFlowPostHandler:
                 answer,
                 workflow):
         question = workflow.params['question']
+        details = workflow.get_runtime_details()
+        message_tokens = sum([row.get('message_tokens') for row in details.values() if 'message_tokens' in row])
+        answer_tokens = sum([row.get('answer_tokens') for row in details.values() if 'answer_tokens' in row])
         chat_record = ChatRecord(id=chat_record_id,
                                  chat_id=chat_id,
                                  problem_text=question,
                                  answer_text=answer,
-                                 details=workflow.get_details(),
-                                 message_tokens=workflow.context['message_tokens'],
-                                 answer_tokens=workflow.context['answer_tokens'],
-                                 run_time=workflow.context['run_time'],
-                                 index=len(self.chat_info.chat_record_list) + 1)
+                                 details=details,
+                                 message_tokens=message_tokens,
+                                 answer_tokens=answer_tokens,
+                                 run_time=time.time() - workflow.context['time'],
+                                 index=0)
         self.chat_info.append_chat_record(chat_record, self.client_id)
         # 重新设置缓存
         chat_cache.set(chat_id,
@@ -75,6 +78,9 @@ class NodeResult:
     def to_response(self, chat_id, chat_record_id, node, workflow, post_handler: WorkFlowPostHandler):
         return self._to_response(chat_id, chat_record_id, self.node_variable, self.workflow_variable, node, workflow,
                                  post_handler)
+
+    def is_assertion_result(self):
+        return 'branch_id' in self.node_variable
 
 
 class ReferenceAddressSerializer(serializers.Serializer):
@@ -103,15 +109,16 @@ class FlowParamsSerializer(serializers.Serializer):
 
 
 class INode:
-    def __init__(self, _id, node_params, workflow_params, workflow_manage):
+    def __init__(self, node, workflow_params, workflow_manage):
         # 当前步骤上下文,用于存储当前步骤信息
-        self.node_params = node_params
+        self.node = node
+        self.node_params = node.properties.get('node_data')
         self.workflow_manage = workflow_manage
         self.node_params_serializer = None
         self.flow_params_serializer = None
         self.context = {}
-        self.id = _id
-        self.valid_args(node_params, workflow_params)
+        self.id = node.id
+        self.valid_args(self.node_params, workflow_params)
 
     def valid_args(self, node_params, flow_params):
         flow_params_serializer_class = self.get_flow_params_serializer_class()
@@ -160,9 +167,9 @@ class INode:
     def execute(self, **kwargs) -> NodeResult:
         pass
 
-    def get_details(self, **kwargs):
+    def get_details(self, index: int, **kwargs):
         """
         运行详情
         :return: 步骤详情
         """
-        return None
+        return {}
