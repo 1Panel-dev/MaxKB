@@ -13,61 +13,64 @@
     >
       <template v-for="(item, index) in form_data.branch" :key="index">
         <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
-          <p class="lighter mb-8">{{ judgeLabel(index) }}</p>
-          <template v-for="(condition, cIndex) in item.conditions" :key="cIndex">
-            <el-row :gutter="8" v-if="index !== form_data.branch.length - 1">
-              <el-col :span="11">
-                <el-form-item
-                  :prop="'branch.' + index + '.conditions' + cIndex + '.field'"
-                  :rules="{
-                    type: Array,
-                    required: true,
-                    message: '请选择变量',
-                    trigger: 'change'
-                  }"
-                >
-                  <NodeCascader
-                    :nodeModel="nodeModel"
-                    class="w-full"
-                    placeholder="请选择变量"
-                    v-model="condition.field"
-                  />
-                </el-form-item>
-              </el-col>
-              <el-col :span="6">
-                <el-form-item
-                  :prop="'branch.' + index + '.conditions' + cIndex + '.compare'"
-                  :rules="{
-                    required: true,
-                    message: '请选择条件',
-                    trigger: 'change'
-                  }"
-                >
-                  <el-select v-model="condition.compare" placeholder="请选择条件" clearable>
-                    <el-option label="Zone one" value="shanghai" />
-                    <el-option label="Zone two" value="beijing" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="6">
-                <el-form-item
-                  :prop="'branch.' + index + '.conditions' + cIndex + '.value'"
-                  :rules="{
-                    required: true,
-                    message: '请输入值',
-                    trigger: 'blur'
-                  }"
-                >
-                  <el-input v-model="condition.value" placeholder="请输入值" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="1">
-                <el-button link type="info" class="mt-4" @click="deleteCondition(index, cIndex)">
-                  <el-icon><Delete /></el-icon>
-                </el-button>
-              </el-col>
-            </el-row>
-          </template>
+          <p class="lighter">{{ judgeLabel(index) }}</p>
+          <div v-if="index !== form_data.branch.length - 1" class="mt-8">
+            <template v-for="(condition, cIndex) in item.conditions" :key="cIndex">
+              <el-row :gutter="8">
+                <el-col :span="11">
+                  <el-form-item
+                    :prop="'branch.' + index + '.conditions' + cIndex + '.field'"
+                    :rules="{
+                      type: Array,
+                      required: true,
+                      message: '请选择变量',
+                      trigger: 'change'
+                    }"
+                  >
+                    <NodeCascader
+                      :nodeModel="nodeModel"
+                      class="w-full"
+                      placeholder="请选择变量"
+                      v-model="condition.field"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item
+                    :prop="'branch.' + index + '.conditions' + cIndex + '.compare'"
+                    :rules="{
+                      required: true,
+                      message: '请选择条件',
+                      trigger: 'change'
+                    }"
+                  >
+                    <el-select v-model="condition.compare" placeholder="请选择条件" clearable>
+                      <el-option label="Zone one" value="shanghai" />
+                      <el-option label="Zone two" value="beijing" />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item
+                    :prop="'branch.' + index + '.conditions' + cIndex + '.value'"
+                    :rules="{
+                      required: true,
+                      message: '请输入值',
+                      trigger: 'blur'
+                    }"
+                  >
+                    <el-input v-model="condition.value" placeholder="请输入值" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="1">
+                  <el-button link type="info" class="mt-4" @click="deleteCondition(index, cIndex)">
+                    <el-icon><Delete /></el-icon>
+                  </el-button>
+                </el-col>
+              </el-row>
+            </template>
+          </div>
+
           <el-button
             link
             type="primary"
@@ -156,7 +159,7 @@ function addBranch() {
     id: randomId(),
     condition: 'and'
   }
-  list.push(obj)
+  list.splice(list.length - 1, 0, obj)
   props.nodeModel.addField({ key: obj.id })
   set(props.nodeModel.properties.node_data, 'branch', list)
 }
