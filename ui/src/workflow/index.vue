@@ -6,9 +6,9 @@
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
 import { ref, onMounted } from 'vue'
-import AppEdge from './common/edge.ts'
+import AppEdge from './common/edge'
 import Control from './common/NodeControl.vue'
-import { baseNodes } from '@/workflow/common/data.ts'
+import { baseNodes } from '@/workflow/common/data'
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
@@ -40,14 +40,8 @@ const graphData = {
         input: [{ key: '输入' }],
         output: [{ key: '输出' }],
         fields: [
-          {
-            label: '检索结果',
-            value: 'data'
-          },
-          {
-            label: '满足直接回答的分段内容',
-            value: 'paragraph'
-          }
+          { label: '检索结果', value: 'data' },
+          { label: '满足直接回答的分段内容', value: 'paragraph' }
         ],
         node_data: {
           dataset_id_list: [],
@@ -65,7 +59,7 @@ const graphData = {
       id: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
       type: 'condition-node',
       x: 810,
-      y: 764,
+      y: 760,
       properties: {
         height: 200,
         width: 600,
@@ -105,7 +99,14 @@ const graphData = {
         height: '',
         stepName: 'AI 对话',
         input: [{ key: '输入' }],
-        output: [{ key: '输出' }]
+        output: [{ key: '输出' }],
+        node_data: {
+          model_id: '',
+          system: '',
+          prompt:
+            '已知信息：\n{data}\n回答要求：\n- 请使用简洁且专业的语言来回答用户的问题。\n- 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。\n- 避免提及你是从已知信息中获得的知识。\n- 请保证答案与已知信息中描述的一致。\n- 请使用 Markdown 语法优化答案的格式。\n- 已知信息中的图片、链接地址和脚本语言请直接返回。\n- 请使用与问题相同的语言来回答。\n问题：\n{question}',
+          dialogue_number: 1
+        }
       }
     },
     {
@@ -117,7 +118,14 @@ const graphData = {
         height: '',
         stepName: 'AI 对话',
         input: [{ key: '输入' }],
-        output: [{ key: '输出' }]
+        output: [{ key: '输出' }],
+        node_data: {
+          model_id: '',
+          system: '',
+          prompt:
+            '已知信息：\n{data}\n回答要求：\n- 请使用简洁且专业的语言来回答用户的问题。\n- 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。\n- 避免提及你是从已知信息中获得的知识。\n- 请保证答案与已知信息中描述的一致。\n- 请使用 Markdown 语法优化答案的格式。\n- 已知信息中的图片、链接地址和脚本语言请直接返回。\n- 请使用与问题相同的语言来回答。\n问题：\n{question}',
+          dialogue_number: 1
+        }
       }
     },
     {
@@ -129,7 +137,26 @@ const graphData = {
         height: '',
         stepName: 'AI 对话',
         input: [{ key: '输入' }],
-        output: [{ key: '输出' }]
+        output: [{ key: '输出' }],
+        node_data: {
+          model_id: '',
+          system: '',
+          prompt:
+            '已知信息：\n{data}\n回答要求：\n- 请使用简洁且专业的语言来回答用户的问题。\n- 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。\n- 避免提及你是从已知信息中获得的知识。\n- 请保证答案与已知信息中描述的一致。\n- 请使用 Markdown 语法优化答案的格式。\n- 已知信息中的图片、链接地址和脚本语言请直接返回。\n- 请使用与问题相同的语言来回答。\n问题：\n{question}',
+          dialogue_number: 1
+        }
+      }
+    },
+    {
+      id: '30c16d31-3881-48cd-991e-da3f99c45681',
+      type: 'reply-node',
+      x: 990,
+      y: 300,
+      properties: {
+        height: '',
+        stepName: '指定回复',
+        input: [{ key: '' }],
+        output: [{ key: '' }]
       }
     }
   ],
@@ -156,14 +183,14 @@ const graphData = {
       type: 'app-edge',
       sourceNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd5',
       targetNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
-      startPoint: { x: 760, y: 464 },
-      endPoint: { x: 520, y: 973.75 },
+      startPoint: { x: 760, y: 503 },
+      endPoint: { x: 520, y: 931.0625 },
       properties: {},
       pointsList: [
-        { x: 760, y: 464 },
-        { x: 870, y: 464 },
-        { x: 410, y: 973.75 },
-        { x: 520, y: 973.75 }
+        { x: 760, y: 503 },
+        { x: 870, y: 503 },
+        { x: 410, y: 931.0625 },
+        { x: 520, y: 931.0625 }
       ],
       sourceAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd5_输出_right',
       targetAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6_输入_left'
@@ -173,14 +200,14 @@ const graphData = {
       type: 'app-edge',
       sourceNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
       targetNodeId: '03597cb0-ed4c-4bcb-b25b-3b358f72b266',
-      startPoint: { x: 1100, y: 968.75 },
-      endPoint: { x: 1170, y: 803 },
+      startPoint: { x: 1100, y: 926.0625 },
+      endPoint: { x: 1170, y: 969 },
       properties: {},
       pointsList: [
-        { x: 1100, y: 968.75 },
-        { x: 1210, y: 968.75 },
-        { x: 1060, y: 803 },
-        { x: 1170, y: 803 }
+        { x: 1100, y: 926.0625 },
+        { x: 1210, y: 926.0625 },
+        { x: 1060, y: 969 },
+        { x: 1170, y: 969 }
       ],
       sourceAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6_9208_right',
       targetAnchorId: '03597cb0-ed4c-4bcb-b25b-3b358f72b266_输入_left'
@@ -190,14 +217,14 @@ const graphData = {
       type: 'app-edge',
       sourceNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
       targetNodeId: '6649ee86-348c-4d68-9cad-71f0612beb05',
-      startPoint: { x: 1100, y: 992.75 },
-      endPoint: { x: 1160, y: 1103 },
+      startPoint: { x: 1100, y: 950.0625 },
+      endPoint: { x: 1160, y: 1269 },
       properties: {},
       pointsList: [
-        { x: 1100, y: 992.75 },
-        { x: 1210, y: 992.75 },
-        { x: 1050, y: 1103 },
-        { x: 1160, y: 1103 }
+        { x: 1100, y: 950.0625 },
+        { x: 1210, y: 950.0625 },
+        { x: 1050, y: 1269 },
+        { x: 1160, y: 1269 }
       ],
       sourceAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6_1143_right',
       targetAnchorId: '6649ee86-348c-4d68-9cad-71f0612beb05_输入_left'
@@ -211,10 +238,10 @@ const graphData = {
       endPoint: { x: 1200, y: 1413 },
       properties: {},
       pointsList: [
-        { x: 1100, y: 1016.75 },
-        { x: 1210, y: 1016.75 },
-        { x: 1090, y: 1413 },
-        { x: 1200, y: 1413 }
+        { x: 1100, y: 974.0625 },
+        { x: 1210, y: 974.0625 },
+        { x: 1090, y: 1579 },
+        { x: 1200, y: 1579 }
       ],
       sourceAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6_输出_right',
       targetAnchorId: '0004a9c9-e2fa-40ac-9215-2e1ad04f09c5_输入_left'

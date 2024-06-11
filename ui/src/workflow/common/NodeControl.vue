@@ -8,7 +8,7 @@
     </el-button>
 
     <el-divider direction="vertical" />
-    <el-button link @click="zoomIn">
+    <el-button link @click="fitView">
       <AppIcon iconName="app-fitview" title="适应"></AppIcon>
     </el-button>
   </el-card>
