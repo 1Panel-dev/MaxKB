@@ -99,17 +99,20 @@ class AppNodeModel extends HtmlNodeModel {
   getDefaultAnchor() {
     const { id, x, y, width } = this
     const anchors: any = []
-    anchors.push({
-      x: x - width / 2 + 10,
-      y: y,
-      id: `${id}`,
-      edgeAddable: false,
-      type: 'left'
-    })
+    if (this.type !== 'start-node') {
+      anchors.push({
+        x: x - width / 2 + 10,
+        y: y,
+        id: `${id}_left`,
+        edgeAddable: false,
+        type: 'left'
+      })
+    }
+
     anchors.push({
       x: x + width / 2 - 10,
       y: y,
-      id: `${id}`,
+      id: `${id}_right`,
       type: 'right'
     })
 

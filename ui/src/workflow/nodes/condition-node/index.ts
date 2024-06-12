@@ -41,7 +41,7 @@ class ConditionModel extends AppNodeModel {
     anchors.push({
       x: x - width / 2 + 10,
       y: y,
-      id: `${id}`,
+      id: `${id}_left`,
       edgeAddable: false,
       type: 'left'
     })

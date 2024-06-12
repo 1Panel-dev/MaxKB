@@ -27,7 +27,6 @@ export const baseNodes = [
     properties: {
       height: 200,
       stepName: '开始',
-      output: [{ key: '' }],
       fields: [
         {
           label: '用户问题',
@@ -47,20 +46,10 @@ export const menuNodes = [
     properties: {
       height: '',
       stepName: 'AI 对话',
-      input: [
-        {
-          key: ''
-        }
-      ],
-      output: [
-        {
-          key: ''
-        }
-      ],
       fields: [
         {
           label: 'AI 回答内容',
-          value: 'content'
+          value: 'answer'
         }
       ]
     }
@@ -73,24 +62,16 @@ export const menuNodes = [
     properties: {
       height: '',
       stepName: '知识库检索',
-      input: [
-        {
-          key: '输入'
-        }
-      ],
-      output: [
-        {
-          key: '输出'
-        }
-      ],
       fields: [
+        { label: '段落列表', value: 'paragraph_list' },
+        { label: '满足直接回答的段落列表', value: 'is_hit_handling_method_list' },
         {
           label: '检索结果',
           value: 'data'
         },
         {
           label: '满足直接回答的分段内容',
-          value: 'paragraph'
+          value: 'directly_return'
         }
       ]
     }
@@ -103,20 +84,10 @@ export const menuNodes = [
     properties: {
       height: '',
       stepName: '问题优化',
-      input: [
-        {
-          key: ''
-        }
-      ],
-      output: [
-        {
-          key: ''
-        }
-      ],
       fields: [
         {
-          label: '用户问题',
-          value: 'question'
+          label: '问题优化结果',
+          value: 'answer'
         }
       ]
     }
@@ -128,17 +99,7 @@ export const menuNodes = [
     icon: 'condition-node-icon',
     properties: {
       width: 600,
-      stepName: '判断器',
-      input: [
-        {
-          key: '输入'
-        }
-      ],
-      output: [
-        {
-          key: '输出'
-        }
-      ]
+      stepName: '判断器'
     }
   },
   {
@@ -148,17 +109,7 @@ export const menuNodes = [
     icon: 'reply-node-icon',
     properties: {
       height: '',
-      stepName: '指定回复',
-      input: [
-        {
-          key: ''
-        }
-      ],
-      output: [
-        {
-          key: ''
-        }
-      ]
+      stepName: '指定回复'
     }
   }
 ]
