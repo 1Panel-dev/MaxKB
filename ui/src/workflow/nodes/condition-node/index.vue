@@ -35,7 +35,7 @@
               <el-row :gutter="8">
                 <el-col :span="11">
                   <el-form-item
-                    :prop="'branch.' + index + '.conditions' + cIndex + '.field'"
+                    :prop="'branch.' + index + '.conditions.' + cIndex + '.field'"
                     :rules="{
                       type: 'array',
                       required: true,
@@ -53,7 +53,7 @@
                 </el-col>
                 <el-col :span="6">
                   <el-form-item
-                    :prop="'branch.' + index + '.conditions' + cIndex + '.compare'"
+                    :prop="'branch.' + index + '.conditions.' + cIndex + '.compare'"
                     :rules="{
                       required: true,
                       message: '请选择条件',
@@ -69,7 +69,7 @@
                 </el-col>
                 <el-col :span="6">
                   <el-form-item
-                    :prop="'branch.' + index + '.conditions' + cIndex + '.value'"
+                    :prop="'branch.' + index + '.conditions.' + cIndex + '.value'"
                     :rules="{
                       required: true,
                       message: '请输入值',
