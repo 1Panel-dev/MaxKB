@@ -4,9 +4,6 @@
     <div class="flex-center h-full">
       <div class="app-title-container flex-center cursor" @click="router.push('/')">
         <div class="app-title-icon"></div>
-        <div class="app-title-text app-logo-font ml-4">
-          {{ defaultTitle }}
-        </div>
       </div>
       <TopMenu></TopMenu>
     </div>

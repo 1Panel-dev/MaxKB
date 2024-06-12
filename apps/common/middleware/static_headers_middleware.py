@@ -25,6 +25,4 @@ class StaticHeadersMiddleware(MiddlewareMixin):
                 response.content = (response.content.decode('utf-8').replace(
                     '<link rel="icon" href="/ui/favicon.ico" />',
                     f'<link rel="icon" href="{application_access_token.application.icon}" />')
-                .replace('<title>MaxKB</title>', f'<title>{application_access_token.application.name}</title>').encode(
-                    "utf-8"))
         return response

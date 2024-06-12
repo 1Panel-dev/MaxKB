@@ -35,7 +35,7 @@
               </div>
               <el-tooltip effect="dark" placement="right">
                 <template #content>
-                  <p>MaxKB 中自定义的模型名称</p>
+                  <p>自定义的模型名称</p>
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
