@@ -12,8 +12,13 @@
       @mousedown.stop
       @mousemove.stop
     >
-      <template v-for="(item, index) in form_data.branch" :key="index">
-        <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
+      <template v-for="(item, index) in form_data.branch" :key="item.id">
+        <el-card
+          v-resize="(wh) => resizeCondition(wh, item, index)"
+          shadow="never"
+          class="card-never mb-8"
+          style="--el-card-padding: 12px"
+        >
           <div class="flex-between lighter">
             {{ item.type }}
             <div class="info" v-if="item.conditions.length > 1">
@@ -110,9 +115,10 @@ import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { randomId } from '@/utils/utils'
 import { compareList } from '@/workflow/common/data'
+
 const props = defineProps<{ nodeModel: any }>()
 const form = {
   branch: [
@@ -137,12 +143,28 @@ const form = {
   ]
 }
 
+const resizeCondition = (wh: any, row: any, index: number) => {
+  const barnch_condition_list = cloneDeep(
+    props.nodeModel.properties.barnch_condition_list
+      ? props.nodeModel.properties.barnch_condition_list
+      : []
+  )
+  const new_barnch_condition_list = barnch_condition_list.map((item: any) => {
+    if (item.id === row.id) {
+      return { ...item, height: wh.height, index: index }
+    }
+    return item
+  })
+  set(props.nodeModel.properties, 'barnch_condition_list', new_barnch_condition_list)
+  refreshBranchAnchor(props.nodeModel.properties.node_data.branch, true)
+}
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)
+      refreshBranchAnchor(form.branch, true)
     }
     return props.nodeModel.properties.node_data
   },
@@ -156,16 +178,6 @@ const ConditionNodeFormRef = ref<FormInstance>()
 const validate = () => {
   ConditionNodeFormRef.value?.validate()
 }
-
-// const judgeLabel = (index: number) => {
-//   if (index === 0) {
-//     return 'IF'
-//   } else if (index === form_data.value.branch.length - 1) {
-//     return 'ELSE'
-//   } else {
-//     return 'ELSE IF ' + index
-//   }
-// }
 
 function addBranch() {
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
@@ -182,8 +194,30 @@ function addBranch() {
     condition: 'and'
   }
   list.splice(list.length - 1, 0, obj)
-  props.nodeModel.addField({ key: obj.id })
+  refreshBranchAnchor(list, true)
   set(props.nodeModel.properties.node_data, 'branch', list)
+}
+function refreshBranchAnchor(list: Array<any>, is_add: boolean) {
+  const barnch_condition_list = cloneDeep(
+    props.nodeModel.properties.barnch_condition_list
+      ? props.nodeModel.properties.barnch_condition_list
+      : []
+  )
+  const new_barnch_condition_list = list
+    .map((item, index) => {
+      const find = barnch_condition_list.find((b) => b.id === item.id)
+      if (find) {
+        return { index: index, height: find.height, id: item.id }
+      } else {
+        if (is_add) {
+          return { index: index, height: 12, id: item.id }
+        }
+      }
+    })
+    .filter((item) => item)
+
+  set(props.nodeModel.properties, 'barnch_condition_list', new_barnch_condition_list)
+  props.nodeModel.refreshBranch()
 }
 
 function addCondition(index: number) {
@@ -200,7 +234,18 @@ function deleteCondition(index: number, cIndex: number) {
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
   list[index]['conditions'].splice(cIndex, 1)
   if (list[index]['conditions'].length === 0) {
-    list.splice(index, 1)
+    const delete_edge = list.splice(index, 1)
+    const delete_target_anchor_id_list = delete_edge.map(
+      (item) => props.nodeModel.id + '_' + item.id + '_right'
+    )
+
+    props.nodeModel.graphModel.eventCenter.emit(
+      'delete_edge',
+      props.nodeModel.outgoing.edges
+        .filter((item) => delete_target_anchor_id_list.includes(item.sourceAnchorId))
+        .map((item) => item.id)
+    )
+    refreshBranchAnchor(list, false)
   }
   set(props.nodeModel.properties.node_data, 'branch', list)
 }

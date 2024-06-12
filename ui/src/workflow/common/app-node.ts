@@ -47,24 +47,6 @@ class AppNode extends HtmlNode {
 }
 
 class AppNodeModel extends HtmlNodeModel {
-  /**
-   * 给model自定义添加字段方法
-   */
-  addField(item: any) {
-    this.properties.output.unshift(item)
-    this.setAttributes()
-    // 为了保持节点顶部位置不变，在节点变化后，对节点进行一个位移,位移距离为添加高度的一半。
-    this.move(0, 24 / 2)
-    // 更新节点连接边的path
-    this.incoming.edges.forEach((edge: any) => {
-      // 调用自定义的更新方案
-      edge.updatePathByAnchor()
-    })
-    this.outgoing.edges.forEach((edge: any) => {
-      // 调用自定义的更新方案
-      edge.updatePathByAnchor()
-    })
-  }
   getOutlineStyle() {
     const style = super.getOutlineStyle()
     style.stroke = 'none'
@@ -87,12 +69,8 @@ class AppNodeModel extends HtmlNodeModel {
     return style
   }
 
-  setHeight(height: number, inputContainerHeight: number, outputContainerHeight: number) {
-    this.height = height + inputContainerHeight + outputContainerHeight + 100
-    this.baseHeight = height
-    this.inputContainerHeight = inputContainerHeight
-    this.outputContainerHeight = outputContainerHeight
-
+  setHeight(height: number) {
+    this.height = height + 100
     this.outgoing.edges.forEach((edge: any) => {
       // 调用自定义的更新方案
       edge.updatePathByAnchor()
@@ -104,7 +82,6 @@ class AppNodeModel extends HtmlNodeModel {
   }
   setAttributes() {
     this.width = this.properties?.width || 340
-
     const circleOnlyAsTarget = {
       message: '只允许从右边的锚点连出',
       validate: (sourceNode: any, targetNode: any, sourceAnchor: any) => {
@@ -120,50 +97,21 @@ class AppNodeModel extends HtmlNodeModel {
     })
   }
   getDefaultAnchor() {
-    const {
-      id,
-      x,
-      y,
-      width,
-      height,
-      properties: { input, output }
-    } = this
-
-    if (this.baseHeight === undefined) {
-      this.baseHeight = 0
-    }
-    if (this.inputContainerHeight === undefined) {
-      this.inputContainerHeight = 0
-    }
-    if (this.height === undefined) {
-      this.height = 200
-    }
-    if (this.outputContainerHeight === undefined) {
-      this.outputContainerHeight = 0
-    }
-
+    const { id, x, y, width } = this
     const anchors: any = []
-    if (input) {
-      input.forEach((field: any, index: any) => {
-        anchors.push({
-          x: x - width / 2 + 10,
-          y: y - height / 2 + this.baseHeight + 35 + index * 24,
-          id: `${id}_${field.key}_left`,
-          edgeAddable: false,
-          type: 'left'
-        })
-      })
-    }
-    if (output) {
-      output.forEach((field: any, index: any) => {
-        anchors.push({
-          x: x + width / 2 - 10,
-          y: y - height / 2 + this.baseHeight + this.inputContainerHeight + 30 + index * 24,
-          id: `${id}_${field.key}_right`,
-          type: 'right'
-        })
-      })
-    }
+    anchors.push({
+      x: x - width / 2 + 10,
+      y: y,
+      id: `${id}`,
+      edgeAddable: false,
+      type: 'left'
+    })
+    anchors.push({
+      x: x + width / 2 - 10,
+      y: y,
+      id: `${id}`,
+      type: 'right'
+    })
 
     return anchors
   }

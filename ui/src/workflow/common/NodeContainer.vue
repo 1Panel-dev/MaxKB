@@ -8,20 +8,6 @@
         </div>
         <div><slot></slot></div>
       </div>
-      <!-- <div class="input-container" v-resize="resetInputContainer">
-        <div v-for="(item, index) in nodeModel.properties.input" :key="index" class="step-field">
-          <span>{{ item.key }}</span>
-        </div>
-      </div>
-      <div class="output-container" v-resize="resetOutputContainer">
-        <div
-          v-for="(item, index) in nodeModel.properties.output"
-          :key="index"
-          class="out-step-field"
-        >
-          <span>{{ item.key }}</span>
-        </div>
-      </div> -->
     </div>
   </div>
 </template>
@@ -42,33 +28,7 @@ const height = ref<{
 const resizeStepContainer = (wh: any) => {
   if (wh.height) {
     height.value.stepContainerHeight = wh.height
-    props.nodeModel.setHeight(
-      height.value.stepContainerHeight,
-      height.value.inputContainerHeight,
-      height.value.outputContainerHeight
-    )
-  }
-}
-
-const resetOutputContainer = (wh: { height: number; width: number }) => {
-  if (wh.height) {
-    height.value.outputContainerHeight = wh.height
-    props.nodeModel.setHeight(
-      height.value.stepContainerHeight,
-      height.value.inputContainerHeight,
-      height.value.outputContainerHeight
-    )
-  }
-}
-
-const resetInputContainer = (wh: { height: number; width: number }) => {
-  if (wh.height) {
-    height.value.inputContainerHeight = wh.height
-    props.nodeModel.setHeight(
-      height.value.stepContainerHeight,
-      height.value.inputContainerHeight,
-      height.value.outputContainerHeight
-    )
+    props.nodeModel.setHeight(height.value.stepContainerHeight)
   }
 }
 

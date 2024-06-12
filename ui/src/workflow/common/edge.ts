@@ -4,7 +4,10 @@ class CustomEdge2 extends BezierEdge {}
 
 class CustomEdgeModel2 extends BezierEdgeModel {
   getArrowStyle() {
-    return { offset: 0 }
+    const arrowStyle = super.getArrowStyle()
+    arrowStyle.offset = 1
+    arrowStyle.verticalLength = 0
+    return arrowStyle
   }
 
   getEdgeStyle() {
@@ -13,6 +16,7 @@ class CustomEdgeModel2 extends BezierEdgeModel {
     // svg属性
     style.strokeWidth = 2
     style.stroke = '#BBBFC4'
+    style.offset = 0
     return style
   }
   /**
@@ -50,6 +54,7 @@ class CustomEdgeModel2 extends BezierEdgeModel {
         x: targetAnchor.x,
         y: targetAnchor.y
       }
+
       this.updateEndPoint(endPoint)
     }
 

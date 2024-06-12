@@ -61,34 +61,13 @@ const graphData = {
       type: 'condition-node',
       x: 810,
       y: 760,
+
       properties: {
         height: 200,
         width: 600,
         stepName: '判断器',
         input: [{ key: '输入' }],
-        output: [{ key: '9208' }, { key: '1143' }, { key: '输出' }],
-        node_data: {
-          branch: [
-            {
-              conditions: [{ field: [], compare: '', value: '' }],
-              id: '2391',
-              type: 'IF',
-              condition: 'and'
-            },
-            {
-              conditions: [{ field: [], compare: '', value: '' }],
-              id: '1143',
-              type: 'IF ELSE 1',
-              condition: 'and'
-            },
-            {
-              conditions: [{ field: [], compare: '', value: '' }],
-              id: '9208',
-              type: 'ELSE',
-              condition: 'and'
-            }
-          ]
-        }
+        output: [{ key: '9208' }, { key: '1143' }, { key: '输出' }]
       }
     },
     {
@@ -118,8 +97,6 @@ const graphData = {
       properties: {
         height: '',
         stepName: 'AI 对话',
-        input: [{ key: '输入' }],
-        output: [{ key: '输出' }],
         node_data: {
           model_id: '',
           system: '',
@@ -137,8 +114,6 @@ const graphData = {
       properties: {
         height: '',
         stepName: 'AI 对话',
-        input: [{ key: '输入' }],
-        output: [{ key: '输出' }],
         node_data: {
           model_id: '',
           system: '',
@@ -161,93 +136,7 @@ const graphData = {
       }
     }
   ],
-  edges: [
-    {
-      id: '8dde4baf-0965-4999-9d37-f867ab16d638',
-      type: 'app-edge',
-      sourceNodeId: 'start-node',
-      targetNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd5',
-      startPoint: { x: 340, y: 788 },
-      endPoint: { x: 440, y: 469 },
-      properties: {},
-      pointsList: [
-        { x: 340, y: 788 },
-        { x: 450, y: 788 },
-        { x: 330, y: 469 },
-        { x: 440, y: 469 }
-      ],
-      sourceAnchorId: 'start-node_输出_right',
-      targetAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd5_输入_left'
-    },
-    {
-      id: 'b60de7b4-d8d2-4e7d-bba6-3738b9e523b9',
-      type: 'app-edge',
-      sourceNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd5',
-      targetNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
-      startPoint: { x: 760, y: 503 },
-      endPoint: { x: 520, y: 931.0625 },
-      properties: {},
-      pointsList: [
-        { x: 760, y: 503 },
-        { x: 870, y: 503 },
-        { x: 410, y: 931.0625 },
-        { x: 520, y: 931.0625 }
-      ],
-      sourceAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd5_输出_right',
-      targetAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6_输入_left'
-    },
-    {
-      id: '8de0da85-b5d6-459a-8be9-4d00082baf1c',
-      type: 'app-edge',
-      sourceNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
-      targetNodeId: '03597cb0-ed4c-4bcb-b25b-3b358f72b266',
-      startPoint: { x: 1100, y: 926.0625 },
-      endPoint: { x: 1170, y: 969 },
-      properties: {},
-      pointsList: [
-        { x: 1100, y: 926.0625 },
-        { x: 1210, y: 926.0625 },
-        { x: 1060, y: 969 },
-        { x: 1170, y: 969 }
-      ],
-      sourceAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6_9208_right',
-      targetAnchorId: '03597cb0-ed4c-4bcb-b25b-3b358f72b266_输入_left'
-    },
-    {
-      id: '3e66821a-ce0a-4ef9-a6cf-ea4095158261',
-      type: 'app-edge',
-      sourceNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
-      targetNodeId: '6649ee86-348c-4d68-9cad-71f0612beb05',
-      startPoint: { x: 1100, y: 950.0625 },
-      endPoint: { x: 1160, y: 1269 },
-      properties: {},
-      pointsList: [
-        { x: 1100, y: 950.0625 },
-        { x: 1210, y: 950.0625 },
-        { x: 1050, y: 1269 },
-        { x: 1160, y: 1269 }
-      ],
-      sourceAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6_1143_right',
-      targetAnchorId: '6649ee86-348c-4d68-9cad-71f0612beb05_输入_left'
-    },
-    {
-      id: 'cc52ab90-58e7-4f54-9660-d9fb16f776ea',
-      type: 'app-edge',
-      sourceNodeId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
-      targetNodeId: '0004a9c9-e2fa-40ac-9215-2e1ad04f09c5',
-      startPoint: { x: 1100, y: 1016.75 },
-      endPoint: { x: 1200, y: 1413 },
-      properties: {},
-      pointsList: [
-        { x: 1100, y: 974.0625 },
-        { x: 1210, y: 974.0625 },
-        { x: 1090, y: 1579 },
-        { x: 1200, y: 1579 }
-      ],
-      sourceAnchorId: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6_输出_right',
-      targetAnchorId: '0004a9c9-e2fa-40ac-9215-2e1ad04f09c5_输入_left'
-    }
-  ]
+  edges: []
 }
 const lf = ref()
 
@@ -318,6 +207,11 @@ onMounted(() => {
     lf.value.setDefaultEdgeType('app-edge')
 
     lf.value.render(graphData)
+    lf.value.graphModel.eventCenter.on('delete_edge', (id_list: Array<string>) => {
+      id_list.forEach((id: string) => {
+        lf.value.deleteEdge(id)
+      })
+    })
   }
 })
 const validate = () => {

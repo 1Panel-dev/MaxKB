@@ -25,3 +25,9 @@ def post_handler():
 
 
 post_handler()
+
+
+def run():
+    from application.flow.workflow_manage import WorkflowManage
+
+

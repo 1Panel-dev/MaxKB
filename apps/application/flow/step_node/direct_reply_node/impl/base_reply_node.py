@@ -65,7 +65,7 @@ class BaseReplyNode(IReplyNode):
         else:
             result = self.generate_reply_content(content)
         if stream:
-            return NodeResult({'result': iter(AIMessageChunk(content=result))}, {},
+            return NodeResult({'result': iter([AIMessageChunk(content=result)])}, {},
                               _to_response=to_stream_response)
         else:
             return NodeResult({'result': AIMessage(content=result)}, {}, _to_response=to_response)

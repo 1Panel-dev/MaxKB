@@ -39,7 +39,7 @@ class IReplyNode(INode):
         return ReplyNodeParamsSerializer
 
     def _run(self):
-        return self.execute(**self.flow_params_serializer.data)
+        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, reply_type, stream, fields=None, content=None, **kwargs) -> NodeResult:
         pass
