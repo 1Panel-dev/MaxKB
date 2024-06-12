@@ -11,6 +11,7 @@ import Control from './common/NodeControl.vue'
 import { baseNodes } from '@/workflow/common/data'
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
+import { ElMessageBox, ElMessage } from 'element-plus'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
 
 defineOptions({ name: 'WorkFlow' })
@@ -266,32 +267,43 @@ onMounted(() => {
           thickness: 1
         }
       },
-      // keyboard: {
-      //   enabled: true,
-      //   shortcuts: [
-      //     {
-      //       keys: ['backspace'],
-      //       callback: () => {
-      //         const elements = lf.value.getSelectElements(true)
-      //         if (
-      //           (elements.edges && elements.edges.length > 0) ||
-      //           (elements.nodes && elements.nodes.length > 0)
-      //         ) {
-      //           const r = window.confirm('确定要删除吗？')
-      //           if (r) {
-      //             lf.value.clearSelectElements()
-      //             elements.edges.forEach((edge: any) => {
-      //               lf.value.deleteEdge(edge.id)
-      //             })
-      //             elements.nodes.forEach((node: any) => {
-      //               lf.value.deleteNode(node.id)
-      //             })
-      //           }
-      //         }
-      //       }
-      //     }
-      //   ]
-      // },
+      keyboard: {
+        enabled: true,
+        shortcuts: [
+          {
+            keys: ['backspace'],
+            callback: (edge: any) => {
+              const defaultOptions: Object = {
+                showCancelButton: true,
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+              }
+              const elements = lf.value.getSelectElements(true)
+              ElMessageBox.confirm('确定删除改节点？', defaultOptions).then((ok) => {
+                const elements = lf.value.getSelectElements(true)
+                lf.value.clearSelectElements()
+                elements.edges.forEach((edge: any) => {
+                  lf.value.deleteEdge(edge.id)
+                })
+                elements.nodes.forEach((node: any) => {
+                  lf.value.deleteNode(node.id)
+                })
+              })
+            }
+          },
+          {
+            keys: ['cmd + c', 'ctrl + c'],
+            callback: (edge: any) => {
+              ElMessage.success({
+                message: '已复制节点',
+                type: 'success',
+                showClose: true,
+                duration: 1500
+              })
+            }
+          }
+        ]
+      },
       isSilentMode: false,
       container: container
     })

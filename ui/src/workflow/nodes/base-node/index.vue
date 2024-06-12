@@ -2,6 +2,10 @@
   <NodeContainer :nodeModel="nodeModel">
     <el-form
       @submit.prevent
+      @mousemove.stop
+      @mousedown.stop
+      @keydown.stop
+      @click.stop
       :model="form_data"
       label-position="top"
       require-asterisk-position="right"

@@ -3,6 +3,11 @@
     <h5 class="title-decoration-1 mb-8">节点设置</h5>
     <el-card shadow="never" class="card-never">
       <el-form
+        @submit.prevent
+        @mousemove.stop
+        @mousedown.stop
+        @keydown.stop
+        @click.stop
         :model="form_data"
         label-position="top"
         require-asterisk-position="right"
@@ -158,7 +163,7 @@ const openParamSettingDialog = () => {
 }
 
 function removeDataset(id: any) {
-  const list = props.nodeModel.properties.node_data.dataset_id_list.filter((v) => v !== id)
+  const list = props.nodeModel.properties.node_data.dataset_id_list.filter((v: any) => v !== id)
   set(props.nodeModel.properties.node_data, 'dataset_id_list', list)
 }
 

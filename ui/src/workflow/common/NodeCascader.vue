@@ -17,7 +17,7 @@ const props = defineProps<{
   nodeModel: any
 }>()
 
-const options = ref([])
+const options = ref<Array<any>>([])
 
 function visibleChange(bool: boolean) {
   if (bool) {
@@ -29,7 +29,7 @@ function visibleChange(bool: boolean) {
 function getIncomingNode(id: string) {
   const list = props.nodeModel.graphModel.getNodeIncomingNode(id)
   if (list.length > 0) {
-    list.forEach((item) => {
+    list.forEach((item: any) => {
       if (!options.value.some((obj: any) => obj.id === item.id)) {
         options.value.unshift({
           value: item.id,
@@ -39,7 +39,7 @@ function getIncomingNode(id: string) {
         })
       }
     })
-    list.forEach((item) => {
+    list.forEach((item: any) => {
       getIncomingNode(item.id)
     })
   }

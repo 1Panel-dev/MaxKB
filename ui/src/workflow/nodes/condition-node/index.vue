@@ -10,6 +10,7 @@
       @submit.prevent
       @click.stop
       @mousedown.stop
+      @mousemove.stop
     >
       <template v-for="(item, index) in form_data.branch" :key="index">
         <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
