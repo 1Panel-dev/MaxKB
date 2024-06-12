@@ -33,7 +33,7 @@
             :footers="footers"
           >
             <template #defFooters>
-              <el-button text type="info">
+              <el-button text type="info" @click="openDialog">
                 <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
               </el-button>
             </template>
@@ -48,6 +48,15 @@
         </el-form-item>
       </el-form>
     </el-card>
+    <!-- 回复内容弹出层 -->
+    <el-dialog v-model="dialogVisible" title="回复内容" append-to-body>
+      <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"> </MdEditor>
+      <template #footer>
+        <div class="dialog-footer mt-24">
+          <el-button type="primary" @click="submitDialog"> 确认 </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -79,6 +88,19 @@ const form_data = computed({
     set(props.nodeModel.properties, 'node_data', value)
   }
 })
+
+const dialogVisible = ref(false)
+const cloneContent = ref('')
+
+function openDialog() {
+  cloneContent.value = form_data.value.content
+  dialogVisible.value = true
+}
+
+function submitDialog() {
+  set(props.nodeModel.properties.node_data, 'content', cloneContent.value)
+  dialogVisible.value = false
+}
 // onMounted(() => {
 //   set(props.nodeModel, 'validate', validate)
 // })

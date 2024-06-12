@@ -32,7 +32,7 @@
                   <el-form-item
                     :prop="'branch.' + index + '.conditions' + cIndex + '.field'"
                     :rules="{
-                      type: Array,
+                      type: 'array',
                       required: true,
                       message: '请选择变量',
                       trigger: 'change'
@@ -189,7 +189,7 @@ function addBranch() {
 function addCondition(index: number) {
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
   list[index]['conditions'].push({
-    field: { node_id: 'xxx', fields: '' },
+    field: [],
     compare: '',
     value: ''
   })
