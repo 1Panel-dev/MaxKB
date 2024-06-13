@@ -23,19 +23,22 @@
                 v-loading="left_loading"
                 :defaultActive="currentChatId"
                 @click="clickListHandle"
+                @mouseenter="mouseenter"
+                @mouseleave="mouseId = ''"
               >
                 <template #default="{ row }">
                   <div class="flex-between">
                     <auto-tooltip :content="row.abstract">
                       {{ row.abstract }}
                     </auto-tooltip>
-                    <div @click.stop>
-                      <el-button text @click.stop="deleteLog(row)">
+                    <div @click.stop v-if="mouseId === row.id">
+                      <el-button style="padding: 0" link @click.stop="deleteLog(row)">
                         <el-icon><Delete /></el-icon>
                       </el-button>
                     </div>
                   </div>
                 </template>
+
                 <template #empty>
                   <div class="text-center">
                     <el-text type="info">暂无历史记录</el-text>
@@ -150,7 +153,11 @@ const paginationConfig = ref({
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
 const currentChatName = ref('新建对话')
+const mouseId = ref('')
 
+function mouseenter(row: any) {
+  mouseId.value = row.id
+}
 function deleteLog(row: any) {
   log.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
     if (currentChatId.value === row.id) {
