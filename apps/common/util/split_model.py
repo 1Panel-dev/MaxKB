@@ -335,6 +335,7 @@ class SplitModel:
         :param text: 文本数据
         :return: 解析后数据 {content:段落数据,keywords:[‘段落关键词’],parent_chain:['段落父级链路']}
         """
+        text = text.replace('\r\n', '\n')
         text = text.replace('\r', '\n')
         text = text.replace("\0", '')
         result_tree = self.parse_to_tree(text, 0)
