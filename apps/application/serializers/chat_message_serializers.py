@@ -94,6 +94,7 @@ class ChatInfo:
                 'client_type': client_type}
 
     def append_chat_record(self, chat_record: ChatRecord, client_id=None):
+        chat_record.problem_text = chat_record.problem_text[0:1024] if chat_record.problem_text is not None else ""
         # 存入缓存中
         self.chat_record_list.append(chat_record)
         if self.application.id is not None:
@@ -138,7 +139,7 @@ def get_post_handler(chat_info: ChatInfo):
 
 class ChatMessageSerializer(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("对话id"))
-    message = serializers.CharField(required=True, error_messages=ErrMessage.char("用户问题"), max_length=1024)
+    message = serializers.CharField(required=True, error_messages=ErrMessage.char("用户问题"))
     stream = serializers.BooleanField(required=True, error_messages=ErrMessage.char("是否流式回答"))
     re_chat = serializers.BooleanField(required=True, error_messages=ErrMessage.char("是否重新回答"))
     application_id = serializers.UUIDField(required=False, allow_null=True, error_messages=ErrMessage.uuid("应用id"))
