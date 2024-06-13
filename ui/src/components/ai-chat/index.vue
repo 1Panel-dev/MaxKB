@@ -146,7 +146,7 @@
           ref="quickInputRef"
           v-model="inputValue"
           placeholder="请输入"
-          :autosize="{ minRows: 1, maxRows: common.isMobile() ? 4 : 10 }"
+          :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
           type="textarea"
           :maxlength="100000"
           @keydown.enter="sendChatHandle($event)"
@@ -189,7 +189,8 @@ import { debounce } from 'lodash'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
-  params: { accessToken, id }
+  params: { accessToken, id },
+  query: { mode }
 } = route as any
 const props = defineProps({
   data: {
@@ -216,6 +217,10 @@ const props = defineProps({
 const emit = defineEmits(['refresh', 'scroll'])
 
 const { application, common } = useStore()
+
+const isMobile = computed(() => {
+  return common.isMobile() || mode === 'embed'
+})
 
 const ParagraphSourceDialogRef = ref()
 const aiChatRef = ref()
@@ -607,6 +612,12 @@ watch(
   },
   { deep: true, immediate: true }
 )
+
+onMounted(() => {
+  setTimeout(() => {
+    quickInputRef.value.textarea.style.height = '0'
+  }, 1000)
+})
 
 defineExpose({
   setScrollBottom
