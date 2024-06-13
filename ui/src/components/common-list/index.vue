@@ -6,6 +6,8 @@
           @click.prevent="clickHandle(item, index)"
           :class="current === item[props.valueKey] ? 'active' : ''"
           class="cursor"
+          @mouseenter="mouseenter(item)"
+          @mouseleave="mouseleave()"
         >
           <slot :row="item" :index="index"> </slot>
         </li>
@@ -44,7 +46,14 @@ watch(
   { immediate: true }
 )
 
-const emit = defineEmits(['click'])
+const emit = defineEmits(['click', 'mouseenter', 'mouseleave'])
+
+function mouseenter(row: any) {
+  emit('mouseenter', row)
+}
+function mouseleave() {
+  emit('mouseleave')
+}
 
 function clickHandle(row: any, index: number) {
   current.value = row[props.valueKey]
