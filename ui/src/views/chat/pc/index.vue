@@ -69,7 +69,7 @@
             </el-dropdown>
           </span>
         </div>
-        <div class="right-height chat-width">
+        <div class="right-height">
           <!-- 对话 -->
           <AiChat
             ref="AiChatRef"
@@ -80,7 +80,8 @@
             :chatId="currentChatId"
             @refresh="refresh"
             @scroll="handleScroll"
-          ></AiChat>
+          >
+          </AiChat>
         </div>
       </div>
     </div>
@@ -362,10 +363,6 @@ onMounted(() => {
     }
   }
 
-  .chat-width {
-    max-width: var(--app-chat-width, 860px);
-    margin: 0 auto;
-  }
   .collapse {
     display: none;
   }
