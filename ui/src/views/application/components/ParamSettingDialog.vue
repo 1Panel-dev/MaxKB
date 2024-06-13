@@ -83,7 +83,7 @@
                 show-input
                 :show-input-controls="false"
                 :min="500"
-                :max="10000"
+                :max="100000"
                 class="custom-slider"
               />
             </el-form-item>
