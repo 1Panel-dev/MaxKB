@@ -96,7 +96,6 @@
                       plain
                       size="small"
                       @click="openParagraph(item)"
-                      :disabled="!item.paragraph_list || item.paragraph_list?.length === 0"
                       >引用分段：{{ item.paragraph_list?.length || 0 }}</el-button
                     >
                     <el-tag type="info" effect="plain" class="mr-8 mt-8">

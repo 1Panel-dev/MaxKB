@@ -25,9 +25,16 @@
                 @click="clickListHandle"
               >
                 <template #default="{ row }">
-                  <auto-tooltip :content="row.abstract">
-                    {{ row.abstract }}
-                  </auto-tooltip>
+                  <div class="flex-between">
+                    <auto-tooltip :content="row.abstract">
+                      {{ row.abstract }}
+                    </auto-tooltip>
+                    <div @click.stop>
+                      <el-button text @click.stop="deleteLog(row)">
+                        <el-icon><Delete /></el-icon>
+                      </el-button>
+                    </div>
+                  </div>
                 </template>
                 <template #empty>
                   <div class="text-center">
@@ -69,7 +76,7 @@
             </el-dropdown>
           </span>
         </div>
-        <div class="right-height chat-width">
+        <div class="right-height">
           <!-- 对话 -->
           <AiChat
             ref="AiChatRef"
@@ -80,7 +87,8 @@
             :chatId="currentChatId"
             @refresh="refresh"
             @scroll="handleScroll"
-          ></AiChat>
+          >
+          </AiChat>
         </div>
       </div>
     </div>
@@ -142,6 +150,19 @@ const paginationConfig = ref({
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
 const currentChatName = ref('新建对话')
+
+function deleteLog(row: any) {
+  log.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
+    if (currentChatId.value === row.id) {
+      currentChatId.value = 'new'
+      currentChatName.value = '新建对话'
+      paginationConfig.value.current_page = 1
+      paginationConfig.value.total = 0
+      currentRecordList.value = []
+    }
+    getChatLog(applicationDetail.value.id)
+  })
+}
 
 function handleScroll(event: any) {
   if (
@@ -362,10 +383,6 @@ onMounted(() => {
     }
   }
 
-  .chat-width {
-    max-width: var(--app-chat-width, 860px);
-    margin: 0 auto;
-  }
   .collapse {
     display: none;
   }
