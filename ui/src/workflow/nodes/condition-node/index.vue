@@ -144,18 +144,18 @@ const form = {
 }
 
 const resizeCondition = (wh: any, row: any, index: number) => {
-  const barnch_condition_list = cloneDeep(
-    props.nodeModel.properties.barnch_condition_list
-      ? props.nodeModel.properties.barnch_condition_list
+  const branch_condition_list = cloneDeep(
+    props.nodeModel.properties.branch_condition_list
+      ? props.nodeModel.properties.branch_condition_list
       : []
   )
-  const new_barnch_condition_list = barnch_condition_list.map((item: any) => {
+  const new_branch_condition_list = branch_condition_list.map((item: any) => {
     if (item.id === row.id) {
       return { ...item, height: wh.height, index: index }
     }
     return item
   })
-  set(props.nodeModel.properties, 'barnch_condition_list', new_barnch_condition_list)
+  set(props.nodeModel.properties, 'branch_condition_list', new_branch_condition_list)
   refreshBranchAnchor(props.nodeModel.properties.node_data.branch, true)
 }
 const form_data = computed({
@@ -198,14 +198,14 @@ function addBranch() {
   set(props.nodeModel.properties.node_data, 'branch', list)
 }
 function refreshBranchAnchor(list: Array<any>, is_add: boolean) {
-  const barnch_condition_list = cloneDeep(
-    props.nodeModel.properties.barnch_condition_list
-      ? props.nodeModel.properties.barnch_condition_list
+  const branch_condition_list = cloneDeep(
+    props.nodeModel.properties.branch_condition_list
+      ? props.nodeModel.properties.branch_condition_list
       : []
   )
-  const new_barnch_condition_list = list
+  const new_branch_condition_list = list
     .map((item, index) => {
-      const find = barnch_condition_list.find((b) => b.id === item.id)
+      const find = branch_condition_list.find((b: any) => b.id === item.id)
       if (find) {
         return { index: index, height: find.height, id: item.id }
       } else {
@@ -216,7 +216,7 @@ function refreshBranchAnchor(list: Array<any>, is_add: boolean) {
     })
     .filter((item) => item)
 
-  set(props.nodeModel.properties, 'barnch_condition_list', new_barnch_condition_list)
+  set(props.nodeModel.properties, 'branch_condition_list', new_branch_condition_list)
   props.nodeModel.refreshBranch()
 }
 

@@ -97,7 +97,7 @@ const graphData = {
             { conditions: [], id: '6750', type: 'ELSE', condition: 'and' }
           ]
         },
-        barnch_condition_list: [
+        branch_condition_list: [
           { index: 0, height: 115.778, id: '5675' },
           { index: 1, height: 115.778, id: '9947' },
           { index: 2, height: 115.778, id: '5048' },
@@ -227,7 +227,7 @@ const graphData = {
             { conditions: [], id: '8871', type: 'ELSE', condition: 'and' }
           ]
         },
-        barnch_condition_list: [
+        branch_condition_list: [
           { index: 0, height: 115.778, id: '3014' },
           { index: 1, height: 115.778, id: '4658' },
           { index: 2, height: 40, id: '8871' }

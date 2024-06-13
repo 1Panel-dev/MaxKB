@@ -32,7 +32,7 @@ class ConditionModel extends AppNodeModel {
       y,
       width,
       height,
-      properties: { barnch_condition_list }
+      properties: { branch_condition_list }
     } = this
     if (this.height === undefined) {
       this.height = 200
@@ -46,10 +46,10 @@ class ConditionModel extends AppNodeModel {
       type: 'left'
     })
 
-    if (barnch_condition_list) {
-      for (let index = 0; index < barnch_condition_list.length; index++) {
-        const element = barnch_condition_list[index]
-        const h = get_up_index_height(barnch_condition_list, index)
+    if (branch_condition_list) {
+      for (let index = 0; index < branch_condition_list.length; index++) {
+        const element = branch_condition_list[index]
+        const h = get_up_index_height(branch_condition_list, index)
         anchors.push({
           x: x + width / 2 - 10,
           y: y - height / 2 + 75 + h + element.height / 2,
