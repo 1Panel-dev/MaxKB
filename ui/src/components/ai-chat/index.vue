@@ -146,7 +146,7 @@
           ref="quickInputRef"
           v-model="inputValue"
           placeholder="请输入"
-          :autosize="{ minRows: 1, maxRows: 4 }"
+          :autosize="{ minRows: 1, maxRows: common.isMobile() ? 4 : 10 }"
           type="textarea"
           :maxlength="100000"
           @keydown.enter="sendChatHandle($event)"
@@ -173,7 +173,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, computed, watch, reactive } from 'vue'
+import { ref, nextTick, computed, watch, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import LogOperationButton from './LogOperationButton.vue'
 import OperationButton from './OperationButton.vue'
@@ -215,7 +215,7 @@ const props = defineProps({
 
 const emit = defineEmits(['refresh', 'scroll'])
 
-const { application } = useStore()
+const { application, common } = useStore()
 
 const ParagraphSourceDialogRef = ref()
 const aiChatRef = ref()
@@ -622,11 +622,7 @@ defineExpose({
   position: relative;
   color: var(--app-text-color);
   box-sizing: border-box;
-  &.chart-log {
-    .ai-chat__content {
-      padding-bottom: 0;
-    }
-  }
+
   &__content {
     padding-top: 0;
     box-sizing: border-box;
