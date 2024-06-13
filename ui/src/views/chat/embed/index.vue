@@ -5,7 +5,7 @@
         <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
       </div>
     </div>
-    <div class="chat-embed__main chat-width">
+    <div class="chat-embed__main">
       <AiChat
         ref="AiChatRef"
         v-model:data="applicationDetail"
@@ -17,12 +17,14 @@
         @scroll="handleScroll"
         class="AiChat-embed"
       >
+        <template #operateBefore>
+          <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
+            <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
+          </el-button>
+        </template>
       </AiChat>
     </div>
 
-    <el-button type="primary" link class="new-chat-button" @click="newChat">
-      <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
-    </el-button>
     <!-- 历史记录弹出层 -->
     <div @click.prevent.stop="show = !show" class="chat-popover-button cursor color-secondary">
       <AppIcon iconName="app-history-outlined"></AppIcon>
@@ -226,9 +228,9 @@ onMounted(() => {
     overflow: hidden;
   }
   .new-chat-button {
-    position: absolute;
-    bottom: 80px;
-    left: 18px;
+    // position: absolute;
+    // bottom: 80px;
+    // left: 18px;
     z-index: 11;
   }
   // 历史对话弹出层
@@ -280,16 +282,12 @@ onMounted(() => {
       top: 50%;
     }
   }
-  .chat-width {
-    max-width: var(--app-chat-width, 860px);
-    margin: 0 auto;
-  }
   .AiChat-embed {
     .ai-chat__operate {
-      padding-top: 38px;
+      padding-top: 12px;
     }
     .ai-chat__content {
-      padding-bottom: 104px
+      padding-bottom: 104px;
     }
   }
 }
