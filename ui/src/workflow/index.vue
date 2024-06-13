@@ -106,7 +106,7 @@ const graphData = {
       }
     },
     {
-      id: 'ec6f5581-fef3-45a1-8dbe-6611a8c9ccfc',
+      id: 'ec6f5581-fef3-45a1-8be1-6611a8c9ccfc',
       type: 'reply-node',
       x: 1830,
       y: -220,
@@ -298,7 +298,7 @@ const graphData = {
   ],
   edges: [
     {
-      id: '21096f2c-d89f-4fb3-bdbe-61484b0686d4',
+      id: '21096f2c-d89f-4fb3-b12-61484b0686d4',
       type: 'app-edge',
       sourceNodeId: 'start-node',
       targetNodeId: 'e781559d-e54b-45d8-bcea-d2d426fd58a3',
@@ -335,7 +335,7 @@ const graphData = {
       id: '6dba7e71-c14c-427e-b7de-09f3b1064291',
       type: 'app-edge',
       sourceNodeId: 'c94a8bfb-34b0-4b1b-8456-0a164870d382',
-      targetNodeId: 'ec6f5581-fef3-45a1-8dbe-6611a8c9ccfc',
+      targetNodeId: 'ec6f5581-fef3-45a1-8be1-6611a8c9ccfc',
       startPoint: { x: 1430, y: 127.33350000000002 },
       endPoint: { x: 1670, y: -220 },
       properties: {},
@@ -346,7 +346,7 @@ const graphData = {
         { x: 1670, y: -220 }
       ],
       sourceAnchorId: 'c94a8bfb-34b0-4b1b-8456-0a164870d382_5675_right',
-      targetAnchorId: 'ec6f5581-fef3-45a1-8dbe-6611a8c9ccfc_left'
+      targetAnchorId: 'ec6f5581-fef3-45a1-8be1-6611a8c9ccfc_left'
     },
     {
       id: '45a83361-1dfe-499e-8407-8c1670386b04',
