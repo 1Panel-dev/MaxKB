@@ -48,6 +48,18 @@ const useLogStore = defineStore({
             reject(error)
           })
       })
+    },
+    async asyncDelChatClientLog(id: string, chatId: string, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        logApi
+          .delChatClientLog(id, chatId, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   }
 })
