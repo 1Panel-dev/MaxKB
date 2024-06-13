@@ -7,9 +7,9 @@
     append-to-body
     align-center
   >
-    <div class="paragraph-source-height">
+    <div class="mb-8">
       <el-scrollbar>
-        <div class="p-16">
+        <div class="paragraph-source-height p-16 pb-0">
           <el-form label-position="top">
             <el-form-item label="用户问题">
               <el-input v-model="detail.problem_text" disabled />
@@ -108,7 +108,7 @@ defineExpose({ open })
     padding: 8px !important;
   }
   .paragraph-source-height {
-    height: calc(100vh - 260px);
+    max-height: calc(100vh - 260px);
   }
   .paragraph-source-card {
     height: 260px;
