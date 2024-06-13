@@ -91,7 +91,7 @@ class DatasetSettingSerializer(serializers.Serializer):
                                    error_messages=ErrMessage.float("引用分段数"))
     similarity = serializers.FloatField(required=True, max_value=1, min_value=0,
                                         error_messages=ErrMessage.float("相识度"))
-    max_paragraph_char_number = serializers.IntegerField(required=True, min_value=500, max_value=10000,
+    max_paragraph_char_number = serializers.IntegerField(required=True, min_value=500, max_value=100000,
                                                          error_messages=ErrMessage.integer("最多引用字符数"))
     search_mode = serializers.CharField(required=True, validators=[
         validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
