@@ -149,7 +149,7 @@
           placeholder="请输入"
           :autosize="{ minRows: 1, maxRows: 4 }"
           type="textarea"
-          :maxlength="1024"
+          :maxlength="100000"
           @keydown.enter="sendChatHandle($event)"
         />
         <div class="operate">
