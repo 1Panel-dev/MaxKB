@@ -1,7 +1,7 @@
 <template>
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
     <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
-      <div ref="dialogScrollbar" class="ai-chat__content p-24">
+      <div ref="dialogScrollbar" class="ai-chat__content p-24 chat-width">
         <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
           <div class="avatar">
             <AppAvatar class="avatar-gradient">
@@ -141,12 +141,13 @@
       </div>
     </el-scrollbar>
     <div class="ai-chat__operate p-24" v-if="!log">
-      <div class="operate-textarea flex">
+      <slot name="operateBefore" />
+      <div class="operate-textarea flex chat-width">
         <el-input
           ref="quickInputRef"
           v-model="inputValue"
           placeholder="请输入"
-          :rows="1"
+          :autosize="{ minRows: 1, maxRows: 4 }"
           type="textarea"
           :maxlength="1024"
           @keydown.enter="sendChatHandle($event)"
@@ -529,6 +530,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
         if (props.chatId === 'new') {
           emit('refresh', chartOpenId.value)
         }
+        quickInputRef.value.textareaStyle.height = '45px'
         return (id || props.data?.show_source) && getSourceDetail(chat)
       })
       .finally(() => {
@@ -628,7 +630,6 @@ defineExpose({
   }
   &__content {
     padding-top: 0;
-    padding-bottom: 96px;
     box-sizing: border-box;
 
     .avatar {
@@ -670,9 +671,7 @@ defineExpose({
   }
   &__operate {
     background: #f3f7f9;
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    position: relative;
     width: 100%;
     box-sizing: border-box;
     z-index: 10;
@@ -725,5 +724,9 @@ defineExpose({
     border: none;
     border-radius: 8px;
   }
+}
+.chat-width {
+  max-width: var(--app-chat-width, 860px);
+  margin: 0 auto;
 }
 </style>
