@@ -50,6 +50,13 @@ class ChatSerializers(serializers.Serializer):
         chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
 
+        def logic_delete(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            QuerySet(Chat).filter(id=self.data.get('chat_id'), application_id=self.data.get('application_id')).update(
+                is_deleted=True)
+            return True
+
         def delete(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -64,7 +71,8 @@ class ChatSerializers(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             queryset = QuerySet(Chat).filter(client_id=self.data.get('client_id'),
-                                             application_id=self.data.get('application_id'))
+                                             application_id=self.data.get('application_id'),
+                                             is_deleted=False)
             queryset = queryset.order_by('-create_time')
             return page_search(current_page, page_size, queryset, lambda row: ChatSerializerModel(row).data)
 

@@ -186,6 +186,18 @@ const getChatLogClient: (
   )
 }
 
+/**
+ * 客户端删除日志
+ * @param 参数 application_id, chat_id,
+ */
+const delChatClientLog: (
+  application_id: string,
+  chat_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (application_id, chat_id, loading) => {
+  return del(`${prefix}/${application_id}/chat/client/${chat_id}`, undefined, {}, loading)
+}
+
 export default {
   getChatLog,
   delChatLog,
@@ -195,5 +207,6 @@ export default {
   getRecordDetail,
   delMarkRecord,
   exportChatLog,
-  getChatLogClient
+  getChatLogClient,
+  delChatClientLog
 }
