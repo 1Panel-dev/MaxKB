@@ -28,7 +28,8 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
         model_type_list = WenxinModelProvider().get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
-        model_info = [model.lower() for model in ChatCompletion.models()]
+        model = WenxinModelProvider().get_model(model_type, model_name, model_credential)
+        model_info = [model.lower() for model in model.client.models()]
         if not model_info.__contains__(model_name.lower()):
             raise AppApiException(ValidCode.valid_error.value, f'{model_name} 模型不支持')
         for key in ['api_key', 'secret_key']:
@@ -38,7 +39,7 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            WenxinModelProvider().get_model(model_type, model_name, model_credential).invoke(
+            model.invoke(
                 [HumanMessage(content='你好')])
         except Exception as e:
             raise e
