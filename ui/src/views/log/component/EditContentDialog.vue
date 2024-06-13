@@ -172,7 +172,7 @@ const open = (data: any) => {
   getDataset()
   form.value.chat_id = data.chat_id
   form.value.record_id = data.id
-  form.value.problem_text = data.problem_text
+  form.value.problem_text = data.problem_text ? data.problem_text.substring(0, 256) : ''
   form.value.content = data.answer_text
   formRef.value?.clearValidate()
   dialogVisible.value = true
