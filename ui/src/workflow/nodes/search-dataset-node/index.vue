@@ -91,9 +91,6 @@
         </el-form-item>
       </el-form>
     </el-card>
-    <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">检索结果 {data}</div>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">满足直接回答的分段内容 {paragraph}</div>
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
     <AddDatasetDialog
       ref="AddDatasetDialogRef"

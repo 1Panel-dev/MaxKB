@@ -30,7 +30,9 @@ export const baseNodes = [
       fields: [
         {
           label: '用户问题',
-          value: 'question'
+          value: 'question',
+          globeLabel: '{{开始.question}}',
+          globeValue: "{{content['start-node'].question}}"
         }
       ]
     }

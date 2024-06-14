@@ -30,6 +30,21 @@ class AppNode extends HtmlNode {
     for (const [key, component] of Object.entries(ElementPlusIcons)) {
       this.app.component(key, component)
     }
+
+    if (props.model.properties.noRender) {
+      delete props.model.properties.noRender
+    } else {
+      const filterNodes = props.graphModel.nodes.filter((v: any) => v.type === props.model.type)
+      if (filterNodes.length - 1 > 0) {
+        props.model.properties.stepName = props.model.properties.stepName + (filterNodes.length - 1)
+      }
+      if (props.model.properties?.fields?.length > 0) {
+        props.model.properties.fields.map((item: any) => {
+          item['globeLabel'] = `{{${props.model.properties.stepName}.${item.value}}}`
+          item['globeValue'] = `{{content[${props.model.id}].${item.value}}}`
+        })
+      }
+    }
   }
 
   setHtml(rootEl: HTMLElement) {

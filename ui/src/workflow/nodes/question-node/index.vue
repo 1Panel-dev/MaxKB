@@ -123,8 +123,6 @@
         </el-form-item>
       </el-form>
     </el-card>
-    <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">用户问题 {question}</div>
     <!-- 添加模版 -->
     <CreateModelDialog
       ref="createModelRef"

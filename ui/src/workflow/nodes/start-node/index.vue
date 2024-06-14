@@ -2,8 +2,6 @@
   <NodeContainer :nodeModel="nodeModel">
     <h5 class="title-decoration-1 mb-8">全局变量</h5>
     <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">当前时间 {time}</div>
-    <h5 class="title-decoration-1 mb-8">参数输出</h5>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">用户问题 {question}</div>
   </NodeContainer>
 </template>
 <script setup lang="ts">

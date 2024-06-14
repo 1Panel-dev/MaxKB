@@ -122,8 +122,7 @@
         </el-form-item>
       </el-form>
     </el-card>
-    <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">AI 回答内容 {content}</div>
+
     <!-- 添加模版 -->
     <CreateModelDialog
       ref="createModelRef"
@@ -145,6 +144,7 @@ import applicationApi from '@/api/application'
 import useStore from '@/stores'
 import { relatedObject } from '@/utils/utils'
 import type { Provider } from '@/api/type/model'
+
 const { model } = useStore()
 
 const {
