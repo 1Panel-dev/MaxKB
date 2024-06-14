@@ -7,20 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { MdEditor, config } from 'md-editor-v3'
-
-import screenfull from 'screenfull'
-
-import katex from 'katex'
-import 'katex/dist/katex.min.css'
-
-import Cropper from 'cropperjs'
-import 'cropperjs/dist/cropper.css'
-
-import mermaid from 'mermaid'
-
-import highlight from 'highlight.js'
-import 'highlight.js/styles/atom-one-dark.css'
+import { MdEditor } from 'md-editor-v3'
 
 // // <3.0
 // import prettier from 'prettier'
@@ -31,28 +18,4 @@ import 'highlight.js/styles/atom-one-dark.css'
 
 // https://at.alicdn.com/t/c/font_2605852_u82y61ve02.js
 import './assets/iconfont.js'
-
-config({
-  editorExtensions: {
-    // prettier: {
-    //   prettierInstance: prettier,
-    //   parserMarkdownInstance: parserMarkdown
-    // },
-    highlight: {
-      instance: highlight
-    },
-    screenfull: {
-      instance: screenfull
-    },
-    katex: {
-      instance: katex
-    },
-    cropper: {
-      instance: Cropper
-    },
-    mermaid: {
-      instance: mermaid
-    }
-  }
-})
 </script>
