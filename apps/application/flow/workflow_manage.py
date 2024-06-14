@@ -53,11 +53,12 @@ class Flow:
 
 
 class WorkflowManage:
-    def __init__(self, flow: Flow, params):
+    def __init__(self, flow: Flow, params, work_flow_post_handler: WorkFlowPostHandler):
         self.params = params
         self.flow = flow
         self.context = {}
         self.node_context = []
+        self.work_flow_post_handler = work_flow_post_handler
         self.current_node = None
         self.current_result = None
 
@@ -74,12 +75,8 @@ class WorkflowManage:
             else:
                 r = self.current_result.to_response(self.params['chat_id'], self.params['chat_record_id'],
                                                     self.current_node, self,
-                                                    WorkFlowPostHandler(client_id=self.params['client_id'],
-                                                                        chat_info=None,
-                                                                        client_type='APPLICATION_ACCESS_TOKEN'))
-                for row in r:
-                    print(row)
-        print(self)
+                                                    self.work_flow_post_handler)
+                return r
 
     def has_next_node(self, node_result: NodeResult | None):
         """

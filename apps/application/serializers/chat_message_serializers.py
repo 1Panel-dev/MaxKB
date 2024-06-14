@@ -7,6 +7,7 @@
     @desc:
 """
 import json
+import uuid
 from typing import List
 from uuid import UUID
 
@@ -22,7 +23,9 @@ from application.chat_pipeline.step.generate_human_message_step.impl.base_genera
     BaseGenerateHumanMessageStep
 from application.chat_pipeline.step.reset_problem_step.impl.base_reset_problem_step import BaseResetProblemStep
 from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset_step import BaseSearchDatasetStep
-from application.models import ChatRecord, Chat, Application, ApplicationDatasetMapping
+from application.flow.i_step_node import WorkFlowPostHandler
+from application.flow.workflow_manage import WorkflowManage, Flow
+from application.models import ChatRecord, Chat, Application, ApplicationDatasetMapping, ApplicationTypeChoices
 from application.models.api_key_model import ApplicationPublicAccessClient, ApplicationAccessToken
 from common.constants.authentication_type import AuthenticationType
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed
@@ -146,8 +149,17 @@ class ChatMessageSerializer(serializers.Serializer):
     client_id = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端id"))
     client_type = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端类型"))
 
-    def is_valid(self, *, raise_exception=False):
-        super().is_valid(raise_exception=True)
+    def is_valid_application_workflow(self, *, raise_exception=False):
+        self.is_valid_intraday_access_num()
+        chat_id = self.data.get('chat_id')
+        chat_info: ChatInfo = chat_cache.get(chat_id)
+        if chat_info is None:
+            chat_info = self.re_open_chat(chat_id)
+            chat_cache.set(chat_id,
+                           chat_info, timeout=60 * 30)
+        return chat_info
+
+    def is_valid_intraday_access_num(self):
         if self.data.get('client_type') == AuthenticationType.APPLICATION_ACCESS_TOKEN.value:
             access_client = QuerySet(ApplicationPublicAccessClient).filter(id=self.data.get('client_id')).first()
             if access_client is None:
@@ -161,6 +173,9 @@ class ChatMessageSerializer(serializers.Serializer):
                 application_id=self.data.get('application_id')).first()
             if application_access_token.access_num <= access_client.intraday_access_num:
                 raise AppChatNumOutOfBoundsFailed(1002, "访问次数超过今日访问量")
+
+    def is_valid_application_simple(self, *, raise_exception=False):
+        self.is_valid_intraday_access_num()
         chat_id = self.data.get('chat_id')
         chat_info: ChatInfo = chat_cache.get(chat_id)
         if chat_info is None:
@@ -179,8 +194,7 @@ class ChatMessageSerializer(serializers.Serializer):
             raise AppApiException(500, "模型正在下载中,请稍后再发起对话")
         return chat_info
 
-    def chat(self):
-        chat_info = self.is_valid(raise_exception=True)
+    def chat_simple(self, chat_info):
         message = self.data.get('message')
         re_chat = self.data.get('re_chat')
         stream = self.data.get('stream')
@@ -210,6 +224,31 @@ class ChatMessageSerializer(serializers.Serializer):
         # 运行流水线作业
         pipeline_message.run(params)
         return pipeline_message.context['chat_result']
+
+    def chat_work_flow(self, chat_info: ChatInfo):
+        message = self.data.get('message')
+        re_chat = self.data.get('re_chat')
+        stream = self.data.get('stream')
+        client_id = self.data.get('client_id')
+        client_type = self.data.get('client_type')
+        work_flow_manage = WorkflowManage(Flow.new_instance(json.loads(chat_info.application.work_flow)),
+                                          {'history_chat_record': chat_info.chat_record_list, 'question': message,
+                                           'chat_id': chat_info.chat_id, 'chat_record_id': str(uuid.uuid1()),
+                                           'stream': stream,
+                                           're_chat': re_chat}, WorkFlowPostHandler(chat_info, client_id, client_type))
+        r = work_flow_manage.run()
+        return r
+
+    def chat(self):
+        super().is_valid(raise_exception=True)
+        application = QuerySet(Application).filter(self.data.get('application_id'))
+        if application.type == ApplicationTypeChoices.SIMPLE:
+            chat_info = self.is_valid_application_simple(raise_exception=True)
+            return self.chat_simple(chat_info)
+
+        else:
+            chat_info = self.is_valid_application_workflow(raise_exception=True)
+            return self.chat_work_flow(chat_info)
 
     @staticmethod
     def re_open_chat(chat_id: str):

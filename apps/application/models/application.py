@@ -18,6 +18,12 @@ from setting.models.model_management import Model
 from users.models import User
 
 
+class ApplicationTypeChoices(models.TextChoices):
+    """订单类型"""
+    SIMPLE = 'SIMPLE', '简易'
+    WORK_FLOW = 'WORK_FLOW', '工作流'
+
+
 def get_dataset_setting_dict():
     return {'top_n': 3, 'similarity': 0.6, 'max_paragraph_char_number': 5000, 'search_mode': 'embedding',
             'no_references_setting': {
@@ -42,6 +48,9 @@ class Application(AppModelMixin):
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="/ui/favicon.ico")
+    work_flow = models.JSONField(verbose_name="工作流数据", default={})
+    type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices,
+                            default=ApplicationTypeChoices.SIMPLE)
 
     @staticmethod
     def get_default_model_prompt():
