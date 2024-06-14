@@ -40,6 +40,7 @@
         editorId="preview-only"
         :modelValue="form.content"
         class="maxkb-md"
+        noIconfont
       />
     </el-form-item>
   </el-form>

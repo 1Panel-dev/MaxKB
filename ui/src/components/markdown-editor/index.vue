@@ -1,5 +1,5 @@
 <template>
-  <MdEditor noIconfont v-bind="$attrs">
+  <MdEditor noIconfont noPrettier v-bind="$attrs">
     <template #defFooters>
       <slot name="defFooters"> </slot>
     </template>
@@ -8,7 +8,6 @@
 
 <script setup lang="ts">
 import { MdEditor, config } from 'md-editor-v3'
-import 'md-editor-v3/lib/style.css'
 
 import screenfull from 'screenfull'
 
@@ -23,19 +22,22 @@ import mermaid from 'mermaid'
 import highlight from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
 
-// >=3.0
-import * as prettier from 'prettier'
-import parserMarkdown from 'prettier/plugins/markdown'
+// // <3.0
+// import prettier from 'prettier'
+// import parserMarkdown from 'prettier/parser-markdown'
+// // >=3.0
+// import * as prettier from 'prettier'
+// import parserMarkdown from 'prettier/plugins/markdown'
 
 // https://at.alicdn.com/t/c/font_2605852_u82y61ve02.js
-import './assets/font_prouiefeic.js'
+import './assets/iconfont.js'
 
 config({
   editorExtensions: {
-    prettier: {
-      prettierInstance: prettier,
-      parserMarkdownInstance: parserMarkdown
-    },
+    // prettier: {
+    //   prettierInstance: prettier,
+    //   parserMarkdownInstance: parserMarkdown
+    // },
     highlight: {
       instance: highlight
     },

@@ -12,7 +12,6 @@ import AppTable from './app-table/index.vue'
 import ReadWrite from './read-write/index.vue'
 import TagEllipsis from './tag-ellipsis/index.vue'
 import CommonList from './common-list/index.vue'
-import MarkdownRenderer from './markdown-renderer/index.vue'
 import dynamicsForm from './dynamics-form'
 import CardCheckbox from './card-checkbox/index.vue'
 import AiChat from './ai-chat/index.vue'
@@ -35,7 +34,6 @@ export default {
     app.component(TagEllipsis.name, TagEllipsis)
     app.component(CommonList.name, CommonList)
     app.use(dynamicsForm)
-    app.component(MarkdownRenderer.name, MarkdownRenderer)
     app.component(CardCheckbox.name, CardCheckbox)
     app.component(AiChat.name, AiChat)
     app.component(InfiniteScroll.name, InfiniteScroll)
