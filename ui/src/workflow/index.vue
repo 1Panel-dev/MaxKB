@@ -36,7 +36,7 @@ const graphData = {
       x: 600,
       y: 560,
       properties: {
-        height: '',
+        noRender: true,
         stepName: 'AI 对话',
         fields: [{ label: 'AI 回答内容', value: 'answer' }],
         node_data: {
@@ -54,6 +54,7 @@ const graphData = {
       x: 1140,
       y: 284,
       properties: {
+        noRender: true,
         width: 600,
         stepName: '判断器',
         node_data: {
@@ -111,7 +112,7 @@ const graphData = {
       x: 1830,
       y: -220,
       properties: {
-        height: '',
+        noRender: true,
         stepName: '指定回复',
         node_data: {
           reply_type: 'content',
@@ -126,21 +127,13 @@ const graphData = {
       x: 1810,
       y: 290,
       properties: {
-        height: '',
+        noRender: true,
         stepName: '知识库检索',
         fields: [
-          {
-            label: '检索结果',
-            value: 'data',
-            globeLabel: '{{知识库检索.data}}',
-            globeValue: "{{content['34902d3d-a3ff-497f-b8e1-0c34a44d7dd5'].data}}"
-          },
-          {
-            label: '满足直接回答的分段内容',
-            value: 'paragraph',
-            globeLabel: '{{知识库检索.paragraph}}',
-            globeValue: "{{content['34902d3d-a3ff-497f-b8e1-0c34a44d7dd5'].paragraph}}"
-          }
+          { label: '段落列表', value: 'paragraph_list' },
+          { label: '满足直接回答的段落列表', value: 'is_hit_handling_method_list' },
+          { label: '检索结果', value: 'data' },
+          { label: '满足直接回答的分段内容', value: 'directly_return' }
         ],
         node_data: {
           dataset_id_list: ['8ba47817-28a1-11ef-90fd-a8a1595801ab'],
@@ -155,23 +148,96 @@ const graphData = {
       }
     },
     {
-      noRender: true,
-      id: '34902d3d-a3ff-497f-b8e1-0c34a44d7dd6',
+      id: 'bd9dd852-d749-4b42-9b95-80f25b9a606d',
+      type: 'ai-chat-node',
+      x: 2430,
+      y: 310,
+      properties: {
+        noRender: true,
+        stepName: 'AI 对话',
+        fields: [{ label: 'AI 回答内容', value: 'answer' }],
+        node_data: {
+          model_id: '9bdd1ab3-135b-11ef-b688-a8a1595801ab',
+          system: '你是售前咨询知识库',
+          prompt:
+            "已知信息：\n{{context['2ac57a56-9150-4f04-a7b9-6390bdaade19'].data}}\n问题：\n{{context['start-node'].question}}",
+          dialogue_number: 0
+        }
+      }
+    },
+    {
+      id: '1cd54877-bfff-4791-b8f5-08c49f8bdf66',
+      type: 'search-dataset-node',
+      x: 1770,
+      y: 840,
+      properties: {
+        noRender: true,
+        stepName: '知识库检索',
+        fields: [
+          { label: '段落列表', value: 'paragraph_list' },
+          { label: '满足直接回答的段落列表', value: 'is_hit_handling_method_list' },
+          { label: '检索结果', value: 'data' },
+          { label: '满足直接回答的分段内容', value: 'directly_return' }
+        ],
+        node_data: {
+          dataset_id_list: ['188c3fa1-28a3-11ef-99e8-a8a1595801ab'],
+          dataset_setting: {
+            top_n: 3,
+            similarity: 0.6,
+            max_paragraph_char_number: 5000,
+            search_mode: 'embedding'
+          },
+          question_reference_address: ['start-node', 'question']
+        }
+      }
+    },
+    {
+      id: 'e99869b2-251f-47a7-9966-c54ffb59b381',
       type: 'condition-node',
-      x: 810,
-      y: 760,
-
+      x: 2310,
+      y: 930,
       properties: {
         noRender: true,
         width: 600,
         stepName: '判断器',
-        input: [{ key: '输入' }],
-        output: [{ key: '9208' }, { key: '1143' }, { key: '输出' }]
+        node_data: {
+          branch: [
+            {
+              conditions: [
+                {
+                  field: ['1cd54877-bfff-4791-b8f5-08c49f8bdf66', 'is_hit_handling_method_list'],
+                  compare: 'ge',
+                  value: '1'
+                }
+              ],
+              id: '3014',
+              type: 'IF',
+              condition: 'and'
+            },
+            {
+              conditions: [
+                {
+                  field: ['1cd54877-bfff-4791-b8f5-08c49f8bdf66', 'paragraph_list'],
+                  compare: 'ge',
+                  value: '1'
+                }
+              ],
+              type: 'ELSE IF 1',
+              id: '4658',
+              condition: 'and'
+            },
+            { conditions: [], id: '8871', type: 'ELSE', condition: 'and' }
+          ]
+        },
+        branch_condition_list: [
+          { index: 0, height: 115.778, id: '3014' },
+          { index: 1, height: 115.778, id: '4658' },
+          { index: 2, height: 40, id: '8871' }
+        ]
       }
     },
-
     {
-      id: '30c16d31-3881-48cd-991e-da3f99c45681',
+      id: '62ab766b-b218-4bea-895f-b7e83614c8b7',
       type: 'reply-node',
       x: 2940,
       y: 530,
@@ -191,7 +257,7 @@ const graphData = {
       x: 2930,
       y: 1000,
       properties: {
-        height: '',
+        noRender: true,
         stepName: 'AI 对话',
         fields: [{ label: 'AI 回答内容', value: 'answer' }],
         node_data: {
@@ -209,7 +275,7 @@ const graphData = {
       x: 2960,
       y: 1470,
       properties: {
-        height: '',
+        noRender: true,
         stepName: '指定回复',
         node_data: { reply_type: 'content', content: '未找到相关内容', fields: [] }
       }
@@ -220,7 +286,7 @@ const graphData = {
       x: 1740,
       y: 1470,
       properties: {
-        height: '',
+        noRender: true,
         stepName: 'AI 对话',
         fields: [{ label: 'AI 回答内容', value: 'answer' }],
         node_data: {
@@ -228,34 +294,6 @@ const graphData = {
           system: '',
           prompt: "{{context['start-node'].question}}",
           dialogue_number: 0
-        }
-      }
-    },
-
-    {
-      id: '4529cbc1-6389-48f3-afd5-3df7db4292a1',
-      type: 'ai-chat-node',
-      x: 530,
-      y: 730,
-      properties: {
-        height: '',
-        stepName: 'AI 对话',
-        input: [{ key: '' }],
-        output: [{ key: '' }],
-        fields: [
-          {
-            label: 'AI 回答内容',
-            value: 'content',
-            globeLabel: '{{AI 对话.content}}',
-            globeValue: '{{content[4529cbc1-6389-48f3-afd5-3df7db4292a1].content}}'
-          }
-        ],
-        node_data: {
-          model_id: '',
-          system: '',
-          prompt:
-            '已知信息：\n{data}\n回答要求：\n- 请使用简洁且专业的语言来回答用户的问题。\n- 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。\n- 避免提及你是从已知信息中获得的知识。\n- 请保证答案与已知信息中描述的一致。\n- 请使用 Markdown 语法优化答案的格式。\n- 已知信息中的图片、链接地址和脚本语言请直接返回。\n- 请使用与问题相同的语言来回答。\n问题：\n{question}',
-          dialogue_number: 1
         }
       }
     }

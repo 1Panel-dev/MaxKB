@@ -46,7 +46,6 @@ export const menuNodes = [
     label: 'AI 对话',
     icon: 'ai-chat-node-icon',
     properties: {
-      height: '',
       stepName: 'AI 对话',
       fields: [
         {
@@ -62,7 +61,6 @@ export const menuNodes = [
     label: '知识库检索',
     icon: 'search-dataset-node-icon',
     properties: {
-      height: '',
       stepName: '知识库检索',
       fields: [
         { label: '段落列表', value: 'paragraph_list' },
@@ -84,7 +82,6 @@ export const menuNodes = [
     label: '问题优化',
     icon: 'question-node-icon',
     properties: {
-      height: '',
       stepName: '问题优化',
       fields: [
         {
@@ -110,7 +107,6 @@ export const menuNodes = [
     label: '指定回复',
     icon: 'reply-node-icon',
     properties: {
-      height: '',
       stepName: '指定回复'
     }
   }
