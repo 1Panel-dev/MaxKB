@@ -7,6 +7,7 @@
     @desc:
 """
 import hashlib
+import json
 import os
 import re
 import uuid
@@ -22,7 +23,7 @@ from django.http import HttpResponse
 from django.template import Template, Context
 from rest_framework import serializers
 
-from application.models import Application, ApplicationDatasetMapping
+from application.models import Application, ApplicationDatasetMapping, ApplicationTypeChoices
 from application.models.api_key_model import ApplicationAccessToken, ApplicationApiKey
 from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.constants.authentication_type import AuthenticationType
@@ -105,6 +106,40 @@ class ModelSettingSerializer(serializers.Serializer):
     prompt = serializers.CharField(required=True, max_length=2048, error_messages=ErrMessage.char("提示词"))
 
 
+class ApplicationWorkflowSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True, max_length=64, min_length=1, error_messages=ErrMessage.char("应用名称"))
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                 max_length=256, min_length=1,
+                                 error_messages=ErrMessage.char("应用描述"))
+    prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
+                                     error_messages=ErrMessage.char("开场白"))
+
+    @staticmethod
+    def to_application_model(user_id: str, application: Dict):
+
+        default_workflow_json = get_file_content(
+            os.path.join(PROJECT_DIR, "apps", "application", 'flow', 'default_workflow.json'))
+        default_workflow = json.loads(default_workflow_json)
+        for node in default_workflow.get('nodes'):
+            if node.get('id') == 'base-node':
+                node.get('properties')['node_data'] = {"desc": application.get('desc'),
+                                                       "name": application.get('name'),
+                                                       "prologue": application.get('prologue')}
+        return Application(id=uuid.uuid1(),
+                           name=application.get('name'),
+                           desc=application.get('desc'),
+                           prologue="",
+                           dialogue_number=0,
+                           user_id=user_id, model_id=None,
+                           dataset_setting={},
+                           model_setting={},
+                           problem_optimization=False,
+                           type=ApplicationTypeChoices.WORK_FLOW,
+                           work_flow=default_workflow,
+                           is_ready=False
+                           )
+
+
 class ApplicationSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, max_length=64, min_length=1, error_messages=ErrMessage.char("应用名称"))
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
@@ -123,6 +158,13 @@ class ApplicationSerializer(serializers.Serializer):
     model_setting = ModelSettingSerializer(required=True)
     # 问题补全
     problem_optimization = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("问题补全"))
+    # 应用类型
+    type = serializers.CharField(required=True, error_messages=ErrMessage.char("应用类型"),
+                                 validators=[
+                                     validators.RegexValidator(regex=re.compile("^SIMPLE|WORK_FLOW$"),
+                                                               message="应用类型只支持SIMPLE|WORK_FLOW", code=500)
+                                 ]
+                                 )
 
     def is_valid(self, *, user_id=None, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -281,6 +323,22 @@ class ApplicationSerializer(serializers.Serializer):
 
         @transaction.atomic
         def insert(self, application: Dict):
+            application_type = application.get('type')
+            if 'WORK_FLOW' == application_type:
+                self.insert_workflow(application)
+            else:
+                self.insert_simple(application)
+            return True
+
+        def insert_workflow(self, application: Dict):
+            self.is_valid(raise_exception=True)
+            user_id = self.data.get('user_id')
+            ApplicationWorkflowSerializer(data=application).is_valid(raise_exception=True)
+            application_model = ApplicationWorkflowSerializer.to_application_model(user_id, application)
+            application_model.save()
+            return True
+
+        def insert_simple(self, application: Dict):
             self.is_valid(raise_exception=True)
             user_id = self.data.get('user_id')
             ApplicationSerializer(data=application).is_valid(user_id=user_id, raise_exception=True)
@@ -296,7 +354,6 @@ class ApplicationSerializer(serializers.Serializer):
                                    access_token=hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]).save()
             # 插入关联数据
             QuerySet(ApplicationDatasetMapping).bulk_create(application_dataset_mapping_model_list)
-            return True
 
         @staticmethod
         def to_application_model(user_id: str, application: Dict):
@@ -306,7 +363,10 @@ class ApplicationSerializer(serializers.Serializer):
                                user_id=user_id, model_id=application.get('model_id'),
                                dataset_setting=application.get('dataset_setting'),
                                model_setting=application.get('model_setting'),
-                               problem_optimization=application.get('problem_optimization')
+                               problem_optimization=application.get('problem_optimization'),
+                               type=ApplicationTypeChoices.SIMPLE,
+                               work_flow={},
+                               is_ready=True
                                )
 
         @staticmethod

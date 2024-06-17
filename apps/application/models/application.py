@@ -51,6 +51,7 @@ class Application(AppModelMixin):
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
     type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
                             default=ApplicationTypeChoices.SIMPLE, max_length=256)
+    is_ready = models.BooleanField(verbose_name="是否就绪", default=True)
 
     @staticmethod
     def get_default_model_prompt():

@@ -151,13 +151,6 @@ class ChatMessageSerializer(serializers.Serializer):
 
     def is_valid_application_workflow(self, *, raise_exception=False):
         self.is_valid_intraday_access_num()
-        chat_id = self.data.get('chat_id')
-        chat_info: ChatInfo = chat_cache.get(chat_id)
-        if chat_info is None:
-            chat_info = self.re_open_chat(chat_id)
-            chat_cache.set(chat_id,
-                           chat_info, timeout=60 * 30)
-        return chat_info
 
     def is_valid_intraday_access_num(self):
         if self.data.get('client_type') == AuthenticationType.APPLICATION_ACCESS_TOKEN.value:
@@ -174,14 +167,8 @@ class ChatMessageSerializer(serializers.Serializer):
             if application_access_token.access_num <= access_client.intraday_access_num:
                 raise AppChatNumOutOfBoundsFailed(1002, "访问次数超过今日访问量")
 
-    def is_valid_application_simple(self, *, raise_exception=False):
+    def is_valid_application_simple(self, *, chat_info: ChatInfo, raise_exception=False):
         self.is_valid_intraday_access_num()
-        chat_id = self.data.get('chat_id')
-        chat_info: ChatInfo = chat_cache.get(chat_id)
-        if chat_info is None:
-            chat_info = self.re_open_chat(chat_id)
-            chat_cache.set(chat_id,
-                           chat_info, timeout=60 * 30)
         model = chat_info.application.model
         if model is None:
             return chat_info
@@ -194,7 +181,7 @@ class ChatMessageSerializer(serializers.Serializer):
             raise AppApiException(500, "模型正在下载中,请稍后再发起对话")
         return chat_info
 
-    def chat_simple(self, chat_info):
+    def chat_simple(self, chat_info: ChatInfo):
         message = self.data.get('message')
         re_chat = self.data.get('re_chat')
         stream = self.data.get('stream')
@@ -241,14 +228,23 @@ class ChatMessageSerializer(serializers.Serializer):
 
     def chat(self):
         super().is_valid(raise_exception=True)
-        application = QuerySet(Application).filter(id=self.data.get('application_id')).first()
-        if application.type == ApplicationTypeChoices.SIMPLE:
-            chat_info = self.is_valid_application_simple(raise_exception=True)
+        chat_info = self.get_chat_info()
+        if chat_info.application.type == ApplicationTypeChoices.SIMPLE:
+            self.is_valid_application_simple(raise_exception=True, chat_info=chat_info),
             return self.chat_simple(chat_info)
-
         else:
-            chat_info = self.is_valid_application_workflow(raise_exception=True)
+            self.is_valid_application_workflow(raise_exception=True)
             return self.chat_work_flow(chat_info)
+
+    def get_chat_info(self):
+        self.is_valid(raise_exception=True)
+        chat_id = self.data.get('chat_id')
+        chat_info: ChatInfo = chat_cache.get(chat_id)
+        if chat_info is None:
+            chat_info: ChatInfo = self.re_open_chat(chat_id)
+            chat_cache.set(chat_id,
+                           chat_info, timeout=60 * 30)
+        return chat_info
 
     @staticmethod
     def re_open_chat(chat_id: str):
