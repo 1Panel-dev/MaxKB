@@ -48,9 +48,9 @@ class Application(AppModelMixin):
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="/ui/favicon.ico")
-    work_flow = models.JSONField(verbose_name="工作流数据", default={})
-    type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices,
-                            default=ApplicationTypeChoices.SIMPLE)
+    work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
+    type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
+                            default=ApplicationTypeChoices.SIMPLE, max_length=256)
 
     @staticmethod
     def get_default_model_prompt():
