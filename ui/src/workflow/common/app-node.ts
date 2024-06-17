@@ -41,7 +41,7 @@ class AppNode extends HtmlNode {
       if (props.model.properties?.fields?.length > 0) {
         props.model.properties.fields.map((item: any) => {
           item['globeLabel'] = `{{${props.model.properties.stepName}.${item.value}}}`
-          item['globeValue'] = `{{content[${props.model.id}].${item.value}}}`
+          item['globeValue'] = `{{context['${props.model.id}'].${item.value}}}`
         })
       }
     }
