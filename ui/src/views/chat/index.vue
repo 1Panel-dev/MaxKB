@@ -5,7 +5,9 @@
 import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-const components: any = import.meta.glob('@/views/chat/**/index.vue')
+const components: any = import.meta.glob('@/views/chat/**/index.vue', {
+  eager: true
+})
 const route = useRoute()
 const {
   query: { mode }
