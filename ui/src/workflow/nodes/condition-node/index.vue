@@ -14,7 +14,7 @@
     >
       <template v-for="(item, index) in form_data.branch" :key="item.id">
         <el-card
-          v-resize="(wh) => resizeCondition(wh, item, index)"
+          v-resize="(wh:any) => resizeCondition(wh, item, index)"
           shadow="never"
           class="card-never mb-8"
           style="--el-card-padding: 12px"
@@ -236,14 +236,14 @@ function deleteCondition(index: number, cIndex: number) {
   if (list[index]['conditions'].length === 0) {
     const delete_edge = list.splice(index, 1)
     const delete_target_anchor_id_list = delete_edge.map(
-      (item) => props.nodeModel.id + '_' + item.id + '_right'
+      (item:any) => props.nodeModel.id + '_' + item.id + '_right'
     )
 
     props.nodeModel.graphModel.eventCenter.emit(
       'delete_edge',
       props.nodeModel.outgoing.edges
-        .filter((item) => delete_target_anchor_id_list.includes(item.sourceAnchorId))
-        .map((item) => item.id)
+        .filter((item:any) => delete_target_anchor_id_list.includes(item.sourceAnchorId))
+        .map((item:any) => item.id)
     )
     refreshBranchAnchor(list, false)
   }

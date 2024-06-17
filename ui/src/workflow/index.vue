@@ -11,41 +11,9 @@ import Control from './common/NodeControl.vue'
 import { baseNodes } from '@/workflow/common/data'
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
-import { ElMessageBox, ElMessage } from 'element-plus'
 import {initDefaultShortcut} from '@/workflow/common/shortcut'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
 
-function translationNodeData(nodeData, distance) {
-  nodeData.x += distance;
-  nodeData.y += distance;
-  if (nodeData.text) {
-    nodeData.text.x += distance;
-    nodeData.text.y += distance;
-  }
-  return nodeData;
-}
-
-function translationEdgeData(edgeData, distance) {
-  if (edgeData.startPoint) {
-    edgeData.startPoint.x += distance;
-    edgeData.startPoint.y += distance;
-  }
-  if (edgeData.endPoint) {
-    edgeData.endPoint.x += distance;
-    edgeData.endPoint.y += distance;
-  }
-  if (edgeData.pointsList && edgeData.pointsList.length > 0) {
-    edgeData.pointsList.forEach((point) => {
-      point.x += distance;
-      point.y += distance;
-    });
-  }
-  if (edgeData.text) {
-    edgeData.text.x += distance;
-    edgeData.text.y += distance;
-  }
-  return edgeData;
-}
 defineOptions({ name: 'WorkFlow' })
 
 type ShapeItem = {
