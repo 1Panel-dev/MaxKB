@@ -38,12 +38,12 @@ class AppNode extends HtmlNode {
       if (filterNodes.length - 1 > 0) {
         props.model.properties.stepName = props.model.properties.stepName + (filterNodes.length - 1)
       }
-      if (props.model.properties?.fields?.length > 0) {
-        props.model.properties.fields.map((item: any) => {
-          item['globeLabel'] = `{{${props.model.properties.stepName}.${item.value}}}`
-          item['globeValue'] = `{{context['${props.model.id}'].${item.value}}}`
-        })
-      }
+    }
+    if (props.model.properties?.fields?.length > 0) {
+      props.model.properties.fields.map((item: any) => {
+        item['globeLabel'] = `{{${props.model.properties.stepName}.${item.value}}}`
+        item['globeValue'] = `{{context['${props.model.id}'].${item.value}}}`
+      })
     }
   }
 

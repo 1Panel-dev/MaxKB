@@ -231,7 +231,7 @@ class ChatMessageSerializer(serializers.Serializer):
         stream = self.data.get('stream')
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
-        work_flow_manage = WorkflowManage(Flow.new_instance(json.loads(chat_info.application.work_flow)),
+        work_flow_manage = WorkflowManage(Flow.new_instance(chat_info.application.work_flow),
                                           {'history_chat_record': chat_info.chat_record_list, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(uuid.uuid1()),
                                            'stream': stream,
@@ -241,7 +241,7 @@ class ChatMessageSerializer(serializers.Serializer):
 
     def chat(self):
         super().is_valid(raise_exception=True)
-        application = QuerySet(Application).filter(self.data.get('application_id'))
+        application = QuerySet(Application).filter(id=self.data.get('application_id')).first()
         if application.type == ApplicationTypeChoices.SIMPLE:
             chat_info = self.is_valid_application_simple(raise_exception=True)
             return self.chat_simple(chat_info)

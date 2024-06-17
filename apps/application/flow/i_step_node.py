@@ -103,9 +103,9 @@ class FlowParamsSerializer(serializers.Serializer):
 
     stream = serializers.BooleanField(required=True, error_messages=ErrMessage.base("流式输出"))
 
-    client_id = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端id"))
+    client_id = serializers.CharField(required=False, error_messages=ErrMessage.char("客户端id"))
 
-    client_type = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端类型"))
+    client_type = serializers.CharField(required=False, error_messages=ErrMessage.char("客户端类型"))
 
 
 class INode:

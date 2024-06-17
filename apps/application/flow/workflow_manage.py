@@ -143,13 +143,18 @@ class WorkflowManage:
         @param prompt: 提示词信息
         @return: 格式化后的提示词
         """
-        prompt_template = PromptTemplate.from_template(prompt, template_format='jinja2')
         context = {
             'global': self.context,
         }
 
         for node in self.node_context:
+            fields = node.node.properties.get('fields')
+            if fields is not None:
+                for field in fields:
+                    prompt = prompt.replace(field.get('globeLabel'), field.get('globeValue'))
             context[node.id] = node.context
+        prompt_template = PromptTemplate.from_template(prompt, template_format='jinja2')
+
         value = prompt_template.format(context=context)
         return value
 

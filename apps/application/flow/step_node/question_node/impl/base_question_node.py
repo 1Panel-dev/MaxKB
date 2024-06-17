@@ -126,13 +126,13 @@ class BaseQuestionNode(IQuestionNode):
             r = chat_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
                                'get_to_response_write_context': get_to_response_write_context,
-                               'history_message': history_message, 'question': question}, {},
+                               'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context_stream,
                               _to_response=to_stream_response)
         else:
             r = chat_model.invoke(message_list)
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
-                               'history_message': history_message, 'question': question}, {},
+                               'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context, _to_response=to_response)
 
     @staticmethod
