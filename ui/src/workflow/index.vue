@@ -12,8 +12,40 @@ import { baseNodes } from '@/workflow/common/data'
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import {initDefaultShortcut} from '@/workflow/common/shortcut'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
 
+function translationNodeData(nodeData, distance) {
+  nodeData.x += distance;
+  nodeData.y += distance;
+  if (nodeData.text) {
+    nodeData.text.x += distance;
+    nodeData.text.y += distance;
+  }
+  return nodeData;
+}
+
+function translationEdgeData(edgeData, distance) {
+  if (edgeData.startPoint) {
+    edgeData.startPoint.x += distance;
+    edgeData.startPoint.y += distance;
+  }
+  if (edgeData.endPoint) {
+    edgeData.endPoint.x += distance;
+    edgeData.endPoint.y += distance;
+  }
+  if (edgeData.pointsList && edgeData.pointsList.length > 0) {
+    edgeData.pointsList.forEach((point) => {
+      point.x += distance;
+      point.y += distance;
+    });
+  }
+  if (edgeData.text) {
+    edgeData.text.x += distance;
+    edgeData.text.y += distance;
+  }
+  return edgeData;
+}
 defineOptions({ name: 'WorkFlow' })
 
 type ShapeItem = {
@@ -490,7 +522,8 @@ const graphData = {
 }
 
 const lf = ref()
-
+const TRANSLATION_DISTANCE = 40;
+let CHILDREN_TRANSLATION_DISTANCE = 40;
 onMounted(() => {
   const container: any = document.querySelector('#container')
   if (container) {
@@ -509,40 +542,7 @@ onMounted(() => {
       },
       keyboard: {
         enabled: true,
-        shortcuts: [
-          {
-            keys: ['backspace'],
-            callback: (edge: any) => {
-              const defaultOptions: Object = {
-                showCancelButton: true,
-                confirmButtonText: '确定',
-                cancelButtonText: '取消'
-              }
-              const elements = lf.value.getSelectElements(true)
-              ElMessageBox.confirm('确定删除改节点？', defaultOptions).then((ok) => {
-                const elements = lf.value.getSelectElements(true)
-                lf.value.clearSelectElements()
-                elements.edges.forEach((edge: any) => {
-                  lf.value.deleteEdge(edge.id)
-                })
-                elements.nodes.forEach((node: any) => {
-                  lf.value.deleteNode(node.id)
-                })
-              })
-            }
-          },
-          {
-            keys: ['cmd + c', 'ctrl + c'],
-            callback: (edge: any) => {
-              ElMessage.success({
-                message: '已复制节点',
-                type: 'success',
-                showClose: true,
-                duration: 1500
-              })
-            }
-          }
-        ]
+       
       },
       isSilentMode: false,
       container: container
@@ -553,11 +553,12 @@ onMounted(() => {
         strokeWidth: 1
       }
     })
-
+    initDefaultShortcut(lf.value,lf.value.graphModel)
     lf.value.batchRegister([...Object.keys(nodes).map((key) => nodes[key].default), AppEdge])
     lf.value.setDefaultEdgeType('app-edge')
 
     lf.value.render(graphData)
+
     lf.value.graphModel.eventCenter.on('delete_edge', (id_list: Array<string>) => {
       id_list.forEach((id: string) => {
         lf.value.deleteEdge(id)
