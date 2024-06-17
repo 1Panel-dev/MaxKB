@@ -567,7 +567,7 @@ class ApplicationSerializer(serializers.Serializer):
                     raise AppApiException(500, "模型不存在")
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization',
-                           'api_key_is_active', 'icon']
+                           'api_key_is_active', 'icon', 'work_flow']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     if update_key == 'multiple_rounds_dialogue':
