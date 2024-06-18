@@ -6,13 +6,11 @@
         <h4>创建应用</h4>
       </div>
       <div>
-        <button @click="validate">点击校验</button>
-        <button @click="getGraphData">点击获取流程数据</button>
         <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
           添加组件
         </el-button>
         <el-button> 调试 </el-button>
-        <el-button type="primary"> 保存 </el-button>
+        <el-button type="primary" @click="publicHandle"> 保存 </el-button>
       </div>
     </div>
     <!-- 下拉框 -->
@@ -37,13 +35,33 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import Workflow from '@/workflow/index.vue'
 import { menuNodes } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
+import applicationApi from '@/api/application'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+const route = useRoute()
 
+const {
+  params: { id }
+} = route as any
 const workflowRef = ref()
 
+const loading = ref(false)
+
 const showPopover = ref(false)
+
+function publicHandle() {
+  workflowRef.value?.validate().then(() => {
+    const obj = {
+      work_flow: getGraphData()
+    }
+    applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
+      MsgSuccess('发布成功')
+    })
+  })
+}
 
 function clickoutside() {
   showPopover.value = false
@@ -53,11 +71,8 @@ function onmousedown(item: any) {
   workflowRef.value?.onmousedown(item)
 }
 
-function validate() {
-  workflowRef.value?.validate()
-}
 function getGraphData() {
-  workflowRef.value?.getGraphData()
+  return workflowRef.value?.getGraphData()
 }
 
 onMounted(() => {})

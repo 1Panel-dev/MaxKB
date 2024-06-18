@@ -183,7 +183,7 @@ const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 
 const validate = () => {
-  questionNodeFormRef.value?.validate()
+  return questionNodeFormRef.value?.validate()
 }
 
 function getModel() {

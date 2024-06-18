@@ -45,8 +45,7 @@ const postApplication: (
 
 /**
  * 修改应用
- * @param 参数 
-
+ * @param 参数
  */
 const putApplication: (
   application_id: String,
@@ -228,6 +227,18 @@ const getApplicationModel: (
   return get(`${prefix}/${application_id}/model`, loading)
 }
 
+/**
+ * 发布应用
+ * @param 参数
+ */
+const putPublishApplication: (
+  application_id: String,
+  data: ApplicationFormType,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return put(`${prefix}/${application_id}/publish`, data, undefined, loading)
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -245,5 +256,6 @@ export default {
   getProfile,
   putChatVote,
   getApplicationHitTest,
-  getApplicationModel
+  getApplicationModel,
+  putPublishApplication
 }

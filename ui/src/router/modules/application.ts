@@ -18,7 +18,7 @@ const applicationRouter = {
       hidden: true
     },
     {
-      path: '/application/:id',
+      path: '/application/:id/:type',
       name: 'ApplicationDetail',
       meta: { title: '应用详情', activeMenu: '/application' },
       component: Layout,
@@ -32,20 +32,20 @@ const applicationRouter = {
             iconActive: 'app-all-menu-active',
             title: '概览',
             active: 'overview',
-            parentPath: '/application/:id',
+            parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail'
           },
           component: () => import('@/views/application-overview/index.vue')
         },
         {
-          path: 'setting', 
+          path: 'setting',
           name: 'AppSetting',
           meta: {
             icon: 'app-setting',
             iconActive: 'app-setting-active',
             title: '设置',
             active: 'setting',
-            parentPath: '/application/:id',
+            parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail'
           },
           component: () => import('@/views/application/CreateAndSetting.vue')
@@ -57,7 +57,7 @@ const applicationRouter = {
             icon: 'app-hit-test',
             title: '命中测试',
             active: 'hit-test',
-            parentPath: '/application/:id',
+            parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail'
           },
           component: () => import('@/views/hit-test/index.vue')
@@ -70,7 +70,7 @@ const applicationRouter = {
             iconActive: 'app-document-active',
             title: '对话日志',
             active: 'log',
-            parentPath: '/application/:id',
+            parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail'
           },
           component: () => import('@/views/log/index.vue')
@@ -79,12 +79,12 @@ const applicationRouter = {
     },
     // 创建编排
     {
-      path: '/application/workflow',
+      path: '/application/:id/workflow',
       name: 'ApplicationWorkflow',
       meta: { activeMenu: '/application' },
       component: () => import('@/views/application-workflow/index.vue'),
       hidden: true
-    },
+    }
   ]
 }
 

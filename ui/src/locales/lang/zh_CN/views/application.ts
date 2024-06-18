@@ -68,9 +68,9 @@ export default {
       confirm: '确认',
       cancel: '取消',
       create: '创建',
-      createSuccess: '创建',
+      createSuccess: '创建成功',
       save: '保存',
-      saveSuccess: '保存'
+      saveSuccess: '保存成功'
     },
     dialogues: {
       addDataset: '添加关联知识库',

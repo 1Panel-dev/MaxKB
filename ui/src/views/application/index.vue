@@ -41,7 +41,7 @@
               :title="item.name"
               :description="item.desc"
               class="application-card cursor"
-              @click="router.push({ path: `/application/${item.id}/overview` })"
+              @click="router.push({ path: `/application/${item.id}/${item.type}/overview` })"
             >
               <template #icon>
                 <AppAvatar
@@ -82,7 +82,9 @@
                   >
                     <el-button
                       text
-                      @click.stop="router.push({ path: `/application/${item.id}/setting` })"
+                      @click.stop="
+                        router.push({ path: `/application/${item.id}/${item.type}/setting` })
+                      "
                     >
                       <AppIcon iconName="Setting"></AppIcon>
                     </el-button>

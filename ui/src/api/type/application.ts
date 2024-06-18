@@ -12,6 +12,7 @@ interface ApplicationFormType {
   problem_optimization?: boolean
   icon?: string | undefined
   type?: string
+  work_flow?: any
 }
 interface chatType {
   id: string

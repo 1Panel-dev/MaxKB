@@ -1,6 +1,11 @@
 <template>
   <div v-if="!menu.meta || !menu.meta.hidden" class="sidebar-item">
-    <el-menu-item ref="subMenu" :index="menu.path" popper-class="sidebar-popper">
+    <el-menu-item
+      ref="subMenu"
+      :index="menu.path"
+      popper-class="sidebar-popper"
+      @click="clickHandle(menu)"
+    >
       <template #title>
         <AppIcon v-if="menu.meta && menu.meta.icon" :iconName="menuIcon" class="sidebar-icon" />
         <span v-if="menu.meta && menu.meta.title">{{ menu.meta.title }}</span>
@@ -11,12 +16,25 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { type RouteRecordRaw } from 'vue-router'
+import { useRouter, useRoute, type RouteRecordRaw } from 'vue-router'
 
 const props = defineProps<{
   menu: RouteRecordRaw
   activeMenu: any
 }>()
+
+const route = useRoute()
+
+const router = useRouter()
+const {
+  params: { id, type }
+} = route as any
+
+function clickHandle(item: any) {
+  if (item.name === 'AppSetting' && type === 'WORK_FLOW') {
+    router.push({ path: `/application/${id}/workflow` })
+  }
+}
 const menuIcon = computed(() => {
   if (props.activeMenu === props.menu.path) {
     return props.menu.meta?.iconActive || props.menu?.meta?.icon

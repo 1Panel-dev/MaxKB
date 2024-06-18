@@ -11,7 +11,7 @@ import Control from './common/NodeControl.vue'
 import { baseNodes } from '@/workflow/common/data'
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
-import {initDefaultShortcut} from '@/workflow/common/shortcut'
+import { initDefaultShortcut } from '@/workflow/common/shortcut'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
 
 defineOptions({ name: 'WorkFlow' })
@@ -490,8 +490,8 @@ const graphData = {
 }
 
 const lf = ref()
-const TRANSLATION_DISTANCE = 40;
-let CHILDREN_TRANSLATION_DISTANCE = 40;
+const TRANSLATION_DISTANCE = 40
+let CHILDREN_TRANSLATION_DISTANCE = 40
 onMounted(() => {
   const container: any = document.querySelector('#container')
   if (container) {
@@ -509,8 +509,7 @@ onMounted(() => {
         }
       },
       keyboard: {
-        enabled: true,
-       
+        enabled: true
       },
       isSilentMode: false,
       container: container
@@ -521,7 +520,7 @@ onMounted(() => {
         strokeWidth: 1
       }
     })
-    initDefaultShortcut(lf.value,lf.value.graphModel)
+    initDefaultShortcut(lf.value, lf.value.graphModel)
     lf.value.batchRegister([...Object.keys(nodes).map((key) => nodes[key].default), AppEdge])
     lf.value.setDefaultEdgeType('app-edge')
 
@@ -535,12 +534,10 @@ onMounted(() => {
   }
 })
 const validate = () => {
-  lf.value.graphModel.nodes.forEach((element: any) => {
-    element?.validate?.()
-  })
+  return Promise.all(lf.value.graphModel.nodes.map((element: any) => element?.validate?.()))
 }
 const getGraphData = () => {
-  console.log(JSON.stringify(lf.value.getGraphData()))
+  return JSON.stringify(lf.value.getGraphData())
 }
 
 const onmousedown = (shapeItem: ShapeItem) => {

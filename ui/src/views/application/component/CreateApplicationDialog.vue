@@ -80,7 +80,6 @@ import type { ApplicationFormType } from '@/api/type/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application'
 import { MsgSuccess } from '@/utils/message'
-import useStore from '@/stores'
 import { t } from '@/locales'
 const router = useRouter()
 
@@ -173,11 +172,12 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid) => {
     if (valid) {
       applicationApi.postApplication(applicationForm.value, loading).then((res) => {
+        console.log(res)
         MsgSuccess(t('views.application.applicationForm.buttons.createSuccess'))
         if (applicationForm.value.type === 'WORK_FLOW') {
-          router.push({ path: `/application//workflow?id=${res.data.id}` })
+          router.push({ path: `/application/${res.data.id}/workflow` })
         } else {
-          router.push({ path: `/application/${res.data.id}/setting` })
+          router.push({ path: `/application/${res.data.id}/${item.type}/setting` })
         }
 
         dialogVisible.value = false

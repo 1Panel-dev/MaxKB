@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { getChildRouteListByPathAndName } from '@/router/index'
 import SidebarItem from './SidebarItem.vue'
 import AppBreadcrumb from './../breadcrumb/index.vue'

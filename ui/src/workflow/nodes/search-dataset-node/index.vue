@@ -190,7 +190,7 @@ function refresh() {
 }
 
 const validate = () => {
-  DatasetNodeFormRef.value?.validate()
+  return DatasetNodeFormRef.value?.validate()
 }
 
 onMounted(() => {

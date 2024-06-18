@@ -176,7 +176,7 @@ const form_data = computed({
 const ConditionNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
-  ConditionNodeFormRef.value?.validate()
+  return ConditionNodeFormRef.value?.validate()
 }
 
 function addBranch() {

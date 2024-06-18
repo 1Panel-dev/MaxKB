@@ -82,7 +82,7 @@ const form_data = computed({
 const baseNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
-  baseNodeFormRef.value?.validate()
+  return baseNodeFormRef.value?.validate()
 }
 
 onMounted(() => {
