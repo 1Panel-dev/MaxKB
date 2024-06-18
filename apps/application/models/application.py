@@ -51,7 +51,6 @@ class Application(AppModelMixin):
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
     type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
                             default=ApplicationTypeChoices.SIMPLE, max_length=256)
-    is_ready = models.BooleanField(verbose_name="是否就绪", default=True)
 
     @staticmethod
     def get_default_model_prompt():
@@ -69,6 +68,15 @@ class Application(AppModelMixin):
 
     class Meta:
         db_table = "application"
+
+
+class WorkFlowVersion(AppModelMixin):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
+    work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
+
+    class Meta:
+        db_table = "application_work_flow_version"
 
 
 class ApplicationDatasetMapping(AppModelMixin):

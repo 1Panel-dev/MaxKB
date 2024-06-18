@@ -23,7 +23,8 @@ from django.http import HttpResponse
 from django.template import Template, Context
 from rest_framework import serializers
 
-from application.models import Application, ApplicationDatasetMapping, ApplicationTypeChoices
+from application.flow.workflow_manage import Flow
+from application.models import Application, ApplicationDatasetMapping, ApplicationTypeChoices, WorkFlowVersion
 from application.models.api_key_model import ApplicationAccessToken, ApplicationApiKey
 from common.config.embedding_config import VectorStore, EmbeddingModel
 from common.constants.authentication_type import AuthenticationType
@@ -135,9 +136,13 @@ class ApplicationWorkflowSerializer(serializers.Serializer):
                            model_setting={},
                            problem_optimization=False,
                            type=ApplicationTypeChoices.WORK_FLOW,
-                           work_flow=default_workflow,
-                           is_ready=False
+                           work_flow=default_workflow
                            )
+
+
+def get_base_node_work_flow(work_flow):
+    node_list = work_flow.get('nodes')
+    [node for node in node_list if node.get('id') == '']
 
 
 class ApplicationSerializer(serializers.Serializer):
@@ -325,10 +330,9 @@ class ApplicationSerializer(serializers.Serializer):
         def insert(self, application: Dict):
             application_type = application.get('type')
             if 'WORK_FLOW' == application_type:
-                self.insert_workflow(application)
+                return self.insert_workflow(application)
             else:
-                self.insert_simple(application)
-            return True
+                return self.insert_simple(application)
 
         def insert_workflow(self, application: Dict):
             self.is_valid(raise_exception=True)
@@ -336,7 +340,7 @@ class ApplicationSerializer(serializers.Serializer):
             ApplicationWorkflowSerializer(data=application).is_valid(raise_exception=True)
             application_model = ApplicationWorkflowSerializer.to_application_model(user_id, application)
             application_model.save()
-            return True
+            return ApplicationSerializerModel(application_model).data
 
         def insert_simple(self, application: Dict):
             self.is_valid(raise_exception=True)
@@ -354,6 +358,7 @@ class ApplicationSerializer(serializers.Serializer):
                                    access_token=hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]).save()
             # 插入关联数据
             QuerySet(ApplicationDatasetMapping).bulk_create(application_dataset_mapping_model_list)
+            return ApplicationSerializerModel(application_model).data
 
         @staticmethod
         def to_application_model(user_id: str, application: Dict):
@@ -365,8 +370,7 @@ class ApplicationSerializer(serializers.Serializer):
                                model_setting=application.get('model_setting'),
                                problem_optimization=application.get('problem_optimization'),
                                type=ApplicationTypeChoices.SIMPLE,
-                               work_flow={},
-                               is_ready=True
+                               work_flow={}
                                )
 
         @staticmethod
@@ -521,6 +525,20 @@ class ApplicationSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid()
             QuerySet(Application).filter(id=self.data.get('application_id')).delete()
+            return True
+
+        def publish(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid()
+            application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
+            work_flow = instance.get('work_flow')
+            if work_flow is None:
+                raise AppApiException(500, "work_flow是必填字段")
+            Flow.new_instance(work_flow).is_valid()
+            application.work_flow = work_flow
+            application.save()
+            work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application)
+            work_flow_version.save()
             return True
 
         def one(self, with_valid=True):

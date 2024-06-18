@@ -15,10 +15,12 @@ from rest_framework import serializers
 
 from application.models import ChatRecord
 from application.models.api_key_model import ApplicationPublicAccessClient
-from application.serializers.application_serializers import chat_cache
 from common.constants.authentication_type import AuthenticationType
 from common.field.common import InstanceField
 from common.util.field_message import ErrMessage
+from django.core import cache
+
+chat_cache = cache.caches['model_cache']
 
 
 def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
@@ -123,7 +125,7 @@ class INode:
     def valid_args(self, node_params, flow_params):
         flow_params_serializer_class = self.get_flow_params_serializer_class()
         node_params_serializer_class = self.get_node_params_serializer_class()
-        if flow_params_serializer_class is not None:
+        if flow_params_serializer_class is not None and flow_params is not None:
             self.flow_params_serializer = flow_params_serializer_class(data=flow_params)
             self.flow_params_serializer.is_valid(raise_exception=True)
         if node_params_serializer_class is not None:

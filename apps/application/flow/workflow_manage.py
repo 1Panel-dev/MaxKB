@@ -6,14 +6,14 @@
     @date：2024/1/9 17:40
     @desc:
 """
-import json
-import uuid
+from functools import reduce
 from typing import List, Dict
 
 from langchain_core.prompts import PromptTemplate
 
 from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
 from application.flow.step_node import get_node
+from common.exception.app_exception import AppApiException
 
 
 class Edge:
@@ -37,6 +37,9 @@ class Node:
             self.__setattr__(keyword, kwargs.get(keyword))
 
 
+end_nodes = ['ai-chat-node', 'reply-node']
+
+
 class Flow:
     def __init__(self, nodes: List[Node], edges: List[Edge]):
         self.nodes = nodes
@@ -50,6 +53,76 @@ class Flow:
                  for node in nodes]
         edges = [Edge(edge.get('id'), edge.get('type'), **edge) for edge in edges]
         return Flow(nodes, edges)
+
+    def get_start_node(self):
+        start_node_list = [node for node in self.nodes if node.id == 'start-node']
+        return start_node_list[0]
+
+    @staticmethod
+    def is_valid_node_params(node: Node):
+        get_node(node.type)(node, Node)
+
+    def is_valid_node(self, node: Node):
+        self.is_valid_node_params(node)
+        if node.type == 'condition-node':
+            branch_list = node.properties.get('branch')
+            for branch in branch_list:
+                source_anchor_id = f"{node.id}_{branch.get('id')}_right"
+                edge_list = [edge for edge in self.edges if edge.sourceAnchorId == source_anchor_id]
+                if len(edge_list) == 0:
+                    raise AppApiException(500,
+                                          f'{node.properties.get("stepName")} 节点的{branch.get("type")}分支需要连接')
+                elif len(edge_list) > 1:
+                    raise AppApiException(500,
+                                          f'{node.properties.get("stepName")} 节点的{branch.get("type")}分支不能连接俩个节点')
+
+        else:
+            edge_list = [edge for edge in self.edges if edge.sourceNodeId == node.id]
+            if len(edge_list) == 0 and not end_nodes.__contains__(node.type):
+                raise AppApiException(500, f'{node.properties.get("stepName")} 节点不能当做结束节点')
+            elif len(edge_list) > 1:
+                raise AppApiException(500,
+                                      f'{node.properties.get("stepName")} 节点不能连接俩个节点')
+
+    def get_next_nodes(self, node: Node):
+        edge_list = [edge for edge in self.edges if edge.sourceNodeId == node.id]
+        node_list = reduce(lambda x, y: [*x, *y],
+                           [[node for node in self.nodes if node.id == edge.targetNodeId] for edge in edge_list],
+                           [])
+        if len(node_list) == 0:
+            raise AppApiException(500,
+                                  f'不存在的下一个节点')
+        return node_list
+
+    def is_valid(self):
+        """
+        校验工作流数据
+        """
+        self.is_valid_start_node()
+        self.is_valid_base_node()
+        self.is_valid_work_flow()
+
+    def is_valid_work_flow(self, up_node=None):
+        if up_node is None:
+            up_node = self.get_start_node()
+        self.is_valid_node(up_node)
+        next_nodes = self.get_next_nodes(up_node)
+        for next_node in next_nodes:
+            self.is_valid_work_flow(next_node)
+
+    def is_valid_start_node(self):
+        start_node_list = [node for node in self.nodes if node.id == 'start-node']
+        if len(start_node_list) == 0:
+            raise AppApiException(500, '开始节点必填')
+        if len(start_node_list) > 1:
+            raise AppApiException(500, '开始节点只能有一个')
+
+    def is_valid_base_node(self):
+        base_node_list = [node for node in self.nodes if node.id == 'base-node']
+        if len(base_node_list) == 0:
+            raise AppApiException(500, '基本信息节点必填')
+        if len(base_node_list) > 1:
+            raise AppApiException(500, '基本信息节点只能有一个')
 
 
 class WorkflowManage:

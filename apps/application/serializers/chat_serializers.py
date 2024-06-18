@@ -22,7 +22,8 @@ from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from rest_framework import serializers
 
-from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord
+from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord, WorkFlowVersion, \
+    ApplicationTypeChoices
 from application.models.api_key_model import ApplicationAccessToken
 from application.serializers.application_serializers import ModelDatasetAssociation, DatasetSettingSerializer, \
     ModelSettingSerializer
@@ -207,6 +208,27 @@ class ChatSerializers(serializers.Serializer):
             self.is_valid(raise_exception=True)
             application_id = self.data.get('application_id')
             application = QuerySet(Application).get(id=application_id)
+            if application.type == ApplicationTypeChoices.SIMPLE:
+                return self.open_simple(application)
+            else:
+                return self.open_work_flow(application)
+
+        def open_work_flow(self, application):
+            self.is_valid(raise_exception=True)
+            application_id = self.data.get('application_id')
+            chat_id = str(uuid.uuid1())
+            work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application_id).order_by(
+                '-create_time')[0:1].first()
+            if work_flow_version is None:
+                raise AppApiException(500, "应用未发布,请发布后再使用")
+            chat_cache.set(chat_id,
+                           ChatInfo(chat_id, None, [],
+                                    [],
+                                    application, work_flow_version), timeout=60 * 30)
+            return chat_id
+
+        def open_simple(self, application):
+            application_id = self.data.get('application_id')
             model = QuerySet(Model).filter(id=application.model_id).first()
             dataset_id_list = [str(row.dataset_id) for row in
                                QuerySet(ApplicationDatasetMapping).filter(

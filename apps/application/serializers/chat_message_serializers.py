@@ -25,7 +25,8 @@ from application.chat_pipeline.step.reset_problem_step.impl.base_reset_problem_s
 from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset_step import BaseSearchDatasetStep
 from application.flow.i_step_node import WorkFlowPostHandler
 from application.flow.workflow_manage import WorkflowManage, Flow
-from application.models import ChatRecord, Chat, Application, ApplicationDatasetMapping, ApplicationTypeChoices
+from application.models import ChatRecord, Chat, Application, ApplicationDatasetMapping, ApplicationTypeChoices, \
+    WorkFlowVersion
 from application.models.api_key_model import ApplicationPublicAccessClient, ApplicationAccessToken
 from common.constants.authentication_type import AuthenticationType
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed
@@ -42,10 +43,11 @@ chat_cache = caches['model_cache']
 class ChatInfo:
     def __init__(self,
                  chat_id: str,
-                 chat_model: BaseChatModel,
+                 chat_model: BaseChatModel | None,
                  dataset_id_list: List[str],
                  exclude_document_id_list: list[str],
-                 application: Application):
+                 application: Application,
+                 work_flow_version: WorkFlowVersion = None):
         """
         :param chat_id:                     对话id
         :param chat_model:                  对话模型
@@ -59,6 +61,7 @@ class ChatInfo:
         self.dataset_id_list = dataset_id_list
         self.exclude_document_id_list = exclude_document_id_list
         self.chat_record_list: List[ChatRecord] = []
+        self.work_flow_version = work_flow_version
 
     def to_base_pipeline_manage_params(self):
         dataset_setting = self.application.dataset_setting
@@ -218,7 +221,7 @@ class ChatMessageSerializer(serializers.Serializer):
         stream = self.data.get('stream')
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
-        work_flow_manage = WorkflowManage(Flow.new_instance(chat_info.application.work_flow),
+        work_flow_manage = WorkflowManage(Flow.new_instance(chat_info.work_flow_version.work_flow),
                                           {'history_chat_record': chat_info.chat_record_list, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(uuid.uuid1()),
                                            'stream': stream,
@@ -246,14 +249,20 @@ class ChatMessageSerializer(serializers.Serializer):
                            chat_info, timeout=60 * 30)
         return chat_info
 
-    @staticmethod
-    def re_open_chat(chat_id: str):
+    def re_open_chat(self, chat_id: str):
         chat = QuerySet(Chat).filter(id=chat_id).first()
         if chat is None:
             raise AppApiException(500, "会话不存在")
         application = QuerySet(Application).filter(id=chat.application_id).first()
         if application is None:
             raise AppApiException(500, "应用不存在")
+        if application.type == ApplicationTypeChoices.SIMPLE:
+            return self.re_open_chat_simple(chat_id, application)
+        else:
+            return self.re_open_chat_work_flow(chat_id, application)
+
+    @staticmethod
+    def re_open_chat_simple(chat_id, application):
         model = QuerySet(Model).filter(id=application.model_id).first()
         chat_model = None
         if model is not None:
@@ -273,3 +282,11 @@ class ChatMessageSerializer(serializers.Serializer):
                                         dataset_id__in=dataset_id_list,
                                         is_active=False)]
         return ChatInfo(chat_id, chat_model, dataset_id_list, exclude_document_id_list, application)
+
+    @staticmethod
+    def re_open_chat_work_flow(chat_id, application):
+        work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application.id).order_by(
+            '-create_time')[0:1].first()
+        if work_flow_version is None:
+            raise AppApiException(500, "应用未发布,请发布后再使用")
+        return ChatInfo(chat_id, None, [], [], application)
