@@ -24,7 +24,7 @@
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
             <CardAdd
               :title="$t('views.application.applicationList.card.createApplication')"
-              @click="router.push({ path: '/application/create' })"
+              @click="openCreateDialog"
             />
           </el-col>
           <el-col
@@ -104,11 +104,13 @@
         </el-row>
       </InfiniteScroll>
     </div>
+    <CreateApplicationDialog ref="CreateApplicationDialogRef" />
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import applicationApi from '@/api/application'
+import CreateApplicationDialog from './component/CreateApplicationDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { isAppIcon } from '@/utils/application'
 import { useRouter } from 'vue-router'
@@ -117,6 +119,7 @@ import { t } from '@/locales'
 const { application } = useStore()
 const router = useRouter()
 
+const CreateApplicationDialogRef = ref()
 const loading = ref(false)
 
 const applicationList = ref<any[]>([])
@@ -128,6 +131,10 @@ const paginationConfig = reactive({
 })
 
 const searchValue = ref('')
+
+function openCreateDialog() {
+  CreateApplicationDialogRef.value.open()
+}
 
 function searchHandle() {
   paginationConfig.total = 0

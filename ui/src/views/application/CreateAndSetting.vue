@@ -317,8 +317,8 @@
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
-import ParamSettingDialog from './components/ParamSettingDialog.vue'
-import AddDatasetDialog from './components/AddDatasetDialog.vue'
+import ParamSettingDialog from './component/ParamSettingDialog.vue'
+import AddDatasetDialog from './component/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
 import { MdEditor } from 'md-editor-v3'
@@ -372,7 +372,8 @@ const applicationForm = ref<ApplicationFormType>({
   model_setting: {
     prompt: defaultPrompt
   },
-  problem_optimization: false
+  problem_optimization: false,
+  type: 'SIMPLE'
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({

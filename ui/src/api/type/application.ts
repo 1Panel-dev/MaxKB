@@ -11,6 +11,7 @@ interface ApplicationFormType {
   model_setting?: any
   problem_optimization?: boolean
   icon?: string | undefined
+  type?: string
 }
 interface chatType {
   id: string
