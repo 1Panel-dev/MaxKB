@@ -1,12 +1,13 @@
 import Components from '@/components'
 import ElementPlus from 'element-plus'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
-import { HtmlNode, HtmlNodeModel, BaseEdge } from '@logicflow/core'
+
+import { HtmlResize } from '@logicflow/extension'
 import { createApp, h } from 'vue'
 import directives from '@/directives'
 import i18n from '@/locales'
 
-class AppNode extends HtmlNode {
+class AppNode extends HtmlResize.view {
   isMounted
   r
   app
@@ -61,7 +62,7 @@ class AppNode extends HtmlNode {
   }
 }
 
-class AppNodeModel extends HtmlNodeModel {
+class AppNodeModel extends HtmlResize.model {
   getOutlineStyle() {
     const style = super.getOutlineStyle()
     style.stroke = 'none'

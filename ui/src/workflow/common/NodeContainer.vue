@@ -123,4 +123,7 @@ const props = defineProps<{
 .outgoing-anchor {
   stroke: #82b366;
 }
+:deep(.el-card) {
+  overflow: visible;
+}
 </style>
