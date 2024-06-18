@@ -557,7 +557,7 @@ const validate = () => {
   return Promise.all(lf.value.graphModel.nodes.map((element: any) => element?.validate?.()))
 }
 const getGraphData = () => {
-  return JSON.stringify(lf.value.getGraphData())
+  return lf.value.getGraphData()
 }
 
 const onmousedown = (shapeItem: ShapeItem) => {
