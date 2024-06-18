@@ -48,6 +48,8 @@ const route = useRoute()
 const {
   params: { id }
 } = route as any
+
+let interval: any
 const workflowRef = ref()
 
 const loading = ref(false)
@@ -84,11 +86,37 @@ function getDetail() {
   })
 }
 
+/**
+ * 定时保存
+ */
+const initInterval = () => {
+  interval = setInterval(() => {
+    const obj = {
+      work_flow: getGraphData()
+    }
+    application.asyncPutApplication(id, obj)
+  }, 60000)
+}
+
+/**
+ * 关闭定时
+ */
+const closeInterval = () => {
+  if (interval) {
+    clearInterval(interval)
+  }
+}
+
 onMounted(() => {
   getDetail()
+  // // 初始化定时任务
+  // initInterval()
 })
 
-onBeforeUnmount(() => {})
+onBeforeUnmount(() => {
+  // 清除定时任务
+  closeInterval()
+})
 </script>
 <style lang="scss">
 .application-workflow {
