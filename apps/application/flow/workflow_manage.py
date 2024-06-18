@@ -60,12 +60,12 @@ class Flow:
 
     @staticmethod
     def is_valid_node_params(node: Node):
-        get_node(node.type)(node, Node)
+        get_node(node.type)(node, None, None)
 
     def is_valid_node(self, node: Node):
         self.is_valid_node_params(node)
         if node.type == 'condition-node':
-            branch_list = node.properties.get('branch')
+            branch_list = node.properties.get('node_data').get('branch')
             for branch in branch_list:
                 source_anchor_id = f"{node.id}_{branch.get('id')}_right"
                 edge_list = [edge for edge in self.edges if edge.sourceAnchorId == source_anchor_id]
@@ -89,7 +89,7 @@ class Flow:
         node_list = reduce(lambda x, y: [*x, *y],
                            [[node for node in self.nodes if node.id == edge.targetNodeId] for edge in edge_list],
                            [])
-        if len(node_list) == 0:
+        if len(node_list) == 0 and not end_nodes.__contains__(node.type):
             raise AppApiException(500,
                                   f'不存在的下一个节点')
         return node_list

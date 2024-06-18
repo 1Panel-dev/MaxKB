@@ -18,7 +18,8 @@ from common.util.field_message import ErrMessage
 class ReplyNodeParamsSerializer(serializers.Serializer):
     reply_type = serializers.CharField(required=True, error_messages=ErrMessage.char("回复类型"))
     fields = serializers.ListField(required=False, error_messages=ErrMessage.list("引用字段"))
-    content = serializers.CharField(required=False, error_messages=ErrMessage.char("直接回答内容"))
+    content = serializers.CharField(required=False, allow_blank=True, allow_null=True,
+                                    error_messages=ErrMessage.char("直接回答内容"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
