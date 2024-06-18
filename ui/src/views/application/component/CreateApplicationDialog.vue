@@ -177,7 +177,7 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
         if (applicationForm.value.type === 'WORK_FLOW') {
           router.push({ path: `/application/${res.data.id}/workflow` })
         } else {
-          router.push({ path: `/application/${res.data.id}/${item.type}/setting` })
+          router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
         }
 
         dialogVisible.value = false

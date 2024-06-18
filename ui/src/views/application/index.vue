@@ -80,12 +80,7 @@
                     :content="$t('views.application.applicationList.card.setting')"
                     placement="top"
                   >
-                    <el-button
-                      text
-                      @click.stop="
-                        router.push({ path: `/application/${item.id}/${item.type}/setting` })
-                      "
-                    >
+                    <el-button text @click.stop="settingApplication(item)">
                       <AppIcon iconName="Setting"></AppIcon>
                     </el-button>
                   </el-tooltip>
@@ -133,6 +128,14 @@ const paginationConfig = reactive({
 })
 
 const searchValue = ref('')
+
+function settingApplication(row: any) {
+  if (row.type === 'WORK_FLOW') {
+    router.push({ path: `/application/${row.id}/workflow` })
+  } else {
+    router.push({ path: `/application/${row.id}/${row.type}/setting` })
+  }
+}
 
 function openCreateDialog() {
   CreateApplicationDialogRef.value.open()

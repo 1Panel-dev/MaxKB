@@ -1,9 +1,9 @@
 <template>
-  <div class="application-workflow">
+  <div class="application-workflow" v-loading="loading">
     <div class="header border-b flex-between p-16-24">
       <div class="flex align-center">
         <back-button to="-1"></back-button>
-        <h4>创建应用</h4>
+        <h4>{{ detail?.name }}</h4>
       </div>
       <div>
         <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
@@ -29,7 +29,7 @@
       </div>
     </el-collapse-transition>
     <div class="workflow-main">
-      <workflow ref="workflowRef" />
+      <workflow ref="workflowRef" v-if="detail" :data="detail?.work_flow" />
     </div>
   </div>
 </template>
@@ -41,6 +41,8 @@ import { menuNodes } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import useStore from '@/stores'
+const { application } = useStore()
 const route = useRoute()
 
 const {
@@ -49,6 +51,7 @@ const {
 const workflowRef = ref()
 
 const loading = ref(false)
+const detail = ref<any>(null)
 
 const showPopover = ref(false)
 
@@ -75,7 +78,15 @@ function getGraphData() {
   return workflowRef.value?.getGraphData()
 }
 
-onMounted(() => {})
+function getDetail() {
+  application.asyncGetApplicationDetail(id, loading).then((res: any) => {
+    detail.value = res.data
+  })
+}
+
+onMounted(() => {
+  getDetail()
+})
 
 onBeforeUnmount(() => {})
 </script>
