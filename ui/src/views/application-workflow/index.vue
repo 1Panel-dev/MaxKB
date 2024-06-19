@@ -9,7 +9,7 @@
         <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
           添加组件
         </el-button>
-        <el-button> 调试 </el-button>
+        <el-button icon="CaretRight">调试</el-button>
         <el-button type="primary" @click="publicHandle"> 保存 </el-button>
       </div>
     </div>
@@ -82,6 +82,9 @@ function getGraphData() {
 
 function getDetail() {
   application.asyncGetApplicationDetail(id, loading).then((res: any) => {
+    res.data?.work_flow['nodes'].map((v: any) => {
+      v['properties']['noRender'] = true
+    })
     detail.value = res.data
   })
 }
@@ -135,9 +138,9 @@ onBeforeUnmount(() => {
     user-select: none; /* CSS3属性 */
     position: absolute;
     top: 110px;
-    right: 24px;
+    right: 23px;
     z-index: 99;
-    width: 240px;
+    width: 253px;
     box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
     background: #ffffff;
     padding-bottom: 8px;
