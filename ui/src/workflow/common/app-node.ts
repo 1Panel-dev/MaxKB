@@ -48,6 +48,18 @@ class AppNode extends HtmlResize.view {
     }
   }
 
+  // getAnchorShape(anchorData) {
+  //   const { x, y, type } = anchorData;
+  //   return h('rect', {
+  //     x: x - 5,
+  //     y: y - 5,
+  //     width: 10,
+  //     height: 10,
+  //     className: `custom-anchor ${
+  //       type === 'left' ? 'incomming-anchor' : 'outgoing-anchor'
+  //     }`,
+  //   });
+  // }
   setHtml(rootEl: HTMLElement) {
     if (!this.isMounted) {
       this.isMounted = true
@@ -115,22 +127,24 @@ class AppNodeModel extends HtmlResize.model {
   getDefaultAnchor() {
     const { id, x, y, width } = this
     const anchors: any = []
-    if (this.type !== 'start-node') {
+
+    if (this.type !== 'base-node') {
+      if (this.type !== 'start-node') {
+        anchors.push({
+          x: x - width / 2 + 10,
+          y: y,
+          id: `${id}_left`,
+          edgeAddable: false,
+          type: 'left'
+        })
+      }
       anchors.push({
-        x: x - width / 2 + 10,
+        x: x + width / 2 - 10,
         y: y,
-        id: `${id}_left`,
-        edgeAddable: false,
-        type: 'left'
+        id: `${id}_right`,
+        type: 'right'
       })
     }
-
-    anchors.push({
-      x: x + width / 2 - 10,
-      y: y,
-      id: `${id}_right`,
-      type: 'right'
-    })
 
     return anchors
   }

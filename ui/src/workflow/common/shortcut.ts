@@ -84,7 +84,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
         confirmButtonText: '确定',
         cancelButtonText: '取消'
       }
-      ElMessageBox.confirm('确定删除改节点？', defaultOptions).then(() => {
+      ElMessageBox.confirm('确定删除该节点？', defaultOptions).then(() => {
         if (!keyboardOptions?.enabled) return true;
         if (graph.textEditElement) return true;
         const elements = graph.getSelectElements(true);

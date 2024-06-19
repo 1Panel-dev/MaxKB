@@ -2,10 +2,26 @@
   <div class="workflow-node-container p-16">
     <div class="step-container p-16">
       <div v-resize="resizeStepContainer">
-        <div class="flex align-center mb-16">
-          <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
-          <h4>{{ nodeModel.properties.stepName }}</h4>
+        <div class="flex-between mb-16">
+          <div class="flex align-center">
+            <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
+            <h4>{{ nodeModel.properties.stepName }}</h4>
+          </div>
+          <div @click.stop>
+            <el-dropdown trigger="click">
+              <el-button text @click.stop>
+                <el-icon class="color-secondary"><MoreFilled /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu style="min-width: 80px">
+                  <el-dropdown-item class="p-8">复制</el-dropdown-item>
+                  <el-dropdown-item class="border-t p-8">删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
+
         <div>
           <slot></slot>
           <template v-if="props.nodeModel.properties.fields?.length > 0">
@@ -61,6 +77,7 @@ const resizeStepContainer = (wh: any) => {
 const props = defineProps<{
   nodeModel: any
 }>()
+
 </script>
 <style lang="scss" scoped>
 .workflow-node-container {

@@ -9,7 +9,10 @@
         <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
           添加组件
         </el-button>
-        <el-button icon="CaretRight">调试</el-button>
+        <el-button @click="showDebug = true">
+          <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
+          调试</el-button
+        >
         <el-button type="primary" @click="publicHandle"> 保存 </el-button>
       </div>
     </div>
@@ -28,9 +31,37 @@
         </template>
       </div>
     </el-collapse-transition>
+    <!-- 主画布 -->
     <div class="workflow-main">
       <workflow ref="workflowRef" v-if="detail" :data="detail?.work_flow" />
     </div>
+    <!-- 调试 -->
+    <el-collapse-transition>
+      <div class="workflow-debug-container" :class="enlarge ? 'enlarge' : ''" v-if="showDebug">
+        <div class="workflow-debug-header">
+          <div class="flex-between">
+            <h4 class="ml-24">
+              {{ detail?.name || $t('views.application.applicationForm.form.appName.label') }}
+            </h4>
+            <div class="mr-16">
+              <el-button link @click="enlarge = !enlarge">
+                <AppIcon
+                  :iconName="enlarge ? 'app-magnify' : 'app-minify'"
+                  class="color-secondary"
+                  style="font-size: 20px"
+                ></AppIcon>
+              </el-button>
+              <el-button link @click="showDebug = false">
+                <el-icon :size="20" class="color-secondary"><Close /></el-icon>
+              </el-button>
+            </div>
+          </div>
+        </div>
+        <div class="scrollbar-height">
+          <AiChat :data="detail"></AiChat>
+        </div>
+      </div>
+    </el-collapse-transition>
   </div>
 </template>
 <script setup lang="ts">
@@ -56,6 +87,8 @@ const loading = ref(false)
 const detail = ref<any>(null)
 
 const showPopover = ref(false)
+const showDebug = ref(false)
+const enlarge = ref(false)
 
 function publicHandle() {
   workflowRef.value?.validate().then(() => {
@@ -64,6 +97,7 @@ function publicHandle() {
     }
     applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
       MsgSuccess('发布成功')
+      getDetail()
     })
   })
 }
@@ -153,6 +187,43 @@ onBeforeUnmount(() => {
         background: var(--app-text-color-light-1);
       }
     }
+  }
+}
+
+.workflow-debug-container {
+  z-index: 10000;
+  position: relative;
+  border-radius: 8px;
+  border: 1px solid #ffffff;
+  background: linear-gradient(
+      188deg,
+      rgba(235, 241, 255, 0.2) 39.6%,
+      rgba(231, 249, 255, 0.2) 94.3%
+    ),
+    #eff0f1;
+  box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.1);
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  overflow: hidden;
+  width: 420px;
+  height: 600px;
+  .workflow-debug-header {
+    background: var(--app-header-bg-color);
+    height: var(--app-header-height);
+    line-height: var(--app-header-height);
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--el-border-color);
+  }
+  .scrollbar-height {
+    height: calc(100% - var(--app-header-height) - 24px);
+    padding-top: 24px;
+  }
+  &.enlarge {
+    width: 50% !important;
+    height: 100% !important;
+    bottom: 0 !important;
+    right: 0 !important;
   }
 }
 </style>
