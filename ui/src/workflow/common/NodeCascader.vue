@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { iconComponent } from '../icons/utils'
 const props = defineProps<{
   nodeModel: any
@@ -44,5 +44,8 @@ function getIncomingNode(id: string) {
     })
   }
 }
+onMounted(() => {
+  getIncomingNode(props.nodeModel.id)
+})
 </script>
 <style scoped></style>

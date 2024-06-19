@@ -1,845 +1,383 @@
 {
-    "edges": [
+  "edges": [
+    {
+      "id": "328b53ca-1f8e-402a-accc-5652e3bd7556",
+      "type": "app-edge",
+      "endPoint": {
+        "x": 560,
+        "y": 220
+      },
+      "pointsList": [
         {
-            "id": "21096f2c-d89f-4fb3-b12-61484b0686d4",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 370,
-                "y": 330
-            },
-            "pointsList": [
-                {
-                    "x": 250,
-                    "y": 330
-                },
-                {
-                    "x": 360,
-                    "y": 330
-                },
-                {
-                    "x": 260,
-                    "y": 330
-                },
-                {
-                    "x": 370,
-                    "y": 330
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 250,
-                "y": 330
-            },
-            "sourceNodeId": "start-node",
-            "targetNodeId": "e781559d-e54b-45d8-bcea-d2d426fd58a3",
-            "sourceAnchorId": "start-node_right",
-            "targetAnchorId": "e781559d-e54b-45d8-bcea-d2d426fd58a3_left"
+          "x": 260,
+          "y": 220
         },
         {
-            "id": "6019001b-f9e8-4081-9538-ef1e717eac7b",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 850,
-                "y": 330
-            },
-            "pointsList": [
-                {
-                    "x": 690,
-                    "y": 330
-                },
-                {
-                    "x": 800,
-                    "y": 330
-                },
-                {
-                    "x": 740,
-                    "y": 330
-                },
-                {
-                    "x": 850,
-                    "y": 330
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 690,
-                "y": 330
-            },
-            "sourceNodeId": "e781559d-e54b-45d8-bcea-d2d426fd58a3",
-            "targetNodeId": "c94a8bfb-34b0-4b1b-8456-0a164870d382",
-            "sourceAnchorId": "e781559d-e54b-45d8-bcea-d2d426fd58a3_right",
-            "targetAnchorId": "c94a8bfb-34b0-4b1b-8456-0a164870d382_left"
+          "x": 370,
+          "y": 220
         },
         {
-            "id": "6dba7e71-c14c-427e-b7de-09f3b1064291",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 1510,
-                "y": -480
-            },
-            "pointsList": [
-                {
-                    "x": 1430,
-                    "y": 172.39999999999998
-                },
-                {
-                    "x": 1540,
-                    "y": 172.39999999999998
-                },
-                {
-                    "x": 1400,
-                    "y": -480
-                },
-                {
-                    "x": 1510,
-                    "y": -480
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 1430,
-                "y": 172.39999999999998
-            },
-            "sourceNodeId": "c94a8bfb-34b0-4b1b-8456-0a164870d382",
-            "targetNodeId": "ec6f5581-fef3-45a1-8be1-6611a8c9ccfc",
-            "sourceAnchorId": "c94a8bfb-34b0-4b1b-8456-0a164870d382_5675_right",
-            "targetAnchorId": "ec6f5581-fef3-45a1-8be1-6611a8c9ccfc_left"
+          "x": 450,
+          "y": 220
         },
         {
-            "id": "45a83361-1dfe-499e-8407-8c1670386b04",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 1510,
-                "y": 60
-            },
-            "pointsList": [
-                {
-                    "x": 1430,
-                    "y": 296.8
-                },
-                {
-                    "x": 1540,
-                    "y": 296.8
-                },
-                {
-                    "x": 1400,
-                    "y": 60
-                },
-                {
-                    "x": 1510,
-                    "y": 60
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 1430,
-                "y": 296.8
-            },
-            "sourceNodeId": "c94a8bfb-34b0-4b1b-8456-0a164870d382",
-            "targetNodeId": "2ac57a56-9150-4f04-a7b9-6390bdaade19",
-            "sourceAnchorId": "c94a8bfb-34b0-4b1b-8456-0a164870d382_9947_right",
-            "targetAnchorId": "2ac57a56-9150-4f04-a7b9-6390bdaade19_left"
-        },
-        {
-            "id": "b18a10f9-df1a-415b-b419-cf44229b3345",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 2090,
-                "y": 60
-            },
-            "pointsList": [
-                {
-                    "x": 1830,
-                    "y": 60
-                },
-                {
-                    "x": 1940,
-                    "y": 60
-                },
-                {
-                    "x": 1980,
-                    "y": 60
-                },
-                {
-                    "x": 2090,
-                    "y": 60
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 1830,
-                "y": 60
-            },
-            "sourceNodeId": "2ac57a56-9150-4f04-a7b9-6390bdaade19",
-            "targetNodeId": "bd9dd852-d749-4b42-9b95-80f25b9a606d",
-            "sourceAnchorId": "2ac57a56-9150-4f04-a7b9-6390bdaade19_right",
-            "targetAnchorId": "bd9dd852-d749-4b42-9b95-80f25b9a606d_left"
-        },
-        {
-            "id": "d9b31737-a480-48e5-84b6-a8556d1d68a5",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 1510,
-                "y": 780
-            },
-            "pointsList": [
-                {
-                    "x": 1430,
-                    "y": 421.2
-                },
-                {
-                    "x": 1540,
-                    "y": 421.2
-                },
-                {
-                    "x": 1400,
-                    "y": 780
-                },
-                {
-                    "x": 1510,
-                    "y": 780
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 1430,
-                "y": 421.2
-            },
-            "sourceNodeId": "c94a8bfb-34b0-4b1b-8456-0a164870d382",
-            "targetNodeId": "1cd54877-bfff-4791-b8f5-08c49f8bdf66",
-            "sourceAnchorId": "c94a8bfb-34b0-4b1b-8456-0a164870d382_5048_right",
-            "targetAnchorId": "1cd54877-bfff-4791-b8f5-08c49f8bdf66_left"
-        },
-        {
-            "id": "32d36445-b2b8-4472-9c86-3a9c147ceea2",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 1950,
-                "y": 780
-            },
-            "pointsList": [
-                {
-                    "x": 1830,
-                    "y": 780
-                },
-                {
-                    "x": 1940,
-                    "y": 780
-                },
-                {
-                    "x": 1840,
-                    "y": 780
-                },
-                {
-                    "x": 1950,
-                    "y": 780
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 1830,
-                "y": 780
-            },
-            "sourceNodeId": "1cd54877-bfff-4791-b8f5-08c49f8bdf66",
-            "targetNodeId": "e99869b2-251f-47a7-9966-c54ffb59b381",
-            "sourceAnchorId": "1cd54877-bfff-4791-b8f5-08c49f8bdf66_right",
-            "targetAnchorId": "e99869b2-251f-47a7-9966-c54ffb59b381_left"
-        },
-        {
-            "id": "98c9014f-0bfc-4595-9c79-48ea785dc6cd",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 2640,
-                "y": 260
-            },
-            "pointsList": [
-                {
-                    "x": 2530,
-                    "y": 684.6
-                },
-                {
-                    "x": 2640,
-                    "y": 684.6
-                },
-                {
-                    "x": 2530,
-                    "y": 260
-                },
-                {
-                    "x": 2640,
-                    "y": 260
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 2530,
-                "y": 684.6
-            },
-            "sourceNodeId": "e99869b2-251f-47a7-9966-c54ffb59b381",
-            "targetNodeId": "62ab766b-b218-4bea-895f-b7e83614c8b7",
-            "sourceAnchorId": "e99869b2-251f-47a7-9966-c54ffb59b381_3014_right",
-            "targetAnchorId": "62ab766b-b218-4bea-895f-b7e83614c8b7_left"
-        },
-        {
-            "id": "57e76e75-5c7f-42cb-a120-cc890243bb17",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 2660,
-                "y": 810
-            },
-            "pointsList": [
-                {
-                    "x": 2530,
-                    "y": 809
-                },
-                {
-                    "x": 2640,
-                    "y": 809
-                },
-                {
-                    "x": 2550,
-                    "y": 810
-                },
-                {
-                    "x": 2660,
-                    "y": 810
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 2530,
-                "y": 809
-            },
-            "sourceNodeId": "e99869b2-251f-47a7-9966-c54ffb59b381",
-            "targetNodeId": "04837361-30ea-41bd-96bc-768ee58d69d6",
-            "sourceAnchorId": "e99869b2-251f-47a7-9966-c54ffb59b381_4658_right",
-            "targetAnchorId": "04837361-30ea-41bd-96bc-768ee58d69d6_left"
-        },
-        {
-            "id": "8becdf8e-243a-482a-bdf6-22e947aa9bd2",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 2660,
-                "y": 1420
-            },
-            "pointsList": [
-                {
-                    "x": 2530,
-                    "y": 895.6000000000001
-                },
-                {
-                    "x": 2640,
-                    "y": 895.6000000000001
-                },
-                {
-                    "x": 2550,
-                    "y": 1420
-                },
-                {
-                    "x": 2660,
-                    "y": 1420
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 2530,
-                "y": 895.6000000000001
-            },
-            "sourceNodeId": "e99869b2-251f-47a7-9966-c54ffb59b381",
-            "targetNodeId": "fe4d14fd-9aeb-40ad-b7e0-3d88bf1c5933",
-            "sourceAnchorId": "e99869b2-251f-47a7-9966-c54ffb59b381_8871_right",
-            "targetAnchorId": "fe4d14fd-9aeb-40ad-b7e0-3d88bf1c5933_left"
-        },
-        {
-            "id": "f0277552-0d5a-4642-838f-989e59afe350",
-            "type": "app-edge",
-            "endPoint": {
-                "x": 1510,
-                "y": 1460
-            },
-            "pointsList": [
-                {
-                    "x": 1430,
-                    "y": 507.8
-                },
-                {
-                    "x": 1540,
-                    "y": 507.8
-                },
-                {
-                    "x": 1400,
-                    "y": 1460
-                },
-                {
-                    "x": 1510,
-                    "y": 1460
-                }
-            ],
-            "properties": {
-
-            },
-            "startPoint": {
-                "x": 1430,
-                "y": 507.8
-            },
-            "sourceNodeId": "c94a8bfb-34b0-4b1b-8456-0a164870d382",
-            "targetNodeId": "c9b74adb-e219-4d2b-8fd5-ecc2bac8786e",
-            "sourceAnchorId": "c94a8bfb-34b0-4b1b-8456-0a164870d382_6750_right",
-            "targetAnchorId": "c9b74adb-e219-4d2b-8fd5-ecc2bac8786e_left"
+          "x": 560,
+          "y": 220
         }
-    ],
-    "nodes": [
+      ],
+      "properties": {},
+      "startPoint": {
+        "x": 260,
+        "y": 220
+      },
+      "sourceNodeId": "start-node",
+      "targetNodeId": "c8903650-67e0-42a3-875f-6896b33f8916",
+      "sourceAnchorId": "start-node_right",
+      "targetAnchorId": "c8903650-67e0-42a3-875f-6896b33f8916_left"
+    },
+    {
+      "id": "9979350a-4321-4f94-91e4-0c755db29e0c",
+      "type": "app-edge",
+      "endPoint": {
+        "x": 960,
+        "y": 220
+      },
+      "pointsList": [
         {
-            "x": 2.777777777777601,
-            "y": -340,
-            "id": "base-node",
-            "type": "base-node",
-            "properties": {
-                "height": 200,
-                "stepName": "基本信息",
-                "node_data": {
-                    "desc": "",
-                    "name": "",
-                    "prologue": "您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？"
-                }
-            }
+          "x": 880,
+          "y": 220
         },
         {
-            "x": 90,
-            "y": 330,
-            "id": "start-node",
-            "type": "start-node",
-            "properties": {
-                "fields": [
-                    {
-                        "label": "用户问题",
-                        "value": "question",
-                        "globeLabel": "{{开始.question}}",
-                        "globeValue": "{{context['start-node'].question}}"
-                    }
-                ],
-                "height": 200,
-                "stepName": "开始"
-            }
+          "x": 990,
+          "y": 220
         },
         {
-            "x": 530,
-            "y": 330,
-            "id": "e781559d-e54b-45d8-bcea-d2d426fd58a3",
-            "type": "ai-chat-node",
-            "properties": {
-                "fields": [
-                    {
-                        "label": "AI 回答内容",
-                        "value": "answer",
-                        "globeLabel": "{{AI 对话.answer}}",
-                        "globeValue": "{{context['e781559d-e54b-45d8-bcea-d2d426fd58a3'].answer}}"
-                    }
-                ],
-                "stepName": "AI 对话",
-                "node_data": {
-                    "prompt": "请直接返回所属的问题分类，不要说推理过程。\n用户问题为：{{开始.question}}\n问题分类是：\n打招呼 \n售前咨询\n售后咨询\n其他咨询",
-                    "system": "你是问题分类大师",
-                    "model_id": "9bdd1ab3-135b-11ef-b688-a8a1595801ab",
-                    "dialogue_number": 0
-                }
-            }
+          "x": 850,
+          "y": 220
         },
         {
-            "x": 1140,
-            "y": 330,
-            "id": "c94a8bfb-34b0-4b1b-8456-0a164870d382",
-            "type": "condition-node",
-            "properties": {
-                "width": 600,
-                "stepName": "判断器",
-                "node_data": {
-                    "branch": [
-                        {
-                            "id": "5675",
-                            "type": "IF",
-                            "condition": "and",
-                            "conditions": [
-                                {
-                                    "field": [
-                                        "e781559d-e54b-45d8-bcea-d2d426fd58a3",
-                                        "answer"
-                                    ],
-                                    "value": "打招呼 ",
-                                    "compare": "contain"
-                                }
-                            ]
-                        },
-                        {
-                            "id": "9947",
-                            "type": "ELSE IF 1",
-                            "condition": "and",
-                            "conditions": [
-                                {
-                                    "field": [
-                                        "e781559d-e54b-45d8-bcea-d2d426fd58a3",
-                                        "answer"
-                                    ],
-                                    "value": "售前咨询",
-                                    "compare": "contain"
-                                }
-                            ]
-                        },
-                        {
-                            "id": "5048",
-                            "type": "ELSE IF 2",
-                            "condition": "and",
-                            "conditions": [
-                                {
-                                    "field": [
-                                        "e781559d-e54b-45d8-bcea-d2d426fd58a3",
-                                        "answer"
-                                    ],
-                                    "value": "售后咨询",
-                                    "compare": "contain"
-                                }
-                            ]
-                        },
-                        {
-                            "id": "6750",
-                            "type": "ELSE",
-                            "condition": "and",
-                            "conditions": [
-
-                            ]
-                        }
-                    ]
-                },
-                "branch_condition_list": [
-                    {
-                        "id": "5675",
-                        "index": 0,
-                        "height": 116.4
-                    },
-                    {
-                        "id": "9947",
-                        "index": 1,
-                        "height": 116.4
-                    },
-                    {
-                        "id": "5048",
-                        "index": 2,
-                        "height": 116.4
-                    },
-                    {
-                        "id": "6750",
-                        "index": 3,
-                        "height": 40.8
-                    }
-                ]
-            }
-        },
-        {
-            "x": 1670,
-            "y": -480,
-            "id": "ec6f5581-fef3-45a1-8be1-6611a8c9ccfc",
-            "type": "reply-node",
-            "properties": {
-                "stepName": "指定回复",
-                "node_data": {
-                    "fields": [
-
-                    ],
-                    "content": "你好我是ai只能机器人,很高兴为你服务",
-                    "reply_type": "content"
-                }
-            }
-        },
-        {
-            "x": 1670,
-            "y": 60,
-            "id": "2ac57a56-9150-4f04-a7b9-6390bdaade19",
-            "type": "search-dataset-node",
-            "properties": {
-                "fields": [
-                    {
-                        "label": "段落列表",
-                        "value": "paragraph_list",
-                        "globeLabel": "{{知识库检索.paragraph_list}}",
-                        "globeValue": "{{context['2ac57a56-9150-4f04-a7b9-6390bdaade19'].paragraph_list}}"
-                    },
-                    {
-                        "label": "满足直接回答的段落列表",
-                        "value": "is_hit_handling_method_list",
-                        "globeLabel": "{{知识库检索.is_hit_handling_method_list}}",
-                        "globeValue": "{{context['2ac57a56-9150-4f04-a7b9-6390bdaade19'].is_hit_handling_method_list}}"
-                    },
-                    {
-                        "label": "检索结果",
-                        "value": "data",
-                        "globeLabel": "{{知识库检索.data}}",
-                        "globeValue": "{{context['2ac57a56-9150-4f04-a7b9-6390bdaade19'].data}}"
-                    },
-                    {
-                        "label": "满足直接回答的分段内容",
-                        "value": "directly_return",
-                        "globeLabel": "{{知识库检索.directly_return}}",
-                        "globeValue": "{{context['2ac57a56-9150-4f04-a7b9-6390bdaade19'].directly_return}}"
-                    }
-                ],
-                "stepName": "知识库检索",
-                "node_data": {
-                    "dataset_id_list": [
-                        "8ba47817-28a1-11ef-90fd-a8a1595801ab"
-                    ],
-                    "dataset_setting": {
-                        "top_n": 3,
-                        "similarity": 0.6,
-                        "search_mode": "embedding",
-                        "max_paragraph_char_number": 5000
-                    },
-                    "question_reference_address": [
-                        "start-node",
-                        "question"
-                    ]
-                }
-            }
-        },
-        {
-            "x": 2250,
-            "y": 60,
-            "id": "bd9dd852-d749-4b42-9b95-80f25b9a606d",
-            "type": "ai-chat-node",
-            "properties": {
-                "fields": [
-                    {
-                        "label": "AI 回答内容",
-                        "value": "answer",
-                        "globeLabel": "{{AI 对话.answer}}",
-                        "globeValue": "{{context['bd9dd852-d749-4b42-9b95-80f25b9a606d'].answer}}"
-                    }
-                ],
-                "stepName": "AI 对话",
-                "node_data": {
-                    "prompt": "已知信息：\n{{知识库检索.data}}\n问题：\n{{开始.question}}",
-                    "system": "你是售前咨询知识库",
-                    "model_id": "9bdd1ab3-135b-11ef-b688-a8a1595801ab",
-                    "dialogue_number": 0
-                }
-            }
-        },
-        {
-            "x": 1670,
-            "y": 780,
-            "id": "1cd54877-bfff-4791-b8f5-08c49f8bdf66",
-            "type": "search-dataset-node",
-            "properties": {
-                "fields": [
-                    {
-                        "label": "段落列表",
-                        "value": "paragraph_list",
-                        "globeLabel": "{{知识库检索.paragraph_list}}",
-                        "globeValue": "{{context['1cd54877-bfff-4791-b8f5-08c49f8bdf66'].paragraph_list}}"
-                    },
-                    {
-                        "label": "满足直接回答的段落列表",
-                        "value": "is_hit_handling_method_list",
-                        "globeLabel": "{{知识库检索.is_hit_handling_method_list}}",
-                        "globeValue": "{{context['1cd54877-bfff-4791-b8f5-08c49f8bdf66'].is_hit_handling_method_list}}"
-                    },
-                    {
-                        "label": "检索结果",
-                        "value": "data",
-                        "globeLabel": "{{知识库检索.data}}",
-                        "globeValue": "{{context['1cd54877-bfff-4791-b8f5-08c49f8bdf66'].data}}"
-                    },
-                    {
-                        "label": "满足直接回答的分段内容",
-                        "value": "directly_return",
-                        "globeLabel": "{{知识库检索.directly_return}}",
-                        "globeValue": "{{context['1cd54877-bfff-4791-b8f5-08c49f8bdf66'].directly_return}}"
-                    }
-                ],
-                "stepName": "知识库检索",
-                "node_data": {
-                    "dataset_id_list": [
-                        "188c3fa1-28a3-11ef-99e8-a8a1595801ab"
-                    ],
-                    "dataset_setting": {
-                        "top_n": 3,
-                        "similarity": 0.6,
-                        "search_mode": "embedding",
-                        "max_paragraph_char_number": 5000
-                    },
-                    "question_reference_address": [
-                        "start-node",
-                        "question"
-                    ]
-                }
-            }
-        },
-        {
-            "x": 2240,
-            "y": 780,
-            "id": "e99869b2-251f-47a7-9966-c54ffb59b381",
-            "type": "condition-node",
-            "properties": {
-                "width": 600,
-                "stepName": "判断器",
-                "node_data": {
-                    "branch": [
-                        {
-                            "id": "3014",
-                            "type": "IF",
-                            "condition": "and",
-                            "conditions": [
-                                {
-                                    "field": [
-                                        "1cd54877-bfff-4791-b8f5-08c49f8bdf66",
-                                        "is_hit_handling_method_list"
-                                    ],
-                                    "value": "1",
-                                    "compare": "ge"
-                                }
-                            ]
-                        },
-                        {
-                            "id": "4658",
-                            "type": "ELSE IF 1",
-                            "condition": "and",
-                            "conditions": [
-                                {
-                                    "field": [
-                                        "1cd54877-bfff-4791-b8f5-08c49f8bdf66",
-                                        "paragraph_list"
-                                    ],
-                                    "value": "1",
-                                    "compare": "ge"
-                                }
-                            ]
-                        },
-                        {
-                            "id": "8871",
-                            "type": "ELSE",
-                            "condition": "and",
-                            "conditions": [
-
-                            ]
-                        }
-                    ]
-                },
-                "branch_condition_list": [
-                    {
-                        "id": "3014",
-                        "index": 0,
-                        "height": 116.4
-                    },
-                    {
-                        "id": "4658",
-                        "index": 1,
-                        "height": 116.4
-                    },
-                    {
-                        "id": "8871",
-                        "index": 2,
-                        "height": 40.8
-                    }
-                ]
-            }
-        },
-        {
-            "x": 2800,
-            "y": 260,
-            "id": "62ab766b-b218-4bea-895f-b7e83614c8b7",
-            "type": "reply-node",
-            "properties": {
-                "stepName": "指定回复",
-                "node_data": {
-                    "fields": [
-                        "1cd54877-bfff-4791-b8f5-08c49f8bdf66",
-                        "directly_return"
-                    ],
-                    "content": "",
-                    "reply_type": "referencing"
-                }
-            }
-        },
-        {
-            "x": 2820,
-            "y": 810,
-            "id": "04837361-30ea-41bd-96bc-768ee58d69d6",
-            "type": "ai-chat-node",
-            "properties": {
-                "fields": [
-                    {
-                        "label": "AI 回答内容",
-                        "value": "answer",
-                        "globeLabel": "{{AI 对话.answer}}",
-                        "globeValue": "{{context['04837361-30ea-41bd-96bc-768ee58d69d6'].answer}}"
-                    }
-                ],
-                "stepName": "AI 对话",
-                "node_data": {
-                    "prompt": "已知信息：\n{{context['1cd54877-bfff-4791-b8f5-08c49f8bdf66'].data}}\n问题：\n{{context['start-node'].question}}",
-                    "system": "你是售后工程师",
-                    "model_id": "9bdd1ab3-135b-11ef-b688-a8a1595801ab",
-                    "dialogue_number": 0
-                }
-            }
-        },
-        {
-            "x": 2820,
-            "y": 1420,
-            "id": "fe4d14fd-9aeb-40ad-b7e0-3d88bf1c5933",
-            "type": "reply-node",
-            "properties": {
-                "stepName": "指定回复",
-                "node_data": {
-                    "fields": [
-
-                    ],
-                    "content": "未找到相关内容",
-                    "reply_type": "content"
-                }
-            }
-        },
-        {
-            "x": 1670,
-            "y": 1460,
-            "id": "c9b74adb-e219-4d2b-8fd5-ecc2bac8786e",
-            "type": "ai-chat-node",
-            "properties": {
-                "fields": [
-                    {
-                        "label": "AI 回答内容",
-                        "value": "answer",
-                        "globeLabel": "{{AI 对话.answer}}",
-                        "globeValue": "{{context['c9b74adb-e219-4d2b-8fd5-ecc2bac8786e'].answer}}"
-                    }
-                ],
-                "stepName": "AI 对话",
-                "node_data": {
-                    "prompt": "{{开始.question}} ",
-                    "system": "",
-                    "model_id": "9bdd1ab3-135b-11ef-b688-a8a1595801ab",
-                    "dialogue_number": 0
-                }
-            }
+          "x": 960,
+          "y": 220
         }
-    ]
+      ],
+      "properties": {},
+      "startPoint": {
+        "x": 880,
+        "y": 220
+      },
+      "sourceNodeId": "c8903650-67e0-42a3-875f-6896b33f8916",
+      "targetNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
+      "sourceAnchorId": "c8903650-67e0-42a3-875f-6896b33f8916_right",
+      "targetAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_left"
+    },
+    {
+      "id": "3dc74fbf-b4b1-41ab-9d65-b3476d05403c",
+      "type": "app-edge",
+      "endPoint": {
+        "x": 1640,
+        "y": -330
+      },
+      "pointsList": [
+        {
+          "x": 1540,
+          "y": 125.5455
+        },
+        {
+          "x": 1650,
+          "y": 125.5455
+        },
+        {
+          "x": 1530,
+          "y": -330
+        },
+        {
+          "x": 1640,
+          "y": -330
+        }
+      ],
+      "properties": {},
+      "startPoint": {
+        "x": 1540,
+        "y": 125.5455
+      },
+      "sourceNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
+      "targetNodeId": "8839b489-3949-4d27-b932-896392d3dff5",
+      "sourceAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_6351_right",
+      "targetAnchorId": "8839b489-3949-4d27-b932-896392d3dff5_left"
+    },
+    {
+      "id": "2e1229ab-1be7-4e98-8032-db3bbe0e4c01",
+      "type": "app-edge",
+      "endPoint": {
+        "x": 1650,
+        "y": 250
+      },
+      "pointsList": [
+        {
+          "x": 1540,
+          "y": 249.00050000000002
+        },
+        {
+          "x": 1650,
+          "y": 249.00050000000002
+        },
+        {
+          "x": 1540,
+          "y": 250
+        },
+        {
+          "x": 1650,
+          "y": 250
+        }
+      ],
+      "properties": {},
+      "startPoint": {
+        "x": 1540,
+        "y": 249.00050000000002
+      },
+      "sourceNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
+      "targetNodeId": "bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91",
+      "sourceAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_5186_right",
+      "targetAnchorId": "bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91_left"
+    },
+    {
+      "id": "f689d923-641f-4039-b307-645bd3fbdf4a",
+      "type": "app-edge",
+      "endPoint": {
+        "x": 1650,
+        "y": 860
+      },
+      "pointsList": [
+        {
+          "x": 1540,
+          "y": 334.728
+        },
+        {
+          "x": 1650,
+          "y": 334.728
+        },
+        {
+          "x": 1540,
+          "y": 860
+        },
+        {
+          "x": 1650,
+          "y": 860
+        }
+      ],
+      "properties": {},
+      "startPoint": {
+        "x": 1540,
+        "y": 334.728
+      },
+      "sourceNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
+      "targetNodeId": "f9cfacd9-2301-431d-a6ea-876717ccaffc",
+      "sourceAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_7119_right",
+      "targetAnchorId": "f9cfacd9-2301-431d-a6ea-876717ccaffc_left"
+    }
+  ],
+  "nodes": [
+    {
+      "x": 130,
+      "y": -230,
+      "id": "base-node",
+      "type": "base-node",
+      "properties": {
+        "height": 200,
+        "stepName": "基本信息",
+        "node_data": {
+          "desc": "test",
+          "name": "test111",
+          "prologue": "您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？"
+        }
+      }
+    },
+    {
+      "x": 100,
+      "y": 220,
+      "id": "start-node",
+      "type": "start-node",
+      "properties": {
+        "fields": [
+          {
+            "label": "用户问题",
+            "value": "question",
+            "globeLabel": "{{开始.question}}",
+            "globeValue": "{{context['start-node'].question}}"
+          }
+        ],
+        "height": 200,
+        "stepName": "开始"
+      }
+    },
+    {
+      "x": 720,
+      "y": 220,
+      "id": "c8903650-67e0-42a3-875f-6896b33f8916",
+      "type": "search-dataset-node",
+      "properties": {
+        "fields": [
+          {
+            "label": "段落列表",
+            "value": "paragraph_list",
+            "globeLabel": "{{知识库检索.paragraph_list}}",
+            "globeValue": "{{context['c8903650-67e0-42a3-875f-6896b33f8916'].paragraph_list}}"
+          },
+          {
+            "label": "满足直接回答的段落列表",
+            "value": "is_hit_handling_method_list",
+            "globeLabel": "{{知识库检索.is_hit_handling_method_list}}",
+            "globeValue": "{{context['c8903650-67e0-42a3-875f-6896b33f8916'].is_hit_handling_method_list}}"
+          },
+          {
+            "label": "检索结果",
+            "value": "data",
+            "globeLabel": "{{知识库检索.data}}",
+            "globeValue": "{{context['c8903650-67e0-42a3-875f-6896b33f8916'].data}}"
+          },
+          {
+            "label": "满足直接回答的分段内容",
+            "value": "directly_return",
+            "globeLabel": "{{知识库检索.directly_return}}",
+            "globeValue": "{{context['c8903650-67e0-42a3-875f-6896b33f8916'].directly_return}}"
+          }
+        ],
+        "stepName": "知识库检索",
+        "node_data": {
+          "dataset_id_list": [],
+          "dataset_setting": {
+            "top_n": 3,
+            "similarity": 0.6,
+            "search_mode": "embedding",
+            "max_paragraph_char_number": 5000
+          },
+          "question_reference_address": [
+            "start-node",
+            "question"
+          ]
+        }
+      }
+    },
+    {
+      "x": 1250,
+      "y": 220,
+      "id": "ce724e9f-c741-4f22-a41c-d43247193629",
+      "type": "condition-node",
+      "properties": {
+        "width": 600,
+        "stepName": "判断器",
+        "node_data": {
+          "branch": [
+            {
+              "id": "6351",
+              "type": "IF",
+              "condition": "and",
+              "conditions": [
+                {
+                  "field": [
+                    "c8903650-67e0-42a3-875f-6896b33f8916",
+                    "is_hit_handling_method_list"
+                  ],
+                  "value": "1",
+                  "compare": "ge"
+                }
+              ]
+            },
+            {
+              "id": "5186",
+              "type": "ELSE IF 1",
+              "condition": "and",
+              "conditions": [
+                {
+                  "field": [
+                    "c8903650-67e0-42a3-875f-6896b33f8916",
+                    "paragraph_list"
+                  ],
+                  "value": "1",
+                  "compare": "ge"
+                }
+              ]
+            },
+            {
+              "id": "7119",
+              "type": "ELSE",
+              "condition": "and",
+              "conditions": []
+            }
+          ]
+        },
+        "branch_condition_list": [
+          {
+            "id": "6351",
+            "index": 0,
+            "height": 115.455
+          },
+          {
+            "id": "5186",
+            "index": 1,
+            "height": 115.455
+          },
+          {
+            "id": "7119",
+            "index": 2,
+            "height": 40
+          }
+        ]
+      }
+    },
+    {
+      "x": 1800,
+      "y": -330,
+      "id": "8839b489-3949-4d27-b932-896392d3dff5",
+      "type": "reply-node",
+      "properties": {
+        "stepName": "指定回复1",
+        "node_data": {
+          "fields": [
+            "c8903650-67e0-42a3-875f-6896b33f8916",
+            "directly_return"
+          ],
+          "content": "",
+          "reply_type": "referencing"
+        }
+      }
+    },
+    {
+      "x": 1810,
+      "y": 250,
+      "id": "bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91",
+      "type": "ai-chat-node",
+      "properties": {
+        "fields": [
+          {
+            "label": "AI 回答内容",
+            "value": "answer",
+            "globeLabel": "{{AI 对话.answer}}",
+            "globeValue": "{{context['bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91'].answer}}"
+          }
+        ],
+        "stepName": "AI 对话",
+        "node_data": {
+          "prompt": "已知信息：\n{{知识库检索.data}}\n问题：\n{{开始.question}}",
+          "system": "",
+          "model_id": "",
+          "dialogue_number": 0
+        }
+      }
+    },
+    {
+      "x": 1810,
+      "y": 860,
+      "id": "f9cfacd9-2301-431d-a6ea-876717ccaffc",
+      "type": "reply-node",
+      "properties": {
+        "stepName": "指定回复2",
+        "node_data": {
+          "fields": [],
+          "content": "未找到相关信息",
+          "reply_type": "content"
+        }
+      }
+    }
+  ]
 }

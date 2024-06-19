@@ -142,7 +142,10 @@ class ApplicationWorkflowSerializer(serializers.Serializer):
 
 def get_base_node_work_flow(work_flow):
     node_list = work_flow.get('nodes')
-    [node for node in node_list if node.get('id') == '']
+    base_node_list = [node for node in node_list if node.get('id') == 'base-node']
+    if len(base_node_list) > 0:
+        return base_node_list[-1]
+    return None
 
 
 class ApplicationSerializer(serializers.Serializer):
@@ -535,6 +538,13 @@ class ApplicationSerializer(serializers.Serializer):
             if work_flow is None:
                 raise AppApiException(500, "work_flow是必填字段")
             Flow.new_instance(work_flow).is_valid()
+            base_node = get_base_node_work_flow(work_flow)
+            if base_node is not None:
+                node_data = base_node.get('properties').get('node_data')
+                if node_data is not None:
+                    application.name = node_data.get('name')
+                    application.desc = node_data.get('desc')
+                    application.prologue = node_data.get('prologue')
             application.work_flow = work_flow
             application.save()
             work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application)
