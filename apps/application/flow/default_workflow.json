@@ -331,7 +331,7 @@
       "id": "8839b489-3949-4d27-b932-896392d3dff5",
       "type": "reply-node",
       "properties": {
-        "stepName": "指定回复1",
+        "stepName": "指定回复",
         "node_data": {
           "fields": [
             "c8903650-67e0-42a3-875f-6896b33f8916",
@@ -371,7 +371,7 @@
       "id": "f9cfacd9-2301-431d-a6ea-876717ccaffc",
       "type": "reply-node",
       "properties": {
-        "stepName": "指定回复2",
+        "stepName": "指定回复1",
         "node_data": {
           "fields": [],
           "content": "未找到相关信息",
