@@ -82,6 +82,17 @@ class ChatApi(ApiMixin):
 
                     ]
 
+    class OpenWorkFlowTemp(ApiMixin):
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=[],
+                properties={
+                    'work_flow': ApplicationApi.WorkFlow.get_request_body_api()
+                }
+            )
+
     class OpenTempChat(ApiMixin):
         @staticmethod
         def get_request_body_api():

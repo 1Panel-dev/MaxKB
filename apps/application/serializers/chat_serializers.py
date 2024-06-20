@@ -46,6 +46,11 @@ from smartdoc.conf import PROJECT_DIR
 chat_cache = caches['model_cache']
 
 
+class WorkFlowSerializers(serializers.Serializer):
+    nodes = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid("节点"))
+    edges = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid("连线"))
+
+
 class ChatSerializers(serializers.Serializer):
     class Operate(serializers.Serializer):
         chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
@@ -251,6 +256,26 @@ class ChatSerializers(serializers.Serializer):
                                     application), timeout=60 * 30)
             return chat_id
 
+    class OpenWorkFlowChat(serializers.Serializer):
+        work_flow = WorkFlowSerializers(error_messages=ErrMessage.uuid("工作流"))
+
+        def open(self):
+            self.is_valid(raise_exception=True)
+            work_flow = self.data.get('work_flow')
+            chat_id = str(uuid.uuid1())
+            application = Application(id=None, dialogue_number=3, model=None,
+                                      dataset_setting={},
+                                      model_setting={},
+                                      problem_optimization=None,
+                                      type=ApplicationTypeChoices.WORK_FLOW
+                                      )
+            work_flow_version = WorkFlowVersion(work_flow=work_flow)
+            chat_cache.set(chat_id,
+                           ChatInfo(chat_id, None, [],
+                                    [],
+                                    application, work_flow_version), timeout=60 * 30)
+            return chat_id
+
     class OpenTempChat(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
@@ -351,7 +376,7 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_info: ChatInfo = chat_cache.get(chat_id)
             if chat_info is not None:
                 chat_record_list = [chat_record for chat_record in chat_info.chat_record_list if
-                                    chat_record.id == uuid.UUID(chat_record_id)]
+                                    str(chat_record.id) == str(chat_record_id)]
                 if chat_record_list is not None and len(chat_record_list):
                     return chat_record_list[-1]
             return QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()

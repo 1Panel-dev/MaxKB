@@ -31,6 +31,7 @@ urlpatterns = [
     path('application/<int:current_page>/<int:page_size>', views.Application.Page.as_view(), name='application_page'),
     path('application/<str:application_id>/chat/open', views.ChatView.Open.as_view(), name='application/open'),
     path("application/chat/open", views.ChatView.OpenTemp.as_view()),
+    path("application/chat_workflow/open", views.ChatView.OpenWorkFlowTemp.as_view()),
     path("application/<str:application_id>/chat/client/<int:current_page>/<int:page_size>",
          views.ChatView.ClientChatHistoryPage.as_view()),
     path("application/<str:application_id>/chat/client/<chat_id>",
