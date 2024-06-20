@@ -62,6 +62,10 @@
                   class="mr-8"
                 />
               </template>
+              <div class="status-tag">
+                <el-tag type="warning" v-if="isWorkFlow(item.type)">高级编排</el-tag>
+                <el-tag v-else>简单配置</el-tag>
+              </div>
 
               <template #footer>
                 <div class="footer-content">
@@ -129,8 +133,12 @@ const paginationConfig = reactive({
 
 const searchValue = ref('')
 
+function isWorkFlow(type: string) {
+  return type === 'WORK_FLOW'
+}
+
 function settingApplication(row: any) {
-  if (row.type === 'WORK_FLOW') {
+  if (isWorkFlow(row.type)) {
     router.push({ path: `/application/${row.id}/workflow` })
   } else {
     router.push({ path: `/application/${row.id}/${row.type}/setting` })

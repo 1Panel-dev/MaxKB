@@ -18,7 +18,11 @@
     </div>
     <!-- 下拉框 -->
     <el-collapse-transition>
-      <div v-show="showPopover" class="workflow-dropdown-menu border border-r-4">
+      <div
+        v-show="showPopover"
+        class="workflow-dropdown-menu border border-r-4"
+        v-click-outside="clickoutsideDebug"
+      >
         <h5 class="title">基础组件</h5>
         <template v-for="(item, index) in menuNodes" :key="index">
           <div class="workflow-dropdown-item cursor flex p-8-12" @mousedown="onmousedown(item)">
@@ -104,6 +108,10 @@ function publicHandle() {
 
 function clickoutside() {
   showPopover.value = false
+}
+
+function clickoutsideDebug() {
+  showDebug.value = false
 }
 
 function onmousedown(item: any) {

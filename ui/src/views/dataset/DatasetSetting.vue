@@ -51,7 +51,7 @@
               />
             </el-form-item>
           </el-form>
-
+          <!-- 
           <h4 class="title-decoration-1 mb-16">关联应用</h4>
 
           <el-row :gutter="12">
@@ -79,7 +79,7 @@
                 {{ item.name }}
               </CardCheckbox>
             </el-col>
-          </el-row>
+          </el-row> -->
 
           <div class="text-right">
             <el-button @click="submit" type="primary"> 保存 </el-button>
