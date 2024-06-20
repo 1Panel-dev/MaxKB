@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!menu.meta || !menu.meta.hidden" class="sidebar-item">
+  <div v-if="(!menu.meta || !menu.meta.hidden) && showMenu()" class="sidebar-item">
     <el-menu-item
       ref="subMenu"
       :index="menu.path"
@@ -23,15 +23,22 @@ const props = defineProps<{
   activeMenu: any
 }>()
 
-const route = useRoute()
-
 const router = useRouter()
+const route = useRoute()
 const {
   params: { id, type }
 } = route as any
 
+function showMenu() {
+  if (type === 'WORK_FLOW') {
+    return props.menu.name !== 'AppHitTest'
+  } else {
+    return true
+  }
+}
+
 function clickHandle(item: any) {
-  if (item.name === 'AppSetting' && type === 'WORK_FLOW') {
+  if (type === 'WORK_FLOW' && item.name === 'AppSetting') {
     router.push({ path: `/application/${id}/workflow` })
   }
 }
