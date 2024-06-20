@@ -31,51 +31,6 @@ class ConditionNodeParamsSerializer(serializers.Serializer):
     branch = ConditionBranchSerializer(many=True)
 
 
-j = """
-     {  "branch": [
-                        {
-                            "conditions": [
-                                {
-                                    "field": [
-                                    "34902d3d-a3ff-497f-b8e1-0c34a44d7dd5",
-                                    "paragraph_list"
-                                    ],
-                                    "compare": "len_eq",
-                                    "value": "0"
-                                }
-                            ],
-                            "id": "2391",
-                            "condition": "and"
-                        },
-                        {
-                            "conditions": [
-                                {
-                                    "field": [
-                                        "34902d3d-a3ff-497f-b8e1-0c34a44d7dd5",
-                                        "paragraph_list"
-                                        ],
-                                        "compare": "len_eq",
-                                        "value": "1"
-                                }
-                            ],
-                            "id": "1143",
-                            "condition": "and"
-                        },
-                        {
-                            "conditions": [
-                                
-                            ],
-                            "id": "9208", 
-                            "condition": "and"
-                        }
-                    ]}
-"""
-a = json.loads(j)
-c = ConditionNodeParamsSerializer(data=a)
-c.is_valid(raise_exception=True)
-print(c.data)
-
-
 class IConditionNode(INode):
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return ConditionNodeParamsSerializer

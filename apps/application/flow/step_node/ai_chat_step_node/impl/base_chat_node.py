@@ -7,6 +7,7 @@
     @desc:
 """
 import json
+from functools import reduce
 from typing import List, Dict
 
 from django.db.models import QuerySet
@@ -139,16 +140,17 @@ class BaseChatNode(IChatNode):
     @staticmethod
     def get_history_message(history_chat_record, dialogue_number):
         start_index = len(history_chat_record) - dialogue_number
-        history_message = [[history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
-                           for index in
-                           range(start_index if start_index > 0 else 0, len(history_chat_record))]
+        history_message = reduce(lambda x, y: [*x, *y], [
+            [history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
+            for index in
+            range(start_index if start_index > 0 else 0, len(history_chat_record))], [])
         return history_message
 
     def generate_prompt_question(self, prompt):
         return HumanMessage(self.workflow_manage.generate_prompt(prompt))
 
     def generate_message_list(self, system: str, prompt: str, history_message):
-        if system is None or len(system) == 0:
+        if system is not None and len(system) > 0:
             return [SystemMessage(self.workflow_manage.generate_prompt(system)), *history_message,
                     HumanMessage(self.workflow_manage.generate_prompt(prompt))]
         else:
