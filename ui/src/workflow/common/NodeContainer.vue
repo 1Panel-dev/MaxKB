@@ -7,7 +7,7 @@
             <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
             <h4>{{ nodeModel.properties.stepName }}</h4>
           </div>
-          <div @click.stop>
+          <div @click.stop v-if="showOperate(nodeModel.type)">
             <el-dropdown trigger="click">
               <el-button text @click.stop>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
@@ -78,6 +78,9 @@ const props = defineProps<{
   nodeModel: any
 }>()
 
+function showOperate(type: string) {
+  return type !== 'base-node' && type !== 'start-node'
+}
 </script>
 <style lang="scss" scoped>
 .workflow-node-container {

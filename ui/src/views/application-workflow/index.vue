@@ -9,7 +9,7 @@
         <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
           添加组件
         </el-button>
-        <el-button @click="showDebug = true">
+        <el-button @click="showDebug = true" :disabled="showDebug">
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
           调试</el-button
         >
@@ -18,11 +18,7 @@
     </div>
     <!-- 下拉框 -->
     <el-collapse-transition>
-      <div
-        v-show="showPopover"
-        class="workflow-dropdown-menu border border-r-4"
-        v-click-outside="clickoutsideDebug"
-      >
+      <div v-show="showPopover" class="workflow-dropdown-menu border border-r-4">
         <h5 class="title">基础组件</h5>
         <template v-for="(item, index) in menuNodes" :key="index">
           <div class="workflow-dropdown-item cursor flex p-8-12" @mousedown="onmousedown(item)">
@@ -41,7 +37,12 @@
     </div>
     <!-- 调试 -->
     <el-collapse-transition>
-      <div class="workflow-debug-container" :class="enlarge ? 'enlarge' : ''" v-if="showDebug">
+      <div
+        v-click-outside="clickoutsideDebug"
+        class="workflow-debug-container"
+        :class="enlarge ? 'enlarge' : ''"
+        v-if="showDebug"
+      >
         <div class="workflow-debug-header">
           <div class="flex-between">
             <h4 class="ml-24">
