@@ -12,7 +12,7 @@
         <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
           添加组件
         </el-button>
-        <el-button @click="showDebug = true" :disabled="showDebug">
+        <el-button @click="clickShowDebug" :disabled="showDebug">
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
           调试</el-button
         >
@@ -80,9 +80,10 @@ import Workflow from '@/workflow/index.vue'
 import { menuNodes } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
+import { WorkFlow } from '@/workflow/common/validate'
 const { application } = useStore()
 const route = useRoute()
 
@@ -116,7 +117,16 @@ function publicHandle() {
 function clickoutside() {
   showPopover.value = false
 }
-
+const clickShowDebug = () => {
+  const graphData = getGraphData()
+  const workflow = new WorkFlow(graphData)
+  try {
+    workflow.is_valid()
+    showDebug.value = true
+  } catch (e: any) {
+    MsgError(e.toString())
+  }
+}
 function clickoutsideDebug() {
   showDebug.value = false
 }
