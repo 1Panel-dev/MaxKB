@@ -150,6 +150,16 @@ const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data)
 }
 
 /**
+ * 获得工作流临时回话Id
+ * @param 参数 
+
+}
+ */
+const postWorkflowChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data) => {
+  return post(`${prefix}/chat_workflow/open`, data)
+}
+
+/**
  * 正式回话Id
  * @param 参数 
  * {
@@ -257,5 +267,6 @@ export default {
   putChatVote,
   getApplicationHitTest,
   getApplicationModel,
-  putPublishApplication
+  putPublishApplication,
+  postWorkflowChatOpen
 }

@@ -591,13 +591,4 @@ defineExpose({
   left: 24px;
   z-index: 2;
 }
-// .lf-dnd-text {
-//   width: 200px;
-// }
-// .lf-dnd-shape {
-//   height: 50px;
-// }
-// .lf-node-selected {
-//   border: 1px solid #000;
-// }
 </style>

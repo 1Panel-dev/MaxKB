@@ -371,16 +371,32 @@ function getChartOpenId(chat?: any) {
         }
       })
   } else {
-    return applicationApi
-      .postChatOpen(obj)
-      .then((res) => {
-        chartOpenId.value = res.data
-        chatMessage(chat)
-      })
-      .catch((res) => {
-        loading.value = false
-        return Promise.reject(res)
-      })
+    if (obj.type === 'WORK_FLOW') {
+      const submitObj = {
+        work_flow: obj.work_flow
+      }
+      return applicationApi
+        .postWorkflowChatOpen(submitObj)
+        .then((res) => {
+          chartOpenId.value = res.data
+          chatMessage(chat)
+        })
+        .catch((res) => {
+          loading.value = false
+          return Promise.reject(res)
+        })
+    } else {
+      return applicationApi
+        .postChatOpen(obj)
+        .then((res) => {
+          chartOpenId.value = res.data
+          chatMessage(chat)
+        })
+        .catch((res) => {
+          loading.value = false
+          return Promise.reject(res)
+        })
+    }
   }
 }
 /**

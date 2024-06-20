@@ -154,8 +154,8 @@ const closeInterval = () => {
 
 onMounted(() => {
   getDetail()
-  // // 初始化定时任务
-  // initInterval()
+  // 初始化定时任务
+  initInterval()
 })
 
 onBeforeUnmount(() => {
