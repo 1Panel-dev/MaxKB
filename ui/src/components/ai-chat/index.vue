@@ -631,7 +631,9 @@ watch(
 
 onMounted(() => {
   setTimeout(() => {
-    quickInputRef.value.textarea.style.height = '0'
+    if (quickInputRef.value) {
+      quickInputRef.value.textarea.style.height = '0'
+    }
   }, 1000)
 })
 
