@@ -145,12 +145,6 @@ const current = computed(() => {
   } = route
   return list.value?.filter((v) => v.id === id)?.[0]
 })
-// const current = computed(() => {
-//   const {
-//     params: { id }
-//   } = route
-//   return list.value?.filter((v) => v.id === id)?.[0]?.type
-// })
 
 const isApplication = computed(() => {
   const { meta } = route as any
@@ -163,7 +157,19 @@ const isDataset = computed(() => {
 function changeMenu(id: string) {
   const lastMatched = route.matched[route.matched.length - 1]
   if (lastMatched) {
-    router.push({ name: lastMatched.name, params: { id: id } })
+    if (isDataset.value) {
+      router.push({ name: lastMatched.name, params: { id: id } })
+    } else if (isApplication.value) {
+      const type = list.value?.filter((v) => v.id === id)?.[0]?.type
+      if (lastMatched.name === 'AppSetting' && type === 'WORK_FLOW') {
+        router.push({ path: `/application/${id}/${type}/overview` })
+      } else {
+        router.push({
+          name: lastMatched.name,
+          params: { id: id, type: type }
+        })
+      }
+    }
   }
 }
 
