@@ -48,7 +48,7 @@ const applicationRouter = {
             parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail'
           },
-          component: () => import('@/views/application/CreateAndSetting.vue')
+          component: () => import('@/views/application/ApplicationSetting.vue')
         },
         {
           path: 'hit-test',

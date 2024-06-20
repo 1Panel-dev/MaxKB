@@ -4,6 +4,9 @@
       <div class="flex align-center">
         <back-button to="-1"></back-button>
         <h4>{{ detail?.name }}</h4>
+        <el-text type="info" class="ml-16" v-if="saveTime"
+          >保存时间：{{ datetimeFormat(saveTime) }}</el-text
+        >
       </div>
       <div>
         <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
@@ -13,7 +16,8 @@
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
           调试</el-button
         >
-        <el-button type="primary" @click="publicHandle"> 保存 </el-button>
+        <el-button @click="saveApplication"> 保存 </el-button>
+        <el-button type="primary" @click="publicHandle"> 发布 </el-button>
       </div>
     </div>
     <!-- 下拉框 -->
@@ -77,6 +81,7 @@ import { menuNodes } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 const { application } = useStore()
 const route = useRoute()
@@ -94,6 +99,7 @@ const detail = ref<any>(null)
 const showPopover = ref(false)
 const showDebug = ref(false)
 const enlarge = ref(false)
+const saveTime = ref<any>('')
 
 function publicHandle() {
   workflowRef.value?.validate().then(() => {
@@ -132,15 +138,21 @@ function getDetail() {
   })
 }
 
+function saveApplication() {
+  const obj = {
+    work_flow: getGraphData()
+  }
+  application.asyncPutApplication(id, obj).then((res) => {
+    saveTime.value = new Date()
+  })
+}
+
 /**
  * 定时保存
  */
 const initInterval = () => {
   interval = setInterval(() => {
-    const obj = {
-      work_flow: getGraphData()
-    }
-    application.asyncPutApplication(id, obj)
+    saveApplication()
   }, 60000)
 }
 
@@ -181,9 +193,9 @@ onBeforeUnmount(() => {
     user-select: none; /* CSS3属性 */
     position: absolute;
     top: 110px;
-    right: 23px;
+    right: 77px;
     z-index: 99;
-    width: 253px;
+    width: 263px;
     box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
     background: #ffffff;
     padding-bottom: 8px;
