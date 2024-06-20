@@ -161,10 +161,11 @@ function changeMenu(id: string) {
       router.push({ name: lastMatched.name, params: { id: id } })
     } else if (isApplication.value) {
       const type = list.value?.filter((v) => v.id === id)?.[0]?.type
-      if (type === 'WORK_FLOW') {
-        if (lastMatched.name === 'AppSetting' || lastMatched.name === 'AppHitTest') {
-          router.push({ path: `/application/${id}/${type}/overview` })
-        }
+      if (
+        type === 'WORK_FLOW' &&
+        (lastMatched.name === 'AppSetting' || lastMatched.name === 'AppHitTest')
+      ) {
+        router.push({ path: `/application/${id}/${type}/overview` })
       } else {
         router.push({
           name: lastMatched.name,
