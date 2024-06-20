@@ -289,4 +289,4 @@ class ChatMessageSerializer(serializers.Serializer):
             '-create_time')[0:1].first()
         if work_flow_version is None:
             raise AppApiException(500, "应用未发布,请发布后再使用")
-        return ChatInfo(chat_id, None, [], [], application)
+        return ChatInfo(chat_id, None, [], [], application, work_flow_version)
