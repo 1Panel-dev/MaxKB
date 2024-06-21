@@ -83,7 +83,7 @@ import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
-import { WorkFlow } from '@/workflow/common/validate'
+import { WorkFlowInstanse } from '@/workflow/common/validate'
 const { application } = useStore()
 const route = useRoute()
 
@@ -103,29 +103,43 @@ const enlarge = ref(false)
 const saveTime = ref<any>('')
 
 function publicHandle() {
-  workflowRef.value?.validate().then(() => {
-    const obj = {
-      work_flow: getGraphData()
-    }
-    applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
-      MsgSuccess('发布成功')
-      getDetail()
+  workflowRef.value
+    ?.validate()
+    .then(() => {
+      const obj = {
+        work_flow: getGraphData()
+      }
+      applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
+        MsgSuccess('发布成功')
+        getDetail()
+      })
     })
-  })
+    .catch((res: any) => {
+      const keys = Object.keys(res)
+      MsgError(res[keys[0]]?.[0]?.message)
+    })
 }
 
 function clickoutside() {
   showPopover.value = false
 }
 const clickShowDebug = () => {
-  const graphData = getGraphData()
-  const workflow = new WorkFlow(graphData)
-  try {
-    workflow.is_valid()
-    showDebug.value = true
-  } catch (e: any) {
-    MsgError(e.toString())
-  }
+  workflowRef.value
+    ?.validate()
+    .then(() => {
+      const graphData = getGraphData()
+      const workflow = new WorkFlowInstanse(graphData)
+      try {
+        workflow.is_valid()
+        showDebug.value = true
+      } catch (e: any) {
+        MsgError(e.toString())
+      }
+    })
+    .catch((res: any) => {
+      const keys = Object.keys(res)
+      MsgError(res[keys[0]]?.[0]?.message)
+    })
 }
 function clickoutsideDebug() {
   showDebug.value = false

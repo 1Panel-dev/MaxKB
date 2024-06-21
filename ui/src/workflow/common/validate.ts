@@ -1,5 +1,5 @@
 const end_nodes = ['ai-chat-node', 'reply-node']
-export class WorkFlow {
+export class WorkFlowInstanse {
   nodes
   edges
   constructor(workflow: { nodes: Array<any>; edges: Array<any> }) {
