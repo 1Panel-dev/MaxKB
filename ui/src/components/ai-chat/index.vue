@@ -73,38 +73,9 @@
 
               <el-card v-else shadow="always" class="dialog-card">
                 <MdRenderer :source="item.answer_text"></MdRenderer>
+                <!-- 知识来源 -->
                 <div v-if="showSource(item)">
-                  <el-divider> <el-text type="info">知识来源</el-text> </el-divider>
-                  <div>
-                    <el-space wrap>
-                      <el-button
-                        v-for="(dataset, index) in item.dataset_list"
-                        :key="index"
-                        type="primary"
-                        plain
-                        size="small"
-                        @click="openParagraph(item, dataset.id)"
-                        >{{ dataset.name }}</el-button
-                      >
-                    </el-space>
-                  </div>
-
-                  <div>
-                    <el-button
-                      class="mr-8 mt-8"
-                      type="primary"
-                      plain
-                      size="small"
-                      @click="openParagraph(item)"
-                      >引用分段：{{ item.paragraph_list?.length || 0 }}</el-button
-                    >
-                    <el-tag type="info" effect="plain" class="mr-8 mt-8">
-                      消耗 tokens: {{ item?.message_tokens + item?.answer_tokens }}
-                    </el-tag>
-                    <el-tag type="info" effect="plain" class="mt-8">
-                      耗时: {{ item.run_time?.toFixed(2) }} s
-                    </el-tag>
-                  </div>
+                  <KnowledgeSource :data="item" />
                 </div>
               </el-card>
               <div class="flex-between mt-8" v-if="log">
@@ -168,8 +139,6 @@
         </div>
       </div>
     </div>
-    <!-- 知识库引用 dialog -->
-    <ParagraphSourceDialog ref="ParagraphSourceDialogRef" />
   </div>
 </template>
 <script setup lang="ts">
@@ -177,7 +146,7 @@ import { ref, nextTick, computed, watch, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import LogOperationButton from './LogOperationButton.vue'
 import OperationButton from './OperationButton.vue'
-import ParagraphSourceDialog from './ParagraphSourceDialog.vue'
+import KnowledgeSource from './KnowledgeSource.vue'
 import applicationApi from '@/api/application'
 import logApi from '@/api/log'
 import { ChatManagement, type chatType } from '@/api/type/application'
@@ -222,7 +191,6 @@ const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed'
 })
 
-const ParagraphSourceDialogRef = ref()
 const aiChatRef = ref()
 const quickInputRef = ref()
 const scrollDiv = ref()
@@ -311,10 +279,6 @@ function showSource(row: any) {
   } else {
     return false
   }
-}
-
-function openParagraph(row: any, id?: string) {
-  ParagraphSourceDialogRef.value.open(row, id)
 }
 
 function quickProblemHandle(val: string) {

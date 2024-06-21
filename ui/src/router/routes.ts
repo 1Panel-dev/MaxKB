@@ -13,6 +13,14 @@ export const routes: Array<RouteRecordRaw> = [
     children: [...rolesRoutes]
   },
 
+  // 高级编排
+  {
+    path: '/application/:id/workflow',
+    name: 'ApplicationWorkflow',
+    meta: { activeMenu: '/application' },
+    component: () => import('@/views/application-workflow/index.vue')
+  },
+
   {
     path: '/chat/:accessToken',
     name: 'Chat',

@@ -62,10 +62,11 @@ function visibleChange(bool: boolean) {
 
 function getIncomingNode(id: string) {
   const list = props.nodeModel.graphModel.getNodeIncomingNode(id)
+  const firstElement = options.value.shift()
   if (list.length > 0) {
     list.forEach((item: any) => {
       if (!options.value.some((obj: any) => obj.id === item.id)) {
-        options.value.splice(1, 1, {
+        options.value.unshift({
           value: item.id,
           label: item.properties.stepName,
           type: item.type,
@@ -73,10 +74,12 @@ function getIncomingNode(id: string) {
         })
       }
     })
+
     list.forEach((item: any) => {
       getIncomingNode(item.id)
     })
   }
+  options.value.unshift(firstElement)
 }
 onMounted(() => {
   getIncomingNode(props.nodeModel.id)
