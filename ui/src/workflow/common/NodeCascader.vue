@@ -1,5 +1,11 @@
 <template>
-  <el-cascader :options="options" @visible-change="visibleChange" v-bind="$attrs" separator=" > ">
+  <el-cascader
+    :teleported="false"
+    :options="options"
+    @visible-change="visibleChange"
+    v-bind="$attrs"
+    separator=" > "
+  >
     <template #default="{ node, data }">
       <span class="flex align-center">
         <component :is="iconComponent(`${data.type}-icon`)" class="mr-8" :size="18" />{{

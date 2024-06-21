@@ -25,6 +25,7 @@
           }"
         >
           <el-select
+            :teleported="false"
             v-model="chat_data.model_id"
             placeholder="请选择 AI 模型"
             class="w-full"

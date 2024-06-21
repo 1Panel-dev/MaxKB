@@ -1,6 +1,6 @@
 <template>
-  <div class="workflow-node-container p-16">
-    <div class="step-container p-16">
+  <div class="workflow-node-container p-16" style="overflow: visible">
+    <div class="step-container p-16" style="overflow: visible">
       <div v-resize="resizeStepContainer">
         <div class="flex-between mb-16">
           <div class="flex align-center">
@@ -8,7 +8,7 @@
             <h4>{{ nodeModel.properties.stepName }}</h4>
           </div>
           <div @click.stop v-if="showOperate(nodeModel.type)">
-            <el-dropdown trigger="click">
+            <el-dropdown :teleported="false" trigger="click">
               <el-button text @click.stop>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
               </el-button>

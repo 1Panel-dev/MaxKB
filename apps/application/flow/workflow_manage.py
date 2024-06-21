@@ -94,13 +94,7 @@ class Flow:
                                   f'不存在的下一个节点')
         return node_list
 
-    def is_valid(self):
-        """
-        校验工作流数据
-        """
-        self.is_valid_start_node()
-        self.is_valid_base_node()
-        self.is_valid_work_flow()
+
 
     def is_valid_work_flow(self, up_node=None):
         if up_node is None:

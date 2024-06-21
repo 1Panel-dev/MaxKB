@@ -75,6 +75,11 @@ class AppNode extends HtmlResize.view {
 }
 
 class AppNodeModel extends HtmlResize.model {
+  getNodeStyle() {
+    return {
+      overflow: 'visible'
+    }
+  }
   getOutlineStyle() {
     const style = super.getOutlineStyle()
     style.stroke = 'none'

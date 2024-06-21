@@ -14,7 +14,7 @@
     >
       <template v-for="(item, index) in form_data.branch" :key="item.id">
         <el-card
-          v-resize="(wh:any) => resizeCondition(wh, item, index)"
+          v-resize="(wh: any) => resizeCondition(wh, item, index)"
           shadow="never"
           class="card-never mb-8"
           style="--el-card-padding: 12px"
@@ -23,7 +23,12 @@
             {{ item.type }}
             <div class="info" v-if="item.conditions.length > 1">
               <span>符合以下</span>
-              <el-select v-model="item.condition" size="small" style="width: 60px; margin: 0 8px">
+              <el-select
+                :teleported="false"
+                v-model="item.condition"
+                size="small"
+                style="width: 60px; margin: 0 8px"
+              >
                 <el-option label="所有" value="and" />
                 <el-option label="任一" value="or" />
               </el-select>
@@ -60,7 +65,12 @@
                       trigger: 'change'
                     }"
                   >
-                    <el-select v-model="condition.compare" placeholder="请选择条件" clearable>
+                    <el-select
+                      :teleported="false"
+                      v-model="condition.compare"
+                      placeholder="请选择条件"
+                      clearable
+                    >
                       <template v-for="(item, index) in compareList" :key="index">
                         <el-option :label="item.label" :value="item.value" />
                       </template>
@@ -236,14 +246,14 @@ function deleteCondition(index: number, cIndex: number) {
   if (list[index]['conditions'].length === 0) {
     const delete_edge = list.splice(index, 1)
     const delete_target_anchor_id_list = delete_edge.map(
-      (item:any) => props.nodeModel.id + '_' + item.id + '_right'
+      (item: any) => props.nodeModel.id + '_' + item.id + '_right'
     )
 
     props.nodeModel.graphModel.eventCenter.emit(
       'delete_edge',
       props.nodeModel.outgoing.edges
-        .filter((item:any) => delete_target_anchor_id_list.includes(item.sourceAnchorId))
-        .map((item:any) => item.id)
+        .filter((item: any) => delete_target_anchor_id_list.includes(item.sourceAnchorId))
+        .map((item: any) => item.id)
     )
     refreshBranchAnchor(list, false)
   }
