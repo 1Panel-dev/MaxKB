@@ -1,10 +1,10 @@
 <template>
   <div class="application-workflow" v-loading="loading">
-    <div class="header border-b flex-between p-16-24">
+    <div class="header border-b flex-between p-12-24">
       <div class="flex align-center">
         <back-button to="-1"></back-button>
         <h4>{{ detail?.name }}</h4>
-        <el-text type="info" class="ml-16" v-if="saveTime"
+        <el-text type="info" class="ml-16 color-secondary" v-if="saveTime"
           >保存时间：{{ datetimeFormat(saveTime) }}</el-text
         >
       </div>
@@ -16,7 +16,10 @@
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
           调试</el-button
         >
-        <el-button @click="saveApplication"> 保存 </el-button>
+        <el-button @click="saveApplication">
+          <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
+          保存
+        </el-button>
         <el-button type="primary" @click="publicHandle"> 发布 </el-button>
       </div>
     </div>
@@ -202,11 +205,14 @@ onBeforeUnmount(() => {
 </script>
 <style lang="scss">
 .application-workflow {
+  background: var(--app-layout-bg-color);
+  height: 100%;
   .header {
     background: #ffffff;
   }
   .workflow-main {
-    height: calc(100vh - var(--app-header-height) - 70px);
+    height: calc(100vh - 62px);
+    box-sizing: border-box;
   }
   .workflow-dropdown-menu {
     -moz-user-select: none; /* Firefox */
@@ -216,10 +222,10 @@ onBeforeUnmount(() => {
     -o-user-select: none; /* Opera */
     user-select: none; /* CSS3属性 */
     position: absolute;
-    top: 110px;
-    right: 77px;
+    top: 49px;
+    right: 90px;
     z-index: 99;
-    width: 263px;
+    width: 268px;
     box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
     background: #ffffff;
     padding-bottom: 8px;

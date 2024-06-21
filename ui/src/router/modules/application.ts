@@ -76,14 +76,6 @@ const applicationRouter = {
           component: () => import('@/views/log/index.vue')
         }
       ]
-    },
-    // 创建编排
-    {
-      path: '/application/:id/workflow',
-      name: 'ApplicationWorkflow',
-      meta: { activeMenu: '/application' },
-      component: () => import('@/views/application-workflow/index.vue'),
-      hidden: true
     }
   ]
 }
