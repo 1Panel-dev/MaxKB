@@ -20,7 +20,7 @@
           prop="model_id"
           :rules="{
             required: true,
-            message: 'AI 模型',
+            message: '请选择 AI 模型',
             trigger: 'change'
           }"
         >
