@@ -1,6 +1,86 @@
-import { BezierEdge, BezierEdgeModel } from '@logicflow/core'
+import { BezierEdge, BezierEdgeModel, h } from '@logicflow/core'
+import { createApp, h as vh } from 'vue'
 
-class CustomEdge2 extends BezierEdge {}
+import CustomLine from './CustomLine.vue'
+
+const DEFAULT_WIDTH = 48
+const DEFAULT_HEIGHT = 32
+class CustomEdge2 extends BezierEdge {
+  isMounted
+  constructor() {
+    super()
+    this.isMounted = false
+  }
+  getEdge() {
+    const { model } = this.props
+    const id = model.id
+    const { customWidth = DEFAULT_WIDTH, customHeight = DEFAULT_HEIGHT } = model.getProperties()
+    const { startPoint, endPoint, path, isAnimation, arrowConfig } = model
+    const animationStyle = model.getEdgeAnimationStyle()
+    const {
+      strokeDasharray,
+      stroke,
+      strokeDashoffset,
+      animationName,
+      animationDuration,
+      animationIterationCount,
+      animationTimingFunction,
+      animationDirection
+    } = animationStyle
+    const positionData = {
+      x: (startPoint.x + endPoint.x - customWidth) / 2,
+      y: (startPoint.y + endPoint.y - customHeight) / 2,
+      width: customWidth,
+      height: customHeight
+    }
+    const style = model.getEdgeStyle()
+    const wrapperStyle = {
+      width: customWidth,
+      height: customHeight
+    }
+    const app = createApp({
+      render: () => vh(CustomLine, {})
+    })
+    setTimeout(() => {
+      const s = document.getElementById(id)
+      if (s && !this.isMounted) {
+        app.mount(s)
+        this.isMounted = true
+      }
+    }, 0)
+
+    delete style.stroke
+    return h('g', {}, [
+      h('style', { type: 'text/css' }, '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}'),
+      h('path', {
+        d: path,
+        ...style,
+        ...arrowConfig,
+        ...(isAnimation
+          ? {
+              strokeDasharray,
+              stroke,
+              style: {
+                strokeDashoffset,
+                animationName,
+                animationDuration,
+                animationIterationCount,
+                animationTimingFunction,
+                animationDirection
+              }
+            }
+          : {})
+      }),
+      h('foreignObject', { ...positionData, style: { overflow: 'visible' } }, [
+        h('div', {
+          id,
+          style: wrapperStyle,
+          className: 'lf-custom-edge-wrapper'
+        })
+      ])
+    ])
+  }
+}
 
 class CustomEdgeModel2 extends BezierEdgeModel {
   getArrowStyle() {
@@ -12,7 +92,6 @@ class CustomEdgeModel2 extends BezierEdgeModel {
 
   getEdgeStyle() {
     const style = super.getEdgeStyle()
-
     // svg属性
     style.strokeWidth = 2
     style.stroke = '#BBBFC4'
