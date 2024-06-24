@@ -343,6 +343,9 @@ class ApplicationSerializer(serializers.Serializer):
             ApplicationWorkflowSerializer(data=application).is_valid(raise_exception=True)
             application_model = ApplicationWorkflowSerializer.to_application_model(user_id, application)
             application_model.save()
+            # 插入认证信息
+            ApplicationAccessToken(application_id=application_model.id,
+                                   access_token=hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]).save()
             return ApplicationSerializerModel(application_model).data
 
         def insert_simple(self, application: Dict):

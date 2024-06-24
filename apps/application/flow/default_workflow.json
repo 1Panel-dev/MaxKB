@@ -279,7 +279,7 @@
                     "is_hit_handling_method_list"
                   ],
                   "value": "1",
-                  "compare": "ge"
+                  "compare": "len_ge"
                 }
               ]
             },
@@ -294,7 +294,7 @@
                     "paragraph_list"
                   ],
                   "value": "1",
-                  "compare": "ge"
+                  "compare": "len_ge"
                 }
               ]
             },
