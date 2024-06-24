@@ -4,7 +4,7 @@
       <div class="execution-details">
         <template v-for="(item, index) in arraySort(detail, 'index')" :key="index">
           <el-card class="mb-8" shadow="never" style="--el-card-padding: 12px 16px">
-            <div class="flex-between cursor" @click="current = index">
+            <div class="flex-between cursor" @click="current = current === index ? '' : index">
               <div class="flex align-center">
                 <el-icon class="mr-8 arrow-icon" :class="current === index ? 'rotate-90' : ''"
                   ><CaretRight
@@ -23,17 +23,17 @@
               </div>
             </div>
             <el-collapse-transition>
-              <div v-if="current === index">
+              <div class="mt-12" v-if="current === index">
                 <!-- 开始 -->
                 <template v-if="item.type === WorkflowType.Start">
-                  <div class="card-never border-r-4 mt-8">
+                  <div class="card-never border-r-4">
                     <h5 class="p-8-12">参数输入</h5>
                     <div class="p-8-12 border-t-dashed lighter">{{ item.question }}</div>
                   </div>
                 </template>
                 <!-- 知识库检索 -->
                 <template v-if="item.type == WorkflowType.SearchDataset">
-                  <div class="card-never border-r-4 mt-8">
+                  <div class="card-never border-r-4">
                     <h5 class="p-8-12">检索结果</h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       <template v-for="(paragraph, index) in item.paragraph_list" :key="index">
@@ -85,7 +85,7 @@
                 </template>
                 <!-- 判断器 -->
                 <template v-if="item.type == WorkflowType.Condition">
-                  <div class="card-never border-r-4 mt-8">
+                  <div class="card-never border-r-4">
                     <h5 class="p-8-12">判断结果</h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       {{ item.branch_name }}
@@ -94,7 +94,7 @@
                 </template>
                 <!-- AI 对话 -->
                 <template v-if="item.type == WorkflowType.AiChat">
-                  <div class="card-never border-r-4 mt-8">
+                  <div class="card-never border-r-4">
                     <h5 class="p-8-12">角色设定 (System)</h5>
                     <div class="p-8-12 border-t-dashed lighter">
                       {{ item.branch_name }}
