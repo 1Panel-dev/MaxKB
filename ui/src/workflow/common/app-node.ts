@@ -66,9 +66,9 @@ class AppNode extends HtmlResize.view {
       {
         ...anchorData,
         x: x - 10,
-        y: y - 9,
-        width: 24,
-        height: 24
+        y: y - 12,
+        width: 30,
+        height: 30
       },
       [
         lh('div', {

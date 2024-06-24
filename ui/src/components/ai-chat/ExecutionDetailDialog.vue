@@ -53,7 +53,7 @@
                         >
                           <template #icon>
                             <AppAvatar class="mr-12 avatar-light" :size="22">
-                              {{ index + 1 + '' }}</AppAvatar
+                              {{ paragraphIndex + 1 + '' }}</AppAvatar
                             >
                           </template>
                           <div class="active-button primary">

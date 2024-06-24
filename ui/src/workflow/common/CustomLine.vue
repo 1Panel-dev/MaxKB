@@ -1,6 +1,12 @@
 <template>
   <div class="custom-edge cursor">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M12 23.0001C5.925 23.0001 1 18.0751 1 12.0001C1 5.92512 5.925 1.00012 12 1.00012C18.075 1.00012 23 5.92512 23 12.0001C23 18.0751 18.075 23.0001 12 23.0001Z"
         fill="#3370FF"
@@ -16,7 +22,7 @@
 <style lang="scss">
 .custom-edge {
   color: var(--el-color-primary);
-  width: 22px;
   stroke: none;
+  width: 22px;
 }
 </style>
