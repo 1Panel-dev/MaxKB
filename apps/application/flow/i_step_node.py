@@ -113,6 +113,8 @@ class FlowParamsSerializer(serializers.Serializer):
 class INode:
     def __init__(self, node, workflow_params, workflow_manage):
         # 当前步骤上下文,用于存储当前步骤信息
+        self.status = 200
+        self.err_message = ''
         self.node = node
         self.node_params = node.properties.get('node_data')
         self.workflow_manage = workflow_manage
@@ -151,6 +153,15 @@ class INode:
 
     def get_flow_params_serializer_class(self) -> Type[serializers.Serializer]:
         return FlowParamsSerializer
+
+    def get_write_error_context(self, e):
+        self.status = 500
+        self.err_message = str(e)
+
+        def write_error_context(answer):
+            pass
+
+        return write_error_context
 
     def run(self) -> NodeResult:
         """

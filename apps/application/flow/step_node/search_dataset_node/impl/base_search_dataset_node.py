@@ -82,5 +82,9 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
             "index": index,
             'run_time': self.context.get('run_time'),
             'paragraph_list': self.context.get('paragraph_list'),
-            'type': self.node.type
-        }
+            'type': self.node.type,
+            'status': self.status,
+            'err_message': self.err_message
+        } if self.status == 200 else {"index": index, 'type': self.node.type,
+                                      'status': self.status,
+                                      'err_message': self.err_message}

@@ -425,7 +425,7 @@ class ChatRecordSerializer(serializers.Serializer):
                     'padding_problem_text') if 'problem_padding' in chat_record.details else None,
                 'dataset_list': dataset_list,
                 'paragraph_list': paragraph_list,
-                'details': chat_record.details
+                'execution_details': [chat_record.details[key] for key in chat_record.details]
             }
 
         def page(self, current_page: int, page_size: int, with_valid=True):

@@ -24,5 +24,9 @@ class BaseStartStepNode(IStarNode):
             "index": index,
             "question": self.context.get('question'),
             'run_time': self.context.get('run_time'),
-            'type': self.node.type
-        }
+            'type': self.node.type,
+            'status': self.status,
+            'err_message': self.err_message
+        } if self.status == 200 else {"index": index, 'type': self.node.type,
+                                      'status': self.status,
+                                      'err_message': self.err_message}

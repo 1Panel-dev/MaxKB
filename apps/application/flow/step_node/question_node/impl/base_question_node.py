@@ -173,5 +173,9 @@ class BaseQuestionNode(IQuestionNode):
             'answer': self.context.get('answer'),
             'type': self.node.type,
             'message_tokens': self.context['message_tokens'],
-            'answer_tokens': self.context['answer_tokens']
-        }
+            'answer_tokens': self.context['answer_tokens'],
+            'status': self.status,
+            'err_message': self.err_message
+        } if self.status == 200 else {"index": index, 'type': self.node.type,
+                                      'status': self.status,
+                                      'err_message': self.err_message}

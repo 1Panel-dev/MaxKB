@@ -43,5 +43,9 @@ class BaseConditionNode(IConditionNode):
             'run_time': self.context.get('run_time'),
             'branch_id': self.context.get('branch_id'),
             'branch_name': self.context.get('branch_name'),
-            'type': self.node.type
-        }
+            'type': self.node.type,
+            'status': self.context.get('status'),
+            'err_message': self.context.get('err_message')
+        } if self.status == 200 else {"index": index, 'type': self.node.type,
+                                      'status': self.status,
+                                      'err_message': self.err_message}

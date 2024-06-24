@@ -9,8 +9,10 @@
 from functools import reduce
 from typing import List, Dict
 
+from langchain_core.messages import AIMessageChunk, AIMessage
 from langchain_core.prompts import PromptTemplate
 
+from application.flow import tools
 from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
 from application.flow.step_node import get_node
 from common.exception.app_exception import AppApiException
@@ -94,8 +96,6 @@ class Flow:
                                   f'不存在的下一个节点')
         return node_list
 
-
-
     def is_valid_work_flow(self, up_node=None):
         if up_node is None:
             up_node = self.get_start_node()
@@ -133,17 +133,28 @@ class WorkflowManage:
         """
         运行工作流
         """
-        while self.has_next_node(self.current_result):
-            self.current_node = self.get_next_node()
-            self.node_context.append(self.current_node)
-            self.current_result = self.current_node.run()
-            if self.has_next_node(self.current_result):
-                self.current_result.write_context(self.current_node, self)
+        try:
+            while self.has_next_node(self.current_result):
+                self.current_node = self.get_next_node()
+                self.node_context.append(self.current_node)
+                self.current_result = self.current_node.run()
+                if self.has_next_node(self.current_result):
+                    self.current_result.write_context(self.current_node, self)
+                else:
+                    r = self.current_result.to_response(self.params['chat_id'], self.params['chat_record_id'],
+                                                        self.current_node, self,
+                                                        self.work_flow_post_handler)
+                    return r
+        except Exception as e:
+            if self.params.get('stream'):
+                return tools.to_stream_response(self.params['chat_id'], self.params['chat_record_id'],
+                                                iter([AIMessageChunk(str(e))]), self,
+                                                self.current_node.get_write_error_context(e),
+                                                self.work_flow_post_handler)
             else:
-                r = self.current_result.to_response(self.params['chat_id'], self.params['chat_record_id'],
-                                                    self.current_node, self,
-                                                    self.work_flow_post_handler)
-                return r
+                return tools.to_response(self.params['chat_id'], self.params['chat_record_id'],
+                                         AIMessage(str(e)), self, self.current_node.get_write_error_context(e),
+                                         self.work_flow_post_handler)
 
     def has_next_node(self, node_result: NodeResult | None):
         """
@@ -168,7 +179,7 @@ class WorkflowManage:
         details_result = {}
         for index in range(len(self.node_context)):
             node = self.node_context[index]
-            details = node.get_details({'index': index})
+            details = node.get_details(index)
             details_result[node.id] = details
         return details_result
 
