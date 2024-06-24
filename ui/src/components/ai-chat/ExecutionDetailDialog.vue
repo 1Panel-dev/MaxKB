@@ -23,9 +23,102 @@
               </div>
             </div>
             <el-collapse-transition>
-              <div class="card-never border-r-4 mt-8" v-if="current === index">
-                <h5 class="p-8-12">参数输入</h5>
-                <div class="p-8-12 border-t-dashed lighter">如何快速开始</div>
+              <div v-if="current === index">
+                <!-- 开始 -->
+                <template v-if="item.type === WorkflowType.Start">
+                  <div class="card-never border-r-4 mt-8">
+                    <h5 class="p-8-12">参数输入</h5>
+                    <div class="p-8-12 border-t-dashed lighter">{{ item.question }}</div>
+                  </div>
+                </template>
+                <!-- 知识库检索 -->
+                <template v-if="item.type == WorkflowType.SearchDataset">
+                  <div class="card-never border-r-4 mt-8">
+                    <h5 class="p-8-12">检索结果</h5>
+                    <div class="p-8-12 border-t-dashed lighter">
+                      <template v-for="(paragraph, index) in item.paragraph_list" :key="index">
+                        <CardBox
+                          shadow="never"
+                          :title="paragraph.title || '-'"
+                          class="paragraph-source-card cursor mb-8"
+                          :class="paragraph.is_active ? '' : 'disabled'"
+                          :showIcon="false"
+                        >
+                          <template #icon>
+                            <AppAvatar class="mr-12 avatar-light" :size="22">
+                              {{ index + 1 + '' }}</AppAvatar
+                            >
+                          </template>
+                          <div class="active-button primary">
+                            {{ paragraph.similarity?.toFixed(3) }}
+                          </div>
+                          <template #description>
+                            <el-scrollbar height="150">
+                              <MdPreview
+                                ref="editorRef"
+                                editorId="preview-only"
+                                :modelValue="paragraph.content"
+                              />
+                            </el-scrollbar>
+                          </template>
+                          <template #footer>
+                            <div class="footer-content flex-between">
+                              <el-text>
+                                <el-icon>
+                                  <Document />
+                                </el-icon>
+                                {{ paragraph?.document_name }}
+                              </el-text>
+                              <div class="flex align-center">
+                                <AppAvatar class="mr-8" shape="square" :size="18">
+                                  <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+                                </AppAvatar>
+
+                                <span class="ellipsis"> {{ paragraph?.dataset_name }}</span>
+                              </div>
+                            </div>
+                          </template>
+                        </CardBox>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+                <!-- 判断器 -->
+                <template v-if="item.type == WorkflowType.Condition">
+                  <div class="card-never border-r-4 mt-8">
+                    <h5 class="p-8-12">判断结果</h5>
+                    <div class="p-8-12 border-t-dashed lighter">
+                      {{ item.branch_name }}
+                    </div>
+                  </div>
+                </template>
+                <!-- AI 对话 -->
+                <template v-if="item.type == WorkflowType.AiChat">
+                  <div class="card-never border-r-4 mt-8">
+                    <h5 class="p-8-12">角色设定 (System)</h5>
+                    <div class="p-8-12 border-t-dashed lighter">
+                      {{ item.branch_name }}
+                    </div>
+                  </div>
+                  <div class="card-never border-r-4 mt-8">
+                    <h5 class="p-8-12">历史记录</h5>
+                    <div class="p-8-12 border-t-dashed lighter"></div>
+                  </div>
+                  <div class="card-never border-r-4 mt-8">
+                    <h5 class="p-8-12">本次对话</h5>
+                    <div class="p-8-12 border-t-dashed lighter pre-line">{{ item.question }}</div>
+                  </div>
+                  <div class="card-never border-r-4 mt-8">
+                    <h5 class="p-8-12">AI 回答</h5>
+                    <div class="p-8-12 border-t-dashed lighter">
+                      <MdPreview
+                        ref="editorRef"
+                        editorId="preview-only"
+                        :modelValue="item.answer"
+                      />
+                    </div>
+                  </div>
+                </template>
               </div>
             </el-collapse-transition>
           </el-card>
