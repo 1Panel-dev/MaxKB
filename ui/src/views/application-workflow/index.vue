@@ -86,7 +86,7 @@ import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
-import { WorkFlowInstanse } from '@/workflow/common/validate'
+import { WorkFlowInstance } from '@/workflow/common/validate'
 
 const { application } = useStore()
 const route = useRoute()
@@ -132,7 +132,7 @@ const clickShowDebug = () => {
     ?.validate()
     .then(() => {
       const graphData = getGraphData()
-      const workflow = new WorkFlowInstanse(graphData)
+      const workflow = new WorkFlowInstance(graphData)
       try {
         workflow.is_valid()
         getDetail()

@@ -38,7 +38,7 @@
   <!-- 知识库引用 dialog -->
   <ParagraphSourceDialog ref="ParagraphSourceDialogRef" />
   <!-- 执行详情 dialog -->
-  <ExecutionDetailDialog ref="ExecutionDetialDialogRef" />
+  <ExecutionDetailDialog ref="ExecutionDetailDialogRef" />
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -58,12 +58,12 @@ const props = defineProps({
 })
 
 const ParagraphSourceDialogRef = ref()
-const ExecutionDetialDialogRef = ref()
+const ExecutionDetailDialogRef = ref()
 function openParagraph(row: any, id?: string) {
   ParagraphSourceDialogRef.value.open(row, id)
 }
 function openExecutionDetail(row: any) {
-  ExecutionDetialDialogRef.value.open(row)
+  ExecutionDetailDialogRef.value.open(row)
 }
 </script>
 <style lang="scss" scoped>

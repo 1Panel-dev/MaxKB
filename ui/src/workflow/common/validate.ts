@@ -1,7 +1,7 @@
 import { WorkflowType } from '@/enums/workflow'
 
 const end_nodes = [WorkflowType.AiChat, WorkflowType.Reply]
-export class WorkFlowInstanse {
+export class WorkFlowInstance {
   nodes
   edges
   constructor(workflow: { nodes: Array<any>; edges: Array<any> }) {
