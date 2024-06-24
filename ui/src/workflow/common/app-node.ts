@@ -3,6 +3,8 @@ import ElementPlus from 'element-plus'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
 
 import { HtmlResize } from '@logicflow/extension'
+
+import { h as lh } from '@logicflow/core'
 import { createApp, h } from 'vue'
 import directives from '@/directives'
 import i18n from '@/locales'
@@ -48,18 +50,46 @@ class AppNode extends HtmlResize.view {
     }
   }
 
-  // getAnchorShape(anchorData) {
-  //   const { x, y, type } = anchorData;
-  //   return h('rect', {
-  //     x: x - 5,
-  //     y: y - 5,
-  //     width: 10,
-  //     height: 10,
-  //     className: `custom-anchor ${
-  //       type === 'left' ? 'incomming-anchor' : 'outgoing-anchor'
-  //     }`,
-  //   });
-  // }
+  getAnchorShape(anchorData: any) {
+    const { x, y, type } = anchorData
+    let isConnect = false
+    let isLeft = false
+    if (type == 'left') {
+      isConnect = this.props.graphModel.edges.some((edge) => edge.targetAnchorId == anchorData.id)
+      isLeft = true
+    } else {
+      isConnect = this.props.graphModel.edges.some((edge) => edge.sourceAnchorId == anchorData.id)
+      isLeft = false
+    }
+
+    return lh(
+      'foreignObject',
+      {
+        ...anchorData,
+        x: x - 10,
+        y: y - 10,
+        width: 20,
+        height: 20
+      },
+      [
+        lh('div', {
+          className: [
+            'node-anchor',
+            isConnect ? 'is-connect' : '',
+            isLeft ? 'node-anchor-left' : 'node-anchor-right'
+          ]
+            .filter((item) => item)
+            .join(' ')
+        }),
+        lh(
+          'style',
+          {},
+          '.node-anchor{height:20px;width:20px;border: 2px solid #3370FF;border-radius: 50%;box-sizing: border-box;}'
+        )
+      ]
+    )
+  }
+
   setHtml(rootEl: HTMLElement) {
     if (!this.isMounted) {
       this.isMounted = true
