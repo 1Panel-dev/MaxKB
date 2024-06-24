@@ -32,11 +32,11 @@ def event_content(chat_id, chat_record_id, response, workflow,
     for chunk in response:
         answer += chunk.content
         yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                                     'content': chunk.content, 'is_end': False}) + "\n\n"
+                                     'content': chunk.content, 'is_end': False}, ensure_ascii=False) + "\n\n"
     write_context(answer)
     post_handler.handler(chat_id, chat_record_id, answer, workflow)
     yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                                 'content': '', 'is_end': True}) + "\n\n"
+                                 'content': '', 'is_end': True}, ensure_ascii=False) + "\n\n"
 
 
 def to_stream_response(chat_id, chat_record_id, response: Iterator[BaseMessageChunk], workflow, write_context,
@@ -53,7 +53,8 @@ def to_stream_response(chat_id, chat_record_id, response: Iterator[BaseMessageCh
     """
     r = StreamingHttpResponse(
         streaming_content=event_content(chat_id, chat_record_id, response, workflow, write_context, post_handler),
-        content_type='text/event-stream;charset=utf-8')
+        content_type='text/event-stream;charset=utf-8',
+        charset='utf-8')
 
     r['Cache-Control'] = 'no-cache'
     return r

@@ -25,6 +25,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
     def execute(self, dataset_id_list, dataset_setting, question,
                 exclude_paragraph_id_list=None,
                 **kwargs) -> NodeResult:
+        self.context['question'] = question
         embedding_model = EmbeddingModel.get_embedding_model()
         embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()
@@ -85,6 +86,4 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
             'type': self.node.type,
             'status': self.status,
             'err_message': self.err_message
-        } if self.status == 200 else {"index": index, 'type': self.node.type,
-                                      'status': self.status,
-                                      'err_message': self.err_message}
+        }

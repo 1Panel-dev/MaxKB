@@ -27,6 +27,4 @@ class BaseStartStepNode(IStarNode):
             'type': self.node.type,
             'status': self.status,
             'err_message': self.err_message
-        } if self.status == 200 else {"index": index, 'type': self.node.type,
-                                      'status': self.status,
-                                      'err_message': self.err_message}
+        }

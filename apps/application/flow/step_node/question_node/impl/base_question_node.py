@@ -120,8 +120,11 @@ class BaseQuestionNode(IQuestionNode):
                                                                                rsa_long_decrypt(model.credential)),
                                                                            streaming=True)
         history_message = self.get_history_message(history_chat_record, dialogue_number)
+        self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)
+        self.context['question'] = question.content
         message_list = self.generate_message_list(system, prompt, history_message)
+        self.context['message_list'] = message_list
         if stream:
             r = chat_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
@@ -168,14 +171,13 @@ class BaseQuestionNode(IQuestionNode):
             'run_time': self.context.get('run_time'),
             'system': self.node_params.get('system'),
             'history_message': [{'content': message.content, 'role': message.type} for message in
-                                self.context.get('history_message')],
+                                (self.context.get('history_message') if self.context.get(
+                                    'history_message') is not None else [])],
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
             'type': self.node.type,
-            'message_tokens': self.context['message_tokens'],
-            'answer_tokens': self.context['answer_tokens'],
+            'message_tokens': self.context.get('message_tokens'),
+            'answer_tokens': self.context.get('answer_tokens'),
             'status': self.status,
             'err_message': self.err_message
-        } if self.status == 200 else {"index": index, 'type': self.node.type,
-                                      'status': self.status,
-                                      'err_message': self.err_message}
+        }

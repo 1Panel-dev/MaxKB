@@ -17,7 +17,7 @@ class BaseConditionNode(IConditionNode):
     def execute(self, **kwargs) -> NodeResult:
         branch_list = self.node_params_serializer.data['branch']
         branch = self._execute(branch_list)
-        r = NodeResult({'branch_id': branch.get('id')}, {})
+        r = NodeResult({'branch_id': branch.get('id'), 'branch_name': branch.get('type')}, {})
         return r
 
     def _execute(self, branch_list: List):
@@ -44,8 +44,6 @@ class BaseConditionNode(IConditionNode):
             'branch_id': self.context.get('branch_id'),
             'branch_name': self.context.get('branch_name'),
             'type': self.node.type,
-            'status': self.context.get('status'),
-            'err_message': self.context.get('err_message')
-        } if self.status == 200 else {"index": index, 'type': self.node.type,
-                                      'status': self.status,
-                                      'err_message': self.err_message}
+            'status': self.status,
+            'err_message': self.err_message
+        }

@@ -86,6 +86,4 @@ class BaseReplyNode(IReplyNode):
             'answer': self.context.get('answer'),
             'status': self.status,
             'err_message': self.err_message
-        } if self.status == 200 else {"index": index, 'type': self.node.type,
-                                      'status': self.status,
-                                      'err_message': self.err_message}
+        }

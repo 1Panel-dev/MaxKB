@@ -12,7 +12,7 @@ from typing import Type
 from django.core import validators
 from rest_framework import serializers
 
-from application.flow.i_step_node import INode, ReferenceAddressSerializer, NodeResult
+from application.flow.i_step_node import INode, NodeResult
 from common.util.field_message import ErrMessage
 
 

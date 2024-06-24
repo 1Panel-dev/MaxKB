@@ -23,6 +23,7 @@ class ConditionSerializer(serializers.Serializer):
 
 class ConditionBranchSerializer(serializers.Serializer):
     id = serializers.CharField(required=True, error_messages=ErrMessage.char("分支id"))
+    type = serializers.CharField(required=True, error_messages=ErrMessage.char("分支类型"))
     condition = serializers.CharField(required=True, error_messages=ErrMessage.char("条件or|and"))
     conditions = ConditionSerializer(many=True)
 

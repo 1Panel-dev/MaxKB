@@ -44,8 +44,10 @@ class WorkFlowPostHandler:
                 workflow):
         question = workflow.params['question']
         details = workflow.get_runtime_details()
-        message_tokens = sum([row.get('message_tokens') for row in details.values() if 'message_tokens' in row])
-        answer_tokens = sum([row.get('answer_tokens') for row in details.values() if 'answer_tokens' in row])
+        message_tokens = sum([row.get('message_tokens') for row in details.values() if
+                              'message_tokens' in row and row.get('message_tokens') is not None])
+        answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
+                             'answer_tokens' in row and row.get('answer_tokens') is not None])
         chat_record = ChatRecord(id=chat_record_id,
                                  chat_id=chat_id,
                                  problem_text=question,
