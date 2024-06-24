@@ -537,7 +537,7 @@ class ApplicationSerializer(serializers.Serializer):
             work_flow = instance.get('work_flow')
             if work_flow is None:
                 raise AppApiException(500, "work_flow是必填字段")
-            Flow.new_instance(work_flow).is_valid()
+            Flow.new_instance(work_flow).is_valid_work_flow()
             base_node = get_base_node_work_flow(work_flow)
             if base_node is not None:
                 node_data = base_node.get('properties').get('node_data')
