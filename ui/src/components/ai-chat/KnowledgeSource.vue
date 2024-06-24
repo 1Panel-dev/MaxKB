@@ -7,7 +7,7 @@
       引用分段 {{ data.paragraph_list?.length || 0 }}</el-button
     >
   </div>
-  <div class="mt-8 mb-12">
+  <div class="mt-8">
     <el-space wrap>
       <el-button
         v-for="(dataset, index) in data.dataset_list"
@@ -20,16 +20,25 @@
     </el-space>
   </div>
 
-  <div class="border-t color-secondary" style="padding-top: 12px">
-    <span class="mr-8"> 消耗 tokens: {{ data?.message_tokens + data?.answer_tokens }} </span>
-    <span> 耗时: {{ data?.run_time?.toFixed(2) }} s</span>
+  <div class="border-t color-secondary flex-between mt-12" style="padding-top: 12px">
+    <div>
+      <span class="mr-8"> 消耗 tokens: {{ data?.message_tokens + data?.answer_tokens }} </span>
+      <span> 耗时: {{ data?.run_time?.toFixed(2) }} s</span>
+    </div>
+    <el-button type="primary" link @click="openExecutionDetail(data)">
+      <el-icon class="mr-4"><Document /></el-icon>
+      执行详情</el-button
+    >
   </div>
   <!-- 知识库引用 dialog -->
   <ParagraphSourceDialog ref="ParagraphSourceDialogRef" />
+  <!-- 执行详情 dialog -->
+  <ExecutionDetailDialog ref="ExecutionDetialDialogRef" />
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import ParagraphSourceDialog from './ParagraphSourceDialog.vue'
+import ExecutionDetailDialog from './ExecutionDetailDialog.vue'
 
 const props = defineProps({
   data: {
@@ -39,8 +48,12 @@ const props = defineProps({
 })
 
 const ParagraphSourceDialogRef = ref()
+const ExecutionDetialDialogRef = ref()
 function openParagraph(row: any, id?: string) {
   ParagraphSourceDialogRef.value.open(row, id)
+}
+function openExecutionDetail(row: any, id?: string) {
+  ExecutionDetialDialogRef.value.open(row)
 }
 </script>
 <style lang="scss" scoped>
