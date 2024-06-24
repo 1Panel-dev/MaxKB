@@ -167,6 +167,7 @@ class BaseQuestionNode(IQuestionNode):
 
     def get_details(self, index: int, **kwargs):
         return {
+            'name': self.node.properties.get('stepName'),
             "index": index,
             'run_time': self.context.get('run_time'),
             'system': self.node_params.get('system'),

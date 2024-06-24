@@ -39,6 +39,7 @@ class BaseConditionNode(IConditionNode):
 
     def get_details(self, index: int, **kwargs):
         return {
+            'name': self.node.properties.get('stepName'),
             "index": index,
             'run_time': self.context.get('run_time'),
             'branch_id': self.context.get('branch_id'),

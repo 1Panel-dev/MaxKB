@@ -21,6 +21,7 @@ class BaseStartStepNode(IStarNode):
 
     def get_details(self, index: int, **kwargs):
         return {
+            'name': self.node.properties.get('stepName'),
             "index": index,
             "question": self.context.get('question'),
             'run_time': self.context.get('run_time'),
