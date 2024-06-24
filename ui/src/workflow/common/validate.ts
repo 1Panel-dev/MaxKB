@@ -1,4 +1,6 @@
-const end_nodes = ['ai-chat-node', 'reply-node']
+import { WorkflowType } from '@/enums/workflow'
+
+const end_nodes = [WorkflowType.AiChat, WorkflowType.Reply]
 export class WorkFlowInstanse {
   nodes
   edges
@@ -10,7 +12,7 @@ export class WorkFlowInstanse {
    * 校验开始节点
    */
   private is_valid_start_node() {
-    const start_node_list = this.nodes.filter((item) => item.id === 'start-node')
+    const start_node_list = this.nodes.filter((item) => item.id === WorkflowType.Start)
     if (start_node_list.length == 0) {
       throw '开始节点必填'
     } else if (start_node_list.length > 1) {
@@ -21,7 +23,7 @@ export class WorkFlowInstanse {
    * 校验基本信息节点
    */
   private is_valid_base_node() {
-    const start_node_list = this.nodes.filter((item) => item.id === 'base-node')
+    const start_node_list = this.nodes.filter((item) => item.id === WorkflowType.Base)
     if (start_node_list.length == 0) {
       throw '基本信息节点必填'
     } else if (start_node_list.length > 1) {
@@ -43,7 +45,7 @@ export class WorkFlowInstanse {
    * @returns
    */
   get_start_node() {
-    const start_node_list = this.nodes.filter((item) => item.id === 'start-node')
+    const start_node_list = this.nodes.filter((item) => item.id === WorkflowType.Start)
     return start_node_list[0]
   }
   /**
@@ -51,7 +53,7 @@ export class WorkFlowInstanse {
    * @returns 基本节点
    */
   get_base_node() {
-    const base_node_list = this.nodes.filter((item) => item.id === 'base-node')
+    const base_node_list = this.nodes.filter((item) => item.id === WorkflowType.Base)
     return base_node_list[0]
   }
 
@@ -86,7 +88,7 @@ export class WorkFlowInstanse {
   }
   private is_valid_nodes() {
     for (const node of this.nodes) {
-      if (node.type !== 'base-node' && node.type !== 'start-node') {
+      if (node.type !== WorkflowType.Base && node.type !== WorkflowType.Start) {
         console.log(node.properties.stepName)
         if (!this.edges.some((edge) => edge.targetNodeId === node.id)) {
           throw `未在流程中的节点:${node.properties.stepName}`
@@ -99,7 +101,7 @@ export class WorkFlowInstanse {
    * @param node 节点
    */
   private is_valid_node(node: any) {
-    if (node.type === 'condition-node') {
+    if (node.type === WorkflowType.Condition) {
       const branch_list = node.properties.node_data.branch
       for (const branch of branch_list) {
         const source_anchor_id = `${node.id}_${branch.id}_right`

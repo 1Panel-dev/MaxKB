@@ -29,7 +29,7 @@
         <h5 class="title">基础组件</h5>
         <template v-for="(item, index) in menuNodes" :key="index">
           <div class="workflow-dropdown-item cursor flex p-8-12" @mousedown="onmousedown(item)">
-            <component :is="iconComponent(item.icon)" class="mr-8 mt-4" :size="32" />
+            <component :is="iconComponent(`${item.type}-icon`)" class="mr-8 mt-4" :size="32" />
             <div class="pre-line">
               <div class="lighter">{{ item.label }}</div>
               <el-text type="info" size="small">{{ item.text }}</el-text>
@@ -87,6 +87,7 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { WorkFlowInstanse } from '@/workflow/common/validate'
+
 const { application } = useStore()
 const route = useRoute()
 
@@ -134,6 +135,7 @@ const clickShowDebug = () => {
       const workflow = new WorkFlowInstanse(graphData)
       try {
         workflow.is_valid()
+        getDetail()
         showDebug.value = true
       } catch (e: any) {
         MsgError(e.toString())
@@ -242,7 +244,7 @@ onBeforeUnmount(() => {
 }
 
 .workflow-debug-container {
-  z-index: 10000;
+  z-index: 2000;
   position: relative;
   border-radius: 8px;
   border: 1px solid #ffffff;

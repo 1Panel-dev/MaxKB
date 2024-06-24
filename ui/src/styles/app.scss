@@ -288,6 +288,10 @@ h5 {
   border-radius: 4px;
 }
 
+.border-t-dashed {
+  border-top: 1px dashed var(--el-border-color);
+}
+
 .cursor {
   cursor: pointer;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex align-center mt-16">
+  <div class="flex align-center mt-16" v-if="!isWorkFlow(props.type)">
     <span class="mr-4 color-secondary">知识来源</span>
     <el-divider direction="vertical" />
     <el-button type="primary" class="mr-8" link @click="openParagraph(data)">
@@ -7,7 +7,7 @@
       引用分段 {{ data.paragraph_list?.length || 0 }}</el-button
     >
   </div>
-  <div class="mt-8 mb-12">
+  <div class="mt-8" v-if="!isWorkFlow(props.type)">
     <el-space wrap>
       <el-button
         v-for="(dataset, index) in data.dataset_list"
@@ -20,27 +20,50 @@
     </el-space>
   </div>
 
-  <div class="border-t color-secondary" style="padding-top: 12px">
-    <span class="mr-8"> 消耗 tokens: {{ data?.message_tokens + data?.answer_tokens }} </span>
-    <span> 耗时: {{ data?.run_time?.toFixed(2) }} s</span>
+  <div class="border-t color-secondary flex-between mt-12" style="padding-top: 12px">
+    <div>
+      <span class="mr-8"> 消耗 tokens: {{ data?.message_tokens + data?.answer_tokens }} </span>
+      <span> 耗时: {{ data?.run_time?.toFixed(2) }} s</span>
+    </div>
+    <el-button
+      v-if="isWorkFlow(props.type)"
+      type="primary"
+      link
+      @click="openExecutionDetail(data.execution_details)"
+    >
+      <el-icon class="mr-4"><Document /></el-icon>
+      执行详情</el-button
+    >
   </div>
   <!-- 知识库引用 dialog -->
   <ParagraphSourceDialog ref="ParagraphSourceDialogRef" />
+  <!-- 执行详情 dialog -->
+  <ExecutionDetailDialog ref="ExecutionDetialDialogRef" />
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import ParagraphSourceDialog from './ParagraphSourceDialog.vue'
+import ExecutionDetailDialog from './ExecutionDetailDialog.vue'
+import { isWorkFlow } from '@/utils/application'
 
 const props = defineProps({
   data: {
     type: Object,
     default: () => {}
+  },
+  type: {
+    type: String,
+    default: ''
   }
 })
 
 const ParagraphSourceDialogRef = ref()
+const ExecutionDetialDialogRef = ref()
 function openParagraph(row: any, id?: string) {
   ParagraphSourceDialogRef.value.open(row, id)
+}
+function openExecutionDetail(row: any) {
+  ExecutionDetialDialogRef.value.open(row)
 }
 </script>
 <style lang="scss" scoped>

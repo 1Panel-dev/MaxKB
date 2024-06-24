@@ -75,7 +75,7 @@
                 <MdRenderer :source="item.answer_text"></MdRenderer>
                 <!-- 知识来源 -->
                 <div v-if="showSource(item)">
-                  <KnowledgeSource :data="item" />
+                  <KnowledgeSource :data="item" :type="props.data.type" />
                 </div>
               </el-card>
               <div class="flex-between mt-8" v-if="log">
@@ -153,6 +153,7 @@ import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
 import MdRenderer from '@/components/markdown-renderer/MdRenderer.vue'
+import { isWorkFlow } from '@/utils/application'
 import { MdPreview } from 'md-editor-v3'
 import { debounce } from 'lodash'
 defineOptions({ name: 'AiChat' })
@@ -335,7 +336,7 @@ function getChartOpenId(chat?: any) {
         }
       })
   } else {
-    if (obj.type === 'WORK_FLOW') {
+    if (isWorkFlow(obj.type)) {
       const submitObj = {
         work_flow: obj.work_flow
       }

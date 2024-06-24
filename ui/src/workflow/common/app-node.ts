@@ -8,6 +8,7 @@ import { h as lh } from '@logicflow/core'
 import { createApp, h } from 'vue'
 import directives from '@/directives'
 import i18n from '@/locales'
+import { WorkflowType } from '@/enums/workflow'
 
 class AppNode extends HtmlResize.view {
   isMounted
@@ -171,8 +172,8 @@ class AppNodeModel extends HtmlResize.model {
     const { id, x, y, width } = this
     const anchors: any = []
 
-    if (this.type !== 'base-node') {
-      if (this.type !== 'start-node') {
+    if (this.type !== WorkflowType.Base) {
+      if (this.type !== WorkflowType.Start) {
         anchors.push({
           x: x - width / 2 + 10,
           y: y,

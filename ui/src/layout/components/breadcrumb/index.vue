@@ -120,7 +120,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
-import { isAppIcon } from '@/utils/application'
+import { isAppIcon, isWorkFlow } from '@/utils/application'
 import useStore from '@/stores'
 const { common, dataset, application } = useStore()
 const route = useRoute()
@@ -162,7 +162,7 @@ function changeMenu(id: string) {
     } else if (isApplication.value) {
       const type = list.value?.filter((v) => v.id === id)?.[0]?.type
       if (
-        type === 'WORK_FLOW' &&
+        isWorkFlow(type) &&
         (lastMatched.name === 'AppSetting' || lastMatched.name === 'AppHitTest')
       ) {
         router.push({ path: `/application/${id}/${type}/overview` })
