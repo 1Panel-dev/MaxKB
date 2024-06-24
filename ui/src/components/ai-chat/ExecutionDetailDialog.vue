@@ -34,9 +34,16 @@
                 <!-- 知识库检索 -->
                 <template v-if="item.type == WorkflowType.SearchDataset">
                   <div class="card-never border-r-4">
+                    <h5 class="p-8-12">检索内容</h5>
+                    <div class="p-8-12 border-t-dashed lighter">{{ item.question }}</div>
+                  </div>
+                  <div class="card-never border-r-4">
                     <h5 class="p-8-12">检索结果</h5>
                     <div class="p-8-12 border-t-dashed lighter">
-                      <template v-for="(paragraph, index) in item.paragraph_list" :key="index">
+                      <template
+                        v-for="(paragraph, paragraphIndex) in item.paragraph_list"
+                        :key="paragraphIndex"
+                      >
                         <CardBox
                           shadow="never"
                           :title="paragraph.title || '-'"
@@ -92,17 +99,28 @@
                     </div>
                   </div>
                 </template>
-                <!-- AI 对话 -->
-                <template v-if="item.type == WorkflowType.AiChat">
+                <!-- AI 对话 / 问题优化-->
+                <template
+                  v-if="item.type == WorkflowType.AiChat || item.type == WorkflowType.Question"
+                >
                   <div class="card-never border-r-4">
                     <h5 class="p-8-12">角色设定 (System)</h5>
                     <div class="p-8-12 border-t-dashed lighter">
-                      {{ item.branch_name }}
+                      {{ item.system || '-' }}
                     </div>
                   </div>
                   <div class="card-never border-r-4 mt-8">
                     <h5 class="p-8-12">历史记录</h5>
-                    <div class="p-8-12 border-t-dashed lighter"></div>
+                    <div class="p-8-12 border-t-dashed lighter">
+                      <p
+                        class="mt-4 mb-4"
+                        v-for="(history, historyIndex) in item.history_message"
+                        :key="historyIndex"
+                      >
+                        <span class="color-secondary mr-4">{{ history.role }}:</span
+                        ><span>{{ history.content }}</span>
+                      </p>
+                    </div>
                   </div>
                   <div class="card-never border-r-4 mt-8">
                     <h5 class="p-8-12">本次对话</h5>
@@ -115,7 +133,25 @@
                         ref="editorRef"
                         editorId="preview-only"
                         :modelValue="item.answer"
+                        style="background: none"
                       />
+                    </div>
+                  </div>
+                </template>
+
+                <!-- 指定回复 -->
+                <template v-if="item.type === WorkflowType.Reply">
+                  <div class="card-never border-r-4">
+                    <h5 class="p-8-12">回复内容</h5>
+                    <div class="p-8-12 border-t-dashed lighter">
+                      <el-scrollbar height="150">
+                        <MdPreview
+                          ref="editorRef"
+                          editorId="preview-only"
+                          :modelValue="item.answer"
+                          style="background: none"
+                        />
+                      </el-scrollbar>
                     </div>
                   </div>
                 </template>
