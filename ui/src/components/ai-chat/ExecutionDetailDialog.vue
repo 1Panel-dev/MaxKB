@@ -7,7 +7,7 @@
             <div class="flex-between cursor">
               <div class="flex align-center">
                 <el-icon class="mr-8"><CaretRight /></el-icon>
-                开始
+                {{ item && item.name }}
               </div>
               <div class="flex align-center">
                 <span class="mr-16 color-secondary">6.01s</span>
@@ -34,13 +34,13 @@ import { MdPreview } from 'md-editor-v3'
 const emit = defineEmits(['refresh'])
 
 const dialogVisible = ref(false)
-const detail = ref<any>({})
+const detail = ref<any[]>([])
 
 const current = ref('')
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    detail.value = {}
+    detail.value = []
   }
 })
 

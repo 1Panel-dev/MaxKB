@@ -115,6 +115,7 @@ import CreateApplicationDialog from './component/CreateApplicationDialog.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { isAppIcon } from '@/utils/application'
 import { useRouter } from 'vue-router'
+import { isWorkFlow } from '@/utils/application'
 import useStore from '@/stores'
 import { t } from '@/locales'
 const { application } = useStore()
@@ -132,10 +133,6 @@ const paginationConfig = reactive({
 })
 
 const searchValue = ref('')
-
-function isWorkFlow(type: string) {
-  return type === 'WORK_FLOW'
-}
 
 function settingApplication(row: any) {
   if (isWorkFlow(row.type)) {

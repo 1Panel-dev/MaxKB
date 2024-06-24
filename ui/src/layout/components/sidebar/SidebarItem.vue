@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter, useRoute, type RouteRecordRaw } from 'vue-router'
-
+import { isWorkFlow } from '@/utils/application'
 const props = defineProps<{
   menu: RouteRecordRaw
   activeMenu: any
@@ -30,7 +30,7 @@ const {
 } = route as any
 
 function showMenu() {
-  if (type === 'WORK_FLOW') {
+  if (isWorkFlow(type)) {
     return props.menu.name !== 'AppHitTest'
   } else {
     return true
@@ -38,7 +38,7 @@ function showMenu() {
 }
 
 function clickHandle(item: any) {
-  if (type === 'WORK_FLOW' && item.name === 'AppSetting') {
+  if (isWorkFlow(type) && item.name === 'AppSetting') {
     router.push({ path: `/application/${id}/workflow` })
   }
 }

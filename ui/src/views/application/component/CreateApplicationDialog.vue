@@ -49,7 +49,7 @@
               <el-card
                 shadow="never"
                 class="mb-16"
-                :class="applicationForm.type === 'WORK_FLOW' ? 'active' : ''"
+                :class="isWorkFlow(applicationForm.type) ? 'active' : ''"
               >
                 <el-radio value="WORK_FLOW" size="large">
                   <p class="mb-4">高级编排</p>
@@ -80,6 +80,7 @@ import type { ApplicationFormType } from '@/api/type/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application'
 import { MsgSuccess } from '@/utils/message'
+import { isWorkFlow } from '@/utils/application'
 import { t } from '@/locales'
 const router = useRouter()
 
@@ -174,7 +175,7 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
       applicationApi.postApplication(applicationForm.value, loading).then((res) => {
         console.log(res)
         MsgSuccess(t('views.application.applicationForm.buttons.createSuccess'))
-        if (applicationForm.value.type === 'WORK_FLOW') {
+        if (isWorkFlow(applicationForm.value.type)) {
           router.push({ path: `/application/${res.data.id}/workflow` })
         } else {
           router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
