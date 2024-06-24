@@ -1,11 +1,13 @@
+import { WorkflowType } from '@/enums/workflow'
+
 /**
  * 说明
  * type 与 nodes 文件对应
  */
 export const baseNodes = [
   {
-    id: 'base-node',
-    type: 'base-node',
+    id: WorkflowType.Base,
+    type: WorkflowType.Base,
     x: 200,
     y: 270,
     properties: {
@@ -20,8 +22,8 @@ export const baseNodes = [
     }
   },
   {
-    id: 'start-node',
-    type: 'start-node',
+    id: WorkflowType.Start,
+    type: WorkflowType.Start,
     x: 180,
     y: 720,
     properties: {
@@ -32,7 +34,7 @@ export const baseNodes = [
           label: '用户问题',
           value: 'question',
           globeLabel: '{{开始.question}}',
-          globeValue: "{{content['start-node'].question}}"
+          globeValue: `{{content['${WorkflowType.Start}'].question}}`
         }
       ]
     }
@@ -41,10 +43,9 @@ export const baseNodes = [
 
 export const menuNodes = [
   {
-    type: 'ai-chat-node',
+    type: WorkflowType.AiChat,
     text: '与 AI 大模型进行对话',
     label: 'AI 对话',
-    icon: 'ai-chat-node-icon',
     properties: {
       stepName: 'AI 对话',
       fields: [
@@ -56,10 +57,9 @@ export const menuNodes = [
     }
   },
   {
-    type: 'search-dataset-node',
+    type: WorkflowType.SearchDataset,
     text: '关联知识库，查找与问题相关的分段',
     label: '知识库检索',
-    icon: 'search-dataset-node-icon',
     properties: {
       stepName: '知识库检索',
       fields: [
@@ -77,10 +77,9 @@ export const menuNodes = [
     }
   },
   {
-    type: 'question-node',
+    type: WorkflowType.Question,
     text: '根据历史聊天记录优化完善当前问题，更利于匹配知识库分段',
     label: '问题优化',
-    icon: 'question-node-icon',
     properties: {
       stepName: '问题优化',
       fields: [
@@ -92,20 +91,18 @@ export const menuNodes = [
     }
   },
   {
-    type: 'condition-node',
+    type: WorkflowType.Condition,
     text: '根据不同条件执行不同的节点',
     label: '判断器',
-    icon: 'condition-node-icon',
     properties: {
       width: 600,
       stepName: '判断器'
     }
   },
   {
-    type: 'reply-node',
+    type: WorkflowType.Reply,
     text: '指定回复内容，引用变量会转换为字符串进行输出',
     label: '指定回复',
-    icon: 'reply-node-icon',
     properties: {
       stepName: '指定回复'
     }
@@ -125,3 +122,7 @@ export const compareList = [
   { value: 'len_lt', label: '长度小于' },
   { value: 'lt', label: '小于' }
 ]
+
+export function isWorkFlow(type: string | undefined) {
+  return type === 'WORK_FLOW'
+}

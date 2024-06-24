@@ -62,7 +62,7 @@ const ExecutionDetialDialogRef = ref()
 function openParagraph(row: any, id?: string) {
   ParagraphSourceDialogRef.value.open(row, id)
 }
-function openExecutionDetail(row: any, id?: string) {
+function openExecutionDetail(row: any) {
   ExecutionDetialDialogRef.value.open(row)
 }
 </script>

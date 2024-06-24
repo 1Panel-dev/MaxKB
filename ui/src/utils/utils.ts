@@ -62,7 +62,7 @@ export function relatedObject(list: any, val: any, attr: string) {
 }
 
 // 排序
-export function arraySort(list: Array<string>, property: any, desc?: boolean) {
+export function arraySort(list: Array<any>, property: any, desc?: boolean) {
   return list.sort((a: any, b: any) => {
     return desc ? b[property] - a[property] : a[property] - b[property]
   })

@@ -55,6 +55,7 @@
 import { ref } from 'vue'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
+import { WorkflowType } from '@/enums/workflow'
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
@@ -79,7 +80,7 @@ const props = defineProps<{
 }>()
 
 function showOperate(type: string) {
-  return type !== 'base-node' && type !== 'start-node'
+  return type !== WorkflowType.Base && type !== WorkflowType.Start
 }
 </script>
 <style lang="scss" scoped>
