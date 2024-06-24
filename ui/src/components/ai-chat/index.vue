@@ -75,7 +75,7 @@
                 <MdRenderer :source="item.answer_text"></MdRenderer>
                 <!-- 知识来源 -->
                 <div v-if="showSource(item)">
-                  <KnowledgeSource :data="item" />
+                  <KnowledgeSource :data="item" :type="props.data.type" />
                 </div>
               </el-card>
               <div class="flex-between mt-8" v-if="log">
