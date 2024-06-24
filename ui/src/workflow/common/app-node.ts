@@ -126,7 +126,7 @@ class AppNodeModel extends HtmlResize.model {
     this.sourceRules.push({
       message: '只允许连一个节点',
       validate: (sourceNode: any, targetNode: any, sourceAnchor: any) => {
-        return !this.graphModel.edges.some((item) => item.sourceNodeId === sourceNode.id)
+        return !this.graphModel.edges.some((item) => item.sourceAnchorId === sourceAnchor.id)
       }
     })
     this.sourceRules.push(circleOnlyAsTarget)
