@@ -1,5 +1,5 @@
 <template>
-  <div class="custom-edge cursor" v-show="props.model.isHovered" @click.stop>
+  <div class="custom-edge cursor" v-show="props.model.isHovered">
     <svg
       @click="deleteEdge"
       width="100%"

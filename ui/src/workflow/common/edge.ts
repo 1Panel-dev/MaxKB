@@ -2,7 +2,15 @@ import { BezierEdge, BezierEdgeModel, h } from '@logicflow/core'
 import { createApp, h as vh } from 'vue'
 
 import CustomLine from './CustomLine.vue'
-
+function isMouseInElement(element: any, e: any) {
+  const rect = element.getBoundingClientRect()
+  return (
+    e.clientX >= rect.left &&
+    e.clientX <= rect.right &&
+    e.clientY >= rect.top &&
+    e.clientY <= rect.bottom
+  )
+}
 const DEFAULT_WIDTH = 32
 const DEFAULT_HEIGHT = 32
 class CustomEdge2 extends BezierEdge {
@@ -11,7 +19,17 @@ class CustomEdge2 extends BezierEdge {
   constructor() {
     super()
     this.isMounted = false
+    this.handleMouseUp = (e: any) => {
+      const element = e.target.parentNode.parentNode.querySelector('.lf-custom-edge-wrapper')
+      if (isMouseInElement(element, e)) {
+        this.props.model.graphModel.eventCenter.emit('delete_node', {
+          node: this.props.model,
+          confirm: false
+        })
+      }
+    }
   }
+
   getEdge() {
     const { model } = this.props
     const id = model.id
@@ -39,7 +57,7 @@ class CustomEdge2 extends BezierEdge {
       width: customWidth,
       height: customHeight
     }
-    console.log(this)
+
     const app = createApp({
       render: () => vh(CustomLine, { model: this.props.model })
     })
@@ -52,33 +70,28 @@ class CustomEdge2 extends BezierEdge {
     }, 0)
 
     delete style.stroke
-    return [
-      h('g', {}, [
-        h(
-          'style',
-          { type: 'text/css' },
-          '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}'
-        ),
-        h('path', {
-          d: path,
-          ...style,
-          ...arrowConfig,
-          ...(isAnimation
-            ? {
-                strokeDasharray,
-                stroke,
-                style: {
-                  strokeDashoffset,
-                  animationName,
-                  animationDuration,
-                  animationIterationCount,
-                  animationTimingFunction,
-                  animationDirection
-                }
+
+    return h('g', {}, [
+      h('style', { type: 'text/css' }, '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}'),
+      h('path', {
+        d: path,
+        ...style,
+        ...arrowConfig,
+        ...(isAnimation
+          ? {
+              strokeDasharray,
+              stroke,
+              style: {
+                strokeDashoffset,
+                animationName,
+                animationDuration,
+                animationIterationCount,
+                animationTimingFunction,
+                animationDirection
               }
-            : {})
-        })
-      ]),
+            }
+          : {})
+      }),
       h(
         'foreignObject',
         {
@@ -95,7 +108,7 @@ class CustomEdge2 extends BezierEdge {
           })
         ]
       )
-    ]
+    ])
   }
 }
 
