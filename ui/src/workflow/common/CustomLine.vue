@@ -1,5 +1,5 @@
 <template>
-  <div class="custom-edge cursor" v-show="props.model.isHovered">
+  <div class="custom-edge cursor" @mouseup.stop @click.stop v-show="props.model.isHovered">
     <svg
       @click="deleteEdge"
       width="100%"
@@ -22,7 +22,7 @@
 <script setup lang="ts">
 const props = defineProps<{ model: any }>()
 const deleteEdge = () => {
-  props.model.graphModel.eventCenter.emit('delete_node')
+  props.model.graphModel.deleteEdgeById(props.model.id)
 }
 </script>
 

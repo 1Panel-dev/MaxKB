@@ -18,8 +18,8 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu style="min-width: 80px">
-                  <el-dropdown-item class="p-8">复制</el-dropdown-item>
-                  <el-dropdown-item class="border-t p-8">删除</el-dropdown-item>
+                  <el-dropdown-item @click="copyNode" class="p-8">复制</el-dropdown-item>
+                  <el-dropdown-item @click="deleteNode" class="border-t p-8">删除</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -60,6 +60,7 @@ import { ref } from 'vue'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
 import { WorkflowType } from '@/enums/workflow'
+import { ElMessageBox, ElMessage } from 'element-plus'
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
@@ -71,7 +72,22 @@ const height = ref<{
 })
 
 const showicon = ref<number | null>(null)
+const copyNode = () => {
+  props.nodeModel.isSelected = true
+  props.nodeModel.graphModel.eventCenter.emit('copy_node')
+}
+const deleteNode = () => {
+  const defaultOptions: Object = {
+    showCancelButton: true,
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  }
 
+  ElMessageBox.confirm('确定删除该节点？', defaultOptions).then(() => {
+    props.nodeModel.graphModel.deleteNode(props.nodeModel.id)
+  })
+  props.nodeModel.graphModel.eventCenter.emit('delete_node')
+}
 const resizeStepContainer = (wh: any) => {
   if (wh.height) {
     height.value.stepContainerHeight = wh.height

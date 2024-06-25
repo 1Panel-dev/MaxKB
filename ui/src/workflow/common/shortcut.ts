@@ -80,21 +80,11 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     }
     return false
   }
-  const delete_node = (params?: { node?: any; confirm?: boolean }) => {
+  const delete_node = () => {
     const defaultOptions: Object = {
       showCancelButton: true,
       confirmButtonText: '确定',
       cancelButtonText: '取消'
-    }
-    if (params && params.node) {
-      if (params.confirm === true || params.confirm === undefined) {
-        ElMessageBox.confirm('确定删除该节点？', defaultOptions).then(() => {
-          lf.deleteEdge(params.node.id)
-        })
-      } else {
-        lf.deleteEdge(params.node.id)
-      }
-      return
     }
 
     ElMessageBox.confirm('确定删除该节点？', defaultOptions).then(() => {
@@ -108,8 +98,6 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     return false
   }
   graph.eventCenter.on('copy_node', copy_node)
-  graph.eventCenter.on('paste_node', copy_node)
-  graph.eventCenter.on('delete_node', delete_node)
   // 复制
   keyboard.on(['cmd + c', 'ctrl + c'], copy_node)
   // 粘贴
