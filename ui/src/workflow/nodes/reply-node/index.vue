@@ -63,8 +63,6 @@
 import { set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import { MdEditor } from 'md-editor-v3'
-import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps<{ nodeModel: any }>()

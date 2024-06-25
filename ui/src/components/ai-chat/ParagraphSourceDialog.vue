@@ -71,7 +71,6 @@
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { cloneDeep } from 'lodash'
 import { arraySort } from '@/utils/utils'
-import { MdPreview } from 'md-editor-v3'
 const emit = defineEmits(['refresh'])
 
 const ParagraphDialogRef = ref()

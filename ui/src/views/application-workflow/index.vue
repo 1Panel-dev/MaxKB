@@ -2,7 +2,9 @@
   <div class="application-workflow" v-loading="loading">
     <div class="header border-b flex-between p-12-24">
       <div class="flex align-center">
-        <back-button to="-1"></back-button>
+        <back-button
+          @click="router.push({ path: `/application/${id}/WORK_FLOW/overview` })"
+        ></back-button>
         <h4>{{ detail?.name }}</h4>
         <el-text type="info" class="ml-16 color-secondary" v-if="saveTime"
           >保存时间：{{ datetimeFormat(saveTime) }}</el-text
@@ -78,7 +80,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import Workflow from '@/workflow/index.vue'
 import { menuNodes } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
@@ -89,6 +91,7 @@ import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 
 const { application } = useStore()
+const router = useRouter()
 const route = useRoute()
 
 const {

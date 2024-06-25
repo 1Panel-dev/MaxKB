@@ -154,9 +154,8 @@ import logApi from '@/api/log'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
-import MdRenderer from '@/components/markdown-renderer/MdRenderer.vue'
+import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import { isWorkFlow } from '@/utils/application'
-import { MdPreview } from 'md-editor-v3'
 import { debounce } from 'lodash'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()

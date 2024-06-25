@@ -56,7 +56,6 @@ import { set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
-import { MdEditor } from 'md-editor-v3'
 const props = defineProps<{ nodeModel: any }>()
 
 const form = {
