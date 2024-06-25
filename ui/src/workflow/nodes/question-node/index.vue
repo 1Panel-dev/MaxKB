@@ -153,8 +153,7 @@ const {
 } = app.config.globalProperties.$route as any
 
 // @ts-ignore
-const defaultPrompt =
-  '已知信息：\n{data}\n回答要求：\n- 请使用简洁且专业的语言来回答用户的问题。\n- 如果你不知道答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。\n- 避免提及你是从已知信息中获得的知识。\n- 请保证答案与已知信息中描述的一致。\n- 请使用 Markdown 语法优化答案的格式。\n- 已知信息中的图片、链接地址和脚本语言请直接返回。\n- 请使用与问题相同的语言来回答。\n问题：\n{question}'
+const defaultPrompt = '{{开始.question}}'
 const form = {
   model_id: '',
   system: '',

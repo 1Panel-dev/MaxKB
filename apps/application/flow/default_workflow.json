@@ -1,202 +1,25 @@
 {
-  "edges": [
-    {
-      "id": "328b53ca-1f8e-402a-accc-5652e3bd7556",
-      "type": "app-edge",
-      "endPoint": {
-        "x": 560,
-        "y": 220
-      },
-      "pointsList": [
-        {
-          "x": 260,
-          "y": 220
-        },
-        {
-          "x": 370,
-          "y": 220
-        },
-        {
-          "x": 450,
-          "y": 220
-        },
-        {
-          "x": 560,
-          "y": 220
-        }
-      ],
-      "properties": {},
-      "startPoint": {
-        "x": 260,
-        "y": 220
-      },
-      "sourceNodeId": "start-node",
-      "targetNodeId": "c8903650-67e0-42a3-875f-6896b33f8916",
-      "sourceAnchorId": "start-node_right",
-      "targetAnchorId": "c8903650-67e0-42a3-875f-6896b33f8916_left"
-    },
-    {
-      "id": "9979350a-4321-4f94-91e4-0c755db29e0c",
-      "type": "app-edge",
-      "endPoint": {
-        "x": 960,
-        "y": 220
-      },
-      "pointsList": [
-        {
-          "x": 880,
-          "y": 220
-        },
-        {
-          "x": 990,
-          "y": 220
-        },
-        {
-          "x": 850,
-          "y": 220
-        },
-        {
-          "x": 960,
-          "y": 220
-        }
-      ],
-      "properties": {},
-      "startPoint": {
-        "x": 880,
-        "y": 220
-      },
-      "sourceNodeId": "c8903650-67e0-42a3-875f-6896b33f8916",
-      "targetNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
-      "sourceAnchorId": "c8903650-67e0-42a3-875f-6896b33f8916_right",
-      "targetAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_left"
-    },
-    {
-      "id": "3dc74fbf-b4b1-41ab-9d65-b3476d05403c",
-      "type": "app-edge",
-      "endPoint": {
-        "x": 1640,
-        "y": -330
-      },
-      "pointsList": [
-        {
-          "x": 1540,
-          "y": 125.5455
-        },
-        {
-          "x": 1650,
-          "y": 125.5455
-        },
-        {
-          "x": 1530,
-          "y": -330
-        },
-        {
-          "x": 1640,
-          "y": -330
-        }
-      ],
-      "properties": {},
-      "startPoint": {
-        "x": 1540,
-        "y": 125.5455
-      },
-      "sourceNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
-      "targetNodeId": "8839b489-3949-4d27-b932-896392d3dff5",
-      "sourceAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_6351_right",
-      "targetAnchorId": "8839b489-3949-4d27-b932-896392d3dff5_left"
-    },
-    {
-      "id": "2e1229ab-1be7-4e98-8032-db3bbe0e4c01",
-      "type": "app-edge",
-      "endPoint": {
-        "x": 1650,
-        "y": 250
-      },
-      "pointsList": [
-        {
-          "x": 1540,
-          "y": 249.00050000000002
-        },
-        {
-          "x": 1650,
-          "y": 249.00050000000002
-        },
-        {
-          "x": 1540,
-          "y": 250
-        },
-        {
-          "x": 1650,
-          "y": 250
-        }
-      ],
-      "properties": {},
-      "startPoint": {
-        "x": 1540,
-        "y": 249.00050000000002
-      },
-      "sourceNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
-      "targetNodeId": "bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91",
-      "sourceAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_5186_right",
-      "targetAnchorId": "bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91_left"
-    },
-    {
-      "id": "f689d923-641f-4039-b307-645bd3fbdf4a",
-      "type": "app-edge",
-      "endPoint": {
-        "x": 1650,
-        "y": 860
-      },
-      "pointsList": [
-        {
-          "x": 1540,
-          "y": 334.728
-        },
-        {
-          "x": 1650,
-          "y": 334.728
-        },
-        {
-          "x": 1540,
-          "y": 860
-        },
-        {
-          "x": 1650,
-          "y": 860
-        }
-      ],
-      "properties": {},
-      "startPoint": {
-        "x": 1540,
-        "y": 334.728
-      },
-      "sourceNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
-      "targetNodeId": "f9cfacd9-2301-431d-a6ea-876717ccaffc",
-      "sourceAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_7119_right",
-      "targetAnchorId": "f9cfacd9-2301-431d-a6ea-876717ccaffc_left"
-    }
-  ],
   "nodes": [
     {
-      "x": 130,
-      "y": -230,
       "id": "base-node",
       "type": "base-node",
+      "x": 240,
+      "y": 40,
       "properties": {
         "height": 200,
         "stepName": "基本信息",
         "node_data": {
-          "desc": "test",
-          "name": "test111",
+          "desc": "",
+          "name": "test",
           "prologue": "您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？"
         }
       }
     },
     {
-      "x": 100,
-      "y": 220,
       "id": "start-node",
       "type": "start-node",
+      "x": 240,
+      "y": 420,
       "properties": {
         "fields": [
           {
@@ -211,10 +34,10 @@
       }
     },
     {
-      "x": 720,
-      "y": 220,
       "id": "c8903650-67e0-42a3-875f-6896b33f8916",
       "type": "search-dataset-node",
+      "x": 670,
+      "y": 150,
       "properties": {
         "fields": [
           {
@@ -259,10 +82,10 @@
       }
     },
     {
-      "x": 1250,
-      "y": 220,
       "id": "ce724e9f-c741-4f22-a41c-d43247193629",
       "type": "condition-node",
+      "x": 1170,
+      "y": 150,
       "properties": {
         "width": 600,
         "stepName": "判断器",
@@ -308,28 +131,28 @@
         },
         "branch_condition_list": [
           {
-            "id": "6351",
             "index": 0,
-            "height": 115.455
+            "height": 115.455,
+            "id": "6351"
           },
           {
-            "id": "5186",
             "index": 1,
-            "height": 115.455
+            "height": 115.455,
+            "id": "5186"
           },
           {
-            "id": "7119",
             "index": 2,
-            "height": 40
+            "height": 40,
+            "id": "7119"
           }
         ]
       }
     },
     {
-      "x": 1800,
-      "y": -330,
       "id": "8839b489-3949-4d27-b932-896392d3dff5",
       "type": "reply-node",
+      "x": 1820,
+      "y": -280,
       "properties": {
         "stepName": "指定回复",
         "node_data": {
@@ -343,10 +166,10 @@
       }
     },
     {
-      "x": 1810,
-      "y": 250,
       "id": "bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91",
       "type": "ai-chat-node",
+      "x": 1820,
+      "y": 180,
       "properties": {
         "fields": [
           {
@@ -360,24 +183,208 @@
         "node_data": {
           "prompt": "已知信息：\n{{知识库检索.data}}\n问题：\n{{开始.question}}",
           "system": "",
-          "model_id": "",
           "dialogue_number": 0
         }
       }
     },
     {
-      "x": 1810,
-      "y": 860,
-      "id": "f9cfacd9-2301-431d-a6ea-876717ccaffc",
-      "type": "reply-node",
+      "id": "ec021e3e-3cd9-4639-959d-33c928bba3aa",
+      "type": "ai-chat-node",
+      "x": 1820,
+      "y": 840,
       "properties": {
-        "stepName": "指定回复1",
+        "fields": [
+          {
+            "label": "AI 回答内容",
+            "value": "answer",
+            "globeLabel": "{{AI 对话1.answer}}",
+            "globeValue": "{{context['ec021e3e-3cd9-4639-959d-33c928bba3aa'].answer}}"
+          }
+        ],
+        "stepName": "AI 对话1",
         "node_data": {
-          "fields": [],
-          "content": "未找到相关信息",
-          "reply_type": "content"
+          "prompt": "{{开始.question}}",
+          "system": "",
+          "dialogue_number": 1
         }
       }
+    }
+  ],
+  "edges": [
+    {
+      "id": "328b53ca-1f8e-402a-accc-5652e3bd7556",
+      "type": "app-edge",
+      "sourceNodeId": "start-node",
+      "targetNodeId": "c8903650-67e0-42a3-875f-6896b33f8916",
+      "startPoint": {
+        "x": 400,
+        "y": 420
+      },
+      "endPoint": {
+        "x": 510,
+        "y": 150
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 400,
+          "y": 420
+        },
+        {
+          "x": 510,
+          "y": 420
+        },
+        {
+          "x": 400,
+          "y": 150
+        },
+        {
+          "x": 510,
+          "y": 150
+        }
+      ],
+      "sourceAnchorId": "start-node_right",
+      "targetAnchorId": "c8903650-67e0-42a3-875f-6896b33f8916_left"
+    },
+    {
+      "id": "9979350a-4321-4f94-91e4-0c755db29e0c",
+      "type": "app-edge",
+      "sourceNodeId": "c8903650-67e0-42a3-875f-6896b33f8916",
+      "targetNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
+      "startPoint": {
+        "x": 830,
+        "y": 150
+      },
+      "endPoint": {
+        "x": 880,
+        "y": 150
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 830,
+          "y": 150
+        },
+        {
+          "x": 940,
+          "y": 150
+        },
+        {
+          "x": 770,
+          "y": 150
+        },
+        {
+          "x": 880,
+          "y": 150
+        }
+      ],
+      "sourceAnchorId": "c8903650-67e0-42a3-875f-6896b33f8916_right",
+      "targetAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_left"
+    },
+    {
+      "id": "3dc74fbf-b4b1-41ab-9d65-b3476d05403c",
+      "type": "app-edge",
+      "sourceNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
+      "targetNodeId": "8839b489-3949-4d27-b932-896392d3dff5",
+      "startPoint": {
+        "x": 1460,
+        "y": 55.54549999999995
+      },
+      "endPoint": {
+        "x": 1660,
+        "y": -280
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 1460,
+          "y": 55.54549999999995
+        },
+        {
+          "x": 1570,
+          "y": 55.54549999999995
+        },
+        {
+          "x": 1550,
+          "y": -280
+        },
+        {
+          "x": 1660,
+          "y": -280
+        }
+      ],
+      "sourceAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_6351_right",
+      "targetAnchorId": "8839b489-3949-4d27-b932-896392d3dff5_left"
+    },
+    {
+      "id": "2e1229ab-1be7-4e98-8032-db3bbe0e4c01",
+      "type": "app-edge",
+      "sourceNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
+      "targetNodeId": "bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91",
+      "startPoint": {
+        "x": 1460,
+        "y": 179.00050000000002
+      },
+      "endPoint": {
+        "x": 1660,
+        "y": 180
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 1460,
+          "y": 179.00050000000002
+        },
+        {
+          "x": 1570,
+          "y": 179.00050000000002
+        },
+        {
+          "x": 1550,
+          "y": 180
+        },
+        {
+          "x": 1660,
+          "y": 180
+        }
+      ],
+      "sourceAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_5186_right",
+      "targetAnchorId": "bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91_left"
+    },
+    {
+      "id": "50a3ec05-c127-4703-85cd-757dc1650882",
+      "type": "app-edge",
+      "sourceNodeId": "ce724e9f-c741-4f22-a41c-d43247193629",
+      "targetNodeId": "ec021e3e-3cd9-4639-959d-33c928bba3aa",
+      "startPoint": {
+        "x": 1460,
+        "y": 264.728
+      },
+      "endPoint": {
+        "x": 1660,
+        "y": 840
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 1460,
+          "y": 264.728
+        },
+        {
+          "x": 1570,
+          "y": 264.728
+        },
+        {
+          "x": 1550,
+          "y": 840
+        },
+        {
+          "x": 1660,
+          "y": 840
+        }
+      ],
+      "sourceAnchorId": "ce724e9f-c741-4f22-a41c-d43247193629_7119_right",
+      "targetAnchorId": "ec021e3e-3cd9-4639-959d-33c928bba3aa_left"
     }
   ]
 }
