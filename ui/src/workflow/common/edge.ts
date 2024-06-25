@@ -3,10 +3,11 @@ import { createApp, h as vh } from 'vue'
 
 import CustomLine from './CustomLine.vue'
 
-const DEFAULT_WIDTH = 48
+const DEFAULT_WIDTH = 32
 const DEFAULT_HEIGHT = 32
 class CustomEdge2 extends BezierEdge {
   isMounted
+
   constructor() {
     super()
     this.isMounted = false
@@ -38,8 +39,9 @@ class CustomEdge2 extends BezierEdge {
       width: customWidth,
       height: customHeight
     }
+    console.log(this)
     const app = createApp({
-      render: () => vh(CustomLine, {})
+      render: () => vh(CustomLine, { model: this.props.model })
     })
     setTimeout(() => {
       const s = document.getElementById(id)
@@ -50,45 +52,50 @@ class CustomEdge2 extends BezierEdge {
     }, 0)
 
     delete style.stroke
-    return h('g', {}, [
-      h('style', { type: 'text/css' }, '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}'),
-      h('path', {
-        d: path,
-        ...style,
-        ...arrowConfig,
-        ...(isAnimation
-          ? {
-              strokeDasharray,
-              stroke,
-              style: {
-                strokeDashoffset,
-                animationName,
-                animationDuration,
-                animationIterationCount,
-                animationTimingFunction,
-                animationDirection
+    return [
+      h('g', {}, [
+        h(
+          'style',
+          { type: 'text/css' },
+          '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}'
+        ),
+        h('path', {
+          d: path,
+          ...style,
+          ...arrowConfig,
+          ...(isAnimation
+            ? {
+                strokeDasharray,
+                stroke,
+                style: {
+                  strokeDashoffset,
+                  animationName,
+                  animationDuration,
+                  animationIterationCount,
+                  animationTimingFunction,
+                  animationDirection
+                }
               }
-            }
-          : {})
-      }),
+            : {})
+        })
+      ]),
       h(
         'foreignObject',
         {
           ...positionData,
           y: positionData.y + 5,
-          x: positionData.x + 11,
-          style: { overflow: 'visible' }
+          x: positionData.x + 5,
+          style: {}
         },
         [
           h('div', {
             id,
-            style: wrapperStyle,
-
+            style: { ...wrapperStyle },
             className: 'lf-custom-edge-wrapper'
           })
         ]
       )
-    ])
+    ]
   }
 }
 
@@ -150,6 +157,11 @@ class CustomEdgeModel2 extends BezierEdgeModel {
     // 这里需要将原有的pointsList设置为空，才能触发bezier的自动计算control点。
     this.pointsList = []
     this.initPoints()
+  }
+  setAttributes(): void {
+    super.setAttributes()
+    this.isHitable = true
+    this.zIndex = 0
   }
 }
 
