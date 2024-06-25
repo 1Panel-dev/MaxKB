@@ -1,6 +1,10 @@
 <template>
   <div class="workflow-node-container p-16" style="overflow: visible">
-    <div class="step-container p-16" style="overflow: visible">
+    <div
+      class="step-container p-16"
+      :class="props.nodeModel.isSelected ? 'isSelected' : ''"
+      style="overflow: visible"
+    >
       <div v-resize="resizeStepContainer">
         <div class="flex-between mb-16">
           <div class="flex align-center">
@@ -92,57 +96,15 @@ function showOperate(type: string) {
     overflow: hidden;
     background: #fff;
     border-radius: 9px;
+    border: 2px solid #ffffff !important;
     box-shadow: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
     &:hover {
       box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
     }
+    &.isSelected {
+      border: 2px solid var(--el-color-primary) !important;
+    }
   }
-}
-
-.step-field {
-  display: flex;
-  justify-content: space-between;
-  height: 24px;
-  padding: 0 10px;
-  font-size: 12px;
-  line-height: 24px;
-}
-
-.field-type {
-  color: #9f9c9f;
-}
-.out-step-field {
-  display: flex;
-  justify-content: space-between;
-  height: 24px;
-  padding: 0 10px;
-  font-size: 12px;
-  line-height: 24px;
-  float: right;
-}
-/* 自定义锚点样式 */
-.custom-anchor {
-  cursor: crosshair;
-  fill: #d9d9d9;
-  stroke: #999;
-  stroke-width: 1;
-  rx: 3;
-  ry: 3;
-}
-
-.custom-anchor:hover {
-  fill: #ff7f0e;
-  stroke: #ff7f0e;
-}
-
-.lf-node-not-allow .custom-anchor:hover {
-  cursor: not-allowed;
-  fill: #d9d9d9;
-  stroke: #999;
-}
-
-.outgoing-anchor {
-  stroke: #82b366;
 }
 :deep(.el-card) {
   overflow: visible;

@@ -53,6 +53,8 @@ onMounted(() => {
   if (container) {
     lf.value = new LogicFlow({
       textEdit: false,
+      adjustEdge: false,
+      adjustEdgeStartAndEnd: false,
       background: {
         backgroundColor: '#f5f6f7'
       },

@@ -132,6 +132,17 @@ class AppNode extends HtmlResize.view {
 }
 
 class AppNodeModel extends HtmlResize.model {
+  getResizeOutlineStyle() {
+    const style = super.getResizeOutlineStyle()
+    style.stroke = 'none'
+    return style
+  }
+  getControlPointStyle() {
+    const style = super.getControlPointStyle()
+    style.stroke = 'none'
+    style.fill= 'none'
+    return style
+  }
   getNodeStyle() {
     return {
       overflow: 'visible'
@@ -219,5 +230,4 @@ class AppNodeModel extends HtmlResize.model {
     return anchors
   }
 }
-
 export { AppNodeModel, AppNode }
