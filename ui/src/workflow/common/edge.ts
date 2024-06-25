@@ -21,9 +21,7 @@ class CustomEdge2 extends BezierEdge {
     this.isMounted = false
     this.handleMouseUp = (e: any) => {
       const element = e.target.parentNode.parentNode.querySelector('.lf-custom-edge-wrapper')
-
       if (isMouseInElement(element, e)) {
-        this.props.model.isSelected = true
         this.props.model.graphModel.deleteEdgeById(this.props.model.id)
       }
     }
