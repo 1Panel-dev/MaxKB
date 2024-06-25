@@ -135,7 +135,12 @@ const clickShowDebug = () => {
       const workflow = new WorkFlowInstance(graphData)
       try {
         workflow.is_valid()
-        getDetail()
+        detail.value = {
+          type: 'WORK_FLOW',
+          ...workflow.get_base_node()?.properties.node_data,
+          work_flow: getGraphData()
+        }
+
         showDebug.value = true
       } catch (e: any) {
         MsgError(e.toString())
