@@ -89,7 +89,6 @@ export class WorkFlowInstance {
   private is_valid_nodes() {
     for (const node of this.nodes) {
       if (node.type !== WorkflowType.Base && node.type !== WorkflowType.Start) {
-        console.log(node.properties.stepName)
         if (!this.edges.some((edge) => edge.targetNodeId === node.id)) {
           throw `未在流程中的节点:${node.properties.stepName}`
         }
