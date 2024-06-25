@@ -27,6 +27,8 @@
                   ref="editorRef"
                   editorId="preview-only"
                   :modelValue="item.str"
+                  noIconfont
+                  no-mermaid
                 />
               </template>
             </el-card>

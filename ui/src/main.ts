@@ -10,6 +10,41 @@ import App from './App.vue'
 import router from '@/router'
 import Components from '@/components'
 import i18n from './locales'
+import { config } from 'md-editor-v3'
+
+import screenfull from 'screenfull'
+
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
+
+import Cropper from 'cropperjs'
+import 'cropperjs/dist/cropper.css'
+
+import mermaid from 'mermaid'
+
+import highlight from 'highlight.js'
+import 'highlight.js/styles/atom-one-dark.css'
+
+config({
+  editorExtensions: {
+    highlight: {
+      instance: highlight
+    },
+    screenfull: {
+      instance: screenfull
+    },
+    katex: {
+      instance: katex
+    },
+    cropper: {
+      instance: Cropper
+    },
+    mermaid: {
+      instance: mermaid
+    }
+  }
+})
+
 const app = createApp(App)
 app.use(store)
 app.use(directives)
