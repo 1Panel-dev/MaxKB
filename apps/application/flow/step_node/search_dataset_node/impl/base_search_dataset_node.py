@@ -44,7 +44,9 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
                            'is_hit_handling_method_list': [row for row in result if row.get('is_hit_handling_method')],
                            'data': '\n'.join([paragraph.get('content') for paragraph in paragraph_list]),
                            'directly_return': '\n'.join([paragraph.get('content') for paragraph in paragraph_list if
-                                                         paragraph.get('is_hit_handling_method')])},
+                                                         paragraph.get('is_hit_handling_method')]),
+                           'question': question},
+
                           {})
 
     @staticmethod
@@ -81,6 +83,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
     def get_details(self, index: int, **kwargs):
         return {
             'name': self.node.properties.get('stepName'),
+            'question': self.context.get('question'),
             "index": index,
             'run_time': self.context.get('run_time'),
             'paragraph_list': self.context.get('paragraph_list'),
