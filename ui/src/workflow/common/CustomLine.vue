@@ -30,8 +30,8 @@ const deleteEdge = () => {
 .custom-edge {
   color: var(--el-color-primary);
   stroke: none;
-  width: 22px;
   z-index: 100000;
   position: absolute;
+  pointer-events: all;
 }
 </style>
