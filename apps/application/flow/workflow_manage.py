@@ -60,6 +60,14 @@ class Flow:
         start_node_list = [node for node in self.nodes if node.id == 'start-node']
         return start_node_list[0]
 
+    def is_valid(self):
+        """
+        校验工作流数据
+        """
+        self.is_valid_start_node()
+        self.is_valid_base_node()
+        self.is_valid_work_flow()
+
     @staticmethod
     def is_valid_node_params(node: Node):
         get_node(node.type)(node, None, None)

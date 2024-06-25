@@ -71,13 +71,23 @@ class CustomEdge2 extends BezierEdge {
             }
           : {})
       }),
-      h('foreignObject', { ...positionData, style: { overflow: 'visible' } }, [
-        h('div', {
-          id,
-          style: wrapperStyle,
-          className: 'lf-custom-edge-wrapper'
-        })
-      ])
+      h(
+        'foreignObject',
+        {
+          ...positionData,
+          y: positionData.y + 5,
+          x: positionData.x + 11,
+          style: { overflow: 'visible' }
+        },
+        [
+          h('div', {
+            id,
+            style: wrapperStyle,
+
+            className: 'lf-custom-edge-wrapper'
+          })
+        ]
+      )
     ])
   }
 }

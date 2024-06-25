@@ -22,6 +22,7 @@ from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from rest_framework import serializers
 
+from application.flow.workflow_manage import Flow
 from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord, WorkFlowVersion, \
     ApplicationTypeChoices
 from application.models.api_key_model import ApplicationAccessToken
@@ -262,6 +263,7 @@ class ChatSerializers(serializers.Serializer):
         def open(self):
             self.is_valid(raise_exception=True)
             work_flow = self.data.get('work_flow')
+            Flow.new_instance(work_flow).is_valid()
             chat_id = str(uuid.uuid1())
             application = Application(id=None, dialogue_number=3, model=None,
                                       dataset_setting={},
