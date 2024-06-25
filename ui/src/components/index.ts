@@ -17,6 +17,8 @@ import CardCheckbox from './card-checkbox/index.vue'
 import AiChat from './ai-chat/index.vue'
 import InfiniteScroll from './infinite-scroll/index.vue'
 import AutoTooltip from './auto-tooltip/index.vue'
+import MdEditor from './markdown/MdEditor.vue'
+import MdPreview from './markdown/MdPreview.vue'
 
 export default {
   install(app: App) {
@@ -38,5 +40,7 @@ export default {
     app.component(AiChat.name, AiChat)
     app.component(InfiniteScroll.name, InfiniteScroll)
     app.component(AutoTooltip.name, AutoTooltip)
+    app.component(MdPreview.name, MdPreview)
+    app.component(MdEditor.name, MdEditor)
   }
 }

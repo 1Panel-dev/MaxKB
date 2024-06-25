@@ -185,7 +185,6 @@ import { cloneDeep } from 'lodash'
 import { arraySort } from '@/utils/utils'
 import { iconComponent } from '@/workflow/icons/utils'
 import { WorkflowType } from '@/enums/workflow'
-import { MdPreview } from 'md-editor-v3'
 
 const dialogVisible = ref(false)
 const detail = ref<any[]>([])
