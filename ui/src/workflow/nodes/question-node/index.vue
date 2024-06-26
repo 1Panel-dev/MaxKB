@@ -97,14 +97,9 @@
               <div class="mr-4">
                 <span>提示词<span class="danger">*</span></span>
               </div>
-              <el-tooltip
-                effect="dark"
-                placement="right"
-                popper-class="max-w-200"
-              >
+              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。可以使用变量：{data}
-                  是携带知识库中已知信息；{question} 是用户提出的问题。</template
+                  >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。</template
                 >
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                 <el-icon><EditPen /></el-icon>
@@ -157,7 +152,7 @@ const {
 } = app.config.globalProperties.$route as any
 
 // @ts-ignore
-const defaultPrompt = '{{开始.question}}'
+const defaultPrompt = '{{问题优化.question}}'
 const form = {
   model_id: '',
   system: '',
