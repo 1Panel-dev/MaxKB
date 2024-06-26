@@ -89,7 +89,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="角色设定">
-          <el-input v-model="form_data.system" placeholder="角色设定" />
+          <el-input v-model="form_data.system" placeholder="角色设定" type="textarea" autosize />
         </el-form-item>
         <el-form-item label="提示词" prop="prompt">
           <template #label>
@@ -97,7 +97,11 @@
               <div class="mr-4">
                 <span>提示词<span class="danger">*</span></span>
               </div>
-              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+              <el-tooltip
+                effect="dark"
+                placement="right"
+                popper-class="max-w-200"
+              >
                 <template #content
                   >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。可以使用变量：{data}
                   是携带知识库中已知信息；{question} 是用户提出的问题。</template

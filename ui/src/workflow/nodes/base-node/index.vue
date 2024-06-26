@@ -46,6 +46,7 @@
           :preview="false"
           :toolbars="[]"
           :footers="[]"
+          @mouseup.stop
         />
       </el-form-item>
     </el-form>
