@@ -49,7 +49,8 @@ def get_word_list(text: str):
 
 def replace_word(word_dict, text: str):
     for key in word_dict:
-        text = re.sub('(?<!#)' + word_dict[key] + '(?!#)', key, text)
+        pattern = '(?<!#)' + re.escape(word_dict[key]) + '(?!#)'
+        text = re.sub(pattern, key, text)
     return text
 
 
