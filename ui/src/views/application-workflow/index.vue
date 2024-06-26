@@ -172,6 +172,7 @@ function getDetail() {
       v['properties']['noRender'] = true
     })
     detail.value = res.data
+    saveTime.value = res.data?.update_time
   })
 }
 
