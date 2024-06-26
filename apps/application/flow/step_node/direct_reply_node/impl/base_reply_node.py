@@ -16,7 +16,7 @@ from application.flow.step_node.direct_reply_node.i_reply_node import IReplyNode
 
 
 def get_to_response_write_context(node_variable: Dict, node: INode):
-    def _write_context(answer):
+    def _write_context(answer, status=200):
         node.context['answer'] = answer
 
     return _write_context
@@ -74,9 +74,9 @@ class BaseReplyNode(IReplyNode):
         return self.workflow_manage.generate_prompt(prompt)
 
     def get_reference_content(self, fields: List[str]):
-        return self.workflow_manage.get_reference_field(
+        return str(self.workflow_manage.get_reference_field(
             fields[0],
-            fields[1:])
+            fields[1:]))
 
     def get_details(self, index: int, **kwargs):
         return {
