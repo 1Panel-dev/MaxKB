@@ -66,7 +66,9 @@
             <el-row>
               <el-col :span="12" class="color-secondary lighter">检索模式</el-col>
               <el-col :span="12" class="lighter">
-                {{ form_data.dataset_setting.search_mode }}</el-col
+                {{
+                  SearchMode[form_data.dataset_setting.search_mode as keyof typeof SearchMode]
+                }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter"> 相似度高于</el-col>
               <el-col :span="12" class="lighter">
@@ -108,10 +110,10 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import AddDatasetDialog from '@/views/application/component/AddDatasetDialog.vue'
 import ParamSettingDialog from '@/views/application/component/ParamSettingDialog.vue'
-
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { relatedObject } from '@/utils/utils'
+import { SearchMode } from '@/enums/application'
 import useStore from '@/stores'
 const { dataset, application, user } = useStore()
 const {
@@ -156,7 +158,7 @@ function refreshParam(data: any) {
 }
 
 const openParamSettingDialog = () => {
-  ParamSettingDialogRef.value?.open(form_data.value.dataset_setting, 'workflow')
+  ParamSettingDialogRef.value?.open(form_data.value.dataset_setting, 'WORK_FLOW')
 }
 
 function removeDataset(id: any) {

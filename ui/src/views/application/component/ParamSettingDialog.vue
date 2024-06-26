@@ -105,7 +105,7 @@
               />
             </el-form-item>
             <el-form-item
-              v-if="!isWorkflow"
+              v-if="!isWorkflowType"
               :label="$t('views.application.applicationForm.dialogues.noReferencesAction')"
             >
               <el-form
@@ -180,6 +180,7 @@
 import { ref, watch, reactive } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
+import { isWorkFlow } from '@/utils/application'
 import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 
@@ -228,7 +229,7 @@ const noReferencesRules = reactive<FormRules<any>>({
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 
-const isWorkflow = ref(false)
+const isWorkflowType = ref(false)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -251,7 +252,7 @@ watch(dialogVisible, (bool) => {
 })
 
 const open = (data: any, type?: string) => {
-  isWorkflow.value = type === 'workflow'
+  isWorkflowType.value = isWorkFlow(type)
   form.value = { ...form.value, ...cloneDeep(data) }
   noReferencesform.value[form.value.no_references_setting.status] =
     form.value.no_references_setting.value
@@ -259,15 +260,21 @@ const open = (data: any, type?: string) => {
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await formEl.validate((valid, fields) => {
-    if (valid) {
-      form.value.no_references_setting.value =
-        noReferencesform.value[form.value.no_references_setting.status]
-      emit('refresh', form.value)
-      dialogVisible.value = false
-    }
-  })
+  if (isWorkflowType.value) {
+    delete form.value['no_references_setting']
+    emit('refresh', form.value)
+    dialogVisible.value = false
+  } else {
+    if (!formEl) return
+    await formEl.validate((valid, fields) => {
+      if (valid) {
+        form.value.no_references_setting.value =
+          noReferencesform.value[form.value.no_references_setting.status]
+        emit('refresh', form.value)
+        dialogVisible.value = false
+      }
+    })
+  }
 }
 
 function changeHandle(val: string) {

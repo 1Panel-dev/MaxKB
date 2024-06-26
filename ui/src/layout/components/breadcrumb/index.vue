@@ -90,10 +90,7 @@
             </el-dropdown-menu>
             <div class="breadcrumb__footer border-t" style="padding: 8px 11px; min-width: 200px">
               <template v-if="isApplication">
-                <div
-                  class="w-full text-left cursor"
-                  @click="router.push({ path: '/application/create' })"
-                >
+                <div class="w-full text-left cursor" @click="openCreateDialog">
                   <el-button link>
                     <el-icon class="mr-4"><Plus /></el-icon> 创建应用
                   </el-button>
@@ -115,11 +112,13 @@
       </template>
     </el-dropdown>
   </div>
+  <CreateApplicationDialog ref="CreateApplicationDialogRef" />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
+import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import { isAppIcon, isWorkFlow } from '@/utils/application'
 import useStore from '@/stores'
 const { common, dataset, application } = useStore()
@@ -134,6 +133,7 @@ onBeforeRouteLeave((to, from) => {
   common.saveBreadcrumb(null)
 })
 
+const CreateApplicationDialogRef = ref()
 const list = ref<any[]>([])
 const loading = ref(false)
 
@@ -154,6 +154,11 @@ const isDataset = computed(() => {
   const { meta } = route as any
   return meta?.activeMenu.includes('dataset')
 })
+
+function openCreateDialog() {
+  CreateApplicationDialogRef.value.open()
+}
+
 function changeMenu(id: string) {
   const lastMatched = route.matched[route.matched.length - 1]
   if (lastMatched) {
