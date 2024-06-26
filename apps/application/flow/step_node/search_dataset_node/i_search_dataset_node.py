@@ -53,7 +53,7 @@ class ISearchDatasetStepNode(INode):
         question = self.workflow_manage.get_reference_field(
             self.node_params_serializer.data.get('question_reference_address')[0],
             self.node_params_serializer.data.get('question_reference_address')[1:])
-        return self.execute(**self.node_params_serializer.data, question=question, exclude_paragraph_id_list=[])
+        return self.execute(**self.node_params_serializer.data, question=str(question), exclude_paragraph_id_list=[])
 
     def execute(self, dataset_id_list, dataset_setting, question,
                 exclude_paragraph_id_list=None,

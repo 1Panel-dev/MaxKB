@@ -64,10 +64,17 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
 
 
 def get_to_response_write_context(node_variable: Dict, node: INode):
-    def _write_context(answer):
+    def _write_context(answer, status=200):
         chat_model = node_variable.get('chat_model')
-        message_tokens = chat_model.get_num_tokens_from_messages(node_variable.get('message_list'))
-        answer_tokens = chat_model.get_num_tokens(answer)
+
+        if status == 200:
+            answer_tokens = chat_model.get_num_tokens(answer)
+            message_tokens = chat_model.get_num_tokens_from_messages(node_variable.get('message_list'))
+        else:
+            answer_tokens = 0
+            message_tokens = 0
+        node.err_message = answer
+        node.status = status
         node.context['message_tokens'] = message_tokens
         node.context['answer_tokens'] = answer_tokens
         node.context['answer'] = answer

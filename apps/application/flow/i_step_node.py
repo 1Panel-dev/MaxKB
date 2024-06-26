@@ -160,7 +160,7 @@ class INode:
         self.status = 500
         self.err_message = str(e)
 
-        def write_error_context(answer):
+        def write_error_context(answer, status=200):
             pass
 
         return write_error_context
