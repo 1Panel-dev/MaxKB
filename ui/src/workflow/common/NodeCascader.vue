@@ -25,15 +25,15 @@ const props = defineProps<{
 
 const options = ref<Array<any>>([
   {
-    value: 'globe',
+    value: 'global',
     label: '全局变量',
-    type: 'globe',
+    type: 'global',
     children: [
       {
         value: 'time',
         label: '当前时间',
         globeLabel: '{{全局变量.time}}',
-        globeValue: "{{content['globe'].time}}"
+        globeValue: "{{content['global'].time}}"
       }
     ]
   }
@@ -43,15 +43,15 @@ function visibleChange(bool: boolean) {
   if (bool) {
     options.value = [
       {
-        value: 'globe',
+        value: 'global',
         label: '全局变量',
-        type: 'globe',
+        type: 'global',
         children: [
           {
             value: 'time',
             label: '当前时间',
             globeLabel: '{{全局变量.time}}',
-            globeValue: "{{content['globe'].time}}"
+            globeValue: "{{content['global'].time}}"
           }
         ]
       }
