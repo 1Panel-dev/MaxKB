@@ -83,7 +83,15 @@
             </el-row>
           </div>
         </el-form-item>
-        <el-form-item label="检索问题输入">
+        <el-form-item
+          label="检索问题输入"
+          prop="question_reference_address"
+          :rules="{
+            message: '请选择检索问题输入',
+            trigger: 'blur',
+            required: true
+          }"
+        >
           <NodeCascader
             :nodeModel="nodeModel"
             class="w-full"

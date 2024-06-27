@@ -30,7 +30,11 @@
       <div v-show="showPopover" class="workflow-dropdown-menu border border-r-4">
         <h5 class="title">基础组件</h5>
         <template v-for="(item, index) in menuNodes" :key="index">
-          <div class="workflow-dropdown-item cursor flex p-8-12" @mousedown="onmousedown(item)">
+          <div
+            class="workflow-dropdown-item cursor flex p-8-12"
+            @click="clickNodes(item)"
+            @mousedown="onmousedown(item)"
+          >
             <component :is="iconComponent(`${item.type}-icon`)" class="mr-8 mt-4" :size="32" />
             <div class="pre-line">
               <div class="lighter">{{ item.label }}</div>
@@ -156,6 +160,10 @@ const clickShowDebug = () => {
 }
 function clickoutsideDebug() {
   showDebug.value = false
+}
+
+function clickNodes(item: any) {
+  // workflowRef.value?.addNode(item)
 }
 
 function onmousedown(item: any) {
