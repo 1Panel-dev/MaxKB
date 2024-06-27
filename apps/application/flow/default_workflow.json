@@ -29,6 +29,14 @@
             "globeValue": "{{context['start-node'].question}}"
           }
         ],
+        "globalFields": [
+          {
+            "value": "time",
+            "label": "当前时间",
+            "globeLabel": "{{全局变量.time}}",
+            "globeValue": "{{context['global'].time}}"
+          }
+        ],
         "height": 200,
         "stepName": "开始"
       }

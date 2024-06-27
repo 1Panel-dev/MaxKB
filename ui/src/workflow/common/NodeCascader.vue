@@ -28,14 +28,7 @@ const options = ref<Array<any>>([
     value: 'global',
     label: '全局变量',
     type: 'global',
-    children: [
-      {
-        value: 'time',
-        label: '当前时间',
-        globeLabel: '{{全局变量.time}}',
-        globeValue: "{{content['global'].time}}"
-      }
-    ]
+    children: []
   }
 ])
 
@@ -46,14 +39,7 @@ function visibleChange(bool: boolean) {
         value: 'global',
         label: '全局变量',
         type: 'global',
-        children: [
-          {
-            value: 'time',
-            label: '当前时间',
-            globeLabel: '{{全局变量.time}}',
-            globeValue: "{{content['global'].time}}"
-          }
-        ]
+        children: []
       }
     ]
     getIncomingNode(props.nodeModel.id)
@@ -62,7 +48,7 @@ function visibleChange(bool: boolean) {
 
 function getIncomingNode(id: string) {
   const list = props.nodeModel.graphModel.getNodeIncomingNode(id)
-  const firstElement = options.value.shift()
+  let firstElement = null
   if (list.length > 0) {
     list.forEach((item: any) => {
       if (!options.value.some((obj: any) => obj.id === item.id)) {
@@ -72,6 +58,14 @@ function getIncomingNode(id: string) {
           type: item.type,
           children: item.properties?.fields || []
         })
+        if (item.properties?.globalFields && item.type === 'start-node') {
+          firstElement = {
+            value: 'global',
+            label: '全局变量',
+            type: 'global',
+            children: item.properties?.globalFields || []
+          }
+        }
       }
     })
 
@@ -79,7 +73,9 @@ function getIncomingNode(id: string) {
       getIncomingNode(item.id)
     })
   }
-  options.value.unshift(firstElement)
+  if (firstElement) {
+    options.value.unshift(firstElement)
+  }
 }
 onMounted(() => {
   getIncomingNode(props.nodeModel.id)

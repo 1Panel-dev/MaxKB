@@ -34,7 +34,15 @@ export const baseNodes = [
           label: '用户问题',
           value: 'question',
           globeLabel: '{{开始.question}}',
-          globeValue: `{{content['${WorkflowType.Start}'].question}}`
+          globeValue: `{{context['${WorkflowType.Start}'].question}}`
+        }
+      ],
+      globalFields: [
+        {
+          value: 'time',
+          label: '当前时间',
+          globeLabel: '{{全局变量.time}}',
+          globeValue: "{{context['global'].time}}"
         }
       ]
     }
