@@ -91,7 +91,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="角色设定">
-          <el-input v-model="form_data.system" placeholder="角色设定" type="textarea" autosize />
+          <el-input
+            v-model="form_data.system"
+            placeholder="角色设定"
+            type="textarea"
+            :autosize="{ minRows: 1, maxRows: 3 }"
+          />
         </el-form-item>
         <el-form-item label="提示词" prop="prompt">
           <template #label>
