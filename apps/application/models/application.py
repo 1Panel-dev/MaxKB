@@ -6,6 +6,8 @@
     @date：2023/9/25 14:24
     @desc:
 """
+import datetime
+import json
 import uuid
 
 from django.contrib.postgres.fields import ArrayField
@@ -106,6 +108,16 @@ class VoteChoices(models.TextChoices):
     TRAMPLE = 1, '反对'
 
 
+class DateEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
+        if isinstance(obj, datetime.datetime):
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            return json.JSONEncoder.default(self, obj)
+
+
 class ChatRecord(AppModelMixin):
     """
     对话日志 详情
@@ -119,7 +131,7 @@ class ChatRecord(AppModelMixin):
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)
     const = models.IntegerField(verbose_name="总费用", default=0)
-    details = models.JSONField(verbose_name="对话详情", default=dict)
+    details = models.JSONField(verbose_name="对话详情", default=dict, encoder=DateEncoder)
     improve_paragraph_id_list = ArrayField(verbose_name="改进标注列表",
                                            base_field=models.UUIDField(max_length=128, blank=True)
                                            , default=list)
