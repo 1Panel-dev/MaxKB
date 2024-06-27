@@ -117,8 +117,8 @@ function publicHandle() {
         work_flow: getGraphData()
       }
       applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
-        MsgSuccess('发布成功')
         getDetail()
+        MsgSuccess('发布成功')
       })
     })
     .catch((res: any) => {
