@@ -1,5 +1,5 @@
 <template>
-  <div class="workflow-node-container p-16" style="overflow: visible">
+  <div @mousedown="mousedown" class="workflow-node-container p-16" style="overflow: visible">
     <div
       class="step-container p-16"
       :class="props.nodeModel.isSelected ? 'isSelected' : ''"
@@ -70,7 +70,17 @@ const height = ref<{
   inputContainerHeight: 0,
   outputContainerHeight: 0
 })
-
+const mousedown = () => {
+  props.nodeModel.graphModel.clearSelectElements()
+  props.nodeModel.graphModel.nodes.forEach((node: any) => {
+    if (node.zIndex == 2) {
+      node.zIndex = 1
+    }
+  })
+  props.nodeModel.isSelected = true
+  props.nodeModel.isHovered = true
+  props.nodeModel.zIndex = 2
+}
 const showicon = ref<number | null>(null)
 const copyNode = () => {
   props.nodeModel.isSelected = true

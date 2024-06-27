@@ -98,7 +98,9 @@
                 <span>提示词<span class="danger">*</span></span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
-                <template #content>通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。</template>
+                <template #content
+                  >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。</template
+                >
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
             </div>
