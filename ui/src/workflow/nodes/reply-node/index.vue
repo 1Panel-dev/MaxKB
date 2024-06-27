@@ -39,6 +39,7 @@
           </MdEditor>
           <NodeCascader
             v-else
+            ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             placeholder="请选择检索问题输入"
@@ -98,9 +99,20 @@ function submitDialog() {
   set(props.nodeModel.properties.node_data, 'content', cloneContent.value)
   dialogVisible.value = false
 }
-// onMounted(() => {
-//   set(props.nodeModel, 'validate', validate)
-// })
+const replyNodeFormRef = ref()
+const nodeCascaderRef = ref()
+const validate = () => {
+  return Promise.all([
+    nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    replyNodeFormRef.value?.validate()
+  ]).catch((err: any) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
+}
+
+onMounted(() => {
+  set(props.nodeModel, 'validate', validate)
+})
 </script>
 <style lang="scss" scoped>
 .reply-node-editor {

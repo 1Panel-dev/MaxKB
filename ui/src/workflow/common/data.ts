@@ -112,7 +112,13 @@ export const menuNodes = [
     text: '指定回复内容，引用变量会转换为字符串进行输出',
     label: '指定回复',
     properties: {
-      stepName: '指定回复'
+      stepName: '指定回复',
+      fields: [
+        {
+          label: '内容',
+          value: 'answer'
+        }
+      ]
     }
   }
 ]

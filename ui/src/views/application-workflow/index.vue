@@ -150,8 +150,14 @@ const clickShowDebug = () => {
       }
     })
     .catch((res: any) => {
-      const keys = Object.keys(res)
-      MsgError(res[keys[0]]?.[0]?.message)
+      const node = res.node
+      const err_message = res.errMessage
+      if (typeof err_message == 'string') {
+        MsgError(res.node.properties?.stepName + '节点 ' + err_message)
+      } else {
+        const keys = Object.keys(err_message)
+        MsgError(node.properties?.stepName + '节点 ' + err_message[keys[0]]?.[0]?.message)
+      }
     })
 }
 function clickoutsideDebug() {

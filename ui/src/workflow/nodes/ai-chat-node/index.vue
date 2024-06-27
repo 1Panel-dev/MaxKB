@@ -196,7 +196,9 @@ const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 
 const validate = () => {
-  return aiChatNodeFormRef.value?.validate()
+  return aiChatNodeFormRef.value?.validate().catch((err) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
 }
 
 function getModel() {

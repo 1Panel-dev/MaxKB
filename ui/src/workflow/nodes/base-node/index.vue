@@ -80,7 +80,9 @@ const form_data = computed({
 const baseNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
-  return baseNodeFormRef.value?.validate()
+  return baseNodeFormRef.value?.validate().catch((err) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
 }
 
 onMounted(() => {

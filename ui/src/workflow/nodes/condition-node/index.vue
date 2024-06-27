@@ -49,6 +49,7 @@
                     }"
                   >
                     <NodeCascader
+                      ref="nodeCascaderRef"
                       :nodeModel="nodeModel"
                       class="w-full"
                       placeholder="请选择变量"
@@ -184,9 +185,15 @@ const form_data = computed({
 })
 
 const ConditionNodeFormRef = ref<FormInstance>()
-
+const nodeCascaderRef = ref()
 const validate = () => {
-  return ConditionNodeFormRef.value?.validate()
+  const v_list = [
+    ConditionNodeFormRef.value?.validate(),
+    ...nodeCascaderRef.value.map((item: any) => item.validate())
+  ]
+  return Promise.all(v_list).catch((err) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
 }
 
 function addBranch() {

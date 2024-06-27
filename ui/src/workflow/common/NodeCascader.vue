@@ -4,6 +4,7 @@
     :options="options"
     @visible-change="visibleChange"
     v-bind="$attrs"
+    v-model="data"
     separator=" > "
   >
     <template #default="{ node, data }">
@@ -17,12 +18,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { iconComponent } from '../icons/utils'
 const props = defineProps<{
   nodeModel: any
+  modelValue: Array<any>
 }>()
+const emit = defineEmits(['update:modelValue'])
 
+const data = computed({
+  set: (value) => {
+    emit('update:modelValue', value)
+  },
+  get: () => {
+    return props.modelValue
+  }
+})
 const options = ref<Array<any>>([])
 
 function visibleChange(bool: boolean) {
@@ -63,6 +74,26 @@ function getIncomingNode(id: string) {
     options.value.unshift(firstElement)
   }
 }
+const validate = () => {
+  getIncomingNode(props.nodeModel.id)
+  if (!data.value) {
+    return Promise.reject('引用变量必填')
+  }
+  if (data.value.length < 2) {
+    return Promise.reject('引用变量错误')
+  }
+  const node_id = data.value[0]
+  const node_field = data.value[1]
+  const nodeParent = options.value.find((item: any) => item.value === node_id)
+  if (!nodeParent) {
+    return Promise.reject('不存在的引用变量')
+  }
+  if (!nodeParent.children.some((item: any) => item.value === node_field)) {
+    return Promise.reject('不存在的引用变量')
+  }
+  return Promise.resolve('')
+}
+defineExpose({ validate })
 onMounted(() => {
   getIncomingNode(props.nodeModel.id)
 })

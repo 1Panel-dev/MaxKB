@@ -1,10 +1,5 @@
 <template>
-  <div
-    @mousedown="mousedown"
-    @mouseup="() => props.nodeModel.graphModel.toFront(props.nodeModel.id)"
-    class="workflow-node-container p-16"
-    style="overflow: visible"
-  >
+  <div @mousedown="mousedown" class="workflow-node-container p-16" style="overflow: visible">
     <div
       class="step-container p-16"
       :class="props.nodeModel.isSelected ? 'isSelected' : ''"
@@ -117,6 +112,9 @@ function editName(val: string) {
 }
 const mousedown = () => {
   props.nodeModel.graphModel.toFront(props.nodeModel.id)
+  props.nodeModel.graphModel.clearSelectElements()
+  props.nodeModel.isSelected = true
+  props.nodeModel.isHovered = true
 }
 const showicon = ref<number | null>(null)
 const copyNode = () => {

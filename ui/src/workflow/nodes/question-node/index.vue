@@ -195,7 +195,9 @@ const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 
 const validate = () => {
-  return questionNodeFormRef.value?.validate()
+  return questionNodeFormRef.value?.validate().catch((err) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
 }
 
 function getModel() {

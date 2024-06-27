@@ -85,6 +85,7 @@
         </el-form-item>
         <el-form-item label="检索问题输入">
           <NodeCascader
+            ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             placeholder="请选择检索问题输入"
@@ -121,7 +122,7 @@ const {
 } = app.config.globalProperties.$route as any
 
 const props = defineProps<{ nodeModel: any }>()
-
+const nodeCascaderRef = ref()
 const form = {
   dataset_id_list: [],
   dataset_setting: {
@@ -192,7 +193,12 @@ function refresh() {
 }
 
 const validate = () => {
-  return DatasetNodeFormRef.value?.validate()
+  return Promise.all([
+    nodeCascaderRef.value.validate(),
+    DatasetNodeFormRef.value?.validate()
+  ]).catch((err) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
 }
 
 onMounted(() => {
