@@ -7,6 +7,7 @@
     @desc:
 """
 import time
+from datetime import datetime
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.start_node.i_start_node import IStarNode
@@ -17,7 +18,8 @@ class BaseStartStepNode(IStarNode):
         """
         开始节点 初始化全局变量
         """
-        return NodeResult({'question': question}, {'time': time.time()})
+        return NodeResult({'question': question},
+                          {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'start_time': time.time()})
 
     def get_details(self, index: int, **kwargs):
         return {

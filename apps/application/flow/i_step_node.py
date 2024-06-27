@@ -55,7 +55,7 @@ class WorkFlowPostHandler:
                                  details=details,
                                  message_tokens=message_tokens,
                                  answer_tokens=answer_tokens,
-                                 run_time=time.time() - workflow.context['time'],
+                                 run_time=time.time() - workflow.context['start_time'],
                                  index=0)
         self.chat_info.append_chat_record(chat_record, self.client_id)
         # 重新设置缓存
