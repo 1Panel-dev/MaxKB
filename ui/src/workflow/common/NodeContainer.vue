@@ -38,9 +38,9 @@
 
         <div>
           <slot></slot>
-          <template v-if="props.nodeModel.properties.fields?.length > 0">
+          <template v-if="paramsFileds?.length > 0">
             <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
-            <template v-for="(item, index) in props.nodeModel.properties.fields" :key="index">
+            <template v-for="(item, index) in paramsFileds" :key="index">
               <div
                 class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
                 @mouseenter="showicon = index"
@@ -66,7 +66,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
@@ -84,7 +84,19 @@ const height = ref<{
 })
 
 const showEditIcon = ref(false)
-
+const paramsFileds = computed(() => {
+  if (props.nodeModel.properties.fields) {
+    return props.nodeModel.properties.fields?.map((field: any) => {
+      return {
+        label: field.label,
+        value: field.value,
+        globeLabel: `{{${props.nodeModel.properties.stepName}.${field.value}}}`,
+        globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`
+      }
+    })
+  }
+  return []
+})
 function editName(val: string) {
   if (val.trim() && val.trim() !== props.nodeModel.properties.stepName) {
     if (
