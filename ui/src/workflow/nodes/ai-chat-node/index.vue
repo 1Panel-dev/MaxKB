@@ -8,7 +8,6 @@
         @mousedown.stop
         @keydown.stop
         @click.stop
-        @wheel.stop
         :model="chat_data"
         label-position="top"
         require-asterisk-position="right"

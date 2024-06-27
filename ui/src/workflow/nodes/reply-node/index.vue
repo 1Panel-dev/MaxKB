@@ -3,7 +3,6 @@
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
-        @mousemove.stop
         @mousedown.stop
         @keydown.stop
         @click.stop

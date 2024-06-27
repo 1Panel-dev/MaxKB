@@ -15,7 +15,6 @@
                 @mousedown.stop
                 @keydown.stop
                 @click.stop
-                @wheel.stop
                 @change="editName"
                 :data="nodeModel.properties.stepName"
                 :showEditIcon="showEditIcon"
