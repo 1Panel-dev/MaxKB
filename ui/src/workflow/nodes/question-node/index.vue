@@ -25,6 +25,9 @@
           }"
         >
           <el-select
+            @wheel="wheel"
+            @keydown="isKeyDown = true"
+            @keyup="isKeyDown = false"
             :teleported="false"
             v-model="form_data.model_id"
             placeholder="请选择 AI 模型"
@@ -146,7 +149,15 @@ import useStore from '@/stores'
 import { relatedObject } from '@/utils/utils'
 import type { Provider } from '@/api/type/model'
 const { model } = useStore()
-
+const isKeyDown = ref(false)
+const wheel = (e: any) => {
+  if (isKeyDown.value) {
+    e.preventDefault()
+  } else {
+    e.stopPropagation()
+    return true
+  }
+}
 const {
   params: { id }
 } = app.config.globalProperties.$route as any
