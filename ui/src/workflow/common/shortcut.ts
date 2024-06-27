@@ -86,12 +86,29 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       confirmButtonText: '确定',
       cancelButtonText: '取消'
     }
-
+    const elements = graph.getSelectElements(true)
+    lf.clearSelectElements()
+    if (elements.nodes.length == 0 && elements.edges.length == 0) {
+      return
+    }
+    if (elements.edges.length > 0 && elements.nodes.length == 0) {
+      elements.edges.forEach((edge: any) => lf.deleteEdge(edge.id))
+      return
+    }
+    const nodes = elements.nodes.filter((node) => ['start-node', 'base-node'].includes(node.type))
+    if (nodes.length > 0) {
+      ElMessage.error({
+        message: `${nodes[0].properties?.stepName}节点不允许删除`,
+        type: 'success',
+        showClose: true,
+        duration: 1500
+      })
+      return
+    }
     ElMessageBox.confirm('确定删除该节点？', defaultOptions).then(() => {
       if (!keyboardOptions?.enabled) return true
       if (graph.textEditElement) return true
-      const elements = graph.getSelectElements(true)
-      lf.clearSelectElements()
+
       elements.edges.forEach((edge: any) => lf.deleteEdge(edge.id))
       elements.nodes.forEach((node: any) => lf.deleteNode(node.id))
     })
