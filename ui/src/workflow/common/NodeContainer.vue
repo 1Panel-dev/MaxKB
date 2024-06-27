@@ -1,5 +1,10 @@
 <template>
-  <div @mousedown="mousedown" class="workflow-node-container p-16" style="overflow: visible">
+  <div
+    @mousedown="mousedown"
+    @mouseup="() => props.nodeModel.graphModel.toFront(props.nodeModel.id)"
+    class="workflow-node-container p-16"
+    style="overflow: visible"
+  >
     <div
       class="step-container p-16"
       :class="props.nodeModel.isSelected ? 'isSelected' : ''"
@@ -111,15 +116,7 @@ function editName(val: string) {
   }
 }
 const mousedown = () => {
-  props.nodeModel.graphModel.clearSelectElements()
-  props.nodeModel.graphModel.nodes.forEach((node: any) => {
-    if (node.zIndex == 2) {
-      node.zIndex = 1
-    }
-  })
-  set(props.nodeModel, 'isSelected', true)
-  set(props.nodeModel, 'isHovered', true)
-  set(props.nodeModel, 'zIndex', 2)
+  props.nodeModel.graphModel.toFront(props.nodeModel.id)
 }
 const showicon = ref<number | null>(null)
 const copyNode = () => {
