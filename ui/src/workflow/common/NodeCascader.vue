@@ -23,25 +23,11 @@ const props = defineProps<{
   nodeModel: any
 }>()
 
-const options = ref<Array<any>>([
-  {
-    value: 'global',
-    label: '全局变量',
-    type: 'global',
-    children: []
-  }
-])
+const options = ref<Array<any>>([])
 
 function visibleChange(bool: boolean) {
   if (bool) {
-    options.value = [
-      {
-        value: 'global',
-        label: '全局变量',
-        type: 'global',
-        children: []
-      }
-    ]
+    options.value = []
     getIncomingNode(props.nodeModel.id)
   }
 }
