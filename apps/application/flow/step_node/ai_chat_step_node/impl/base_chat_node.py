@@ -7,6 +7,7 @@
     @desc:
 """
 import json
+import time
 from functools import reduce
 from typing import List, Dict
 
@@ -42,6 +43,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     node.context['answer'] = answer
     node.context['history_message'] = node_variable['history_message']
     node.context['question'] = node_variable['question']
+    node.context['run_time'] = time.time() - node.context['start_time']
 
 
 def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
@@ -79,6 +81,7 @@ def get_to_response_write_context(node_variable: Dict, node: INode):
         node.context['message_tokens'] = message_tokens
         node.context['answer_tokens'] = answer_tokens
         node.context['answer'] = answer
+        node.context['run_time'] = time.time() - node.context['start_time']
 
     return _write_context
 
