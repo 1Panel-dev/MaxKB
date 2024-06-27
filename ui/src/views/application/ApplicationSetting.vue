@@ -1,8 +1,15 @@
 <template>
-  <LayoutContainer
-    :header="$t('views.application.applicationForm.title.edit')"
-    class="create-application"
-  >
+  <LayoutContainer class="create-application">
+    <template #header>
+      <div class="flex-between w-full">
+        <h3>
+          {{ $t('views.application.applicationForm.title.edit') }}
+        </h3>
+        <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading">
+          保存并发布
+        </el-button>
+      </div>
+    </template>
     <el-row v-loading="loading">
       <el-col :span="10">
         <div class="p-24 mb-16" style="padding-bottom: 0">
@@ -260,11 +267,6 @@
             </el-form>
           </el-scrollbar>
         </div>
-        <div class="text-right border-t p-16">
-          <el-button type="primary" @click="submit(applicationFormRef)" :disabled="loading">
-            保存并发布
-          </el-button>
-        </div>
       </el-col>
       <el-col :span="14" class="p-24 border-l">
         <h4 class="title-decoration-1 mb-16">
@@ -493,10 +495,10 @@ onMounted(() => {
     box-sizing: border-box;
   }
   .scrollbar-height-left {
-    height: calc(var(--app-main-height) - 127px);
+    height: calc(var(--app-main-height) - 64px);
   }
   .scrollbar-height {
-    height: calc(var(--app-main-height) - 150px);
+    height: calc(var(--app-main-height) - 160px);
   }
 }
 
