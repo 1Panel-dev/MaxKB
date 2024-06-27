@@ -1,5 +1,12 @@
 <template>
-  <el-dialog title="执行详情" v-model="dialogVisible" destroy-on-close align-center @click.stop>
+  <el-dialog
+    class="execution-details-dialog"
+    title="执行详情"
+    v-model="dialogVisible"
+    destroy-on-close
+    align-center
+    @click.stop
+  >
     <el-scrollbar>
       <div class="execution-details">
         <template v-for="(item, index) in arraySort(detail, 'index')" :key="index">
@@ -49,52 +56,7 @@
                             v-for="(paragraph, paragraphIndex) in item.paragraph_list"
                             :key="paragraphIndex"
                           >
-                            <CardBox
-                              shadow="never"
-                              :title="paragraph.title || '-'"
-                              class="paragraph-source-card cursor mb-8"
-                              :class="paragraph.is_active ? '' : 'disabled'"
-                              :showIcon="false"
-                            >
-                              <template #icon>
-                                <AppAvatar class="mr-12 avatar-light" :size="22">
-                                  {{ paragraphIndex + 1 + '' }}</AppAvatar
-                                >
-                              </template>
-                              <div class="active-button primary">
-                                {{ paragraph.similarity?.toFixed(3) }}
-                              </div>
-                              <template #description>
-                                <el-scrollbar height="150">
-                                  <MdPreview
-                                    ref="editorRef"
-                                    editorId="preview-only"
-                                    :modelValue="paragraph.content"
-                                  />
-                                </el-scrollbar>
-                              </template>
-                              <template #footer>
-                                <div class="footer-content flex-between">
-                                  <el-text>
-                                    <el-icon>
-                                      <Document />
-                                    </el-icon>
-                                    {{ paragraph?.document_name }}
-                                  </el-text>
-                                  <div class="flex align-center">
-                                    <AppAvatar class="mr-8" shape="square" :size="18">
-                                      <img
-                                        src="@/assets/icon_document.svg"
-                                        style="width: 58%"
-                                        alt=""
-                                      />
-                                    </AppAvatar>
-
-                                    <span class="ellipsis"> {{ paragraph?.dataset_name }}</span>
-                                  </div>
-                                </div>
-                              </template>
-                            </CardBox>
+                            <ParagraphCard :data="paragraph" :index="paragraphIndex" />
                           </template>
                         </template>
                         <template v-else> - </template>
@@ -193,6 +155,7 @@
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { cloneDeep } from 'lodash'
+import ParagraphCard from './component/ParagraphCard.vue'
 import { arraySort } from '@/utils/utils'
 import { iconComponent } from '@/workflow/icons/utils'
 import { WorkflowType } from '@/enums/workflow'
@@ -219,10 +182,28 @@ onBeforeUnmount(() => {
 defineExpose({ open })
 </script>
 <style lang="scss">
-.execution-details {
-  max-height: calc(100vh - 260px);
-  .arrow-icon {
-    transition: 0.2s;
+.execution-details-dialog {
+  padding: 0;
+
+  .el-dialog__header {
+    padding: 24px 24px 0 24px;
+  }
+  .el-dialog__body {
+    padding: 8px !important;
+  }
+  .execution-details {
+    max-height: calc(100vh - 260px);
+    .arrow-icon {
+      transition: 0.2s;
+    }
+  }
+}
+@media only screen and (max-width: 768px) {
+  .execution-details-dialog {
+    width: 90% !important;
+    .footer-content {
+      display: block;
+    }
   }
 }
 </style>
