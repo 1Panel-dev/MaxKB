@@ -38,9 +38,9 @@
 
         <div>
           <slot></slot>
-          <template v-if="paramsFileds?.length > 0">
+          <template v-if="paramsFields?.length > 0">
             <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
-            <template v-for="(item, index) in paramsFileds" :key="index">
+            <template v-for="(item, index) in paramsFields" :key="index">
               <div
                 class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
                 @mouseenter="showicon = index"
@@ -84,7 +84,7 @@ const height = ref<{
 })
 
 const showEditIcon = ref(false)
-const paramsFileds = computed(() => {
+const paramsFields = computed(() => {
   if (props.nodeModel.properties.fields) {
     return props.nodeModel.properties.fields?.map((field: any) => {
       return {
