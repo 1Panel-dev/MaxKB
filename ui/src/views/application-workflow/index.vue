@@ -288,7 +288,4 @@ onBeforeUnmount(() => {
     right: 0 !important;
   }
 }
-.lf-graph {
-  user-select: all;
-}
 </style>
