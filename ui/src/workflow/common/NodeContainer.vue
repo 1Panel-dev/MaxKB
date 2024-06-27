@@ -9,7 +9,18 @@
         <div class="flex-between mb-16">
           <div class="flex align-center">
             <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
-            <h4>{{ nodeModel.properties.stepName }}</h4>
+            <h4 @mouseenter="showEditIcon = true" @mouseleave="showEditIcon = false">
+              <ReadWrite
+                @mousemove.stop
+                @mousedown.stop
+                @keydown.stop
+                @click.stop
+                @wheel.stop
+                @change="editName"
+                :data="nodeModel.properties.stepName"
+                :showEditIcon="showEditIcon"
+              />
+            </h4>
           </div>
           <div @click.stop v-if="showOperate(nodeModel.type)">
             <el-dropdown :teleported="false" trigger="click">
@@ -57,6 +68,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
+import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
 import { WorkflowType } from '@/enums/workflow'
@@ -70,6 +82,14 @@ const height = ref<{
   inputContainerHeight: 0,
   outputContainerHeight: 0
 })
+
+const showEditIcon = ref(false)
+
+function editName(val: string) {
+  if (val) {
+    set(props.nodeModel.properties, 'stepName', val)
+  }
+}
 const mousedown = () => {
   props.nodeModel.graphModel.clearSelectElements()
   props.nodeModel.graphModel.nodes.forEach((node: any) => {
@@ -77,13 +97,13 @@ const mousedown = () => {
       node.zIndex = 1
     }
   })
-  props.nodeModel.isSelected = true
-  props.nodeModel.isHovered = true
-  props.nodeModel.zIndex = 2
+  set(props.nodeModel, 'isSelected', true)
+  set(props.nodeModel, 'isHovered', true)
+  set(props.nodeModel, 'zIndex', 2)
 }
 const showicon = ref<number | null>(null)
 const copyNode = () => {
-  props.nodeModel.isSelected = true
+  set(props.nodeModel, 'isSelected', true)
   props.nodeModel.graphModel.eventCenter.emit('copy_node')
 }
 const deleteNode = () => {
