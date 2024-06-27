@@ -117,6 +117,7 @@
           <el-input-number
             v-model="chat_data.dialogue_number"
             :min="0"
+            :value-on-clear="0"
             controls-position="right"
             class="w-full"
           />
@@ -153,7 +154,8 @@ const {
 } = app.config.globalProperties.$route as any
 
 // @ts-ignore
-const defaultPrompt = '{{开始.question}}'
+const defaultPrompt = `根据上下文优化和完善用户问题：{{开始.question}}
+请输出一个优化后的问题。`
 const form = {
   model_id: '',
   system: '',

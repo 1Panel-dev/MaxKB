@@ -73,6 +73,7 @@ import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
 import { WorkflowType } from '@/enums/workflow'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import { MsgError } from '@/utils/message'
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
@@ -86,8 +87,16 @@ const height = ref<{
 const showEditIcon = ref(false)
 
 function editName(val: string) {
-  if (val) {
-    set(props.nodeModel.properties, 'stepName', val)
+  if (val.trim() && val.trim() !== props.nodeModel.properties.stepName) {
+    if (
+      !props.nodeModel.graphModel.nodes?.some(
+        (node: any) => node.properties.stepName === val.trim()
+      )
+    ) {
+      set(props.nodeModel.properties, 'stepName', val.trim())
+    } else {
+      MsgError('节点名称已存在！')
+    }
   }
 }
 const mousedown = () => {
