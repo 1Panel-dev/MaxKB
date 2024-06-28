@@ -1,6 +1,7 @@
 import type LogicFlow from '@logicflow/core'
 import { type GraphModel } from '@logicflow/core'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
+import { WorkflowType } from '@/enums/workflow'
 let selected: any | null = null
 
 function translationNodeData(nodeData: any, distance: any) {
@@ -54,6 +55,13 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       selected = null
       return true
     }
+    const base_nodes = elements.nodes.filter(
+      (node: any) => node.type === WorkflowType.Start || node.type === WorkflowType.Base
+    )
+    if (base_nodes.length > 0) {
+      MsgError(base_nodes[0]?.properties?.stepName + '不能被复制')
+      return
+    }
     selected = elements
     selected.nodes.forEach((node: any) => translationNodeData(node, TRANSLATION_DISTANCE))
     selected.edges.forEach((edge: any) => translationEdgeData(edge, TRANSLATION_DISTANCE))
@@ -65,6 +73,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     if (graph.textEditElement) return true
     if (selected && (selected.nodes || selected.edges)) {
       lf.clearSelectElements()
+      console.log(selected)
       const addElements = lf.addElements(selected, CHILDREN_TRANSLATION_DISTANCE)
       if (!addElements) return true
       addElements.nodes.forEach((node) => lf.selectElementById(node.id, true))
