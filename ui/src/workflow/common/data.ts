@@ -124,7 +124,10 @@ export const menuNodes = [
 ]
 
 export const compareList = [
+  { value: 'is_null', label: '为空' },
+  { value: 'is_not_null', label: '不为空' },
   { value: 'contain', label: '包含' },
+  { value: 'not_contain', label: '不包含' },
   { value: 'eq', label: '等于' },
   { value: 'ge', label: '大于等于' },
   { value: 'gt', label: '大于' },

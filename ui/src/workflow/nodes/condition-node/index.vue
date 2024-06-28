@@ -67,6 +67,9 @@
                     }"
                   >
                     <el-select
+                      @wheel="wheel"
+                      @keydown="isKeyDown = true"
+                      @keyup="isKeyDown = false"
                       :teleported="false"
                       v-model="condition.compare"
                       placeholder="请选择条件"
@@ -153,7 +156,15 @@ const form = {
     }
   ]
 }
-
+const isKeyDown = ref(false)
+const wheel = (e: any) => {
+  if (isKeyDown.value) {
+    e.preventDefault()
+  } else {
+    e.stopPropagation()
+    return true
+  }
+}
 const resizeCondition = (wh: any, row: any, index: number) => {
   const branch_condition_list = cloneDeep(
     props.nodeModel.properties.branch_condition_list

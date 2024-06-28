@@ -25,7 +25,6 @@ const props = defineProps<{
   modelValue: Array<any>
 }>()
 const emit = defineEmits(['update:modelValue'])
-
 const data = computed({
   set: (value) => {
     emit('update:modelValue', value)
