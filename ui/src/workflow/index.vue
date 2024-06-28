@@ -113,12 +113,13 @@ const onmousedown = (shapeItem: ShapeItem) => {
   }
 }
 const addNode = (shapeItem: ShapeItem) => {
-  const virtualdata = lf.value.graphModel.getVirtualRectSize()
+  const { virtualRectCenterPositionX, virtualRectCenterPositionY } =
+    lf.value.graphModel.getVirtualRectSize()
   lf.value.graphModel.addNode({
     type: shapeItem.type,
     properties: shapeItem.properties,
-    x: virtualdata.virtualRectCenterPositionX,
-    y: virtualdata.virtualRectCenterPositionY
+    x: virtualRectCenterPositionX,
+    y: virtualRectCenterPositionY
   })
 }
 

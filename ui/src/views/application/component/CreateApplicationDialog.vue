@@ -173,7 +173,6 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid) => {
     if (valid) {
       applicationApi.postApplication(applicationForm.value, loading).then((res) => {
-        console.log(res)
         MsgSuccess(t('views.application.applicationForm.buttons.createSuccess'))
         if (isWorkFlow(applicationForm.value.type)) {
           router.push({ path: `/application/${res.data.id}/workflow` })

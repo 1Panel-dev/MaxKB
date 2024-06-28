@@ -175,7 +175,7 @@ function clickoutsideDebug() {
 }
 
 function clickNodes(item: any) {
-  // workflowRef.value?.addNode(item)
+  workflowRef.value?.addNode(item)
 }
 
 function onmousedown(item: any) {

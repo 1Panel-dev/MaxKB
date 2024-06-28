@@ -105,8 +105,8 @@ function editName(val: string) {
 }
 const mousedown = () => {
   props.nodeModel.graphModel.clearSelectElements()
-  props.nodeModel.isSelected = true
-  props.nodeModel.isHovered = true
+  set(props.nodeModel, 'isSelected', true)
+  set(props.nodeModel, 'isHovered', true)
   props.nodeModel.graphModel.toFront(props.nodeModel.id)
 }
 const showicon = ref<number | null>(null)
