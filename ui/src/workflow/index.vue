@@ -89,9 +89,9 @@ onMounted(() => {
         lf.value.deleteEdge(id)
       })
     })
-    // setTimeout(() => {
-    //   lf.value?.fitView()
-    // }, 500)
+    setTimeout(() => {
+      lf.value?.fitView()
+    }, 500)
   }
 })
 const validate = () => {
@@ -113,14 +113,19 @@ const onmousedown = (shapeItem: ShapeItem) => {
   }
 }
 const addNode = (shapeItem: ShapeItem) => {
+  lf.value.clearSelectElements()
   const { virtualRectCenterPositionX, virtualRectCenterPositionY } =
     lf.value.graphModel.getVirtualRectSize()
-  lf.value.graphModel.addNode({
+  console.log(lf.value.graphModel.getVirtualRectSize())
+  const newNode = lf.value.graphModel.addNode({
     type: shapeItem.type,
     properties: shapeItem.properties,
     x: virtualRectCenterPositionX,
     y: virtualRectCenterPositionY
   })
+  newNode.isSelected = true
+  newNode.isHovered = true
+  lf.value.toFront(newNode.id)
 }
 
 defineExpose({

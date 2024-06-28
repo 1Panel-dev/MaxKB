@@ -26,9 +26,15 @@
             </h4>
             <h4 v-else>{{ nodeModel.properties.stepName }}</h4>
           </div>
-          <div @click.stop v-if="showOperate(nodeModel.type)">
-            <el-dropdown :teleported="false">
-              <el-button text @click.stop>
+          <div
+            @mousemove.stop
+            @mousedown.stop
+            @keydown.stop
+            @click.stop
+            v-if="showOperate(nodeModel.type)"
+          >
+            <el-dropdown :teleported="false" trigger="click">
+              <el-button text>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
               </el-button>
               <template #dropdown>
@@ -41,7 +47,7 @@
           </div>
         </div>
 
-        <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
+        <div @mousedown.stop @keydown.stop @click.stop>
           <slot></slot>
           <template v-if="nodeFields.length > 0">
             <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
