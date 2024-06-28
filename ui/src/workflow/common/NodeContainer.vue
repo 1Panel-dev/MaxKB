@@ -128,8 +128,10 @@ const deleteNode = () => {
 }
 const resizeStepContainer = (wh: any) => {
   if (wh.height) {
-    height.value.stepContainerHeight = wh.height
-    props.nodeModel.setHeight(height.value.stepContainerHeight)
+    if (!props.nodeModel.virtual) {
+      height.value.stepContainerHeight = wh.height
+      props.nodeModel.setHeight(height.value.stepContainerHeight)
+    }
   }
 }
 

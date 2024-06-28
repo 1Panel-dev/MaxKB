@@ -105,7 +105,7 @@ const onmousedown = (shapeItem: ShapeItem) => {
   if (shapeItem.type) {
     lf.value.dnd.startDrag({
       type: shapeItem.type,
-      properties: shapeItem.properties
+      properties: { ...shapeItem.properties, droping: true }
     })
   }
   if (shapeItem.callback) {

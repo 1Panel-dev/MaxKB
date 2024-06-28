@@ -17,5 +17,5 @@ class IsNotNullCompare(Compare):
         if compare == 'is_not_null':
             return True
 
-    def compare(self, source_value, compare, target_value):
+    def compare(self, source_value, compare, target_value=None):
         return source_value is not None
