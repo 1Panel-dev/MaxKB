@@ -24,17 +24,13 @@
         "fields": [
           {
             "label": "用户问题",
-            "value": "question",
-            "globeLabel": "{{开始.question}}",
-            "globeValue": "{{context['start-node'].question}}"
+            "value": "question"
           }
         ],
         "globalFields": [
           {
             "value": "time",
-            "label": "当前时间",
-            "globeLabel": "{{全局变量.time}}",
-            "globeValue": "{{context['global'].time}}"
+            "label": "当前时间"
           }
         ],
         "height": 200,
@@ -174,9 +170,7 @@
         "fields": [
           {
             "label": "AI 回答内容",
-            "value": "answer",
-            "globeLabel": "{{AI 对话.answer}}",
-            "globeValue": "{{context['bf0e1bca-d19a-4bb3-b269-b37f9fa1bd91'].answer}}"
+            "value": "answer"
           }
         ],
         "stepName": "AI 对话",

@@ -166,8 +166,10 @@ class AppNodeModel extends HtmlResize.model {
   }
 
   setHeight(height: number) {
-    this.height = height + 100
-    this.move(0, this.height / 2 - 40)
+    const sourceHeight = this.height
+    const targetHeight = height + 100
+    this.height = targetHeight
+    this.move(0, (targetHeight - sourceHeight) / 2)
     this.outgoing.edges.forEach((edge: any) => {
       // 调用自定义的更新方案
       edge.updatePathByAnchor()

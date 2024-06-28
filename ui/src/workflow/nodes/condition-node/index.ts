@@ -14,8 +14,6 @@ const get_up_index_height = (condition_list: Array<any>, index: number) => {
 }
 class ConditionModel extends AppNodeModel {
   refreshBranch() {
-    // 为了保持节点顶部位置不变，在节点变化后，对节点进行一个位移,位移距离为添加高度的一半。
-    this.move(0, this.height / 2 - 40)
     // 更新节点连接边的path
     this.incoming.edges.forEach((edge: any) => {
       // 调用自定义的更新方案
