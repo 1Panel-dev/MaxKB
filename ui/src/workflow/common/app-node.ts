@@ -44,6 +44,9 @@ class AppNode extends HtmlResize.view {
       }
     }
     props.model.properties.config = nodeDict[props.model.type].properties.config
+    if (props.model.properties.height) {
+      props.model.height = props.model.properties.height
+    }
   }
 
   getAnchorShape(anchorData: any) {
@@ -169,6 +172,7 @@ class AppNodeModel extends HtmlResize.model {
     const sourceHeight = this.height
     const targetHeight = height + 100
     this.height = targetHeight
+    this.properties['height'] = targetHeight
     this.move(0, (targetHeight - sourceHeight) / 2)
     this.outgoing.edges.forEach((edge: any) => {
       // 调用自定义的更新方案

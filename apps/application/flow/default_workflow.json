@@ -3,15 +3,15 @@
         {
             "id": "base-node",
             "type": "base-node",
-            "x": 390,
-            "y": 2898.5,
+            "x": 440,
+            "y": 3350,
             "properties": {
                 "config": {},
-                "height": 200,
+                "height": 517,
                 "stepName": "基本信息",
                 "node_data": {
-                    "desc": "12",
-                    "name": "221",
+                    "desc": "",
+                    "name": "",
                     "prologue": "您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？"
                 }
             }
@@ -19,8 +19,8 @@
         {
             "id": "start-node",
             "type": "start-node",
-            "x": 460,
-            "y": 3434.2665,
+            "x": 440,
+            "y": 3710,
             "properties": {
                 "config": {
                     "fields": [
@@ -42,7 +42,7 @@
                         "value": "question"
                     }
                 ],
-                "height": 200,
+                "height": 268.533,
                 "stepName": "开始",
                 "globalFields": [
                     {
@@ -55,8 +55,8 @@
         {
             "id": "b931efe5-5b66-46e0-ae3b-0160cb18eeb5",
             "type": "search-dataset-node",
-            "x": 910,
-            "y": 3117.4,
+            "x": 830,
+            "y": 3470,
             "properties": {
                 "config": {
                     "fields": [
@@ -78,6 +78,7 @@
                         }
                     ]
                 },
+                "height": 754.8,
                 "stepName": "知识库检索",
                 "node_data": {
                     "dataset_id_list": [],
@@ -97,8 +98,8 @@
         {
             "id": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "type": "condition-node",
-            "x": 1630,
-            "y": 3002.3334999999997,
+            "x": 1380,
+            "y": 3470,
             "properties": {
                 "width": 600,
                 "config": {
@@ -109,6 +110,7 @@
                         }
                     ]
                 },
+                "height": 524.6669999999999,
                 "stepName": "判断器",
                 "node_data": {
                     "branch": [
@@ -172,8 +174,8 @@
         {
             "id": "4ffe1086-25df-4c85-b168-979b5bbf0a26",
             "type": "reply-node",
-            "x": 2400,
-            "y": 2316.1335,
+            "x": 2090,
+            "y": 2820,
             "properties": {
                 "config": {
                     "fields": [
@@ -183,6 +185,7 @@
                         }
                     ]
                 },
+                "height": 312.267,
                 "stepName": "指定回复",
                 "node_data": {
                     "fields": [
@@ -197,8 +200,8 @@
         {
             "id": "f1f1ee18-5a02-46f6-b4e6-226253cdffbb",
             "type": "ai-chat-node",
-            "x": 2400,
-            "y": 3090.7,
+            "x": 2090,
+            "y": 3460,
             "properties": {
                 "config": {
                     "fields": [
@@ -208,6 +211,7 @@
                         }
                     ]
                 },
+                "height": 681.4,
                 "stepName": "AI 对话",
                 "node_data": {
                     "prompt": "已知信息：\n{{知识库检索.data}}\n问题：\n{{开始.question}}",
@@ -220,8 +224,8 @@
         {
             "id": "309d0eef-c597-46b5-8d51-b9a28aaef4c7",
             "type": "ai-chat-node",
-            "x": 2400,
-            "y": 3880.7,
+            "x": 2090,
+            "y": 4180,
             "properties": {
                 "config": {
                     "fields": [
@@ -231,6 +235,7 @@
                         }
                     ]
                 },
+                "height": 681.4,
                 "stepName": "AI 对话1",
                 "node_data": {
                     "prompt": "{{开始.question}}",
@@ -248,30 +253,30 @@
             "sourceNodeId": "start-node",
             "targetNodeId": "b931efe5-5b66-46e0-ae3b-0160cb18eeb5",
             "startPoint": {
-                "x": 620,
-                "y": 3434.2665
+                "x": 600,
+                "y": 3710
             },
             "endPoint": {
-                "x": 750,
-                "y": 3117.4
+                "x": 670,
+                "y": 3470
             },
             "properties": {},
             "pointsList": [
                 {
-                    "x": 620,
-                    "y": 3434.2665
+                    "x": 600,
+                    "y": 3710
                 },
                 {
-                    "x": 730,
-                    "y": 3434.2665
+                    "x": 710,
+                    "y": 3710
                 },
                 {
-                    "x": 640,
-                    "y": 3117.4
+                    "x": 560,
+                    "y": 3470
                 },
                 {
-                    "x": 750,
-                    "y": 3117.4
+                    "x": 670,
+                    "y": 3470
                 }
             ],
             "sourceAnchorId": "start-node_right",
@@ -283,30 +288,30 @@
             "sourceNodeId": "b931efe5-5b66-46e0-ae3b-0160cb18eeb5",
             "targetNodeId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "startPoint": {
-                "x": 1070,
-                "y": 3117.4
+                "x": 990,
+                "y": 3470
             },
             "endPoint": {
-                "x": 1340,
-                "y": 3002.3334999999997
+                "x": 1090,
+                "y": 3470
             },
             "properties": {},
             "pointsList": [
                 {
-                    "x": 1070,
-                    "y": 3117.4
+                    "x": 990,
+                    "y": 3470
                 },
                 {
-                    "x": 1180,
-                    "y": 3117.4
+                    "x": 1100,
+                    "y": 3470
                 },
                 {
-                    "x": 1230,
-                    "y": 3002.3334999999997
+                    "x": 980,
+                    "y": 3470
                 },
                 {
-                    "x": 1340,
-                    "y": 3002.3334999999997
+                    "x": 1090,
+                    "y": 3470
                 }
             ],
             "sourceAnchorId": "b931efe5-5b66-46e0-ae3b-0160cb18eeb5_right",
@@ -318,30 +323,30 @@
             "sourceNodeId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "targetNodeId": "4ffe1086-25df-4c85-b168-979b5bbf0a26",
             "startPoint": {
-                "x": 1920,
-                "y": 2873.0665
+                "x": 1670,
+                "y": 3340.733
             },
             "endPoint": {
-                "x": 2240,
-                "y": 2316.1335
+                "x": 1930,
+                "y": 2820
             },
             "properties": {},
             "pointsList": [
                 {
-                    "x": 1920,
-                    "y": 2873.0665
+                    "x": 1670,
+                    "y": 3340.733
                 },
                 {
-                    "x": 2030,
-                    "y": 2873.0665
+                    "x": 1780,
+                    "y": 3340.733
                 },
                 {
-                    "x": 2130,
-                    "y": 2316.1335
+                    "x": 1820,
+                    "y": 2820
                 },
                 {
-                    "x": 2240,
-                    "y": 2316.1335
+                    "x": 1930,
+                    "y": 2820
                 }
             ],
             "sourceAnchorId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b_1009_right",
@@ -353,30 +358,30 @@
             "sourceNodeId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "targetNodeId": "f1f1ee18-5a02-46f6-b4e6-226253cdffbb",
             "startPoint": {
-                "x": 1920,
-                "y": 2997.1994999999997
+                "x": 1670,
+                "y": 3464.866
             },
             "endPoint": {
-                "x": 2240,
-                "y": 3090.7
+                "x": 1930,
+                "y": 3460
             },
             "properties": {},
             "pointsList": [
                 {
-                    "x": 1920,
-                    "y": 2997.1994999999997
+                    "x": 1670,
+                    "y": 3464.866
                 },
                 {
-                    "x": 2030,
-                    "y": 2997.1994999999997
+                    "x": 1780,
+                    "y": 3464.866
                 },
                 {
-                    "x": 2130,
-                    "y": 3090.7
+                    "x": 1820,
+                    "y": 3460
                 },
                 {
-                    "x": 2240,
-                    "y": 3090.7
+                    "x": 1930,
+                    "y": 3460
                 }
             ],
             "sourceAnchorId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b_4908_right",
@@ -388,30 +393,30 @@
             "sourceNodeId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "targetNodeId": "309d0eef-c597-46b5-8d51-b9a28aaef4c7",
             "startPoint": {
-                "x": 1920,
-                "y": 3083.266
+                "x": 1670,
+                "y": 3550.9325000000003
             },
             "endPoint": {
-                "x": 2240,
-                "y": 3880.7
+                "x": 1930,
+                "y": 4180
             },
             "properties": {},
             "pointsList": [
                 {
-                    "x": 1920,
-                    "y": 3083.266
+                    "x": 1670,
+                    "y": 3550.9325000000003
                 },
                 {
-                    "x": 2030,
-                    "y": 3083.266
+                    "x": 1780,
+                    "y": 3550.9325000000003
                 },
                 {
-                    "x": 2130,
-                    "y": 3880.7
+                    "x": 1820,
+                    "y": 4180
                 },
                 {
-                    "x": 2240,
-                    "y": 3880.7
+                    "x": 1930,
+                    "y": 4180
                 }
             ],
             "sourceAnchorId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b_161_right",
