@@ -4,9 +4,11 @@ const end_nodes = [WorkflowType.AiChat, WorkflowType.Reply]
 export class WorkFlowInstance {
   nodes
   edges
+  workFlowNodes: Array<any>
   constructor(workflow: { nodes: Array<any>; edges: Array<any> }) {
     this.nodes = workflow.nodes
     this.edges = workflow.edges
+    this.workFlowNodes = []
   }
   /**
    * 校验开始节点
@@ -61,15 +63,27 @@ export class WorkFlowInstance {
    * 校验工作流
    * @param up_node 上一个节点
    */
-  private is_valid_work_flow(up_node?: any) {
+  private _is_valid_work_flow(up_node?: any) {
     if (!up_node) {
       up_node = this.get_start_node()
     }
+    this.workFlowNodes.push(up_node)
     this.is_valid_node(up_node)
     const next_nodes = this.get_next_nodes(up_node)
     for (const next_node of next_nodes) {
-      this.is_valid_work_flow(next_node)
+      this._is_valid_work_flow(next_node)
     }
+  }
+  private is_valid_work_flow() {
+    this.workFlowNodes = []
+    this._is_valid_work_flow()
+    const notInWorkFlowNodes = this.nodes
+      .filter((node: any) => node.id !== WorkflowType.Start && node.id !== WorkflowType.Base)
+      .filter((node) => !this.workFlowNodes.includes(node))
+    if (notInWorkFlowNodes.length > 0) {
+      throw `未在流程中的节点:${notInWorkFlowNodes.map((node) => node.properties.stepName).join('，')}`
+    }
+    this.workFlowNodes = []
   }
   /**
    * 获取流程下一个节点列表

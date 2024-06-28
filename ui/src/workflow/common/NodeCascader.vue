@@ -43,8 +43,9 @@ function visibleChange(bool: boolean) {
   }
 }
 
-function getIncomingNode(id: string) {
-  const list = props.nodeModel.graphModel.getNodeIncomingNode(id)
+function _getIncomingNode(id: String, startId: String) {
+  let list = props.nodeModel.graphModel.getNodeIncomingNode(id)
+  list = list.filter((item: any) => item.id !== startId)
   let firstElement = null
   if (list.length > 0) {
     list.forEach((item: any) => {
@@ -67,12 +68,15 @@ function getIncomingNode(id: string) {
     })
 
     list.forEach((item: any) => {
-      getIncomingNode(item.id)
+      _getIncomingNode(item.id, startId)
     })
   }
   if (firstElement) {
     options.value.unshift(firstElement)
   }
+}
+function getIncomingNode(id: string) {
+  _getIncomingNode(id, id)
 }
 const validate = () => {
   getIncomingNode(props.nodeModel.id)
