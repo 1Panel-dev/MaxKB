@@ -53,14 +53,14 @@ function _getIncomingNode(id: String, startId: String) {
           value: item.id,
           label: item.properties.stepName,
           type: item.type,
-          children: item.properties?.fields || []
+          children: item.properties?.config?.fields || []
         })
         if (item.properties?.globalFields && item.type === 'start-node') {
           firstElement = {
             value: 'global',
             label: '全局变量',
             type: 'global',
-            children: item.properties?.globalFields || []
+            children: item.properties?.config?.globalFields || []
           }
         }
       }

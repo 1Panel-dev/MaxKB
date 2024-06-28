@@ -41,11 +41,11 @@
           </div>
         </div>
 
-        <div>
+        <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
           <slot></slot>
-          <template v-if="nodeModel.properties.fields?.length > 0">
+          <template v-if="nodeFields.length > 0">
             <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
-            <template v-for="(item, index) in nodeModel.properties.fields" :key="index">
+            <template v-for="(item, index) in nodeFields" :key="index">
               <div
                 class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
                 @mouseenter="showicon = index"
@@ -136,23 +136,21 @@ const resizeStepContainer = (wh: any) => {
 const props = defineProps<{
   nodeModel: any
 }>()
-watch(
-  () => props.nodeModel.properties?.stepName,
-  () => {
-    if (props.nodeModel.properties.fields) {
-      const fields = props.nodeModel.properties.fields?.map((field: any) => {
-        return {
-          label: field.label,
-          value: field.value,
-          globeLabel: `{{${props.nodeModel.properties.stepName}.${field.value}}}`,
-          globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`
-        }
-      })
-      set(props.nodeModel.properties, 'fields', fields)
-    }
-  },
-  { immediate: true }
-)
+const nodeFields = computed(() => {
+  if (props.nodeModel.properties.config.fields) {
+    const fields = props.nodeModel.properties.config.fields?.map((field: any) => {
+      return {
+        label: field.label,
+        value: field.value,
+        globeLabel: `{{${props.nodeModel.properties.stepName}.${field.value}}}`,
+        globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`
+      }
+    })
+    return fields
+  }
+  return []
+})
+
 function showOperate(type: string) {
   return type !== WorkflowType.Base && type !== WorkflowType.Start
 }

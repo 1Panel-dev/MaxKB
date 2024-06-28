@@ -235,15 +235,21 @@ class WorkflowManage:
 
         for node in self.node_context:
             properties = node.node.properties
-            fields = properties.get('fields')
-            if fields is not None:
-                for field in fields:
-                    prompt = prompt.replace(field.get('globeLabel'), field.get('globeValue'))
-            global_fields = properties.get('globalFields')
-            if global_fields is not None:
-                for field in global_fields:
-                    prompt = prompt.replace(field.get('globeLabel'), field.get('globeValue'))
-            context[node.id] = node.context
+            node_config = properties.get('config')
+            if node_config is not None:
+                fields = node_config.get('fields')
+                if fields is not None:
+                    for field in fields:
+                        globeLabel = f"{properties.get('stepName')}.{field.get('value')}"
+                        globeValue = f"context['{node.id}'].{field.get('value')}"
+                        prompt = prompt.replace(globeLabel, globeValue)
+                global_fields = node_config.get('globalFields')
+                if global_fields is not None:
+                    for field in global_fields:
+                        globeLabel = f"全局变量.{field.get('value')}"
+                        globeValue = f"context['global'].{field.get('value')}"
+                        prompt = prompt.replace(globeLabel, globeValue)
+                context[node.id] = node.context
         prompt_template = PromptTemplate.from_template(prompt, template_format='jinja2')
 
         value = prompt_template.format(context=context)

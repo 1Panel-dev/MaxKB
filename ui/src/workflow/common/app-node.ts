@@ -9,7 +9,7 @@ import { createApp, h } from 'vue'
 import directives from '@/directives'
 import i18n from '@/locales'
 import { WorkflowType } from '@/enums/workflow'
-
+import { nodeDict } from '@/workflow/common/data'
 class AppNode extends HtmlResize.view {
   isMounted
   r
@@ -43,12 +43,7 @@ class AppNode extends HtmlResize.view {
         props.model.properties.stepName = props.model.properties.stepName + (filterNodes.length - 1)
       }
     }
-    if (props.model.properties?.fields?.length > 0) {
-      props.model.properties.fields.map((item: any) => {
-        item['globeLabel'] = `{{${props.model.properties.stepName}.${item.value}}}`
-        item['globeValue'] = `{{context['${props.model.id}'].${item.value}}}`
-      })
-    }
+    props.model.properties.config = nodeDict[props.model.type].properties.config
   }
 
   getAnchorShape(anchorData: any) {
