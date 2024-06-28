@@ -1,6 +1,6 @@
 import type LogicFlow from '@logicflow/core'
 import { type GraphModel } from '@logicflow/core'
-import { ElMessageBox, ElMessage } from 'element-plus'
+import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 let selected: any | null = null
 
 function translationNodeData(nodeData: any, distance: any) {
@@ -57,12 +57,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     selected = elements
     selected.nodes.forEach((node: any) => translationNodeData(node, TRANSLATION_DISTANCE))
     selected.edges.forEach((edge: any) => translationEdgeData(edge, TRANSLATION_DISTANCE))
-    ElMessage.success({
-      message: '已复制节点',
-      type: 'success',
-      showClose: true,
-      duration: 1500
-    })
+    MsgSuccess('已复制节点')
     return false
   }
   const paste_node = () => {
@@ -81,11 +76,6 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     return false
   }
   const delete_node = () => {
-    const defaultOptions: Object = {
-      showCancelButton: true,
-      confirmButtonText: '确定',
-      cancelButtonText: '取消'
-    }
     const elements = graph.getSelectElements(true)
     lf.clearSelectElements()
     if (elements.nodes.length == 0 && elements.edges.length == 0) {
@@ -97,21 +87,20 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     }
     const nodes = elements.nodes.filter((node) => ['start-node', 'base-node'].includes(node.type))
     if (nodes.length > 0) {
-      ElMessage.error({
-        message: `${nodes[0].properties?.stepName}节点不允许删除`,
-        type: 'success',
-        showClose: true,
-        duration: 1500
-      })
+      MsgError(`${nodes[0].properties?.stepName}节点不允许删除`)
       return
     }
-    ElMessageBox.confirm('确定删除该节点？', defaultOptions).then(() => {
+    MsgConfirm(`提示`, `确定删除该节点？`, {
+      confirmButtonText: '删除',
+      confirmButtonClass: 'danger'
+    }).then(() => {
       if (!keyboardOptions?.enabled) return true
       if (graph.textEditElement) return true
 
       elements.edges.forEach((edge: any) => lf.deleteEdge(edge.id))
       elements.nodes.forEach((node: any) => lf.deleteNode(node.id))
     })
+
     return false
   }
   graph.eventCenter.on('copy_node', copy_node)
