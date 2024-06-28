@@ -116,23 +116,27 @@ const addNode = (shapeItem: ShapeItem) => {
   lf.value.clearSelectElements()
   const { virtualRectCenterPositionX, virtualRectCenterPositionY } =
     lf.value.graphModel.getVirtualRectSize()
-  console.log(lf.value.graphModel.getVirtualRectSize())
   const newNode = lf.value.graphModel.addNode({
     type: shapeItem.type,
     properties: shapeItem.properties,
     x: virtualRectCenterPositionX,
-    y: virtualRectCenterPositionY
+    y: virtualRectCenterPositionY - lf.value.graphModel.height / 2
   })
   newNode.isSelected = true
   newNode.isHovered = true
   lf.value.toFront(newNode.id)
 }
 
+const clearGraphData = () => {
+  return lf.value.graphModel.clearData()
+}
+
 defineExpose({
   onmousedown,
   validate,
   getGraphData,
-  addNode
+  addNode,
+  clearGraphData
 })
 </script>
 <style lang="scss">

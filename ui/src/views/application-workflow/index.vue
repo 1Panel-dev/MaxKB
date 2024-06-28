@@ -232,6 +232,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   // 清除定时任务
   closeInterval()
+  workflowRef.value?.clearGraphData()
 })
 </script>
 <style lang="scss">
