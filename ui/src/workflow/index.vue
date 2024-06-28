@@ -89,9 +89,9 @@ onMounted(() => {
         lf.value.deleteEdge(id)
       })
     })
-    setTimeout(() => {
-      lf.value?.fitView()
-    }, 500)
+    // setTimeout(() => {
+    //   lf.value?.fitView()
+    // }, 500)
   }
 })
 const validate = () => {

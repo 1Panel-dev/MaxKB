@@ -76,8 +76,8 @@ export const searchDatasetNode = {
     stepName: '知识库检索',
     config: {
       fields: [
-        { label: '段落列表', value: 'paragraph_list' },
-        { label: '满足直接回答的段落列表', value: 'is_hit_handling_method_list' },
+        { label: '检索结果的分段列表', value: 'paragraph_list' },
+        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
         {
           label: '检索结果',
           value: 'data'
