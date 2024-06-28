@@ -9,7 +9,11 @@
         <div class="flex-between mb-16">
           <div class="flex align-center">
             <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
-            <h4 @mouseenter="showEditIcon = true" @mouseleave="showEditIcon = false">
+            <h4
+              @mouseenter="showEditIcon = true"
+              @mouseleave="showEditIcon = false"
+              v-if="showOperate(nodeModel.type)"
+            >
               <ReadWrite
                 @mousemove.stop
                 @mousedown.stop
@@ -20,9 +24,10 @@
                 :showEditIcon="showEditIcon"
               />
             </h4>
+            <h4 v-else>{{ nodeModel.properties.stepName }}</h4>
           </div>
           <div @click.stop v-if="showOperate(nodeModel.type)">
-            <el-dropdown :teleported="false" trigger="click">
+            <el-dropdown :teleported="false">
               <el-button text @click.stop>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
               </el-button>
