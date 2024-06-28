@@ -74,6 +74,7 @@
                       v-model="condition.compare"
                       placeholder="请选择条件"
                       clearable
+                      @change="changeCondition($event, index, cIndex)"
                     >
                       <template v-for="(item, index) in compareList" :key="index">
                         <el-option :label="item.label" :value="item.value" />
@@ -83,6 +84,7 @@
                 </el-col>
                 <el-col :span="6">
                   <el-form-item
+                    v-if="condition.compare !== 'is_null' && condition.compare !== 'is_not_null'"
                     :prop="'branch.' + index + '.conditions.' + cIndex + '.value'"
                     :rules="{
                       required: true,
@@ -165,6 +167,7 @@ const wheel = (e: any) => {
     return true
   }
 }
+
 const resizeCondition = (wh: any, row: any, index: number) => {
   const branch_condition_list = cloneDeep(
     props.nodeModel.properties.branch_condition_list
@@ -276,6 +279,14 @@ function deleteCondition(index: number, cIndex: number) {
     refreshBranchAnchor(list, false)
   }
   set(props.nodeModel.properties.node_data, 'branch', list)
+}
+
+function changeCondition(val: string, index: number, cIndex: number) {
+  if (val === 'is_null' || val === 'is_not_null') {
+    const list = cloneDeep(props.nodeModel.properties.node_data.branch)
+    list[index]['conditions'][cIndex].value = 1
+    set(props.nodeModel.properties.node_data, 'branch', list)
+  }
 }
 
 onMounted(() => {

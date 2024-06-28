@@ -51,7 +51,7 @@
                 @mouseenter="showicon = index"
                 @mouseleave="showicon = null"
               >
-                <span>{{ item.label }} {{ '{' + item.value + '}' }}</span>
+                <span style="max-width: 92%">{{ item.label }} {{ '{' + item.value + '}' }}</span>
                 <el-tooltip
                   effect="dark"
                   content="复制参数"
@@ -76,8 +76,7 @@ import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
 import { WorkflowType } from '@/enums/workflow'
-import { ElMessageBox, ElMessage } from 'element-plus'
-import { MsgError } from '@/utils/message'
+import { MsgError, MsgConfirm } from '@/utils/message'
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
@@ -105,8 +104,8 @@ function editName(val: string) {
 }
 const mousedown = () => {
   props.nodeModel.graphModel.clearSelectElements()
-  props.nodeModel.isSelected = true
-  props.nodeModel.isHovered = true
+  set(props.nodeModel, 'isSelected', true)
+  set(props.nodeModel, 'isHovered', true)
   props.nodeModel.graphModel.toFront(props.nodeModel.id)
 }
 const showicon = ref<number | null>(null)
@@ -115,13 +114,10 @@ const copyNode = () => {
   props.nodeModel.graphModel.eventCenter.emit('copy_node')
 }
 const deleteNode = () => {
-  const defaultOptions: Object = {
-    showCancelButton: true,
-    confirmButtonText: '确定',
-    cancelButtonText: '取消'
-  }
-
-  ElMessageBox.confirm('确定删除该节点？', defaultOptions).then(() => {
+  MsgConfirm(`提示`, `确定删除该节点？`, {
+    confirmButtonText: '删除',
+    confirmButtonClass: 'danger'
+  }).then(() => {
     props.nodeModel.graphModel.deleteNode(props.nodeModel.id)
   })
   props.nodeModel.graphModel.eventCenter.emit('delete_node')
