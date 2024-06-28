@@ -110,8 +110,11 @@ const mousedown = () => {
 }
 const showicon = ref<number | null>(null)
 const copyNode = () => {
-  set(props.nodeModel, 'isSelected', true)
-  props.nodeModel.graphModel.eventCenter.emit('copy_node')
+  props.nodeModel.graphModel.clearSelectElements()
+  const cloneNode = props.nodeModel.graphModel.cloneNode(props.nodeModel.id)
+  set(cloneNode, 'isSelected', true)
+  set(cloneNode, 'isHovered', true)
+  props.nodeModel.graphModel.toFront(cloneNode.id)
 }
 const deleteNode = () => {
   MsgConfirm(`提示`, `确定删除该节点？`, {
