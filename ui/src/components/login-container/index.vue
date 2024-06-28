@@ -1,10 +1,7 @@
 <template>
   <div class="login-form-container">
     <div class="login-title">
-      <div class="title flex-center mb-8">
-        <div class="logo mr-4"></div>
-        <div class="app-logo-font">{{ title || defaultTitle }}</div>
-      </div>
+      <div class="logo text-center"><img src="@/assets/MaxKB-logo.svg" height="45" /></div>
       <div class="sub-title text-center" v-if="subTitle">
         <el-text type="info">{{ subTitle }}</el-text>
       </div>
@@ -28,16 +25,6 @@ defineProps({
 
   .login-title {
     margin-bottom: 32px;
-
-    .title {
-      font-size: 32px;
-      .logo {
-        background-image: url('@/assets/logo.png');
-        background-size: 100% 100%;
-        width: 45px;
-        height: 45px;
-      }
-    }
     .sub-title {
       font-size: 16px;
     }
