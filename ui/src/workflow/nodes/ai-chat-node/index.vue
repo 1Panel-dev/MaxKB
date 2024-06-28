@@ -169,8 +169,8 @@ const {
 } = app.config.globalProperties.$route as any
 
 // @ts-ignore
-const defaultPrompt = `根据上下文优化和完善用户问题：{{开始.question}}
-请输出一个优化后的问题。`
+const defaultPrompt = `
+{{开始.question}}`
 const form = {
   model_id: '',
   system: '',

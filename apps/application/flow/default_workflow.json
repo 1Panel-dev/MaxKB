@@ -49,28 +49,20 @@
       "properties": {
         "fields": [
           {
-            "label": "段落列表",
-            "value": "paragraph_list",
-            "globeLabel": "{{知识库检索.paragraph_list}}",
-            "globeValue": "{{context['c8903650-67e0-42a3-875f-6896b33f8916'].paragraph_list}}"
+            "label": "检索结果的分段列表",
+            "value": "paragraph_list"
           },
           {
-            "label": "满足直接回答的段落列表",
-            "value": "is_hit_handling_method_list",
-            "globeLabel": "{{知识库检索.is_hit_handling_method_list}}",
-            "globeValue": "{{context['c8903650-67e0-42a3-875f-6896b33f8916'].is_hit_handling_method_list}}"
+            "label": "满足直接回答的分段列表",
+            "value": "is_hit_handling_method_list"
           },
           {
             "label": "检索结果",
-            "value": "data",
-            "globeLabel": "{{知识库检索.data}}",
-            "globeValue": "{{context['c8903650-67e0-42a3-875f-6896b33f8916'].data}}"
+            "value": "data"
           },
           {
             "label": "满足直接回答的分段内容",
-            "value": "directly_return",
-            "globeLabel": "{{知识库检索.directly_return}}",
-            "globeValue": "{{context['c8903650-67e0-42a3-875f-6896b33f8916'].directly_return}}"
+            "value": "directly_return"
           }
         ],
         "stepName": "知识库检索",
