@@ -6,7 +6,12 @@
           {{ data }}
         </auto-tooltip>
 
-        <el-button v-if="!trigger && showEditIcon" class="ml-4" @click.stop="editNameHandle" text>
+        <el-button
+          v-if="trigger === 'default' && showEditIcon"
+          class="ml-4"
+          @click.stop="editNameHandle"
+          text
+        >
           <el-icon><EditPen /></el-icon>
         </el-button>
       </div>
@@ -59,8 +64,8 @@ const props = defineProps({
   },
   trigger: {
     type: String,
-    default: '',
-    validator: (value: string) => ['dblclick'].includes(value)
+    default: 'default',
+    validator: (value: string) => ['default', 'dblclick'].includes(value)
   }
 })
 const emit = defineEmits(['change'])
