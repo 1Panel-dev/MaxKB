@@ -83,6 +83,7 @@ import { MsgSuccess } from '@/utils/message'
 import { isWorkFlow } from '@/utils/application'
 import { t } from '@/locales'
 const router = useRouter()
+const emit = defineEmits(['refresh'])
 
 // @ts-ignore
 const defaultPrompt = t('views.application.prompt.defaultPrompt', {
@@ -179,7 +180,7 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
         } else {
           router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
         }
-
+        emit('refresh')
         dialogVisible.value = false
       })
     }

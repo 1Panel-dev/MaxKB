@@ -74,6 +74,7 @@
                     :max="form.search_mode === 'blend' ? 2 : 1"
                     :precision="3"
                     :step="0.1"
+                    :value-on-clear="0"
                     controls-position="right"
                     class="w-full"
                   />
@@ -87,6 +88,7 @@
                     v-model="form.top_n"
                     :min="1"
                     :max="100"
+                    :value-on-clear="1"
                     controls-position="right"
                     class="w-full"
                   />

@@ -65,6 +65,7 @@
             :max="1"
             :precision="3"
             :step="0.1"
+            :value-on-clear="0"
             controls-position="right"
             size="small"
             class="ml-4 mr-4"

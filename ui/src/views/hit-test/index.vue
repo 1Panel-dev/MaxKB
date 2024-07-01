@@ -37,7 +37,7 @@
                   shadow="hover"
                   :title="item.title || '-'"
                   :description="item.content"
-                  class="document-card layout-bg layout-bg cursor "
+                  class="document-card layout-bg layout-bg cursor"
                   :class="item.is_active ? '' : 'disabled'"
                   :showIcon="false"
                   @click="editParagraph(item)"
@@ -133,6 +133,7 @@
                 :max="cloneForm.search_mode === 'blend' ? 2 : 1"
                 :precision="3"
                 :step="0.1"
+                :value-on-clear="0"
                 controls-position="right"
                 class="w-full"
               />

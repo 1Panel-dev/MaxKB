@@ -17,6 +17,7 @@
           v-model="form.access_num"
           :min="0"
           :step="1"
+          :value-on-clear="0"
           controls-position="right"
           step-strictly
         />
