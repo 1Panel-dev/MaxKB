@@ -72,10 +72,6 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data cr2
 - [MeterSphere](https://github.com/metersphere/metersphere/) - 现代化、开源的测试管理及接口测试工具
 - [Halo](https://github.com/halo-dev/halo/) - 强大易用的开源建站工具
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/MaxKB&type=Date)](https://star-history.com/#1Panel-dev/MaxKB&Date)
-
 ## License
 
 Copyright (c) 2014-2024 飞致云 FIT2CLOUD, All rights reserved.
