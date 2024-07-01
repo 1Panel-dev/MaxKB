@@ -21,7 +21,8 @@ from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
 from common.util.field_message import ErrMessage
 from dataset.models import Paragraph, Problem, Document, ProblemParagraphMapping
-from dataset.serializers.common_serializers import update_document_char_length, BatchSerializer
+from dataset.serializers.common_serializers import update_document_char_length, BatchSerializer, ProblemParagraphObject, \
+    ProblemParagraphManage
 from dataset.serializers.problem_serializers import ProblemInstanceSerializer, ProblemSerializer, ProblemSerializers
 from embedding.models import SourceType
 
@@ -567,8 +568,10 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             document_id = self.data.get('document_id')
             paragraph_problem_model = self.get_paragraph_problem_model(dataset_id, document_id, instance)
             paragraph = paragraph_problem_model.get('paragraph')
-            problem_model_list = paragraph_problem_model.get('problem_model_list')
-            problem_paragraph_mapping_list = paragraph_problem_model.get('problem_paragraph_mapping_list')
+            problem_paragraph_object_list = paragraph_problem_model.get('problem_paragraph_object_list')
+            problem_model_list, problem_paragraph_mapping_list = (ProblemParagraphManage(problem_paragraph_object_list,
+                                                                                         dataset_id).
+                                                                  to_problem_model_list())
             # 插入段落
             paragraph_problem_model.get('paragraph').save()
             # 插入問題
@@ -591,30 +594,12 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                   content=instance.get("content"),
                                   dataset_id=dataset_id,
                                   title=instance.get("title") if 'title' in instance else '')
-            problem_list = instance.get('problem_list')
-            exists_problem_list = []
-            if 'problem_list' in instance and len(problem_list) > 0:
-                exists_problem_list = QuerySet(Problem).filter(dataset_id=dataset_id,
-                                                               content__in=[p.get('content') for p in
-                                                                            problem_list]).all()
+            problem_paragraph_object_list = [
+                ProblemParagraphObject(dataset_id, document_id, paragraph.id, problem.get('content')) for problem in
+                (instance.get('problem_list') if 'problem_list' in instance else [])]
 
-            problem_model_list = [
-                ParagraphSerializers.Create.or_get(exists_problem_list, problem.get('content'), dataset_id) for
-                problem in (
-                    instance.get('problem_list') if 'problem_list' in instance else [])]
-            # 问题去重
-            problem_model_list = [x for i, x in enumerate(problem_model_list) if
-                                  len([item for item in problem_model_list[:i] if item.content == x.content]) <= 0]
-
-            problem_paragraph_mapping_list = [
-                ProblemParagraphMapping(id=uuid.uuid1(), document_id=document_id, problem_id=problem_model.id,
-                                        paragraph_id=paragraph.id,
-                                        dataset_id=dataset_id) for
-                problem_model in problem_model_list]
             return {'paragraph': paragraph,
-                    'problem_model_list': [problem_model for problem_model in problem_model_list if
-                                           not list(exists_problem_list).__contains__(problem_model)],
-                    'problem_paragraph_mapping_list': problem_paragraph_mapping_list}
+                    'problem_paragraph_object_list': problem_paragraph_object_list}
 
         @staticmethod
         def or_get(exists_problem_list, content, dataset_id):

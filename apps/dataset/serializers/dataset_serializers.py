@@ -37,7 +37,7 @@ from common.util.file_util import get_file_content
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping
-from dataset.serializers.common_serializers import list_paragraph, MetaSerializer
+from dataset.serializers.common_serializers import list_paragraph, MetaSerializer, ProblemParagraphManage
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
 from embedding.models import SearchMode
 from setting.models import AuthOperate
@@ -383,8 +383,7 @@ class DataSetSerializers(serializers.ModelSerializer):
 
             document_model_list = []
             paragraph_model_list = []
-            problem_model_list = []
-            problem_paragraph_mapping_list = []
+            problem_paragraph_object_list = []
             # 插入文档
             for document in instance.get('documents') if 'documents' in instance else []:
                 document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(dataset_id,
@@ -392,12 +391,12 @@ class DataSetSerializers(serializers.ModelSerializer):
                 document_model_list.append(document_paragraph_dict_model.get('document'))
                 for paragraph in document_paragraph_dict_model.get('paragraph_model_list'):
                     paragraph_model_list.append(paragraph)
-                for problem in document_paragraph_dict_model.get('problem_model_list'):
-                    problem_model_list.append(problem)
-                for problem_paragraph_mapping in document_paragraph_dict_model.get('problem_paragraph_mapping_list'):
-                    problem_paragraph_mapping_list.append(problem_paragraph_mapping)
-            problem_model_list, problem_paragraph_mapping_list = DocumentSerializers.Create.reset_problem_model(
-                problem_model_list, problem_paragraph_mapping_list)
+                for problem_paragraph_object in document_paragraph_dict_model.get('problem_paragraph_object_list'):
+                    problem_paragraph_object_list.append(problem_paragraph_object)
+
+            problem_model_list, problem_paragraph_mapping_list = (ProblemParagraphManage(problem_paragraph_object_list,
+                                                                                         dataset_id)
+                                                                  .to_problem_model_list())
             # 插入知识库
             dataset.save()
             # 插入文档

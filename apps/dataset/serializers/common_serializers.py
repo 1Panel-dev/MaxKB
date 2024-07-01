@@ -7,6 +7,7 @@
     @desc:
 """
 import os
+import uuid
 from typing import List
 
 from django.db.models import QuerySet
@@ -20,7 +21,7 @@ from common.mixins.api_mixin import ApiMixin
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
-from dataset.models import Paragraph
+from dataset.models import Paragraph, Problem, ProblemParagraphMapping
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -79,3 +80,53 @@ class BatchSerializer(ApiMixin, serializers.Serializer):
                                           description="主键id列表")
             }
         )
+
+
+class ProblemParagraphObject:
+    def __init__(self, dataset_id: str, document_id: str, paragraph_id: str, problem_content: str):
+        self.dataset_id = dataset_id
+        self.document_id = document_id
+        self.paragraph_id = paragraph_id
+        self.problem_content = problem_content
+
+
+def or_get(exists_problem_list, content, dataset_id, document_id, paragraph_id, problem_content_dict):
+    if content in problem_content_dict:
+        return problem_content_dict.get(content)[0], document_id, paragraph_id
+    exists = [row for row in exists_problem_list if row.content == content]
+    if len(exists) > 0:
+        problem_content_dict[content] = exists[0], False
+        return exists[0], document_id, paragraph_id
+    else:
+        problem = Problem(id=uuid.uuid1(), content=content, dataset_id=dataset_id)
+        problem_content_dict[content] = problem, True
+        return problem, document_id, paragraph_id
+
+
+class ProblemParagraphManage:
+    def __init__(self, problemParagraphObjectList: [ProblemParagraphObject], dataset_id):
+        self.dataset_id = dataset_id
+        self.problemParagraphObjectList = problemParagraphObjectList
+
+    def to_problem_model_list(self):
+        problem_list = [item.problem_content for item in self.problemParagraphObjectList]
+        exists_problem_list = []
+        if len(self.problemParagraphObjectList) > 0:
+            # 查询到已存在的问题列表
+            exists_problem_list = QuerySet(Problem).filter(dataset_id=self.dataset_id,
+                                                           content__in=problem_list).all()
+        problem_content_dict = {}
+        problem_model_list = [
+            or_get(exists_problem_list, problemParagraphObject.problem_content, problemParagraphObject.dataset_id,
+                   problemParagraphObject.document_id, problemParagraphObject.paragraph_id, problem_content_dict) for
+            problemParagraphObject in self.problemParagraphObjectList]
+
+        problem_paragraph_mapping_list = [
+            ProblemParagraphMapping(id=uuid.uuid1(), document_id=document_id, problem_id=problem_model.id,
+                                    paragraph_id=paragraph_id,
+                                    dataset_id=self.dataset_id) for
+            problem_model, document_id, paragraph_id in problem_model_list]
+
+        result = [problem_model for problem_model, is_create in problem_content_dict.values() if
+                  is_create], problem_paragraph_mapping_list
+        return result
