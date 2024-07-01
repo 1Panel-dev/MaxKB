@@ -1,12 +1,12 @@
 <template>
   <div class="cursor w-full">
     <slot name="read">
-      <div class="flex align-center" v-if="!isEdit">
+      <div class="flex align-center" v-if="!isEdit" @dblclick="dblclick">
         <auto-tooltip :content="data">
           {{ data }}
         </auto-tooltip>
 
-        <el-button class="ml-4" @click.stop="editNameHandle" text v-if="showEditIcon">
+        <el-button v-if="!trigger && showEditIcon" class="ml-4" @click.stop="editNameHandle" text>
           <el-icon><EditPen /></el-icon>
         </el-button>
       </div>
@@ -56,6 +56,11 @@ const props = defineProps({
   maxlength: {
     type: Number,
     default: () => 0
+  },
+  trigger: {
+    type: String,
+    default: '',
+    validator: (value: string) => ['dblclick'].includes(value)
   }
 })
 const emit = defineEmits(['change'])
@@ -73,6 +78,12 @@ watch(isEdit, (bool) => {
     })
   }
 })
+
+function dblclick() {
+  if (props.trigger === 'dblclick') {
+    editNameHandle()
+  }
+}
 
 function submit() {
   loading.value = true
