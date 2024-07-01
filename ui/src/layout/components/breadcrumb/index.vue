@@ -112,7 +112,7 @@
       </template>
     </el-dropdown>
   </div>
-  <CreateApplicationDialog ref="CreateApplicationDialogRef" />
+  <CreateApplicationDialog ref="CreateApplicationDialogRef" @refresh="refresh" />
 </template>
 
 <script setup lang="ts">
@@ -127,7 +127,7 @@ const router = useRouter()
 const {
   meta: { activeMenu },
   params: { id }
-} = route
+} = route as any
 
 onBeforeRouteLeave((to, from) => {
   common.saveBreadcrumb(null)
@@ -140,19 +140,14 @@ const loading = ref(false)
 const breadcrumbData = computed(() => common.breadcrumb)
 
 const current = computed(() => {
-  const {
-    params: { id }
-  } = route
   return list.value?.filter((v) => v.id === id)?.[0]
 })
 
 const isApplication = computed(() => {
-  const { meta } = route as any
-  return meta?.activeMenu.includes('application')
+  return activeMenu.includes('application')
 })
 const isDataset = computed(() => {
-  const { meta } = route as any
-  return meta?.activeMenu.includes('dataset')
+  return activeMenu.includes('dataset')
 })
 
 function openCreateDialog() {
@@ -206,6 +201,12 @@ function getApplication() {
     .catch(() => {
       loading.value = false
     })
+}
+function refresh() {
+  if (isApplication.value) {
+    common.saveBreadcrumb(null)
+    getApplication()
+  }
 }
 onMounted(() => {
   if (!breadcrumbData.value) {
