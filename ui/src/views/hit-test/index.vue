@@ -198,6 +198,7 @@ import emptyImg from '@/assets/hit-test-empty.png'
 
 const route = useRoute()
 const {
+  meta: { activeMenu },
   params: { id }
 } = route as any
 
@@ -223,12 +224,10 @@ const questionTitle = ref('')
 const isDisabledChart = computed(() => !inputValue.value)
 
 const isApplication = computed(() => {
-  const { meta } = route as any
-  return meta?.activeMenu.includes('application')
+  return activeMenu.includes('application')
 })
 const isDataset = computed(() => {
-  const { meta } = route as any
-  return meta?.activeMenu.includes('dataset')
+  return activeMenu.includes('dataset')
 })
 
 function changeHandle(val: string) {
