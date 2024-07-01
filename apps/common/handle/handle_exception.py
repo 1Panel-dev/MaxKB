@@ -63,9 +63,9 @@ def find_err_detail(exc_detail):
             _value = exc_detail[key]
             if isinstance(_value, list):
                 return find_err_detail(_value)
-            elif isinstance(_value, ErrorDetail):
+            if isinstance(_value, ErrorDetail):
                 return _value
-            elif isinstance(_value, dict) and len(_value.keys()) > 0:
+            if isinstance(_value, dict) and len(_value.keys()) > 0:
                 return find_err_detail(_value)
     if isinstance(exc_detail, list):
         for v in exc_detail:

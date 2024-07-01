@@ -59,11 +59,11 @@ def exist_permissions(user_role: List[RoleConstants], user_permission: List[Perm
                       **kwargs):
     if isinstance(permission, ViewPermission):
         return exist_permissions_by_view_permission(user_role, user_permission, permission, request, **kwargs)
-    elif isinstance(permission, RoleConstants):
+    if isinstance(permission, RoleConstants):
         return exist_role_by_role_constants(user_role, [permission])
-    elif isinstance(permission, PermissionConstants):
+    if isinstance(permission, PermissionConstants):
         return exist_permissions_by_permission_constants(user_permission, [permission])
-    elif isinstance(permission, Permission):
+    if isinstance(permission, Permission):
         return user_permission.__contains__(permission)
     return False
 
@@ -72,8 +72,7 @@ def exist(user_role: List[RoleConstants], user_permission: List[PermissionConsta
     if callable(permission):
         p = permission(request, kwargs)
         return exist_permissions(user_role, user_permission, p, request)
-    else:
-        return exist_permissions(user_role, user_permission, permission, request, **kwargs)
+    return exist_permissions(user_role, user_permission, permission, request, **kwargs)
 
 
 def has_permissions(*permission, compare=CompareConstants.OR):
@@ -92,8 +91,7 @@ def has_permissions(*permission, compare=CompareConstants.OR):
             # 判断是否有权限
             if any(exit_list) if compare == CompareConstants.OR else all(exit_list):
                 return func(view, request, **kwargs)
-            else:
-                raise AppUnauthorizedFailed(403, "没有权限访问")
+            raise AppUnauthorizedFailed(403, "没有权限访问")
 
         return run
 
