@@ -9,11 +9,7 @@
         <div class="flex-between mb-16">
           <div class="flex align-center">
             <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
-            <h4
-              @mouseenter="showEditIcon = true"
-              @mouseleave="showEditIcon = false"
-              v-if="showOperate(nodeModel.type)"
-            >
+            <h4 v-if="showOperate(nodeModel.type)">
               <ReadWrite
                 @mousemove.stop
                 @mousedown.stop
@@ -21,7 +17,7 @@
                 @click.stop
                 @change="editName"
                 :data="nodeModel.properties.stepName"
-                :showEditIcon="showEditIcon"
+                trigger="dblclick"
               />
             </h4>
             <h4 v-else>{{ nodeModel.properties.stepName }}</h4>

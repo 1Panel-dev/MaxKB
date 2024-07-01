@@ -203,10 +203,7 @@ function getApplication() {
     })
 }
 function refresh() {
-  if (isApplication.value) {
-    common.saveBreadcrumb(null)
-    getApplication()
-  }
+  common.saveBreadcrumb(null)
 }
 onMounted(() => {
   if (!breadcrumbData.value) {
