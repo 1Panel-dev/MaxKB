@@ -41,7 +41,7 @@ from common.util.file_util import get_file_content
 from common.util.fork import Fork
 from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status, ProblemParagraphMapping, Image
-from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer
+from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer, ProblemParagraphManage
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
 
@@ -380,8 +380,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     document_paragraph_model = DocumentSerializers.Create.get_paragraph_model(document, paragraphs)
 
                     paragraph_model_list = document_paragraph_model.get('paragraph_model_list')
-                    problem_model_list = document_paragraph_model.get('problem_model_list')
-                    problem_paragraph_mapping_list = document_paragraph_model.get('problem_paragraph_mapping_list')
+                    problem_paragraph_object_list = document_paragraph_model.get('problem_paragraph_object_list')
+                    problem_model_list, problem_paragraph_mapping_list = ProblemParagraphManage(
+                        problem_paragraph_object_list, document.dataset_id).to_problem_model_list()
                     # 批量插入段落
                     QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
                     # 批量插入问题
@@ -626,11 +627,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             dataset_id = self.data.get('dataset_id')
             document_paragraph_model = self.get_document_paragraph_model(dataset_id, instance)
+
             document_model = document_paragraph_model.get('document')
             paragraph_model_list = document_paragraph_model.get('paragraph_model_list')
-            problem_model_list = document_paragraph_model.get('problem_model_list')
-            problem_paragraph_mapping_list = document_paragraph_model.get('problem_paragraph_mapping_list')
-
+            problem_paragraph_object_list = document_paragraph_model.get('problem_paragraph_object_list')
+            problem_model_list, problem_paragraph_mapping_list = (ProblemParagraphManage(problem_paragraph_object_list,
+                                                                                         dataset_id)
+                                                                  .to_problem_model_list())
             # 插入文档
             document_model.save()
             # 批量插入段落
@@ -685,35 +688,15 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 dataset_id, document_model.id, paragraph) for paragraph in paragraph_list]
 
             paragraph_model_list = []
-            problem_model_list = []
-            problem_paragraph_mapping_list = []
+            problem_paragraph_object_list = []
             for paragraphs in paragraph_model_dict_list:
                 paragraph = paragraphs.get('paragraph')
-                for problem_model in paragraphs.get('problem_model_list'):
-                    problem_model_list.append(problem_model)
-                for problem_paragraph_mapping in paragraphs.get('problem_paragraph_mapping_list'):
-                    problem_paragraph_mapping_list.append(problem_paragraph_mapping)
+                for problem_model in paragraphs.get('problem_paragraph_object_list'):
+                    problem_paragraph_object_list.append(problem_model)
                 paragraph_model_list.append(paragraph)
 
-            problem_model_list, problem_paragraph_mapping_list = DocumentSerializers.Create.reset_problem_model(
-                problem_model_list, problem_paragraph_mapping_list)
-
             return {'document': document_model, 'paragraph_model_list': paragraph_model_list,
-                    'problem_model_list': problem_model_list,
-                    'problem_paragraph_mapping_list': problem_paragraph_mapping_list}
-
-        @staticmethod
-        def reset_problem_model(problem_model_list, problem_paragraph_mapping_list):
-            new_problem_model_list = [x for i, x in enumerate(problem_model_list) if
-                                      len([item for item in problem_model_list[:i] if item.content == x.content]) <= 0]
-
-            for new_problem_model in new_problem_model_list:
-                old_model_list = [problem.id for problem in problem_model_list if
-                                  problem.content == new_problem_model.content]
-                for problem_paragraph_mapping in problem_paragraph_mapping_list:
-                    if old_model_list.__contains__(problem_paragraph_mapping.problem_id):
-                        problem_paragraph_mapping.problem_id = new_problem_model.id
-            return new_problem_model_list, problem_paragraph_mapping_list
+                    'problem_paragraph_object_list': problem_paragraph_object_list}
 
         @staticmethod
         def get_document_paragraph_model(dataset_id, instance: Dict):
@@ -834,8 +817,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             dataset_id = self.data.get("dataset_id")
             document_model_list = []
             paragraph_model_list = []
-            problem_model_list = []
-            problem_paragraph_mapping_list = []
+            problem_paragraph_object_list = []
             # 插入文档
             for document in instance_list:
                 document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(dataset_id,
@@ -843,11 +825,12 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 document_model_list.append(document_paragraph_dict_model.get('document'))
                 for paragraph in document_paragraph_dict_model.get('paragraph_model_list'):
                     paragraph_model_list.append(paragraph)
-                for problem in document_paragraph_dict_model.get('problem_model_list'):
-                    problem_model_list.append(problem)
-                for problem_paragraph_mapping in document_paragraph_dict_model.get('problem_paragraph_mapping_list'):
-                    problem_paragraph_mapping_list.append(problem_paragraph_mapping)
+                for problem_paragraph_object in document_paragraph_dict_model.get('problem_paragraph_object_list'):
+                    problem_paragraph_object_list.append(problem_paragraph_object)
 
+            problem_model_list, problem_paragraph_mapping_list = (ProblemParagraphManage(problem_paragraph_object_list,
+                                                                                         dataset_id)
+                                                                  .to_problem_model_list())
             # 插入文档
             QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
             # 批量插入段落
