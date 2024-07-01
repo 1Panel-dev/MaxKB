@@ -1,11 +1,11 @@
 <template>
-  <div class="content-container">
+  <div class="content-container border-r-4">
     <div class="content-container__header flex align-center w-full" v-if="slots.header || header">
       <slot name="backButton">
         <back-button :to="backTo" v-if="showBack"></back-button>
       </slot>
       <slot name="header">
-        <h3>{{ header }}</h3>
+        <h4>{{ header }}</h4>
       </slot>
     </div>
     <el-scrollbar>
@@ -41,7 +41,6 @@ const showBack = computed(() => {
   }
   .content-container__main {
     background-color: var(--app-view-bg-color);
-    border-radius: 4px;
     box-sizing: border-box;
     min-width: 700px;
   }

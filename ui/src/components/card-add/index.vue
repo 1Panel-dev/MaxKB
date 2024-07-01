@@ -1,7 +1,7 @@
 <template>
   <el-card shadow="never" class="card-add">
     <div class="flex-center">
-      <AppIcon iconName="Plus" class="add-icon p-8" />
+      <AppIcon iconName="Plus" class="add-icon p-8 border-r-4 layout-bg" />
       <span>{{ title }}</span>
     </div>
   </el-card>
@@ -31,9 +31,7 @@ defineProps({
 
   .add-icon {
     font-size: 14px;
-    border-radius: 4px;
     border: 1px solid var(--app-border-color-dark);
-    background: var(--app-layout-bg-color);
     margin-right: 12px;
   }
   &:hover {

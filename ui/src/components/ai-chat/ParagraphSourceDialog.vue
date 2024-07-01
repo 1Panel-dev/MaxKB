@@ -19,50 +19,7 @@
             </el-form-item>
             <el-form-item label="引用分段">
               <template v-for="(item, index) in detail.paragraph_list" :key="index">
-                <CardBox
-                  shadow="never"
-                  :title="item.title || '-'"
-                  class="paragraph-source-card cursor mb-8"
-                  :class="item.is_active ? '' : 'disabled'"
-                  :showIcon="false"
-                >
-                  <template #icon>
-                    <AppAvatar class="mr-12 avatar-light" :size="22">
-                      {{ index + 1 + '' }}</AppAvatar
-                    >
-                  </template>
-                  <div class="active-button primary">{{ item.similarity?.toFixed(3) }}</div>
-                  <template #description>
-                    <el-scrollbar height="150">
-                      <MdPreview
-                        ref="editorRef"
-                        editorId="preview-only"
-                        :modelValue="item.content"
-                      />
-                    </el-scrollbar>
-                  </template>
-                  <template #footer>
-                    <div class="footer-content flex-between">
-                      <el-text class="flex align-center">
-                        <el-icon class="mr-4">
-                          <Document />
-                        </el-icon>
-                        <span class="ellipsis-1 break-all" :title="item?.document_name">
-                          {{ item?.document_name }}</span
-                        >
-                      </el-text>
-                      <div class="flex align-center">
-                        <AppAvatar class="mr-8" shape="square" :size="18">
-                          <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
-                        </AppAvatar>
-
-                        <span class="ellipsis" :title="item?.dataset_name">
-                          {{ item?.dataset_name }}</span
-                        >
-                      </div>
-                    </div>
-                  </template>
-                </CardBox>
+                <ParagraphCard :data="item" :index="index" />
               </template>
             </el-form-item>
           </el-form>
@@ -75,10 +32,9 @@
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { cloneDeep } from 'lodash'
 import { arraySort } from '@/utils/utils'
-import { MdPreview } from 'md-editor-v3'
+import ParagraphCard from './component/ParagraphCard.vue'
 const emit = defineEmits(['refresh'])
 
-const ParagraphDialogRef = ref()
 const dialogVisible = ref(false)
 const detail = ref<any>({})
 
@@ -114,18 +70,12 @@ defineExpose({ open })
   .paragraph-source-height {
     max-height: calc(100vh - 260px);
   }
-  .paragraph-source-card {
-    height: 260px;
-  }
 }
 @media only screen and (max-width: 768px) {
   .paragraph-source {
     width: 90% !important;
     .footer-content {
       display: block;
-    }
-    .paragraph-source-card {
-      height: 285px;
     }
   }
 }

@@ -12,7 +12,7 @@
             {{ $t('views.applicationOverview.appInfo.EmbedDialog.fullscreenModeTitle') }}
           </p>
           <img src="@/assets/window1.png" alt="" class="ml-8" />
-          <div class="code border-t p-16">
+          <div class="code layout-bg border-t p-16">
             <div class="flex-between">
               <span class="bold">{{
                 $t('views.applicationOverview.appInfo.EmbedDialog.copyInstructions')
@@ -104,7 +104,7 @@ defineExpose({ open })
 
   .code {
     color: var(--app-text-color) !important;
-    background: var(--app-layout-bg-color);
+
     font-weight: 400;
     font-size: 13px;
     white-space: pre;

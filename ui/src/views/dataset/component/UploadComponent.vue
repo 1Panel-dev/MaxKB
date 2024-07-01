@@ -90,7 +90,9 @@
               <img :src="getImgUrl(item && item?.name)" alt="" width="40" />
               <div class="ml-8">
                 <p>{{ item && item?.name }}</p>
-                <el-text type="info">{{ filesize(item && item?.size) || '0K' }}</el-text>
+                <el-text type="info" size="small">{{
+                  filesize(item && item?.size) || '0K'
+                }}</el-text>
               </div>
             </div>
             <el-button text @click="deleteFile(index)">

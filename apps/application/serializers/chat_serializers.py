@@ -22,7 +22,9 @@ from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from rest_framework import serializers
 
-from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord
+from application.flow.workflow_manage import Flow
+from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord, WorkFlowVersion, \
+    ApplicationTypeChoices
 from application.models.api_key_model import ApplicationAccessToken
 from application.serializers.application_serializers import ModelDatasetAssociation, DatasetSettingSerializer, \
     ModelSettingSerializer
@@ -43,6 +45,11 @@ from setting.models_provider.constants.model_provider_constants import ModelProv
 from smartdoc.conf import PROJECT_DIR
 
 chat_cache = caches['model_cache']
+
+
+class WorkFlowSerializers(serializers.Serializer):
+    nodes = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid("节点"))
+    edges = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid("连线"))
 
 
 class ChatSerializers(serializers.Serializer):
@@ -207,6 +214,27 @@ class ChatSerializers(serializers.Serializer):
             self.is_valid(raise_exception=True)
             application_id = self.data.get('application_id')
             application = QuerySet(Application).get(id=application_id)
+            if application.type == ApplicationTypeChoices.SIMPLE:
+                return self.open_simple(application)
+            else:
+                return self.open_work_flow(application)
+
+        def open_work_flow(self, application):
+            self.is_valid(raise_exception=True)
+            application_id = self.data.get('application_id')
+            chat_id = str(uuid.uuid1())
+            work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application_id).order_by(
+                '-create_time')[0:1].first()
+            if work_flow_version is None:
+                raise AppApiException(500, "应用未发布,请发布后再使用")
+            chat_cache.set(chat_id,
+                           ChatInfo(chat_id, None, [],
+                                    [],
+                                    application, work_flow_version), timeout=60 * 30)
+            return chat_id
+
+        def open_simple(self, application):
+            application_id = self.data.get('application_id')
             model = QuerySet(Model).filter(id=application.model_id).first()
             dataset_id_list = [str(row.dataset_id) for row in
                                QuerySet(ApplicationDatasetMapping).filter(
@@ -227,6 +255,27 @@ class ChatSerializers(serializers.Serializer):
                                          dataset_id__in=dataset_id_list,
                                          is_active=False)],
                                     application), timeout=60 * 30)
+            return chat_id
+
+    class OpenWorkFlowChat(serializers.Serializer):
+        work_flow = WorkFlowSerializers(error_messages=ErrMessage.uuid("工作流"))
+
+        def open(self):
+            self.is_valid(raise_exception=True)
+            work_flow = self.data.get('work_flow')
+            Flow.new_instance(work_flow).is_valid()
+            chat_id = str(uuid.uuid1())
+            application = Application(id=None, dialogue_number=3, model=None,
+                                      dataset_setting={},
+                                      model_setting={},
+                                      problem_optimization=None,
+                                      type=ApplicationTypeChoices.WORK_FLOW
+                                      )
+            work_flow_version = WorkFlowVersion(work_flow=work_flow)
+            chat_cache.set(chat_id,
+                           ChatInfo(chat_id, None, [],
+                                    [],
+                                    application, work_flow_version), timeout=60 * 30)
             return chat_id
 
     class OpenTempChat(serializers.Serializer):
@@ -329,7 +378,7 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_info: ChatInfo = chat_cache.get(chat_id)
             if chat_info is not None:
                 chat_record_list = [chat_record for chat_record in chat_info.chat_record_list if
-                                    chat_record.id == uuid.UUID(chat_record_id)]
+                                    str(chat_record.id) == str(chat_record_id)]
                 if chat_record_list is not None and len(chat_record_list):
                     return chat_record_list[-1]
             return QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
@@ -377,7 +426,8 @@ class ChatRecordSerializer(serializers.Serializer):
                 'padding_problem_text': chat_record.details.get('problem_padding').get(
                     'padding_problem_text') if 'problem_padding' in chat_record.details else None,
                 'dataset_list': dataset_list,
-                'paragraph_list': paragraph_list
+                'paragraph_list': paragraph_list,
+                'execution_details': [chat_record.details[key] for key in chat_record.details]
             }
 
         def page(self, current_page: int, page_size: int, with_valid=True):

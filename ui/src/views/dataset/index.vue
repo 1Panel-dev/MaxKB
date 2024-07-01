@@ -1,7 +1,7 @@
 <template>
   <div class="dataset-list-container p-24" style="padding-top: 16px">
     <div class="flex-between mb-16">
-      <h3>知识库</h3>
+      <h4>知识库</h4>
       <el-input
         v-model="searchValue"
         @change="searchHandle"

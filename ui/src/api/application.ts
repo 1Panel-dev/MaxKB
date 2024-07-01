@@ -45,8 +45,7 @@ const postApplication: (
 
 /**
  * 修改应用
- * @param 参数 
-
+ * @param 参数
  */
 const putApplication: (
   application_id: String,
@@ -151,6 +150,16 @@ const postChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data)
 }
 
 /**
+ * 获得工作流临时回话Id
+ * @param 参数 
+
+}
+ */
+const postWorkflowChatOpen: (data: ApplicationFormType) => Promise<Result<any>> = (data) => {
+  return post(`${prefix}/chat_workflow/open`, data)
+}
+
+/**
  * 正式回话Id
  * @param 参数 
  * {
@@ -228,6 +237,18 @@ const getApplicationModel: (
   return get(`${prefix}/${application_id}/model`, loading)
 }
 
+/**
+ * 发布应用
+ * @param 参数
+ */
+const putPublishApplication: (
+  application_id: String,
+  data: ApplicationFormType,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return put(`${prefix}/${application_id}/publish`, data, undefined, loading)
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -245,5 +266,7 @@ export default {
   getProfile,
   putChatVote,
   getApplicationHitTest,
-  getApplicationModel
+  getApplicationModel,
+  putPublishApplication,
+  postWorkflowChatOpen
 }

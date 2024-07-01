@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-pc" :class="classObj" v-loading="loading">
+  <div class="chat-pc layout-bg" :class="classObj" v-loading="loading">
     <div class="chat-pc__header">
       <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
     </div>
@@ -317,7 +317,6 @@ onMounted(() => {
 </script>
 <style lang="scss">
 .chat-pc {
-  background-color: var(--app-layout-bg-color);
   overflow: hidden;
 
   &__header {

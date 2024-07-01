@@ -64,6 +64,18 @@ class ChatView(APIView):
             return result.success(ChatSerializers.OpenChat(
                 data={'user_id': request.user.id, 'application_id': application_id}).open())
 
+    class OpenWorkFlowTemp(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="获取工作流临时会话id",
+                             operation_id="获取工作流临时会话id",
+                             request_body=ChatApi.OpenWorkFlowTemp.get_request_body_api(),
+                             tags=["应用/会话"])
+        def post(self, request: Request):
+            return result.success(ChatSerializers.OpenWorkFlowChat(
+                data={**request.data, 'user_id': request.user.id}).open())
+
     class OpenTemp(APIView):
         authentication_classes = [TokenAuth]
 

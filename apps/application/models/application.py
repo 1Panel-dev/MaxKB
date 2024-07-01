@@ -6,6 +6,8 @@
     @date：2023/9/25 14:24
     @desc:
 """
+import datetime
+import json
 import uuid
 
 from django.contrib.postgres.fields import ArrayField
@@ -16,6 +18,12 @@ from common.mixins.app_model_mixin import AppModelMixin
 from dataset.models.data_set import DataSet
 from setting.models.model_management import Model
 from users.models import User
+
+
+class ApplicationTypeChoices(models.TextChoices):
+    """订单类型"""
+    SIMPLE = 'SIMPLE', '简易'
+    WORK_FLOW = 'WORK_FLOW', '工作流'
 
 
 def get_dataset_setting_dict():
@@ -42,6 +50,9 @@ class Application(AppModelMixin):
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="/ui/favicon.ico")
+    work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
+    type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
+                            default=ApplicationTypeChoices.SIMPLE, max_length=256)
 
     @staticmethod
     def get_default_model_prompt():
@@ -59,6 +70,15 @@ class Application(AppModelMixin):
 
     class Meta:
         db_table = "application"
+
+
+class WorkFlowVersion(AppModelMixin):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
+    work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
+
+    class Meta:
+        db_table = "application_work_flow_version"
 
 
 class ApplicationDatasetMapping(AppModelMixin):
@@ -88,6 +108,16 @@ class VoteChoices(models.TextChoices):
     TRAMPLE = 1, '反对'
 
 
+class DateEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
+        if isinstance(obj, datetime.datetime):
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            return json.JSONEncoder.default(self, obj)
+
+
 class ChatRecord(AppModelMixin):
     """
     对话日志 详情
@@ -101,7 +131,7 @@ class ChatRecord(AppModelMixin):
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)
     const = models.IntegerField(verbose_name="总费用", default=0)
-    details = models.JSONField(verbose_name="对话详情", default=dict)
+    details = models.JSONField(verbose_name="对话详情", default=dict, encoder=DateEncoder)
     improve_paragraph_id_list = ArrayField(verbose_name="改进标注列表",
                                            base_field=models.UUIDField(max_length=128, blank=True)
                                            , default=list)

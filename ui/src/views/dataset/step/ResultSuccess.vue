@@ -30,10 +30,10 @@
       >
         <div class="flex-between">
           <div class="flex">
-            <img :src="getImgUrl(item && item?.name)" alt="" width="40"/>
+            <img :src="getImgUrl(item && item?.name)" alt="" width="40" />
             <div class="ml-8">
               <p>{{ item && item?.name }}</p>
-              <el-text type="info">{{ filesize(item && item?.char_length) }}</el-text>
+              <el-text type="info" size="small">{{ filesize(item && item?.char_length) }}</el-text>
             </div>
           </div>
           <div>
@@ -65,8 +65,8 @@ const props = defineProps({
   }
 })
 const router = useRouter()
-const paragraph_count = computed(
-  () => props.data?.document_list.reduce((sum: number, obj: any) => (sum += obj.paragraph_count), 0)
+const paragraph_count = computed(() =>
+  props.data?.document_list.reduce((sum: number, obj: any) => (sum += obj.paragraph_count), 0)
 )
 
 const char_length = computed(

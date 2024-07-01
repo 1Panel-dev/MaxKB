@@ -161,7 +161,25 @@ class ApplicationApi(ApiMixin):
                     'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="问题优化",
                                                            description="是否开启问题优化", default=True),
                     'icon': openapi.Schema(type=openapi.TYPE_STRING, title="icon",
-                                           description="icon", default="/ui/favicon.ico")
+                                           description="icon", default="/ui/favicon.ico"),
+                    'work_flow': ApplicationApi.WorkFlow.get_request_body_api()
+
+                }
+            )
+
+    class WorkFlow(ApiMixin):
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=[''],
+                properties={
+                    'nodes': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT),
+                                            title="节点列表", description="节点列表",
+                                            default=[]),
+                    'edges': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT),
+                                            title='连线列表', description="连线列表",
+                                            default={}),
 
                 }
             )
@@ -219,6 +237,17 @@ class ApplicationApi(ApiMixin):
                 }
             )
 
+    class Publish(ApiMixin):
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=[],
+                properties={
+                    'work_flow': ApplicationApi.WorkFlow.get_request_body_api()
+                }
+            )
+
     class Create(ApiMixin):
         @staticmethod
         def get_request_body_api():
@@ -239,7 +268,9 @@ class ApplicationApi(ApiMixin):
                     'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
                     'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
                     'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="问题优化",
-                                                           description="是否开启问题优化", default=True)
+                                                           description="是否开启问题优化", default=True),
+                    'type': openapi.Schema(type=openapi.TYPE_STRING, title="应用类型",
+                                           description="应用类型 简易:SIMPLE|工作流:WORK_FLOW")
 
                 }
             )

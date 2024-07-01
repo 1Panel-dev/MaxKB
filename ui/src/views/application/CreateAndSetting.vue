@@ -206,7 +206,7 @@
                       v-for="(item, index) in applicationForm.dataset_id_list"
                       :key="index"
                     >
-                      <el-card class="relate-dataset-card" shadow="never">
+                      <el-card class="relate-dataset-card border-r-4" shadow="never">
                         <div class="flex-between">
                           <div class="flex align-center">
                             <AppAvatar
@@ -218,7 +218,7 @@
                               <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
                             </AppAvatar>
 
-                            <AppAvatar v-else class="mr-12" shape="square" :size="32">
+                            <AppAvatar v-else class="mr-8" shape="square" :size="32">
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>
                             <div class="ellipsis">
@@ -317,11 +317,10 @@
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
-import ParamSettingDialog from './components/ParamSettingDialog.vue'
-import AddDatasetDialog from './components/AddDatasetDialog.vue'
+import ParamSettingDialog from './component/ParamSettingDialog.vue'
+import AddDatasetDialog from './component/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
-import { MdEditor } from 'md-editor-v3'
 import applicationApi from '@/api/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
@@ -372,7 +371,8 @@ const applicationForm = ref<ApplicationFormType>({
   model_setting: {
     prompt: defaultPrompt
   },
-  problem_optimization: false
+  problem_optimization: false,
+  type: 'SIMPLE'
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({
@@ -525,7 +525,6 @@ onMounted(() => {
 .create-application {
   .relate-dataset-card {
     color: var(--app-text-color);
-    border-radius: 4px;
   }
   .dialog-bg {
     border-radius: 8px;
@@ -540,13 +539,7 @@ onMounted(() => {
     height: calc(var(--app-main-height) - 150px);
   }
 }
-.model-icon {
-  width: 20px;
-}
-.check-icon {
-  position: absolute;
-  right: 10px;
-}
+
 .prologue-md-editor {
   height: 150px;
 }

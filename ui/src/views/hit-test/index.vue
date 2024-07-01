@@ -2,10 +2,10 @@
   <div class="hit-test">
     <LayoutContainer>
       <template #header>
-        <h3>
+        <h4>
           命中测试
           <el-text type="info" class="ml-4">针对用户提问调试段落匹配情况，保障回答效果。</el-text>
-        </h3>
+        </h4>
       </template>
       <div class="hit-test__main p-16" v-loading="loading">
         <div class="question-title clearfix" v-if="questionTitle">
@@ -37,7 +37,7 @@
                   shadow="hover"
                   :title="item.title || '-'"
                   :description="item.content"
-                  class="document-card cursor"
+                  class="document-card layout-bg layout-bg cursor "
                   :class="item.is_active ? '' : 'disabled'"
                   :showIcon="false"
                   @click="editParagraph(item)"
@@ -362,7 +362,6 @@ onMounted(() => {})
   }
   .document-card {
     height: 210px;
-    background: var(--app-layout-bg-color);
     border: 1px solid var(--app-layout-bg-color);
     &:hover {
       background: #ffffff;

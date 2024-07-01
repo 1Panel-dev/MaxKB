@@ -7,6 +7,7 @@
     :destroy-on-close="true"
     :before-close="close"
     title="选择供应商"
+    append-to-body
   >
     <el-row :gutter="12" v-loading="loading">
       <el-col :span="12" class="mb-16" v-for="(data, index) in list_provider" :key="index">

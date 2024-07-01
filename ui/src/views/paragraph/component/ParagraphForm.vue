@@ -19,7 +19,7 @@
       <span class="lighter" v-else>{{ form.title || '-' }}</span>
     </el-form-item>
     <el-form-item label="分段内容" prop="content">
-      <MarkdownEditor
+      <MdEditor
         v-if="isEdit"
         v-model="form.content"
         placeholder="请输入分段内容"
@@ -33,7 +33,7 @@
         <template #defFooters>
           <span style="margin-left: -6px">/ 4096</span>
         </template>
-      </MarkdownEditor>
+      </MdEditor>
       <MdPreview
         v-else
         ref="editorRef"
@@ -47,8 +47,6 @@
 <script setup lang="ts">
 import { ref, reactive, onUnmounted, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { MdPreview } from 'md-editor-v3'
-import MarkdownEditor from '@/components/markdown-editor/index.vue'
 import imageApi from '@/api/image'
 const props = defineProps({
   data: {
