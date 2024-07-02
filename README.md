@@ -62,8 +62,8 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data cr2
 - 后端：[Python / Django](https://www.djangoproject.com/)
 - LangChain：[LangChain](https://www.langchain.com/)
 - 向量数据库：[PostgreSQL / pgvector](https://www.postgresql.org/)
-- 大模型：Azure OpenAI、OpenAI、百度千帆大模型、[Ollama](https://github.com/ollama/ollama)、通义千问、Kimi、智谱 AI、讯飞星火
-
+- 大模型：各种本地私有或者公共大模型
+  
 ## 飞致云的其他明星项目
 
 - [1Panel](https://github.com/1panel-dev/1panel/) - 现代化、开源的 Linux 服务器运维管理面板
