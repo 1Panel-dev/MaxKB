@@ -18,6 +18,10 @@ from .len_gt_compare import *
 from .len_le_compare import *
 from .len_lt_compare import *
 from .len_equal_compare import *
+from .is_not_null_compare import *
+from .is_null_compare import *
 
 compare_handle_list = [GECompare(), GTCompare(), ContainCompare(), EqualCompare(), LTCompare(), LECompare(),
-                       LenLECompare(), LenGECompare(), LenEqualCompare(), LenGTCompare(), LenLTCompare()]
+                       LenLECompare(), LenGECompare(), LenEqualCompare(), LenGTCompare(), LenLTCompare(),
+                       IsNullCompare(),
+                       IsNotNullCompare()]
