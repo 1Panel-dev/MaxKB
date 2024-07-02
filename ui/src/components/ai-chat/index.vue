@@ -63,7 +63,13 @@
                   shadow="always"
                   class="dialog-card"
                 >
-                  抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。
+                  <MdRenderer
+                    source=" 抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
+                  ></MdRenderer>
+                  <!-- 知识来源 -->
+                  <div v-if="showSource(item)">
+                    <KnowledgeSource :data="item" :type="props.data.type" />
+                  </div>
                 </el-card>
                 <el-card v-else-if="item.is_stop" shadow="always" class="dialog-card">
                   已停止回答
