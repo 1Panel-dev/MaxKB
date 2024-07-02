@@ -257,7 +257,7 @@ def post_handler_paragraph(content: str, limit: int, with_filter: bool):
 
 replace_map = {
     re.compile('\n+'): '\n',
-    re.compile('\\s+'): ' ',
+    re.compile(' +'): ' ',
     re.compile('#+'): "",
     re.compile("\t+"): ''
 }
