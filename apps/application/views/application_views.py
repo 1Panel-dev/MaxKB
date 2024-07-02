@@ -199,8 +199,7 @@ class Application(APIView):
                 return result.success(ApplicationSerializer.Operate(
                     data={'application_id': request.auth.keywords.get('application_id'),
                           'user_id': request.user.id}).profile())
-            else:
-                raise AppAuthenticationFailed(401, "身份异常")
+            raise AppAuthenticationFailed(401, "身份异常")
 
     class ApplicationKey(APIView):
         authentication_classes = [TokenAuth]
