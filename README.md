@@ -32,6 +32,8 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data cr2
 
 你也可以在线体验：[DataEase 小助手](https://dataease.io/docs/v2/)，它是基于 MaxKB 搭建的智能问答系统，已经嵌入到 DataEase 产品及在线文档中。
 
+如果你需要搭建技术博客或者知识库，推荐使用 [Halo 开源建站工具](https://github.com/halo-dev/halo/)，你可以体验下飞致云官方的 [技术博客](https://blog.fit2cloud.com/) 和 [知识库](https://kb.fit2cloud.com) 案例。
+
 如你有更多问题，可以查看使用手册，或者通过论坛与我们交流。
 
 - [使用手册](https://github.com/1Panel-dev/MaxKB/wiki/1-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2)
