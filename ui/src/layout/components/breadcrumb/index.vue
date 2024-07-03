@@ -88,27 +88,24 @@
                 </div>
               </template>
             </el-dropdown-menu>
-            <div class="breadcrumb__footer border-t" style="padding: 8px 11px; min-width: 200px">
-              <template v-if="isApplication">
-                <div class="w-full text-left cursor" @click="openCreateDialog">
-                  <el-button link>
-                    <el-icon class="mr-4"><Plus /></el-icon> 创建应用
-                  </el-button>
-                </div>
-              </template>
-              <template v-else-if="isDataset">
-                <div
-                  class="w-full text-left cursor"
-                  @click="router.push({ path: '/dataset/create' })"
-                >
-                  <el-button link>
-                    <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
-                  </el-button>
-                </div>
-              </template>
-            </div>
           </div>
         </el-scrollbar>
+        <div class="breadcrumb__footer border-t" style="padding: 8px 11px; min-width: 200px">
+          <template v-if="isApplication">
+            <div class="w-full text-left cursor" @click="openCreateDialog">
+              <el-button link>
+                <el-icon class="mr-4"><Plus /></el-icon> 创建应用
+              </el-button>
+            </div>
+          </template>
+          <template v-else-if="isDataset">
+            <div class="w-full text-left cursor" @click="router.push({ path: '/dataset/create' })">
+              <el-button link>
+                <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
+              </el-button>
+            </div>
+          </template>
+        </div>
       </template>
     </el-dropdown>
   </div>
