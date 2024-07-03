@@ -60,6 +60,10 @@ class Flow:
         start_node_list = [node for node in self.nodes if node.id == 'start-node']
         return start_node_list[0]
 
+    def get_search_node(self):
+        return [node for node in self.nodes if node.type == 'search-dataset-node']
+
+
     def is_valid(self):
         """
         校验工作流数据
