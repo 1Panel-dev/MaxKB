@@ -126,6 +126,8 @@ class BaseChatNode(IChatNode):
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 **kwargs) -> NodeResult:
         model = QuerySet(Model).filter(id=model_id).first()
+        if model is None:
+            raise Exception("模型不存在")
         chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
                                                                            json.loads(
                                                                                rsa_long_decrypt(model.credential)),
