@@ -552,6 +552,7 @@ class ApplicationSerializer(serializers.Serializer):
             dataset_list = self.list_dataset(with_valid=False)
             dataset_id_list = self.update_reverse_search_node(work_flow,
                                                               [str(dataset.get('id')) for dataset in dataset_list])
+
             application.work_flow = work_flow
             application.save()
             # 插入知识库关联关系
@@ -589,7 +590,7 @@ class ApplicationSerializer(serializers.Serializer):
 
         def update_reverse_search_node(self, work_flow, user_dataset_id_list: List):
             search_node_list = self.get_search_node(work_flow)
-            dataset_id_list = []
+            result_dataset_id_list = []
             for search_node in search_node_list:
                 node_data = search_node.get('properties', {}).get('node_data', {})
                 dataset_id_list = node_data.get('dataset_id_list', [])
@@ -603,8 +604,8 @@ class ApplicationSerializer(serializers.Serializer):
                 source_dataset_id_list = list({*source_dataset_id_list, *dataset_id_list})
                 node_data['source_dataset_id_list'] = []
                 node_data['dataset_id_list'] = source_dataset_id_list
-                dataset_id_list = [*source_dataset_id_list, *dataset_id_list]
-            return list(set(dataset_id_list))
+                result_dataset_id_list = [*source_dataset_id_list, *result_dataset_id_list]
+            return list(set(result_dataset_id_list))
 
         def profile(self, with_valid=True):
             if with_valid:
@@ -667,6 +668,8 @@ class ApplicationSerializer(serializers.Serializer):
 
         @staticmethod
         def save_application_mapping(dataset_id_list, application_id):
+            # 需要排除已删除的数据集
+            dataset_id_list = [dataset.id for dataset in QuerySet(DataSet).filter(id__in=dataset_id_list)]
             # 删除已经关联的id
             QuerySet(ApplicationDatasetMapping).filter(dataset_id__in=dataset_id_list,
                                                        application_id=application_id).delete()
