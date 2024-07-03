@@ -23,7 +23,7 @@
           iconName="app-reading"
           class="cursor color-secondary mr-8 ml-8"
           style="font-size: 20px"
-          @click="toUrl('https://github.com/1Panel-dev/MaxKB/wiki')"
+          @click="toUrl('https://maxkb.cn/docs/')"
         ></AppIcon>
       </el-tooltip>
       <el-tooltip effect="dark" :content="$t('layout.topbar.forum')" placement="top">

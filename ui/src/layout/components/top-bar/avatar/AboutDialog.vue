@@ -9,7 +9,7 @@
       <el-card
         shadow="hover"
         class="mb-16"
-        @click="toUrl('https://github.com/1Panel-dev/MaxKB/wiki')"
+        @click="toUrl('https://maxkb.cn/docs/')"
       >
         <div class="flex align-center cursor">
           <AppIcon iconName="app-reading" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
