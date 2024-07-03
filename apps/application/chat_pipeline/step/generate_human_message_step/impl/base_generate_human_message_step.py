@@ -48,9 +48,9 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
         if paragraph_list is None or len(paragraph_list) == 0:
             if no_references_setting.get('status') == 'ai_questioning':
                 return HumanMessage(
-                    content=no_references_setting.get('value').format(**{'question': problem}))
+                    content=no_references_setting.get('value').replace('{question}', problem))
             else:
-                return HumanMessage(content=prompt.format(**{'data': "", 'question': problem}))
+                return HumanMessage(content=prompt.replace('{data}', "").replace('{question}', problem))
         temp_data = ""
         data_list = []
         for p in paragraph_list:
@@ -63,4 +63,4 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
             else:
                 data_list.append(f"<data>{content}</data>")
         data = "\n".join(data_list)
-        return HumanMessage(content=prompt.format(**{'data': data, 'question': problem}))
+        return HumanMessage(content=prompt.replace('{data}', data).replace('{question}', problem))
