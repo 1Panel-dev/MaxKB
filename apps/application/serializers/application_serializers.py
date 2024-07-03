@@ -550,13 +550,12 @@ class ApplicationSerializer(serializers.Serializer):
                     application.desc = node_data.get('desc')
                     application.prologue = node_data.get('prologue')
             dataset_list = self.list_dataset(with_valid=False)
-            dataset_id_list = self.update_reverse_search_node(work_flow,
-                                                              [str(dataset.get('id')) for dataset in dataset_list])
-
+            application_dataset_id_list = [str(dataset.get('id')) for dataset in dataset_list]
+            dataset_id_list = self.update_reverse_search_node(work_flow, application_dataset_id_list)
             application.work_flow = work_flow
             application.save()
             # 插入知识库关联关系
-            self.save_application_mapping(dataset_id_list, application.id)
+            self.save_application_mapping(application_dataset_id_list, dataset_id_list, application.id)
             work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application)
             work_flow_version.save()
             return True
@@ -662,16 +661,16 @@ class ApplicationSerializer(serializers.Serializer):
                     if not application_dataset_id_list.__contains__(dataset_id):
                         raise AppApiException(500, f"未知的知识库id${dataset_id},无法关联")
 
-                self.save_application_mapping(application_dataset_id_list, application_id)
+                self.save_application_mapping(application_dataset_id_list, dataset_id_list, application_id)
             chat_cache.clear_by_application_id(application_id)
             return self.one(with_valid=False)
 
         @staticmethod
-        def save_application_mapping(dataset_id_list, application_id):
+        def save_application_mapping(application_dataset_id_list, dataset_id_list, application_id):
             # 需要排除已删除的数据集
             dataset_id_list = [dataset.id for dataset in QuerySet(DataSet).filter(id__in=dataset_id_list)]
             # 删除已经关联的id
-            QuerySet(ApplicationDatasetMapping).filter(dataset_id__in=dataset_id_list,
+            QuerySet(ApplicationDatasetMapping).filter(dataset_id__in=application_dataset_id_list,
                                                        application_id=application_id).delete()
             # 插入
             QuerySet(ApplicationDatasetMapping).bulk_create(
