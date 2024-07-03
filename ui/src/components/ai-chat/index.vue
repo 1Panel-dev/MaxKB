@@ -104,7 +104,7 @@
                   >
                 </div>
               </div>
-              <div v-if="item.write_ed && props.appId" class="flex-between">
+              <div v-if="item.write_ed && props.appId && 500 != item.status" class="flex-between">
                 <OperationButton
                   :data="item"
                   :applicationId="appId"
@@ -280,7 +280,7 @@ watch(
 function showSource(row: any) {
   if (props.log) {
     return true
-  } else if (row.write_ed) {
+  } else if (row.write_ed && 500 !== row.status) {
     if (id || props.data?.show_source) {
       return true
     }
@@ -453,6 +453,7 @@ const errorWrite = (chat: any, message?: string) => {
   ChatManagement.addChatRecord(chat, 50, loading)
   ChatManagement.write(chat.id)
   ChatManagement.append(chat.id, message || '抱歉，当前正在维护，无法提供服务，请稍后再试！')
+  ChatManagement.updateStatus(chat.id, 500)
   ChatManagement.close(chat.id)
 }
 function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
@@ -466,7 +467,8 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
       write_ed: false,
       is_stop: false,
       record_id: '',
-      vote_status: '-1'
+      vote_status: '-1',
+      status: undefined
     })
     chatList.value.push(chat)
     ChatManagement.addChatRecord(chat, 50, loading)
