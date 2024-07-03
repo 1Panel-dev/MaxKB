@@ -7,9 +7,9 @@
     >
       <div v-resize="resizeStepContainer">
         <div class="flex-between mb-16">
-          <div class="flex align-center">
+          <div class="flex align-center" style="max-width: 90%">
             <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
-            <h4 v-if="showOperate(nodeModel.type)">
+            <h4 v-if="showOperate(nodeModel.type)" style="max-width: 90%">
               <ReadWrite
                 @mousemove.stop
                 @mousedown.stop
