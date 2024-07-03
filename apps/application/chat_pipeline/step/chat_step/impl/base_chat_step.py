@@ -143,7 +143,8 @@ class BaseChatStep(IChatStep):
     def get_stream_result(message_list: List[BaseMessage],
                           chat_model: BaseChatModel = None,
                           paragraph_list=None,
-                          no_references_setting=None):
+                          no_references_setting=None,
+                          problem_text=None):
         if paragraph_list is None:
             paragraph_list = []
         directly_return_chunk_list = [AIMessageChunk(content=paragraph.content)
@@ -153,7 +154,8 @@ class BaseChatStep(IChatStep):
             return iter(directly_return_chunk_list), False
         elif len(paragraph_list) == 0 and no_references_setting.get(
                 'status') == 'designated_answer':
-            return iter([AIMessageChunk(content=no_references_setting.get('value'))]), False
+            return iter(
+                [AIMessageChunk(content=no_references_setting.get('value').replace('{question}', problem_text))]), False
         if chat_model is None:
             return iter([AIMessageChunk('抱歉，没有配置 AI 模型，无法优化引用分段，请先去应用中设置 AI 模型。')]), False
         else:
@@ -170,7 +172,7 @@ class BaseChatStep(IChatStep):
                        client_id=None, client_type=None,
                        no_references_setting=None):
         chat_result, is_ai_chat = self.get_stream_result(message_list, chat_model, paragraph_list,
-                                                         no_references_setting)
+                                                         no_references_setting, problem_text)
         chat_record_id = uuid.uuid1()
         r = StreamingHttpResponse(
             streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
@@ -185,7 +187,8 @@ class BaseChatStep(IChatStep):
     def get_block_result(message_list: List[BaseMessage],
                          chat_model: BaseChatModel = None,
                          paragraph_list=None,
-                         no_references_setting=None):
+                         no_references_setting=None,
+                         problem_text=None):
         if paragraph_list is None:
             paragraph_list = []
 
@@ -196,7 +199,7 @@ class BaseChatStep(IChatStep):
             return directly_return_chunk_list[0], False
         elif len(paragraph_list) == 0 and no_references_setting.get(
                 'status') == 'designated_answer':
-            return AIMessage(no_references_setting.get('value')), False
+            return AIMessage(no_references_setting.get('value').replace('{question}', problem_text)), False
         if chat_model is None:
             return AIMessage('抱歉，没有配置 AI 模型，无法优化引用分段，请先去应用中设置 AI 模型。'), False
         else:
@@ -215,7 +218,7 @@ class BaseChatStep(IChatStep):
         # 调用模型
         try:
             chat_result, is_ai_chat = self.get_block_result(message_list, chat_model, paragraph_list,
-                                                            no_references_setting)
+                                                            no_references_setting, problem_text)
             if is_ai_chat:
                 request_token = chat_model.get_num_tokens_from_messages(message_list)
                 response_token = chat_model.get_num_tokens(chat_result.content)
