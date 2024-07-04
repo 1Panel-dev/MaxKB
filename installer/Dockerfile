@@ -39,7 +39,7 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_DB_PORT=5432  \
     MAXKB_DB_USER=root \
     MAXKB_DB_PASSWORD=Password123@postgres \
-    MAXKB_EMBEDDING_MODEL_NAME=/opt/maxkb/model/embedding/shibing624_text2vec-base-chinese \
+    MAXKB_EMBEDDING_MODEL_NAME=/opt/maxkb/model/embedding/BAAI_bge-m3 \
     MAXKB_EMBEDDING_MODEL_PATH=/opt/maxkb/model/embedding
 
 WORKDIR /opt/maxkb/app

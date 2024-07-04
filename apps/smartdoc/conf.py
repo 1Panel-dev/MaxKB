@@ -82,7 +82,7 @@ class Config(dict):
         "DB_PASSWORD": "Password123@postgres",
         "DB_ENGINE": "django.db.backends.postgresql_psycopg2",
         # 向量模型
-        "EMBEDDING_MODEL_NAME": "shibing624/text2vec-base-chinese",
+        "EMBEDDING_MODEL_NAME": "BAAI/bge-m3",
         "EMBEDDING_DEVICE": "cpu",
         "EMBEDDING_MODEL_PATH": os.path.join(PROJECT_DIR, 'models'),
         # 向量库配置
