@@ -40,3 +40,11 @@ class UploadedImageField(serializers.ImageField):
 
     def to_representation(self, value):
         return value
+
+
+class UploadedFileField(serializers.FileField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        return value

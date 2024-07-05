@@ -55,5 +55,7 @@ urlpatterns = [
     path('dataset/<str:dataset_id>/problem/<str:problem_id>', views.Problem.Operate.as_view()),
     path('dataset/<str:dataset_id>/problem/<str:problem_id>/paragraph', views.Problem.Paragraph.as_view()),
     path('image/<str:image_id>', views.Image.Operate.as_view()),
-    path('image', views.Image.as_view())
+    path('image', views.Image.as_view()),
+    path('file/<str:file_id>', views.FileView.Operate.as_view()),
+    path('file', views.FileView.as_view())
 ]
