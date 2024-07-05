@@ -1,3 +1,12 @@
+@font-face {
+  font-family: AlibabaPuHuiTi;
+  src:
+    url('./font/AlibabaPuHuiTi-3-55-Regular.woff') format('woff'),
+    url('./font/AlibabaPuHuiTi-3-55-Regular.ttf') format('truetype'),
+    url('./font/AlibabaPuHuiTi-3-55-Regular.eot') format('eot'),
+    url('./font/AlibabaPuHuiTi-3-55-Regular.otf') format('opentype'),
+    url('./font/AlibabaPuHuiTi-3-55-Regular.woff2') format('woff2');
+}
 * {
   margin: 0;
   padding: 0;
@@ -11,8 +20,7 @@ html {
 body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, 'Hiragino Sans GB', 'Microsoft YaHei',
-    '微软雅黑', Arial, sans-serif;
+  font-family: 'PingFang SC', AlibabaPuHuiTi !important;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
@@ -357,16 +365,6 @@ h5 {
     content: '';
     background: var(--el-color-primary);
   }
-}
-
-.app-logo-font {
-  background: var(--app-logo-color);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-family: Arial Black;
-  font-style: normal;
-  font-weight: 900;
 }
 
 /* tag */
