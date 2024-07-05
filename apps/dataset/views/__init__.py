@@ -11,3 +11,4 @@ from .document import *
 from .paragraph import *
 from .problem import *
 from .image import *
+from .file import *

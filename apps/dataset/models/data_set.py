@@ -10,6 +10,7 @@ import uuid
 
 from django.db import models
 
+from common.db.sql_execute import select_one
 from common.mixins.app_model_mixin import AppModelMixin
 from users.models import User
 
@@ -123,3 +124,26 @@ class Image(AppModelMixin):
 
     class Meta:
         db_table = "image"
+
+
+class File(AppModelMixin):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
+
+    file_name = models.CharField(max_length=256, verbose_name="文件名称", default="")
+
+    loid = models.IntegerField(verbose_name="loid")
+
+    class Meta:
+        db_table = "file"
+
+    def save(
+            self, bytea=None, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        result = select_one("SELECT lo_from_bytea(%s, %s::bytea) as loid", [0, bytea])
+        self.loid = result['loid']
+        self.file_name = 'speech.mp3'
+        super().save()
+
+    def get_byte(self):
+        result = select_one(f'SELECT lo_get({self.loid}) as "data"', [])
+        return result['data']
