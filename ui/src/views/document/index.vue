@@ -140,7 +140,7 @@
               {{ datetimeFormat(row.update_time) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="left" width="110">
+          <el-table-column label="操作" align="left" width="110" fixed="right">
             <template #default="{ row }">
               <div v-if="datasetDetail.type === '0'">
                 <span class="mr-4">

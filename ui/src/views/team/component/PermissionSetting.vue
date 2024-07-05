@@ -28,7 +28,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="管理" align="center" width="60">
+      <el-table-column label="管理" align="center" width="60" fixed="right">
         <!-- <template #header>
         <el-checkbox
           v-model="allChecked[MANAGE]"
@@ -44,7 +44,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="使用" align="center" width="60">
+      <el-table-column label="使用" align="center" width="60" fixed="right">
         <!-- <template #header>
         <el-checkbox
           v-model="allChecked[USE]"
