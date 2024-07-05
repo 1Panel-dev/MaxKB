@@ -24,10 +24,13 @@ class EmbeddingModel:
             model_name = CONFIG.get('EMBEDDING_MODEL_NAME')
             cache_folder = CONFIG.get('EMBEDDING_MODEL_PATH')
             device = CONFIG.get('EMBEDDING_DEVICE')
+            encode_kwargs = {'normalize_embeddings': True}
             e = HuggingFaceEmbeddings(
                 model_name=model_name,
                 cache_folder=cache_folder,
-                model_kwargs={'device': device})
+                model_kwargs={'device': device},
+                encode_kwargs=encode_kwargs,
+            )
             EmbeddingModel.instance = e
         return EmbeddingModel.instance
 
