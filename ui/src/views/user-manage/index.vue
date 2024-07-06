@@ -43,7 +43,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="110" align="left">
+        <el-table-column label="操作" width="110" align="left" fixed="right">
           <template #default="{ row }">
             <span class="mr-4">
               <el-tooltip effect="dark" content="编辑" placement="top">

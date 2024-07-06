@@ -70,7 +70,7 @@
               {{ datetimeFormat(row.update_time) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="left">
+          <el-table-column label="操作" align="left" fixed="right">
             <template #default="{ row }">
               <div>
                 <span class="mr-4">
