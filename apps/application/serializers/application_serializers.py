@@ -32,6 +32,7 @@ from common.db.search import get_dynamics_model, native_search, native_page_sear
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed
 from common.field.common import UploadedImageField
+from common.util.common import valid_license
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from dataset.models import DataSet, Document, Image
@@ -329,6 +330,8 @@ class ApplicationSerializer(serializers.Serializer):
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
+        @valid_license(model=Application, count=5,
+                       message='社区版最多支持 5 个应用，如需拥有更多应用，请联系我们（https://fit2cloud.com/）。')
         @transaction.atomic
         def insert(self, application: Dict):
             application_type = application.get('type')
