@@ -18,5 +18,10 @@ class ValidApi(ApiMixin):
                                   in_=openapi.IN_PATH,
                                   type=openapi.TYPE_STRING,
                                   required=True,
-                                  description='校验类型:application|dataset|user')
+                                  description='校验类型:application|dataset|user'),
+                openapi.Parameter(name='valid_count',
+                                  in_=openapi.IN_PATH,
+                                  type=openapi.TYPE_STRING,
+                                  required=True,
+                                  description='校验数量')
                 ]

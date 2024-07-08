@@ -34,14 +34,17 @@ class ValidSerializer(serializers.Serializer):
         validators.RegexValidator(regex=re.compile("^application|dataset|user$"),
                                   message="类型只支持:application|dataset|user", code=500)
     ])
+    valid_count = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("校验数量"))
 
     def valid(self, is_valid=True):
         if is_valid:
             self.is_valid(raise_exception=True)
         model_value = model_message_dict.get(self.data.get('valid_type'))
-        if (not (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                            'XPACK_LICENSE_IS_VALID') else None)
-                and QuerySet(
-                    model_value.get('model')).count() >= model_value.get('count')):
-            raise AppApiException(400, model_value.get('message'))
+        if not (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
+                                                           'XPACK_LICENSE_IS_VALID') else None):
+            if self.data.get('valid_count') != model_value.get('count'):
+                raise AppApiException(400, model_value.get('message'))
+            if QuerySet(
+                    model_value.get('model')).count() >= model_value.get('count'):
+                raise AppApiException(400, model_value.get('message'))
         return True

@@ -28,5 +28,5 @@ class Valid(APIView):
                          responses=result.get_default_response()
         , tags=["校验"])
     @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-    def get(self, request: Request, valid_type: str):
-        return result.success(ValidSerializer(data={'valid_type': valid_type}).valid())
+    def get(self, request: Request, valid_type: str, valid_count: int):
+        return result.success(ValidSerializer(data={'valid_type': valid_type, 'valid_count': valid_count}).valid())
