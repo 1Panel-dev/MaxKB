@@ -45,8 +45,9 @@ class SystemSerializer(ApiMixin, serializers.Serializer):
     @staticmethod
     def get_profile():
         version = os.environ.get('MAXKB_VERSION')
-        return {'version': version, 'XPACK_LICENSE_IS_VALID': (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                                                          'XPACK_LICENSE_IS_VALID') else False)}
+        return {'version': version, 'IS_XPACK': hasattr(settings, 'XPACK_LICENSE_IS_VALID'),
+                'XPACK_LICENSE_IS_VALID': (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
+                                                                                      'XPACK_LICENSE_IS_VALID') else False)}
 
     @staticmethod
     def get_response_body_api():
@@ -177,8 +178,8 @@ class RegisterSerializer(ApiMixin, serializers.Serializer):
 
         return True
 
-    @valid_license(model=User, count=1,
-                   message='社区版最多支持 1 个用户，如需拥有更多用户，请联系我们（https://fit2cloud.com/）。')
+    @valid_license(model=User, count=2,
+                   message='社区版最多支持 2 个用户，如需拥有更多用户，请联系我们（https://fit2cloud.com/）。')
     @transaction.atomic
     def save(self, **kwargs):
         m = User(
@@ -686,8 +687,8 @@ class UserManageSerializer(serializers.Serializer):
             if self.data.get('password') != self.data.get('re_password'):
                 raise ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.to_app_api_exception()
 
-    @valid_license(model=User, count=1,
-                   message='社区版最多支持 1 个用户，如需拥有更多用户，请联系我们（https://fit2cloud.com/）。')
+    @valid_license(model=User, count=2,
+                   message='社区版最多支持 2 个用户，如需拥有更多用户，请联系我们（https://fit2cloud.com/）。')
     @transaction.atomic
     def save(self, instance, with_valid=True):
         if with_valid:
