@@ -7,14 +7,13 @@
     @desc:  认证类
 """
 import traceback
+from importlib import import_module
 
+from django.conf import settings
 from django.core import cache
 from django.core import signing
 from rest_framework.authentication import TokenAuthentication
 
-from common.auth.handle.impl.application_key import ApplicationKey
-from common.auth.handle.impl.public_access_token import PublicAccessToken
-from common.auth.handle.impl.user_token import UserToken
 from common.exception.app_exception import AppAuthenticationFailed, AppEmbedIdentityFailed, AppChatNumOutOfBoundsFailed
 
 token_cache = cache.caches['token_cache']
@@ -25,7 +24,16 @@ class AnonymousAuthentication(TokenAuthentication):
         return None, None
 
 
-handles = [UserToken(), PublicAccessToken(), ApplicationKey()]
+def new_instance_by_class_path(class_path: str):
+    parts = class_path.rpartition('.')
+    package_path = parts[0]
+    class_name = parts[2]
+    module = import_module(package_path)
+    HandlerClass = getattr(module, class_name)
+    return HandlerClass()
+
+
+handles = [new_instance_by_class_path(class_path) for class_path in settings.AUTH_HANDLES]
 
 
 class TokenDetails:
