@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer header="邮箱设置">
+  <LayoutContainer header="邮箱配置">
     <div class="email-setting main-calc-height">
       <el-scrollbar>
         <div class="p-24" v-loading="loading">
