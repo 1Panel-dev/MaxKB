@@ -54,17 +54,55 @@ const settingRouter = {
       component: () => import('@/views/template/index.vue')
     },
     {
-      path: '/email',
-      name: 'email',
+      path: '/system',
+      name: 'system',
       meta: {
-        icon: 'Message',
-        title: '邮箱设置',
+        icon: 'app-setting',
+        iconActive: 'app-setting-active',
+        title: '系统设置',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting',
         permission: new Role('ADMIN')
       },
-      component: () => import('@/views/email/index.vue')
+      children: [
+        {
+          path: '/system/theme',
+          name: 'theme',
+          meta: {
+            title: '外观设置',
+            activeMenu: '/setting',
+            parentPath: '/setting',
+            parentName: 'setting',
+            permission: new Role('ADMIN')
+          },
+          component: () => import('@/views/theme/index.vue')
+        },
+        {
+          path: '/system/authentication',
+          name: 'authentication',
+          meta: {
+            title: '登录认证',
+            activeMenu: '/setting',
+            parentPath: '/setting',
+            parentName: 'setting',
+            permission: new Role('ADMIN')
+          },
+          component: () => import('@/views/authentication/index.vue')
+        },
+        {
+          path: '/system/email',
+          name: 'email',
+          meta: {
+            title: '邮箱配置',
+            activeMenu: '/setting',
+            parentPath: '/setting',
+            parentName: 'setting',
+            permission: new Role('ADMIN')
+          },
+          component: () => import('@/views/email/index.vue')
+        }
+      ]
     }
   ]
 }

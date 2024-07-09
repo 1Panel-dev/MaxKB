@@ -1,6 +1,27 @@
 <template>
   <div v-if="(!menu.meta || !menu.meta.hidden) && showMenu()" class="sidebar-item">
+    <el-sub-menu
+      v-if="menu?.children && menu?.children.length > 0"
+      :index="menu.path"
+      popper-class="sidebar-container-popper"
+    >
+      <template #title>
+        <el-icon>
+          <AppIcon v-if="menu.meta && menu.meta.icon" :iconName="menuIcon" class="sidebar-icon" />
+        </el-icon>
+        <span>{{ menu.meta?.title as string }}</span>
+      </template>
+      <sidebar-item
+        v-hasPermission="menu.meta?.permission"
+        v-for="(child, index) in menu?.children"
+        :key="index"
+        :menu="child"
+        :activeMenu="activeMenu"
+      >
+      </sidebar-item>
+    </el-sub-menu>
     <el-menu-item
+      v-else
       ref="subMenu"
       :index="menu.path"
       popper-class="sidebar-popper"
@@ -66,7 +87,18 @@ const menuIcon = computed(() => {
       color: var(--el-menu-active-color);
     }
   }
-
+  :deep(.el-sub-menu__title) {
+    padding: 13px 12px 13px 16px !important;
+    &:hover {
+      background: none;
+      color: var(--el-menu-active-color);
+    }
+  }
+  .el-sub-menu {
+    .el-menu-item {
+      padding-left: 43px !important;
+    }
+  }
   .el-menu-item.is-active {
     color: var(--el-menu-active-color);
     background: var(--el-color-primary-light-9);
