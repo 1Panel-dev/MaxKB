@@ -17,6 +17,7 @@ urlpatterns = [
     path('model', views.Model.as_view(), name='model'),
     path('model/<str:model_id>', views.Model.Operate.as_view(), name='model/operate'),
     path('model/<str:model_id>/meta', views.Model.ModelMeta.as_view(), name='model/operate/meta'),
-    path('email_setting', views.SystemSetting.Email.as_view(), name='email_setting')
+    path('email_setting', views.SystemSetting.Email.as_view(), name='email_setting'),
+    path('valid/<str:valid_type>/<int:valid_count>', views.Valid.as_view())
 
 ]

@@ -66,7 +66,7 @@
         <el-button @click.prevent="dialogVisible = false">
           {{ $t('views.application.applicationForm.buttons.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitHandle(applicationFormRef)">
+        <el-button type="primary" @click="submitValid(applicationFormRef)">
           {{ $t('views.application.applicationForm.buttons.create') }}
         </el-button>
       </span>
@@ -79,9 +79,13 @@ import { useRouter, useRoute } from 'vue-router'
 import type { ApplicationFormType } from '@/api/type/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application'
-import { MsgSuccess } from '@/utils/message'
+import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { isWorkFlow } from '@/utils/application'
 import { t } from '@/locales'
+import useStore from '@/stores'
+import { ValidType, ValidCount } from '@/enums/common'
+
+const { common, user } = useStore()
 const router = useRouter()
 const emit = defineEmits(['refresh'])
 
@@ -169,6 +173,24 @@ const open = () => {
   dialogVisible.value = true
 }
 
+const submitValid = (formEl: FormInstance | undefined) => {
+  if (user.isEnterprise()) {
+    submitHandle(formEl)
+  } else {
+    common
+      .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
+      .then(async (res: any) => {
+        if (res?.data?.data) {
+          submitHandle(formEl)
+        } else {
+          MsgAlert(
+            '提示',
+            '社区版最多支持 5 个应用，如需拥有更多应用，请联系我们（https://fit2cloud.com/）。'
+          )
+        }
+      })
+  }
+}
 const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {

@@ -23,6 +23,8 @@ interface User {
    * 是否需要修改密码
    */
   is_edit_password?: boolean
+  IS_XPACK?: boolean
+  XPACK_LICENSE_IS_VALID?: boolean
 }
 
 interface LoginRequest {

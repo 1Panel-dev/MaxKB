@@ -36,6 +36,14 @@ export const MsgError = (message: string) => {
   })
 }
 
+export const MsgAlert = (title: string, description: string, options?: any) => {
+  const defaultOptions: Object = {
+    confirmButtonText: '确定',
+    ...options
+  }
+  return ElMessageBox.alert(description, title, defaultOptions)
+}
+
 /**
  * 删除知识库
  * @param 参数 message: {title, description,type}

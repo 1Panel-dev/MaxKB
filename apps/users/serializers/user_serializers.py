@@ -12,6 +12,7 @@ import random
 import re
 import uuid
 
+from django.conf import settings
 from django.core import validators, signing, cache
 from django.core.mail import send_mail
 from django.core.mail.backends.smtp import EmailBackend
@@ -29,6 +30,7 @@ from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.response.result import get_api_response
+from common.util.common import valid_license
 from common.util.field_message import ErrMessage
 from common.util.lock import lock
 from dataset.models import DataSet, Document, Paragraph, Problem, ProblemParagraphMapping
@@ -43,7 +45,9 @@ class SystemSerializer(ApiMixin, serializers.Serializer):
     @staticmethod
     def get_profile():
         version = os.environ.get('MAXKB_VERSION')
-        return {'version': version}
+        return {'version': version, 'IS_XPACK': hasattr(settings, 'XPACK_LICENSE_IS_VALID'),
+                'XPACK_LICENSE_IS_VALID': (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
+                                                                                      'XPACK_LICENSE_IS_VALID') else False)}
 
     @staticmethod
     def get_response_body_api():
@@ -174,6 +178,8 @@ class RegisterSerializer(ApiMixin, serializers.Serializer):
 
         return True
 
+    @valid_license(model=User, count=2,
+                   message='社区版最多支持 2 个用户，如需拥有更多用户，请联系我们（https://fit2cloud.com/）。')
     @transaction.atomic
     def save(self, **kwargs):
         m = User(
@@ -681,6 +687,8 @@ class UserManageSerializer(serializers.Serializer):
             if self.data.get('password') != self.data.get('re_password'):
                 raise ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.to_app_api_exception()
 
+    @valid_license(model=User, count=2,
+                   message='社区版最多支持 2 个用户，如需拥有更多用户，请联系我们（https://fit2cloud.com/）。')
     @transaction.atomic
     def save(self, instance, with_valid=True):
         if with_valid:

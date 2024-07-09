@@ -83,9 +83,13 @@
 import { ref, onMounted, reactive } from 'vue'
 import UserDialog from './component/UserDialog.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess, MsgConfirm, MsgAlert } from '@/utils/message'
 import userApi from '@/api/user-manage'
 import { datetimeFormat } from '@/utils/time'
+import useStore from '@/stores'
+import { ValidType, ValidCount } from '@/enums/common'
+
+const { common, user } = useStore()
 
 const UserDialogRef = ref()
 const UserPwdDialogRef = ref()
@@ -127,8 +131,22 @@ function editUser(row: any) {
 }
 
 function createUser() {
-  title.value = '创建用户'
-  UserDialogRef.value.open()
+  if (user.isEnterprise()) {
+    title.value = '创建用户'
+    UserDialogRef.value.open()
+  } else {
+    common.asyncGetValid(ValidType.User, ValidCount.User, loading).then((res: any) => {
+      if (res?.data?.data) {
+        title.value = '创建用户'
+        UserDialogRef.value.open()
+      } else {
+        MsgAlert(
+          '提示',
+          '社区版最多支持 2 个用户，如需拥有更多用户，请联系我们（https://fit2cloud.com/）。'
+        )
+      }
+    })
+  }
 }
 
 function deleteUserManage(row: any) {
