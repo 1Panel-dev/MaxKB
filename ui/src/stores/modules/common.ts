@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
-import { DeviceType } from '@/enums/common'
+import { DeviceType, ValidType } from '@/enums/common'
+import type { Ref } from 'vue'
+import userApi from '@/api/user'
 
 export interface commonTypes {
   breadcrumb: any
@@ -32,6 +34,18 @@ const useCommonStore = defineStore({
     },
     isMobile() {
       return this.device === DeviceType.Mobile
+    },
+    async asyncGetValid(valid_type: ValidType, valid_count: number, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        userApi
+          .getValid(valid_type, valid_count, loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   }
 })

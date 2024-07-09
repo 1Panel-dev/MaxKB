@@ -8,6 +8,7 @@ export interface userStateTypes {
   token: any
   version?: string
   accessToken?: string
+  isXPack: false
 }
 
 const useUserStore = defineStore({
@@ -16,9 +17,13 @@ const useUserStore = defineStore({
     userType: 1,
     userInfo: null,
     token: '',
-    version: ''
+    version: '',
+    isXPack: false
   }),
   actions: {
+    isEnterprise() {
+      return this.userInfo?.IS_XPACK && this.userInfo?.XPACK_LICENSE_IS_VALID
+    },
     getToken(): String | null {
       if (this.token) {
         return this.token

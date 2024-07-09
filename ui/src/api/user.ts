@@ -131,6 +131,19 @@ const getVersion: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) =
   return get('/profile', undefined, loading)
 }
 
+/**
+ * 获取校验
+ * @param valid_type 校验类型: application|dataset|user
+ * @param valid_count 校验数量: 5 | 50 | 2
+ */
+const getValid: (
+  valid_type: string,
+  valid_count: number,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (valid_type, valid_count, loading) => {
+  return get(`/valid/${valid_type}/${valid_count}`, undefined, loading)
+}
+
 export default {
   login,
   register,
@@ -142,5 +155,6 @@ export default {
   resetCurrentUserPassword,
   logout,
   getUserList,
-  getVersion
+  getVersion,
+  getValid
 }
