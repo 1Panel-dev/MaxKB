@@ -23,6 +23,9 @@
         <el-dropdown-item class="border-t p-8" @click="openResetPassword">
           {{ $t("layout.topbar.avatar.resetPassword") }}
         </el-dropdown-item>
+         <el-dropdown-item class="border-t p-8" @click="openAPIKeyDialog">
+          {{ $t("layout.topbar.avatar.apiKey") }}
+        </el-dropdown-item>
         <el-dropdown-item class="border-t" @click="openAbout"> {{ $t("layout.topbar.avatar.about") }} </el-dropdown-item>
         <el-dropdown-item class="border-t" @click="logout"> {{ $t("layout.topbar.avatar.logout") }} </el-dropdown-item>
       </el-dropdown-menu>
@@ -30,6 +33,7 @@
   </el-dropdown>
   <ResetPassword ref="resetPasswordRef"></ResetPassword>
   <AboutDialog ref="AboutDialogRef"></AboutDialog>
+  <APIKeyDialog :user-id="user.userInfo?.id" ref="APIKeyDialogRef" />
   <UserPwdDialog ref="UserPwdDialogRef" />
 </template>
 <script setup lang="ts">
@@ -39,15 +43,20 @@ import { useRouter } from 'vue-router'
 import ResetPassword from './ResetPassword.vue'
 import AboutDialog from './AboutDialog.vue'
 import UserPwdDialog from '@/views/user-manage/component/UserPwdDialog.vue'
+import APIKeyDialog from "./APIKeyDialog.vue";
 const { user } = useStore()
 const router = useRouter()
 
 const UserPwdDialogRef = ref()
 const AboutDialogRef = ref()
+const APIKeyDialogRef = ref()
 const resetPasswordRef = ref<InstanceType<typeof ResetPassword>>()
 
 const openAbout = () => {
   AboutDialogRef.value?.open()
+}
+function openAPIKeyDialog() {
+  APIKeyDialogRef.value.open()
 }
 
 const openResetPassword = () => {
