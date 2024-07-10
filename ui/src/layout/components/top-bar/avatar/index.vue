@@ -21,13 +21,19 @@
           </p>
         </div>
         <el-dropdown-item class="border-t p-8" @click="openResetPassword">
-          {{ $t("layout.topbar.avatar.resetPassword") }}
+          {{ $t('layout.topbar.avatar.resetPassword') }}
         </el-dropdown-item>
-         <el-dropdown-item class="border-t p-8" @click="openAPIKeyDialog">
-          {{ $t("layout.topbar.avatar.apiKey") }}
+        <div v-hasPermission="new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')">
+          <el-dropdown-item class="border-t p-8" @click="openAPIKeyDialog">
+            {{ $t('layout.topbar.avatar.apiKey') }}
+          </el-dropdown-item>
+        </div>
+        <el-dropdown-item class="border-t" @click="openAbout">
+          {{ $t('layout.topbar.avatar.about') }}
         </el-dropdown-item>
-        <el-dropdown-item class="border-t" @click="openAbout"> {{ $t("layout.topbar.avatar.about") }} </el-dropdown-item>
-        <el-dropdown-item class="border-t" @click="logout"> {{ $t("layout.topbar.avatar.logout") }} </el-dropdown-item>
+        <el-dropdown-item class="border-t" @click="logout">
+          {{ $t('layout.topbar.avatar.logout') }}
+        </el-dropdown-item>
       </el-dropdown-menu>
     </template>
   </el-dropdown>
@@ -43,7 +49,8 @@ import { useRouter } from 'vue-router'
 import ResetPassword from './ResetPassword.vue'
 import AboutDialog from './AboutDialog.vue'
 import UserPwdDialog from '@/views/user-manage/component/UserPwdDialog.vue'
-import APIKeyDialog from "./APIKeyDialog.vue";
+import APIKeyDialog from './APIKeyDialog.vue'
+import { ComplexPermission } from '@/utils/permission/type'
 const { user } = useStore()
 const router = useRouter()
 
