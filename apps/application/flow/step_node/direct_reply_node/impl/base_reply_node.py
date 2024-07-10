@@ -65,10 +65,10 @@ class BaseReplyNode(IReplyNode):
         else:
             result = self.generate_reply_content(content)
         if stream:
-            return NodeResult({'result': iter([AIMessageChunk(content=result)])}, {},
+            return NodeResult({'result': iter([AIMessageChunk(content=result)]), 'answer': result}, {},
                               _to_response=to_stream_response)
         else:
-            return NodeResult({'result': AIMessage(content=result)}, {}, _to_response=to_response)
+            return NodeResult({'result': AIMessage(content=result), 'answer': result}, {}, _to_response=to_response)
 
     def generate_reply_content(self, prompt):
         return self.workflow_manage.generate_prompt(prompt)
