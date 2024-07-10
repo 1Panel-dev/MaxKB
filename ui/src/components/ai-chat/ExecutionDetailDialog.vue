@@ -53,7 +53,11 @@
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.paragraph_list?.length > 0">
                           <template
-                            v-for="(paragraph, paragraphIndex) in item.paragraph_list"
+                            v-for="(paragraph, paragraphIndex) in arraySort(
+                              item.paragraph_list,
+                              'similarity',
+                              true
+                            )"
                             :key="paragraphIndex"
                           >
                             <ParagraphCard :data="paragraph" :index="paragraphIndex" />

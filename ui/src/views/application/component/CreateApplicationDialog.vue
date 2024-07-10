@@ -180,7 +180,7 @@ const submitValid = (formEl: FormInstance | undefined) => {
     common
       .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
       .then(async (res: any) => {
-        if (res?.data?.data) {
+        if (res?.data) {
           submitHandle(formEl)
         } else {
           MsgAlert(
