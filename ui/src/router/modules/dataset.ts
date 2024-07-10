@@ -1,8 +1,9 @@
-import Layout from '@/layout/main-layout/index.vue'
+import Layout from '@/layout/layout-template/DetailLayout.vue'
 const datasetRouter = {
   path: '/dataset',
   name: 'dataset',
   meta: { title: '知识库', permission: 'DATASET:READ' },
+  component: () => import('@/layout/layout-template/AppLayout.vue'),
   redirect: '/dataset',
   children: [
     {

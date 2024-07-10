@@ -5,11 +5,11 @@
       <template v-for="(item, index) in tabList" :key="index">
         <el-tab-pane :label="item.label" :name="item.name">
           <div class="authentication-setting__main main-calc-height">
-            <div class="form-container">
-              <el-scrollbar>
+            <el-scrollbar>
+              <div class="form-container">
                 <component :is="item.component" />
-              </el-scrollbar>
-            </div>
+              </div>
+            </el-scrollbar>
           </div>
         </el-tab-pane>
       </template>
