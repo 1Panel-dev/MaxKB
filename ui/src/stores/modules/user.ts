@@ -23,6 +23,9 @@ const useUserStore = defineStore({
     isXPack: false
   }),
   actions: {
+    isExpire() {
+      return this.isXPack && !this.XPACK_LICENSE_IS_VALID
+    },
     isEnterprise() {
       return this.isXPack && this.XPACK_LICENSE_IS_VALID
     },

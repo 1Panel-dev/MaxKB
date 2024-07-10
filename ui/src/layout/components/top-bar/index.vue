@@ -1,5 +1,13 @@
 ·
 <template>
+  <el-alert
+    v-if="user.isExpire()"
+    title="未上传 License 或 License 已过期。"
+    type="warning"
+    class="border-b"
+    show-icon
+    :closable="false"
+  />
   <div class="top-bar-container border-b flex-between">
     <div class="flex-center h-full">
       <div class="app-title-container cursor" @click="router.push('/')">
@@ -63,8 +71,10 @@ import Avatar from './avatar/index.vue'
 import { useRouter } from 'vue-router'
 import { langList } from '@/locales/index'
 import { useLocale } from '@/locales/useLocale'
+import useStore from '@/stores'
 const router = useRouter()
-const defaultTitle = import.meta.env.VITE_APP_TITLE
+
+const { user } = useStore()
 
 const { changeLocale } = useLocale()
 const changeLang = (lang: string) => {

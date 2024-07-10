@@ -361,3 +361,13 @@
     line-height: 30px;
   }
 }
+
+// 提示横幅
+.el-alert--warning.is-light {
+  background-color: #ffe7cc;
+  color: var(--app-text-color);
+  font-weight: 400;
+  .el-alert__icon {
+    color: #ff8800;
+  }
+}
