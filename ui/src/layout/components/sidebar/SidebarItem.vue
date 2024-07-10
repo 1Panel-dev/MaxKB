@@ -12,7 +12,7 @@
         <span>{{ menu.meta?.title as string }}</span>
       </template>
       <sidebar-item
-        v-hasPermission="menu.meta?.permission"
+        v-hasPermission="child.meta?.permission"
         v-for="(child, index) in menu?.children"
         :key="index"
         :menu="child"
