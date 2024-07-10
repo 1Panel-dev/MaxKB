@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { TopBar, Sidebar, AppMain } from '../components'
+import {  Sidebar, AppMain } from '../components'
 </script>
 <style lang="scss">
 .sidebar-container {
