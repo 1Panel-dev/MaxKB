@@ -8,6 +8,7 @@ export interface userStateTypes {
   token: any
   version?: string
   accessToken?: string
+  XPACK_LICENSE_IS_VALID: false
   isXPack: false
 }
 
@@ -18,11 +19,12 @@ const useUserStore = defineStore({
     userInfo: null,
     token: '',
     version: '',
+    XPACK_LICENSE_IS_VALID: false,
     isXPack: false
   }),
   actions: {
     isEnterprise() {
-      return this.userInfo?.IS_XPACK && this.userInfo?.XPACK_LICENSE_IS_VALID
+      return this.isXPack && this.XPACK_LICENSE_IS_VALID
     },
     getToken(): String | null {
       if (this.token) {
@@ -40,7 +42,9 @@ const useUserStore = defineStore({
 
     getPermissions() {
       if (this.userInfo) {
-        return this.userInfo?.permissions
+        return this.isXPack && this.XPACK_LICENSE_IS_VALID
+          ? [...this.userInfo?.permissions, 'x-pack']
+          : this.userInfo?.permissions
       } else {
         return []
       }
@@ -59,6 +63,8 @@ const useUserStore = defineStore({
     async asyncGetVersion() {
       return UserApi.getVersion().then((ok) => {
         this.version = ok.data?.version || '-'
+        this.isXPack = ok.data?.IS_XPACK
+        this.XPACK_LICENSE_IS_VALID = ok.data?.XPACK_LICENSE_IS_VALID
       })
     },
 
