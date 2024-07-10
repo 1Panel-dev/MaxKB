@@ -12,7 +12,7 @@ import { TopBar, AppMain } from '../components'
     </div>
   </div>
 </template>
-<style lang="scss" scoped>
+<style lang="scss">
 .app-layout {
   background-color: var(--app-layout-bg-color);
   height: 100%;

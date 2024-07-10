@@ -1,5 +1,5 @@
 import { hasPermission } from '@/utils/permission/index'
-import Layout from '@/layout/main-layout/index.vue'
+import Layout from '@/layout/layout-template/SystemLayout.vue'
 import { Role } from '@/utils/permission/type'
 const settingRouter = {
   path: '/setting',
