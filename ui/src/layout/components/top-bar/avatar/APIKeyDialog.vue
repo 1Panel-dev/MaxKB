@@ -1,16 +1,18 @@
 <template>
   <el-dialog :title="$t('layout.topbar.avatar.apiKey')" v-model="dialogVisible" width="800">
-    <div class="mb-16 grey-background">
-      <el-text type="info">{{ $t('layout.topbar.avatar.apiServiceAddress') }}</el-text>
+    <el-card shadow="never" class="layout-bg mb-16">
+      <el-text type="info" class="color-secondary">{{
+        $t('layout.topbar.avatar.apiServiceAddress')
+      }}</el-text>
       <p style="margin-top: 10px">
-        <a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all" style="color: black;">
+        <span class="vertical-middle lighter break-all">
           {{ apiUrl }}
-        </a>
+        </span>
         <el-button type="primary" text @click="copyClick(apiUrl)">
           <AppIcon iconName="app-copy"></AppIcon>
         </el-button>
       </p>
-    </div>
+    </el-card>
 
     <el-button type="primary" class="mb-16" @click="createApiKey">
       {{ $t('views.applicationOverview.appInfo.APIKeyDialog.creatApiKey') }}
@@ -27,78 +29,78 @@
         </template>
       </el-table-column>
       <el-table-column
-          :label="$t('views.applicationOverview.appInfo.APIKeyDialog.status')"
-          width="60"
+        :label="$t('views.applicationOverview.appInfo.APIKeyDialog.status')"
+        width="60"
       >
         <template #default="{ row }">
           <div @click.stop>
-            <el-switch size="small" v-model="row.is_active" @change="changeState($event, row)"/>
+            <el-switch size="small" v-model="row.is_active" @change="changeState($event, row)" />
           </div>
         </template>
       </el-table-column>
       <el-table-column
-          prop="name"
-          :label="$t('views.applicationOverview.appInfo.APIKeyDialog.creationDate')"
-          width="170"
+        prop="name"
+        :label="$t('views.applicationOverview.appInfo.APIKeyDialog.creationDate')"
+        width="170"
       >
         <template #default="{ row }">
           {{ datetimeFormat(row.create_time) }}
         </template>
       </el-table-column>
       <el-table-column
-          :label="$t('views.applicationOverview.appInfo.APIKeyDialog.operations')"
-          align="left"
-          width="80"
+        :label="$t('views.applicationOverview.appInfo.APIKeyDialog.operations')"
+        align="left"
+        width="80"
       >
         <template #default="{ row }">
-           <span class="mr-4">
+          <span class="mr-4">
             <el-tooltip
-                effect="dark"
-                :content="$t('views.applicationOverview.appInfo.APIKeyDialog.settings')"
-                placement="top"
+              effect="dark"
+              :content="$t('views.applicationOverview.appInfo.APIKeyDialog.settings')"
+              placement="top"
             >
               <el-button type="primary" text @click.stop="settingApiKey(row)">
-                <el-icon><Setting/></el-icon>
+                <el-icon><Setting /></el-icon>
               </el-button>
             </el-tooltip>
           </span>
           <el-tooltip
-              effect="dark"
-              :content="$t('views.applicationOverview.appInfo.APIKeyDialog.delete')"
-              placement="top"
+            effect="dark"
+            :content="$t('views.applicationOverview.appInfo.APIKeyDialog.delete')"
+            placement="top"
           >
             <el-button type="primary" text @click="deleteApiKey(row)">
               <el-icon>
-                <Delete/>
+                <Delete />
               </el-icon>
             </el-button>
           </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
-    <SettingAPIKeyDialog ref="SettingAPIKeyDialogRef" @refresh="refresh"/>
+    <SettingAPIKeyDialog ref="SettingAPIKeyDialogRef" @refresh="refresh" />
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref, watch} from 'vue'
-import {useRoute} from 'vue-router'
-import {copyClick} from '@/utils/clipboard'
-import overviewApi from '@/api/system-api-key'
-import {datetimeFormat} from '@/utils/time'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {t} from '@/locales'
-import SettingAPIKeyDialog from "./SettingAPIKeyDialog.vue";
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { copyClick } from '@/utils/clipboard'
+import systemKeyApi from '@/api/system-api-key'
+import { datetimeFormat } from '@/utils/time'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
+import SettingAPIKeyDialog from './SettingAPIKeyDialog.vue'
 
 const route = useRoute()
 const {
-  params: {id}
+  params: { id }
 } = route
 
 const props = defineProps({
   userId: {
     type: String,
     default: ''
-  },
+  }
 })
 const emit = defineEmits(['addData'])
 
@@ -107,7 +109,6 @@ const SettingAPIKeyDialogRef = ref()
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 const apiKey = ref<any>(null)
-
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -121,23 +122,22 @@ function settingApiKey(row: any) {
 
 function deleteApiKey(row: any) {
   MsgConfirm(
-      // @ts-ignore
-      `${t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm1')}: ${row.secret_key}?`,
-      t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm2'),
-      {
-        confirmButtonText: t('views.applicationOverview.appInfo.APIKeyDialog.confirmDelete'),
-        cancelButtonText: t('views.applicationOverview.appInfo.APIKeyDialog.cancel'),
-        confirmButtonClass: 'danger'
-      }
+    // @ts-ignore
+    `${t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm1')}: ${row.secret_key}?`,
+    t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm2'),
+    {
+      confirmButtonText: t('views.applicationOverview.appInfo.APIKeyDialog.confirmDelete'),
+      cancelButtonText: t('views.applicationOverview.appInfo.APIKeyDialog.cancel'),
+      confirmButtonClass: 'danger'
+    }
   )
-      .then(() => {
-        overviewApi.delAPIKey(row.id, loading).then(() => {
-          MsgSuccess(t('views.applicationOverview.appInfo.APIKeyDialog.deleteSuccess'))
-          getApiKeyList()
-        })
+    .then(() => {
+      systemKeyApi.delAPIKey(row.id, loading).then(() => {
+        MsgSuccess(t('views.applicationOverview.appInfo.APIKeyDialog.deleteSuccess'))
+        getApiKeyList()
       })
-      .catch(() => {
-      })
+    })
+    .catch(() => {})
 }
 
 function changeState(bool: Boolean, row: any) {
@@ -145,16 +145,16 @@ function changeState(bool: Boolean, row: any) {
     is_active: bool
   }
   const str = bool
-      ? t('views.applicationOverview.appInfo.APIKeyDialog.enabledSuccess')
-      : t('views.applicationOverview.appInfo.APIKeyDialog.disabledSuccess')
-  overviewApi.putAPIKey(row.id, obj, loading).then((res) => {
+    ? t('views.applicationOverview.appInfo.APIKeyDialog.enabledSuccess')
+    : t('views.applicationOverview.appInfo.APIKeyDialog.disabledSuccess')
+  systemKeyApi.putAPIKey(row.id, obj, loading).then((res) => {
     MsgSuccess(str)
     getApiKeyList()
   })
 }
 
 function createApiKey() {
-  overviewApi.postAPIKey(loading).then((res) => {
+  systemKeyApi.postAPIKey(loading).then((res) => {
     getApiKeyList()
   })
 }
@@ -165,7 +165,7 @@ const open = () => {
 }
 
 function getApiKeyList() {
-  overviewApi.getAPIKey().then((res) => {
+  systemKeyApi.getAPIKey().then((res) => {
     apiKey.value = res.data
   })
 }
@@ -174,12 +174,6 @@ function refresh() {
   getApiKeyList()
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
-<style lang="scss" scope>
-.grey-background {
-  background-color: #f2f2f2; /* 灰色背景 */
-  padding: 20px; /* 内边距 */
-  border-radius: 8px; /* 可选：添加圆角 */
-}
-</style>
+<style lang="scss" scope></style>
