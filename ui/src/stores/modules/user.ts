@@ -63,18 +63,25 @@ const useUserStore = defineStore({
       this.userType = num
     },
 
-    async asyncGetVersion() {
-      return UserApi.getVersion().then((ok) => {
-        this.version = ok.data?.version || '-'
-        this.isXPack = ok.data?.IS_XPACK
-        this.XPACK_LICENSE_IS_VALID = ok.data?.XPACK_LICENSE_IS_VALID
+    async asyncGetProfile() {
+      return new Promise((resolve, reject) => {
+        UserApi.getProfile()
+          .then((ok) => {
+            this.version = ok.data?.version || '-'
+            this.isXPack = ok.data?.IS_XPACK
+            this.XPACK_LICENSE_IS_VALID = ok.data?.XPACK_LICENSE_IS_VALID
+            resolve(ok)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
 
     async profile() {
       return UserApi.profile().then((ok) => {
         this.userInfo = ok.data
-        this.asyncGetVersion()
+        this.asyncGetProfile()
       })
     },
 

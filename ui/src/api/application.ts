@@ -135,7 +135,7 @@ const postAppAuthentication: (access_token: string, loading?: Ref<boolean>) => P
   "access_token": "string"
 }
  */
-const getProfile: (loading?: Ref<boolean>) => Promise<any> = (loading) => {
+const getAppProfile: (loading?: Ref<boolean>) => Promise<any> = (loading) => {
   return get(`${prefix}/profile`, undefined, loading)
 }
 
@@ -263,7 +263,7 @@ export default {
   getAccessToken,
   putAccessToken,
   postAppAuthentication,
-  getProfile,
+  getAppProfile,
   putChatVote,
   getApplicationHitTest,
   getApplicationModel,

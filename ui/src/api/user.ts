@@ -125,9 +125,9 @@ const getUserList: (email_or_username: string, loading?: Ref<boolean>) => Promis
 }
 
 /**
- * 获取version
+ * 获取profile
  */
-const getVersion: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+const getProfile: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
   return get('/profile', undefined, loading)
 }
 
@@ -155,6 +155,6 @@ export default {
   resetCurrentUserPassword,
   logout,
   getUserList,
-  getVersion,
+  getProfile,
   getValid
 }

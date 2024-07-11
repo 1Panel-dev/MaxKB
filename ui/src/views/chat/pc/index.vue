@@ -189,16 +189,16 @@ function getAccessToken(token: string) {
   application
     .asyncAppAuthentication(token, loading)
     .then(() => {
-      getProfile()
+      getAppProfile()
     })
     .catch(() => {
       applicationAvailable.value = false
     })
 }
 
-function getProfile() {
+function getAppProfile() {
   applicationApi
-    .getProfile(loading)
+    .getAppProfile(loading)
     .then((res) => {
       applicationDetail.value = res.data
       getChatLog(applicationDetail.value.id)
