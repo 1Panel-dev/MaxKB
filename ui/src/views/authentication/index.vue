@@ -1,6 +1,6 @@
 <template>
   <div class="authentication-setting p-24">
-    <h4>登录认证</h4>
+    <h4>{{$t('login.authentication')}}</h4>
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
       <template v-for="(item, index) in tabList" :key="index">
         <el-tab-pane :label="item.label" :name="item.name">
@@ -17,16 +17,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from 'vue'
-import emailApi from '@/api/email-setting'
-import type { FormInstance, FormRules } from 'element-plus'
-import { MsgSuccess } from '@/utils/message'
+import { ref, computed, onMounted } from 'vue'
 import LDAP from './component/LDAP.vue'
-
+import { t } from '@/locales'
 const activeName = ref('LDAP')
 const tabList = [
   {
-    label: 'LDAP设置',
+    label: t('login.ldap.title'),
     name: 'LDAP',
     component: LDAP
   }

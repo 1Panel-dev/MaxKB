@@ -85,8 +85,8 @@ const useUserStore = defineStore({
       })
     },
 
-    async login(username: string, password: string) {
-      return UserApi.login({ username, password }).then((ok) => {
+    async login(auth_type: string, username: string, password: string) {
+      return UserApi.login(auth_type, { username, password }).then((ok) => {
         this.token = ok.data
         localStorage.setItem('token', ok.data)
         return this.profile()
@@ -97,6 +97,11 @@ const useUserStore = defineStore({
       return UserApi.logout().then(() => {
         localStorage.removeItem('token')
         return true
+      })
+    },
+    async getAuthType() {
+      return UserApi.getAuthType().then((ok) => {
+        return ok.data
       })
     }
   }
