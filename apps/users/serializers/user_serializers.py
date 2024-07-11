@@ -78,7 +78,7 @@ class LoginSerializer(ApiMixin, serializers.Serializer):
         user = QuerySet(User).filter(Q(username=username,
                                        password=password) | Q(email=username,
                                                               password=password)).first()
-        if user is None:
+        if user is None or user.source != "LOCAL":
             raise ExceptionCodeConstants.INCORRECT_USERNAME_AND_PASSWORD.value.to_app_api_exception()
         if not user.is_active:
             raise AppApiException(1005, "用户已被禁用,请联系管理员!")
@@ -698,7 +698,7 @@ class UserManageSerializer(serializers.Serializer):
                     phone="" if instance.get('phone') is None else instance.get('phone'),
                     nick_name="" if instance.get('nick_name') is None else instance.get('nick_name')
                     , username=instance.get('username'), password=password_encrypt(instance.get('password')),
-                    role=RoleConstants.USER.name,
+                    role=RoleConstants.USER.name, source="LOCAL",
                     is_active=True)
         user.save()
         # 初始化用户团队
