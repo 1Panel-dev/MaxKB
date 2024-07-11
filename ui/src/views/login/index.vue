@@ -1,7 +1,7 @@
 <template>
   <login-layout v-loading="loading">
     <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库">
-      <h2 class="mb-24">普通登录</h2>
+      <h2 class="mb-24">{{ loginMode || '普通登录' }}</h2>
       <el-form
         class="login-form"
         :rules="rules"
@@ -48,6 +48,27 @@
           忘记密码?
         </el-button>
       </div>
+
+      <!-- <div class="login-gradient-divider lighter mt-24">
+        <span>更多登录方式</span>
+      </div>
+      <div class="text-center mt-16">
+        <el-button
+          v-if="loginMode !== 'LDAP'"
+          circle
+          class="login-button-circle color-secondary"
+          @click="changeMode('LDAP')"
+          >LDAP</el-button
+        >
+        <el-button
+          v-if="loginMode !== ''"
+          circle
+          class="login-button-circle color-secondary"
+          style="font-size: 24px"
+          icon="UserFilled"
+          @click="changeMode('')"
+        />
+      </div> -->
     </LoginContainer>
   </login-layout>
 </template>
@@ -84,6 +105,17 @@ const rules = ref<FormRules<LoginRequest>>({
 })
 const loginFormRef = ref<FormInstance>()
 
+const loginMode = ref('')
+
+function changeMode(val: string) {
+  loginMode.value = val || ''
+  loginForm.value = {
+    username: '',
+    password: ''
+  }
+  loginFormRef.value?.clearValidate()
+}
+
 const login = () => {
   loginFormRef.value?.validate().then(() => {
     loading.value = true
@@ -96,4 +128,33 @@ const login = () => {
   })
 }
 </script>
-<style lang="scss" scope></style>
+<style lang="scss" scope>
+.login-gradient-divider {
+  position: relative;
+  text-align: center;
+  color: var(--el-color-info);
+
+  ::before {
+    content: '';
+    width: 25%;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(222, 224, 227, 0) 0%, #dee0e3 100%);
+    position: absolute;
+    left: 16px;
+    top: 50%;
+  }
+
+  ::after {
+    content: '';
+    width: 25%;
+    height: 1px;
+    background: linear-gradient(90deg, #dee0e3 0%, rgba(222, 224, 227, 0) 100%);
+    position: absolute;
+    right: 16px;
+    top: 50%;
+  }
+}
+.login-button-circle {
+  padding: 25px !important;
+}
+</style>
