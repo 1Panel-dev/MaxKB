@@ -115,7 +115,7 @@ class ModelSerializer(serializers.Serializer):
             model_name = self.data.get(
                 'model_name')
             credential = self.data.get('credential')
-
+            provider_handler = ModelProvideConstants[provider].value
             model_credential = ModelProvideConstants[provider].value.get_model_credential(model_type,
                                                                                           model_name)
             source_model_credential = json.loads(rsa_long_decrypt(model.credential))
@@ -124,7 +124,7 @@ class ModelSerializer(serializers.Serializer):
                 for k in source_encryption_model_credential.keys():
                     if credential[k] == source_encryption_model_credential[k]:
                         credential[k] = source_model_credential[k]
-            return credential, model_credential
+            return credential, model_credential, provider_handler
 
     class Create(serializers.Serializer):
         user_id = serializers.CharField(required=True, error_messages=ErrMessage.uuid("用户id"))
@@ -145,13 +145,10 @@ class ModelSerializer(serializers.Serializer):
                                       name=self.data.get('name')).exists():
                 raise AppApiException(500, f'模型名称【{self.data.get("name")}】已存在')
             # 校验模型认证数据
-            ModelProvideConstants[self.data.get('provider')].value.get_model_credential(self.data.get('model_type'),
-                                                                                        self.data.get(
-                                                                                            'model_name')).is_valid(
-                self.data.get('model_type'),
-                self.data.get('model_name'),
-                self.data.get('credential'),
-                raise_exception=True)
+            ModelProvideConstants[self.data.get('provider')].value.is_valid_credential(self.data.get('model_type'),
+                                                                                       self.data.get('model_name'),
+                                                                                       self.data.get('credential')
+                                                                                       )
 
         def insert(self, user_id, with_valid=False):
             status = Status.SUCCESS
@@ -232,16 +229,17 @@ class ModelSerializer(serializers.Serializer):
             if model is None:
                 raise AppApiException(500, '不存在的id')
             else:
-                credential, model_credential = ModelSerializer.Edit(data={**instance, 'user_id': user_id}).is_valid(
+                credential, model_credential, provider_handler = ModelSerializer.Edit(
+                    data={**instance, 'user_id': user_id}).is_valid(
                     model=model)
                 try:
                     model.status = Status.SUCCESS
                     # 校验模型认证数据
-                    model_credential.is_valid(
-                        model.model_type,
-                        instance.get("model_name"),
-                        credential,
-                        raise_exception=True)
+                    provider_handler.is_valid_credential(model.model_type,
+                                                         instance.get("model_name"),
+                                                         credential,
+                                                         raise_exception=True)
+
                 except AppApiException as e:
                     if e.code == ValidCode.model_not_fount:
                         model.status = Status.DOWNLOAD

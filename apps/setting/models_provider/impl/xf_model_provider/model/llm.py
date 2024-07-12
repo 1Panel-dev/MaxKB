@@ -7,7 +7,7 @@
     @desc:
 """
 
-from typing import List, Optional, Any, Iterator
+from typing import List, Optional, Any, Iterator, Dict
 
 from langchain_community.chat_models import ChatSparkLLM
 from langchain_community.chat_models.sparkllm import _convert_message_to_dict, _convert_delta_to_message_chunk
@@ -16,9 +16,21 @@ from langchain_core.messages import BaseMessage, AIMessageChunk, get_buffer_stri
 from langchain_core.outputs import ChatGenerationChunk
 
 from common.config.tokenizer_manage_config import TokenizerManage
+from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 
-class XFChatSparkLLM(ChatSparkLLM):
+class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
+
+    @staticmethod
+    def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        return XFChatSparkLLM(
+            spark_app_id=model_credential.get('spark_app_id'),
+            spark_api_key=model_credential.get('spark_api_key'),
+            spark_api_secret=model_credential.get('spark_api_secret'),
+            spark_api_url=model_credential.get('spark_api_url'),
+            spark_llm_domain=model_name
+        )
+
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
         tokenizer = TokenizerManage.get_tokenizer()
         return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
