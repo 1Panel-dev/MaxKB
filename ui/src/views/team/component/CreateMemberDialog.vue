@@ -22,27 +22,6 @@
     >
       <el-form-item label="用户名/邮箱" prop="users">
         <tags-input v-model:tags="memberForm.users" placeholder="请输入成员的用户名或邮箱" />
-        <!-- <el-select
-          ref="SelectRemoteRef"
-          class="custom-select-multiple"
-          v-model="memberForm.users"
-          multiple
-          filterable
-          remote
-          reserve-keyword
-          placeholder="请输入成员的用户名或邮箱"
-          no-data-text="用户不存在"
-          :remote-method="remoteMethod"
-          :loading="loading"
-          @change="changeSelectHandle"
-        >
-          <el-option
-            v-for="item in userOptions"
-            :key="item?.id"
-            :label="item?.username"
-            :value="item?.id"
-          />
-        </el-select> -->
       </el-form-item>
     </el-form>
     <template #footer>

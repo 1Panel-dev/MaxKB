@@ -1,7 +1,7 @@
 <template>
   <div @mousedown="mousedown" class="workflow-node-container p-16" style="overflow: visible">
     <div
-      class="step-container p-16"
+      class="step-container app-card p-16"
       :class="props.nodeModel.isSelected ? 'isSelected' : ''"
       style="overflow: visible"
     >
@@ -161,14 +161,8 @@ function showOperate(type: string) {
 <style lang="scss" scoped>
 .workflow-node-container {
   .step-container {
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #fff;
-    border-radius: 9px;
     border: 2px solid #ffffff !important;
-    box-shadow: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
+    box-sizing: border-box;
     &:hover {
       box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
     }
