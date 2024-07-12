@@ -235,7 +235,7 @@ onMounted(() => {
     border-radius: 4px;
     &:hover {
       background: var(--el-color-primary-light-9);
-      color: var(--el-menu-active-color);
+      color: var(--el-color-primary);
     }
   }
   &__footer {

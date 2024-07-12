@@ -8,6 +8,7 @@ export interface commonTypes {
   paginationConfig: any | null
   search: any
   device: string
+  theme: string
 }
 
 const useCommonStore = defineStore({
@@ -17,9 +18,16 @@ const useCommonStore = defineStore({
     // 搜索和分页缓存
     paginationConfig: {},
     search: {},
-    device: DeviceType.Desktop
+    device: DeviceType.Desktop,
+    theme: ''
   }),
   actions: {
+    isDefaultTheme() {
+      this.theme === '#3370ff'
+    },
+    setTheme(val: string) {
+      this.theme = val
+    },
     saveBreadcrumb(data: any) {
       this.breadcrumb = data
     },
