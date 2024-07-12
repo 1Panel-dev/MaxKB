@@ -8,7 +8,7 @@
           <el-radio-group
             v-model="themeForm.theme"
             class="app-radio-button-group"
-            @change="themeColorChange"
+            @change="changeTheme"
           >
             <template v-for="(item, index) in themeList" :key="index">
               <el-radio-button :label="item.label" :value="item.value" />
@@ -23,7 +23,7 @@
               <el-button type="primary" link> 恢复默认 </el-button>
             </div>
             <div class="theme-preview">
-              <el-row :gutter="20">
+              <el-row :gutter="8">
                 <el-col :span="16">
                   <LoginPreview />
                 </el-col>
@@ -91,16 +91,18 @@
       </div>
     </el-scrollbar>
     <div class="theme-setting__operate w-full p-16-24">
-      <el-button>放弃更新</el-button>
+      <el-button @click="resetTheme">放弃更新</el-button>
       <el-button type="primary"> 保存并应用 </el-button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import LoginPreview from './LoginPreview.vue'
+import { useElementPlusTheme } from 'use-element-plus-theme'
+
 const themeList = [
   {
     label: '默认',
@@ -148,7 +150,21 @@ const rules = reactive<FormRules>({
   slogan: [{ required: true, message: '请输入欢迎语', trigger: 'blur' }]
 })
 
-const themeColorChange = (val: string) => {}
+const { changeTheme } = useElementPlusTheme(themeForm.value.theme)
+
+function resetTheme() {
+  themeForm.value.theme = '#3370FF'
+  changeTheme(themeForm.value.theme)
+}
+
+watch(
+  () => themeForm.value.theme,
+  (val) => {
+    if (val) {
+      console.log(val)
+    }
+  }
+)
 </script>
 
 <style lang="scss" scoped>

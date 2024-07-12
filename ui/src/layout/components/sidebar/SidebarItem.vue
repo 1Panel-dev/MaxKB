@@ -50,6 +50,8 @@ const {
   params: { id, type }
 } = route as any
 
+
+
 function showMenu() {
   if (isWorkFlow(type)) {
     return props.menu.name !== 'AppHitTest'
@@ -84,14 +86,14 @@ const menuIcon = computed(() => {
     border-radius: 4px;
     &:hover {
       background: none;
-      color: var(--el-menu-active-color);
+      color: var(--el-color-primary);
     }
   }
   :deep(.el-sub-menu__title) {
     padding: 13px 12px 13px 16px !important;
     &:hover {
       background: none;
-      color: var(--el-menu-active-color);
+      color: var(--el-color-primary);
     }
   }
   .el-sub-menu {
@@ -100,7 +102,7 @@ const menuIcon = computed(() => {
     }
   }
   .el-menu-item.is-active {
-    color: var(--el-menu-active-color);
+    color: var(--el-color-primary);
     background: var(--el-color-primary-light-9);
   }
 }
