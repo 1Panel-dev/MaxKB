@@ -24,7 +24,7 @@
         <el-input v-model="form.config_data.ldap_filter" :placeholder="$t('login.ldap.ldap_filterPlaceholder')"/>
       </el-form-item>
       <el-form-item :label="$t('login.ldap.ldap_mapping')" prop="config_data.ldap_mapping">
-        <el-input v-model="form.config_data.ldap_mapping" :placeholder="$t('login.ldap.ldap_mappingPlaceholder')"/>
+        <el-input v-model="form.config_data.ldap_mapping" placeholder='{"name":"name","email":"mail","username":"cn"}'/>
       </el-form-item>
       <el-form-item>
         <el-checkbox v-model="form.is_active">{{ $t('login.ldap.enableAuthentication') }}</el-checkbox>
