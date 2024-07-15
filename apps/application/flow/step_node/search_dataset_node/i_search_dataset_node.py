@@ -61,11 +61,14 @@ class ISearchDatasetStepNode(INode):
         question = self.workflow_manage.get_reference_field(
             self.node_params_serializer.data.get('question_reference_address')[0],
             self.node_params_serializer.data.get('question_reference_address')[1:])
-        history_chat_record = self.flow_params_serializer.data.get('history_chat_record', [])
-        paragraph_id_list = [p.get('id') for p in flat_map(
-            [get_paragraph_list(chat_record, self.node.id) for chat_record in history_chat_record if
-             chat_record.problem_text == question])]
-        exclude_paragraph_id_list = list(set(paragraph_id_list))
+        exclude_paragraph_id_list = []
+        if self.flow_params_serializer.data.get('re_chat', False):
+            history_chat_record = self.flow_params_serializer.data.get('history_chat_record', [])
+            paragraph_id_list = [p.get('id') for p in flat_map(
+                [get_paragraph_list(chat_record, self.node.id) for chat_record in history_chat_record if
+                 chat_record.problem_text == question])]
+            exclude_paragraph_id_list = list(set(paragraph_id_list))
+
         return self.execute(**self.node_params_serializer.data, question=str(question),
                             exclude_paragraph_id_list=exclude_paragraph_id_list)
 
