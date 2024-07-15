@@ -3,14 +3,14 @@
     <div class="header">
       <div class="tag flex-between">
         <div class="flex align-center">
-          <img src="@/assets/logo.svg" height="24" class="mr-8" />
-          <span class="ellipsis">MaxKB111111111111111</span>
+          <LogoIcon height="24px" class="mr-8" />
+          <span class="ellipsis">{{ title }}</span>
         </div>
         <el-icon><Close /></el-icon>
       </div>
     </div>
-    <login-layout style="height: 530px">
-      <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库" class="login-container">
+    <login-layout style="height: 530px" :themeImg="themeImg">
+      <LoginContainer :subTitle="slogan" class="login-container">
         <div class="mask"></div>
         <h2 class="mb-24">{{ '普通登录' }}</h2>
         <el-form class="login-form">
@@ -41,7 +41,22 @@
   </div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const props = defineProps({
+  themeImg: {
+    type: String,
+    default: 'default'
+  },
+  slogan: {
+    type: String,
+    default: '欢迎使用 MaxKB 智能知识库'
+  },
+  title: {
+    type: String,
+    default: 'MaxKB'
+  }
+})
+</script>
 
 <style lang="scss" scoped>
 .login-preview {

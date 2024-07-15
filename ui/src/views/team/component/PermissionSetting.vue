@@ -19,7 +19,7 @@
               shape="square"
               :size="24"
             />
-            <AppAvatar v-else-if="isDataset" class="mr-12" shape="square" :size="24">
+            <AppAvatar v-else-if="isDataset" class="mr-12 avatar-blue" shape="square" :size="24">
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
             <auto-tooltip :content="row?.name">

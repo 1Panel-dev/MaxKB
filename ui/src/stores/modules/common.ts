@@ -23,7 +23,7 @@ const useCommonStore = defineStore({
   }),
   actions: {
     isDefaultTheme() {
-      this.theme === '#3370ff'
+      return !this.theme || this.theme === '#3370FF'
     },
     setTheme(val: string) {
       this.theme = val

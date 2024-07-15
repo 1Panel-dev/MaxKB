@@ -4,7 +4,7 @@
       <slot name="header">
         <div class="title flex align-center">
           <slot name="icon">
-            <AppAvatar v-if="showIcon" class="mr-12" shape="square" :size="32">
+            <AppAvatar v-if="showIcon" class="mr-12 avatar-blue" shape="square" :size="32">
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
           </slot>
