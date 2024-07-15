@@ -579,6 +579,8 @@ class ApplicationSerializer(serializers.Serializer):
                     'dataset_id_list': dataset_id_list}
 
         def get_search_node(self, work_flow):
+            if work_flow is None:
+                return []
             return [node for node in work_flow.get('nodes', []) if node.get('type', '') == 'search-dataset-node']
 
         def update_search_node(self, work_flow, user_dataset_id_list: List):
