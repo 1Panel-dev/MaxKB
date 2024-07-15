@@ -105,11 +105,13 @@ class FlowParamsSerializer(serializers.Serializer):
 
     chat_record_id = serializers.CharField(required=True, error_messages=ErrMessage.char("对话记录id"))
 
-    stream = serializers.BooleanField(required=True, error_messages=ErrMessage.base("流式输出"))
+    stream = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("流式输出"))
 
     client_id = serializers.CharField(required=False, error_messages=ErrMessage.char("客户端id"))
 
     client_type = serializers.CharField(required=False, error_messages=ErrMessage.char("客户端类型"))
+
+    re_chat = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("换个答案"))
 
 
 class INode:
