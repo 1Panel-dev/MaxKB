@@ -52,7 +52,6 @@ class Dataset(APIView):
         @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary="创建QA知识库",
                              operation_id="创建QA知识库",
-
                              manual_parameters=DataSetSerializers.Create.CreateQASerializers.get_request_params_api(),
                              responses=get_api_response(
                                  DataSetSerializers.Create.CreateQASerializers.get_response_body_api()),

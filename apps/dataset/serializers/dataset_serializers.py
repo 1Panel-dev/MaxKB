@@ -206,6 +206,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                                          max_length=256,
                                          min_length=1)
 
+            embedding_mode_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("向量模型"))
+
             documents = DocumentInstanceSerializer(required=False, many=True)
 
             def is_valid(self, *, raise_exception=False):
@@ -225,6 +227,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                                          error_messages=ErrMessage.char("知识库描述"),
                                          max_length=256,
                                          min_length=1)
+
+            embedding_mode_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("向量模型"))
 
             file_list = serializers.ListSerializer(required=True,
                                                    error_messages=ErrMessage.list("文件列表"),
@@ -365,7 +369,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                 self.CreateQASerializers(data=instance).is_valid()
             file_list = instance.get('file_list')
             document_list = flat_map([DocumentSerializers.Create.parse_qa_file(file) for file in file_list])
-            dataset_instance = {'name': instance.get('name'), 'desc': instance.get('desc'), 'documents': document_list}
+            dataset_instance = {'name': instance.get('name'), 'desc': instance.get('desc'), 'documents': document_list,
+                                'embedding_mode_id': instance.get('embedding_mode_id')}
             return self.save(dataset_instance, with_valid=True)
 
         @valid_license(model=DataSet, count=50,
@@ -381,7 +386,8 @@ class DataSetSerializers(serializers.ModelSerializer):
             if QuerySet(DataSet).filter(user_id=user_id, name=instance.get('name')).exists():
                 raise AppApiException(500, "知识库名称重复!")
             dataset = DataSet(
-                **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id})
+                **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id,
+                   'embedding_mode_id': instance.get('embedding_mode_id')})
 
             document_model_list = []
             paragraph_model_list = []
@@ -500,6 +506,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="知识库名称", description="知识库名称"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
+                    'embedding_mode_id': openapi.Schema(type=openapi.TYPE_STRING, title='向量模型',
+                                                        description='向量模型'),
                     'documents': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档数据", description="文档数据",
                                                 items=DocumentSerializers().Create.get_request_body_api()
                                                 )
@@ -782,6 +790,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                 raise AppApiException(500, "知识库名称重复!")
             _dataset = QuerySet(DataSet).get(id=self.data.get("id"))
             DataSetSerializers.Edit(data=dataset).is_valid(dataset=_dataset)
+            if 'embedding_mode_id' in dataset:
+                _dataset.embedding_mode_id = dataset.get('embedding_mode_id')
             if "name" in dataset:
                 _dataset.name = dataset.get("name")
             if 'desc' in dataset:

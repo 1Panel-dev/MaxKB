@@ -67,6 +67,20 @@ class ApplicationApi(ApiMixin):
             }
         )
 
+    class Model(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='application_id',
+                                      in_=openapi.IN_PATH,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description='应用id'),
+                    openapi.Parameter(name='model_type', in_=openapi.IN_QUERY,
+                                      type=openapi.TYPE_STRING,
+                                      required=False,
+                                      description='模型类型'),
+                    ]
+
     class ApiKey(ApiMixin):
         @staticmethod
         def get_request_params_api():

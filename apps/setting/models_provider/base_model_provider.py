@@ -61,7 +61,7 @@ class IModelProvider(ABC):
     def get_model_list(self, model_type):
         if model_type is None:
             raise AppApiException(500, '模型类型不能为空')
-        return self.get_model_info_manage().get_model_list()
+        return self.get_model_info_manage().get_model_list_by_model_type(model_type)
 
     def get_model_credential(self, model_type, model_name):
         model_info = self.get_model_info_manage().get_model_info(model_type, model_name)
@@ -190,6 +190,9 @@ class ModelInfoManage:
 
     def get_model_list(self):
         return [model.to_dict() for model in self.model_list]
+
+    def get_model_list_by_model_type(self, model_type):
+        return [model.to_dict() for model in self.model_list if model.model_type == model_type]
 
     def get_model_type_list(self):
         return [{'key': _type.value.get('message'), 'value': _type.value.get('code')} for _type in ModelTypeConst if

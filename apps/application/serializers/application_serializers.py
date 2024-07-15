@@ -522,12 +522,14 @@ class ApplicationSerializer(serializers.Serializer):
             if not QuerySet(Application).filter(id=self.data.get('application_id')).exists():
                 raise AppApiException(500, '不存在的应用id')
 
-        def list_model(self, with_valid=True):
+        def list_model(self, model_type=None, with_valid=True):
             if with_valid:
                 self.is_valid()
+            if model_type is None:
+                model_type = "LLM"
             application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
             return ModelSerializer.Query(
-                data={'user_id': application.user_id}).list(
+                data={'user_id': application.user_id, 'model_type': model_type}).list(
                 with_valid=True)
 
         def delete(self, with_valid=True):
