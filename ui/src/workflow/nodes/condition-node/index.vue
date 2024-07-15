@@ -277,6 +277,12 @@ function deleteCondition(index: number, cIndex: number) {
         .map((item: any) => item.id)
     )
     refreshBranchAnchor(list, false)
+
+    list.forEach((item: any, index: number) => {
+      if (item.type === 'ELSE IF ' + (index + 1)) {
+        item.type = 'ELSE IF ' + index
+      }
+    })
   }
   set(props.nodeModel.properties.node_data, 'branch', list)
 }
