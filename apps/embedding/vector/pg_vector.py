@@ -105,9 +105,9 @@ class PGVector(BaseVectorStore):
             return []
         query_set = QuerySet(Embedding).filter(dataset_id__in=dataset_id_list, is_active=is_active)
         if exclude_document_id_list is not None and len(exclude_document_id_list) > 0:
-            exclude_dict.__setitem__('document_id__in', exclude_document_id_list)
+            query_set = query_set.exclude(document_id__in=exclude_document_id_list)
         if exclude_paragraph_list is not None and len(exclude_paragraph_list) > 0:
-            exclude_dict.__setitem__('paragraph_id__in', exclude_paragraph_list)
+            query_set = query_set.exclude(paragraph_id__in=exclude_paragraph_list)
         query_set = query_set.exclude(**exclude_dict)
         for search_handle in search_handle_list:
             if search_handle.support(search_mode):

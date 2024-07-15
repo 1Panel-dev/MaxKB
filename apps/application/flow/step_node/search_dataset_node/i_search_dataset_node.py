@@ -13,6 +13,7 @@ from django.core import validators
 from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
+from common.util.common import flat_map
 from common.util.field_message import ErrMessage
 
 
@@ -43,6 +44,13 @@ class SearchDatasetStepNodeSerializer(serializers.Serializer):
         super().is_valid(raise_exception=True)
 
 
+def get_paragraph_list(chat_record, node_id):
+    return flat_map([chat_record.details[key].get('paragraph_list', []) for key in chat_record.details if
+                     (chat_record.details[
+                          key].get('type', '') == 'search-dataset-node') and chat_record.details[key].get(
+                         'paragraph_list', []) is not None and key == node_id])
+
+
 class ISearchDatasetStepNode(INode):
     type = 'search-dataset-node'
 
@@ -53,7 +61,13 @@ class ISearchDatasetStepNode(INode):
         question = self.workflow_manage.get_reference_field(
             self.node_params_serializer.data.get('question_reference_address')[0],
             self.node_params_serializer.data.get('question_reference_address')[1:])
-        return self.execute(**self.node_params_serializer.data, question=str(question), exclude_paragraph_id_list=[])
+        history_chat_record = self.flow_params_serializer.data.get('history_chat_record', [])
+        paragraph_id_list = [p.get('id') for p in flat_map(
+            [get_paragraph_list(chat_record, self.node.id) for chat_record in history_chat_record if
+             chat_record.problem_text == question])]
+        exclude_paragraph_id_list = list(set(paragraph_id_list))
+        return self.execute(**self.node_params_serializer.data, question=str(question),
+                            exclude_paragraph_id_list=exclude_paragraph_id_list)
 
     def execute(self, dataset_id_list, dataset_setting, question,
                 exclude_paragraph_id_list=None,
