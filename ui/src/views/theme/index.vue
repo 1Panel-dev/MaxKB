@@ -102,6 +102,8 @@ import { ref, reactive, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import LoginPreview from './LoginPreview.vue'
 import { useElementPlusTheme } from 'use-element-plus-theme'
+import useStore from '@/stores'
+const { common } = useStore()
 
 const themeList = [
   {
@@ -161,7 +163,7 @@ watch(
   () => themeForm.value.theme,
   (val) => {
     if (val) {
-      console.log(val)
+      common.setTheme(val)
     }
   }
 )
