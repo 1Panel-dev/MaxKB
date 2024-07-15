@@ -21,7 +21,12 @@
                 >
                   <el-radio :value="item.id" size="large">
                     <div class="flex align-center">
-                      <AppAvatar v-if="item?.type === '0'" class="mr-8" shape="square" :size="32">
+                      <AppAvatar
+                        v-if="item?.type === '0'"
+                        class="mr-8 avatar-blue"
+                        shape="square"
+                        :size="32"
+                      >
                         <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                       </AppAvatar>
                       <AppAvatar

@@ -64,7 +64,7 @@
               </template>
               <div class="status-tag">
                 <el-tag type="warning" v-if="isWorkFlow(item.type)">高级编排</el-tag>
-                <el-tag v-else>简单配置</el-tag>
+                <el-tag class="blue-tag" v-else>简单配置</el-tag>
               </div>
 
               <template #footer>

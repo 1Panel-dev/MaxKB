@@ -15,7 +15,7 @@
             <el-form-item label="知识库类型" required>
               <el-card shadow="never" class="mb-8" v-if="detail.type === '0'">
                 <div class="flex align-center">
-                  <AppAvatar class="mr-8" shape="square" :size="32">
+                  <AppAvatar class="mr-8 avatar-blue" shape="square" :size="32">
                     <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                   </AppAvatar>
                   <div>

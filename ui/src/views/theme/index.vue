@@ -25,7 +25,7 @@
             <div class="theme-preview">
               <el-row :gutter="8">
                 <el-col :span="16">
-                  <LoginPreview />
+                  <LoginPreview :themeImg="themeImg" :slogan="themeForm.slogan" :title="themeForm.title" />
                 </el-col>
                 <el-col :span="8">
                   <div class="theme-form">
@@ -109,32 +109,32 @@ const themeList = [
   {
     label: '默认',
     value: '#3370FF',
-    loginBackground: '@/assets/theme/default.jpg'
+    loginBackground: 'default'
   },
   {
     label: '活力橙',
     value: '#FF8800',
-    loginBackground: '@/assets/theme/orange.jpg'
+    loginBackground: 'orange'
   },
   {
     label: '松石绿',
     value: '#00B69D',
-    loginBackground: '@/assets/theme/green.jpg'
+    loginBackground: 'green'
   },
   {
     label: '商务蓝',
     value: '#4954E6',
-    loginBackground: '@/assets/theme/default.jpg'
+    loginBackground: 'default'
   },
   {
     label: '神秘紫',
     value: '#7F3BF5',
-    loginBackground: '@/assets/theme/purple.jpg'
+    loginBackground: 'purple'
   },
   {
     label: '胭脂红',
     value: '#F01D94',
-    loginBackground: '@/assets/theme/red.jpg'
+    loginBackground: 'red'
   }
 ]
 const themeFormRef = ref<FormInstance>()
@@ -152,6 +152,8 @@ const rules = reactive<FormRules>({
   slogan: [{ required: true, message: '请输入欢迎语', trigger: 'blur' }]
 })
 
+const themeImg = ref('default')
+
 const { changeTheme } = useElementPlusTheme(themeForm.value.theme)
 
 function resetTheme() {
@@ -164,6 +166,7 @@ watch(
   (val) => {
     if (val) {
       common.setTheme(val)
+      themeImg.value = themeList.filter((v) => v.value === val)[0].loginBackground
     }
   }
 )

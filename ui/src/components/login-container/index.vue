@@ -1,7 +1,9 @@
 <template>
   <div class="login-form-container">
     <div class="login-title">
-      <div class="logo text-center"><img src="@/assets/MaxKB-logo.svg" height="45" /></div>
+      <div class="logo text-center">
+        <LogoFull height="45px" />
+      </div>
       <div class="sub-title text-center" v-if="subTitle">
         <el-text type="info">{{ subTitle }}</el-text>
       </div>
@@ -12,7 +14,6 @@
   </div>
 </template>
 <script setup lang="ts">
-const defaultTitle = import.meta.env.VITE_APP_TITLE
 defineOptions({ name: 'LoginContainer' })
 defineProps({
   title: String,
