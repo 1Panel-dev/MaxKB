@@ -150,7 +150,7 @@ const {
   params: { id }
 } = route as any
 
-const apiUrl = window.location.origin + '/doc/chat'
+const apiUrl = window.location.origin + '/doc/chat/'
 
 const EditAvatarDialogRef = ref()
 const LimitDialogRef = ref()
