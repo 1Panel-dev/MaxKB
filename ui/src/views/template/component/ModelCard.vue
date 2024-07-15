@@ -15,7 +15,7 @@
       </div>
     </template>
 
-    <div class="border-t mt-16">
+    <div class="mt-16">
       <ul>
         <li class="flex mt-16">
           <el-text type="info">模型类型</el-text>
@@ -176,7 +176,7 @@ onBeforeUnmount(() => {
 </script>
 <style lang="scss" scoped>
 .model-card {
-  min-height: 153px;
+  min-height: 135px;
   min-width: auto;
   .operation-button {
     position: absolute;
