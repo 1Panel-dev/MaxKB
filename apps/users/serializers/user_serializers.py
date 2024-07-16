@@ -497,7 +497,7 @@ class UserSerializer(ApiMixin, serializers.ModelSerializer):
 class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone', 'is_active', 'role', 'nick_name', 'create_time', 'update_time']
+        fields = ['id', 'username', 'email', 'phone', 'is_active', 'role', 'nick_name', 'create_time', 'update_time', 'source']
 
     @staticmethod
     def get_response_body_api():
@@ -512,6 +512,7 @@ class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):
                 'phone': openapi.Schema(type=openapi.TYPE_STRING, title="手机号", description="手机号"),
                 'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否激活", description="是否激活"),
                 'role': openapi.Schema(type=openapi.TYPE_STRING, title="角色", description="角色"),
+                'source': openapi.Schema(type=openapi.TYPE_STRING, title="来源", description="来源"),
                 'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title="姓名", description="姓名"),
                 'create_time': openapi.Schema(type=openapi.TYPE_STRING, title="创建时间", description="修改时间"),
                 'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间", description="修改时间")
