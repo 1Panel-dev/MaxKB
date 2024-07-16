@@ -35,9 +35,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import useStore from '@/stores'
-const { common, user } = useStore()
+const { user } = useStore()
 const isDefaultTheme = computed(() => {
-  return common.isDefaultTheme()
+  return user.isDefaultTheme()
 })
 
 const aboutDialogVisible = ref(false)

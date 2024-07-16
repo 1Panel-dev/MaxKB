@@ -4,7 +4,7 @@ import { Role, ComplexPermission } from '@/utils/permission/type'
 const settingRouter = {
   path: '/setting',
   name: 'setting',
-  meta: { icon: 'Setting', title: '系统设置', permission: 'SETTING:READ' },
+  meta: { icon: 'Setting', title: '系统管理', permission: 'SETTING:READ' },
   redirect: () => {
     if (hasPermission(new Role('ADMIN'), 'AND')) {
       return '/user'
@@ -59,7 +59,7 @@ const settingRouter = {
       meta: {
         icon: 'app-setting',
         iconActive: 'app-setting-active',
-        title: '系统设置',
+        title: '系统管理',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting',

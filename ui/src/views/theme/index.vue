@@ -1,5 +1,5 @@
 <template>
-  <div class="theme-setting">
+  <div class="theme-setting" v-loading="loading">
     <h4 class="p-16-24">外观设置</h4>
     <el-scrollbar>
       <div class="p-24 pt-0">
@@ -8,7 +8,7 @@
           <el-radio-group
             v-model="themeForm.theme"
             class="app-radio-button-group"
-            @change="changeTheme"
+            @change="changeThemeHandle"
           >
             <template v-for="(item, index) in themeList" :key="index">
               <el-radio-button :label="item.label" :value="item.value" />
@@ -20,19 +20,30 @@
           <el-card shadow="never" class="layout-bg">
             <div class="flex-between">
               <h5 class="mb-16">页面预览</h5>
-              <el-button type="primary" link> 恢复默认 </el-button>
+              <el-button type="primary" link @click="resetForm"> 恢复默认 </el-button>
             </div>
             <div class="theme-preview">
               <el-row :gutter="8">
                 <el-col :span="16">
-                  <LoginPreview :themeImg="themeImg" :slogan="themeForm.slogan" :title="themeForm.title" />
+                  <LoginPreview :data="themeForm" />
                 </el-col>
                 <el-col :span="8">
                   <div class="theme-form">
                     <el-card shadow="never" class="mb-8">
                       <div class="flex-between mb-8">
                         <span class="lighter">网站 Logo</span>
-                        <el-button size="small"> 替换图片 </el-button>
+                        <el-upload
+                          ref="uploadRef"
+                          action="#"
+                          :auto-upload="false"
+                          :show-file-list="false"
+                          accept="image/*"
+                          :on-change="
+                            (file: any, fileList: any) => onChange(file, fileList, 'icon')
+                          "
+                        >
+                          <el-button size="small"> 替换图片 </el-button>
+                        </el-upload>
                       </div>
                       <el-text type="info" size="small"
                         >顶部网站显示的 Logo，建议尺寸 48 x 48，支持 JPG、PNG、SVG，大小不超过
@@ -42,7 +53,18 @@
                     <el-card shadow="never" class="mb-8">
                       <div class="flex-between mb-8">
                         <span class="lighter">登录 Logo</span>
-                        <el-button size="small"> 替换图片 </el-button>
+                        <el-upload
+                          ref="uploadRef"
+                          action="#"
+                          :auto-upload="false"
+                          :show-file-list="false"
+                          accept="image/*"
+                          :on-change="
+                            (file: any, fileList: any) => onChange(file, fileList, 'loginLogo')
+                          "
+                        >
+                          <el-button size="small"> 替换图片 </el-button>
+                        </el-upload>
                       </div>
                       <el-text type="info" size="small"
                         >登录页面右侧 Logo，建议尺寸 204*52，支持 JPG、PNG、SVG，大小不超过
@@ -52,7 +74,18 @@
                     <el-card shadow="never" class="mb-8">
                       <div class="flex-between mb-8">
                         <span class="lighter">登录背景图</span>
-                        <el-button size="small"> 替换图片 </el-button>
+                        <el-upload
+                          ref="uploadRef"
+                          action="#"
+                          :auto-upload="false"
+                          :show-file-list="false"
+                          accept="image/*"
+                          :on-change="
+                            (file: any, fileList: any) => onChange(file, fileList, 'loginImage')
+                          "
+                        >
+                          <el-button size="small"> 替换图片 </el-button>
+                        </el-upload>
                       </div>
                       <el-text type="info" size="small">
                         左侧背景图，矢量图建议尺寸 576*900，位图建议尺寸1152*1800；支持
@@ -92,53 +125,34 @@
     </el-scrollbar>
     <div class="theme-setting__operate w-full p-16-24">
       <el-button @click="resetTheme">放弃更新</el-button>
-      <el-button type="primary"> 保存并应用 </el-button>
+      <el-button type="primary" @click="updataTheme(themeFormRef)"> 保存并应用 </el-button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watch } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
+import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
+import { cloneDeep } from 'lodash'
 import LoginPreview from './LoginPreview.vue'
-import { useElementPlusTheme } from 'use-element-plus-theme'
+import { themeList, defautSetting } from '@/utils/theme'
+import ThemeApi from '@/api/theme'
+import { MsgSuccess, MsgError } from '@/utils/message'
 import useStore from '@/stores'
-const { common } = useStore()
 
-const themeList = [
-  {
-    label: '默认',
-    value: '#3370FF',
-    loginBackground: 'default'
-  },
-  {
-    label: '活力橙',
-    value: '#FF8800',
-    loginBackground: 'orange'
-  },
-  {
-    label: '松石绿',
-    value: '#00B69D',
-    loginBackground: 'green'
-  },
-  {
-    label: '商务蓝',
-    value: '#4954E6',
-    loginBackground: 'default'
-  },
-  {
-    label: '神秘紫',
-    value: '#7F3BF5',
-    loginBackground: 'purple'
-  },
-  {
-    label: '胭脂红',
-    value: '#F01D94',
-    loginBackground: 'red'
-  }
-]
+const { user } = useStore()
+
+onBeforeRouteLeave((to, from) => {
+  user.setTheme(cloneTheme.value)
+})
+
+const themeInfo = computed(() => user.themeInfo)
+
 const themeFormRef = ref<FormInstance>()
-const themeForm = ref({
+const loading = ref(false)
+const cloneTheme = ref(null)
+const themeForm = ref<any>({
   theme: '#3370FF',
   icon: '',
   loginLogo: '',
@@ -152,24 +166,67 @@ const rules = reactive<FormRules>({
   slogan: [{ required: true, message: '请输入欢迎语', trigger: 'blur' }]
 })
 
-const themeImg = ref('default')
-
-const { changeTheme } = useElementPlusTheme(themeForm.value.theme)
-
-function resetTheme() {
-  themeForm.value.theme = '#3370FF'
-  changeTheme(themeForm.value.theme)
-}
-
-watch(
-  () => themeForm.value.theme,
-  (val) => {
-    if (val) {
-      common.setTheme(val)
-      themeImg.value = themeList.filter((v) => v.value === val)[0].loginBackground
+const onChange = (file: any, fileList: UploadFiles, attr: string) => {
+  if (attr === 'loginImage') {
+    const isLimit = file?.size / 1024 / 1024 < 5
+    if (!isLimit) {
+      // @ts-ignore
+      MsgError(`文件大小超过 5M`)
+      return false
+    }
+  } else {
+    const isLimit = file?.size / 1024 < 200
+    if (!isLimit) {
+      // @ts-ignore
+      MsgError(`文件大小超过 200KB`)
+      return false
     }
   }
-)
+
+  themeForm.value[attr] = file.raw
+}
+
+function changeThemeHandle(val: string) {
+  themeForm.value.theme = val
+  user.setTheme(themeForm.value)
+}
+
+function resetTheme() {
+  user.setTheme(cloneTheme.value)
+  themeForm.value = cloneDeep(themeInfo.value)
+}
+
+function resetForm() {
+  themeForm.value = {
+    theme: themeForm.value.theme,
+    ...defautSetting
+  }
+  user.setTheme(themeForm.value)
+}
+
+const updataTheme = async (formEl: FormInstance | undefined, test?: string) => {
+  if (!formEl) return
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      let fd = new FormData()
+      Object.keys(themeForm.value).map((item) => {
+        fd.append(item, themeForm.value[item])
+      })
+      ThemeApi.postThemeInfo(fd, loading).then((res) => {
+        user.theme()
+        cloneTheme.value = cloneDeep(themeForm.value)
+        MsgSuccess('外观设置成功')
+      })
+    }
+  })
+}
+
+onMounted(() => {
+  if (themeInfo.value) {
+    themeForm.value = themeInfo.value
+    cloneTheme.value = cloneDeep(themeInfo.value)
+  }
+})
 </script>
 
 <style lang="scss" scoped>

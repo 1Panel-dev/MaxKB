@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import type { User } from '@/api/type/user'
 import UserApi from '@/api/user'
 import ThemeApi from '@/api/theme'
+import { useElementPlusTheme } from 'use-element-plus-theme'
+const { changeTheme } = useElementPlusTheme()
 
 export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
@@ -26,6 +28,13 @@ const useUserStore = defineStore({
     themeInfo: null
   }),
   actions: {
+    isDefaultTheme() {
+      return !this.themeInfo?.theme || this.themeInfo?.theme === '#3370FF'
+    },
+    setTheme(data: any) {
+      changeTheme(data?.['theme'])
+      this.themeInfo = data
+    },
     isExpire() {
       return this.isXPack && !this.XPACK_LICENSE_IS_VALID
     },
@@ -82,8 +91,14 @@ const useUserStore = defineStore({
     },
 
     async theme() {
-      return ThemeApi.getThemeInfo().then((ok) => {
+      return await ThemeApi.getThemeInfo().then((ok) => {
         this.themeInfo = ok.data
+        changeTheme(this.themeInfo['theme'])
+        window.document.title = this.themeInfo['title'] || 'MaxKB'
+        const link = document.querySelector('link[rel="icon"]') as any
+        if (link) {
+          link['href'] = this.themeInfo['icon'] || '/favicon.ico'
+        }
       })
     },
 

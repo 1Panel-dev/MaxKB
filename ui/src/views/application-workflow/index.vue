@@ -64,7 +64,7 @@
             <div class="mr-16">
               <el-button link @click="enlarge = !enlarge">
                 <AppIcon
-                  :iconName="enlarge ? 'app-magnify' : 'app-minify'"
+                  :iconName="enlarge ? 'app-minify' : 'app-magnify'"
                   class="color-secondary"
                   style="font-size: 20px"
                 ></AppIcon>
