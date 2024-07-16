@@ -40,6 +40,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
             return NodeResult({'paragraph_list': [], 'is_hit_handling_method': []}, {})
         paragraph_list = self.list_paragraph(embedding_list, vector)
         result = [self.reset_paragraph(paragraph, embedding_list) for paragraph in paragraph_list]
+        result = sorted(result, key=lambda p: p.get('similarity'), reverse=True)
         return NodeResult({'paragraph_list': result,
                            'is_hit_handling_method_list': [row for row in result if row.get('is_hit_handling_method')],
                            'data': '\n'.join([paragraph.get('content') for paragraph in paragraph_list]),
