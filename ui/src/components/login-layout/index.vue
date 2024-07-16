@@ -32,7 +32,7 @@ const fileURL = computed(() => {
 })
 
 const loginImageStyle = computed(() => {
-  if (user.themeInfo.loginImage) {
+  if (user.themeInfo?.loginImage) {
     return {
       backgroundImage: `url(${fileURL.value})`
     }
