@@ -81,7 +81,7 @@ const useUserStore = defineStore({
     async profile() {
       return UserApi.profile().then((ok) => {
         this.userInfo = ok.data
-        this.asyncGetProfile()
+        return this.asyncGetProfile()
       })
     },
 
