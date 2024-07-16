@@ -25,6 +25,11 @@
         <el-table-column prop="nick_name" label="姓名" />
         <el-table-column prop="email" label="邮箱" show-overflow-tooltip />
         <el-table-column prop="phone" label="手机号" />
+        <el-table-column prop="source" label="用户类型">
+          <template #default="{ row }">
+            {{ row.source === 'LOCAL' ? '系统用户' : row.source }}
+          </template>
+        </el-table-column>
         <el-table-column label="状态" width="60">
           <template #default="{ row }">
             <div @click.stop>
