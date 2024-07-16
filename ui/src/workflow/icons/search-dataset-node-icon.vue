@@ -1,5 +1,5 @@
 <template>
-  <AppAvatar shape="square">
+  <AppAvatar shape="square" class="avatar-blue">
     <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
   </AppAvatar>
 </template>

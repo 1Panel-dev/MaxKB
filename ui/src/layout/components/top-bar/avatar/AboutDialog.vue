@@ -1,16 +1,16 @@
 <template>
-  <el-dialog v-model="aboutDialogVisible" class="about-dialog border-r-4">
+  <el-dialog
+    v-model="aboutDialogVisible"
+    class="about-dialog border-r-4"
+    :class="!isDefaultTheme ? 'custom-header' : ''"
+  >
     <template #header="{ titleId, titleClass }">
       <div class="logo flex-center" :id="titleId" :class="titleClass">
-        <img src="@/assets/MaxKB-logo.svg" height="59" />
+        <LogoFull height="59px" />
       </div>
     </template>
     <div class="about-ui">
-      <el-card
-        shadow="hover"
-        class="mb-16"
-        @click="toUrl('https://maxkb.cn/docs/')"
-      >
+      <el-card shadow="hover" class="mb-16" @click="toUrl('https://maxkb.cn/docs/')">
         <div class="flex align-center cursor">
           <AppIcon iconName="app-reading" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
           <span>{{ $t('layout.topbar.wiki') }}</span>
@@ -33,11 +33,12 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import useStore from '@/stores'
-const defaultTitle = import.meta.env.VITE_APP_TITLE
-
 const { user } = useStore()
+const isDefaultTheme = computed(() => {
+  return user.isDefaultTheme()
+})
 
 const aboutDialogVisible = ref(false)
 
@@ -78,6 +79,12 @@ defineExpose({ open })
       text-align: left;
       color: var(--app-text-color-secondary);
     }
+  }
+}
+
+.custom-header {
+  .el-dialog__header {
+    background: var(--el-color-primary-light-9) !important;
   }
 }
 </style>

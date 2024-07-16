@@ -1,6 +1,6 @@
 <template>
   <div class="authentication-setting p-24">
-    <h4>{{$t('login.authentication')}}</h4>
+    <h4>{{ $t('login.authentication') }}</h4>
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
       <template v-for="(item, index) in tabList" :key="index">
         <el-tab-pane :label="item.label" :name="item.name">
@@ -28,13 +28,6 @@ const tabList = [
     component: LDAP
   }
 ]
-
-// 动态引入组件
-const loadComponent = async (componentName: string) => {
-  await import(`./component/${componentName}.vue`).then((res) => res.default)
-}
-
-const currentComponent = computed(() => loadComponent(activeName.value))
 
 function handleClick() {}
 

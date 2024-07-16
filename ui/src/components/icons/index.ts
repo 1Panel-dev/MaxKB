@@ -955,7 +955,7 @@ export const iconMap: any = {
       ])
     }
   },
-  'app-minify': {
+  'app-magnify': {
     iconReader: () => {
       return h('i', [
         h(
@@ -976,7 +976,7 @@ export const iconMap: any = {
       ])
     }
   },
-  'app-magnify': {
+  'app-minify': {
     iconReader: () => {
       return h('i', [
         h(
@@ -1071,5 +1071,5 @@ export const iconMap: any = {
         )
       ])
     }
-  },
+  }
 }

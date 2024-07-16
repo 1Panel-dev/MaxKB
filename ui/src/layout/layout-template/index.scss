@@ -1,0 +1,23 @@
+.app-layout {
+  background-color: var(--app-layout-bg-color);
+  height: 100%;
+}
+
+.app-main {
+  position: relative;
+  height: 100%;
+  padding: var(--app-header-height) 0 0 !important;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.sidebar-container {
+  box-sizing: border-box;
+  transition: width 0.28s;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background-color: var(--sidebar-bg-color);
+}
+.view-container {
+  width: calc(100% - var(--sidebar-width));
+}

@@ -23,8 +23,8 @@
           </el-icon>
           {{ data?.document_name }}
         </el-text>
-        <div class="flex align-center" style="line-height: 32px;">
-          <AppAvatar class="mr-8" shape="square" :size="18">
+        <div class="flex align-center" style="line-height: 32px">
+          <AppAvatar class="mr-8 avatar-blue" shape="square" :size="18">
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
 
@@ -52,7 +52,7 @@ const props = defineProps({
 }
 @media only screen and (max-width: 768px) {
   .paragraph-source-card-height {
-      height: 285px;
-    }
+    height: 285px;
+  }
 }
 </style>

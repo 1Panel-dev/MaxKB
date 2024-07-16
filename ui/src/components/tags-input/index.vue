@@ -28,12 +28,6 @@
         <div class="value" v-else>{{ item.username }}</div>
       </template>
     </el-autocomplete>
-    <!-- <el-input
-      :validate-event="false"
-      v-model="currentval"
-      :placeholder="tagsList.length == 0 ? placeholder : ''"
-      @keydown.enter="addTags"
-    /> -->
   </div>
 </template>
 <script setup lang="ts">

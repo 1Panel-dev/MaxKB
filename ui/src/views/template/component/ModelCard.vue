@@ -32,7 +32,7 @@
       <el-progress
         type="circle"
         :width="56"
-        color="#3370ff"
+        color="#3370FF"
         :percentage="progress"
         class="percentage"
       >

@@ -18,7 +18,7 @@
                 <el-card shadow="never" class="mb-16" :class="form.type === '0' ? 'active' : ''">
                   <el-radio value="0" size="large">
                     <div class="flex align-center">
-                      <AppAvatar class="mr-8" shape="square" :size="32">
+                      <AppAvatar class="mr-8 avatar-blue" shape="square" :size="32">
                         <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                       </AppAvatar>
                       <div>

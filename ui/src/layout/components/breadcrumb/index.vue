@@ -36,7 +36,7 @@
           >
             <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
           </AppAvatar>
-          <AppAvatar v-else class="mr-8" shape="square" :size="24">
+          <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="24">
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
           <div class="ellipsis">{{ current?.name }}</div>
@@ -228,7 +228,7 @@ onMounted(() => {
     border-radius: 4px;
     &:hover {
       background: var(--el-color-primary-light-9);
-      color: var(--el-menu-active-color);
+      color: var(--el-color-primary);
     }
   }
   &__footer {
