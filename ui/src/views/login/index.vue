@@ -1,21 +1,21 @@
 <template>
   <login-layout v-loading="loading">
-    <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库">
+    <LoginContainer :subTitle="user.themeInfo?.slogan || '欢迎使用 MaxKB 智能知识库'">
       <h2 class="mb-24">{{ loginMode || '普通登录' }}</h2>
       <el-form
-          class="login-form"
-          :rules="rules"
-          :model="loginForm"
-          ref="loginFormRef"
-          @keyup.enter="login"
+        class="login-form"
+        :rules="rules"
+        :model="loginForm"
+        ref="loginFormRef"
+        @keyup.enter="login"
       >
         <div class="mb-24">
           <el-form-item prop="username">
             <el-input
-                size="large"
-                class="input-item"
-                v-model="loginForm.username"
-                placeholder="请输入用户名"
+              size="large"
+              class="input-item"
+              v-model="loginForm.username"
+              placeholder="请输入用户名"
             >
             </el-input>
           </el-form-item>
@@ -23,12 +23,12 @@
         <div class="mb-24">
           <el-form-item prop="password">
             <el-input
-                type="password"
-                size="large"
-                class="input-item"
-                v-model="loginForm.password"
-                placeholder="请输入密码"
-                show-password
+              type="password"
+              size="large"
+              class="input-item"
+              v-model="loginForm.password"
+              placeholder="请输入密码"
+              show-password
             >
             </el-input>
           </el-form-item>
@@ -40,10 +40,10 @@
           注册
         </el-button> -->
         <el-button
-            class="forgot-password"
-            @click="router.push('/forgot_password')"
-            link
-            type="primary"
+          class="forgot-password"
+          @click="router.push('/forgot_password')"
+          link
+          type="primary"
         >
           忘记密码?
         </el-button>
@@ -55,21 +55,21 @@
       <div class="text-center mt-16">
         <template v-for="item in modeList">
           <el-button
-              v-if="item !== ''&&loginMode !== item"
-              circle
-              :key="item"
-              class="login-button-circle color-secondary"
-              @click="changeMode(item)"
-          >{{ item }}
+            v-if="item !== '' && loginMode !== item"
+            circle
+            :key="item"
+            class="login-button-circle color-secondary"
+            @click="changeMode(item)"
+            >{{ item }}
           </el-button>
           <el-button
-              v-if="item === ''&&loginMode !== ''"
-              circle
-              :key="item"
-              class="login-button-circle color-secondary"
-              style="font-size: 24px"
-              icon="UserFilled"
-              @click="changeMode('')"
+            v-if="item === '' && loginMode !== ''"
+            circle
+            :key="item"
+            class="login-button-circle color-secondary"
+            style="font-size: 24px"
+            icon="UserFilled"
+            @click="changeMode('')"
           />
         </template>
       </div>
@@ -77,14 +77,14 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
-import type {LoginRequest} from '@/api/type/user'
-import {useRouter} from 'vue-router'
-import type {FormInstance, FormRules} from 'element-plus'
+import { onMounted, ref } from 'vue'
+import type { LoginRequest } from '@/api/type/user'
+import { useRouter } from 'vue-router'
+import type { FormInstance, FormRules } from 'element-plus'
 import useStore from '@/stores'
 
 const loading = ref<boolean>(false)
-const {user} = useStore()
+const { user } = useStore()
 const router = useRouter()
 const loginForm = ref<LoginRequest>({
   username: '',
@@ -109,8 +109,7 @@ const rules = ref<FormRules<LoginRequest>>({
 })
 const loginFormRef = ref<FormInstance>()
 
-
-const modeList = ref<string[]>(['']);
+const modeList = ref<string[]>([''])
 const loginMode = ref('')
 
 function changeMode(val: string) {
@@ -126,25 +125,28 @@ const login = () => {
   loginFormRef.value?.validate().then(() => {
     loading.value = true
     user
-        .login(loginMode.value, loginForm.value.username, loginForm.value.password)
-        .then(() => {
-          router.push({name: 'home'})
-        })
-        .finally(() => (loading.value = false))
+      .login(loginMode.value, loginForm.value.username, loginForm.value.password)
+      .then(() => {
+        router.push({ name: 'home' })
+      })
+      .finally(() => (loading.value = false))
   })
 }
 
 onMounted(() => {
+  user.theme()
   user.asyncGetProfile().then((res) => {
     if (user.isXPack) {
       loading.value = true
-      user.getAuthType().then((res) => {
-        modeList.value = [...modeList.value, ...res];
-      }).finally(() => (loading.value = false))
+      user
+        .getAuthType()
+        .then((res) => {
+          modeList.value = [...modeList.value, ...res]
+        })
+        .finally(() => (loading.value = false))
     }
   })
 })
-
 </script>
 <style lang="scss" scope>
 .login-gradient-divider {

@@ -1,7 +1,6 @@
 import { Result } from '@/request/Result'
 import { get, post, del, put } from '@/request/index'
-import type { TeamMember } from '@/api/type/team'
-
+import type { Ref } from 'vue'
 const prefix = '/display'
 
 /**
@@ -13,7 +12,7 @@ const getThemeInfo: () => Promise<Result<any>> = () => {
 
 /**
  * 更新外观设置
- * @param 参数 
+ * @param 参数
  * * formData {
  *   theme
  *   icon
@@ -23,12 +22,14 @@ const getThemeInfo: () => Promise<Result<any>> = () => {
  *   slogan
  * }
  */
-const postThemeInfo: (data: any) => Promise<Result<boolean>> = (data) => {
-  return post(`${prefix}/update`, data)
+const postThemeInfo: (data: any, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  data,
+  loading
+) => {
+  return post(`${prefix}/update`, data, undefined, loading)
 }
 
 export default {
-    getThemeInfo,
-    postThemeInfo
-  }
-  
+  getThemeInfo,
+  postThemeInfo
+}

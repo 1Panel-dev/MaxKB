@@ -45,9 +45,9 @@ defineProps({
     default: '36px'
   }
 })
-const { common } = useStore()
+const { user } = useStore()
 const isDefaultTheme = computed(() => {
-  return common.isDefaultTheme()
+  return user.isDefaultTheme()
 })
 </script>
 <style lang="scss" scoped>

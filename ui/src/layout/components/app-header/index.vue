@@ -8,9 +8,9 @@
 import { ref, computed, onMounted } from 'vue'
 import TopBar from '../top-bar/index.vue'
 import useStore from '@/stores'
-const { common } = useStore()
+const { user } = useStore()
 const isDefaultTheme = computed(() => {
-  return common.isDefaultTheme()
+  return user.isDefaultTheme()
 })
 </script>
 

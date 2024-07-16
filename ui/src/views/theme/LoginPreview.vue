@@ -3,14 +3,15 @@
     <div class="header">
       <div class="tag flex-between">
         <div class="flex align-center">
-          <LogoIcon height="24px" class="mr-8" />
-          <span class="ellipsis">{{ title }}</span>
+          <img v-if="props.data.icon" :src="fileURL" alt="" height="20px" class="mr-8" />
+          <img v-else src="@/assets/logo/logo.svg" height="24px" class="mr-8" />
+          <span class="ellipsis">{{ data.title }}</span>
         </div>
         <el-icon><Close /></el-icon>
       </div>
     </div>
-    <login-layout style="height: 530px" :themeImg="themeImg">
-      <LoginContainer :subTitle="slogan" class="login-container">
+    <login-layout style="height: 530px">
+      <LoginContainer :subTitle="data.slogan" class="login-container">
         <div class="mask"></div>
         <h2 class="mb-24">{{ '普通登录' }}</h2>
         <el-form class="login-form">
@@ -42,18 +43,24 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
+
 const props = defineProps({
-  themeImg: {
-    type: String,
-    default: 'default'
-  },
-  slogan: {
-    type: String,
-    default: '欢迎使用 MaxKB 智能知识库'
-  },
-  title: {
-    type: String,
-    default: 'MaxKB'
+  data: {
+    type: Object,
+    default: null
+  }
+})
+
+const fileURL = computed(() => {
+  if (props.data.icon) {
+    if (typeof props.data.icon === 'string') {
+      return props.data.icon
+    } else {
+      return URL.createObjectURL(props.data.icon)
+    }
+  } else {
+    return ''
   }
 })
 </script>
