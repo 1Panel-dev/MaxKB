@@ -92,8 +92,7 @@ const useUserStore = defineStore({
 
     async theme() {
       return await ThemeApi.getThemeInfo().then((ok) => {
-        this.themeInfo = ok.data
-        changeTheme(this.themeInfo['theme'])
+        this.setTheme(ok.data)
         window.document.title = this.themeInfo['title'] || 'MaxKB'
         const link = document.querySelector('link[rel="icon"]') as any
         if (link) {
@@ -103,9 +102,9 @@ const useUserStore = defineStore({
     },
 
     async profile() {
-      return UserApi.profile().then((ok) => {
+      return UserApi.profile().then(async (ok) => {
         this.userInfo = ok.data
-        this.theme()
+        await this.theme()
         return this.asyncGetProfile()
       })
     },
