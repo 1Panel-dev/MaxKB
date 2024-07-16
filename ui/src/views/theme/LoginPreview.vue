@@ -79,6 +79,7 @@ const fileURL = computed(() => {
       top: 0;
       height: 100%;
       width: 100%;
+      z-index: 3;
     }
   }
 
