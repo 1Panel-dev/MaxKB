@@ -1,5 +1,5 @@
 <template>
-  <img v-if="user.themeInfo.loginLogo" :src="fileURL" alt="" height="45px" class="mr-8" />
+  <img v-if="user.themeInfo?.loginLogo" :src="fileURL" alt="" height="45px" class="mr-8" />
   <template v-else>
     <svg
       v-if="!isDefaultTheme"
@@ -75,11 +75,11 @@ const isDefaultTheme = computed(() => {
 })
 
 const fileURL = computed(() => {
-  if (user.themeInfo.loginLogo) {
-    if (typeof user.themeInfo.loginLogo === 'string') {
-      return user.themeInfo.loginLogo
+  if (user.themeInfo?.loginLogo) {
+    if (typeof user.themeInfo?.loginLogo === 'string') {
+      return user.themeInfo?.loginLogo
     } else {
-      return URL.createObjectURL(user.themeInfo.loginLogo)
+      return URL.createObjectURL(user.themeInfo?.loginLogo)
     }
   } else {
     return ''
