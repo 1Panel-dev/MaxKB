@@ -20,11 +20,11 @@ defineOptions({ name: 'LoginLayout' })
 const { user } = useStore()
 
 const fileURL = computed(() => {
-  if (user.themeInfo.loginImage) {
-    if (typeof user.themeInfo.loginImage === 'string') {
-      return user.themeInfo.loginImage
+  if (user.themeInfo?.loginImage) {
+    if (typeof user.themeInfo?.loginImage === 'string') {
+      return user.themeInfo?.loginImage
     } else {
-      return URL.createObjectURL(user.themeInfo.loginImage)
+      return URL.createObjectURL(user.themeInfo?.loginImage)
     }
   } else {
     return ''
