@@ -35,7 +35,7 @@ export function getThemeImg(val: string) {
   return themeList.filter((v) => v.value === val)?.[0]?.loginBackground || 'default'
 }
 
-export const defautSetting = {
+export const defaultSetting = {
   icon: '',
   loginLogo: '',
   loginImage: '',
