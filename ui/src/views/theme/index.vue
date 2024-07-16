@@ -136,7 +136,7 @@ import { onBeforeRouteLeave } from 'vue-router'
 import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import LoginPreview from './LoginPreview.vue'
-import { themeList, defautSetting } from '@/utils/theme'
+import { themeList, defaultSetting } from '@/utils/theme'
 import ThemeApi from '@/api/theme'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import useStore from '@/stores'
@@ -199,7 +199,7 @@ function resetTheme() {
 function resetForm() {
   themeForm.value = {
     theme: themeForm.value.theme,
-    ...defautSetting
+    ...defaultSetting
   }
   user.setTheme(themeForm.value)
 }
