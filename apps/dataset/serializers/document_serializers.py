@@ -656,13 +656,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                         paragraphs = get_split_model('web.md').parse(response.content)
                         # 插入
                         DocumentSerializers.Create(data={'dataset_id': dataset_id}).save(
-                            {'name': source_url, 'paragraphs': paragraphs,
+                            {'name': source_url[0:128], 'paragraphs': paragraphs,
                              'meta': {'source_url': source_url, 'selector': selector},
                              'type': Type.web}, with_valid=True)
                     except Exception as e:
                         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
                 else:
-                    Document(name=source_url,
+                    Document(name=source_url[0:128],
                              meta={'source_url': source_url, 'selector': selector},
                              type=Type.web,
                              char_length=0,
