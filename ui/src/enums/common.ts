@@ -14,3 +14,8 @@ export enum ValidCount {
   Dataset = 50,
   User = 2
 }
+
+export enum EditionType {
+  Standard = '社区版',
+  Enterprise = '专业版'
+}

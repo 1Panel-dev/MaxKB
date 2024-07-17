@@ -299,6 +299,10 @@ h5 {
 .border-t-dashed {
   border-top: 1px dashed var(--el-border-color);
 }
+.border-primary {
+  border: 1px solid var(--el-color-primary);
+  color: var(--el-color-primary);
+}
 
 .cursor {
   cursor: pointer;

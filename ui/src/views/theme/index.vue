@@ -22,100 +22,102 @@
               <h5 class="mb-16">页面预览</h5>
               <el-button type="primary" link @click="resetForm"> 恢复默认 </el-button>
             </div>
-            <div class="theme-preview">
-              <el-row :gutter="8">
-                <el-col :span="16">
-                  <LoginPreview :data="themeForm" />
-                </el-col>
-                <el-col :span="8">
-                  <div class="theme-form">
-                    <el-card shadow="never" class="mb-8">
-                      <div class="flex-between mb-8">
-                        <span class="lighter">网站 Logo</span>
-                        <el-upload
-                          ref="uploadRef"
-                          action="#"
-                          :auto-upload="false"
-                          :show-file-list="false"
-                          accept="image/*"
-                          :on-change="
-                            (file: any, fileList: any) => onChange(file, fileList, 'icon')
-                          "
+            <el-scrollbar>
+              <div class="theme-preview">
+                <el-row :gutter="8">
+                  <el-col :span="16">
+                    <LoginPreview :data="themeForm" />
+                  </el-col>
+                  <el-col :span="8">
+                    <div class="theme-form">
+                      <el-card shadow="never" class="mb-8">
+                        <div class="flex-between mb-8">
+                          <span class="lighter">网站 Logo</span>
+                          <el-upload
+                            ref="uploadRef"
+                            action="#"
+                            :auto-upload="false"
+                            :show-file-list="false"
+                            accept="image/*"
+                            :on-change="
+                              (file: any, fileList: any) => onChange(file, fileList, 'icon')
+                            "
+                          >
+                            <el-button size="small"> 替换图片 </el-button>
+                          </el-upload>
+                        </div>
+                        <el-text type="info" size="small"
+                          >顶部网站显示的 Logo，建议尺寸 48 x 48，支持 JPG、PNG、SVG，大小不超过
+                          200KB</el-text
                         >
-                          <el-button size="small"> 替换图片 </el-button>
-                        </el-upload>
-                      </div>
-                      <el-text type="info" size="small"
-                        >顶部网站显示的 Logo，建议尺寸 48 x 48，支持 JPG、PNG、SVG，大小不超过
-                        200KB</el-text
-                      >
-                    </el-card>
-                    <el-card shadow="never" class="mb-8">
-                      <div class="flex-between mb-8">
-                        <span class="lighter">登录 Logo</span>
-                        <el-upload
-                          ref="uploadRef"
-                          action="#"
-                          :auto-upload="false"
-                          :show-file-list="false"
-                          accept="image/*"
-                          :on-change="
-                            (file: any, fileList: any) => onChange(file, fileList, 'loginLogo')
-                          "
+                      </el-card>
+                      <el-card shadow="never" class="mb-8">
+                        <div class="flex-between mb-8">
+                          <span class="lighter">登录 Logo</span>
+                          <el-upload
+                            ref="uploadRef"
+                            action="#"
+                            :auto-upload="false"
+                            :show-file-list="false"
+                            accept="image/*"
+                            :on-change="
+                              (file: any, fileList: any) => onChange(file, fileList, 'loginLogo')
+                            "
+                          >
+                            <el-button size="small"> 替换图片 </el-button>
+                          </el-upload>
+                        </div>
+                        <el-text type="info" size="small"
+                          >登录页面右侧 Logo，建议尺寸 204*52，支持 JPG、PNG、SVG，大小不超过
+                          200KB</el-text
                         >
-                          <el-button size="small"> 替换图片 </el-button>
-                        </el-upload>
-                      </div>
-                      <el-text type="info" size="small"
-                        >登录页面右侧 Logo，建议尺寸 204*52，支持 JPG、PNG、SVG，大小不超过
-                        200KB</el-text
-                      >
-                    </el-card>
-                    <el-card shadow="never" class="mb-8">
-                      <div class="flex-between mb-8">
-                        <span class="lighter">登录背景图</span>
-                        <el-upload
-                          ref="uploadRef"
-                          action="#"
-                          :auto-upload="false"
-                          :show-file-list="false"
-                          accept="image/*"
-                          :on-change="
-                            (file: any, fileList: any) => onChange(file, fileList, 'loginImage')
-                          "
-                        >
-                          <el-button size="small"> 替换图片 </el-button>
-                        </el-upload>
-                      </div>
-                      <el-text type="info" size="small">
-                        左侧背景图，矢量图建议尺寸 576*900，位图建议尺寸1152*1800；支持
-                        JPG、PNG、SVG，大小不超过 5M
-                      </el-text>
-                    </el-card>
+                      </el-card>
+                      <el-card shadow="never" class="mb-8">
+                        <div class="flex-between mb-8">
+                          <span class="lighter">登录背景图</span>
+                          <el-upload
+                            ref="uploadRef"
+                            action="#"
+                            :auto-upload="false"
+                            :show-file-list="false"
+                            accept="image/*"
+                            :on-change="
+                              (file: any, fileList: any) => onChange(file, fileList, 'loginImage')
+                            "
+                          >
+                            <el-button size="small"> 替换图片 </el-button>
+                          </el-upload>
+                        </div>
+                        <el-text type="info" size="small">
+                          左侧背景图，矢量图建议尺寸 576*900，位图建议尺寸1152*1800；支持
+                          JPG、PNG、SVG，大小不超过 5M
+                        </el-text>
+                      </el-card>
 
-                    <el-form
-                      ref="themeFormRef"
-                      :model="themeForm"
-                      label-position="top"
-                      require-asterisk-position="right"
-                      :rules="rules"
-                      @submit.prevent
-                    >
-                      <el-form-item label="网站名称" prop="title">
-                        <el-input v-model="themeForm.title" placeholder="请输入网站名称">
-                        </el-input>
-                        <el-text type="info"> 显示在网页 Tab 的平台名称 </el-text>
-                      </el-form-item>
-                      <el-form-item label="欢迎语" prop="slogan">
-                        <el-input v-model="themeForm.slogan" placeholder="请输入欢迎语"> </el-input>
-                        <el-text type="info"> 产品 Logo 下的 欢迎语 </el-text>
-                      </el-form-item>
-                    </el-form>
-                  </div></el-col
-                >
-              </el-row>
-            </div>
-
+                      <el-form
+                        ref="themeFormRef"
+                        :model="themeForm"
+                        label-position="top"
+                        require-asterisk-position="right"
+                        :rules="rules"
+                        @submit.prevent
+                      >
+                        <el-form-item label="网站名称" prop="title">
+                          <el-input v-model="themeForm.title" placeholder="请输入网站名称">
+                          </el-input>
+                          <el-text type="info"> 显示在网页 Tab 的平台名称 </el-text>
+                        </el-form-item>
+                        <el-form-item label="欢迎语" prop="slogan">
+                          <el-input v-model="themeForm.slogan" placeholder="请输入欢迎语">
+                          </el-input>
+                          <el-text type="info"> 产品 Logo 下的 欢迎语 </el-text>
+                        </el-form-item>
+                      </el-form>
+                    </div></el-col
+                  >
+                </el-row>
+              </div>
+            </el-scrollbar>
             <div class="mt-16">
               <el-text type="info">默认为 MaxKB 登录界面，支持自定义设置</el-text>
             </div>
