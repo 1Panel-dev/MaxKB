@@ -80,11 +80,12 @@ defineExpose({ open })
       color: var(--app-text-color-secondary);
     }
   }
-}
-
-.custom-header {
+  &.custom-header {
   .el-dialog__header {
     background: var(--el-color-primary-light-9) !important;
   }
 }
+}
+
+
 </style>
