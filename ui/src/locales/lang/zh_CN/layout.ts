@@ -12,7 +12,7 @@ export default {
         MenuItem: {
             application: "应用",
             dataset: "知识库",
-            setting: "系统设置"
+            setting: "系统管理"
         },
         avatar: {
             resetPassword: "修改密码",

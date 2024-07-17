@@ -9,31 +9,55 @@
         <LogoFull height="59px" />
       </div>
     </template>
-    <div class="about-ui">
-      <el-card shadow="hover" class="mb-16" @click="toUrl('https://maxkb.cn/docs/')">
-        <div class="flex align-center cursor">
-          <AppIcon iconName="app-reading" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
-          <span>{{ $t('layout.topbar.wiki') }}</span>
-        </div>
-      </el-card>
-      <el-card shadow="hover" class="mb-16" @click="toUrl('https://github.com/1Panel-dev/MaxKB')">
-        <div class="flex align-center cursor">
-          <AppIcon iconName="app-github" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
-          <span>{{ $t('layout.topbar.github') }}</span>
-        </div>
-      </el-card>
-      <el-card shadow="hover" class="mb-16" @click="toUrl('https://bbs.fit2cloud.com/c/mk/11')">
-        <div class="flex align-center cursor">
-          <AppIcon iconName="app-help" class="mr-16 ml-8" style="font-size: 24px"></AppIcon>
-          <span>{{ $t('layout.topbar.forum') }}</span>
-        </div>
-      </el-card>
+    <div class="about-ui" v-loading="loading">
+      <div class="flex">
+        <span class="label">授权给</span><span>{{ licenseInfo?.corporation || '-' }}</span>
+      </div>
+      <div class="flex">
+        <span class="label">ISV</span><span>{{ licenseInfo?.isv || '-' }}</span>
+      </div>
+      <div class="flex">
+        <span class="label">过期时间</span><span>{{ licenseInfo?.expired || '-' }}</span>
+      </div>
+      <div class="flex">
+        <span class="label">版本</span
+        ><span>{{
+          licenseInfo?.edition ? EditionType[licenseInfo.edition as keyof typeof EditionType] : '-'
+        }}</span>
+      </div>
+      <div class="flex">
+        <span class="label">版本号</span><span>{{ licenseInfo?.licenseVersion || '-' }}</span>
+      </div>
+      <div class="flex">
+        <span class="label">序列号</span><span>{{ licenseInfo?.serialNo || '-' }}</span>
+      </div>
+      <div class="flex">
+        <span class="label">备注</span><span>{{ licenseInfo?.remark || '-' }}</span>
+      </div>
+
+      <div class="mt-16 flex align-center" v-hasPermission="new Role('ADMIN')">
+        <el-upload
+          ref="uploadRef"
+          action="#"
+          :auto-upload="false"
+          :show-file-list="false"
+          :on-change="onChange"
+        >
+          <el-button class="border-primary">更新 License</el-button>
+        </el-upload>
+
+        <el-button class="border-primary ml-16" @click="toSupport">获取技术支持</el-button>
+      </div>
     </div>
-    <div class="text-center">{{ $t('layout.topbar.avatar.version') }}:{{ user.version }}</div>
+
+    <!-- <div class="text-center">{{ $t('layout.topbar.avatar.version') }}:{{ user.version }}</div> -->
   </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import licenseApi from '@/api/license'
+import { EditionType } from '@/enums/common'
+import { Role } from '@/utils/permission/type'
 import useStore from '@/stores'
 const { user } = useStore()
 const isDefaultTheme = computed(() => {
@@ -41,12 +65,29 @@ const isDefaultTheme = computed(() => {
 })
 
 const aboutDialogVisible = ref(false)
+const loading = ref(false)
+const licenseInfo = ref<any>(null)
 
 const open = () => {
+  getLicenseInfo()
   aboutDialogVisible.value = true
 }
 
-function toUrl(url: string) {
+const onChange = (file: any) => {
+  let fd = new FormData()
+  fd.append('license_file', file.raw)
+  licenseApi.putLicense(fd, loading).then((res: any) => {
+    getLicenseInfo()
+  })
+}
+function getLicenseInfo() {
+  licenseApi.getLicense(loading).then((res: any) => {
+    licenseInfo.value = res.data?.license
+  })
+}
+
+function toSupport() {
+  const url = 'https://support.fit2cloud.com/'
   window.open(url, '_blank')
 }
 
@@ -69,22 +110,23 @@ defineExpose({ open })
     box-sizing: border-box;
   }
   .about-ui {
-    width: 360px;
+    width: 450px;
     margin: 0 auto;
     font-weight: 400;
-    font-size: 16px;
+    font-size: 14px;
     margin-top: 24px;
+    line-height: 36px;
+
     .label {
-      width: 180px;
+      width: 150px;
       text-align: left;
       color: var(--app-text-color-secondary);
     }
   }
-}
-
-.custom-header {
-  .el-dialog__header {
-    background: var(--el-color-primary-light-9) !important;
+  &.custom-header {
+    .el-dialog__header {
+      background: var(--el-color-primary-light-9) !important;
+    }
   }
 }
 </style>
