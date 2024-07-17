@@ -300,6 +300,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                                          min_length=1)
             source_url = serializers.CharField(required=True, error_messages=ErrMessage.char("Web 根地址"), )
 
+            embedding_mode_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("向量模型"))
+
             selector = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                              error_messages=ErrMessage.char("选择器"))
 
@@ -351,6 +353,8 @@ class DataSetSerializers(serializers.ModelSerializer):
                     properties={
                         'name': openapi.Schema(type=openapi.TYPE_STRING, title="知识库名称", description="知识库名称"),
                         'desc': openapi.Schema(type=openapi.TYPE_STRING, title="知识库描述", description="知识库描述"),
+                        'embedding_mode_id': openapi.Schema(type=openapi.TYPE_STRING, title="向量模型id",
+                                                            description="向量模型id"),
                         'source_url': openapi.Schema(type=openapi.TYPE_STRING, title="web站点url",
                                                      description="web站点url"),
                         'selector': openapi.Schema(type=openapi.TYPE_STRING, title="选择器", description="选择器")
@@ -459,7 +463,8 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset = DataSet(
                 **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id,
                    'type': Type.web,
-                   'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector')}})
+                   'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector'),
+                            'embedding_mode_id': instance.get('embedding_mode_id')}})
             dataset.save()
             ListenerManagement.sync_web_dataset_signal.send(
                 SyncWebDatasetArgs(str(dataset_id), instance.get('source_url'), instance.get('selector'),
