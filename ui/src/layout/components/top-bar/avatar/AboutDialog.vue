@@ -17,7 +17,13 @@
         <span class="label">ISV</span><span>{{ licenseInfo?.isv || '-' }}</span>
       </div>
       <div class="flex">
-        <span class="label">过期时间</span><span>{{ licenseInfo?.expired || '-' }}</span>
+        <span class="label">过期时间</span>
+        <span
+          >{{ licenseInfo?.expired || '-' }}
+          <span class="danger" v-if="fromNowDate(licenseInfo?.expired)"
+            >（{{ fromNowDate(licenseInfo?.expired) }}）</span
+          ></span
+        >
       </div>
       <div class="flex">
         <span class="label">版本</span
@@ -58,6 +64,7 @@ import { ref, computed } from 'vue'
 import licenseApi from '@/api/license'
 import { EditionType } from '@/enums/common'
 import { Role } from '@/utils/permission/type'
+import { fromNowDate } from '@/utils/time'
 import useStore from '@/stores'
 const { user } = useStore()
 const isDefaultTheme = computed(() => {
