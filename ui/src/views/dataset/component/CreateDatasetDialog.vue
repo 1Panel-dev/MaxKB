@@ -70,10 +70,10 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false">
+        <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitValid">
+        <el-button type="primary" @click="submitValid" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.create') }}
         </el-button>
       </span>
@@ -126,18 +126,16 @@ const submitValid = () => {
   if (user.isEnterprise()) {
     submitHandle()
   } else {
-    common
-      .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
-      .then(async (res: any) => {
-        if (res?.data) {
-          submitHandle()
-        } else {
-          MsgAlert(
-            '提示',
-            '社区版最多支持 5 个应用，如需拥有更多应用，请联系我们（https://fit2cloud.com/）。'
-          )
-        }
-      })
+    common.asyncGetValid(ValidType.Dataset, ValidCount.Dataset, loading).then(async (res: any) => {
+      if (res?.data) {
+        submitHandle()
+      } else {
+        MsgAlert(
+          '提示',
+          '社区版最多支持 50 个知识库，如需拥有更多知识库，请联系我们（https://fit2cloud.com/）。'
+        )
+      }
+    })
   }
 }
 const submitHandle = async () => {
