@@ -15,7 +15,6 @@ from functools import reduce
 from typing import Dict, List
 from urllib.parse import urlparse
 
-from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core import validators
 from django.db import transaction, models
@@ -25,7 +24,7 @@ from drf_yasg import openapi
 from rest_framework import serializers
 
 from application.models import ApplicationDatasetMapping
-from common.config.embedding_config import VectorStore, EmbeddingModel
+from common.config.embedding_config import VectorStore
 from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.db.sql_execute import select_list
 from common.event import ListenerManagement, SyncWebDatasetArgs
@@ -37,7 +36,8 @@ from common.util.file_util import get_file_content
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping
-from dataset.serializers.common_serializers import list_paragraph, MetaSerializer, ProblemParagraphManage
+from dataset.serializers.common_serializers import list_paragraph, MetaSerializer, ProblemParagraphManage, \
+    get_embedding_model_by_dataset_id
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
 from embedding.models import SearchMode
 from setting.models import AuthOperate
@@ -359,8 +359,9 @@ class DataSetSerializers(serializers.ModelSerializer):
 
         @staticmethod
         def post_embedding_dataset(document_list, dataset_id):
+            model = get_embedding_model_by_dataset_id(dataset_id)
             # 发送向量化事件
-            ListenerManagement.embedding_by_dataset_signal.send(dataset_id)
+            ListenerManagement.embedding_by_dataset_signal.send(dataset_id, embedding_model=model)
             return document_list
 
         def save_qa(self, instance: Dict, with_valid=True):
@@ -565,12 +566,13 @@ class DataSetSerializers(serializers.ModelSerializer):
                                         QuerySet(Document).filter(
                                             dataset_id=self.data.get('id'),
                                             is_active=False)]
+            model = get_embedding_model_by_dataset_id(self.data.get('id'))
             # 向量库检索
             hit_list = vector.hit_test(self.data.get('query_text'), [self.data.get('id')], exclude_document_id_list,
                                        self.data.get('top_number'),
                                        self.data.get('similarity'),
                                        SearchMode(self.data.get('search_mode')),
-                                       EmbeddingModel.get_embedding_model())
+                                       model)
             hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get('paragraph_id'): hit} for hit in hit_list], {})
             p_list = list_paragraph([h.get('paragraph_id') for h in hit_list])
             return [{**p, 'similarity': hit_dict.get(p.get('id')).get('similarity'),

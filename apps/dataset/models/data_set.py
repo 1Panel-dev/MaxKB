@@ -49,8 +49,8 @@ class DataSet(AppModelMixin):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="所属用户")
     type = models.CharField(verbose_name='类型', max_length=1, choices=Type.choices,
                             default=Type.base)
-    embedding_mode_id = models.ForeignKey(Model, on_delete=models.DO_NOTHING, verbose_name="向量模型",
-                                          default=default_model)
+    embedding_mode = models.ForeignKey(Model, on_delete=models.DO_NOTHING, verbose_name="向量模型",
+                                       default=default_model)
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:
