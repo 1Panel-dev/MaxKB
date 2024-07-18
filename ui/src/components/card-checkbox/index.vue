@@ -18,7 +18,8 @@
         </slot>
         <slot></slot>
       </div>
-      <el-checkbox v-bind:modelValue="modelValue.includes(toModelValue)"> </el-checkbox>
+      <el-checkbox v-bind:modelValue="modelValue.includes(toModelValue)" @change="checkboxChange">
+      </el-checkbox>
     </div>
   </el-card>
 </template>
@@ -40,7 +41,7 @@ const toModelValue = computed(() => (props.valueField ? props.data[props.valueFi
 //   set: (val) => val
 // })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'change'])
 
 const checked = () => {
   const value = props.modelValue ? props.modelValue : []
@@ -52,6 +53,10 @@ const checked = () => {
   } else {
     emit('update:modelValue', [...value, toModelValue.value])
   }
+}
+
+function checkboxChange() {
+  emit('change')
 }
 </script>
 <style lang="scss" scoped>

@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import modelApi from '@/api/model'
-import type { modelRequest, Provider } from '@/api/type/model'
+import type { ListModelRequest, Provider } from '@/api/type/model'
 const useModelStore = defineStore({
   id: 'model',
   state: () => ({}),
   actions: {
-    async asyncGetModel(data?: modelRequest) {
+    async asyncGetModel(data?: ListModelRequest) {
       return new Promise((resolve, reject) => {
         modelApi
           .getModel(data)
