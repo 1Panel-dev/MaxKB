@@ -26,12 +26,7 @@
         >
       </div>
       <div class="flex">
-        <span class="label">版本</span
-        ><span>{{
-          user.isXPack
-            ? EditionType[licenseInfo.edition as keyof typeof EditionType] || '专业版'
-            : '社区版'
-        }}</span>
+        <span class="label">版本</span><span>{{ user.isXPack ? '专业版' : '社区版' }}</span>
       </div>
       <div class="flex">
         <span class="label">版本号</span
@@ -63,8 +58,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import licenseApi from '@/api/license'
-import { EditionType } from '@/enums/common'
-import { ComplexPermission } from '@/utils/permission/type'
 import { fromNowDate } from '@/utils/time'
 import useStore from '@/stores'
 const { user } = useStore()
