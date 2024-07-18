@@ -785,6 +785,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                             QuerySet(ApplicationDatasetMapping).filter(
                                 dataset_id=self.data.get('id'))]))}
 
+        @transaction.atomic
         def edit(self, dataset: Dict, user_id: str):
             """
             修改知识库

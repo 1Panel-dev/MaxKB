@@ -159,6 +159,8 @@ class ListenerManagement:
         @param embedding_model 向量模型
         :return: None
         """
+        if not try_lock('embedding' + document_id):
+            return
         max_kb.info(f"开始--->向量化文档:{document_id}")
         QuerySet(Document).filter(id=document_id).update(**{'status': Status.embedding})
         QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': Status.embedding})
@@ -184,6 +186,7 @@ class ListenerManagement:
                 **{'status': status, 'update_time': datetime.datetime.now()})
             QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': status})
             max_kb.info(f"结束--->向量化文档:{document_id}")
+            un_lock('embedding' + document_id)
 
     @staticmethod
     @embedding_poxy
@@ -196,6 +199,7 @@ class ListenerManagement:
         """
         max_kb.info(f"开始--->向量化数据集:{dataset_id}")
         try:
+            ListenerManagement.delete_embedding_by_dataset(dataset_id)
             document_list = QuerySet(Document).filter(dataset_id=dataset_id)
             max_kb.info(f"数据集文档:{[d.name for d in document_list]}")
             for document in document_list:
