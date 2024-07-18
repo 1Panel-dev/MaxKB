@@ -260,6 +260,7 @@ class ChatSerializers(serializers.Serializer):
 
     class OpenWorkFlowChat(serializers.Serializer):
         work_flow = WorkFlowSerializers(error_messages=ErrMessage.uuid("工作流"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
         def open(self):
             self.is_valid(raise_exception=True)
@@ -270,7 +271,8 @@ class ChatSerializers(serializers.Serializer):
                                       dataset_setting={},
                                       model_setting={},
                                       problem_optimization=None,
-                                      type=ApplicationTypeChoices.WORK_FLOW
+                                      type=ApplicationTypeChoices.WORK_FLOW,
+                                      user_id=self.data.get('user_id')
                                       )
             work_flow_version = WorkFlowVersion(work_flow=work_flow)
             chat_cache.set(chat_id,
@@ -333,7 +335,8 @@ class ChatSerializers(serializers.Serializer):
             application = Application(id=None, dialogue_number=3, model=model,
                                       dataset_setting=self.data.get('dataset_setting'),
                                       model_setting=self.data.get('model_setting'),
-                                      problem_optimization=self.data.get('problem_optimization'))
+                                      problem_optimization=self.data.get('problem_optimization'),
+                                      user_id=user_id)
             chat_cache.set(chat_id,
                            ChatInfo(chat_id, chat_model, dataset_id_list,
                                     [str(document.id) for document in

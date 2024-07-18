@@ -23,11 +23,13 @@ from setting.models_provider import get_model
 from smartdoc.conf import PROJECT_DIR
 
 
-def get_model_by_id(_id):
+def get_model_by_id(_id, user_id):
     model = QuerySet(Model).filter(id=_id).first()
     if model is None:
         raise Exception("模型不存在")
-    return get_model(model)
+    if model.permission_type == 'PRIVATE' and str(model.user_id) != str(user_id):
+        raise Exception(f"无权限使用此模型:{model.name}")
+    return model
 
 
 def get_embedding_id(dataset_id_list):
@@ -53,7 +55,8 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
         if len(dataset_id_list) == 0:
             return get_none_result(question)
         model_id = get_embedding_id(dataset_id_list)
-        embedding_model = EmbeddingModelManage.get_model(model_id, get_model_by_id)
+        model = get_model_by_id(model_id, self.flow_params_serializer.data.get('user_id'))
+        embedding_model = EmbeddingModelManage.get_model(model_id, lambda _id: get_model(model))
         embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()
         exclude_document_id_list = [str(document.id) for document in
