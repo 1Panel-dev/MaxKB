@@ -129,11 +129,12 @@ const getDatasetDetail: (dataset_id: string, loading?: Ref<boolean>) => Promise<
       "desc": true
     }
  */
-const putDataset: (dataset_id: string, data: any) => Promise<Result<any>> = (
-  dataset_id,
-  data: any
-) => {
-  return put(`${prefix}/${dataset_id}`, data)
+const putDataset: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, data, loading) => {
+  return put(`${prefix}/${dataset_id}`, data, undefined, loading)
 }
 /**
  * 获取知识库 可关联的应用列表
