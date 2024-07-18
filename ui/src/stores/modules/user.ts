@@ -78,10 +78,13 @@ const useUserStore = defineStore({
     async asyncGetProfile() {
       return new Promise((resolve, reject) => {
         UserApi.getProfile()
-          .then((ok) => {
+          .then(async (ok) => {
             this.version = ok.data?.version || '-'
             this.isXPack = ok.data?.IS_XPACK
             this.XPACK_LICENSE_IS_VALID = ok.data?.XPACK_LICENSE_IS_VALID
+            if (this.isEnterprise()) {
+              await this.theme()
+            }
             resolve(ok)
           })
           .catch((error) => {
@@ -104,7 +107,6 @@ const useUserStore = defineStore({
     async profile() {
       return UserApi.profile().then(async (ok) => {
         this.userInfo = ok.data
-        await this.theme()
         return this.asyncGetProfile()
       })
     },
