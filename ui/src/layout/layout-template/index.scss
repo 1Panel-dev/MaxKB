@@ -9,6 +9,9 @@
   padding: var(--app-header-height) 0 0 !important;
   box-sizing: border-box;
   overflow: auto;
+  &.isExpire {
+    padding-top: calc(var(--app-header-height) + 40px) !important;
+  }
 }
 
 .sidebar-container {

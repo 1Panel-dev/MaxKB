@@ -17,7 +17,7 @@
         <span class="label">ISV</span><span>{{ licenseInfo?.isv || '-' }}</span>
       </div>
       <div class="flex">
-        <span class="label">过期时间</span>
+        <span class="label">到期时间</span>
         <span
           >{{ licenseInfo?.expired || '-' }}
           <span class="danger" v-if="licenseInfo?.expired && fromNowDate(licenseInfo?.expired)"
@@ -28,8 +28,8 @@
       <div class="flex">
         <span class="label">版本</span
         ><span>{{
-          licenseInfo?.edition
-            ? EditionType[licenseInfo.edition as keyof typeof EditionType]
+          user.isXPack
+            ? EditionType[licenseInfo.edition as keyof typeof EditionType] || '专业版'
             : '社区版'
         }}</span>
       </div>
@@ -44,10 +44,7 @@
         <span class="label">备注</span><span>{{ licenseInfo?.remark || '-' }}</span>
       </div>
 
-      <div
-        class="mt-16 flex align-center"
-        v-hasPermission="new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')"
-      >
+      <div class="mt-16 flex align-center" v-if="user.isXPack">
         <el-upload
           ref="uploadRef"
           action="#"
@@ -80,7 +77,7 @@ const loading = ref(false)
 const licenseInfo = ref<any>(null)
 
 const open = () => {
-  if (user.isEnterprise()) {
+  if (user.isXPack) {
     getLicenseInfo()
   }
 

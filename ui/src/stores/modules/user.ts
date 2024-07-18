@@ -82,6 +82,7 @@ const useUserStore = defineStore({
             this.version = ok.data?.version || '-'
             this.isXPack = ok.data?.IS_XPACK
             this.XPACK_LICENSE_IS_VALID = ok.data?.XPACK_LICENSE_IS_VALID
+
             if (this.isEnterprise()) {
               await this.theme()
             }
