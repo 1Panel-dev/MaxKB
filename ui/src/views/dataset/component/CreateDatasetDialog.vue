@@ -89,6 +89,8 @@ import { MsgSuccess, MsgAlert } from '@/utils/message'
 import useStore from '@/stores'
 import { ValidType, ValidCount } from '@/enums/common'
 
+const emit = defineEmits(['refresh'])
+
 const { common, user } = useStore()
 const router = useRouter()
 const BaseFormRef = ref()
@@ -150,12 +152,14 @@ const submitHandle = async () => {
           datasetApi.postDataset(obj, loading).then((res) => {
             MsgSuccess('创建成功')
             router.push({ path: `/dataset/${res.data.id}/document` })
+            emit('refresh')
           })
         } else {
           const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
           datasetApi.postWebDataset(obj, loading).then((res) => {
             MsgSuccess('创建成功')
             router.push({ path: `/dataset/${res.data.id}/document` })
+            emit('refresh')
           })
         }
       } else {
