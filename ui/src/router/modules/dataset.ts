@@ -13,9 +13,9 @@ const datasetRouter = {
     },
     {
       path: '/dataset/:type', // create 或者 upload
-      name: 'CreateDataset',
+      name: 'UploadDocumentDataset',
       meta: { activeMenu: '/dataset' },
-      component: () => import('@/views/dataset/CreateDataset.vue'),
+      component: () => import('@/views/dataset/UploadDocumentDataset.vue'),
       hidden: true
     },
     {

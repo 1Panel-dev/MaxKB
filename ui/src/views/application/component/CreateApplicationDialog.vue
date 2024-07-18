@@ -63,10 +63,10 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false">
+        <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitValid(applicationFormRef)">
+        <el-button type="primary" @click="submitValid(applicationFormRef)" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.create') }}
         </el-button>
       </span>

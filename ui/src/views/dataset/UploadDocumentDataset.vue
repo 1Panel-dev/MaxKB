@@ -1,15 +1,18 @@
 <template>
-  <LayoutContainer :header="isCreate ? '创建知识库' : '上传文档'" class="create-dataset">
+  <LayoutContainer header="上传文档" class="create-dataset">
     <template #backButton>
       <back-button @click="back"></back-button>
     </template>
     <div class="create-dataset__main flex" v-loading="loading">
       <div class="create-dataset__component main-calc-height">
         <template v-if="active === 0">
-          <StepFirst ref="StepFirstRef" />
+          <div class="upload-document p-24">
+            <!-- 上传文档 -->
+            <UploadComponent ref="UploadComponentRef" />
+          </div>
         </template>
         <template v-else-if="active === 1">
-          <StepSecond ref="StepSecondRef" />
+          <SetRules ref="SetRulesRef" />
         </template>
         <template v-else-if="active === 2">
           <ResultSuccess :data="successInfo" />
@@ -19,12 +22,7 @@
     <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
       <el-button @click="router.go(-1)" :disabled="loading">取消</el-button>
       <el-button @click="prev" v-if="active === 1" :disabled="loading">上一步</el-button>
-      <el-button
-        @click="next"
-        type="primary"
-        v-if="active === 0"
-        :disabled="loading || StepFirstRef?.loading"
-      >
+      <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading">
         创建并导入
       </el-button>
       <el-button @click="submit" type="primary" v-if="active === 1" :disabled="loading">
@@ -36,9 +34,9 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import StepFirst from './step/StepFirst.vue'
-import StepSecond from './step/StepSecond.vue'
-import ResultSuccess from './step/ResultSuccess.vue'
+import SetRules from './component/SetRules.vue'
+import ResultSuccess from './component/ResultSuccess.vue'
+import UploadComponent from './component/UploadComponent.vue'
 import datasetApi from '@/api/dataset'
 import documentApi from '@/api/document'
 import type { datasetData } from '@/api/type/dataset'
@@ -46,33 +44,17 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 import useStore from '@/stores'
 const { dataset, document } = useStore()
-const baseInfo = computed(() => dataset.baseInfo)
-const webInfo = computed(() => dataset.webInfo)
 const documentsFiles = computed(() => dataset.documentsFiles)
 const documentsType = computed(() => dataset.documentsType)
 
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { type },
   query: { id } // id为datasetID，有id的是上传文档
 } = route
-const isCreate = type === 'create'
-// const steps = [
-//   {
-//     ref: 'StepFirstRef',
-//     name: '上传文档',
-//     component: StepFirst
-//   },
-//   {
-//     ref: 'StepSecondRef',
-//     name: '设置分段规则',
-//     component: StepSecond
-//   }
-// ]
 
-const StepFirstRef = ref()
-const StepSecondRef = ref()
+const SetRulesRef = ref()
+const UploadComponentRef = ref()
 
 const loading = ref(false)
 const disabled = ref(false)
@@ -81,7 +63,7 @@ const successInfo = ref<any>(null)
 
 async function next() {
   disabled.value = true
-  if (await StepFirstRef.value?.onSubmit()) {
+  if (await UploadComponentRef.value.validate()) {
     if (documentsType.value === 'QA') {
       let fd = new FormData()
       documentsFiles.value.forEach((item: any) => {
@@ -118,16 +100,14 @@ const prev = () => {
 }
 
 function clearStore() {
-  dataset.saveBaseInfo(null)
-  dataset.saveWebInfo(null)
   dataset.saveDocumentsFile([])
   dataset.saveDocumentsType('')
 }
 function submit() {
   loading.value = true
   const documents = [] as any
-  StepSecondRef.value?.paragraphList.map((item: any) => {
-    if (!StepSecondRef.value?.checkedConnect) {
+  SetRulesRef.value?.paragraphList.map((item: any) => {
+    if (!SetRulesRef.value?.checkedConnect) {
       item.content.map((v: any) => {
         delete v['problem_list']
       })
@@ -159,7 +139,7 @@ function submit() {
   }
 }
 function back() {
-  if (baseInfo.value || webInfo.value || documentsFiles.value?.length > 0) {
+  if (documentsFiles.value?.length > 0) {
     MsgConfirm(`提示`, `当前的更改尚未保存，确认退出吗?`, {
       confirmButtonText: '确认',
       type: 'warning'
@@ -205,6 +185,11 @@ onUnmounted(() => {
     background: #ffffff;
     width: 100%;
     box-sizing: border-box;
+  }
+  .upload-document {
+    width: 70%;
+    margin: 0 auto;
+    margin-bottom: 20px;
   }
 }
 </style>

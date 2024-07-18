@@ -3,6 +3,7 @@
     <div class="dataset-setting main-calc-height">
       <el-scrollbar>
         <div class="p-24" v-loading="loading">
+          <h4 class="title-decoration-1 mb-16">基本信息</h4>
           <BaseForm ref="BaseFormRef" :data="detail" />
 
           <el-form

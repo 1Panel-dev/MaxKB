@@ -1,5 +1,4 @@
 <template>
-  <h4 class="title-decoration-1 mb-16">基本信息</h4>
   <el-form
     ref="FormRef"
     :model="form"
@@ -27,14 +26,26 @@
         @blur="form.desc = form.desc.trim()"
       />
     </el-form-item>
+    <el-form-item label="Embedding模型" prop="embedding_mode_id">
+      <el-select
+        v-model="form.embedding_mode_id"
+        class="w-full m-2"
+        placeholder="请选择Embedding模型"
+      >
+        <el-option
+          v-for="item in modelOptions"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+        ></el-option>
+      </el-select>
+    </el-form-item>
   </el-form>
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import type { datasetData } from '@/api/type/dataset'
-import { isAllPropertiesEmpty } from '@/utils/utils'
 
 const props = defineProps({
   data: {
@@ -42,47 +53,33 @@ const props = defineProps({
     default: () => {}
   }
 })
-const route = useRoute()
-const {
-  params: { type }
-} = route
-const isCreate = type === 'create'
-const { dataset } = useStore()
-const baseInfo = computed(() => dataset.baseInfo)
+const { model } = useStore()
 const form = ref<datasetData>({
   name: '',
-  desc: ''
+  desc: '',
+  embedding_mode_id: ''
 })
 
 const rules = reactive({
   name: [{ required: true, message: '请输入知识库名称', trigger: 'blur' }],
-  desc: [{ required: true, message: '请输入知识库描述', trigger: 'blur' }]
+  desc: [{ required: true, message: '请输入知识库描述', trigger: 'blur' }],
+  embedding_mode_id: [{ required: true, message: '请输入Embedding模型', trigger: 'change' }]
 })
 const FormRef = ref()
+const modelOptions = ref([])
 
 watch(
   () => props.data,
   (value) => {
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
-      form.value.desc = value.desc
+      form.value.embedding_mode_id = value.embedding_mode_id
     }
   },
   {
     immediate: true
   }
 )
-
-watch(form.value, (value) => {
-  if (isAllPropertiesEmpty(value)) {
-    dataset.saveBaseInfo(null)
-  } else {
-    if (isCreate) {
-      dataset.saveBaseInfo(value)
-    }
-  }
-})
-
 /*
   表单校验
 */
@@ -93,16 +90,22 @@ function validate() {
   })
 }
 
+function getModel() {
+  model.asyncGetModel({ model_type: 'EMBEDDING' }).then((res: any) => {
+    modelOptions.value = res?.data
+  })
+}
+
 onMounted(() => {
-  if (baseInfo.value) {
-    form.value = baseInfo.value
-  }
+  getModel()
 })
 onUnmounted(() => {
   form.value = {
     name: '',
-    desc: ''
+    desc: '',
+    embedding_mode_id: ''
   }
+  FormRef.value?.clearValidate()
 })
 
 defineExpose({
