@@ -134,7 +134,9 @@ const login = () => {
 }
 
 onMounted(() => {
-  user.theme()
+  if (user.isEnterprise()) {
+    user.theme()
+  }
   user.asyncGetProfile().then((res) => {
     if (user.isXPack) {
       loading.value = true
