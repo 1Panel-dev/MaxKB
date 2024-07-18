@@ -20,9 +20,9 @@ from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
 from common.util.field_message import ErrMessage
-from dataset.models import Paragraph, Problem, Document, ProblemParagraphMapping
+from dataset.models import Paragraph, Problem, Document, ProblemParagraphMapping, DataSet
 from dataset.serializers.common_serializers import update_document_char_length, BatchSerializer, ProblemParagraphObject, \
-    ProblemParagraphManage, get_embedding_model_by_dataset_id
+    ProblemParagraphManage, get_embedding_model_by_dataset_id, get_embedding_model_by_dataset
 from dataset.serializers.problem_serializers import ProblemInstanceSerializer, ProblemSerializer, ProblemSerializers
 from embedding.models import SourceType
 
@@ -338,10 +338,11 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                     # 修改mapping
                     QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list,
                                                                   ['document_id'])
+
                 # 修改向量段落信息
                 ListenerManagement.update_embedding_document_id(UpdateEmbeddingDocumentIdArgs(
                     [paragraph.id for paragraph in paragraph_list],
-                    target_document_id, target_dataset_id))
+                    target_document_id, target_dataset_id, target_embedding_model=None))
                 # 修改段落信息
                 paragraph_list.update(document_id=target_document_id)
             # 不同数据集迁移
@@ -368,12 +369,19 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 # 修改mapping
                 QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list,
                                                               ['problem_id', 'dataset_id', 'document_id'])
-                # 修改向量段落信息
-                ListenerManagement.update_embedding_document_id(UpdateEmbeddingDocumentIdArgs(
-                    [paragraph.id for paragraph in paragraph_list],
-                    target_document_id, target_dataset_id))
+                target_dataset = QuerySet(DataSet).filter(id=target_dataset_id).first()
+                dataset = QuerySet(DataSet).filter(id=dataset_id).first()
+                embedding_model = None
+                if target_dataset.embedding_mode_id != dataset.embedding_mode_id:
+                    embedding_model = get_embedding_model_by_dataset(target_dataset)
+                pid_list = [paragraph.id for paragraph in paragraph_list]
                 # 修改段落信息
                 paragraph_list.update(dataset_id=target_dataset_id, document_id=target_document_id)
+                # 修改向量段落信息
+                ListenerManagement.update_embedding_document_id(UpdateEmbeddingDocumentIdArgs(
+                    pid_list,
+                    target_document_id, target_dataset_id, target_embedding_model=embedding_model))
+
             update_document_char_length(document_id)
             update_document_char_length(target_document_id)
 

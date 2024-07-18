@@ -235,12 +235,17 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                      meta={})
             else:
                 document_list.update(dataset_id=target_dataset_id)
-            # 修改向量信息
-            ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
-                [paragraph.id for paragraph in paragraph_list],
-                target_dataset_id))
+            model = None
+            if dataset.embedding_mode_id != target_dataset.embedding_mode_id:
+                model = get_embedding_model_by_dataset_id(target_dataset_id)
+
+            pid_list = [paragraph.id for paragraph in paragraph_list]
             # 修改段落信息
             paragraph_list.update(dataset_id=target_dataset_id)
+            # 修改向量信息
+            ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
+                pid_list,
+                target_dataset_id, model))
 
         @staticmethod
         def get_target_dataset_problem(target_dataset_id: str,

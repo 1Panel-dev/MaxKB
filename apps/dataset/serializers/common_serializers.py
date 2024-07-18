@@ -147,3 +147,7 @@ def get_embedding_model_by_dataset_id_list(dataset_id_list: List):
 def get_embedding_model_by_dataset_id(dataset_id: str):
     dataset = QuerySet(DataSet).select_related('embedding_mode').filter(id=dataset_id).first()
     return EmbeddingModelManage.get_model(dataset_id, lambda _id: get_model(dataset.embedding_mode))
+
+
+def get_embedding_model_by_dataset(dataset):
+    return EmbeddingModelManage.get_model(str(dataset.id), lambda _id: get_model(dataset.embedding_mode))

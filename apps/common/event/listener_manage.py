@@ -47,22 +47,26 @@ class SyncWebDocumentArgs:
 
 
 class UpdateProblemArgs:
-    def __init__(self, problem_id: str, problem_content: str):
+    def __init__(self, problem_id: str, problem_content: str, embedding_model: Embeddings):
         self.problem_id = problem_id
         self.problem_content = problem_content
+        self.embedding_model = embedding_model
 
 
 class UpdateEmbeddingDatasetIdArgs:
-    def __init__(self, paragraph_id_list: List[str], target_dataset_id: str):
+    def __init__(self, paragraph_id_list: List[str], target_dataset_id: str, target_embedding_model: Embeddings):
         self.paragraph_id_list = paragraph_id_list
         self.target_dataset_id = target_dataset_id
+        self.target_embedding_model = target_embedding_model
 
 
 class UpdateEmbeddingDocumentIdArgs:
-    def __init__(self, paragraph_id_list: List[str], target_document_id: str, target_dataset_id: str):
+    def __init__(self, paragraph_id_list: List[str], target_document_id: str, target_dataset_id: str,
+                 target_embedding_model: Embeddings = None):
         self.paragraph_id_list = paragraph_id_list
         self.target_document_id = target_document_id
         self.target_dataset_id = target_dataset_id
+        self.target_embedding_model = target_embedding_model
 
 
 class ListenerManagement:
@@ -87,6 +91,36 @@ class ListenerManagement:
     @staticmethod
     def embedding_by_problem(args, embedding_model: Embeddings):
         VectorStore.get_embedding_vector().save(**args, embedding=embedding_model)
+
+    @staticmethod
+    def embedding_by_paragraph_list(paragraph_id_list, embedding_model: Embeddings):
+        try:
+            data_list = native_search(
+                {'problem': QuerySet(get_dynamics_model({'paragraph.id': django.db.models.CharField()})).filter(
+                    **{'paragraph.id__in': paragraph_id_list}),
+                    'paragraph': QuerySet(Paragraph).filter(id__in=paragraph_id_list)},
+                select_string=get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
+            ListenerManagement.embedding_by_paragraph_data_list(data_list, paragraph_id_list=paragraph_id_list,
+                                                                embedding_model=embedding_model)
+        except Exception as e:
+            max_kb_error.error(f'查询向量数据:{paragraph_id_list}出现错误{str(e)}{traceback.format_exc()}')
+
+    @staticmethod
+    @embedding_poxy
+    def embedding_by_paragraph_data_list(data_list, paragraph_id_list, embedding_model: Embeddings):
+        max_kb.info(f'开始--->向量化段落:{paragraph_id_list}')
+        try:
+            # 删除段落
+            VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_id_list)
+            # 批量向量化
+            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model)
+        except Exception as e:
+            max_kb_error.error(f'向量化段落:{paragraph_id_list}出现错误{str(e)}{traceback.format_exc()}')
+            status = Status.error
+        finally:
+            QuerySet(Paragraph).filter(id__in=paragraph_id_list).update(**{'status': status})
+            max_kb.info(f'结束--->向量化段落:{paragraph_id_list}')
 
     @staticmethod
     @embedding_poxy
@@ -227,14 +261,22 @@ class ListenerManagement:
 
     @staticmethod
     def update_embedding_dataset_id(args: UpdateEmbeddingDatasetIdArgs):
-        VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
-                                                                   {'dataset_id': args.target_dataset_id})
+        if args.target_embedding_model is None:
+            VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
+                                                                       {'dataset_id': args.target_dataset_id})
+        else:
+            ListenerManagement.embedding_by_paragraph_list(args.paragraph_id_list,
+                                                           embedding_model=args.target_embedding_model)
 
     @staticmethod
     def update_embedding_document_id(args: UpdateEmbeddingDocumentIdArgs):
-        VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
-                                                                   {'document_id': args.target_document_id,
-                                                                    'dataset_id': args.target_dataset_id})
+        if args.target_embedding_model is None:
+            VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
+                                                                       {'document_id': args.target_document_id,
+                                                                        'dataset_id': args.target_dataset_id})
+        else:
+            ListenerManagement.embedding_by_paragraph_list(args.paragraph_id_list,
+                                                           embedding_model=args.target_embedding_model)
 
     @staticmethod
     def delete_embedding_by_source_ids(source_ids: List[str]):
