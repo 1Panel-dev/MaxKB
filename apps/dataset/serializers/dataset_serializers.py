@@ -745,7 +745,8 @@ class DataSetSerializers(serializers.ModelSerializer):
         def re_embedding(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            ListenerManagement.embedding_by_dataset_signal.send(self.data.get('id'))
+            model = get_embedding_model_by_dataset_id(self.data.get('id'))
+            ListenerManagement.embedding_by_dataset_signal.send(self.data.get('id'), embedding_model=model)
 
         def list_application(self, with_valid=True):
             if with_valid:

@@ -85,8 +85,8 @@ class ListenerManagement:
     delete_embedding_by_dataset_id_list_signal = signal("delete_embedding_by_dataset_id_list")
 
     @staticmethod
-    def embedding_by_problem(args):
-        VectorStore.get_embedding_vector().save(**args)
+    def embedding_by_problem(args, embedding_model: Embeddings):
+        VectorStore.get_embedding_vector().save(**args, embedding=embedding_model)
 
     @staticmethod
     @embedding_poxy
@@ -165,7 +165,7 @@ class ListenerManagement:
             document_list = QuerySet(Document).filter(dataset_id=dataset_id)
             max_kb.info(f"数据集文档:{[d.name for d in document_list]}")
             for document in document_list:
-                ListenerManagement.embedding_by_document(document.id, embedding_model)
+                ListenerManagement.embedding_by_document(document.id, embedding_model=embedding_model)
         except Exception as e:
             max_kb_error.error(f'向量化数据集:{dataset_id}出现错误{str(e)}{traceback.format_exc()}')
         finally:

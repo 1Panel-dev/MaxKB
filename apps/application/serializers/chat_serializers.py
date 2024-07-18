@@ -39,6 +39,7 @@ from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from common.util.rsa_util import rsa_long_decrypt
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
+from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -533,9 +534,10 @@ class ChatRecordSerializer(serializers.Serializer):
                 raise AppApiException(500, "文档id不正确")
 
         @staticmethod
-        def post_embedding_paragraph(chat_record, paragraph_id):
+        def post_embedding_paragraph(chat_record, paragraph_id, dataset_id):
+            model = get_embedding_model_by_dataset_id(dataset_id)
             # 发送向量化事件
-            ListenerManagement.embedding_by_paragraph_signal.send(paragraph_id)
+            ListenerManagement.embedding_by_paragraph_signal.send(paragraph_id, embedding_model=model)
             return chat_record
 
         @post(post_function=post_embedding_paragraph)
@@ -573,7 +575,7 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_record.improve_paragraph_id_list.append(paragraph.id)
             # 添加标注
             chat_record.save()
-            return ChatRecordSerializerModel(chat_record).data, paragraph.id
+            return ChatRecordSerializerModel(chat_record).data, paragraph.id, dataset_id
 
         class Operate(serializers.Serializer):
             chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))

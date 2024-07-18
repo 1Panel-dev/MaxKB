@@ -41,7 +41,8 @@ from common.util.file_util import get_file_content
 from common.util.fork import Fork
 from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status, ProblemParagraphMapping, Image
-from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer, ProblemParagraphManage
+from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer, ProblemParagraphManage, \
+    get_embedding_model_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from smartdoc.conf import PROJECT_DIR
 
@@ -392,7 +393,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                         problem_paragraph_mapping_list) > 0 else None
                     # 向量化
                     if with_embedding:
-                        ListenerManagement.embedding_by_document_signal.send(document_id)
+                        model = get_embedding_model_by_dataset_id(dataset_id=document.dataset_id)
+                        ListenerManagement.embedding_by_document_signal.send(document_id, embedding_model=model)
                 else:
                     document.status = Status.error
                     document.save()
@@ -405,6 +407,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
     class Operate(ApiMixin, serializers.Serializer):
         document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(
             "文档id"))
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("数据集id"))
 
         @staticmethod
         def get_request_params_api():
@@ -530,7 +533,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
-            ListenerManagement.embedding_by_document_signal.send(document_id)
+            model = get_embedding_model_by_dataset_id(dataset_id=self.data.get('dataset_id'))
+            ListenerManagement.embedding_by_document_signal.send(document_id, embedding_model=model)
 
         @transaction.atomic
         def delete(self):
@@ -599,8 +603,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             return True
 
         @staticmethod
-        def post_embedding(result, document_id):
-            ListenerManagement.embedding_by_document_signal.send(document_id)
+        def post_embedding(result, document_id, dataset_id):
+            model = get_embedding_model_by_dataset_id(dataset_id)
+            ListenerManagement.embedding_by_document_signal.send(document_id, embedding_model=model)
             return result
 
         @staticmethod
@@ -646,7 +651,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             document_id = str(document_model.id)
             return DocumentSerializers.Operate(
                 data={'dataset_id': dataset_id, 'document_id': document_id}).one(
-                with_valid=True), document_id
+                with_valid=True), document_id, dataset_id
 
         @staticmethod
         def get_sync_handler(dataset_id):
@@ -803,9 +808,10 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             return openapi.Schema(type=openapi.TYPE_ARRAY, items=DocumentSerializers.Create.get_request_body_api())
 
         @staticmethod
-        def post_embedding(document_list):
+        def post_embedding(document_list, dataset_id):
             for document_dict in document_list:
-                ListenerManagement.embedding_by_document_signal.send(document_dict.get('id'))
+                model = get_embedding_model_by_dataset_id(dataset_id)
+                ListenerManagement.embedding_by_document_signal.send(document_dict.get('id'), embedding_model=model)
             return document_list
 
         @post(post_function=post_embedding)
@@ -846,7 +852,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 return [],
             query_set = query_set.filter(**{'id__in': [d.id for d in document_model_list]})
             return native_search(query_set, select_string=get_file_content(
-                os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_document.sql')), with_search_one=False),
+                os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_document.sql')),
+                                 with_search_one=False), dataset_id
 
         @staticmethod
         def _batch_sync(document_id_list: List[str]):

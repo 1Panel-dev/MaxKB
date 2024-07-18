@@ -22,7 +22,7 @@ from common.util.common import post
 from common.util.field_message import ErrMessage
 from dataset.models import Paragraph, Problem, Document, ProblemParagraphMapping
 from dataset.serializers.common_serializers import update_document_char_length, BatchSerializer, ProblemParagraphObject, \
-    ProblemParagraphManage
+    ProblemParagraphManage, get_embedding_model_by_dataset_id
 from dataset.serializers.problem_serializers import ProblemInstanceSerializer, ProblemSerializer, ProblemSerializers
 from embedding.models import SourceType
 
@@ -132,6 +132,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                                                 paragraph_id=self.data.get('paragraph_id'),
                                                                 dataset_id=self.data.get('dataset_id'))
             problem_paragraph_mapping.save()
+            model = get_embedding_model_by_dataset_id(self.data.get('dataset_id'))
             if with_embedding:
                 ListenerManagement.embedding_by_problem_signal.send({'text': problem.content,
                                                                      'is_active': True,
@@ -140,7 +141,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                                                      'document_id': self.data.get('document_id'),
                                                                      'paragraph_id': self.data.get('paragraph_id'),
                                                                      'dataset_id': self.data.get('dataset_id'),
-                                                                     })
+                                                                     }, embedding_model=model)
 
             return ProblemSerializers.Operate(
                 data={'dataset_id': self.data.get('dataset_id'),
@@ -227,6 +228,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                                                 problem_id=problem.id)
             problem_paragraph_mapping.save()
             if with_embedding:
+                model = get_embedding_model_by_dataset_id(self.data.get('dataset_id'))
                 ListenerManagement.embedding_by_problem_signal.send({'text': problem.content,
                                                                      'is_active': True,
                                                                      'source_type': SourceType.PROBLEM,
@@ -234,7 +236,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                                                      'document_id': self.data.get('document_id'),
                                                                      'paragraph_id': self.data.get('paragraph_id'),
                                                                      'dataset_id': self.data.get('dataset_id'),
-                                                                     })
+                                                                     }, embedding_model=model)
 
         def un_association(self, with_valid=True):
             if with_valid:
@@ -454,13 +456,14 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 raise AppApiException(500, "段落id不存在")
 
         @staticmethod
-        def post_embedding(paragraph, instance):
+        def post_embedding(paragraph, instance, dataset_id):
             if 'is_active' in instance and instance.get('is_active') is not None:
                 s = (ListenerManagement.enable_embedding_by_paragraph_signal if instance.get(
                     'is_active') else ListenerManagement.disable_embedding_by_paragraph_signal)
                 s.send(paragraph.get('id'))
             else:
-                ListenerManagement.embedding_by_paragraph_signal.send(paragraph.get('id'))
+                model = get_embedding_model_by_dataset_id(dataset_id)
+                ListenerManagement.embedding_by_paragraph_signal.send(paragraph.get('id'), embedding_model=model)
             return paragraph
 
         @post(post_embedding)
@@ -508,7 +511,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
 
             _paragraph.save()
             update_document_char_length(self.data.get('document_id'))
-            return self.one(), instance
+            return self.one(), instance, self.data.get('dataset_id')
 
         def get_problem_list(self):
             ProblemParagraphMapping(ProblemParagraphMapping)
@@ -582,7 +585,8 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             # 修改长度
             update_document_char_length(document_id)
             if with_embedding:
-                ListenerManagement.embedding_by_paragraph_signal.send(str(paragraph.id))
+                model = get_embedding_model_by_dataset_id(dataset_id)
+                ListenerManagement.embedding_by_paragraph_signal.send(str(paragraph.id), embedding_model=model)
             return ParagraphSerializers.Operate(
                 data={'paragraph_id': str(paragraph.id), 'dataset_id': dataset_id, 'document_id': document_id}).one(
                 with_valid=True)
