@@ -1,7 +1,7 @@
 <template>
   <div class="app-layout">
     <AppHeader />
-    <div class="app-main">
+    <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''">
       <div class="main-layout h-full flex">
         <div class="sidebar-container">
           <Sidebar />
@@ -16,6 +16,8 @@
 
 <script setup lang="ts">
 import { AppHeader, Sidebar, AppMain } from '../components'
+import useStore from '@/stores'
+const { user } = useStore()
 </script>
 <style lang="scss" scoped>
 @import './index.scss';
