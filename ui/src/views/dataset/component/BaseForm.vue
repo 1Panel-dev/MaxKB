@@ -123,6 +123,7 @@ watch(
   (value) => {
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
+      form.value.desc = value.desc
       form.value.embedding_mode_id = value.embedding_mode_id
     }
   },

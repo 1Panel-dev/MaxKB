@@ -170,18 +170,6 @@ async function submit() {
   }
 }
 
-function reEmbeddingDataset(row: any) {
-  datasetApi.putReEmbeddingDataset(row.id).then(() => {
-    MsgSuccess('提交成功')
-  })
-}
-
-function saveDataset(data: any) {
-  datasetApi.putDataset(id, data, loading).then((res) => {
-    MsgSuccess('保存成功')
-  })
-}
-
 function getDetail() {
   dataset.asyncGetDatasetDetail(id, loading).then((res: any) => {
     detail.value = res.data
