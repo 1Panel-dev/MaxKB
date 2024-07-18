@@ -87,7 +87,8 @@ class ModelSerializer(serializers.Serializer):
 
             return [
                 {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
-                 'model_name': model.model_name, 'status': model.status, 'meta': model.meta} for model in
+                 'model_name': model.model_name, 'status': model.status, 'meta': model.meta,
+                 'permission_type': model.permission_type} for model in
                 model_query_set.filter(**query_params).order_by("-create_time")]
 
     class Edit(serializers.Serializer):
@@ -198,7 +199,8 @@ class ModelSerializer(serializers.Serializer):
                 'meta': model.meta,
                 'credential': ModelProvideConstants[model.provider].value.get_model_credential(model.model_type,
                                                                                                model.model_name).encryption_dict(
-                    credential)}
+                    credential),
+                'permission_type': model.permission_type}
 
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
@@ -224,7 +226,8 @@ class ModelSerializer(serializers.Serializer):
             return {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
                     'model_name': model.model_name,
                     'status': model.status,
-                    'meta': model.meta, }
+                    'meta': model.meta
+                    }
 
         def delete(self, with_valid=True):
             if with_valid:

@@ -55,6 +55,15 @@
             placeholder="请给基础模型设置一个名称"
           />
         </el-form-item>
+        <el-form-item prop="model_type" :rules="base_form_data_rule.permission_type">
+          <template #label>
+            <span>权限</span>
+          </template>
+          <el-radio-group v-model="base_form_data.permission_type">
+            <el-radio value="PRIVATE" size="large" border>私有</el-radio>
+            <el-radio value="PUBLIC" size="large" border>公用</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
           <template #label>
             <span>模型类型</span>
@@ -74,6 +83,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
+
         <el-form-item prop="model_name" :rules="base_form_data_rule.model_name">
           <template #label>
             <div class="flex align-center" style="display: inline-flex">
@@ -150,17 +160,18 @@ const dialogVisible = ref<boolean>(false)
 
 const base_form_data_rule = ref<FormRules>({
   name: { required: true, trigger: 'blur', message: '模型名不能为空' },
+  permission_type: { required: true, trigger: 'change', message: '权限不能为空' },
   model_type: { required: true, trigger: 'change', message: '模型类型不能为空' },
   model_name: { required: true, trigger: 'change', message: '基础模型不能为空' }
 })
 
 const base_form_data = ref<{
   name: string
-
+  permission_type: string
   model_type: string
 
   model_name: string
-}>({ name: '', model_type: '', model_name: '' })
+}>({ name: '', model_type: '', model_name: '', permission_type: 'PRIVATE' })
 
 const credential_form_data = ref<Dict<any>>({})
 
@@ -212,7 +223,7 @@ const list_base_model = (model_type: any) => {
 }
 
 const close = () => {
-  base_form_data.value = { name: '', model_type: '', model_name: '' }
+  base_form_data.value = { name: '', model_type: '', model_name: '', permission_type: 'PRIVATE' }
   credential_form_data.value = {}
   model_form_field.value = []
   base_model_list.value = []

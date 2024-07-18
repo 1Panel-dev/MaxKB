@@ -48,6 +48,15 @@
             placeholder="请给基础模型设置一个名称"
           />
         </el-form-item>
+        <el-form-item prop="model_type" :rules="base_form_data_rule.permission_type">
+          <template #label>
+            <span>权限</span>
+          </template>
+          <el-radio-group v-model="base_form_data.permission_type">
+            <el-radio value="PRIVATE" size="large" border>私有</el-radio>
+            <el-radio value="PUBLIC" size="large" border>公用</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
           <template #label>
             <span>模型类型</span>
@@ -151,11 +160,11 @@ const base_form_data_rule = ref<FormRules>({
 
 const base_form_data = ref<{
   name: string
-
+  permission_type: string
   model_type: string
 
   model_name: string
-}>({ name: '', model_type: '', model_name: '' })
+}>({ name: '', model_type: '', model_name: '', permission_type: 'PRIVATE' })
 
 const credential_form_data = ref<Dict<any>>({})
 
@@ -204,6 +213,7 @@ const open = (provider: Provider, model: Model) => {
 
     base_form_data.value = {
       name: model.name,
+      permission_type: model.permission_type,
       model_type: model.model_type,
       model_name: model.model_name
     }
@@ -214,7 +224,7 @@ const open = (provider: Provider, model: Model) => {
 }
 
 const close = () => {
-  base_form_data.value = { name: '', model_type: '', model_name: '' }
+  base_form_data.value = { name: '', model_type: '', model_name: '', permission_type: '' }
   dynamicsFormRef.value?.ruleFormRef?.resetFields()
   credential_form_data.value = {}
   model_form_field.value = []
