@@ -15,11 +15,6 @@ export const themeList = [
     loginBackground: 'green'
   },
   {
-    label: '商务蓝',
-    value: '#4954E6',
-    loginBackground: 'default'
-  },
-  {
     label: '神秘紫',
     value: '#7F3BF5',
     loginBackground: 'purple'
