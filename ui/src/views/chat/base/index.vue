@@ -1,6 +1,6 @@
 <template>
   <div class="chat layout-bg" v-loading="loading">
-    <div class="chat__header">
+    <div class="chat__header" :class="!isDefaultTheme ? 'custom-header' : ''">
       <div class="chat-width">
         <h2 class="ml-24">{{ applicationDetail?.name }}</h2>
       </div>
@@ -16,7 +16,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
@@ -26,6 +26,10 @@ const {
 } = route as any
 
 const { application, user } = useStore()
+
+const isDefaultTheme = computed(() => {
+  return user.isDefaultTheme()
+})
 
 const loading = ref(false)
 const applicationDetail = ref<any>({})

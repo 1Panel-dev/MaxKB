@@ -4,7 +4,7 @@
       <div class="flex">
         <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
         <div class="w-full">
-          <div class="flex" style="height: 22px;">
+          <div class="flex" style="height: 22px">
             <auto-tooltip :content="model.name" style="max-width: 40%">
               {{ model.name }}
             </auto-tooltip>

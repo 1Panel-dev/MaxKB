@@ -4,6 +4,8 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import useStore from '@/stores'
+const { user } = useStore()
 
 const components: any = import.meta.glob('@/views/chat/**/index.vue', {
   eager: true
@@ -18,6 +20,8 @@ const currentTemplate = computed(() => {
   return components[name].default
 })
 
-onMounted(() => {})
+onMounted(() => {
+  user.asyncGetProfile()
+})
 </script>
 <style lang="scss"></style>
