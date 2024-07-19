@@ -1,31 +1,30 @@
 <template>
   <card-box :title="model.name" shadow="hover" class="model-card">
     <template #header>
-      <div class="flex align-center">
+      <div class="flex">
         <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
         <div class="w-full">
-          <auto-tooltip :content="model.name" style="max-width: 40%">
-            {{ model.name }}
-          </auto-tooltip>
+          <div class="flex" style="height: 22px;">
+            <auto-tooltip :content="model.name" style="max-width: 40%">
+              {{ model.name }}
+            </auto-tooltip>
+            <span v-if="currentModel.status === 'ERROR'">
+              <el-tooltip effect="dark" :content="errMessage" placement="top">
+                <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+              </el-tooltip>
+            </span>
+            <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
+              <el-tooltip effect="dark" content="暂停下载" placement="top">
+                <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+              </el-tooltip>
+            </span>
+          </div>
           <div class="mt-4">
             <el-tag v-if="model.permission_type === 'PRIVATE'" type="danger" class="danger-tag"
               >私有</el-tag
             >
             <el-tag v-else type="info" class="info-tag">公有</el-tag>
           </div>
-        </div>
-
-        <div class="flex align-center" v-if="currentModel.status === 'ERROR'">
-          <el-tag type="danger" class="ml-8">失败</el-tag>
-          <el-tooltip effect="dark" :content="errMessage" placement="top">
-            <el-icon class="danger ml-4" size="20"><Warning /></el-icon>
-          </el-tooltip>
-        </div>
-        <div class="flex align-center" v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
-          <el-tag type="danger" class="ml-8">暂停下载</el-tag>
-          <el-tooltip effect="dark" content="暂停下载" placement="top">
-            <el-icon class="danger ml-4" size="20"><Warning /></el-icon>
-          </el-tooltip>
         </div>
       </div>
     </template>
