@@ -14,8 +14,8 @@
   --app-header-height: 56px;
   --app-header-padding: 0 20px;
   --app-header-bg-color: linear-gradient(90deg, #ebf1ff 24.34%, #e5fbf8 56.18%, #f2ebfe 90.18%);
-  --app-logo-color: linear-gradient(180deg, #3370FF 0%, #7f3bf5 100%);
-  --app-avatar-gradient-color: linear-gradient(270deg, #9258f7 0%, #3370FF 100%);
+  --app-logo-color: linear-gradient(180deg, #3370ff 0%, #7f3bf5 100%);
+  --app-avatar-gradient-color: linear-gradient(270deg, #9258f7 0%, #3370ff 100%);
 
   /* 计算高度 */
   --app-main-height: calc(100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 40px);
@@ -30,6 +30,7 @@
   --tag-success-color: #2ca91f;
   --tag-warning-bg: rgba(255, 136, 0, 0.2);
   --tag-warning-color: #d97400;
+  --tag-danger-bg: rgba(245, 74, 69, 0.2);
 
   /** card */
   --card-width: 330px;

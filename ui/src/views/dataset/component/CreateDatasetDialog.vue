@@ -132,10 +132,7 @@ const submitValid = () => {
       if (res?.data) {
         submitHandle()
       } else {
-        MsgAlert(
-          '提示',
-          '社区版最多支持 50 个知识库，如需拥有更多知识库，请联系我们（https://fit2cloud.com/）。'
-        )
+        MsgAlert('提示', '社区版最多支持 50 个知识库，如需拥有更多知识库，请升级为专业版。')
       }
     })
   }

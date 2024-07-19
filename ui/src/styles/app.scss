@@ -377,6 +377,11 @@ h5 {
   color: var(--el-color-primary);
   border: none;
 }
+.danger-tag {
+  background: var(--tag-danger-bg);
+  color: #d03f3b;
+  border: none;
+}
 .success-tag {
   background: var(--tag-success-bg);
   color: var(--el-color-success);
@@ -385,6 +390,12 @@ h5 {
 .warning-tag {
   background: var(--tag-warning-bg);
   color: var(--el-color-warning);
+  border: none;
+}
+
+.info-tag {
+  background: var(--app-text-color-light-1);
+  color: var(--app-text-color-secondary);
   border: none;
 }
 
