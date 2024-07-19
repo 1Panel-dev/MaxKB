@@ -31,14 +31,15 @@ class Command(BaseCommand):
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         cmd = [
             'gunicorn', 'smartdoc.asgi:application',
-            '-b', options.get('b', '0.0.0.0:8080'),
-            '-k', options.get('k', 'uvicorn.workers.UvicornWorker'),
-            '-w', options.get('w', '5'),
-            '--max-requests', options.get('max_requests', '10240'),
-            '--max-requests-jitter', options.get('max_requests_jitter', '2048'),
-            '--access-logformat', options.get('access_logformat', log_format),
+            '-b', options.get('b') if options.get('b') is not None else '0.0.0.0:8080',
+            '-k', options.get('k') if options.get('k') is not None else 'uvicorn.workers.UvicornWorker',
+            '-w', options.get('w') if options.get('w') is not None else '5',
+            '--max-requests', options.get('max_requests') if options.get('max_requests') is not None else '10240',
+            '--max-requests-jitter',
+            options.get('max_requests_jitter') if options.get('max_requests_jitter') is not None else '2048',
+            '--access-logformat',
+            options.get('access_logformat') if options.get('access_logformat') is not None else log_format,
             '--access-logfile', '-'
         ]
-        APPS_DIR = os.path.join(BASE_DIR, 'apps')
-        kwargs = {'cwd': APPS_DIR}
+        kwargs = {'cwd': BASE_DIR}
         subprocess.run(cmd, **kwargs)
