@@ -30,10 +30,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
         cmd = [
-            'gunicorn', 'smartdoc.asgi:application',
+            'gunicorn', 'smartdoc.wsgi:application',
             '-b', options.get('b') if options.get('b') is not None else '0.0.0.0:8080',
-            '-k', options.get('k') if options.get('k') is not None else 'uvicorn.workers.UvicornWorker',
-            '-w', options.get('w') if options.get('w') is not None else '5',
+            '-k', options.get('k') if options.get('k') is not None else 'gunicorn.workers.sync.SyncWorker',
+            '-w', options.get('w') if options.get('w') is not None else '1',
             '--max-requests', options.get('max_requests') if options.get('max_requests') is not None else '10240',
             '--max-requests-jitter',
             options.get('max_requests_jitter') if options.get('max_requests_jitter') is not None else '2048',
