@@ -63,7 +63,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         'action', type=str,
-        choices=("start", "upgrade_db", "collect_static"),
+        choices=("start", "dev", "upgrade_db", "collect_static"),
         help="Action to run"
     )
     args = parser.parse_args()
