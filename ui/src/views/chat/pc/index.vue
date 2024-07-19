@@ -1,6 +1,6 @@
 <template>
   <div class="chat-pc layout-bg" :class="classObj" v-loading="loading">
-    <div class="chat-pc__header">
+    <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
       <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
     </div>
     <div class="flex">
@@ -121,6 +121,10 @@ const {
 } = route as any
 
 const { application, user, log, common } = useStore()
+
+const isDefaultTheme = computed(() => {
+  return user.isDefaultTheme()
+})
 
 const isCollapse = ref(false)
 
