@@ -60,7 +60,6 @@ const loading = ref(false)
 const disabled = ref(false)
 const active = ref(0)
 const successInfo = ref<any>(null)
-
 async function next() {
   disabled.value = true
   if (await UploadComponentRef.value.validate()) {
@@ -77,15 +76,6 @@ async function next() {
           MsgSuccess('提交成功')
           clearStore()
           router.push({ path: `/dataset/${id}/document` })
-        })
-      } else {
-        // QA知识库创建
-        fd.append('name', baseInfo.value?.name as string)
-        fd.append('desc', baseInfo.value?.desc as string)
-
-        datasetApi.postQADataset(fd, loading).then((res) => {
-          successInfo.value = res.data
-          active.value = 2
         })
       }
     } else {
@@ -117,7 +107,7 @@ function submit() {
       paragraphs: item.content
     })
   })
-  const obj = { ...baseInfo.value, documents } as datasetData
+
   if (id) {
     // 上传文档
     document
@@ -130,12 +120,6 @@ function submit() {
       .catch(() => {
         loading.value = false
       })
-  } else {
-    datasetApi.postDataset(obj, loading).then((res) => {
-      successInfo.value = res.data
-      active.value = 2
-      clearStore()
-    })
   }
 }
 function back() {
