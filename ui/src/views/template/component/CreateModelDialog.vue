@@ -59,9 +59,26 @@
           <template #label>
             <span>权限</span>
           </template>
-          <el-radio-group v-model="base_form_data.permission_type">
-            <el-radio value="PRIVATE" size="large" border>私有</el-radio>
-            <el-radio value="PUBLIC" size="large" border>公用</el-radio>
+
+          <el-radio-group v-model="base_form_data.permission_type" class="card__radio">
+            <el-row :gutter="16">
+              <template v-for="(value, key) of PermissionType" :key="key">
+                <el-col :span="12">
+                  <el-card
+                    shadow="never"
+                    class="mb-16"
+                    :class="base_form_data.permission_type === key ? 'active' : ''"
+                  >
+                    <el-radio :value="key" size="large">
+                      <p class="mb-4">{{ value }}</p>
+                      <el-text type="info">
+                        {{ PermissionDesc[key] }}
+                      </el-text>
+                    </el-radio>
+                  </el-card>
+                </el-col>
+              </template>
+            </el-row>
           </el-radio-group>
         </el-form-item>
         <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
@@ -145,6 +162,7 @@ import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
+import { PermissionType, PermissionDesc } from '@/enums/model'
 
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
