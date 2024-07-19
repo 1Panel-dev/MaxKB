@@ -99,7 +99,7 @@
             </div>
           </template>
           <template v-else-if="isDataset">
-            <div class="w-full text-left cursor" @click="router.push({ path: '/dataset/create' })">
+            <div class="w-full text-left cursor" @click="openCreateDialog">
               <el-button link>
                 <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
               </el-button>
@@ -110,12 +110,14 @@
     </el-dropdown>
   </div>
   <CreateApplicationDialog ref="CreateApplicationDialogRef" @refresh="refresh" />
+  <CreateDatasetDialog ref="CreateDatasetDialogRef" @refresh="refresh" />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
+import CreateDatasetDialog from '@/views/dataset/component/CreateDatasetDialog.vue'
 import { isAppIcon, isWorkFlow } from '@/utils/application'
 import useStore from '@/stores'
 const { common, dataset, application } = useStore()
@@ -130,6 +132,7 @@ onBeforeRouteLeave((to, from) => {
   common.saveBreadcrumb(null)
 })
 
+const CreateDatasetDialogRef = ref()
 const CreateApplicationDialogRef = ref()
 const list = ref<any[]>([])
 const loading = ref(false)
@@ -148,7 +151,11 @@ const isDataset = computed(() => {
 })
 
 function openCreateDialog() {
-  CreateApplicationDialogRef.value.open()
+  if (isDataset.value) {
+    CreateDatasetDialogRef.value.open()
+  } else if (isApplication.value) {
+    CreateApplicationDialogRef.value.open()
+  }
 }
 
 function changeMenu(id: string) {

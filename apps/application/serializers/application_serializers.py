@@ -26,7 +26,7 @@ from rest_framework import serializers
 from application.flow.workflow_manage import Flow
 from application.models import Application, ApplicationDatasetMapping, ApplicationTypeChoices, WorkFlowVersion
 from application.models.api_key_model import ApplicationAccessToken, ApplicationApiKey
-from common.config.embedding_config import VectorStore, EmbeddingModel
+from common.config.embedding_config import VectorStore
 from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
@@ -36,7 +36,7 @@ from common.util.common import valid_license
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from dataset.models import DataSet, Document, Image
-from dataset.serializers.common_serializers import list_paragraph
+from dataset.serializers.common_serializers import list_paragraph, get_embedding_model_by_dataset_id_list
 from embedding.models import SearchMode
 from setting.models import AuthOperate
 from setting.models.model_management import Model
@@ -415,12 +415,13 @@ class ApplicationSerializer(serializers.Serializer):
                                         QuerySet(Document).filter(
                                             dataset_id__in=dataset_id_list,
                                             is_active=False)]
+            model = get_embedding_model_by_dataset_id_list(dataset_id_list)
             # 向量库检索
             hit_list = vector.hit_test(self.data.get('query_text'), dataset_id_list, exclude_document_id_list,
                                        self.data.get('top_number'),
                                        self.data.get('similarity'),
                                        SearchMode(self.data.get('search_mode')),
-                                       EmbeddingModel.get_embedding_model())
+                                       model)
             hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get('paragraph_id'): hit} for hit in hit_list], {})
             p_list = list_paragraph([h.get('paragraph_id') for h in hit_list])
             return [{**p, 'similarity': hit_dict.get(p.get('id')).get('similarity'),
@@ -522,12 +523,14 @@ class ApplicationSerializer(serializers.Serializer):
             if not QuerySet(Application).filter(id=self.data.get('application_id')).exists():
                 raise AppApiException(500, '不存在的应用id')
 
-        def list_model(self, with_valid=True):
+        def list_model(self, model_type=None, with_valid=True):
             if with_valid:
                 self.is_valid()
+            if model_type is None:
+                model_type = "LLM"
             application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
             return ModelSerializer.Query(
-                data={'user_id': application.user_id}).list(
+                data={'user_id': application.user_id, 'model_type': model_type}).list(
                 with_valid=True)
 
         def delete(self, with_valid=True):

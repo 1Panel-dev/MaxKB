@@ -130,7 +130,18 @@ const getModelMetaById: (model_id: string, loading?: Ref<boolean>) => Promise<Re
 ) => {
   return get(`${prefix}/${model_id}/meta`, {}, loading)
 }
-
+/**
+ * 暂停下载
+ * @param model_id 模型id
+ * @param loading 加载器
+ * @returns
+ */
+const pauseDownload: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  model_id,
+  loading
+) => {
+  return put(`${prefix}/${model_id}/pause_download`, undefined, {}, loading)
+}
 const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   model_id,
   loading
@@ -147,5 +158,6 @@ export default {
   updateModel,
   deleteModel,
   getModelById,
-  getModelMetaById
+  getModelMetaById,
+  pauseDownload
 }

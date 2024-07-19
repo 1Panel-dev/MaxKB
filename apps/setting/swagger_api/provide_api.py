@@ -74,6 +74,8 @@ class ModelCreateApi(ApiMixin):
                                   'provider': openapi.Schema(type=openapi.TYPE_STRING,
                                                              title="供应商",
                                                              description="供应商"),
+                                  'permission_type': openapi.Schema(type=openapi.TYPE_STRING, title="权限",
+                                                                    description="PUBLIC|PRIVATE"),
                                   'model_type': openapi.Schema(type=openapi.TYPE_STRING,
                                                                title="供应商",
                                                                description="供应商"),
@@ -82,7 +84,8 @@ class ModelCreateApi(ApiMixin):
                                                                description="供应商"),
                                   'credential': openapi.Schema(type=openapi.TYPE_OBJECT,
                                                                title="模型证书信息",
-                                                               description="模型证书信息")
+                                                               description="模型证书信息"),
+
                               }
                               )
 

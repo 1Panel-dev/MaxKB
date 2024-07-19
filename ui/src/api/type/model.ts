@@ -53,6 +53,7 @@ interface Model {
    * 模型类型
    */
   model_type: string
+  permission_type: 'PUBLIC' | 'PRIVATE'
   /**
    * 基础模型
    */
@@ -68,7 +69,7 @@ interface Model {
   /**
    * 状态
    */
-  status: 'SUCCESS' | 'DOWNLOAD' | 'ERROR'
+  status: 'SUCCESS' | 'DOWNLOAD' | 'ERROR' | 'PAUSE_DOWNLOAD'
   /**
    * 元数据
    */

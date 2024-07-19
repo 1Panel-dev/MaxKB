@@ -9,9 +9,11 @@
 import uuid
 
 from django.db import models
+from django.db.models import QuerySet
 
 from common.db.sql_execute import select_one
 from common.mixins.app_model_mixin import AppModelMixin
+from setting.models import Model
 from users.models import User
 
 
@@ -33,6 +35,10 @@ class HitHandlingMethod(models.TextChoices):
     directly_return = 'directly_return', '直接返回'
 
 
+def default_model():
+    return uuid.UUID('42f63a3d-427e-11ef-b3ec-a8a1595801ab')
+
+
 class DataSet(AppModelMixin):
     """
     数据集表
@@ -43,7 +49,8 @@ class DataSet(AppModelMixin):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="所属用户")
     type = models.CharField(verbose_name='类型', max_length=1, choices=Type.choices,
                             default=Type.base)
-
+    embedding_mode = models.ForeignKey(Model, on_delete=models.DO_NOTHING, verbose_name="向量模型",
+                                       default=default_model)
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:

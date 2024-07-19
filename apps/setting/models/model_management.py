@@ -22,6 +22,13 @@ class Status(models.TextChoices):
 
     DOWNLOAD = "DOWNLOAD", '下载中'
 
+    PAUSE_DOWNLOAD = "PAUSE_DOWNLOAD", '暂停下载'
+
+
+class PermissionType(models.TextChoices):
+    PUBLIC = "PUBLIC", '公开'
+    PRIVATE = "PRIVATE", "私有"
+
 
 class Model(AppModelMixin):
     """
@@ -45,6 +52,9 @@ class Model(AppModelMixin):
     credential = models.CharField(max_length=102400, verbose_name="模型认证信息")
 
     meta = models.JSONField(verbose_name="模型元数据,用于存储下载,或者错误信息", default=dict)
+
+    permission_type = models.CharField(max_length=20, verbose_name='权限类型', choices=PermissionType.choices,
+                                       default=PermissionType.PRIVATE)
 
     class Meta:
         db_table = "model"

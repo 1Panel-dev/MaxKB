@@ -13,12 +13,38 @@ from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.search_dataset_node.i_search_dataset_node import ISearchDatasetStepNode
-from common.config.embedding_config import EmbeddingModel, VectorStore
+from common.config.embedding_config import VectorStore, ModelManage
 from common.db.search import native_search
 from common.util.file_util import get_file_content
-from dataset.models import Document, Paragraph
+from dataset.models import Document, Paragraph, DataSet
 from embedding.models import SearchMode
+from setting.models import Model
+from setting.models_provider import get_model
 from smartdoc.conf import PROJECT_DIR
+
+
+def get_model_by_id(_id, user_id):
+    model = QuerySet(Model).filter(id=_id).first()
+    if model is None:
+        raise Exception("模型不存在")
+    if model.permission_type == 'PRIVATE' and str(model.user_id) != str(user_id):
+        raise Exception(f"无权限使用此模型:{model.name}")
+    return model
+
+
+def get_embedding_id(dataset_id_list):
+    dataset_list = QuerySet(DataSet).filter(id__in=dataset_id_list)
+    if len(set([dataset.embedding_mode_id for dataset in dataset_list])) > 1:
+        raise Exception("知识库未向量模型不一致")
+    if len(dataset_list) == 0:
+        raise Exception("知识库设置错误,请重新设置知识库")
+    return dataset_list[0].embedding_mode_id
+
+
+def get_none_result(question):
+    return NodeResult(
+        {'paragraph_list': [], 'is_hit_handling_method': [], 'question': question, 'data': '',
+         'directly_return': ''}, {})
 
 
 class BaseSearchDatasetNode(ISearchDatasetStepNode):
@@ -26,7 +52,11 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
                 exclude_paragraph_id_list=None,
                 **kwargs) -> NodeResult:
         self.context['question'] = question
-        embedding_model = EmbeddingModel.get_embedding_model()
+        if len(dataset_id_list) == 0:
+            return get_none_result(question)
+        model_id = get_embedding_id(dataset_id_list)
+        model = get_model_by_id(model_id, self.flow_params_serializer.data.get('user_id'))
+        embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model))
         embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()
         exclude_document_id_list = [str(document.id) for document in
@@ -37,7 +67,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
                                       exclude_paragraph_id_list, True, dataset_setting.get('top_n'),
                                       dataset_setting.get('similarity'), SearchMode(dataset_setting.get('search_mode')))
         if embedding_list is None:
-            return NodeResult({'paragraph_list': [], 'is_hit_handling_method': []}, {})
+            return get_none_result(question)
         paragraph_list = self.list_paragraph(embedding_list, vector)
         result = [self.reset_paragraph(paragraph, embedding_list) for paragraph in paragraph_list]
         result = sorted(result, key=lambda p: p.get('similarity'), reverse=True)

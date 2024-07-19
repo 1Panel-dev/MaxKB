@@ -43,6 +43,7 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
             validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
                                       message="类型只支持register|reset_password", code=500)
         ], error_messages=ErrMessage.char("检索模式"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
     def get_step_serializer(self, manage: PipelineManage) -> Type[InstanceSerializer]:
         return self.InstanceSerializer
@@ -56,6 +57,7 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
     def execute(self, problem_text: str, dataset_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
                 search_mode: str = None,
+                user_id=None,
                 **kwargs) -> List[ParagraphPipelineModel]:
         """
         关于 用户和补全问题 说明: 补全问题如果有就使用补全问题去查询 反之就用用户原始问题查询
@@ -67,6 +69,7 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
         :param exclude_paragraph_id_list:          需要排除段落id
         :param padding_problem_text                补全问题
         :param search_mode                         检索模式
+        :param user_id                             用户id
         :return: 段落列表
         """
         pass

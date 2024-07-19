@@ -20,7 +20,9 @@ from common.forms import BaseForm
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, \
     BaseModelCredential, DownModelChunk, DownModelChunkStatus, ValidCode, ModelInfoManage
+from setting.models_provider.impl.ollama_model_provider.credential.embedding import OllamaEmbeddingModelCredential
 from setting.models_provider.impl.ollama_model_provider.credential.llm import OllamaLLMModelCredential
+from setting.models_provider.impl.ollama_model_provider.model.embedding import OllamaEmbedding
 from setting.models_provider.impl.ollama_model_provider.model.llm import OllamaChatModel
 from smartdoc.conf import PROJECT_DIR
 
@@ -88,14 +90,25 @@ model_info_list = [
     ModelInfo(
         'phi3',
         'Phi-3 Mini是Microsoft的3.8B参数，轻量级，最先进的开放模型。',
-        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel)
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+]
+ollama_embedding_model_credential = OllamaEmbeddingModelCredential()
+embedding_model_info = [
+    ModelInfo(
+        'nomic-embed-text',
+        '一个具有大令牌上下文窗口的高性能开放嵌入模型。',
+        ModelTypeConst.EMBEDDING, ollama_embedding_model_credential, OllamaEmbedding),
 ]
 
-model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
+model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_model_info_list(
+    embedding_model_info).append_default_model_info(
     ModelInfo(
         'phi3',
         'Phi-3 Mini是Microsoft的3.8B参数，轻量级，最先进的开放模型。',
-        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel)).build()
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel)).append_default_model_info(ModelInfo(
+    'nomic-embed-text',
+    '一个具有大令牌上下文窗口的高性能开放嵌入模型。',
+    ModelTypeConst.EMBEDDING, ollama_embedding_model_credential, OllamaEmbedding), ).build()
 
 
 def get_base_url(url: str):
@@ -139,7 +152,6 @@ def convert(response_stream) -> Iterator[DownModelChunk]:
             temp = ""
 
     if len(temp) > 0:
-        print(temp)
         rows = [t for t in temp.split("\n") if len(t) > 0]
         for row in rows:
             yield convert_to_down_model_chunk(row, index)
@@ -154,9 +166,6 @@ class OllamaModelProvider(IModelProvider):
             os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'ollama_model_provider', 'icon',
                          'ollama_icon_svg')))
 
-    def get_dialogue_number(self):
-        return 2
-
     @staticmethod
     def get_base_model_list(api_base):
         base_url = get_base_url(api_base)
@@ -165,7 +174,7 @@ class OllamaModelProvider(IModelProvider):
         return r.json()
 
     def down_model(self, model_type: str, model_name, model_credential: Dict[str, object]) -> Iterator[DownModelChunk]:
-        api_base = model_credential.get('api_base')
+        api_base = model_credential.get('api_base', '')
         base_url = get_base_url(api_base)
         r = requests.request(
             method="POST",

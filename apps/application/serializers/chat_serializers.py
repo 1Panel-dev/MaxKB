@@ -29,6 +29,7 @@ from application.models.api_key_model import ApplicationAccessToken
 from application.serializers.application_serializers import ModelDatasetAssociation, DatasetSettingSerializer, \
     ModelSettingSerializer
 from application.serializers.chat_message_serializers import ChatInfo
+from common.config.embedding_config import ModelManage
 from common.constants.permission_constants import RoleConstants
 from common.db.search import native_search, native_page_search, page_search, get_dynamics_model
 from common.event import ListenerManagement
@@ -39,8 +40,10 @@ from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from common.util.rsa_util import rsa_long_decrypt
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
+from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
+from setting.models_provider import get_model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from smartdoc.conf import PROJECT_DIR
 
@@ -241,12 +244,7 @@ class ChatSerializers(serializers.Serializer):
                                    application_id=application_id)]
             chat_model = None
             if model is not None:
-                chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
-                                                                                   json.loads(
-                                                                                       rsa_long_decrypt(
-                                                                                           model.credential)),
-                                                                                   streaming=True)
-
+                chat_model = ModelManage.get_model(str(model.id), lambda _id: get_model(model))
             chat_id = str(uuid.uuid1())
             chat_cache.set(chat_id,
                            ChatInfo(chat_id, chat_model, dataset_id_list,
@@ -259,6 +257,7 @@ class ChatSerializers(serializers.Serializer):
 
     class OpenWorkFlowChat(serializers.Serializer):
         work_flow = WorkFlowSerializers(error_messages=ErrMessage.uuid("工作流"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
         def open(self):
             self.is_valid(raise_exception=True)
@@ -269,7 +268,8 @@ class ChatSerializers(serializers.Serializer):
                                       dataset_setting={},
                                       model_setting={},
                                       problem_optimization=None,
-                                      type=ApplicationTypeChoices.WORK_FLOW
+                                      type=ApplicationTypeChoices.WORK_FLOW,
+                                      user_id=self.data.get('user_id')
                                       )
             work_flow_version = WorkFlowVersion(work_flow=work_flow)
             chat_cache.set(chat_id,
@@ -332,7 +332,8 @@ class ChatSerializers(serializers.Serializer):
             application = Application(id=None, dialogue_number=3, model=model,
                                       dataset_setting=self.data.get('dataset_setting'),
                                       model_setting=self.data.get('model_setting'),
-                                      problem_optimization=self.data.get('problem_optimization'))
+                                      problem_optimization=self.data.get('problem_optimization'),
+                                      user_id=user_id)
             chat_cache.set(chat_id,
                            ChatInfo(chat_id, chat_model, dataset_id_list,
                                     [str(document.id) for document in
@@ -533,9 +534,10 @@ class ChatRecordSerializer(serializers.Serializer):
                 raise AppApiException(500, "文档id不正确")
 
         @staticmethod
-        def post_embedding_paragraph(chat_record, paragraph_id):
+        def post_embedding_paragraph(chat_record, paragraph_id, dataset_id):
+            model = get_embedding_model_by_dataset_id(dataset_id)
             # 发送向量化事件
-            ListenerManagement.embedding_by_paragraph_signal.send(paragraph_id)
+            ListenerManagement.embedding_by_paragraph_signal.send(paragraph_id, embedding_model=model)
             return chat_record
 
         @post(post_function=post_embedding_paragraph)
@@ -573,7 +575,7 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_record.improve_paragraph_id_list.append(paragraph.id)
             # 添加标注
             chat_record.save()
-            return ChatRecordSerializerModel(chat_record).data, paragraph.id
+            return ChatRecordSerializerModel(chat_record).data, paragraph.id, dataset_id
 
         class Operate(serializers.Serializer):
             chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))

@@ -1,16 +1,30 @@
 <template>
   <card-box :title="model.name" shadow="hover" class="model-card">
     <template #header>
-      <div class="flex align-center">
+      <div class="flex">
         <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
-        <auto-tooltip :content="model.name" style="max-width: 40%">
-          {{ model.name }}
-        </auto-tooltip>
-        <div class="flex align-center" v-if="currentModel.status === 'ERROR'">
-          <el-tag type="danger" class="ml-8">失败</el-tag>
-          <el-tooltip effect="dark" :content="errMessage" placement="top">
-            <el-icon class="danger ml-4" size="20"><Warning /></el-icon>
-          </el-tooltip>
+        <div class="w-full">
+          <div class="flex" style="height: 22px">
+            <auto-tooltip :content="model.name" style="max-width: 40%">
+              {{ model.name }}
+            </auto-tooltip>
+            <span v-if="currentModel.status === 'ERROR'">
+              <el-tooltip effect="dark" :content="errMessage" placement="top">
+                <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+              </el-tooltip>
+            </span>
+            <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
+              <el-tooltip effect="dark" content="暂停下载" placement="top">
+                <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
+              </el-tooltip>
+            </span>
+          </div>
+          <div class="mt-4">
+            <el-tag v-if="model.permission_type === 'PRIVATE'" type="danger" class="danger-tag"
+              >私有</el-tag
+            >
+            <el-tag v-else type="info" class="info-tag">公有</el-tag>
+          </div>
         </div>
       </div>
     </template>
@@ -29,18 +43,14 @@
     </div>
     <!-- progress -->
     <div class="progress-mask" v-if="currentModel.status === 'DOWNLOAD'">
-      <el-progress
-        type="circle"
-        :width="56"
-        color="#3370FF"
-        :percentage="progress"
-        class="percentage"
-      >
-        <template #default="{ percentage }">
-          <span class="percentage-value">{{ percentage }}%</span>
-        </template>
-      </el-progress>
-      <span class="percentage-label">正在下载 <span class="dotting"></span></span>
+      <DownloadLoading class="percentage" />
+
+      <div class="percentage-label flex-center">
+        正在下载中 <span class="dotting"></span>
+        <el-button link type="primary" class="ml-16" @click.stop="cancelDownload"
+          >取消下载</el-button
+        >
+      </div>
     </div>
 
     <template #mouseEnter>
@@ -48,7 +58,13 @@
         <el-tooltip effect="dark" content="修改" placement="top">
           <el-button text @click.stop="openEditModel">
             <el-icon>
-              <component :is="currentModel.status === 'ERROR' ? 'RefreshRight' : 'EditPen'" />
+              <component
+                :is="
+                  currentModel.status === 'ERROR' || currentModel.status === 'PAUSE_DOWNLOAD'
+                    ? 'RefreshRight'
+                    : 'EditPen'
+                "
+              />
             </el-icon>
           </el-button>
         </el-tooltip>
@@ -68,6 +84,7 @@ import type { Provider, Model } from '@/api/type/model'
 import ModelApi from '@/api/model'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/template/component/EditModel.vue'
+import DownloadLoading from '@/components/loading/DownloadLoading.vue'
 import { MsgConfirm } from '@/utils/message'
 
 const props = defineProps<{
@@ -94,27 +111,6 @@ const errMessage = computed(() => {
   }
   return ''
 })
-const progress = computed(() => {
-  if (currentModel.value) {
-    const down_model_chunk = currentModel.value.meta['down_model_chunk']
-    if (down_model_chunk) {
-      const maxObj = down_model_chunk
-        .filter((chunk: any) => chunk.index > 1)
-        .reduce(
-          (prev: any, current: any) => {
-            return (prev.index || 0) > (current.index || 0) ? prev : current
-          },
-          { progress: 0 }
-        )
-      if (maxObj) {
-        return parseFloat(maxObj.progress?.toFixed(1))
-      }
-      return 0
-    }
-    return 0
-  }
-  return 0
-})
 const emit = defineEmits(['change', 'update:model'])
 const eidtModelRef = ref<InstanceType<typeof EditModel>>()
 let interval: any
@@ -129,6 +125,13 @@ const deleteModel = () => {
       })
     })
     .catch(() => {})
+}
+
+const cancelDownload = () => {
+  ModelApi.pauseDownload(props.model.id).then(() => {
+    downModel.value = undefined
+    emit('change')
+  })
 }
 const openEditModel = () => {
   const provider = props.provider_list.find((p) => p.provider === props.model.provider)
@@ -197,21 +200,21 @@ onBeforeUnmount(() => {
     z-index: 99;
     text-align: center;
     .percentage {
-      top: 50%;
-      transform: translateY(-65%);
+      margin-top: 55px;
+      margin-bottom: 16px;
     }
 
-    .percentage-value {
-      display: block;
-      font-size: 12px;
-      color: var(--el-color-primary);
-    }
+    // .percentage-value {
+    //   display: flex;
+    //   font-size: 13px;
+    //   align-items: center;
+    //   color: var(--app-text-color-secondary);
+    // }
     .percentage-label {
-      display: block;
-      margin-top: 45px;
+      margin-top: 50px;
       margin-left: 10px;
-      font-size: 12px;
-      color: var(--el-color-primary);
+      font-size: 13px;
+      color: var(--app-text-color-secondary);
     }
   }
 }

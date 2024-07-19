@@ -14,14 +14,14 @@ embedding_thread_pool = ThreadPoolExecutor(3)
 
 
 def poxy(poxy_function):
-    def inner(args):
-        work_thread_pool.submit(poxy_function, args)
+    def inner(args, **keywords):
+        work_thread_pool.submit(poxy_function, args, **keywords)
 
     return inner
 
 
 def embedding_poxy(poxy_function):
-    def inner(args):
-        embedding_thread_pool.submit(poxy_function, args)
+    def inner(args, **keywords):
+        embedding_thread_pool.submit(poxy_function, args, **keywords)
 
     return inner

@@ -22,7 +22,7 @@
       >
         <el-row :gutter="15">
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
-            <CardAdd title="创建知识库" @click="router.push({ path: '/dataset/create' })" />
+            <CardAdd title="创建知识库" @click="openCreateDialog" />
           </el-col>
           <template v-for="(item, index) in datasetList" :key="index">
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
@@ -107,17 +107,20 @@
       </InfiniteScroll>
     </div>
     <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
+    <CreateDatasetDialog ref="CreateDatasetDialogRef"/>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive, computed } from 'vue'
 import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
+import CreateDatasetDialog from './component/CreateDatasetDialog.vue'
 import datasetApi from '@/api/dataset'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { useRouter } from 'vue-router'
 import { numberFormat } from '@/utils/utils'
 const router = useRouter()
 
+const CreateDatasetDialogRef = ref()
 const SyncWebDialogRef = ref()
 const loading = ref(false)
 const datasetList = ref<any[]>([])
@@ -128,6 +131,10 @@ const paginationConfig = reactive({
 })
 
 const searchValue = ref('')
+
+function openCreateDialog() {
+  CreateDatasetDialogRef.value.open()
+}
 
 function refresh() {
   MsgSuccess('同步任务发送成功')

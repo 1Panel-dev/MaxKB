@@ -15,8 +15,9 @@ from typing import List
 import django.db.models
 from blinker import signal
 from django.db.models import QuerySet
+from langchain_core.embeddings import Embeddings
 
-from common.config.embedding_config import VectorStore, EmbeddingModel
+from common.config.embedding_config import VectorStore
 from common.db.search import native_search, get_dynamics_model
 from common.event.common import poxy, embedding_poxy
 from common.util.file_util import get_file_content
@@ -46,22 +47,26 @@ class SyncWebDocumentArgs:
 
 
 class UpdateProblemArgs:
-    def __init__(self, problem_id: str, problem_content: str):
+    def __init__(self, problem_id: str, problem_content: str, embedding_model: Embeddings):
         self.problem_id = problem_id
         self.problem_content = problem_content
+        self.embedding_model = embedding_model
 
 
 class UpdateEmbeddingDatasetIdArgs:
-    def __init__(self, paragraph_id_list: List[str], target_dataset_id: str):
+    def __init__(self, paragraph_id_list: List[str], target_dataset_id: str, target_embedding_model: Embeddings):
         self.paragraph_id_list = paragraph_id_list
         self.target_dataset_id = target_dataset_id
+        self.target_embedding_model = target_embedding_model
 
 
 class UpdateEmbeddingDocumentIdArgs:
-    def __init__(self, paragraph_id_list: List[str], target_document_id: str, target_dataset_id: str):
+    def __init__(self, paragraph_id_list: List[str], target_document_id: str, target_dataset_id: str,
+                 target_embedding_model: Embeddings = None):
         self.paragraph_id_list = paragraph_id_list
         self.target_document_id = target_document_id
         self.target_dataset_id = target_dataset_id
+        self.target_embedding_model = target_embedding_model
 
 
 class ListenerManagement:
@@ -84,16 +89,46 @@ class ListenerManagement:
     delete_embedding_by_dataset_id_list_signal = signal("delete_embedding_by_dataset_id_list")
 
     @staticmethod
-    def embedding_by_problem(args):
-        VectorStore.get_embedding_vector().save(**args)
+    def embedding_by_problem(args, embedding_model: Embeddings):
+        VectorStore.get_embedding_vector().save(**args, embedding=embedding_model)
+
+    @staticmethod
+    def embedding_by_paragraph_list(paragraph_id_list, embedding_model: Embeddings):
+        try:
+            data_list = native_search(
+                {'problem': QuerySet(get_dynamics_model({'paragraph.id': django.db.models.CharField()})).filter(
+                    **{'paragraph.id__in': paragraph_id_list}),
+                    'paragraph': QuerySet(Paragraph).filter(id__in=paragraph_id_list)},
+                select_string=get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
+            ListenerManagement.embedding_by_paragraph_data_list(data_list, paragraph_id_list=paragraph_id_list,
+                                                                embedding_model=embedding_model)
+        except Exception as e:
+            max_kb_error.error(f'查询向量数据:{paragraph_id_list}出现错误{str(e)}{traceback.format_exc()}')
 
     @staticmethod
     @embedding_poxy
-    def embedding_by_paragraph(paragraph_id):
+    def embedding_by_paragraph_data_list(data_list, paragraph_id_list, embedding_model: Embeddings):
+        max_kb.info(f'开始--->向量化段落:{paragraph_id_list}')
+        try:
+            # 删除段落
+            VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_id_list)
+            # 批量向量化
+            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model)
+        except Exception as e:
+            max_kb_error.error(f'向量化段落:{paragraph_id_list}出现错误{str(e)}{traceback.format_exc()}')
+            status = Status.error
+        finally:
+            QuerySet(Paragraph).filter(id__in=paragraph_id_list).update(**{'status': status})
+            max_kb.info(f'结束--->向量化段落:{paragraph_id_list}')
+
+    @staticmethod
+    @embedding_poxy
+    def embedding_by_paragraph(paragraph_id, embedding_model: Embeddings):
         """
         向量化段落 根据段落id
-        :param paragraph_id: 段落id
-        :return: None
+        @param paragraph_id:    段落id
+        @param embedding_model:  向量模型
         """
         max_kb.info(f"开始--->向量化段落:{paragraph_id}")
         status = Status.success
@@ -107,7 +142,7 @@ class ListenerManagement:
             # 删除段落
             VectorStore.get_embedding_vector().delete_by_paragraph_id(paragraph_id)
             # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list)
+            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model)
         except Exception as e:
             max_kb_error.error(f'向量化段落:{paragraph_id}出现错误{str(e)}{traceback.format_exc()}')
             status = Status.error
@@ -117,12 +152,15 @@ class ListenerManagement:
 
     @staticmethod
     @embedding_poxy
-    def embedding_by_document(document_id):
+    def embedding_by_document(document_id, embedding_model: Embeddings):
         """
         向量化文档
-        :param document_id: 文档id
+        @param document_id: 文档id
+        @param embedding_model 向量模型
         :return: None
         """
+        if not try_lock('embedding' + str(document_id)):
+            return
         max_kb.info(f"开始--->向量化文档:{document_id}")
         QuerySet(Document).filter(id=document_id).update(**{'status': Status.embedding})
         QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': Status.embedding})
@@ -138,7 +176,7 @@ class ListenerManagement:
             # 删除文档向量数据
             VectorStore.get_embedding_vector().delete_by_document_id(document_id)
             # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list)
+            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model)
         except Exception as e:
             max_kb_error.error(f'向量化文档:{document_id}出现错误{str(e)}{traceback.format_exc()}')
             status = Status.error
@@ -148,21 +186,24 @@ class ListenerManagement:
                 **{'status': status, 'update_time': datetime.datetime.now()})
             QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': status})
             max_kb.info(f"结束--->向量化文档:{document_id}")
+            un_lock('embedding' + str(document_id))
 
     @staticmethod
     @embedding_poxy
-    def embedding_by_dataset(dataset_id):
+    def embedding_by_dataset(dataset_id, embedding_model: Embeddings):
         """
         向量化知识库
-        :param dataset_id: 知识库id
+        @param dataset_id: 知识库id
+        @param embedding_model 向量模型
         :return: None
         """
         max_kb.info(f"开始--->向量化数据集:{dataset_id}")
         try:
+            ListenerManagement.delete_embedding_by_dataset(dataset_id)
             document_list = QuerySet(Document).filter(dataset_id=dataset_id)
             max_kb.info(f"数据集文档:{[d.name for d in document_list]}")
             for document in document_list:
-                ListenerManagement.embedding_by_document(document.id)
+                ListenerManagement.embedding_by_document(document.id, embedding_model=embedding_model)
         except Exception as e:
             max_kb_error.error(f'向量化数据集:{dataset_id}出现错误{str(e)}{traceback.format_exc()}')
         finally:
@@ -224,14 +265,22 @@ class ListenerManagement:
 
     @staticmethod
     def update_embedding_dataset_id(args: UpdateEmbeddingDatasetIdArgs):
-        VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
-                                                                   {'dataset_id': args.target_dataset_id})
+        if args.target_embedding_model is None:
+            VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
+                                                                       {'dataset_id': args.target_dataset_id})
+        else:
+            ListenerManagement.embedding_by_paragraph_list(args.paragraph_id_list,
+                                                           embedding_model=args.target_embedding_model)
 
     @staticmethod
     def update_embedding_document_id(args: UpdateEmbeddingDocumentIdArgs):
-        VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
-                                                                   {'document_id': args.target_document_id,
-                                                                    'dataset_id': args.target_dataset_id})
+        if args.target_embedding_model is None:
+            VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
+                                                                       {'document_id': args.target_document_id,
+                                                                        'dataset_id': args.target_dataset_id})
+        else:
+            ListenerManagement.embedding_by_paragraph_list(args.paragraph_id_list,
+                                                           embedding_model=args.target_embedding_model)
 
     @staticmethod
     def delete_embedding_by_source_ids(source_ids: List[str]):
@@ -244,11 +293,6 @@ class ListenerManagement:
     @staticmethod
     def delete_embedding_by_dataset_id_list(source_ids: List[str]):
         VectorStore.get_embedding_vector().delete_by_dataset_id_list(source_ids)
-
-    @staticmethod
-    @poxy
-    def init_embedding_model(ages):
-        EmbeddingModel.get_embedding_model()
 
     def run(self):
         #  添加向量 根据问题id
@@ -276,8 +320,7 @@ class ListenerManagement:
         ListenerManagement.disable_embedding_by_paragraph_signal.connect(self.disable_embedding_by_paragraph)
         # 启动段落向量
         ListenerManagement.enable_embedding_by_paragraph_signal.connect(self.enable_embedding_by_paragraph)
-        # 初始化向量化模型
-        ListenerManagement.init_embedding_model_signal.connect(self.init_embedding_model)
+
         # 同步web站点知识库
         ListenerManagement.sync_web_dataset_signal.connect(self.sync_web_dataset)
         # 同步web站点 文档

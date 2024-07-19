@@ -41,3 +41,7 @@ class MemCache(LocMemCache):
                 delete_keys.append(key)
         for key in delete_keys:
             self._delete(key)
+
+    def clear_timeout_data(self):
+        for key in self._cache.keys():
+            self.get(key)

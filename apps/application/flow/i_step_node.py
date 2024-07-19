@@ -111,6 +111,7 @@ class FlowParamsSerializer(serializers.Serializer):
 
     client_type = serializers.CharField(required=False, error_messages=ErrMessage.char("客户端类型"))
 
+    user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("用户id"))
     re_chat = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("换个答案"))
 
 

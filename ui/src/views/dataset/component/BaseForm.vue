@@ -1,11 +1,11 @@
 <template>
-  <h4 class="title-decoration-1 mb-16">基本信息</h4>
   <el-form
     ref="FormRef"
     :model="form"
     :rules="rules"
     label-position="top"
     require-asterisk-position="right"
+    v-loading="loading"
   >
     <el-form-item label="知识库名称" prop="name">
       <el-input
@@ -27,14 +27,72 @@
         @blur="form.desc = form.desc.trim()"
       />
     </el-form-item>
+    <el-form-item label="Embedding模型" prop="embedding_mode_id">
+      <el-select
+        v-model="form.embedding_mode_id"
+        placeholder="请选择Embedding模型"
+        class="w-full"
+        popper-class="select-model"
+        :clearable="true"
+      >
+        <el-option-group
+          v-for="(value, label) in modelOptions"
+          :key="value"
+          :label="relatedObject(providerOptions, label, 'provider')?.name"
+        >
+          <el-option
+            v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+            class="flex-between"
+          >
+            <div class="flex">
+              <span
+                v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                class="model-icon mr-8"
+              ></span>
+              <span>{{ item.name }}</span>
+            </div>
+            <el-icon class="check-icon" v-if="item.id === form.embedding_mode_id"
+              ><Check
+            /></el-icon>
+          </el-option>
+          <!-- 不可用 -->
+          <el-option
+            v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+            class="flex-between"
+            disabled
+          >
+            <div class="flex">
+              <span
+                v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                class="model-icon mr-8"
+              ></span>
+              <span>{{ item.name }}</span>
+              <span class="danger">{{
+                $t('views.application.applicationForm.form.aiModel.unavailable')
+              }}</span>
+            </div>
+            <el-icon class="check-icon" v-if="item.id === form.embedding_mode_id"
+              ><Check
+            /></el-icon>
+          </el-option>
+        </el-option-group>
+      </el-select>
+    </el-form-item>
   </el-form>
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { groupBy } from 'lodash'
 import useStore from '@/stores'
 import type { datasetData } from '@/api/type/dataset'
-import { isAllPropertiesEmpty } from '@/utils/utils'
+import { relatedObject } from '@/utils/utils'
+import type { Provider } from '@/api/type/model'
 
 const props = defineProps({
   data: {
@@ -42,23 +100,23 @@ const props = defineProps({
     default: () => {}
   }
 })
-const route = useRoute()
-const {
-  params: { type }
-} = route
-const isCreate = type === 'create'
-const { dataset } = useStore()
-const baseInfo = computed(() => dataset.baseInfo)
+const { model } = useStore()
 const form = ref<datasetData>({
   name: '',
-  desc: ''
+  desc: '',
+  embedding_mode_id: ''
 })
 
 const rules = reactive({
   name: [{ required: true, message: '请输入知识库名称', trigger: 'blur' }],
-  desc: [{ required: true, message: '请输入知识库描述', trigger: 'blur' }]
+  desc: [{ required: true, message: '请输入知识库描述', trigger: 'blur' }],
+  embedding_mode_id: [{ required: true, message: '请输入Embedding模型', trigger: 'change' }]
 })
+
 const FormRef = ref()
+const loading = ref(false)
+const modelOptions = ref<any>([])
+const providerOptions = ref<Array<Provider>>([])
 
 watch(
   () => props.data,
@@ -66,23 +124,13 @@ watch(
     if (value && JSON.stringify(value) !== '{}') {
       form.value.name = value.name
       form.value.desc = value.desc
+      form.value.embedding_mode_id = value.embedding_mode_id
     }
   },
   {
     immediate: true
   }
 )
-
-watch(form.value, (value) => {
-  if (isAllPropertiesEmpty(value)) {
-    dataset.saveBaseInfo(null)
-  } else {
-    if (isCreate) {
-      dataset.saveBaseInfo(value)
-    }
-  }
-})
-
 /*
   表单校验
 */
@@ -93,16 +141,43 @@ function validate() {
   })
 }
 
+function getModel() {
+  loading.value = true
+  model
+    .asyncGetModel({ model_type: 'EMBEDDING' })
+    .then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
+function getProvider() {
+  loading.value = true
+  model
+    .asyncGetProvider()
+    .then((res: any) => {
+      providerOptions.value = res?.data
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
 onMounted(() => {
-  if (baseInfo.value) {
-    form.value = baseInfo.value
-  }
+  getProvider()
+  getModel()
 })
 onUnmounted(() => {
   form.value = {
     name: '',
-    desc: ''
+    desc: '',
+    embedding_mode_id: ''
   }
+  FormRef.value?.clearValidate()
 })
 
 defineExpose({

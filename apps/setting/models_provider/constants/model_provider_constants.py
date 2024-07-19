@@ -18,6 +18,7 @@ from setting.models_provider.impl.qwen_model_provider.qwen_model_provider import
 from setting.models_provider.impl.wenxin_model_provider.wenxin_model_provider import WenxinModelProvider
 from setting.models_provider.impl.xf_model_provider.xf_model_provider import XunFeiModelProvider
 from setting.models_provider.impl.zhipu_model_provider.zhipu_model_provider import ZhiPuModelProvider
+from setting.models_provider.impl.local_model_provider.local_model_provider import LocalModelProvider
 
 
 class ModelProvideConstants(Enum):
@@ -31,3 +32,4 @@ class ModelProvideConstants(Enum):
     model_xf_provider = XunFeiModelProvider()
     model_deepseek_provider = DeepSeekModelProvider()
     model_gemini_provider = GeminiModelProvider()
+    model_local_provider = LocalModelProvider()

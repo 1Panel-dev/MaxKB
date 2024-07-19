@@ -14,6 +14,7 @@ from django.db.models import QuerySet
 from drf_yasg import openapi
 from rest_framework import serializers
 
+from common.config.embedding_config import ModelManage
 from common.db.search import native_search
 from common.db.sql_execute import update_execute
 from common.exception.app_exception import AppApiException
@@ -21,7 +22,8 @@ from common.mixins.api_mixin import ApiMixin
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
-from dataset.models import Paragraph, Problem, ProblemParagraphMapping
+from dataset.models import Paragraph, Problem, ProblemParagraphMapping, DataSet
+from setting.models_provider import get_model
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -130,3 +132,22 @@ class ProblemParagraphManage:
         result = [problem_model for problem_model, is_create in problem_content_dict.values() if
                   is_create], problem_paragraph_mapping_list
         return result
+
+
+def get_embedding_model_by_dataset_id_list(dataset_id_list: List):
+    dataset_list = QuerySet(DataSet).filter(id__in=dataset_id_list)
+    if len(set([dataset.embedding_mode_id for dataset in dataset_list])) > 1:
+        raise Exception("知识库未向量模型不一致")
+    if len(dataset_list) == 0:
+        raise Exception("知识库设置错误,请重新设置知识库")
+    return ModelManage.get_model(str(dataset_list[0].id),
+                                          lambda _id: get_model(dataset_list[0].embedding_mode))
+
+
+def get_embedding_model_by_dataset_id(dataset_id: str):
+    dataset = QuerySet(DataSet).select_related('embedding_mode').filter(id=dataset_id).first()
+    return ModelManage.get_model(dataset_id, lambda _id: get_model(dataset.embedding_mode))
+
+
+def get_embedding_model_by_dataset(dataset):
+    return ModelManage.get_model(str(dataset.id), lambda _id: get_model(dataset.embedding_mode))

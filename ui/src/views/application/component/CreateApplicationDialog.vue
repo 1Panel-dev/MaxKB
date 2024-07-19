@@ -63,10 +63,10 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false">
+        <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitValid(applicationFormRef)">
+        <el-button type="primary" @click="submitValid(applicationFormRef)" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.create') }}
         </el-button>
       </span>
@@ -183,10 +183,7 @@ const submitValid = (formEl: FormInstance | undefined) => {
         if (res?.data) {
           submitHandle(formEl)
         } else {
-          MsgAlert(
-            '提示',
-            '社区版最多支持 5 个应用，如需拥有更多应用，请联系我们（https://fit2cloud.com/）。'
-          )
+          MsgAlert('提示', '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。')
         }
       })
   }
