@@ -14,7 +14,7 @@ from django.db.models import QuerySet
 from drf_yasg import openapi
 from rest_framework import serializers
 
-from common.config.embedding_config import EmbeddingModelManage
+from common.config.embedding_config import ModelManage
 from common.db.search import native_search
 from common.db.sql_execute import update_execute
 from common.exception.app_exception import AppApiException
@@ -140,14 +140,14 @@ def get_embedding_model_by_dataset_id_list(dataset_id_list: List):
         raise Exception("知识库未向量模型不一致")
     if len(dataset_list) == 0:
         raise Exception("知识库设置错误,请重新设置知识库")
-    return EmbeddingModelManage.get_model(str(dataset_list[0].id),
+    return ModelManage.get_model(str(dataset_list[0].id),
                                           lambda _id: get_model(dataset_list[0].embedding_mode))
 
 
 def get_embedding_model_by_dataset_id(dataset_id: str):
     dataset = QuerySet(DataSet).select_related('embedding_mode').filter(id=dataset_id).first()
-    return EmbeddingModelManage.get_model(dataset_id, lambda _id: get_model(dataset.embedding_mode))
+    return ModelManage.get_model(dataset_id, lambda _id: get_model(dataset.embedding_mode))
 
 
 def get_embedding_model_by_dataset(dataset):
-    return EmbeddingModelManage.get_model(str(dataset.id), lambda _id: get_model(dataset.embedding_mode))
+    return ModelManage.get_model(str(dataset.id), lambda _id: get_model(dataset.embedding_mode))

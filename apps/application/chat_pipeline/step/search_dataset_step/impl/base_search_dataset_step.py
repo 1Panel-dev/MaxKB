@@ -13,7 +13,7 @@ from django.db.models import QuerySet
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.step.search_dataset_step.i_search_dataset_step import ISearchDatasetStep
-from common.config.embedding_config import VectorStore, EmbeddingModelManage
+from common.config.embedding_config import VectorStore, ModelManage
 from common.db.search import native_search
 from common.util.file_util import get_file_content
 from dataset.models import Paragraph, DataSet
@@ -23,10 +23,12 @@ from setting.models_provider import get_model
 from smartdoc.conf import PROJECT_DIR
 
 
-def get_model_by_id(_id):
+def get_model_by_id(_id, user_id):
     model = QuerySet(Model).filter(id=_id).first()
     if model is None:
         raise Exception("模型不存在")
+    if model.permission_type == 'PRIVATE' and str(model.user_id) != str(user_id):
+        raise Exception(f"无权限使用此模型:{model.name}")
     return model
 
 
@@ -44,14 +46,15 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
     def execute(self, problem_text: str, dataset_id_list: list[str], exclude_document_id_list: list[str],
                 exclude_paragraph_id_list: list[str], top_n: int, similarity: float, padding_problem_text: str = None,
                 search_mode: str = None,
+                user_id=None,
                 **kwargs) -> List[ParagraphPipelineModel]:
         if len(dataset_id_list) == 0:
             return []
         exec_problem_text = padding_problem_text if padding_problem_text is not None else problem_text
         model_id = get_embedding_id(dataset_id_list)
-        model = get_model_by_id(model_id)
+        model = get_model_by_id(model_id, user_id)
         self.context['model_name'] = model.name
-        embedding_model = EmbeddingModelManage.get_model(model_id, lambda _id: get_model(model))
+        embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model))
         embedding_value = embedding_model.embed_query(exec_problem_text)
         vector = VectorStore.get_embedding_vector()
         embedding_list = vector.query(exec_problem_text, embedding_value, dataset_id_list, exclude_document_id_list,

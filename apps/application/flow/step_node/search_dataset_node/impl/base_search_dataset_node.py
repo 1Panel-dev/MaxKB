@@ -13,7 +13,7 @@ from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.search_dataset_node.i_search_dataset_node import ISearchDatasetStepNode
-from common.config.embedding_config import VectorStore, EmbeddingModelManage
+from common.config.embedding_config import VectorStore, ModelManage
 from common.db.search import native_search
 from common.util.file_util import get_file_content
 from dataset.models import Document, Paragraph, DataSet
@@ -56,7 +56,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
             return get_none_result(question)
         model_id = get_embedding_id(dataset_id_list)
         model = get_model_by_id(model_id, self.flow_params_serializer.data.get('user_id'))
-        embedding_model = EmbeddingModelManage.get_model(model_id, lambda _id: get_model(model))
+        embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model))
         embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()
         exclude_document_id_list = [str(document.id) for document in

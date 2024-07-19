@@ -88,7 +88,9 @@ class ChatInfo:
             'no_references_setting': self.application.dataset_setting.get(
                 'no_references_setting') if 'no_references_setting' in self.application.dataset_setting else {
                 'status': 'ai_questioning',
-                'value': '{question}'}
+                'value': '{question}',
+            },
+            'user_id': self.application.user_id
 
         }
 

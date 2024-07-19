@@ -29,6 +29,7 @@ from application.models.api_key_model import ApplicationAccessToken
 from application.serializers.application_serializers import ModelDatasetAssociation, DatasetSettingSerializer, \
     ModelSettingSerializer
 from application.serializers.chat_message_serializers import ChatInfo
+from common.config.embedding_config import ModelManage
 from common.constants.permission_constants import RoleConstants
 from common.db.search import native_search, native_page_search, page_search, get_dynamics_model
 from common.event import ListenerManagement
@@ -42,6 +43,7 @@ from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
 from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
+from setting.models_provider import get_model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from smartdoc.conf import PROJECT_DIR
 
@@ -242,12 +244,7 @@ class ChatSerializers(serializers.Serializer):
                                    application_id=application_id)]
             chat_model = None
             if model is not None:
-                chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
-                                                                                   json.loads(
-                                                                                       rsa_long_decrypt(
-                                                                                           model.credential)),
-                                                                                   streaming=True)
-
+                chat_model = ModelManage.get_model(str(model.id), lambda _id: get_model(model))
             chat_id = str(uuid.uuid1())
             chat_cache.set(chat_id,
                            ChatInfo(chat_id, chat_model, dataset_id_list,
