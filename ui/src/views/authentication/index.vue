@@ -1,5 +1,5 @@
 <template>
-  <div class="authentication-setting p-24">
+  <div class="authentication-setting p-16-24">
     <h4>{{ $t('login.authentication') }}</h4>
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
       <template v-for="(item, index) in tabList" :key="index">
@@ -38,7 +38,7 @@ onMounted(() => {})
   background-color: var(--app-view-bg-color);
   box-sizing: border-box;
   min-width: 700px;
-  height: calc(100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 80px);
+  height: calc(100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 70px);
   box-sizing: border-box;
   .form-container {
     width: 70%;
