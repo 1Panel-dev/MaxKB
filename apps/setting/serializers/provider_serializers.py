@@ -38,6 +38,9 @@ class ModelPullManage:
             for chunk in response:
                 down_model_chunk[chunk.digest] = chunk.to_dict()
                 if time.time() - timestamp > 5:
+                    model_new = QuerySet(Model).filter(id=model.id).first()
+                    if model_new.status == Status.PAUSE_DOWNLOAD:
+                        return
                     QuerySet(Model).filter(id=model.id).update(
                         meta={"down_model_chunk": list(down_model_chunk.values())})
                     timestamp = time.time()
@@ -236,6 +239,12 @@ class ModelSerializer(serializers.Serializer):
             if len(application_list) > 0:
                 raise AppApiException(500, f"该模型关联了{len(application_list)} 个应用，无法删除该模型。")
             QuerySet(Model).filter(id=self.data.get('id')).delete()
+            return True
+
+        def pause_download(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            QuerySet(Model).filter(id=self.data.get('id')).update(status=Status.PAUSE_DOWNLOAD)
             return True
 
         def edit(self, instance: Dict, user_id: str, with_valid=True):

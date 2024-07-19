@@ -69,6 +69,18 @@ class Model(APIView):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).one_meta(with_valid=True))
 
+    class PauseDownload(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="暂停模型下载",
+                             operation_id="暂停模型下载",
+                             tags=["模型"])
+        @has_permissions(PermissionConstants.MODEL_CREATE)
+        def put(self, request: Request, model_id: str):
+            return result.success(
+                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).pause_download())
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 

@@ -21,6 +21,12 @@
             <el-icon class="danger ml-4" size="20"><Warning /></el-icon>
           </el-tooltip>
         </div>
+        <div class="flex align-center" v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
+          <el-tag type="danger" class="ml-8">暂停下载</el-tag>
+          <el-tooltip effect="dark" content="暂停下载" placement="top">
+            <el-icon class="danger ml-4" size="20"><Warning /></el-icon>
+          </el-tooltip>
+        </div>
       </div>
     </template>
 
@@ -39,17 +45,6 @@
     <!-- progress -->
     <div class="progress-mask" v-if="currentModel.status === 'DOWNLOAD'">
       <DownloadLoading class="percentage" />
-      <!-- <el-progress
-        type="circle"
-        :width="56"
-        color="#3370FF"
-        :percentage="progress"
-        class="percentage"
-      >
-        <template #default="{ percentage }">
-          <span class="percentage-value">{{ percentage }}%</span>
-        </template>
-      </el-progress> -->
 
       <div class="percentage-label flex-center">
         正在下载中 <span class="dotting"></span>
@@ -64,7 +59,13 @@
         <el-tooltip effect="dark" content="修改" placement="top">
           <el-button text @click.stop="openEditModel">
             <el-icon>
-              <component :is="currentModel.status === 'ERROR' ? 'RefreshRight' : 'EditPen'" />
+              <component
+                :is="
+                  currentModel.status === 'ERROR' || currentModel.status === 'PAUSE_DOWNLOAD'
+                    ? 'RefreshRight'
+                    : 'EditPen'
+                "
+              />
             </el-icon>
           </el-button>
         </el-tooltip>
@@ -111,27 +112,6 @@ const errMessage = computed(() => {
   }
   return ''
 })
-// const progress = computed(() => {
-//   if (currentModel.value) {
-//     const down_model_chunk = currentModel.value.meta['down_model_chunk']
-//     if (down_model_chunk) {
-//       const maxObj = down_model_chunk
-//         .filter((chunk: any) => chunk.index > 1)
-//         .reduce(
-//           (prev: any, current: any) => {
-//             return (prev.index || 0) > (current.index || 0) ? prev : current
-//           },
-//           { progress: 0 }
-//         )
-//       if (maxObj) {
-//         return parseFloat(maxObj.progress?.toFixed(1))
-//       }
-//       return 0
-//     }
-//     return 0
-//   }
-//   return 0
-// })
 const emit = defineEmits(['change', 'update:model'])
 const eidtModelRef = ref<InstanceType<typeof EditModel>>()
 let interval: any
@@ -148,7 +128,12 @@ const deleteModel = () => {
     .catch(() => {})
 }
 
-const cancelDownload = () => {}
+const cancelDownload = () => {
+  ModelApi.pauseDownload(props.model.id).then(() => {
+    downModel.value = undefined
+    emit('change')
+  })
+}
 const openEditModel = () => {
   const provider = props.provider_list.find((p) => p.provider === props.model.provider)
   if (provider) {

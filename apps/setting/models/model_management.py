@@ -22,6 +22,8 @@ class Status(models.TextChoices):
 
     DOWNLOAD = "DOWNLOAD", '下载中'
 
+    PAUSE_DOWNLOAD = "PAUSE_DOWNLOAD", '暂停下载'
+
 
 class PermissionType(models.TextChoices):
     PUBLIC = "PUBLIC", '公开'

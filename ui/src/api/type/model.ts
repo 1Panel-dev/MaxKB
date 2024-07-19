@@ -69,7 +69,7 @@ interface Model {
   /**
    * 状态
    */
-  status: 'SUCCESS' | 'DOWNLOAD' | 'ERROR'
+  status: 'SUCCESS' | 'DOWNLOAD' | 'ERROR' | 'PAUSE_DOWNLOAD'
   /**
    * 元数据
    */
