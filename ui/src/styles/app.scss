@@ -690,3 +690,8 @@ h5 {
     box-shadow: none;
   }
 }
+
+// 自定义主题
+.custom-header {
+  background: var(--el-color-primary-light-9) !important;
+}

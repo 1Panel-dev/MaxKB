@@ -31,7 +31,4 @@ const isDefaultTheme = computed(() => {
   top: 0;
   z-index: 100;
 }
-.custom-header {
-  background: var(--el-color-primary-light-9) !important;
-}
 </style>
