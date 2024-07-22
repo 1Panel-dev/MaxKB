@@ -26,11 +26,10 @@
         >
       </div>
       <div class="flex">
-        <span class="label">版本</span><span>{{ user.isXPack ? '专业版' : '社区版' }}</span>
+        <span class="label">版本</span><span>{{ user.showXpack() ? '专业版' : '社区版' }}</span>
       </div>
       <div class="flex">
-        <span class="label">版本号</span
-        ><span>{{ licenseInfo?.licenseVersion || user.version }}</span>
+        <span class="label">版本号</span><span>{{ user.version }}</span>
       </div>
       <div class="flex">
         <span class="label">序列号</span><span>{{ licenseInfo?.serialNo || '-' }}</span>
@@ -38,11 +37,7 @@
       <div class="flex">
         <span class="label">备注</span><span>{{ licenseInfo?.remark || '-' }}</span>
       </div>
-
-      <div
-        class="mt-16 flex align-center"
-        v-hasPermission="new ComplexPermission(['ADMIN'], ['x-pack'], 'OR')"
-      >
+      <div class="mt-16 flex align-center" v-if="user.showXpack()">
         <el-upload
           ref="uploadRef"
           action="#"
@@ -59,7 +54,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import licenseApi from '@/api/license'
 import { fromNowDate } from '@/utils/time'
 import { ComplexPermission } from '@/utils/permission/type'
@@ -72,9 +67,18 @@ const isDefaultTheme = computed(() => {
 const aboutDialogVisible = ref(false)
 const loading = ref(false)
 const licenseInfo = ref<any>(null)
+const isUpdate = ref(false)
 
+watch(aboutDialogVisible, (bool) => {
+  if (!bool) {
+    if (isUpdate.value) {
+      window.location.reload()
+    }
+    isUpdate.value = false
+  }
+})
 const open = () => {
-  if (user.isXPack) {
+  if (user.showXpack()) {
     getLicenseInfo()
   }
 
@@ -86,6 +90,7 @@ const onChange = (file: any) => {
   fd.append('license_file', file.raw)
   licenseApi.putLicense(fd, loading).then((res: any) => {
     getLicenseInfo()
+    isUpdate.value = true
   })
 }
 function getLicenseInfo() {

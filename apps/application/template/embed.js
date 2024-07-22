@@ -19,34 +19,8 @@ const guideHtml=`
 </div>
 `
 const chatButtonHtml=
-`<div class="maxkb-chat-button" ><svg style="vertical-align: middle;overflow: hidden;" width="48" height="56" viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g filter="url(#filter0_d_349_49711)">
-<path d="M8 24C8 12.9543 16.9543 4 28 4H48V44H28C16.9543 44 8 35.0457 8 24Z" fill="url(#paint0_linear_349_49711)"/>
-</g>
-<path d="M31.2632 30.2754H28.1992L27.0636 31.411C26.9971 31.4775 26.9518 31.5623 26.9335 31.6546C26.9151 31.7468 26.9245 31.8425 26.9605 31.9294C26.9965 32.0163 27.0575 32.0906 27.1357 32.1429C27.2139 32.1951 27.3059 32.223 27.4 32.223H32.0625C32.1566 32.223 32.2486 32.1951 32.3268 32.1429C32.405 32.0906 32.466 32.0163 32.502 31.9294C32.538 31.8425 32.5474 31.7468 32.529 31.6546C32.5107 31.5623 32.4654 31.4775 32.3989 31.411L31.2632 30.2754Z" fill="white"/>
-<path d="M39.6831 21.3652H39.0791V25.6142H39.6831C39.8051 25.6142 39.9221 25.5657 40.0083 25.4795C40.0945 25.3932 40.143 25.2763 40.143 25.1543V21.8251C40.143 21.7031 40.0945 21.5862 40.0083 21.4999C39.9221 21.4137 39.8051 21.3652 39.6831 21.3652Z" fill="white"/>
-<path d="M20.9208 21.3652H20.3168C20.1948 21.3652 20.0779 21.4137 19.9916 21.4999C19.9054 21.5862 19.8569 21.7031 19.8569 21.8251V25.1543C19.8569 25.2763 19.9054 25.3932 19.9916 25.4795C20.0779 25.5657 20.1948 25.6142 20.3168 25.6142H20.9208V21.3652Z" fill="white"/>
-<path d="M32.3323 21.9277C32.1041 21.9277 31.8854 22.0184 31.7241 22.1796C31.5628 22.3409 31.4722 22.5597 31.4722 22.7878V23.4045C31.4722 23.6326 31.5628 23.8514 31.7241 24.0127C31.8854 24.174 32.1042 24.2646 32.3323 24.2646C32.5604 24.2646 32.7792 24.174 32.9405 24.0127C33.1018 23.8514 33.1924 23.6326 33.1924 23.4045V22.7878C33.1924 22.6749 33.1702 22.563 33.1269 22.4587C33.0837 22.3543 33.0204 22.2595 32.9405 22.1796C32.8606 22.0998 32.7658 22.0364 32.6614 21.9932C32.5571 21.95 32.4452 21.9277 32.3323 21.9277Z" fill="white"/>
-<path d="M27.8464 21.9277C27.6183 21.9277 27.3995 22.0184 27.2382 22.1796C27.0769 22.3409 26.9863 22.5597 26.9863 22.7878V23.4045C26.9863 23.6326 27.0769 23.8514 27.2383 24.0127C27.3996 24.174 27.6183 24.2646 27.8465 24.2646C28.0746 24.2646 28.2933 24.174 28.4547 24.0127C28.616 23.8514 28.7066 23.6326 28.7066 23.4045V22.7878C28.7066 22.6749 28.6843 22.563 28.6411 22.4587C28.5979 22.3543 28.5345 22.2595 28.4546 22.1796C28.3748 22.0998 28.2799 22.0364 28.1756 21.9932C28.0712 21.95 27.9594 21.9277 27.8464 21.9277Z" fill="white"/>
-<path d="M35.2258 17.0488H24.7738C23.8508 17.0499 22.9659 17.417 22.3133 18.0696C21.6606 18.7223 21.2935 19.6071 21.2925 20.5301V26.4227C21.2935 27.3457 21.6606 28.2306 22.3133 28.8832C22.9659 29.5359 23.8508 29.903 24.7738 29.904H35.2258C36.1488 29.903 37.0336 29.5359 37.6863 28.8832C38.3389 28.2306 38.7061 27.3457 38.7071 26.4227V20.5301C38.7061 19.6071 38.3389 18.7223 37.6863 18.0696C37.0336 17.417 36.1488 17.0499 35.2258 17.0488ZM35.5181 26.3875C35.5181 26.5538 35.452 26.7133 35.3344 26.8309C35.2168 26.9485 35.0573 27.0146 34.891 27.0146H29.7929C29.0215 27.0146 28.2631 27.2129 27.5904 27.5903L25.8801 28.55V27.0146H25.1086C24.9422 27.0146 24.7827 26.9486 24.6651 26.831C24.5475 26.7134 24.4815 26.5539 24.4815 26.3876V20.1408C24.4815 19.9745 24.5475 19.815 24.6651 19.6974C24.7827 19.5798 24.9422 19.5137 25.1086 19.5137H34.891C35.0573 19.5137 35.2168 19.5798 35.3344 19.6974C35.452 19.815 35.5181 19.9745 35.5181 20.1408V26.3875Z" fill="white"/>
-<defs>
-<filter id="filter0_d_349_49711" x="0" y="0" width="56" height="56" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dy="4"/>
-<feGaussianBlur stdDeviation="4"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0.168627 0 0 0 0 0.372549 0 0 0 0 0.85098 0 0 0 0.24 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_349_49711"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_349_49711" result="shape"/>
-</filter>
-<linearGradient id="paint0_linear_349_49711" x1="48" y1="25.6667" x2="8" y2="25.6667" gradientUnits="userSpaceOnUse">
-<stop stop-color="#9258F7"/>
-<stop offset="1" stop-color="#3370FF"/>
-</linearGradient>
-</defs>
-</svg>
-
+`<div class="maxkb-chat-button" >
+<img style="height:100%;width:100%;" src="{{float_icon}}">
 </div>`
 
  
@@ -113,6 +87,12 @@ const initChat=(root)=>{
       closeviewport.classList.remove('maxkb-viewportnone')
     }
   }
+  if({{is_draggable}}){
+  chat_button.addEventListener("dragend",(e)=>{
+     chat_button.style.top=(e.y-25)+'px'
+     chat_button.style.left=(e.x-25)+'px'
+    })
+  }
   viewport.onclick=viewport_func
   closeviewport.onclick=viewport_func
 }
@@ -127,7 +107,7 @@ function initMaxkb(){
   maxkb.appendChild(root)
   document.body.appendChild(maxkb)
   const maxkbMaskTip=localStorage.getItem('maxkbMaskTip')
-  if(maxkbMaskTip==null){
+  if(maxkbMaskTip==null && {{show_guide}}){
     initGuide(root)
   }
   initChat(root)
@@ -247,6 +227,8 @@ function initMaxkbStyle(root){
         bottom: 30px;
         right: 0;
         cursor: pointer;
+        height:50px;
+        width:50px;
     }
     #maxkb #maxkb-chat-container{
         z-index:10000;position: relative;

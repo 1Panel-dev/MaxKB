@@ -26,7 +26,11 @@
     </div>
 
     <!-- 历史记录弹出层 -->
-    <div @click.prevent.stop="show = !show" class="chat-popover-button cursor color-secondary">
+    <div
+      v-if="applicationDetail.show_history"
+      @click.prevent.stop="show = !show"
+      class="chat-popover-button cursor color-secondary"
+    >
       <AppIcon iconName="app-history-outlined"></AppIcon>
     </div>
 
@@ -77,7 +81,6 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import applicationApi from '@/api/application'
 import useStore from '@/stores'
 const route = useRoute()
 const {
@@ -159,11 +162,13 @@ function getAccessToken(token: string) {
     })
 }
 function getAppProfile() {
-  applicationApi
-    .getAppProfile(loading)
-    .then((res) => {
+  application
+    .asyncGetAppProfile(loading)
+    .then((res: any) => {
       applicationDetail.value = res.data
-      getChatLog(applicationDetail.value.id)
+      if (res.data?.show_history) {
+        getChatLog(applicationDetail.value.id)
+      }
     })
     .catch(() => {
       applicationAvailable.value = false

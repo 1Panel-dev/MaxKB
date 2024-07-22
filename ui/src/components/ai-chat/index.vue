@@ -4,10 +4,8 @@
       <div ref="dialogScrollbar" class="ai-chat__content p-24 chat-width">
         <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
           <div class="avatar">
-            <!-- <AppAvatar class="avatar-gradient">
-              <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
-            </AppAvatar> -->
-            <LogoIcon height="30px" />
+            <img v-if="data.avatar" :src="data.avatar" height="30px" />
+            <LogoIcon v-else height="30px" />
           </div>
 
           <div class="content">
@@ -52,10 +50,8 @@
           <!-- 回答 -->
           <div class="item-content mb-16 lighter">
             <div class="avatar">
-              <!-- <AppAvatar class="avatar-gradient">
-                <img src="@/assets/icon_robot.svg" style="width: 75%" alt="" />
-              </AppAvatar> -->
-              <LogoIcon height="30px" />
+              <img v-if="data.avatar" :src="data.avatar" height="30px" />
+              <LogoIcon v-else height="30px" />
             </div>
 
             <div class="content">
@@ -610,7 +606,7 @@ onMounted(() => {
     if (quickInputRef.value) {
       quickInputRef.value.textarea.style.height = '0'
     }
-  }, 1500)
+  }, 1800)
 })
 
 defineExpose({

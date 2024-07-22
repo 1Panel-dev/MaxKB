@@ -138,7 +138,7 @@ onMounted(() => {
     user.theme()
   }
   user.asyncGetProfile().then((res) => {
-    if (user.isXPack && user.XPACK_LICENSE_IS_VALID) {
+    if (user.showXpack()) {
       loading.value = true
       user
         .getAuthType()
