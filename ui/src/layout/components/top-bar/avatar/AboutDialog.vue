@@ -39,7 +39,10 @@
         <span class="label">备注</span><span>{{ licenseInfo?.remark || '-' }}</span>
       </div>
 
-      <div class="mt-16 flex align-center" v-if="user.isXPack">
+      <div
+        class="mt-16 flex align-center"
+        v-hasPermission="new ComplexPermission(['ADMIN'], ['x-pack'], 'OR')"
+      >
         <el-upload
           ref="uploadRef"
           action="#"
@@ -59,6 +62,7 @@
 import { ref, computed } from 'vue'
 import licenseApi from '@/api/license'
 import { fromNowDate } from '@/utils/time'
+import { ComplexPermission } from '@/utils/permission/type'
 import useStore from '@/stores'
 const { user } = useStore()
 const isDefaultTheme = computed(() => {

@@ -27,10 +27,10 @@
         @blur="form.desc = form.desc.trim()"
       />
     </el-form-item>
-    <el-form-item label="Embedding模型" prop="embedding_mode_id">
+    <el-form-item label="向量模型" prop="embedding_mode_id">
       <el-select
         v-model="form.embedding_mode_id"
-        placeholder="请选择Embedding模型"
+        placeholder="请选择向量模型"
         class="w-full"
         popper-class="select-model"
         :clearable="true"
