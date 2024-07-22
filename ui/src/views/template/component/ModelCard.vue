@@ -47,7 +47,12 @@
 
       <div class="percentage-label flex-center">
         正在下载中 <span class="dotting"></span>
-        <el-button link type="primary" class="ml-16" @click.stop="cancelDownload"
+        <el-button
+          link
+          type="primary"
+          class="ml-16"
+          :disabled="!is_permisstion"
+          @click.stop="cancelDownload"
           >取消下载</el-button
         >
       </div>
@@ -56,7 +61,7 @@
     <template #mouseEnter>
       <div class="operation-button">
         <el-tooltip effect="dark" content="修改" placement="top">
-          <el-button text @click.stop="openEditModel">
+          <el-button text :disabled="!is_permisstion" @click.stop="openEditModel">
             <el-icon>
               <component
                 :is="
@@ -68,9 +73,8 @@
             </el-icon>
           </el-button>
         </el-tooltip>
-
         <el-tooltip effect="dark" content="删除" placement="top">
-          <el-button text @click.stop="deleteModel">
+          <el-button :disabled="!is_permisstion" text @click.stop="deleteModel">
             <el-icon><Delete /></el-icon>
           </el-button>
         </el-tooltip>
@@ -86,14 +90,20 @@ import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/template/component/EditModel.vue'
 import DownloadLoading from '@/components/loading/DownloadLoading.vue'
 import { MsgConfirm } from '@/utils/message'
-
+import useStore from '@/stores'
 const props = defineProps<{
   model: Model
   provider_list: Array<Provider>
   updateModelById: (model_id: string, model: Model) => void
 }>()
+
+const { user } = useStore()
 const downModel = ref<Model>()
 
+const is_permisstion = computed(() => {
+  console.log(user.userInfo?.id, props.model.user_id)
+  return user.userInfo?.id == props.model.user_id
+})
 const currentModel = computed(() => {
   if (downModel.value) {
     return downModel.value
