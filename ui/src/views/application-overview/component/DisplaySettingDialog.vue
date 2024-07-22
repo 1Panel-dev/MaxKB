@@ -100,8 +100,8 @@ const defaultSetting = {
   show_history: true,
   draggable: false,
   show_guide: true,
-  avatar: null,
-  float_icon: null
+  avatar: '',
+  float_icon: ''
 }
 
 const displayFormRef = ref()
@@ -114,13 +114,13 @@ const xpackForm = ref<any>({
   show_history: false,
   draggable: false,
   show_guide: false,
-  avatar: null,
-  float_icon: null
+  avatar: '',
+  float_icon: ''
 })
 
 const imgUrl = ref<any>({
-  avatar: null,
-  float_icon: null
+  avatar: '',
+  float_icon: ''
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -132,8 +132,8 @@ watch(dialogVisible, (bool) => {
       show_source: false
     }
     imgUrl.value = {
-      avatar: null,
-      float_icon: null
+      avatar: "",
+      float_icon: ""
     }
   }
 })
@@ -143,8 +143,8 @@ function resetForm() {
     ...defaultSetting
   }
   imgUrl.value = {
-    avatar: null,
-    float_icon: null
+    avatar: "",
+    float_icon: ""
   }
 }
 
