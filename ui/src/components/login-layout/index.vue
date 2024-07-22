@@ -38,7 +38,7 @@ const loginImageStyle = computed(() => {
     }
   } else {
     return {
-      backgroundImage: `url(../src/assets/theme/${getThemeImg(user.themeInfo?.theme)}.jpg)`
+      backgroundImage: `url(src/assets/theme/${getThemeImg(user.themeInfo?.theme)}.jpg)`
     }
   }
 })
