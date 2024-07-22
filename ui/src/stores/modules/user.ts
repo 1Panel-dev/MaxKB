@@ -28,6 +28,9 @@ const useUserStore = defineStore({
     themeInfo: null
   }),
   actions: {
+    showXpack() {
+      return this.isXPack
+    },
     isDefaultTheme() {
       return !this.themeInfo?.theme || this.themeInfo?.theme === '#3370FF'
     },

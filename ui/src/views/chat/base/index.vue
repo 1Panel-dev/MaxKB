@@ -18,7 +18,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import applicationApi from '@/api/application'
 import useStore from '@/stores'
 const route = useRoute()
 const {
@@ -46,9 +45,9 @@ function getAccessToken(token: string) {
     })
 }
 function getAppProfile() {
-  applicationApi
-    .getAppProfile(loading)
-    .then((res) => {
+  application
+    .asyncGetAppProfile(loading)
+    .then((res: any) => {
       applicationDetail.value = res.data
     })
     .catch(() => {

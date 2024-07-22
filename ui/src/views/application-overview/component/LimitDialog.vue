@@ -4,12 +4,12 @@
     v-model="dialogVisible"
   >
     <el-form label-position="top" ref="limitFormRef" :model="form">
-      <el-form-item
+      <!-- <el-form-item
         :label="$t('views.applicationOverview.appInfo.LimitDialog.showSourceLabel')"
         @click.prevent
       >
         <el-switch size="small" v-model="form.show_source"></el-switch>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item
         :label="$t('views.applicationOverview.appInfo.LimitDialog.clientQueryLimitLabel')"
       >
@@ -69,7 +69,6 @@ const emit = defineEmits(['refresh'])
 
 const limitFormRef = ref()
 const form = ref<any>({
-  show_source: false,
   access_num: 0,
   white_active: true,
   white_list: ''
@@ -81,7 +80,6 @@ const loading = ref(false)
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
-      show_source: false,
       access_num: 0,
       white_active: true,
       white_list: ''
@@ -90,7 +88,6 @@ watch(dialogVisible, (bool) => {
 })
 
 const open = (data: any) => {
-  form.value.show_source = data.show_source
   form.value.access_num = data.access_num
   form.value.white_active = data.white_active
   form.value.white_list = data.white_list?.length ? data.white_list?.join('\n') : ''
@@ -102,7 +99,6 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       const obj = {
-        show_source: form.value.show_source,
         white_list: form.value.white_list ? form.value.white_list.split('\n') : [],
         white_active: form.value.white_active,
         access_num: form.value.access_num

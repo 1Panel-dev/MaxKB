@@ -108,7 +108,6 @@ import { reactive, ref, onMounted, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
-import applicationApi from '@/api/application'
 import useStore from '@/stores'
 
 import useResize from '@/layout/hooks/useResize'
@@ -201,11 +200,14 @@ function getAccessToken(token: string) {
 }
 
 function getAppProfile() {
-  applicationApi
-    .getAppProfile(loading)
-    .then((res) => {
+  application
+    .asyncGetAppProfile(loading)
+    .then((res: any) => {
       applicationDetail.value = res.data
-      getChatLog(applicationDetail.value.id)
+      if (res.data?.show_history) { 
+        getChatLog(applicationDetail.value.id)
+      }
+
     })
     .catch(() => {
       applicationAvailable.value = false
