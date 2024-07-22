@@ -5,6 +5,7 @@
     width="600"
     append-to-body
     class="addDataset-dialog"
+    align-center
   >
     <template #header="{ titleId, titleClass }">
       <div class="flex-between mb-8">
@@ -23,19 +24,23 @@
         所选知识库必须使用相同的 Embedding 模型
       </el-text>
     </template>
-    <el-row :gutter="12" v-loading="loading">
-      <el-col :span="12" v-for="(item, index) in filterData" :key="index" class="mb-16">
-        <CardCheckbox value-field="id" :data="item" v-model="checkList" @change="changeHandle">
-          <span class="ellipsis">
-            {{ item.name }}
-          </span>
-        </CardCheckbox>
-      </el-col>
-    </el-row>
+    <el-scrollbar>
+      <div class="max-height">
+        <el-row :gutter="12" v-loading="loading">
+          <el-col :span="12" v-for="(item, index) in filterData" :key="index" class="mb-16">
+            <CardCheckbox value-field="id" :data="item" v-model="checkList" @change="changeHandle">
+              <span class="ellipsis">
+                {{ item.name }}
+              </span>
+            </CardCheckbox>
+          </el-col>
+        </el-row>
+      </div>
+    </el-scrollbar>
     <template #footer>
       <div class="flex-between">
-        <div>
-          <el-text type="info" class="color-secondary" v-if="checkList.length > 0">
+        <div class="flex">
+          <el-text type="info" class="color-secondary mr-8" v-if="checkList.length > 0">
             已选 {{ checkList.length }} 个知识库
           </el-text>
           <el-button link type="primary" v-if="checkList.length > 0" @click="clearCheck">
@@ -87,6 +92,8 @@ function changeHandle() {
     currentEmbedding.value = props.data.filter(
       (v) => v.id === checkList.value[0]
     )[0].embedding_mode_id
+  } else if (checkList.value.length === 0) {
+    currentEmbedding.value = ''
   }
 }
 function clearCheck() {
@@ -96,6 +103,12 @@ function clearCheck() {
 
 const open = (checked: any) => {
   checkList.value = checked
+  if (checkList.value.length > 0) {
+    currentEmbedding.value = props.data.filter(
+      (v) => v.id === checkList.value[0]
+    )[0].embedding_mode_id
+  }
+
   dialogVisible.value = true
 }
 const submitHandle = () => {
@@ -111,11 +124,25 @@ defineExpose({ open })
 </script>
 <style lang="scss" scope>
 .addDataset-dialog {
+  padding: 0;
+  .el-dialog__header {
+    padding: 24px 24px 8px 24px;
+  }
+  .el-dialog__body {
+    padding: 8px !important;
+  }
+  .el-dialog__footer {
+    padding: 8px 24px 24px 24px;
+  }
   .el-dialog__header.show-close {
-    padding-right: 15px;
+    padding-right: 34px;
   }
   .el-dialog__headerbtn {
     top: 13px;
+  }
+  .max-height {
+    max-height: calc(100vh - 260px);
+    padding: 0 16px;
   }
 }
 </style>

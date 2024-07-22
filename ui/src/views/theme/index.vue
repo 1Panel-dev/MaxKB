@@ -134,7 +134,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import LoginPreview from './LoginPreview.vue'
@@ -144,6 +144,7 @@ import { MsgSuccess, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 
 const { user } = useStore()
+const router = useRouter()
 
 onBeforeRouteLeave((to, from) => {
   user.setTheme(cloneTheme.value)
@@ -224,6 +225,9 @@ const updataTheme = async (formEl: FormInstance | undefined, test?: string) => {
 }
 
 onMounted(() => {
+  if (user.isExpire()) {
+    router.push({ path: `/application` })
+  }
   if (themeInfo.value) {
     themeForm.value = themeInfo.value
     cloneTheme.value = cloneDeep(themeInfo.value)

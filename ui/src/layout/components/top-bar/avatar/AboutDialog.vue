@@ -2,7 +2,7 @@
   <el-dialog
     v-model="aboutDialogVisible"
     class="about-dialog border-r-4"
-    :class="!isDefaultTheme ? 'custom-header' : ''"
+    :class="!isDefaultTheme ? 'dialog-custom-header' : ''"
   >
     <template #header="{ titleId, titleClass }">
       <div class="logo flex-center" :id="titleId" :class="titleClass">
@@ -26,11 +26,10 @@
         >
       </div>
       <div class="flex">
-        <span class="label">版本</span><span>{{ user.isXPack ? '专业版' : '社区版' }}</span>
+        <span class="label">版本</span><span>{{ user.showXpack() ? '专业版' : '社区版' }}</span>
       </div>
       <div class="flex">
-        <span class="label">版本号</span
-        ><span>{{ licenseInfo?.licenseVersion || user.version }}</span>
+        <span class="label">版本号</span><span>{{ user.version }}</span>
       </div>
       <div class="flex">
         <span class="label">序列号</span><span>{{ licenseInfo?.serialNo || '-' }}</span>
@@ -38,8 +37,7 @@
       <div class="flex">
         <span class="label">备注</span><span>{{ licenseInfo?.remark || '-' }}</span>
       </div>
-
-      <div class="mt-16 flex align-center" v-if="user.isXPack">
+      <div class="mt-16 flex align-center" v-if="user.showXpack()">
         <el-upload
           ref="uploadRef"
           action="#"
@@ -56,9 +54,10 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import licenseApi from '@/api/license'
 import { fromNowDate } from '@/utils/time'
+import { ComplexPermission } from '@/utils/permission/type'
 import useStore from '@/stores'
 const { user } = useStore()
 const isDefaultTheme = computed(() => {
@@ -68,9 +67,18 @@ const isDefaultTheme = computed(() => {
 const aboutDialogVisible = ref(false)
 const loading = ref(false)
 const licenseInfo = ref<any>(null)
+const isUpdate = ref(false)
 
+watch(aboutDialogVisible, (bool) => {
+  if (!bool) {
+    if (isUpdate.value) {
+      window.location.reload()
+    }
+    isUpdate.value = false
+  }
+})
 const open = () => {
-  if (user.isXPack) {
+  if (user.showXpack()) {
     getLicenseInfo()
   }
 
@@ -82,6 +90,7 @@ const onChange = (file: any) => {
   fd.append('license_file', file.raw)
   licenseApi.putLicense(fd, loading).then((res: any) => {
     getLicenseInfo()
+    isUpdate.value = true
   })
 }
 function getLicenseInfo() {
@@ -100,7 +109,7 @@ defineExpose({ open })
 <style lang="scss" scope>
 .about-dialog {
   padding: 0 0 24px 0;
-  width: 600px;
+  width: 620px;
   font-weight: 400;
   .el-dialog__header {
     background: var(--app-header-bg-color);
@@ -108,18 +117,21 @@ defineExpose({ open })
     height: 140px;
     box-sizing: border-box;
     border-radius: 4px 4px 0 0;
+    &.show-close {
+      padding-right: 0;
+    }
   }
   .el-dialog__title {
     height: 140px;
     box-sizing: border-box;
   }
   .about-ui {
-    width: 450px;
     margin: 0 auto;
     font-weight: 400;
     font-size: 14px;
     margin-top: 24px;
     line-height: 36px;
+    padding: 0 40px;
 
     .label {
       width: 150px;
@@ -127,7 +139,7 @@ defineExpose({ open })
       color: var(--app-text-color-secondary);
     }
   }
-  &.custom-header {
+  &.dialog-custom-header {
     .el-dialog__header {
       background: var(--el-color-primary-light-9) !important;
     }

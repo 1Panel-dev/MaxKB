@@ -32,6 +32,7 @@ from common.db.search import get_dynamics_model, native_search, native_page_sear
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed
 from common.field.common import UploadedImageField
+from common.models.db_model_manage import DBModelManage
 from common.util.common import valid_license
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
@@ -194,10 +195,19 @@ class ApplicationSerializer(serializers.Serializer):
             file.close()
             application_access_token = QuerySet(ApplicationAccessToken).filter(
                 access_token=self.data.get('token')).first()
+            is_draggable = 'false'
+            show_guide = 'true'
+            float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/favicon.ico"
+            application_setting_model = DBModelManage.get_model('application_setting')
+            if application_setting_model is not None:
+                application_setting = QuerySet(application_setting_model).filter(
+                    application_id=application_access_token.application_id).first()
+                if application_setting is not None:
+                    is_draggable = 'true' if application_setting.is_draggable else 'false'
+                    float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}{application_setting.float_icon}"
+                    show_guide = 'true' if application_setting else 'false'
 
             is_auth = 'true' if application_access_token is not None and application_access_token.is_active else 'false'
-            application_access_token = QuerySet(ApplicationAccessToken).filter(
-                access_token=self.data.get('token')).first()
             t = Template(content)
             s = t.render(
                 Context(
@@ -205,7 +215,10 @@ class ApplicationSerializer(serializers.Serializer):
                      'token': self.data.get('token'),
                      'white_list_str': ",".join(
                          application_access_token.white_list),
-                     'white_active': 'true' if application_access_token.white_active else 'false'}))
+                     'white_active': 'true' if application_access_token.white_active else 'false',
+                     'is_draggable': is_draggable,
+                     'float_icon': float_icon,
+                     'show_guide': show_guide}))
             response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
             return response
 

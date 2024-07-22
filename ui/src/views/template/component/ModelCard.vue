@@ -23,7 +23,7 @@
             <el-tag v-if="model.permission_type === 'PRIVATE'" type="danger" class="danger-tag"
               >私有</el-tag
             >
-            <el-tag v-else type="info" class="info-tag">公有</el-tag>
+            <el-tag v-else type="info" class="info-tag">公用</el-tag>
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@
     </div>
 
     <template #mouseEnter>
-      <div class="operation-button">
+      <div class="operation-button" v-if="model.permission_type === 'PUBLIC'">
         <el-tooltip effect="dark" content="修改" placement="top">
           <el-button text :disabled="!is_permisstion" @click.stop="openEditModel">
             <el-icon>

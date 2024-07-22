@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="创建知识库" v-model="dialogVisible" width="650" append-to-body>
+  <el-dialog title="创建知识库" v-model="dialogVisible" width="680" append-to-body>
     <!-- 基本信息 -->
     <BaseForm ref="BaseFormRef" v-if="dialogVisible" />
     <el-form
@@ -25,7 +25,7 @@
                     </AppAvatar>
                     <div>
                       <p class="mb-4">通用型</p>
-                      <el-text type="info">可以通过上传文件或手动录入方式构建知识库</el-text>
+                      <el-text type="info">上传本地文件或手动录入</el-text>
                     </div>
                   </div>
                 </el-radio>
@@ -44,7 +44,7 @@
                     </AppAvatar>
                     <div>
                       <p class="mb-4">Web 站点</p>
-                      <el-text type="info">通过网站链接同步方式构建知识库 </el-text>
+                      <el-text type="info">同步Web网站文本数据 </el-text>
                     </div>
                   </div>
                 </el-radio>

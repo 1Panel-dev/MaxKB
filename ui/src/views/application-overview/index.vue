@@ -2,7 +2,9 @@
   <LayoutContainer :header="$t('views.applicationOverview.title')">
     <el-scrollbar>
       <div class="main-calc-height p-24">
-        <h4 class="title-decoration-1 mb-16">{{$t('views.applicationOverview.appInfo.header')}}</h4>
+        <h4 class="title-decoration-1 mb-16">
+          {{ $t('views.applicationOverview.appInfo.header') }}
+        </h4>
         <el-card shadow="never" class="overview-card" v-loading="loading">
           <div class="title flex align-center">
             <div
@@ -42,7 +44,9 @@
           <el-row :gutter="12">
             <el-col :span="12" class="mt-16">
               <div class="flex">
-                <el-text type="info">{{$t('views.applicationOverview.appInfo.publicAccessLink')}}</el-text>
+                <el-text type="info">{{
+                  $t('views.applicationOverview.appInfo.publicAccessLink')
+                }}</el-text>
                 <el-switch
                   v-model="accessToken.is_active"
                   class="ml-8"
@@ -68,18 +72,27 @@
               </div>
               <div>
                 <el-button :disabled="!accessToken?.is_active" type="primary">
-                  <a v-if="accessToken?.is_active" :href="shareUrl" target="_blank"> {{$t('views.applicationOverview.appInfo.demo')}} </a>
-                  <span v-else> {{$t('views.applicationOverview.appInfo.demo')}}</span>
+                  <a v-if="accessToken?.is_active" :href="shareUrl" target="_blank">
+                    {{ $t('views.applicationOverview.appInfo.demo') }}
+                  </a>
+                  <span v-else> {{ $t('views.applicationOverview.appInfo.demo') }}</span>
                 </el-button>
                 <el-button :disabled="!accessToken?.is_active" @click="openDialog">
-                  {{$t('views.applicationOverview.appInfo.embedThirdParty')}}
+                  {{ $t('views.applicationOverview.appInfo.embedThirdParty') }}
                 </el-button>
-                <el-button @click="openLimitDialog">  {{$t('views.applicationOverview.appInfo.accessRestrictions')}} </el-button>
+                <el-button @click="openLimitDialog">
+                  {{ $t('views.applicationOverview.appInfo.accessRestrictions') }}
+                </el-button>
+                <el-button @click="openDisplaySettingDialog">
+                  {{ $t('views.applicationOverview.appInfo.displaySetting') }}
+                </el-button>
               </div>
             </el-col>
             <el-col :span="12" class="mt-16">
               <div class="flex">
-                <el-text type="info">{{$t('views.applicationOverview.appInfo.apiAccessCredentials')}} </el-text>
+                <el-text type="info"
+                  >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
+                </el-text>
               </div>
               <div class="mt-4 mb-16 url-height">
                 <a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
@@ -91,12 +104,16 @@
                 </el-button>
               </div>
               <div>
-                <el-button @click="openAPIKeyDialog">{{$t('views.applicationOverview.appInfo.apiKey')}}</el-button>
+                <el-button @click="openAPIKeyDialog">{{
+                  $t('views.applicationOverview.appInfo.apiKey')
+                }}</el-button>
               </div>
             </el-col>
           </el-row>
         </el-card>
-        <h4 class="title-decoration-1 mt-16 mb-16">{{$t('views.applicationOverview.monitor.monitoringStatistics')}}</h4>
+        <h4 class="title-decoration-1 mt-16 mb-16">
+          {{ $t('views.applicationOverview.monitor.monitoringStatistics') }}
+        </h4>
         <div class="mb-16">
           <el-select v-model="history_day" class="mr-12 w-120" @change="changeDayHandle">
             <el-option
@@ -126,6 +143,7 @@
     <APIKeyDialog ref="APIKeyDialogRef" />
     <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
+    <DisplaySettingDialog ref="DisplaySettingDialogRef" @refresh="refresh" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -134,6 +152,8 @@ import { useRoute } from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
+import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
+
 import EditAvatarDialog from './component/EditAvatarDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
 import applicationApi from '@/api/application'
@@ -152,6 +172,7 @@ const {
 
 const apiUrl = window.location.origin + '/doc/chat/'
 
+const DisplaySettingDialogRef = ref()
 const EditAvatarDialogRef = ref()
 const LimitDialogRef = ref()
 const APIKeyDialogRef = ref()
@@ -168,7 +189,7 @@ const dayOptions = [
   {
     value: 7,
     // @ts-ignore
-    label: t('views.applicationOverview.monitor.pastDayOptions.past7Days')  // 使用 t 方法来国际化显示文本
+    label: t('views.applicationOverview.monitor.pastDayOptions.past7Days') // 使用 t 方法来国际化显示文本
   },
   {
     value: 30,
@@ -204,6 +225,9 @@ const statisticsData = ref([])
 
 const showEditIcon = ref(false)
 
+function openDisplaySettingDialog() {
+  DisplaySettingDialogRef.value.open(accessToken.value)
+}
 function openEditAvatar() {
   EditAvatarDialogRef.value.open(detail.value)
 }
@@ -234,14 +258,14 @@ function refreshAccessToken() {
     t('views.applicationOverview.appInfo.refreshToken.msgConfirm2'),
     {
       confirmButtonText: t('views.applicationOverview.appInfo.refreshToken.confirm'),
-      cancelButtonText:t('views.applicationOverview.appInfo.refreshToken.cancel')
+      cancelButtonText: t('views.applicationOverview.appInfo.refreshToken.cancel')
     }
   )
     .then(() => {
       const obj = {
         access_token_reset: true
       }
-       // @ts-ignore
+      // @ts-ignore
       const str = t('views.applicationOverview.appInfo.refreshToken.refreshSuccess')
       updateAccessToken(obj, str)
     })
@@ -251,7 +275,9 @@ function changeState(bool: Boolean) {
   const obj = {
     is_active: bool
   }
-  const str = bool ? t('views.applicationOverview.appInfo.changeState.enableSuccess') : t('views.applicationOverview.appInfo.changeState.disableSuccess')
+  const str = bool
+    ? t('views.applicationOverview.appInfo.changeState.enableSuccess')
+    : t('views.applicationOverview.appInfo.changeState.disableSuccess')
   updateAccessToken(obj, str)
 }
 

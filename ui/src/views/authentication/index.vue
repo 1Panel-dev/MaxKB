@@ -18,8 +18,14 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import LDAP from './component/LDAP.vue'
 import { t } from '@/locales'
+import useStore from '@/stores'
+
+const { user } = useStore()
+const router = useRouter()
+
 const activeName = ref('LDAP')
 const tabList = [
   {
@@ -31,7 +37,11 @@ const tabList = [
 
 function handleClick() {}
 
-onMounted(() => {})
+onMounted(() => {
+  if (user.isExpire()) {
+    router.push({ path: `/application` })
+  }
+})
 </script>
 <style lang="scss" scoped>
 .authentication-setting__main {
