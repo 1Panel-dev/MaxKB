@@ -7,7 +7,6 @@
     @desc:
 """
 import datetime
-import json
 import os
 import re
 import uuid
@@ -38,13 +37,11 @@ from common.util.common import post
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
-from common.util.rsa_util import rsa_long_decrypt
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
 from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from setting.models import Model
 from setting.models_provider import get_model
-from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from smartdoc.conf import PROJECT_DIR
 
 chat_cache = caches['model_cache']
@@ -238,16 +235,12 @@ class ChatSerializers(serializers.Serializer):
 
         def open_simple(self, application):
             application_id = self.data.get('application_id')
-            model = QuerySet(Model).filter(id=application.model_id).first()
             dataset_id_list = [str(row.dataset_id) for row in
                                QuerySet(ApplicationDatasetMapping).filter(
                                    application_id=application_id)]
-            chat_model = None
-            if model is not None:
-                chat_model = ModelManage.get_model(str(model.id), lambda _id: get_model(model))
             chat_id = str(uuid.uuid1())
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id, chat_model, dataset_id_list,
+                           ChatInfo(chat_id, None, dataset_id_list,
                                     [str(document.id) for document in
                                      QuerySet(Document).filter(
                                          dataset_id__in=dataset_id_list,
@@ -318,24 +311,14 @@ class ChatSerializers(serializers.Serializer):
             user_id = self.is_valid(raise_exception=True)
             chat_id = str(uuid.uuid1())
             model_id = self.data.get('model_id')
-            if model_id is not None and len(model_id) > 0:
-                model = QuerySet(Model).filter(user_id=user_id, id=self.data.get('model_id')).first()
-                chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
-                                                                                   json.loads(
-                                                                                       rsa_long_decrypt(
-                                                                                           model.credential)),
-                                                                                   streaming=True)
-            else:
-                model = None
-                chat_model = None
             dataset_id_list = self.data.get('dataset_id_list')
-            application = Application(id=None, dialogue_number=3, model=model,
+            application = Application(id=None, dialogue_number=3, model_id=model_id,
                                       dataset_setting=self.data.get('dataset_setting'),
                                       model_setting=self.data.get('model_setting'),
                                       problem_optimization=self.data.get('problem_optimization'),
                                       user_id=user_id)
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id, chat_model, dataset_id_list,
+                           ChatInfo(chat_id, None, dataset_id_list,
                                     [str(document.id) for document in
                                      QuerySet(Document).filter(
                                          dataset_id__in=dataset_id_list,

@@ -13,23 +13,13 @@ from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.search_dataset_node.i_search_dataset_node import ISearchDatasetStepNode
-from common.config.embedding_config import VectorStore, ModelManage
+from common.config.embedding_config import VectorStore
 from common.db.search import native_search
 from common.util.file_util import get_file_content
 from dataset.models import Document, Paragraph, DataSet
 from embedding.models import SearchMode
-from setting.models import Model
-from setting.models_provider import get_model
+from setting.models_provider.tools import get_model_instance_by_model_user_id
 from smartdoc.conf import PROJECT_DIR
-
-
-def get_model_by_id(_id, user_id):
-    model = QuerySet(Model).filter(id=_id).first()
-    if model is None:
-        raise Exception("模型不存在")
-    if model.permission_type == 'PRIVATE' and str(model.user_id) != str(user_id):
-        raise Exception(f"无权限使用此模型:{model.name}")
-    return model
 
 
 def get_embedding_id(dataset_id_list):
@@ -55,8 +45,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
         if len(dataset_id_list) == 0:
             return get_none_result(question)
         model_id = get_embedding_id(dataset_id_list)
-        model = get_model_by_id(model_id, self.flow_params_serializer.data.get('user_id'))
-        embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model))
+        embedding_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'))
         embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()
         exclude_document_id_list = [str(document.id) for document in

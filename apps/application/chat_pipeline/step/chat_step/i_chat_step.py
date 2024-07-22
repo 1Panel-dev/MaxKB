@@ -53,8 +53,7 @@ class IChatStep(IBaseChatPipelineStep):
         # 对话列表
         message_list = serializers.ListField(required=True, child=MessageField(required=True),
                                              error_messages=ErrMessage.list("对话列表"))
-        # 大语言模型
-        chat_model = ModelField(required=False, allow_null=True, error_messages=ErrMessage.list("大语言模型"))
+        model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
         # 段落列表
         paragraph_list = serializers.ListField(error_messages=ErrMessage.list("段落列表"))
         # 对话id
@@ -72,6 +71,8 @@ class IChatStep(IBaseChatPipelineStep):
         client_type = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端类型"))
         # 未查询到引用分段
         no_references_setting = NoReferencesSetting(required=True, error_messages=ErrMessage.base("无引用分段设置"))
+
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -91,7 +92,8 @@ class IChatStep(IBaseChatPipelineStep):
     def execute(self, message_list: List[BaseMessage],
                 chat_id, problem_text,
                 post_response_handler: PostResponseHandler,
-                chat_model: BaseChatModel = None,
+                model_id: str = None,
+                user_id: str = None,
                 paragraph_list=None,
                 manage: PipelineManage = None,
                 padding_problem_text: str = None, stream: bool = True, client_id=None, client_type=None,
