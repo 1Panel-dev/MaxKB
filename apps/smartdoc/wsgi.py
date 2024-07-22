@@ -19,9 +19,11 @@ application = get_wsgi_application()
 def post_handler():
     from common import event
     from common import job
+    from common.models.db_model_manage import DBModelManage
     event.run()
     event.ListenerManagement.init_embedding_model_signal.send()
     job.run()
+    DBModelManage.init()
 
 
 post_handler()
