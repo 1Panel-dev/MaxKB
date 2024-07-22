@@ -3,7 +3,7 @@
     <div class="login-container w-full h-full">
       <el-row class="container w-full h-full">
         <el-col :xs="0" :sm="0" :md="10" :lg="10" :xl="10" class="left-container">
-          <div class="login-image" :style="loginImageStyle"></div>
+          <div class="login-image" :style="{ backgroundImage: `url(${loginImage})` }"></div>
         </el-col>
         <el-col :xs="24" :sm="24" :md="14" :lg="14" :xl="14" class="right-container flex-center">
           <slot></slot>
@@ -16,6 +16,7 @@
 import { computed } from 'vue'
 import { getThemeImg } from '@/utils/theme'
 import useStore from '@/stores'
+import { request } from '@/request'
 defineOptions({ name: 'LoginLayout' })
 const { user } = useStore()
 
@@ -31,15 +32,12 @@ const fileURL = computed(() => {
   }
 })
 
-const loginImageStyle = computed(() => {
+const loginImage = computed(() => {
   if (user.themeInfo?.loginImage) {
-    return {
-      backgroundImage: `url(${fileURL.value})`
-    }
+    return `${fileURL.value}`
   } else {
-    return {
-      backgroundImage: `url(../src/assets/theme/${getThemeImg(user.themeInfo?.theme)}.jpg)`
-    }
+    return new URL(`../../assets/theme/${getThemeImg(user.themeInfo?.theme)}.jpg`, import.meta.url)
+      .href
   }
 })
 </script>

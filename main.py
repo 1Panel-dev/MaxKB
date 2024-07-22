@@ -43,7 +43,10 @@ def perform_db_migrate():
 
 
 def start_services():
-    management.call_command('migrate')
+    management.call_command('gunicorn')
+
+
+def runserver():
     management.call_command('runserver', "0.0.0.0:8080")
 
 
@@ -60,7 +63,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         'action', type=str,
-        choices=("start", "upgrade_db", "collect_static"),
+        choices=("start", "dev", "upgrade_db", "collect_static"),
         help="Action to run"
     )
     args = parser.parse_args()
@@ -70,6 +73,10 @@ if __name__ == '__main__':
         perform_db_migrate()
     elif action == "collect_static":
         collect_static()
+    elif action == 'dev':
+        perform_db_migrate()
+        runserver()
     else:
         collect_static()
+        perform_db_migrate()
         start_services()

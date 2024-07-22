@@ -175,7 +175,7 @@ class Application(APIView):
         @swagger_auto_schema(operation_summary="获取模型列表",
                              operation_id="获取模型列表",
                              tags=["应用"],
-                             manual_parameters=ApplicationApi.ApiKey.get_request_params_api())
+                             manual_parameters=ApplicationApi.Model.get_request_params_api())
         @has_permissions(ViewPermission(
             [RoleConstants.ADMIN, RoleConstants.USER],
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
@@ -185,7 +185,7 @@ class Application(APIView):
             return result.success(
                 ApplicationSerializer.Operate(
                     data={'application_id': application_id,
-                          'user_id': request.user.id}).list_model())
+                          'user_id': request.user.id}).list_model(request.query_params.get('model_type')))
 
     class Profile(APIView):
         authentication_classes = [TokenAuth]

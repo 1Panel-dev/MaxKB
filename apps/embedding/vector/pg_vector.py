@@ -13,9 +13,8 @@ from abc import ABC, abstractmethod
 from typing import Dict, List
 
 from django.db.models import QuerySet
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_core.embeddings import Embeddings
 
-from common.config.embedding_config import EmbeddingModel
 from common.db.search import generate_sql_by_query_dict
 from common.db.sql_execute import select_list
 from common.util.file_util import get_file_content
@@ -33,14 +32,6 @@ class PGVector(BaseVectorStore):
     def update_by_source_ids(self, source_ids: List[str], instance: Dict):
         QuerySet(Embedding).filter(source_id__in=source_ids).update(**instance)
 
-    def embed_documents(self, text_list: List[str]):
-        embedding = EmbeddingModel.get_embedding_model()
-        return embedding.embed_documents(text_list)
-
-    def embed_query(self, text: str):
-        embedding = EmbeddingModel.get_embedding_model()
-        return embedding.embed_query(text)
-
     def vector_is_create(self) -> bool:
         # 项目启动默认是创建好的 不需要再创建
         return True
@@ -50,7 +41,7 @@ class PGVector(BaseVectorStore):
 
     def _save(self, text, source_type: SourceType, dataset_id: str, document_id: str, paragraph_id: str, source_id: str,
               is_active: bool,
-              embedding: HuggingFaceEmbeddings):
+              embedding: Embeddings):
         text_embedding = embedding.embed_query(text)
         embedding = Embedding(id=uuid.uuid1(),
                               dataset_id=dataset_id,
@@ -64,7 +55,7 @@ class PGVector(BaseVectorStore):
         embedding.save()
         return True
 
-    def _batch_save(self, text_list: List[Dict], embedding: HuggingFaceEmbeddings):
+    def _batch_save(self, text_list: List[Dict], embedding: Embeddings):
         texts = [row.get('text') for row in text_list]
         embeddings = embedding.embed_documents(texts)
         embedding_list = [Embedding(id=uuid.uuid1(),
@@ -83,7 +74,7 @@ class PGVector(BaseVectorStore):
     def hit_test(self, query_text, dataset_id_list: list[str], exclude_document_id_list: list[str], top_number: int,
                  similarity: float,
                  search_mode: SearchMode,
-                 embedding: HuggingFaceEmbeddings):
+                 embedding: Embeddings):
         if dataset_id_list is None or len(dataset_id_list) == 0:
             return []
         exclude_dict = {}

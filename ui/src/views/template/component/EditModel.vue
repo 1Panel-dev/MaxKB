@@ -48,6 +48,32 @@
             placeholder="请给基础模型设置一个名称"
           />
         </el-form-item>
+        <el-form-item prop="model_type" :rules="base_form_data_rule.permission_type">
+          <template #label>
+            <span>权限</span>
+          </template>
+
+          <el-radio-group v-model="base_form_data.permission_type" class="card__radio">
+            <el-row :gutter="16">
+              <template v-for="(value, key) of PermissionType" :key="key">
+                <el-col :span="12">
+                  <el-card
+                    shadow="never"
+                    class="mb-16"
+                    :class="base_form_data.permission_type === key ? 'active' : ''"
+                  >
+                    <el-radio :value="key" size="large">
+                      <p class="mb-4">{{ value }}</p>
+                      <el-text type="info">
+                        {{ PermissionDesc[key] }}
+                      </el-text>
+                    </el-radio>
+                  </el-card>
+                </el-col>
+              </template>
+            </el-row>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
           <template #label>
             <span>模型类型</span>
@@ -128,7 +154,7 @@ import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
-import AppIcon from '@/components/icons/AppIcon.vue'
+import { PermissionType, PermissionDesc } from '@/enums/model'
 
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
@@ -151,11 +177,11 @@ const base_form_data_rule = ref<FormRules>({
 
 const base_form_data = ref<{
   name: string
-
+  permission_type: string
   model_type: string
 
   model_name: string
-}>({ name: '', model_type: '', model_name: '' })
+}>({ name: '', model_type: '', model_name: '', permission_type: 'PRIVATE' })
 
 const credential_form_data = ref<Dict<any>>({})
 
@@ -204,6 +230,7 @@ const open = (provider: Provider, model: Model) => {
 
     base_form_data.value = {
       name: model.name,
+      permission_type: model.permission_type,
       model_type: model.model_type,
       model_name: model.model_name
     }
@@ -214,7 +241,7 @@ const open = (provider: Provider, model: Model) => {
 }
 
 const close = () => {
-  base_form_data.value = { name: '', model_type: '', model_name: '' }
+  base_form_data.value = { name: '', model_type: '', model_name: '', permission_type: '' }
   dynamicsFormRef.value?.ruleFormRef?.resetFields()
   credential_form_data.value = {}
   model_form_field.value = []

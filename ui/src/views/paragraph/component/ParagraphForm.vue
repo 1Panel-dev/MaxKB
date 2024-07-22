@@ -23,7 +23,7 @@
         v-if="isEdit"
         v-model="form.content"
         placeholder="请输入分段内容"
-        :maxLength="4096"
+        :maxLength="100000"
         :preview="false"
         :toolbars="toolbars"
         style="height: 300px"
@@ -31,7 +31,7 @@
         :footers="footers"
       >
         <template #defFooters>
-          <span style="margin-left: -6px">/ 4096</span>
+          <span style="margin-left: -6px">/ 100000</span>
         </template>
       </MdEditor>
       <MdPreview

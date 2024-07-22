@@ -20,7 +20,8 @@ from common.event import ListenerManagement, UpdateProblemArgs
 from common.mixins.api_mixin import ApiMixin
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
-from dataset.models import Problem, Paragraph, ProblemParagraphMapping
+from dataset.models import Problem, Paragraph, ProblemParagraphMapping, DataSet
+from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -157,6 +158,8 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             content = instance.get('content')
             problem = QuerySet(Problem).filter(id=problem_id,
                                                dataset_id=dataset_id).first()
+            QuerySet(DataSet).filter(id=dataset_id)
             problem.content = content
             problem.save()
-            ListenerManagement.update_problem_signal.send(UpdateProblemArgs(problem_id, content))
+            model = get_embedding_model_by_dataset_id(dataset_id)
+            ListenerManagement.update_problem_signal.send(UpdateProblemArgs(problem_id, content, model))

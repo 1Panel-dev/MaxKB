@@ -45,7 +45,7 @@ class SystemSerializer(ApiMixin, serializers.Serializer):
     @staticmethod
     def get_profile():
         version = os.environ.get('MAXKB_VERSION')
-        return {'version': version, 'IS_XPACK': hasattr(settings, 'XPACK_LICENSE_IS_VALID'),
+        return {'version': version, 'IS_XPACK': hasattr(settings, 'IS_XPACK'),
                 'XPACK_LICENSE_IS_VALID': (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
                                                                                       'XPACK_LICENSE_IS_VALID') else False)}
 

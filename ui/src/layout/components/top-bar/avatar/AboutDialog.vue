@@ -37,7 +37,6 @@
       <div class="flex">
         <span class="label">备注</span><span>{{ licenseInfo?.remark || '-' }}</span>
       </div>
-
       <div class="mt-16 flex align-center" v-if="user.showXpack()">
         <el-upload
           ref="uploadRef"
@@ -58,6 +57,7 @@
 import { ref, computed, watch } from 'vue'
 import licenseApi from '@/api/license'
 import { fromNowDate } from '@/utils/time'
+import { ComplexPermission } from '@/utils/permission/type'
 import useStore from '@/stores'
 const { user } = useStore()
 const isDefaultTheme = computed(() => {
@@ -109,7 +109,7 @@ defineExpose({ open })
 <style lang="scss" scope>
 .about-dialog {
   padding: 0 0 24px 0;
-  width: 600px;
+  width: 620px;
   font-weight: 400;
   .el-dialog__header {
     background: var(--app-header-bg-color);
@@ -117,18 +117,21 @@ defineExpose({ open })
     height: 140px;
     box-sizing: border-box;
     border-radius: 4px 4px 0 0;
+    &.show-close {
+      padding-right: 0;
+    }
   }
   .el-dialog__title {
     height: 140px;
     box-sizing: border-box;
   }
   .about-ui {
-    width: 450px;
     margin: 0 auto;
     font-weight: 400;
     font-size: 14px;
     margin-top: 24px;
     line-height: 36px;
+    padding: 0 40px;
 
     .label {
       width: 150px;

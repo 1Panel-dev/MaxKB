@@ -11,7 +11,9 @@ import os
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, \
     ModelTypeConst, ModelInfoManage
+from setting.models_provider.impl.openai_model_provider.credential.embedding import OpenAIEmbeddingCredential
 from setting.models_provider.impl.openai_model_provider.credential.llm import OpenAILLMModelCredential
+from setting.models_provider.impl.openai_model_provider.model.embedding import OpenAIEmbeddingModel
 from setting.models_provider.impl.openai_model_provider.model.llm import OpenAIChatModel
 from smartdoc.conf import PROJECT_DIR
 
@@ -58,11 +60,17 @@ model_info_list = [
               ModelTypeConst.LLM, openai_llm_model_credential,
               OpenAIChatModel)
 ]
+open_ai_embedding_credential = OpenAIEmbeddingCredential()
+model_info_embedding_list = [
+    ModelInfo('text-embedding-ada-002', '',
+              ModelTypeConst.EMBEDDING, open_ai_embedding_credential,
+              OpenAIEmbeddingModel)]
 
 model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
     ModelInfo('gpt-3.5-turbo', '最新的gpt-3.5-turbo，随OpenAI调整而更新', ModelTypeConst.LLM,
               openai_llm_model_credential, OpenAIChatModel
-              )).build()
+              )).append_model_info_list(model_info_embedding_list).append_default_model_info(
+    model_info_embedding_list[0]).build()
 
 
 class OpenAIModelProvider(IModelProvider):

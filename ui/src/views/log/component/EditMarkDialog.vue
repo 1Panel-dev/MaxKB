@@ -141,4 +141,13 @@ const submit = async (formEl: FormInstance) => {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope></style>
+<style lang="scss" scope>
+.edit-mark-dialog {
+  .el-dialog__header.show-close {
+    padding-right: 15px;
+  }
+  .el-dialog__headerbtn {
+    top: 13px;
+  }
+}
+</style>

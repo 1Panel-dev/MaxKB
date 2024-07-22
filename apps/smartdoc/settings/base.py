@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'rest_framework',
     "drf_yasg",  # swagger 接口
     'django_filters',  # 条件过滤
-    'django_apscheduler'
+    'django_apscheduler',
+    'common'
 
 ]
 
@@ -104,9 +105,6 @@ CACHES = {
     "token_cache": {
         'BACKEND': 'common.cache.file_cache.FileCache',
         'LOCATION': os.path.join(PROJECT_DIR, 'data', 'cache', "token_cache")  # 文件夹路径
-    },
-    "chat_cache": {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
 

@@ -88,7 +88,9 @@ class ChatInfo:
             'no_references_setting': self.application.dataset_setting.get(
                 'no_references_setting') if 'no_references_setting' in self.application.dataset_setting else {
                 'status': 'ai_questioning',
-                'value': '{question}'}
+                'value': '{question}',
+            },
+            'user_id': self.application.user_id
 
         }
 
@@ -221,11 +223,13 @@ class ChatMessageSerializer(serializers.Serializer):
         stream = self.data.get('stream')
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
+        user_id = chat_info.application.user_id
         work_flow_manage = WorkflowManage(Flow.new_instance(chat_info.work_flow_version.work_flow),
                                           {'history_chat_record': chat_info.chat_record_list, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(uuid.uuid1()),
                                            'stream': stream,
-                                           're_chat': re_chat}, WorkFlowPostHandler(chat_info, client_id, client_type))
+                                           're_chat': re_chat,
+                                           'user_id': user_id}, WorkFlowPostHandler(chat_info, client_id, client_type))
         r = work_flow_manage.run()
         return r
 
@@ -263,14 +267,6 @@ class ChatMessageSerializer(serializers.Serializer):
 
     @staticmethod
     def re_open_chat_simple(chat_id, application):
-        model = QuerySet(Model).filter(id=application.model_id).first()
-        chat_model = None
-        if model is not None:
-            # 对话模型
-            chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
-                                                                               json.loads(
-                                                                                   rsa_long_decrypt(model.credential)),
-                                                                               streaming=True)
         # 数据集id列表
         dataset_id_list = [str(row.dataset_id) for row in
                            QuerySet(ApplicationDatasetMapping).filter(
@@ -281,7 +277,7 @@ class ChatMessageSerializer(serializers.Serializer):
                                     QuerySet(Document).filter(
                                         dataset_id__in=dataset_id_list,
                                         is_active=False)]
-        return ChatInfo(chat_id, chat_model, dataset_id_list, exclude_document_id_list, application)
+        return ChatInfo(chat_id, None, dataset_id_list, exclude_document_id_list, application)
 
     @staticmethod
     def re_open_chat_work_flow(chat_id, application):

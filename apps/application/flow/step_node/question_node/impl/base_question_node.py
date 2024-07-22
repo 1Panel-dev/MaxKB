@@ -6,21 +6,17 @@
     @date：2024/6/4 14:30
     @desc:
 """
-import json
 import time
 from functools import reduce
 from typing import List, Dict
 
-from django.db.models import QuerySet
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_core.messages import BaseMessage
 
 from application.flow import tools
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.question_node.i_question_node import IQuestionNode
-from common.util.rsa_util import rsa_long_decrypt
-from setting.models import Model
-from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
+from setting.models_provider.tools import get_model_instance_by_model_user_id
 
 
 def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
@@ -125,13 +121,7 @@ def to_response(chat_id, chat_record_id, node_variable: Dict, workflow_variable:
 class BaseQuestionNode(IQuestionNode):
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 **kwargs) -> NodeResult:
-        model = QuerySet(Model).filter(id=model_id).first()
-        if model is None:
-            raise Exception("模型不存在")
-        chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
-                                                                           json.loads(
-                                                                               rsa_long_decrypt(model.credential)),
-                                                                           streaming=True)
+        chat_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'))
         history_message = self.get_history_message(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)
