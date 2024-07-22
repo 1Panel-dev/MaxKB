@@ -203,9 +203,9 @@ class ApplicationSerializer(serializers.Serializer):
                 application_setting = QuerySet(application_setting_model).filter(
                     application_id=application_access_token.application_id).first()
                 if application_setting is not None:
-                    is_draggable = 'true' if application_setting.is_draggable else 'false'
+                    is_draggable = 'true' if application_setting.draggable else 'false'
                     float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}{application_setting.float_icon}"
-                    show_guide = 'true' if application_setting else 'false'
+                    show_guide = 'true' if application_setting.show_guide else 'false'
 
             is_auth = 'true' if application_access_token is not None and application_access_token.is_active else 'false'
             t = Template(content)
