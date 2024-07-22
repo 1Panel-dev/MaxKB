@@ -56,6 +56,11 @@ class Model(AppModelMixin):
     permission_type = models.CharField(max_length=20, verbose_name='权限类型', choices=PermissionType.choices,
                                        default=PermissionType.PRIVATE)
 
+    def is_permission(self, user_id):
+        if self.permission_type == PermissionType.PRIVATE and str(user_id) == str(self.user_id):
+            return False
+        return True
+
     class Meta:
         db_table = "model"
         unique_together = ['name', 'user_id']

@@ -639,10 +639,11 @@ class ApplicationSerializer(serializers.Serializer):
                 application.model_id = None
             else:
                 model = QuerySet(Model).filter(
-                    id=instance.get('model_id'),
-                    user_id=application.user_id).first()
+                    id=instance.get('model_id')).first()
                 if model is None:
                     raise AppApiException(500, "模型不存在")
+                if not model.is_permission(application.user_id):
+                    raise AppApiException(500, f"沒有权限使用该模型:{model.name}")
             if 'work_flow' in instance:
                 # 当前用户可修改关联的知识库列表
                 application_dataset_id_list = [str(dataset_dict.get('id')) for dataset_dict in

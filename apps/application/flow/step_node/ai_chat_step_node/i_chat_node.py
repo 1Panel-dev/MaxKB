@@ -32,6 +32,7 @@ class IChatNode(INode):
     def _run(self):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
+    def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id,
+                chat_record_id,
                 **kwargs) -> NodeResult:
         pass

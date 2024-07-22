@@ -26,6 +26,7 @@ from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, Post
 from application.models.api_key_model import ApplicationPublicAccessClient
 from common.constants.authentication_type import AuthenticationType
 from common.response import result
+from setting.models_provider.tools import get_model_instance_by_model_user_id
 
 
 def add_access_num(client_id=None, client_type=None):
@@ -101,7 +102,8 @@ class BaseChatStep(IChatStep):
                 chat_id,
                 problem_text,
                 post_response_handler: PostResponseHandler,
-                chat_model: BaseChatModel = None,
+                model_id: str = None,
+                user_id: str = None,
                 paragraph_list=None,
                 manage: PipelineManage = None,
                 padding_problem_text: str = None,
@@ -109,6 +111,7 @@ class BaseChatStep(IChatStep):
                 client_id=None, client_type=None,
                 no_references_setting=None,
                 **kwargs):
+        chat_model = get_model_instance_by_model_user_id(model_id, user_id)
         if stream:
             return self.execute_stream(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                        paragraph_list,

@@ -267,14 +267,6 @@ class ChatMessageSerializer(serializers.Serializer):
 
     @staticmethod
     def re_open_chat_simple(chat_id, application):
-        model = QuerySet(Model).filter(id=application.model_id).first()
-        chat_model = None
-        if model is not None:
-            # 对话模型
-            chat_model = ModelProvideConstants[model.provider].value.get_model(model.model_type, model.model_name,
-                                                                               json.loads(
-                                                                                   rsa_long_decrypt(model.credential)),
-                                                                               streaming=True)
         # 数据集id列表
         dataset_id_list = [str(row.dataset_id) for row in
                            QuerySet(ApplicationDatasetMapping).filter(
@@ -285,7 +277,7 @@ class ChatMessageSerializer(serializers.Serializer):
                                     QuerySet(Document).filter(
                                         dataset_id__in=dataset_id_list,
                                         is_active=False)]
-        return ChatInfo(chat_id, chat_model, dataset_id_list, exclude_document_id_list, application)
+        return ChatInfo(chat_id, None, dataset_id_list, exclude_document_id_list, application)
 
     @staticmethod
     def re_open_chat_work_flow(chat_id, application):
