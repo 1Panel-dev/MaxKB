@@ -2,7 +2,7 @@
   <el-dialog
     v-model="aboutDialogVisible"
     class="about-dialog border-r-4"
-    :class="!isDefaultTheme ? 'custom-header' : ''"
+    :class="!isDefaultTheme ? 'dialog-custom-header' : ''"
   >
     <template #header="{ titleId, titleClass }">
       <div class="logo flex-center" :id="titleId" :class="titleClass">
@@ -29,8 +29,7 @@
         <span class="label">版本</span><span>{{ user.showXpack() ? '专业版' : '社区版' }}</span>
       </div>
       <div class="flex">
-        <span class="label">版本号</span
-        ><span>{{ licenseInfo?.licenseVersion || user.version }}</span>
+        <span class="label">版本号</span><span>{{ user.version }}</span>
       </div>
       <div class="flex">
         <span class="label">序列号</span><span>{{ licenseInfo?.serialNo || '-' }}</span>
@@ -137,7 +136,7 @@ defineExpose({ open })
       color: var(--app-text-color-secondary);
     }
   }
-  &.custom-header {
+  &.dialog-custom-header {
     .el-dialog__header {
       background: var(--el-color-primary-light-9) !important;
     }

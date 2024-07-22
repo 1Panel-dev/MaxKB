@@ -101,10 +101,10 @@ const useUserStore = defineStore({
       return await ThemeApi.getThemeInfo().then((ok) => {
         this.setTheme(ok.data)
         window.document.title = this.themeInfo['title'] || 'MaxKB'
-        const link = document.querySelector('link[rel="icon"]') as any
-        if (link) {
-          link['href'] = this.themeInfo['icon'] || '/favicon.ico'
-        }
+        // const link = document.querySelector('link[rel="icon"]') as any
+        // if (link) {
+        //   link['href'] = this.themeInfo['icon'] || '/favicon.ico'
+        // }
       })
     },
 
