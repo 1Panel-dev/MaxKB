@@ -643,7 +643,7 @@ class UserManageSerializer(serializers.Serializer):
 
         def is_valid(self, *, user_id=None, raise_exception=False):
             super().is_valid(raise_exception=True)
-            if QuerySet(User).filter(email=self.data.get('email')).exclude(id=user_id).exists():
+            if self.data.get('email') is not None and QuerySet(User).filter(email=self.data.get('email')).exclude(id=user_id).exists():
                 raise AppApiException(1004, "邮箱已经被使用")
 
         @staticmethod
