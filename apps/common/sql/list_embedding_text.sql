@@ -19,9 +19,7 @@ SELECT
 	paragraph."id" AS paragraph_id,
 	paragraph.dataset_id AS dataset_id,
 	1 AS source_type,
-	concat_ws('
-',concat_ws('
-',paragraph.title,paragraph."content"),paragraph.title) AS "text",
+	concat_ws(E'\n',paragraph.title,paragraph."content") AS "text",
 	paragraph.is_active AS is_active
 FROM
 	paragraph paragraph
