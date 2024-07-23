@@ -8,14 +8,29 @@
 """
 import threading
 from abc import ABC, abstractmethod
+from functools import reduce
 from typing import List, Dict
 
 from langchain_core.embeddings import Embeddings
 
+from common.chunk import text_to_chunk
 from common.util.common import sub_array
 from embedding.models import SourceType, SearchMode
 
 lock = threading.Lock()
+
+
+def chunk_data(data: Dict):
+    if str(data.get('source_type')) == SourceType.PARAGRAPH.value:
+        text = data.get('text')
+        chunk_list = text_to_chunk(text)
+        return [{**data, 'text': chunk} for chunk in chunk_list]
+    return [data]
+
+
+def chunk_data_list(data_list: List[Dict]):
+    result = [chunk_data(data) for data in data_list]
+    return reduce(lambda x, y: [*x, *y], result, [])
 
 
 class BaseVectorStore(ABC):
@@ -64,7 +79,12 @@ class BaseVectorStore(ABC):
         :return:  bool
         """
         self.save_pre_handler()
-        self._save(text, source_type, dataset_id, document_id, paragraph_id, source_id, is_active, embedding)
+        data = {'document_id': document_id, 'paragraph_id': paragraph_id, 'dataset_id': dataset_id,
+                'is_active': is_active, 'source_id': source_id, 'source_type': source_type, 'text': text}
+        chunk_list = chunk_data(data)
+        result = sub_array(chunk_list)
+        for child_array in result:
+            self._batch_save(child_array, embedding)
 
     def batch_save(self, data_list: List[Dict], embedding: Embeddings):
         # 获取锁
@@ -77,7 +97,8 @@ class BaseVectorStore(ABC):
             :return: bool
             """
             self.save_pre_handler()
-            result = sub_array(data_list)
+            chunk_list = chunk_data_list(data_list)
+            result = sub_array(chunk_list)
             for child_array in result:
                 self._batch_save(child_array, embedding)
         finally:

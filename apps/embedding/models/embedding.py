@@ -50,4 +50,3 @@ class Embedding(models.Model):
 
     class Meta:
         db_table = "embedding"
-        unique_together = ['source_id', 'source_type']
