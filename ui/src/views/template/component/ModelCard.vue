@@ -33,7 +33,7 @@
       <ul>
         <li class="flex mt-16">
           <el-text type="info">模型类型</el-text>
-          <span class="ellipsis ml-16"> {{ model.model_type }}</span>
+          <span class="ellipsis ml-16"> {{ modelType[model.model_type as keyof typeof modelType] }}</span>
         </li>
         <li class="flex mt-12">
           <el-text type="info">基础模型</el-text>
@@ -90,6 +90,7 @@ import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import EditModel from '@/views/template/component/EditModel.vue'
 import DownloadLoading from '@/components/loading/DownloadLoading.vue'
 import { MsgConfirm } from '@/utils/message'
+import { modelType } from '@/enums/model'
 import useStore from '@/stores'
 const props = defineProps<{
   model: Model
