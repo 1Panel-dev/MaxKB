@@ -39,4 +39,6 @@ class ImageSerializer(serializers.Serializer):
             image = QuerySet(Image).filter(id=image_id).first()
             if image is None:
                 raise NotFound404(404, "不存在的图片")
+            if image.image_name.endswith('.svg'):
+                return HttpResponse(image.image, status=200, headers={'Content-Type': 'image/svg+xml'})
             return HttpResponse(image.image, status=200, headers={'Content-Type': 'image/png'})
