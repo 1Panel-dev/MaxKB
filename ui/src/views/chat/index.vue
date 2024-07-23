@@ -20,7 +20,7 @@ const currentTemplate = computed(() => {
   if (mode && mode === 'embed') {
     modeName = 'embed'
   } else {
-    modeName = show_history.value ? 'pc' : 'base'
+    modeName = show_history.value || !user.showXpack() ? 'pc' : 'base'
   }
 
   const name = `/src/views/chat/${modeName}/index.vue`

@@ -21,6 +21,7 @@ import MdEditor from './markdown/MdEditor.vue'
 import MdPreview from './markdown/MdPreview.vue'
 import LogoFull from './logo/LogoFull.vue'
 import LogoIcon from './logo/LogoIcon.vue'
+import SendIcon from './logo/SendIcon.vue'
 
 export default {
   install(app: App) {
@@ -46,5 +47,6 @@ export default {
     app.component(MdEditor.name, MdEditor)
     app.component(LogoFull.name, LogoFull)
     app.component(LogoIcon.name, LogoIcon)
+    app.component(SendIcon.name, SendIcon)
   }
 }

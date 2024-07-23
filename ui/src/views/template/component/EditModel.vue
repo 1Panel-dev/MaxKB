@@ -48,7 +48,7 @@
             placeholder="请给基础模型设置一个名称"
           />
         </el-form-item>
-        <el-form-item prop="model_type" :rules="base_form_data_rule.permission_type">
+        <el-form-item prop="permission_type" :rules="base_form_data_rule.permission_type">
           <template #label>
             <span>权限</span>
           </template>

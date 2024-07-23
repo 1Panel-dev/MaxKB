@@ -56,7 +56,7 @@
         :class="enlarge ? 'enlarge' : ''"
         v-if="showDebug"
       >
-        <div class="workflow-debug-header">
+        <div class="workflow-debug-header" :class="!isDefaultTheme ? 'custom-header' : ''">
           <div class="flex-between">
             <h4 class="ml-24">
               {{ detail?.name || $t('views.application.applicationForm.form.appName.label') }}
@@ -94,10 +94,13 @@ import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 
-const { application } = useStore()
+const { user, application } = useStore()
 const router = useRouter()
 const route = useRoute()
 
+const isDefaultTheme = computed(() => {
+  return user.isDefaultTheme()
+})
 const {
   params: { id }
 } = route as any

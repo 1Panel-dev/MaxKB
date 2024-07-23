@@ -55,11 +55,10 @@
             placeholder="请给基础模型设置一个名称"
           />
         </el-form-item>
-        <el-form-item prop="model_type" :rules="base_form_data_rule.permission_type">
+        <el-form-item prop="permission_type" :rules="base_form_data_rule.permission_type">
           <template #label>
             <span>权限</span>
           </template>
-
           <el-radio-group v-model="base_form_data.permission_type" class="card__radio">
             <el-row :gutter="16">
               <template v-for="(value, key) of PermissionType" :key="key">
@@ -187,7 +186,6 @@ const base_form_data = ref<{
   name: string
   permission_type: string
   model_type: string
-
   model_name: string
 }>({ name: '', model_type: '', model_name: '', permission_type: 'PRIVATE' })
 
@@ -199,7 +197,8 @@ const form_data = computed({
       ...credential_form_data.value,
       name: base_form_data.value.name,
       model_type: base_form_data.value.model_type,
-      model_name: base_form_data.value.model_name
+      model_name: base_form_data.value.model_name,
+      permission_type: base_form_data.value.permission_type
     }
   },
   set: (event: any) => {
