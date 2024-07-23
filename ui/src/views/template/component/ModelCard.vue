@@ -59,7 +59,7 @@
     </div>
 
     <template #mouseEnter>
-      <div class="operation-button" v-if="model.permission_type === 'PUBLIC'">
+      <div class="operation-button">
         <el-tooltip effect="dark" content="修改" placement="top">
           <el-button text :disabled="!is_permisstion" @click.stop="openEditModel">
             <el-icon>
