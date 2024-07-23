@@ -4,12 +4,24 @@
       <el-form-item>
         <el-space direction="vertical" alignment="start">
           <el-checkbox v-model="form.show_source" label="显示知识来源" />
-          <el-checkbox v-model="form.show_history" label="显示历史记录" />
-          <el-checkbox v-model="form.draggable" label="可拖拽位置（浮窗模式）" />
-          <el-checkbox v-model="form.show_guide" label="显示引导图（浮窗模式）" />
+          <el-checkbox
+            v-model="form.show_history"
+            label="显示历史记录"
+            v-if="user.isEnterprise()"
+          />
+          <el-checkbox
+            v-model="form.draggable"
+            label="可拖拽位置（浮窗模式）"
+            v-if="user.isEnterprise()"
+          />
+          <el-checkbox
+            v-model="form.show_guide"
+            label="显示引导图（浮窗模式）"
+            v-if="user.isEnterprise()"
+          />
         </el-space>
       </el-form-item>
-      <el-form-item label="对话头像">
+      <el-form-item label="对话头像" v-if="user.isEnterprise()">
         <div class="flex mt-8">
           <div class="border border-r-4 mr-16" style="width: 50px; height: 50px; padding: 8px">
             <img v-if="imgUrl.avatar" :src="imgUrl.avatar" alt="" height="50px" />
@@ -35,7 +47,7 @@
           </el-upload>
         </div>
       </el-form-item>
-      <el-form-item label="浮窗入口图标">
+      <el-form-item label="浮窗入口图标" v-if="user.isEnterprise()">
         <div class="flex mt-8">
           <div class="border border-r-4 mr-16" style="width: 50px; height: 50px; padding: 8px">
             <img v-if="imgUrl.float_icon" :src="imgUrl.float_icon" alt="" height="50px" />
@@ -132,8 +144,8 @@ watch(dialogVisible, (bool) => {
       show_source: false
     }
     imgUrl.value = {
-      avatar: "",
-      float_icon: ""
+      avatar: '',
+      float_icon: ''
     }
   }
 })
@@ -143,8 +155,8 @@ function resetForm() {
     ...defaultSetting
   }
   imgUrl.value = {
-    avatar: "",
-    float_icon: ""
+    avatar: '',
+    float_icon: ''
   }
 }
 
