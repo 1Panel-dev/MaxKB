@@ -6,8 +6,8 @@ const prefix = '/display'
 /**
  * 查看外观设置
  */
-const getThemeInfo: () => Promise<Result<any>> = () => {
-  return get(`${prefix}/info`)
+const getThemeInfo: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get(`${prefix}/info`, undefined, loading)
 }
 
 /**

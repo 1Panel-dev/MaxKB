@@ -136,11 +136,12 @@
             @click="sendChatHandle"
           >
             <img v-show="isDisabledChart || loading" src="@/assets/icon_send.svg" alt="" />
-            <img
-              v-show="!isDisabledChart && !loading"
+            <SendIcon v-show="!isDisabledChart && !loading" />
+            <!-- <img
+           
               src="@/assets/icon_send_colorful.svg"
               alt=""
-            />
+            /> -->
           </el-button>
         </div>
       </div>

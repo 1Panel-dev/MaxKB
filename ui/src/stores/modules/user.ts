@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
+import { type Ref } from 'vue'
 import type { User } from '@/api/type/user'
+
 import UserApi from '@/api/user'
 import ThemeApi from '@/api/theme'
 import { useElementPlusTheme } from 'use-element-plus-theme'
-const { changeTheme } = useElementPlusTheme()
 
 export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
@@ -35,6 +36,7 @@ const useUserStore = defineStore({
       return !this.themeInfo?.theme || this.themeInfo?.theme === '#3370FF'
     },
     setTheme(data: any) {
+      const { changeTheme } = useElementPlusTheme(this.themeInfo?.theme)
       changeTheme(data?.['theme'])
       this.themeInfo = data
     },
@@ -97,8 +99,8 @@ const useUserStore = defineStore({
       })
     },
 
-    async theme() {
-      return await ThemeApi.getThemeInfo().then((ok) => {
+    async theme(loading?: Ref<boolean>) {
+      return await ThemeApi.getThemeInfo(loading).then((ok) => {
         this.setTheme(ok.data)
         window.document.title = this.themeInfo['title'] || 'MaxKB'
         // const link = document.querySelector('link[rel="icon"]') as any

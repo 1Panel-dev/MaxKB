@@ -1,5 +1,5 @@
 <template>
-  <login-layout v-loading="loading">
+  <login-layout v-if="user.isEnterprise() ? user.themeInfo : true" v-loading="loading">
     <LoginContainer :subTitle="user.themeInfo?.slogan || '欢迎使用 MaxKB 智能知识库'">
       <h2 class="mb-24">{{ loginMode || '普通登录' }}</h2>
       <el-form
@@ -77,7 +77,7 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onBeforeMount } from 'vue'
 import type { LoginRequest } from '@/api/type/user'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -134,9 +134,6 @@ const login = () => {
 }
 
 onMounted(() => {
-  if (user.isEnterprise()) {
-    user.theme()
-  }
   user.asyncGetProfile().then((res) => {
     if (user.showXpack()) {
       loading.value = true
@@ -148,6 +145,11 @@ onMounted(() => {
         .finally(() => (loading.value = false))
     }
   })
+})
+onBeforeMount(() => {
+  if (user.isEnterprise()) {
+    user.theme(loading)
+  }
 })
 </script>
 <style lang="scss" scope>
