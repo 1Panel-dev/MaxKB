@@ -43,7 +43,7 @@
           </template>
           <el-input
             v-model="base_form_data.name"
-            maxlength="20"
+            maxlength="64"
             show-word-limit
             placeholder="请给基础模型设置一个名称"
           />

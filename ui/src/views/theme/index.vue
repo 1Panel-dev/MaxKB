@@ -108,7 +108,12 @@
                           <el-text type="info"> 显示在网页 Tab 的平台名称 </el-text>
                         </el-form-item>
                         <el-form-item label="欢迎语" prop="slogan">
-                          <el-input v-model="themeForm.slogan" placeholder="请输入欢迎语">
+                          <el-input
+                            v-model="themeForm.slogan"
+                            placeholder="请输入欢迎语"
+                            maxlength="64"
+                            show-word-limit
+                          >
                           </el-input>
                           <el-text type="info"> 产品 Logo 下的 欢迎语 </el-text>
                         </el-form-item>
