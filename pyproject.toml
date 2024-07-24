@@ -44,7 +44,7 @@ openpyxl = "^3.1.2"
 xlrd = "^2.0.1"
 gunicorn = "^22.0.0"
 python-daemon = "3.0.1"
-uvicorn = "0.22.0"
+gevent = "^24.2.1"
 
 [build-system]
 requires = ["poetry-core"]
