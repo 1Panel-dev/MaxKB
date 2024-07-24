@@ -423,7 +423,8 @@ class ApplicationSerializer(serializers.Serializer):
             dataset_id_list = [ad.dataset_id for ad in
                                QuerySet(ApplicationDatasetMapping).filter(
                                    application_id=self.data.get('id'))]
-
+            if len(dataset_id_list) == 0:
+                return []
             exclude_document_id_list = [str(document.id) for document in
                                         QuerySet(Document).filter(
                                             dataset_id__in=dataset_id_list,
