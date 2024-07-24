@@ -26,15 +26,12 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data cr2
 # 密码: MaxKB@123..
 ```
 
-你也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama + Llama 3，30 分钟内即可上线基于本地大模型的知识库问答系统，并嵌入到第三方业务系统中。
+- 你也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama + Llama 3，30 分钟内即可上线基于本地大模型的知识库问答系统，并嵌入到第三方业务系统中；
+- 如果是内网环境，推荐使用 [离线安装包](https://community.fit2cloud.com/#/products/maxkb/downloads) 进行安装部署；
+- 你也可以在线体验：[DataEase 小助手](https://dataease.io/docs/v2/)，它是基于 MaxKB 搭建的智能问答系统，已经嵌入到 DataEase 产品及在线文档中；
+- 友情提示：社区版限制 1 个团队成员，5 个应用，50 个知识库。
 
-如果是内网环境，推荐使用 [离线安装包](https://community.fit2cloud.com/#/products/maxkb/downloads) 进行安装部署。
-
-你也可以在线体验：[DataEase 小助手](https://dataease.io/docs/v2/)，它是基于 MaxKB 搭建的智能问答系统，已经嵌入到 DataEase 产品及在线文档中。
-
-如果你需要搭建技术博客或者知识库，推荐使用 [Halo 开源建站工具](https://github.com/halo-dev/halo/)，你可以体验下飞致云官方的 [技术博客](https://blog.fit2cloud.com/) 和 [知识库](https://kb.fit2cloud.com) 案例。
-
-如你有更多问题，可以查看使用手册，或者通过论坛与我们交流。
+如你有更多问题，可以查看使用手册，或者通过论坛与我们交流。如果你需要搭建技术博客或者知识库，推荐使用 [Halo 开源建站工具](https://github.com/halo-dev/halo/)，你可以体验下飞致云官方的 [技术博客](https://blog.fit2cloud.com/) 和 [知识库](https://kb.fit2cloud.com) 案例。
 
 - [使用手册](https://maxkb.cn/docs/)
 - [演示视频](https://www.bilibili.com/video/BV1BE421M7YM/)
@@ -42,8 +39,6 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data cr2
 - 技术交流群
 
 <image height="150px" width="150px" src="https://github.com/1Panel-dev/MaxKB/assets/52996290/a083d214-02be-4178-a1db-4f428124153a"/>
-     
-
 
 ## UI 展示
 
