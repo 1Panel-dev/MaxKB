@@ -114,9 +114,9 @@ const {
 const emit = defineEmits(['refresh'])
 
 const defaultSetting = {
-  show_source: true,
+  show_source: false,
   show_history: true,
-  draggable: false,
+  draggable: true,
   show_guide: true,
   avatar: '',
   float_icon: ''
