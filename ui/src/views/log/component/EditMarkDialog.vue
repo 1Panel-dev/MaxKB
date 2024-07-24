@@ -30,7 +30,7 @@
             <el-input
               v-model="form.content"
               placeholder="请输入分段内容"
-              maxlength="4096"
+              maxlength="100000"
               show-word-limit
               :rows="15"
               type="textarea"
