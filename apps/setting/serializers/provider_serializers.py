@@ -18,6 +18,7 @@ from django.db.models import QuerySet, Q
 from rest_framework import serializers
 
 from application.models import Application
+from common.config.embedding_config import ModelManage
 from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
 from common.util.rsa_util import rsa_long_decrypt, rsa_long_encrypt
@@ -279,6 +280,8 @@ class ModelSerializer(serializers.Serializer):
                             model.__setattr__(update_key, rsa_long_encrypt(model_credential_str))
                         else:
                             model.__setattr__(update_key, instance.get(update_key))
+            # 修改模型时候删除缓存
+            ModelManage.delete_key(str(model.id))
             model.save()
             if model.status == Status.DOWNLOAD:
                 thread = threading.Thread(target=ModelPullManage.pull, args=(model, credential))
