@@ -104,7 +104,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['addData'])
 
-const apiUrl = window.location.origin + '/doc'
+const apiUrl = window.location.origin + '/doc/'
 const SettingAPIKeyDialogRef = ref()
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
