@@ -89,7 +89,7 @@ watch(dialogVisible, (bool) => {
 })
 
 function changeHandle() {
-  if (checkList.value.length === 1) {
+  if (checkList.value.length > 0) {
     currentEmbedding.value = props.data.filter(
       (v) => v.id === checkList.value[0]
     )[0].embedding_mode_id
