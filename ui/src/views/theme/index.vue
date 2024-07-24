@@ -181,6 +181,8 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
       // @ts-ignore
       MsgError(`文件大小超过 5M`)
       return false
+    } else {
+      themeForm.value[attr] = file.raw
     }
   } else {
     const isLimit = file?.size / 1024 < 200
@@ -188,10 +190,10 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
       // @ts-ignore
       MsgError(`文件大小超过 200KB`)
       return false
+    } else {
+      themeForm.value[attr] = file.raw
     }
   }
-
-  themeForm.value[attr] = file.raw
 }
 
 function changeThemeHandle(val: string) {

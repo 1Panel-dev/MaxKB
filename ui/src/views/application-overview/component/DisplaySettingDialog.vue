@@ -49,8 +49,14 @@
       </el-form-item>
       <el-form-item label="浮窗入口图标" v-if="user.isEnterprise()">
         <div class="flex mt-8">
-          <div class="border border-r-4 mr-16" style="width: 50px; height: 50px; padding: 8px">
-            <img v-if="imgUrl.float_icon" :src="imgUrl.float_icon" alt="" height="50px" />
+          <div class="border border-r-4 mr-16" style="padding: 8px">
+            <el-image
+              v-if="imgUrl.float_icon"
+              :src="imgUrl.float_icon"
+              alt=""
+              fit="cover"
+              style="width: 50px; height: 50px; display: block"
+            />
             <img v-else src="@/assets/logo/logo.svg" height="50px" />
           </div>
 
@@ -95,7 +101,7 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import applicationApi from '@/api/application'
 import applicationXpackApi from '@/api/application-xpack'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess, MsgError } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
 const { user } = useStore()
@@ -167,9 +173,10 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
     // @ts-ignore
     MsgError(t('views.applicationOverview.appInfo.EditAvatarDialog.fileSizeExceeded'))
     return false
+  } else {
+    xpackForm.value[attr] = file.raw
+    imgUrl.value[attr] = URL.createObjectURL(file.raw)
   }
-  xpackForm.value[attr] = file.raw
-  imgUrl.value[attr] = URL.createObjectURL(file.raw)
 }
 
 const open = (data: any) => {

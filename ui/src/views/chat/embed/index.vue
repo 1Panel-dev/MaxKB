@@ -155,7 +155,9 @@ function getAccessToken(token: string) {
   application
     .asyncAppAuthentication(token, loading)
     .then(() => {
-      getAppProfile()
+      setTimeout(() => {
+        getAppProfile()
+      }, 500)
     })
     .catch(() => {
       applicationAvailable.value = false

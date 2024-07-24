@@ -100,9 +100,11 @@ const onChange = (file: any) => {
     // @ts-ignore
     MsgError(t('views.applicationOverview.appInfo.EditAvatarDialog.fileSizeExceeded'))
     return false
+  } else { 
+    iconFile.value = file
+    fileURL.value = URL.createObjectURL(file.raw)
   }
-  iconFile.value = file
-  fileURL.value = URL.createObjectURL(file.raw)
+
 }
 
 function submit() {
