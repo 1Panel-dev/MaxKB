@@ -273,11 +273,31 @@
           {{ $t('views.application.applicationForm.form.apptest') }}
         </h4>
         <div class="dialog-bg">
-          <h4 class="p-24">
-            {{
-              applicationForm?.name || $t('views.application.applicationForm.form.appName.label')
-            }}
-          </h4>
+          <div class="flex align-center p-24">
+            <div class="mr-12">
+              <AppAvatar
+                v-if="isAppIcon(applicationForm?.icon)"
+                shape="square"
+                :size="32"
+                style="background: none"
+              >
+                <img :src="applicationForm?.icon" alt="" />
+              </AppAvatar>
+              <AppAvatar
+                v-else-if="applicationForm?.name"
+                :name="applicationForm?.name"
+                pinyinColor
+                shape="square"
+                :size="32"
+              />
+            </div>
+
+            <h4>
+              {{
+                applicationForm?.name || $t('views.application.applicationForm.form.appName.label')
+              }}
+            </h4>
+          </div>
           <div class="scrollbar-height">
             <AiChat :data="applicationForm"></AiChat>
           </div>
@@ -312,6 +332,7 @@ import AddDatasetDialog from './component/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
 import applicationApi from '@/api/application'
+import { isAppIcon } from '@/utils/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import type { Provider } from '@/api/type/model'

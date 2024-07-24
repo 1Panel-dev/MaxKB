@@ -58,9 +58,29 @@
       >
         <div class="workflow-debug-header" :class="!isDefaultTheme ? 'custom-header' : ''">
           <div class="flex-between">
-            <h4 class="ml-24">
-              {{ detail?.name || $t('views.application.applicationForm.form.appName.label') }}
-            </h4>
+            <div class="flex align-center">
+              <div class="mr-12 ml-24">
+                <AppAvatar
+                  v-if="isAppIcon(detail?.icon)"
+                  shape="square"
+                  :size="32"
+                  style="background: none"
+                >
+                  <img :src="detail?.icon" alt="" />
+                </AppAvatar>
+                <AppAvatar
+                  v-else-if="detail?.name"
+                  :name="detail?.name"
+                  pinyinColor
+                  shape="square"
+                  :size="32"
+                />
+              </div>
+
+              <h4>
+                {{ detail?.name || $t('views.application.applicationForm.form.appName.label') }}
+              </h4>
+            </div>
             <div class="mr-16">
               <el-button link @click="enlarge = !enlarge">
                 <AppIcon
@@ -89,6 +109,7 @@ import Workflow from '@/workflow/index.vue'
 import { menuNodes } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application'
+import { isAppIcon } from '@/utils/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'

@@ -1,8 +1,26 @@
 <template>
   <div class="chat layout-bg" v-loading="loading">
     <div class="chat__header" :class="!isDefaultTheme ? 'custom-header' : ''">
-      <div class="chat-width">
-        <h2 class="ml-24">{{ applicationDetail?.name }}</h2>
+      <div class="chat-width flex align-center">
+        <div class="mr-12 ml-24">
+          <AppAvatar
+            v-if="isAppIcon(applicationDetail?.icon)"
+            shape="square"
+            :size="32"
+            style="background: none"
+          >
+            <img :src="applicationDetail?.icon" alt="" />
+          </AppAvatar>
+          <AppAvatar
+            v-else-if="applicationDetail?.name"
+            :name="applicationDetail?.name"
+            pinyinColor
+            shape="square"
+            :size="32"
+          />
+        </div>
+
+        <h2>{{ applicationDetail?.name }}</h2>
       </div>
     </div>
     <div class="chat__main chat-width">
@@ -18,6 +36,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 const route = useRoute()
 const {

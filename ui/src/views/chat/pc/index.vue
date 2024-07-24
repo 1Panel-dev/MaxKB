@@ -1,7 +1,27 @@
 <template>
   <div class="chat-pc layout-bg" :class="classObj" v-loading="loading">
     <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
-      <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
+      <div class="flex align-center">
+        <div class="mr-12 ml-24">
+          <AppAvatar
+            v-if="isAppIcon(applicationDetail?.icon)"
+            shape="square"
+            :size="32"
+            style="background: none"
+          >
+            <img :src="applicationDetail?.icon" alt="" />
+          </AppAvatar>
+          <AppAvatar
+            v-else-if="applicationDetail?.name"
+            :name="applicationDetail?.name"
+            pinyinColor
+            shape="square"
+            :size="32"
+          />
+        </div>
+
+        <h4>{{ applicationDetail?.name }}</h4>
+      </div>
     </div>
     <div class="flex">
       <div class="chat-pc__left border-r">
@@ -108,6 +128,7 @@ import { reactive, ref, onMounted, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
+import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 
 import useResize from '@/layout/hooks/useResize'
@@ -204,10 +225,9 @@ function getAppProfile() {
     .asyncGetAppProfile(loading)
     .then((res: any) => {
       applicationDetail.value = res.data
-      if (res.data?.show_history) { 
+      if (res.data?.show_history) {
         getChatLog(applicationDetail.value.id)
       }
-
     })
     .catch(() => {
       applicationAvailable.value = false
