@@ -57,9 +57,9 @@ class Model(AppModelMixin):
                                        default=PermissionType.PRIVATE)
 
     def is_permission(self, user_id):
-        if self.permission_type == PermissionType.PRIVATE and str(user_id) == str(self.user_id):
-            return False
-        return True
+        if self.permission_type == PermissionType.PUBLIC or str(user_id) == str(self.user_id):
+            return True
+        return False
 
     class Meta:
         db_table = "model"
