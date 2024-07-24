@@ -6,7 +6,6 @@
     @date：2024/7/19 17:43
     @desc:
 """
-import os
 import subprocess
 
 from django.core.management.base import BaseCommand
@@ -21,18 +20,26 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-b', nargs='+', type=str, help="端口:0.0.0.0:8080")  # 0.0.0.0:8080
         parser.add_argument('-k', nargs='?', type=str,
-                            help="workers处理器:uvicorn.workers.UvicornWorker")  # uvicorn.workers.UvicornWorker
-        parser.add_argument('-w', action='append', type=str, help='worker 数量')  # worker 数量
-        parser.add_argument('--max-requests', action='append', type=str, help="最大请求")  # 10240
-        parser.add_argument('--max-requests-jitter', action='append', type=str)
-        parser.add_argument('--access-logformat', action='append', type=str)  # %(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s
+                            help="workers处理器:gevent")  # uvicorn.workers.UvicornWorker
+        parser.add_argument('-w', type=str, help='worker 数量')  # 进程数量
+        parser.add_argument('--threads', type=str, help='线程数量')  # 线程数量
+        parser.add_argument('--worker-connections', type=str, help="每个线程的协程数量")  # 10240
+        parser.add_argument('--max-requests', type=str, help="最大请求")  # 10240
+        parser.add_argument('--max-requests-jitter', type=str)
+        parser.add_argument('--access-logformat', type=str)  # %(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s
 
     def handle(self, *args, **options):
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
+        print(options.get('worker_connections'))
+        print(options.get('threads'))
+        print(options)
         cmd = [
             'gunicorn', 'smartdoc.wsgi:application',
             '-b', options.get('b') if options.get('b') is not None else '0.0.0.0:8080',
-            '-k', options.get('k') if options.get('k') is not None else 'gunicorn.workers.sync.SyncWorker',
+            '-k', options.get('k') if options.get('k') is not None else 'gevent',
+            '--threads', options.get('threads') if options.get('threads') is not None else '30',
+            '--worker-connections',
+            options.get('worker_connections') if options.get('worker_connections') is not None else '100',
             '-w', options.get('w') if options.get('w') is not None else '1',
             '--max-requests', options.get('max_requests') if options.get('max_requests') is not None else '10240',
             '--max-requests-jitter',
