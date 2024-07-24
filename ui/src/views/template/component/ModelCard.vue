@@ -33,11 +33,15 @@
       <ul>
         <li class="flex mt-16">
           <el-text type="info">模型类型</el-text>
-          <span class="ellipsis ml-16"> {{ modelType[model.model_type as keyof typeof modelType] }}</span>
+          <span class="ellipsis ml-16">
+            {{ modelType[model.model_type as keyof typeof modelType] }}</span
+          >
         </li>
         <li class="flex mt-12">
           <el-text type="info">基础模型</el-text>
-          <span class="ellipsis ml-16"> {{ model.model_name }}</span>
+          <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
+            {{ model.model_name }}</span
+          >
         </li>
       </ul>
     </div>

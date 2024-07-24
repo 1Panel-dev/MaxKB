@@ -161,7 +161,7 @@ const themeFormRef = ref<FormInstance>()
 const loading = ref(false)
 const cloneTheme = ref(null)
 const themeForm = ref<any>({
-  theme: '#3370FF',
+  theme: '',
   icon: '',
   loginLogo: '',
   loginImage: '',
