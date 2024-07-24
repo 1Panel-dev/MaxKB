@@ -46,6 +46,8 @@ gunicorn = "^22.0.0"
 python-daemon = "3.0.1"
 gevent = "^24.2.1"
 
+boto3 = "^1.34.151"
+langchain-aws = "^0.1.13"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
