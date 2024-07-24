@@ -84,6 +84,7 @@ const filterData = computed(() => {
 watch(dialogVisible, (bool) => {
   if (!bool) {
     checkList.value = []
+    currentEmbedding.value = ''
   }
 })
 
