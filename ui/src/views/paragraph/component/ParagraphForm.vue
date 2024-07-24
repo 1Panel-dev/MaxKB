@@ -98,7 +98,7 @@ const form = ref<any>({
 const rules = reactive<FormRules>({
   content: [
     { required: true, message: '请输入分段内容', trigger: 'blur' },
-    { max: 4096, message: '内容最多不超过 4096 个字', trigger: 'blur' }
+    { max: 100000, message: '内容最多不超过 4096 个字', trigger: 'blur' }
   ]
 })
 

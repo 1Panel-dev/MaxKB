@@ -89,7 +89,7 @@ class Paragraph(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, db_constraint=False)
     dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING)
-    content = models.CharField(max_length=4096, verbose_name="段落内容")
+    content = models.CharField(max_length=102400, verbose_name="段落内容")
     title = models.CharField(max_length=256, verbose_name="标题", default="")
     status = models.CharField(verbose_name='状态', max_length=1, choices=Status.choices,
                               default=Status.embedding)
