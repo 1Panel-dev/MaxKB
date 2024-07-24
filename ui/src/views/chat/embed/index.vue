@@ -1,8 +1,26 @@
 <template>
   <div class="chat-embed layout-bg" v-loading="loading">
     <div class="chat-embed__header" :class="!isDefaultTheme ? 'custom-header' : ''">
-      <div class="chat-width">
-        <h4 class="ml-24">{{ applicationDetail?.name }}</h4>
+      <div class="chat-width flex align-center">
+        <div class="mr-12 ml-24">
+          <AppAvatar
+            v-if="isAppIcon(applicationDetail?.icon)"
+            shape="square"
+            :size="32"
+            style="background: none"
+          >
+            <img :src="applicationDetail?.icon" alt="" />
+          </AppAvatar>
+          <AppAvatar
+            v-else-if="applicationDetail?.name"
+            :name="applicationDetail?.name"
+            pinyinColor
+            shape="square"
+            :size="32"
+          />
+        </div>
+
+        <h4>{{ applicationDetail?.name }}</h4>
       </div>
     </div>
     <div class="chat-embed__main">
@@ -81,6 +99,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 const route = useRoute()
 const {
