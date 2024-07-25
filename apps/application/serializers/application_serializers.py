@@ -28,10 +28,13 @@ from application.models import Application, ApplicationDatasetMapping, Applicati
 from application.models.api_key_model import ApplicationAccessToken, ApplicationApiKey
 from common.config.embedding_config import VectorStore
 from common.constants.authentication_type import AuthenticationType
+from common.constants.cache_code_constants import CacheCodeConstants
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed
 from common.field.common import UploadedImageField
+from common.middleware.cross_domain_middleware import get_application_api_key
+from common.middleware.static_headers_middleware import get_application_access_token
 from common.models.db_model_manage import DBModelManage
 from common.util.common import valid_license
 from common.util.field_message import ErrMessage
@@ -44,8 +47,7 @@ from setting.models.model_management import Model
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 
-token_cache = cache.caches['token_cache']
-chat_cache = cache.caches['model_cache']
+chat_cache = cache.caches['chat_cache']
 
 
 class ModelDatasetAssociation(serializers.Serializer):
@@ -251,6 +253,8 @@ class ApplicationSerializer(serializers.Serializer):
             if 'is_active' in instance:
                 application_access_token.is_active = instance.get("is_active")
             if 'access_token_reset' in instance and instance.get('access_token_reset'):
+                cache.cache.delete(application_access_token.access_token,
+                                   version=CacheCodeConstants.APPLICATION_ACCESS_TOKEN_CACHE.value)
                 application_access_token.access_token = hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]
             if 'access_num' in instance and instance.get('access_num') is not None:
                 application_access_token.access_num = instance.get("access_num")
@@ -261,6 +265,7 @@ class ApplicationSerializer(serializers.Serializer):
             if 'show_source' in instance and instance.get('show_source') is not None:
                 application_access_token.show_source = instance.get('show_source')
             application_access_token.save()
+            get_application_access_token(application_access_token.access_token, False)
             return self.one(with_valid=False)
 
         def one(self, with_valid=True):
@@ -526,6 +531,9 @@ class ApplicationSerializer(serializers.Serializer):
             image.save()
             application.icon = f'/api/image/{image_id}'
             application.save()
+            application_access_token = QuerySet(ApplicationAccessToken).filter(
+                application_id=self.data.get('application_id')).first()
+            get_application_access_token(application_access_token.access_token, False)
             return {**ApplicationSerializer.Query.reset_application(ApplicationSerializerModel(application).data)}
 
     class Operate(serializers.Serializer):
@@ -686,6 +694,9 @@ class ApplicationSerializer(serializers.Serializer):
 
                 self.save_application_mapping(application_dataset_id_list, dataset_id_list, application_id)
             chat_cache.clear_by_application_id(application_id)
+            application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application_id).first()
+            # 更新缓存数据
+            get_application_access_token(application_access_token.access_token, False)
             return self.one(with_valid=False)
 
         @staticmethod
@@ -767,8 +778,11 @@ class ApplicationSerializer(serializers.Serializer):
                     self.is_valid(raise_exception=True)
                 api_key_id = self.data.get("api_key_id")
                 application_id = self.data.get('application_id')
-                QuerySet(ApplicationApiKey).filter(id=api_key_id,
-                                                   application_id=application_id).delete()
+                application_api_key = QuerySet(ApplicationApiKey).filter(id=api_key_id,
+                                                                         application_id=application_id).first()
+                cache.cache.delete(application_api_key.secret_key,
+                                   version=CacheCodeConstants.APPLICATION_API_KEY_CACHE.value)
+                application_api_key.delete()
 
             def edit(self, instance, with_valid=True):
                 if with_valid:
@@ -787,3 +801,5 @@ class ApplicationSerializer(serializers.Serializer):
                 if 'cross_domain_list' in instance and instance.get('cross_domain_list') is not None:
                     application_api_key.cross_domain_list = instance.get('cross_domain_list')
                 application_api_key.save()
+                # 写入缓存
+                get_application_api_key(application_api_key.secret_key, False)

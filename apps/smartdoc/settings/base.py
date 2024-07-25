@@ -92,9 +92,21 @@ SWAGGER_SETTINGS = {
 CACHES = {
     "default": {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 60 * 30,
+        'OPTIONS': {
+            'MAX_ENTRIES': 150,
+            'CULL_FREQUENCY': 5,
+        }
     },
-    'model_cache': {
-        'BACKEND': 'common.cache.mem_cache.MemCache'
+    'chat_cache': {
+        'BACKEND': 'common.cache.mem_cache.MemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 60 * 30,
+        'OPTIONS': {
+            'MAX_ENTRIES': 150,
+            'CULL_FREQUENCY': 5,
+        }
     },
     # 存储用户信息
     'user_cache': {

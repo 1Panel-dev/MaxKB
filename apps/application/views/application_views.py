@@ -28,7 +28,7 @@ from common.swagger_api.common_api import CommonApi
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.dataset_serializers import DataSetSerializers
 
-chat_cache = cache.caches['model_cache']
+chat_cache = cache.caches['chat_cache']
 
 
 class ApplicationStatistics(APIView):

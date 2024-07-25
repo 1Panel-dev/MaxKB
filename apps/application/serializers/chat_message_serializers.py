@@ -6,7 +6,6 @@
     @date：2023/11/14 13:51
     @desc:
 """
-import json
 import uuid
 from typing import List
 from uuid import UUID
@@ -31,13 +30,11 @@ from application.models.api_key_model import ApplicationPublicAccessClient, Appl
 from common.constants.authentication_type import AuthenticationType
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed
 from common.util.field_message import ErrMessage
-from common.util.rsa_util import rsa_long_decrypt
 from common.util.split_model import flat_map
 from dataset.models import Paragraph, Document
 from setting.models import Model, Status
-from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 
-chat_cache = caches['model_cache']
+chat_cache = caches['chat_cache']
 
 
 class ChatInfo:

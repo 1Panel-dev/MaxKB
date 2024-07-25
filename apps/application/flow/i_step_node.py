@@ -20,7 +20,7 @@ from common.field.common import InstanceField
 from common.util.field_message import ErrMessage
 from django.core import cache
 
-chat_cache = cache.caches['model_cache']
+chat_cache = cache.caches['chat_cache']
 
 
 def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
