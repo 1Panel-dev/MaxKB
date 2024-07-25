@@ -22,8 +22,10 @@ from django.views import static
 from rest_framework import status
 
 from application.urls import urlpatterns as application_urlpatterns
+from common.constants.cache_code_constants import CacheCodeConstants
 from common.init.init_doc import init_doc
 from common.response.result import Result
+from common.util.cache_util import get_cache
 from smartdoc import settings
 from smartdoc.conf import PROJECT_DIR
 
@@ -51,6 +53,15 @@ if not settings.DEBUG:
     pro()
 
 
+@get_cache(cache_key=lambda index_path: index_path,
+           version=CacheCodeConstants.STATIC_RESOURCE_CACHE.value)
+def get_index_html(index_path):
+    file = open(index_path, "r", encoding='utf-8')
+    content = file.read()
+    file.close()
+    return content
+
+
 def page_not_found(request, exception):
     """
     页面不存在处理
@@ -60,9 +71,7 @@ def page_not_found(request, exception):
     index_path = os.path.join(PROJECT_DIR, 'apps', "static", 'ui', 'index.html')
     if not os.path.exists(index_path):
         return HttpResponse("页面不存在", status=404)
-    file = open(index_path, "r", encoding='utf-8')
-    content = file.read()
-    file.close()
+    content = get_index_html(index_path)
     if request.path.startswith('/ui/chat/'):
         return HttpResponse(content, status=200)
     return HttpResponse(content, status=200, headers={'X-Frame-Options': 'DENY'})

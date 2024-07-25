@@ -44,7 +44,7 @@ from setting.models import Model
 from setting.models_provider import get_model
 from smartdoc.conf import PROJECT_DIR
 
-chat_cache = caches['model_cache']
+chat_cache = caches['chat_cache']
 
 
 class WorkFlowSerializers(serializers.Serializer):
