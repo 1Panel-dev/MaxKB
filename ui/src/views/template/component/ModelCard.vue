@@ -106,7 +106,6 @@ const { user } = useStore()
 const downModel = ref<Model>()
 
 const is_permisstion = computed(() => {
-  console.log(user.userInfo?.id, props.model.user_id)
   return user.userInfo?.id == props.model.user_id
 })
 const currentModel = computed(() => {

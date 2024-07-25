@@ -73,7 +73,7 @@
                   <auto-tooltip :content="row.abstract">
                     {{ row.abstract }}
                   </auto-tooltip>
-                  <div @click.stop v-if="mouseId === row.id">
+                  <div @click.stop v-if="mouseId === row.id && row.id !== 'new'">
                     <el-button style="padding: 0" link @click.stop="deleteLog(row)">
                       <el-icon><Delete /></el-icon>
                     </el-button>
