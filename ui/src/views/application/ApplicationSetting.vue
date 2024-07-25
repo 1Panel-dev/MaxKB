@@ -88,12 +88,18 @@
                       :value="item.id"
                       class="flex-between"
                     >
-                      <div class="flex">
+                      <div class="flex align-center">
                         <span
                           v-html="relatedObject(providerOptions, label, 'provider')?.icon"
                           class="model-icon mr-8"
                         ></span>
                         <span>{{ item.name }}</span>
+                        <el-tag
+                          v-if="item.permission_type === 'PUBLIC'"
+                          type="info"
+                          class="info-tag ml-8"
+                          >公用
+                        </el-tag>
                       </div>
                       <el-icon class="check-icon" v-if="item.id === applicationForm.model_id"
                         ><Check
