@@ -14,7 +14,11 @@
               </el-tooltip>
             </span>
             <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
-              <el-tooltip effect="dark" content="暂停下载" placement="top">
+              <el-tooltip
+                effect="dark"
+                :content="`基础模型: ${props.model.model_name} 下载失败`"
+                placement="top"
+              >
                 <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
               </el-tooltip>
             </span>
