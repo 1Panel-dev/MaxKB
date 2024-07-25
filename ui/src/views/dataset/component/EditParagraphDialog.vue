@@ -20,7 +20,7 @@
             </el-button>
           </span>
         </p>
-        <el-scrollbar height="345px">
+        <el-scrollbar height="500px">
           <div class="p-24" style="padding-top: 16px">
             <el-input
               v-if="isAddProblem"

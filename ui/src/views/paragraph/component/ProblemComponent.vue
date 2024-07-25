@@ -9,7 +9,7 @@
     </span>
   </p>
   <div v-loading="loading">
-    <el-scrollbar height="345px">
+    <el-scrollbar height="500px">
       <div class="p-24" style="padding-top: 16px">
         <el-select
           v-if="isAddProblem"
