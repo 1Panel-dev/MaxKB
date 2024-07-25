@@ -112,7 +112,7 @@ const model_list = ref<Array<Model>>([])
 
 const updateModelById = (model_id: string, model: Model) => {
   model_list.value
-    .filter((m) => (m.id = model_id))
+    .filter((m) => m.id == model_id)
     .forEach((m) => {
       m.status = model.status
     })
