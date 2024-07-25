@@ -87,11 +87,13 @@ const initChat=(root)=>{
       closeviewport.classList.remove('maxkb-viewportnone')
     }
   }
-  if({{is_draggable}}){
-  chat_button.addEventListener("dragend",(e)=>{
+   const drag=(e)=>{
      chat_button.style.top=(e.y-25)+'px'
      chat_button.style.left=(e.x-25)+'px'
-    })
+    }
+  if({{is_draggable}}){
+  chat_button.addEventListener("drag",drag)
+  chat_button.addEventListener("dragend",drag)
   }
   viewport.onclick=viewport_func
   closeviewport.onclick=viewport_func
