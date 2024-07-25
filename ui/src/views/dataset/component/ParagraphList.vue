@@ -45,7 +45,7 @@
 </template>
 <script setup lang="ts">
 import { cloneDeep } from 'lodash'
-import { defineProps, ref, computed } from 'vue'
+import { ref, computed } from 'vue'
 import EditParagraphDialog from './EditParagraphDialog.vue'
 import { MsgConfirm } from '@/utils/message'
 const page_size = ref<number>(20)

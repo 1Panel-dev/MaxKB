@@ -53,6 +53,7 @@
                 class="model-icon mr-8"
               ></span>
               <span>{{ item.name }}</span>
+              <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag">公用</el-tag>
             </div>
             <el-icon class="check-icon" v-if="item.id === form.embedding_mode_id"
               ><Check
