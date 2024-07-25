@@ -22,6 +22,7 @@ from django.views import static
 from rest_framework import status
 
 from application.urls import urlpatterns as application_urlpatterns
+from common.cache_data.static_resource_cache import get_index_html
 from common.constants.cache_code_constants import CacheCodeConstants
 from common.init.init_doc import init_doc
 from common.response.result import Result
@@ -51,15 +52,6 @@ def pro():
 
 if not settings.DEBUG:
     pro()
-
-
-@get_cache(cache_key=lambda index_path: index_path,
-           version=CacheCodeConstants.STATIC_RESOURCE_CACHE.value)
-def get_index_html(index_path):
-    file = open(index_path, "r", encoding='utf-8')
-    content = file.read()
-    file.close()
-    return content
 
 
 def page_not_found(request, exception):

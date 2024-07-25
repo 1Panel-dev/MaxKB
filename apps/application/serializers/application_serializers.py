@@ -26,15 +26,14 @@ from rest_framework import serializers
 from application.flow.workflow_manage import Flow
 from application.models import Application, ApplicationDatasetMapping, ApplicationTypeChoices, WorkFlowVersion
 from application.models.api_key_model import ApplicationAccessToken, ApplicationApiKey
+from common.cache_data.application_access_token_cache import get_application_access_token, del_application_access_token
+from common.cache_data.application_api_key_cache import del_application_api_key, get_application_api_key
 from common.config.embedding_config import VectorStore
 from common.constants.authentication_type import AuthenticationType
-from common.constants.cache_code_constants import CacheCodeConstants
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed
 from common.field.common import UploadedImageField
-from common.middleware.cross_domain_middleware import get_application_api_key
-from common.middleware.static_headers_middleware import get_application_access_token
 from common.models.db_model_manage import DBModelManage
 from common.util.common import valid_license
 from common.util.field_message import ErrMessage
@@ -253,8 +252,7 @@ class ApplicationSerializer(serializers.Serializer):
             if 'is_active' in instance:
                 application_access_token.is_active = instance.get("is_active")
             if 'access_token_reset' in instance and instance.get('access_token_reset'):
-                cache.cache.delete(application_access_token.access_token,
-                                   version=CacheCodeConstants.APPLICATION_ACCESS_TOKEN_CACHE.value)
+                del_application_access_token(application_access_token.access_token)
                 application_access_token.access_token = hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]
             if 'access_num' in instance and instance.get('access_num') is not None:
                 application_access_token.access_num = instance.get("access_num")
@@ -780,8 +778,7 @@ class ApplicationSerializer(serializers.Serializer):
                 application_id = self.data.get('application_id')
                 application_api_key = QuerySet(ApplicationApiKey).filter(id=api_key_id,
                                                                          application_id=application_id).first()
-                cache.cache.delete(application_api_key.secret_key,
-                                   version=CacheCodeConstants.APPLICATION_API_KEY_CACHE.value)
+                del_application_api_key(application_api_key.secret_key)
                 application_api_key.delete()
 
             def edit(self, instance, with_valid=True):
