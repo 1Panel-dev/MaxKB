@@ -78,7 +78,10 @@
               </div>
 
               <el-card v-else shadow="always" class="dialog-card">
-                <MdRenderer :source="item.answer_text"></MdRenderer>
+                <MdRenderer
+                  :source="item.answer_text"
+                  :quick-problem-handle="quickProblemHandle"
+                ></MdRenderer>
                 <!-- 知识来源 -->
                 <div v-if="showSource(item)">
                   <KnowledgeSource :data="item" :type="props.data.type" />
