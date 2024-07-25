@@ -70,23 +70,28 @@ const split_quick_question = (result: Array<string>) => {
     }, [])
 }
 const split_quick_question_ = (source: string) => {
-  const temp_md_quick_question_list = source.match(/<quick_question>.*<\/quick_question>/g)
+  const temp_md_quick_question_list = source.match(/<quick_question>[\d\D]*?<\/quick_question>/g)
   const md_quick_question_list = temp_md_quick_question_list
     ? temp_md_quick_question_list.filter((i) => i)
     : []
   const split_quick_question_value = source
-    .split(/(!\[.*?\]\(img\/.*?\){.*?})|(!\[.*?\]\(img\/.*?\))/g)
+    .split(/<quick_question>[\d\D]*?<\/quick_question>/g)
     .filter((item) => item !== undefined)
     .filter((item) => !md_quick_question_list?.includes(item))
-    .map((item) => item.replace('<quick_question>', '').replace('</quick_question>', ''))
+  console.log(split_quick_question_value, md_quick_question_list)
   const result = Array.from(
     { length: md_quick_question_list.length + split_quick_question_value.length },
     (v, i) => i
   ).map((index) => {
     if (index % 2 == 0) {
-      return { type: 'question', content: split_quick_question_value[Math.floor(index / 2)] }
+      return { type: 'md', content: split_quick_question_value[Math.floor(index / 2)] }
     } else {
-      return { type: 'md', content: md_quick_question_list[Math.floor(index / 2)] }
+      return {
+        type: 'question',
+        content: md_quick_question_list[Math.floor(index / 2)]
+          .replace('<quick_question>', '')
+          .replace('</quick_question>', '')
+      }
     }
   })
   return result
