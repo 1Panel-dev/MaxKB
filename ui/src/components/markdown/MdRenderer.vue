@@ -1,13 +1,24 @@
 <template>
-  <MdPreview
-    noIconfont
-    ref="editorRef"
-    editorId="preview-only"
-    :modelValue="item"
-    v-for="(item, index) in md_view_list"
-    :key="index"
-    class="maxkb-md"
-  />
+  <template v-for="(item, index) in md_view_list" :key="index">
+    <div
+      v-if="item.type === 'question'"
+      @click="quickProblemHandle ? quickProblemHandle(item.content) : (content: string) => {}"
+      class="problem-button ellipsis-2 mb-8"
+      :class="quickProblemHandle ? 'cursor' : 'disabled'"
+    >
+      <el-icon><EditPen /></el-icon>
+      {{ item.content }}
+    </div>
+    <MdPreview
+      v-else
+      noIconfont
+      ref="editorRef"
+      editorId="preview-only"
+      :modelValue="item.content"
+      :key="index"
+      class="maxkb-md"
+    />
+  </template>
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
@@ -20,9 +31,16 @@ config({
     }
   }
 })
-const props = withDefaults(defineProps<{ source?: string; inner_suffix?: boolean }>(), {
-  source: ''
-})
+const props = withDefaults(
+  defineProps<{
+    source?: string
+    inner_suffix?: boolean
+    quickProblemHandle?: (q: string) => void
+  }>(),
+  {
+    source: ''
+  }
+)
 const editorRef = ref()
 const md_view_list = computed(() => {
   const temp_source = props.source
@@ -42,7 +60,61 @@ const md_view_list = computed(() => {
       return md_img_list[Math.floor(index / 2)]
     }
   })
-  return result
+  return split_quick_question(result)
 })
+const split_quick_question = (result: Array<string>) => {
+  return result
+    .map((item) => split_quick_question_(item))
+    .reduce((x: any, y: any) => {
+      return [...x, ...y]
+    }, [])
+}
+const split_quick_question_ = (source: string) => {
+  const temp_md_quick_question_list = source.match(/<quick_question>.*<\/quick_question>/g)
+  const md_quick_question_list = temp_md_quick_question_list
+    ? temp_md_quick_question_list.filter((i) => i)
+    : []
+  const split_quick_question_value = source
+    .split(/(!\[.*?\]\(img\/.*?\){.*?})|(!\[.*?\]\(img\/.*?\))/g)
+    .filter((item) => item !== undefined)
+    .filter((item) => !md_quick_question_list?.includes(item))
+    .map((item) => item.replace('<quick_question>', '').replace('</quick_question>', ''))
+  const result = Array.from(
+    { length: md_quick_question_list.length + split_quick_question_value.length },
+    (v, i) => i
+  ).map((index) => {
+    if (index % 2 == 0) {
+      return { type: 'question', content: split_quick_question_value[Math.floor(index / 2)] }
+    } else {
+      return { type: 'md', content: md_quick_question_list[Math.floor(index / 2)] }
+    }
+  })
+  return result
+}
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.problem-button {
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  background: var(--app-layout-bg-color);
+  height: 46px;
+  padding: 0 12px;
+  line-height: 46px;
+  box-sizing: border-box;
+  color: var(--el-text-color-regular);
+  -webkit-line-clamp: 1;
+  word-break: break-all;
+  &:hover {
+    background: var(--el-color-primary-light-9);
+  }
+  &.disabled {
+    &:hover {
+      background: var(--app-layout-bg-color);
+    }
+  }
+  :deep(.el-icon) {
+    color: var(--el-color-primary);
+  }
+}
+</style>
