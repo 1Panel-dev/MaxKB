@@ -161,10 +161,10 @@ class ModelSerializer(serializers.Serializer):
             if QuerySet(Model).filter(user_id=self.data.get('user_id'),
                                       name=self.data.get('name')).exists():
                 raise AppApiException(500, f'模型名称【{self.data.get("name")}】已存在')
-            # 校验模型认证数据
             ModelProvideConstants[self.data.get('provider')].value.is_valid_credential(self.data.get('model_type'),
                                                                                        self.data.get('model_name'),
-                                                                                       self.data.get('credential')
+                                                                                       self.data.get('credential'),
+                                                                                       raise_exception=True
                                                                                        )
 
         def insert(self, user_id, with_valid=False):
