@@ -44,6 +44,7 @@
           :auto-upload="false"
           :show-file-list="false"
           :on-change="onChange"
+          v-hasPermission="new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')"
         >
           <el-button class="border-primary">更新 License</el-button>
         </el-upload>
