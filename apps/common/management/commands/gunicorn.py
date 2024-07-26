@@ -36,10 +36,8 @@ class Command(BaseCommand):
         cmd = [
             'gunicorn', 'smartdoc.wsgi:application',
             '-b', options.get('b') if options.get('b') is not None else '0.0.0.0:8080',
-            '-k', options.get('k') if options.get('k') is not None else 'gevent',
-            '--threads', options.get('threads') if options.get('threads') is not None else '30',
-            '--worker-connections',
-            options.get('worker_connections') if options.get('worker_connections') is not None else '100',
+            '-k', options.get('k') if options.get('k') is not None else 'gthread',
+            '--threads', options.get('threads') if options.get('threads') is not None else '200',
             '-w', options.get('w') if options.get('w') is not None else '1',
             '--max-requests', options.get('max_requests') if options.get('max_requests') is not None else '10240',
             '--max-requests-jitter',
