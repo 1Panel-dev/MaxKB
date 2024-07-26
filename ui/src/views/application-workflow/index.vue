@@ -59,7 +59,7 @@
         <div class="workflow-debug-header" :class="!isDefaultTheme ? 'custom-header' : ''">
           <div class="flex-between">
             <div class="flex align-center">
-              <div class="mr-12 ml-24">
+              <div class="mr-12 ml-24 flex">
                 <AppAvatar
                   v-if="isAppIcon(detail?.icon)"
                   shape="square"

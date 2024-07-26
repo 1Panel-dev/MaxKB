@@ -2,7 +2,7 @@
   <div class="chat-pc layout-bg" :class="classObj" v-loading="loading">
     <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
       <div class="flex align-center">
-        <div class="mr-12 ml-24">
+        <div class="mr-12 ml-24 flex">
           <AppAvatar
             v-if="isAppIcon(applicationDetail?.icon)"
             shape="square"
