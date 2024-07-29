@@ -22,6 +22,7 @@ from common.config.embedding_config import ModelManage
 from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
 from common.util.rsa_util import rsa_long_decrypt, rsa_long_encrypt
+from dataset.models import DataSet
 from setting.models.model_management import Model, Status
 from setting.models_provider.base_model_provider import ValidCode, DownModelChunkStatus
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -236,10 +237,20 @@ class ModelSerializer(serializers.Serializer):
         def delete(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            application_list = QuerySet(Application).filter(model_id=self.data.get('id')).all()
-            if len(application_list) > 0:
-                raise AppApiException(500, f"该模型关联了{len(application_list)} 个应用，无法删除该模型。")
-            QuerySet(Model).filter(id=self.data.get('id')).delete()
+            model_id = self.data.get('id')
+            model = Model.objects.filter(id=model_id).first()
+            if not model:
+                # 模型不存在，直接返回或抛出异常
+                raise AppApiException(500, "模型不存在")
+            if model.model_type == 'LLM':
+                application_count = Application.objects.filter(model_id=model_id).count()
+                if application_count > 0:
+                    raise AppApiException(500, f"该模型关联了{application_count} 个应用，无法删除该模型。")
+            elif model.model_type == 'EMBEDDING':
+                dataset_count = DataSet.objects.filter(embedding_mode_id=model_id).count()
+                if dataset_count > 0:
+                    raise AppApiException(500, f"该模型关联了{dataset_count} 个知识库，无法删除该模型。")
+            model.delete()
             return True
 
         def pause_download(self, with_valid=True):
