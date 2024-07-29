@@ -37,7 +37,7 @@
       <div class="flex">
         <span class="label">备注</span><span>{{ licenseInfo?.remark || '-' }}</span>
       </div>
-      <div class="mt-16 mr-16 flex align-center" v-if="user.showXpack()">
+      <div class="mt-16 flex align-center" v-if="user.showXpack()">
         <el-upload
           ref="uploadRef"
           action="#"
@@ -46,7 +46,7 @@
           :on-change="onChange"
           v-hasPermission="new Role('ADMIN')"
         >
-          <el-button class="border-primary">更新 License</el-button>
+          <el-button class="border-primary mr-16">更新 License</el-button>
         </el-upload>
 
         <el-button class="border-primary" @click="toSupport">获取技术支持</el-button>
