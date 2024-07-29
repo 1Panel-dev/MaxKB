@@ -78,7 +78,6 @@ const split_quick_question_ = (source: string) => {
     .split(/<quick_question>[\d\D]*?<\/quick_question>/g)
     .filter((item) => item !== undefined)
     .filter((item) => !md_quick_question_list?.includes(item))
-  console.log(split_quick_question_value, md_quick_question_list)
   const result = Array.from(
     { length: md_quick_question_list.length + split_quick_question_value.length },
     (v, i) => i

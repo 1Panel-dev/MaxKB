@@ -1,5 +1,5 @@
 <template>
-  <MdPreview noIconfont noPrettier v-bind="$attrs" />
+  <MdPreview noIconfont noPrettier :codeFoldable="false" v-bind="$attrs" />
 </template>
 
 <script setup lang="ts">
