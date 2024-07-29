@@ -53,6 +53,7 @@ const checked = () => {
   } else {
     emit('update:modelValue', [...value, toModelValue.value])
   }
+  checkboxChange()
 }
 
 function checkboxChange() {
