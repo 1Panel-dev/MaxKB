@@ -280,11 +280,11 @@ def filter_special_char(content: str):
 
 class SplitModel:
 
-    def __init__(self, content_level_pattern, with_filter=True, limit=4096):
+    def __init__(self, content_level_pattern, with_filter=True, limit=100000):
         self.content_level_pattern = content_level_pattern
         self.with_filter = with_filter
-        if limit is None or limit > 4096:
-            limit = 4096
+        if limit is None or limit > 100000:
+            limit = 100000
         if limit < 50:
             limit = 50
         self.limit = limit
@@ -375,7 +375,7 @@ default_split_pattern = {
 }
 
 
-def get_split_model(filename: str, with_filter: bool = False, limit: int = 4096):
+def get_split_model(filename: str, with_filter: bool = False, limit: int = 100000):
     """
     根据文件名称获取分段模型
     :param limit:        每段大小

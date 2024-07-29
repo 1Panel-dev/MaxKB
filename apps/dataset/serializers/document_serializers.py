@@ -788,7 +788,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             file_list = self.data.get("file")
             return list(
                 map(lambda f: file_to_paragraph(f, self.data.get("patterns", None), self.data.get("with_filter", None),
-                                                self.data.get("limit", None)), file_list))
+                                                self.data.get("limit", 4096)), file_list))
 
     class SplitPattern(ApiMixin, serializers.Serializer):
         @staticmethod
