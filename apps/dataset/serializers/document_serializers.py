@@ -539,6 +539,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
             model = get_embedding_model_by_dataset_id(dataset_id=self.data.get('dataset_id'))
+            QuerySet(Document).filter(id=document_id).update(**{'status': Status.queue_up})
+            QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': Status.queue_up})
             ListenerManagement.embedding_by_document_signal.send(document_id, embedding_model=model)
 
         @transaction.atomic

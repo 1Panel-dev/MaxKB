@@ -189,7 +189,6 @@ class ListenerManagement:
             un_lock('embedding' + str(document_id))
 
     @staticmethod
-    @embedding_poxy
     def embedding_by_dataset(dataset_id, embedding_model: Embeddings):
         """
         向量化知识库

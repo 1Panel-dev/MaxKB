@@ -35,7 +35,7 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping, Status
 from dataset.serializers.common_serializers import list_paragraph, MetaSerializer, ProblemParagraphManage, \
     get_embedding_model_by_dataset_id
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
@@ -746,6 +746,8 @@ class DataSetSerializers(serializers.ModelSerializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             model = get_embedding_model_by_dataset_id(self.data.get('id'))
+            QuerySet(Document).filter(dataset_id=self.data.get('id')).update(**{'status': Status.queue_up})
+            QuerySet(Paragraph).filter(dataset_id=self.data.get('id')).update(**{'status': Status.queue_up})
             ListenerManagement.embedding_by_dataset_signal.send(self.data.get('id'), embedding_model=model)
 
         def list_application(self, with_valid=True):
