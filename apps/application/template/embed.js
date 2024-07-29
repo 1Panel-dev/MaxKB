@@ -87,13 +87,20 @@ const initChat=(root)=>{
       closeviewport.classList.remove('maxkb-viewportnone')
     }
   }
-   const drag=(e)=>{
-     chat_button.style.top=(e.y-25)+'px'
-     chat_button.style.left=(e.x-25)+'px'
-    }
+     const drag=(e)=>{
+            if (['touchmove','touchstart'].includes(e.type)) {
+             chat_button.style.top=(e.touches[0].clientY-25)+'px'
+             chat_button.style.left=(e.touches[0].clientX-25)+'px'
+          } else {
+             chat_button.style.top=(e.y-25)+'px'
+             chat_button.style.left=(e.x-25)+'px'
+          }
+        }
   if({{is_draggable}}){
   chat_button.addEventListener("drag",drag)
   chat_button.addEventListener("dragend",drag)
+  chat_button.addEventListener("touchstart",drag)
+  chat_button.addEventListener("touchmove",drag)
   }
   viewport.onclick=viewport_func
   closeviewport.onclick=viewport_func
