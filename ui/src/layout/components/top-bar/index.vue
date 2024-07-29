@@ -10,6 +10,16 @@
       <TopMenu></TopMenu>
     </div>
     <div class="flex-center avatar">
+      <el-button
+        v-if="!user.showXpack()"
+        link
+        type="primary"
+        @click="toUrl('https://maxkb.cn/pricing.html')"
+        class="mr-8"
+      >
+        <AppIcon iconName="app-pricing" class="mr-8" style="font-size: 20px"></AppIcon>
+        购买专业版
+      </el-button>
       <el-tooltip effect="dark" :content="$t('layout.topbar.github')" placement="top">
         <AppIcon
           iconName="app-github"
@@ -29,7 +39,7 @@
       <el-tooltip effect="dark" :content="$t('layout.topbar.forum')" placement="top">
         <AppIcon
           iconName="app-help"
-          class="cursor color-secondary mr-8 ml-8"
+          class="cursor color-secondary mr-16 ml-8"
           style="font-size: 20px"
           @click="toUrl('https://bbs.fit2cloud.com/c/mk/11')"
         ></AppIcon>
@@ -63,6 +73,9 @@ import Avatar from './avatar/index.vue'
 import { useRouter } from 'vue-router'
 import { langList } from '@/locales/index'
 import { useLocale } from '@/locales/useLocale'
+
+import useStore from '@/stores'
+const { user } = useStore()
 const router = useRouter()
 
 const { changeLocale } = useLocale()
