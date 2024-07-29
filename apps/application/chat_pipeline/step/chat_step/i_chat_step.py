@@ -53,7 +53,7 @@ class IChatStep(IBaseChatPipelineStep):
         # 对话列表
         message_list = serializers.ListField(required=True, child=MessageField(required=True),
                                              error_messages=ErrMessage.list("对话列表"))
-        model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
+        model_id = serializers.UUIDField(required=False, allow_null=True, error_messages=ErrMessage.uuid("模型id"))
         # 段落列表
         paragraph_list = serializers.ListField(error_messages=ErrMessage.list("段落列表"))
         # 对话id
