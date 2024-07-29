@@ -98,6 +98,9 @@ const initChat=(root)=>{
         }
   if({{is_draggable}}){
   chat_button.addEventListener("drag",drag)
+  chat_button.addEventListener("dragover",(e)=>{
+             e.preventDefault()
+   })
   chat_button.addEventListener("dragend",drag)
   chat_button.addEventListener("touchstart",drag)
   chat_button.addEventListener("touchmove",drag)
