@@ -45,7 +45,7 @@
           <el-scrollbar>
             <div class="p-24 pt-0">
               <el-row v-if="model_split_list.length > 0" :gutter="15">
-                <template v-for="(row, index) in model_split_list" :key="index">
+                <template v-for="row in model_split_list" :key="row.id">
                   <el-col
                     :xs="24"
                     :sm="24"

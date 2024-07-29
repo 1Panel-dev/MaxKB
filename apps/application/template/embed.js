@@ -149,19 +149,18 @@ function initMaxkbStyle(root){
       left: 0;
   }
   #maxkb .maxkb-mask .maxkb-content {
-      width: 45px;
-      height: 48px;
+      width: 50px;
+      height: 50px;
       box-shadow: 1px 1px 1px 2000px rgba(0,0,0,.6);
-      border-radius: 50% 0 0 50%;
       position: absolute;
       right: 0;
-      bottom: 38px;
+      bottom: 30px;
       z-index: 1000;
   }
   #maxkb .maxkb-tips {
       position: fixed;
       bottom: 30px;
-      right: 60px;
+      right: 66px;
       padding: 22px 24px 24px;
       border-radius: 6px;
       color: #ffffff;
@@ -229,8 +228,8 @@ function initMaxkbStyle(root){
         bottom: 30px;
         right: 0;
         cursor: pointer;
-        height:50px;
-        width:50px;
+        height:30px;
+        width:30px;
     }
     #maxkb #maxkb-chat-container{
         z-index:10000;position: relative;

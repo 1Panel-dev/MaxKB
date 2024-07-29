@@ -23,9 +23,15 @@
       </el-form-item>
       <el-form-item label="对话头像" v-if="user.isEnterprise()">
         <div class="flex mt-8">
-          <div class="border border-r-4 mr-16" style="width: 50px; height: 50px; padding: 8px">
-            <img v-if="imgUrl.avatar" :src="imgUrl.avatar" alt="" height="50px" />
-            <LogoIcon v-else height="50px" />
+          <div class="border border-r-4 mr-16" style="padding: 8px">
+            <el-image
+              v-if="imgUrl.avatar"
+              :src="imgUrl.avatar"
+              alt=""
+              fit="cover"
+              style="width: 50px; height: 50px; display: block"
+            />
+            <LogoIcon v-else height="50px" style="width: 50px; height: 50px; display: block" />
           </div>
 
           <el-upload
@@ -57,7 +63,12 @@
               fit="cover"
               style="width: 50px; height: 50px; display: block"
             />
-            <img v-else src="@/assets/logo/logo.svg" height="50px" />
+            <img
+              v-else
+              src="@/assets/logo/logo.svg"
+              height="50px"
+              style="width: 50px; height: 50px; display: block"
+            />
           </div>
 
           <el-upload

@@ -37,19 +37,19 @@
       <div class="flex">
         <span class="label">备注</span><span>{{ licenseInfo?.remark || '-' }}</span>
       </div>
-      <div class="mt-16 flex align-center" v-if="user.showXpack()">
+      <div class="mt-16 mr-16 flex align-center" v-if="user.showXpack()">
         <el-upload
           ref="uploadRef"
           action="#"
           :auto-upload="false"
           :show-file-list="false"
           :on-change="onChange"
-          v-hasPermission="new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')"
+          v-hasPermission="new Role('ADMIN')"
         >
           <el-button class="border-primary">更新 License</el-button>
         </el-upload>
 
-        <el-button class="border-primary ml-16" @click="toSupport">获取技术支持</el-button>
+        <el-button class="border-primary" @click="toSupport">获取技术支持</el-button>
       </div>
     </div>
   </el-dialog>
@@ -58,7 +58,7 @@
 import { ref, computed, watch } from 'vue'
 import licenseApi from '@/api/license'
 import { fromNowDate } from '@/utils/time'
-import { ComplexPermission } from '@/utils/permission/type'
+import { Role } from '@/utils/permission/type'
 import useStore from '@/stores'
 const { user } = useStore()
 const isDefaultTheme = computed(() => {
