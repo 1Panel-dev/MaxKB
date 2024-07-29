@@ -30,9 +30,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
-        print(options.get('worker_connections'))
-        print(options.get('threads'))
-        print(options)
         cmd = [
             'gunicorn', 'smartdoc.wsgi:application',
             '-b', options.get('b') if options.get('b') is not None else '0.0.0.0:8080',
