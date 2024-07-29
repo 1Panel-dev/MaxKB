@@ -238,8 +238,8 @@ function initMaxkbStyle(root){
         bottom: 30px;
         right: 0;
         cursor: pointer;
-        height:30px;
-        width:30px;
+        height:50px;
+        width:50px;
     }
     #maxkb #maxkb-chat-container{
         z-index:10000;position: relative;
