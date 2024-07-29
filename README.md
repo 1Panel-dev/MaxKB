@@ -29,7 +29,7 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data cr2
 - 你也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama + Llama 3，30 分钟内即可上线基于本地大模型的知识库问答系统，并嵌入到第三方业务系统中；
 - 如果是内网环境，推荐使用 [离线安装包](https://community.fit2cloud.com/#/products/maxkb/downloads) 进行安装部署；
 - 你也可以在线体验：[DataEase 小助手](https://dataease.io/docs/v2/)，它是基于 MaxKB 搭建的智能问答系统，已经嵌入到 DataEase 产品及在线文档中；
-- 友情提示：社区版限制 1 个团队成员，5 个应用，50 个知识库。
+- MaxKB 产品版本分为社区版和专业版，详情请参见：[MaxKB 产品版本对比](https://maxkb.cn/pricing.html)。
 
 如你有更多问题，可以查看使用手册，或者通过论坛与我们交流。如果你需要搭建技术博客或者知识库，推荐使用 [Halo 开源建站工具](https://github.com/halo-dev/halo/)，你可以体验下飞致云官方的 [技术博客](https://blog.fit2cloud.com/) 和 [知识库](https://kb.fit2cloud.com) 案例。
 
@@ -60,7 +60,7 @@ docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data cr2
 - LangChain：[LangChain](https://www.langchain.com/)
 - 向量数据库：[PostgreSQL / pgvector](https://www.postgresql.org/)
 - 大模型：各种本地私有或者公共大模型
-  
+
 ## 飞致云的其他明星项目
 
 - [1Panel](https://github.com/1panel-dev/1panel/) - 现代化、开源的 Linux 服务器运维管理面板
