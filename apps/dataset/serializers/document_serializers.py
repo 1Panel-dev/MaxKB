@@ -675,6 +675,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
                 else:
                     Document(name=source_url[0:128],
+                             dataset_id=dataset_id,
                              meta={'source_url': source_url, 'selector': selector},
                              type=Type.web,
                              char_length=0,
