@@ -22,6 +22,7 @@ class Status(models.TextChoices):
     embedding = 0, '导入中'
     success = 1, '已完成'
     error = 2, '导入失败'
+    queue_up = 3, '排队中'
 
 
 class Type(models.TextChoices):
@@ -66,7 +67,7 @@ class Document(AppModelMixin):
     name = models.CharField(max_length=150, verbose_name="文档名称")
     char_length = models.IntegerField(verbose_name="文档字符数 冗余字段")
     status = models.CharField(verbose_name='状态', max_length=1, choices=Status.choices,
-                              default=Status.embedding)
+                              default=Status.queue_up)
     is_active = models.BooleanField(default=True)
 
     type = models.CharField(verbose_name='类型', max_length=1, choices=Type.choices,
