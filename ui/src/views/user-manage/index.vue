@@ -141,7 +141,7 @@ function createUser() {
     UserDialogRef.value.open()
   } else {
     common.asyncGetValid(ValidType.User, ValidCount.User, loading).then((res: any) => {
-      if (res?.data?.data) {
+      if (res?.data) {
         title.value = '创建用户'
         UserDialogRef.value.open()
       } else {
