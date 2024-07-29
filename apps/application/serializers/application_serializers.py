@@ -45,6 +45,7 @@ from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
+from django.conf import settings
 
 chat_cache = cache.caches['chat_cache']
 
@@ -199,8 +200,10 @@ class ApplicationSerializer(serializers.Serializer):
             is_draggable = 'false'
             show_guide = 'true'
             float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/favicon.ico"
+            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
+                                                                                  'XPACK_LICENSE_IS_VALID') else False)
             application_setting_model = DBModelManage.get_model('application_setting')
-            if application_setting_model is not None:
+            if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(
                     application_id=application_access_token.application_id).first()
                 if application_setting is not None:
@@ -216,7 +219,7 @@ class ApplicationSerializer(serializers.Serializer):
                     {'is_auth': is_auth, 'protocol': self.data.get('protocol'), 'host': self.data.get('host'),
                      'token': self.data.get('token'),
                      'white_list_str': ",".join(
-                         application_access_token.white_list),
+                         application_access_token.white_list if application_access_token.white_list is not None else []),
                      'white_active': 'true' if application_access_token.white_active else 'false',
                      'is_draggable': is_draggable,
                      'float_icon': float_icon,
