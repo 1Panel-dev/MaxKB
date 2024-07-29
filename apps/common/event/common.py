@@ -30,8 +30,10 @@ def get_cache_key(poxy_function, args):
 
 def get_cache_poxy_function(poxy_function, cache_key):
     def fun(args, **keywords):
-        poxy_function(args, **keywords)
-        memory_cache.delete(cache_key)
+        try:
+            poxy_function(args, **keywords)
+        finally:
+            memory_cache.delete(cache_key)
 
     return fun
 
