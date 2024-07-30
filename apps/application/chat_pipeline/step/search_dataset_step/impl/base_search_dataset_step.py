@@ -35,7 +35,7 @@ def get_model_by_id(_id, user_id):
 def get_embedding_id(dataset_id_list):
     dataset_list = QuerySet(DataSet).filter(id__in=dataset_id_list)
     if len(set([dataset.embedding_mode_id for dataset in dataset_list])) > 1:
-        raise Exception("知识库未向量模型不一致")
+        raise Exception("关联知识库的向量模型不一致，无法召回分段。")
     if len(dataset_list) == 0:
         raise Exception("知识库设置错误,请重新设置知识库")
     return dataset_list[0].embedding_mode_id
