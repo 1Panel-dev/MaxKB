@@ -5,18 +5,20 @@
     </template>
     <div class="create-dataset__main flex" v-loading="loading">
       <div class="create-dataset__component main-calc-height">
-        <template v-if="active === 0">
-          <div class="upload-document p-24">
-            <!-- 上传文档 -->
-            <UploadComponent ref="UploadComponentRef" />
-          </div>
-        </template>
-        <template v-else-if="active === 1">
-          <SetRules ref="SetRulesRef" />
-        </template>
-        <template v-else-if="active === 2">
-          <ResultSuccess :data="successInfo" />
-        </template>
+        <el-scrollbar>
+          <template v-if="active === 0">
+            <div class="upload-document p-24">
+              <!-- 上传文档 -->
+              <UploadComponent ref="UploadComponentRef" />
+            </div>
+          </template>
+          <template v-else-if="active === 1">
+            <SetRules ref="SetRulesRef" />
+          </template>
+          <template v-else-if="active === 2">
+            <ResultSuccess :data="successInfo" />
+          </template>
+        </el-scrollbar>
       </div>
     </div>
     <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
