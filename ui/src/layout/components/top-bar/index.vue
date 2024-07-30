@@ -11,7 +11,7 @@
     </div>
     <div class="flex-center avatar">
       <el-button
-        v-if="!user.showXpack()"
+        v-if="!user.isEnterprise()"
         link
         type="primary"
         @click="toUrl('https://maxkb.cn/pricing.html')"

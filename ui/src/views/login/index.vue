@@ -135,7 +135,7 @@ const login = () => {
 
 onMounted(() => {
   user.asyncGetProfile().then((res) => {
-    if (user.showXpack()) {
+    if (user.isEnterprise()) {
       loading.value = true
       user
         .getAuthType()
