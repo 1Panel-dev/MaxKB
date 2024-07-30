@@ -187,7 +187,7 @@ function getAppProfile() {
     .asyncGetAppProfile(loading)
     .then((res: any) => {
       applicationDetail.value = res.data
-      if (res.data?.show_history) {
+      if (res.data?.show_history || !user.isEnterprise()) {
         getChatLog(applicationDetail.value.id)
       }
     })
