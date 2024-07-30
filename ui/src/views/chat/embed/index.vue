@@ -45,7 +45,7 @@
 
     <!-- 历史记录弹出层 -->
     <div
-      v-if="applicationDetail.show_history"
+      v-if="applicationDetail.show_history || !user.isEnterprise()"
       @click.prevent.stop="show = !show"
       class="chat-popover-button cursor color-secondary"
     >
