@@ -37,12 +37,15 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
+import useStore from '@/stores'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ResetPasswordRequest } from '@/api/type/user'
 import userApi from '@/api/user-manage'
 import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits(['refresh'])
+
+const { user } = useStore()
 
 const userFormRef = ref()
 const userForm = ref<any>({
@@ -113,6 +116,7 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (valid) {
       userApi.putUserManagePassword(userId.value, userForm.value, loading).then((res) => {
         emit('refresh')
+        user.profile()
         MsgSuccess('修改用户密码成功')
         dialogVisible.value = false
       })
