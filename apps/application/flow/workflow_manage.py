@@ -6,10 +6,11 @@
     @date：2024/1/9 17:40
     @desc:
 """
+import json
 from functools import reduce
 from typing import List, Dict
 
-from langchain_core.messages import AIMessageChunk, AIMessage
+from langchain_core.messages import AIMessage
 from langchain_core.prompts import PromptTemplate
 
 from application.flow import tools
@@ -62,7 +63,6 @@ class Flow:
 
     def get_search_node(self):
         return [node for node in self.nodes if node.type == 'search-dataset-node']
-
 
     def is_valid(self):
         """
@@ -140,33 +140,71 @@ class WorkflowManage:
         self.work_flow_post_handler = work_flow_post_handler
         self.current_node = None
         self.current_result = None
+        self.answer = ""
 
     def run(self):
-        """
-        运行工作流
-        """
+        if self.params.get('stream'):
+            return self.run_stream()
+        return self.run_block()
+
+    def run_block(self):
         try:
             while self.has_next_node(self.current_result):
                 self.current_node = self.get_next_node()
                 self.node_context.append(self.current_node)
                 self.current_result = self.current_node.run()
-                if self.has_next_node(self.current_result):
-                    self.current_result.write_context(self.current_node, self)
-                else:
-                    r = self.current_result.to_response(self.params['chat_id'], self.params['chat_record_id'],
-                                                        self.current_node, self,
-                                                        self.work_flow_post_handler)
-                    return r
+                result = self.current_result.write_context(self.current_node, self)
+                if result is not None:
+                    list(result)
+                if not self.has_next_node(self.current_result):
+                    return tools.to_response_simple(self.params['chat_id'], self.params['chat_record_id'],
+                                                    AIMessage(self.answer), self,
+                                                    self.work_flow_post_handler)
         except Exception as e:
-            if self.params.get('stream'):
-                return tools.to_stream_response(self.params['chat_id'], self.params['chat_record_id'],
-                                                iter([AIMessageChunk(str(e))]), self,
-                                                self.current_node.get_write_error_context(e),
-                                                self.work_flow_post_handler)
-            else:
-                return tools.to_response(self.params['chat_id'], self.params['chat_record_id'],
-                                         AIMessage(str(e)), self, self.current_node.get_write_error_context(e),
-                                         self.work_flow_post_handler)
+            return tools.to_response(self.params['chat_id'], self.params['chat_record_id'],
+                                     AIMessage(str(e)), self, self.current_node.get_write_error_context(e),
+                                     self.work_flow_post_handler)
+
+    def run_stream(self):
+        return tools.to_stream_response_simple(self.stream_event())
+
+    def stream_event(self):
+        try:
+            while self.has_next_node(self.current_result):
+                self.current_node = self.get_next_node()
+                self.node_context.append(self.current_node)
+                self.current_result = self.current_node.run()
+                result = self.current_result.write_context(self.current_node, self)
+                if result is not None:
+                    for r in result:
+                        if self.is_result():
+                            yield self.get_chunk_content(r)
+                if not self.has_next_node(self.current_result):
+                    yield self.get_chunk_content('', True)
+                    break
+            self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
+                                                self.answer,
+                                                self)
+        except Exception as e:
+            self.current_node.get_write_error_context(e)
+            self.answer += str(e)
+            self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
+                                                self.answer,
+                                                self)
+            yield self.get_chunk_content(str(e), True)
+
+    def is_result(self):
+        """
+        判断是否是返回节点
+        @return:
+        """
+        return self.current_node.node_params.get('is_result', not self.has_next_node(
+            self.current_result)) if self.current_node.node_params is not None else False
+
+    def get_chunk_content(self, chunk, is_end=False):
+        return 'data: ' + json.dumps(
+            {'chat_id': self.params['chat_id'], 'id': self.params['chat_record_id'], 'operate': True,
+             'content': chunk, 'is_end': is_end}, ensure_ascii=False) + "\n\n"
 
     def has_next_node(self, node_result: NodeResult | None):
         """
