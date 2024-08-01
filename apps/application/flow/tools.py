@@ -85,3 +85,21 @@ def to_response(chat_id, chat_record_id, response: BaseMessage, workflow, write_
     post_handler.handler(chat_id, chat_record_id, answer, workflow)
     return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
                            'content': answer, 'is_end': True})
+
+
+def to_response_simple(chat_id, chat_record_id, response: BaseMessage, workflow,
+                       post_handler: WorkFlowPostHandler):
+    answer = response.content
+    post_handler.handler(chat_id, chat_record_id, answer, workflow)
+    return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
+                           'content': answer, 'is_end': True})
+
+
+def to_stream_response_simple(stream_event):
+    r = StreamingHttpResponse(
+        streaming_content=stream_event,
+        content_type='text/event-stream;charset=utf-8',
+        charset='utf-8')
+
+    r['Cache-Control'] = 'no-cache'
+    return r

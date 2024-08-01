@@ -20,6 +20,7 @@ class ReplyNodeParamsSerializer(serializers.Serializer):
     fields = serializers.ListField(required=False, error_messages=ErrMessage.list("引用字段"))
     content = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                     error_messages=ErrMessage.char("直接回答内容"))
+    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
