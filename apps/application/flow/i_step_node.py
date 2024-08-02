@@ -33,6 +33,7 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
     if global_variable is not None:
         for key in global_variable:
             workflow.context[key] = global_variable[key]
+    node.context['run_time'] = time.time() - node.context['start_time']
 
 
 class WorkFlowPostHandler:
