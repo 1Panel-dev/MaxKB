@@ -6,6 +6,7 @@
     @date：2024/6/4 14:30
     @desc:
 """
+import time
 from functools import reduce
 from typing import List, Dict
 
@@ -26,6 +27,7 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['answer'] = answer
     node.context['history_message'] = node_variable['history_message']
     node.context['question'] = node_variable['question']
+    node.context['run_time'] = time.time() - node.context['start_time']
     if workflow.is_result():
         workflow.answer += answer
 
