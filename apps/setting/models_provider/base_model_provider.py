@@ -89,6 +89,10 @@ class MaxKBBaseModel(ABC):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         pass
 
+    @staticmethod
+    def is_cache_model():
+        return True
+
 
 class BaseModelCredential(ABC):
 

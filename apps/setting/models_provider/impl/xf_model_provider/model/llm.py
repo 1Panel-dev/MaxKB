@@ -20,6 +20,9 @@ from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 
 class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
+    @staticmethod
+    def is_cache_model():
+        return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
