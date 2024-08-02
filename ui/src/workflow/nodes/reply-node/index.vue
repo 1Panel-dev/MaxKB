@@ -61,7 +61,7 @@
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_return" />
+          <el-switch size="small" v-model="form_data.is_result" />
         </el-form-item>
       </el-form>
     </el-card>
@@ -88,7 +88,7 @@ const form = {
   reply_type: 'content',
   content: '',
   fields: [],
-  is_return: false
+  is_result: false
 }
 const footers: any = [null, '=', 0]
 
@@ -131,7 +131,7 @@ const validate = () => {
 
 onMounted(() => {
   if (isLastNode(props.nodeModel)) {
-    set(props.nodeModel.properties.node_data, 'is_return', true)
+    set(props.nodeModel.properties.node_data, 'is_result', true)
   }
 
   set(props.nodeModel, 'validate', validate)

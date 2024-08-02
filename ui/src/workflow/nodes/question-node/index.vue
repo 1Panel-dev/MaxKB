@@ -148,7 +148,7 @@
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_return" />
+          <el-switch size="small" v-model="form_data.is_result" />
         </el-form-item>
       </el-form>
     </el-card>
@@ -197,7 +197,7 @@ const form = {
   system: '你是一个问题优化大师',
   prompt: defaultPrompt,
   dialogue_number: 1,
-  is_return: false
+  is_result: false
 }
 
 const form_data = computed({
@@ -258,7 +258,7 @@ onMounted(() => {
   getProvider()
   getModel()
   if (isLastNode(props.nodeModel)) {
-    set(props.nodeModel.properties.node_data, 'is_return', true)
+    set(props.nodeModel.properties.node_data, 'is_result', true)
   }
   set(props.nodeModel, 'validate', validate)
 })
