@@ -22,6 +22,8 @@ class QuestionNodeSerializer(serializers.Serializer):
     # 多轮对话数量
     dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("多轮对话数量"))
 
+    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
+
 
 class IQuestionNode(INode):
     type = 'question-node'

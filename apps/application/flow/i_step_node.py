@@ -10,6 +10,7 @@ import time
 from abc import abstractmethod
 from typing import Type, Dict, List
 
+from django.core import cache
 from django.db.models import QuerySet
 from rest_framework import serializers
 
@@ -18,7 +19,6 @@ from application.models.api_key_model import ApplicationPublicAccessClient
 from common.constants.authentication_type import AuthenticationType
 from common.field.common import InstanceField
 from common.util.field_message import ErrMessage
-from django.core import cache
 
 chat_cache = cache.caches['chat_cache']
 
@@ -27,9 +27,13 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
     if step_variable is not None:
         for key in step_variable:
             node.context[key] = step_variable[key]
+        if workflow.is_result() and 'answer' in step_variable:
+            yield step_variable['answer']
+            workflow.answer += step_variable['answer']
     if global_variable is not None:
         for key in global_variable:
             workflow.context[key] = global_variable[key]
+    node.context['run_time'] = time.time() - node.context['start_time']
 
 
 class WorkFlowPostHandler:
@@ -70,18 +74,14 @@ class WorkFlowPostHandler:
 
 
 class NodeResult:
-    def __init__(self, node_variable: Dict, workflow_variable: Dict, _to_response=None, _write_context=write_context):
+    def __init__(self, node_variable: Dict, workflow_variable: Dict,
+                 _write_context=write_context):
         self._write_context = _write_context
         self.node_variable = node_variable
         self.workflow_variable = workflow_variable
-        self._to_response = _to_response
 
     def write_context(self, node, workflow):
-        self._write_context(self.node_variable, self.workflow_variable, node, workflow)
-
-    def to_response(self, chat_id, chat_record_id, node, workflow, post_handler: WorkFlowPostHandler):
-        return self._to_response(chat_id, chat_record_id, self.node_variable, self.workflow_variable, node, workflow,
-                                 post_handler)
+        return self._write_context(self.node_variable, self.workflow_variable, node, workflow)
 
     def is_assertion_result(self):
         return 'branch_id' in self.node_variable

@@ -46,6 +46,23 @@
             v-model="form_data.fields"
           />
         </el-form-item>
+        <el-form-item label="返回内容" @click.prevent>
+          <template #label>
+            <div class="flex align-center">
+              <div class="mr-4">
+                <span>返回内容<span class="danger">*</span></span>
+              </div>
+              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+                <template #content>
+                  关闭后该节点的内容则不输出给用户。
+                  如果你想让用户看到该节点的输出内容，请打开开关。
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+          </template>
+          <el-switch size="small" v-model="form_data.is_result" />
+        </el-form-item>
       </el-form>
     </el-card>
     <!-- 回复内容弹出层 -->
@@ -64,12 +81,14 @@ import { set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import { ref, computed, onMounted } from 'vue'
+import { isLastNode } from '@/workflow/common/data'
 
 const props = defineProps<{ nodeModel: any }>()
 const form = {
   reply_type: 'content',
   content: '',
-  fields: []
+  fields: [],
+  is_result: false
 }
 const footers: any = [null, '=', 0]
 
@@ -111,6 +130,12 @@ const validate = () => {
 }
 
 onMounted(() => {
+  if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
+    if (isLastNode(props.nodeModel)) {
+      set(props.nodeModel.properties.node_data, 'is_result', true)
+    }
+  }
+
   set(props.nodeModel, 'validate', validate)
 })
 </script>

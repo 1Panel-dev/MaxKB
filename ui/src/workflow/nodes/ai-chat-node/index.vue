@@ -132,6 +132,23 @@
             class="w-full"
           />
         </el-form-item>
+        <el-form-item label="返回内容" @click.prevent>
+          <template #label>
+            <div class="flex align-center">
+              <div class="mr-4">
+                <span>返回内容<span class="danger">*</span></span>
+              </div>
+              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+                <template #content>
+                  关闭后该节点的内容则不输出给用户。
+                  如果你想让用户看到该节点的输出内容，请打开开关。
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+          </template>
+          <el-switch size="small" v-model="chat_data.is_result" />
+        </el-form-item>
       </el-form>
     </el-card>
 
@@ -156,6 +173,7 @@ import applicationApi from '@/api/application'
 import useStore from '@/stores'
 import { relatedObject } from '@/utils/utils'
 import type { Provider } from '@/api/type/model'
+import { isLastNode } from '@/workflow/common/data'
 
 const { model } = useStore()
 const isKeyDown = ref(false)
@@ -180,7 +198,8 @@ const form = {
   model_id: '',
   system: '',
   prompt: defaultPrompt,
-  dialogue_number: 1
+  dialogue_number: 1,
+  is_result: false
 }
 
 const chat_data = computed({
@@ -240,6 +259,12 @@ const openCreateModel = (provider?: Provider) => {
 onMounted(() => {
   getProvider()
   getModel()
+  if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
+    if (isLastNode(props.nodeModel)) {
+      set(props.nodeModel.properties.node_data, 'is_result', true)
+    }
+  }
+
   set(props.nodeModel, 'validate', validate)
 })
 </script>
