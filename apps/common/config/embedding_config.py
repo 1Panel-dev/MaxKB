@@ -18,7 +18,7 @@ class ModelManage:
     @staticmethod
     def get_model(_id, get_model):
         model_instance = ModelManage.cache.get(_id)
-        if model_instance is None:
+        if model_instance is None or not model_instance.is_cache_model():
             model_instance = get_model(_id)
             ModelManage.cache.set(_id, model_instance, timeout=60 * 30)
             return model_instance
