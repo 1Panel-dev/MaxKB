@@ -133,6 +133,23 @@
             class="w-full"
           />
         </el-form-item>
+        <el-form-item label="返回内容" @click.prevent>
+          <template #label>
+            <div class="flex align-center">
+              <div class="mr-4">
+                <span>返回内容<span class="danger">*</span></span>
+              </div>
+              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+                <template #content>
+                  关闭后该节点的内容则不输出给用户。
+                  如果你想让用户看到该节点的输出内容，请打开开关。
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+          </template>
+          <el-switch size="small" v-model="form_data.is_return" />
+        </el-form-item>
       </el-form>
     </el-card>
     <!-- 添加模版 -->
@@ -156,6 +173,8 @@ import applicationApi from '@/api/application'
 import useStore from '@/stores'
 import { relatedObject } from '@/utils/utils'
 import type { Provider } from '@/api/type/model'
+import { isLastNode } from '@/workflow/common/data'
+
 const { model } = useStore()
 const isKeyDown = ref(false)
 const wheel = (e: any) => {
@@ -177,7 +196,8 @@ const form = {
   model_id: '',
   system: '你是一个问题优化大师',
   prompt: defaultPrompt,
-  dialogue_number: 1
+  dialogue_number: 1,
+  is_return: false
 }
 
 const form_data = computed({
@@ -237,6 +257,9 @@ const openCreateModel = (provider?: Provider) => {
 onMounted(() => {
   getProvider()
   getModel()
+  if (isLastNode(props.nodeModel)) {
+    set(props.nodeModel.properties.node_data, 'is_return', true)
+  }
   set(props.nodeModel, 'validate', validate)
 })
 </script>
