@@ -130,8 +130,10 @@ const validate = () => {
 }
 
 onMounted(() => {
-  if (isLastNode(props.nodeModel)) {
-    set(props.nodeModel.properties.node_data, 'is_result', true)
+  if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
+    if (isLastNode(props.nodeModel)) {
+      set(props.nodeModel.properties.node_data, 'is_result', true)
+    }
   }
 
   set(props.nodeModel, 'validate', validate)
