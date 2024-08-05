@@ -42,7 +42,7 @@
               </AppAvatar>
             </div>
             <div class="content">
-              <div class="text break-all">
+              <div class="text break-all pre-wrap">
                 {{ item.problem_text }}
               </div>
             </div>
@@ -607,7 +607,7 @@ watch(
 
 onMounted(() => {
   setTimeout(() => {
-    if (quickInputRef.value) {
+    if (quickInputRef.value && mode === 'embed') {
       quickInputRef.value.textarea.style.height = '0'
     }
   }, 1800)

@@ -104,7 +104,7 @@
                     </div>
                     <div class="card-never border-r-4 mt-8">
                       <h5 class="p-8-12">本次对话</h5>
-                      <div class="p-8-12 border-t-dashed lighter pre-line">
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.question || '-' }}
                       </div>
                     </div>

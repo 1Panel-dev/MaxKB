@@ -20,10 +20,10 @@ const props = defineProps({
 })
 
 function zoomIn() {
-  props.lf?.zoom(true)
+  props.lf?.zoom(true, [0, 0])
 }
 function zoomOut() {
-  props.lf?.zoom(false)
+  props.lf?.zoom(false, [0, 0])
 }
 function fitView() {
   props.lf?.resetZoom()
