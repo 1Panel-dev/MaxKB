@@ -42,7 +42,7 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <div class="mt-8 white-space">
+            <div class="mt-8 pre-wrap">
               {{ source2 }}
             </div>
           </div>
@@ -109,9 +109,6 @@ defineExpose({ open })
     font-size: 13px;
     white-space: pre;
     height: 180px;
-    .white-space {
-      white-space: pre-wrap;
-    }
   }
 }
 </style>

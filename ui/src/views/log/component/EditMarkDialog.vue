@@ -38,7 +38,7 @@
             </el-input>
           </el-form-item>
         </el-form>
-        <span v-else class="pre-line">{{ form?.content }}</span>
+        <span v-else class="pre-wrap">{{ form?.content }}</span>
       </div>
     </el-scrollbar>
 

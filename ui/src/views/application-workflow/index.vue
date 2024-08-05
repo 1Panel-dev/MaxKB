@@ -36,7 +36,7 @@
             @mousedown="onmousedown(item)"
           >
             <component :is="iconComponent(`${item.type}-icon`)" class="mr-8 mt-4" :size="32" />
-            <div class="pre-line">
+            <div class="pre-wrap">
               <div class="lighter">{{ item.label }}</div>
               <el-text type="info" size="small">{{ item.text }}</el-text>
             </div>
