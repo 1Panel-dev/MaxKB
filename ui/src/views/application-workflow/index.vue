@@ -114,6 +114,7 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
+import { hasPermission } from '@/utils/permission'
 
 const { user, application } = useStore()
 const router = useRouter()
@@ -250,7 +251,9 @@ const closeInterval = () => {
 onMounted(() => {
   getDetail()
   // 初始化定时任务
-  initInterval()
+  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND')) {
+    initInterval()
+  }
 })
 
 onBeforeUnmount(() => {
