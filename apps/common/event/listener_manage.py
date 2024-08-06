@@ -110,11 +110,16 @@ class ListenerManagement:
     @embedding_poxy
     def embedding_by_paragraph_data_list(data_list, paragraph_id_list, embedding_model: Embeddings):
         max_kb.info(f'开始--->向量化段落:{paragraph_id_list}')
+        status = Status.success
         try:
             # 删除段落
             VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_id_list)
+
+            def is_save_function():
+                return QuerySet(Paragraph).filter(id__in=paragraph_id_list).exists()
+
             # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model)
+            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
         except Exception as e:
             max_kb_error.error(f'向量化段落:{paragraph_id_list}出现错误{str(e)}{traceback.format_exc()}')
             status = Status.error
@@ -141,8 +146,12 @@ class ListenerManagement:
                     os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
             # 删除段落
             VectorStore.get_embedding_vector().delete_by_paragraph_id(paragraph_id)
+
+            def is_save_function():
+                return QuerySet(Paragraph).filter(id=paragraph_id).exists()
+
             # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model)
+            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
         except Exception as e:
             max_kb_error.error(f'向量化段落:{paragraph_id}出现错误{str(e)}{traceback.format_exc()}')
             status = Status.error
@@ -175,8 +184,12 @@ class ListenerManagement:
                     os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
             # 删除文档向量数据
             VectorStore.get_embedding_vector().delete_by_document_id(document_id)
+
+            def is_save_function():
+                return QuerySet(Document).filter(id=document_id).exists()
+
             # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model)
+            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
         except Exception as e:
             max_kb_error.error(f'向量化文档:{document_id}出现错误{str(e)}{traceback.format_exc()}')
             status = Status.error
