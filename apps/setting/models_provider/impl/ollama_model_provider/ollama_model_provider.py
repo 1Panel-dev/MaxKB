@@ -113,9 +113,10 @@ model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_
 
 def get_base_url(url: str):
     parse = urlparse(url)
-    return ParseResult(scheme=parse.scheme, netloc=parse.netloc, path='', params='',
-                       query='',
-                       fragment='').geturl()
+    result_url = ParseResult(scheme=parse.scheme, netloc=parse.netloc, path=parse.path, params='',
+                             query='',
+                             fragment='').geturl()
+    return result_url[:-1] if result_url.endswith("/") else result_url
 
 
 def convert_to_down_model_chunk(row_str: str, chunk_index: int):
