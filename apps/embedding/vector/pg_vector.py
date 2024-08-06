@@ -55,7 +55,7 @@ class PGVector(BaseVectorStore):
         embedding.save()
         return True
 
-    def _batch_save(self, text_list: List[Dict], embedding: Embeddings):
+    def _batch_save(self, text_list: List[Dict], embedding: Embeddings, is_save_function):
         texts = [row.get('text') for row in text_list]
         embeddings = embedding.embed_documents(texts)
         embedding_list = [Embedding(id=uuid.uuid1(),
@@ -68,7 +68,8 @@ class PGVector(BaseVectorStore):
                                     embedding=embeddings[index],
                                     search_vector=to_ts_vector(text_list[index]['text'])) for index in
                           range(0, len(text_list))]
-        QuerySet(Embedding).bulk_create(embedding_list) if len(embedding_list) > 0 else None
+        if is_save_function():
+            QuerySet(Embedding).bulk_create(embedding_list) if len(embedding_list) > 0 else None
         return True
 
     def hit_test(self, query_text, dataset_id_list: list[str], exclude_document_id_list: list[str], top_number: int,
