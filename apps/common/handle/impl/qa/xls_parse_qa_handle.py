@@ -31,6 +31,7 @@ def handle_sheet(file_name, sheet):
         problem_list = [{'content': p[0:255]} for p in problem.split('\n') if len(p.strip()) > 0]
         title = get_row_value(row, title_row_index_dict, 'title')
         title = str(title) if title is not None else ''
+        content = str(content)
         paragraph_list.append({'title': title[0:255],
                                'content': content[0:4096],
                                'problem_list': problem_list})
