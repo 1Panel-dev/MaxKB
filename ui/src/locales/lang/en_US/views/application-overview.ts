@@ -48,10 +48,10 @@ export default {
       upload: 'Upload',
       default: 'Default Logo',
       custom: 'Custom',
-      sizeTip: 'Suggested size 32*32, supports ico, png, size no more than 200KB',
+      sizeTip: 'Suggested size 32*32, supports jpg, png, gif, size no more than 10 M',
       cancel: 'Cancel',
       save: 'Save',
-      fileSizeExceeded: 'File size exceeds 200KB',
+      fileSizeExceeded: 'File size exceeds 10 M',
       setSuccess: 'Setting Successful',
       uploadImagePrompt: 'Please upload an image'
     },
