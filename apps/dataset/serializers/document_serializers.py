@@ -365,7 +365,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if document.type != Type.web:
                 return True
             try:
-                document.status = Status.embedding
+                document.status = Status.queue_up
                 document.save()
                 source_url = document.meta.get('source_url')
                 selector_list = document.meta.get('selector').split(
