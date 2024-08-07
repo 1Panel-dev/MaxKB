@@ -13,13 +13,13 @@ from django.http import HttpResponse
 from rest_framework import serializers
 
 from common.exception.app_exception import NotFound404
-from common.field.common import UploadedFileField
+from common.field.common import UploadedImageField
 from common.util.field_message import ErrMessage
 from dataset.models import Image
 
 
 class ImageSerializer(serializers.Serializer):
-    image = UploadedFileField(required=True, error_messages=ErrMessage.file("图片"))
+    image = UploadedImageField(required=True, error_messages=ErrMessage.image("图片"))
 
     def upload(self, with_valid=True):
         if with_valid:
