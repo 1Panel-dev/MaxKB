@@ -65,7 +65,7 @@ class ModelSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
-        name = serializers.CharField(required=False, max_length=20,
+        name = serializers.CharField(required=False, max_length=64,
                                      error_messages=ErrMessage.char("模型名称"))
 
         model_type = serializers.CharField(required=False, error_messages=ErrMessage.char("模型类型"))
@@ -99,7 +99,7 @@ class ModelSerializer(serializers.Serializer):
     class Edit(serializers.Serializer):
         user_id = serializers.CharField(required=False, error_messages=ErrMessage.uuid("用户id"))
 
-        name = serializers.CharField(required=False, max_length=20,
+        name = serializers.CharField(required=False, max_length=64,
                                      error_messages=ErrMessage.char("模型名称"))
 
         model_type = serializers.CharField(required=False, error_messages=ErrMessage.char("模型类型"))
@@ -142,7 +142,7 @@ class ModelSerializer(serializers.Serializer):
     class Create(serializers.Serializer):
         user_id = serializers.CharField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
-        name = serializers.CharField(required=True, max_length=20, error_messages=ErrMessage.char("模型名称"))
+        name = serializers.CharField(required=True, max_length=64, error_messages=ErrMessage.char("模型名称"))
 
         provider = serializers.CharField(required=True, error_messages=ErrMessage.char("供应商"))
 
