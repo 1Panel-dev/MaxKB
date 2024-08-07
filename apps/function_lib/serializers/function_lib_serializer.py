@@ -11,8 +11,9 @@ import uuid
 from django.db.models import QuerySet
 from rest_framework import serializers
 
-from common.db.search import native_page_search, page_search
+from common.db.search import page_search
 from common.util.field_message import ErrMessage
+from common.util.function_code import exec_code
 from function_lib.models.function import FunctionLib
 
 
@@ -26,7 +27,13 @@ class FunctionLibModelSerializer(serializers.ModelSerializer):
 class FunctionLibInputField(serializers.Serializer):
     name = serializers.CharField(required=True, error_messages=ErrMessage.char('变量名'))
     is_required = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("是否必填"))
+    type = serializers.CharField(required=True, error_messages=ErrMessage.char("类型"))
     source = serializers.CharField(required=True, error_messages=ErrMessage.char("来源"))
+
+
+class DebugField(serializers.Serializer):
+    name = serializers.CharField(required=True, error_messages=ErrMessage.char('变量名'))
+    value = serializers.CharField(required=True, error_messages=ErrMessage.char("变量值"))
 
 
 class EditFunctionLib(serializers.Serializer):
@@ -100,7 +107,12 @@ class FunctionLibSerializer(serializers.Serializer):
         def debug(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
+            exec_code(function_lib.code, self.input_field_list_to_params(function_lib.input_field_list))
 
+        @staticmethod
+        def input_field_list_to_params(input_field_list):
+            return {field.get('name'): field.get('value') for field in input_field_list}
 
         def one(self, with_valid=True):
             if with_valid:
