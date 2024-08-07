@@ -27,7 +27,7 @@ def get_level_block(text, level_content_list, level_content_index, cursor):
         level_content_list) else None
     start_index = text.index(start_content, cursor)
     end_index = text.index(next_content, start_index + 1) if next_content is not None else len(text)
-    return text[start_index+len(start_content):end_index], end_index
+    return text[start_index + len(start_content):end_index], end_index
 
 
 def to_tree_obj(content, state='title'):
@@ -303,17 +303,20 @@ class SplitModel:
             level_content_list.insert(0, to_tree_obj(""))
 
         cursor = 0
-        for i in range(len(level_content_list)):
-            block, cursor = get_level_block(text, level_content_list, i, cursor)
+        level_title_content_list = [item for item in level_content_list if item.get('state') == 'title']
+        for i in range(len(level_title_content_list)):
+            start_content: str = level_title_content_list[i].get('content')
+            if cursor < text.index(start_content, cursor):
+                level_content_list.insert(0, to_tree_obj(text[cursor:   text.index(start_content, cursor)], 'block'))
+            block, cursor = get_level_block(text, level_title_content_list, i, cursor)
             if len(block) == 0:
-                level_content_list[i]['children'] = [to_tree_obj("", "block")]
                 continue
             children = self.parse_to_tree(text=block, index=index + 1)
-            level_content_list[i]['children'] = children
+            level_title_content_list[i]['children'] = children
             first_child_idx_in_block = block.lstrip().index(children[0]["content"].lstrip())
             if first_child_idx_in_block != 0:
                 inner_children = self.parse_to_tree(block[:first_child_idx_in_block], index + 1)
-                level_content_list[i]['children'].extend(inner_children)
+                level_title_content_list[i]['children'].extend(inner_children)
         return level_content_list
 
     def parse(self, text: str):
