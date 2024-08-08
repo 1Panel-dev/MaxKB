@@ -463,6 +463,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             dataset = DataSet(
                 **{'id': dataset_id, 'name': instance.get("name"), 'desc': instance.get('desc'), 'user_id': user_id,
                    'type': Type.web,
+                   'embedding_mode_id': instance.get('embedding_mode_id'),
                    'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector'),
                             'embedding_mode_id': instance.get('embedding_mode_id')}})
             dataset.save()
