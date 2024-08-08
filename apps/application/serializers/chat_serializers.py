@@ -28,7 +28,6 @@ from application.models.api_key_model import ApplicationAccessToken
 from application.serializers.application_serializers import ModelDatasetAssociation, DatasetSettingSerializer, \
     ModelSettingSerializer
 from application.serializers.chat_message_serializers import ChatInfo
-from common.config.embedding_config import ModelManage
 from common.constants.permission_constants import RoleConstants
 from common.db.search import native_search, native_page_search, page_search, get_dynamics_model
 from common.event import ListenerManagement
@@ -40,8 +39,6 @@ from common.util.lock import try_lock, un_lock
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
 from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
-from setting.models import Model
-from setting.models_provider import get_model
 from smartdoc.conf import PROJECT_DIR
 
 chat_cache = caches['chat_cache']
@@ -312,7 +309,8 @@ class ChatSerializers(serializers.Serializer):
             chat_id = str(uuid.uuid1())
             model_id = self.data.get('model_id')
             dataset_id_list = self.data.get('dataset_id_list')
-            application = Application(id=None, dialogue_number=3, model_id=model_id,
+            dialogue_number = 3 if self.data.get('multiple_rounds_dialogue', False) else 0
+            application = Application(id=None, dialogue_number=dialogue_number, model_id=model_id,
                                       dataset_setting=self.data.get('dataset_setting'),
                                       model_setting=self.data.get('model_setting'),
                                       problem_optimization=self.data.get('problem_optimization'),

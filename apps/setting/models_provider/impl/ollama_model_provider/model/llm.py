@@ -18,9 +18,10 @@ from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 def get_base_url(url: str):
     parse = urlparse(url)
-    return ParseResult(scheme=parse.scheme, netloc=parse.netloc, path='', params='',
-                       query='',
-                       fragment='').geturl()
+    result_url = ParseResult(scheme=parse.scheme, netloc=parse.netloc, path=parse.path, params='',
+                             query='',
+                             fragment='').geturl()
+    return result_url[:-1] if result_url.endswith("/") else result_url
 
 
 class OllamaChatModel(MaxKBBaseModel, ChatOpenAI):
@@ -28,7 +29,8 @@ class OllamaChatModel(MaxKBBaseModel, ChatOpenAI):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         api_base = model_credential.get('api_base', '')
         base_url = get_base_url(api_base)
-        return OllamaChatModel(model=model_name, openai_api_base=(base_url + '/v1'),
+        base_url = base_url if base_url.endswith('/v1') else (base_url + '/v1')
+        return OllamaChatModel(model=model_name, openai_api_base=base_url,
                                openai_api_key=model_credential.get('api_key'))
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:

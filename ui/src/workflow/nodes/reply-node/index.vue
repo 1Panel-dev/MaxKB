@@ -16,7 +16,12 @@
           <template #label>
             <div class="flex-between">
               <span>回复内容</span>
-              <el-select v-model="form_data.reply_type" size="small" style="width: 85px">
+              <el-select
+                :teleported="false"
+                v-model="form_data.reply_type"
+                size="small"
+                style="width: 85px"
+              >
                 <el-option label="引用变量" value="referencing" />
                 <el-option label="自定义" value="content" />
               </el-select>
@@ -24,6 +29,9 @@
           </template>
           <MdEditor
             v-if="form_data.reply_type === 'content'"
+            @wheel="wheel"
+            @keydown="isKeyDown = true"
+            @keyup="isKeyDown = false"
             class="reply-node-editor"
             style="height: 150px"
             v-model="form_data.content"
@@ -84,6 +92,15 @@ import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 
 const props = defineProps<{ nodeModel: any }>()
+const isKeyDown = ref(false)
+const wheel = (e: any) => {
+  if (isKeyDown.value) {
+    e.preventDefault()
+  } else {
+    e.stopPropagation()
+    return true
+  }
+}
 const form = {
   reply_type: 'content',
   content: '',

@@ -42,15 +42,15 @@ export default {
       disabledSuccess: '已禁用'
     },
     EditAvatarDialog: {
-      title: '编辑logo',
+      title: '应用头像',
       customizeUpload: '自定义上传',
       upload: '上传',
       default: '默认logo',
       custom: '自定义',
-      sizeTip: '建议尺寸 32*32，支持 ico、png，大小不超过200KB',
+      sizeTip: '建议尺寸 32*32，支持 JPG、PNG, GIF，大小不超过 10 MB',
       cancel: '取消',
       save: '保存',
-      fileSizeExceeded: '文件大小超过 200KB',
+      fileSizeExceeded: '文件大小超过 10 MB',
       setSuccess: '设置成功',
       uploadImagePrompt: '请上传一张图片'
     },

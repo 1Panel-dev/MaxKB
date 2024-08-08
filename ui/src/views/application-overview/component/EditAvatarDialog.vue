@@ -1,9 +1,12 @@
 <template>
-  <el-dialog :title="$t('views.applicationOverview.appInfo.EditAvatarDialog.title')" v-model="dialogVisible">
+  <el-dialog
+    :title="$t('views.applicationOverview.appInfo.EditAvatarDialog.title')"
+    v-model="dialogVisible"
+  >
     <el-radio-group v-model="radioType" class="radio-block mb-16">
       <div>
         <el-radio value="default">
-          <p>{{$t('views.applicationOverview.appInfo.EditAvatarDialog.default')}}</p>
+          <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.default') }}</p>
           <AppAvatar
             v-if="detail?.name"
             :name="detail?.name"
@@ -16,7 +19,7 @@
       </div>
       <div class="mt-8">
         <el-radio value="custom">
-          <p>{{$t('views.applicationOverview.appInfo.EditAvatarDialog.customizeUpload')}}</p>
+          <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.customizeUpload') }}</p>
           <div class="flex mt-8">
             <AppAvatar
               v-if="fileURL"
@@ -35,19 +38,25 @@
               accept="image/*"
               :on-change="onChange"
             >
-              <el-button icon="Upload" :disabled="radioType !== 'custom'">{{$t('views.applicationOverview.appInfo.EditAvatarDialog.upload')}}</el-button>
+              <el-button icon="Upload" :disabled="radioType !== 'custom'">{{
+                $t('views.applicationOverview.appInfo.EditAvatarDialog.upload')
+              }}</el-button>
             </el-upload>
           </div>
           <div class="el-upload__tip info mt-16">
-            {{$t('views.applicationOverview.appInfo.EditAvatarDialog.sizeTip')}}
+            {{ $t('views.applicationOverview.appInfo.EditAvatarDialog.sizeTip') }}
           </div>
         </el-radio>
       </div>
     </el-radio-group>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> {{$t('views.applicationOverview.appInfo.EditAvatarDialog.cancel')}}</el-button>
-        <el-button type="primary" @click="submit" :loading="loading"> {{$t('views.applicationOverview.appInfo.EditAvatarDialog.save')}}</el-button>
+        <el-button @click.prevent="dialogVisible = false">
+          {{ $t('views.applicationOverview.appInfo.EditAvatarDialog.cancel') }}</el-button
+        >
+        <el-button type="primary" @click="submit" :loading="loading">
+          {{ $t('views.applicationOverview.appInfo.EditAvatarDialog.save') }}</el-button
+        >
       </span>
     </template>
   </el-dialog>
@@ -94,17 +103,16 @@ const open = (data: any) => {
 }
 
 const onChange = (file: any) => {
-  //1、判断文件大小是否合法，文件限制不能大于 200KB
-  const isLimit = file?.size / 1024 < 200
+  //1、判断文件大小是否合法，文件限制不能大于10MB
+  const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
     // @ts-ignore
     MsgError(t('views.applicationOverview.appInfo.EditAvatarDialog.fileSizeExceeded'))
     return false
-  } else { 
+  } else {
     iconFile.value = file
     fileURL.value = URL.createObjectURL(file.raw)
   }
-
 }
 
 function submit() {

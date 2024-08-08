@@ -47,7 +47,7 @@
             }}</el-button>
             <template #tip>
               <div class="el-upload__tip info" style="margin-top: 0">
-                建议尺寸 32*32，支持 JPG、PNG，大小不超过 200 KB
+                建议尺寸 32*32，支持 JPG、PNG, GIF，大小不超过 10 MB
               </div>
             </template>
           </el-upload>
@@ -84,7 +84,7 @@
             }}</el-button>
             <template #tip>
               <div class="el-upload__tip info" style="margin-top: 0">
-                建议尺寸 32*32，支持 JPG、PNG，大小不超过 200 KB
+                建议尺寸 32*32，支持 JPG、PNG, GIF，大小不超过 10 MB
               </div>
             </template>
           </el-upload>
@@ -178,8 +178,8 @@ function resetForm() {
 }
 
 const onChange = (file: any, fileList: UploadFiles, attr: string) => {
-  //1、判断文件大小是否合法，文件限制不能大于 200KB
-  const isLimit = file?.size / 1024 < 200
+  //1、判断文件大小是否合法，文件限制不能大于 10 MB
+  const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
     // @ts-ignore
     MsgError(t('views.applicationOverview.appInfo.EditAvatarDialog.fileSizeExceeded'))
