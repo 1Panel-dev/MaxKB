@@ -36,6 +36,10 @@ class DebugField(serializers.Serializer):
     value = serializers.CharField(required=True, error_messages=ErrMessage.char("变量值"))
 
 
+class DebugInstance(serializers.Serializer):
+    debug_field_list = DebugField(required=True, many=True)
+
+
 class EditFunctionLib(serializers.Serializer):
     name = serializers.CharField(required=False, error_messages=ErrMessage.char("函数名称"))
 
@@ -104,15 +108,15 @@ class FunctionLibSerializer(serializers.Serializer):
             QuerySet(FunctionLib).filter(id=self.data.get('id')).update(**edit_dict)
             return self.one(False)
 
-        def debug(self, with_valid=True):
+        def debug(self, debug_instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+                DebugInstance(data=debug_instance).is_valid(raise_exception=True)
             function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
-            exec_code(function_lib.code, self.input_field_list_to_params(function_lib.input_field_list))
-
-        @staticmethod
-        def input_field_list_to_params(input_field_list):
-            return {field.get('name'): field.get('value') for field in input_field_list}
+            params = {field.get('name'): field.get('value') for field in debug_instance.get('input_field_list')}
+            result = {}
+            exec_result = exec_code(function_lib.code, params)
+            return exec_result
 
         def one(self, with_valid=True):
             if with_valid:
