@@ -132,16 +132,19 @@ class FunctionLibSerializer(serializers.Serializer):
             debug_field_list = debug_instance.get('debug_field_list')
             params = {field.get('name'): self.convert_value(field.get('name'), field.get('value'), field.get('type'))
                       for field in
-                      [{'value': self.get_field(debug_field_list, field.get('name')).get('value'), **field} for field in
+                      [{'value': self.get_field_value(debug_field_list, field.get('name'), field.get('is_required')),
+                        **field} for field in
                        function_lib.input_field_list]}
             return exec_code(function_lib.code, params)
 
         @staticmethod
-        def get_field(debug_field_list, name):
+        def get_field_value(debug_field_list, name, is_required):
             result = [field for field in debug_field_list if field.get('name') == name]
             if len(result) > 0:
                 return result[-1]
-            raise AppApiException(500, f"{name}字段未设置值")
+            if is_required:
+                raise AppApiException(500, f"{name}字段未设置值")
+            return None
 
         @staticmethod
         def convert_value(name: str, value: str, _type):
