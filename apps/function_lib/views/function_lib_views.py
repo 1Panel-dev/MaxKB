@@ -49,12 +49,12 @@ class FunctionLibView(APIView):
         @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary="调试函数",
                              operation_id="调试函数",
-                             request_body=FunctionLibApi.Edit.get_request_body_api(),
+                             request_body=FunctionLibApi.Debug.get_request_body_api(),
                              tags=['函数库'])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
         def post(self, request: Request, function_lib_id: str):
             return result.success(
-                FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).edit(
+                FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).debug(
                     request.data))
 
     class Operate(APIView):

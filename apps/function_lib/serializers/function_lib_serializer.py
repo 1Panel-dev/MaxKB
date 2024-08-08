@@ -6,12 +6,16 @@
     @date：2024/8/2 17:35
     @desc:
 """
+import json
+import re
 import uuid
 
+from django.core import validators
 from django.db.models import QuerySet
 from rest_framework import serializers
 
 from common.db.search import page_search
+from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
 from common.util.function_code import exec_code
 from function_lib.models.function import FunctionLib
@@ -27,8 +31,14 @@ class FunctionLibModelSerializer(serializers.ModelSerializer):
 class FunctionLibInputField(serializers.Serializer):
     name = serializers.CharField(required=True, error_messages=ErrMessage.char('变量名'))
     is_required = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("是否必填"))
-    type = serializers.CharField(required=True, error_messages=ErrMessage.char("类型"))
-    source = serializers.CharField(required=True, error_messages=ErrMessage.char("来源"))
+    type = serializers.CharField(required=True, error_messages=ErrMessage.char("类型"), validators=[
+        validators.RegexValidator(regex=re.compile("^string|int|dict|array|float$"),
+                                  message="字段只支持string|int|dict|array|float", code=500)
+    ])
+    source = serializers.CharField(required=True, error_messages=ErrMessage.char("来源"), validators=[
+        validators.RegexValidator(regex=re.compile("^custom|reference$"),
+                                  message="字段只支持custom|reference", code=500)
+    ])
 
 
 class DebugField(serializers.Serializer):
@@ -50,11 +60,23 @@ class EditFunctionLib(serializers.Serializer):
     input_field_list = FunctionLibInputField(required=False, many=True)
 
 
+class CreateFunctionLib(serializers.Serializer):
+    name = serializers.CharField(required=True, error_messages=ErrMessage.char("函数名称"))
+
+    desc = serializers.CharField(required=False, error_messages=ErrMessage.char("函数描述"))
+
+    code = serializers.CharField(required=True, error_messages=ErrMessage.char("函数内容"))
+
+    input_field_list = FunctionLibInputField(required=True, many=True)
+
+
 class FunctionLibSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
-        name = serializers.CharField(required=False, error_messages=ErrMessage.char("函数名称"))
+        name = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                     error_messages=ErrMessage.char("函数名称"))
 
-        desc = serializers.CharField(required=False, error_messages=ErrMessage.char("函数描述"))
+        desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                     error_messages=ErrMessage.char("函数描述"))
 
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
@@ -78,20 +100,14 @@ class FunctionLibSerializer(serializers.Serializer):
                                post_records_handler=lambda row: FunctionLibModelSerializer(row).data)
 
     class Create(serializers.Serializer):
-        name = serializers.CharField(required=True, error_messages=ErrMessage.char("函数名称"))
 
-        desc = serializers.CharField(required=False, error_messages=ErrMessage.char("函数描述"))
-
-        code = serializers.CharField(required=True, error_messages=ErrMessage.char("函数内容"))
-
-        input_field_list = FunctionLibInputField(required=True, many=True)
-
-        def insert(self, with_valid=True):
+        def insert(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            function_lib = FunctionLib(id=uuid.uuid1(), name=self.data.get('name'), desc=self.data.get('desc'),
-                                       code=self.data.get('code'),
-                                       input_field_list=self.data.get('input_field_list'))
+                CreateFunctionLib(data=instance).is_valid(raise_exception=True)
+            function_lib = FunctionLib(id=uuid.uuid1(), name=instance.get('name'), desc=instance.get('desc'),
+                                       code=instance.get('code'),
+                                       input_field_list=instance.get('input_field_list'))
             function_lib.save()
             return FunctionLibModelSerializer(function_lib).data
 
@@ -113,10 +129,34 @@ class FunctionLibSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 DebugInstance(data=debug_instance).is_valid(raise_exception=True)
             function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
-            params = {field.get('name'): field.get('value') for field in debug_instance.get('input_field_list')}
-            result = {}
-            exec_result = exec_code(function_lib.code, params)
-            return exec_result
+            debug_field_list = debug_instance.get('debug_field_list')
+            params = {field.get('name'): self.convert_value(field.get('name'), field.get('value'), field.get('type'))
+                      for field in
+                      [{'value': self.get_field(debug_field_list, field.get('name')).get('value'), **field} for field in
+                       function_lib.input_field_list]}
+            return exec_code(function_lib.code, params)
+
+        @staticmethod
+        def get_field(debug_field_list, name):
+            result = [field for field in debug_field_list if field.get('name') == name]
+            if len(result) > 0:
+                return result[-1]
+            raise AppApiException(500, f"{name}字段未设置值")
+
+        @staticmethod
+        def convert_value(name: str, value: str, _type):
+            try:
+                if _type == 'int':
+                    return int(value)
+                if _type == 'float':
+                    return float(value)
+                if _type == 'dict':
+                    return json.loads(value)
+                if _type == 'array':
+                    return json.loads(value)
+                return value
+            except Exception as e:
+                raise AppApiException(500, f'字段:{name}类型:{_type}值:{value}类型转换错误')
 
         def one(self, with_valid=True):
             if with_valid:
