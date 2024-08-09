@@ -189,8 +189,12 @@ function getList() {
 }
 
 onMounted(() => {
+  console.log(router)
   getList()
 })
+
+
+
 </script>
 <style lang="scss" scoped>
 .application-card {

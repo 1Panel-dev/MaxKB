@@ -8,7 +8,7 @@ const prefix = '/auth'
  * 获取认证设置
  */
 const getAuthSetting: (auth_type: string, loading?: Ref<boolean>) => Promise<Result<any>> = (auth_type, loading) => {
-    return get(`${prefix}/${auth_type}/info`, undefined, loading)
+    return get(`${prefix}/${auth_type}/detail`, undefined, loading)
 }
 
 /**

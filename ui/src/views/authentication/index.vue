@@ -20,6 +20,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import LDAP from './component/LDAP.vue'
+import CAS from './component/CAS.vue'
+import OIDC from './component/OIDC.vue'
 import { t } from '@/locales'
 import useStore from '@/stores'
 
@@ -32,6 +34,16 @@ const tabList = [
     label: t('login.ldap.title'),
     name: 'LDAP',
     component: LDAP
+  },
+  {
+    label: t('login.cas.title'),
+    name: 'CAS',
+    component: CAS
+  },
+  {
+    label: t('login.oidc.title'),
+    name: 'OIDC',
+    component: OIDC
   }
 ]
 
