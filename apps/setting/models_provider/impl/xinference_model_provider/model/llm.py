@@ -1,17 +1,7 @@
 # coding=utf-8
-"""
-    @project: maxkb
-    @Author：虎
-    @file： llm.py
-    @date：2024/3/6 11:48
-    @desc:
-"""
+
 from typing import List, Dict
 from urllib.parse import urlparse, ParseResult
-
-from langchain_core.messages import BaseMessage, get_buffer_string
-
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
@@ -24,11 +14,26 @@ def get_base_url(url: str):
     return result_url[:-1] if result_url.endswith("/") else result_url
 
 
-class OllamaChatModel(MaxKBBaseModel, BaseChatOpenAI):
+class XinferenceChatModel(MaxKBBaseModel, BaseChatOpenAI):
+
+    @staticmethod
+    def is_cache_model():
+        return False
+
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         api_base = model_credential.get('api_base', '')
         base_url = get_base_url(api_base)
         base_url = base_url if base_url.endswith('/v1') else (base_url + '/v1')
-        return OllamaChatModel(model=model_name, openai_api_base=base_url,
-                               openai_api_key=model_credential.get('api_key'))
+        optional_params = {}
+        if 'max_tokens' in model_kwargs:
+            optional_params['max_tokens'] = model_kwargs['max_tokens']
+        if 'temperature' in model_kwargs:
+            optional_params['temperature'] = model_kwargs['temperature']
+        return XinferenceChatModel(
+            model=model_name,
+            openai_api_base=base_url,
+            openai_api_key=model_credential.get('api_key'),
+            streaming=model_kwargs.get('streaming', False),
+            **optional_params
+        )

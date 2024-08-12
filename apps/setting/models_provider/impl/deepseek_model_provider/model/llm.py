@@ -8,14 +8,11 @@
 """
 from typing import List, Dict
 
-from langchain_core.messages import BaseMessage, get_buffer_string
-from langchain_openai import ChatOpenAI
-
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
+from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
-class DeepSeekChatModel(MaxKBBaseModel, ChatOpenAI):
+class DeepSeekChatModel(MaxKBBaseModel, BaseChatOpenAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         deepseek_chat_open_ai = DeepSeekChatModel(
@@ -25,10 +22,3 @@ class DeepSeekChatModel(MaxKBBaseModel, ChatOpenAI):
         )
         return deepseek_chat_open_ai
 
-    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        tokenizer = TokenizerManage.get_tokenizer()
-        return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
-
-    def get_num_tokens(self, text: str) -> int:
-        tokenizer = TokenizerManage.get_tokenizer()
-        return len(tokenizer.encode(text))
