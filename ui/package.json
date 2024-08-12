@@ -18,6 +18,7 @@
     "@logicflow/extension": "^1.2.27",
     "@vueuse/core": "^10.9.0",
     "axios": "^0.28.0",
+    "codemirror-editor-vue3": "^2.7.0",
     "cropperjs": "^1.6.2",
     "echarts": "^5.5.0",
     "element-plus": "^2.5.6",
