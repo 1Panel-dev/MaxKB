@@ -49,6 +49,7 @@ gevent = "^24.2.1"
 boto3 = "^1.34.151"
 langchain-aws = "^0.1.13"
 tencentcloud-sdk-python = "^3.0.1205"
+xinference-client = "^0.14.0.post1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

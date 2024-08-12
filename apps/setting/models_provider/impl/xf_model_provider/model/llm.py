@@ -6,16 +6,15 @@
     @date：2024/04/19 15:55
     @desc:
 """
-
+import json
 from typing import List, Optional, Any, Iterator, Dict
 
-from langchain_community.chat_models import ChatSparkLLM
-from langchain_community.chat_models.sparkllm import _convert_message_to_dict, _convert_delta_to_message_chunk
+from langchain_community.chat_models.sparkllm import _convert_message_to_dict, _convert_delta_to_message_chunk, \
+    ChatSparkLLM
 from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.messages import BaseMessage, AIMessageChunk, get_buffer_string
+from langchain_core.messages import BaseMessage, AIMessageChunk
 from langchain_core.outputs import ChatGenerationChunk
 
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 
@@ -31,16 +30,19 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
             spark_api_key=model_credential.get('spark_api_key'),
             spark_api_secret=model_credential.get('spark_api_secret'),
             spark_api_url=model_credential.get('spark_api_url'),
-            spark_llm_domain=model_name
+            spark_llm_domain=model_name,
+            temperature=model_kwargs.get('temperature', 0.5),
+            max_tokens=model_kwargs.get('max_tokens', 5),
         )
 
+    def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
+        return self.__dict__.get('_last_generation_info')
+
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        tokenizer = TokenizerManage.get_tokenizer()
-        return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
+        return self.get_last_generation_info().get('prompt_tokens', 0)
 
     def get_num_tokens(self, text: str) -> int:
-        tokenizer = TokenizerManage.get_tokenizer()
-        return len(tokenizer.encode(text))
+        return self.get_last_generation_info().get('completion_tokens', 0)
 
     def _stream(
             self,
@@ -58,11 +60,17 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
             True,
         )
         for content in self.client.subscribe(timeout=self.request_timeout):
-            if "data" not in content:
+            if "data" in content:
+                delta = content["data"]
+                chunk = _convert_delta_to_message_chunk(delta, default_chunk_class)
+                cg_chunk = ChatGenerationChunk(message=chunk)
+            elif "usage" in content:
+                generation_info = content["usage"]
+                self.__dict__.setdefault('_last_generation_info', {}).update(generation_info)
                 continue
-            delta = content["data"]
-            chunk = _convert_delta_to_message_chunk(delta, default_chunk_class)
-            cg_chunk = ChatGenerationChunk(message=chunk)
-            if run_manager:
-                run_manager.on_llm_new_token(str(chunk.content), chunk=cg_chunk)
+            else:
+                continue
+            if cg_chunk is not None:
+                if run_manager:
+                    run_manager.on_llm_new_token(str(cg_chunk.message.content), chunk=cg_chunk)
             yield cg_chunk
