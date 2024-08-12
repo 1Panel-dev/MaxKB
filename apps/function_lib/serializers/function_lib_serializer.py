@@ -66,7 +66,8 @@ class EditFunctionLib(serializers.Serializer):
 class CreateFunctionLib(serializers.Serializer):
     name = serializers.CharField(required=True, error_messages=ErrMessage.char("函数名称"))
 
-    desc = serializers.CharField(required=False, error_messages=ErrMessage.char("函数描述"))
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                 error_messages=ErrMessage.char("函数描述"))
 
     code = serializers.CharField(required=True, error_messages=ErrMessage.char("函数内容"))
 
@@ -89,6 +90,7 @@ class FunctionLibSerializer(serializers.Serializer):
                 query_set = query_set.filter(name=self.data.get('name'))
             if self.data.get('desc') is not None:
                 query_set = query_set.filter(name=self.data.get('desc'))
+            query_set.order_by("-create_time")
             return query_set
 
         def list(self, with_valid=True):
@@ -122,8 +124,8 @@ class FunctionLibSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 EditFunctionLib(data=instance).is_valid(raise_exception=True)
             edit_field_list = ['name', 'desc', 'code', 'input_field_list']
-            edit_dict = {field: instance.get(field) for field in edit_field_list if
-                         field in instance and instance.get('field') is not None}
+            edit_dict = {field: instance.get(field) for field in edit_field_list if (
+                    field in instance and instance.get(field) is not None)}
             QuerySet(FunctionLib).filter(id=self.data.get('id')).update(**edit_dict)
             return self.one(False)
 
