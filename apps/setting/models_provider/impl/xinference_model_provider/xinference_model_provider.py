@@ -508,7 +508,7 @@ class XinferenceModelProvider(IModelProvider):
         return model_info_manage
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='model_xinference_provider', name='Xinference', icon=get_file_content(
+        return ModelProvideInfo(provider='model_xinference_provider', name='Xorbits Inference', icon=get_file_content(
             os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'xinference_model_provider', 'icon',
                          'xinference_icon_svg')))
 
