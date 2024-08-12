@@ -6,21 +6,14 @@
     @date：2024/4/28 11:42
     @desc:
 """
-from typing import List, Dict
 
 from langchain_community.chat_models import ChatZhipuAI
 from langchain_community.chat_models.zhipuai import _truncate_params, _get_jwt_token, connect_sse, \
     _convert_delta_to_message_chunk
-from langchain_core.messages import BaseMessage, get_buffer_string
-
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 import json
-import logging
-import time
-from collections.abc import AsyncIterator, Iterator
-from contextlib import asynccontextmanager, contextmanager
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from collections.abc import Iterator
+from typing import Any, Dict, List, Optional
 
 from langchain_core.callbacks import (
     CallbackManagerForLLMRun,
