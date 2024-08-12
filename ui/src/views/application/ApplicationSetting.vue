@@ -67,6 +67,9 @@
                 <template #label>
                   <div class="flex-between">
                     <span>{{ $t('views.application.applicationForm.form.aiModel.label') }}</span>
+                    <!-- <el-button type="primary" link @click="openAIParamSettingDialog">
+                      {{ $t('views.application.applicationForm.form.paramSetting') }}
+                    </el-button> -->
                   </div>
                 </template>
                 <el-select
@@ -311,6 +314,7 @@
       </el-col>
     </el-row>
 
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
@@ -333,6 +337,7 @@
 import { reactive, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
+import AIModeParamSettingDialog from './component/AIModeParamSettingDialog.vue'
 import ParamSettingDialog from './component/ParamSettingDialog.vue'
 import AddDatasetDialog from './component/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
@@ -358,6 +363,7 @@ const defaultPrompt = t('views.application.prompt.defaultPrompt', {
   question: '{question}'
 })
 
+const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
 const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
@@ -427,6 +433,10 @@ const submit = async (formEl: FormInstance | undefined) => {
       })
     }
   })
+}
+
+const openAIParamSettingDialog = () => {
+  AIModeParamSettingDialogRef.value?.open(applicationForm.value)
 }
 
 const openParamSettingDialog = () => {
