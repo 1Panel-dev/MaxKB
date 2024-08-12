@@ -17,7 +17,9 @@ RUN apt-get update && \
 
 COPY . /opt/maxkb/app
 RUN mkdir -p /opt/maxkb/app /opt/maxkb/model /opt/maxkb/conf && \
-    rm -rf /opt/maxkb/app/ui
+    rm -rf /opt/maxkb/app/ui &&\
+    useradd sandbox && mkdir /opt/maxkb/app/sandbox && chown sandbox:sandbox /opt/maxkb/app/sandbox && chmod 700 /opt/maxkb/app/sandbox \
+
 COPY --from=web-build ui /opt/maxkb/app/ui
 WORKDIR /opt/maxkb/app
 RUN python3 -m venv /opt/py3 && \
@@ -40,7 +42,8 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_DB_USER=root \
     MAXKB_DB_PASSWORD=Password123@postgres \
     MAXKB_EMBEDDING_MODEL_NAME=/opt/maxkb/model/embedding/shibing624_text2vec-base-chinese \
-    MAXKB_EMBEDDING_MODEL_PATH=/opt/maxkb/model/embedding
+    MAXKB_EMBEDDING_MODEL_PATH=/opt/maxkb/model/embedding \
+    MAXKB_SANDBOX=true
 
 WORKDIR /opt/maxkb/app
 COPY --from=stage-build /opt/maxkb /opt/maxkb

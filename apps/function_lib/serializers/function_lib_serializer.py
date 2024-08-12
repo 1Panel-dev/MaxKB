@@ -7,7 +7,6 @@
     @desc:
 """
 import json
-import os
 import re
 import uuid
 
@@ -20,9 +19,9 @@ from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
 from common.util.function_code import FunctionExecutor
 from function_lib.models.function import FunctionLib
-from smartdoc.const import PROJECT_DIR
+from smartdoc.const import CONFIG
 
-function_executor = FunctionExecutor(os.path.join(PROJECT_DIR, 'data', 'result', "function_debug"))
+function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
 
 
 class FunctionLibModelSerializer(serializers.ModelSerializer):

@@ -7,7 +7,6 @@
     @desc:
 """
 import json
-import os
 
 from django.db.models import QuerySet
 
@@ -16,9 +15,9 @@ from application.flow.step_node.function_lib_node.i_function_lib_node import IFu
 from common.exception.app_exception import AppApiException
 from common.util.function_code import FunctionExecutor
 from function_lib.models.function import FunctionLib
-from smartdoc.const import PROJECT_DIR
+from smartdoc.const import CONFIG
 
-function_executor = FunctionExecutor(os.path.join(PROJECT_DIR, 'data', 'result', "function_node"))
+function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
 
 
 def get_field_value(debug_field_list, name, is_required):
