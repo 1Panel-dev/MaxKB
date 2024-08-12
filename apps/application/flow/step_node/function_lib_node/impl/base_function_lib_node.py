@@ -7,14 +7,18 @@
     @desc:
 """
 import json
+import os
 
 from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.function_lib_node.i_function_lib_node import IFunctionLibNode
 from common.exception.app_exception import AppApiException
-from common.util.function_code import exec_code
+from common.util.function_code import FunctionExecutor
 from function_lib.models.function import FunctionLib
+from smartdoc.const import PROJECT_DIR
+
+function_executor = FunctionExecutor(os.path.join(PROJECT_DIR, 'data', 'result', "function_node"))
 
 
 def get_field_value(debug_field_list, name, is_required):
@@ -49,5 +53,5 @@ class BaseFunctionLibNodeNode(IFunctionLibNode):
                   [{'value': get_field_value(input_field_list, field.get('name'), field.get('is_required')), **field}
                    for field in
                    function_lib.input_field_list]}
-        result = exec_code(function_lib.code, params)
+        result = function_executor.exec_code(function_lib.code, params)
         return NodeResult({'result': result}, {})

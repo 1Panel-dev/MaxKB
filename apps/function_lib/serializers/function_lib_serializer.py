@@ -7,6 +7,7 @@
     @desc:
 """
 import json
+import os
 import re
 import uuid
 
@@ -17,8 +18,11 @@ from rest_framework import serializers
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
-from common.util.function_code import exec_code
+from common.util.function_code import FunctionExecutor
 from function_lib.models.function import FunctionLib
+from smartdoc.const import PROJECT_DIR
+
+function_executor = FunctionExecutor(os.path.join(PROJECT_DIR, 'data', 'result', "function_debug"))
 
 
 class FunctionLibModelSerializer(serializers.ModelSerializer):
@@ -135,13 +139,13 @@ class FunctionLibSerializer(serializers.Serializer):
                       [{'value': self.get_field_value(debug_field_list, field.get('name'), field.get('is_required')),
                         **field} for field in
                        function_lib.input_field_list]}
-            return exec_code(function_lib.code, params)
+            return function_executor.exec_code(function_lib.code, params)
 
         @staticmethod
         def get_field_value(debug_field_list, name, is_required):
             result = [field for field in debug_field_list if field.get('name') == name]
             if len(result) > 0:
-                return result[-1]
+                return result[-1].get('value')
             if is_required:
                 raise AppApiException(500, f"{name}字段未设置值")
             return None
