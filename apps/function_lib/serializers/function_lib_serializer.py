@@ -85,12 +85,12 @@ class FunctionLibSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
         def get_query_set(self):
-            query_set = QuerySet(FunctionLib)
+            query_set = QuerySet(FunctionLib).filter(user_id=self.data.get('user_id'))
             if self.data.get('name') is not None:
                 query_set = query_set.filter(name=self.data.get('name'))
             if self.data.get('desc') is not None:
                 query_set = query_set.filter(name=self.data.get('desc'))
-            query_set.order_by("-create_time")
+            query_set = query_set.order_by("-create_time")
             return query_set
 
         def list(self, with_valid=True):
@@ -105,6 +105,7 @@ class FunctionLibSerializer(serializers.Serializer):
                                post_records_handler=lambda row: FunctionLibModelSerializer(row).data)
 
     class Create(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
         def insert(self, instance, with_valid=True):
             if with_valid:
@@ -112,12 +113,19 @@ class FunctionLibSerializer(serializers.Serializer):
                 CreateFunctionLib(data=instance).is_valid(raise_exception=True)
             function_lib = FunctionLib(id=uuid.uuid1(), name=instance.get('name'), desc=instance.get('desc'),
                                        code=instance.get('code'),
+                                       user_id=self.data.get('user_id'),
                                        input_field_list=instance.get('input_field_list'))
             function_lib.save()
             return FunctionLibModelSerializer(function_lib).data
 
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("函数id"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if not QuerySet(FunctionLib).filter(id=self.data.get('id'), user_id=self.data.get('user_id')).exists():
+                raise AppApiException(500, '函数不存在')
 
         def edit(self, instance, with_valid=True):
             if with_valid:
