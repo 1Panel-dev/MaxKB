@@ -46,7 +46,8 @@ class FunctionLibInputField(serializers.Serializer):
 
 class DebugField(serializers.Serializer):
     name = serializers.CharField(required=True, error_messages=ErrMessage.char('变量名'))
-    value = serializers.CharField(required=True, error_messages=ErrMessage.char("变量值"))
+    value = serializers.CharField(required=False, allow_blank=True, allow_null=True,
+                                  error_messages=ErrMessage.char("变量值"))
 
 
 class DebugInstance(serializers.Serializer):
@@ -143,7 +144,8 @@ class FunctionLibSerializer(serializers.Serializer):
                 DebugInstance(data=debug_instance).is_valid(raise_exception=True)
             function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
             debug_field_list = debug_instance.get('debug_field_list')
-            params = {field.get('name'): self.convert_value(field.get('name'), field.get('value'), field.get('type'))
+            params = {field.get('name'): self.convert_value(field.get('name'), field.get('value'), field.get('type'),
+                                                            field.get('is_required'))
                       for field in
                       [{'value': self.get_field_value(debug_field_list, field.get('name'), field.get('is_required')),
                         **field} for field in
@@ -160,7 +162,9 @@ class FunctionLibSerializer(serializers.Serializer):
             return None
 
         @staticmethod
-        def convert_value(name: str, value: str, _type):
+        def convert_value(name: str, value: str, _type: str, is_required: bool):
+            if not is_required and value is None:
+                return None
             try:
                 if _type == 'int':
                     return int(value)
