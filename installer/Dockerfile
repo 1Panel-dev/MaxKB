@@ -52,15 +52,13 @@ ENV LANG=en_US.UTF-8 \
 
 ENV POSTGRES_USER root
 ENV POSTGRES_PASSWORD Password123@postgres
-ENV PIP_TARGET /opt/maxkb/site-packages
+ENV PIP_TARGET /var/lib/postgresql/data/python-packages
 ENV PYTHONPATH $PIP_TARGET:$PYTHONPATH
 
 RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
     cp -f /opt/maxkb/app/installer/run-maxkb.sh /usr/bin/run-maxkb.sh && \
     cp -f /opt/maxkb/app/installer/init.sql /docker-entrypoint-initdb.d
-
-VOLUME [ "$PIP_TARGET" ]
 
 EXPOSE 8080
 
