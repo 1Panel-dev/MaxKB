@@ -42,14 +42,28 @@ const postFunctionLib: (data: functionLibData, loading?: Ref<boolean>) => Promis
  */
 const putFunctionLib: (
   function_lib_id: string,
+  data: functionLibData,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (function_lib_id, data, loading) => {
+  return put(`${prefix}/${function_lib_id}`, data, undefined, loading)
+}
+
+/**
+ * 调试函数
+ * @param 参数 
+
+ */
+const postFunctionLibDebug: (
+  function_lib_id: string,
   data: any,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (function_lib_id, data: functionLibData, loading) => {
-  return put(`${prefix}/${function_lib_id}`, data, undefined, loading)
+) => Promise<Result<any>> = (function_lib_id, data: any, loading) => {
+  return post(`${prefix}/${function_lib_id}/debug`, data, undefined, loading)
 }
 
 export default {
   getFunctionLib,
   postFunctionLib,
-  putFunctionLib
+  putFunctionLib,
+  postFunctionLibDebug
 }

@@ -12,83 +12,65 @@
     </template>
     <div>
       <h4 class="title-decoration-1 mb-16">输入变量</h4>
-      <el-form
-        ref="FormRef"
-        :model="form"
-        :rules="rules"
-        label-position="top"
-        require-asterisk-position="right"
-        v-loading="loading"
-      >
-        <el-form-item label="函数名称" prop="name">
-          <el-input
-            v-model="form.name"
-            placeholder="请输入函数名称"
-            maxlength="64"
-            show-word-limit
-            @blur="form.name = form.name.trim()"
-          />
-        </el-form-item>
-        <el-form-item label="描述">
-          <el-input
-            v-model="form.desc"
-            type="textarea"
-            placeholder="请输入函数的描述"
-            maxlength="128"
-            show-word-limit
-            :autosize="{ minRows: 3 }"
-            @blur="form.desc = form.desc.trim()"
-          />
-        </el-form-item>
-      </el-form>
+      <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
+        <el-form
+          ref="FormRef"
+          :model="form"
+          :rules="rules"
+          label-position="top"
+          require-asterisk-position="right"
+          hide-required-asterisk
+          v-loading="loading"
+        >
+          <template v-for="(item, index) in form.debug_field_list" :key="index">
+            <el-form-item
+              :label="item.name"
+              :rules="{
+                required: item.is_required,
+                message: '请输入变量值',
+                trigger: 'blur'
+              }"
+            >
+              <template #label>
+                <div class="flex">
+                  <span>{{ item.name }} <span class="danger" v-if="item.is_required">*</span></span>
+                  <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
+                </div>
+              </template>
+              <el-input v-model="item.value" placeholder="请输入变量值" />
+            </el-form-item>
+          </template>
+        </el-form>
+      </el-card>
+      <el-button type="primary" class="mt-16"> 运行 </el-button>
 
-      <h4 class="title-decoration-1 mb-16 mt-16">
-        输出变量 <el-text type="info" class="color-secondary"> 使用函数时显示 </el-text>
-      </h4>
-      <div class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter">
-        <span>结果 {result}</span>
-      </div>
+      <h4 class="title-decoration-1 mb-16 mt-16">运行结果</h4>
     </div>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-
-import type { functionLibData } from '@/api/type/function-lib'
 import functionLibApi from '@/api/function-lib'
 import type { FormInstance } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import { cloneDeep } from 'lodash'
 
 const emit = defineEmits(['refresh'])
-const FieldFormDialogRef = ref()
-
 const FormRef = ref()
-
-const isEdit = ref(false)
 const loading = ref(false)
 const dubugVisible = ref(false)
 const showEditor = ref(false)
-const currentIndex = ref<any>(null)
 
-const form = ref<functionLibData>({
-  name: '',
-  desc: '',
-  code: '',
-  input_field_list: []
+const form = ref<any>({
+  debug_field_list: []
 })
 
 watch(dubugVisible, (bool) => {
   if (!bool) {
-    isEdit.value = false
     showEditor.value = true
-    currentIndex.value = null
     form.value = {
-      name: '',
-      desc: '',
-      code: '',
-      input_field_list: []
+      debug_field_list: []
     }
   }
 })
@@ -101,27 +83,23 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid: any) => {
     if (valid) {
-      if (isEdit.value) {
-        functionLibApi.putFunctionLib(form.value?.id as string, form.value, loading).then((res) => {
-          MsgSuccess('编辑成功')
-          emit('refresh', res.data)
-          dubugVisible.value = false
-        })
-      } else {
-        functionLibApi.postFunctionLib(form.value, loading).then((res) => {
-          MsgSuccess('创建成功')
-          emit('refresh')
-          dubugVisible.value = false
-        })
-      }
+      functionLibApi.postFunctionLibDebug(form.value?.id, form.value, loading).then((res) => {
+        MsgSuccess('创建成功')
+        emit('refresh')
+        dubugVisible.value = false
+      })
     }
   })
 }
 
-const open = (data: any) => {
-  if (data) {
-    isEdit.value = true
-    form.value = cloneDeep(data)
+const open = (list: any) => {
+  if (list) {
+    list.forEach((item: any) => {
+      form.value.debug_field_list.push({
+        value: '',
+        ...item
+      })
+    })
   }
   dubugVisible.value = true
 }
