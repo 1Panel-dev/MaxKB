@@ -34,7 +34,7 @@ def convert_value(name: str, value: str, _type, is_required: bool):
         raise AppApiException(500, f'字段:{name}类型:{_type}值:{value}类型转换错误')
 
 
-class BaseFunctionLibNodeNode(IFunctionNode):
+class BaseFunctionNodeNode(IFunctionNode):
     def execute(self, function_lib_id, input_field_list, code, **kwargs) -> NodeResult:
         params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'),
                                                    field.get('is_required'))
