@@ -11,38 +11,43 @@
       </div>
     </template>
     <div>
-      <h4 class="title-decoration-1 mb-16">输入变量</h4>
-      <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
-        <el-form
-          ref="FormRef"
-          :model="form"
-          label-position="top"
-          require-asterisk-position="right"
-          hide-required-asterisk
-          v-loading="loading"
-        >
-          <template v-for="(item, index) in form.debug_field_list" :key="index">
-            <el-form-item
-              :label="item.name"
-              :prop="'debug_field_list.' + index + '.value'"
-              :rules="{
-                required: item.is_required,
-                message: '请输入变量值',
-                trigger: 'blur'
-              }"
-            >
-              <template #label>
-                <div class="flex">
-                  <span>{{ item.name }} <span class="danger" v-if="item.is_required">*</span></span>
-                  <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
-                </div>
-              </template>
-              <el-input v-model="item.value" placeholder="请输入变量值" />
-            </el-form-item>
-          </template>
-        </el-form>
-      </el-card>
-      <el-button type="primary" class="mt-16" @click="submit(FormRef)"> 运行 </el-button>
+      <div v-if="form.debug_field_list.length > 0" class="mb-16">
+        <h4 class="title-decoration-1 mb-16">输入变量</h4>
+        <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
+          <el-form
+            ref="FormRef"
+            :model="form"
+            label-position="top"
+            require-asterisk-position="right"
+            hide-required-asterisk
+            v-loading="loading"
+          >
+            <template v-for="(item, index) in form.debug_field_list" :key="index">
+              <el-form-item
+                :label="item.name"
+                :prop="'debug_field_list.' + index + '.value'"
+                :rules="{
+                  required: item.is_required,
+                  message: '请输入变量值',
+                  trigger: 'blur'
+                }"
+              >
+                <template #label>
+                  <div class="flex">
+                    <span
+                      >{{ item.name }} <span class="danger" v-if="item.is_required">*</span></span
+                    >
+                    <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
+                  </div>
+                </template>
+                <el-input v-model="item.value" placeholder="请输入变量值" />
+              </el-form-item>
+            </template>
+          </el-form>
+        </el-card>
+      </div>
+
+      <el-button type="primary" @click="submit(FormRef)" :loading="loading"> 运行 </el-button>
       <div v-if="showResult" class="mt-8">
         <h4 class="title-decoration-1 mb-16 mt-16">运行结果</h4>
         <div class="mb-16">
@@ -51,7 +56,10 @@
         </div>
 
         <p class="lighter mb-8">输出</p>
-        <el-card class="pre-wrap" shadow="never">{{ result || '-' }}</el-card>
+
+        <el-card class="pre-wrap" shadow="never" style="max-height: 350px; overflow: scroll">
+          {{ result || '-' }}
+        </el-card>
       </div>
     </div>
   </el-drawer>
@@ -89,27 +97,41 @@ watch(dubugVisible, (bool) => {
 })
 
 const submit = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await formEl.validate((valid: any) => {
-    if (valid) {
-      functionLibApi
-        .postFunctionLibDebug(form.value, loading)
-        .then((res) => {
-          showResult.value = true
-          isSuccess.value = true
-          result.value = res.data
-        })
-        .catch((res) => {
-          showResult.value = true
-          isSuccess.value = false
-          result.value = res.data
-        })
-    }
-  })
+  if (!formEl) {
+    functionLibApi
+      .postFunctionLibDebug(form.value, loading)
+      .then((res) => {
+        showResult.value = true
+        isSuccess.value = true
+        result.value = res.data
+      })
+      .catch((res) => {
+        showResult.value = true
+        isSuccess.value = false
+        result.value = res.data
+      })
+  } else {
+    await formEl.validate((valid: any) => {
+      if (valid) {
+        functionLibApi
+          .postFunctionLibDebug(form.value, loading)
+          .then((res) => {
+            showResult.value = true
+            isSuccess.value = true
+            result.value = res.data
+          })
+          .catch((res) => {
+            showResult.value = true
+            isSuccess.value = false
+            result.value = res.data
+          })
+      }
+    })
+  }
 }
 
 const open = (data: any) => {
-  if (data.input_field_list) {
+  if (data.input_field_list.length > 0) {
     data.input_field_list.forEach((item: any) => {
       form.value.debug_field_list.push({
         value: '',
