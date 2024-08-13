@@ -52,6 +52,8 @@ class DebugField(serializers.Serializer):
 
 class DebugInstance(serializers.Serializer):
     debug_field_list = DebugField(required=True, many=True)
+    input_field_list = FunctionLibInputField(required=True, many=True)
+    code = serializers.CharField(required=True, error_messages=ErrMessage.char("函数内容"))
 
 
 class EditFunctionLib(serializers.Serializer):
@@ -119,38 +121,23 @@ class FunctionLibSerializer(serializers.Serializer):
             function_lib.save()
             return FunctionLibModelSerializer(function_lib).data
 
-    class Operate(serializers.Serializer):
-        id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("函数id"))
+    class Debug(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
-
-        def is_valid(self, *, raise_exception=False):
-            super().is_valid(raise_exception=True)
-            if not QuerySet(FunctionLib).filter(id=self.data.get('id'), user_id=self.data.get('user_id')).exists():
-                raise AppApiException(500, '函数不存在')
-
-        def edit(self, instance, with_valid=True):
-            if with_valid:
-                self.is_valid(raise_exception=True)
-                EditFunctionLib(data=instance).is_valid(raise_exception=True)
-            edit_field_list = ['name', 'desc', 'code', 'input_field_list']
-            edit_dict = {field: instance.get(field) for field in edit_field_list if (
-                    field in instance and instance.get(field) is not None)}
-            QuerySet(FunctionLib).filter(id=self.data.get('id')).update(**edit_dict)
-            return self.one(False)
 
         def debug(self, debug_instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 DebugInstance(data=debug_instance).is_valid(raise_exception=True)
-            function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
+            input_field_list = debug_instance.get('input_field_list')
+            code = debug_instance.get('code')
             debug_field_list = debug_instance.get('debug_field_list')
             params = {field.get('name'): self.convert_value(field.get('name'), field.get('value'), field.get('type'),
                                                             field.get('is_required'))
                       for field in
                       [{'value': self.get_field_value(debug_field_list, field.get('name'), field.get('is_required')),
                         **field} for field in
-                       function_lib.input_field_list]}
-            return function_executor.exec_code(function_lib.code, params)
+                       input_field_list]}
+            return function_executor.exec_code(code, params)
 
         @staticmethod
         def get_field_value(debug_field_list, name, is_required):
@@ -177,6 +164,25 @@ class FunctionLibSerializer(serializers.Serializer):
                 return value
             except Exception as e:
                 raise AppApiException(500, f'字段:{name}类型:{_type}值:{value}类型转换错误')
+
+    class Operate(serializers.Serializer):
+        id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("函数id"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if not QuerySet(FunctionLib).filter(id=self.data.get('id'), user_id=self.data.get('user_id')).exists():
+                raise AppApiException(500, '函数不存在')
+
+        def edit(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                EditFunctionLib(data=instance).is_valid(raise_exception=True)
+            edit_field_list = ['name', 'desc', 'code', 'input_field_list']
+            edit_dict = {field: instance.get(field) for field in edit_field_list if (
+                    field in instance and instance.get(field) is not None)}
+            QuerySet(FunctionLib).filter(id=self.data.get('id')).update(**edit_dict)
+            return self.one(False)
 
         def one(self, with_valid=True):
             if with_valid:

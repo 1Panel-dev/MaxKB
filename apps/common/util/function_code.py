@@ -41,7 +41,6 @@ class FunctionExecutor:
             os.umask(old_mask)
 
     def exec_code(self, code_str, keywords):
-        start = time.time()
         _id = str(uuid.uuid1())
         success = '{"code":200,"msg":"成功","data":exec_result}'
         err = '{"code":500,"msg":str(e),"data":None}'

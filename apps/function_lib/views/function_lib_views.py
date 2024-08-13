@@ -52,9 +52,9 @@ class FunctionLibView(APIView):
                              request_body=FunctionLibApi.Debug.get_request_body_api(),
                              tags=['函数库'])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-        def post(self, request: Request, function_lib_id: str):
+        def post(self, request: Request):
             return result.success(
-                FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).debug(
+                FunctionLibSerializer.Debug(data={'user_id': request.user.id}).debug(
                     request.data))
 
     class Operate(APIView):

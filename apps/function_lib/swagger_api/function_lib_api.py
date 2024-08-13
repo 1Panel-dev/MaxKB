@@ -64,6 +64,31 @@ class FunctionLibApi(ApiMixin):
                                                                                     type=openapi.TYPE_STRING,
                                                                                     title="变量值",
                                                                                     description="变量值"),
+                                                                            })),
+                    'code': openapi.Schema(type=openapi.TYPE_STRING, title="函数内容", description="函数内容"),
+                    'input_field_list': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                       description="输入变量列表",
+                                                       items=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                                            required=['name', 'is_required', 'source'],
+                                                                            properties={
+                                                                                'name': openapi.Schema(
+                                                                                    type=openapi.TYPE_STRING,
+                                                                                    title="变量名",
+                                                                                    description="变量名"),
+                                                                                'is_required': openapi.Schema(
+                                                                                    type=openapi.TYPE_BOOLEAN,
+                                                                                    title="是否必填",
+                                                                                    description="是否必填"),
+                                                                                'type': openapi.Schema(
+                                                                                    type=openapi.TYPE_STRING,
+                                                                                    title="字段类型",
+                                                                                    description="字段类型 string|int|dict|array|float"
+                                                                                ),
+                                                                                'source': openapi.Schema(
+                                                                                    type=openapi.TYPE_STRING,
+                                                                                    title="来源",
+                                                                                    description="来源只支持custom|reference"),
+
                                                                             }))
                 }
             )
@@ -99,7 +124,7 @@ class FunctionLibApi(ApiMixin):
                                                                                 'source': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
                                                                                     title="来源",
-                                                                                    description="来源"),
+                                                                                    description="来源只支持custom|reference"),
 
                                                                             }))
                 }
@@ -136,7 +161,7 @@ class FunctionLibApi(ApiMixin):
                                                                                 'source': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
                                                                                     title="来源",
-                                                                                    description="来源"),
+                                                                                    description="来源只支持custom|reference"),
 
                                                                             }))
                 }
