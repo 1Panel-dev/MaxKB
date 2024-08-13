@@ -57,7 +57,7 @@
 
         <p class="lighter mb-8">输出</p>
 
-        <el-card class="pre-wrap" shadow="never" style="max-height: 350px; overflow: scroll">
+        <el-card class="pre-wrap danger" shadow="never" style="max-height: 350px; overflow: scroll">
           {{ result || '-' }}
         </el-card>
       </div>
@@ -113,18 +113,17 @@ const submit = async (formEl: FormInstance | undefined) => {
   } else {
     await formEl.validate((valid: any) => {
       if (valid) {
-        functionLibApi
-          .postFunctionLibDebug(form.value, loading)
-          .then((res) => {
+        functionLibApi.postFunctionLibDebug(form.value, loading).then((res) => {
+          if (res.code === 500) {
+            showResult.value = true
+            isSuccess.value = false
+            result.value = res.message
+          } else {
             showResult.value = true
             isSuccess.value = true
             result.value = res.data
-          })
-          .catch((res) => {
-            showResult.value = true
-            isSuccess.value = false
-            result.value = res.data
-          })
+          }
+        })
       }
     })
   }

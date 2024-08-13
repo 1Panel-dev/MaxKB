@@ -41,7 +41,7 @@ instance.interceptors.response.use(
     if (response.data) {
       if (response.data.code !== 200 && !(response.data instanceof Blob)) {
         if (
-          !response.config.url.includes('/valid') ||
+          !response.config.url.includes('/valid') &&
           !response.config.url.includes('/function_lib/debug')
         ) {
           MsgError(response.data.message)
