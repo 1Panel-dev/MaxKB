@@ -98,13 +98,13 @@
     <template #footer>
       <div>
         <el-button :loading="loading">取消</el-button>
-        <el-button :loading="loading">调试</el-button>
+        <el-button :loading="loading" @click="openDebug">调试</el-button>
         <el-button type="primary" @click="submit(FormRef)" :loading="loading">
           {{ isEdit ? '保存' : '创建' }}</el-button
         >
       </div>
     </template>
-
+    <FunctionDebugDrawer ref="FunctionDebugDrawerRef" />
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </el-drawer>
 </template>
@@ -112,14 +112,16 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
 import FieldFormDialog from './FieldFormDialog.vue'
+import FunctionDebugDrawer from './FunctionDebugDrawer.vue'
 import type { functionLibData } from '@/api/type/function-lib'
 import functionLibApi from '@/api/function-lib'
 import type { FormInstance } from 'element-plus'
-import { MsgSuccess } from '@/utils/message'
+import { MsgSuccess, MsgError } from '@/utils/message'
 import { cloneDeep } from 'lodash'
 
 const emit = defineEmits(['refresh'])
 const FieldFormDialogRef = ref()
+const FunctionDebugDrawerRef = ref()
 
 const FormRef = ref()
 
@@ -153,6 +155,14 @@ watch(visible, (bool) => {
 const rules = reactive({
   name: [{ required: true, message: '请输入函数名称', trigger: 'blur' }]
 })
+
+function openDebug() {
+  if (form.value?.input_field_list && form.value?.input_field_list?.length > 0) {
+    FunctionDebugDrawerRef.value.open(form.value?.input_field_list)
+  } else {
+    MsgError('请添加变量！')
+  }
+}
 
 function deleteField(index: any) {
   form.value.input_field_list?.splice(index, 1)
