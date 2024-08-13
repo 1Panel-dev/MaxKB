@@ -158,7 +158,7 @@ const rules = reactive({
 
 function openDebug() {
   if (form.value?.input_field_list && form.value?.input_field_list?.length > 0) {
-    FunctionDebugDrawerRef.value.open(form.value?.input_field_list)
+    FunctionDebugDrawerRef.value.open(form.value)
   } else {
     MsgError('请添加变量！')
   }

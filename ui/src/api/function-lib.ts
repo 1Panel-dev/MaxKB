@@ -53,12 +53,11 @@ const putFunctionLib: (
  * @param 参数 
 
  */
-const postFunctionLibDebug: (
-  function_lib_id: string,
+const postFunctionLibDebug: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
   data: any,
-  loading?: Ref<boolean>
-) => Promise<Result<any>> = (function_lib_id, data: any, loading) => {
-  return post(`${prefix}/${function_lib_id}/debug`, data, undefined, loading)
+  loading
+) => {
+  return post(`${prefix}/debug`, data, undefined, loading)
 }
 
 export default {
