@@ -33,11 +33,17 @@ class ZhipuChatModel(MaxKBBaseModel, ChatZhipuAI):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        optional_params = {}
+        if 'max_tokens' in model_kwargs:
+            optional_params['max_tokens'] = model_kwargs['max_tokens']
+        if 'temperature' in model_kwargs:
+            optional_params['temperature'] = model_kwargs['temperature']
+
         zhipuai_chat = ZhipuChatModel(
-            temperature=0.5,
             api_key=model_credential.get('api_key'),
             model=model_name,
-            max_tokens=model_kwargs.get('max_tokens', 5)
+            streaming=model_kwargs.get('streaming', False),
+            **optional_params
         )
         return zhipuai_chat
 

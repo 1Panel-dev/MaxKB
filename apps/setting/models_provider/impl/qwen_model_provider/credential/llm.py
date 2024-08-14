@@ -45,3 +45,16 @@ class OpenAILLMModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     api_key = forms.PasswordInputField('API Key', required=True)
+
+    def get_other_fields(self, model_name):
+        return {
+            'temperature': {
+                'value': 1.0,
+                'min': 0.1,
+                'max': 1.9,
+                'step': 0.01,
+                'label': '温度',
+                'precision': 2,
+                'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
+            },
+        }

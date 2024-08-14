@@ -73,6 +73,9 @@ class IChatStep(IBaseChatPipelineStep):
         no_references_setting = NoReferencesSetting(required=True, error_messages=ErrMessage.base("无引用分段设置"))
 
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        temperature = serializers.FloatField(required=False, allow_null=True, error_messages=ErrMessage.float("温度"))
+        max_tokens = serializers.IntegerField(required=False, allow_null=True,
+                                              error_messages=ErrMessage.integer("最大token数"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)

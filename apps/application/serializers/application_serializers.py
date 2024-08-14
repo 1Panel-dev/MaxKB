@@ -43,6 +43,7 @@ from dataset.serializers.common_serializers import list_paragraph, get_embedding
 from embedding.models import SearchMode
 from setting.models import AuthOperate
 from setting.models.model_management import Model
+from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 from django.conf import settings
@@ -109,6 +110,10 @@ class DatasetSettingSerializer(serializers.Serializer):
 
 class ModelSettingSerializer(serializers.Serializer):
     prompt = serializers.CharField(required=True, max_length=2048, error_messages=ErrMessage.char("提示词"))
+    temperature = serializers.FloatField(required=False, allow_null=True,
+                                         error_messages=ErrMessage.char("温度"))
+    max_tokens = serializers.IntegerField(required=False, allow_null=True,
+                                          error_messages=ErrMessage.integer("最大token数"))
 
 
 class ApplicationWorkflowSerializer(serializers.Serializer):
@@ -541,6 +546,7 @@ class ApplicationSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        model_id = serializers.UUIDField(required=False, error_messages=ErrMessage.uuid("模型id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -721,6 +727,35 @@ class ApplicationSerializer(serializers.Serializer):
                 os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'list_application_dataset.sql')),
                 [self.data.get('user_id') if self.data.get('user_id') == str(application.user_id) else None,
                  application.user_id, self.data.get('user_id')])
+
+        def get_other_file_list(self):
+            temperature = None
+            max_tokens = None
+            application = Application.objects.filter(id=self.initial_data.get("application_id")).first()
+            if application:
+                setting_dict = application.model_setting
+                temperature = setting_dict.get("temperature")
+                max_tokens = setting_dict.get("max_tokens")
+            model = Model.objects.filter(id=self.initial_data.get("model_id")).first()
+            if model:
+                res = ModelProvideConstants[model.provider].value.get_model_credential(model.model_type,
+                                                                                       model.model_name).get_other_fields(
+                    model.model_name)
+                if temperature and res.get('temperature'):
+                    res['temperature']['value'] = temperature
+                if max_tokens and res.get('max_tokens'):
+                    res['max_tokens']['value'] = max_tokens
+                return res
+
+        def save_other_config(self, data):
+            application = Application.objects.filter(id=self.initial_data.get("application_id")).first()
+            if application:
+                setting_dict = application.model_setting
+                for key in ['max_tokens', 'temperature']:
+                    if key in data:
+                        setting_dict[key] = data[key]
+                application.model_setting = setting_dict
+                application.save()
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:

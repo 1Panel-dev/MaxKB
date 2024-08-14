@@ -236,6 +236,11 @@ class ChatHunyuan(BaseChatModel):
                     choice["Delta"], default_chunk_class
                 )
                 default_chunk_class = chunk.__class__
+                # FinishReason === stop
+                if choice.get("FinishReason") == "stop":
+                    self.__dict__.setdefault("_last_generation_info", {}).update(
+                        response.get("Usage", {})
+                    )
                 cg_chunk = ChatGenerationChunk(message=chunk)
                 if run_manager:
                     run_manager.on_llm_new_token(chunk.content, chunk=cg_chunk)

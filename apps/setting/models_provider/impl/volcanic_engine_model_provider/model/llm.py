@@ -1,27 +1,21 @@
 from typing import List, Dict
 
-from langchain_community.chat_models import VolcEngineMaasChat
-from langchain_core.messages import BaseMessage, get_buffer_string
-
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
-from langchain_openai import ChatOpenAI
+
+from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
-class VolcanicEngineChatModel(MaxKBBaseModel, ChatOpenAI):
+class VolcanicEngineChatModel(MaxKBBaseModel, BaseChatOpenAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        volcanic_engine_chat = VolcanicEngineChatModel(
+        optional_params = {}
+        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
+            optional_params['max_tokens'] = model_kwargs['max_tokens']
+        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
+            optional_params['temperature'] = model_kwargs['temperature']
+        return VolcanicEngineChatModel(
             model=model_name,
-            volc_engine_maas_ak=model_credential.get("access_key_id"),
-            volc_engine_maas_sk=model_credential.get("secret_access_key"),
+            openai_api_base=model_credential.get('api_base'),
+            openai_api_key=model_credential.get('api_key'),
+            **optional_params
         )
-        return volcanic_engine_chat
-
-    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        tokenizer = TokenizerManage.get_tokenizer()
-        return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
-
-    def get_num_tokens(self, text: str) -> int:
-        tokenizer = TokenizerManage.get_tokenizer()
-        return len(tokenizer.encode(text))

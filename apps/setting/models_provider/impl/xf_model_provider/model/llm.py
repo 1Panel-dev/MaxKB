@@ -25,14 +25,19 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        optional_params = {}
+        if 'max_tokens' in model_kwargs:
+            optional_params['max_tokens'] = model_kwargs['max_tokens']
+        if 'temperature' in model_kwargs:
+            optional_params['temperature'] = model_kwargs['temperature']
         return XFChatSparkLLM(
             spark_app_id=model_credential.get('spark_app_id'),
             spark_api_key=model_credential.get('spark_api_key'),
             spark_api_secret=model_credential.get('spark_api_secret'),
             spark_api_url=model_credential.get('spark_api_url'),
             spark_llm_domain=model_name,
-            temperature=model_kwargs.get('temperature', 0.5),
-            max_tokens=model_kwargs.get('max_tokens', 5),
+            streaming=model_kwargs.get('streaming', False),
+            **optional_params
         )
 
     def get_last_generation_info(self) -> Optional[Dict[str, Any]]:

@@ -8,122 +8,135 @@
     append-to-body
   >
     <el-form label-position="top" ref="paramFormRef" :model="form">
-      <el-form-item>
+      <el-form-item v-for="(item, key) in form" :key="key">
         <template #label>
           <div class="flex align-center">
             <div class="flex-between mr-4">
-              <span>温度</span>
+              <span>{{ item.label }}</span>
             </div>
             <el-tooltip effect="dark" placement="right">
-              <template #content
-                >较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定</template
-              >
+              <template #content>{{ item.tooltip }}</template>
               <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
             </el-tooltip>
           </div>
         </template>
         <el-slider
-          v-model="form.similarity"
+          v-model="item.value"
           show-input
           :show-input-controls="false"
-          :min="0"
-          :max="1"
-          :precision="2"
-          :step="0.01"
-          class="custom-slider"
-        />
-      </el-form-item>
-      <el-form-item>
-        <template #label>
-          <div class="flex align-center">
-            <div class="flex-between mr-4">
-              <span>输出最大Tokens</span>
-            </div>
-            <el-tooltip effect="dark" placement="right">
-              <template #content>指定模型可生成的最大token个数</template>
-              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-            </el-tooltip>
-          </div>
-        </template>
-        <el-slider
-          v-model="form.max_paragraph_char_number"
-          show-input
-          :show-input-controls="false"
-          :min="1"
-          :max="10000"
+          :min="item.min"
+          :max="item.max"
+          :precision="item.precision || 0"
+          :step="item.step || 1"
           class="custom-slider"
         />
       </el-form-item>
     </el-form>
-
     <template #footer>
       <span class="dialog-footer p-16">
-        <el-button @click.prevent="dialogVisible = false">{{
-          $t('views.application.applicationForm.buttons.cancel')
-        }}</el-button>
-        <el-button type="primary" @click="submit(paramFormRef)" :loading="loading">
+        <el-button @click.prevent="dialogVisible = false">
+          {{ $t('views.application.applicationForm.buttons.cancel') }}
+        </el-button>
+        <el-button type="primary" @click="submit" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.confirm') }}
         </el-button>
       </span>
     </template>
   </el-dialog>
 </template>
+
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
-import { cloneDeep } from 'lodash'
-import type { FormInstance, FormRules } from 'element-plus'
+import { ref, reactive, watch } from 'vue'
+import { cloneDeep, set } from 'lodash'
+import type { FormInstance } from 'element-plus'
+import useStore from '@/stores'
+
+const { application } = useStore()
 
 const emit = defineEmits(['refresh'])
 
-const paramFormRef = ref()
-
-const form = ref<any>({
-  similarity: 0.6,
-  max_paragraph_char_number: 5000
-})
-
-const dialogVisible = ref<boolean>(false)
+const paramFormRef = ref<FormInstance>()
+const form = reactive<Form>({})
+const dialogVisible = ref(false)
 const loading = ref(false)
+const props = defineProps<{
+  id: any
+}>()
+const resetForm = () => {
+  // 清空 form 对象，等待新的数据
+  Object.keys(form).forEach((key) => delete form[key])
+}
 
-watch(dialogVisible, (bool) => {
-  if (!bool) {
-    form.value = {
-      similarity: 0.6,
-      max_paragraph_char_number: 5000
-    }
-  }
-})
+interface Form {
+  [key: string]: FormField
+}
+
+interface FormField {
+  value: any
+  min?: number
+  max?: number
+  step?: number
+  label?: string
+  precision?: number
+  tooltip?: string
+}
 
 const open = (data: any) => {
-  form.value = cloneDeep(data)
-
+  const newData = cloneDeep(data)
+  Object.keys(form).forEach((key) => {
+    delete form[key]
+  })
+  Object.keys(newData).forEach((key) => {
+    set(form, key, newData[key])
+  })
   dialogVisible.value = true
 }
 
-const submit = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await formEl.validate((valid, fields) => {
-    if (valid) {
-      emit('refresh', form.value)
-      dialogVisible.value = false
-    }
-  })
+const submit = async () => {
+  if (paramFormRef.value) {
+    await paramFormRef.value.validate((valid, fields) => {
+      if (valid) {
+        const data = Object.keys(form).reduce(
+          (acc, key) => {
+            acc[key] = form[key].value
+            return acc
+          },
+          {} as Record<string, any>
+        )
+        application.asyncPostModelConfig(props.id, data, loading).then(() => {
+          emit('refresh', form)
+          dialogVisible.value = false
+        })
+      }
+    })
+  }
 }
+
+watch(dialogVisible, (bool) => {
+  if (!bool) {
+    resetForm()
+  }
+})
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope>
+
+<style lang="scss" scoped>
 .aiMode-param-dialog {
   padding: 8px 8px 24px 8px;
+
   .el-dialog__header {
     padding: 16px 16px 0 16px;
   }
+
   .el-dialog__body {
     padding: 16px !important;
   }
+
   .dialog-max-height {
     height: 550px;
   }
+
   .custom-slider {
     .el-input-number.is-without-controls .el-input__wrapper {
       padding: 0 !important;

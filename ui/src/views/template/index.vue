@@ -9,6 +9,7 @@
           @click="clickListHandle"
           value-key="provider"
           default-active=""
+          style="overflow-y: auto"
         >
           <template #default="{ row, index }">
             <div class="flex" v-if="index === 0">

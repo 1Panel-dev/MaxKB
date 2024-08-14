@@ -53,3 +53,16 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField('API Key', required=True)
 
     secret_key = forms.PasswordInputField("Secret Key", required=True)
+
+    def get_other_fields(self, model_name):
+        return {
+            'temperature': {
+                'value': 0.95,
+                'min': 0.1,
+                'max': 1.0,
+                'step': 0.01,
+                'label': '温度',
+                'precision': 2,
+                'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
+            },
+        }

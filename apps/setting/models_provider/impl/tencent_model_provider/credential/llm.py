@@ -45,3 +45,16 @@ class TencentLLMModelCredential(BaseForm, BaseModelCredential):
     hunyuan_app_id = forms.TextInputField('APP ID', required=True)
     hunyuan_secret_id = forms.PasswordInputField('SecretId', required=True)
     hunyuan_secret_key = forms.PasswordInputField('SecretKey', required=True)
+
+    def get_other_fields(self, model_name):
+        return {
+            'temperature': {
+                'value': 0.5,
+                'min': 0.1,
+                'max': 2.0,
+                'step': 0.01,
+                'label': '温度',
+                'precision': 2,
+                'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
+            },
+        }

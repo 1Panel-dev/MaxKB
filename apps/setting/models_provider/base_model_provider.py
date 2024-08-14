@@ -108,6 +108,13 @@ class BaseModelCredential(ABC):
         """
         pass
 
+    def get_other_fields(self, model_name):
+        """
+        获取其他字段
+        :return:
+        """
+        pass
+
     @staticmethod
     def encryption(message: str):
         """
