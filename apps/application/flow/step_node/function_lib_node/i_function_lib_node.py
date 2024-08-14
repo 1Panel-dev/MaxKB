@@ -11,12 +11,13 @@ from typing import Type
 from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
+from common.field.common import ObjectField
 from common.util.field_message import ErrMessage
 
 
 class InputField(serializers.Serializer):
     name = serializers.CharField(required=True, error_messages=ErrMessage.char('变量名'))
-    value = serializers.CharField(required=True, error_messages=ErrMessage.char("变量值"))
+    value = ObjectField(required=True, error_messages=ErrMessage.char("变量值"), model_type_list=[str, list])
 
 
 class FunctionLibNodeParamsSerializer(serializers.Serializer):

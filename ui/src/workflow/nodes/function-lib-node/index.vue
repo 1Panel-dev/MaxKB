@@ -53,7 +53,6 @@
         <el-text type="info" v-else> 暂无数据 </el-text>
       </el-card>
     </el-form>
-    <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -62,29 +61,15 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
-import FieldFormDialog from '@/views/function-lib/component/FieldFormDialog.vue'
 
 const props = defineProps<{ nodeModel: any }>()
 
-const isKeyDown = ref(false)
-const wheel = (e: any) => {
-  if (isKeyDown.value) {
-    e.preventDefault()
-  } else {
-    e.stopPropagation()
-    return true
-  }
-}
-
-const FieldFormDialogRef = ref()
 const nodeCascaderRef = ref()
 
 const form = {
-  code: '',
   input_field_list: []
 }
 
-const currentIndex = ref<any>(null)
 const showEditor = ref(false)
 
 const chat_data = computed({
@@ -107,39 +92,6 @@ const validate = () => {
   return FunctionNodeFormRef.value?.validate().catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
-}
-
-function changeCode(value: string) {
-  set(props.nodeModel.properties.node_data, 'code', value)
-}
-
-function openAddDialog(data?: any, index?: any) {
-  if (typeof index !== 'undefined') {
-    currentIndex.value = index
-  }
-
-  FieldFormDialogRef.value.open(data)
-}
-
-function deleteField(index: any) {
-  const list = cloneDeep(props.nodeModel.properties.node_data.input_field_list)
-  list.splice(index, 1)
-  set(props.nodeModel.properties.node_data, 'input_field_list', list)
-}
-
-function refreshFieldList(data: any) {
-  const list = cloneDeep(props.nodeModel.properties.node_data.input_field_list)
-  const obj = {
-    value: '',
-    ...data
-  }
-  if (currentIndex.value !== null) {
-    list.splice(currentIndex.value, 1, obj)
-  } else {
-    list.push(obj)
-  }
-  set(props.nodeModel.properties.node_data, 'input_field_list', list)
-  currentIndex.value = null
 }
 
 onMounted(() => {

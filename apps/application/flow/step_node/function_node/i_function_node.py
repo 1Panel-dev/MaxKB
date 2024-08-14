@@ -14,6 +14,7 @@ from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
 from common.exception.app_exception import AppApiException
+from common.field.common import ObjectField
 from common.util.field_message import ErrMessage
 
 
@@ -28,8 +29,7 @@ class InputField(serializers.Serializer):
         validators.RegexValidator(regex=re.compile("^custom|reference$"),
                                   message="字段只支持custom|reference", code=500)
     ])
-    value = serializers.CharField(required=False, allow_blank=True, allow_null=True,
-                                  error_messages=ErrMessage.char("变量值"))
+    value = ObjectField(required=True, error_messages=ErrMessage.char("变量值"), model_type_list=[str, list])
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)

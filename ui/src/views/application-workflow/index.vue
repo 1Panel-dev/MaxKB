@@ -49,8 +49,8 @@
           <el-tab-pane label="函数库" name="function">
             <div
               class="workflow-dropdown-item cursor flex p-8-12"
-              @click="clickNodes(functionLibCumtomNode)"
-              @mousedown="onmousedown(functionLibCumtomNode)"
+              @click="clickNodes(functionNode)"
+              @mousedown="onmousedown(functionNode)"
             >
               <component
                 :is="iconComponent(`function-lib-node-icon`)"
@@ -58,8 +58,8 @@
                 :size="32"
               />
               <div class="pre-wrap">
-                <div class="lighter">{{ functionLibCumtomNode.label }}</div>
-                <el-text type="info" size="small">{{ functionLibCumtomNode.text }}</el-text>
+                <div class="lighter">{{ functionNode.label }}</div>
+                <el-text type="info" size="small">{{ functionNode.text }}</el-text>
               </div>
             </div>
 
@@ -146,7 +146,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Workflow from '@/workflow/index.vue'
-import { menuNodes, functionLibNode, functionLibCumtomNode } from '@/workflow/common/data'
+import { menuNodes, functionLibNode, functionNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application'
 import { isAppIcon } from '@/utils/application'
@@ -254,7 +254,7 @@ function clickNodes(item: any, data?: any) {
 function onmousedown(item: any, data?: any) {
   if (data) {
     item['properties']['stepName'] = data.name
-    item['properties']['node_data'] = data
+    item['properties']['node_data'] = { ...data, function_lib_id: data.id }
   }
   workflowRef.value?.onmousedown(item)
   showPopover.value = false

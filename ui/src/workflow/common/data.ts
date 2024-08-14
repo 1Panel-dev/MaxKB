@@ -144,7 +144,7 @@ export const menuNodes = [aiChatNode, searchDatasetNode, questionNode, condition
 /**
  * 自定义函数配置数据
  */
-export const functionLibCumtomNode = {
+export const functionNode = {
   type: WorkflowType.FunctionLibCustom,
   text: '通过执行自定义脚本，实现数据处理',
   label: '自定义函数',
@@ -203,7 +203,7 @@ export const nodeDict: any = {
   [WorkflowType.Start]: startNode,
   [WorkflowType.Reply]: replyNode,
   [WorkflowType.FunctionLib]: functionLibNode,
-  [WorkflowType.FunctionLibCustom]: functionLibCumtomNode
+  [WorkflowType.FunctionLibCustom]: functionNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

@@ -17,9 +17,14 @@ from smartdoc.const import CONFIG
 function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
 
 
-def convert_value(name: str, value: str, _type, is_required: bool):
+def convert_value(name: str, value, _type, is_required, source, node):
     if not is_required and value is None:
         return None
+    if source == 'reference':
+        value = node.workflow_manage.get_reference_field(
+            value[0],
+            value[1:])
+        return value
     try:
         if _type == 'int':
             return int(value)
@@ -37,7 +42,20 @@ def convert_value(name: str, value: str, _type, is_required: bool):
 class BaseFunctionNodeNode(IFunctionNode):
     def execute(self, input_field_list, code, **kwargs) -> NodeResult:
         params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'),
-                                                   field.get('is_required'))
+                                                   field.get('is_required'), field.get('source'), self)
                   for field in input_field_list}
         result = function_executor.exec_code(code, params)
+        self.context['params'] = params
         return NodeResult({'result': result}, {})
+
+    def get_details(self, index: int, **kwargs):
+        return {
+            'name': self.node.properties.get('stepName'),
+            "index": index,
+            "result": self.context.get('result'),
+            "params": self.context.get('params'),
+            'run_time': self.context.get('run_time'),
+            'type': self.node.type,
+            'status': self.status,
+            'err_message': self.err_message
+        }

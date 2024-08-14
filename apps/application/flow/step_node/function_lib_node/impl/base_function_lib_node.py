@@ -23,13 +23,20 @@ function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
 def get_field_value(debug_field_list, name, is_required):
     result = [field for field in debug_field_list if field.get('name') == name]
     if len(result) > 0:
-        return result[-1]
+        return result[-1]['value']
     if is_required:
         raise AppApiException(500, f"{name}字段未设置值")
     return None
 
 
-def convert_value(name: str, value: str, _type):
+def convert_value(name: str, value, _type, is_required, source, node):
+    if not is_required and value is None:
+        return None
+    if source == 'reference':
+        value = node.workflow_manage.get_reference_field(
+            value[0],
+            value[1:])
+        return value
     try:
         if _type == 'int':
             return int(value)
@@ -47,10 +54,26 @@ def convert_value(name: str, value: str, _type):
 class BaseFunctionLibNodeNode(IFunctionLibNode):
     def execute(self, function_lib_id, input_field_list, **kwargs) -> NodeResult:
         function_lib = QuerySet(FunctionLib).filter(id=function_lib_id).first()
-        params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'))
+        params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'),
+                                                   field.get('is_required'),
+                                                   field.get('source'), self)
                   for field in
-                  [{'value': get_field_value(input_field_list, field.get('name'), field.get('is_required')), **field}
+                  [{'value': get_field_value(input_field_list, field.get('name'), field.get('is_required'),
+                                             ), **field}
                    for field in
                    function_lib.input_field_list]}
+        self.context['params'] = params
         result = function_executor.exec_code(function_lib.code, params)
         return NodeResult({'result': result}, {})
+
+    def get_details(self, index: int, **kwargs):
+        return {
+            'name': self.node.properties.get('stepName'),
+            "index": index,
+            "result": self.context.get('result'),
+            "params": self.context.get('params'),
+            'run_time': self.context.get('run_time'),
+            'type': self.node.type,
+            'status': self.status,
+            'err_message': self.err_message
+        }
