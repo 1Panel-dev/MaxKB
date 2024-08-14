@@ -43,10 +43,10 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_EMBEDDING_MODEL_PATH=/opt/maxkb/model/embedding \
     LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH \
-    POSTGRES_USER root \
-    POSTGRES_PASSWORD Password123@postgres \
-    PIP_TARGET /var/lib/postgresql/data/python-packages \
-    PYTHONPATH $PIP_TARGET:$PYTHONPATH
+    POSTGRES_USER=root \
+    POSTGRES_PASSWORD=Password123@postgres \
+    PIP_TARGET=/var/lib/postgresql/data/python-packages \
+    PYTHONPATH=$PIP_TARGET:$PYTHONPATH
 
 WORKDIR /opt/maxkb/app
 COPY --from=stage-build /opt/maxkb /opt/maxkb
