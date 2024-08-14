@@ -5,6 +5,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :destroy-on-close="true"
+    append-to-body
   >
     <el-form
       label-position="top"

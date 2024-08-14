@@ -7,6 +7,19 @@ import { type Ref } from 'vue'
 const prefix = '/function_lib'
 
 /**
+ * 获取函数列表
+ * param {
+          "name": "string",
+        }
+ */
+const getAllFunctionLib: (param?: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  param,
+  loading
+) => {
+  return get(`${prefix}`, param || {}, loading)
+}
+
+/**
  * 获取分页函数列表
  * page {
           "current_page": "string",
@@ -64,5 +77,6 @@ export default {
   getFunctionLib,
   postFunctionLib,
   putFunctionLib,
-  postFunctionLibDebug
+  postFunctionLibDebug,
+  getAllFunctionLib
 }

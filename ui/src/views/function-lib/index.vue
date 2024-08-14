@@ -73,9 +73,6 @@
 import { ref, onMounted, reactive } from 'vue'
 import functionLibApi from '@/api/function-lib'
 import FunctionFormDrawer from './component/FunctionFormDrawer.vue'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
-import { useRouter } from 'vue-router'
-const router = useRouter()
 
 const loading = ref(false)
 
