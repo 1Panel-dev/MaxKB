@@ -39,7 +39,6 @@ class InputField(serializers.Serializer):
 
 
 class FunctionNodeParamsSerializer(serializers.Serializer):
-    function_lib_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid('函数库id'))
     input_field_list = InputField(required=True, many=True)
     code = serializers.CharField(required=True, error_messages=ErrMessage.char("函数"))
 
@@ -56,5 +55,5 @@ class IFunctionNode(INode):
     def _run(self):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, function_lib_id, input_field_list, code, **kwargs) -> NodeResult:
+    def execute(self, input_field_list, code, **kwargs) -> NodeResult:
         pass

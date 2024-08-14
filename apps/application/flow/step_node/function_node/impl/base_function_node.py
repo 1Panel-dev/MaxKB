@@ -35,7 +35,7 @@ def convert_value(name: str, value: str, _type, is_required: bool):
 
 
 class BaseFunctionNodeNode(IFunctionNode):
-    def execute(self, function_lib_id, input_field_list, code, **kwargs) -> NodeResult:
+    def execute(self, input_field_list, code, **kwargs) -> NodeResult:
         params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'),
                                                    field.get('is_required'))
                   for field in input_field_list}
