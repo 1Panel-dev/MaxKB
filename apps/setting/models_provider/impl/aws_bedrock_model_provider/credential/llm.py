@@ -60,3 +60,16 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
     region_name = forms.TextInputField('Region Name', required=True)
     access_key_id = forms.TextInputField('Access Key ID', required=True)
     secret_access_key = forms.PasswordInputField('Secret Access Key', required=True)
+
+    def get_other_fields(self, model_name):
+        return {
+            'max_tokens': {
+                'value': 1024,
+                'min': 1,
+                'max': 8192,
+                'step': 1,
+                'label': '输出最大Tokens',
+                'precision': 0,
+                'tooltip': '指定模型可生成的最大token个数'
+            }
+        }

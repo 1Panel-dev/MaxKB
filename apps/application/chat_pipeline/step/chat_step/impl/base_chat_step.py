@@ -111,7 +111,7 @@ class BaseChatStep(IChatStep):
                 client_id=None, client_type=None,
                 no_references_setting=None,
                 **kwargs):
-        chat_model = get_model_instance_by_model_user_id(model_id, user_id) if model_id is not None else None
+        chat_model = get_model_instance_by_model_user_id(model_id, user_id, **kwargs) if model_id is not None else None
         if stream:
             return self.execute_stream(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                        paragraph_list,

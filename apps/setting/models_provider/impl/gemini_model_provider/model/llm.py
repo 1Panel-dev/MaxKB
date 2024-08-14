@@ -16,11 +16,23 @@ from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 
 class GeminiChatModel(MaxKBBaseModel, ChatGoogleGenerativeAI):
+
+    @staticmethod
+    def is_cache_model():
+        return False
+
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        optional_params = {}
+        if 'temperature' in model_kwargs:
+            optional_params['temperature'] = model_kwargs['temperature']
+        if 'max_tokens' in model_kwargs:
+            optional_params['max_output_tokens'] = model_kwargs['max_tokens']
+
         gemini_chat = GeminiChatModel(
             model=model_name,
-            google_api_key=model_credential.get('api_key')
+            google_api_key=model_credential.get('api_key'),
+            **optional_params
         )
         return gemini_chat
 

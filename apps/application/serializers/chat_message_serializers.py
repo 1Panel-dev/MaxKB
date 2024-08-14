@@ -80,6 +80,8 @@ class ChatInfo:
             'model_id': self.application.model.id if self.application.model is not None else None,
             'problem_optimization': self.application.problem_optimization,
             'stream': True,
+            'temperature': model_setting.get('temperature') if 'temperature' in model_setting else None,
+            'max_tokens': model_setting.get('max_tokens') if 'max_tokens' in model_setting else None,
             'search_mode': self.application.dataset_setting.get(
                 'search_mode') if 'search_mode' in self.application.dataset_setting else 'embedding',
             'no_references_setting': self.application.dataset_setting.get(
