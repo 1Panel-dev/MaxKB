@@ -25,7 +25,7 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
         for key in step_variable:
             node.context[key] = step_variable[key]
         if workflow.is_result() and 'result' in step_variable:
-            result = step_variable['result'] + '\n'
+            result = str(step_variable['result']) + '\n'
             yield result
             workflow.answer += result
     node.context['run_time'] = time.time() - node.context['start_time']
