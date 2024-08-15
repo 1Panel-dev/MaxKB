@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import Codemirror from 'codemirror-editor-vue3'
-import 'codemirror/mode/python/python.js'
 
 defineOptions({ name: 'CodemirrorEditor' })
 const cmOptions = {
