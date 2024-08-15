@@ -8,7 +8,8 @@ import 'codemirror/mode/python/python.js'
 
 defineOptions({ name: 'CodemirrorEditor' })
 const cmOptions = {
-  mode: 'text/x-python'
+  mode: 'text/x-python',
+  autoRefresh: true
 }
 </script>
 

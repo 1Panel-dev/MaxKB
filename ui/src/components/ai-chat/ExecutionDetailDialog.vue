@@ -141,6 +141,27 @@
                       </div>
                     </div>
                   </template>
+
+                  <!-- 函数库 -->
+                  <template
+                    v-if="
+                      item.type === WorkflowType.FunctionLib ||
+                      item.type === WorkflowType.FunctionLibCustom
+                    "
+                  >
+                    <div class="card-never border-r-4 mt-8">
+                      <h5 class="p-8-12">输入</h5>
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                        {{ item.params || '-' }}
+                      </div>
+                    </div>
+                    <div class="card-never border-r-4 mt-8">
+                      <h5 class="p-8-12">输出</h5>
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                        {{ item.result || '-' }}
+                      </div>
+                    </div>
+                  </template>
                 </template>
                 <template v-else>
                   <div class="card-never border-r-4">
