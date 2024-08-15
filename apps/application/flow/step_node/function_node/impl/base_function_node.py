@@ -7,6 +7,9 @@
     @desc:
 """
 import json
+import time
+
+from typing import Dict
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.function_node.i_function_node import IFunctionNode
@@ -15,6 +18,17 @@ from common.util.function_code import FunctionExecutor
 from smartdoc.const import CONFIG
 
 function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
+
+
+def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
+    if step_variable is not None:
+        for key in step_variable:
+            node.context[key] = step_variable[key]
+        if workflow.is_result() and 'result' in step_variable:
+            result = step_variable['result'] + '\n'
+            yield result
+            workflow.answer += result
+    node.context['run_time'] = time.time() - node.context['start_time']
 
 
 def convert_value(name: str, value, _type, is_required, source, node):
@@ -46,7 +60,7 @@ class BaseFunctionNodeNode(IFunctionNode):
                   for field in input_field_list}
         result = function_executor.exec_code(code, params)
         self.context['params'] = params
-        return NodeResult({'result': result}, {})
+        return NodeResult({'result': result}, {}, _write_context=write_context)
 
     def get_details(self, index: int, **kwargs):
         return {

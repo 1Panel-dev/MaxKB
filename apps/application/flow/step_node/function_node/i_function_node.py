@@ -41,6 +41,7 @@ class InputField(serializers.Serializer):
 class FunctionNodeParamsSerializer(serializers.Serializer):
     input_field_list = InputField(required=True, many=True)
     code = serializers.CharField(required=True, error_messages=ErrMessage.char("函数"))
+    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)

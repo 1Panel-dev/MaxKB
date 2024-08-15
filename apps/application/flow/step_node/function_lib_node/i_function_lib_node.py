@@ -23,6 +23,7 @@ class InputField(serializers.Serializer):
 class FunctionLibNodeParamsSerializer(serializers.Serializer):
     function_lib_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid('函数库id'))
     input_field_list = InputField(required=True, many=True)
+    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)

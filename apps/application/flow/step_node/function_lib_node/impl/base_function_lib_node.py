@@ -7,6 +7,8 @@
     @desc:
 """
 import json
+import time
+from typing import Dict
 
 from django.db.models import QuerySet
 
@@ -18,6 +20,17 @@ from function_lib.models.function import FunctionLib
 from smartdoc.const import CONFIG
 
 function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
+
+
+def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
+    if step_variable is not None:
+        for key in step_variable:
+            node.context[key] = step_variable[key]
+        if workflow.is_result() and 'result' in step_variable:
+            result = step_variable['result'] + '\n'
+            yield result
+            workflow.answer += result
+    node.context['run_time'] = time.time() - node.context['start_time']
 
 
 def get_field_value(debug_field_list, name, is_required):
@@ -64,7 +77,7 @@ class BaseFunctionLibNodeNode(IFunctionLibNode):
                    function_lib.input_field_list]}
         self.context['params'] = params
         result = function_executor.exec_code(function_lib.code, params)
-        return NodeResult({'result': result}, {})
+        return NodeResult({'result': result}, {}, _write_context=write_context)
 
     def get_details(self, index: int, **kwargs):
         return {
