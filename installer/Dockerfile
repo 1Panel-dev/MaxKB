@@ -17,8 +17,8 @@ RUN apt-get update && \
 
 COPY . /opt/maxkb/app
 RUN mkdir -p /opt/maxkb/app /opt/maxkb/model /opt/maxkb/conf && \
-    rm -rf /opt/maxkb/app/ui &&\
-    useradd sandbox && mkdir /opt/maxkb/app/sandbox && chown sandbox:sandbox /opt/maxkb/app/sandbox && chmod 700 /opt/maxkb/app/sandbox \
+    rm -rf /opt/maxkb/app/ui && \
+    useradd sandbox && mkdir /opt/maxkb/app/sandbox && chown sandbox:sandbox /opt/maxkb/app/sandbox && chmod 700 /opt/maxkb/app/sandbox
 
 COPY --from=web-build ui /opt/maxkb/app/ui
 WORKDIR /opt/maxkb/app
