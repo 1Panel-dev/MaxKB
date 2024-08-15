@@ -141,6 +141,42 @@ export const replyNode = {
 }
 export const menuNodes = [aiChatNode, searchDatasetNode, questionNode, conditionNode, replyNode]
 
+/**
+ * 自定义函数配置数据
+ */
+export const functionNode = {
+  type: WorkflowType.FunctionLibCustom,
+  text: '通过执行自定义脚本，实现数据处理',
+  label: '自定义函数',
+  properties: {
+    stepName: '自定义函数',
+    config: {
+      fields: [
+        {
+          label: '结果',
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
+export const functionLibNode = {
+  type: WorkflowType.FunctionLib,
+  text: '通过执行自定义脚本，实现数据处理',
+  label: '自定义函数',
+  properties: {
+    stepName: '自定义函数',
+    config: {
+      fields: [
+        {
+          label: '结果',
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
+
 export const compareList = [
   { value: 'is_null', label: '为空' },
   { value: 'is_not_null', label: '不为空' },
@@ -165,7 +201,9 @@ export const nodeDict: any = {
   [WorkflowType.Condition]: conditionNode,
   [WorkflowType.Base]: baseNode,
   [WorkflowType.Start]: startNode,
-  [WorkflowType.Reply]: replyNode
+  [WorkflowType.Reply]: replyNode,
+  [WorkflowType.FunctionLib]: functionLibNode,
+  [WorkflowType.FunctionLibCustom]: functionNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

@@ -11,7 +11,7 @@ Class-based views
     1. Add an import:  forms other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: forms django.urls import include, path
+    1. Import the include() function_lib: forms django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import os
@@ -34,7 +34,8 @@ urlpatterns = [
     path("api/", include("users.urls")),
     path("api/", include("dataset.urls")),
     path("api/", include("setting.urls")),
-    path("api/", include("application.urls"))
+    path("api/", include("application.urls")),
+    path("api/", include("function_lib.urls"))
 ]
 
 

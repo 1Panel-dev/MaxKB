@@ -1,6 +1,11 @@
 import { WorkflowType } from '@/enums/workflow'
 
-const end_nodes = [WorkflowType.AiChat, WorkflowType.Reply]
+const end_nodes = [
+  WorkflowType.AiChat,
+  WorkflowType.Reply,
+  WorkflowType.FunctionLib,
+  WorkflowType.FunctionLibCustom
+]
 export class WorkFlowInstance {
   nodes
   edges

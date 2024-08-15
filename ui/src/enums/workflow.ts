@@ -5,5 +5,7 @@ export enum WorkflowType {
   SearchDataset = 'search-dataset-node',
   Question = 'question-node',
   Condition = 'condition-node',
-  Reply = 'reply-node'
+  Reply = 'reply-node',
+  FunctionLib = 'function-lib-node',
+  FunctionLibCustom = 'function-node'
 }

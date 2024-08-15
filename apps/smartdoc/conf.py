@@ -87,7 +87,8 @@ class Config(dict):
         "EMBEDDING_MODEL_PATH": os.path.join(PROJECT_DIR, 'models'),
         # 向量库配置
         "VECTOR_STORE_NAME": 'pg_vector',
-        "DEBUG": False
+        "DEBUG": False,
+        'SANDBOX': False
 
     }
 

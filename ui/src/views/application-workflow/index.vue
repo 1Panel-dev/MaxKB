@@ -11,9 +11,7 @@
         >
       </div>
       <div>
-        <el-button icon="Plus" @click="showPopover = !showPopover" v-click-outside="clickoutside">
-          添加组件
-        </el-button>
+        <el-button icon="Plus" @click="showPopover = !showPopover"> 添加组件 </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug">
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
           调试</el-button
@@ -27,21 +25,63 @@
     </div>
     <!-- 下拉框 -->
     <el-collapse-transition>
-      <div v-show="showPopover" class="workflow-dropdown-menu border border-r-4">
-        <h5 class="title">基础组件</h5>
-        <template v-for="(item, index) in menuNodes" :key="index">
-          <div
-            class="workflow-dropdown-item cursor flex p-8-12"
-            @click="clickNodes(item)"
-            @mousedown="onmousedown(item)"
-          >
-            <component :is="iconComponent(`${item.type}-icon`)" class="mr-8 mt-4" :size="32" />
-            <div class="pre-wrap">
-              <div class="lighter">{{ item.label }}</div>
-              <el-text type="info" size="small">{{ item.text }}</el-text>
+      <div
+        v-show="showPopover"
+        class="workflow-dropdown-menu border border-r-4"
+        v-click-outside="clickoutside"
+      >
+        <el-tabs v-model="activeName" class="workflow-dropdown-tabs">
+          <el-tab-pane label="基础组件" name="base">
+            <template v-for="(item, index) in menuNodes" :key="index">
+              <div
+                class="workflow-dropdown-item cursor flex p-8-12"
+                @click="clickNodes(item)"
+                @mousedown="onmousedown(item)"
+              >
+                <component :is="iconComponent(`${item.type}-icon`)" class="mr-8 mt-4" :size="32" />
+                <div class="pre-wrap">
+                  <div class="lighter">{{ item.label }}</div>
+                  <el-text type="info" size="small">{{ item.text }}</el-text>
+                </div>
+              </div>
+            </template>
+          </el-tab-pane>
+          <el-tab-pane label="函数库" name="function">
+            <div
+              class="workflow-dropdown-item cursor flex p-8-12"
+              @click="clickNodes(functionNode)"
+              @mousedown="onmousedown(functionNode)"
+            >
+              <component
+                :is="iconComponent(`function-lib-node-icon`)"
+                class="mr-8 mt-4"
+                :size="32"
+              />
+              <div class="pre-wrap">
+                <div class="lighter">{{ functionNode.label }}</div>
+                <el-text type="info" size="small">{{ functionNode.text }}</el-text>
+              </div>
             </div>
-          </div>
-        </template>
+
+            <template v-for="(item, index) in functionLibList" :key="index">
+              <div
+                class="workflow-dropdown-item cursor flex p-8-12"
+                @click="clickNodes(functionLibNode, item)"
+                @mousedown="onmousedown(functionLibNode, item)"
+              >
+                <component
+                  :is="iconComponent(`function-lib-node-icon`)"
+                  class="mr-8 mt-4"
+                  :size="32"
+                />
+                <div class="pre-wrap">
+                  <div class="lighter">{{ item.name }}</div>
+                  <el-text type="info" size="small">{{ item.desc }}</el-text>
+                </div>
+              </div>
+            </template>
+          </el-tab-pane>
+        </el-tabs>
       </div>
     </el-collapse-transition>
     <!-- 主画布 -->
@@ -106,7 +146,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Workflow from '@/workflow/index.vue'
-import { menuNodes } from '@/workflow/common/data'
+import { menuNodes, functionLibNode, functionNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application'
 import { isAppIcon } from '@/utils/application'
@@ -115,6 +155,7 @@ import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
+import functionLibApi from '@/api/function-lib'
 
 const { user, application } = useStore()
 const router = useRouter()
@@ -137,6 +178,8 @@ const showPopover = ref(false)
 const showDebug = ref(false)
 const enlarge = ref(false)
 const saveTime = ref<any>('')
+const activeName = ref('base')
+const functionLibList = ref<any[]>([])
 
 function publicHandle() {
   workflowRef.value
@@ -199,12 +242,22 @@ function clickoutsideDebug() {
   showDebug.value = false
 }
 
-function clickNodes(item: any) {
+function clickNodes(item: any, data?: any) {
+  if (data) {
+    item['properties']['stepName'] = data.name
+    item['properties']['node_data'] = data
+  }
   workflowRef.value?.addNode(item)
+  showPopover.value = false
 }
 
-function onmousedown(item: any) {
+function onmousedown(item: any, data?: any) {
+  if (data) {
+    item['properties']['stepName'] = data.name
+    item['properties']['node_data'] = { ...data, function_lib_id: data.id }
+  }
   workflowRef.value?.onmousedown(item)
+  showPopover.value = false
 }
 
 function getGraphData() {
@@ -230,6 +283,12 @@ function saveApplication() {
   })
 }
 
+function getList() {
+  functionLibApi.getAllFunctionLib({}, loading).then((res: any) => {
+    functionLibList.value = res.data
+  })
+}
+
 /**
  * 定时保存
  */
@@ -250,6 +309,7 @@ const closeInterval = () => {
 
 onMounted(() => {
   getDetail()
+  getList()
   // 初始化定时任务
   if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND')) {
     initInterval()
@@ -296,6 +356,11 @@ onBeforeUnmount(() => {
       &:hover {
         background: var(--app-text-color-light-1);
       }
+    }
+  }
+  .workflow-dropdown-tabs {
+    .el-tabs__nav-wrap {
+      padding: 0 16px;
     }
   }
 }

@@ -6,7 +6,7 @@ authors = ["shaohuzhang1 <shaohu.zhang@fit2cloud.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.12"
 django = "4.2.15"
 djangorestframework = "^3.15.2"
 drf-yasg = "1.21.7"
@@ -45,6 +45,9 @@ xlrd = "^2.0.1"
 gunicorn = "^22.0.0"
 python-daemon = "3.0.1"
 gevent = "^24.2.1"
+restrictedpython = "^7.2"
+cgroups = "^0.1.0"
+wasm-exec = "^0.1.9"
 
 boto3 = "^1.34.151"
 langchain-aws = "^0.1.13"

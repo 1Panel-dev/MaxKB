@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     "drf_yasg",  # swagger 接口
     'django_filters',  # 条件过滤
     'django_apscheduler',
-    'common'
+    'common',
+    'function_lib'
 
 ]
 
