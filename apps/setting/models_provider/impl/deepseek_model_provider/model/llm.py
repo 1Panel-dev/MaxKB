@@ -8,27 +8,29 @@
 """
 from typing import List, Dict
 
-from langchain_core.messages import BaseMessage, get_buffer_string
-from langchain_openai import ChatOpenAI
-
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
+from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
-class DeepSeekChatModel(MaxKBBaseModel, ChatOpenAI):
+class DeepSeekChatModel(MaxKBBaseModel, BaseChatOpenAI):
+
+    @staticmethod
+    def is_cache_model():
+        return False
+
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        optional_params = {}
+        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
+            optional_params['max_tokens'] = model_kwargs['max_tokens']
+        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
+            optional_params['temperature'] = model_kwargs['temperature']
+
         deepseek_chat_open_ai = DeepSeekChatModel(
             model=model_name,
             openai_api_base='https://api.deepseek.com',
-            openai_api_key=model_credential.get('api_key')
+            openai_api_key=model_credential.get('api_key'),
+            **optional_params
         )
         return deepseek_chat_open_ai
 
-    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        tokenizer = TokenizerManage.get_tokenizer()
-        return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
-
-    def get_num_tokens(self, text: str) -> int:
-        tokenizer = TokenizerManage.get_tokenizer()
-        return len(tokenizer.encode(text))

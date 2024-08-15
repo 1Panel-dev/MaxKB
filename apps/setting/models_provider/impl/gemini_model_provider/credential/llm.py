@@ -32,7 +32,8 @@ class GeminiLLMModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            model.invoke([HumanMessage(content='你好')])
+            res = model.invoke([HumanMessage(content='你好')])
+            print(res)
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
@@ -46,3 +47,25 @@ class GeminiLLMModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     api_key = forms.PasswordInputField('API Key', required=True)
+
+    def get_other_fields(self):
+        return {
+            'temperature': {
+                'value': 0.7,
+                'min': 0.1,
+                'max': 1.0,
+                'step': 0.01,
+                'label': '温度',
+                'precision': 2,
+                'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
+            },
+            'max_tokens': {
+                'value': 800,
+                'min': 1,
+                'max': 4096,
+                'step': 1,
+                'label': '输出最大Tokens',
+                'precision': 0,
+                'tooltip': '指定模型可生成的最大token个数'
+            }
+        }

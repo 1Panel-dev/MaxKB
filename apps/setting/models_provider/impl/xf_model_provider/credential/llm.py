@@ -49,3 +49,28 @@ class XunFeiLLMModelCredential(BaseForm, BaseModelCredential):
     spark_app_id = forms.TextInputField('APP ID', required=True)
     spark_api_key = forms.PasswordInputField("API Key", required=True)
     spark_api_secret = forms.PasswordInputField('API Secret', required=True)
+
+    def get_other_fields(self, model_name):
+        max_value = 8192
+        if model_name == 'general' or model_name == 'pro-128k':
+            max_value = 4096
+        return {
+            'temperature': {
+                'value': 0.5,
+                'min': 0.1,
+                'max': 1,
+                'step': 0.01,
+                'label': '温度',
+                'precision': 2,
+                'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
+            },
+            'max_tokens': {
+                'value': 4096,
+                'min': 1,
+                'max': max_value,
+                'step': 1,
+                'label': '输出最大Tokens',
+                'precision': 0,
+                'tooltip': '指定模型可生成的最大token个数'
+            }
+        }

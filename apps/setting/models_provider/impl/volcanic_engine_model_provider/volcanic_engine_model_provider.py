@@ -14,7 +14,7 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
 from setting.models_provider.impl.openai_model_provider.credential.embedding import OpenAIEmbeddingCredential
 from setting.models_provider.impl.openai_model_provider.credential.llm import OpenAILLMModelCredential
 from setting.models_provider.impl.openai_model_provider.model.embedding import OpenAIEmbeddingModel
-from setting.models_provider.impl.openai_model_provider.model.llm import OpenAIChatModel
+from setting.models_provider.impl.volcanic_engine_model_provider.model.llm import VolcanicEngineChatModel
 
 from smartdoc.conf import PROJECT_DIR
 
@@ -24,7 +24,7 @@ model_info_list = [
     ModelInfo('ep-xxxxxxxxxx-yyyy',
               '用户前往火山方舟的模型推理页面创建推理接入点，这里需要输入ep-xxxxxxxxxx-yyyy进行调用',
               ModelTypeConst.LLM,
-              volcanic_engine_llm_model_credential, OpenAIChatModel
+              volcanic_engine_llm_model_credential, VolcanicEngineChatModel
               )
 ]
 

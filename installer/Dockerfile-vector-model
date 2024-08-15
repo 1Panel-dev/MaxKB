@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm as vector-model
+FROM python:3.11-slim-bookworm AS vector-model
 
 COPY installer/install_model.py install_model.py
 RUN pip3 install --upgrade pip setuptools && \

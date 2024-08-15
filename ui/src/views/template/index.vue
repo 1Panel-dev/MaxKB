@@ -3,28 +3,38 @@
     <div class="template-manage flex main-calc-height">
       <div class="template-manage__left p-8 border-r">
         <h4 class="p-16" style="padding-bottom: 8px">供应商</h4>
-        <common-list
-          :data="provider_list"
-          v-loading="loading"
-          @click="clickListHandle"
-          value-key="provider"
-          default-active=""
-        >
-          <template #default="{ row, index }">
-            <div class="flex" v-if="index === 0">
-              <AppIcon
-                class="mr-8"
-                style="height: 20px; width: 20px"
-                :iconName="active_provider === row ? 'app-all-menu-active' : 'app-all-menu'"
-              ></AppIcon>
-              <span>全部模型</span>
-            </div>
-            <div class="flex" v-else>
-              <span :innerHTML="row.icon" alt="" style="height: 20px; width: 20px" class="mr-8" />
-              <span>{{ row.name }}</span>
-            </div>
-          </template>
-        </common-list>
+        <div class="model-list-height-left">
+          <el-scrollbar>
+            <common-list
+              :data="provider_list"
+              v-loading="loading"
+              @click="clickListHandle"
+              value-key="provider"
+              default-active=""
+              style="overflow-y: auto"
+            >
+              <template #default="{ row, index }">
+                <div class="flex" v-if="index === 0">
+                  <AppIcon
+                    class="mr-8"
+                    style="height: 20px; width: 20px"
+                    :iconName="active_provider === row ? 'app-all-menu-active' : 'app-all-menu'"
+                  ></AppIcon>
+                  <span>全部模型</span>
+                </div>
+                <div class="flex" v-else>
+                  <span
+                    :innerHTML="row.icon"
+                    alt=""
+                    style="height: 20px; width: 20px"
+                    class="mr-8"
+                  />
+                  <span>{{ row.name }}</span>
+                </div>
+              </template>
+            </common-list>
+          </el-scrollbar>
+        </div>
       </div>
       <div class="template-manage__right w-full" v-loading="list_model_loading">
         <div class="p-24 pb-0">
@@ -162,6 +172,9 @@ onMounted(() => {
 
   .model-list-height {
     height: calc(var(--create-dataset-height) - 70px);
+  }
+  .model-list-height-left {
+    height: calc(var(--create-dataset-height));
   }
 }
 </style>

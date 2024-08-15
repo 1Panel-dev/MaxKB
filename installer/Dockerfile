@@ -1,11 +1,11 @@
-FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 as vector-model
-FROM node:18-alpine3.18 as web-build
+FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 AS vector-model
+FROM node:18-alpine3.18 AS web-build
 COPY ui ui
 RUN cd ui && \
     npm install && \
     npm run build && \
     rm -rf ./node_modules
-FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11-pg15.6 as stage-build
+FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11-pg15.6 AS stage-build
 
 ARG DEPENDENCIES="                    \
         python3-pip"
@@ -43,18 +43,18 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     MAXKB_DB_PASSWORD=Password123@postgres \
     MAXKB_EMBEDDING_MODEL_NAME=/opt/maxkb/model/embedding/shibing624_text2vec-base-chinese \
     MAXKB_EMBEDDING_MODEL_PATH=/opt/maxkb/model/embedding \
-    MAXKB_SANDBOX=true
+    MAXKB_SANDBOX=true \
+    LANG=en_US.UTF-8 \
+    PATH=/opt/py3/bin:$PATH \
+    POSTGRES_USER=root \
+    POSTGRES_PASSWORD=Password123@postgres \
+    PIP_TARGET=/var/lib/postgresql/data/python-packages \
+    PYTHONPATH=$PIP_TARGET:$PYTHONPATH
 
 WORKDIR /opt/maxkb/app
 COPY --from=stage-build /opt/maxkb /opt/maxkb
 COPY --from=stage-build /opt/py3 /opt/py3
 COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb/model
-
-ENV LANG=en_US.UTF-8 \
-    PATH=/opt/py3/bin:$PATH
-
-ENV POSTGRES_USER root
-ENV POSTGRES_PASSWORD Password123@postgres
 
 RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \

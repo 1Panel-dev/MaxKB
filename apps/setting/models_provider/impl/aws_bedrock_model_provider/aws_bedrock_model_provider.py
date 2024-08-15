@@ -31,13 +31,56 @@ def _get_aws_bedrock_icon_path():
 
 
 def _initialize_model_info():
-    model_info_list = [_create_model_info(
-        'amazon.titan-text-premier-v1:0',
-        'Titan Text Premier 是 Titan Text 系列中功能强大且先进的型号，旨在为各种企业应用程序提供卓越的性能。凭借其尖端功能，它提供了更高的准确性和出色的结果，使其成为寻求一流文本处理解决方案的组织的绝佳选择。',
-        ModelTypeConst.LLM,
-        BedrockLLMModelCredential,
-        BedrockModel
-    ),
+    model_info_list = [
+        _create_model_info(
+            'anthropic.claude-v2:1',
+            'Claude 2 的更新，采用双倍的上下文窗口，并在长文档和 RAG 上下文中提高可靠性、幻觉率和循证准确性。',
+            ModelTypeConst.LLM,
+            BedrockLLMModelCredential,
+            BedrockModel
+        ),
+        _create_model_info(
+            'anthropic.claude-v2',
+            'Anthropic 功能强大的模型，可处理各种任务，从复杂的对话和创意内容生成到详细的指令服从。',
+            ModelTypeConst.LLM,
+            BedrockLLMModelCredential,
+            BedrockModel
+        ),
+        _create_model_info(
+            'anthropic.claude-3-haiku-20240307-v1:0',
+            'Claude 3 Haiku 是 Anthropic 最快速、最紧凑的模型，具有近乎即时的响应能力。该模型可以快速回答简单的查询和请求。客户将能够构建模仿人类交互的无缝人工智能体验。 Claude 3 Haiku 可以处理图像和返回文本输出，并且提供 200K 上下文窗口。',
+            ModelTypeConst.LLM,
+            BedrockLLMModelCredential,
+            BedrockModel
+        ),
+        _create_model_info(
+            'anthropic.claude-3-sonnet-20240229-v1:0',
+            'Anthropic 推出的 Claude 3 Sonnet 模型在智能和速度之间取得理想的平衡，尤其是在处理企业工作负载方面。该模型提供最大的效用，同时价格低于竞争产品，并且其经过精心设计，是大规模部署人工智能的可靠选择。',
+            ModelTypeConst.LLM,
+            BedrockLLMModelCredential,
+            BedrockModel
+        ),
+        _create_model_info(
+            'anthropic.claude-3-5-sonnet-20240620-v1:0',
+            'Claude 3.5 Sonnet提高了智能的行业标准，在广泛的评估中超越了竞争对手的型号和Claude 3 Opus，具有我们中端型号的速度和成本效益。',
+            ModelTypeConst.LLM,
+            BedrockLLMModelCredential,
+            BedrockModel
+        ),
+        _create_model_info(
+            'anthropic.claude-instant-v1',
+            '一种更快速、更实惠但仍然非常强大的模型，它可以处理一系列任务，包括随意对话、文本分析、摘要和文档问题回答。',
+            ModelTypeConst.LLM,
+            BedrockLLMModelCredential,
+            BedrockModel
+        ),
+        _create_model_info(
+            'amazon.titan-text-premier-v1:0',
+            'Titan Text Premier 是 Titan Text 系列中功能强大且先进的型号，旨在为各种企业应用程序提供卓越的性能。凭借其尖端功能，它提供了更高的准确性和出色的结果，使其成为寻求一流文本处理解决方案的组织的绝佳选择。',
+            ModelTypeConst.LLM,
+            BedrockLLMModelCredential,
+            BedrockModel
+        ),
         _create_model_info(
             'amazon.titan-text-lite-v1',
             'Amazon Titan Text Lite 是一种轻量级的高效模型，非常适合英语任务的微调，包括摘要和文案写作等，在这种场景下，客户需要更小、更经济高效且高度可定制的模型',
@@ -59,7 +102,7 @@ def _initialize_model_info():
         _create_model_info(
             'mistral.mistral-7b-instruct-v0:2',
             '7B 密集型转换器，可快速部署，易于定制。体积虽小，但功能强大，适用于各种用例。支持英语和代码，以及 32k 的上下文窗口。',
-            ModelTypeConst.EMBEDDING,
+            ModelTypeConst.LLM,
             BedrockLLMModelCredential,
             BedrockModel),
         _create_model_info(

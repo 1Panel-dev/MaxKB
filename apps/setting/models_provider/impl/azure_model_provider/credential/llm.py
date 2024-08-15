@@ -53,3 +53,25 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField("API Key (api_key)", required=True)
 
     deployment_name = forms.TextInputField("部署名 (deployment_name)", required=True)
+
+    def get_other_fields(self, model_name):
+        return {
+            'temperature': {
+                'value': 0.7,
+                'min': 0.1,
+                'max': 1,
+                'step': 0.01,
+                'label': '温度',
+                'precision': 2,
+                'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
+            },
+            'max_tokens': {
+                'value': 800,
+                'min': 1,
+                'max': 4096,
+                'step': 1,
+                'label': '输出最大Tokens',
+                'precision': 0,
+                'tooltip': '指定模型可生成的最大token个数'
+            }
+        }
