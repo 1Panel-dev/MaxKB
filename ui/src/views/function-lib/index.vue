@@ -49,7 +49,7 @@
               <template #footer>
                 <div class="footer-content">
                   <el-tooltip effect="dark" content="复制" placement="top">
-                    <el-button text>
+                    <el-button text @click.stop="copyFunctionLib(item)">
                       <AppIcon iconName="app-copy"></AppIcon>
                     </el-button>
                   </el-tooltip>
@@ -73,7 +73,7 @@
 import { ref, onMounted, reactive } from 'vue'
 import functionLibApi from '@/api/function-lib'
 import FunctionFormDrawer from './component/FunctionFormDrawer.vue'
-
+import { MsgSuccess, MsgError } from '@/utils/message'
 const loading = ref(false)
 
 const FunctionFormDrawerRef = ref()
@@ -112,6 +112,17 @@ function deleteFunctionLib(row: any) {
   // )
   //   .then(() => {})
   //   .catch(() => {})
+}
+
+function copyFunctionLib(row: any) {
+  delete row['id']
+  functionLibApi.postFunctionLib(row, loading).then((res) => {
+    MsgSuccess('复制成功')
+    paginationConfig.total = 0
+    paginationConfig.current_page = 1
+    functionLibList.value = []
+    getList()
+  })
 }
 
 function getList() {

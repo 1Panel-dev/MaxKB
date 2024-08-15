@@ -141,7 +141,7 @@ const form = ref<functionLibData>({
 watch(visible, (bool) => {
   if (!bool) {
     isEdit.value = false
-    showEditor.value = true
+    showEditor.value = false
     currentIndex.value = null
     form.value = {
       name: '',
