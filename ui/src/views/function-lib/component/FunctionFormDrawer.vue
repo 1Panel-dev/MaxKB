@@ -97,7 +97,7 @@
 
     <template #footer>
       <div>
-        <el-button :loading="loading">取消</el-button>
+        <el-button :loading="loading" @click="visible = false">取消</el-button>
         <el-button :loading="loading" @click="openDebug">调试</el-button>
         <el-button type="primary" @click="submit(FormRef)" :loading="loading">
           {{ isEdit ? '保存' : '创建' }}</el-button

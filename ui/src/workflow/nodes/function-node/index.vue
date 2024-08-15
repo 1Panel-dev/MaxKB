@@ -1,7 +1,8 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
+    <h5 class="title-decoration-1 mb-16">节点设置</h5>
     <div class="flex-between">
-      <h5 class="title-decoration-1 mb-8">输入变量</h5>
+      <h5 class="lighter mb-8">输入变量</h5>
       <el-button link type="primary" @click="openAddDialog()">
         <el-icon class="mr-4"><Plus /></el-icon> 添加
       </el-button>
@@ -66,16 +67,32 @@
         <el-text type="info" v-else> 暂无数据 </el-text>
       </el-card>
 
-      <h5 class="title-decoration-1 mb-16">Python 代码</h5>
-
+      <h5 class="lighter mb-8">Python 代码</h5>
       <CodemirrorEditor
         v-model:value="chat_data.code"
-        v-if="showEditor"
         @change="changeCode"
         @wheel="wheel"
         @keydown="isKeyDown = true"
         @keyup="isKeyDown = false"
+        class="mb-8"
+        v-if="showEditor"
       />
+      <el-form-item label="返回内容" @click.prevent>
+        <template #label>
+          <div class="flex align-center">
+            <div class="mr-4">
+              <span>返回内容<span class="danger">*</span></span>
+            </div>
+            <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+              <template #content>
+                关闭后该节点的内容则不输出给用户。 如果你想让用户看到该节点的输出内容，请打开开关。
+              </template>
+              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+            </el-tooltip>
+          </div>
+        </template>
+        <el-switch size="small" v-model="chat_data.is_result" />
+      </el-form-item>
     </el-form>
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </NodeContainer>
@@ -87,6 +104,7 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import FieldFormDialog from '@/views/function-lib/component/FieldFormDialog.vue'
+import { isLastNode } from '@/workflow/common/data'
 
 const props = defineProps<{ nodeModel: any }>()
 
@@ -105,7 +123,8 @@ const nodeCascaderRef = ref()
 
 const form = {
   code: '',
-  input_field_list: []
+  input_field_list: [],
+  is_result: false
 }
 
 const currentIndex = ref<any>(null)
@@ -167,6 +186,11 @@ function refreshFieldList(data: any) {
 }
 
 onMounted(() => {
+  if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
+    if (isLastNode(props.nodeModel)) {
+      set(props.nodeModel.properties.node_data, 'is_result', true)
+    }
+  }
   set(props.nodeModel, 'validate', validate)
   setTimeout(() => {
     showEditor.value = true

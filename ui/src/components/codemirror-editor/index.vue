@@ -18,4 +18,7 @@ const cmOptions = {
   border: 1px solid #bbbfc4;
   border-radius: 4px;
 }
+.CodeMirror-gutters {
+  left: 0 !important;
+}
 </style>
