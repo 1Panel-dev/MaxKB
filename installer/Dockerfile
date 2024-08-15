@@ -17,8 +17,7 @@ RUN apt-get update && \
 
 COPY . /opt/maxkb/app
 RUN mkdir -p /opt/maxkb/app /opt/maxkb/model /opt/maxkb/conf && \
-    rm -rf /opt/maxkb/app/ui && \
-    useradd -m sandbox && mkdir /opt/maxkb/app/sandbox && chown sandbox:sandbox /opt/maxkb/app/sandbox && chmod 700 /opt/maxkb/app/sandbox
+    rm -rf /opt/maxkb/app/ui
 
 COPY --from=web-build ui /opt/maxkb/app/ui
 WORKDIR /opt/maxkb/app
@@ -59,7 +58,11 @@ COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb/model
 RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
     cp -f /opt/maxkb/app/installer/run-maxkb.sh /usr/bin/run-maxkb.sh && \
-    cp -f /opt/maxkb/app/installer/init.sql /docker-entrypoint-initdb.d
+    cp -f /opt/maxkb/app/installer/init.sql /docker-entrypoint-initdb.d && \
+    mkdir /opt/maxkb/app/sandbox &&  \
+    useradd --no-create-home --home /opt/maxkb/app/sandbox --shell /bin/bash sandbox &&  \
+    chown sandbox:sandbox /opt/maxkb/app/sandbox
+
 
 EXPOSE 8080
 
