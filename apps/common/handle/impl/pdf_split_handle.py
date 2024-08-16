@@ -9,13 +9,16 @@
 import re
 from typing import List
 
-import pypdf
+from pypdf import PdfReader, PdfWriter
 import os
 import tempfile
+import logging
 from langchain_community.document_loaders import PyPDFLoader
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.util.split_model import SplitModel
+
+import time
 
 default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),
@@ -26,25 +29,7 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile("(?<!\n)\n\n+")]
 
 
-def check_pdf_is_image(pdf_path):
-    try:
-        # 打开PDF文件
-        with open(pdf_path, "rb") as f:
-            reader = pypdf.PdfReader(f)
-            for page_num in range(len(reader.pages)):
-                page = reader.pages[page_num]
-
-                # 尝试提取文本
-                text = page.extract_text()
-                if text and text.strip():  # 如果页面中有文本内容
-                    return False  # 不是纯图片
-                else:
-                    return True  # 可能是图片或扫描件
-
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
-
+max_kb = logging.getLogger("max_kb")
 
 class PdfSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
@@ -56,17 +41,37 @@ class PdfSplitHandle(BaseSplitHandle):
             temp_file_path = temp_file.name
 
         try:
-            if check_pdf_is_image(temp_file_path):
-                loader = PyPDFLoader(temp_file_path, extract_images=True)
-            else:
-                loader = PyPDFLoader(temp_file_path, extract_images=False)
+            content = ""
+            reader = PdfReader(temp_file_path)
+            for page_num in range(len(reader.pages)):
+                start_time = time.time()
+                page = reader.pages[page_num]
+                text = page.extract_text()
 
-            content = "\n".join([page.page_content for page in loader.lazy_load()])
+                if text and text.strip():  # 如果页面中有文本内容
+                    page_content = text
+                else:
+                    try:
+                        writer = PdfWriter()
+                        writer.add_page(page)
+                        with tempfile.NamedTemporaryFile(delete=False) as output_pdf:
+                            writer.write(output_pdf)
+                        loader = PyPDFLoader(output_pdf.name, extract_images=True)
+                        page_content = "\n" + loader.load()[0].page_content
+                    finally:
+                        os.remove(output_pdf.name)
 
+                content += page_content
+
+                elapsed_time = time.time() - start_time
+                # todo 实现进度条代替下面的普通输出
+                max_kb.debug(f"File: {file.name}, Page: {page_num + 1}, Time : {elapsed_time: .3f}s,   content-length: {len(page_content)}")
             if pattern_list is not None and len(pattern_list) > 0:
                 split_model = SplitModel(pattern_list, with_filter, limit)
             else:
                 split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
+
+
         except BaseException as e:
             return {'name': file.name,
                     'content': []}
