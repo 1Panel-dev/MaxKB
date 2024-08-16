@@ -71,6 +71,15 @@ class FunctionLibView(APIView):
                 FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).edit(
                     request.data))
 
+        @action(methods=['DELETE'], detail=False)
+        @swagger_auto_schema(operation_summary="删除函数",
+                             operation_id="删除函数",
+                             tags=['函数库'])
+        @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
+        def delete(self, request: Request, function_lib_id: str):
+            return result.success(
+                FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).delete())
+
     class Page(APIView):
         authentication_classes = [TokenAuth]
 
