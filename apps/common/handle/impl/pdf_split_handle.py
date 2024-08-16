@@ -26,10 +26,6 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile("(?<!\n)\n\n+")]
 
 
-def number_to_text(pdf_document, page_number):
-    return pdf_document[page_number].page_content
-
-
 def check_pdf_is_image(pdf_path):
     try:
         # 打开PDF文件
@@ -64,8 +60,9 @@ class PdfSplitHandle(BaseSplitHandle):
                 loader = PyPDFLoader(temp_file_path, extract_images=True)
             else:
                 loader = PyPDFLoader(temp_file_path, extract_images=False)
-            pdf_document = loader.load()
-            content = "\n".join([number_to_text(pdf_document, page_number) for page_number in range(len(pdf_document))])
+
+            content = "\n".join([page.page_content for page in loader.lazy_load()])
+
             if pattern_list is not None and len(pattern_list) > 0:
                 split_model = SplitModel(pattern_list, with_filter, limit)
             else:
