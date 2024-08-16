@@ -174,6 +174,12 @@ class FunctionLibSerializer(serializers.Serializer):
             if not QuerySet(FunctionLib).filter(id=self.data.get('id'), user_id=self.data.get('user_id')).exists():
                 raise AppApiException(500, '函数不存在')
 
+        def delete(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            QuerySet(FunctionLib).filter(id=self.data.get('id')).delete()
+            return True
+
         def edit(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
