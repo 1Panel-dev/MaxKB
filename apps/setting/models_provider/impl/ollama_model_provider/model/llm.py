@@ -10,10 +10,10 @@ from typing import List, Dict
 from urllib.parse import urlparse, ParseResult
 
 from langchain_core.messages import BaseMessage, get_buffer_string
+from langchain_openai.chat_models import ChatOpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
-from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
 def get_base_url(url: str):
@@ -24,7 +24,7 @@ def get_base_url(url: str):
     return result_url[:-1] if result_url.endswith("/") else result_url
 
 
-class OllamaChatModel(MaxKBBaseModel, BaseChatOpenAI):
+class OllamaChatModel(MaxKBBaseModel, ChatOpenAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         api_base = model_credential.get('api_base', '')

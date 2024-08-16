@@ -9,13 +9,9 @@
 import uuid
 from typing import List, Dict, Optional, Any, Iterator
 
-from langchain.schema.messages import get_buffer_string
-from langchain_community.chat_models import QianfanChatEndpoint
-from langchain_community.chat_models.baidu_qianfan_endpoint import _convert_dict_to_message
+from langchain_community.chat_models.baidu_qianfan_endpoint import _convert_dict_to_message, QianfanChatEndpoint
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.outputs import ChatGenerationChunk
-
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from langchain_core.messages import (
     AIMessageChunk,
@@ -24,6 +20,9 @@ from langchain_core.messages import (
 
 
 class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
+    @staticmethod
+    def is_cache_model():
+        return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
@@ -36,7 +35,7 @@ class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
                                 qianfan_ak=model_credential.get('api_key'),
                                 qianfan_sk=model_credential.get('secret_key'),
                                 streaming=model_kwargs.get('streaming', False),
-                                **optional_params)
+                                init_kwargs=optional_params)
 
     def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
         return self.__dict__.get('_last_generation_info')
@@ -54,6 +53,7 @@ class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
             run_manager: Optional[CallbackManagerForLLMRun] = None,
             **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
+        kwargs = {**self.init_kwargs, **kwargs}
         params = self._convert_prompt_msg_params(messages, **kwargs)
         params["stop"] = stop
         params["stream"] = True
@@ -61,7 +61,7 @@ class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
             if res:
                 msg = _convert_dict_to_message(res)
                 additional_kwargs = msg.additional_kwargs.get("function_call", {})
-                if msg.content == "":
+                if msg.content == "" or res.get("body").get("is_end"):
                     token_usage = res.get("body").get("usage")
                     self.__dict__.setdefault('_last_generation_info', {}).update(token_usage)
                 chunk = ChatGenerationChunk(

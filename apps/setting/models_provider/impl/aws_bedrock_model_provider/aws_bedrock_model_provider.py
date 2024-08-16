@@ -94,12 +94,6 @@ def _initialize_model_info():
             BedrockLLMModelCredential,
             BedrockModel),
         _create_model_info(
-            'amazon.titan-embed-text-v2:0',
-            'Amazon Titan Text Embeddings V2 是一种轻量级、高效的模型，非常适合在不同维度上执行高精度检索任务。该模型支持灵活的嵌入大小（1024、512 和 256），并优先考虑在较小维度上保持准确性，从而可以在不影响准确性的情况下降低存储成本。Titan Text Embeddings V2 适用于各种任务，包括文档检索、推荐系统、搜索引擎和对话式系统。',
-            ModelTypeConst.LLM,
-            BedrockLLMModelCredential,
-            BedrockModel),
-        _create_model_info(
             'mistral.mistral-7b-instruct-v0:2',
             '7B 密集型转换器，可快速部署，易于定制。体积虽小，但功能强大，适用于各种用例。支持英语和代码，以及 32k 的上下文窗口。',
             ModelTypeConst.LLM,

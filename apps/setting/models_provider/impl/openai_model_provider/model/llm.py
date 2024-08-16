@@ -6,16 +6,9 @@
     @date：2024/4/18 15:28
     @desc:
 """
-from typing import List, Dict, Optional, Iterator, Any, Type
+from typing import List, Dict
 
-from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.messages import BaseMessage, get_buffer_string, BaseMessageChunk, AIMessageChunk
-from langchain_core.messages.ai import UsageMetadata
-from langchain_core.outputs import ChatGenerationChunk
-from langchain_openai import ChatOpenAI
-from langchain_openai.chat_models.base import _convert_delta_to_message_chunk
-
-from common.config.tokenizer_manage_config import TokenizerManage
+from langchain_openai.chat_models import ChatOpenAI
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 
@@ -32,6 +25,7 @@ class OpenAIChatModel(MaxKBBaseModel, ChatOpenAI):
             openai_api_base=model_credential.get('api_base'),
             openai_api_key=model_credential.get('api_key'),
             **optional_params,
-            stream_usage=True
+            streaming=True,
+            stream_usage=True,
         )
         return azure_chat_open_ai

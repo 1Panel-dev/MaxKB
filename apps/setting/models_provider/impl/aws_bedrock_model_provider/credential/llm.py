@@ -63,10 +63,19 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
 
     def get_other_fields(self, model_name):
         return {
+            'temperature': {
+                'value': 0.7,
+                'min': 0.1,
+                'max': 1,
+                'step': 0.01,
+                'label': '温度',
+                'precision': 2,
+                'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
+            },
             'max_tokens': {
                 'value': 1024,
                 'min': 1,
-                'max': 8192,
+                'max': 4096,
                 'step': 1,
                 'label': '输出最大Tokens',
                 'precision': 0,

@@ -1,10 +1,27 @@
-from typing import List, Dict, Any, Optional, Iterator
+from typing import List, Dict
 from langchain_community.chat_models import BedrockChat
-from langchain_community.chat_models.bedrock import ChatPromptAdapter
-from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.messages import BaseMessage, get_buffer_string, AIMessageChunk
-from langchain_core.outputs import ChatGenerationChunk
 from setting.models_provider.base_model_provider import MaxKBBaseModel
+
+
+def get_max_tokens_keyword(model_name):
+    """
+    根据模型名称返回正确的 max_tokens 关键字。
+
+    :param model_name: 模型名称字符串
+    :return: 对应的 max_tokens 关键字字符串
+    """
+    if 'amazon' in model_name:
+        return 'maxTokenCount'
+    elif 'anthropic' in model_name:
+        return 'max_tokens_to_sample'
+    elif 'ai21' in model_name:
+        return 'maxTokens'
+    elif 'cohere' in model_name or 'mistral' in model_name:
+        return 'max_tokens'
+    elif 'meta' in model_name:
+        return 'max_gen_len'
+    else:
+        raise ValueError("Unsupported model supplier in model_name.")
 
 
 class BedrockModel(MaxKBBaseModel, BedrockChat):
@@ -23,7 +40,8 @@ class BedrockModel(MaxKBBaseModel, BedrockChat):
                      **model_kwargs) -> 'BedrockModel':
         optional_params = {}
         if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
+            keyword = get_max_tokens_keyword(model_name)
+            optional_params[keyword] = model_kwargs['max_tokens']
         if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
             optional_params['temperature'] = model_kwargs['temperature']
 
@@ -31,42 +49,6 @@ class BedrockModel(MaxKBBaseModel, BedrockChat):
             model_id=model_name,
             region_name=model_credential['region_name'],
             credentials_profile_name=model_credential['credentials_profile_name'],
-            streaming=model_kwargs.pop('streaming', False),
-            **optional_params
+            streaming=model_kwargs.pop('streaming', True),
+            model_kwargs=optional_params
         )
-
-    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        return sum(self._get_num_tokens(get_buffer_string([message])) for message in messages)
-
-    def get_num_tokens(self, text: str) -> int:
-        return self._get_num_tokens(text)
-
-    def _stream(
-            self,
-            messages: List[BaseMessage],
-            stop: Optional[List[str]] = None,
-            run_manager: Optional[CallbackManagerForLLMRun] = None,
-            **kwargs: Any,
-    ) -> Iterator[ChatGenerationChunk]:
-        provider = self._get_provider()
-        prompt, system, formatted_messages = None, None, None
-
-        if provider == "anthropic":
-            system, formatted_messages = ChatPromptAdapter.format_messages(
-                provider, messages
-            )
-        else:
-            prompt = ChatPromptAdapter.convert_messages_to_prompt(
-                provider=provider, messages=messages
-            )
-
-        for chunk in self._prepare_input_and_invoke_stream(
-                prompt=prompt,
-                system=system,
-                messages=formatted_messages,
-                stop=stop,
-                run_manager=run_manager,
-                **kwargs,
-        ):
-            delta = chunk.text
-            yield ChatGenerationChunk(message=AIMessageChunk(content=delta))
