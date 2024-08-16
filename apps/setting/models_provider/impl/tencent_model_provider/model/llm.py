@@ -9,6 +9,9 @@ from setting.models_provider.impl.tencent_model_provider.model.hunyuan import Ch
 
 
 class TencentModel(MaxKBBaseModel, ChatHunyuan):
+    @staticmethod
+    def is_cache_model():
+        return False
 
     def __init__(self, model_name: str, credentials: Dict[str, str], streaming: bool = False, **kwargs):
         hunyuan_app_id = credentials.get('hunyuan_app_id')
@@ -25,7 +28,7 @@ class TencentModel(MaxKBBaseModel, ChatHunyuan):
 
         super().__init__(model=model_name, hunyuan_app_id=hunyuan_app_id, hunyuan_secret_id=hunyuan_secret_id,
                          hunyuan_secret_key=hunyuan_secret_key, streaming=streaming,
-                         temperature=optional_params.get('temperature', None)
+                         temperature=optional_params.get('temperature', 1.0)
                          )
 
     @staticmethod

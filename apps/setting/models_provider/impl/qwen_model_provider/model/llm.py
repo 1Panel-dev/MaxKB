@@ -20,6 +20,10 @@ from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 class QwenChatModel(MaxKBBaseModel, ChatTongyi):
     @staticmethod
+    def is_cache_model():
+        return False
+
+    @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {}
         if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
@@ -29,7 +33,7 @@ class QwenChatModel(MaxKBBaseModel, ChatTongyi):
         chat_tong_yi = QwenChatModel(
             model_name=model_name,
             dashscope_api_key=model_credential.get('api_key'),
-            **optional_params,
+            model_kwargs=optional_params,
         )
         return chat_tong_yi
 
@@ -61,7 +65,7 @@ class QwenChatModel(MaxKBBaseModel, ChatTongyi):
             if (
                     choice["finish_reason"] == "stop"
                     and message["content"] == ""
-            ):
+            ) or (choice["finish_reason"] == "length"):
                 token_usage = stream_resp["usage"]
                 self.__dict__.setdefault('_last_generation_info', {}).update(token_usage)
             if (
