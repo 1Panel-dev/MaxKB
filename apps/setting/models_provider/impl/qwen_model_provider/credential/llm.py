@@ -57,4 +57,13 @@ class OpenAILLMModelCredential(BaseForm, BaseModelCredential):
                 'precision': 2,
                 'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
             },
+            'max_tokens': {
+                'value': 800,
+                'min': 1,
+                'max': 2048,
+                'step': 1,
+                'label': '输出最大Tokens',
+                'precision': 0,
+                'tooltip': '指定模型可生成的最大token个数'
+            }
         }

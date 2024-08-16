@@ -26,6 +26,10 @@ def get_base_url(url: str):
 
 class OllamaChatModel(MaxKBBaseModel, ChatOpenAI):
     @staticmethod
+    def is_cache_model():
+        return False
+
+    @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         api_base = model_credential.get('api_base', '')
         base_url = get_base_url(api_base)
