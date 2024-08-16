@@ -48,7 +48,7 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     POSTGRES_USER=root \
     POSTGRES_PASSWORD=Password123@postgres \
     PIP_TARGET=/var/lib/postgresql/data/python-packages \
-    PYTHONPATH=$PIP_TARGET:$PYTHONPATH
+    PYTHONPATH=/var/lib/postgresql/data/python-packages
 
 WORKDIR /opt/maxkb/app
 COPY --from=stage-build /opt/maxkb /opt/maxkb
