@@ -474,7 +474,6 @@ function refreshForm(data: any) {
     ...applicationForm.value.model_setting,
     ...data
   }
-  console.log(applicationForm.value.model_setting)
 }
 
 const openCreateModel = (provider?: Provider) => {
