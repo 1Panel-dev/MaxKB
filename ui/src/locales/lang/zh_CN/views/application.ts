@@ -28,7 +28,8 @@ export default {
     title: {
       create: '创建应用',
       edit: '设置',
-      info: '应用信息'
+      info: '应用信息',
+      copy: '复制应用'
     },
     form: {
       appName: {
@@ -70,7 +71,9 @@ export default {
       create: '创建',
       createSuccess: '创建成功',
       save: '保存',
-      saveSuccess: '保存成功'
+      saveSuccess: '保存成功',
+      copy: '复制',
+      copySuccess: '复制成功'
     },
     dialogues: {
       addDataset: '添加关联知识库',

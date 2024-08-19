@@ -29,7 +29,8 @@ export default {
     title: {
       create: 'Create Application',
       edit: 'Edit Settings',
-      info: 'Application Information'
+      info: 'Application Information',
+      copy: 'Copy Application'
     },
     form: {
       appName: {
@@ -73,7 +74,9 @@ export default {
       create: 'Create',
       createSuccess: 'Create Success',
       save: 'Save',
-      saveSuccess: 'Save Success'
+      saveSuccess: 'Save Success',
+      copy: 'Copy',
+      copySuccess: 'Copy Success'
     },
     dialogues: {
       addDataset: 'Add Related Knowledge Base',
