@@ -48,7 +48,7 @@ class GeminiLLMModelCredential(BaseForm, BaseModelCredential):
 
     api_key = forms.PasswordInputField('API Key', required=True)
 
-    def get_other_fields(self):
+    def get_other_fields(self, model_name):
         return {
             'temperature': {
                 'value': 0.7,
