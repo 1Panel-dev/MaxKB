@@ -18,6 +18,7 @@
         <el-input
           v-model="form.name"
           placeholder="请输入变量名"
+          maxlength="64"
           show-word-limit
           @blur="form.name = form.name.trim()"
         />
