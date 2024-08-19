@@ -58,6 +58,7 @@
                 class="w-full"
                 placeholder="请选择变量"
                 v-model="item.value"
+                :width="100"
               />
               <el-input v-else v-model="item.value" placeholder="请输入变量值" />
             </el-form-item>
@@ -68,15 +69,21 @@
       </el-card>
 
       <h5 class="lighter mb-8">Python 代码</h5>
-      <CodemirrorEditor
-        v-model:value="chat_data.code"
-        @change="changeCode"
-        @wheel="wheel"
-        @keydown="isKeyDown = true"
-        @keyup="isKeyDown = false"
-        class="mb-8"
-        v-if="showEditor"
-      />
+      <div class="workflow-CodemirrorEditor mb-8" v-if="showEditor">
+        <CodemirrorEditor
+          v-model="chat_data.code"
+          @wheel="wheel"
+          @keydown="isKeyDown = true"
+          @keyup="isKeyDown = false"
+          style="height: 130px !important"
+        />
+        <div class="workflow-CodemirrorEditor__footer">
+          <el-button text type="info" @click="openCodemirrorDialog" class="magnify">
+            <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
+          </el-button>
+        </div>
+      </div>
+
       <el-form-item label="返回内容" @click.prevent>
         <template #label>
           <div class="flex align-center">
@@ -95,6 +102,18 @@
       </el-form-item>
     </el-form>
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
+    <!-- Codemirror 弹出层 -->
+    <el-dialog v-model="dialogVisible" title="Python 代码" append-to-body>
+      <CodemirrorEditor
+        v-model="cloneContent"
+        style="height: 300px !important; border: 1px solid #bbbfc4; border-radius: 4px"
+      />
+      <template #footer>
+        <div class="dialog-footer mt-24">
+          <el-button type="primary" @click="submitDialog"> 确认</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -152,8 +171,21 @@ const validate = () => {
   })
 }
 
-function changeCode(value: string) {
-  set(props.nodeModel.properties.node_data, 'code', value)
+// function changeCode(value: string) {
+//   set(props.nodeModel.properties.node_data, 'code', value)
+// }
+
+const dialogVisible = ref(false)
+const cloneContent = ref('')
+
+function openCodemirrorDialog() {
+  cloneContent.value = chat_data.value.code
+  dialogVisible.value = true
+}
+
+function submitDialog() {
+  set(props.nodeModel.properties.node_data, 'code', cloneContent.value)
+  dialogVisible.value = false
 }
 
 function openAddDialog(data?: any, index?: any) {
@@ -197,4 +229,21 @@ onMounted(() => {
   }, 100)
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss">
+.workflow-CodemirrorEditor {
+  border: 1px solid #bbbfc4;
+  border-radius: 4px;
+  position: relative;
+  padding-bottom: 20px;
+  &__footer {
+    .magnify {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+    }
+  }
+  .cm-gutters {
+    display: none !important;
+  }
+}
+</style>

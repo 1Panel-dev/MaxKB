@@ -125,7 +125,7 @@
         <el-input
           ref="quickInputRef"
           v-model="inputValue"
-          placeholder="请输入"
+          placeholder="请输入问题，Ctrl+Enter 换行，Enter发送"
           :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
           type="textarea"
           :maxlength="100000"

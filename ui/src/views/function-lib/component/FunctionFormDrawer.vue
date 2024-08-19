@@ -85,8 +85,9 @@
         Python 代码 <el-text type="info" class="color-secondary"> 使用函数时不显示 </el-text>
       </h4>
 
-      <CodemirrorEditor v-model:value="form.code" v-if="showEditor" @change="changeCode" />
-
+      <div class="function-CodemirrorEditor" v-if="showEditor">
+        <CodemirrorEditor v-model="form.code" />
+      </div>
       <h4 class="title-decoration-1 mb-16 mt-16">
         输出变量 <el-text type="info" class="color-secondary"> 使用函数时显示 </el-text>
       </h4>
@@ -181,9 +182,9 @@ function refreshFieldList(data: any) {
   currentIndex.value = null
 }
 
-function changeCode(value: string) {
-  form.value.code = value
-}
+// function changeCode(value: string) {
+//   form.value.code = value
+// }
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -221,4 +222,9 @@ defineExpose({
   open
 })
 </script>
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.function-CodemirrorEditor {
+  border: 1px solid #bbbfc4;
+  border-radius: 4px;
+}
+</style>

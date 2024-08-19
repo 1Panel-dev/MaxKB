@@ -45,19 +45,18 @@
 </template>
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+
 import { cloneDeep } from 'lodash'
 import type { ApplicationFormType } from '@/api/type/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
-import { isWorkFlow } from '@/utils/application'
+
 import { t } from '@/locales'
 import useStore from '@/stores'
 import { ValidType, ValidCount } from '@/enums/common'
 
 const { common, user } = useStore()
-const router = useRouter()
 const emit = defineEmits(['refresh'])
 
 // @ts-ignore
@@ -69,7 +68,7 @@ const applicationFormRef = ref()
 
 const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
-
+// @ts-ignore
 const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',

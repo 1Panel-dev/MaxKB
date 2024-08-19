@@ -47,27 +47,11 @@
             </template>
           </el-tab-pane>
           <el-tab-pane label="函数库" name="function">
-            <div
-              class="workflow-dropdown-item cursor flex p-8-12"
-              @click="clickNodes(functionNode)"
-              @mousedown="onmousedown(functionNode)"
-            >
-              <component
-                :is="iconComponent(`function-lib-node-icon`)"
-                class="mr-8 mt-4"
-                :size="32"
-              />
-              <div class="pre-wrap">
-                <div class="lighter">{{ functionNode.label }}</div>
-                <el-text type="info" size="small">{{ functionNode.text }}</el-text>
-              </div>
-            </div>
-
-            <template v-for="(item, index) in functionLibList" :key="index">
+            <el-scrollbar max-height="300">
               <div
                 class="workflow-dropdown-item cursor flex p-8-12"
-                @click="clickNodes(functionLibNode, item)"
-                @mousedown="onmousedown(functionLibNode, item)"
+                @click="clickNodes(functionNode)"
+                @mousedown="onmousedown(functionNode)"
               >
                 <component
                   :is="iconComponent(`function-lib-node-icon`)"
@@ -75,11 +59,29 @@
                   :size="32"
                 />
                 <div class="pre-wrap">
-                  <div class="lighter">{{ item.name }}</div>
-                  <el-text type="info" size="small">{{ item.desc }}</el-text>
+                  <div class="lighter">{{ functionNode.label }}</div>
+                  <el-text type="info" size="small">{{ functionNode.text }}</el-text>
                 </div>
               </div>
-            </template>
+
+              <template v-for="(item, index) in functionLibList" :key="index">
+                <div
+                  class="workflow-dropdown-item cursor flex p-8-12"
+                  @click="clickNodes(functionLibNode, item)"
+                  @mousedown="onmousedown(functionLibNode, item)"
+                >
+                  <component
+                    :is="iconComponent(`function-lib-node-icon`)"
+                    class="mr-8 mt-4"
+                    :size="32"
+                  />
+                  <div class="pre-wrap">
+                    <div class="lighter">{{ item.name }}</div>
+                    <el-text type="info" size="small">{{ item.desc }}</el-text>
+                  </div>
+                </div>
+              </template>
+            </el-scrollbar>
           </el-tab-pane>
         </el-tabs>
       </div>
