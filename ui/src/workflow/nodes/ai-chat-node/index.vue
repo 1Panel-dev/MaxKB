@@ -34,7 +34,7 @@
                 type="primary"
                 link
                 @click="openAIParamSettingDialog(chat_data.model_id)"
-                @refresh="refreshParam"
+                @refreshForm="refreshParam"
               >
                 {{ $t('views.application.applicationForm.form.paramSetting') }}
               </el-button>

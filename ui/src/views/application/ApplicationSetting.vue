@@ -327,7 +327,7 @@
       </el-col>
     </el-row>
 
-    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" :id="id" />
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" :id="id" @refresh="refreshForm" />
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
@@ -466,6 +466,15 @@ const openParamSettingDialog = () => {
 
 function refreshParam(data: any) {
   applicationForm.value.dataset_setting = data
+}
+
+function refreshForm(data: any) {
+  // data是一个对象  把data的值赋值给model_setting 但是是合并
+  applicationForm.value.model_setting = {
+    ...applicationForm.value.model_setting,
+    ...data
+  }
+  console.log(applicationForm.value.model_setting)
 }
 
 const openCreateModel = (provider?: Provider) => {
