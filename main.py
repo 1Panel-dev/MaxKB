@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import sys
+import time
 
 import django
 from django.core import management
@@ -43,7 +44,27 @@ def perform_db_migrate():
 
 
 def start_services():
-    management.call_command('gunicorn')
+    services = args.services if isinstance(args.services, list) else [args.services]
+    start_args = []
+    if args.daemon:
+        start_args.append('--daemon')
+    if args.force:
+        start_args.append('--force')
+    if args.worker:
+        start_args.extend(['--worker', str(args.worker)])
+    else:
+        worker = os.environ.get('CORE_WORKER')
+        if isinstance(worker, str) and worker.isdigit():
+            start_args.extend(['--worker', worker])
+
+    try:
+        management.call_command(action, *services, *start_args)
+    except KeyboardInterrupt:
+        logging.info('Cancel ...')
+        time.sleep(2)
+    except Exception as exc:
+        logging.error("Start service error {}: {}".format(services, exc))
+        time.sleep(2)
 
 
 def runserver():
@@ -66,8 +87,16 @@ if __name__ == '__main__':
         choices=("start", "dev", "upgrade_db", "collect_static"),
         help="Action to run"
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "services", type=str, default='all', nargs="*",
+        choices=("all", "web", "task"),
+        help="The service to start",
+    )
 
+    parser.add_argument('-d', '--daemon', nargs="?", const=True)
+    parser.add_argument('-w', '--worker', type=int, nargs="?")
+    parser.add_argument('-f', '--force', nargs="?", const=True)
+    args = parser.parse_args()
     action = args.action
     if action == "upgrade_db":
         perform_db_migrate()
