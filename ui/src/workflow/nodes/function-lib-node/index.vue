@@ -29,8 +29,11 @@
               <template #label>
                 <div class="flex-between">
                   <div>
-                    <span
-                      >{{ item.name }} <span class="danger" v-if="item.is_required">*</span></span
+                    <span>
+                      <auto-tooltip :content="item.name">
+                        {{ item.name }}
+                      </auto-tooltip>
+                      <span class="danger" v-if="item.is_required">*</span></span
                     >
                     <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
                   </div>

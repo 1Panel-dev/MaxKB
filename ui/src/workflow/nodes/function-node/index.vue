@@ -33,10 +33,13 @@
             >
               <template #label>
                 <div class="flex-between">
-                  <div>
-                    <span
-                      >{{ item.name }} <span class="danger" v-if="item.is_required">*</span></span
-                    >
+                  <div class="flex">
+                    <span class="flex">
+                      <auto-tooltip :content="item.name" style="max-width: 130px">
+                        {{ item.name }}
+                      </auto-tooltip>
+                      <span class="danger" v-if="item.is_required">*</span>
+                    </span>
                     <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
                   </div>
                   <div>
@@ -197,7 +200,7 @@ function openAddDialog(data?: any, index?: any) {
 }
 
 function deleteField(index: any) {
-  const list = cloneDeep(props.nodeModel.properties.node_data.input_field_list)
+  const list: any = cloneDeep(props.nodeModel.properties.node_data.input_field_list)
   list.splice(index, 1)
   set(props.nodeModel.properties.node_data, 'input_field_list', list)
 }
@@ -205,7 +208,7 @@ function deleteField(index: any) {
 function refreshFieldList(data: any) {
   const list = cloneDeep(props.nodeModel.properties.node_data.input_field_list)
   const obj = {
-    value: '',
+    value: data.source === 'reference' ? [] : '',
     ...data
   }
   if (currentIndex.value !== null) {

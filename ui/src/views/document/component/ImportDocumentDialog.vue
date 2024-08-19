@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="导入文档"
+    :title="title"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -94,6 +94,10 @@ const {
   params: { id }
 } = route as any
 
+const props = defineProps({
+  title: String
+})
+
 const emit = defineEmits(['refresh'])
 const webFormRef = ref()
 const loading = ref<boolean>(false)
@@ -173,7 +177,9 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (documentId.value) {
           const obj = {
             hit_handling_method: form.value.hit_handling_method,
-            directly_return_similarity: form.value.directly_return_similarity || 0.9,
+            directly_return_similarity: Number(form.value.directly_return_similarity)
+              ? form.value.directly_return_similarity
+              : 0.9,
             meta: {
               source_url: form.value.source_url,
               selector: form.value.selector
@@ -188,7 +194,9 @@ const submit = async (formEl: FormInstance | undefined) => {
           // 批量设置
           const obj = {
             hit_handling_method: form.value.hit_handling_method,
-            directly_return_similarity: form.value.directly_return_similarity || 0.9,
+            directly_return_similarity: Number(form.value.directly_return_similarity)
+              ? form.value.directly_return_similarity
+              : 0.9,
             id_list: documentList.value
           }
           documentApi.batchEditHitHandling(id, obj, loading).then(() => {
