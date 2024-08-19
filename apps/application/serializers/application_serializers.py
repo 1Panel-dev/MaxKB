@@ -547,6 +547,7 @@ class ApplicationSerializer(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
         model_id = serializers.UUIDField(required=False, error_messages=ErrMessage.uuid("模型id"))
+        ai_node_id = serializers.UUIDField(required=False, error_messages=ErrMessage.uuid("AI节点id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -731,31 +732,61 @@ class ApplicationSerializer(serializers.Serializer):
         def get_other_file_list(self):
             temperature = None
             max_tokens = None
-            application = Application.objects.filter(id=self.initial_data.get("application_id")).first()
+            application_id = self.initial_data.get("application_id")
+            ai_node_id = self.initial_data.get("ai_node_id")
+            model_id = self.initial_data.get("model_id")
+
+            application = Application.objects.filter(id=application_id).first()
             if application:
-                setting_dict = application.model_setting
-                temperature = setting_dict.get("temperature")
-                max_tokens = setting_dict.get("max_tokens")
-            model = Model.objects.filter(id=self.initial_data.get("model_id")).first()
+                if application.type == 'SIMPLE':
+                    setting_dict = application.model_setting
+                    temperature = setting_dict.get("temperature")
+                    max_tokens = setting_dict.get("max_tokens")
+                elif application.type == 'WORK_FLOW':
+                    work_flow = application.work_flow
+                    api_node = next((node for node in work_flow.get('nodes', []) if node.get('id') == ai_node_id), None)
+                    if api_node:
+                        node_data = api_node.get('properties', {}).get('node_data', {})
+                        temperature = node_data.get("temperature")
+                        max_tokens = node_data.get("max_tokens")
+
+            model = Model.objects.filter(id=model_id).first()
             if model:
                 res = ModelProvideConstants[model.provider].value.get_model_credential(model.model_type,
                                                                                        model.model_name).get_other_fields(
                     model.model_name)
-                if temperature and res.get('temperature'):
+                if temperature is not None and 'temperature' in res:
                     res['temperature']['value'] = temperature
-                if max_tokens and res.get('max_tokens'):
+                if max_tokens is not None and 'max_tokens' in res:
                     res['max_tokens']['value'] = max_tokens
                 return res
 
         def save_other_config(self, data):
             application = Application.objects.filter(id=self.initial_data.get("application_id")).first()
-            if application:
+            if not application:
+                return
+
+            if application.type == 'SIMPLE':
                 setting_dict = application.model_setting
                 for key in ['max_tokens', 'temperature']:
                     if key in data:
                         setting_dict[key] = data[key]
                 application.model_setting = setting_dict
-                application.save()
+
+            elif application.type == 'WORK_FLOW':
+                work_flow = application.work_flow
+                ai_node_id = data.get("node_id")
+                for api_node in work_flow.get('nodes', []):
+                    if api_node.get('id') == ai_node_id:
+                        node_data = api_node.get('properties', {}).get('node_data', {})
+                        for key in ['max_tokens', 'temperature']:
+                            if key in data:
+                                node_data[key] = data[key]
+                        api_node['properties']['node_data'] = node_data
+                        break
+                application.work_flow = work_flow
+
+            application.save()
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:

@@ -1,11 +1,5 @@
 # coding=utf-8
-"""
-    @project: MaxKB
-    @Author：虎
-    @file： llm.py
-    @date：2024/7/12 10:19
-    @desc:
-"""
+
 from typing import Dict
 
 from langchain_core.messages import HumanMessage
@@ -16,59 +10,55 @@ from common.forms import BaseForm
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 
-class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
+class VLLMModelCredential(BaseForm, BaseModelCredential):
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
-        model = provider.get_model(model_type, model_name, model_credential)
-        model_info = [model.lower() for model in model.client.models()]
-        if not model_info.__contains__(model_name.lower()):
-            raise AppApiException(ValidCode.valid_error.value, f'{model_name} 模型不支持')
-        for key in ['api_key', 'secret_key']:
-            if key not in model_credential:
-                if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
-                else:
-                    return False
         try:
-            model.invoke(
-                [HumanMessage(content='你好')])
+            model_list = provider.get_base_model_list(model_credential.get('api_base'))
         except Exception as e:
-            raise e
+            raise AppApiException(ValidCode.valid_error.value, "API 域名无效")
+        exist = provider.get_model_info_by_name(model_list, model_name)
+        if len(exist) == 0:
+            raise AppApiException(ValidCode.valid_error.value, "模型不存在,请先下载模型")
+        model = provider.get_model(model_type, model_name, model_credential)
+        try:
+            res = model.invoke([HumanMessage(content='你好')])
+            print(res)
+        except Exception as e:
+            print(e)
         return True
 
     def encryption_dict(self, model_info: Dict[str, object]):
-        return {**model_info, 'secret_key': super().encryption(model_info.get('secret_key', ''))}
+        return {**model_info, 'api_key': super().encryption(model_info.get('api_key', ''))}
 
     def build_model(self, model_info: Dict[str, object]):
-        for key in ['api_key', 'secret_key', 'model']:
+        for key in ['api_key', 'model']:
             if key not in model_info:
                 raise AppApiException(500, f'{key} 字段为必填字段')
         self.api_key = model_info.get('api_key')
-        self.secret_key = model_info.get('secret_key')
         return self
 
+    api_base = forms.TextInputField('API 域名', required=True)
     api_key = forms.PasswordInputField('API Key', required=True)
-
-    secret_key = forms.PasswordInputField("Secret Key", required=True)
 
     def get_other_fields(self, model_name):
         return {
             'temperature': {
-                'value': 0.95,
+                'value': 0.7,
                 'min': 0.1,
-                'max': 1.0,
+                'max': 1,
                 'step': 0.01,
                 'label': '温度',
                 'precision': 2,
                 'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
             },
             'max_tokens': {
-                'value': 1024,
-                'min': 2,
-                'max': 2048,
+                'value': 800,
+                'min': 1,
+                'max': 4096,
                 'step': 1,
                 'label': '输出最大Tokens',
                 'precision': 0,

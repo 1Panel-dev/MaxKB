@@ -34,9 +34,9 @@ class ZhipuChatModel(MaxKBBaseModel, ChatZhipuAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {}
-        if 'max_tokens' in model_kwargs:
+        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
             optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs:
+        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
             optional_params['temperature'] = model_kwargs['temperature']
 
         zhipuai_chat = ZhipuChatModel(

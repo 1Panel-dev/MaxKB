@@ -455,7 +455,7 @@ const openAIParamSettingDialog = () => {
     MsgSuccess(t('请选择AI 模型'))
     return
   }
-  application.asyncGetModelConfig(id, model_id, loading).then((res: any) => {
+  application.asyncGetModelConfig(id, model_id, '', loading).then((res: any) => {
     AIModeParamSettingDialogRef.value?.open(res.data)
   })
 }

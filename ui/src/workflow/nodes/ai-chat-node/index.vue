@@ -14,6 +14,7 @@
         class="mb-24"
         label-width="auto"
         ref="aiChatNodeFormRef"
+        hide-required-asterisk
       >
         <el-form-item
           label="AI 模型"
@@ -24,6 +25,21 @@
             trigger: 'change'
           }"
         >
+          <template #label>
+            <div class="flex-between">
+              <div>
+                <span>AI 模型<span class="danger">*</span></span>
+              </div>
+              <el-button
+                type="primary"
+                link
+                @click="openAIParamSettingDialog(chat_data.model_id)"
+                @refresh="refreshParam"
+              >
+                {{ $t('views.application.applicationForm.form.paramSetting') }}
+              </el-button>
+            </div>
+          </template>
           <el-select
             @wheel="wheel"
             @keydown="isKeyDown = true"
@@ -57,9 +73,9 @@
                     >公用
                   </el-tag>
                 </div>
-                <el-icon class="check-icon" v-if="item.id === chat_data.model_id"
-                  ><Check
-                /></el-icon>
+                <el-icon class="check-icon" v-if="item.id === chat_data.model_id">
+                  <Check />
+                </el-icon>
               </el-option>
               <!-- 不可用 -->
               <el-option
@@ -78,21 +94,24 @@
                   <span>{{ item.name }}</span>
                   <span class="danger">（不可用）</span>
                 </div>
-                <el-icon class="check-icon" v-if="item.id === chat_data.model_id"
-                  ><Check
-                /></el-icon>
+                <el-icon class="check-icon" v-if="item.id === chat_data.model_id">
+                  <Check />
+                </el-icon>
               </el-option>
             </el-option-group>
             <template #footer>
               <div class="w-full text-left cursor" @click="openCreateModel()">
                 <el-button type="primary" link>
-                  <el-icon class="mr-4"><Plus /></el-icon>
+                  <el-icon class="mr-4">
+                    <Plus />
+                  </el-icon>
                   添加模型
                 </el-button>
               </div>
             </template>
           </el-select>
         </el-form-item>
+
         <el-form-item label="角色设定">
           <el-input
             v-model="chat_data.system"
@@ -109,8 +128,8 @@
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。</template
-                >
+                  >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。
+                </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
             </div>
@@ -163,10 +182,10 @@
     </el-card>
     <!-- 回复内容弹出层 -->
     <el-dialog v-model="dialogVisible" title="提示词" append-to-body>
-      <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"> </MdEditor>
+      <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"></MdEditor>
       <template #footer>
         <div class="dialog-footer mt-24">
-          <el-button type="primary" @click="submitDialog"> 确认 </el-button>
+          <el-button type="primary" @click="submitDialog"> 确认</el-button>
         </div>
       </template>
     </el-dialog>
@@ -177,6 +196,13 @@
       @change="openCreateModel($event)"
     ></CreateModelDialog>
     <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)" />
+
+    <AIModeParamSettingDialog
+      ref="AIModeParamSettingDialogRef"
+      :id="id"
+      :node-id="props.nodeModel.id"
+      @refresh="refreshParam"
+    />
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -192,8 +218,9 @@ import useStore from '@/stores'
 import { relatedObject } from '@/utils/utils'
 import type { Provider } from '@/api/type/model'
 import { isLastNode } from '@/workflow/common/data'
+import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 
-const { model } = useStore()
+const { model, application } = useStore()
 const isKeyDown = ref(false)
 const wheel = (e: any) => {
   if (isKeyDown.value) {
@@ -206,14 +233,17 @@ const wheel = (e: any) => {
 const dialogVisible = ref(false)
 const cloneContent = ref('')
 const footers: any = [null, '=', 0]
+
 function openDialog() {
   cloneContent.value = chat_data.value.prompt
   dialogVisible.value = true
 }
+
 function submitDialog() {
   set(props.nodeModel.properties.node_data, 'prompt', cloneContent.value)
   dialogVisible.value = false
 }
+
 const {
   params: { id }
 } = app.config.globalProperties.$route as any
@@ -228,7 +258,9 @@ const form = {
   system: '',
   prompt: defaultPrompt,
   dialogue_number: 1,
-  is_result: false
+  is_result: false,
+  temperature: null,
+  max_tokens: null
 }
 
 const chat_data = computed({
@@ -252,7 +284,7 @@ const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
-
+const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 const validate = () => {
   return aiChatNodeFormRef.value?.validate().catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
@@ -283,6 +315,19 @@ const openCreateModel = (provider?: Provider) => {
   } else {
     selectProviderRef.value?.open()
   }
+}
+
+const openAIParamSettingDialog = (modelId: string) => {
+  if (modelId) {
+    application.asyncGetModelConfig(id, modelId, props.nodeModel.id).then((res: any) => {
+      AIModeParamSettingDialogRef.value?.open(res.data)
+    })
+  }
+}
+
+function refreshParam(data: any) {
+  chat_data.value.temperature = data.temperature
+  chat_data.value.max_tokens = data.max_tokens
 }
 
 onMounted(() => {

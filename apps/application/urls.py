@@ -20,6 +20,8 @@ urlpatterns = [
          views.ApplicationStatistics.ChatRecordAggregateTrend.as_view()),
     path('application/<str:application_id>/model', views.Application.Model.as_view()),
     path('application/<str:application_id>/model/<str:model_id>', views.Application.Model.Operate.as_view()),
+    path('application/<str:application_id>/model/<str:model_id>/<str:ai_node_id>',
+         views.Application.Model.Operate.as_view()),
     path('application/<str:application_id>/other-config', views.Application.Model.OtherConfig.as_view()),
     path('application/<str:application_id>/hit_test', views.Application.HitTest.as_view()),
     path('application/<str:application_id>/api_key', views.Application.ApplicationKey.as_view()),

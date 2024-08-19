@@ -60,7 +60,8 @@ const form = reactive<Form>({})
 const dialogVisible = ref(false)
 const loading = ref(false)
 const props = defineProps<{
-  id: any
+  id: string
+  nodeId?: string
 }>()
 const resetForm = () => {
   // 清空 form 对象，等待新的数据
@@ -103,8 +104,11 @@ const submit = async () => {
           },
           {} as Record<string, any>
         )
+        if (props.nodeId) {
+          data.node_id = props.nodeId
+        }
         application.asyncPostModelConfig(props.id, data, loading).then(() => {
-          emit('refresh', form)
+          emit('refresh', data)
           dialogVisible.value = false
         })
       }

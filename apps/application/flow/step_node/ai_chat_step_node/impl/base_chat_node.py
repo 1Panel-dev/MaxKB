@@ -66,7 +66,11 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
 class BaseChatNode(IChatNode):
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 **kwargs) -> NodeResult:
-        chat_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'))
+        kwargs = {k: v for k, v in kwargs.items() if k in ['temperature', 'max_tokens']}
+
+        chat_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'),
+                                                         **kwargs
+                                                         )
         history_message = self.get_history_message(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)
