@@ -75,6 +75,7 @@ class PdfSplitHandle(BaseSplitHandle):
 
 
         except BaseException as e:
+            max_kb.error(f"File: {file.name}, error: {e}")
             return {'name': file.name,
                     'content': []}
         finally:
