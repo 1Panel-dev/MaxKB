@@ -9,7 +9,7 @@
 import re
 from typing import List
 
-from pypdf import PdfReader, PdfWriter
+import fitz
 import os
 import tempfile
 import logging
@@ -40,26 +40,28 @@ class PdfSplitHandle(BaseSplitHandle):
             # 获取临时文件的路径
             temp_file_path = temp_file.name
 
+        pdf_document = fitz.open(temp_file_path)
         try:
             content = ""
-            reader = PdfReader(temp_file_path)
-            for page_num in range(len(reader.pages)):
+            for page_num in range(len(pdf_document)):
                 start_time = time.time()
-                page = reader.pages[page_num]
-                text = page.extract_text()
+                page = pdf_document.load_page(page_num)
+                text = page.get_text()
 
                 if text and text.strip():  # 如果页面中有文本内容
                     page_content = text
                 else:
                     try:
-                        writer = PdfWriter()
-                        writer.add_page(page)
-                        with tempfile.NamedTemporaryFile(delete=False) as output_pdf:
-                            writer.write(output_pdf)
-                        loader = PyPDFLoader(output_pdf.name, extract_images=True)
+                        new_doc = fitz.open()
+                        new_doc.insert_pdf(pdf_document, from_page=page_num, to_page=page_num)
+                        page_num_pdf = tempfile.gettempdir() + f"/{file.name}_{page_num}.pdf"
+                        new_doc.save(page_num_pdf)
+                        new_doc.close()
+
+                        loader = PyPDFLoader(page_num_pdf, extract_images=True)
                         page_content = "\n" + loader.load()[0].page_content
                     finally:
-                        os.remove(output_pdf.name)
+                        os.remove(page_num_pdf)
 
                 content += page_content
 
@@ -76,6 +78,7 @@ class PdfSplitHandle(BaseSplitHandle):
             return {'name': file.name,
                     'content': []}
         finally:
+            pdf_document.close()
             # 处理完后可以删除临时文件
             os.remove(temp_file_path)
 
