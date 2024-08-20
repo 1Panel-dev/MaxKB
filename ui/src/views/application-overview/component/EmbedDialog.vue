@@ -11,7 +11,7 @@
           <p class="title p-16 bold">
             {{ $t('views.applicationOverview.appInfo.EmbedDialog.fullscreenModeTitle') }}
           </p>
-          <img src="@/assets/window1.png" alt="" class="ml-8" />
+          <img src="@/assets/window1.png" alt="" class="ml-8" height="150" />
           <div class="code layout-bg border-t p-16">
             <div class="flex-between">
               <span class="bold">{{
@@ -32,8 +32,8 @@
           <p class="title p-16 bold">
             {{ $t('views.applicationOverview.appInfo.EmbedDialog.floatingModeTitle') }}
           </p>
-          <img src="@/assets/window2.png" alt="" class="ml-8" />
-          <div class="code border-t p-16">
+          <img src="@/assets/window2.png" alt="" class="ml-8" height="150" />
+          <div class="code layout-bg border-t p-16">
             <div class="flex-between">
               <span class="bold">{{
                 $t('views.applicationOverview.appInfo.EmbedDialog.copyInstructions')

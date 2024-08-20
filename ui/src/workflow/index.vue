@@ -151,4 +151,7 @@ defineExpose({
   left: 24px;
   z-index: 2;
 }
+.lf-drag-able {
+  cursor: pointer;
+}
 </style>

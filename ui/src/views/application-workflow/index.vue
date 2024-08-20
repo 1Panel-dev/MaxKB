@@ -334,6 +334,7 @@ onBeforeUnmount(() => {
   .workflow-main {
     height: calc(100vh - 62px);
     box-sizing: border-box;
+    cursor: pointer;
   }
   .workflow-dropdown-menu {
     -moz-user-select: none; /* Firefox */
@@ -363,6 +364,9 @@ onBeforeUnmount(() => {
   .workflow-dropdown-tabs {
     .el-tabs__nav-wrap {
       padding: 0 16px;
+    }
+    .el-tabs__nav-wrap:after {
+      height: 1px;
     }
   }
 }
