@@ -47,7 +47,6 @@ class BaseChatOpenAI(ChatOpenAI):
                     if token_usage := chunk.get("usage"):
                         self.__dict__.setdefault('_last_generation_info', {}).update(token_usage)
                         logprobs = None
-                    else:
                         continue
                 else:
                     choice = chunk["choices"][0]
