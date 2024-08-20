@@ -42,7 +42,8 @@ class BaseChatOpenAI(ChatOpenAI):
             for chunk in response:
                 if not isinstance(chunk, dict):
                     chunk = chunk.model_dump()
-                if len(chunk["choices"]) == 0 or chunk["choices"][0]["finish_reason"] == "length" or chunk["choices"][0]["finish_reason"] == "stop":
+                if (len(chunk["choices"]) == 0 or chunk["choices"][0]["finish_reason"] == "length" or
+                    chunk["choices"][0]["finish_reason"] == "stop") and chunk.get("usage") is not None:
                     if token_usage := chunk.get("usage"):
                         self.__dict__.setdefault('_last_generation_info', {}).update(token_usage)
                         logprobs = None
