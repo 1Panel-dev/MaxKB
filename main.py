@@ -67,8 +67,15 @@ def start_services():
         time.sleep(2)
 
 
-def runserver():
-    management.call_command('runserver', "0.0.0.0:8080")
+def dev():
+    services = args.services if isinstance(args.services, list) else args.services
+    if services.__contains__('web'):
+        management.call_command('runserver', "0.0.0.0:8080")
+    elif services.__contains__('celery'):
+        management.call_command('celery', 'celery')
+    elif services.__contains__('local_model'):
+        os.environ.setdefault('SERVER_NAME', 'local_model')
+        management.call_command('runserver', "127.0.0.1:5432")
 
 
 if __name__ == '__main__':
@@ -87,9 +94,10 @@ if __name__ == '__main__':
         choices=("start", "dev", "upgrade_db", "collect_static"),
         help="Action to run"
     )
+    args, e = parser.parse_known_args()
     parser.add_argument(
-        "services", type=str, default='all', nargs="*",
-        choices=("all", "web", "task"),
+        "services", type=str, default='all' if args.action == 'start' else 'web', nargs="*",
+        choices=("all", "web", "task") if args.action == 'start' else ("web", "celery", 'local_model'),
         help="The service to start",
     )
 
@@ -105,7 +113,7 @@ if __name__ == '__main__':
     elif action == 'dev':
         collect_static()
         perform_db_migrate()
-        runserver()
+        dev()
     else:
         collect_static()
         perform_db_migrate()

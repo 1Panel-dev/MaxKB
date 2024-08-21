@@ -15,6 +15,7 @@ from functools import reduce
 from typing import List, Dict
 
 import xlwt
+from celery_once import AlreadyQueued
 from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet
@@ -25,7 +26,6 @@ from xlwt import Utils
 
 from common.db.search import native_search, native_page_search
 from common.event.common import work_thread_pool
-from common.event.listener_manage import ListenerManagement, SyncWebDocumentArgs, UpdateEmbeddingDatasetIdArgs
 from common.exception.app_exception import AppApiException
 from common.handle.impl.doc_split_handle import DocSplitHandle
 from common.handle.impl.html_split_handle import HTMLSplitHandle
@@ -42,8 +42,11 @@ from common.util.fork import Fork
 from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status, ProblemParagraphMapping, Image
 from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer, ProblemParagraphManage, \
-    get_embedding_model_by_dataset_id
+    get_embedding_model_by_dataset_id, get_embedding_model_id_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
+from dataset.task import sync_web_document
+from embedding.task.embedding import embedding_by_document, delete_embedding_by_document_list, \
+    delete_embedding_by_document, update_embedding_dataset_id
 from smartdoc.conf import PROJECT_DIR
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle()]
@@ -235,17 +238,15 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                      meta={})
             else:
                 document_list.update(dataset_id=target_dataset_id)
-            model = None
+            model_id = None
             if dataset.embedding_mode_id != target_dataset.embedding_mode_id:
-                model = get_embedding_model_by_dataset_id(target_dataset_id)
+                model_id = get_embedding_model_by_dataset_id(target_dataset_id)
 
             pid_list = [paragraph.id for paragraph in paragraph_list]
             # 修改段落信息
             paragraph_list.update(dataset_id=target_dataset_id)
             # 修改向量信息
-            ListenerManagement.update_embedding_dataset_id(UpdateEmbeddingDatasetIdArgs(
-                pid_list,
-                target_dataset_id, model))
+            update_embedding_dataset_id(pid_list, target_dataset_id, model_id)
 
         @staticmethod
         def get_target_dataset_problem(target_dataset_id: str,
@@ -377,7 +378,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     # 删除问题
                     QuerySet(model=ProblemParagraphMapping).filter(document_id=document_id).delete()
                     # 删除向量库
-                    ListenerManagement.delete_embedding_by_document_signal.send(document_id)
+                    delete_embedding_by_document(document_id)
                     paragraphs = get_split_model('web.md').parse(result.content)
                     document.char_length = reduce(lambda x, y: x + y,
                                                   [len(p.get('content')) for p in paragraphs],
@@ -398,8 +399,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                         problem_paragraph_mapping_list) > 0 else None
                     # 向量化
                     if with_embedding:
-                        model = get_embedding_model_by_dataset_id(dataset_id=document.dataset_id)
-                        ListenerManagement.embedding_by_document_signal.send(document_id, embedding_model=model)
+                        embedding_model_id = get_embedding_model_id_by_dataset_id(document.dataset_id)
+                        embedding_by_document.delay(document_id, embedding_model_id)
                 else:
                     document.status = Status.error
                     document.save()
@@ -538,10 +539,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
-            model = get_embedding_model_by_dataset_id(dataset_id=self.data.get('dataset_id'))
             QuerySet(Document).filter(id=document_id).update(**{'status': Status.queue_up})
             QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': Status.queue_up})
-            ListenerManagement.embedding_by_document_signal.send(document_id, embedding_model=model)
+            embedding_model_id = get_embedding_model_id_by_dataset_id(dataset_id=self.data.get('dataset_id'))
+            try:
+                embedding_by_document.delay(document_id, embedding_model_id)
+            except AlreadyQueued as e:
+                raise AppApiException(500, "任务正在执行中,请勿重复下发")
 
         @transaction.atomic
         def delete(self):
@@ -552,7 +556,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             # 删除问题
             QuerySet(model=ProblemParagraphMapping).filter(document_id=document_id).delete()
             # 删除向量库
-            ListenerManagement.delete_embedding_by_document_signal.send(document_id)
+            delete_embedding_by_document(document_id)
             return True
 
         @staticmethod
@@ -611,8 +615,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
         @staticmethod
         def post_embedding(result, document_id, dataset_id):
-            model = get_embedding_model_by_dataset_id(dataset_id)
-            ListenerManagement.embedding_by_document_signal.send(document_id, embedding_model=model)
+            model_id = get_embedding_model_id_by_dataset_id(dataset_id)
+            embedding_by_document.delay(document_id, model_id)
             return result
 
         @staticmethod
@@ -660,29 +664,6 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 data={'dataset_id': dataset_id, 'document_id': document_id}).one(
                 with_valid=True), document_id, dataset_id
 
-        @staticmethod
-        def get_sync_handler(dataset_id):
-            def handler(source_url: str, selector, response: Fork.Response):
-                if response.status == 200:
-                    try:
-                        paragraphs = get_split_model('web.md').parse(response.content)
-                        # 插入
-                        DocumentSerializers.Create(data={'dataset_id': dataset_id}).save(
-                            {'name': source_url[0:128], 'paragraphs': paragraphs,
-                             'meta': {'source_url': source_url, 'selector': selector},
-                             'type': Type.web}, with_valid=True)
-                    except Exception as e:
-                        logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
-                else:
-                    Document(name=source_url[0:128],
-                             dataset_id=dataset_id,
-                             meta={'source_url': source_url, 'selector': selector},
-                             type=Type.web,
-                             char_length=0,
-                             status=Status.error).save()
-
-            return handler
-
         def save_web(self, instance: Dict, with_valid=True):
             if with_valid:
                 DocumentWebInstanceSerializer(data=instance).is_valid(raise_exception=True)
@@ -690,8 +671,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             dataset_id = self.data.get('dataset_id')
             source_url_list = instance.get('source_url_list')
             selector = instance.get('selector')
-            args = SyncWebDocumentArgs(source_url_list, selector, self.get_sync_handler(dataset_id))
-            ListenerManagement.sync_web_document_signal.send(args)
+            sync_web_document.delay(dataset_id, source_url_list, selector)
 
         @staticmethod
         def get_paragraph_model(document_model, paragraph_list: List):
@@ -818,8 +798,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         @staticmethod
         def post_embedding(document_list, dataset_id):
             for document_dict in document_list:
-                model = get_embedding_model_by_dataset_id(dataset_id)
-                ListenerManagement.embedding_by_document_signal.send(document_dict.get('id'), embedding_model=model)
+                model_id = get_embedding_model_id_by_dataset_id(dataset_id)
+                embedding_by_document(document_dict.get('id'), model_id)
             return document_list
 
         @post(post_function=post_embedding)
@@ -887,7 +867,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             QuerySet(Paragraph).filter(document_id__in=document_id_list).delete()
             QuerySet(ProblemParagraphMapping).filter(document_id__in=document_id_list).delete()
             # 删除向量库
-            ListenerManagement.delete_embedding_by_document_list_signal.send(document_id_list)
+            delete_embedding_by_document_list(document_id_list)
             return True
 
         def batch_edit_hit_handling(self, instance: Dict, with_valid=True):

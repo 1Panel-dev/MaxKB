@@ -18,13 +18,12 @@ broker_path = os.path.join(celery_data_dir, "celery_db.sqlite3")
 backend_path = os.path.join(celery_data_dir, "celery_results.sqlite3")
 # 使用sql_lite 当做broker 和 响应接收
 CELERY_BROKER_URL = f'sqla+sqlite:///{broker_path}'
-CELERY_RESULT_BACKEND = f'db+sqlite:///{backend_path}'
-
-CELERY_TIMEZONE = CONFIG.TIME_ZONE
+CELERY_result_backend = f'db+sqlite:///{backend_path}'
+CELERY_timezone = CONFIG.TIME_ZONE
 CELERY_ENABLE_UTC = False
-CELERY_TASK_SERIALIZER = 'pickle'
-CELERY_RESULT_SERIALIZER = 'pickle'
-CELERY_ACCEPT_CONTENT = ['json', 'pickle']
+CELERY_task_serializer = 'pickle'
+CELERY_result_serializer = 'pickle'
+CELERY_accept_content = ['json', 'pickle']
 CELERY_RESULT_EXPIRES = 600
 CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime).19s %(message)s'
 CELERY_WORKER_LOG_FORMAT = '%(asctime).19s %(message)s'
@@ -33,3 +32,9 @@ CELERY_WORKER_REDIRECT_STDOUTS = True
 CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
 CELERY_WORKER_CANCEL_LONG_RUNNING_TASKS_ON_CONNECTION_LOSS = True
+CELERY_ONCE = {
+    'backend': 'celery_once.backends.File',
+    'settings': {'location': os.path.join(celery_data_dir, "celery_once")}
+}
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'logs', 'celery')

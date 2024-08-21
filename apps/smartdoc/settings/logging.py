@@ -114,6 +114,14 @@ LOGGING = {
             'level': LOG_LEVEL,
             'propagate': False,
         },
+        'common.event': {
+            'handlers': ['console', 'file'],
+            'level': "DEBUG",
+            'propagate': False,
+        },
+        'sqlalchemy': {'handlers': ['console', 'file'],
+                       'level': "ERROR",
+                       'propagate': False, }
     }
 }
 

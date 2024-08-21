@@ -21,7 +21,6 @@ def post_handler():
     from common import job
     from common.models.db_model_manage import DBModelManage
     event.run()
-    event.ListenerManagement.init_embedding_model_signal.send()
     job.run()
     DBModelManage.init()
 

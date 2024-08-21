@@ -151,3 +151,17 @@ def get_embedding_model_by_dataset_id(dataset_id: str):
 
 def get_embedding_model_by_dataset(dataset):
     return ModelManage.get_model(str(dataset.embedding_mode_id), lambda _id: get_model(dataset.embedding_mode))
+
+
+def get_embedding_model_id_by_dataset_id(dataset_id):
+    dataset = QuerySet(DataSet).select_related('embedding_mode').filter(id=dataset_id).first()
+    return str(dataset.embedding_mode_id)
+
+
+def get_embedding_model_id_by_dataset_id_list(dataset_id_list: List):
+    dataset_list = QuerySet(DataSet).filter(id__in=dataset_id_list)
+    if len(set([dataset.embedding_mode_id for dataset in dataset_list])) > 1:
+        raise Exception("知识库未向量模型不一致")
+    if len(dataset_list) == 0:
+        raise Exception("知识库设置错误,请重新设置知识库")
+    return str(dataset_list[0].embedding_mode_id)

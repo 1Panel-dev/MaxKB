@@ -127,7 +127,7 @@ class BaseVectorStore(ABC):
             return []
         embedding_query = embedding.embed_query(query_text)
         result = self.query(embedding_query, dataset_id_list, exclude_document_id_list, exclude_paragraph_list,
-                            is_active, 1, 0.65)
+                            is_active, 1, 3, 0.65)
         return result[0]
 
     @abstractmethod
@@ -169,7 +169,7 @@ class BaseVectorStore(ABC):
         pass
 
     @abstractmethod
-    def delete_bu_document_id_list(self, document_id_list: List[str]):
+    def delete_by_document_id_list(self, document_id_list: List[str]):
         pass
 
     @abstractmethod

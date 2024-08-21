@@ -24,3 +24,5 @@ DEBUG = CONFIG.DEBUG or False
 LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'logs')
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 TMP_DIR = os.path.join(PROJECT_DIR, 'tmp')
+if not os.path.exists(TMP_DIR):
+    os.makedirs(TMP_DIR)

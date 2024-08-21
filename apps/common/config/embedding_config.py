@@ -6,9 +6,12 @@
     @date：2023/10/23 16:03
     @desc:
 """
+import threading
 import time
 
 from common.cache.mem_cache import MemCache
+
+lock = threading.Lock()
 
 
 class ModelManage:
@@ -17,15 +20,21 @@ class ModelManage:
 
     @staticmethod
     def get_model(_id, get_model):
-        model_instance = ModelManage.cache.get(_id)
-        if model_instance is None or not model_instance.is_cache_model():
-            model_instance = get_model(_id)
-            ModelManage.cache.set(_id, model_instance, timeout=60 * 30)
+        # 获取锁
+        lock.acquire()
+        try:
+            model_instance = ModelManage.cache.get(_id)
+            if model_instance is None or not model_instance.is_cache_model():
+                model_instance = get_model(_id)
+                ModelManage.cache.set(_id, model_instance, timeout=60 * 30)
+                return model_instance
+            # 续期
+            ModelManage.cache.touch(_id, timeout=60 * 30)
+            ModelManage.clear_timeout_cache()
             return model_instance
-        # 续期
-        ModelManage.cache.touch(_id, timeout=60 * 30)
-        ModelManage.clear_timeout_cache()
-        return model_instance
+        finally:
+            # 释放锁
+            lock.release()
 
     @staticmethod
     def clear_timeout_cache():

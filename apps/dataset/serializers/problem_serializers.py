@@ -16,12 +16,12 @@ from drf_yasg import openapi
 from rest_framework import serializers
 
 from common.db.search import native_search, native_page_search
-from common.event import ListenerManagement, UpdateProblemArgs
 from common.mixins.api_mixin import ApiMixin
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from dataset.models import Problem, Paragraph, ProblemParagraphMapping, DataSet
-from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id
+from dataset.serializers.common_serializers import get_embedding_model_id_by_dataset_id
+from embedding.task import delete_embedding_by_source_ids, update_problem_embedding
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -111,7 +111,7 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             source_ids = [row.id for row in problem_paragraph_mapping_list]
             problem_paragraph_mapping_list.delete()
             QuerySet(Problem).filter(id__in=problem_id_list).delete()
-            ListenerManagement.delete_embedding_by_source_ids_signal.send(source_ids)
+            delete_embedding_by_source_ids(source_ids)
             return True
 
     class Operate(serializers.Serializer):
@@ -146,7 +146,7 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             source_ids = [row.id for row in problem_paragraph_mapping_list]
             problem_paragraph_mapping_list.delete()
             QuerySet(Problem).filter(id=self.data.get('problem_id')).delete()
-            ListenerManagement.delete_embedding_by_source_ids_signal.send(source_ids)
+            delete_embedding_by_source_ids(source_ids)
             return True
 
         @transaction.atomic
@@ -161,5 +161,5 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             QuerySet(DataSet).filter(id=dataset_id)
             problem.content = content
             problem.save()
-            model = get_embedding_model_by_dataset_id(dataset_id)
-            ListenerManagement.update_problem_signal.send(UpdateProblemArgs(problem_id, content, model))
+            model_id = get_embedding_model_id_by_dataset_id(dataset_id)
+            update_problem_embedding(problem_id, content, model_id)

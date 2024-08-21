@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import logging
+import os
 
 from celery import subtask
 from celery.signals import (
@@ -30,6 +31,14 @@ def on_app_ready(sender=None, headers=None, **kwargs):
             logger.debug("Periodic task [{}] is disabled!".format(task))
             continue
         subtask(task).delay()
+
+
+def delete_files(directory):
+    if os.path.isdir(directory):
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
 
 @worker_shutdown.connect
