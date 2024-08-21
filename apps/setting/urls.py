@@ -1,3 +1,5 @@
+import os
+
 from django.urls import path
 
 from . import views
@@ -22,3 +24,10 @@ urlpatterns = [
     path('valid/<str:valid_type>/<int:valid_count>', views.Valid.as_view())
 
 ]
+if os.environ.get('SERVER_NAME', 'web') == 'local_model':
+    urlpatterns += [
+        path('model/<str:model_id>/embed_documents', views.ModelApply.EmbedDocuments.as_view(),
+             name='model/embed_documents'),
+        path('model/<str:model_id>/embed_query', views.ModelApply.EmbedQuery.as_view(),
+             name='model/embed_query'),
+    ]

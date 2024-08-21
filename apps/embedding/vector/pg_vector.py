@@ -27,6 +27,8 @@ from smartdoc.conf import PROJECT_DIR
 class PGVector(BaseVectorStore):
 
     def delete_by_source_ids(self, source_ids: List[str], source_type: str):
+        if len(source_ids) == 0:
+            return
         QuerySet(Embedding).filter(source_id__in=source_ids, source_type=source_type).delete()
 
     def update_by_source_ids(self, source_ids: List[str], instance: Dict):
@@ -67,7 +69,7 @@ class PGVector(BaseVectorStore):
                                     source_type=text_list[index].get('source_type'),
                                     embedding=embeddings[index],
                                     search_vector=to_ts_vector(text_list[index]['text'])) for index in
-                          range(0, len(text_list))]
+                          range(0, len(texts))]
         if is_save_function():
             QuerySet(Embedding).bulk_create(embedding_list) if len(embedding_list) > 0 else None
         return True
@@ -124,7 +126,9 @@ class PGVector(BaseVectorStore):
         QuerySet(Embedding).filter(document_id=document_id).delete()
         return True
 
-    def delete_bu_document_id_list(self, document_id_list: List[str]):
+    def delete_by_document_id_list(self, document_id_list: List[str]):
+        if len(document_id_list) == 0:
+            return True
         return QuerySet(Embedding).filter(document_id__in=document_id_list).delete()
 
     def delete_by_source_id(self, source_id: str, source_type: str):

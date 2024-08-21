@@ -27,7 +27,6 @@ from application.models import ApplicationDatasetMapping
 from common.config.embedding_config import VectorStore
 from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.db.sql_execute import select_list
-from common.event import ListenerManagement, SyncWebDatasetArgs
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post, flat_map, valid_license
@@ -37,9 +36,11 @@ from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping, Status
 from dataset.serializers.common_serializers import list_paragraph, MetaSerializer, ProblemParagraphManage, \
-    get_embedding_model_by_dataset_id
+    get_embedding_model_by_dataset_id, get_embedding_model_id_by_dataset_id
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
+from dataset.task import sync_web_dataset
 from embedding.models import SearchMode
+from embedding.task import embedding_by_dataset, delete_embedding_by_dataset
 from setting.models import AuthOperate
 from smartdoc.conf import PROJECT_DIR
 
@@ -363,9 +364,9 @@ class DataSetSerializers(serializers.ModelSerializer):
 
         @staticmethod
         def post_embedding_dataset(document_list, dataset_id):
-            model = get_embedding_model_by_dataset_id(dataset_id)
+            model_id = get_embedding_model_id_by_dataset_id(dataset_id)
             # 发送向量化事件
-            ListenerManagement.embedding_by_dataset_signal.send(dataset_id, embedding_model=model)
+            embedding_by_dataset.delay(dataset_id, model_id)
             return document_list
 
         def save_qa(self, instance: Dict, with_valid=True):
@@ -435,23 +436,6 @@ class DataSetSerializers(serializers.ModelSerializer):
             else:
                 return parsed_url.path.split("/")[-1]
 
-        @staticmethod
-        def get_save_handler(dataset_id, selector):
-            def handler(child_link: ChildLink, response: Fork.Response):
-                if response.status == 200:
-                    try:
-                        document_name = child_link.tag.text if child_link.tag is not None and len(
-                            child_link.tag.text.strip()) > 0 else child_link.url
-                        paragraphs = get_split_model('web.md').parse(response.content)
-                        DocumentSerializers.Create(data={'dataset_id': dataset_id}).save(
-                            {'name': document_name, 'paragraphs': paragraphs,
-                             'meta': {'source_url': child_link.url, 'selector': selector},
-                             'type': Type.web}, with_valid=True)
-                    except Exception as e:
-                        logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
-
-            return handler
-
         def save_web(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -467,9 +451,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                    'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector'),
                             'embedding_mode_id': instance.get('embedding_mode_id')}})
             dataset.save()
-            ListenerManagement.sync_web_dataset_signal.send(
-                SyncWebDatasetArgs(str(dataset_id), instance.get('source_url'), instance.get('selector'),
-                                   self.get_save_handler(dataset_id, instance.get('selector'))))
+            sync_web_dataset.delay((str(dataset_id), instance.get('source_url'), instance.get('selector')))
             return {**DataSetSerializers(dataset).data,
                     'document_list': []}
 
@@ -642,9 +624,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             """
             url = dataset.meta.get('source_url')
             selector = dataset.meta.get('selector') if 'selector' in dataset.meta else None
-            ListenerManagement.sync_web_dataset_signal.send(
-                SyncWebDatasetArgs(str(dataset.id), url, selector,
-                                   self.get_sync_handler(dataset)))
+            sync_web_dataset.delay(str(dataset.id), url, selector)
 
         def complete_sync(self, dataset):
             """
@@ -658,7 +638,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             # 删除段落
             QuerySet(Paragraph).filter(dataset=dataset).delete()
             # 删除向量
-            ListenerManagement.delete_embedding_by_dataset_signal.send(self.data.get('id'))
+            delete_embedding_by_dataset(self.data.get('id'))
             # 同步
             self.replace_sync(dataset)
 
@@ -740,16 +720,17 @@ class DataSetSerializers(serializers.ModelSerializer):
             QuerySet(Paragraph).filter(dataset=dataset).delete()
             QuerySet(Problem).filter(dataset=dataset).delete()
             dataset.delete()
-            ListenerManagement.delete_embedding_by_dataset_signal.send(self.data.get('id'))
+            delete_embedding_by_dataset(self.data.get('id'))
             return True
 
         def re_embedding(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            model = get_embedding_model_by_dataset_id(self.data.get('id'))
+
             QuerySet(Document).filter(dataset_id=self.data.get('id')).update(**{'status': Status.queue_up})
             QuerySet(Paragraph).filter(dataset_id=self.data.get('id')).update(**{'status': Status.queue_up})
-            ListenerManagement.embedding_by_dataset_signal.send(self.data.get('id'), embedding_model=model)
+            embedding_model_id = get_embedding_model_id_by_dataset_id(self.data.get('id'))
+            embedding_by_dataset.delay(self.data.get('id'), embedding_model_id)
 
         def list_application(self, with_valid=True):
             if with_valid:

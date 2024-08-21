@@ -26,7 +26,6 @@ from common.constants.authentication_type import AuthenticationType
 from common.constants.exception_code_constants import ExceptionCodeConstants
 from common.constants.permission_constants import RoleConstants, get_permission_list_by_role
 from common.db.search import page_search
-from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.response.result import get_api_response
@@ -34,6 +33,7 @@ from common.util.common import valid_license
 from common.util.field_message import ErrMessage
 from common.util.lock import lock
 from dataset.models import DataSet, Document, Paragraph, Problem, ProblemParagraphMapping
+from embedding.task import delete_embedding_by_dataset_id_list
 from setting.models import Team, SystemSetting, SettingType, Model, TeamMember, TeamMemberPermission
 from smartdoc.conf import PROJECT_DIR
 from users.models.user import User, password_encrypt, get_user_dynamics_permission
@@ -497,7 +497,8 @@ class UserSerializer(ApiMixin, serializers.ModelSerializer):
 class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone', 'is_active', 'role', 'nick_name', 'create_time', 'update_time', 'source']
+        fields = ['id', 'username', 'email', 'phone', 'is_active', 'role', 'nick_name', 'create_time', 'update_time',
+                  'source']
 
     @staticmethod
     def get_response_body_api():
@@ -643,7 +644,8 @@ class UserManageSerializer(serializers.Serializer):
 
         def is_valid(self, *, user_id=None, raise_exception=False):
             super().is_valid(raise_exception=True)
-            if self.data.get('email') is not None and QuerySet(User).filter(email=self.data.get('email')).exclude(id=user_id).exists():
+            if self.data.get('email') is not None and QuerySet(User).filter(email=self.data.get('email')).exclude(
+                    id=user_id).exists():
                 raise AppApiException(1004, "邮箱已经被使用")
 
         @staticmethod
@@ -738,7 +740,7 @@ class UserManageSerializer(serializers.Serializer):
             QuerySet(Paragraph).filter(dataset_id__in=dataset_id_list).delete()
             QuerySet(ProblemParagraphMapping).filter(dataset_id__in=dataset_id_list).delete()
             QuerySet(Problem).filter(dataset_id__in=dataset_id_list).delete()
-            ListenerManagement.delete_embedding_by_dataset_id_list_signal.send(dataset_id_list)
+            delete_embedding_by_dataset_id_list(dataset_id_list)
             dataset_list.delete()
             # 删除团队
             QuerySet(Team).filter(user_id=self.data.get('id')).delete()
