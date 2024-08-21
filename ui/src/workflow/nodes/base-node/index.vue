@@ -26,6 +26,7 @@
           maxlength="64"
           placeholder="请输入应用名称"
           show-word-limit
+          @blur="form_data.name = form_data.name?.trim()"
         />
       </el-form-item>
       <el-form-item label="应用描述">
