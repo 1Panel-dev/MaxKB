@@ -155,7 +155,7 @@
                 </span>
                 <span @click.stop>
                   <el-dropdown trigger="click">
-                    <el-button text>
+                    <el-button text type="primary">
                       <el-icon><MoreFilled /></el-icon>
                     </el-button>
                     <template #dropdown>
@@ -188,7 +188,7 @@
                 </el-tooltip>
                 <span @click.stop>
                   <el-dropdown trigger="click">
-                    <el-button text>
+                    <el-button text type="primary">
                       <el-icon><MoreFilled /></el-icon>
                     </el-button>
                     <template #dropdown>
