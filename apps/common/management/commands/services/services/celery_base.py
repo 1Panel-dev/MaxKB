@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from .base import BaseService
 from ..hands import *
 

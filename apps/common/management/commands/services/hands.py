@@ -2,8 +2,6 @@ import logging
 import os
 import sys
 
-from django.conf import settings
-
 from smartdoc.const import CONFIG, PROJECT_DIR
 
 try:
@@ -17,7 +15,7 @@ except ImportError as e:
     __version__ = 'Unknown'
     sys.exit(1)
 
-HTTP_HOST = CONFIG.HTTP_BIND_HOST or '127.0.0.1'
+HTTP_HOST = '0.0.0.0'
 HTTP_PORT = CONFIG.HTTP_LISTEN_PORT or 8080
 DEBUG = CONFIG.DEBUG or False
 
