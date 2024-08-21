@@ -71,6 +71,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
+import { cloneDeep } from 'lodash'
 import functionLibApi from '@/api/function-lib'
 import FunctionFormDrawer from './component/FunctionFormDrawer.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -120,8 +121,9 @@ function deleteFunctionLib(row: any) {
 }
 
 function copyFunctionLib(row: any) {
-  delete row['id']
-  functionLibApi.postFunctionLib(row, loading).then((res) => {
+  const obj = cloneDeep(row)
+  delete obj['id']
+  functionLibApi.postFunctionLib(obj, loading).then((res) => {
     MsgSuccess('复制成功')
     paginationConfig.total = 0
     paginationConfig.current_page = 1
