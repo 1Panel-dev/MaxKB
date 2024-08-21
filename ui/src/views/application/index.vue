@@ -116,7 +116,7 @@
       </InfiniteScroll>
     </div>
     <CreateApplicationDialog ref="CreateApplicationDialogRef" />
-    <CopyApplicationDialog ref="CopyApplicationDialogRef" @refresh="refresh" />
+    <CopyApplicationDialog ref="CopyApplicationDialogRef" />
   </div>
 </template>
 <script setup lang="ts">
@@ -203,13 +203,6 @@ function getList() {
       applicationList.value = [...applicationList.value, ...res.data.records]
       paginationConfig.total = res.data.total
     })
-}
-
-function refresh() {
-  paginationConfig.total = 0
-  paginationConfig.current_page = 1
-  applicationList.value = []
-  getList()
 }
 
 onMounted(() => {

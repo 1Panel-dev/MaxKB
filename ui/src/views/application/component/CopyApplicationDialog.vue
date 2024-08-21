@@ -45,19 +45,18 @@
 </template>
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
-
+import { useRouter, useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type { ApplicationFormType } from '@/api/type/application'
 import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
-
+import { isWorkFlow } from '@/utils/application'
 import { t } from '@/locales'
 import useStore from '@/stores'
 import { ValidType, ValidCount } from '@/enums/common'
-
+const router = useRouter()
 const { common, user } = useStore()
-const emit = defineEmits(['refresh'])
 
 // @ts-ignore
 const defaultPrompt = t('views.application.prompt.defaultPrompt', {
@@ -159,7 +158,11 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
     if (valid) {
       applicationApi.postApplication(applicationForm.value, loading).then((res) => {
         MsgSuccess(t('views.application.applicationForm.buttons.createSuccess'))
-        emit('refresh')
+        if (isWorkFlow(applicationForm.value.type)) {
+          router.push({ path: `/application/${res.data.id}/workflow` })
+        } else {
+          router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
+        }
         dialogVisible.value = false
       })
     }

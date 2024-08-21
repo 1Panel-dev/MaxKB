@@ -73,10 +73,22 @@ const postFunctionLibDebug: (data: any, loading?: Ref<boolean>) => Promise<Resul
   return post(`${prefix}/debug`, data, undefined, loading)
 }
 
+/**
+ * 删除函数
+ * @param 参数 function_lib_id
+ */
+const delFunctionLib: (
+  function_lib_id: String,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (function_lib_id, loading) => {
+  return del(`${prefix}/${function_lib_id}`, undefined, {}, loading)
+}
+
 export default {
   getFunctionLib,
   postFunctionLib,
   putFunctionLib,
   postFunctionLibDebug,
-  getAllFunctionLib
+  getAllFunctionLib,
+  delFunctionLib
 }
