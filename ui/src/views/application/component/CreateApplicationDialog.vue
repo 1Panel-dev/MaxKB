@@ -199,7 +199,6 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
         } else {
           router.push({ path: `/application/${res.data.id}/${res.data.type}/setting` })
         }
-        emit('refresh')
         dialogVisible.value = false
       })
     }

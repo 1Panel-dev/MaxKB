@@ -73,7 +73,7 @@
 import { ref, onMounted, reactive } from 'vue'
 import functionLibApi from '@/api/function-lib'
 import FunctionFormDrawer from './component/FunctionFormDrawer.vue'
-import { MsgSuccess, MsgError } from '@/utils/message'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 const loading = ref(false)
 
 const FunctionFormDrawerRef = ref()
@@ -100,18 +100,23 @@ function searchHandle() {
 }
 
 function deleteFunctionLib(row: any) {
-  // MsgConfirm(
-  //   // @ts-ignore
-  //   `${t('views.function-lib.function-libList.card.delete.confirmTitle')}${row.name} ?`,
-  //   t('views.function-lib.function-libList.card.delete.confirmMessage'),
-  //   {
-  //     confirmButtonText: t('views.function-lib.function-libList.card.delete.confirmButton'),
-  //     cancelButtonText: t('views.function-lib.function-libList.card.delete.cancelButton'),
-  //     confirmButtonClass: 'danger'
-  //   }
-  // )
-  //   .then(() => {})
-  //   .catch(() => {})
+  MsgConfirm(
+    `是否删除函数：${row.name} ?`,
+    '删除后，引用了该函数的应用提问时会报错 ，请谨慎操作。',
+    {
+      confirmButtonText: '删除',
+      cancelButtonText: '取消',
+      confirmButtonClass: 'danger'
+    }
+  )
+    .then(() => {
+      functionLibApi.delFunctionLib(row.id, loading).then(() => {
+        const index = functionLibList.value.findIndex((v) => v.id === row.id)
+        functionLibList.value.splice(index, 1)
+        MsgSuccess('删除成功')
+      })
+    })
+    .catch(() => {})
 }
 
 function copyFunctionLib(row: any) {
