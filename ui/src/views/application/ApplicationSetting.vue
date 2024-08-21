@@ -43,6 +43,7 @@
                   maxlength="64"
                   :placeholder="$t('views.application.applicationForm.form.appName.placeholder')"
                   show-word-limit
+                  @blur="applicationForm.name = applicationForm.name?.trim()"
                 />
               </el-form-item>
               <el-form-item
