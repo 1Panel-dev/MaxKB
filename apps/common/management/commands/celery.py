@@ -26,6 +26,8 @@ class Command(BaseCommand):
         service = options.get('service')
         os.environ.setdefault('CELERY_NAME', ','.join(service))
         server_hostname = os.environ.get("SERVER_HOSTNAME")
+        if os.getuid() == 0:
+            os.environ.setdefault('C_FORCE_ROOT', '1')
         if not server_hostname:
             server_hostname = '%h'
         cmd = [
