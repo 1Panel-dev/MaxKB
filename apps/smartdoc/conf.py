@@ -88,7 +88,10 @@ class Config(dict):
         # 向量库配置
         "VECTOR_STORE_NAME": 'pg_vector',
         "DEBUG": False,
-        'SANDBOX': False
+        'SANDBOX': False,
+        'LOCAL_MODEL_HOST': '127.0.0.1',
+        'LOCAL_MODEL_PORT': '11636',
+        'LOCAL_MODEL_PROTOCOL': "http"
 
     }
 

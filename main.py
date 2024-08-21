@@ -75,7 +75,9 @@ def dev():
         management.call_command('celery', 'celery')
     elif services.__contains__('local_model'):
         os.environ.setdefault('SERVER_NAME', 'local_model')
-        management.call_command('runserver', "127.0.0.1:5432")
+        from smartdoc.const import CONFIG
+        bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
+        management.call_command('runserver', bind)
 
 
 if __name__ == '__main__':
