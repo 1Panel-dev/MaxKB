@@ -23,7 +23,7 @@ class GunicornLocalModelService(BaseService):
         print("\n- Start Gunicorn Local Model WSGI HTTP Server")
         os.environ.setdefault('SERVER_NAME', 'local_model')
         log_format = '%(h)s %(t)s %(L)ss "%(r)s" %(s)s %(b)s '
-        bind = f'127.0.0.1:5432'
+        bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
         cmd = [
             'gunicorn', 'smartdoc.wsgi:application',
             '-b', bind,

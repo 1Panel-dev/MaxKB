@@ -14,6 +14,7 @@ from langchain_core.pydantic_v1 import BaseModel
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
+from smartdoc.const import CONFIG
 
 
 class WebLocalEmbedding(MaxKBBaseModel, BaseModel, Embeddings):
@@ -28,14 +29,18 @@ class WebLocalEmbedding(MaxKBBaseModel, BaseModel, Embeddings):
         self.model_id = kwargs.get('model_id', None)
 
     def embed_query(self, text: str) -> List[float]:
-        res = requests.post(f'http://127.0.0.1:5432/api/model/{self.model_id}/embed_query', {'text': text})
+        bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
+        res = requests.post(f'{CONFIG.get("LOCAL_MODEL_PROTOCOL")}://{bind}/api/model/{self.model_id}/embed_query',
+                            {'text': text})
         result = res.json()
         if result.get('code', 500) == 200:
             return result.get('data')
         raise Exception(result.get('msg'))
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        res = requests.post(f'http://127.0.0.1:5432/api/model/{self.model_id}/embed_documents', {'texts': texts})
+        bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
+        res = requests.post(f'{CONFIG.get("LOCAL_MODEL_PROTOCOL")}://{bind}/api/model/{self.model_id}/embed_documents',
+                            {'texts': texts})
         result = res.json()
         if result.get('code', 500) == 200:
             return result.get('data')
