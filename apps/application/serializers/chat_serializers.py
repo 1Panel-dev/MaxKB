@@ -37,8 +37,10 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
-from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id
+from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id, \
+    get_embedding_model_id_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
+from embedding.task import embedding_by_paragraph
 from smartdoc.conf import PROJECT_DIR
 
 chat_cache = caches['chat_cache']
@@ -516,9 +518,9 @@ class ChatRecordSerializer(serializers.Serializer):
 
         @staticmethod
         def post_embedding_paragraph(chat_record, paragraph_id, dataset_id):
-            model = get_embedding_model_by_dataset_id(dataset_id)
+            model_id = get_embedding_model_id_by_dataset_id(dataset_id)
             # 发送向量化事件
-            ListenerManagement.embedding_by_paragraph_signal.send(paragraph_id, embedding_model=model)
+            embedding_by_paragraph(paragraph_id, model_id)
             return chat_record
 
         @post(post_function=post_embedding_paragraph)

@@ -18,6 +18,7 @@ TOKEN_KEY = 'solomon_world_token'
 TOKEN_SALT = 'solomonwanc@gmail.com'
 TIME_OUT = 30 * 60
 
+
 # 加密
 def encrypt(obj):
     value = signing.dumps(obj, key=TOKEN_KEY, salt=TOKEN_SALT)
@@ -29,7 +30,6 @@ def encrypt(obj):
 def decrypt(src):
     src = signing.b64_decode(src.encode()).decode()
     raw = signing.loads(src, key=TOKEN_KEY, salt=TOKEN_SALT)
-    print(type(raw))
     return raw
 
 
@@ -74,5 +74,3 @@ def check_token(token):
     if last_token:
         return last_token == token
     return False
-
-

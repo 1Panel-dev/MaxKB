@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django_filters',  # 条件过滤
     'django_apscheduler',
     'common',
-    'function_lib'
+    'function_lib',
+    'django_celery_beat'
 
 ]
 
@@ -60,6 +61,7 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60 * 60 * 2)  # <-- 设置token有效时间
 }
 
+APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
 ROOT_URLCONF = 'smartdoc.urls'
 # FORCE_SCRIPT_NAME
 TEMPLATES = [

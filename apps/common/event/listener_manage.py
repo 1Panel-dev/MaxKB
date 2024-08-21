@@ -13,22 +13,20 @@ import traceback
 from typing import List
 
 import django.db.models
-from blinker import signal
 from django.db.models import QuerySet
 from langchain_core.embeddings import Embeddings
 
 from common.config.embedding_config import VectorStore
 from common.db.search import native_search, get_dynamics_model
-from common.event.common import poxy, embedding_poxy
+from common.event.common import embedding_poxy
 from common.util.file_util import get_file_content
-from common.util.fork import ForkManage, Fork
 from common.util.lock import try_lock, un_lock
 from dataset.models import Paragraph, Status, Document, ProblemParagraphMapping
-from embedding.models import SourceType
+from embedding.models import SourceType, SearchMode
 from smartdoc.conf import PROJECT_DIR
 
-max_kb_error = logging.getLogger("max_kb_error")
-max_kb = logging.getLogger("max_kb")
+max_kb_error = logging.getLogger(__file__)
+max_kb = logging.getLogger(__file__)
 
 
 class SyncWebDatasetArgs:
@@ -70,23 +68,6 @@ class UpdateEmbeddingDocumentIdArgs:
 
 
 class ListenerManagement:
-    embedding_by_problem_signal = signal("embedding_by_problem")
-    embedding_by_paragraph_signal = signal("embedding_by_paragraph")
-    embedding_by_dataset_signal = signal("embedding_by_dataset")
-    embedding_by_document_signal = signal("embedding_by_document")
-    delete_embedding_by_document_signal = signal("delete_embedding_by_document")
-    delete_embedding_by_document_list_signal = signal("delete_embedding_by_document_list")
-    delete_embedding_by_dataset_signal = signal("delete_embedding_by_dataset")
-    delete_embedding_by_paragraph_signal = signal("delete_embedding_by_paragraph")
-    delete_embedding_by_source_signal = signal("delete_embedding_by_source")
-    enable_embedding_by_paragraph_signal = signal('enable_embedding_by_paragraph')
-    disable_embedding_by_paragraph_signal = signal('disable_embedding_by_paragraph')
-    init_embedding_model_signal = signal('init_embedding_model')
-    sync_web_dataset_signal = signal('sync_web_dataset')
-    sync_web_document_signal = signal('sync_web_document')
-    update_problem_signal = signal('update_problem')
-    delete_embedding_by_source_ids_signal = signal('delete_embedding_by_source_ids')
-    delete_embedding_by_dataset_id_list_signal = signal("delete_embedding_by_dataset_id_list")
 
     @staticmethod
     def embedding_by_problem(args, embedding_model: Embeddings):
@@ -160,7 +141,6 @@ class ListenerManagement:
             max_kb.info(f'结束--->向量化段落:{paragraph_id}')
 
     @staticmethod
-    @embedding_poxy
     def embedding_by_document(document_id, embedding_model: Embeddings):
         """
         向量化文档
@@ -227,7 +207,7 @@ class ListenerManagement:
 
     @staticmethod
     def delete_embedding_by_document_list(document_id_list: List[str]):
-        VectorStore.get_embedding_vector().delete_bu_document_id_list(document_id_list)
+        VectorStore.get_embedding_vector().delete_by_document_id_list(document_id_list)
 
     @staticmethod
     def delete_embedding_by_dataset(dataset_id):
@@ -250,25 +230,6 @@ class ListenerManagement:
         VectorStore.get_embedding_vector().update_by_paragraph_id(paragraph_id, {'is_active': True})
 
     @staticmethod
-    @poxy
-    def sync_web_document(args: SyncWebDocumentArgs):
-        for source_url in args.source_url_list:
-            result = Fork(base_fork_url=source_url, selector_list=args.selector.split(' ')).fork()
-            args.handler(source_url, args.selector, result)
-
-    @staticmethod
-    @poxy
-    def sync_web_dataset(args: SyncWebDatasetArgs):
-        if try_lock('sync_web_dataset' + args.lock_key):
-            try:
-                ForkManage(args.url, args.selector.split(" ") if args.selector is not None else []).fork(2, set(),
-                                                                                                         args.handler)
-            except Exception as e:
-                logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
-            finally:
-                un_lock('sync_web_dataset' + args.lock_key)
-
-    @staticmethod
     def update_problem(args: UpdateProblemArgs):
         problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(problem_id=args.problem_id)
         embed_value = args.embedding_model.embed_query(args.problem_content)
@@ -281,6 +242,9 @@ class ListenerManagement:
             VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
                                                                        {'dataset_id': args.target_dataset_id})
         else:
+            # 删除向量数据
+            ListenerManagement.delete_embedding_by_paragraph_ids(args.paragraph_id_list)
+            # 向量数据
             ListenerManagement.embedding_by_paragraph_list(args.paragraph_id_list,
                                                            embedding_model=args.target_embedding_model)
 
@@ -306,38 +270,10 @@ class ListenerManagement:
     def delete_embedding_by_dataset_id_list(source_ids: List[str]):
         VectorStore.get_embedding_vector().delete_by_dataset_id_list(source_ids)
 
-    def run(self):
-        #  添加向量 根据问题id
-        ListenerManagement.embedding_by_problem_signal.connect(self.embedding_by_problem)
-        #  添加向量 根据段落id
-        ListenerManagement.embedding_by_paragraph_signal.connect(self.embedding_by_paragraph)
-        #  添加向量 根据知识库id
-        ListenerManagement.embedding_by_dataset_signal.connect(
-            self.embedding_by_dataset)
-        #  添加向量 根据文档id
-        ListenerManagement.embedding_by_document_signal.connect(
-            self.embedding_by_document)
-        # 删除 向量 根据文档
-        ListenerManagement.delete_embedding_by_document_signal.connect(self.delete_embedding_by_document)
-        # 删除 向量 根据文档id列表
-        ListenerManagement.delete_embedding_by_document_list_signal.connect(self.delete_embedding_by_document_list)
-        # 删除 向量 根据知识库id
-        ListenerManagement.delete_embedding_by_dataset_signal.connect(self.delete_embedding_by_dataset)
-        # 删除向量 根据段落id
-        ListenerManagement.delete_embedding_by_paragraph_signal.connect(
-            self.delete_embedding_by_paragraph)
-        # 删除向量 根据资源id
-        ListenerManagement.delete_embedding_by_source_signal.connect(self.delete_embedding_by_source)
-        # 禁用段落
-        ListenerManagement.disable_embedding_by_paragraph_signal.connect(self.disable_embedding_by_paragraph)
-        # 启动段落向量
-        ListenerManagement.enable_embedding_by_paragraph_signal.connect(self.enable_embedding_by_paragraph)
-
-        # 同步web站点知识库
-        ListenerManagement.sync_web_dataset_signal.connect(self.sync_web_dataset)
-        # 同步web站点 文档
-        ListenerManagement.sync_web_document_signal.connect(self.sync_web_document)
-        # 更新问题向量
-        ListenerManagement.update_problem_signal.connect(self.update_problem)
-        ListenerManagement.delete_embedding_by_source_ids_signal.connect(self.delete_embedding_by_source_ids)
-        ListenerManagement.delete_embedding_by_dataset_id_list_signal.connect(self.delete_embedding_by_dataset_id_list)
+    @staticmethod
+    def hit_test(query_text, dataset_id: list[str], exclude_document_id_list: list[str], top_number: int,
+                 similarity: float,
+                 search_mode: SearchMode,
+                 embedding: Embeddings):
+        return VectorStore.get_embedding_vector().hit_test(query_text, dataset_id, exclude_document_id_list, top_number,
+                                                           similarity, search_mode, embedding)

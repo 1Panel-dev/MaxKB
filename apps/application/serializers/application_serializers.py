@@ -14,6 +14,7 @@ import uuid
 from functools import reduce
 from typing import Dict, List
 
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core import cache, validators
 from django.core import signing
@@ -46,7 +47,6 @@ from setting.models.model_management import Model
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
-from django.conf import settings
 
 chat_cache = cache.caches['chat_cache']
 
