@@ -66,7 +66,7 @@
         </el-row>
       </InfiniteScroll>
     </div>
-    <FunctionFormDrawer ref="FunctionFormDrawerRef" @refresh="refresh" />
+    <FunctionFormDrawer ref="FunctionFormDrawerRef" @refresh="refresh" :title="title" />
   </div>
 </template>
 <script setup lang="ts">
@@ -88,8 +88,10 @@ const paginationConfig = reactive({
 })
 
 const searchValue = ref('')
+const title = ref('')
 
 function openCreateDialog(data?: any) {
+  title.value = data ? '编辑函数' : '创建函数'
   FunctionFormDrawerRef.value.open(data)
 }
 
@@ -121,15 +123,11 @@ function deleteFunctionLib(row: any) {
 }
 
 function copyFunctionLib(row: any) {
+  title.value = '复制函数'
   const obj = cloneDeep(row)
   delete obj['id']
-  functionLibApi.postFunctionLib(obj, loading).then((res) => {
-    MsgSuccess('复制成功')
-    paginationConfig.total = 0
-    paginationConfig.current_page = 1
-    functionLibList.value = []
-    getList()
-  })
+  obj['name'] = obj['name'] + ' 副本'
+  FunctionFormDrawerRef.value.open(obj)
 }
 
 function getList() {

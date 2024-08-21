@@ -134,6 +134,7 @@ watch(dialogVisible, (bool) => {
 const open = (data: any) => {
   const obj = cloneDeep(data)
   delete obj['id']
+  obj['name'] = obj['name'] + ' 副本'
   applicationForm.value = obj
   dialogVisible.value = true
 }

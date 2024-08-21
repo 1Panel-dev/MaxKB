@@ -1,7 +1,7 @@
 <template>
   <el-drawer v-model="visible" size="60%">
     <template #header>
-      <h4>{{ isEdit ? '编辑函数' : '创建函数' }}</h4>
+      <h4>{{ title }}</h4>
     </template>
     <div>
       <h4 class="title-decoration-1 mb-16">基础信息</h4>
@@ -120,6 +120,10 @@ import type { FormInstance } from 'element-plus'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { cloneDeep } from 'lodash'
 
+const props = defineProps({
+  title: String
+})
+
 const emit = defineEmits(['refresh'])
 const FieldFormDialogRef = ref()
 const FunctionDebugDrawerRef = ref()
@@ -182,10 +186,6 @@ function refreshFieldList(data: any) {
   currentIndex.value = null
 }
 
-// function changeCode(value: string) {
-//   form.value.code = value
-// }
-
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid: any) => {
@@ -209,7 +209,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 const open = (data: any) => {
   if (data) {
-    isEdit.value = true
+    isEdit.value = data?.id ? true : false
     form.value = cloneDeep(data)
   }
   visible.value = true
