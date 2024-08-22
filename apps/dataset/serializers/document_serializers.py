@@ -33,6 +33,8 @@ from common.handle.impl.pdf_split_handle import PdfSplitHandle
 from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
 from common.handle.impl.qa.xls_parse_qa_handle import XlsParseQAHandle
 from common.handle.impl.qa.xlsx_parse_qa_handle import XlsxParseQAHandle
+from common.handle.impl.table.csv_parse_table_handle import CsvSplitHandle
+from common.handle.impl.table.excel_parse_table_handle import ExcelSplitHandle
 from common.handle.impl.text_split_handle import TextSplitHandle
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post, flat_map
@@ -51,6 +53,7 @@ from embedding.task.embedding import embedding_by_document, delete_embedding_by_
 from smartdoc.conf import PROJECT_DIR
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle()]
+parse_table_handle_list = [CsvSplitHandle(), ExcelSplitHandle()]
 
 
 class FileBufferHandle:
@@ -152,6 +155,13 @@ class DocumentInstanceQASerializer(ApiMixin, serializers.Serializer):
                                                                        error_messages=ErrMessage.file("文件")))
 
 
+class DocumentInstanceTableSerializer(ApiMixin, serializers.Serializer):
+    file_list = serializers.ListSerializer(required=True,
+                                           error_messages=ErrMessage.list("文件列表"),
+                                           child=serializers.FileField(required=True,
+                                                                       error_messages=ErrMessage.file("文件")))
+
+
 class DocumentSerializers(ApiMixin, serializers.Serializer):
     class Export(ApiMixin, serializers.Serializer):
         type = serializers.CharField(required=True, validators=[
@@ -182,6 +192,23 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                                                   'Content-Disposition': 'attachment; filename="csv_template.csv"'})
             elif self.data.get('type') == 'excel':
                 file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', 'excel_template.xlsx'), "rb")
+                content = file.read()
+                file.close()
+                return HttpResponse(content, status=200, headers={'Content-Type': 'application/vnd.ms-excel',
+                                                                  'Content-Disposition': 'attachment; filename="excel_template.xlsx"'})
+
+        def table_export(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+
+            if self.data.get('type') == 'csv':
+                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', 'MaxKB表格模板.csv'), "rb")
+                content = file.read()
+                file.close()
+                return HttpResponse(content, status=200, headers={'Content-Type': 'text/cxv',
+                                                                  'Content-Disposition': 'attachment; filename="csv_template.csv"'})
+            elif self.data.get('type') == 'excel':
+                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', 'MaxKB表格模板.xlsx'), "rb")
                 content = file.read()
                 file.close()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'application/vnd.ms-excel',
@@ -633,12 +660,28 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     return parse_qa_handle.handle(file, get_buffer)
             raise AppApiException(500, '不支持的文件格式')
 
+        @staticmethod
+        def parse_table_file(file):
+            get_buffer = FileBufferHandle().get_buffer
+            for parse_table_handle in parse_table_handle_list:
+                if parse_table_handle.support(file, get_buffer):
+                    return parse_table_handle.handle(file, get_buffer)
+            raise AppApiException(500, '不支持的文件格式')
+
         def save_qa(self, instance: Dict, with_valid=True):
             if with_valid:
                 DocumentInstanceQASerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
             file_list = instance.get('file_list')
             document_list = flat_map([self.parse_qa_file(file) for file in file_list])
+            return DocumentSerializers.Batch(data={'dataset_id': self.data.get('dataset_id')}).batch_save(document_list)
+
+        def save_table(self, instance: Dict, with_valid=True):
+            if with_valid:
+                DocumentInstanceTableSerializer(data=instance).is_valid(raise_exception=True)
+                self.is_valid(raise_exception=True)
+            file_list = instance.get('file_list')
+            document_list = flat_map([self.parse_table_file(file) for file in file_list])
             return DocumentSerializers.Batch(data={'dataset_id': self.data.get('dataset_id')}).batch_save(document_list)
 
         @post(post_function=post_embedding)

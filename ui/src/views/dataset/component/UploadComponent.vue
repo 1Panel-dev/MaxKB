@@ -10,6 +10,7 @@
     <el-form-item>
       <el-radio-group v-model="form.fileType" @change="radioChange">
         <el-radio value="txt">文本文件</el-radio>
+        <el-radio value="table">表格</el-radio>
         <el-radio value="QA">QA 问答对</el-radio>
       </el-radio-group>
     </el-form-item>
@@ -48,6 +49,42 @@
       <el-divider direction="vertical" />
       <el-button type="primary" link @click="downloadTemplate('csv')"> 下载 CSV 模板 </el-button>
     </el-form-item>
+    <el-form-item prop="fileList" v-else-if="form.fileType === 'table'">
+      <el-upload
+        :webkitdirectory="false"
+        class="w-full mb-4"
+        drag
+        multiple
+        v-model:file-list="form.fileList"
+        action="#"
+        :auto-upload="false"
+        :show-file-list="false"
+        accept=".xlsx, .xls, .csv"
+        :limit="50"
+        :on-exceed="onExceed"
+        :on-change="fileHandleChange"
+        @click.prevent="handlePreview(false)"
+      >
+        <img src="@/assets/upload-icon.svg" alt="" />
+        <div class="el-upload__text">
+          <p>
+            拖拽文件至此上传或
+            <em class="hover" @click.prevent="handlePreview(false)"> 选择文件 </em>
+            <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
+          </p>
+          <div class="upload__decoration">
+            <p>当前支持 EXCEL和CSV 格式文件。</p>
+            <p>第一行必须是列标题，且列标题必须是有意义的术语，表中每条记录将作为一个分段。</p>
+            <p>每次最多上传50个文档，每个文档最大不能超过100MB。</p>
+          </div>
+        </div>
+      </el-upload>
+      <el-button type="primary" link @click="downloadTableTemplate('excel')">
+        下载 Excel 模板
+      </el-button>
+      <el-divider direction="vertical" />
+      <el-button type="primary" link @click="downloadTableTemplate('csv')"> 下载 CSV 模板 </el-button>
+    </el-form-item>
     <el-form-item prop="fileList" v-else>
       <el-upload
         :webkitdirectory="false"
@@ -73,7 +110,7 @@
           </p>
           <div class="upload__decoration">
             <p>
-              支持格式：TXT、Markdown、PDF、DOCX、HTML 每次最多上传50个文件，每个文件不超过 100MB
+              支持格式：TXT、Markdown、PDF、DOCX、HTML、Excel、CSV 每次最多上传50个文件，每个文件不超过 100MB
             </p>
             <p>若使用【高级分段】建议上传前规范文件的分段标识</p>
           </div>
@@ -131,6 +168,10 @@ watch(form.value, (value) => {
 
 function downloadTemplate(type: string) {
   documentApi.exportQATemplate(`${type}模版.${type == 'csv' ? type : 'xlsx'}`, type)
+}
+
+function downloadTableTemplate(type: string) {
+  documentApi.exportTableTemplate(`${type}模版.${type == 'csv' ? type : 'xlsx'}`, type)
 }
 
 function radioChange() {

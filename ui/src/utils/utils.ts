@@ -39,6 +39,7 @@ export function fileType(name: string) {
 */
 const typeList: any = {
   txt: ['txt', 'pdf', 'docx', 'csv', 'md', 'html', 'PDF'],
+  table: ['xlsx', 'xls', 'csv'],
   QA: ['xlsx', 'csv', 'xls']
 }
 
