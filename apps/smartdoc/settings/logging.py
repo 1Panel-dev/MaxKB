@@ -91,7 +91,7 @@ LOGGING = {
         },
         'sqlalchemy': {
             'handlers': ['console', 'file', 'syslog'],
-            'level': LOG_LEVEL,
+            'level': "ERROR",
             'propagate': False,
         },
         'django.db.backends': {
@@ -119,9 +119,6 @@ LOGGING = {
             'level': "DEBUG",
             'propagate': False,
         },
-        'sqlalchemy': {'handlers': ['console', 'file'],
-                       'level': "ERROR",
-                       'propagate': False, }
     }
 }
 
