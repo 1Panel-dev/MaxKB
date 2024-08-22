@@ -28,8 +28,8 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile("(?<=\\n)(?<!#)###### (?!#).*|(?<=^)(?<!#)###### (?!#).*"),
                         re.compile("(?<!\n)\n\n+")]
 
-
 max_kb = logging.getLogger("max_kb")
+
 
 class PdfSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
@@ -60,6 +60,13 @@ class PdfSplitHandle(BaseSplitHandle):
 
                         loader = PyPDFLoader(page_num_pdf, extract_images=True)
                         page_content = "\n" + loader.load()[0].page_content
+                    except NotImplementedError as e:
+                        # 文件格式不支持，直接退出
+                        raise e
+                    except BaseException as e:
+                        # 当页出错继续进行下一页，防止一个页面出错导致整个文件解析失败
+                        max_kb.error(f"File: {file.name}, Page: {page_num + 1}, error: {e}")
+                        continue
                     finally:
                         os.remove(page_num_pdf)
 
