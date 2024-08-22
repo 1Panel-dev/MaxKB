@@ -121,15 +121,18 @@ class ApplicationWorkflowSerializer(serializers.Serializer):
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                  max_length=256, min_length=1,
                                  error_messages=ErrMessage.char("应用描述"))
+    work_flow = serializers.DictField(required=False, error_messages=ErrMessage.dict("工作流对象"))
     prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                      error_messages=ErrMessage.char("开场白"))
 
     @staticmethod
     def to_application_model(user_id: str, application: Dict):
-
-        default_workflow_json = get_file_content(
-            os.path.join(PROJECT_DIR, "apps", "application", 'flow', 'default_workflow.json'))
-        default_workflow = json.loads(default_workflow_json)
+        if application.get('work_flow') is not None:
+            default_workflow = application.get('work_flow')
+        else:
+            default_workflow_json = get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "application", 'flow', 'default_workflow.json'))
+            default_workflow = json.loads(default_workflow_json)
         for node in default_workflow.get('nodes'):
             if node.get('id') == 'base-node':
                 node.get('properties')['node_data'] = {"desc": application.get('desc'),
