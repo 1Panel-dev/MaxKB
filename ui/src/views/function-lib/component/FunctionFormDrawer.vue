@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="visible" size="60%">
+  <el-drawer v-model="visible" size="60%" :before-close="close">
     <template #header>
       <h4>{{ title }}</h4>
     </template>
@@ -85,8 +85,13 @@
         Python 代码 <el-text type="info" class="color-secondary"> 使用函数时不显示 </el-text>
       </h4>
 
-      <div class="function-CodemirrorEditor" v-if="showEditor">
+      <div class="function-CodemirrorEditor mb-8" v-if="showEditor">
         <CodemirrorEditor v-model="form.code" />
+        <div class="function-CodemirrorEditor__footer">
+          <el-button text type="info" @click="openCodemirrorDialog" class="magnify">
+            <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
+          </el-button>
+        </div>
       </div>
       <h4 class="title-decoration-1 mb-16 mt-16">
         输出变量 <el-text type="info" class="color-secondary"> 使用函数时显示 </el-text>
@@ -105,6 +110,19 @@
         >
       </div>
     </template>
+
+    <!-- Codemirror 弹出层 -->
+    <el-dialog v-model="dialogVisible" title="Python 代码" append-to-body>
+      <CodemirrorEditor
+        v-model="cloneContent"
+        style="height: 300px !important; border: 1px solid #bbbfc4; border-radius: 4px"
+      />
+      <template #footer>
+        <div class="dialog-footer mt-24">
+          <el-button type="primary" @click="submitDialog"> 确认</el-button>
+        </div>
+      </template>
+    </el-dialog>
     <FunctionDebugDrawer ref="FunctionDebugDrawerRef" />
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </el-drawer>
@@ -117,7 +135,7 @@ import FunctionDebugDrawer from './FunctionDebugDrawer.vue'
 import type { functionLibData } from '@/api/type/function-lib'
 import functionLibApi from '@/api/function-lib'
 import type { FormInstance } from 'element-plus'
-import { MsgSuccess, MsgError } from '@/utils/message'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { cloneDeep } from 'lodash'
 
 const props = defineProps({
@@ -143,6 +161,9 @@ const form = ref<functionLibData>({
   input_field_list: []
 })
 
+const dialogVisible = ref(false)
+const cloneContent = ref<any>('')
+
 watch(visible, (bool) => {
   if (!bool) {
     isEdit.value = false
@@ -160,6 +181,39 @@ watch(visible, (bool) => {
 const rules = reactive({
   name: [{ required: true, message: '请输入函数名称', trigger: 'blur' }]
 })
+
+function openCodemirrorDialog() {
+  cloneContent.value = form.value.code
+  dialogVisible.value = true
+}
+
+function submitDialog() {
+  form.value.code = cloneContent.value
+  dialogVisible.value = false
+}
+
+function close() {
+  if (!areAllValuesNonEmpty(form.value)) {
+    visible.value = false
+  } else {
+    MsgConfirm(`提示`, `当前的更改尚未保存，确认退出吗?`, {
+      confirmButtonText: '确认',
+      type: 'warning'
+    })
+      .then(() => {
+        visible.value = false
+      })
+      .catch(() => {})
+  }
+}
+
+function areAllValuesNonEmpty(obj: any) {
+  return Object.values(obj).some((value) => {
+    return Array.isArray(value)
+      ? value.length !== 0
+      : value !== null && value !== undefined && value !== ''
+  })
+}
 
 function openDebug() {
   FunctionDebugDrawerRef.value.open(form.value)
@@ -222,9 +276,4 @@ defineExpose({
   open
 })
 </script>
-<style lang="scss" scoped>
-.function-CodemirrorEditor {
-  border: 1px solid #bbbfc4;
-  border-radius: 4px;
-}
-</style>
+<style lang="scss" scoped></style>
