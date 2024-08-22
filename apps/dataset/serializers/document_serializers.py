@@ -799,7 +799,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         def post_embedding(document_list, dataset_id):
             for document_dict in document_list:
                 model_id = get_embedding_model_id_by_dataset_id(dataset_id)
-                embedding_by_document(document_dict.get('id'), model_id)
+                embedding_by_document.delay(document_dict.get('id'), model_id)
             return document_list
 
         @post(post_function=post_embedding)
