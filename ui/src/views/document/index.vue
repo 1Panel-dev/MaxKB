@@ -85,7 +85,7 @@
                 <el-icon class="is-loading primary"><Loading /></el-icon> 索引中
               </el-text>
               <el-text v-else-if="row.status === '3'">
-                <el-icon class="is-loading primary"><Loading /></el-icon>排队中
+                <el-icon class="is-loading primary"><Loading /></el-icon> 排队中
               </el-text>
             </template>
           </el-table-column>
