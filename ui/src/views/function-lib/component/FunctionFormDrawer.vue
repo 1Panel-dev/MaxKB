@@ -193,7 +193,7 @@ function submitDialog() {
 }
 
 function close() {
-  if (!areAllValuesNonEmpty(form.value)) {
+  if (isEdit.value || !areAllValuesNonEmpty(form.value)) {
     visible.value = false
   } else {
     MsgConfirm(`提示`, `当前的更改尚未保存，确认退出吗?`, {
