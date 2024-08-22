@@ -78,6 +78,21 @@ async function next() {
           router.push({ path: `/dataset/${id}/document` })
         })
       }
+    } else if (documentsType.value === 'table') {
+      let fd = new FormData()
+      documentsFiles.value.forEach((item: any) => {
+        if (item?.raw) {
+          fd.append('file', item?.raw)
+        }
+      })
+      if (id) {
+        // table文档上传
+        documentApi.postTableDocument(id as string, fd, loading).then((res) => {
+          MsgSuccess('提交成功')
+          clearStore()
+          router.push({ path: `/dataset/${id}/document` })
+        })
+      }
     } else {
       if (active.value++ > 2) active.value = 0
     }

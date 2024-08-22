@@ -212,6 +212,19 @@ const postQADocument: (
 }
 
 /**
+ * 导入表格
+ * @param 参数
+ * file
+ */
+const postTableDocument: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, data, loading) => {
+  return post(`${prefix}/${dataset_id}/document/table`, data, undefined, loading)
+}
+
+/**
  * 批量迁移文档
  * @param 参数 dataset_id,target_dataset_id,
  */
@@ -257,6 +270,18 @@ const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>)
 }
 
 /**
+ * 获得table模版
+ * @param 参数 fileName,type,
+ */
+const exportTableTemplate: (fileName: string, type: string, loading?: Ref<boolean>) => void = (
+  fileName,
+  type,
+  loading
+) => {
+  return exportExcel(fileName, `${prefix}/document/table_template/export`, { type }, loading)
+}
+
+/**
  * 导出文档
  * @param document_name 文档名称
  * @param dataset_id    数据集id
@@ -295,6 +320,8 @@ export default {
   putMigrateMulDocument,
   batchEditHitHandling,
   exportQATemplate,
+  exportTableTemplate,
   postQADocument,
+  postTableDocument,
   exportDocument
 }
