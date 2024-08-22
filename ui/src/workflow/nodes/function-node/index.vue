@@ -174,10 +174,6 @@ const validate = () => {
   })
 }
 
-// function changeCode(value: string) {
-//   set(props.nodeModel.properties.node_data, 'code', value)
-// }
-
 const dialogVisible = ref(false)
 const cloneContent = ref('')
 
@@ -233,20 +229,5 @@ onMounted(() => {
 })
 </script>
 <style lang="scss">
-.workflow-CodemirrorEditor {
-  border: 1px solid #bbbfc4;
-  border-radius: 4px;
-  position: relative;
-  padding-bottom: 20px;
-  &__footer {
-    .magnify {
-      position: absolute;
-      bottom: 5px;
-      right: 5px;
-    }
-  }
-  .cm-gutters {
-    display: none !important;
-  }
-}
+
 </style>

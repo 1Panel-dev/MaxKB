@@ -65,7 +65,7 @@ const form = ref<any>({
   name: '',
   type: typeOptions[0],
   source: 'reference',
-  is_required: false
+  is_required: true
 })
 
 const rules = reactive({
@@ -80,7 +80,7 @@ watch(dialogVisible, (bool) => {
       name: '',
       type: typeOptions[0],
       source: 'reference',
-      is_required: false
+      is_required: true
     }
     isEdit.value = false
   }
@@ -94,6 +94,7 @@ const open = (row: any) => {
 
   dialogVisible.value = true
 }
+
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
