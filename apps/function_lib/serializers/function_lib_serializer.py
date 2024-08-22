@@ -57,11 +57,14 @@ class DebugInstance(serializers.Serializer):
 
 
 class EditFunctionLib(serializers.Serializer):
-    name = serializers.CharField(required=False, error_messages=ErrMessage.char("函数名称"))
+    name = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                 error_messages=ErrMessage.char("函数名称"))
 
-    desc = serializers.CharField(required=False, error_messages=ErrMessage.char("函数描述"))
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                 error_messages=ErrMessage.char("函数描述"))
 
-    code = serializers.CharField(required=False, error_messages=ErrMessage.char("函数内容"))
+    code = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                 error_messages=ErrMessage.char("函数内容"))
 
     input_field_list = FunctionLibInputField(required=False, many=True)
 
@@ -90,9 +93,9 @@ class FunctionLibSerializer(serializers.Serializer):
         def get_query_set(self):
             query_set = QuerySet(FunctionLib).filter(user_id=self.data.get('user_id'))
             if self.data.get('name') is not None:
-                query_set = query_set.filter(name=self.data.get('name'))
+                query_set = query_set.filter(name__contains=self.data.get('name'))
             if self.data.get('desc') is not None:
-                query_set = query_set.filter(name=self.data.get('desc'))
+                query_set = query_set.filter(desc__contains=self.data.get('desc'))
             query_set = query_set.order_by("-create_time")
             return query_set
 
@@ -158,9 +161,15 @@ class FunctionLibSerializer(serializers.Serializer):
                 if _type == 'float':
                     return float(value)
                 if _type == 'dict':
-                    return json.loads(value)
+                    v = json.loads(value)
+                    if isinstance(v, dict):
+                        return v
+                    raise Exception("类型错误")
                 if _type == 'array':
-                    return json.loads(value)
+                    v = json.loads(value)
+                    if isinstance(v, list):
+                        return v
+                    raise Exception("类型错误")
                 return value
             except Exception as e:
                 raise AppApiException(500, f'字段:{name}类型:{_type}值:{value}类型转换错误')

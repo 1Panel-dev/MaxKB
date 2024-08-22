@@ -9,12 +9,12 @@
 import os
 import subprocess
 import sys
-import time
 import uuid
 from textwrap import dedent
 
 from diskcache import Cache
 
+from smartdoc.const import BASE_DIR
 from smartdoc.const import PROJECT_DIR
 
 python_directory = sys.executable
@@ -81,10 +81,11 @@ except Exception as e:
         with open(exec_python_file, 'w') as file:
             file.write(_code)
             os.system(f"chown {self.user}:{self.user} {exec_python_file}")
+        kwargs = {'cwd': BASE_DIR}
         subprocess_result = subprocess.run(
             ['su', '-c', python_directory + ' ' + exec_python_file, self.user],
             text=True,
-            capture_output=True)
+            capture_output=True, **kwargs)
         os.remove(exec_python_file)
         return subprocess_result
 

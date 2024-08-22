@@ -9,7 +9,6 @@
 import uuid
 
 from django.db import models
-from django.db.models import QuerySet
 
 from common.db.sql_execute import select_one
 from common.mixins.app_model_mixin import AppModelMixin
