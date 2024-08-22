@@ -451,7 +451,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                    'meta': {'source_url': instance.get('source_url'), 'selector': instance.get('selector'),
                             'embedding_mode_id': instance.get('embedding_mode_id')}})
             dataset.save()
-            sync_web_dataset.delay((str(dataset_id), instance.get('source_url'), instance.get('selector')))
+            sync_web_dataset.delay(str(dataset_id), instance.get('source_url'), instance.get('selector'))
             return {**DataSetSerializers(dataset).data,
                     'document_list': []}
 
