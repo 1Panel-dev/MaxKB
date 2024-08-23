@@ -177,9 +177,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (documentId.value) {
           const obj = {
             hit_handling_method: form.value.hit_handling_method,
-            directly_return_similarity: Number(form.value.directly_return_similarity)
-              ? form.value.directly_return_similarity
-              : 0.9,
+            directly_return_similarity: form.value.directly_return_similarity,
             meta: {
               source_url: form.value.source_url,
               selector: form.value.selector
