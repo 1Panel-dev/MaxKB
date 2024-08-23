@@ -40,7 +40,7 @@ class VllmModelProvider(IModelProvider):
         return model_info_manage
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='model_vllm_provider', name='Vllm', icon=get_file_content(
+        return ModelProvideInfo(provider='model_vllm_provider', name='vllm', icon=get_file_content(
             os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'vllm_model_provider', 'icon',
                          'vllm_icon_svg')))
 

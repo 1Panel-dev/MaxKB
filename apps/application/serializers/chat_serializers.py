@@ -11,14 +11,17 @@ import os
 import re
 import uuid
 from functools import reduce
+from io import BytesIO
 from typing import Dict
 
+import openpyxl
 import xlwt
 from django.core import validators
 from django.core.cache import caches
 from django.db import transaction, models
 from django.db.models import QuerySet, Q
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse, HttpResponseServerError
+from openpyxl.workbook import Workbook
 from rest_framework import serializers
 
 from application.flow.workflow_manage import Flow
@@ -166,28 +169,45 @@ class ChatSerializers(serializers.Serializer):
         def export(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            data_list = native_search(self.get_query_set(), select_string=get_file_content(
-                os.path.join(PROJECT_DIR, "apps", "application", 'sql', 'export_application_chat.sql')),
+
+            data_list = native_search(self.get_query_set(),
+                                      select_string=get_file_content(
+                                          os.path.join(PROJECT_DIR, "apps", "application", 'sql',
+                                                       'export_application_chat.sql')),
                                       with_table_name=False)
 
-            # 创建工作簿对象
-            workbook = xlwt.Workbook(encoding='utf-8')
-            # 添加工作表
-            worksheet = workbook.add_sheet('Sheet1')
-            data = [
-                ['会话ID', '摘要', '用户问题', '优化后问题', '回答', '用户反馈', '引用分段数', '分段标题+内容',
-                 '标注', '消耗tokens', '耗时（s）', '提问时间'],
-                *[self.to_row(row) for row in data_list]
-            ]
-            # 写入数据到工作表
-            for row_idx, row in enumerate(data):
-                for col_idx, col in enumerate(row):
-                    worksheet.write(row_idx, col_idx, col)
-                # 创建HttpResponse对象返回Excel文件
-            response = HttpResponse(content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="data.xls"'
+            batch_size = 500
 
-            workbook.save(response)
+            def stream_response():
+                workbook = openpyxl.Workbook()
+                worksheet = workbook.active
+                worksheet.title = 'Sheet1'
+
+                headers = ['会话ID', '摘要', '用户问题', '优化后问题', '回答', '用户反馈', '引用分段数',
+                           '分段标题+内容',
+                           '标注', '消耗tokens', '耗时（s）', '提问时间']
+                for col_idx, header in enumerate(headers, 1):
+                    cell = worksheet.cell(row=1, column=col_idx)
+                    cell.value = header
+
+                for i in range(0, len(data_list), batch_size):
+                    batch_data = data_list[i:i + batch_size]
+
+                    for row_idx, row in enumerate(batch_data, start=i + 2):
+                        for col_idx, value in enumerate(self.to_row(row), 1):
+                            cell = worksheet.cell(row=row_idx, column=col_idx)
+                            cell.value = value
+
+                output = BytesIO()
+                workbook.save(output)
+                output.seek(0)
+                yield output.getvalue()
+                output.close()
+                workbook.close()
+
+            response = StreamingHttpResponse(stream_response(),
+                                             content_type='application/vnd.open.xmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename="data.xlsx"'
             return response
 
         def page(self, current_page: int, page_size: int, with_valid=True):
