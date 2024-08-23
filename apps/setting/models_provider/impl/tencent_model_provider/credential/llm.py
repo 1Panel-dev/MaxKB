@@ -7,7 +7,7 @@ from setting.models_provider.base_model_provider import BaseModelCredential, Val
 
 
 class TencentLLMModelCredential(BaseForm, BaseModelCredential):
-    REQUIRED_FIELDS = ['hunyuan_secret_id', 'hunyuan_secret_key']
+    REQUIRED_FIELDS = ['hunyuan_app_id', 'hunyuan_secret_id', 'hunyuan_secret_key']
 
     @classmethod
     def _validate_model_type(cls, model_type, provider, raise_exception=False):
@@ -42,6 +42,7 @@ class TencentLLMModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model):
         return {**model, 'hunyuan_secret_key': super().encryption(model.get('hunyuan_secret_key', ''))}
 
+    hunyuan_app_id = forms.TextInputField('APP ID', required=True)
     hunyuan_secret_id = forms.PasswordInputField('SecretId', required=True)
     hunyuan_secret_key = forms.PasswordInputField('SecretKey', required=True)
 
