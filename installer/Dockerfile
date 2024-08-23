@@ -47,8 +47,8 @@ ENV MAXKB_VERSION="${DOCKER_IMAGE_TAG} (build at ${BUILD_AT}, commit: ${GITHUB_C
     PATH=/opt/py3/bin:$PATH \
     POSTGRES_USER=root \
     POSTGRES_PASSWORD=Password123@postgres \
-    PIP_TARGET=/var/lib/postgresql/data/python-packages \
-    PYTHONPATH=/var/lib/postgresql/data/python-packages \
+    PIP_TARGET=/opt/maxkb/app/sandbox/python-packages \
+    PYTHONPATH=/opt/maxkb/app/sandbox/python-packages \
     PYTHONUNBUFFERED=1
 
 WORKDIR /opt/maxkb/app
@@ -60,7 +60,7 @@ RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
     cp -f /opt/maxkb/app/installer/run-maxkb.sh /usr/bin/run-maxkb.sh && \
     cp -f /opt/maxkb/app/installer/init.sql /docker-entrypoint-initdb.d && \
-    mkdir /opt/maxkb/app/sandbox &&  \
+    mkdir -p /opt/maxkb/app/sandbox/python-packages &&  \
     useradd --no-create-home --home /opt/maxkb/app/sandbox --shell /bin/bash sandbox &&  \
     chown sandbox:sandbox /opt/maxkb/app/sandbox
 
