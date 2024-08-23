@@ -39,7 +39,7 @@ def get_cache_poxy_function(poxy_function, cache_key):
 
 
 def embedding_poxy(poxy_function):
-    def inner(args, **keywords):
+    def inner(*args, **keywords):
         key = get_cache_key(poxy_function, args)
         if memory_cache.has_key(key):
             return
