@@ -130,37 +130,6 @@ const useApplicationStore = defineStore({
             reject(error)
           })
       })
-    },
-    // 获取模型的  温度/max_token字段设置
-    async asyncGetModelConfig(
-      id: string,
-      model_id: string,
-      ai_node_id?: string,
-      loading?: Ref<boolean>
-    ) {
-      return new Promise((resolve, reject) => {
-        applicationApi
-          .getModelOtherConfig(id, model_id, ai_node_id, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
-    },
-    // 保存应用的  温度/max_token字段设置
-    async asyncPostModelConfig(id: string, params?: any, loading?: Ref<boolean>) {
-      return new Promise((resolve, reject) => {
-        applicationApi
-          .putModelOtherConfig(id, params, loading)
-          .then((data) => {
-            resolve(data)
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
     }
   }
 })

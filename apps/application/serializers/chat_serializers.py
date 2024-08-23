@@ -33,17 +33,17 @@ from application.serializers.application_serializers import ModelDatasetAssociat
 from application.serializers.chat_message_serializers import ChatInfo
 from common.constants.permission_constants import RoleConstants
 from common.db.search import native_search, native_page_search, page_search, get_dynamics_model
-from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.util.common import post
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
-from dataset.serializers.common_serializers import get_embedding_model_by_dataset_id, \
-    get_embedding_model_id_by_dataset_id
+from dataset.serializers.common_serializers import get_embedding_model_id_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from embedding.task import embedding_by_paragraph
+from setting.models import Model
+from setting.models_provider import get_model_credential
 from smartdoc.conf import PROJECT_DIR
 
 chat_cache = caches['chat_cache']
@@ -52,6 +52,17 @@ chat_cache = caches['chat_cache']
 class WorkFlowSerializers(serializers.Serializer):
     nodes = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid("节点"))
     edges = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid("连线"))
+
+
+def valid_model_params_setting(model_id, model_params_setting):
+    if model_id is None:
+        return
+    model = QuerySet(Model).filter(id=model_id).first()
+    credential = get_model_credential(model.provider, model.model_type, model.model_name)
+    model_params_setting_form = credential.get_model_params_setting_form(model.model_name)
+    if model_params_setting is None or len(model_params_setting.keys()) == 0:
+        model_params_setting = model_params_setting_form.get_default_form_data()
+    credential.get_model_params_setting_form(model.model_name).valid_form(model_params_setting)
 
 
 class ChatSerializers(serializers.Serializer):
@@ -253,6 +264,7 @@ class ChatSerializers(serializers.Serializer):
             return chat_id
 
         def open_simple(self, application):
+            valid_model_params_setting(application.model_id, application.model_params_setting)
             application_id = self.data.get('application_id')
             dataset_id_list = [str(row.dataset_id) for row in
                                QuerySet(ApplicationDatasetMapping).filter(
@@ -309,6 +321,8 @@ class ChatSerializers(serializers.Serializer):
         model_setting = ModelSettingSerializer(required=True)
         # 问题补全
         problem_optimization = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("问题补全"))
+        # 模型相关设置
+        model_params_setting = serializers.JSONField(required=True)
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -332,10 +346,12 @@ class ChatSerializers(serializers.Serializer):
             model_id = self.data.get('model_id')
             dataset_id_list = self.data.get('dataset_id_list')
             dialogue_number = 3 if self.data.get('multiple_rounds_dialogue', False) else 0
+            valid_model_params_setting(model_id, self.data.get('model_params_setting'))
             application = Application(id=None, dialogue_number=dialogue_number, model_id=model_id,
                                       dataset_setting=self.data.get('dataset_setting'),
                                       model_setting=self.data.get('model_setting'),
                                       problem_optimization=self.data.get('problem_optimization'),
+                                      model_params_setting=self.data.get('model_params_setting'),
                                       user_id=user_id)
             chat_cache.set(chat_id,
                            ChatInfo(chat_id, None, dataset_id_list,

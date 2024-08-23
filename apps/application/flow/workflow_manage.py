@@ -10,6 +10,7 @@ import json
 from functools import reduce
 from typing import List, Dict
 
+from django.db.models import QuerySet
 from langchain_core.messages import AIMessage
 from langchain_core.prompts import PromptTemplate
 
@@ -17,6 +18,8 @@ from application.flow import tools
 from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
 from application.flow.step_node import get_node
 from common.exception.app_exception import AppApiException
+from setting.models import Model
+from setting.models_provider import get_model_credential
 
 
 class Edge:
@@ -68,6 +71,7 @@ class Flow:
         """
         校验工作流数据
         """
+        self.is_valid_model_params()
         self.is_valid_start_node()
         self.is_valid_base_node()
         self.is_valid_work_flow()
@@ -122,6 +126,19 @@ class Flow:
             raise AppApiException(500, '开始节点必填')
         if len(start_node_list) > 1:
             raise AppApiException(500, '开始节点只能有一个')
+
+    def is_valid_model_params(self):
+        node_list = [node for node in self.nodes if (node.type == 'ai-chat-node' or node.type == 'question-node')]
+        for node in node_list:
+            model = QuerySet(Model).filter(id=node.properties.get('node_data', {}).get('model_id')).first()
+            credential = get_model_credential(model.provider, model.model_type, model.model_name)
+            model_params_setting = node.properties.get('node_data', {}).get('model_params_setting')
+            model_params_setting_form = credential.get_model_params_setting_form(
+                model.model_name)
+            if model_params_setting is None:
+                model_params_setting = model_params_setting_form.get_default_form_data()
+                node.properties.get('node_data', {})['model_params_setting'] = model_params_setting
+            model_params_setting_form.valid_form(model_params_setting)
 
     def is_valid_base_node(self):
         base_node_list = [node for node in self.nodes if node.id == 'base-node']

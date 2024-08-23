@@ -9,6 +9,9 @@
 from enum import Enum
 from typing import List, Dict
 
+from common.exception.app_exception import AppApiException
+from common.forms.label.base_label import BaseLabel
+
 
 class TriggerType(Enum):
     # 执行函数获取 OptionList数据
@@ -20,7 +23,7 @@ class TriggerType(Enum):
 class BaseField:
     def __init__(self,
                  input_type: str,
-                 label: str,
+                 label: str or BaseLabel,
                  required: bool = False,
                  default_value: object = None,
                  relation_show_field_dict: Dict = None,
@@ -53,10 +56,16 @@ class BaseField:
         self.required = required
         self.trigger_type = trigger_type
 
-    def to_dict(self):
+    def is_valid(self, value):
+        field_label = self.label.label if hasattr(self.label, 'to_dict') else self.label
+        if self.required and value is None:
+            raise AppApiException(500,
+                                  f"{field_label} 为必填参数")
+
+    def to_dict(self, **kwargs):
         return {
             'input_type': self.input_type,
-            'label': self.label,
+            'label': self.label.to_dict(**kwargs) if hasattr(self.label, 'to_dict') else self.label,
             'required': self.required,
             'default_value': self.default_value,
             'relation_show_field_dict': self.relation_show_field_dict,
@@ -64,6 +73,7 @@ class BaseField:
             'trigger_type': self.trigger_type.value,
             'attrs': self.attrs,
             'props_info': self.props_info,
+            **kwargs
         }
 
 
@@ -97,8 +107,8 @@ class BaseDefaultOptionField(BaseField):
         self.value_field = value_field
         self.option_list = option_list
 
-    def to_dict(self):
-        return {**super().to_dict(), 'text_field': self.text_field, 'value_field': self.value_field,
+    def to_dict(self, **kwargs):
+        return {**super().to_dict(**kwargs), 'text_field': self.text_field, 'value_field': self.value_field,
                 'option_list': self.option_list}
 
 
@@ -141,6 +151,6 @@ class BaseExecField(BaseField):
         self.provider = provider
         self.method = method
 
-    def to_dict(self):
-        return {**super().to_dict(), 'text_field': self.text_field, 'value_field': self.value_field,
+    def to_dict(self, **kwargs):
+        return {**super().to_dict(**kwargs), 'text_field': self.text_field, 'value_field': self.value_field,
                 'provider': self.provider, 'method': self.method}

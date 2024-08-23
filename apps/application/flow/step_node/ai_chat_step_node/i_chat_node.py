@@ -23,9 +23,8 @@ class ChatNodeSerializer(serializers.Serializer):
     dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("多轮对话数量"))
 
     is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
-    temperature = serializers.FloatField(required=False, allow_null=True, error_messages=ErrMessage.float("温度"))
-    max_tokens = serializers.IntegerField(required=False, allow_null=True,
-                                          error_messages=ErrMessage.integer("最大token数"))
+
+    model_params_setting = serializers.DictField(required=True, error_messages=ErrMessage.integer("模型参数相关设置"))
 
 
 class IChatNode(INode):
@@ -39,5 +38,6 @@ class IChatNode(INode):
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id,
                 chat_record_id,
+                model_params_setting,
                 **kwargs) -> NodeResult:
         pass

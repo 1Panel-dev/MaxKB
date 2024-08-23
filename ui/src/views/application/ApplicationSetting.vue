@@ -328,7 +328,7 @@
       </el-col>
     </el-row>
 
-    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" :id="id" @refresh="refreshForm" />
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm" />
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
@@ -348,8 +348,8 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { reactive, ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { groupBy } from 'lodash'
 import AIModeParamSettingDialog from './component/AIModeParamSettingDialog.vue'
 import ParamSettingDialog from './component/ParamSettingDialog.vue'
@@ -408,6 +408,7 @@ const applicationForm = ref<ApplicationFormType>({
   model_setting: {
     prompt: defaultPrompt
   },
+  model_params_setting: {},
   problem_optimization: false,
   type: 'SIMPLE'
 })
@@ -456,9 +457,7 @@ const openAIParamSettingDialog = () => {
     MsgSuccess(t('请选择AI 模型'))
     return
   }
-  application.asyncGetModelConfig(id, model_id, '', loading).then((res: any) => {
-    AIModeParamSettingDialogRef.value?.open(res.data)
-  })
+  AIModeParamSettingDialogRef.value?.open(model_id, applicationForm.value.model_params_setting)
 }
 
 const openParamSettingDialog = () => {
@@ -470,11 +469,7 @@ function refreshParam(data: any) {
 }
 
 function refreshForm(data: any) {
-  // data是一个对象  把data的值赋值给model_setting 但是是合并
-  applicationForm.value.model_setting = {
-    ...applicationForm.value.model_setting,
-    ...data
-  }
+  applicationForm.value.model_params_setting = data
 }
 
 const openCreateModel = (provider?: Provider) => {

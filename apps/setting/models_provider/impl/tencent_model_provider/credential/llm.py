@@ -1,9 +1,19 @@
 # coding=utf-8
 from langchain_core.messages import HumanMessage
+
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
+
+
+class TencentLLMModelParams(BaseForm):
+    temperature = forms.SliderField(TooltipLabel('温度', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
+                                    required=True, default_value=0.5,
+                                    _min=0.1,
+                                    _max=2.0,
+                                    _step=0.01,
+                                    precision=2)
 
 
 class TencentLLMModelCredential(BaseForm, BaseModelCredential):
@@ -46,15 +56,5 @@ class TencentLLMModelCredential(BaseForm, BaseModelCredential):
     hunyuan_secret_id = forms.PasswordInputField('SecretId', required=True)
     hunyuan_secret_key = forms.PasswordInputField('SecretKey', required=True)
 
-    def get_other_fields(self, model_name):
-        return {
-            'temperature': {
-                'value': 0.5,
-                'min': 0.1,
-                'max': 2.0,
-                'step': 0.01,
-                'label': '温度',
-                'precision': 2,
-                'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
-            },
-        }
+    def get_model_params_setting_form(self, model_name):
+        return TencentLLMModelParams()

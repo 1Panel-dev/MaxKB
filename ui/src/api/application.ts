@@ -249,41 +249,6 @@ const putPublishApplication: (
   return put(`${prefix}/${application_id}/publish`, data, undefined, loading)
 }
 
-/**
- * 获取模型其他配置
- * @param application_id
- * @param model_id
- * @param loading
- * @returns
- */
-const getModelOtherConfig: (
-  application_id: string,
-  model_id: string,
-  ai_node_id?: string,
-  loading?: Ref<boolean>
-) => Promise<Result<any>> = (application_id, model_id, ai_node_id?, loading?) => {
-  if (ai_node_id) {
-    // 如果 ai_node_id 不为空，则调用带有 ai_node_id 的 API
-    return get(`${prefix}/${application_id}/model/${model_id}/${ai_node_id}`, undefined, loading)
-  } else {
-    // 如果 ai_node_id 为空，则调用不带 ai_node_id 的 API
-    return get(`${prefix}/${application_id}/model/${model_id}`, undefined, loading)
-  }
-}
-
-/**
- * 保存其他配置信息
- * @param application_id
- *
- */
-const putModelOtherConfig: (
-  application_id: string,
-  data: any,
-  loading?: Ref<boolean>
-) => Promise<Result<any>> = (application_id, data, loading) => {
-  return put(`${prefix}/${application_id}/other-config`, data, undefined, loading)
-}
-
 export default {
   getAllAppilcation,
   getApplication,
@@ -303,7 +268,5 @@ export default {
   getApplicationHitTest,
   getApplicationModel,
   putPublishApplication,
-  postWorkflowChatOpen,
-  getModelOtherConfig,
-  putModelOtherConfig
+  postWorkflowChatOpen
 }

@@ -20,3 +20,5 @@ from .text_input_field import *
 from .radio_button_field import *
 from .table_checkbox import *
 from .radio_card_field import *
+from .label import *
+from .slider_field import *

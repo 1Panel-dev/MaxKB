@@ -24,6 +24,7 @@ from common.util.field_message import ErrMessage
 from common.util.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from dataset.models import DataSet
 from setting.models.model_management import Model, Status
+from setting.models_provider import get_model, get_model_credential
 from setting.models_provider.base_model_provider import ValidCode, DownModelChunkStatus
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 
@@ -233,6 +234,14 @@ class ModelSerializer(serializers.Serializer):
                     'status': model.status,
                     'meta': model.meta
                     }
+
+        def get_model_params(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            model_id = self.data.get('id')
+            model = QuerySet(Model).filter(id=model_id).first()
+            credential = get_model_credential(model.provider, model.model_type, model.model_name)
+            return credential.get_model_params_setting_form(model.model_name).to_form_list()
 
         def delete(self, with_valid=True):
             if with_valid:

@@ -8,6 +8,7 @@
         require-asterisk-position="right"
         ref="ceFormRef"
         v-model="_data[index]"
+        :model="_data[index]"
         :other-params="other"
         :render_data="render_data()"
         v-bind="attr"

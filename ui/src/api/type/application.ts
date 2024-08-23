@@ -13,6 +13,7 @@ interface ApplicationFormType {
   icon?: string | undefined
   type?: string
   work_flow?: any
+  model_params_setting?: any
 }
 interface chatType {
   id: string
