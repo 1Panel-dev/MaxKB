@@ -31,6 +31,7 @@
                 <span>AI 模型<span class="danger">*</span></span>
               </div>
               <el-button
+                :disabled="!chat_data.model_id"
                 type="primary"
                 link
                 @click="openAIParamSettingDialog(chat_data.model_id)"
@@ -313,7 +314,7 @@ const openCreateModel = (provider?: Provider) => {
 
 const openAIParamSettingDialog = (modelId: string) => {
   if (modelId) {
-    AIModeParamSettingDialogRef.value?.open(modelId)
+    AIModeParamSettingDialogRef.value?.open(modelId,chat_data.value.model_params_setting)
   }
 }
 

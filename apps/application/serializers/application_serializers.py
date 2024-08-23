@@ -694,7 +694,7 @@ class ApplicationSerializer(serializers.Serializer):
 
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization',
-                           'api_key_is_active', 'icon', 'work_flow']
+                           'api_key_is_active', 'icon', 'work_flow', 'model_params_setting']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     if update_key == 'multiple_rounds_dialogue':

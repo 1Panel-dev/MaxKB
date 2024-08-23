@@ -14,8 +14,9 @@
         class="mb-24"
         label-width="auto"
         ref="questionNodeFormRef"
+        hide-required-asterisk
       >
-        <el-form-item
+      <el-form-item
           label="AI 模型"
           prop="model_id"
           :rules="{
@@ -24,6 +25,22 @@
             trigger: 'change'
           }"
         >
+          <template #label>
+            <div class="flex-between">
+              <div>
+                <span>AI 模型<span class="danger">*</span></span>
+              </div>
+              <el-button
+                type="primary"
+                link
+                :disabled="!form_data.model_id"
+                @click="openAIParamSettingDialog(form_data.model_id)"
+                @refreshForm="refreshParam"
+              >
+                {{ $t('views.application.applicationForm.form.paramSetting') }}
+              </el-button>
+            </div>
+          </template>
           <el-select
             @wheel="wheel"
             @keydown="isKeyDown = true"
@@ -195,6 +212,7 @@ import useStore from '@/stores'
 import { relatedObject } from '@/utils/utils'
 import type { Provider } from '@/api/type/model'
 import { isLastNode } from '@/workflow/common/data'
+const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 
 const { model } = useStore()
 const isKeyDown = ref(false)
@@ -235,6 +253,11 @@ function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'model_params_setting', data)
 }
 
+const openAIParamSettingDialog = (modelId: string) => {
+  if (modelId) {
+    AIModeParamSettingDialogRef.value?.open(modelId,form_data.value.model_params_setting)
+  }
+}
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
