@@ -240,7 +240,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 document_list.update(dataset_id=target_dataset_id)
             model_id = None
             if dataset.embedding_mode_id != target_dataset.embedding_mode_id:
-                model_id = get_embedding_model_by_dataset_id(target_dataset_id)
+                model_id = get_embedding_model_id_by_dataset_id(target_dataset_id)
 
             pid_list = [paragraph.id for paragraph in paragraph_list]
             # 修改段落信息
