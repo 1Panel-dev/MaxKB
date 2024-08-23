@@ -178,6 +178,7 @@
       @change="openCreateModel($event)"
     ></CreateModelDialog>
     <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)" />
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -186,6 +187,7 @@ import { app } from '@/main'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
+import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import applicationApi from '@/api/application'
@@ -228,6 +230,9 @@ const form = {
   prompt: defaultPrompt,
   dialogue_number: 1,
   is_result: false
+}
+function refreshParam(data: any) {
+  set(props.nodeModel.properties.node_data, 'model_params_setting', data)
 }
 
 const form_data = computed({

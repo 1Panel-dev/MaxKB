@@ -48,6 +48,7 @@ class Application(AppModelMixin):
     model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     dataset_setting = models.JSONField(verbose_name="数据集参数设置", default=get_dataset_setting_dict)
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
+    model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default={})
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="/ui/favicon.ico")
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)

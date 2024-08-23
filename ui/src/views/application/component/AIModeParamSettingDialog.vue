@@ -7,31 +7,16 @@
     style="width: 550px"
     append-to-body
   >
-    <el-form label-position="top" ref="paramFormRef" :model="form">
-      <el-form-item v-for="(item, key) in form" :key="key">
-        <template #label>
-          <div class="flex align-center">
-            <div class="flex-between mr-4">
-              <span>{{ item.label }}</span>
-            </div>
-            <el-tooltip effect="dark" placement="right">
-              <template #content>{{ item.tooltip }}</template>
-              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-            </el-tooltip>
-          </div>
-        </template>
-        <el-slider
-          v-model="item.value"
-          show-input
-          :show-input-controls="false"
-          :min="item.min"
-          :max="item.max"
-          :precision="item.precision || 0"
-          :step="item.step || 1"
-          class="custom-slider"
-        />
-      </el-form-item>
-    </el-form>
+    <DynamicsForm
+      v-model="form_data"
+      :model="form_data"
+      label-position="top"
+      require-asterisk-position="right"
+      :render_data="model_form_field"
+      ref="dynamicsFormRef"
+    >
+    </DynamicsForm>
+
     <template #footer>
       <span class="dialog-footer p-16">
         <el-button @click.prevent="dialogVisible = false">
@@ -46,81 +31,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import { cloneDeep, set } from 'lodash'
+import { ref } from 'vue'
+
 import type { FormInstance } from 'element-plus'
-import useStore from '@/stores'
-
-const { application } = useStore()
-
+import type { FormField } from '@/components/dynamics-form/type'
+import modelAPi from '@/api/model'
+import DynamicsForm from '@/components/dynamics-form/index.vue'
+import { keys } from 'lodash'
+const model_form_field = ref<Array<FormField>>([])
 const emit = defineEmits(['refresh'])
-
-const paramFormRef = ref<FormInstance>()
-const form = reactive<Form>({})
+const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
+const form_data = ref<any>({})
 const dialogVisible = ref(false)
 const loading = ref(false)
-const props = defineProps<{
-  id: string
-  nodeId?: string
-}>()
-const resetForm = () => {
-  // 清空 form 对象，等待新的数据
-  Object.keys(form).forEach((key) => delete form[key])
-}
 
-interface Form {
-  [key: string]: FormField
-}
-
-interface FormField {
-  value: any
-  min?: number
-  max?: number
-  step?: number
-  label?: string
-  precision?: number
-  tooltip?: string
-}
-
-const open = (data: any) => {
-  const newData = cloneDeep(data)
-  Object.keys(form).forEach((key) => {
-    delete form[key]
-  })
-  Object.keys(newData).forEach((key) => {
-    set(form, key, newData[key])
+const open = (model_id: string, model_setting_data?: any) => {
+  modelAPi.getModelParamsForm(model_id, loading).then((ok) => {
+    model_form_field.value = ok.data
+    model_setting_data =
+      model_setting_data && keys(model_setting_data).length > 0
+        ? model_setting_data
+        : ok.data
+            .map((item) => ({ [item.field]: item.default_value }))
+            .reduce((x, y) => ({ ...x, ...y }), {})
+    // 渲染动态表单
+    dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
   })
   dialogVisible.value = true
 }
 
 const submit = async () => {
-  if (paramFormRef.value) {
-    await paramFormRef.value.validate((valid, fields) => {
-      if (valid) {
-        const data = Object.keys(form).reduce(
-          (acc, key) => {
-            acc[key] = form[key].value
-            return acc
-          },
-          {} as Record<string, any>
-        )
-        if (props.nodeId) {
-          data.node_id = props.nodeId
-        }
-        application.asyncPostModelConfig(props.id, data, loading).then(() => {
-          emit('refresh', data)
-          dialogVisible.value = false
-        })
-      }
-    })
-  }
+  emit('refresh', form_data.value)
+  dialogVisible.value = false
 }
-
-watch(dialogVisible, (bool) => {
-  if (!bool) {
-    resetForm()
-  }
-})
 
 defineExpose({ open })
 </script>

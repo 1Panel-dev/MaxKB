@@ -33,6 +33,7 @@ from common.util.field_message import ErrMessage
 from common.util.split_model import flat_map
 from dataset.models import Paragraph, Document
 from setting.models import Model, Status
+from setting.models_provider import get_model_credential
 
 chat_cache = caches['chat_cache']
 
@@ -63,6 +64,12 @@ class ChatInfo:
     def to_base_pipeline_manage_params(self):
         dataset_setting = self.application.dataset_setting
         model_setting = self.application.model_setting
+        model_id = self.application.model.id if self.application.model is not None else None
+        model_params_setting = None
+        if model_id is not None:
+            model = QuerySet(Model).filter(id=model_id).first()
+            credential = get_model_credential(model.provider, model.model_type, model.model_name)
+            model_params_setting = credential.get_model_params_setting_form(model.model_name).get_default_form_data()
         return {
             'dataset_id_list': self.dataset_id_list,
             'exclude_document_id_list': self.exclude_document_id_list,
@@ -77,11 +84,11 @@ class ChatInfo:
             'prompt': model_setting.get(
                 'prompt') if 'prompt' in model_setting else Application.get_default_model_prompt(),
             'chat_model': self.chat_model,
-            'model_id': self.application.model.id if self.application.model is not None else None,
+            'model_id': model_id,
             'problem_optimization': self.application.problem_optimization,
             'stream': True,
-            'temperature': model_setting.get('temperature') if 'temperature' in model_setting else None,
-            'max_tokens': model_setting.get('max_tokens') if 'max_tokens' in model_setting else None,
+            'model_params_setting': model_params_setting if self.application.model_params_setting is None or len(
+                self.application.model_params_setting.keys()) == 0 else self.application.model_params_setting,
             'search_mode': self.application.dataset_setting.get(
                 'search_mode') if 'search_mode' in self.application.dataset_setting else 'embedding',
             'no_references_setting': self.application.dataset_setting.get(
@@ -90,7 +97,6 @@ class ChatInfo:
                 'value': '{question}',
             },
             'user_id': self.application.user_id
-
         }
 
     def to_pipeline_manage_params(self, problem_text: str, post_response_handler: PostResponseHandler,

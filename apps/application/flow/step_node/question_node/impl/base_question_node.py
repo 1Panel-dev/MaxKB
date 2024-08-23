@@ -65,8 +65,10 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
 
 class BaseQuestionNode(IQuestionNode):
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
+                model_params_setting,
                 **kwargs) -> NodeResult:
-        chat_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'))
+        chat_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'),
+                                                         **model_params_setting)
         history_message = self.get_history_message(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)

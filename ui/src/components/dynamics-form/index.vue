@@ -33,7 +33,7 @@
 import type { Dict } from '@/api/type/common'
 import FormItem from '@/components/dynamics-form/FormItem.vue'
 import type { FormField } from '@/components/dynamics-form/type'
-import { ref, onMounted, watch, type Ref } from 'vue'
+import { ref, onBeforeMount, watch, type Ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import triggerApi from '@/api/provider'
 import type Result from '@/request/Result'
@@ -152,7 +152,7 @@ const initDefaultData = (formField: FormField) => {
   }
 }
 
-onMounted(() => {
+onBeforeMount(() => {
   render(props.render_data, {})
 })
 

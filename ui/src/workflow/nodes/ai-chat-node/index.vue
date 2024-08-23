@@ -196,13 +196,7 @@
       @change="openCreateModel($event)"
     ></CreateModelDialog>
     <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)" />
-
-    <AIModeParamSettingDialog
-      ref="AIModeParamSettingDialogRef"
-      :id="id"
-      :node-id="props.nodeModel.id"
-      @refresh="refreshParam"
-    />
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -319,15 +313,12 @@ const openCreateModel = (provider?: Provider) => {
 
 const openAIParamSettingDialog = (modelId: string) => {
   if (modelId) {
-    application.asyncGetModelConfig(id, modelId, props.nodeModel.id).then((res: any) => {
-      AIModeParamSettingDialogRef.value?.open(res.data)
-    })
+    AIModeParamSettingDialogRef.value?.open(modelId)
   }
 }
 
 function refreshParam(data: any) {
-  chat_data.value.temperature = data.temperature
-  chat_data.value.max_tokens = data.max_tokens
+  set(props.nodeModel.properties.node_data, 'model_params_setting', data)
 }
 
 onMounted(() => {

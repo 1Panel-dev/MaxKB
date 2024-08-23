@@ -108,10 +108,10 @@ class BaseModelCredential(ABC):
         """
         pass
 
-    def get_other_fields(self, model_name):
+    def get_model_params_setting_form(self, model_name):
         """
-        获取其他字段
-        :return:
+               模型参数设置表单
+               :return:
         """
         pass
 

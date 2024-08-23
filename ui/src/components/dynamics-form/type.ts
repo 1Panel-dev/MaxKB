@@ -117,7 +117,7 @@ interface FormField {
   /**
    * 提示
    */
-  label?: string
+  label?: string | any
   /**
    * 是否 必填
    */

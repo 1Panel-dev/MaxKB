@@ -73,9 +73,8 @@ class IChatStep(IBaseChatPipelineStep):
         no_references_setting = NoReferencesSetting(required=True, error_messages=ErrMessage.base("无引用分段设置"))
 
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
-        temperature = serializers.FloatField(required=False, allow_null=True, error_messages=ErrMessage.float("温度"))
-        max_tokens = serializers.IntegerField(required=False, allow_null=True,
-                                              error_messages=ErrMessage.integer("最大token数"))
+
+        model_params_setting = serializers.DictField(required=True, error_messages=ErrMessage.dict("模型参数设置"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -100,5 +99,5 @@ class IChatStep(IBaseChatPipelineStep):
                 paragraph_list=None,
                 manage: PipelineManage = None,
                 padding_problem_text: str = None, stream: bool = True, client_id=None, client_type=None,
-                no_references_setting=None, **kwargs):
+                no_references_setting=None, model_params_setting=None, **kwargs):
         pass

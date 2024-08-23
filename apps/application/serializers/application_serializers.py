@@ -44,6 +44,7 @@ from dataset.serializers.common_serializers import list_paragraph, get_embedding
 from embedding.models import SearchMode
 from setting.models import AuthOperate
 from setting.models.model_management import Model
+from setting.models_provider import get_model_credential
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
@@ -93,6 +94,14 @@ class NoReferencesSetting(serializers.Serializer):
     value = serializers.CharField(required=True, error_messages=ErrMessage.char("提示词"))
 
 
+def valid_model_params_setting(model_id, model_params_setting):
+    if model_id is None:
+        return
+    model = QuerySet(Model).filter(id=model_id).first()
+    credential = get_model_credential(model.provider, model.model_type, model.model_name)
+    credential.get_model_params_setting_form(model.model_name).valid_form(model_params_setting)
+
+
 class DatasetSettingSerializer(serializers.Serializer):
     top_n = serializers.FloatField(required=True, max_value=100, min_value=1,
                                    error_messages=ErrMessage.float("引用分段数"))
@@ -110,10 +119,6 @@ class DatasetSettingSerializer(serializers.Serializer):
 
 class ModelSettingSerializer(serializers.Serializer):
     prompt = serializers.CharField(required=True, max_length=2048, error_messages=ErrMessage.char("提示词"))
-    temperature = serializers.FloatField(required=False, allow_null=True,
-                                         error_messages=ErrMessage.char("温度"))
-    max_tokens = serializers.IntegerField(required=False, allow_null=True,
-                                          error_messages=ErrMessage.integer("最大token数"))
 
 
 class ApplicationWorkflowSerializer(serializers.Serializer):
@@ -185,6 +190,7 @@ class ApplicationSerializer(serializers.Serializer):
                                                                message="应用类型只支持SIMPLE|WORK_FLOW", code=500)
                                  ]
                                  )
+    model_params_setting = serializers.DictField(required=False, error_messages=ErrMessage.dict('模型参数'))
 
     def is_valid(self, *, user_id=None, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -354,6 +360,8 @@ class ApplicationSerializer(serializers.Serializer):
         problem_optimization = serializers.BooleanField(required=False, allow_null=True,
                                                         error_messages=ErrMessage.boolean("问题补全"))
         icon = serializers.CharField(required=False, allow_null=True, error_messages=ErrMessage.char("icon图标"))
+
+        model_params_setting = serializers.DictField(required=False, error_messages=ErrMessage.dict('模型参数'))
 
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
@@ -667,7 +675,7 @@ class ApplicationSerializer(serializers.Serializer):
                 ApplicationSerializer.Edit(data=instance).is_valid(
                     raise_exception=True)
             application_id = self.data.get("application_id")
-
+            valid_model_params_setting(instance.get('model_id'), instance.get('model_params_setting'))
             application = QuerySet(Application).get(id=application_id)
             if instance.get('model_id') is None or len(instance.get('model_id')) == 0:
                 application.model_id = None

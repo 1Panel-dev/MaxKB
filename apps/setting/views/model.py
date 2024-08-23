@@ -81,6 +81,19 @@ class Model(APIView):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).pause_download())
 
+    class ModelParamsForm(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取模型参数表单",
+                             operation_id="获取模型参数表单",
+                             manual_parameters=ProvideApi.ModelForm.get_request_params_api(),
+                             tags=["模型"])
+        @has_permissions(PermissionConstants.MODEL_READ)
+        def get(self, request: Request, model_id: str):
+            return result.success(
+                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).get_model_params())
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 

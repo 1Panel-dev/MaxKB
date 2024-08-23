@@ -10,8 +10,25 @@ from typing import Dict
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
+
+
+class OllamaLLMModelParams(BaseForm):
+    temperature = forms.SliderField(TooltipLabel('温度', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
+                                    required=True, default_value=0.3,
+                                    _min=0.1,
+                                    _max=1.0,
+                                    _step=0.01,
+                                    precision=2)
+
+    max_tokens = forms.SliderField(
+        TooltipLabel('输出最大Tokens', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
+        required=True, default_value=1024,
+        _min=1,
+        _max=4096,
+        _step=1,
+        precision=0)
 
 
 class OllamaLLMModelCredential(BaseForm, BaseModelCredential):
@@ -43,24 +60,5 @@ class OllamaLLMModelCredential(BaseForm, BaseModelCredential):
     api_base = forms.TextInputField('API 域名', required=True)
     api_key = forms.PasswordInputField('API Key', required=True)
 
-    def get_other_fields(self, model_name):
-        return {
-            'temperature': {
-                'value': 0.3,
-                'min': 0.1,
-                'max': 1.0,
-                'step': 0.01,
-                'label': '温度',
-                'precision': 2,
-                'tooltip': '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'
-            },
-            'max_tokens': {
-                'value': 1024,
-                'min': 1,
-                'max': 4096,
-                'step': 1,
-                'label': '输出最大Tokens',
-                'precision': 0,
-                'tooltip': '指定模型可生成的最大token个数'
-            }
-        }
+    def get_model_params_setting_form(self, model_name):
+        return OllamaLLMModelParams()

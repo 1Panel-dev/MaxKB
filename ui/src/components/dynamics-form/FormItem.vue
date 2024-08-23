@@ -2,13 +2,18 @@
   <el-form-item
     v-loading="loading"
     :style="formItemStyle"
-    :label="formfield.label"
     :prop="formfield.field"
     :key="formfield.field"
     :rules="rules"
   >
     <template #label v-if="formfield.label">
-      <FormItemLabel :form-field="formfield"></FormItemLabel>
+      <FormItemLabel v-if="isString(formfield.label)" :form-field="formfield"></FormItemLabel>
+      <component
+        v-else
+        :is="formfield.label.input_type"
+        :label="formfield.label.label"
+        v-bind="label_attrs"
+      ></component>
     </template>
     <component
       ref="componentFormRef"
@@ -58,6 +63,9 @@ const emit = defineEmits(['change'])
 
 const loading = ref<boolean>(false)
 
+const isString = (value: any) => {
+  return typeof value === 'string'
+}
 const itemValue = computed({
   get: () => {
     return props.modelValue
@@ -72,7 +80,13 @@ const itemValue = computed({
   }
 })
 const componentFormRef = ref<any>()
-
+const label_attrs = computed(() => {
+  return props.formfield.label &&
+    typeof props.formfield.label !== 'string' &&
+    props.formfield.label.attrs
+    ? props.formfield.label.attrs
+    : {}
+})
 const props_info = computed(() => {
   return props.formfield.props_info ? props.formfield.props_info : {}
 })
@@ -87,7 +101,11 @@ const formItemStyle = computed(() => {
  * 表单错误Msg
  */
 const errMsg = computed(() => {
-  return props_info.value.err_msg ? props_info.value.err_msg : props.formfield.label + '不能为空'
+  return props_info.value.err_msg
+    ? props_info.value.err_msg
+    : isString(props.formfield.label)
+      ? props.formfield.label
+      : props.formfield.label.label + '不能为空'
 })
 
 /**

@@ -1,6 +1,11 @@
 <template>
   <div style="width: 1024px">
-    <DynamicsForm v-model="form_data" :render_data="damo_data" ref="dynamicsFormRef">
+    <DynamicsForm
+      v-model="form_data"
+      :model="form_data"
+      :render_data="damo_data"
+      ref="dynamicsFormRef"
+    >
       <template #default="scope">
         <el-form-item label="其他字段">
           <el-input v-model="scope.form_value['zha']" /> </el-form-item
@@ -14,6 +19,7 @@ import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import { ref } from 'vue'
 import type { Dict } from '@/api/type/common'
+
 const damo_data: Array<FormField> = [
   { field: 'name', input_type: 'PasswordInput', label: '用戶名', required: false },
   {
@@ -28,6 +34,20 @@ const damo_data: Array<FormField> = [
       { field: 'name2', input_type: 'TextInput', label: '用戶名2' },
       { field: 'name3', input_type: 'TextInput', label: '用戶名3' }
     ]
+  },
+  {
+    field: 'maxkb_tokens',
+    input_type: 'Slider',
+    default_value: 1,
+    attrs: {
+      min: 0,
+      max: 10,
+      step: 1,
+      precision: 1,
+      'show-input-controls': false,
+      'show-input': true
+    },
+    label: { label: '温度', attrs: { tooltip: 'sss' }, input_type: 'TooltipLabel' }
   },
   {
     field: 'object_card_field',

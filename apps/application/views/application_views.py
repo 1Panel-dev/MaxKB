@@ -187,30 +187,6 @@ class Application(APIView):
                     data={'application_id': application_id,
                           'user_id': request.user.id}).list_model(request.query_params.get('model_type')))
 
-        class Operate(APIView):
-            authentication_classes = [TokenAuth]
-
-            @swagger_auto_schema(operation_summary="获取应用参数设置其他字段",
-                                 operation_id="获取应用参数设置其他字段",
-                                 tags=["应用/会话"])
-            def get(self, request: Request, application_id: str, model_id: str, ai_node_id=None):
-                return result.success(
-                    ApplicationSerializer.Operate(
-                        data={'application_id': application_id, 'model_id': model_id,
-                              'ai_node_id': ai_node_id}).get_other_file_list())
-
-        class OtherConfig(APIView):
-            authentication_classes = [TokenAuth]
-
-            @swagger_auto_schema(operation_summary="获取应用参数设置其他字段",
-                                 operation_id="获取应用参数设置其他字段",
-                                 tags=["应用/会话"])
-            def put(self, request: Request, application_id: str):
-                return result.success(
-                    ApplicationSerializer.Operate(
-                        data={'application_id': application_id}).save_other_config(
-                        request.data))
-
     class Profile(APIView):
         authentication_classes = [TokenAuth]
 
