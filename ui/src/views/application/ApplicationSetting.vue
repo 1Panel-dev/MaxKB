@@ -79,6 +79,7 @@
                   </div>
                 </template>
                 <el-select
+                  @change="model_change"
                   v-model="applicationForm.model_id"
                   :placeholder="$t('views.application.applicationForm.form.aiModel.placeholder')"
                   class="w-full"
@@ -450,7 +451,9 @@ const submit = async (formEl: FormInstance | undefined) => {
     }
   })
 }
-
+const model_change = (model_id: string) => {
+  AIModeParamSettingDialogRef.value?.reset_default(model_id)
+}
 const openAIParamSettingDialog = () => {
   const model_id = applicationForm.value.model_id
   if (!model_id) {

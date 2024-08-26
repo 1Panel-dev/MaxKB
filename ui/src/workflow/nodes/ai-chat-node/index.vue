@@ -42,6 +42,7 @@
             </div>
           </template>
           <el-select
+            @change="model_change"
             @wheel="wheel"
             @keydown="isKeyDown = true"
             @keyup="isKeyDown = false"
@@ -238,7 +239,9 @@ function submitDialog() {
   set(props.nodeModel.properties.node_data, 'prompt', cloneContent.value)
   dialogVisible.value = false
 }
-
+const model_change = (model_id: string) => {
+  AIModeParamSettingDialogRef.value?.reset_default(model_id)
+}
 const {
   params: { id }
 } = app.config.globalProperties.$route as any
@@ -314,7 +317,7 @@ const openCreateModel = (provider?: Provider) => {
 
 const openAIParamSettingDialog = (modelId: string) => {
   if (modelId) {
-    AIModeParamSettingDialogRef.value?.open(modelId,chat_data.value.model_params_setting)
+    AIModeParamSettingDialogRef.value?.open(modelId, chat_data.value.model_params_setting)
   }
 }
 

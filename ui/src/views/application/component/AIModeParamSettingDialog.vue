@@ -32,8 +32,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-
-import type { FormInstance } from 'element-plus'
 import type { FormField } from '@/components/dynamics-form/type'
 import modelAPi from '@/api/model'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
@@ -46,6 +44,7 @@ const dialogVisible = ref(false)
 const loading = ref(false)
 
 const open = (model_id: string, model_setting_data?: any) => {
+  form_data.value = {}
   modelAPi.getModelParamsForm(model_id, loading).then((ok) => {
     model_form_field.value = ok.data
     model_setting_data =
@@ -60,12 +59,25 @@ const open = (model_id: string, model_setting_data?: any) => {
   dialogVisible.value = true
 }
 
+const reset_default = (model_id: string) => {
+  form_data.value = {}
+  modelAPi.getModelParamsForm(model_id, loading).then((ok) => {
+    model_form_field.value = ok.data
+    const model_setting_data = ok.data
+      .map((item) => ({ [item.field]: item.default_value }))
+      .reduce((x, y) => ({ ...x, ...y }), {})
+    // 渲染动态表单
+    dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
+    emit('refresh', form_data.value)
+  })
+}
+
 const submit = async () => {
   emit('refresh', form_data.value)
   dialogVisible.value = false
 }
 
-defineExpose({ open })
+defineExpose({ open, reset_default })
 </script>
 
 <style lang="scss" scoped>
