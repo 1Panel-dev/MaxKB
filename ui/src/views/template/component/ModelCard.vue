@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex">
         <span style="height: 32px; width: 32px" :innerHTML="icon" class="mr-12"></span>
-        <div class="w-full">
+        <div style="width: calc(100% - 32px - 4px - var(--app-base-px))">
           <div class="flex" style="height: 22px">
             <auto-tooltip :content="model.name" style="max-width: 40%">
               {{ model.name }}
