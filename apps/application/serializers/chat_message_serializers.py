@@ -41,21 +41,18 @@ chat_cache = caches['chat_cache']
 class ChatInfo:
     def __init__(self,
                  chat_id: str,
-                 chat_model: BaseChatModel | None,
                  dataset_id_list: List[str],
                  exclude_document_id_list: list[str],
                  application: Application,
                  work_flow_version: WorkFlowVersion = None):
         """
         :param chat_id:                     对话id
-        :param chat_model:                  对话模型
         :param dataset_id_list:             数据集列表
         :param exclude_document_id_list:    排除的文档
         :param application:                 应用信息
         """
         self.chat_id = chat_id
         self.application = application
-        self.chat_model = chat_model
         self.dataset_id_list = dataset_id_list
         self.exclude_document_id_list = exclude_document_id_list
         self.chat_record_list: List[ChatRecord] = []
@@ -83,7 +80,6 @@ class ChatInfo:
             'dialogue_number': self.application.dialogue_number,
             'prompt': model_setting.get(
                 'prompt') if 'prompt' in model_setting else Application.get_default_model_prompt(),
-            'chat_model': self.chat_model,
             'model_id': model_id,
             'problem_optimization': self.application.problem_optimization,
             'stream': True,
@@ -282,7 +278,7 @@ class ChatMessageSerializer(serializers.Serializer):
                                     QuerySet(Document).filter(
                                         dataset_id__in=dataset_id_list,
                                         is_active=False)]
-        return ChatInfo(chat_id, None, dataset_id_list, exclude_document_id_list, application)
+        return ChatInfo(chat_id, dataset_id_list, exclude_document_id_list, application)
 
     @staticmethod
     def re_open_chat_work_flow(chat_id, application):
@@ -290,4 +286,4 @@ class ChatMessageSerializer(serializers.Serializer):
             '-create_time')[0:1].first()
         if work_flow_version is None:
             raise AppApiException(500, "应用未发布,请发布后再使用")
-        return ChatInfo(chat_id, None, [], [], application, work_flow_version)
+        return ChatInfo(chat_id, [], [], application, work_flow_version)

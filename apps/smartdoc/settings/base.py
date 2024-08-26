@@ -105,13 +105,8 @@ CACHES = {
         }
     },
     'chat_cache': {
-        'BACKEND': 'common.cache.mem_cache.MemCache',
-        'LOCATION': 'unique-snowflake',
-        'TIMEOUT': 60 * 30,
-        'OPTIONS': {
-            'MAX_ENTRIES': 150,
-            'CULL_FREQUENCY': 5,
-        }
+        'BACKEND': 'common.cache.file_cache.FileCache',
+        'LOCATION': os.path.join(PROJECT_DIR, 'data', 'cache', "chat_cache")  # 文件夹路径
     },
     # 存储用户信息
     'user_cache': {
