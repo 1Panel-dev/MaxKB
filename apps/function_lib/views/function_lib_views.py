@@ -80,6 +80,15 @@ class FunctionLibView(APIView):
             return result.success(
                 FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).delete())
 
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取函数详情",
+                             operation_id="获取函数详情",
+                             tags=['函数库'])
+        @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
+        def get(self, request: Request, function_lib_id: str):
+            return result.success(
+                FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).one())
+
     class Page(APIView):
         authentication_classes = [TokenAuth]
 

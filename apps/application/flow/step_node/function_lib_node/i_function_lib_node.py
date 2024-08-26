@@ -8,11 +8,13 @@
 """
 from typing import Type
 
+from django.db.models import QuerySet
 from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
 from common.field.common import ObjectField
 from common.util.field_message import ErrMessage
+from function_lib.models.function import FunctionLib
 
 
 class InputField(serializers.Serializer):
@@ -27,6 +29,9 @@ class FunctionLibNodeParamsSerializer(serializers.Serializer):
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
+        f_lib = QuerySet(FunctionLib).filter(id=self.data.get('function_lib_id')).first()
+        if f_lib is None:
+            raise Exception('函数库已被删除')
 
 
 class IFunctionLibNode(INode):

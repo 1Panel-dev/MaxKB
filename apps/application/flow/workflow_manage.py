@@ -19,6 +19,7 @@ from application.flow import tools
 from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
 from application.flow.step_node import get_node
 from common.exception.app_exception import AppApiException
+from function_lib.models.function import FunctionLib
 from setting.models import Model
 from setting.models_provider import get_model_credential
 
@@ -142,6 +143,13 @@ class Flow:
                 model_params_setting = model_params_setting_form.get_default_form_data()
                 node.properties.get('node_data', {})['model_params_setting'] = model_params_setting
             model_params_setting_form.valid_form(model_params_setting)
+            if node.properties.get('status', 200) != 200:
+                raise ValidationError(ErrorDetail(f'节点{node.properties.get("stepName")} 不可用'))
+        node_list = [node for node in self.nodes if (node.type == 'function-lib-node')]
+        for node in node_list:
+            f_lib = QuerySet(FunctionLib).filter(id=node.properties.get('function_lib_id')).first()
+            if f_lib is None:
+                raise ValidationError(ErrorDetail(f'节点{node.properties.get("stepName")} 函数库不可用'))
 
     def is_valid_base_node(self):
         base_node_list = [node for node in self.nodes if node.id == 'base-node']
@@ -171,6 +179,7 @@ class WorkflowManage:
         try:
             while self.has_next_node(self.current_result):
                 self.current_node = self.get_next_node()
+                self.current_node.valid_args(self.current_node.node_params, self.current_node.workflow_params)
                 self.node_context.append(self.current_node)
                 self.current_result = self.current_node.run()
                 result = self.current_result.write_context(self.current_node, self)
@@ -193,6 +202,7 @@ class WorkflowManage:
             while self.has_next_node(self.current_result):
                 self.current_node = self.get_next_node()
                 self.node_context.append(self.current_node)
+                self.current_node.valid_args(self.current_node.node_params, self.current_node.workflow_params)
                 self.current_result = self.current_node.run()
                 result = self.current_result.write_context(self.current_node, self)
                 if result is not None:

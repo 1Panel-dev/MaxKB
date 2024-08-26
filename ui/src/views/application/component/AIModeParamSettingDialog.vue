@@ -60,15 +60,13 @@ const open = (model_id: string, model_setting_data?: any) => {
 }
 
 const reset_default = (model_id: string) => {
-  form_data.value = {}
   modelAPi.getModelParamsForm(model_id, loading).then((ok) => {
     model_form_field.value = ok.data
     const model_setting_data = ok.data
       .map((item) => ({ [item.field]: item.default_value }))
       .reduce((x, y) => ({ ...x, ...y }), {})
-    // 渲染动态表单
-    dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
-    emit('refresh', form_data.value)
+
+    emit('refresh', model_setting_data)
   })
 }
 
