@@ -258,7 +258,7 @@ class ChatSerializers(serializers.Serializer):
             if work_flow_version is None:
                 raise AppApiException(500, "应用未发布,请发布后再使用")
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id, None, [],
+                           ChatInfo(chat_id, [],
                                     [],
                                     application, work_flow_version), timeout=60 * 30)
             return chat_id
@@ -271,7 +271,7 @@ class ChatSerializers(serializers.Serializer):
                                    application_id=application_id)]
             chat_id = str(uuid.uuid1())
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id, None, dataset_id_list,
+                           ChatInfo(chat_id,  dataset_id_list,
                                     [str(document.id) for document in
                                      QuerySet(Document).filter(
                                          dataset_id__in=dataset_id_list,
@@ -297,7 +297,7 @@ class ChatSerializers(serializers.Serializer):
                                       )
             work_flow_version = WorkFlowVersion(work_flow=work_flow)
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id, None, [],
+                           ChatInfo(chat_id,  [],
                                     [],
                                     application, work_flow_version), timeout=60 * 30)
             return chat_id
@@ -354,7 +354,7 @@ class ChatSerializers(serializers.Serializer):
                                       model_params_setting=self.data.get('model_params_setting'),
                                       user_id=user_id)
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id, None, dataset_id_list,
+                           ChatInfo(chat_id,  dataset_id_list,
                                     [str(document.id) for document in
                                      QuerySet(Document).filter(
                                          dataset_id__in=dataset_id_list,
