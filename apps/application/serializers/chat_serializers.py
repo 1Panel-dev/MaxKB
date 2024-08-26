@@ -271,7 +271,7 @@ class ChatSerializers(serializers.Serializer):
                                    application_id=application_id)]
             chat_id = str(uuid.uuid1())
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id,  dataset_id_list,
+                           ChatInfo(chat_id, dataset_id_list,
                                     [str(document.id) for document in
                                      QuerySet(Document).filter(
                                          dataset_id__in=dataset_id_list,
@@ -297,7 +297,7 @@ class ChatSerializers(serializers.Serializer):
                                       )
             work_flow_version = WorkFlowVersion(work_flow=work_flow)
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id,  [],
+                           ChatInfo(chat_id, [],
                                     [],
                                     application, work_flow_version), timeout=60 * 30)
             return chat_id
@@ -322,7 +322,7 @@ class ChatSerializers(serializers.Serializer):
         # 问题补全
         problem_optimization = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("问题补全"))
         # 模型相关设置
-        model_params_setting = serializers.JSONField(required=True)
+        model_params_setting = serializers.JSONField(required=False, error_messages=ErrMessage.dict("模型参数相关设置"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -354,7 +354,7 @@ class ChatSerializers(serializers.Serializer):
                                       model_params_setting=self.data.get('model_params_setting'),
                                       user_id=user_id)
             chat_cache.set(chat_id,
-                           ChatInfo(chat_id,  dataset_id_list,
+                           ChatInfo(chat_id, dataset_id_list,
                                     [str(document.id) for document in
                                      QuerySet(Document).filter(
                                          dataset_id__in=dataset_id_list,

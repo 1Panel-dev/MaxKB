@@ -96,7 +96,10 @@
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
-                          <el-dropdown-item @click="copyApplication(item)">
+                          <el-dropdown-item
+                            v-if="is_show_copy_button(item)"
+                            @click="copyApplication(item)"
+                          >
                             <AppIcon iconName="app-copy"></AppIcon>
                             复制</el-dropdown-item
                           >
@@ -130,7 +133,7 @@ import { useRouter } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
 import useStore from '@/stores'
 import { t } from '@/locales'
-const { application } = useStore()
+const { application, user } = useStore()
 const router = useRouter()
 
 const CopyApplicationDialogRef = ref()
@@ -149,11 +152,13 @@ const searchValue = ref('')
 
 function copyApplication(row: any) {
   application.asyncGetApplicationDetail(row.id, loading).then((res: any) => {
-    row['dataset_id_list'] = res.data.dataset_id_list
+    CopyApplicationDialogRef.value.open(res.data)
   })
-  CopyApplicationDialogRef.value.open(row)
 }
 
+const is_show_copy_button = (row: any) => {
+  return user.userInfo ? user.userInfo.id == row.user_id : false
+}
 function settingApplication(row: any) {
   if (isWorkFlow(row.type)) {
     router.push({ path: `/application/${row.id}/workflow` })
