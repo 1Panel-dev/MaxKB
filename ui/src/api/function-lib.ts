@@ -83,6 +83,18 @@ const delFunctionLib: (
 ) => Promise<Result<boolean>> = (function_lib_id, loading) => {
   return del(`${prefix}/${function_lib_id}`, undefined, {}, loading)
 }
+/**
+ * 获取函数详情
+ * @param function_lib_id 函数id
+ * @param loading 加载器
+ * @returns 函数详情
+ */
+const getFunctionLibById: (
+  function_lib_id: String,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (function_lib_id, loading) => {
+  return get(`${prefix}/${function_lib_id}`, undefined, loading)
+}
 
 export default {
   getFunctionLib,
@@ -90,5 +102,6 @@ export default {
   putFunctionLib,
   postFunctionLibDebug,
   getAllFunctionLib,
-  delFunctionLib
+  delFunctionLib,
+  getFunctionLibById
 }

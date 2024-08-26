@@ -16,7 +16,7 @@
     >
       <el-card shadow="never" class="card-never mb-16" style="--el-card-padding: 12px">
         <div v-if="chat_data.input_field_list?.length > 0">
-          <template v-for="(item, index) in chat_data.input_field_list" :key="index">
+          <template v-for="(item, index) in chat_data.input_field_list" :key="item.name">
             <el-form-item
               :label="item.name"
               :prop="'input_field_list.' + index + '.value'"
@@ -80,7 +80,7 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
-
+import functionLibApi from '@/api/function-lib'
 const props = defineProps<{ nodeModel: any }>()
 
 const nodeCascaderRef = ref()
@@ -112,12 +112,33 @@ const validate = () => {
   })
 }
 
+const update_field = () => {
+  functionLibApi
+    .getFunctionLibById(props.nodeModel.properties.node_data.function_lib_id)
+    .then((ok) => {
+      const old_input_field_list = props.nodeModel.properties.node_data.input_field_list
+      const merge_input_field_list = ok.data.input_field_list.map((item: any) => {
+        const find_field = old_input_field_list.find((old_item: any) => old_item.name == item.name)
+        if (find_field && find_field.source == item.source) {
+          return { ...item, value: JSON.parse(JSON.stringify(find_field.value)) }
+        }
+        return { ...item, value: item.source == 'reference' ? [] : '' }
+      })
+      set(props.nodeModel.properties.node_data, 'input_field_list', merge_input_field_list)
+      set(props.nodeModel.properties, 'status', 200)
+    })
+    .catch((err) => {
+      set(props.nodeModel.properties, 'status', 500)
+    })
+}
+
 onMounted(() => {
   if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
     if (isLastNode(props.nodeModel)) {
       set(props.nodeModel.properties.node_data, 'is_result', true)
     }
   }
+  update_field()
   set(props.nodeModel, 'validate', validate)
 })
 </script>

@@ -13,6 +13,7 @@ from typing import Type, Dict, List
 from django.core import cache
 from django.db.models import QuerySet
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError, ErrorDetail
 
 from application.models import ChatRecord
 from application.models.api_key_model import ApplicationPublicAccessClient
@@ -123,12 +124,12 @@ class INode:
         self.err_message = ''
         self.node = node
         self.node_params = node.properties.get('node_data')
+        self.workflow_params = workflow_params
         self.workflow_manage = workflow_manage
         self.node_params_serializer = None
         self.flow_params_serializer = None
         self.context = {}
         self.id = node.id
-        self.valid_args(self.node_params, workflow_params)
 
     def valid_args(self, node_params, flow_params):
         flow_params_serializer_class = self.get_flow_params_serializer_class()
@@ -139,6 +140,8 @@ class INode:
         if node_params_serializer_class is not None:
             self.node_params_serializer = node_params_serializer_class(data=node_params)
             self.node_params_serializer.is_valid(raise_exception=True)
+        if self.node.properties.get('status', 200) != 200:
+            raise ValidationError(ErrorDetail(f'节点{self.node.properties.get("stepName")} 不可用'))
 
     def get_reference_field(self, fields: List[str]):
         return self.get_field(self.context, fields)

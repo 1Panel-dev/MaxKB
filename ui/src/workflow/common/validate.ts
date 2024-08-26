@@ -138,5 +138,8 @@ export class WorkFlowInstance {
         throw `${node.properties.stepName} 节点不能连接俩个节点`
       }
     }
+    if (node.properties.status && node.properties.status !== 200) {
+      throw `${node.properties.stepName} 节点不可用`
+    }
   }
 }

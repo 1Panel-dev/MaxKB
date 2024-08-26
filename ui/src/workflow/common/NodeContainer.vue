@@ -7,7 +7,10 @@
     >
       <div v-resize="resizeStepContainer">
         <div class="flex-between mb-16">
-          <div class="flex align-center" style="max-width: 90%">
+          <div
+            class="flex align-center"
+            :style="{ maxWidth: node_status == 200 ? 'calc(100% - 55px)' : 'calc(100% - 85px)' }"
+          >
             <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
             <h4 v-if="showOperate(nodeModel.type)" style="max-width: 90%">
               <ReadWrite
@@ -22,6 +25,7 @@
             </h4>
             <h4 v-else>{{ nodeModel.properties.stepName }}</h4>
           </div>
+
           <div
             @mousemove.stop
             @mousedown.stop
@@ -29,6 +33,9 @@
             @click.stop
             v-if="showOperate(nodeModel.type)"
           >
+            <el-tag type="danger" v-if="node_status != 200" style="margin-right: 8px"
+              >不可用</el-tag
+            >
             <el-dropdown :teleported="false" trigger="click">
               <el-button text>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
@@ -73,7 +80,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
@@ -89,8 +96,12 @@ const height = ref<{
   outputContainerHeight: 0
 })
 
-const showEditIcon = ref(false)
-
+const node_status = computed(() => {
+  if (props.nodeModel.properties.status) {
+    return props.nodeModel.properties.status
+  }
+  return 200
+})
 function editName(val: string) {
   if (val.trim() && val.trim() !== props.nodeModel.properties.stepName) {
     if (

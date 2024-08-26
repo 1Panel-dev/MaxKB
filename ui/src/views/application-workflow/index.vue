@@ -256,7 +256,14 @@ function clickNodes(item: any, data?: any) {
 function onmousedown(item: any, data?: any) {
   if (data) {
     item['properties']['stepName'] = data.name
-    item['properties']['node_data'] = { ...data, function_lib_id: data.id }
+    item['properties']['node_data'] = {
+      ...data,
+      function_lib_id: data.id,
+      input_field_list: data.input_field_list.map((field: any) => ({
+        ...field,
+        value: field.source == 'reference' ? [] : ''
+      }))
+    }
   }
   workflowRef.value?.onmousedown(item)
   showPopover.value = false
