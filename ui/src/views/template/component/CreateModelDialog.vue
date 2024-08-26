@@ -160,7 +160,7 @@ import ModelApi from '@/api/model'
 import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormRules } from 'element-plus'
-import { MsgSuccess } from '@/utils/message'
+import { MsgSuccess, MsgWarning } from '@/utils/message'
 import { PermissionType, PermissionDesc } from '@/enums/model'
 
 const providerValue = ref<Provider>()
@@ -207,6 +207,11 @@ const form_data = computed({
 })
 
 const getModelForm = (model_name: string) => {
+  if (!form_data.value.model_type) {
+    MsgWarning('请先选择模型类型')
+    base_form_data.value.model_name = ''
+    return
+  }
   if (providerValue.value) {
     ModelApi.getModelCreateForm(
       providerValue.value.provider,
