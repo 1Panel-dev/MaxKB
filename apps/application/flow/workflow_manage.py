@@ -147,7 +147,10 @@ class Flow:
                 raise ValidationError(ErrorDetail(f'节点{node.properties.get("stepName")} 不可用'))
         node_list = [node for node in self.nodes if (node.type == 'function-lib-node')]
         for node in node_list:
-            f_lib = QuerySet(FunctionLib).filter(id=node.properties.get('function_lib_id')).first()
+            function_lib_id = node.properties.get('node_data', {}).get('function_lib_id')
+            if function_lib_id is None:
+                raise ValidationError(ErrorDetail(f'节点{node.properties.get("stepName")} 函数库id不能为空'))
+            f_lib = QuerySet(FunctionLib).filter(id=function_lib_id).first()
             if f_lib is None:
                 raise ValidationError(ErrorDetail(f'节点{node.properties.get("stepName")} 函数库不可用'))
 
