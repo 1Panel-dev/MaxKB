@@ -61,3 +61,19 @@ class FileCache(BaseCache):
         if value is None:
             return None
         return datetime.timedelta(seconds=math.ceil(expire_time - time.time()))
+
+    def clear_by_application_id(self, application_id):
+        delete_keys = []
+        for key in self.cache.iterkeys():
+            value = self.cache.get(key)
+            if (hasattr(value,
+                        'application') and value.application is not None and value.application.id is not None and
+                    str(
+                        value.application.id) == application_id):
+                delete_keys.append(key)
+        for key in delete_keys:
+            self.delete(key)
+
+    def clear_timeout_data(self):
+        for key in self.cache.iterkeys():
+            self.get(key)
