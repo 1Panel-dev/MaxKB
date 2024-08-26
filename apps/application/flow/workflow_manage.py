@@ -13,6 +13,7 @@ from typing import List, Dict
 from django.db.models import QuerySet
 from langchain_core.messages import AIMessage
 from langchain_core.prompts import PromptTemplate
+from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from application.flow import tools
 from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
@@ -131,6 +132,8 @@ class Flow:
         node_list = [node for node in self.nodes if (node.type == 'ai-chat-node' or node.type == 'question-node')]
         for node in node_list:
             model = QuerySet(Model).filter(id=node.properties.get('node_data', {}).get('model_id')).first()
+            if model is None:
+                raise ValidationError(ErrorDetail(f'节点{node.properties.get("stepName")} 模型不存在'))
             credential = get_model_credential(model.provider, model.model_type, model.model_name)
             model_params_setting = node.properties.get('node_data', {}).get('model_params_setting')
             model_params_setting_form = credential.get_model_params_setting_form(
