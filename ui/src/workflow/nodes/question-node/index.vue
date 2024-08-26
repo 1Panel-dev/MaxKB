@@ -16,7 +16,7 @@
         ref="questionNodeFormRef"
         hide-required-asterisk
       >
-      <el-form-item
+        <el-form-item
           label="AI 模型"
           prop="model_id"
           :rules="{
@@ -42,6 +42,7 @@
             </div>
           </template>
           <el-select
+            @change="model_change"
             @wheel="wheel"
             @keydown="isKeyDown = true"
             @keyup="isKeyDown = false"
@@ -231,6 +232,9 @@ function openDialog() {
   cloneContent.value = form_data.value.prompt
   dialogVisible.value = true
 }
+const model_change = (model_id: string) => {
+  AIModeParamSettingDialogRef.value?.reset_default(model_id)
+}
 function submitDialog() {
   set(props.nodeModel.properties.node_data, 'prompt', cloneContent.value)
   dialogVisible.value = false
@@ -255,7 +259,7 @@ function refreshParam(data: any) {
 
 const openAIParamSettingDialog = (modelId: string) => {
   if (modelId) {
-    AIModeParamSettingDialogRef.value?.open(modelId,form_data.value.model_params_setting)
+    AIModeParamSettingDialogRef.value?.open(modelId, form_data.value.model_params_setting)
   }
 }
 const form_data = computed({

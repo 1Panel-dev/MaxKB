@@ -92,7 +92,7 @@ class Model(APIView):
         @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request, model_id: str):
             return result.success(
-                ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).get_model_params())
+                ModelSerializer.ModelParams(data={'id': model_id, 'user_id': request.user.id}).get_model_params())
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

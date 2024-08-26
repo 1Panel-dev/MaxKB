@@ -23,7 +23,7 @@ from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
 from common.util.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from dataset.models import DataSet
-from setting.models.model_management import Model, Status
+from setting.models.model_management import Model, Status, PermissionType
 from setting.models_provider import get_model, get_model_credential
 from setting.models_provider.base_model_provider import ValidCode, DownModelChunkStatus
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -208,6 +208,27 @@ class ModelSerializer(serializers.Serializer):
                     credential),
                 'permission_type': model.permission_type}
 
+    class ModelParams(serializers.Serializer):
+        id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
+
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            model = QuerySet(Model).filter(id=self.data.get("id")).first()
+            if model is None:
+                raise AppApiException(500, '模型不存在')
+            if model.permission_type == PermissionType.PRIVATE and self.data.get('user_id') != str(model.user_id):
+                raise AppApiException(500, '没有权限访问到此模型')
+
+        def get_model_params(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            model_id = self.data.get('id')
+            model = QuerySet(Model).filter(id=model_id).first()
+            credential = get_model_credential(model.provider, model.model_type, model.model_name)
+            return credential.get_model_params_setting_form(model.model_name).to_form_list()
+
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
 
@@ -234,14 +255,6 @@ class ModelSerializer(serializers.Serializer):
                     'status': model.status,
                     'meta': model.meta
                     }
-
-        def get_model_params(self, with_valid=True):
-            if with_valid:
-                self.is_valid(raise_exception=True)
-            model_id = self.data.get('id')
-            model = QuerySet(Model).filter(id=model_id).first()
-            credential = get_model_credential(model.provider, model.model_type, model.model_name)
-            return credential.get_model_params_setting_form(model.model_name).to_form_list()
 
         def delete(self, with_valid=True):
             if with_valid:
