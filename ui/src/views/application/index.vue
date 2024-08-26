@@ -148,6 +148,9 @@ const paginationConfig = reactive({
 const searchValue = ref('')
 
 function copyApplication(row: any) {
+  application.asyncGetApplicationDetail(row.id, loading).then((res: any) => {
+    row['dataset_id_list'] = res.data.dataset_id_list
+  })
   CopyApplicationDialogRef.value.open(row)
 }
 
