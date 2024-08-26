@@ -246,11 +246,15 @@ def post_handler_paragraph(content: str, limit: int):
     while (pos := content.find("\n", start)) != -1:
         split, start = content[start:pos + 1], pos + 1
         if len(temp_char + split) > limit:
+            if len(temp_char) > 4096:
+                pass
             result.append(temp_char)
             temp_char = ''
         temp_char = temp_char + split
     temp_char = temp_char + content[start:]
     if len(temp_char) > 0:
+        if len(temp_char) > 4096:
+            pass
         result.append(temp_char)
 
     pattern = "[\\S\\s]{1," + str(limit) + '}'
@@ -298,7 +302,7 @@ class SplitModel:
         """
         level_content_list = parse_title_level(text, self.content_level_pattern, index)
         if len(level_content_list) == 0:
-            return list(map(lambda row: to_tree_obj(row, 'block'), post_handler_paragraph(text, limit=self.limit)))
+            return [to_tree_obj(row, 'block') for row in post_handler_paragraph(text, limit=self.limit)]
         if index == 0 and text.lstrip().index(level_content_list[0]["content"].lstrip()) != 0:
             level_content_list.insert(0, to_tree_obj(""))
 
@@ -307,7 +311,9 @@ class SplitModel:
         for i in range(len(level_title_content_list)):
             start_content: str = level_title_content_list[i].get('content')
             if cursor < text.index(start_content, cursor):
-                level_content_list.insert(0, to_tree_obj(text[cursor:   text.index(start_content, cursor)], 'block'))
+                for row in post_handler_paragraph(text[cursor:   text.index(start_content, cursor)], limit=self.limit):
+                    level_content_list.insert(0, to_tree_obj(row, 'block'))
+
             block, cursor = get_level_block(text, level_title_content_list, i, cursor)
             if len(block) == 0:
                 continue
@@ -330,6 +336,9 @@ class SplitModel:
         text = text.replace("\0", '')
         result_tree = self.parse_to_tree(text, 0)
         result = result_tree_to_paragraph(result_tree, [], [], self.with_filter)
+        for e in result:
+            if len(e['content']) > 4096:
+                pass
         return [item for item in [self.post_reset_paragraph(row) for row in result] if
                 'content' in item and len(item.get('content').strip()) > 0]
 
