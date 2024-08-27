@@ -416,6 +416,7 @@ class ApplicationSerializer(serializers.Serializer):
                                model_setting=application.get('model_setting'),
                                problem_optimization=application.get('problem_optimization'),
                                type=ApplicationTypeChoices.SIMPLE,
+                               model_params_setting=application.get('model_params_setting',{}),
                                work_flow={}
                                )
 
