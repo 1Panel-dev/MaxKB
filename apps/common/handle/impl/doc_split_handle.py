@@ -149,6 +149,7 @@ class DocSplitHandle(BaseSplitHandle):
 
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()
-        if file_name.endswith(".docx") or file_name.endswith(".doc"):
+        if file_name.endswith(".docx") or file_name.endswith(".doc") or file_name.endswith(
+                ".DOC") or file_name.endswith(".DOCX"):
             return True
         return False

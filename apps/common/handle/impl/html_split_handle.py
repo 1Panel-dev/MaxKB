@@ -38,7 +38,7 @@ def get_encoding(buffer):
 class HTMLSplitHandle(BaseSplitHandle):
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()
-        if file_name.endswith(".html"):
+        if file_name.endswith(".html") or file_name.endswith(".HTML"):
             return True
         return False
 

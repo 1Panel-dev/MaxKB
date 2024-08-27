@@ -74,7 +74,8 @@ class PdfSplitHandle(BaseSplitHandle):
 
                 elapsed_time = time.time() - start_time
                 # todo 实现进度条代替下面的普通输出
-                max_kb.debug(f"File: {file.name}, Page: {page_num + 1}, Time : {elapsed_time: .3f}s,   content-length: {len(page_content)}")
+                max_kb.debug(
+                    f"File: {file.name}, Page: {page_num + 1}, Time : {elapsed_time: .3f}s,   content-length: {len(page_content)}")
             if pattern_list is not None and len(pattern_list) > 0:
                 split_model = SplitModel(pattern_list, with_filter, limit)
             else:
@@ -96,6 +97,6 @@ class PdfSplitHandle(BaseSplitHandle):
 
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()
-        if file_name.endswith(".pdf"):
+        if file_name.endswith(".pdf") or file_name.endswith(".PDF"):
             return True
         return False
