@@ -152,7 +152,7 @@ const searchValue = ref('')
 
 function copyApplication(row: any) {
   application.asyncGetApplicationDetail(row.id, loading).then((res: any) => {
-    CopyApplicationDialogRef.value.open(res.data)
+    CopyApplicationDialogRef.value.open({ ...res.data, model_id: res.data.model })
   })
 }
 
