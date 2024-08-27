@@ -72,7 +72,7 @@
       </el-card>
 
       <h5 class="lighter mb-8">Python 代码</h5>
-      <div class="workflow-CodemirrorEditor mb-8" v-if="showEditor">
+      <div class="function-CodemirrorEditor mb-8" v-if="showEditor">
         <CodemirrorEditor
           v-model="chat_data.code"
           @wheel="wheel"
@@ -80,7 +80,7 @@
           @keyup="isKeyDown = false"
           style="height: 130px !important"
         />
-        <div class="workflow-CodemirrorEditor__footer">
+        <div class="function-CodemirrorEditor__footer">
           <el-button text type="info" @click="openCodemirrorDialog" class="magnify">
             <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
           </el-button>
