@@ -589,6 +589,13 @@ class ApplicationSerializer(serializers.Serializer):
             return FunctionLibSerializer.Operate(data={'user_id': application.user_id, 'id': function_lib_id}).one(
                 with_valid=True)
 
+        def get_model_params_form(self, model_id, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
+            return ModelSerializer.ModelParams(
+                data={'user_id': application.user_id, 'id': model_id}).get_model_params(with_valid=True)
+
         def delete(self, with_valid=True):
             if with_valid:
                 self.is_valid()

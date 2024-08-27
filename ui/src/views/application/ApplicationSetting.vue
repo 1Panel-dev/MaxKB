@@ -453,7 +453,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 }
 const model_change = (model_id?: string) => {
   if (model_id) {
-    AIModeParamSettingDialogRef.value?.reset_default(model_id)
+    AIModeParamSettingDialogRef.value?.reset_default(model_id, id)
   } else {
     refreshForm({})
   }
@@ -464,7 +464,7 @@ const openAIParamSettingDialog = () => {
     MsgSuccess(t('请选择AI 模型'))
     return
   }
-  AIModeParamSettingDialogRef.value?.open(model_id, applicationForm.value.model_params_setting)
+  AIModeParamSettingDialogRef.value?.open(model_id, id, applicationForm.value.model_params_setting)
 }
 
 const openParamSettingDialog = () => {

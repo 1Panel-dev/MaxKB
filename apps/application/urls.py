@@ -22,6 +22,8 @@ urlpatterns = [
     path('application/<str:application_id>/function_lib', views.Application.FunctionLib.as_view()),
     path('application/<str:application_id>/function_lib/<str:function_lib_id>',
          views.Application.FunctionLib.Operate.as_view()),
+    path('application/<str:application_id>/model_params_form/<str:model_id>',
+         views.Application.ModelParamsForm.as_view()),
     path('application/<str:application_id>/hit_test', views.Application.HitTest.as_view()),
     path('application/<str:application_id>/api_key', views.Application.ApplicationKey.as_view()),
     path("application/<str:application_id>/api_key/<str:api_key_id>",

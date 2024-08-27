@@ -34,6 +34,7 @@
 import { ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
 import modelAPi from '@/api/model'
+import applicationApi from '@/api/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import { keys } from 'lodash'
 const model_form_field = ref<Array<FormField>>([])
@@ -42,16 +43,21 @@ const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
 const form_data = ref<any>({})
 const dialogVisible = ref(false)
 const loading = ref(false)
-
-const open = (model_id: string, model_setting_data?: any) => {
+const getApi = (model_id: string, application_id?: string) => {
+  return application_id
+    ? applicationApi.getModelParamsForm(application_id, model_id, loading)
+    : modelAPi.getModelParamsForm(model_id, loading)
+}
+const open = (model_id: string, application_id?: string, model_setting_data?: any) => {
   form_data.value = {}
-  modelAPi.getModelParamsForm(model_id, loading).then((ok) => {
+  const api = getApi(model_id, application_id)
+  api.then((ok) => {
     model_form_field.value = ok.data
     model_setting_data =
       model_setting_data && keys(model_setting_data).length > 0
         ? model_setting_data
         : ok.data
-            .map((item) => ({ [item.field]: item.default_value }))
+            .map((item: any) => ({ [item.field]: item.default_value }))
             .reduce((x, y) => ({ ...x, ...y }), {})
     // 渲染动态表单
     dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
@@ -59,8 +65,9 @@ const open = (model_id: string, model_setting_data?: any) => {
   dialogVisible.value = true
 }
 
-const reset_default = (model_id: string) => {
-  modelAPi.getModelParamsForm(model_id, loading).then((ok) => {
+const reset_default = (model_id: string, application_id?: string) => {
+  const api = getApi(model_id, application_id)
+  api.then((ok) => {
     model_form_field.value = ok.data
     const model_setting_data = ok.data
       .map((item) => ({ [item.field]: item.default_value }))
