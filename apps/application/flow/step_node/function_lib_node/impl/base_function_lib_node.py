@@ -44,16 +44,19 @@ def get_field_value(debug_field_list, name, is_required):
 
 def valid_reference_value(_type, value, name):
     if _type == 'int':
-        return isinstance(value, int)
-    if _type == 'float':
-        return isinstance(value, float)
-    if _type == 'dict':
-        return isinstance(value, dict)
-    if _type == 'array':
-        return isinstance(value, list)
-    if _type == 'string':
-        return isinstance(value, str)
-    raise Exception(500, f'字段:{name}类型:{_type}值:{value}类型错误')
+        instance_type = int
+    elif _type == 'float':
+        instance_type = float
+    elif _type == 'dict':
+        instance_type = dict
+    elif _type == 'array':
+        instance_type = list
+    elif _type == 'string':
+        instance_type = str
+    else:
+        raise Exception(500, f'字段:{name}类型:{_type} 不支持的类型')
+    if not isinstance(value, instance_type):
+        raise Exception(f'字段:{name}类型:{_type}值:{value}类型错误')
 
 
 def convert_value(name: str, value, _type, is_required, source, node):
