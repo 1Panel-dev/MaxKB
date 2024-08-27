@@ -248,7 +248,32 @@ const putPublishApplication: (
 ) => Promise<Result<any>> = (application_id, data, loading) => {
   return put(`${prefix}/${application_id}/publish`, data, undefined, loading)
 }
-
+/**
+ * 获取应用所属的函数库列表
+ * @param application_id 应用id
+ * @param loading
+ * @returns
+ */
+const listFunctionLib: (application_id: String, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  application_id,
+  loading
+) => {
+  return get(`${prefix}/${application_id}/function_lib`, undefined, loading)
+}
+/**
+ * 获取应用所属的函数库
+ * @param application_id
+ * @param function_lib_id
+ * @param loading
+ * @returns
+ */
+const getFunctionLib: (
+  application_id: String,
+  function_lib_id: String,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, function_lib_id, loading) => {
+  return get(`${prefix}/${application_id}/function_lib/${function_lib_id}`, undefined, loading)
+}
 export default {
   getAllAppilcation,
   getApplication,
@@ -268,5 +293,7 @@ export default {
   getApplicationHitTest,
   getApplicationModel,
   putPublishApplication,
-  postWorkflowChatOpen
+  postWorkflowChatOpen,
+  listFunctionLib,
+  getFunctionLib
 }

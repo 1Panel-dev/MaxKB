@@ -187,6 +187,43 @@ class Application(APIView):
                     data={'application_id': application_id,
                           'user_id': request.user.id}).list_model(request.query_params.get('model_type')))
 
+    class FunctionLib(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=["GET"], detail=False)
+        @swagger_auto_schema(operation_summary="获取函数库列表",
+                             operation_id="获取函数库列表",
+                             tags=["应用"])
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationSerializer.Operate(
+                    data={'application_id': application_id,
+                          'user_id': request.user.id}).list_function_lib())
+
+        class Operate(APIView):
+            authentication_classes = [TokenAuth]
+
+            @action(methods=["GET"], detail=False)
+            @swagger_auto_schema(operation_summary="获取函数库列表",
+                                 operation_id="获取函数库列表",
+                                 tags=["应用"],
+                                 )
+            @has_permissions(ViewPermission(
+                [RoleConstants.ADMIN, RoleConstants.USER],
+                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                dynamic_tag=keywords.get('application_id'))],
+                compare=CompareConstants.AND))
+            def get(self, request: Request, application_id: str, function_lib_id: str):
+                return result.success(
+                    ApplicationSerializer.Operate(
+                        data={'application_id': application_id,
+                              'user_id': request.user.id}).get_function_lib(function_lib_id))
+
     class Profile(APIView):
         authentication_classes = [TokenAuth]
 
