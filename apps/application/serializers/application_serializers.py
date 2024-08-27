@@ -42,6 +42,7 @@ from common.util.file_util import get_file_content
 from dataset.models import DataSet, Document, Image
 from dataset.serializers.common_serializers import list_paragraph, get_embedding_model_by_dataset_id_list
 from embedding.models import SearchMode
+from function_lib.serializers.function_lib_serializer import FunctionLibSerializer
 from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.models_provider import get_model_credential
@@ -573,6 +574,19 @@ class ApplicationSerializer(serializers.Serializer):
             application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
             return ModelSerializer.Query(
                 data={'user_id': application.user_id, 'model_type': model_type}).list(
+                with_valid=True)
+
+        def list_function_lib(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
+            return FunctionLibSerializer.Query(data={'user_id': application.user_id}).list(with_valid=True)
+
+        def get_function_lib(self, function_lib_id, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
+            return FunctionLibSerializer.Operate(data={'user_id': application.user_id, 'id': function_lib_id}).one(
                 with_valid=True)
 
         def delete(self, with_valid=True):

@@ -157,7 +157,6 @@ import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
-import functionLibApi from '@/api/function-lib'
 
 const { user, application } = useStore()
 const router = useRouter()
@@ -300,7 +299,7 @@ function saveApplication() {
 }
 
 function getList() {
-  functionLibApi.getAllFunctionLib({}, loading).then((res: any) => {
+  applicationApi.listFunctionLib(id, loading).then((res: any) => {
     functionLibList.value = res.data
   })
 }

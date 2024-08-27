@@ -80,11 +80,14 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
-import functionLibApi from '@/api/function-lib'
+import applicationApi from '@/api/application'
+import { app } from '@/main'
 const props = defineProps<{ nodeModel: any }>()
 
 const nodeCascaderRef = ref()
-
+const {
+  params: { id }
+} = app.config.globalProperties.$route as any
 const form = {
   input_field_list: [],
   is_result: false
@@ -113,8 +116,8 @@ const validate = () => {
 }
 
 const update_field = () => {
-  functionLibApi
-    .getFunctionLibById(props.nodeModel.properties.node_data.function_lib_id)
+  applicationApi
+    .getFunctionLib(id, props.nodeModel.properties.node_data.function_lib_id)
     .then((ok) => {
       const old_input_field_list = props.nodeModel.properties.node_data.input_field_list
       const merge_input_field_list = ok.data.input_field_list.map((item: any) => {
