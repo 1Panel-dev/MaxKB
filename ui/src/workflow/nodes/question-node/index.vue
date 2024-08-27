@@ -234,7 +234,7 @@ function openDialog() {
 }
 const model_change = (model_id?: string) => {
   if (model_id) {
-    AIModeParamSettingDialogRef.value?.reset_default(model_id)
+    AIModeParamSettingDialogRef.value?.reset_default(model_id, id)
   } else {
     refreshParam({})
   }
@@ -263,7 +263,7 @@ function refreshParam(data: any) {
 
 const openAIParamSettingDialog = (modelId: string) => {
   if (modelId) {
-    AIModeParamSettingDialogRef.value?.open(modelId, form_data.value.model_params_setting)
+    AIModeParamSettingDialogRef.value?.open(modelId, id, form_data.value.model_params_setting)
   }
 }
 const form_data = computed({

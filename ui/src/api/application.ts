@@ -3,7 +3,7 @@ import { get, post, postStream, del, put } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
-
+import type { FormField } from '@/components/dynamics-form/type'
 const prefix = '/application'
 
 /**
@@ -274,6 +274,20 @@ const getFunctionLib: (
 ) => Promise<Result<any>> = (application_id, function_lib_id, loading) => {
   return get(`${prefix}/${application_id}/function_lib/${function_lib_id}`, undefined, loading)
 }
+/**
+ * 获取模型参数表单
+ * @param application_id 应用id
+ * @param model_id      模型id
+ * @param loading
+ * @returns
+ */
+const getModelParamsForm: (
+  application_id: String,
+  model_id: String,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<FormField>>> = (application_id, model_id, loading) => {
+  return get(`${prefix}/${application_id}/model_params_form/${model_id}`, undefined, loading)
+}
 export default {
   getAllAppilcation,
   getApplication,
@@ -295,5 +309,6 @@ export default {
   putPublishApplication,
   postWorkflowChatOpen,
   listFunctionLib,
-  getFunctionLib
+  getFunctionLib,
+  getModelParamsForm
 }

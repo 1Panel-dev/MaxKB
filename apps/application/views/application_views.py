@@ -27,6 +27,7 @@ from common.response import result
 from common.swagger_api.common_api import CommonApi
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.dataset_serializers import DataSetSerializers
+from setting.swagger_api.provide_api import ProvideApi
 
 chat_cache = cache.caches['chat_cache']
 
@@ -186,6 +187,24 @@ class Application(APIView):
                 ApplicationSerializer.Operate(
                     data={'application_id': application_id,
                           'user_id': request.user.id}).list_model(request.query_params.get('model_type')))
+
+    class ModelParamsForm(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取模型参数表单",
+                             operation_id="获取模型参数表单",
+                             tags=["模型"])
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, application_id: str, model_id: str):
+            return result.success(
+                ApplicationSerializer.Operate(
+                    data={'application_id': application_id,
+                          'user_id': request.user.id}).get_model_params_form(model_id))
 
     class FunctionLib(APIView):
         authentication_classes = [TokenAuth]
