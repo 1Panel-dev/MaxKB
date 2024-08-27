@@ -52,10 +52,9 @@ class UpdateProblemArgs:
 
 
 class UpdateEmbeddingDatasetIdArgs:
-    def __init__(self, paragraph_id_list: List[str], target_dataset_id: str, target_embedding_model: Embeddings):
+    def __init__(self, paragraph_id_list: List[str], target_dataset_id: str):
         self.paragraph_id_list = paragraph_id_list
         self.target_dataset_id = target_dataset_id
-        self.target_embedding_model = target_embedding_model
 
 
 class UpdateEmbeddingDocumentIdArgs:
@@ -88,7 +87,6 @@ class ListenerManagement:
             max_kb_error.error(f'查询向量数据:{paragraph_id_list}出现错误{str(e)}{traceback.format_exc()}')
 
     @staticmethod
-    @embedding_poxy
     def embedding_by_paragraph_data_list(data_list, paragraph_id_list, embedding_model: Embeddings):
         max_kb.info(f'开始--->向量化段落:{paragraph_id_list}')
         status = Status.success
@@ -109,7 +107,6 @@ class ListenerManagement:
             max_kb.info(f'结束--->向量化段落:{paragraph_id_list}')
 
     @staticmethod
-    @embedding_poxy
     def embedding_by_paragraph(paragraph_id, embedding_model: Embeddings):
         """
         向量化段落 根据段落id
@@ -238,15 +235,8 @@ class ListenerManagement:
 
     @staticmethod
     def update_embedding_dataset_id(args: UpdateEmbeddingDatasetIdArgs):
-        if args.target_embedding_model is None:
-            VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
-                                                                       {'dataset_id': args.target_dataset_id})
-        else:
-            # 删除向量数据
-            ListenerManagement.delete_embedding_by_paragraph_ids(args.paragraph_id_list)
-            # 向量数据
-            ListenerManagement.embedding_by_paragraph_list(args.paragraph_id_list,
-                                                           embedding_model=args.target_embedding_model)
+        VectorStore.get_embedding_vector().update_by_paragraph_ids(args.paragraph_id_list,
+                                                                   {'dataset_id': args.target_dataset_id})
 
     @staticmethod
     def update_embedding_document_id(args: UpdateEmbeddingDocumentIdArgs):
