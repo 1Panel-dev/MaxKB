@@ -28,8 +28,8 @@
             >
               <template #label>
                 <div class="flex-between">
-                  <div>
-                    <span>
+                  <div class="flex">
+                    <span class="flex">
                       <auto-tooltip :content="item.name">
                         {{ item.name }}
                       </auto-tooltip>
