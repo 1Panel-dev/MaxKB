@@ -42,11 +42,12 @@ from common.util.fork import Fork
 from common.util.split_model import get_split_model
 from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status, ProblemParagraphMapping, Image
 from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer, ProblemParagraphManage, \
-    get_embedding_model_by_dataset_id, get_embedding_model_id_by_dataset_id
+    get_embedding_model_id_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
 from dataset.task import sync_web_document
 from embedding.task.embedding import embedding_by_document, delete_embedding_by_document_list, \
-    delete_embedding_by_document, update_embedding_dataset_id
+    delete_embedding_by_document, update_embedding_dataset_id, delete_embedding_by_paragraph_ids, \
+    embedding_by_document_list
 from smartdoc.conf import PROJECT_DIR
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle()]
@@ -246,7 +247,12 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             # 修改段落信息
             paragraph_list.update(dataset_id=target_dataset_id)
             # 修改向量信息
-            update_embedding_dataset_id(pid_list, target_dataset_id, model_id)
+            if model_id:
+                delete_embedding_by_paragraph_ids(pid_list)
+                QuerySet(Document).filter(id__in=document_id_list).update(status=Status.queue_up)
+                embedding_by_document_list.delay(document_id_list, model_id)
+            else:
+                update_embedding_dataset_id(pid_list, target_dataset_id)
 
         @staticmethod
         def get_target_dataset_problem(target_dataset_id: str,
