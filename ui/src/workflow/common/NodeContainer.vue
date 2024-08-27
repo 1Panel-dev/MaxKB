@@ -2,7 +2,7 @@
   <div @mousedown="mousedown" class="workflow-node-container p-16" style="overflow: visible">
     <div
       class="step-container app-card p-16"
-      :class="props.nodeModel.isSelected ? 'isSelected' : ''"
+      :class="{ isSelected: props.nodeModel.isSelected, error: node_status !== 200 }"
       style="overflow: visible"
     >
       <div v-resize="resizeStepContainer">
@@ -33,9 +33,6 @@
             @click.stop
             v-if="showOperate(nodeModel.type)"
           >
-            <el-tag type="danger" v-if="node_status != 200" style="margin-right: 8px"
-              >不可用</el-tag
-            >
             <el-dropdown :teleported="false" trigger="click">
               <el-button text>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
@@ -51,6 +48,14 @@
         </div>
 
         <div @mousedown.stop @keydown.stop @click.stop>
+          <el-alert
+            v-if="node_status != 200"
+            class="mb-16"
+            title="该函数不可用"
+            type="error"
+            show-icon
+            :closable="false"
+          />
           <slot></slot>
           <template v-if="nodeFields.length > 0">
             <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
@@ -179,6 +184,9 @@ function showOperate(type: string) {
     }
     &.isSelected {
       border: 2px solid var(--el-color-primary) !important;
+    }
+    &.error {
+      border: 1px solid #f54a45 !important;
     }
   }
 }
