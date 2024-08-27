@@ -451,8 +451,12 @@ const submit = async (formEl: FormInstance | undefined) => {
     }
   })
 }
-const model_change = (model_id: string) => {
-  AIModeParamSettingDialogRef.value?.reset_default(model_id)
+const model_change = (model_id?: string) => {
+  if (model_id) {
+    AIModeParamSettingDialogRef.value?.reset_default(model_id)
+  } else {
+    refreshForm({})
+  }
 }
 const openAIParamSettingDialog = () => {
   const model_id = applicationForm.value.model_id

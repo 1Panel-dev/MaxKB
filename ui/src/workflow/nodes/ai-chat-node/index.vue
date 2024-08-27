@@ -239,8 +239,12 @@ function submitDialog() {
   set(props.nodeModel.properties.node_data, 'prompt', cloneContent.value)
   dialogVisible.value = false
 }
-const model_change = (model_id: string) => {
-  AIModeParamSettingDialogRef.value?.reset_default(model_id)
+const model_change = (model_id?: string) => {
+  if (model_id) {
+    AIModeParamSettingDialogRef.value?.reset_default(model_id)
+  } else {
+    refreshParam({})
+  }
 }
 const {
   params: { id }
