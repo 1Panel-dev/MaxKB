@@ -45,8 +45,6 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     for chunk in response:
         answer += chunk.content
         yield chunk.content
-    answer += '\n'
-    yield '\n'
     _write_context(node_variable, workflow_variable, node, workflow, answer)
 
 

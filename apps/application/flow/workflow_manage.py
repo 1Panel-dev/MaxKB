@@ -209,9 +209,13 @@ class WorkflowManage:
                 self.current_result = self.current_node.run()
                 result = self.current_result.write_context(self.current_node, self)
                 if result is not None:
-                    for r in result:
-                        if self.is_result():
+                    if self.is_result():
+                        for r in result:
                             yield self.get_chunk_content(r)
+                        yield self.get_chunk_content('\n')
+                        self.answer += '\n'
+                    else:
+                        list(result)
                 if not self.has_next_node(self.current_result):
                     yield self.get_chunk_content('', True)
                     break
