@@ -16,7 +16,7 @@
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
           调试</el-button
         >
-        <el-button @click="saveApplication">
+        <el-button @click="saveApplication(true)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           保存
         </el-button>
@@ -289,12 +289,15 @@ function getDetail() {
   })
 }
 
-function saveApplication() {
+function saveApplication(bool?: boolean) {
   const obj = {
     work_flow: getGraphData()
   }
   application.asyncPutApplication(id, obj).then((res) => {
     saveTime.value = new Date()
+    if (bool) {
+      MsgSuccess('保存成功')
+    }
   })
 }
 
