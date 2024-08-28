@@ -21,7 +21,7 @@ model_info_list = [
     ModelInfo('glm-4v', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel),
     ModelInfo('glm-3-turbo', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel)
 ]
-model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_model_info(
+model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
     ModelInfo('glm-4', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel)).build()
 
 
