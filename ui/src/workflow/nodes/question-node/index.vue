@@ -4,10 +4,6 @@
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
-        @mousemove.stop
-        @mousedown.stop
-        @keydown.stop
-        @click.stop
         :model="form_data"
         label-position="top"
         require-asterisk-position="right"
@@ -44,8 +40,6 @@
           <el-select
             @change="model_change"
             @wheel="wheel"
-            @keydown="isKeyDown = true"
-            @keyup="isKeyDown = false"
             :teleported="false"
             v-model="form_data.model_id"
             placeholder="请选择 AI 模型"
@@ -136,8 +130,6 @@
           </template>
           <MdEditor
             @wheel="wheel"
-            @keydown="isKeyDown = true"
-            @keyup="isKeyDown = false"
             class="reply-node-editor"
             style="height: 150px"
             v-model="form_data.prompt"
@@ -216,10 +208,11 @@ import { isLastNode } from '@/workflow/common/data'
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 
 const { model } = useStore()
-const isKeyDown = ref(false)
+
 const wheel = (e: any) => {
-  if (isKeyDown.value) {
+  if (e.ctrlKey === true) {
     e.preventDefault()
+    return true
   } else {
     e.stopPropagation()
     return true

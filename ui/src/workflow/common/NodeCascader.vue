@@ -1,8 +1,6 @@
 <template>
   <el-cascader
     @wheel="wheel"
-    @keydown="isKeyDown = true"
-    @keyup="isKeyDown = false"
     :teleported="false"
     :options="options"
     @visible-change="visibleChange"
@@ -11,12 +9,7 @@
     separator=" > "
   >
     <template #default="{ node, data }">
-      <span
-        class="flex align-center"
-        @wheel="wheel"
-        @keydown="isKeyDown = true"
-        @keyup="isKeyDown = false"
-      >
+      <span class="flex align-center" @wheel="wheel">
         <component :is="iconComponent(`${data.type}-icon`)" class="mr-8" :size="18" />{{
           data.label
         }}</span
@@ -42,10 +35,11 @@ const data = computed({
   }
 })
 const options = ref<Array<any>>([])
-const isKeyDown = ref(false)
+
 const wheel = (e: any) => {
-  if (isKeyDown.value) {
+  if (e.ctrlKey === true) {
     e.preventDefault()
+    return true
   } else {
     e.stopPropagation()
     return true

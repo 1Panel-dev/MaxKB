@@ -4,10 +4,6 @@
     <h5 class="lighter mb-8">输入变量</h5>
     <el-form
       @submit.prevent
-      @mousemove.stop
-      @mousedown.stop
-      @keydown.stop
-      @click.stop
       ref="FunctionNodeFormRef"
       :model="chat_data"
       label-position="top"

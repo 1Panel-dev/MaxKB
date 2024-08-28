@@ -9,10 +9,6 @@
     </div>
     <el-form
       @submit.prevent
-      @mousemove.stop
-      @mousedown.stop
-      @keydown.stop
-      @click.stop
       ref="FunctionNodeFormRef"
       :model="chat_data"
       label-position="top"
@@ -228,6 +224,4 @@ onMounted(() => {
   }, 100)
 })
 </script>
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>

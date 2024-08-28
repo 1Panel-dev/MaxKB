@@ -2,9 +2,6 @@
   <NodeContainer :nodeModel="nodeModel">
     <el-form
       @submit.prevent
-      @mousedown.stop
-      @keydown.stop
-      @click.stop
       :model="form_data"
       label-position="top"
       require-asterisk-position="right"
@@ -42,8 +39,6 @@
       <el-form-item label="开场白">
         <MdEditor
           @wheel="wheel"
-          @keydown="isKeyDown = true"
-          @keyup="isKeyDown = false"
           style="height: 150px"
           v-model="form_data.prologue"
           :preview="false"
@@ -82,10 +77,11 @@ const form = {
   prologue:
     '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
 }
-const isKeyDown = ref(false)
+
 const wheel = (e: any) => {
-  if (isKeyDown.value) {
+  if (e.ctrlKey === true) {
     e.preventDefault()
+    return true
   } else {
     e.stopPropagation()
     return true

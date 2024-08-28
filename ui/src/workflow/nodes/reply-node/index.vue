@@ -3,9 +3,6 @@
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
-        @mousedown.stop
-        @keydown.stop
-        @click.stop
         :model="form_data"
         label-position="top"
         require-asterisk-position="right"
@@ -30,8 +27,6 @@
           <MdEditor
             v-if="form_data.reply_type === 'content'"
             @wheel="wheel"
-            @keydown="isKeyDown = true"
-            @keyup="isKeyDown = false"
             class="reply-node-editor"
             style="height: 150px"
             v-model="form_data.content"
@@ -92,10 +87,11 @@ import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 
 const props = defineProps<{ nodeModel: any }>()
-const isKeyDown = ref(false)
+
 const wheel = (e: any) => {
-  if (isKeyDown.value) {
+  if (e.ctrlKey === true) {
     e.preventDefault()
+    return true
   } else {
     e.stopPropagation()
     return true
