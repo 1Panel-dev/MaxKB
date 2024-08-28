@@ -38,7 +38,7 @@ export function fileType(name: string) {
   获得文件对应图片
 */
 const typeList: any = {
-  txt: ['txt', 'pdf', 'docx', 'csv', 'md', 'html'],
+  txt: ['txt', 'pdf', 'docx', 'csv', 'md', 'html', 'PDF'],
   QA: ['xlsx', 'csv', 'xls']
 }
 

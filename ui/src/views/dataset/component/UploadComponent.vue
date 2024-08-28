@@ -58,7 +58,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        accept=".txt, .md, .csv, .log, .docx, .pdf, .html"
+        accept=".txt, .md, .csv, .log, .docx, .pdf, .html, .PDF"
         :limit="50"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
