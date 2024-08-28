@@ -30,7 +30,7 @@
                 <div class="flex-between">
                   <div class="flex">
                     <span class="flex">
-                      <auto-tooltip :content="item.name">
+                      <auto-tooltip :content="item.name" style="max-width: 130px">
                         {{ item.name }}
                       </auto-tooltip>
                       <span class="danger" v-if="item.is_required">*</span></span
