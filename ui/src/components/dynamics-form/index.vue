@@ -172,7 +172,7 @@ const render = (
     })
   }
   if (data) {
-    formValue.value = data
+    formValue.value = _.cloneDeep(data)
   }
 }
 /**
