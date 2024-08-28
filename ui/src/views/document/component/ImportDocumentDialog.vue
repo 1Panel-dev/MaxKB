@@ -192,9 +192,7 @@ const submit = async (formEl: FormInstance | undefined) => {
           // 批量设置
           const obj = {
             hit_handling_method: form.value.hit_handling_method,
-            directly_return_similarity: Number(form.value.directly_return_similarity)
-              ? form.value.directly_return_similarity
-              : 0.9,
+            directly_return_similarity: form.value.directly_return_similarity,
             id_list: documentList.value
           }
           documentApi.batchEditHitHandling(id, obj, loading).then(() => {
