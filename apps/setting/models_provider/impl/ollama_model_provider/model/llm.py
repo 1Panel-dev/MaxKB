@@ -43,3 +43,11 @@ class OllamaChatModel(MaxKBBaseModel, ChatOpenAI):
         return OllamaChatModel(model=model_name, openai_api_base=base_url,
                                openai_api_key=model_credential.get('api_key'),
                                stream_usage=True, **optional_params)
+
+    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
+        tokenizer = TokenizerManage.get_tokenizer()
+        return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
+
+    def get_num_tokens(self, text: str) -> int:
+        tokenizer = TokenizerManage.get_tokenizer()
+        return len(tokenizer.encode(text))
