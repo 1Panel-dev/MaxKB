@@ -38,6 +38,6 @@ class IChatNode(INode):
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id,
                 chat_record_id,
-                model_params_setting,
+                model_params_setting=None,
                 **kwargs) -> NodeResult:
         pass
