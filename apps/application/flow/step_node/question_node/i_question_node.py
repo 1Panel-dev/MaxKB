@@ -36,6 +36,6 @@ class IQuestionNode(INode):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
-                model_params_setting,
+                model_params_setting=None,
                 **kwargs) -> NodeResult:
         pass

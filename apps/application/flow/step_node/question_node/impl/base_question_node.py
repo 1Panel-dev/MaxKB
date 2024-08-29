@@ -74,7 +74,7 @@ def get_default_model_params_setting(model_id):
 
 class BaseQuestionNode(IQuestionNode):
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
-                model_params_setting,
+                model_params_setting=None,
                 **kwargs) -> NodeResult:
         if model_params_setting is None:
             model_params_setting = get_default_model_params_setting(model_id)
