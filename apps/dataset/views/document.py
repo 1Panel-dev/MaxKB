@@ -293,23 +293,24 @@ class Document(APIView):
             return result.success(operate.delete())
 
     class SplitPattern(APIView):
+        authentication_classes = [TokenAuth]
+
         @action(methods=['GET'], detail=False)
         @swagger_auto_schema(operation_summary="获取分段标识列表",
                              operation_id="获取分段标识列表",
-                             tags=["知识库/文档"],
-                             security=[])
+                             tags=["知识库/文档"])
         def get(self, request: Request):
             return result.success(DocumentSerializers.SplitPattern.list())
 
     class Split(APIView):
+        authentication_classes = [TokenAuth]
         parser_classes = [MultiPartParser]
 
         @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary="分段文档",
                              operation_id="分段文档",
                              manual_parameters=DocumentSerializers.Split.get_request_params_api(),
-                             tags=["知识库/文档"],
-                             security=[])
+                             tags=["知识库/文档"])
         def post(self, request: Request):
             split_data = {'file': request.FILES.getlist('file')}
             request_data = request.data
