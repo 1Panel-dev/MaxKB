@@ -23,7 +23,7 @@ class QuestionNodeSerializer(serializers.Serializer):
     dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("多轮对话数量"))
 
     is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
-    model_params_setting = serializers.DictField(required=True, error_messages=ErrMessage.integer("模型参数相关设置"))
+    model_params_setting = serializers.DictField(required=False, error_messages=ErrMessage.integer("模型参数相关设置"))
 
 
 class IQuestionNode(INode):
