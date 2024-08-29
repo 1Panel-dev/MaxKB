@@ -8,8 +8,16 @@
 """
 from typing import List, Dict
 
+from langchain_core.messages import BaseMessage, get_buffer_string
 from langchain_openai.chat_models import ChatOpenAI
+
+from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
+
+
+def custom_get_token_ids(text: str):
+    tokenizer = TokenizerManage.get_tokenizer()
+    return tokenizer.encode(text)
 
 
 class OpenAIChatModel(MaxKBBaseModel, ChatOpenAI):
@@ -32,5 +40,6 @@ class OpenAIChatModel(MaxKBBaseModel, ChatOpenAI):
             **optional_params,
             streaming=True,
             stream_usage=True,
+            custom_get_token_ids=custom_get_token_ids
         )
         return azure_chat_open_ai
