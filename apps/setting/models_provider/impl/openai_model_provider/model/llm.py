@@ -43,3 +43,17 @@ class OpenAIChatModel(MaxKBBaseModel, ChatOpenAI):
             custom_get_token_ids=custom_get_token_ids
         )
         return azure_chat_open_ai
+
+    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
+        try:
+            super().get_num_tokens_from_messages(messages)
+        except Exception as e:
+            tokenizer = TokenizerManage.get_tokenizer()
+            return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
+
+    def get_num_tokens(self, text: str) -> int:
+        try:
+            super().get_num_tokens(text)
+        except Exception as e:
+            tokenizer = TokenizerManage.get_tokenizer()
+            return len(tokenizer.encode(text))
