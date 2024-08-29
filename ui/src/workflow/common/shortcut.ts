@@ -73,7 +73,6 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     if (graph.textEditElement) return true
     if (selected && (selected.nodes || selected.edges)) {
       lf.clearSelectElements()
-      console.log(selected)
       const addElements = lf.addElements(selected, CHILDREN_TRANSLATION_DISTANCE)
       if (!addElements) return true
       addElements.nodes.forEach((node) => lf.selectElementById(node.id, true))
