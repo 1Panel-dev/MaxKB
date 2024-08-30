@@ -14,9 +14,6 @@
         <span class="label">授权给</span><span>{{ licenseInfo?.corporation || '-' }}</span>
       </div>
       <div class="flex">
-        <span class="label">ISV</span><span>{{ licenseInfo?.isv || '-' }}</span>
-      </div>
-      <div class="flex">
         <span class="label">到期时间</span>
         <span
           >{{ licenseInfo?.expired || '-' }}
@@ -51,6 +48,9 @@
 
         <el-button class="border-primary" @click="toSupport">获取技术支持</el-button>
       </div>
+    </div>
+    <div class="border-t text-center mt-16 p-16 pb-0">
+      <el-text type="info">2014-2025 版权所有 © 杭州飞致云信息科技有限公司</el-text>
     </div>
   </el-dialog>
 </template>
