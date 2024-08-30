@@ -33,6 +33,7 @@ class Template(APIView):
     def get(self, request: Request):
         return DocumentSerializers.Export(data={'type': request.query_params.get('type')}).export(with_valid=True)
 
+
 class TableTemplate(APIView):
     authentication_classes = [TokenAuth]
 
@@ -82,6 +83,7 @@ class QaDocument(APIView):
                 {'file_list': request.FILES.getlist('file')},
                 with_valid=True))
 
+
 class TableDocument(APIView):
     authentication_classes = [TokenAuth]
     parser_classes = [MultiPartParser]
@@ -100,6 +102,7 @@ class TableDocument(APIView):
             DocumentSerializers.Create(data={'dataset_id': dataset_id}).save_table(
                 {'file_list': request.FILES.getlist('file')},
                 with_valid=True))
+
 
 class Document(APIView):
     authentication_classes = [TokenAuth]
@@ -232,6 +235,24 @@ class Document(APIView):
             return result.success(
                 DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).refresh(
                 ))
+
+    class BatchRefresh(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="批量刷新文档向量库",
+                             operation_id="批量刷新文档向量库",
+                             request_body=
+                             DocumentApi.BatchEditHitHandlingApi.get_request_body_api(),
+                             manual_parameters=DocumentSerializers.Create.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库/文档"])
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def put(self, request: Request, dataset_id: str):
+            return result.success(
+                DocumentSerializers.Batch(data={'dataset_id': dataset_id}).batch_refresh(request.data))
 
     class Migrate(APIView):
         authentication_classes = [TokenAuth]
