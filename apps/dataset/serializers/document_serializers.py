@@ -337,6 +337,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                      error_messages=ErrMessage.char(
                                          "文档名称"))
         hit_handling_method = serializers.CharField(required=False, error_messages=ErrMessage.char("命中处理方式"))
+        is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean("文档是否可用"))
+        status = serializers.CharField(required=False, error_messages=ErrMessage.char("文档状态"))
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
@@ -345,6 +347,10 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 query_set = query_set.filter(**{'name__icontains': self.data.get('name')})
             if 'hit_handling_method' in self.data and self.data.get('hit_handling_method') is not None:
                 query_set = query_set.filter(**{'hit_handling_method': self.data.get('hit_handling_method')})
+            if 'is_active' in self.data and self.data.get('is_active') is not None:
+                query_set = query_set.filter(**{'is_active': self.data.get('is_active')})
+            if 'status' in self.data and self.data.get('status') is not None:
+                query_set = query_set.filter(**{'status': self.data.get('status')})
             query_set = query_set.order_by('-create_time')
             return query_set
 
@@ -935,6 +941,21 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if directly_return_similarity is not None:
                 update_dict['directly_return_similarity'] = directly_return_similarity
             QuerySet(Document).filter(id__in=document_id_list).update(**update_dict)
+
+        def batch_refresh(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id_list = instance.get("id_list")
+            with transaction.atomic():
+                Document.objects.filter(id__in=document_id_list).update(status=Status.queue_up)
+                Paragraph.objects.filter(document_id__in=document_id_list).update(status=Status.queue_up)
+                dataset_id = self.data.get('dataset_id')
+                embedding_model_id = get_embedding_model_id_by_dataset_id(dataset_id=dataset_id)
+                for document_id in document_id_list:
+                    try:
+                        embedding_by_document.delay(document_id, embedding_model_id)
+                    except AlreadyQueued as e:
+                        raise AppApiException(500, "任务正在执行中,请勿重复下发")
 
 
 class FileBufferHandle:

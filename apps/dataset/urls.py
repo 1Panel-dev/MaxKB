@@ -34,6 +34,7 @@ urlpatterns = [
          name="document_export"),
     path('dataset/<str:dataset_id>/document/<str:document_id>/sync', views.Document.SyncWeb.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/refresh', views.Document.Refresh.as_view()),
+    path('dataset/<str:dataset_id>/document/batch_refresh', views.Document.BatchRefresh.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph', views.Paragraph.as_view()),
     path(
         'dataset/<str:dataset_id>/document/<str:document_id>/paragraph/migrate/dataset/<str:target_dataset_id>/document/<str:target_document_id>',
