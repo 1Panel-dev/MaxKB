@@ -1,8 +1,8 @@
 <template>
-  <el-drawer v-model="dubugVisible" size="60%" :append-to-body="true">
+  <el-drawer v-model="debugVisible" size="60%" :append-to-body="true">
     <template #header>
       <div class="flex align-center" style="margin-left: -8px">
-        <el-button class="cursor mr-4" link @click.prevent="dubugVisible = false">
+        <el-button class="cursor mr-4" link @click.prevent="debugVisible = false">
           <el-icon :size="20">
             <Back />
           </el-icon>
@@ -72,7 +72,7 @@ import type { FormInstance } from 'element-plus'
 
 const FormRef = ref()
 const loading = ref(false)
-const dubugVisible = ref(false)
+const debugVisible = ref(false)
 const showResult = ref(false)
 const isSuccess = ref(false)
 const result = ref('')
@@ -83,7 +83,7 @@ const form = ref<any>({
   input_field_list: []
 })
 
-watch(dubugVisible, (bool) => {
+watch(debugVisible, (bool) => {
   if (!bool) {
     showResult.value = false
     isSuccess.value = false
@@ -140,7 +140,7 @@ const open = (data: any) => {
   }
   form.value.code = data.code
   form.value.input_field_list = data.input_field_list
-  dubugVisible.value = true
+  debugVisible.value = true
 }
 
 defineExpose({
