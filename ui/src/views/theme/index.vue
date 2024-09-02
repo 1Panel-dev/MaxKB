@@ -6,14 +6,19 @@
         <div class="app-card p-24">
           <h5 class="mb-16">平台显示主题</h5>
           <el-radio-group
-            v-model="themeForm.theme"
+            v-model="themeRadio"
             class="app-radio-button-group"
             @change="changeThemeHandle"
           >
             <template v-for="(item, index) in themeList" :key="index">
               <el-radio-button :label="item.label" :value="item.value" />
             </template>
+            <el-radio-button label="自定义" value="custom" />
           </el-radio-group>
+          <div v-if="themeRadio === 'custom'">
+            <h5 class="mt-16 mb-8">平台显示主题</h5>
+            <el-color-picker v-model="customColor" @change="customColorHandle" />
+          </div>
         </div>
         <div class="app-card p-24 mt-16">
           <h5 class="mb-16">平台登陆设置</h5>
@@ -168,6 +173,8 @@ const themeForm = ref<any>({
   title: 'MaxKB',
   slogan: '欢迎使用 MaxKB 智能知识库'
 })
+const themeRadio = ref('')
+const customColor = ref('')
 
 const rules = reactive<FormRules>({
   title: [{ required: true, message: '请输入网站标题', trigger: 'blur' }],
@@ -197,6 +204,12 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
 }
 
 function changeThemeHandle(val: string) {
+  if (val !== 'custom') {
+    themeForm.value.theme = val
+    user.setTheme(themeForm.value)
+  }
+}
+function customColorHandle(val: string) {
   themeForm.value.theme = val
   user.setTheme(themeForm.value)
 }
@@ -236,6 +249,10 @@ onMounted(() => {
     router.push({ path: `/application` })
   }
   if (themeInfo.value) {
+    themeRadio.value = themeList.some((v) => v === themeInfo.value.theme)
+      ? themeInfo.value.theme
+      : 'custom'
+    customColor.value = themeInfo.value.theme
     themeForm.value = themeInfo.value
     cloneTheme.value = cloneDeep(themeInfo.value)
   }
