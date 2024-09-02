@@ -1,4 +1,4 @@
-FROM postgres:15.6-bookworm
+FROM postgres:15.6-bullseye
 
 ARG DEPENDENCIES="                    \
         curl                          \
