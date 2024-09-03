@@ -1,10 +1,11 @@
-FROM postgres:15.6-bookworm
+FROM python:3.11-slim-bullseye AS python-stage
+FROM postgres:15.8-bullseye
 
 ARG DEPENDENCIES="                    \
+        libexpat1-dev                 \
+        libffi-dev                    \
         curl                          \
         vim                           \
-        python3.11-mini               \
-        python3.11-venv               \
         postgresql-15-pgvector"
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
@@ -12,3 +13,5 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     apt-get update && apt-get install -y --no-install-recommends $DEPENDENCIES && \
     apt-get clean all  && \
     rm -rf /var/lib/apt/lists/*
+
+COPY --from=python-stage /usr/local /usr/local
