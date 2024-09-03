@@ -12,13 +12,6 @@ const applicationRouter = {
       component: () => import('@/views/application/index.vue')
     },
     {
-      path: '/application/create',
-      name: 'CreateApplication',
-      meta: { activeMenu: '/application' },
-      component: () => import('@/views/application/CreateAndSetting.vue'),
-      hidden: true
-    },
-    {
       path: '/application/:id/:type',
       name: 'ApplicationDetail',
       meta: { title: '应用详情', activeMenu: '/application' },
@@ -50,6 +43,19 @@ const applicationRouter = {
             parentName: 'ApplicationDetail'
           },
           component: () => import('@/views/application/ApplicationSetting.vue')
+        },
+        {
+          path: 'access',
+          name: 'AppAccess',
+          meta: {
+            icon: 'app-access',
+            iconActive: 'app-access-active',
+            title: '应用接入',
+            active: 'access',
+            parentPath: '/application/:id/:type',
+            parentName: 'ApplicationDetail'
+          },
+          component: () => import('@/views/application/ApplicationAccess.vue')
         },
         {
           path: 'hit-test',
