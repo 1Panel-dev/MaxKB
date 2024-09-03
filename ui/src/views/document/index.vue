@@ -153,6 +153,13 @@
                     </el-button>
                   </el-tooltip>
                 </span>
+                <span class="mr-4">
+                  <el-tooltip effect="dark" content="设置" placement="top">
+                    <el-button type="primary" text @click.stop="settingDoc(row)">
+                      <el-icon><Setting /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </span>
                 <span @click.stop>
                   <el-dropdown trigger="click">
                     <el-button text type="primary">
@@ -160,10 +167,6 @@
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item @click="settingDoc(row)">
-                          <el-icon><Setting /></el-icon>
-                          设置
-                        </el-dropdown-item>
                         <el-dropdown-item @click="openDatasetDialog(row)">
                           <AppIcon iconName="app-migrate"></AppIcon>
                           迁移
@@ -181,11 +184,21 @@
                 </span>
               </div>
               <div v-if="datasetDetail.type === '1'">
-                <el-tooltip effect="dark" content="同步" placement="top">
-                  <el-button type="primary" text @click.stop="syncDocument(row)">
-                    <el-icon><Refresh /></el-icon>
-                  </el-button>
-                </el-tooltip>
+                <span class="mr-4">
+                  <el-tooltip effect="dark" content="同步" placement="top">
+                    <el-button type="primary" text @click.stop="syncDocument(row)">
+                      <el-icon><Refresh /></el-icon>
+                    </el-button>
+                  </el-tooltip>
+                </span>
+                <span class="mr-4">
+                  <el-tooltip effect="dark" content="重新向量化" placement="top">
+                    <el-button type="primary" text @click.stop="refreshDocument(row)">
+                      <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                </span>
+
                 <span @click.stop>
                   <el-dropdown trigger="click">
                     <el-button text type="primary">
@@ -193,13 +206,6 @@
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item @click="refreshDocument(row)">
-                          <AppIcon
-                            iconName="app-document-refresh"
-                            style="font-size: 16px"
-                          ></AppIcon>
-                          重新向量化</el-dropdown-item
-                        >
                         <el-dropdown-item icon="Setting" @click="settingDoc(row)"
                           >设置</el-dropdown-item
                         >

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { type Ref } from 'vue'
 import type { User } from '@/api/type/user'
-
+import { cloneDeep } from 'lodash'
 import UserApi from '@/api/user'
 import ThemeApi from '@/api/theme'
 import { useElementPlusTheme } from 'use-element-plus-theme'
@@ -38,7 +38,7 @@ const useUserStore = defineStore({
     setTheme(data: any) {
       const { changeTheme } = useElementPlusTheme(this.themeInfo?.theme)
       changeTheme(data?.['theme'])
-      this.themeInfo = data
+      this.themeInfo = cloneDeep(data)
     },
     isExpire() {
       return this.isXPack && !this.XPACK_LICENSE_IS_VALID

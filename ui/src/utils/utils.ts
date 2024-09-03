@@ -38,7 +38,7 @@ export function fileType(name: string) {
   获得文件对应图片
 */
 const typeList: any = {
-  txt: ['txt', 'pdf', 'docx', 'csv', 'md', 'html', 'PDF'],
+  txt: ['txt', 'pdf', 'docx', 'csv', 'md', 'html'],
   table: ['xlsx', 'xls', 'csv'],
   QA: ['xlsx', 'csv', 'xls']
 }
@@ -46,12 +46,12 @@ const typeList: any = {
 export function getImgUrl(name: string) {
   const list = Object.values(typeList).flat()
 
-  const type = list.includes(fileType(name.toLowerCase())) ? fileType(name.toLowerCase()) : 'unknow'
+  const type = list.includes(fileType(name).toLowerCase()) ? fileType(name).toLowerCase() : 'unknow'
   return new URL(`../assets/${type}-icon.svg`, import.meta.url).href
 }
 // 是否是白名单后缀
 export function isRightType(name: string, type: string) {
-  return typeList[type].includes(fileType(name))
+  return typeList[type].includes(fileType(name).toLowerCase())
 }
 
 /*
