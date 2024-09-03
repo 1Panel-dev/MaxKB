@@ -4,6 +4,7 @@ import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
+
 const prefix = '/application'
 
 /**
@@ -288,6 +289,41 @@ const getModelParamsForm: (
 ) => Promise<Result<Array<FormField>>> = (application_id, model_id, loading) => {
   return get(`${prefix}/${application_id}/model_params_form/${model_id}`, undefined, loading)
 }
+/**
+ * 获取平台状态
+ */
+const getPlatformStatus: (application_id: string) => Promise<Result<any>> = (application_id) => {
+  return get(`/platform/${application_id}/status`)
+}
+/**
+ * 获取平台配置
+ */
+const getPlatformConfig: (application_id: string, type: string) => Promise<Result<any>> = (
+  application_id,
+  type
+) => {
+  return get(`/platform/${application_id}/${type}`)
+}
+/**
+ * 更新平台配置
+ */
+const updatePlatformConfig: (
+  application_id: string,
+  type: string,
+  data: any
+) => Promise<Result<any>> = (application_id, type, data) => {
+  return post(`/platform/${application_id}/${type}`, data)
+}
+/**
+ * 更新平台状态
+ */
+const updatePlatformStatus: (application_id: string, data: any) => Promise<Result<any>> = (
+  application_id,
+  data
+) => {
+  return post(`/platform/${application_id}/status`, data)
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -310,5 +346,45 @@ export default {
   postWorkflowChatOpen,
   listFunctionLib,
   getFunctionLib,
-  getModelParamsForm
+  getModelParamsForm,
+  getPlatformStatus,
+  getPlatformConfig,
+  updatePlatformConfig,
+  updatePlatformStatus
 }
+
+// types.ts
+export interface WechatConfig {
+  app_id: string
+  app_secret: string
+  token: string
+  encoding_aes_key: string
+  callbackUrl: string
+}
+
+export interface DingtalkConfig {
+  appInfo: string
+  clientId: string
+  clientSecret: string
+}
+
+export interface WecomConfig {
+  appInfo: string
+  corporateId: string
+  agentId: string
+  secret: string
+  token: string
+  encodingAESKey: string
+  callbackUrl: string
+}
+
+export interface FeishuConfig {
+  configInfo: string
+  appId: string
+  appSecret: string
+  verificationToken: string
+}
+
+export type PlatformConfig = WechatConfig | DingtalkConfig | WecomConfig | FeishuConfig
+
+export type PlatformType = 'wechat' | 'dingtalk' | 'wecom' | 'feishu'
