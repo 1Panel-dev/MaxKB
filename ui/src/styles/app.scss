@@ -699,10 +699,11 @@ h5 {
     font-weight: 400;
   }
   .el-radio-button__original-radio:checked + .el-radio-button__inner {
-    color: var(--el-color-primary);
-    background: var(--el-color-primary-light-9);
-    border: none;
-    box-shadow: none;
+    color: var(--el-color-primary) !important;
+    background: var(--el-color-primary-light-9) !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-weight: 500;
   }
 }
 
