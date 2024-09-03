@@ -7,14 +7,33 @@
     label-position="top"
     require-asterisk-position="right"
   >
-    <el-form-item>
-      <el-radio-group v-model="form.fileType" @change="radioChange">
-        <el-radio value="txt">文本文件</el-radio>
-        <el-radio value="table">表格</el-radio>
-        <el-radio value="QA">QA 问答对</el-radio>
+    <div class="mt-16 mb-16">
+      <el-radio-group v-model="form.fileType" @change="radioChange" class="app-radio-button-group">
+        <el-radio-button value="txt">文本文件</el-radio-button>
+        <el-radio-button value="table">表格</el-radio-button>
+        <el-radio-button value="QA">QA 问答对</el-radio-button>
       </el-radio-group>
-    </el-form-item>
+    </div>
+
     <el-form-item prop="fileList" v-if="form.fileType === 'QA'">
+      <div class="update-info flex p-8-12 border-r-4 mb-16 w-full">
+        <div class="mt-4">
+          <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
+        </div>
+        <div class="ml-16 lighter">
+          <p>
+            1、点击下载对应模版并完善信息：
+            <el-button type="primary" link @click="downloadTemplate('excel')">
+              下载 Excel 模版
+            </el-button>
+            <el-button type="primary" link @click="downloadTemplate('csv')">
+              下载 CSV 模版
+            </el-button>
+          </p>
+          <p>2、上传的表格文件中每个 sheet 会作为一个文档，sheet名称为文档名称</p>
+          <p>3、每次最多上传 50 个文件，每个文件不超过 100MB</p>
+        </div>
+      </div>
       <el-upload
         :webkitdirectory="false"
         class="w-full mb-4"
@@ -38,18 +57,31 @@
             <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>当前支持 XLSX / XLS / CSV 格式的文档</p>
-            <p>每次最多上传50个文件，每个文件不超过 100MB</p>
+            <p>支持格式：EXCEL、CSV</p>
           </div>
         </div>
       </el-upload>
-      <el-button type="primary" link @click="downloadTemplate('excel')">
-        下载 Excel 模板
-      </el-button>
-      <el-divider direction="vertical" />
-      <el-button type="primary" link @click="downloadTemplate('csv')"> 下载 CSV 模板 </el-button>
     </el-form-item>
     <el-form-item prop="fileList" v-else-if="form.fileType === 'table'">
+      <div class="update-info flex p-8-12 border-r-4 mb-16 w-full">
+        <div class="mt-4">
+          <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
+        </div>
+        <div class="ml-16 lighter">
+          <p>
+            1、点击下载对应模版并完善信息：
+            <el-button type="primary" link @click="downloadTableTemplate('excel')">
+              下载 Excel 模版
+            </el-button>
+            <el-button type="primary" link @click="downloadTableTemplate('csv')">
+              下载 CSV 模版
+            </el-button>
+          </p>
+          <p>2、第一行必须是列标题，且列标题必须是有意义的术语，表中每条记录将作为一个分段</p>
+          <p>3、上传的表格文件中每个 sheet 会作为一个文档，sheet名称为文档名称</p>
+          <p>4、每次最多上传 50 个文件，每个文件不超过 100MB</p>
+        </div>
+      </div>
       <el-upload
         :webkitdirectory="false"
         class="w-full mb-4"
@@ -73,19 +105,21 @@
             <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>当前支持 EXCEL和CSV 格式文件。</p>
-            <p>第一行必须是列标题，且列标题必须是有意义的术语，表中每条记录将作为一个分段。</p>
-            <p>每次最多上传50个文档，每个文档最大不能超过100MB。</p>
+            <p>支持格式：EXCEL 和 CSV</p>
           </div>
         </div>
       </el-upload>
-      <el-button type="primary" link @click="downloadTableTemplate('excel')">
-        下载 Excel 模板
-      </el-button>
-      <el-divider direction="vertical" />
-      <el-button type="primary" link @click="downloadTableTemplate('csv')"> 下载 CSV 模板 </el-button>
     </el-form-item>
     <el-form-item prop="fileList" v-else>
+      <div class="update-info flex p-8-12 border-r-4 mb-16 w-full">
+        <div class="mt-4">
+          <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
+        </div>
+        <div class="ml-16 lighter">
+          <p>1、文件上传前，建议规范文件的分段标识</p>
+          <p>2、每次最多上传 50 个文件，每个文件不超过 100MB</p>
+        </div>
+      </div>
       <el-upload
         :webkitdirectory="false"
         class="w-full"
@@ -95,7 +129,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        accept=".txt, .md, .csv, .log, .docx, .pdf, .html, .PDF"
+        accept=".txt, .md, .csv, .log, .docx, .pdf, .html"
         :limit="50"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
@@ -109,10 +143,7 @@
             <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>
-              支持格式：TXT、Markdown、PDF、DOCX、HTML、Excel、CSV 每次最多上传50个文件，每个文件不超过 100MB
-            </p>
-            <p>若使用【高级分段】建议上传前规范文件的分段标识</p>
+            <p>支持格式：TXT、Markdown、PDF、DOCX、HTML</p>
           </div>
         </div>
       </el-upload>
@@ -252,5 +283,9 @@ defineExpose({
   .hover:hover {
     color: var(--el-color-primary-light-5);
   }
+}
+.update-info {
+  background: #d6e2ff;
+  line-height: 25px;
 }
 </style>
