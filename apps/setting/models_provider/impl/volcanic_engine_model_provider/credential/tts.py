@@ -8,8 +8,8 @@ from common.forms import BaseForm
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 
-class VolcanicEngineSTTModelCredential(BaseForm, BaseModelCredential):
-    volcanic_api_url = forms.TextInputField('API 域名', required=True, default_value='wss://openspeech.bytedance.com/api/v2/asr')
+class VolcanicEngineTTSModelCredential(BaseForm, BaseModelCredential):
+    volcanic_api_url = forms.TextInputField('API 域名', required=True, default_value='wss://openspeech.bytedance.com/api/v1/tts/ws_binary')
     volcanic_app_id = forms.TextInputField('App ID', required=True)
     volcanic_token = forms.PasswordInputField('Token', required=True)
     volcanic_cluster = forms.TextInputField('Cluster', required=True)

@@ -8,11 +8,11 @@ from common.forms import BaseForm
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 
-class VolcanicEngineSTTModelCredential(BaseForm, BaseModelCredential):
-    volcanic_api_url = forms.TextInputField('API 域名', required=True, default_value='wss://openspeech.bytedance.com/api/v2/asr')
-    volcanic_app_id = forms.TextInputField('App ID', required=True)
-    volcanic_token = forms.PasswordInputField('Token', required=True)
-    volcanic_cluster = forms.TextInputField('Cluster', required=True)
+class XunFeiTTSModelCredential(BaseForm, BaseModelCredential):
+    spark_api_url = forms.TextInputField('API 域名', required=True, default_value='wss://tts-api.xfyun.cn/v2/tts')
+    spark_app_id = forms.TextInputField('APP ID', required=True)
+    spark_api_key = forms.PasswordInputField("API Key", required=True)
+    spark_api_secret = forms.PasswordInputField('API Secret', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
                  raise_exception=False):
@@ -20,7 +20,7 @@ class VolcanicEngineSTTModelCredential(BaseForm, BaseModelCredential):
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
 
-        for key in ['volcanic_api_url', 'volcanic_app_id', 'volcanic_token', 'volcanic_cluster']:
+        for key in ['spark_api_url', 'spark_app_id', 'spark_api_key', 'spark_api_secret']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
@@ -39,7 +39,8 @@ class VolcanicEngineSTTModelCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, 'volcanic_token': super().encryption(model.get('volcanic_token', ''))}
+        return {**model, 'spark_api_secret': super().encryption(model.get('spark_api_secret', ''))}
+
 
     def get_model_params_setting_form(self, model_name):
         pass
