@@ -288,6 +288,147 @@
                 </template>
                 <el-switch size="small" v-model="applicationForm.problem_optimization"></el-switch>
               </el-form-item>
+              <el-form-item>
+                 <template #label>
+                  <div class="flex align-center">
+                    <span class="mr-4">语音输入</span>
+                    <el-tooltip
+                      effect="dark"
+                      content="开启后，需要设定语音转文本模型，语音输入完成后会转化为文字直接发送提问"
+                      placement="right"
+                    >
+                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                    </el-tooltip>
+                    <el-switch v-model="applicationForm.stt_model_enable"/>
+                  </div>
+                </template>
+                <el-select
+                  v-model="applicationForm.stt_model_id"
+                  class="w-full"
+                  popper-class="select-model"
+                >
+                  <el-option-group
+                    v-for="(value, label) in sttModelOptions"
+                    :key="value"
+                    :label="relatedObject(providerOptions, label, 'provider')?.name"
+                  >
+                    <el-option
+                      v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                      class="flex-between"
+                    >
+                      <div class="flex align-center">
+                        <span
+                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                          class="model-icon mr-8"
+                        ></span>
+                        <span>{{ item.name }}</span>
+                        <el-tag
+                          v-if="item.permission_type === 'PUBLIC'"
+                          type="info"
+                          class="info-tag ml-8"
+                          >公用
+                        </el-tag>
+                      </div>
+                      <el-icon class="check-icon" v-if="item.id === applicationForm.stt_model_id">
+                        <Check />
+                      </el-icon>
+                    </el-option>
+                    <!-- 不可用 -->
+                    <el-option
+                      v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                      class="flex-between"
+                      disabled
+                    >
+                      <div class="flex">
+                        <span
+                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                          class="model-icon mr-8"
+                        ></span>
+                        <span>{{ item.name }}</span>
+                        <span class="danger">{{
+                          $t('views.application.applicationForm.form.aiModel.unavailable')
+                        }}</span>
+                      </div>
+                      <el-icon class="check-icon" v-if="item.id === applicationForm.stt_model_id">
+                        <Check />
+                      </el-icon>
+                    </el-option>
+                  </el-option-group>
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                 <template #label>
+                  <div class="flex align-center">
+                    <span class="mr-4">语音播放</span>
+                    <el-switch v-model="applicationForm.tts_model_enable"/>
+                  </div>
+                </template>
+                <el-select
+                  v-model="applicationForm.tts_model_id"
+                  class="w-full"
+                  popper-class="select-model"
+                >
+                  <el-option-group
+                    v-for="(value, label) in ttsModelOptions"
+                    :key="value"
+                    :label="relatedObject(providerOptions, label, 'provider')?.name"
+                  >
+                    <el-option
+                      v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                      class="flex-between"
+                    >
+                      <div class="flex align-center">
+                        <span
+                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                          class="model-icon mr-8"
+                        ></span>
+                        <span>{{ item.name }}</span>
+                        <el-tag
+                          v-if="item.permission_type === 'PUBLIC'"
+                          type="info"
+                          class="info-tag ml-8"
+                          >公用
+                        </el-tag>
+                      </div>
+                      <el-icon class="check-icon" v-if="item.id === applicationForm.tts_model_id">
+                        <Check />
+                      </el-icon>
+                    </el-option>
+                    <!-- 不可用 -->
+                    <el-option
+                      v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                      class="flex-between"
+                      disabled
+                    >
+                      <div class="flex">
+                        <span
+                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                          class="model-icon mr-8"
+                        ></span>
+                        <span>{{ item.name }}</span>
+                        <span class="danger">{{
+                          $t('views.application.applicationForm.form.aiModel.unavailable')
+                        }}</span>
+                      </div>
+                      <el-icon class="check-icon" v-if="item.id === applicationForm.tts_model_id">
+                        <Check />
+                      </el-icon>
+                    </el-option>
+                  </el-option-group>
+                </el-select>
+              </el-form-item>
             </el-form>
           </el-scrollbar>
         </div>
@@ -411,6 +552,10 @@ const applicationForm = ref<ApplicationFormType>({
   },
   model_params_setting: {},
   problem_optimization: false,
+  stt_model_id: '',
+  tts_model_id: '',
+  stt_model_enable: false,
+  tts_model_enable: false,
   type: 'SIMPLE'
 })
 
@@ -440,6 +585,8 @@ const rules = reactive<FormRules<ApplicationFormType>>({
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 const datasetList = ref([])
+const sttModelOptions = ref<any>(null)
+const ttsModelOptions = ref<any>(null)
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -508,6 +655,8 @@ function getDetail() {
   application.asyncGetApplicationDetail(id, loading).then((res: any) => {
     applicationForm.value = res.data
     applicationForm.value.model_id = res.data.model
+    applicationForm.value.stt_model_id = res.data.stt_model
+    applicationForm.value.tts_model_id = res.data.tts_model
   })
 }
 
@@ -523,6 +672,32 @@ function getModel() {
     .getApplicationModel(id)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
+function getSTTModel() {
+  loading.value = true
+  applicationApi
+    .getApplicationSTTModel(id)
+    .then((res: any) => {
+      sttModelOptions.value = groupBy(res?.data, 'provider')
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
+function getTTSModel() {
+  loading.value = true
+  applicationApi
+    .getApplicationTTSModel(id)
+    .then((res: any) => {
+      ttsModelOptions.value = groupBy(res?.data, 'provider')
       loading.value = false
     })
     .catch(() => {
@@ -552,6 +727,8 @@ onMounted(() => {
   getModel()
   getDataset()
   getDetail()
+  getSTTModel()
+  getTTSModel()
 })
 </script>
 <style lang="scss" scoped>

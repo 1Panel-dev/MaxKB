@@ -534,3 +534,35 @@ class Application(APIView):
                 ApplicationSerializer.Query(
                     data={**query_params_to_single_dict(request.query_params), 'user_id': request.user.id}).page(
                     current_page, page_size))
+
+    class SpeechToText(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                                        [lambda r, keywords: Permission(group=Group.APPLICATION,
+                                                                        operate=Operate.USE,
+                                                                        dynamic_tag=keywords.get(
+                                                                            'application_id'))],
+                                        compare=CompareConstants.AND))
+        def post(self, request: Request, application_id: str, model_id: str):
+            return result.success(
+                ApplicationSerializer.Operate(
+                    data={'application_id': application_id, 'user_id': request.user.id, 'model_id': model_id})
+                .speech_to_text(request.FILES.getlist('file')[0]))
+
+    class TextToSpeech(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                                        [lambda r, keywords: Permission(group=Group.APPLICATION,
+                                                                        operate=Operate.USE,
+                                                                        dynamic_tag=keywords.get(
+                                                                            'application_id'))],
+                                        compare=CompareConstants.AND))
+        def post(self, request: Request, application_id: str, model_id: str):
+            return result.success(
+                ApplicationSerializer.Operate(
+                    data={'application_id': application_id, 'user_id': request.user.id, 'model_id': model_id})
+                .text_to_speech(request.data.get('text')))

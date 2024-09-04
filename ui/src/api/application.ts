@@ -250,6 +250,35 @@ const getApplicationRerankerModel: (
 ) => Promise<Result<Array<any>>> = (application_id, loading) => {
   return get(`${prefix}/${application_id}/model`, { model_type: 'RERANKER' }, loading)
 }
+
+/**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationSTTModel: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/model`, { model_type: 'STT' }, loading)
+}
+
+/**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationTTSModel: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/model`, { model_type: 'TTS' }, loading)
+}
+
 /**
  * 发布应用
  * @param 参数
@@ -324,5 +353,7 @@ export default {
   listFunctionLib,
   getFunctionLib,
   getModelParamsForm,
-  getApplicationRerankerModel
+  getApplicationRerankerModel,
+  getApplicationSTTModel,
+  getApplicationTTSModel,
 }
