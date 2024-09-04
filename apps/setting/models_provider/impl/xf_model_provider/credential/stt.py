@@ -9,7 +9,7 @@ from setting.models_provider.base_model_provider import BaseModelCredential, Val
 
 
 class XunFeiSTTModelCredential(BaseForm, BaseModelCredential):
-    spark_api_url = forms.TextInputField('API 域名', required=True)
+    spark_api_url = forms.TextInputField('API 域名', required=True, default_value='wss://iat-api.xfyun.cn/v2/iat')
     spark_app_id = forms.TextInputField('APP ID', required=True)
     spark_api_key = forms.PasswordInputField("API Key", required=True)
     spark_api_secret = forms.PasswordInputField('API Secret', required=True)
