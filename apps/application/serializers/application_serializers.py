@@ -516,7 +516,7 @@ class ApplicationSerializer(serializers.Serializer):
         @staticmethod
         def reset_application(application: Dict):
             application['multiple_rounds_dialogue'] = True if application.get('dialogue_number') > 0 else False
-            del application['dialogue_number']
+
             if 'dataset_setting' in application:
                 application['dataset_setting'] = {'search_mode': 'embedding', 'no_references_setting': {
                     'status': 'ai_questioning',
@@ -710,21 +710,39 @@ class ApplicationSerializer(serializers.Serializer):
                     raise AppApiException(500, "模型不存在")
                 if not model.is_permission(application.user_id):
                     raise AppApiException(500, f"沒有权限使用该模型:{model.name}")
+            if instance.get('stt_model_id') is None or len(instance.get('stt_model_id')) == 0:
+                application.stt_model_id = None
+            else:
+                model = QuerySet(Model).filter(
+                    id=instance.get('stt_model_id')).first()
+                if model is None:
+                    raise AppApiException(500, "模型不存在")
+                if not model.is_permission(application.user_id):
+                    raise AppApiException(500, f"沒有权限使用该模型:{model.name}")
+            if instance.get('tts_model_id') is None or len(instance.get('tts_model_id')) == 0:
+                application.tts_model_id = None
+            else:
+                model = QuerySet(Model).filter(
+                    id=instance.get('tts_model_id')).first()
+                if model is None:
+                    raise AppApiException(500, "模型不存在")
+                if not model.is_permission(application.user_id):
+                    raise AppApiException(500, f"沒有权限使用该模型:{model.name}")
             if 'work_flow' in instance:
                 # 当前用户可修改关联的知识库列表
                 application_dataset_id_list = [str(dataset_dict.get('id')) for dataset_dict in
                                                self.list_dataset(with_valid=False)]
                 self.update_reverse_search_node(instance.get('work_flow'), application_dataset_id_list)
+                # 找到语音配置相关
+                self.get_work_flow_model(instance)
 
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
-                           'dataset_setting', 'model_setting', 'problem_optimization',
+                           'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
+                           'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable',
                            'api_key_is_active', 'icon', 'work_flow', 'model_params_setting']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
-                    if update_key == 'multiple_rounds_dialogue':
-                        application.__setattr__('dialogue_number', 0 if not instance.get(update_key) else 3)
-                    else:
-                        application.__setattr__(update_key, instance.get(update_key))
+                    application.__setattr__(update_key, instance.get(update_key))
             application.save()
 
             if 'dataset_id_list' in instance:
@@ -822,6 +840,27 @@ class ApplicationSerializer(serializers.Serializer):
                 application.work_flow = work_flow
 
             application.save()
+
+        @staticmethod
+        def get_work_flow_model(instance):
+            nodes = instance.get('work_flow')['nodes']
+            for node in nodes:
+                if node['id'] == 'base-node':
+                    instance['stt_model_id'] = node['properties']['node_data']['stt_model_id']
+                    instance['tts_model_id'] = node['properties']['node_data']['tts_model_id']
+                    instance['stt_model_enable'] = node['properties']['node_data']['stt_model_enable']
+                    instance['tts_model_enable'] = node['properties']['node_data']['tts_model_enable']
+                    break
+
+        def speech_to_text(self, filelist):
+            # todo 找到模型 mp3转text
+            print(self.application_id)
+            print(filelist)
+
+        def text_to_speech(self, text):
+            # todo 找到模型 text转bytes
+            print(self.application_id)
+            print(text)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:

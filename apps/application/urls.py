@@ -63,5 +63,8 @@ urlpatterns = [
     path(
         'application/<str:application_id>/chat/<chat_id>/chat_record/<str:chat_record_id>/dataset/<str:dataset_id>/document_id/<str:document_id>/improve/<str:paragraph_id>',
         views.ChatView.ChatRecord.Improve.Operate.as_view(),
-        name='')
+        name=''),
+    path('application/<str:application_id>/<str:model_id>/speech_to_text', views.Application.SpeechToText.as_view(), name='application/audio'),
+    path('application/<str:application_id>/<str:model_id>/text_to_speech', views.Application.TextToSpeech.as_view(), name='application/audio'),
+
 ]
