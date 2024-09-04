@@ -14,7 +14,7 @@ import os
 from datetime import datetime
 from typing import Dict
 from urllib.parse import urlencode, urlparse
-
+import ssl
 import websockets
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
@@ -23,6 +23,10 @@ from setting.models_provider.impl.base_tts import BaseTextToSpeech
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
+
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
 
 class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
@@ -89,7 +93,7 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     def check_auth(self):
         async def check():
-            async with websockets.connect(self.create_url(), max_size=1000000000) as ws:
+            async with websockets.connect(self.create_url(), max_size=1000000000, ssl=ssl_context) as ws:
                 pass
 
         asyncio.run(check())
@@ -99,7 +103,7 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         # 使用小语种须使用以下方式，此处的unicode指的是 utf16小端的编码方式，即"UTF-16LE"”
         # self.Data = {"status": 2, "text": str(base64.b64encode(self.Text.encode('utf-16')), "UTF8")}
         async def handle():
-            async with websockets.connect(self.create_url(), max_size=1000000000) as ws:
+            async with websockets.connect(self.create_url(), max_size=1000000000, ssl=ssl_context) as ws:
                 # 发送 full client request
                 await self.send(ws, text)
                 return await self.handle_message(ws)
