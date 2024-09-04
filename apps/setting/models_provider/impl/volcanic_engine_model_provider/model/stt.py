@@ -18,7 +18,7 @@ from hashlib import sha256
 from io import BytesIO
 from typing import Dict
 from urllib.parse import urlparse
-
+import ssl
 import websockets
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
@@ -60,6 +60,10 @@ CUSTOM_TYPE = 0b1111
 NO_COMPRESSION = 0b0000
 GZIP = 0b0001
 CUSTOM_COMPRESSION = 0b1111
+
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
 
 def generate_header(
@@ -292,7 +296,8 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             header = self.token_auth()
         elif self.auth_method == "signature":
             header = self.signature_auth(full_client_request)
-        async with websockets.connect(self.volcanic_api_url, extra_headers=header, max_size=1000000000) as ws:
+        async with websockets.connect(self.volcanic_api_url, extra_headers=header, max_size=1000000000,
+                                      ssl=ssl_context) as ws:
             # 发送 full client request
             await ws.send(full_client_request)
             res = await ws.recv()
@@ -319,7 +324,8 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         header = self.token_auth()
 
         async def check():
-            async with websockets.connect(self.volcanic_api_url, extra_headers=header, max_size=1000000000) as ws:
+            async with websockets.connect(self.volcanic_api_url, extra_headers=header, max_size=1000000000,
+                                          ssl=ssl_context) as ws:
                 pass
 
         asyncio.run(check())

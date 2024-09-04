@@ -14,7 +14,7 @@ import gzip
 import json
 import uuid
 from typing import Dict
-
+import ssl
 import websockets
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
@@ -34,6 +34,10 @@ MESSAGE_COMPRESSIONS = {0: "no compression", 1: "gzip", 15: "custom compression 
 # message compression: b0001 (gzip) (4bits)
 # reserved data: 0x00 (1 byte)
 default_header = bytearray(b'\x11\x10\x11\x00')
+
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
 
 class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
@@ -68,7 +72,8 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         header = self.token_auth()
 
         async def check():
-            async with websockets.connect(self.volcanic_api_url, extra_headers=header, ping_interval=None) as ws:
+            async with websockets.connect(self.volcanic_api_url, extra_headers=header, ping_interval=None,
+                                          ssl=ssl_context) as ws:
                 pass
 
         asyncio.run(check())
@@ -113,7 +118,8 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         full_client_request.extend((len(payload_bytes)).to_bytes(4, 'big'))  # payload size(4 bytes)
         full_client_request.extend(payload_bytes)  # payload
         header = {"Authorization": f"Bearer; {self.volcanic_token}"}
-        async with websockets.connect(self.volcanic_api_url, extra_headers=header, ping_interval=None) as ws:
+        async with websockets.connect(self.volcanic_api_url, extra_headers=header, ping_interval=None,
+                                      ssl=ssl_context) as ws:
             await ws.send(full_client_request)
             return await self.parse_response(ws)
 
