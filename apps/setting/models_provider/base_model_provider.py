@@ -141,6 +141,7 @@ class ModelTypeConst(Enum):
     EMBEDDING = {'code': 'EMBEDDING', 'message': '向量模型'}
     STT = {'code': 'STT', 'message': '语音识别'}
     TTS = {'code': 'TTS', 'message': '语音合成'}
+    RERANKER = {'code': 'RERANKER', 'message': '重排模型'}
 
 
 class ModelInfo:

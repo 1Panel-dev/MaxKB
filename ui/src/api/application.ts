@@ -238,6 +238,19 @@ const getApplicationModel: (
 }
 
 /**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationRerankerModel: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/model`, { model_type: 'RERANKER' }, loading)
+}
+/**
  * 发布应用
  * @param 参数
  */
@@ -310,5 +323,6 @@ export default {
   postWorkflowChatOpen,
   listFunctionLib,
   getFunctionLib,
-  getModelParamsForm
+  getModelParamsForm,
+  getApplicationRerankerModel
 }
