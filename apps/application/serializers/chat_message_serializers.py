@@ -12,7 +12,6 @@ from uuid import UUID
 
 from django.core.cache import caches
 from django.db.models import QuerySet
-from langchain.chat_models.base import BaseChatModel
 from rest_framework import serializers
 
 from application.chat_pipeline.pipeline_manage import PipelineManage
@@ -278,7 +277,12 @@ class ChatMessageSerializer(serializers.Serializer):
                                     QuerySet(Document).filter(
                                         dataset_id__in=dataset_id_list,
                                         is_active=False)]
-        return ChatInfo(chat_id, dataset_id_list, exclude_document_id_list, application)
+        chat_info = ChatInfo(chat_id, dataset_id_list, exclude_document_id_list, application)
+        chat_record_list = list(QuerySet(ChatRecord).filter(chat_id=chat_id).order_by('-create_time')[0:5])
+        chat_record_list.sort(key=lambda r: r.create_time)
+        for chat_record in chat_record_list:
+            chat_info.chat_record_list.append(chat_record)
+        return chat_info
 
     @staticmethod
     def re_open_chat_work_flow(chat_id, application):
@@ -286,4 +290,10 @@ class ChatMessageSerializer(serializers.Serializer):
             '-create_time')[0:1].first()
         if work_flow_version is None:
             raise AppApiException(500, "应用未发布,请发布后再使用")
-        return ChatInfo(chat_id, [], [], application, work_flow_version)
+
+        chat_info = ChatInfo(chat_id, [], [], application, work_flow_version)
+        chat_record_list = list(QuerySet(ChatRecord).filter(chat_id=chat_id).order_by('-create_time')[0:5])
+        chat_record_list.sort(key=lambda r: r.create_time)
+        for chat_record in chat_record_list:
+            chat_info.chat_record_list.append(chat_record)
+        return chat_info
