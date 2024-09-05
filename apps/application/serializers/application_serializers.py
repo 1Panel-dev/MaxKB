@@ -627,6 +627,7 @@ class ApplicationSerializer(serializers.Serializer):
             # 插入知识库关联关系
             self.save_application_mapping(application_dataset_id_list, dataset_id_list, application.id)
             work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application)
+            chat_cache.clear_by_application_id(str(application.id))
             work_flow_version.save()
             return True
 
@@ -737,7 +738,8 @@ class ApplicationSerializer(serializers.Serializer):
                         raise AppApiException(500, f"未知的知识库id${dataset_id},无法关联")
 
                 self.save_application_mapping(application_dataset_id_list, dataset_id_list, application_id)
-            chat_cache.clear_by_application_id(application_id)
+            if application.type == ApplicationTypeChoices.SIMPLE:
+                chat_cache.clear_by_application_id(application_id)
             application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application_id).first()
             # 更新缓存数据
             get_application_access_token(application_access_token.access_token, False)
