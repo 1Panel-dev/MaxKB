@@ -139,7 +139,30 @@ export const replyNode = {
     }
   }
 }
-export const menuNodes = [aiChatNode, searchDatasetNode, questionNode, conditionNode, replyNode]
+export const rerankerNode = {
+  type: WorkflowType.RrerankerNode,
+  text: '使用重排模型对多个知识库的检索结果进行二次召回',
+  label: '多路召回',
+  properties: {
+    stepName: '多路召回',
+    config: {
+      fields: [
+        {
+          label: '结果',
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
+export const menuNodes = [
+  aiChatNode,
+  searchDatasetNode,
+  questionNode,
+  conditionNode,
+  replyNode,
+  rerankerNode
+]
 
 /**
  * 自定义函数配置数据
@@ -203,7 +226,8 @@ export const nodeDict: any = {
   [WorkflowType.Start]: startNode,
   [WorkflowType.Reply]: replyNode,
   [WorkflowType.FunctionLib]: functionLibNode,
-  [WorkflowType.FunctionLibCustom]: functionNode
+  [WorkflowType.FunctionLibCustom]: functionNode,
+  [WorkflowType.RrerankerNode]: rerankerNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

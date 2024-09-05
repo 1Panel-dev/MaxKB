@@ -36,3 +36,13 @@ class ModelApply(APIView):
         def post(self, request: Request, model_id):
             return result.success(
                 ModelApplySerializers(data={'model_id': model_id}).embed_query(request.data))
+
+    class CompressDocuments(APIView):
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="重排序文档",
+                             operation_id="重排序文档",
+                             responses=result.get_default_response(),
+                             tags=["模型"])
+        def post(self, request: Request, model_id):
+            return result.success(
+                ModelApplySerializers(data={'model_id': model_id}).compress_documents(request.data))

@@ -16,14 +16,20 @@ from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst, ModelInfo, IModelProvider, \
     ModelInfoManage
 from setting.models_provider.impl.local_model_provider.credential.embedding import LocalEmbeddingCredential
+from setting.models_provider.impl.local_model_provider.credential.reranker import LocalRerankerCredential
 from setting.models_provider.impl.local_model_provider.model.embedding import LocalEmbedding
+from setting.models_provider.impl.local_model_provider.model.reranker import LocalReranker
 from smartdoc.conf import PROJECT_DIR
 
 embedding_text2vec_base_chinese = ModelInfo('shibing624/text2vec-base-chinese', '', ModelTypeConst.EMBEDDING,
                                             LocalEmbeddingCredential(), LocalEmbedding)
+bge_reranker_v2_m3 = ModelInfo('BAAI/bge-reranker-v2-m3', '', ModelTypeConst.RERANKER,
+                               LocalRerankerCredential(), LocalReranker)
 
 model_info_manage = (ModelInfoManage.builder().append_model_info(embedding_text2vec_base_chinese)
                      .append_default_model_info(embedding_text2vec_base_chinese)
+                     .append_model_info(bge_reranker_v2_m3)
+                     .append_default_model_info(bge_reranker_v2_m3)
                      .build())
 
 
