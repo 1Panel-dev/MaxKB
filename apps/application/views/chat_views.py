@@ -6,6 +6,7 @@
     @date：2023/11/14 9:53
     @desc:
 """
+
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -15,12 +16,37 @@ from application.serializers.chat_message_serializers import ChatMessageSerializ
 from application.serializers.chat_serializers import ChatSerializers, ChatRecordSerializer
 from application.swagger_api.chat_api import ChatApi, VoteApi, ChatRecordApi, ImproveApi, ChatRecordImproveApi, \
     ChatClientHistoryApi
-from common.auth import TokenAuth, has_permissions
+from common.auth import TokenAuth, has_permissions, OpenAIKeyAuth
 from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import Permission, Group, Operate, \
     RoleConstants, ViewPermission, CompareConstants
+from common.exception.app_exception import ChatException
+from common.handle.impl.response.openai_to_response import OpenaiToResponse
 from common.response import result
 from common.util.common import query_params_to_single_dict
+
+
+class Openai(APIView):
+    authentication_classes = [OpenAIKeyAuth]
+
+    @action(methods=['POST'], detail=False)
+    @swagger_auto_schema(operation_summary="openai接口对话",
+                         operation_id="openai接口对话",
+                         tags=["openai对话"])
+    def post(self, request: Request, chat_id: str):
+        if request.data.get('messages') is None or len(request.data.get('messages')) == 0:
+            raise ChatException(500, "message必填")
+        return ChatMessageSerializer(
+            data={'chat_id': chat_id, 'message': request.data.get('messages')[-1].get('content'),
+                  're_chat': (request.data.get(
+                      're_chat') if 're_chat' in request.data else False),
+                  'stream': (request.data.get(
+                      'stream') if 'stream' in request.data else False),
+                  'application_id': (request.auth.keywords.get(
+                      'application_id') if request.auth.client_type == AuthenticationType.APPLICATION_ACCESS_TOKEN.value else None),
+                  'client_id': request.auth.client_id,
+                  'client_type': request.auth.client_type}).chat(
+            base_to_response=OpenaiToResponse())
 
 
 class ChatView(APIView):
