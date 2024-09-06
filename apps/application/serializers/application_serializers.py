@@ -845,6 +845,8 @@ class ApplicationSerializer(serializers.Serializer):
 
         @staticmethod
         def get_work_flow_model(instance):
+            if 'nodes' not in instance.get('work_flow'):
+                return
             nodes = instance.get('work_flow')['nodes']
             for node in nodes:
                 if node['id'] == 'base-node':
