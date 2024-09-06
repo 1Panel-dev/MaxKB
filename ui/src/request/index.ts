@@ -240,6 +240,23 @@ export const exportExcel: (
     .catch((e) => {})
 }
 
+
+export const download: (
+  url: string,
+  method: string,
+  data?: any,
+  params?: any,
+  loading?: NProgress | Ref<boolean>
+) => Promise<any> = (
+  url: string,
+  method: string,
+  data?: any,
+  params?: any,
+  loading?: NProgress | Ref<boolean>
+) => {
+  return promise(request({ url: url, method: method, data, params, responseType: 'blob' }), loading)
+}
+
 /**
  * 与服务器建立ws链接
  * @param url websocket路径
