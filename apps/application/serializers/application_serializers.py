@@ -47,6 +47,7 @@ from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.models_provider import get_model_credential
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
+from setting.models_provider.tools import get_model_instance_by_model_user_id
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 
@@ -856,15 +857,24 @@ class ApplicationSerializer(serializers.Serializer):
                     instance['tts_model_enable'] = node['properties']['node_data']['tts_model_enable']
                     break
 
-        def speech_to_text(self, filelist):
-            # todo 找到模型 mp3转text
-            print(self.application_id)
-            print(filelist)
+        def speech_to_text(self, file, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            application_id = self.data.get('application_id')
+            application = QuerySet(Application).filter(id=application_id).first()
+            if application.stt_model_enable:
+                model = get_model_instance_by_model_user_id(application.stt_model_id, application.user_id)
+                text = model.speech_to_text(file)
+                return text
 
-        def text_to_speech(self, text):
-            # todo 找到模型 text转bytes
-            print(self.application_id)
-            print(text)
+        def text_to_speech(self, text, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            application_id = self.data.get('application_id')
+            application = QuerySet(Application).filter(id=application_id).first()
+            if application.tts_model_enable:
+                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id)
+                return model.text_to_speech(text)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:

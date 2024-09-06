@@ -114,6 +114,11 @@
                   @regeneration="regenerationChart(item)"
                 />
               </div>
+              <div style="float: right;" v-if="props.data.tts_model_enable">
+                <el-button :disabled="!item.write_ed" @click="playAnswerText(item.answer_text)">
+                  <el-icon><VideoPlay /></el-icon>
+                </el-button>
+              </div>
             </div>
           </div>
         </template>
@@ -131,6 +136,20 @@
           :maxlength="100000"
           @keydown.enter="sendChatHandle($event)"
         />
+        <div class="operate" v-if="props.data.stt_model_enable">
+          <el-button
+            v-if="mediaRecorderStatus"
+            @click="startRecording"
+          >
+            <el-icon><Microphone /></el-icon>
+          </el-button>
+          <el-button
+            v-else
+            @click="stopRecording"
+          >
+            <el-icon><VideoPause /></el-icon>
+          </el-button>
+        </div>
         <div class="operate">
           <el-button
             text
@@ -149,6 +168,8 @@
         </div>
       </div>
     </div>
+    <!-- 先渲染，不然不能播放   -->
+    <audio ref="audioPlayer" controls hidden="hidden"></audio>
   </div>
 </template>
 <script setup lang="ts">
@@ -165,6 +186,10 @@ import useStore from '@/stores'
 import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import { isWorkFlow } from '@/utils/application'
 import { debounce } from 'lodash'
+import Recorder from 'recorder-core'
+import 'recorder-core/src/engine/mp3'
+import 'recorder-core/src/engine/mp3-engine'
+
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
@@ -589,6 +614,103 @@ const handleScroll = () => {
         scrollDiv.value.setScrollTop(getMaxHeight())
       }
     }
+  }
+}
+
+// 定义响应式引用
+const mediaRecorder= ref<any>(null)
+const audioPlayer= ref<HTMLAudioElement | null>(null)
+const mediaRecorderStatus = ref(true)
+
+
+// 开始录音
+const startRecording = async () => {
+  try {
+    mediaRecorderStatus.value = false
+    mediaRecorder.value = new Recorder({
+      type: 'mp3',
+      bitRate: 128,
+      sampleRate: 44100,
+    })
+
+    mediaRecorder.value.open(() => {
+        mediaRecorder.value.start()
+    }, (err: any) => {
+      console.error(err)
+    })
+  } catch (error) {
+    console.error('无法获取音频权限：', error)
+  }
+}
+
+// 停止录音
+const stopRecording = () => {
+  if (mediaRecorder.value) {
+    mediaRecorderStatus.value = true
+    mediaRecorder.value.stop((blob: Blob, duration: number) => {
+       // 测试blob是否能正常播放
+       //  const link = document.createElement('a')
+       //  link.href = window.URL.createObjectURL(blob)
+       //  link.download = 'abc.mp3'
+       //  link.click()
+
+        uploadRecording(blob) // 上传录音文件
+    }, (err: any) => {
+      console.error('录音失败:', err)
+    })
+  }
+}
+
+// 上传录音文件
+const uploadRecording = async (audioBlob: Blob) => {
+  try {
+    const formData = new FormData()
+    formData.append('file', audioBlob, 'recording.mp3')
+
+      if (id) {
+        applicationApi.postSpeechToText(id as string, formData, loading)
+          .then((response) => {
+            console.log('上传成功:', response.data)
+            inputValue.value = response.data
+            // chatMessage(null, res.data)
+          })
+      }
+
+  } catch (error) {
+    console.error('上传失败:', error)
+  }
+}
+
+const playAnswerText = (text: string) => {
+  if (id) {
+    console.log(text)
+    applicationApi.postTextToSpeech(id as string, { 'text': text }, loading)
+      .then((res: any) => {
+
+        // 假设我们有一个 MP3 文件的字节数组
+        // 创建 Blob 对象
+        const blob = new Blob([res], { type: 'audio/mp3' })
+
+        // 创建对象 URL
+        const url = URL.createObjectURL(blob)
+
+        // 测试blob是否能正常播放
+        // const link = document.createElement('a')
+        // link.href = window.URL.createObjectURL(blob)
+        // link.download = "abc.mp3"
+        // link.click()
+
+        // 检查 audioPlayer 是否已经引用了 DOM 元素
+        if (audioPlayer.value instanceof HTMLAudioElement) {
+          audioPlayer.value.src = url;
+          audioPlayer.value.play(); // 自动播放音频
+        } else {
+          console.error("audioPlayer.value is not an instance of HTMLAudioElement");
+        }
+      })
+      .catch((err) => {
+        console.log('err: ', err)
+      })
   }
 }
 

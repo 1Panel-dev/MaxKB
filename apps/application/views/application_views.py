@@ -545,10 +545,9 @@ class Application(APIView):
                                                                         dynamic_tag=keywords.get(
                                                                             'application_id'))],
                                         compare=CompareConstants.AND))
-        def post(self, request: Request, application_id: str, model_id: str):
+        def post(self, request: Request, application_id: str):
             return result.success(
-                ApplicationSerializer.Operate(
-                    data={'application_id': application_id, 'user_id': request.user.id, 'model_id': model_id})
+                ApplicationSerializer.Operate(data={'application_id': application_id, 'user_id': request.user.id})
                 .speech_to_text(request.FILES.getlist('file')[0]))
 
     class TextToSpeech(APIView):
@@ -561,8 +560,9 @@ class Application(APIView):
                                                                         dynamic_tag=keywords.get(
                                                                             'application_id'))],
                                         compare=CompareConstants.AND))
-        def post(self, request: Request, application_id: str, model_id: str):
-            return result.success(
-                ApplicationSerializer.Operate(
-                    data={'application_id': application_id, 'user_id': request.user.id, 'model_id': model_id})
-                .text_to_speech(request.data.get('text')))
+        def post(self, request: Request, application_id: str):
+            byte_data = ApplicationSerializer.Operate(
+                data={'application_id': application_id, 'user_id': request.user.id}).text_to_speech(
+                request.data.get('text'))
+            return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
+                                                              'Content-Disposition': 'attachment; filename="abc.mp3"'})

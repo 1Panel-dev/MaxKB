@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, postStream, del, put } from '@/request/index'
+import { get, post, postStream, del, put, request, download } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
@@ -330,6 +330,29 @@ const getModelParamsForm: (
 ) => Promise<Result<Array<FormField>>> = (application_id, model_id, loading) => {
   return get(`${prefix}/${application_id}/model_params_form/${model_id}`, undefined, loading)
 }
+
+/**
+ * 语音转文本
+ */
+const postSpeechToText: (
+  application_id: String,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return post(`${prefix}/${application_id}/speech_to_text`, data, undefined, loading)
+}
+
+/**
+ * 语音转文本
+ */
+const postTextToSpeech: (
+  application_id: String,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return download(`${prefix}/${application_id}/text_to_speech`, 'post', data, undefined, loading)
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -356,4 +379,6 @@ export default {
   getApplicationRerankerModel,
   getApplicationSTTModel,
   getApplicationTTSModel,
+  postSpeechToText,
+  postTextToSpeech,
 }
