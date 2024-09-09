@@ -217,6 +217,7 @@ import { ref, computed, onMounted } from 'vue'
 import { relatedObject } from '@/utils/utils'
 import useStore from '@/stores'
 import applicationApi from '@/api/application'
+import type { Provider } from '@/api/type/model'
 const { model } = useStore()
 
 const {
@@ -227,7 +228,7 @@ const props = defineProps<{ nodeModel: any }>()
 
 const sttModelOptions = ref<any>(null)
 const ttsModelOptions = ref<any>(null)
-const providerOptions = ref<any>(null)
+const providerOptions = ref<Array<Provider>>([])
 
 const form = {
   name: '',
