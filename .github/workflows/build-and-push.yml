@@ -22,8 +22,8 @@ on:
         default: 'dockerhub'
         type: choice
         options:
-          - dockerhub
           - fit2cloud-registry
+          - dockerhub
           - dockerhub, fit2cloud-registry
 
 jobs:
