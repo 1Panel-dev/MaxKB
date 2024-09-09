@@ -690,6 +690,10 @@ class ApplicationSerializer(serializers.Serializer):
                 raise AppUnauthorizedFailed(500, "非法用户")
             return ApplicationSerializer.Query.reset_application(
                 {**ApplicationSerializer.ApplicationModel(application).data,
+                 'stt_model_id': application.stt_model_id,
+                 'tts_model_id': application.tts_model_id,
+                 'stt_model_enable': application.stt_model_enable,
+                 'tts_model_enable': application.tts_model_enable,
                  'show_source': application_access_token.show_source})
 
         @transaction.atomic

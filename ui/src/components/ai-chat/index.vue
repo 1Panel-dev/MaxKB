@@ -666,15 +666,12 @@ const uploadRecording = async (audioBlob: Blob) => {
   try {
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
-
-      if (id) {
-        applicationApi.postSpeechToText(id as string, formData, loading)
-          .then((response) => {
-            console.log('上传成功:', response.data)
-            inputValue.value = response.data
-            // chatMessage(null, res.data)
-          })
-      }
+      applicationApi.postSpeechToText(props.data.id as string, formData, loading)
+        .then((response) => {
+          console.log('上传成功:', response.data)
+          inputValue.value = response.data
+          // chatMessage(null, res.data)
+        })
 
   } catch (error) {
     console.error('上传失败:', error)
@@ -682,36 +679,33 @@ const uploadRecording = async (audioBlob: Blob) => {
 }
 
 const playAnswerText = (text: string) => {
-  if (id) {
-    console.log(text)
-    applicationApi.postTextToSpeech(id as string, { 'text': text }, loading)
-      .then((res: any) => {
+  applicationApi.postTextToSpeech(props.data.id as string, { 'text': text }, loading)
+    .then((res: any) => {
 
-        // 假设我们有一个 MP3 文件的字节数组
-        // 创建 Blob 对象
-        const blob = new Blob([res], { type: 'audio/mp3' })
+      // 假设我们有一个 MP3 文件的字节数组
+      // 创建 Blob 对象
+      const blob = new Blob([res], { type: 'audio/mp3' })
 
-        // 创建对象 URL
-        const url = URL.createObjectURL(blob)
+      // 创建对象 URL
+      const url = URL.createObjectURL(blob)
 
-        // 测试blob是否能正常播放
-        // const link = document.createElement('a')
-        // link.href = window.URL.createObjectURL(blob)
-        // link.download = "abc.mp3"
-        // link.click()
+      // 测试blob是否能正常播放
+      // const link = document.createElement('a')
+      // link.href = window.URL.createObjectURL(blob)
+      // link.download = "abc.mp3"
+      // link.click()
 
-        // 检查 audioPlayer 是否已经引用了 DOM 元素
-        if (audioPlayer.value instanceof HTMLAudioElement) {
-          audioPlayer.value.src = url;
-          audioPlayer.value.play(); // 自动播放音频
-        } else {
-          console.error("audioPlayer.value is not an instance of HTMLAudioElement");
-        }
-      })
-      .catch((err) => {
-        console.log('err: ', err)
-      })
-  }
+      // 检查 audioPlayer 是否已经引用了 DOM 元素
+      if (audioPlayer.value instanceof HTMLAudioElement) {
+        audioPlayer.value.src = url;
+        audioPlayer.value.play(); // 自动播放音频
+      } else {
+        console.error("audioPlayer.value is not an instance of HTMLAudioElement");
+      }
+    })
+    .catch((err) => {
+      console.log('err: ', err)
+    })
 }
 
 function setScrollBottom() {

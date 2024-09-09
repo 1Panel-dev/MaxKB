@@ -539,7 +539,7 @@ class Application(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['POST'], detail=False)
-        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
                                         [lambda r, keywords: Permission(group=Group.APPLICATION,
                                                                         operate=Operate.USE,
                                                                         dynamic_tag=keywords.get(
@@ -554,7 +554,7 @@ class Application(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['POST'], detail=False)
-        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
                                         [lambda r, keywords: Permission(group=Group.APPLICATION,
                                                                         operate=Operate.USE,
                                                                         dynamic_tag=keywords.get(
