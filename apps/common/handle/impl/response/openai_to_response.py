@@ -19,7 +19,8 @@ from common.handle.base_to_response import BaseToResponse
 
 
 class OpenaiToResponse(BaseToResponse):
-    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens):
+    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens,
+                          _status=status.HTTP_200_OK):
         data = ChatCompletion(id=chat_record_id, choices=[
             BlockChoice(finish_reason='stop', index=0, chat_id=chat_id,
                         message=ChatCompletionMessage(role='assistant', content=content))],
@@ -28,7 +29,7 @@ class OpenaiToResponse(BaseToResponse):
                                                     prompt_tokens=prompt_tokens,
                                                     total_tokens=completion_tokens + prompt_tokens)
                               ).dict()
-        return JsonResponse(data=data, status=status.HTTP_200_OK)
+        return JsonResponse(data=data, status=status)
 
     def to_stream_chunk_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens):
         chunk = ChatCompletionChunk(id=chat_record_id, model='', object='chat.completion.chunk',

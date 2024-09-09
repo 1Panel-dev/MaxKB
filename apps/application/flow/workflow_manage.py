@@ -11,8 +11,8 @@ from functools import reduce
 from typing import List, Dict
 
 from django.db.models import QuerySet
-from langchain_core.messages import AIMessage
 from langchain_core.prompts import PromptTemplate
+from rest_framework import status
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from application.flow import tools
@@ -193,13 +193,19 @@ class WorkflowManage:
                 if result is not None:
                     list(result)
                 if not self.has_next_node(self.current_result):
-                    return tools.to_response_simple(self.params['chat_id'], self.params['chat_record_id'],
-                                                    AIMessage(self.answer), self,
-                                                    self.work_flow_post_handler)
+                    details = self.get_runtime_details()
+                    message_tokens = sum([row.get('message_tokens') for row in details.values() if
+                                          'message_tokens' in row and row.get('message_tokens') is not None])
+                    answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
+                                         'answer_tokens' in row and row.get('answer_tokens') is not None])
+                    return self.base_to_response.to_block_response(self.params['chat_id'],
+                                                                   self.params['chat_record_id'], self.answer, True
+                                                                   , message_tokens, answer_tokens)
         except Exception as e:
-            return tools.to_response(self.params['chat_id'], self.params['chat_record_id'],
-                                     AIMessage(str(e)), self, self.current_node.get_write_error_context(e),
-                                     self.work_flow_post_handler)
+            self.current_node.get_write_error_context(e)
+            return self.base_to_response.to_block_response(self.params['chat_id'], self.params['chat_record_id'],
+                                                           str(e), True,
+                                                           0, 0, _status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def run_stream(self):
         return tools.to_stream_response_simple(self.stream_event())
@@ -212,19 +218,21 @@ class WorkflowManage:
                 self.current_node.valid_args(self.current_node.node_params, self.current_node.workflow_params)
                 self.current_result = self.current_node.run()
                 result = self.current_result.write_context(self.current_node, self)
+                has_next_node = self.has_next_node(self.current_result)
                 if result is not None:
                     if self.is_result():
                         for r in result:
                             yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
                                                                                  self.params['chat_record_id'],
                                                                                  r, False, 0, 0)
-                        yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
-                                                                             self.params['chat_record_id'],
-                                                                             '\n', False, 0, 0)
-                        self.answer += '\n'
+                        if has_next_node:
+                            yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
+                                                                                 self.params['chat_record_id'],
+                                                                                 '\n', False, 0, 0)
+                            self.answer += '\n'
                     else:
                         list(result)
-                if not self.has_next_node(self.current_result):
+                if not has_next_node:
                     details = self.get_runtime_details()
                     message_tokens = sum([row.get('message_tokens') for row in details.values() if
                                           'message_tokens' in row and row.get('message_tokens') is not None])

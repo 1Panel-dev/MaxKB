@@ -7,7 +7,7 @@
     @desc:
 """
 import uuid
-from typing import List
+from typing import List, Dict
 from uuid import UUID
 
 from django.core.cache import caches
@@ -27,8 +27,9 @@ from application.models import ChatRecord, Chat, Application, ApplicationDataset
     WorkFlowVersion
 from application.models.api_key_model import ApplicationPublicAccessClient, ApplicationAccessToken
 from common.constants.authentication_type import AuthenticationType
-from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed, ChatException
+from common.exception.app_exception import AppChatNumOutOfBoundsFailed, ChatException
 from common.handle.base_to_response import BaseToResponse
+from common.handle.impl.response.openai_to_response import OpenaiToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
 from common.util.field_message import ErrMessage
 from common.util.split_model import flat_map
@@ -145,6 +146,58 @@ def get_post_handler(chat_info: ChatInfo):
                            chat_info, timeout=60 * 30)
 
     return PostHandler()
+
+
+class OpenAIMessage(serializers.Serializer):
+    content = serializers.CharField(required=True, error_messages=ErrMessage.char('内容'))
+    role = serializers.CharField(required=True, error_messages=ErrMessage.char('角色'))
+
+
+class OpenAIInstanceSerializer(serializers.Serializer):
+    messages = serializers.ListField(child=OpenAIMessage())
+    chat_id = serializers.UUIDField(required=False, error_messages=ErrMessage.char("对话id"))
+    re_chat = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean("重新生成"))
+    stream = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean("流式输出"))
+
+
+class OpenAIChatSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+    client_id = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端id"))
+    client_type = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端类型"))
+
+    @staticmethod
+    def get_message(instance):
+        return instance.get('messages')[-1].get('content')
+
+    @staticmethod
+    def generate_chat(chat_id, application_id, message, client_id):
+        if chat_id is None:
+            chat_id = str(uuid.uuid1())
+        chat = QuerySet(Chat).filter(id=chat_id).first()
+        if chat is None:
+            Chat(id=chat_id, application_id=application_id, abstract=message, client_id=client_id).save()
+        return chat_id
+
+    def chat(self, instance: Dict, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+            OpenAIInstanceSerializer(data=instance).is_valid(raise_exception=True)
+        chat_id = instance.get('chat_id')
+        message = self.get_message(instance)
+        re_chat = instance.get('re_chat', False)
+        stream = instance.get('stream', False)
+        application_id = self.data.get('application_id')
+        client_id = self.data.get('client_id')
+        client_type = self.data.get('client_type')
+        chat_id = self.generate_chat(chat_id, application_id, message, client_id)
+        return ChatMessageSerializer(
+            data={'chat_id': chat_id, 'message': message,
+                  're_chat': re_chat,
+                  'stream': stream,
+                  'application_id': application_id,
+                  'client_id': client_id,
+                  'client_type': client_type}).chat(
+            base_to_response=OpenaiToResponse())
 
 
 class ChatMessageSerializer(serializers.Serializer):

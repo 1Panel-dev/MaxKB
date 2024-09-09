@@ -8,11 +8,14 @@
 """
 from abc import ABC, abstractmethod
 
+from rest_framework import status
+
 
 class BaseToResponse(ABC):
 
     @abstractmethod
-    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens):
+    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens,
+                          _status=status.HTTP_200_OK):
         pass
 
     @abstractmethod

@@ -8,14 +8,17 @@
 """
 import json
 
+from rest_framework import status
+
 from common.handle.base_to_response import BaseToResponse
 from common.response import result
 
 
 class SystemToResponse(BaseToResponse):
-    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens):
+    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens,
+                          _status=status.HTTP_200_OK):
         return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                               'content': content, 'is_end': is_end})
+                               'content': content, 'is_end': is_end}, response_status=_status, code=_status)
 
     def to_stream_chunk_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens):
         chunk = json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,

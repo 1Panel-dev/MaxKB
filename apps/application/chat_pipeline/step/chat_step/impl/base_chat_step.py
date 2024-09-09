@@ -6,7 +6,6 @@
     @date：2024/1/9 18:25
     @desc: 对话step Base实现
 """
-import json
 import logging
 import time
 import traceback
@@ -19,13 +18,13 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
 from langchain.schema.messages import HumanMessage, AIMessage
 from langchain_core.messages import AIMessageChunk
+from rest_framework import status
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
 from application.models.api_key_model import ApplicationPublicAccessClient
 from common.constants.authentication_type import AuthenticationType
-from common.response import result
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 
 
@@ -243,4 +242,4 @@ class BaseChatStep(IChatStep):
                                           all_text, manage, self, padding_problem_text, client_id)
             add_access_num(client_id, client_type)
             return manage.get_base_to_response().to_block_response(str(chat_id), str(chat_record_id), all_text, True, 0,
-                                                                   0)
+                                                                   0, _status=status.HTTP_500_INTERNAL_SERVER_ERROR)
