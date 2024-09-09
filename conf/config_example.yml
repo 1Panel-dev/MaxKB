@@ -1,0 +1,29 @@
+# 数据库链接信息
+DB_NAME: maxkb
+DB_HOST: 192.168.10.245
+DB_PORT: 5432
+DB_USER: postgres
+DB_PASSWORD: nmghl@123
+DB_ENGINE: django.db.backends.postgresql_psycopg2
+
+DEBUG: false
+
+TIME_ZONE: Asia/Shanghai
+  
+  
+EMBEDDING_MODEL_NAME: BAAI/bge-m3
+EMBEDDING_DEVICE: cpu
+
+LOCAL_MODEL_HOST: 192.168.10.217
+LOCAL_MODEL_PORT: 11636
+LOCAL_MODEL_PROTOCOL: http
+
+# 使用的向量数据库 pg_vector | es_vector
+VECTOR_STORE_NAME : es_vector
+# es链接地址
+VECTOR_STORE_ES_ENDPOINT: http://192.168.10.252:9200
+# es库用户名和密码，默认不开启用于验证
+VECTOR_STORE_ES_USERNAME: default
+VECTOR_STORE_ES_PASSWORD: default
+# es索引名称
+VECTOR_STORE_ES_INDEX: maxkb_vector
