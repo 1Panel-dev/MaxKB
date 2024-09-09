@@ -57,6 +57,7 @@ class VectorStore:
         if VectorStore.instance is None:
             from smartdoc.const import CONFIG
             store_name = CONFIG.get("VECTOR_STORE_NAME")
+            # 增加es配置
             if store_name == 'es_vector':
                 from embedding.vector.es_vector import ESVector
                 from elasticsearch import Elasticsearch

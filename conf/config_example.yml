@@ -20,7 +20,7 @@ LOCAL_MODEL_PROTOCOL: http
 
 # 使用的向量数据库 pg_vector | es_vector
 VECTOR_STORE_NAME : es_vector
-# es链接地址
+# es链接地址 
 VECTOR_STORE_ES_ENDPOINT: http://192.168.10.252:9200
 # es库用户名和密码，默认不开启用于验证
 VECTOR_STORE_ES_USERNAME: default

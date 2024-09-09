@@ -4,7 +4,7 @@
     @Author：ilxch@163.com
     @file： es_vector.py
     @date：2024/09/04 15:28
-    @desc: ES数据库操作API
+    @desc: ES数据库操作API,包含向量存储、关键词查询、向量查询、混合查询等
 """
 import uuid
 from abc import ABC, abstractmethod
