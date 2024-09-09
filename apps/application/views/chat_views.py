@@ -6,21 +6,35 @@
     @date：2023/11/14 9:53
     @desc:
 """
+
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from application.serializers.chat_message_serializers import ChatMessageSerializer
+from application.serializers.chat_message_serializers import ChatMessageSerializer, OpenAIChatSerializer
 from application.serializers.chat_serializers import ChatSerializers, ChatRecordSerializer
 from application.swagger_api.chat_api import ChatApi, VoteApi, ChatRecordApi, ImproveApi, ChatRecordImproveApi, \
-    ChatClientHistoryApi
-from common.auth import TokenAuth, has_permissions
+    ChatClientHistoryApi, OpenAIChatApi
+from common.auth import TokenAuth, has_permissions, OpenAIKeyAuth
 from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import Permission, Group, Operate, \
     RoleConstants, ViewPermission, CompareConstants
 from common.response import result
 from common.util.common import query_params_to_single_dict
+
+
+class Openai(APIView):
+    authentication_classes = [OpenAIKeyAuth]
+
+    @action(methods=['POST'], detail=False)
+    @swagger_auto_schema(operation_summary="openai接口对话",
+                         operation_id="openai接口对话",
+                         request_body=OpenAIChatApi.get_request_body_api(),
+                         tags=["openai对话"])
+    def post(self, request: Request, application_id: str):
+        return OpenAIChatSerializer(data={'application_id': application_id, 'client_id': request.auth.client_id,
+                                          'client_type': request.auth.client_type}).chat(request.data)
 
 
 class ChatView(APIView):

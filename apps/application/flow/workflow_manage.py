@@ -11,14 +11,16 @@ from functools import reduce
 from typing import List, Dict
 
 from django.db.models import QuerySet
-from langchain_core.messages import AIMessage
 from langchain_core.prompts import PromptTemplate
+from rest_framework import status
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from application.flow import tools
 from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
 from application.flow.step_node import get_node
 from common.exception.app_exception import AppApiException
+from common.handle.base_to_response import BaseToResponse
+from common.handle.impl.response.system_to_response import SystemToResponse
 from function_lib.models.function import FunctionLib
 from setting.models import Model
 from setting.models_provider import get_model_credential
@@ -163,7 +165,8 @@ class Flow:
 
 
 class WorkflowManage:
-    def __init__(self, flow: Flow, params, work_flow_post_handler: WorkFlowPostHandler):
+    def __init__(self, flow: Flow, params, work_flow_post_handler: WorkFlowPostHandler,
+                 base_to_response: BaseToResponse = SystemToResponse()):
         self.params = params
         self.flow = flow
         self.context = {}
@@ -172,6 +175,7 @@ class WorkflowManage:
         self.current_node = None
         self.current_result = None
         self.answer = ""
+        self.base_to_response = base_to_response
 
     def run(self):
         if self.params.get('stream'):
@@ -189,13 +193,19 @@ class WorkflowManage:
                 if result is not None:
                     list(result)
                 if not self.has_next_node(self.current_result):
-                    return tools.to_response_simple(self.params['chat_id'], self.params['chat_record_id'],
-                                                    AIMessage(self.answer), self,
-                                                    self.work_flow_post_handler)
+                    details = self.get_runtime_details()
+                    message_tokens = sum([row.get('message_tokens') for row in details.values() if
+                                          'message_tokens' in row and row.get('message_tokens') is not None])
+                    answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
+                                         'answer_tokens' in row and row.get('answer_tokens') is not None])
+                    return self.base_to_response.to_block_response(self.params['chat_id'],
+                                                                   self.params['chat_record_id'], self.answer, True
+                                                                   , message_tokens, answer_tokens)
         except Exception as e:
-            return tools.to_response(self.params['chat_id'], self.params['chat_record_id'],
-                                     AIMessage(str(e)), self, self.current_node.get_write_error_context(e),
-                                     self.work_flow_post_handler)
+            self.current_node.get_write_error_context(e)
+            return self.base_to_response.to_block_response(self.params['chat_id'], self.params['chat_record_id'],
+                                                           str(e), True,
+                                                           0, 0, _status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def run_stream(self):
         return tools.to_stream_response_simple(self.stream_event())
@@ -208,16 +218,29 @@ class WorkflowManage:
                 self.current_node.valid_args(self.current_node.node_params, self.current_node.workflow_params)
                 self.current_result = self.current_node.run()
                 result = self.current_result.write_context(self.current_node, self)
+                has_next_node = self.has_next_node(self.current_result)
                 if result is not None:
                     if self.is_result():
                         for r in result:
-                            yield self.get_chunk_content(r)
-                        yield self.get_chunk_content('\n')
-                        self.answer += '\n'
+                            yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
+                                                                                 self.params['chat_record_id'],
+                                                                                 r, False, 0, 0)
+                        if has_next_node:
+                            yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
+                                                                                 self.params['chat_record_id'],
+                                                                                 '\n', False, 0, 0)
+                            self.answer += '\n'
                     else:
                         list(result)
-                if not self.has_next_node(self.current_result):
-                    yield self.get_chunk_content('', True)
+                if not has_next_node:
+                    details = self.get_runtime_details()
+                    message_tokens = sum([row.get('message_tokens') for row in details.values() if
+                                          'message_tokens' in row and row.get('message_tokens') is not None])
+                    answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
+                                         'answer_tokens' in row and row.get('answer_tokens') is not None])
+                    yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
+                                                                         self.params['chat_record_id'],
+                                                                         '', True, message_tokens, answer_tokens)
                     break
             self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
                                                 self.answer,
@@ -228,7 +251,8 @@ class WorkflowManage:
             self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
                                                 self.answer,
                                                 self)
-            yield self.get_chunk_content(str(e), True)
+            yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'], self.params['chat_record_id'],
+                                                                 str(e), True, 0, 0)
 
     def is_result(self):
         """
