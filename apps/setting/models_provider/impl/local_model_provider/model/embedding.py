@@ -33,6 +33,7 @@ class WebLocalEmbedding(MaxKBBaseModel, BaseModel, Embeddings):
         res = requests.post(f'{CONFIG.get("LOCAL_MODEL_PROTOCOL")}://{bind}/api/model/{self.model_id}/embed_query',
                             {'text': text})
         result = res.json()
+        #print("查询内容：",result)
         if result.get('code', 500) == 200:
             return result.get('data')
         raise Exception(result.get('msg'))

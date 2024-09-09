@@ -127,7 +127,6 @@ class ListenerManagement:
 
             def is_save_function():
                 return QuerySet(Paragraph).filter(id=paragraph_id).exists()
-
             # 批量向量化
             VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
         except Exception as e:

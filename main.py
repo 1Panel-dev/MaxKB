@@ -70,7 +70,7 @@ def start_services():
 def dev():
     services = args.services if isinstance(args.services, list) else args.services
     if services.__contains__('web'):
-        management.call_command('runserver', "0.0.0.0:8080")
+        management.call_command('runserver', "192.168.10.217:8080")
     elif services.__contains__('celery'):
         management.call_command('celery', 'celery')
     elif services.__contains__('local_model'):
@@ -81,7 +81,8 @@ def dev():
 
 
 if __name__ == '__main__':
-    os.environ['HF_HOME'] = '/opt/maxkb/model/base'
+    os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+    os.environ['HF_HOME'] = 'J:/workspace/openai/maxkb/model/base'
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;

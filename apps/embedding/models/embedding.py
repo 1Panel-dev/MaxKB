@@ -48,5 +48,19 @@ class Embedding(models.Model):
 
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
+    # 将对象转换成es可用的json对象
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "document_id": self.document_id,
+            "paragraph_id": self.paragraph_id,
+            "dataset_id": self.dataset_id,
+            "is_active": self.is_active,
+            "source_id": self.source_id,
+            "source_type": self.source_type,
+            "embedding": self.embedding,
+            "search_vector": self.search_vector,
+        }
+
     class Meta:
         db_table = "embedding"

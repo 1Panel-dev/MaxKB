@@ -14,10 +14,9 @@ from .start_node import *
 from .direct_reply_node import *
 from .function_lib_node import *
 from .function_node import *
-from .reranker_node import *
 
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchDatasetNode, BaseQuestionNode, BaseConditionNode, BaseReplyNode,
-             BaseFunctionNodeNode, BaseFunctionLibNodeNode, BaseRerankerNode]
+             BaseFunctionNodeNode, BaseFunctionLibNodeNode]
 
 
 def get_node(node_type):

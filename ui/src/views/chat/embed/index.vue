@@ -36,11 +36,9 @@
         class="AiChat-embed"
       >
         <template #operateBefore>
-          <div class="chat-width">
-            <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
-              <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
-            </el-button>
-          </div>
+          <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
+            <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
+          </el-button>
         </template>
       </AiChat>
     </div>
@@ -335,10 +333,6 @@ onMounted(() => {
     .ai-chat__operate {
       padding-top: 12px;
     }
-  }
-  .chat-width {
-    max-width: var(--app-chat-width, 860px);
-    margin: 0 auto;
   }
 }
 </style>

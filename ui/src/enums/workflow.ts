@@ -7,6 +7,5 @@ export enum WorkflowType {
   Condition = 'condition-node',
   Reply = 'reply-node',
   FunctionLib = 'function-lib-node',
-  FunctionLibCustom = 'function-node',
-  RrerankerNode = 'reranker-node'
+  FunctionLibCustom = 'function-node'
 }

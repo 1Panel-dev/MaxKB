@@ -54,10 +54,6 @@ class Application(AppModelMixin):
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
     type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
                             default=ApplicationTypeChoices.SIMPLE, max_length=256)
-    tts_model = models.ForeignKey(Model, related_name='tts_model_id', on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
-    stt_model = models.ForeignKey(Model, related_name='stt_model_id', on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
-    tts_model_enable = models.BooleanField(verbose_name="语音合成模型是否启用", default=False)
-    stt_model_enable = models.BooleanField(verbose_name="语音识别模型是否启用", default=False)
 
     @staticmethod
     def get_default_model_prompt():

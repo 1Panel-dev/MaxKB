@@ -48,19 +48,31 @@ class ModelManage:
 
 
 class VectorStore:
-    from embedding.vector.pg_vector import PGVector
     from embedding.vector.base_vector import BaseVectorStore
-    instance_map = {
-        'pg_vector': PGVector,
-    }
     instance = None
 
     @staticmethod
     def get_embedding_vector() -> BaseVectorStore:
-        from embedding.vector.pg_vector import PGVector
+
         if VectorStore.instance is None:
             from smartdoc.const import CONFIG
-            vector_store_class = VectorStore.instance_map.get(CONFIG.get("VECTOR_STORE_NAME"),
-                                                              PGVector)
-            VectorStore.instance = vector_store_class()
+            store_name = CONFIG.get("VECTOR_STORE_NAME")
+            if store_name == 'es_vector':
+                from embedding.vector.es_vector import ESVector
+                from elasticsearch import Elasticsearch
+
+                es_host = CONFIG.get("VECTOR_STORE_ES_ENDPOINT")
+                es_username = CONFIG.get("VECTOR_STORE_ES_USERNAME")
+                es_password = CONFIG.get("VECTOR_STORE_ES_PASSWORD")
+                es_indexname = CONFIG.get("VECTOR_STORE_ES_INDEX")
+                http_auth = (es_username, es_password)
+                VectorStore.instance = ESVector(Elasticsearch(hosts=[es_host],
+                                                              http_auth=http_auth)
+                                                , es_indexname)
+                if not VectorStore.instance.vector_is_create():
+                    VectorStore.instance.vector_create()
+            else:
+                from embedding.vector.pg_vector import PGVector
+                VectorStore.instance = PGVector()
+
         return VectorStore.instance

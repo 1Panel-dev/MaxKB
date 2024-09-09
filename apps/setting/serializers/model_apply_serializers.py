@@ -7,7 +7,6 @@
     @desc:
 """
 from django.db.models import QuerySet
-from langchain_core.documents import Document
 from rest_framework import serializers
 
 from common.config.embedding_config import ModelManage
@@ -34,26 +33,18 @@ class EmbedQuery(serializers.Serializer):
     text = serializers.CharField(required=True, error_messages=ErrMessage.char("向量文本"))
 
 
-class CompressDocument(serializers.Serializer):
-    page_content = serializers.CharField(required=True, error_messages=ErrMessage.char("文本"))
-    metadata = serializers.DictField(required=False, error_messages=ErrMessage.dict("元数据"))
-
-
-class CompressDocuments(serializers.Serializer):
-    documents = CompressDocument(required=True, many=True)
-    query = serializers.CharField(required=True, error_messages=ErrMessage.char("查询query"))
-
-
 class ModelApplySerializers(serializers.Serializer):
     model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
-
     def embed_documents(self, instance, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
             EmbedDocuments(data=instance).is_valid(raise_exception=True)
 
         model = get_embedding_model(self.data.get('model_id'))
-        return model.embed_documents(instance.getlist('texts'))
+        texts = instance.getlist('texts')
+        for text in texts:
+            print("to embed texts:",text)
+        return model.embed_documents(texts)
 
     def embed_query(self, instance, with_valid=True):
         if with_valid:
@@ -61,13 +52,6 @@ class ModelApplySerializers(serializers.Serializer):
             EmbedQuery(data=instance).is_valid(raise_exception=True)
 
         model = get_embedding_model(self.data.get('model_id'))
-        return model.embed_query(instance.get('text'))
-
-    def compress_documents(self, instance, with_valid=True):
-        if with_valid:
-            self.is_valid(raise_exception=True)
-            CompressDocuments(data=instance).is_valid(raise_exception=True)
-        model = get_embedding_model(self.data.get('model_id'))
-        return [{'page_content': d.page_content, 'metadata': d.metadata} for d in model.compress_documents(
-            [Document(page_content=document.get('page_content'), metadata=document.get('metadata')) for document in
-             instance.get('documents')], instance.get('query'))]
+        text = instance.get('text')
+        query = model.embed_query(text)
+        return query
