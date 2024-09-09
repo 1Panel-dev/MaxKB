@@ -213,7 +213,8 @@ class ChatMessageSerializer(serializers.Serializer):
         self.is_valid_intraday_access_num()
 
     def is_valid_chat_id(self, chat_info: ChatInfo):
-        if self.data.get('application_id') != str(chat_info.application.id):
+        if self.data.get('application_id') is not None and self.data.get('application_id') != str(
+                chat_info.application.id):
             raise ChatException(500, "会话不存在")
 
     def is_valid_intraday_access_num(self):
