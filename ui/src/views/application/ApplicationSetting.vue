@@ -464,7 +464,7 @@
             </h4>
           </div>
           <div class="scrollbar-height">
-            <AiChat :data="applicationForm"></AiChat>
+            <AiChat :data="applicationForm" :tts-model-options="ttsModelOptions"></AiChat>
           </div>
         </div>
       </el-col>

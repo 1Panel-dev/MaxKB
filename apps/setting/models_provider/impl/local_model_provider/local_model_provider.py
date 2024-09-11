@@ -17,8 +17,10 @@ from setting.models_provider.base_model_provider import ModelProvideInfo, ModelT
     ModelInfoManage
 from setting.models_provider.impl.local_model_provider.credential.embedding import LocalEmbeddingCredential
 from setting.models_provider.impl.local_model_provider.credential.reranker import LocalRerankerCredential
+from setting.models_provider.impl.local_model_provider.credential.tts import BrowserTextToSpeechCredential
 from setting.models_provider.impl.local_model_provider.model.embedding import LocalEmbedding
 from setting.models_provider.impl.local_model_provider.model.reranker import LocalReranker
+from setting.models_provider.impl.local_model_provider.model.tts import BrowserTextToSpeech
 from smartdoc.conf import PROJECT_DIR
 
 embedding_text2vec_base_chinese = ModelInfo('shibing624/text2vec-base-chinese', '', ModelTypeConst.EMBEDDING,
@@ -26,10 +28,14 @@ embedding_text2vec_base_chinese = ModelInfo('shibing624/text2vec-base-chinese', 
 bge_reranker_v2_m3 = ModelInfo('BAAI/bge-reranker-v2-m3', '', ModelTypeConst.RERANKER,
                                LocalRerankerCredential(), LocalReranker)
 
+browser_tts = ModelInfo('browser_tts', '', ModelTypeConst.TTS, BrowserTextToSpeechCredential(), BrowserTextToSpeech)
+
+
 model_info_manage = (ModelInfoManage.builder().append_model_info(embedding_text2vec_base_chinese)
                      .append_default_model_info(embedding_text2vec_base_chinese)
                      .append_model_info(bge_reranker_v2_m3)
                      .append_default_model_info(bge_reranker_v2_m3)
+                     .append_model_info(browser_tts)
                      .build())
 
 

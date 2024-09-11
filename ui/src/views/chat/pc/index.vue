@@ -108,6 +108,7 @@
             :appId="applicationDetail?.id"
             :record="currentRecordList"
             :chatId="currentChatId"
+            :tts-model-options="ttsModelOptions"
             @refresh="refresh"
             @scroll="handleScroll"
           >
@@ -130,6 +131,8 @@ import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
+import applicationApi from '@/api/application'
+import { groupBy } from 'lodash'
 
 import useResize from '@/layout/hooks/useResize'
 useResize()
@@ -167,6 +170,8 @@ const left_loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
 const chatLogeData = ref<any[]>([])
+const ttsModelOptions = ref<any>(null)
+
 
 const paginationConfig = ref({
   current_page: 1,
@@ -228,6 +233,7 @@ function getAppProfile() {
       if (res.data?.show_history || !user.isEnterprise()) {
         getChatLog(applicationDetail.value.id)
       }
+      getTTSModel()
     })
     .catch(() => {
       applicationAvailable.value = false
@@ -335,6 +341,20 @@ async function exportHTML(): Promise<void> {
   const blob: Blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' })
   saveAs(blob, suggestedName)
 }
+
+function getTTSModel() {
+  loading.value = true
+  applicationApi
+    .getApplicationTTSModel(applicationDetail.value.id)
+    .then((res: any) => {
+      ttsModelOptions.value = groupBy(res?.data, 'provider')
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
 
 onMounted(() => {
   user.changeUserType(2)

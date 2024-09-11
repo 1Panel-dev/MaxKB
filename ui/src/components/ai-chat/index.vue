@@ -136,6 +136,7 @@
                   @regeneration="regenerationChart(item)"
                 />
               </div>
+              <!-- 语音播放 -->
               <div style="float: right;" v-if="props.data.tts_model_enable">
                 <el-button :disabled="!item.write_ed" @click="playAnswerText(item.answer_text)">
                   <el-icon>
@@ -247,7 +248,13 @@ const props = defineProps({
   chatId: {
     type: String,
     default: ''
-  } // 历史记录Id
+  }, // 历史记录Id
+  ttsModelOptions: {
+    type: Object,
+    default: () => {
+      return {}
+    }
+  }
 })
 
 const emit = defineEmits(['refresh', 'scroll'])
@@ -321,8 +328,7 @@ watch(
 )
 
 function handleInputFieldList() {
-  props.data.work_flow?.nodes
-    .filter((v: any) => v.id === 'base-node')
+  props.data.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
       inputFieldList.value = v.properties.input_field_list.map((v: any) => {
         switch (v.type) {
@@ -763,6 +769,14 @@ const uploadRecording = async (audioBlob: Blob) => {
 }
 
 const playAnswerText = (text: string) => {
+  if (props.ttsModelOptions?.model_local_provider?.filter((v: any) => v.id === props.data.tts_model_id).length > 0) {
+    // 创建一个新的 SpeechSynthesisUtterance 实例
+    const utterance = new SpeechSynthesisUtterance(text);
+    // 调用浏览器的朗读功能
+    window.speechSynthesis.speak(utterance);
+    return
+  }
+
   applicationApi.postTextToSpeech(props.data.id as string, { 'text': text }, loading)
     .then((res: any) => {
 
