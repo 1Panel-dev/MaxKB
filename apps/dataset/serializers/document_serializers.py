@@ -671,7 +671,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             get_buffer = FileBufferHandle().get_buffer
             for parse_table_handle in parse_table_handle_list:
                 if parse_table_handle.support(file, get_buffer):
-                    return parse_table_handle.handle(file, get_buffer)
+                    return parse_table_handle.handle(file, get_buffer, save_image)
             raise AppApiException(500, '不支持的文件格式')
 
         def save_qa(self, instance: Dict, with_valid=True):
