@@ -30,7 +30,7 @@ class CsvParseQAHandle(BaseParseQAHandle):
             return True
         return False
 
-    def handle(self, file, get_buffer):
+    def handle(self, file, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
             reader = csv.reader(io.TextIOWrapper(io.BytesIO(buffer), encoding=detect(buffer)['encoding']))
