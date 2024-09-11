@@ -4,6 +4,7 @@ import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
+
 const prefix = '/application'
 
 /**
@@ -352,6 +353,40 @@ const postTextToSpeech: (
 ) => Promise<Result<any>> = (application_id, data, loading) => {
   return download(`${prefix}/${application_id}/text_to_speech`, 'post', data, undefined, loading)
 }
+/**
+ * 获取平台状态
+ */
+const getPlatformStatus: (application_id: string) => Promise<Result<any>> = (application_id) => {
+  return get(`/platform/${application_id}/status`)
+}
+/**
+ * 获取平台配置
+ */
+const getPlatformConfig: (application_id: string, type: string) => Promise<Result<any>> = (
+  application_id,
+  type
+) => {
+  return get(`/platform/${application_id}/${type}`)
+}
+/**
+ * 更新平台配置
+ */
+const updatePlatformConfig: (
+  application_id: string,
+  type: string,
+  data: any
+) => Promise<Result<any>> = (application_id, type, data) => {
+  return post(`/platform/${application_id}/${type}`, data)
+}
+/**
+ * 更新平台状态
+ */
+const updatePlatformStatus: (application_id: string, data: any) => Promise<Result<any>> = (
+  application_id,
+  data
+) => {
+  return post(`/platform/${application_id}/status`, data)
+}
 
 export default {
   getAllAppilcation,
@@ -381,4 +416,8 @@ export default {
   getApplicationTTSModel,
   postSpeechToText,
   postTextToSpeech,
+  getPlatformStatus,
+  getPlatformConfig,
+  updatePlatformConfig,
+  updatePlatformStatus
 }
