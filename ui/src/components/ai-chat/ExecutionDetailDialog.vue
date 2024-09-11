@@ -39,7 +39,10 @@
                   <template v-if="item.type === WorkflowType.Start">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">参数输入</h5>
-                      <div class="p-8-12 border-t-dashed lighter">{{ item.question || '-' }}</div>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <div>用户问题: {{ item.question || '-' }}</div>
+                        <div v-for="(f, i) in item.global_fields" :key="i">{{f.label}}: {{f.value}}</div>
+                      </div>
                     </div>
                   </template>
                   <!-- 知识库检索 -->
