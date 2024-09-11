@@ -46,7 +46,7 @@ class XlsParseQAHandle(BaseParseQAHandle):
             return True
         return False
 
-    def handle(self, file, get_buffer):
+    def handle(self, file, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
             workbook = xlrd.open_workbook(file_contents=buffer)

@@ -663,7 +663,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             get_buffer = FileBufferHandle().get_buffer
             for parse_qa_handle in parse_qa_handle_list:
                 if parse_qa_handle.support(file, get_buffer):
-                    return parse_qa_handle.handle(file, get_buffer)
+                    return parse_qa_handle.handle(file, get_buffer, save_image)
             raise AppApiException(500, '不支持的文件格式')
 
         @staticmethod
@@ -972,7 +972,8 @@ split_handles = [HTMLSplitHandle(), DocSplitHandle(), PdfSplitHandle(), default_
 
 
 def save_image(image_list):
-    QuerySet(Image).bulk_create(image_list)
+    if image_list is not None and len(image_list) > 0:
+        QuerySet(Image).bulk_create(image_list)
 
 
 def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):
