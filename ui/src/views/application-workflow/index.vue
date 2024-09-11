@@ -138,7 +138,7 @@
           </div>
         </div>
         <div class="scrollbar-height">
-          <AiChat :data="detail"></AiChat>
+          <AiChat :data="detail" :tts-model-options="ttsModelOptions"></AiChat>
         </div>
       </div>
     </el-collapse-transition>
@@ -157,6 +157,7 @@ import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
+import { groupBy } from 'lodash'
 
 const { user, application } = useStore()
 const router = useRouter()
@@ -181,6 +182,7 @@ const enlarge = ref(false)
 const saveTime = ref<any>('')
 const activeName = ref('base')
 const functionLibList = ref<any[]>([])
+const ttsModelOptions = ref<any>(null)
 
 function publicHandle() {
   workflowRef.value
@@ -310,6 +312,20 @@ function getList() {
   })
 }
 
+function getTTSModel() {
+  loading.value = true
+  applicationApi
+    .getApplicationTTSModel(id)
+    .then((res: any) => {
+      ttsModelOptions.value = groupBy(res?.data, 'provider')
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
+
 /**
  * 定时保存
  */
@@ -329,6 +345,7 @@ const closeInterval = () => {
 }
 
 onMounted(() => {
+  getTTSModel()
   getDetail()
   getList()
   // 初始化定时任务
