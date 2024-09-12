@@ -176,16 +176,30 @@
                     <div class="card-never border-r-4 mt-8">
                       <h5 class="p-8-12">检索结果</h5>
                       <div class="p-8-12 border-t-dashed lighter">
-                        <template v-if="item.paragraph_list?.length > 0">
+                        <template v-if="item.result_list?.length > 0">
                           <template
-                            v-for="(paragraph, paragraphIndex) in arraySort(
-                              item.paragraph_list,
-                              'similarity',
-                              true
-                            )"
+                            v-for="(paragraph, paragraphIndex) in item.result_list"
                             :key="paragraphIndex"
                           >
-                            <ParagraphCard :data="paragraph" :index="paragraphIndex" />
+                            <CardBox
+                              shadow="never"
+                              title=""
+                              class="paragraph-source-card cursor mb-8 paragraph-source-card-height"
+                              :showIcon="false"
+                            >
+                              <div class="active-button primary">
+                                {{ paragraph.metadata.relevance_score?.toFixed(3) }}
+                              </div>
+                              <template #description>
+                                <el-scrollbar height="150">
+                                  <MdPreview
+                                    ref="editorRef"
+                                    editorId="preview-only"
+                                    :modelValue="paragraph.page_content"
+                                  />
+                                </el-scrollbar>
+                              </template>
+                            </CardBox>
                           </template>
                         </template>
                         <template v-else> - </template>
