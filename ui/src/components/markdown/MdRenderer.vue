@@ -9,7 +9,8 @@
       <el-icon><EditPen /></el-icon>
       {{ item.content }}
     </div>
-    <div v-else-if="item.type === 'html_rander'" :innerHTML="item.content"></div>
+    <HtmlRander v-else-if="item.type === 'html_rander'" :source="item.content"></HtmlRander>
+
     <MdPreview
       v-else
       noIconfont
@@ -24,12 +25,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { config } from 'md-editor-v3'
+import HtmlRander from './HtmlRander.vue'
 config({
   markdownItConfig(md) {
     md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
       tokens[idx].attrSet('target', '_blank')
       return md.renderer.renderToken(tokens, idx, options)
     }
+    document.appendChild
   }
 })
 const props = withDefaults(
