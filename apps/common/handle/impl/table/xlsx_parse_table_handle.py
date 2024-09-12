@@ -10,10 +10,10 @@ from common.handle.impl.tools import xlsx_embed_cells_images
 max_kb = logging.getLogger("max_kb")
 
 
-class ExcelSplitHandle(BaseParseTableHandle):
+class XlsxSplitHandle(BaseParseTableHandle):
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()
-        if file_name.endswith('.xls') or file_name.endswith('.xlsx'):
+        if file_name.endswith('.xlsx'):
             return True
         return False
 
@@ -34,13 +34,11 @@ class ExcelSplitHandle(BaseParseTableHandle):
                 if not rows: continue
                 ti = list(rows[0])
                 for r in list(rows[1:]):
-                    title = []
                     l = []
                     for i, c in enumerate(r):
                         if not c.value:
                             continue
                         t = str(ti[i].value) if i < len(ti) else ""
-                        title.append(t)
                         content = str(c.value)
                         image = image_dict.get(content, None)
                         if image is not None:

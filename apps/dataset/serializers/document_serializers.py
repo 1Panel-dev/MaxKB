@@ -34,7 +34,8 @@ from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
 from common.handle.impl.qa.xls_parse_qa_handle import XlsParseQAHandle
 from common.handle.impl.qa.xlsx_parse_qa_handle import XlsxParseQAHandle
 from common.handle.impl.table.csv_parse_table_handle import CsvSplitHandle
-from common.handle.impl.table.excel_parse_table_handle import ExcelSplitHandle
+from common.handle.impl.table.xlsx_parse_table_handle import XlsxSplitHandle
+from common.handle.impl.table.xls_parse_table_handle import XlsSplitHandle
 from common.handle.impl.text_split_handle import TextSplitHandle
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post, flat_map
@@ -53,7 +54,7 @@ from embedding.task.embedding import embedding_by_document, delete_embedding_by_
 from smartdoc.conf import PROJECT_DIR
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle()]
-parse_table_handle_list = [CsvSplitHandle(), ExcelSplitHandle()]
+parse_table_handle_list = [CsvSplitHandle(), XlsSplitHandle(), XlsxSplitHandle()]
 
 
 class FileBufferHandle:
