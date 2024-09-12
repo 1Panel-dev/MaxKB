@@ -82,10 +82,19 @@
         </div>
       </div>
     </div>
+    <el-collapse-transition>
+      <div
+        style="height: 400px; left: 100%; top: 50%; transform: translate(0, -50%)"
+        v-show="showAnchor"
+        class="workflow-dropdown-menu border border-r-4"
+      >
+        内容嘻嘻嘻
+      </div>
+    </el-collapse-transition>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
@@ -100,7 +109,7 @@ const height = ref<{
   inputContainerHeight: 0,
   outputContainerHeight: 0
 })
-
+const showAnchor = ref<boolean>(false)
 const node_status = computed(() => {
   if (props.nodeModel.properties.status) {
     return props.nodeModel.properties.status
@@ -173,6 +182,11 @@ const nodeFields = computed(() => {
 function showOperate(type: string) {
   return type !== WorkflowType.Base && type !== WorkflowType.Start
 }
+onMounted(() => {
+  set(props.nodeModel, 'openNodeMenu', () => {
+    showAnchor.value = !showAnchor.value
+  })
+})
 </script>
 <style lang="scss" scoped>
 .workflow-node-container {
