@@ -24,10 +24,11 @@ class BaseStartStepNode(IStarNode):
     def get_details(self, index: int, **kwargs):
         global_fields = []
         for field in self.node.properties.get('config')['globalFields']:
+            key = field['value']
             global_fields.append({
                 'label': field['label'],
-                'key': field['value'],
-                'value': self.workflow_manage[field['value']]
+                'key': key,
+                'value': self.workflow_manage[key] if key in self.workflow_manage else ''
             })
         return {
             'name': self.node.properties.get('stepName'),
