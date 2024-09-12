@@ -118,13 +118,11 @@
                     v-if="item.is_stop && !item.write_ed"
                     @click="startChat(item)"
                     link
-                  >继续
-                  </el-button
-                  >
+                    >继续
+                  </el-button>
                   <el-button type="primary" v-else-if="!item.write_ed" @click="stopChat(item)" link
-                  >停止回答
-                  </el-button
-                  >
+                    >停止回答
+                  </el-button>
                 </div>
               </div>
               <div v-if="item.write_ed && props.appId && 500 != item.status" class="flex-between">
@@ -137,7 +135,7 @@
                 />
               </div>
               <!-- 语音播放 -->
-              <div style="float: right;" v-if="props.data.tts_model_enable">
+              <div style="float: right" v-if="props.data.tts_model_enable">
                 <el-button :disabled="!item.write_ed" @click="playAnswerText(item.answer_text)">
                   <el-icon>
                     <VideoPlay />
@@ -162,18 +160,12 @@
           @keydown.enter="sendChatHandle($event)"
         />
         <div class="operate" v-if="props.data.stt_model_enable">
-          <el-button
-            v-if="mediaRecorderStatus"
-            @click="startRecording"
-          >
+          <el-button v-if="mediaRecorderStatus" @click="startRecording">
             <el-icon>
               <Microphone />
             </el-icon>
           </el-button>
-          <el-button
-            v-else
-            @click="stopRecording"
-          >
+          <el-button v-else @click="stopRecording">
             <el-icon>
               <VideoPause />
             </el-icon>
@@ -231,8 +223,7 @@ const {
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {
-    }
+    default: () => {}
   },
   appId: String, // 仅分享链接有
   log: Boolean,
@@ -289,15 +280,15 @@ const prologueList = computed(() => {
     .reduce((pre_array: Array<any>, current: string, index: number) => {
       const currentObj = isMdArray(current)
         ? {
-          type: 'question',
-          str: current.replace(/^-\s+/, ''),
-          index: index
-        }
+            type: 'question',
+            str: current.replace(/^-\s+/, ''),
+            index: index
+          }
         : {
-          type: 'md',
-          str: current,
-          index: index
-        }
+            type: 'md',
+            str: current,
+            index: index
+          }
       if (pre_array.length > 0) {
         const pre = pre_array[pre_array.length - 1]
         if (!isMdArray(current) && pre.type == 'md') {
@@ -328,38 +319,46 @@ watch(
 )
 
 function handleInputFieldList() {
-  props.data.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')
+  props.data.work_flow?.nodes
+    ?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
-      inputFieldList.value = v.properties.input_field_list.map((v: any) => {
-        switch (v.type) {
-          case 'input':
-            return { field: v.variable, input_type: 'TextInput', label: v.name, required: v.is_required }
-          case 'select':
-            return {
-              field: v.variable,
-              input_type: 'SingleSelect',
-              label: v.name,
-              required: v.is_required,
-              option_list: v.optionList.map((o: any) => {
-                return { key: o, value: o }
-              })
+      inputFieldList.value = v.properties.input_field_list
+        ? v.properties.input_field_list.map((v: any) => {
+            switch (v.type) {
+              case 'input':
+                return {
+                  field: v.variable,
+                  input_type: 'TextInput',
+                  label: v.name,
+                  required: v.is_required
+                }
+              case 'select':
+                return {
+                  field: v.variable,
+                  input_type: 'SingleSelect',
+                  label: v.name,
+                  required: v.is_required,
+                  option_list: v.optionList.map((o: any) => {
+                    return { key: o, value: o }
+                  })
+                }
+              case 'date':
+                return {
+                  field: v.variable,
+                  input_type: 'DatePicker',
+                  label: v.name,
+                  required: v.is_required,
+                  attrs: {
+                    format: 'YYYY-MM-DD HH:mm:ss',
+                    'value-format': 'YYYY-MM-DD HH:mm:ss',
+                    type: 'datetime'
+                  }
+                }
+              default:
+                break
             }
-          case 'date':
-            return {
-              field: v.variable,
-              input_type: 'DatePicker',
-              label: v.name,
-              required: v.is_required,
-              attrs: {
-                'format': 'YYYY-MM-DD HH:mm:ss',
-                'value-format': 'YYYY-MM-DD HH:mm:ss',
-                'type': 'datetime'
-              }
-            }
-          default:
-            break
-        }
-      })
+          })
+        : []
     })
 }
 
@@ -712,7 +711,6 @@ const mediaRecorder = ref<any>(null)
 const audioPlayer = ref<HTMLAudioElement | null>(null)
 const mediaRecorderStatus = ref(true)
 
-
 // 开始录音
 const startRecording = async () => {
   try {
@@ -723,11 +721,14 @@ const startRecording = async () => {
       sampleRate: 44100
     })
 
-    mediaRecorder.value.open(() => {
-      mediaRecorder.value.start()
-    }, (err: any) => {
-      console.error(err)
-    })
+    mediaRecorder.value.open(
+      () => {
+        mediaRecorder.value.start()
+      },
+      (err: any) => {
+        console.error(err)
+      }
+    )
   } catch (error) {
     console.error('无法获取音频权限：', error)
   }
@@ -737,17 +738,20 @@ const startRecording = async () => {
 const stopRecording = () => {
   if (mediaRecorder.value) {
     mediaRecorderStatus.value = true
-    mediaRecorder.value.stop((blob: Blob, duration: number) => {
-      // 测试blob是否能正常播放
-      //  const link = document.createElement('a')
-      //  link.href = window.URL.createObjectURL(blob)
-      //  link.download = 'abc.mp3'
-      //  link.click()
+    mediaRecorder.value.stop(
+      (blob: Blob, duration: number) => {
+        // 测试blob是否能正常播放
+        //  const link = document.createElement('a')
+        //  link.href = window.URL.createObjectURL(blob)
+        //  link.download = 'abc.mp3'
+        //  link.click()
 
-      uploadRecording(blob) // 上传录音文件
-    }, (err: any) => {
-      console.error('录音失败:', err)
-    })
+        uploadRecording(blob) // 上传录音文件
+      },
+      (err: any) => {
+        console.error('录音失败:', err)
+      }
+    )
   }
 }
 
@@ -756,30 +760,32 @@ const uploadRecording = async (audioBlob: Blob) => {
   try {
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
-    applicationApi.postSpeechToText(props.data.id as string, formData, loading)
-      .then((response) => {
-        console.log('上传成功:', response.data)
-        inputValue.value = response.data
-        // chatMessage(null, res.data)
-      })
-
+    applicationApi.postSpeechToText(props.data.id as string, formData, loading).then((response) => {
+      console.log('上传成功:', response.data)
+      inputValue.value = response.data
+      // chatMessage(null, res.data)
+    })
   } catch (error) {
     console.error('上传失败:', error)
   }
 }
 
 const playAnswerText = (text: string) => {
-  if (props.ttsModelOptions?.model_local_provider?.filter((v: any) => v.id === props.data.tts_model_id).length > 0) {
+  if (
+    props.ttsModelOptions?.model_local_provider?.filter(
+      (v: any) => v.id === props.data.tts_model_id
+    ).length > 0
+  ) {
     // 创建一个新的 SpeechSynthesisUtterance 实例
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(text)
     // 调用浏览器的朗读功能
-    window.speechSynthesis.speak(utterance);
+    window.speechSynthesis.speak(utterance)
     return
   }
 
-  applicationApi.postTextToSpeech(props.data.id as string, { 'text': text }, loading)
+  applicationApi
+    .postTextToSpeech(props.data.id as string, { text: text }, loading)
     .then((res: any) => {
-
       // 假设我们有一个 MP3 文件的字节数组
       // 创建 Blob 对象
       const blob = new Blob([res], { type: 'audio/mp3' })
