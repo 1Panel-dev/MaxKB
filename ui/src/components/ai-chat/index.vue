@@ -239,13 +239,7 @@ const props = defineProps({
   chatId: {
     type: String,
     default: ''
-  }, // 历史记录Id
-  ttsModelOptions: {
-    type: Object,
-    default: () => {
-      return {}
-    }
-  }
+  } // 历史记录Id
 })
 
 const emit = defineEmits(['refresh', 'scroll'])
@@ -771,20 +765,14 @@ const uploadRecording = async (audioBlob: Blob) => {
 }
 
 const playAnswerText = (text: string) => {
-  if (
-    props.ttsModelOptions?.model_local_provider?.filter(
-      (v: any) => v.id === props.data.tts_model_id
-    ).length > 0
-  ) {
+  if (props.data.tts_type === 'BROWSER') {
     // 创建一个新的 SpeechSynthesisUtterance 实例
     const utterance = new SpeechSynthesisUtterance(text)
     // 调用浏览器的朗读功能
     window.speechSynthesis.speak(utterance)
-    return
   }
-
-  applicationApi
-    .postTextToSpeech(props.data.id as string, { text: text }, loading)
+  if (props.data.tts_type === 'TTS') {
+      applicationApi.postTextToSpeech(props.data.id as string, { 'text': text }, loading)
     .then((res: any) => {
       // 假设我们有一个 MP3 文件的字节数组
       // 创建 Blob 对象
@@ -810,6 +798,7 @@ const playAnswerText = (text: string) => {
     .catch((err) => {
       console.log('err: ', err)
     })
+  }
 }
 
 onMounted(() => {

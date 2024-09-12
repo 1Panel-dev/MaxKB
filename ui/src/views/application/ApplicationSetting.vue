@@ -369,7 +369,12 @@
                     <el-switch v-model="applicationForm.tts_model_enable"/>
                   </div>
                 </template>
+                <el-radio-group v-model="applicationForm.tts_type">
+                  <el-radio label="浏览器播放(免费)" value="BROWSER"/>
+                  <el-radio label="TTS模型" value="TTS"/>
+                </el-radio-group>
                 <el-select
+                  v-if="applicationForm.tts_type === 'TTS'"
                   v-model="applicationForm.tts_model_id"
                   class="w-full"
                   popper-class="select-model"
@@ -464,7 +469,7 @@
             </h4>
           </div>
           <div class="scrollbar-height">
-            <AiChat :data="applicationForm" :tts-model-options="ttsModelOptions"></AiChat>
+            <AiChat :data="applicationForm"></AiChat>
           </div>
         </div>
       </el-col>
@@ -556,6 +561,7 @@ const applicationForm = ref<ApplicationFormType>({
   tts_model_id: '',
   stt_model_enable: false,
   tts_model_enable: false,
+  tts_type: 'BROWSER',
   type: 'SIMPLE'
 })
 
@@ -657,6 +663,7 @@ function getDetail() {
     applicationForm.value.model_id = res.data.model
     applicationForm.value.stt_model_id = res.data.stt_model
     applicationForm.value.tts_model_id = res.data.tts_model
+    applicationForm.value.tts_type = res.data.tts_type
   })
 }
 

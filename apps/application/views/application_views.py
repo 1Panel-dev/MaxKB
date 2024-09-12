@@ -178,7 +178,7 @@ class Application(APIView):
                              tags=["应用"],
                              manual_parameters=ApplicationApi.Model.get_request_params_api())
         @has_permissions(ViewPermission(
-            [RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
+            [RoleConstants.ADMIN, RoleConstants.USER],
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
