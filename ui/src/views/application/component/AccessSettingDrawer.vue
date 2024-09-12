@@ -14,6 +14,7 @@
       label-position="top"
       require-asterisk-position="right"
     >
+      <h4 class="title-decoration-1 mb-16">应用信息</h4>
       <template v-for="(item, key) in configFields[configType]" :key="key">
         <el-form-item :label="item.label" :prop="key">
           <el-input v-model="form[configType][key]" :placeholder="item.placeholder" />

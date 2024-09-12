@@ -41,7 +41,9 @@
                       <h5 class="p-8-12">参数输入</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div>用户问题: {{ item.question || '-' }}</div>
-                        <div v-for="(f, i) in item.global_fields" :key="i">{{f.label}}: {{f.value}}</div>
+                        <div v-for="(f, i) in item.global_fields" :key="i">
+                          {{ f.label }}: {{ f.value }}
+                        </div>
                       </div>
                     </div>
                   </template>
@@ -162,6 +164,31 @@
                       <h5 class="p-8-12">输出</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.result || '-' }}
+                      </div>
+                    </div>
+                  </template>
+                  <!-- 多路召回 -->
+                  <template v-if="item.type == WorkflowType.RrerankerNode">
+                    <div class="card-never border-r-4">
+                      <h5 class="p-8-12">检索内容</h5>
+                      <div class="p-8-12 border-t-dashed lighter">{{ item.question || '-' }}</div>
+                    </div>
+                    <div class="card-never border-r-4 mt-8">
+                      <h5 class="p-8-12">检索结果</h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <template v-if="item.paragraph_list?.length > 0">
+                          <template
+                            v-for="(paragraph, paragraphIndex) in arraySort(
+                              item.paragraph_list,
+                              'similarity',
+                              true
+                            )"
+                            :key="paragraphIndex"
+                          >
+                            <ParagraphCard :data="paragraph" :index="paragraphIndex" />
+                          </template>
+                        </template>
+                        <template v-else> - </template>
                       </div>
                     </div>
                   </template>
