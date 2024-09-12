@@ -47,6 +47,7 @@ class BaseRerankerNode(IRerankerNode):
     def execute(self, question, reranker_setting, reranker_list, reranker_model_id,
                 **kwargs) -> NodeResult:
         documents = merge_reranker_list(reranker_list)
+        self.context['document_list'] = documents
         reranker_model = get_model_instance_by_model_user_id(reranker_model_id,
                                                              self.flow_params_serializer.data.get('user_id'))
         result = reranker_model.compress_documents(
@@ -62,6 +63,7 @@ class BaseRerankerNode(IRerankerNode):
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
+            'document_list': self.context.get('document_list'),
             "question": self.node_params_serializer.data.get('question'),
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
