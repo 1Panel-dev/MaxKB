@@ -9,6 +9,7 @@
       <el-icon><EditPen /></el-icon>
       {{ item.content }}
     </div>
+    <div v-else-if="item.type === 'html_rander'" :innerHTML="item.content"></div>
     <MdPreview
       v-else
       noIconfont
@@ -60,7 +61,7 @@ const md_view_list = computed(() => {
       return md_img_list[Math.floor(index / 2)]
     }
   })
-  return split_quick_question(result)
+  return split_html_rander(split_quick_question(result))
 })
 const split_quick_question = (result: Array<string>) => {
   return result
@@ -90,6 +91,40 @@ const split_quick_question_ = (source: string) => {
         content: md_quick_question_list[Math.floor(index / 2)]
           .replace('<quick_question>', '')
           .replace('</quick_question>', '')
+      }
+    }
+  })
+  return result
+}
+const split_html_rander = (result: Array<any>) => {
+  return result
+    .map((item) => split_html_rander_(item.content, item.type))
+    .reduce((x: any, y: any) => {
+      return [...x, ...y]
+    }, [])
+}
+
+const split_html_rander_ = (source: string, type: string) => {
+  const temp_md_quick_question_list = source.match(/<html_rander>[\d\D]*?<\/html_rander>/g)
+  const md_quick_question_list = temp_md_quick_question_list
+    ? temp_md_quick_question_list.filter((i) => i)
+    : []
+  const split_quick_question_value = source
+    .split(/<html_rander>[\d\D]*?<\/html_rander>/g)
+    .filter((item) => item !== undefined)
+    .filter((item) => !md_quick_question_list?.includes(item))
+  const result = Array.from(
+    { length: md_quick_question_list.length + split_quick_question_value.length },
+    (v, i) => i
+  ).map((index) => {
+    if (index % 2 == 0) {
+      return { type: type, content: split_quick_question_value[Math.floor(index / 2)] }
+    } else {
+      return {
+        type: 'html_rander',
+        content: md_quick_question_list[Math.floor(index / 2)]
+          .replace('<html_rander>', '')
+          .replace('</html_rander>', '')
       }
     }
   })
