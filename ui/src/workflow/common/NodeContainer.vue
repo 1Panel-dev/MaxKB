@@ -83,23 +83,34 @@
       </div>
     </div>
     <el-collapse-transition>
-      <div
-        style="height: 400px; left: 100%; top: 50%; transform: translate(0, -50%)"
-        v-show="showAnchor"
-        class="workflow-dropdown-menu border border-r-4"
-      >
-        内容嘻嘻嘻
-      </div>
+      <DropdownMenu
+        @mousemove.stop
+        @mousedown.stop
+        @keydown.stop
+        @click.stop
+        :show="showAnchor"
+        :id="id"
+        style="left: 100%; top: 50%; transform: translate(0, -50%)"
+        @clickNodes="clickNodes"
+        @onmousedown="onmousedown"
+      />
     </el-collapse-transition>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { app } from '@/main'
+import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
 import { WorkflowType } from '@/enums/workflow'
 import { MsgError, MsgConfirm } from '@/utils/message'
+
+const {
+  params: { id }
+} = app.config.globalProperties.$route as any
+
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
@@ -159,6 +170,20 @@ const resizeStepContainer = (wh: any) => {
       props.nodeModel.setHeight(height.value.stepContainerHeight)
     }
   }
+}
+
+function clickNodes(item: any) {
+  // workflowRef.value?.addNode(item)
+  // showAnchor.value = false
+}
+
+function onmousedown(item: any) {
+  // workflowRef.value?.onmousedown(item)
+  // showAnchor.value = false
+}
+
+function clickoutside() {
+  showAnchor.value = false
 }
 
 const props = defineProps<{
