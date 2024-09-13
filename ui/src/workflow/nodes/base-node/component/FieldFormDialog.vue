@@ -34,9 +34,9 @@
       </el-form-item>
       <el-form-item label="输入类型">
         <el-select v-model="form.type">
-          <el-option label="文本框" value="input"/>
-          <el-option label="日期" value="date"/>
-          <el-option label="下拉选项" value="select"/>
+          <el-option label="文本框" value="input" />
+          <el-option label="日期" value="date" />
+          <el-option label="下拉选项" value="select" />
         </el-select>
       </el-form-item>
       <el-form-item v-if="form.type === 'select'">
@@ -49,10 +49,18 @@
           </div>
         </template>
         <template #default>
-          <div class="w-full flex-between" :key="option" v-for="(option, $index) in form.optionList">
-            <input class="el-textarea__inner" v-model.lazy="form.optionList[$index]" placeholder="请输入选项值"/>
-            <el-button link type="primary" @click="delOption($index)">
-              <el-icon class="mr-4"><Remove /></el-icon> 删除
+          <div
+            class="w-full flex-between"
+            :key="option"
+            v-for="(option, $index) in form.optionList"
+          >
+            <input
+              class="el-textarea__inner"
+              v-model.lazy="form.optionList[$index]"
+              placeholder="请输入选项值"
+            />
+            <el-button link class="ml-8" @click="delOption($index)">
+              <el-icon><Delete /></el-icon>
             </el-button>
           </div>
         </template>
@@ -62,11 +70,10 @@
       </el-form-item>
       <el-form-item label="赋值方式">
         <el-radio-group v-model="form.assignment_method">
-          <el-radio label="user_input">用户输入</el-radio>
-          <el-radio label="api_input">接口传参</el-radio>
+          <el-radio value="user_input">用户输入</el-radio>
+          <el-radio value="api_input">接口传参</el-radio>
         </el-radio-group>
       </el-form-item>
-
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -152,7 +159,6 @@ const addOption = () => {
 const delOption = (index: number) => {
   form.value.optionList.splice(index, 1)
 }
-
 
 defineExpose({ open, close })
 </script>

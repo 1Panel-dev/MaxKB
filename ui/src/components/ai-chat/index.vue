@@ -108,7 +108,11 @@
                 </div>
               </el-card>
               <div class="flex-between mt-8" v-if="log">
-                <LogOperationButton v-model:data="chatList[index]" :applicationId="appId" />
+                <LogOperationButton
+                  v-model:data="chatList[index]"
+                  :applicationId="appId"
+                  :tts="props.data.tts_model_enable"
+                />
               </div>
 
               <div class="flex-between mt-8" v-else>
@@ -127,20 +131,13 @@
               </div>
               <div v-if="item.write_ed && props.appId && 500 != item.status" class="flex-between">
                 <OperationButton
+                  :tts="props.data.tts_model_enable"
                   :data="item"
                   :applicationId="appId"
                   :chatId="chartOpenId"
                   :chat_loading="loading"
                   @regeneration="regenerationChart(item)"
                 />
-              </div>
-              <!-- 语音播放 -->
-              <div style="float: right" v-if="props.data.tts_model_enable">
-                <el-button :disabled="!item.write_ed" @click="playAnswerText(item.answer_text)">
-                  <el-icon>
-                    <VideoPlay />
-                  </el-icon>
-                </el-button>
               </div>
             </div>
           </div>
@@ -159,19 +156,22 @@
           :maxlength="100000"
           @keydown.enter="sendChatHandle($event)"
         />
-        <div class="operate" v-if="props.data.stt_model_enable">
-          <el-button v-if="mediaRecorderStatus" @click="startRecording">
-            <el-icon>
-              <Microphone />
-            </el-icon>
-          </el-button>
-          <el-button v-else @click="stopRecording">
-            <el-icon>
-              <VideoPause />
-            </el-icon>
-          </el-button>
-        </div>
-        <div class="operate">
+
+        <div class="operate flex align-center">
+          <span v-if="props.data.stt_model_enable">
+            <el-button text v-if="mediaRecorderStatus" @click="startRecording">
+              <el-icon>
+                <Microphone />
+              </el-icon>
+            </el-button>
+            <el-button text v-else @click="stopRecording">
+              <el-icon>
+                <VideoPause />
+              </el-icon>
+            </el-button>
+            <el-divider direction="vertical" />
+          </span>
+
           <el-button
             text
             class="sent-button"
@@ -180,17 +180,10 @@
           >
             <img v-show="isDisabledChart || loading" src="@/assets/icon_send.svg" alt="" />
             <SendIcon v-show="!isDisabledChart && !loading" />
-            <!-- <img
-           
-              src="@/assets/icon_send_colorful.svg"
-              alt=""
-            /> -->
           </el-button>
         </div>
       </div>
     </div>
-    <!-- 先渲染，不然不能播放   -->
-    <audio ref="audioPlayer" controls hidden="hidden"></audio>
   </div>
 </template>
 <script setup lang="ts">
@@ -318,50 +311,54 @@ function handleInputFieldList() {
     ?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
       inputFieldList.value = v.properties.input_field_list
-        ? v.properties.input_field_list.filter((v: any) => v.assignment_method === 'user_input').map((v: any) => {
-            switch (v.type) {
-              case 'input':
-                return {
-                  field: v.variable,
-                  input_type: 'TextInput',
-                  label: v.name,
-                  required: v.is_required
-                }
-              case 'select':
-                return {
-                  field: v.variable,
-                  input_type: 'SingleSelect',
-                  label: v.name,
-                  required: v.is_required,
-                  option_list: v.optionList.map((o: any) => {
-                    return { key: o, value: o }
-                  })
-                }
-              case 'date':
-                return {
-                  field: v.variable,
-                  input_type: 'DatePicker',
-                  label: v.name,
-                  required: v.is_required,
-                  attrs: {
-                    format: 'YYYY-MM-DD HH:mm:ss',
-                    'value-format': 'YYYY-MM-DD HH:mm:ss',
-                    type: 'datetime'
+        ? v.properties.input_field_list
+            .filter((v: any) => v.assignment_method === 'user_input')
+            .map((v: any) => {
+              switch (v.type) {
+                case 'input':
+                  return {
+                    field: v.variable,
+                    input_type: 'TextInput',
+                    label: v.name,
+                    required: v.is_required
                   }
-                }
-              default:
-                break
-            }
-          })
+                case 'select':
+                  return {
+                    field: v.variable,
+                    input_type: 'SingleSelect',
+                    label: v.name,
+                    required: v.is_required,
+                    option_list: v.optionList.map((o: any) => {
+                      return { key: o, value: o }
+                    })
+                  }
+                case 'date':
+                  return {
+                    field: v.variable,
+                    input_type: 'DatePicker',
+                    label: v.name,
+                    required: v.is_required,
+                    attrs: {
+                      format: 'YYYY-MM-DD HH:mm:ss',
+                      'value-format': 'YYYY-MM-DD HH:mm:ss',
+                      type: 'datetime'
+                    }
+                  }
+                default:
+                  break
+              }
+            })
         : []
       apiInputFieldList.value = v.properties.input_field_list
-        ? v.properties.input_field_list.filter((v: any) => v.assignment_method === 'api_input').map((v: any) => {
-          return {
-            field: v.variable,
-            label: v.name,
-            required: v.is_required
-          }
-        })
+        ? v.properties.input_field_list
+            .filter((v: any) => v.assignment_method === 'api_input')
+            .map((v: any) => {
+              return {
+                field: v.variable,
+                label: v.name,
+                required: v.is_required
+              }
+            })
         : []
     })
 }
@@ -720,7 +717,7 @@ const handleScroll = () => {
 
 // 定义响应式引用
 const mediaRecorder = ref<any>(null)
-const audioPlayer = ref<HTMLAudioElement | null>(null)
+
 const mediaRecorderStatus = ref(true)
 
 // 开始录音
@@ -779,43 +776,6 @@ const uploadRecording = async (audioBlob: Blob) => {
     })
   } catch (error) {
     console.error('上传失败:', error)
-  }
-}
-
-const playAnswerText = (text: string) => {
-  if (props.data.tts_type === 'BROWSER') {
-    // 创建一个新的 SpeechSynthesisUtterance 实例
-    const utterance = new SpeechSynthesisUtterance(text)
-    // 调用浏览器的朗读功能
-    window.speechSynthesis.speak(utterance)
-  }
-  if (props.data.tts_type === 'TTS') {
-      applicationApi.postTextToSpeech(props.data.id as string, { 'text': text }, loading)
-    .then((res: any) => {
-      // 假设我们有一个 MP3 文件的字节数组
-      // 创建 Blob 对象
-      const blob = new Blob([res], { type: 'audio/mp3' })
-
-      // 创建对象 URL
-      const url = URL.createObjectURL(blob)
-
-      // 测试blob是否能正常播放
-      // const link = document.createElement('a')
-      // link.href = window.URL.createObjectURL(blob)
-      // link.download = "abc.mp3"
-      // link.click()
-
-      // 检查 audioPlayer 是否已经引用了 DOM 元素
-      if (audioPlayer.value instanceof HTMLAudioElement) {
-        audioPlayer.value.src = url
-        audioPlayer.value.play() // 自动播放音频
-      } else {
-        console.error('audioPlayer.value is not an instance of HTMLAudioElement')
-      }
-    })
-    .catch((err) => {
-      console.log('err: ', err)
-    })
   }
 }
 
@@ -946,10 +906,12 @@ defineExpose({
 
       .operate {
         padding: 6px 10px;
+        .el-icon {
+          font-size: 20px;
+        }
 
         .sent-button {
           max-height: none;
-
           .el-icon {
             font-size: 24px;
           }
