@@ -51,7 +51,6 @@
                 ref="dynamicsFormRef"
               />
               <DynamicsForm
-                v-if="debug"
                 v-model="api_form_data"
                 :model="api_form_data"
                 label-position="left"
@@ -242,10 +241,6 @@ const props = defineProps({
     type: String,
     default: ''
   }, // 历史记录Id
-  debug: {
-    type: Boolean,
-    default: false
-  }
 })
 
 const emit = defineEmits(['refresh', 'scroll'])
@@ -460,16 +455,11 @@ function checkInputParam() {
   // 浏览器query参数找到接口传参
   let msg = []
   for (let f of apiInputFieldList.value) {
-    if (!props.debug) {
-      if (f.required && !route.query[f.field]) {
-        msg.push(f.field)
-      }
+    if (!api_form_data.value[f.field]) {
       api_form_data.value[f.field] = route.query[f.field]
-    } else {
-      if (f.required && !api_form_data.value[f.field]) {
-        MsgWarning('请填写所有必填字段')
-        return false
-      }
+    }
+    if (!api_form_data.value[f.field]) {
+      msg.push(f.field)
     }
   }
   if (msg.length > 0) {

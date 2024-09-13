@@ -138,7 +138,7 @@
           </div>
         </div>
         <div class="scrollbar-height">
-          <AiChat :data="detail" :debug="true"></AiChat>
+          <AiChat :data="detail"></AiChat>
         </div>
       </div>
     </el-collapse-transition>
