@@ -259,6 +259,7 @@ const inputValue = ref('')
 const chartOpenId = ref('')
 const chatList = ref<any[]>([])
 const inputFieldList = ref<FormField[]>([])
+const apiInputFieldList = ref<any[]>([])
 const form_data = ref<any>({})
 
 const isDisabledChart = computed(
@@ -317,7 +318,7 @@ function handleInputFieldList() {
     ?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
       inputFieldList.value = v.properties.input_field_list
-        ? v.properties.input_field_list.map((v: any) => {
+        ? v.properties.input_field_list.filter((v: any) => v.assignment_method === 'user_input').map((v: any) => {
             switch (v.type) {
               case 'input':
                 return {
@@ -352,6 +353,15 @@ function handleInputFieldList() {
                 break
             }
           })
+        : []
+      apiInputFieldList.value = v.properties.input_field_list
+        ? v.properties.input_field_list.filter((v: any) => v.assignment_method === 'api_input').map((v: any) => {
+          return {
+            field: v.variable,
+            label: v.name,
+            required: v.is_required
+          }
+        })
         : []
     })
 }
@@ -566,6 +576,14 @@ const errorWrite = (chat: any, message?: string) => {
 }
 
 function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
+  // 浏览器query参数找到接口传参
+  for (let f of apiInputFieldList.value) {
+    if (f.required && !route.query[f.field]) {
+      MsgWarning(`请在接入的URL补全必填参数${f.field}`)
+      return
+    }
+    form_data.value[f.field] = route.query[f.field]
+  }
   loading.value = true
   if (!chat) {
     chat = reactive({
