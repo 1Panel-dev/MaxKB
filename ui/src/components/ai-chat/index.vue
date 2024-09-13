@@ -50,6 +50,14 @@
                 :render_data="inputFieldList"
                 ref="dynamicsFormRef"
               />
+              <DynamicsForm
+                v-model="form_data"
+                :model="form_data"
+                label-position="left"
+                require-asterisk-position="right"
+                :render_data="apiInputFieldList"
+                ref="dynamicsFormRef2"
+              />
             </el-card>
           </div>
         </div>
@@ -252,7 +260,7 @@ const inputValue = ref('')
 const chartOpenId = ref('')
 const chatList = ref<any[]>([])
 const inputFieldList = ref<FormField[]>([])
-const apiInputFieldList = ref<any[]>([])
+const apiInputFieldList = ref<FormField[]>([])
 const form_data = ref<any>({})
 
 const isDisabledChart = computed(
@@ -353,10 +361,38 @@ function handleInputFieldList() {
         ? v.properties.input_field_list
             .filter((v: any) => v.assignment_method === 'api_input')
             .map((v: any) => {
-              return {
-                field: v.variable,
-                label: v.name,
-                required: v.is_required
+              switch (v.type) {
+                case 'input':
+                  return {
+                    field: v.variable,
+                    input_type: 'TextInput',
+                    label: v.name,
+                    required: v.is_required
+                  }
+                case 'select':
+                  return {
+                    field: v.variable,
+                    input_type: 'SingleSelect',
+                    label: v.name,
+                    required: v.is_required,
+                    option_list: v.optionList.map((o: any) => {
+                      return { key: o, value: o }
+                    })
+                  }
+                case 'date':
+                  return {
+                    field: v.variable,
+                    input_type: 'DatePicker',
+                    label: v.name,
+                    required: v.is_required,
+                    attrs: {
+                      format: 'YYYY-MM-DD HH:mm:ss',
+                      'value-format': 'YYYY-MM-DD HH:mm:ss',
+                      type: 'datetime'
+                    }
+                  }
+                default:
+                  break
               }
             })
         : []
@@ -395,6 +431,13 @@ function showSource(row: any) {
 }
 
 function quickProblemHandle(val: string) {
+  // 检查inputFieldList是否有未填写的字段
+  for (let i = 0; i < inputFieldList.value.length; i++) {
+    if (inputFieldList.value[i].required && !form_data.value[inputFieldList.value[i].field]) {
+      MsgWarning('请填写所有必填字段')
+      return
+    }
+  }
   if (!loading.value && props.data?.name) {
     handleDebounceClick(val)
   }
