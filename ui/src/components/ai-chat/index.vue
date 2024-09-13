@@ -574,12 +574,16 @@ const errorWrite = (chat: any, message?: string) => {
 
 function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
   // 浏览器query参数找到接口传参
+  let msg = []
   for (let f of apiInputFieldList.value) {
     if (f.required && !route.query[f.field]) {
-      MsgWarning(`请在接入的URL补全必填参数${f.field}`)
-      return
+      msg.push(f.field)
     }
     form_data.value[f.field] = route.query[f.field]
+  }
+  if (msg.length > 0) {
+    MsgWarning(`请在URL中填写参数 ${msg.join('、')}的值`)
+    return
   }
   loading.value = true
   if (!chat) {
