@@ -10,7 +10,10 @@
       {{ item.content }}
     </div>
     <HtmlRander v-else-if="item.type === 'html_rander'" :source="item.content"></HtmlRander>
-
+    <EchartsRander
+      v-else-if="item.type === 'echarts_rander'"
+      :option="item.content"
+    ></EchartsRander>
     <MdPreview
       v-else
       noIconfont
@@ -26,6 +29,7 @@
 import { computed, ref } from 'vue'
 import { config } from 'md-editor-v3'
 import HtmlRander from './HtmlRander.vue'
+import EchartsRander from './EchartsRander.vue'
 config({
   markdownItConfig(md) {
     md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
@@ -64,8 +68,9 @@ const md_view_list = computed(() => {
       return md_img_list[Math.floor(index / 2)]
     }
   })
-  return split_html_rander(split_quick_question(result))
+  return split_echarts_rander(split_html_rander(split_quick_question(result)))
 })
+
 const split_quick_question = (result: Array<string>) => {
   return result
     .map((item) => split_quick_question_(item))
@@ -128,6 +133,41 @@ const split_html_rander_ = (source: string, type: string) => {
         content: md_quick_question_list[Math.floor(index / 2)]
           .replace('<html_rander>', '')
           .replace('</html_rander>', '')
+      }
+    }
+  })
+  return result
+}
+
+const split_echarts_rander = (result: Array<any>) => {
+  return result
+    .map((item) => split_echarts_rander_(item.content, item.type))
+    .reduce((x: any, y: any) => {
+      return [...x, ...y]
+    }, [])
+}
+
+const split_echarts_rander_ = (source: string, type: string) => {
+  const temp_md_quick_question_list = source.match(/<echarts_rander>[\d\D]*?<\/echarts_rander>/g)
+  const md_quick_question_list = temp_md_quick_question_list
+    ? temp_md_quick_question_list.filter((i) => i)
+    : []
+  const split_quick_question_value = source
+    .split(/<echarts_rander>[\d\D]*?<\/echarts_rander>/g)
+    .filter((item) => item !== undefined)
+    .filter((item) => !md_quick_question_list?.includes(item))
+  const result = Array.from(
+    { length: md_quick_question_list.length + split_quick_question_value.length },
+    (v, i) => i
+  ).map((index) => {
+    if (index % 2 == 0) {
+      return { type: type, content: split_quick_question_value[Math.floor(index / 2)] }
+    } else {
+      return {
+        type: 'echarts_rander',
+        content: md_quick_question_list[Math.floor(index / 2)]
+          .replace('<echarts_rander>', '')
+          .replace('</echarts_rander>', '')
       }
     }
   })
