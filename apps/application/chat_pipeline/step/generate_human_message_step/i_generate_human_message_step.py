@@ -37,6 +37,8 @@ class IGenerateHumanMessageStep(IBaseChatPipelineStep):
             "最大携带知识库段落长度"))
         # 模板
         prompt = serializers.CharField(required=True, error_messages=ErrMessage.char("提示词"))
+        system = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                       error_messages=ErrMessage.char("系统提示词(角色)"))
         # 补齐问题
         padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.char("补齐问题"))
         # 未查询到引用分段
@@ -59,6 +61,7 @@ class IGenerateHumanMessageStep(IBaseChatPipelineStep):
                 prompt: str,
                 padding_problem_text: str = None,
                 no_references_setting=None,
+                system=None,
                 **kwargs) -> List[BaseMessage]:
         """
 

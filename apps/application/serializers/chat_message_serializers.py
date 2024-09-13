@@ -80,8 +80,11 @@ class ChatInfo:
             'history_chat_record': self.chat_record_list,
             'chat_id': self.chat_id,
             'dialogue_number': self.application.dialogue_number,
+            'problem_optimization_prompt': self.application.problem_optimization_prompt,
             'prompt': model_setting.get(
                 'prompt') if 'prompt' in model_setting else Application.get_default_model_prompt(),
+            'system': model_setting.get(
+                'system', None),
             'model_id': model_id,
             'problem_optimization': self.application.problem_optimization,
             'stream': True,
