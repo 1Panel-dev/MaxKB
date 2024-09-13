@@ -108,6 +108,7 @@
             :appId="applicationDetail?.id"
             :record="currentRecordList"
             :chatId="currentChatId"
+            :debug="true"
             @refresh="refresh"
             @scroll="handleScroll"
           >
