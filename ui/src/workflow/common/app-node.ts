@@ -18,7 +18,6 @@ class AppNode extends HtmlResize.view {
   constructor(props: any, VueNode: any) {
     super(props)
     this.isMounted = false
-
     this.r = h(VueNode, {
       properties: props.model.properties,
       nodeModel: props.model
@@ -73,7 +72,7 @@ class AppNode extends HtmlResize.view {
           style: { zindex: 0 },
           onClick: () => {
             if (!isConnect && type == 'right') {
-              this.props.model.openNodeMenu()
+              this.props.model.openNodeMenu(anchorData)
             }
           },
           dangerouslySetInnerHTML: {

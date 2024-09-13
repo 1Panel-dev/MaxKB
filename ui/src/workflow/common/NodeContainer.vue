@@ -121,6 +121,7 @@ const height = ref<{
   outputContainerHeight: 0
 })
 const showAnchor = ref<boolean>(false)
+const anchorData = ref<any>()
 const node_status = computed(() => {
   if (props.nodeModel.properties.status) {
     return props.nodeModel.properties.status
@@ -173,14 +174,23 @@ const resizeStepContainer = (wh: any) => {
 }
 
 function clickNodes(item: any) {
-  // workflowRef.value?.addNode(item)
-  // showAnchor.value = false
+  const nodeModel = props.nodeModel.graphModel.addNode({
+    type: item.type,
+    properties: item.properties,
+    x: anchorData.value?.x + props.nodeModel.width + 100,
+    y: anchorData.value?.y - item.height
+  })
+  props.nodeModel.graphModel.addEdge({
+    type: 'app-edge',
+    sourceNodeId: props.nodeModel.id,
+    sourceAnchorId: anchorData.value?.id,
+    targetNodeId: nodeModel.id
+  })
+
+  closeNodeMenu()
 }
 
-function onmousedown(item: any) {
-  // workflowRef.value?.onmousedown(item)
-  // showAnchor.value = false
-}
+function onmousedown(item: any) {}
 
 function clickoutside() {
   showAnchor.value = false
@@ -207,9 +217,17 @@ const nodeFields = computed(() => {
 function showOperate(type: string) {
   return type !== WorkflowType.Base && type !== WorkflowType.Start
 }
+const openNodeMenu = (anchorValue: any) => {
+  showAnchor.value = true
+  anchorData.value = anchorValue
+}
+const closeNodeMenu = () => {
+  showAnchor.value = false
+  anchorData.value = undefined
+}
 onMounted(() => {
-  set(props.nodeModel, 'openNodeMenu', () => {
-    showAnchor.value = !showAnchor.value
+  set(props.nodeModel, 'openNodeMenu', (anchorData: any) => {
+    showAnchor.value ? closeNodeMenu() : openNodeMenu(anchorData)
   })
 })
 </script>

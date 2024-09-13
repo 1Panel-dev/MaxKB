@@ -50,8 +50,7 @@
             <el-button text type="info" @click="openDialog">
               <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
             </el-button>
-          </template
-          >
+          </template>
         </MdEditor>
       </el-form-item>
       <el-form-item>
@@ -68,11 +67,7 @@
             <el-switch v-model="form_data.stt_model_enable" />
           </div>
         </template>
-        <el-select
-          v-model="form_data.stt_model_id"
-          class="w-full"
-          popper-class="select-model"
-        >
+        <el-select v-model="form_data.stt_model_id" class="w-full" popper-class="select-model">
           <el-option-group
             v-for="(value, label) in sttModelOptions"
             :key="value"
@@ -86,16 +81,13 @@
               class="flex-between"
             >
               <div class="flex align-center">
-                        <span
-                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                          class="model-icon mr-8"
-                        ></span>
+                <span
+                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                  class="model-icon mr-8"
+                ></span>
                 <span>{{ item.name }}</span>
-                <el-tag
-                  v-if="item.permission_type === 'PUBLIC'"
-                  type="info"
-                  class="info-tag ml-8"
-                >公用
+                <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
+                  >公用
                 </el-tag>
               </div>
               <el-icon class="check-icon" v-if="item.id === form_data.stt_model_id">
@@ -112,14 +104,14 @@
               disabled
             >
               <div class="flex">
-                        <span
-                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                          class="model-icon mr-8"
-                        ></span>
+                <span
+                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                  class="model-icon mr-8"
+                ></span>
                 <span>{{ item.name }}</span>
                 <span class="danger">{{
-                    $t('views.application.applicationForm.form.aiModel.unavailable')
-                  }}</span>
+                  $t('views.application.applicationForm.form.aiModel.unavailable')
+                }}</span>
               </div>
               <el-icon class="check-icon" v-if="item.id === form_data.stt_model_id">
                 <Check />
@@ -136,8 +128,8 @@
           </div>
         </template>
         <el-radio-group v-model="form_data.tts_type">
-          <el-radio label="浏览器播放(免费)" value="BROWSER"/>
-          <el-radio label="TTS模型" value="TTS"/>
+          <el-radio label="浏览器播放(免费)" value="BROWSER" />
+          <el-radio label="TTS模型" value="TTS" />
         </el-radio-group>
         <el-select
           v-if="form_data.tts_type === 'TTS'"
@@ -158,16 +150,13 @@
               class="flex-between"
             >
               <div class="flex align-center">
-                        <span
-                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                          class="model-icon mr-8"
-                        ></span>
+                <span
+                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                  class="model-icon mr-8"
+                ></span>
                 <span>{{ item.name }}</span>
-                <el-tag
-                  v-if="item.permission_type === 'PUBLIC'"
-                  type="info"
-                  class="info-tag ml-8"
-                >公用
+                <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
+                  >公用
                 </el-tag>
               </div>
               <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
@@ -184,14 +173,14 @@
               disabled
             >
               <div class="flex">
-                        <span
-                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                          class="model-icon mr-8"
-                        ></span>
+                <span
+                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                  class="model-icon mr-8"
+                ></span>
                 <span>{{ item.name }}</span>
                 <span class="danger">{{
-                    $t('views.application.applicationForm.form.aiModel.unavailable')
-                  }}</span>
+                  $t('views.application.applicationForm.form.aiModel.unavailable')
+                }}</span>
               </div>
               <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
                 <Check />
@@ -208,46 +197,46 @@
       </el-button>
     </div>
     <el-table :data="props.nodeModel.properties.input_field_list" class="mb-16">
-        <el-table-column prop="name" label="变量名" />
-        <el-table-column prop="variable" label="变量" />
-        <el-table-column label="输入类型">
-          <template #default="{ row }">
-            <el-tag type="info" class="info-tag" v-if="row.type === 'input'">文本框</el-tag>
-            <el-tag type="info" class="info-tag" v-if="row.type === 'date'">日期</el-tag>
-            <el-tag type="info" class="info-tag" v-if="row.type === 'select'">下拉选项</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="必填">
-          <template #default="{ row }">
-            <div @click.stop>
-              <el-switch size="small" v-model="row.is_required" />
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="source" label="赋值方式">
-          <template #default="{ row }">
-            {{ row.source === 'user_input' ? '用户输入' : '接口传参' }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="left" width="80">
-          <template #default="{ row, $index }">
-            <span class="mr-4">
-              <el-tooltip effect="dark" content="修改" placement="top">
-                <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
-                  <el-icon><EditPen /></el-icon>
-                </el-button>
-              </el-tooltip>
-            </span>
-            <el-tooltip effect="dark" content="删除" placement="top">
-              <el-button type="primary" text @click="deleteField($index)">
-                <el-icon>
-                  <Delete />
-                </el-icon>
+      <el-table-column prop="name" label="变量名" />
+      <el-table-column prop="variable" label="变量" />
+      <el-table-column label="输入类型">
+        <template #default="{ row }">
+          <el-tag type="info" class="info-tag" v-if="row.type === 'input'">文本框</el-tag>
+          <el-tag type="info" class="info-tag" v-if="row.type === 'date'">日期</el-tag>
+          <el-tag type="info" class="info-tag" v-if="row.type === 'select'">下拉选项</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="必填">
+        <template #default="{ row }">
+          <div @click.stop>
+            <el-switch size="small" v-model="row.is_required" />
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="source" label="赋值方式">
+        <template #default="{ row }">
+          {{ row.source === 'user_input' ? '用户输入' : '接口传参' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="left" width="80">
+        <template #default="{ row, $index }">
+          <span class="mr-4">
+            <el-tooltip effect="dark" content="修改" placement="top">
+              <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
+                <el-icon><EditPen /></el-icon>
               </el-button>
             </el-tooltip>
-          </template>
-        </el-table-column>
-      </el-table>
+          </span>
+          <el-tooltip effect="dark" content="删除" placement="top">
+            <el-button type="primary" text @click="deleteField($index)">
+              <el-icon>
+                <Delete />
+              </el-icon>
+            </el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+    </el-table>
     <!-- 回复内容弹出层 -->
     <el-dialog v-model="dialogVisible" title="开场白" append-to-body>
       <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"></MdEditor>
@@ -257,8 +246,8 @@
         </div>
       </template>
     </el-dialog>
+    <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </NodeContainer>
-  <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
 </template>
 <script setup lang="ts">
 import { app } from '@/main'
@@ -335,28 +324,21 @@ const validate = () => {
 }
 
 function getProvider() {
-  model
-    .asyncGetProvider()
-    .then((res: any) => {
-      providerOptions.value = res?.data
-    })
+  model.asyncGetProvider().then((res: any) => {
+    providerOptions.value = res?.data
+  })
 }
 
-
 function getSTTModel() {
-  applicationApi
-    .getApplicationSTTModel(id)
-    .then((res: any) => {
-      sttModelOptions.value = groupBy(res?.data, 'provider')
-    })
+  applicationApi.getApplicationSTTModel(id).then((res: any) => {
+    sttModelOptions.value = groupBy(res?.data, 'provider')
+  })
 }
 
 function getTTSModel() {
-  applicationApi
-    .getApplicationTTSModel(id)
-    .then((res: any) => {
-      ttsModelOptions.value = groupBy(res?.data, 'provider')
-    })
+  applicationApi.getApplicationTTSModel(id).then((res: any) => {
+    ttsModelOptions.value = groupBy(res?.data, 'provider')
+  })
 }
 
 const currentIndex = ref(null)
@@ -391,7 +373,6 @@ function refreshFieldList(data: any) {
   FieldFormDialogRef.value.close()
 }
 
-
 onMounted(() => {
   set(props.nodeModel, 'validate', validate)
   if (props.nodeModel.properties.input_field_list) {
@@ -403,7 +384,6 @@ onMounted(() => {
   getProvider()
   getTTSModel()
   getSTTModel()
-
 })
 </script>
 <style lang="scss" scoped>
