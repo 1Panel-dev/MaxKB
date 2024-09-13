@@ -23,6 +23,31 @@ class ChatClientHistoryApi(ApiMixin):
                 ]
 
 
+class OpenAIChatApi(ApiMixin):
+    @staticmethod
+    def get_request_body_api():
+        return openapi.Schema(type=openapi.TYPE_OBJECT,
+                              required=['message'],
+                              properties={
+                                  'messages': openapi.Schema(type=openapi.TYPE_ARRAY, title="问题", description="问题",
+                                                             items=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                                                  required=['role', 'content'],
+                                                                                  properties={
+                                                                                      'content': openapi.Schema(
+                                                                                          type=openapi.TYPE_STRING,
+                                                                                          title="问题内容", default=''),
+                                                                                      'role': openapi.Schema(
+                                                                                          type=openapi.TYPE_STRING,
+                                                                                          title='角色', default="user")
+                                                                                  }
+                                                                                  )),
+                                  'chat_id': openapi.Schema(type=openapi.TYPE_STRING, title="对话id"),
+                                  're_chat': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="重新生成", default=False),
+                                  'stream': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="流式输出", default=True)
+
+                              })
+
+
 class ChatApi(ApiMixin):
     @staticmethod
     def get_request_body_api():

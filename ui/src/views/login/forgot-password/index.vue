@@ -1,6 +1,6 @@
 <template>
   <login-layout>
-    <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库">
+    <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库问答系统">
       <h2 class="mb-24">忘记密码</h2>
       <el-form
         class="register-form"

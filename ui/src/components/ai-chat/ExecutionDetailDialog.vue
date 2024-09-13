@@ -39,7 +39,12 @@
                   <template v-if="item.type === WorkflowType.Start">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">参数输入</h5>
-                      <div class="p-8-12 border-t-dashed lighter">{{ item.question || '-' }}</div>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <div>用户问题: {{ item.question || '-' }}</div>
+                        <div v-for="(f, i) in item.global_fields" :key="i">
+                          {{ f.label }}: {{ f.value }}
+                        </div>
+                      </div>
                     </div>
                   </template>
                   <!-- 知识库检索 -->
@@ -159,6 +164,67 @@
                       <h5 class="p-8-12">输出</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.result || '-' }}
+                      </div>
+                    </div>
+                  </template>
+                  <!-- 多路召回 -->
+                  <template v-if="item.type == WorkflowType.RrerankerNode">
+                    <div class="card-never border-r-4">
+                      <h5 class="p-8-12">检索内容</h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <template v-if="item.document_list?.length > 0">
+                          <template
+                            v-for="(paragraph, paragraphIndex) in item.document_list"
+                            :key="paragraphIndex"
+                          >
+                            <CardBox shadow="never" title="" class="cursor mb-8" :showIcon="false">
+                              <template #description>
+                                <el-scrollbar max-height="150">
+                                  <MdPreview
+                                    ref="editorRef"
+                                    editorId="preview-only"
+                                    :modelValue="paragraph"
+                                  />
+                                </el-scrollbar>
+                              </template>
+                            </CardBox>
+                          </template>
+                        </template>
+                        <template v-else> - </template>
+                      </div>
+                    </div>
+                    <div class="card-never border-r-4 mt-8">
+                      <h5 class="p-8-12">检索结果</h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <template v-if="item.result_list?.length > 0">
+                          <template
+                            v-for="(paragraph, paragraphIndex) in item.result_list"
+                            :key="paragraphIndex"
+                          >
+                            <CardBox
+                              shadow="never"
+                              :title="''"
+                              class="paragraph-source-card cursor mb-8 paragraph-source-card-height"
+                              :showIcon="false"
+                            >
+                              <div class="active-button primary">
+                                {{ paragraph.metadata.relevance_score?.toFixed(3) }}
+                              </div>
+                              <template #description>
+                                <div class="mt-8">
+                                  <el-scrollbar height="150">
+                                    <MdPreview
+                                      ref="editorRef"
+                                      editorId="preview-only"
+                                      :modelValue="paragraph.page_content"
+                                    />
+                                  </el-scrollbar>
+                                </div>
+                              </template>
+                            </CardBox>
+                          </template>
+                        </template>
+                        <template v-else> - </template>
                       </div>
                     </div>
                   </template>

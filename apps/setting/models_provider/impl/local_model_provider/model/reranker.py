@@ -50,6 +50,8 @@ class WebLocalBaseReranker(MaxKBBaseModel, BaseDocumentCompressor):
 
     def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \
             Sequence[Document]:
+        if documents is None or len(documents) == 0:
+            return []
         bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
         res = requests.post(
             f'{CONFIG.get("LOCAL_MODEL_PROTOCOL")}://{bind}/api/model/{self.model_id}/compress_documents',
@@ -85,6 +87,8 @@ class LocalBaseReranker(MaxKBBaseModel, BaseDocumentCompressor):
 
     def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \
             Sequence[Document]:
+        if documents is None or len(documents) == 0:
+            return []
         with torch.no_grad():
             inputs = self.tokenizer([[query, document.page_content] for document in documents], padding=True,
                                     truncation=True, return_tensors='pt', max_length=512)

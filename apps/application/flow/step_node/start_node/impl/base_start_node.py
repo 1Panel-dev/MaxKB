@@ -22,6 +22,14 @@ class BaseStartStepNode(IStarNode):
                           {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'start_time': time.time()})
 
     def get_details(self, index: int, **kwargs):
+        global_fields = []
+        for field in self.node.properties.get('config')['globalFields']:
+            key = field['value']
+            global_fields.append({
+                'label': field['label'],
+                'key': key,
+                'value': self.workflow_manage[key] if key in self.workflow_manage else ''
+            })
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
@@ -29,5 +37,6 @@ class BaseStartStepNode(IStarNode):
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'global_fields': global_fields
         }

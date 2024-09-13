@@ -17,7 +17,9 @@
                   class="problem-button ellipsis-2 mb-8"
                   :class="log ? 'disabled' : 'cursor'"
                 >
-                  <el-icon><EditPen /></el-icon>
+                  <el-icon>
+                    <EditPen />
+                  </el-icon>
                   {{ item.str }}
                 </div>
                 <MdPreview
@@ -30,6 +32,24 @@
                   no-mermaid
                 />
               </template>
+            </el-card>
+          </div>
+        </div>
+        <div v-if="inputFieldList.length > 0">
+          <div class="avatar">
+            <img v-if="data.avatar" :src="data.avatar" height="30px" />
+            <LogoIcon v-else height="30px" />
+          </div>
+          <div class="content">
+            <el-card shadow="always" class="dialog-card">
+              <DynamicsForm
+                v-model="form_data"
+                :model="form_data"
+                label-position="left"
+                require-asterisk-position="right"
+                :render_data="inputFieldList"
+                ref="dynamicsFormRef"
+              />
             </el-card>
           </div>
         </div>
@@ -98,11 +118,11 @@
                     v-if="item.is_stop && !item.write_ed"
                     @click="startChat(item)"
                     link
-                    >继续</el-button
-                  >
+                    >继续
+                  </el-button>
                   <el-button type="primary" v-else-if="!item.write_ed" @click="stopChat(item)" link
-                    >停止回答</el-button
-                  >
+                    >停止回答
+                  </el-button>
                 </div>
               </div>
               <div v-if="item.write_ed && props.appId && 500 != item.status" class="flex-between">
@@ -114,9 +134,12 @@
                   @regeneration="regenerationChart(item)"
                 />
               </div>
-              <div style="float: right;" v-if="props.data.tts_model_enable">
+              <!-- 语音播放 -->
+              <div style="float: right" v-if="props.data.tts_model_enable">
                 <el-button :disabled="!item.write_ed" @click="playAnswerText(item.answer_text)">
-                  <el-icon><VideoPlay /></el-icon>
+                  <el-icon>
+                    <VideoPlay />
+                  </el-icon>
                 </el-button>
               </div>
             </div>
@@ -137,17 +160,15 @@
           @keydown.enter="sendChatHandle($event)"
         />
         <div class="operate" v-if="props.data.stt_model_enable">
-          <el-button
-            v-if="mediaRecorderStatus"
-            @click="startRecording"
-          >
-            <el-icon><Microphone /></el-icon>
+          <el-button v-if="mediaRecorderStatus" @click="startRecording">
+            <el-icon>
+              <Microphone />
+            </el-icon>
           </el-button>
-          <el-button
-            v-else
-            @click="stopRecording"
-          >
-            <el-icon><VideoPause /></el-icon>
+          <el-button v-else @click="stopRecording">
+            <el-icon>
+              <VideoPause />
+            </el-icon>
           </el-button>
         </div>
         <div class="operate">
@@ -189,6 +210,9 @@ import { debounce } from 'lodash'
 import Recorder from 'recorder-core'
 import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
+import { MsgWarning } from '@/utils/message'
+import DynamicsForm from '@/components/dynamics-form/index.vue'
+import type { FormField } from '@/components/dynamics-form/type'
 
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
@@ -234,6 +258,9 @@ const loading = ref(false)
 const inputValue = ref('')
 const chartOpenId = ref('')
 const chatList = ref<any[]>([])
+const inputFieldList = ref<FormField[]>([])
+const apiInputFieldList = ref<any[]>([])
+const form_data = ref<any>({})
 
 const isDisabledChart = computed(
   () => !(inputValue.value.trim() && (props.appId || props.data?.name))
@@ -286,10 +313,64 @@ watch(
   { deep: true }
 )
 
+function handleInputFieldList() {
+  props.data.work_flow?.nodes
+    ?.filter((v: any) => v.id === 'base-node')
+    .map((v: any) => {
+      inputFieldList.value = v.properties.input_field_list
+        ? v.properties.input_field_list.filter((v: any) => v.assignment_method === 'user_input').map((v: any) => {
+            switch (v.type) {
+              case 'input':
+                return {
+                  field: v.variable,
+                  input_type: 'TextInput',
+                  label: v.name,
+                  required: v.is_required
+                }
+              case 'select':
+                return {
+                  field: v.variable,
+                  input_type: 'SingleSelect',
+                  label: v.name,
+                  required: v.is_required,
+                  option_list: v.optionList.map((o: any) => {
+                    return { key: o, value: o }
+                  })
+                }
+              case 'date':
+                return {
+                  field: v.variable,
+                  input_type: 'DatePicker',
+                  label: v.name,
+                  required: v.is_required,
+                  attrs: {
+                    format: 'YYYY-MM-DD HH:mm:ss',
+                    'value-format': 'YYYY-MM-DD HH:mm:ss',
+                    type: 'datetime'
+                  }
+                }
+              default:
+                break
+            }
+          })
+        : []
+      apiInputFieldList.value = v.properties.input_field_list
+        ? v.properties.input_field_list.filter((v: any) => v.assignment_method === 'api_input').map((v: any) => {
+          return {
+            field: v.variable,
+            label: v.name,
+            required: v.is_required
+          }
+        })
+        : []
+    })
+}
+
 watch(
   () => props.data,
   () => {
     chartOpenId.value = ''
+    handleInputFieldList()
   },
   { deep: true }
 )
@@ -327,6 +408,13 @@ const handleDebounceClick = debounce((val) => {
 }, 200)
 
 function sendChatHandle(event: any) {
+  // 检查inputFieldList是否有未填写的字段
+  for (let i = 0; i < inputFieldList.value.length; i++) {
+    if (inputFieldList.value[i].required && !form_data.value[inputFieldList.value[i].field]) {
+      MsgWarning('请填写所有必填字段')
+      return
+    }
+  }
   if (!event.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
     event.preventDefault()
@@ -340,12 +428,14 @@ function sendChatHandle(event: any) {
     inputValue.value += '\n'
   }
 }
+
 const stopChat = (chat: chatType) => {
   ChatManagement.stop(chat.id)
 }
 const startChat = (chat: chatType) => {
   ChatManagement.write(chat.id)
 }
+
 /**
  * 对话
  */
@@ -398,6 +488,7 @@ function getChartOpenId(chat?: any) {
     }
   }
 }
+
 /**
  * 获取一个递归函数,处理流式数据
  * @param chat    每一条对话记录
@@ -483,7 +574,16 @@ const errorWrite = (chat: any, message?: string) => {
   ChatManagement.updateStatus(chat.id, 500)
   ChatManagement.close(chat.id)
 }
+
 function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
+  // 浏览器query参数找到接口传参
+  for (let f of apiInputFieldList.value) {
+    if (f.required && !route.query[f.field]) {
+      MsgWarning(`请在接入的URL补全必填参数${f.field}`)
+      return
+    }
+    form_data.value[f.field] = route.query[f.field]
+  }
   loading.value = true
   if (!chat) {
     chat = reactive({
@@ -513,7 +613,8 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
   } else {
     const obj = {
       message: chat.problem_text,
-      re_chat: re_chat || false
+      re_chat: re_chat || false,
+      form_data: form_data.value
     }
     // 对话
     applicationApi
@@ -618,10 +719,9 @@ const handleScroll = () => {
 }
 
 // 定义响应式引用
-const mediaRecorder= ref<any>(null)
-const audioPlayer= ref<HTMLAudioElement | null>(null)
+const mediaRecorder = ref<any>(null)
+const audioPlayer = ref<HTMLAudioElement | null>(null)
 const mediaRecorderStatus = ref(true)
-
 
 // 开始录音
 const startRecording = async () => {
@@ -630,14 +730,17 @@ const startRecording = async () => {
     mediaRecorder.value = new Recorder({
       type: 'mp3',
       bitRate: 128,
-      sampleRate: 44100,
+      sampleRate: 44100
     })
 
-    mediaRecorder.value.open(() => {
+    mediaRecorder.value.open(
+      () => {
         mediaRecorder.value.start()
-    }, (err: any) => {
-      console.error(err)
-    })
+      },
+      (err: any) => {
+        console.error(err)
+      }
+    )
   } catch (error) {
     console.error('无法获取音频权限：', error)
   }
@@ -647,17 +750,20 @@ const startRecording = async () => {
 const stopRecording = () => {
   if (mediaRecorder.value) {
     mediaRecorderStatus.value = true
-    mediaRecorder.value.stop((blob: Blob, duration: number) => {
-       // 测试blob是否能正常播放
-       //  const link = document.createElement('a')
-       //  link.href = window.URL.createObjectURL(blob)
-       //  link.download = 'abc.mp3'
-       //  link.click()
+    mediaRecorder.value.stop(
+      (blob: Blob, duration: number) => {
+        // 测试blob是否能正常播放
+        //  const link = document.createElement('a')
+        //  link.href = window.URL.createObjectURL(blob)
+        //  link.download = 'abc.mp3'
+        //  link.click()
 
         uploadRecording(blob) // 上传录音文件
-    }, (err: any) => {
-      console.error('录音失败:', err)
-    })
+      },
+      (err: any) => {
+        console.error('录音失败:', err)
+      }
+    )
   }
 }
 
@@ -666,22 +772,26 @@ const uploadRecording = async (audioBlob: Blob) => {
   try {
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
-      applicationApi.postSpeechToText(props.data.id as string, formData, loading)
-        .then((response) => {
-          console.log('上传成功:', response.data)
-          inputValue.value = response.data
-          // chatMessage(null, res.data)
-        })
-
+    applicationApi.postSpeechToText(props.data.id as string, formData, loading).then((response) => {
+      console.log('上传成功:', response.data)
+      inputValue.value = response.data
+      // chatMessage(null, res.data)
+    })
   } catch (error) {
     console.error('上传失败:', error)
   }
 }
 
 const playAnswerText = (text: string) => {
-  applicationApi.postTextToSpeech(props.data.id as string, { 'text': text }, loading)
+  if (props.data.tts_type === 'BROWSER') {
+    // 创建一个新的 SpeechSynthesisUtterance 实例
+    const utterance = new SpeechSynthesisUtterance(text)
+    // 调用浏览器的朗读功能
+    window.speechSynthesis.speak(utterance)
+  }
+  if (props.data.tts_type === 'TTS') {
+      applicationApi.postTextToSpeech(props.data.id as string, { 'text': text }, loading)
     .then((res: any) => {
-
       // 假设我们有一个 MP3 文件的字节数组
       // 创建 Blob 对象
       const blob = new Blob([res], { type: 'audio/mp3' })
@@ -697,16 +807,21 @@ const playAnswerText = (text: string) => {
 
       // 检查 audioPlayer 是否已经引用了 DOM 元素
       if (audioPlayer.value instanceof HTMLAudioElement) {
-        audioPlayer.value.src = url;
-        audioPlayer.value.play(); // 自动播放音频
+        audioPlayer.value.src = url
+        audioPlayer.value.play() // 自动播放音频
       } else {
-        console.error("audioPlayer.value is not an instance of HTMLAudioElement");
+        console.error('audioPlayer.value is not an instance of HTMLAudioElement')
       }
     })
     .catch((err) => {
       console.log('err: ', err)
     })
+  }
 }
+
+onMounted(() => {
+  handleInputFieldList()
+})
 
 function setScrollBottom() {
   // 将滚动条滚动到最下面
@@ -751,15 +866,19 @@ defineExpose({
     .avatar {
       float: left;
     }
+
     .content {
       padding-left: var(--padding-left);
+
       :deep(ol) {
         margin-left: 16px !important;
       }
     }
+
     .text {
       padding: 6px 0;
     }
+
     .problem-button {
       width: 100%;
       border: none;
@@ -772,25 +891,30 @@ defineExpose({
       color: var(--el-text-color-regular);
       -webkit-line-clamp: 1;
       word-break: break-all;
+
       &:hover {
         background: var(--el-color-primary-light-9);
       }
+
       &.disabled {
         &:hover {
           background: var(--app-layout-bg-color);
         }
       }
+
       :deep(.el-icon) {
         color: var(--el-color-primary);
       }
     }
   }
+
   &__operate {
     background: #f3f7f9;
     position: relative;
     width: 100%;
     box-sizing: border-box;
     z-index: 10;
+
     &:before {
       background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
       content: '';
@@ -800,6 +924,7 @@ defineExpose({
       left: 0;
       height: 16px;
     }
+
     .operate-textarea {
       box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
       background-color: #ffffff;
@@ -818,16 +943,21 @@ defineExpose({
         padding: 12px 16px;
         box-sizing: border-box;
       }
+
       .operate {
         padding: 6px 10px;
+
         .sent-button {
           max-height: none;
+
           .el-icon {
             font-size: 24px;
           }
         }
+
         :deep(.el-loading-spinner) {
           margin-top: -15px;
+
           .circular {
             width: 31px;
             height: 31px;
@@ -836,11 +966,13 @@ defineExpose({
       }
     }
   }
+
   .dialog-card {
     border: none;
     border-radius: 8px;
   }
 }
+
 .chat-width {
   max-width: var(--app-chat-width, 860px);
   margin: 0 auto;

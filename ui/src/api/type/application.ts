@@ -18,6 +18,7 @@ interface ApplicationFormType {
   tts_model_id?: string
   stt_model_enable?: boolean
   tts_model_enable?: boolean
+  tts_type?: string
 }
 interface chatType {
   id: string

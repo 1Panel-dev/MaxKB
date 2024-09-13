@@ -79,7 +79,12 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
                 **paragraph,
                 'similarity': find_embedding.get('similarity'),
                 'is_hit_handling_method': find_embedding.get('similarity') > paragraph.get(
-                    'directly_return_similarity') and paragraph.get('hit_handling_method') == 'directly_return'
+                    'directly_return_similarity') and paragraph.get('hit_handling_method') == 'directly_return',
+                'update_time': paragraph.get('update_time').strftime("%Y-%m-%d %H:%M:%S"),
+                'create_time': paragraph.get('create_time').strftime("%Y-%m-%d %H:%M:%S"),
+                'id': str(paragraph.get('id')),
+                'dataset_id': str(paragraph.get('dataset_id')),
+                'document_id': str(paragraph.get('document_id'))
             }
 
     @staticmethod

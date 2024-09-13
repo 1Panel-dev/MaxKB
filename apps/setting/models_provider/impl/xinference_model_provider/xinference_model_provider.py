@@ -10,8 +10,10 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
 from setting.models_provider.impl.xinference_model_provider.credential.embedding import \
     XinferenceEmbeddingModelCredential
 from setting.models_provider.impl.xinference_model_provider.credential.llm import XinferenceLLMModelCredential
+from setting.models_provider.impl.xinference_model_provider.credential.reranker import XInferenceRerankerModelCredential
 from setting.models_provider.impl.xinference_model_provider.model.embedding import XinferenceEmbedding
 from setting.models_provider.impl.xinference_model_provider.model.llm import XinferenceChatModel
+from setting.models_provider.impl.xinference_model_provider.model.reranker import XInferenceReranker
 from smartdoc.conf import PROJECT_DIR
 
 xinference_llm_model_credential = XinferenceLLMModelCredential()
@@ -480,7 +482,9 @@ embedding_model_info = [
     ModelInfo('text2vec-large-chinese', 'Text2Vec 的中文大型版本嵌入模型。', ModelTypeConst.EMBEDDING,
               xinference_embedding_model_credential, XinferenceEmbedding),
 ]
-
+rerank_list = [ModelInfo('bce-reranker-base_v1',
+                         '发布新的重新排名器，建立在强大的 M3 和LLM （GEMMA 和 MiniCPM，实际上没那么大）骨干上，支持多语言处理和更大的输入，大幅提高 BEIR、C-MTEB/Retrieval 的排名性能、MIRACL、LlamaIndex 评估',
+                         ModelTypeConst.RERANKER, XInferenceRerankerModelCredential(), XInferenceReranker)]
 model_info_manage = (ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
     ModelInfo(
         'phi3',
@@ -492,6 +496,7 @@ model_info_manage = (ModelInfoManage.builder().append_model_info_list(model_info
         '',
         '',
         ModelTypeConst.EMBEDDING, xinference_embedding_model_credential, XinferenceEmbedding))
+                     .append_model_info_list(rerank_list).append_default_model_info(rerank_list[0])
                      .build())
 
 

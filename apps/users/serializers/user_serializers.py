@@ -387,7 +387,7 @@ class SendEmailSerializer(ApiMixin, serializers.Serializer):
                                       system_setting.meta.get('email_use_ssl')
                                       )
             # 发送邮件
-            send_mail(f'【MaxKB 智能知识库-{"用户注册" if state == "register" else "修改密码"}】',
+            send_mail(f'【MaxKB 智能知识库问答系统-{"用户注册" if state == "register" else "修改密码"}】',
                       '',
                       html_message=f'{content.replace("${code}", code)}',
                       from_email=system_setting.meta.get('from_email'),

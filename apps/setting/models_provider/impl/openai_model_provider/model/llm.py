@@ -6,9 +6,11 @@
     @date：2024/4/18 15:28
     @desc:
 """
-from typing import List, Dict
+from typing import List, Dict, Optional, Any
 
+from langchain_core.language_models import LanguageModelInput
 from langchain_core.messages import BaseMessage, get_buffer_string
+from langchain_core.runnables import RunnableConfig
 from langchain_openai.chat_models import ChatOpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage

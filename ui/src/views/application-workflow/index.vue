@@ -218,6 +218,7 @@ const clickShowDebug = () => {
       try {
         workflow.is_valid()
         detail.value = {
+          ...detail.value,
           type: 'WORK_FLOW',
           ...workflow.get_base_node()?.properties.node_data,
           work_flow: getGraphData()
@@ -285,6 +286,9 @@ function getDetail() {
       v['properties']['noRender'] = true
     })
     detail.value = res.data
+    detail.value.stt_model_id = res.data.stt_model
+    detail.value.tts_model_id = res.data.tts_model
+    detail.value.tts_type = res.data.tts_type
     saveTime.value = res.data?.update_time
   })
 }

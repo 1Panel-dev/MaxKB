@@ -66,6 +66,9 @@ function cardLeave() {
   min-height: var(--card-min-height);
   min-width: var(--card-min-width);
   border-radius: 8px;
+  .title {
+    height: 20px;
+  }
   .description {
     color: var(--app-text-color-secondary);
     line-height: 22px;

@@ -694,6 +694,8 @@ class ApplicationSerializer(serializers.Serializer):
                  'tts_model_id': application.tts_model_id,
                  'stt_model_enable': application.stt_model_enable,
                  'tts_model_enable': application.tts_model_enable,
+                 'tts_type': application.tts_type,
+                 'work_flow': application.work_flow,
                  'show_source': application_access_token.show_source})
 
         @transaction.atomic
@@ -744,7 +746,7 @@ class ApplicationSerializer(serializers.Serializer):
 
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
-                           'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable',
+                           'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
                            'api_key_is_active', 'icon', 'work_flow', 'model_params_setting']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
@@ -855,10 +857,17 @@ class ApplicationSerializer(serializers.Serializer):
             nodes = instance.get('work_flow')['nodes']
             for node in nodes:
                 if node['id'] == 'base-node':
-                    instance['stt_model_id'] = node['properties']['node_data']['stt_model_id']
-                    instance['tts_model_id'] = node['properties']['node_data']['tts_model_id']
-                    instance['stt_model_enable'] = node['properties']['node_data']['stt_model_enable']
-                    instance['tts_model_enable'] = node['properties']['node_data']['tts_model_enable']
+                    node_data = node['properties']['node_data']
+                    if 'stt_model_id' in node_data:
+                        instance['stt_model_id'] = node_data['stt_model_id']
+                    if 'tts_model_id' in node_data:
+                        instance['tts_model_id'] = node_data['tts_model_id']
+                    if 'stt_model_enable' in node_data:
+                        instance['stt_model_enable'] = node_data['stt_model_enable']
+                    if 'tts_model_enable' in node_data:
+                        instance['tts_model_enable'] = node_data['tts_model_enable']
+                    if 'tts_type' in node_data:
+                        instance['tts_type'] = node_data['tts_type']
                     break
 
         def speech_to_text(self, file, with_valid=True):

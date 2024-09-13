@@ -15,7 +15,7 @@ class CsvSplitHandle(BaseParseTableHandle):
             return True
         return False
 
-    def handle(self, file, get_buffer):
+    def handle(self, file, get_buffer,save_image):
         buffer = get_buffer(file)
         try:
             content = buffer.decode(detect(buffer)['encoding'])
