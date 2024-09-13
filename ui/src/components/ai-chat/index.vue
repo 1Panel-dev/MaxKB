@@ -35,7 +35,7 @@
             </el-card>
           </div>
         </div>
-        <div v-if="inputFieldList.length > 0">
+        <div v-if="inputFieldList.length > 0 || apiInputFieldList.length > 0">
           <div class="avatar">
             <img v-if="data.avatar" :src="data.avatar" height="30px" />
             <LogoIcon v-else height="30px" />
@@ -51,8 +51,9 @@
                 ref="dynamicsFormRef"
               />
               <DynamicsForm
-                v-model="form_data"
-                :model="form_data"
+                v-if="debug"
+                v-model="api_form_data"
+                :model="api_form_data"
                 label-position="left"
                 require-asterisk-position="right"
                 :render_data="apiInputFieldList"
@@ -240,7 +241,11 @@ const props = defineProps({
   chatId: {
     type: String,
     default: ''
-  } // 历史记录Id
+  }, // 历史记录Id
+  debug: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const emit = defineEmits(['refresh', 'scroll'])
@@ -262,6 +267,7 @@ const chatList = ref<any[]>([])
 const inputFieldList = ref<FormField[]>([])
 const apiInputFieldList = ref<FormField[]>([])
 const form_data = ref<any>({})
+const api_form_data = ref<any>({})
 
 const isDisabledChart = computed(
   () => !(inputValue.value.trim() && (props.appId || props.data?.name))
@@ -431,12 +437,8 @@ function showSource(row: any) {
 }
 
 function quickProblemHandle(val: string) {
-  // 检查inputFieldList是否有未填写的字段
-  for (let i = 0; i < inputFieldList.value.length; i++) {
-    if (inputFieldList.value[i].required && !form_data.value[inputFieldList.value[i].field]) {
-      MsgWarning('请填写所有必填字段')
-      return
-    }
+  if (!checkInputParam()) {
+    return
   }
   if (!loading.value && props.data?.name) {
     handleDebounceClick(val)
@@ -447,13 +449,39 @@ const handleDebounceClick = debounce((val) => {
   chatMessage(null, val)
 }, 200)
 
-function sendChatHandle(event: any) {
+function checkInputParam() {
   // 检查inputFieldList是否有未填写的字段
   for (let i = 0; i < inputFieldList.value.length; i++) {
     if (inputFieldList.value[i].required && !form_data.value[inputFieldList.value[i].field]) {
       MsgWarning('请填写所有必填字段')
-      return
+      return false
     }
+  }
+  // 浏览器query参数找到接口传参
+  let msg = []
+  for (let f of apiInputFieldList.value) {
+    if (!props.debug) {
+      if (f.required && !route.query[f.field]) {
+        msg.push(f.field)
+      }
+      api_form_data.value[f.field] = route.query[f.field]
+    } else {
+      if (f.required && !api_form_data.value[f.field]) {
+        MsgWarning('请填写所有必填字段')
+        return false
+      }
+    }
+  }
+  if (msg.length > 0) {
+    MsgWarning(`请在URL中填写参数 ${msg.join('、')}的值`)
+    return false
+  }
+  return true
+}
+
+function sendChatHandle(event: any) {
+  if (!checkInputParam()) {
+    return
   }
   if (!event.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
@@ -616,18 +644,6 @@ const errorWrite = (chat: any, message?: string) => {
 }
 
 function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
-  // 浏览器query参数找到接口传参
-  let msg = []
-  for (let f of apiInputFieldList.value) {
-    if (f.required && !route.query[f.field]) {
-      msg.push(f.field)
-    }
-    form_data.value[f.field] = route.query[f.field]
-  }
-  if (msg.length > 0) {
-    MsgWarning(`请在URL中填写参数 ${msg.join('、')}的值`)
-    return
-  }
   loading.value = true
   if (!chat) {
     chat = reactive({
@@ -658,7 +674,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
     const obj = {
       message: chat.problem_text,
       re_chat: re_chat || false,
-      form_data: form_data.value
+      form_data: {...form_data.value, ...api_form_data.value}
     }
     // 对话
     applicationApi
