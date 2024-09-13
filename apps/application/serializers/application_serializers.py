@@ -204,7 +204,7 @@ class ApplicationSerializer(serializers.Serializer):
         protocol = serializers.CharField(required=True, error_messages=ErrMessage.char("协议"))
         token = serializers.CharField(required=True, error_messages=ErrMessage.char("token"))
 
-        def get_embed(self, with_valid=True):
+        def get_embed(self, with_valid=True, params={}):
             if with_valid:
                 self.is_valid(raise_exception=True)
             index_path = os.path.join(PROJECT_DIR, 'apps', "application", 'template', 'embed.js')
@@ -218,6 +218,9 @@ class ApplicationSerializer(serializers.Serializer):
             float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/favicon.ico"
             X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
                                                                                   'XPACK_LICENSE_IS_VALID') else False)
+            # 获取接入的query参数
+            query = self.get_query_api_input(application_access_token.application, params)
+
             application_setting_model = DBModelManage.get_model('application_setting')
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(
@@ -239,9 +242,25 @@ class ApplicationSerializer(serializers.Serializer):
                      'white_active': 'true' if application_access_token.white_active else 'false',
                      'is_draggable': is_draggable,
                      'float_icon': float_icon,
+                     'query': query,
                      'show_guide': show_guide}))
             response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
             return response
+
+        def get_query_api_input(self, application, params):
+            query = ''
+            if application.work_flow is not None:
+                work_flow = application.work_flow
+                if work_flow is not None:
+                    for node in work_flow['nodes']:
+                        if node['id'] == 'base-node':
+                            input_field_list = node['properties']['input_field_list']
+                            if input_field_list is not None:
+                                for field in input_field_list:
+                                    if field['assignment_method'] == 'api_input' and field['variable'] in params:
+                                        query += f"&{field['variable']}={params[field['variable']]}"
+
+            return query
 
     class AccessTokenSerializer(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.boolean("应用id"))
