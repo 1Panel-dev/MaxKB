@@ -54,7 +54,7 @@
         </MdEditor>
       </el-form-item>
       <div class="flex-between mb-8">
-        <h5 class="lighter">输入变量</h5>
+        <h5 class="lighter">全局变量</h5>
         <el-button link type="primary" @click="openAddDialog()">
           <el-icon class="mr-4"><Plus /></el-icon> 添加
         </el-button>

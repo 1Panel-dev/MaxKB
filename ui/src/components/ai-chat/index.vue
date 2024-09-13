@@ -1,5 +1,27 @@
 <template>
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
+    <div v-if="inputFieldList.length > 0" class="mb-16" style="padding: 0 24px">
+      <el-card shadow="always" class="dialog-card">
+        <div class="flex align-center cursor w-full" @click="showUserInput = !showUserInput">
+          <el-icon class="mr-8 arrow-icon" :class="showUserInput ? 'rotate-90' : ''"
+            ><CaretRight
+          /></el-icon>
+          用户输入
+        </div>
+        <el-collapse-transition>
+          <DynamicsForm
+            class="mt-16"
+            v-show="showUserInput"
+            v-model="form_data"
+            :model="form_data"
+            label-position="left"
+            require-asterisk-position="right"
+            :render_data="inputFieldList"
+            ref="dynamicsFormRef"
+          />
+        </el-collapse-transition>
+      </el-card>
+    </div>
     <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
       <div ref="dialogScrollbar" class="ai-chat__content p-24 chat-width">
         <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
@@ -240,7 +262,7 @@ const props = defineProps({
   chatId: {
     type: String,
     default: ''
-  }, // 历史记录Id
+  } // 历史记录Id
 })
 
 const emit = defineEmits(['refresh', 'scroll'])
@@ -263,6 +285,8 @@ const inputFieldList = ref<FormField[]>([])
 const apiInputFieldList = ref<FormField[]>([])
 const form_data = ref<any>({})
 const api_form_data = ref<any>({})
+
+const showUserInput = ref(true)
 
 const isDisabledChart = computed(
   () => !(inputValue.value.trim() && (props.appId || props.data?.name))
@@ -664,7 +688,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
     const obj = {
       message: chat.problem_text,
       re_chat: re_chat || false,
-      form_data: {...form_data.value, ...api_form_data.value}
+      form_data: { ...form_data.value, ...api_form_data.value }
     }
     // 对话
     applicationApi
@@ -985,6 +1009,7 @@ defineExpose({
   .dialog-card {
     border: none;
     border-radius: 8px;
+    box-sizing: border-box;
   }
 }
 
