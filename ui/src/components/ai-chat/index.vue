@@ -1,6 +1,10 @@
 <template>
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
-    <div v-if="inputFieldList.length > 0" class="mb-16" style="padding: 0 24px">
+    <div
+      v-if="inputFieldList.length > 0 || apiInputFieldList.length > 0"
+      class="mb-16"
+      style="padding: 0 24px"
+    >
       <el-card shadow="always" class="dialog-card">
         <div class="flex align-center cursor w-full" @click="showUserInput = !showUserInput">
           <el-icon class="mr-8 arrow-icon" :class="showUserInput ? 'rotate-90' : ''"
@@ -9,16 +13,25 @@
           用户输入
         </div>
         <el-collapse-transition>
-          <DynamicsForm
-            class="mt-16"
-            v-show="showUserInput"
-            v-model="form_data"
-            :model="form_data"
-            label-position="left"
-            require-asterisk-position="right"
-            :render_data="inputFieldList"
-            ref="dynamicsFormRef"
-          />
+          <div v-show="showUserInput" class="mt-16">
+            <DynamicsForm
+              v-model="form_data"
+              :model="form_data"
+              label-position="left"
+              require-asterisk-position="right"
+              :render_data="inputFieldList"
+              ref="dynamicsFormRef"
+            />
+            <DynamicsForm
+              v-if="debug"
+              v-model="api_form_data"
+              :model="api_form_data"
+              label-position="left"
+              require-asterisk-position="right"
+              :render_data="apiInputFieldList"
+              ref="dynamicsFormRef2"
+            />
+          </div>
         </el-collapse-transition>
       </el-card>
     </div>
@@ -57,32 +70,7 @@
             </el-card>
           </div>
         </div>
-        <div v-if="inputFieldList.length > 0 || apiInputFieldList.length > 0">
-          <div class="avatar">
-            <img v-if="data.avatar" :src="data.avatar" height="30px" />
-            <LogoIcon v-else height="30px" />
-          </div>
-          <div class="content">
-            <el-card shadow="always" class="dialog-card">
-              <DynamicsForm
-                v-model="form_data"
-                :model="form_data"
-                label-position="left"
-                require-asterisk-position="right"
-                :render_data="inputFieldList"
-                ref="dynamicsFormRef"
-              />
-              <DynamicsForm
-                v-model="api_form_data"
-                :model="api_form_data"
-                label-position="left"
-                require-asterisk-position="right"
-                :render_data="apiInputFieldList"
-                ref="dynamicsFormRef2"
-              />
-            </el-card>
-          </div>
-        </div>
+
         <template v-for="(item, index) in chatList" :key="index">
           <!-- 问题 -->
           <div class="item-content mb-16 lighter">
@@ -262,7 +250,11 @@ const props = defineProps({
   chatId: {
     type: String,
     default: ''
-  } // 历史记录Id
+  }, // 历史记录Id
+  debug: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const emit = defineEmits(['refresh', 'scroll'])
