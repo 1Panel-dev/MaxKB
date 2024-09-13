@@ -240,8 +240,11 @@ const clickShowDebug = () => {
       }
     })
 }
-function clickoutsideDebug() {
-  showDebug.value = false
+function clickoutsideDebug(e: any) {
+  const Elm = e?.target?.className?.includes?.('el-select')
+  if (!Elm) {
+    showDebug.value = false
+  }
 }
 
 function clickNodes(item: any, data?: any) {

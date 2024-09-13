@@ -1,7 +1,7 @@
 <template>
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
     <div
-      v-if="inputFieldList.length > 0 || apiInputFieldList.length > 0"
+      v-if="inputFieldList.length > 0 || (debug && apiInputFieldList.length > 0)"
       class="mb-16"
       style="padding: 0 24px"
     >
@@ -176,7 +176,7 @@
         />
 
         <div class="operate flex align-center">
-          <span v-if="props.data.stt_model_enable">
+          <span v-if="props.data.stt_model_enable" class="flex align-center">
             <el-button text v-if="mediaRecorderStatus" @click="startRecording">
               <el-icon>
                 <Microphone />
