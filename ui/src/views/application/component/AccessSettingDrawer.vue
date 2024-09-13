@@ -101,7 +101,7 @@ const {
   params: { id }
 } = route as any
 
-const form = reactive({
+const form = reactive<any>({
   wechat: { app_id: '', app_secret: '', token: '', encoding_aes_key: '', callback_url: '' },
   dingtalk: { client_id: '', client_secret: '', callback_url: '' },
   wecom: {
@@ -115,7 +115,7 @@ const form = reactive({
   feishu: { app_id: '', app_secret: '', verification_token: '', callback_url: '' }
 })
 
-const rules = reactive({
+const rules = reactive<{ [propName: string]: any }>({
   wechat: {
     app_id: [{ required: true, message: '请输入开发者ID', trigger: 'blur' }],
     app_secret: [{ required: true, message: '请输入开发者密码', trigger: 'blur' }],
@@ -140,7 +140,7 @@ const rules = reactive({
   }
 })
 
-const configFields = {
+const configFields: { [propName: string]: { [propName: string]: any } } = {
   wechat: {
     app_id: { label: '开发者ID (APP ID)', placeholder: '请输入开发者ID' },
     app_secret: { label: '开发者密码 (APP Secret)', placeholder: '请输入开发者密码' },
@@ -199,7 +199,7 @@ const passwordVisible = reactive<Record<string, boolean>>(
   )
 )
 
-const isPasswordField = (key: string) => passwordFields.has(key)
+const isPasswordField = (key: any) => passwordFields.has(key)
 
 const closeDrawer = () => {
   visible.value = false
