@@ -224,9 +224,9 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="source" label="赋值方式">
+        <el-table-column prop="assignment_method" label="赋值方式">
           <template #default="{ row }">
-            {{ row.source === 'user_input' ? '用户输入' : '接口传参' }}
+            {{ row.assignment_method === 'user_input' ? '用户输入' : '接口传参' }}
           </template>
         </el-table-column>
         <el-table-column label="操作" align="left" width="80">
