@@ -84,6 +84,7 @@
     </div>
     <el-collapse-transition>
       <DropdownMenu
+        v-if="showAnchor"
         @mousemove.stop
         @mousedown.stop
         @keydown.stop
@@ -92,7 +93,6 @@
         :id="id"
         style="left: 100%; top: 50%; transform: translate(0, -50%)"
         @clickNodes="clickNodes"
-        @onmousedown="onmousedown"
       />
     </el-collapse-transition>
   </div>
@@ -188,12 +188,6 @@ function clickNodes(item: any) {
   })
 
   closeNodeMenu()
-}
-
-function onmousedown(item: any) {}
-
-function clickoutside() {
-  showAnchor.value = false
 }
 
 const props = defineProps<{
