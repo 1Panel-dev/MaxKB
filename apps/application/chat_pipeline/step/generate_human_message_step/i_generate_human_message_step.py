@@ -74,6 +74,7 @@ class IGenerateHumanMessageStep(IBaseChatPipelineStep):
         :param padding_problem_text        用户修改文本
         :param kwargs:                     其他参数
         :param no_references_setting:     无引用分段设置
+        :param system                     系统提示称
         :return:
         """
         pass

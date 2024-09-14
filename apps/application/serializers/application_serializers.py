@@ -120,8 +120,9 @@ class DatasetSettingSerializer(serializers.Serializer):
 
 
 class ModelSettingSerializer(serializers.Serializer):
-    prompt = serializers.CharField(required=True, max_length=102400, error_messages=ErrMessage.char("提示词"))
-    system = serializers.CharField(required=False, max_length=102400, allow_null=True, allow_blank=True,
+    prompt = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
+                                   error_messages=ErrMessage.char("提示词"))
+    system = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
                                    error_messages=ErrMessage.char("角色提示词"))
     no_references_prompt = serializers.CharField(required=True, max_length=102400, allow_null=True, allow_blank=True,
                                                  error_messages=ErrMessage.char("无引用分段提示词"))

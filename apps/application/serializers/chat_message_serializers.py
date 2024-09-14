@@ -67,7 +67,8 @@ class ChatInfo:
                 'status': 'ai_questioning',
                 'value': '{question}'})
         if no_references_setting.get('status') == 'ai_questioning':
-            no_references_setting['value'] = model_setting.get('no_references_prompt', '{question}')
+            no_references_prompt = model_setting.get('no_references_prompt', '{question}')
+            no_references_setting['value'] = no_references_prompt if len(no_references_prompt) > 0 else "{question}"
         return no_references_setting
 
     def to_base_pipeline_manage_params(self):
@@ -90,9 +91,11 @@ class ChatInfo:
             'history_chat_record': self.chat_record_list,
             'chat_id': self.chat_id,
             'dialogue_number': self.application.dialogue_number,
-            'problem_optimization_prompt': self.application.problem_optimization_prompt,
+            'problem_optimization_prompt': self.application.problem_optimization_prompt if self.application.problem_optimization_prompt is not None and len(
+                self.application.problem_optimization_prompt) > 0 else '()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中',
             'prompt': model_setting.get(
-                'prompt') if 'prompt' in model_setting else Application.get_default_model_prompt(),
+                'prompt') if 'prompt' in model_setting and len(model_setting.get(
+                'prompt')) > 0 else Application.get_default_model_prompt(),
             'system': model_setting.get(
                 'system', None),
             'model_id': model_id,
