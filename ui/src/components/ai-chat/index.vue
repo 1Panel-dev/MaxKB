@@ -168,7 +168,13 @@
         <el-input
           ref="quickInputRef"
           v-model="inputValue"
-          placeholder="请输入问题，Ctrl+Enter 换行，Enter发送"
+          :placeholder="
+            startRecorderTime
+              ? '说话中...'
+              : recorderLoading
+                ? '转文字中...'
+                : '请输入问题，Ctrl+Enter 换行，Enter发送'
+          "
           :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
           type="textarea"
           :maxlength="100000"
@@ -182,15 +188,21 @@
                 <Microphone />
               </el-icon>
             </el-button>
-            <el-button text v-else @click="stopRecording">
-              <el-icon>
-                <VideoPause />
-              </el-icon>
-            </el-button>
-            <el-divider direction="vertical" />
+            <div v-else class="operate flex align-center">
+              <el-text type="info"
+                >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
+              >
+              <el-button text type="primary" @click="stopRecording" :loading="recorderLoading">
+                <el-icon>
+                  <VideoPause />
+                </el-icon>
+              </el-button>
+            </div>
+            <el-divider v-if="!startRecorderTime && !recorderLoading" direction="vertical" />
           </span>
 
           <el-button
+            v-if="!startRecorderTime && !recorderLoading"
             text
             class="sent-button"
             :disabled="isDisabledChart || loading"
@@ -270,7 +282,7 @@ const quickInputRef = ref()
 const scrollDiv = ref()
 const dialogScrollbar = ref()
 const loading = ref(false)
-const inputValue = ref('')
+const inputValue = ref<string>('')
 const chartOpenId = ref('')
 const chatList = ref<any[]>([])
 const inputFieldList = ref<FormField[]>([])
@@ -279,6 +291,9 @@ const form_data = ref<any>({})
 const api_form_data = ref<any>({})
 
 const showUserInput = ref(true)
+const recorderTime = ref(0)
+const startRecorderTime = ref(false)
+const recorderLoading = ref(false)
 
 const isDisabledChart = computed(
   () => !(inputValue.value.trim() && (props.appId || props.data?.name))
@@ -793,6 +808,7 @@ const mediaRecorderStatus = ref(true)
 const startRecording = async () => {
   try {
     mediaRecorderStatus.value = false
+    handleTimeChange()
     mediaRecorder.value = new Recorder({
       type: 'mp3',
       bitRate: 128,
@@ -814,6 +830,8 @@ const startRecording = async () => {
 
 // 停止录音
 const stopRecording = () => {
+  startRecorderTime.value = false
+  recorderTime.value = 0
   if (mediaRecorder.value) {
     mediaRecorderStatus.value = true
     mediaRecorder.value.stop(
@@ -823,7 +841,6 @@ const stopRecording = () => {
         //  link.href = window.URL.createObjectURL(blob)
         //  link.download = 'abc.mp3'
         //  link.click()
-
         uploadRecording(blob) // 上传录音文件
       },
       (err: any) => {
@@ -836,16 +853,37 @@ const stopRecording = () => {
 // 上传录音文件
 const uploadRecording = async (audioBlob: Blob) => {
   try {
+    recorderLoading.value = true
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
     applicationApi.postSpeechToText(props.data.id as string, formData, loading).then((response) => {
       console.log('上传成功:', response.data)
-      inputValue.value = response.data
+      recorderLoading.value = false
+      mediaRecorder.value.close()
+      inputValue.value = typeof response.data === 'string' ? response.data : ''
       // chatMessage(null, res.data)
     })
   } catch (error) {
+    recorderLoading.value = false
     console.error('上传失败:', error)
   }
+}
+
+const handleTimeChange = () => {
+  startRecorderTime.value = true
+
+  setTimeout(() => {
+    if (recorderTime.value === 60) {
+      recorderTime.value = 0
+      stopRecording()
+      startRecorderTime.value = false
+    }
+    if (!startRecorderTime.value) {
+      return
+    }
+    recorderTime.value++
+    handleTimeChange()
+  }, 1000)
 }
 
 onMounted(() => {

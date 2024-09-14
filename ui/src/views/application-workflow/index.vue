@@ -409,7 +409,7 @@ onBeforeUnmount(() => {
   bottom: 16px;
   right: 16px;
   overflow: hidden;
-  width: 420px;
+  width: 450px;
   height: 600px;
   .workflow-debug-header {
     background: var(--app-header-bg-color);
