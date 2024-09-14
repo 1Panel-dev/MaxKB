@@ -171,11 +171,11 @@
                   </div>
                 </template>
                 <el-input
-                  v-model="applicationForm.model_setting.prompt"
+                  v-model="applicationForm.model_setting.no_references_prompt"
                   :rows="6"
                   type="textarea"
                   maxlength="2048"
-                  :placeholder="defaultPrompt"
+                  placeholder="{question}"
                 />
               </el-form-item>
               <el-form-item label="历史聊天记录" @click.prevent>
