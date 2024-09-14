@@ -103,6 +103,8 @@ class FunctionLibApi(ApiMixin):
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="函数名称", description="函数名称"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="函数描述", description="函数描述"),
                     'code': openapi.Schema(type=openapi.TYPE_STRING, title="函数内容", description="函数内容"),
+                    'permission_type': openapi.Schema(type=openapi.TYPE_STRING, title="权限", description="权限"),
+                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
                     'input_field_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                        description="输入变量列表",
                                                        items=openapi.Schema(type=openapi.TYPE_OBJECT,
@@ -135,11 +137,13 @@ class FunctionLibApi(ApiMixin):
         def get_request_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['name', 'code', 'input_field_list'],
+                required=['name', 'code', 'input_field_list', 'permission_type'],
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="函数名称", description="函数名称"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="函数描述", description="函数描述"),
                     'code': openapi.Schema(type=openapi.TYPE_STRING, title="函数内容", description="函数内容"),
+                    'permission_type': openapi.Schema(type=openapi.TYPE_STRING, title="权限", description="权限"),
+                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
                     'input_field_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                        description="输入变量列表",
                                                        items=openapi.Schema(type=openapi.TYPE_OBJECT,

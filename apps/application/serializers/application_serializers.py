@@ -601,7 +601,8 @@ class ApplicationSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
-            return FunctionLibSerializer.Query(data={'user_id': application.user_id}).list(with_valid=True)
+            return FunctionLibSerializer.Query(data={'user_id': application.user_id, 'is_active': True}).list(
+                with_valid=True)
 
         def get_function_lib(self, function_lib_id, with_valid=True):
             if with_valid:
