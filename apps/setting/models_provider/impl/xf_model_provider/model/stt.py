@@ -8,6 +8,8 @@ import datetime
 import hashlib
 import hmac
 import json
+import logging
+import os
 from datetime import datetime
 from typing import Dict
 from urllib.parse import urlencode, urlparse
@@ -25,6 +27,7 @@ ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
+max_kb = logging.getLogger("max_kb")
 
 class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     spark_app_id: str
@@ -89,11 +92,9 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         return url
 
     def check_auth(self):
-        async def check():
-            async with websockets.connect(self.create_url(), ssl=ssl_context) as ws:
-                pass
-
-        asyncio.run(check())
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        with open(f'{cwd}/iat_mp3_16k.mp3', 'rb') as f:
+             self.speech_to_text(f)
 
     def speech_to_text(self, file):
         async def handle():
@@ -112,8 +113,7 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         sid = message["sid"]
         if code != 0:
             errMsg = message["message"]
-            print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
-            return errMsg
+            raise Exception(f"sid: {sid} call error: {errMsg} code is: {code}")
         else:
             data = message["data"]["result"]["ws"]
             result = ""

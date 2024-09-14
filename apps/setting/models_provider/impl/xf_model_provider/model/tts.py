@@ -10,6 +10,7 @@ import datetime
 import hashlib
 import hmac
 import json
+import logging
 import os
 from datetime import datetime
 from typing import Dict
@@ -19,6 +20,8 @@ import websockets
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tts import BaseTextToSpeech
+
+max_kb = logging.getLogger("max_kb")
 
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
@@ -92,11 +95,7 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         return url
 
     def check_auth(self):
-        async def check():
-            async with websockets.connect(self.create_url(), max_size=1000000000, ssl=ssl_context) as ws:
-                pass
-
-        asyncio.run(check())
+        self.text_to_speech("你好")
 
     def text_to_speech(self, text):
 
@@ -119,13 +118,13 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             # print(message)
             code = message["code"]
             sid = message["sid"]
-            audio = message["data"]["audio"]
-            audio = base64.b64decode(audio)
 
             if code != 0:
                 errMsg = message["message"]
-                print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
+                raise Exception(f"sid: {sid} call error: {errMsg} code is: {code}")
             else:
+                audio = message["data"]["audio"]
+                audio = base64.b64decode(audio)
                 audio_bytes += audio
             # 退出
             if message["data"]["status"] == 2:
