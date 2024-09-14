@@ -53,21 +53,76 @@
           </template>
         </MdEditor>
       </el-form-item>
+      <div class="flex-between mb-8">
+        <h5 class="lighter">全局变量</h5>
+        <el-button link type="primary" @click="openAddDialog()">
+          <el-icon class="mr-4"><Plus /></el-icon> 添加
+        </el-button>
+      </div>
+      <el-table :data="props.nodeModel.properties.input_field_list" class="mb-16">
+        <el-table-column prop="name" label="变量名" />
+        <el-table-column prop="variable" label="变量" />
+        <el-table-column label="输入类型">
+          <template #default="{ row }">
+            <el-tag type="info" class="info-tag" v-if="row.type === 'input'">文本框</el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.type === 'date'">日期</el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.type === 'select'">下拉选项</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="必填">
+          <template #default="{ row }">
+            <div @click.stop>
+              <el-switch size="small" v-model="row.is_required" />
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="assignment_method" label="赋值方式">
+          <template #default="{ row }">
+            {{ row.assignment_method === 'user_input' ? '用户输入' : '接口传参' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="left" width="80">
+          <template #default="{ row, $index }">
+            <span class="mr-4">
+              <el-tooltip effect="dark" content="修改" placement="top">
+                <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
+                  <el-icon><EditPen /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </span>
+            <el-tooltip effect="dark" content="删除" placement="top">
+              <el-button type="primary" text @click="deleteField($index)">
+                <el-icon>
+                  <Delete />
+                </el-icon>
+              </el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
       <el-form-item>
         <template #label>
-          <div class="flex align-center">
-            <span class="mr-4">语音输入</span>
-            <el-tooltip
-              effect="dark"
-              content="开启后，需要设定语音转文本模型，语音输入完成后会转化为文字直接发送提问"
-              placement="right"
-            >
-              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-            </el-tooltip>
-            <el-switch v-model="form_data.stt_model_enable" />
+          <div class="flex-between">
+            <div class="flex align-center">
+              <span class="mr-4">语音输入</span>
+              <el-tooltip
+                effect="dark"
+                content="开启后，需要设定语音转文本模型，语音输入完成后会转化为文字直接发送提问"
+                placement="right"
+              >
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+            <el-switch size="small" v-model="form_data.stt_model_enable" />
           </div>
         </template>
-        <el-select v-model="form_data.stt_model_id" class="w-full" popper-class="select-model">
+
+        <el-select
+          v-model="form_data.stt_model_id"
+          class="w-full"
+          popper-class="select-model"
+          placeholder="请输入"
+        >
           <el-option-group
             v-for="(value, label) in sttModelOptions"
             :key="value"
@@ -122,9 +177,9 @@
       </el-form-item>
       <el-form-item>
         <template #label>
-          <div class="flex align-center">
+          <div class="flex-between">
             <span class="mr-4">语音播放</span>
-            <el-switch v-model="form_data.tts_model_enable" />
+            <el-switch size="small" v-model="form_data.tts_model_enable" />
           </div>
         </template>
         <el-radio-group v-model="form_data.tts_type">
@@ -136,6 +191,7 @@
           v-model="form_data.tts_model_id"
           class="w-full"
           popper-class="select-model"
+          placeholder="请输入"
         >
           <el-option-group
             v-for="(value, label) in ttsModelOptions"
@@ -190,6 +246,7 @@
         </el-select>
       </el-form-item>
     </el-form>
+
     <div class="flex-between">
       全局变量
       <el-button link type="primary" @click="openAddDialog()">
