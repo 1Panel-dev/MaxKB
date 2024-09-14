@@ -214,8 +214,7 @@ const defaultValue = {
   designated_answer: t('views.application.applicationForm.dialogues.designated_answer')
 }
 
-const defaultPrompt = `根据上下文优化和完善用户问题：{{开始.question}}
-请输出一个优化后的问题。`
+const defaultPrompt = `()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中`
 
 const form = ref<any>({
   dataset_setting: {
@@ -229,7 +228,7 @@ const form = ref<any>({
     }
   },
   problem_optimization: false,
-  problem_optimization_prompt: ''
+  problem_optimization_prompt: defaultPrompt
 })
 
 const noReferencesform = ref<any>({

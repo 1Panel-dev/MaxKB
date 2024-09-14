@@ -157,16 +157,23 @@
                   placeholder="你是 xxx 小助手"
                 />
               </el-form-item>
-              <el-form-item :label="$t('views.application.applicationForm.form.prompt.label')">
+              <el-form-item
+                :label="$t('views.application.applicationForm.form.prompt.label')"
+                prop="model_setting.no_references_prompt"
+                :rules="{
+                  required: applicationForm.model_id,
+                  message: '请输入提示词',
+                  trigger: 'blur'
+                }"
+              >
                 <template #label>
                   <div class="flex align-center">
                     <div class="flex-between mr-4">
                       <span
-                        >{{
-                          $t('views.application.applicationForm.form.prompt.label')
-                        }}
-                        (无引用知识库)</span
-                      >
+                        >{{ $t('views.application.applicationForm.form.prompt.label') }}
+                        (无引用知识库)
+                        <span class="danger" v-if="applicationForm.model_id">*</span>
+                      </span>
                     </div>
                   </div>
                 </template>
@@ -254,13 +261,22 @@
                   </el-row>
                 </div>
               </el-form-item>
-              <el-form-item :label="$t('views.application.applicationForm.form.prompt.label')">
+              <el-form-item
+                :label="$t('views.application.applicationForm.form.prompt.label')"
+                prop="model_setting.prompt"
+                :rules="{
+                  required: applicationForm.model_id,
+                  message: '请输入提示词',
+                  trigger: 'blur'
+                }"
+              >
                 <template #label>
                   <div class="flex align-center">
                     <div class="flex-between mr-4">
                       <span>
                         {{ $t('views.application.applicationForm.form.prompt.label') }}
                         (引用知识库)
+                        <span class="danger" v-if="applicationForm.model_id">*</span>
                       </span>
                     </div>
                   </div>
@@ -556,7 +572,8 @@ const applicationForm = ref<ApplicationFormType>({
   },
   model_params_setting: {},
   problem_optimization: false,
-  problem_optimization_prompt: '',
+  problem_optimization_prompt:
+    '()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中',
   stt_model_id: '',
   tts_model_id: '',
   stt_model_enable: false,
