@@ -138,7 +138,7 @@
           </div>
         </div>
         <div class="scrollbar-height">
-          <AiChat :data="detail"></AiChat>
+          <AiChat :data="detail" :debug="true"></AiChat>
         </div>
       </div>
     </el-collapse-transition>
@@ -240,8 +240,11 @@ const clickShowDebug = () => {
       }
     })
 }
-function clickoutsideDebug() {
-  showDebug.value = false
+function clickoutsideDebug(e: any) {
+  const Elm = e?.target?.className?.includes?.('el-select')
+  if (!Elm) {
+    showDebug.value = false
+  }
 }
 
 function clickNodes(item: any, data?: any) {
@@ -406,7 +409,7 @@ onBeforeUnmount(() => {
   bottom: 16px;
   right: 16px;
   overflow: hidden;
-  width: 420px;
+  width: 450px;
   height: 600px;
   .workflow-debug-header {
     background: var(--app-header-bg-color);

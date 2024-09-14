@@ -1,5 +1,40 @@
 <template>
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
+    <div
+      v-if="inputFieldList.length > 0 || (debug && apiInputFieldList.length > 0)"
+      class="mb-16"
+      style="padding: 0 24px"
+    >
+      <el-card shadow="always" class="dialog-card">
+        <div class="flex align-center cursor w-full" @click="showUserInput = !showUserInput">
+          <el-icon class="mr-8 arrow-icon" :class="showUserInput ? 'rotate-90' : ''"
+            ><CaretRight
+          /></el-icon>
+          用户输入
+        </div>
+        <el-collapse-transition>
+          <div v-show="showUserInput" class="mt-16">
+            <DynamicsForm
+              v-model="form_data"
+              :model="form_data"
+              label-position="left"
+              require-asterisk-position="right"
+              :render_data="inputFieldList"
+              ref="dynamicsFormRef"
+            />
+            <DynamicsForm
+              v-if="debug"
+              v-model="api_form_data"
+              :model="api_form_data"
+              label-position="left"
+              require-asterisk-position="right"
+              :render_data="apiInputFieldList"
+              ref="dynamicsFormRef2"
+            />
+          </div>
+        </el-collapse-transition>
+      </el-card>
+    </div>
     <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
       <div ref="dialogScrollbar" class="ai-chat__content p-24 chat-width">
         <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
@@ -35,24 +70,7 @@
             </el-card>
           </div>
         </div>
-        <div v-if="inputFieldList.length > 0">
-          <div class="avatar">
-            <img v-if="data.avatar" :src="data.avatar" height="30px" />
-            <LogoIcon v-else height="30px" />
-          </div>
-          <div class="content">
-            <el-card shadow="always" class="dialog-card">
-              <DynamicsForm
-                v-model="form_data"
-                :model="form_data"
-                label-position="left"
-                require-asterisk-position="right"
-                :render_data="inputFieldList"
-                ref="dynamicsFormRef"
-              />
-            </el-card>
-          </div>
-        </div>
+
         <template v-for="(item, index) in chatList" :key="index">
           <!-- 问题 -->
           <div class="item-content mb-16 lighter">
@@ -108,7 +126,11 @@
                 </div>
               </el-card>
               <div class="flex-between mt-8" v-if="log">
-                <LogOperationButton v-model:data="chatList[index]" :applicationId="appId" />
+                <LogOperationButton
+                  v-model:data="chatList[index]"
+                  :applicationId="appId"
+                  :tts="props.data.tts_model_enable"
+                />
               </div>
 
               <div class="flex-between mt-8" v-else>
@@ -127,20 +149,13 @@
               </div>
               <div v-if="item.write_ed && props.appId && 500 != item.status" class="flex-between">
                 <OperationButton
+                  :tts="props.data.tts_model_enable"
                   :data="item"
                   :applicationId="appId"
                   :chatId="chartOpenId"
                   :chat_loading="loading"
                   @regeneration="regenerationChart(item)"
                 />
-              </div>
-              <!-- 语音播放 -->
-              <div style="float: right" v-if="props.data.tts_model_enable">
-                <el-button :disabled="!item.write_ed" @click="playAnswerText(item.answer_text)">
-                  <el-icon>
-                    <VideoPlay />
-                  </el-icon>
-                </el-button>
               </div>
             </div>
           </div>
@@ -153,26 +168,41 @@
         <el-input
           ref="quickInputRef"
           v-model="inputValue"
-          placeholder="请输入问题，Ctrl+Enter 换行，Enter发送"
+          :placeholder="
+            startRecorderTime
+              ? '说话中...'
+              : recorderLoading
+                ? '转文字中...'
+                : '请输入问题，Ctrl+Enter 换行，Enter发送'
+          "
           :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
           type="textarea"
           :maxlength="100000"
           @keydown.enter="sendChatHandle($event)"
         />
-        <div class="operate" v-if="props.data.stt_model_enable">
-          <el-button v-if="mediaRecorderStatus" @click="startRecording">
-            <el-icon>
-              <Microphone />
-            </el-icon>
-          </el-button>
-          <el-button v-else @click="stopRecording">
-            <el-icon>
-              <VideoPause />
-            </el-icon>
-          </el-button>
-        </div>
-        <div class="operate">
+
+        <div class="operate flex align-center">
+          <span v-if="props.data.stt_model_enable" class="flex align-center">
+            <el-button text v-if="mediaRecorderStatus" @click="startRecording">
+              <el-icon>
+                <Microphone />
+              </el-icon>
+            </el-button>
+            <div v-else class="operate flex align-center">
+              <el-text type="info"
+                >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
+              >
+              <el-button text type="primary" @click="stopRecording" :loading="recorderLoading">
+                <el-icon>
+                  <VideoPause />
+                </el-icon>
+              </el-button>
+            </div>
+            <el-divider v-if="!startRecorderTime && !recorderLoading" direction="vertical" />
+          </span>
+
           <el-button
+            v-if="!startRecorderTime && !recorderLoading"
             text
             class="sent-button"
             :disabled="isDisabledChart || loading"
@@ -180,17 +210,10 @@
           >
             <img v-show="isDisabledChart || loading" src="@/assets/icon_send.svg" alt="" />
             <SendIcon v-show="!isDisabledChart && !loading" />
-            <!-- <img
-           
-              src="@/assets/icon_send_colorful.svg"
-              alt=""
-            /> -->
           </el-button>
         </div>
       </div>
     </div>
-    <!-- 先渲染，不然不能播放   -->
-    <audio ref="audioPlayer" controls hidden="hidden"></audio>
   </div>
 </template>
 <script setup lang="ts">
@@ -239,7 +262,11 @@ const props = defineProps({
   chatId: {
     type: String,
     default: ''
-  } // 历史记录Id
+  }, // 历史记录Id
+  debug: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const emit = defineEmits(['refresh', 'scroll'])
@@ -255,11 +282,18 @@ const quickInputRef = ref()
 const scrollDiv = ref()
 const dialogScrollbar = ref()
 const loading = ref(false)
-const inputValue = ref('')
+const inputValue = ref<string>('')
 const chartOpenId = ref('')
 const chatList = ref<any[]>([])
 const inputFieldList = ref<FormField[]>([])
+const apiInputFieldList = ref<FormField[]>([])
 const form_data = ref<any>({})
+const api_form_data = ref<any>({})
+
+const showUserInput = ref(true)
+const recorderTime = ref(0)
+const startRecorderTime = ref(false)
+const recorderLoading = ref(false)
 
 const isDisabledChart = computed(
   () => !(inputValue.value.trim() && (props.appId || props.data?.name))
@@ -317,41 +351,82 @@ function handleInputFieldList() {
     ?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
       inputFieldList.value = v.properties.input_field_list
-        ? v.properties.input_field_list.map((v: any) => {
-            switch (v.type) {
-              case 'input':
-                return {
-                  field: v.variable,
-                  input_type: 'TextInput',
-                  label: v.name,
-                  required: v.is_required
-                }
-              case 'select':
-                return {
-                  field: v.variable,
-                  input_type: 'SingleSelect',
-                  label: v.name,
-                  required: v.is_required,
-                  option_list: v.optionList.map((o: any) => {
-                    return { key: o, value: o }
-                  })
-                }
-              case 'date':
-                return {
-                  field: v.variable,
-                  input_type: 'DatePicker',
-                  label: v.name,
-                  required: v.is_required,
-                  attrs: {
-                    format: 'YYYY-MM-DD HH:mm:ss',
-                    'value-format': 'YYYY-MM-DD HH:mm:ss',
-                    type: 'datetime'
+        ? v.properties.input_field_list
+            .filter((v: any) => v.assignment_method === 'user_input')
+            .map((v: any) => {
+              switch (v.type) {
+                case 'input':
+                  return {
+                    field: v.variable,
+                    input_type: 'TextInput',
+                    label: v.name,
+                    required: v.is_required
                   }
-                }
-              default:
-                break
-            }
-          })
+                case 'select':
+                  return {
+                    field: v.variable,
+                    input_type: 'SingleSelect',
+                    label: v.name,
+                    required: v.is_required,
+                    option_list: v.optionList.map((o: any) => {
+                      return { key: o, value: o }
+                    })
+                  }
+                case 'date':
+                  return {
+                    field: v.variable,
+                    input_type: 'DatePicker',
+                    label: v.name,
+                    required: v.is_required,
+                    attrs: {
+                      format: 'YYYY-MM-DD HH:mm:ss',
+                      'value-format': 'YYYY-MM-DD HH:mm:ss',
+                      type: 'datetime'
+                    }
+                  }
+                default:
+                  break
+              }
+            })
+        : []
+      apiInputFieldList.value = v.properties.input_field_list
+        ? v.properties.input_field_list
+            .filter((v: any) => v.assignment_method === 'api_input')
+            .map((v: any) => {
+              switch (v.type) {
+                case 'input':
+                  return {
+                    field: v.variable,
+                    input_type: 'TextInput',
+                    label: v.name,
+                    required: v.is_required
+                  }
+                case 'select':
+                  return {
+                    field: v.variable,
+                    input_type: 'SingleSelect',
+                    label: v.name,
+                    required: v.is_required,
+                    option_list: v.optionList.map((o: any) => {
+                      return { key: o, value: o }
+                    })
+                  }
+                case 'date':
+                  return {
+                    field: v.variable,
+                    input_type: 'DatePicker',
+                    label: v.name,
+                    required: v.is_required,
+                    attrs: {
+                      format: 'YYYY-MM-DD HH:mm:ss',
+                      'value-format': 'YYYY-MM-DD HH:mm:ss',
+                      type: 'datetime'
+                    }
+                  }
+                default:
+                  break
+              }
+            })
         : []
     })
 }
@@ -388,6 +463,9 @@ function showSource(row: any) {
 }
 
 function quickProblemHandle(val: string) {
+  if (!checkInputParam()) {
+    return
+  }
   if (!loading.value && props.data?.name) {
     handleDebounceClick(val)
   }
@@ -397,13 +475,34 @@ const handleDebounceClick = debounce((val) => {
   chatMessage(null, val)
 }, 200)
 
-function sendChatHandle(event: any) {
+function checkInputParam() {
   // 检查inputFieldList是否有未填写的字段
   for (let i = 0; i < inputFieldList.value.length; i++) {
     if (inputFieldList.value[i].required && !form_data.value[inputFieldList.value[i].field]) {
       MsgWarning('请填写所有必填字段')
-      return
+      return false
     }
+  }
+  // 浏览器query参数找到接口传参
+  let msg = []
+  for (let f of apiInputFieldList.value) {
+    if (!api_form_data.value[f.field]) {
+      api_form_data.value[f.field] = route.query[f.field]
+    }
+    if (!api_form_data.value[f.field]) {
+      msg.push(f.field)
+    }
+  }
+  if (msg.length > 0) {
+    MsgWarning(`请在URL中填写参数 ${msg.join('、')}的值`)
+    return false
+  }
+  return true
+}
+
+function sendChatHandle(event: any) {
+  if (!checkInputParam()) {
+    return
   }
   if (!event.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
@@ -596,7 +695,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
     const obj = {
       message: chat.problem_text,
       re_chat: re_chat || false,
-      form_data: form_data.value
+      form_data: { ...form_data.value, ...api_form_data.value }
     }
     // 对话
     applicationApi
@@ -702,13 +801,14 @@ const handleScroll = () => {
 
 // 定义响应式引用
 const mediaRecorder = ref<any>(null)
-const audioPlayer = ref<HTMLAudioElement | null>(null)
+
 const mediaRecorderStatus = ref(true)
 
 // 开始录音
 const startRecording = async () => {
   try {
     mediaRecorderStatus.value = false
+    handleTimeChange()
     mediaRecorder.value = new Recorder({
       type: 'mp3',
       bitRate: 128,
@@ -730,6 +830,8 @@ const startRecording = async () => {
 
 // 停止录音
 const stopRecording = () => {
+  startRecorderTime.value = false
+  recorderTime.value = 0
   if (mediaRecorder.value) {
     mediaRecorderStatus.value = true
     mediaRecorder.value.stop(
@@ -739,7 +841,6 @@ const stopRecording = () => {
         //  link.href = window.URL.createObjectURL(blob)
         //  link.download = 'abc.mp3'
         //  link.click()
-
         uploadRecording(blob) // 上传录音文件
       },
       (err: any) => {
@@ -752,53 +853,37 @@ const stopRecording = () => {
 // 上传录音文件
 const uploadRecording = async (audioBlob: Blob) => {
   try {
+    recorderLoading.value = true
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
     applicationApi.postSpeechToText(props.data.id as string, formData, loading).then((response) => {
       console.log('上传成功:', response.data)
-      inputValue.value = response.data
+      recorderLoading.value = false
+      mediaRecorder.value.close()
+      inputValue.value = typeof response.data === 'string' ? response.data : ''
       // chatMessage(null, res.data)
     })
   } catch (error) {
+    recorderLoading.value = false
     console.error('上传失败:', error)
   }
 }
 
-const playAnswerText = (text: string) => {
-  if (props.data.tts_type === 'BROWSER') {
-    // 创建一个新的 SpeechSynthesisUtterance 实例
-    const utterance = new SpeechSynthesisUtterance(text)
-    // 调用浏览器的朗读功能
-    window.speechSynthesis.speak(utterance)
-  }
-  if (props.data.tts_type === 'TTS') {
-      applicationApi.postTextToSpeech(props.data.id as string, { 'text': text }, loading)
-    .then((res: any) => {
-      // 假设我们有一个 MP3 文件的字节数组
-      // 创建 Blob 对象
-      const blob = new Blob([res], { type: 'audio/mp3' })
+const handleTimeChange = () => {
+  startRecorderTime.value = true
 
-      // 创建对象 URL
-      const url = URL.createObjectURL(blob)
-
-      // 测试blob是否能正常播放
-      // const link = document.createElement('a')
-      // link.href = window.URL.createObjectURL(blob)
-      // link.download = "abc.mp3"
-      // link.click()
-
-      // 检查 audioPlayer 是否已经引用了 DOM 元素
-      if (audioPlayer.value instanceof HTMLAudioElement) {
-        audioPlayer.value.src = url
-        audioPlayer.value.play() // 自动播放音频
-      } else {
-        console.error('audioPlayer.value is not an instance of HTMLAudioElement')
-      }
-    })
-    .catch((err) => {
-      console.log('err: ', err)
-    })
-  }
+  setTimeout(() => {
+    if (recorderTime.value === 60) {
+      recorderTime.value = 0
+      stopRecording()
+      startRecorderTime.value = false
+    }
+    if (!startRecorderTime.value) {
+      return
+    }
+    recorderTime.value++
+    handleTimeChange()
+  }, 1000)
 }
 
 onMounted(() => {
@@ -928,10 +1013,12 @@ defineExpose({
 
       .operate {
         padding: 6px 10px;
+        .el-icon {
+          font-size: 20px;
+        }
 
         .sent-button {
           max-height: none;
-
           .el-icon {
             font-size: 24px;
           }
@@ -952,6 +1039,7 @@ defineExpose({
   .dialog-card {
     border: none;
     border-radius: 8px;
+    box-sizing: border-box;
   }
 }
 

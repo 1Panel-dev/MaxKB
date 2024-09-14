@@ -285,16 +285,18 @@
 
               <el-form-item>
                 <template #label>
-                  <div class="flex align-center">
-                    <span class="mr-4">语音输入</span>
-                    <el-tooltip
-                      effect="dark"
-                      content="开启后，需要设定语音转文本模型，语音输入完成后会转化为文字直接发送提问"
-                      placement="right"
-                    >
-                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                    </el-tooltip>
-                    <el-switch v-model="applicationForm.stt_model_enable" />
+                  <div class="flex-between">
+                    <div class="flex align-center">
+                      <span class="mr-4">语音输入</span>
+                      <el-tooltip
+                        effect="dark"
+                        content="开启后，需要设定语音转文本模型，语音输入完成后会转化为文字直接发送提问"
+                        placement="right"
+                      >
+                        <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                      </el-tooltip>
+                    </div>
+                    <el-switch size="small" v-model="applicationForm.stt_model_enable" />
                   </div>
                 </template>
                 <el-select
@@ -359,14 +361,14 @@
               </el-form-item>
               <el-form-item>
                 <template #label>
-                  <div class="flex align-center">
+                  <div class="flex-between">
                     <span class="mr-4">语音播放</span>
-                    <el-switch v-model="applicationForm.tts_model_enable" />
+                    <el-switch size="small" v-model="applicationForm.tts_model_enable" />
                   </div>
                 </template>
                 <el-radio-group v-model="applicationForm.tts_type">
-                  <el-radio label="浏览器播放(免费)" value="BROWSER" />
-                  <el-radio label="TTS模型" value="TTS" />
+                  <el-radio label="BROWSER">浏览器播放(免费)</el-radio>
+                  <el-radio label="TTS">TTS模型</el-radio>
                 </el-radio-group>
                 <el-select
                   v-if="applicationForm.tts_type === 'TTS'"

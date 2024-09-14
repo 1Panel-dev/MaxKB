@@ -50,164 +50,16 @@
             <el-button text type="info" @click="openDialog">
               <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
             </el-button>
-          </template
-          >
+          </template>
         </MdEditor>
       </el-form-item>
-      <el-form-item>
-        <template #label>
-          <div class="flex align-center">
-            <span class="mr-4">语音输入</span>
-            <el-tooltip
-              effect="dark"
-              content="开启后，需要设定语音转文本模型，语音输入完成后会转化为文字直接发送提问"
-              placement="right"
-            >
-              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-            </el-tooltip>
-            <el-switch v-model="form_data.stt_model_enable" />
-          </div>
-        </template>
-        <el-select
-          v-model="form_data.stt_model_id"
-          class="w-full"
-          popper-class="select-model"
-        >
-          <el-option-group
-            v-for="(value, label) in sttModelOptions"
-            :key="value"
-            :label="relatedObject(providerOptions, label, 'provider')?.name"
-          >
-            <el-option
-              v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-              class="flex-between"
-            >
-              <div class="flex align-center">
-                        <span
-                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                          class="model-icon mr-8"
-                        ></span>
-                <span>{{ item.name }}</span>
-                <el-tag
-                  v-if="item.permission_type === 'PUBLIC'"
-                  type="info"
-                  class="info-tag ml-8"
-                >公用
-                </el-tag>
-              </div>
-              <el-icon class="check-icon" v-if="item.id === form_data.stt_model_id">
-                <Check />
-              </el-icon>
-            </el-option>
-            <!-- 不可用 -->
-            <el-option
-              v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-              class="flex-between"
-              disabled
-            >
-              <div class="flex">
-                        <span
-                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                          class="model-icon mr-8"
-                        ></span>
-                <span>{{ item.name }}</span>
-                <span class="danger">{{
-                    $t('views.application.applicationForm.form.aiModel.unavailable')
-                  }}</span>
-              </div>
-              <el-icon class="check-icon" v-if="item.id === form_data.stt_model_id">
-                <Check />
-              </el-icon>
-            </el-option>
-          </el-option-group>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <template #label>
-          <div class="flex align-center">
-            <span class="mr-4">语音播放</span>
-            <el-switch v-model="form_data.tts_model_enable" />
-          </div>
-        </template>
-        <el-radio-group v-model="form_data.tts_type">
-          <el-radio label="浏览器播放(免费)" value="BROWSER"/>
-          <el-radio label="TTS模型" value="TTS"/>
-        </el-radio-group>
-        <el-select
-          v-if="form_data.tts_type === 'TTS'"
-          v-model="form_data.tts_model_id"
-          class="w-full"
-          popper-class="select-model"
-        >
-          <el-option-group
-            v-for="(value, label) in ttsModelOptions"
-            :key="value"
-            :label="relatedObject(providerOptions, label, 'provider')?.name"
-          >
-            <el-option
-              v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-              class="flex-between"
-            >
-              <div class="flex align-center">
-                        <span
-                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                          class="model-icon mr-8"
-                        ></span>
-                <span>{{ item.name }}</span>
-                <el-tag
-                  v-if="item.permission_type === 'PUBLIC'"
-                  type="info"
-                  class="info-tag ml-8"
-                >公用
-                </el-tag>
-              </div>
-              <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
-                <Check />
-              </el-icon>
-            </el-option>
-            <!-- 不可用 -->
-            <el-option
-              v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-              class="flex-between"
-              disabled
-            >
-              <div class="flex">
-                        <span
-                          v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                          class="model-icon mr-8"
-                        ></span>
-                <span>{{ item.name }}</span>
-                <span class="danger">{{
-                    $t('views.application.applicationForm.form.aiModel.unavailable')
-                  }}</span>
-              </div>
-              <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
-                <Check />
-              </el-icon>
-            </el-option>
-          </el-option-group>
-        </el-select>
-      </el-form-item>
-    </el-form>
-    <div class="flex-between">
-      全局变量
-      <el-button link type="primary" @click="openAddDialog()">
-        <el-icon class="mr-4"><Plus /></el-icon> 添加
-      </el-button>
-    </div>
-    <el-table :data="props.nodeModel.properties.input_field_list" class="mb-16">
+      <div class="flex-between mb-8">
+        <h5 class="lighter">全局变量</h5>
+        <el-button link type="primary" @click="openAddDialog()">
+          <el-icon class="mr-4"><Plus /></el-icon> 添加
+        </el-button>
+      </div>
+      <el-table :data="props.nodeModel.properties.input_field_list" class="mb-16">
         <el-table-column prop="name" label="变量名" />
         <el-table-column prop="variable" label="变量" />
         <el-table-column label="输入类型">
@@ -224,9 +76,9 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="source" label="赋值方式">
+        <el-table-column prop="assignment_method" label="赋值方式">
           <template #default="{ row }">
-            {{ row.source === 'user_input' ? '用户输入' : '接口传参' }}
+            {{ row.assignment_method === 'user_input' ? '用户输入' : '接口传参' }}
           </template>
         </el-table-column>
         <el-table-column label="操作" align="left" width="80">
@@ -248,6 +100,152 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-form-item>
+        <template #label>
+          <div class="flex-between">
+            <div class="flex align-center">
+              <span class="mr-4">语音输入</span>
+              <el-tooltip
+                effect="dark"
+                content="开启后，需要设定语音转文本模型，语音输入完成后会转化为文字直接发送提问"
+                placement="right"
+              >
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+            <el-switch size="small" v-model="form_data.stt_model_enable" />
+          </div>
+        </template>
+        <el-select
+          v-model="form_data.stt_model_id"
+          class="w-full"
+          popper-class="select-model"
+          placeholder="请输入"
+        >
+          <el-option-group
+            v-for="(value, label) in sttModelOptions"
+            :key="value"
+            :label="relatedObject(providerOptions, label, 'provider')?.name"
+          >
+            <el-option
+              v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+              class="flex-between"
+            >
+              <div class="flex align-center">
+                <span
+                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                  class="model-icon mr-8"
+                ></span>
+                <span>{{ item.name }}</span>
+                <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
+                  >公用
+                </el-tag>
+              </div>
+              <el-icon class="check-icon" v-if="item.id === form_data.stt_model_id">
+                <Check />
+              </el-icon>
+            </el-option>
+            <!-- 不可用 -->
+            <el-option
+              v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+              class="flex-between"
+              disabled
+            >
+              <div class="flex">
+                <span
+                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                  class="model-icon mr-8"
+                ></span>
+                <span>{{ item.name }}</span>
+                <span class="danger">{{
+                  $t('views.application.applicationForm.form.aiModel.unavailable')
+                }}</span>
+              </div>
+              <el-icon class="check-icon" v-if="item.id === form_data.stt_model_id">
+                <Check />
+              </el-icon>
+            </el-option>
+          </el-option-group>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <template #label>
+          <div class="flex-between">
+            <span class="mr-4">语音播放</span>
+            <el-switch size="small" v-model="form_data.tts_model_enable" />
+          </div>
+        </template>
+        <el-radio-group v-model="form_data.tts_type">
+          <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
+          <el-radio value="TTS">TTS模型</el-radio>
+        </el-radio-group>
+        <el-select
+          v-if="form_data.tts_type === 'TTS'"
+          v-model="form_data.tts_model_id"
+          class="w-full"
+          popper-class="select-model"
+          placeholder="请输入"
+        >
+          <el-option-group
+            v-for="(value, label) in ttsModelOptions"
+            :key="value"
+            :label="relatedObject(providerOptions, label, 'provider')?.name"
+          >
+            <el-option
+              v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+              class="flex-between"
+            >
+              <div class="flex align-center">
+                <span
+                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                  class="model-icon mr-8"
+                ></span>
+                <span>{{ item.name }}</span>
+                <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
+                  >公用
+                </el-tag>
+              </div>
+              <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
+                <Check />
+              </el-icon>
+            </el-option>
+            <!-- 不可用 -->
+            <el-option
+              v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+              class="flex-between"
+              disabled
+            >
+              <div class="flex">
+                <span
+                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                  class="model-icon mr-8"
+                ></span>
+                <span>{{ item.name }}</span>
+                <span class="danger">{{
+                  $t('views.application.applicationForm.form.aiModel.unavailable')
+                }}</span>
+              </div>
+              <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
+                <Check />
+              </el-icon>
+            </el-option>
+          </el-option-group>
+        </el-select>
+      </el-form-item>
+    </el-form>
+
     <!-- 回复内容弹出层 -->
     <el-dialog v-model="dialogVisible" title="开场白" append-to-body>
       <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"></MdEditor>
@@ -335,28 +333,21 @@ const validate = () => {
 }
 
 function getProvider() {
-  model
-    .asyncGetProvider()
-    .then((res: any) => {
-      providerOptions.value = res?.data
-    })
+  model.asyncGetProvider().then((res: any) => {
+    providerOptions.value = res?.data
+  })
 }
 
-
 function getSTTModel() {
-  applicationApi
-    .getApplicationSTTModel(id)
-    .then((res: any) => {
-      sttModelOptions.value = groupBy(res?.data, 'provider')
-    })
+  applicationApi.getApplicationSTTModel(id).then((res: any) => {
+    sttModelOptions.value = groupBy(res?.data, 'provider')
+  })
 }
 
 function getTTSModel() {
-  applicationApi
-    .getApplicationTTSModel(id)
-    .then((res: any) => {
-      ttsModelOptions.value = groupBy(res?.data, 'provider')
-    })
+  applicationApi.getApplicationTTSModel(id).then((res: any) => {
+    ttsModelOptions.value = groupBy(res?.data, 'provider')
+  })
 }
 
 const currentIndex = ref(null)
@@ -391,7 +382,6 @@ function refreshFieldList(data: any) {
   FieldFormDialogRef.value.close()
 }
 
-
 onMounted(() => {
   set(props.nodeModel, 'validate', validate)
   if (props.nodeModel.properties.input_field_list) {
@@ -403,7 +393,6 @@ onMounted(() => {
   getProvider()
   getTTSModel()
   getSTTModel()
-
 })
 </script>
 <style lang="scss" scoped>
