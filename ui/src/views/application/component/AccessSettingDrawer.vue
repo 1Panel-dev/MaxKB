@@ -28,6 +28,10 @@
           </el-input>
         </el-form-item>
       </template>
+      <div v-if="configType === 'wechat'" class="flex align-center" style="margin-bottom: 8px">
+        <span class="el-form-item__label">是否是订阅号</span>
+        <el-switch v-if="configType === 'wechat'" v-model="form[configType].is_personal" />
+      </div>
 
       <h4 class="title-decoration-1 mb-16">回调地址</h4>
       <el-form-item label="URL" prop="callback_url">
@@ -102,7 +106,14 @@ const {
 } = route as any
 
 const form = reactive<any>({
-  wechat: { app_id: '', app_secret: '', token: '', encoding_aes_key: '', callback_url: '' },
+  wechat: {
+    app_id: '',
+    app_secret: '',
+    token: '',
+    encoding_aes_key: '',
+    is_personal: false,
+    callback_url: ''
+  },
   dingtalk: { client_id: '', client_secret: '', callback_url: '' },
   wecom: {
     app_id: '',
