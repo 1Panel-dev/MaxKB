@@ -1,4 +1,4 @@
-name: 构建镜像并推送仓库
+name: build-and-push
 
 run-name: 构建镜像并推送仓库 ${{ github.event.inputs.dockerImageTag }} (${{ github.event.inputs.registry }})
 
