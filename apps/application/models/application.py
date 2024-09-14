@@ -35,7 +35,7 @@ def get_dataset_setting_dict():
 
 
 def get_model_setting_dict():
-    return {'prompt': Application.get_default_model_prompt()}
+    return {'prompt': Application.get_default_model_prompt(), 'no_references_prompt': '{question}'}
 
 
 class Application(AppModelMixin):

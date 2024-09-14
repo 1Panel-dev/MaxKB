@@ -264,7 +264,9 @@ class ApplicationApi(ApiMixin):
                                                       '\n{question}')),
 
                     'system': openapi.Schema(type=openapi.TYPE_STRING, title="系统提示词(角色)",
-                                             description="系统提示词(角色)")
+                                             description="系统提示词(角色)"),
+                    'no_references_prompt': openapi.Schema(type=openapi.TYPE_STRING, title="无引用分段提示词",
+                                                           default="{question}", description="无引用分段提示词")
 
                 }
             )

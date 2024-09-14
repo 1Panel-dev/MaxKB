@@ -122,6 +122,8 @@ class DatasetSettingSerializer(serializers.Serializer):
 class ModelSettingSerializer(serializers.Serializer):
     prompt = serializers.CharField(required=True, max_length=2048, error_messages=ErrMessage.char("提示词"))
     system = serializers.CharField(required=False, max_length=2048, error_messages=ErrMessage.char("角色提示词"))
+    no_references_prompt = serializers.CharField(required=True, max_length=2048,
+                                                 error_messages=ErrMessage.char("无引用分段提示词"))
 
 
 class ApplicationWorkflowSerializer(serializers.Serializer):
