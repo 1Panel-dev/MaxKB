@@ -60,6 +60,16 @@ class ChatInfo:
         self.chat_record_list: List[ChatRecord] = []
         self.work_flow_version = work_flow_version
 
+    @staticmethod
+    def get_no_references_setting(dataset_setting, model_setting):
+        no_references_setting = dataset_setting.get(
+            'no_references_setting', {
+                'status': 'ai_questioning',
+                'value': '{question}'})
+        if no_references_setting.get('status') == 'ai_questioning':
+            no_references_setting['value'] = model_setting.get('no_references_prompt', '{question}')
+        return no_references_setting
+
     def to_base_pipeline_manage_params(self):
         dataset_setting = self.application.dataset_setting
         model_setting = self.application.model_setting
@@ -92,11 +102,7 @@ class ChatInfo:
                 self.application.model_params_setting.keys()) == 0 else self.application.model_params_setting,
             'search_mode': self.application.dataset_setting.get(
                 'search_mode') if 'search_mode' in self.application.dataset_setting else 'embedding',
-            'no_references_setting': self.application.dataset_setting.get(
-                'no_references_setting') if 'no_references_setting' in self.application.dataset_setting else {
-                'status': 'ai_questioning',
-                'value': '{question}',
-            },
+            'no_references_setting': self.get_no_references_setting(self.application.dataset_setting, model_setting),
             'user_id': self.application.user_id
         }
 
