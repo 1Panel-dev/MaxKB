@@ -93,7 +93,8 @@ const props = defineProps({
     type: Boolean
   },
   log: Boolean,
-  tts: Boolean
+  tts: Boolean,
+  tts_type: String
 })
 
 const emit = defineEmits(['update:data', 'regeneration'])
@@ -116,15 +117,15 @@ function voteHandle(val: string) {
 }
 
 const playAnswerText = (text: string) => {
-  if (props.data.tts_type === 'BROWSER') {
+  if (props.tts_type === 'BROWSER') {
     // 创建一个新的 SpeechSynthesisUtterance 实例
     const utterance = new SpeechSynthesisUtterance(text)
     // 调用浏览器的朗读功能
     window.speechSynthesis.speak(utterance)
   }
-  if (props.data.tts_type === 'TTS') {
+  if (props.tts_type === 'TTS') {
     applicationApi
-      .postTextToSpeech(props.data.id as string, { text: text }, loading)
+      .postTextToSpeech(props.applicationId as string, { text: text }, loading)
       .then((res: any) => {
         // 假设我们有一个 MP3 文件的字节数组
         // 创建 Blob 对象
