@@ -132,8 +132,8 @@ class RegisterSerializer(ApiMixin, serializers.Serializer):
                                      max_length=20,
                                      min_length=6,
                                      validators=[
-                                         validators.RegexValidator(regex=re.compile("^[a-zA-Z][a-zA-Z0-9_]{5,20}$"),
-                                                                   message="用户名字符数为 6-20 个字符，必须以字母开头，可使用字母、数字、下划线等")
+                                         validators.RegexValidator(regex=re.compile("^.{6,20}$"),
+                                                                   message="用户名字符数为 6-20 个字符")
                                      ])
     password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"),
                                      validators=[validators.RegexValidator(regex=re.compile(
@@ -590,8 +590,8 @@ class UserManageSerializer(serializers.Serializer):
                                          max_length=20,
                                          min_length=6,
                                          validators=[
-                                             validators.RegexValidator(regex=re.compile("^[a-zA-Z][a-zA-Z0-9_]{5,20}$"),
-                                                                       message="用户名字符数为 6-20 个字符，必须以字母开头，可使用字母、数字、下划线等")
+                                             validators.RegexValidator(regex=re.compile("^.{6,20}$"),
+                                                                       message="用户名字符数为 6-20 个字符")
                                          ])
         password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"),
                                          validators=[validators.RegexValidator(regex=re.compile(
