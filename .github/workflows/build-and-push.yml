@@ -21,7 +21,7 @@ on:
       registry:
         description: 'Push To Registry'
         required: true
-        default: 'dockerhub'
+        default: 'fit2cloud-registry'
         type: choice
         options:
           - fit2cloud-registry
