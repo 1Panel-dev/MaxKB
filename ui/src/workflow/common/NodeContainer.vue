@@ -82,15 +82,35 @@
         </div>
       </div>
     </div>
+    <el-collapse-transition>
+      <DropdownMenu
+        v-if="showAnchor"
+        @mousemove.stop
+        @mousedown.stop
+        @keydown.stop
+        @click.stop
+        :show="showAnchor"
+        :id="id"
+        style="left: 100%; top: 50%; transform: translate(0, -50%)"
+        @clickNodes="clickNodes"
+      />
+    </el-collapse-transition>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { app } from '@/main'
+import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
 import { WorkflowType } from '@/enums/workflow'
 import { MsgError, MsgConfirm } from '@/utils/message'
+
+const {
+  params: { id }
+} = app.config.globalProperties.$route as any
+
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
@@ -100,7 +120,8 @@ const height = ref<{
   inputContainerHeight: 0,
   outputContainerHeight: 0
 })
-
+const showAnchor = ref<boolean>(false)
+const anchorData = ref<any>()
 const node_status = computed(() => {
   if (props.nodeModel.properties.status) {
     return props.nodeModel.properties.status
@@ -152,6 +173,23 @@ const resizeStepContainer = (wh: any) => {
   }
 }
 
+function clickNodes(item: any) {
+  const nodeModel = props.nodeModel.graphModel.addNode({
+    type: item.type,
+    properties: item.properties,
+    x: anchorData.value?.x + props.nodeModel.width + 100,
+    y: anchorData.value?.y - item.height
+  })
+  props.nodeModel.graphModel.addEdge({
+    type: 'app-edge',
+    sourceNodeId: props.nodeModel.id,
+    sourceAnchorId: anchorData.value?.id,
+    targetNodeId: nodeModel.id
+  })
+
+  closeNodeMenu()
+}
+
 const props = defineProps<{
   nodeModel: any
 }>()
@@ -173,6 +211,19 @@ const nodeFields = computed(() => {
 function showOperate(type: string) {
   return type !== WorkflowType.Base && type !== WorkflowType.Start
 }
+const openNodeMenu = (anchorValue: any) => {
+  showAnchor.value = true
+  anchorData.value = anchorValue
+}
+const closeNodeMenu = () => {
+  showAnchor.value = false
+  anchorData.value = undefined
+}
+onMounted(() => {
+  set(props.nodeModel, 'openNodeMenu', (anchorData: any) => {
+    showAnchor.value ? closeNodeMenu() : openNodeMenu(anchorData)
+  })
+})
 </script>
 <style lang="scss" scoped>
 .workflow-node-container {

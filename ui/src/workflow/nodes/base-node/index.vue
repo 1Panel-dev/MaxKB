@@ -116,6 +116,7 @@
             <el-switch size="small" v-model="form_data.stt_model_enable" />
           </div>
         </template>
+
         <el-select
           v-model="form_data.stt_model_id"
           class="w-full"
@@ -182,8 +183,8 @@
           </div>
         </template>
         <el-radio-group v-model="form_data.tts_type">
-          <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
-          <el-radio value="TTS">TTS模型</el-radio>
+          <el-radio label="浏览器播放(免费)" value="BROWSER" />
+          <el-radio label="TTS模型" value="TTS" />
         </el-radio-group>
         <el-select
           v-if="form_data.tts_type === 'TTS'"
@@ -246,6 +247,53 @@
       </el-form-item>
     </el-form>
 
+    <div class="flex-between">
+      全局变量
+      <el-button link type="primary" @click="openAddDialog()">
+        <el-icon class="mr-4"><Plus /></el-icon> 添加
+      </el-button>
+    </div>
+    <el-table :data="props.nodeModel.properties.input_field_list" class="mb-16">
+      <el-table-column prop="name" label="变量名" />
+      <el-table-column prop="variable" label="变量" />
+      <el-table-column label="输入类型">
+        <template #default="{ row }">
+          <el-tag type="info" class="info-tag" v-if="row.type === 'input'">文本框</el-tag>
+          <el-tag type="info" class="info-tag" v-if="row.type === 'date'">日期</el-tag>
+          <el-tag type="info" class="info-tag" v-if="row.type === 'select'">下拉选项</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="必填">
+        <template #default="{ row }">
+          <div @click.stop>
+            <el-switch size="small" v-model="row.is_required" />
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="source" label="赋值方式">
+        <template #default="{ row }">
+          {{ row.source === 'user_input' ? '用户输入' : '接口传参' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="left" width="80">
+        <template #default="{ row, $index }">
+          <span class="mr-4">
+            <el-tooltip effect="dark" content="修改" placement="top">
+              <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
+                <el-icon><EditPen /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </span>
+          <el-tooltip effect="dark" content="删除" placement="top">
+            <el-button type="primary" text @click="deleteField($index)">
+              <el-icon>
+                <Delete />
+              </el-icon>
+            </el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+    </el-table>
     <!-- 回复内容弹出层 -->
     <el-dialog v-model="dialogVisible" title="开场白" append-to-body>
       <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"></MdEditor>
@@ -255,8 +303,8 @@
         </div>
       </template>
     </el-dialog>
+    <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </NodeContainer>
-  <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
 </template>
 <script setup lang="ts">
 import { app } from '@/main'

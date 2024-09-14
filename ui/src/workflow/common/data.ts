@@ -29,9 +29,11 @@ export const baseNode = {
   type: WorkflowType.Base,
   x: 200,
   y: 270,
+  text: '',
   properties: {
     height: 200,
     stepName: '基本信息',
+    input_field_list: [],
     node_data: {
       name: '',
       desc: '',
@@ -53,6 +55,7 @@ export const aiChatNode = {
   type: WorkflowType.AiChat,
   text: '与 AI 大模型进行对话',
   label: 'AI 对话',
+  height: 340,
   properties: {
     stepName: 'AI 对话',
     config: {
@@ -72,6 +75,7 @@ export const searchDatasetNode = {
   type: WorkflowType.SearchDataset,
   text: '关联知识库，查找与问题相关的分段',
   label: '知识库检索',
+  height: 355,
   properties: {
     stepName: '知识库检索',
     config: {
@@ -94,6 +98,7 @@ export const questionNode = {
   type: WorkflowType.Question,
   text: '根据历史聊天记录优化完善当前问题，更利于匹配知识库分段',
   label: '问题优化',
+  height: 345,
   properties: {
     stepName: '问题优化',
     config: {
@@ -110,6 +115,7 @@ export const conditionNode = {
   type: WorkflowType.Condition,
   text: '根据不同条件执行不同的节点',
   label: '判断器',
+  height: 175,
   properties: {
     width: 600,
     stepName: '判断器',
@@ -127,6 +133,7 @@ export const replyNode = {
   type: WorkflowType.Reply,
   text: '指定回复内容，引用变量会转换为字符串进行输出',
   label: '指定回复',
+  height: 210,
   properties: {
     stepName: '指定回复',
     config: {
@@ -143,6 +150,7 @@ export const rerankerNode = {
   type: WorkflowType.RrerankerNode,
   text: '使用重排模型对多个知识库的检索结果进行二次召回',
   label: '多路召回',
+  height: 252,
   properties: {
     stepName: '多路召回',
     config: {
@@ -171,6 +179,7 @@ export const functionNode = {
   type: WorkflowType.FunctionLibCustom,
   text: '通过执行自定义脚本，实现数据处理',
   label: '自定义函数',
+  height: 260,
   properties: {
     stepName: '自定义函数',
     config: {
@@ -187,6 +196,7 @@ export const functionLibNode = {
   type: WorkflowType.FunctionLib,
   text: '通过执行自定义脚本，实现数据处理',
   label: '自定义函数',
+  height: 170,
   properties: {
     stepName: '自定义函数',
     config: {
