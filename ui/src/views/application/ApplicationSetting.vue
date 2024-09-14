@@ -150,7 +150,7 @@
               </el-form-item>
               <el-form-item label="角色设定">
                 <el-input
-                  v-model="applicationForm.model_setting.no_references_prompt"
+                  v-model="applicationForm.model_setting.system"
                   :rows="6"
                   type="textarea"
                   maxlength="2048"
