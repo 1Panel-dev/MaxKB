@@ -41,7 +41,7 @@ const showicon = ref(false)
 
 const inputFieldList = ref<any[]>([])
 
-onMounted(() => {
+function handleRefreshFieldList(data: any[]) {
   props.nodeModel.graphModel.nodes
     .filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
@@ -56,6 +56,14 @@ onMounted(() => {
       ]
       inputFieldList.value = v.properties.input_field_list
     })
+}
+
+props.nodeModel.graphModel.eventCenter.on('refreshFieldList', (data: any) => {
+  handleRefreshFieldList(data)
+})
+
+onMounted(() => {
+  handleRefreshFieldList([])
 })
 </script>
 <style lang="scss" scoped></style>

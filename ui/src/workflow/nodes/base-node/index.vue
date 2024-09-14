@@ -412,6 +412,7 @@ function openAddDialog(data?: any, index?: any) {
 
 function deleteField(index: any) {
   inputFieldList.value.splice(index, 1)
+  props.nodeModel.graphModel.eventCenter.emit('refreshFieldList', inputFieldList.value)
 }
 
 function refreshFieldList(data: any) {
@@ -428,6 +429,7 @@ function refreshFieldList(data: any) {
   }
   currentIndex.value = null
   FieldFormDialogRef.value.close()
+  props.nodeModel.graphModel.eventCenter.emit('refreshFieldList', inputFieldList.value)
 }
 
 onMounted(() => {
