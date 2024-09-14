@@ -812,7 +812,7 @@ const startRecording = async () => {
     mediaRecorder.value = new Recorder({
       type: 'mp3',
       bitRate: 128,
-      sampleRate: 44100
+      sampleRate: 16000
     })
 
     mediaRecorder.value.open(
