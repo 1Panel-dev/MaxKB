@@ -29,6 +29,8 @@ class IResetProblemStep(IBaseChatPipelineStep):
                                                     error_messages=ErrMessage.list("历史对答"))
         # 大语言模型
         chat_model = ModelField(required=False, allow_null=True, error_messages=ErrMessage.base("大语言模型"))
+        problem_optimization_prompt = serializers.CharField(required=False, max_length=102400,
+                                                            error_messages=ErrMessage.char("问题补全提示词"))
 
     def get_step_serializer(self, manage: PipelineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer
@@ -47,5 +49,6 @@ class IResetProblemStep(IBaseChatPipelineStep):
 
     @abstractmethod
     def execute(self, problem_text: str, history_chat_record: List[ChatRecord] = None, chat_model: BaseChatModel = None,
+                problem_optimization_prompt=None,
                 **kwargs):
         pass

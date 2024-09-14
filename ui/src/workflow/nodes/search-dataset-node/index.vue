@@ -159,11 +159,11 @@ const datasetList = ref<any>([])
 const datasetLoading = ref(false)
 
 function refreshParam(data: any) {
-  set(props.nodeModel.properties.node_data, 'dataset_setting', data)
+  set(props.nodeModel.properties.node_data, 'dataset_setting', data.dataset_setting)
 }
 
 const openParamSettingDialog = () => {
-  ParamSettingDialogRef.value?.open(form_data.value.dataset_setting, 'WORK_FLOW')
+  ParamSettingDialogRef.value?.open(form_data.value, 'WORK_FLOW')
 }
 
 function removeDataset(id: any) {

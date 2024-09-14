@@ -120,7 +120,12 @@ class DatasetSettingSerializer(serializers.Serializer):
 
 
 class ModelSettingSerializer(serializers.Serializer):
-    prompt = serializers.CharField(required=True, max_length=2048, error_messages=ErrMessage.char("提示词"))
+    prompt = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
+                                   error_messages=ErrMessage.char("提示词"))
+    system = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
+                                   error_messages=ErrMessage.char("角色提示词"))
+    no_references_prompt = serializers.CharField(required=True, max_length=102400, allow_null=True, allow_blank=True,
+                                                 error_messages=ErrMessage.char("无引用分段提示词"))
 
 
 class ApplicationWorkflowSerializer(serializers.Serializer):
@@ -174,7 +179,7 @@ class ApplicationSerializer(serializers.Serializer):
                                  error_messages=ErrMessage.char("应用描述"))
     model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      error_messages=ErrMessage.char("模型"))
-    multiple_rounds_dialogue = serializers.BooleanField(required=True, error_messages=ErrMessage.char("多轮对话"))
+    dialogue_number = serializers.BooleanField(required=True, error_messages=ErrMessage.char("会话次数"))
     prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                      error_messages=ErrMessage.char("开场白"))
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
@@ -185,6 +190,8 @@ class ApplicationSerializer(serializers.Serializer):
     model_setting = ModelSettingSerializer(required=True)
     # 问题补全
     problem_optimization = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("问题补全"))
+    problem_optimization_prompt = serializers.CharField(required=False, max_length=102400,
+                                                        error_messages=ErrMessage.char("问题补全提示词"))
     # 应用类型
     type = serializers.CharField(required=True, error_messages=ErrMessage.char("应用类型"),
                                  validators=[
@@ -364,8 +371,8 @@ class ApplicationSerializer(serializers.Serializer):
                                      error_messages=ErrMessage.char("应用描述"))
         model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                          error_messages=ErrMessage.char("模型"))
-        multiple_rounds_dialogue = serializers.BooleanField(required=False,
-                                                            error_messages=ErrMessage.boolean("多轮会话"))
+        dialogue_number = serializers.IntegerField(required=False,
+                                                   error_messages=ErrMessage.boolean("多轮会话"))
         prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                          error_messages=ErrMessage.char("开场白"))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
@@ -430,13 +437,14 @@ class ApplicationSerializer(serializers.Serializer):
         def to_application_model(user_id: str, application: Dict):
             return Application(id=uuid.uuid1(), name=application.get('name'), desc=application.get('desc'),
                                prologue=application.get('prologue'),
-                               dialogue_number=3 if application.get('multiple_rounds_dialogue') else 0,
+                               dialogue_number=application.get('dialogue_number', 0),
                                user_id=user_id, model_id=application.get('model_id'),
                                dataset_setting=application.get('dataset_setting'),
                                model_setting=application.get('model_setting'),
                                problem_optimization=application.get('problem_optimization'),
                                type=ApplicationTypeChoices.SIMPLE,
                                model_params_setting=application.get('model_params_setting', {}),
+                               problem_optimization_prompt=application.get('problem_optimization_prompt', None),
                                work_flow={}
                                )
 

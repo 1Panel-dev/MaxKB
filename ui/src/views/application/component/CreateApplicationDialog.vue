@@ -104,7 +104,7 @@ const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
   model_id: '',
-  multiple_rounds_dialogue: false,
+  dialogue_number: 1,
   prologue: t('views.application.prompt.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
@@ -118,9 +118,19 @@ const applicationForm = ref<ApplicationFormType>({
     }
   },
   model_setting: {
-    prompt: defaultPrompt
+    prompt: defaultPrompt,
+    system: '你是 xxx 小助手',
+    no_references_prompt: '{question}'
   },
+  model_params_setting: {},
   problem_optimization: false,
+  problem_optimization_prompt:
+    '()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中',
+  stt_model_id: '',
+  tts_model_id: '',
+  stt_model_enable: false,
+  tts_model_enable: false,
+  tts_type: 'BROWSER',
   type: 'SIMPLE'
 })
 
@@ -147,7 +157,7 @@ watch(dialogVisible, (bool) => {
       name: '',
       desc: '',
       model_id: '',
-      multiple_rounds_dialogue: false,
+      dialogue_number: 1,
       prologue: t('views.application.prompt.defaultPrologue'),
       dataset_id_list: [],
       dataset_setting: {
@@ -161,9 +171,18 @@ watch(dialogVisible, (bool) => {
         }
       },
       model_setting: {
-        prompt: defaultPrompt
+        prompt: defaultPrompt,
+        system: '你是 xxx 小助手',
+        no_references_prompt: '{question}'
       },
+      model_params_setting: {},
       problem_optimization: false,
+      problem_optimization_prompt: '',
+      stt_model_id: '',
+      tts_model_id: '',
+      stt_model_enable: false,
+      tts_model_enable: false,
+      tts_type: 'BROWSER',
       type: 'SIMPLE'
     }
     applicationFormRef.value?.clearValidate()
