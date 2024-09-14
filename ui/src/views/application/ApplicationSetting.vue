@@ -150,7 +150,7 @@
               </el-form-item>
               <el-form-item label="角色设定">
                 <el-input
-                  v-model="applicationForm.model_setting.system"
+                  v-model="applicationForm.model_setting.no_references_prompt"
                   :rows="6"
                   type="textarea"
                   maxlength="2048"
@@ -367,8 +367,8 @@
                   </div>
                 </template>
                 <el-radio-group v-model="applicationForm.tts_type">
-                  <el-radio label="BROWSER">浏览器播放(免费)</el-radio>
-                  <el-radio label="TTS">TTS模型</el-radio>
+                  <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
+                  <el-radio value="TTS">TTS模型</el-radio>
                 </el-radio-group>
                 <el-select
                   v-if="applicationForm.tts_type === 'TTS'"
@@ -551,7 +551,8 @@ const applicationForm = ref<ApplicationFormType>({
   },
   model_setting: {
     prompt: defaultPrompt,
-    system: '你是 xxx 小助手'
+    system: '你是 xxx 小助手',
+    no_references_prompt: '{question}'
   },
   model_params_setting: {},
   problem_optimization: false,
