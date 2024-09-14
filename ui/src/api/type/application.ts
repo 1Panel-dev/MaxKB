@@ -4,12 +4,13 @@ interface ApplicationFormType {
   name?: string
   desc?: string
   model_id?: string
-  multiple_rounds_dialogue?: boolean
+  dialogue_number?: number
   prologue?: string
   dataset_id_list?: string[]
   dataset_setting?: any
   model_setting?: any
   problem_optimization?: boolean
+  problem_optimization_prompt?: string
   icon?: string | undefined
   type?: string
   work_flow?: any

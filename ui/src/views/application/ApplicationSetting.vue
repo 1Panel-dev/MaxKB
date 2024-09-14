@@ -61,10 +61,7 @@
                 />
               </el-form-item>
 
-              <el-form-item
-                :label="$t('views.application.applicationForm.form.aiModel.label')"
-                prop="model_id"
-              >
+              <el-form-item :label="$t('views.application.applicationForm.form.aiModel.label')">
                 <template #label>
                   <div class="flex-between">
                     <span>{{ $t('views.application.applicationForm.form.aiModel.label') }}</span>
@@ -151,29 +148,26 @@
                   </template>
                 </el-select>
               </el-form-item>
-              <el-form-item
-                :label="$t('views.application.applicationForm.form.prompt.label')"
-                prop="model_setting.prompt"
-              >
+              <el-form-item label="角色设定">
+                <el-input
+                  v-model="applicationForm.model_setting.system"
+                  :rows="6"
+                  type="textarea"
+                  maxlength="2048"
+                  placeholder="你是 xxx 小助手"
+                />
+              </el-form-item>
+              <el-form-item :label="$t('views.application.applicationForm.form.prompt.label')">
                 <template #label>
                   <div class="flex align-center">
                     <div class="flex-between mr-4">
                       <span
-                        >{{ $t('views.application.applicationForm.form.prompt.label') }}
-                        <span class="danger">*</span></span
+                        >{{
+                          $t('views.application.applicationForm.form.prompt.label')
+                        }}
+                        (无引用知识库)</span
                       >
                     </div>
-                    <el-tooltip effect="dark" placement="right">
-                      <template #content
-                        >{{
-                          $t('views.application.applicationForm.form.prompt.tooltip', {
-                            data: '{data}',
-                            question: '{question}'
-                          })
-                        }}
-                      </template>
-                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                    </el-tooltip>
                   </div>
                 </template>
                 <el-input
@@ -184,14 +178,14 @@
                   :placeholder="defaultPrompt"
                 />
               </el-form-item>
-              <el-form-item
-                :label="$t('views.application.applicationForm.form.multipleRoundsDialogue')"
-                @click.prevent
-              >
-                <el-switch
-                  size="small"
-                  v-model="applicationForm.multiple_rounds_dialogue"
-                ></el-switch>
+              <el-form-item label="历史聊天记录" @click.prevent>
+                <el-input-number
+                  v-model="applicationForm.dialogue_number"
+                  :min="0"
+                  :value-on-clear="0"
+                  controls-position="right"
+                  class="w-full"
+                />
               </el-form-item>
               <el-form-item
                 label="$t('views.application.applicationForm.form.relatedKnowledgeBase')"
@@ -260,6 +254,25 @@
                   </el-row>
                 </div>
               </el-form-item>
+              <el-form-item :label="$t('views.application.applicationForm.form.prompt.label')">
+                <template #label>
+                  <div class="flex align-center">
+                    <div class="flex-between mr-4">
+                      <span>
+                        {{ $t('views.application.applicationForm.form.prompt.label') }}
+                        (引用知识库)
+                      </span>
+                    </div>
+                  </div>
+                </template>
+                <el-input
+                  v-model="applicationForm.model_setting.prompt"
+                  :rows="6"
+                  type="textarea"
+                  maxlength="2048"
+                  :placeholder="defaultPrompt"
+                />
+              </el-form-item>
               <el-form-item :label="$t('views.application.applicationForm.form.prologue')">
                 <MdEditor
                   class="prologue-md-editor"
@@ -269,27 +282,9 @@
                   :footers="[]"
                 />
               </el-form-item>
-              <el-form-item @click.prevent>
-                <template #label>
-                  <div class="flex align-center">
-                    <span class="mr-4">{{
-                      $t('views.application.applicationForm.form.problemOptimization.label')
-                    }}</span>
-                    <el-tooltip
-                      effect="dark"
-                      :content="
-                        $t('views.application.applicationForm.form.problemOptimization.tooltip')
-                      "
-                      placement="right"
-                    >
-                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                    </el-tooltip>
-                  </div>
-                </template>
-                <el-switch size="small" v-model="applicationForm.problem_optimization"></el-switch>
-              </el-form-item>
+
               <el-form-item>
-                 <template #label>
+                <template #label>
                   <div class="flex align-center">
                     <span class="mr-4">语音输入</span>
                     <el-tooltip
@@ -299,7 +294,7 @@
                     >
                       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                     </el-tooltip>
-                    <el-switch v-model="applicationForm.stt_model_enable"/>
+                    <el-switch v-model="applicationForm.stt_model_enable" />
                   </div>
                 </template>
                 <el-select
@@ -363,15 +358,15 @@
                 </el-select>
               </el-form-item>
               <el-form-item>
-                 <template #label>
+                <template #label>
                   <div class="flex align-center">
                     <span class="mr-4">语音播放</span>
-                    <el-switch v-model="applicationForm.tts_model_enable"/>
+                    <el-switch v-model="applicationForm.tts_model_enable" />
                   </div>
                 </template>
                 <el-radio-group v-model="applicationForm.tts_type">
-                  <el-radio label="浏览器播放(免费)" value="BROWSER"/>
-                  <el-radio label="TTS模型" value="TTS"/>
+                  <el-radio label="浏览器播放(免费)" value="BROWSER" />
+                  <el-radio label="TTS模型" value="TTS" />
                 </el-radio-group>
                 <el-select
                   v-if="applicationForm.tts_type === 'TTS'"
@@ -539,7 +534,7 @@ const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
   model_id: '',
-  multiple_rounds_dialogue: false,
+  dialogue_number: 1,
   prologue: t('views.application.prompt.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
@@ -553,10 +548,12 @@ const applicationForm = ref<ApplicationFormType>({
     }
   },
   model_setting: {
-    prompt: defaultPrompt
+    prompt: defaultPrompt,
+    system: '你是 xxx 小助手'
   },
   model_params_setting: {},
   problem_optimization: false,
+  problem_optimization_prompt: '',
   stt_model_id: '',
   tts_model_id: '',
   stt_model_enable: false,
@@ -570,20 +567,6 @@ const rules = reactive<FormRules<ApplicationFormType>>({
     {
       required: true,
       message: t('views.application.applicationForm.form.appName.placeholder'),
-      trigger: 'blur'
-    }
-  ],
-  model_id: [
-    {
-      required: false,
-      message: t('views.application.applicationForm.form.aiModel.placeholder'),
-      trigger: 'change'
-    }
-  ],
-  'model_setting.prompt': [
-    {
-      required: true,
-      message: t('views.application.applicationForm.form.prompt.placeholder'),
       trigger: 'blur'
     }
   ]
@@ -621,11 +604,11 @@ const openAIParamSettingDialog = () => {
 }
 
 const openParamSettingDialog = () => {
-  ParamSettingDialogRef.value?.open(applicationForm.value.dataset_setting)
+  ParamSettingDialogRef.value?.open(applicationForm.value)
 }
 
 function refreshParam(data: any) {
-  applicationForm.value.dataset_setting = data
+  applicationForm.value = { ...applicationForm.value, ...data }
 }
 
 function refreshForm(data: any) {
