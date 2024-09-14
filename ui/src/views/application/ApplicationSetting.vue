@@ -651,7 +651,7 @@ function getDetail() {
     applicationForm.value.tts_model_id = res.data.tts_model
     applicationForm.value.tts_type = res.data.tts_type
     applicationForm.value.model_setting.no_references_prompt =
-      res.data.model_setting.no_references_prompt || '{question}'
+      res.data.model_setting.no_references_prompt || ''
   })
 }
 
