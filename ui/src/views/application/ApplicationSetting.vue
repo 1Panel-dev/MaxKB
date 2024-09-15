@@ -457,7 +457,11 @@
         </h4>
         <div class="dialog-bg">
           <div class="flex align-center p-24">
-            <div class="mr-12">
+            <div
+              class="edit-avatar mr-12"
+              @mouseenter="showEditIcon = true"
+              @mouseleave="showEditIcon = false"
+            >
               <AppAvatar
                 v-if="isAppIcon(applicationForm?.icon)"
                 shape="square"
@@ -473,8 +477,16 @@
                 shape="square"
                 :size="32"
               />
+              <AppAvatar
+                v-if="showEditIcon"
+                shape="square"
+                class="edit-mask"
+                :size="32"
+                @click="openEditAvatar"
+              >
+                <el-icon><EditPen /></el-icon>
+              </AppAvatar>
             </div>
-
             <h4>
               {{
                 applicationForm?.name || $t('views.application.applicationForm.form.appName.label')
@@ -505,6 +517,7 @@
       @change="openCreateModel($event)"
     ></CreateModelDialog>
     <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)" />
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -516,6 +529,8 @@ import ParamSettingDialog from './component/ParamSettingDialog.vue'
 import AddDatasetDialog from './component/AddDatasetDialog.vue'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
+
+import EditAvatarDialog from '@/views/application-overview/component/EditAvatarDialog.vue'
 import applicationApi from '@/api/application'
 import { isAppIcon } from '@/utils/application'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -545,6 +560,7 @@ const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 
 const applicationFormRef = ref<FormInstance>()
 const AddDatasetDialogRef = ref()
+const EditAvatarDialogRef = ref()
 
 const loading = ref(false)
 const datasetLoading = ref(false)
@@ -596,6 +612,7 @@ const providerOptions = ref<Array<Provider>>([])
 const datasetList = ref([])
 const sttModelOptions = ref<any>(null)
 const ttsModelOptions = ref<any>(null)
+  const showEditIcon = ref(false)
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -728,6 +745,13 @@ function getProvider() {
     .catch(() => {
       loading.value = false
     })
+}
+
+function openEditAvatar() {
+  EditAvatarDialogRef.value.open(applicationForm.value)
+}
+function refreshIcon() {
+  getDetail()
 }
 
 function refresh() {
