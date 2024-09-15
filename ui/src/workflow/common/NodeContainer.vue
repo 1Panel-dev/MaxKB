@@ -33,6 +33,11 @@
             @click.stop
             v-if="showOperate(nodeModel.type)"
           >
+            <!-- <el-button text @click="showNode = !showNode" class="mr-4">
+              <el-icon class="mr-8 arrow-icon" :class="showNode ? 'rotate-90' : ''"
+                ><CaretRight
+              /></el-icon>
+            </el-button> -->
             <el-dropdown :teleported="false" trigger="click">
               <el-button text>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
@@ -46,42 +51,44 @@
             </el-dropdown>
           </div>
         </div>
-
-        <div @mousedown.stop @keydown.stop @click.stop>
-          <el-alert
-            v-if="node_status != 200"
-            class="mb-16"
-            title="该函数不可用"
-            type="error"
-            show-icon
-            :closable="false"
-          />
-          <slot></slot>
-          <template v-if="nodeFields.length > 0">
-            <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
-            <template v-for="(item, index) in nodeFields" :key="index">
-              <div
-                class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
-                @mouseenter="showicon = index"
-                @mouseleave="showicon = null"
-              >
-                <span style="max-width: 92%">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-                <el-tooltip
-                  effect="dark"
-                  content="复制参数"
-                  placement="top"
-                  v-if="showicon === index"
+        <el-collapse-transition>
+          <div @mousedown.stop @keydown.stop @click.stop>
+            <el-alert
+              v-if="node_status != 200"
+              class="mb-16"
+              title="该函数不可用"
+              type="error"
+              show-icon
+              :closable="false"
+            />
+            <slot></slot>
+            <template v-if="nodeFields.length > 0">
+              <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
+              <template v-for="(item, index) in nodeFields" :key="index">
+                <div
+                  class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
+                  @mouseenter="showicon = index"
+                  @mouseleave="showicon = null"
                 >
-                  <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
-                    <AppIcon iconName="app-copy"></AppIcon>
-                  </el-button>
-                </el-tooltip>
-              </div>
+                  <span style="max-width: 92%">{{ item.label }} {{ '{' + item.value + '}' }}</span>
+                  <el-tooltip
+                    effect="dark"
+                    content="复制参数"
+                    placement="top"
+                    v-if="showicon === index"
+                  >
+                    <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
+                      <AppIcon iconName="app-copy"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </template>
             </template>
-          </template>
-        </div>
+          </div>
+        </el-collapse-transition>
       </div>
     </div>
+
     <el-collapse-transition>
       <DropdownMenu
         v-if="showAnchor"
@@ -122,6 +129,7 @@ const height = ref<{
 })
 const showAnchor = ref<boolean>(false)
 const anchorData = ref<any>()
+const showNode = ref<boolean>(true)
 const node_status = computed(() => {
   if (props.nodeModel.properties.status) {
     return props.nodeModel.properties.status
@@ -239,6 +247,9 @@ onMounted(() => {
     &.error {
       border: 1px solid #f54a45 !important;
     }
+  }
+  .arrow-icon {
+    transition: 0.2s;
   }
 }
 :deep(.el-card) {
