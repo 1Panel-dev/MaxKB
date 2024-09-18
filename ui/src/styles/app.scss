@@ -734,7 +734,6 @@ h5 {
   }
 }
 
-
 .edit-avatar {
   position: relative;
   .edit-mask {
@@ -742,4 +741,8 @@ h5 {
     left: 0;
     background: rgba(0, 0, 0, 0.4);
   }
+}
+
+.record-tip-confirm {
+  max-width: 800px !important;
 }
