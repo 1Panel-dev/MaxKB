@@ -6,7 +6,7 @@
       style="overflow: visible"
     >
       <div v-resize="resizeStepContainer">
-        <div class="flex-between mb-16">
+        <div class="flex-between">
           <div
             class="flex align-center"
             :style="{ maxWidth: node_status == 200 ? 'calc(100% - 55px)' : 'calc(100% - 85px)' }"
@@ -33,11 +33,11 @@
             @click.stop
             v-if="showOperate(nodeModel.type)"
           >
-            <!-- <el-button text @click="showNode = !showNode" class="mr-4">
+            <el-button text @click="showNode = !showNode" class="mr-4">
               <el-icon class="mr-8 arrow-icon" :class="showNode ? 'rotate-90' : ''"
                 ><CaretRight
               /></el-icon>
-            </el-button> -->
+            </el-button>
             <el-dropdown :teleported="false" trigger="click">
               <el-button text>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
@@ -52,7 +52,7 @@
           </div>
         </div>
         <el-collapse-transition>
-          <div @mousedown.stop @keydown.stop @click.stop>
+          <div @mousedown.stop @keydown.stop @click.stop v-if="showNode" class="mt-16">
             <el-alert
               v-if="node_status != 200"
               class="mb-16"
