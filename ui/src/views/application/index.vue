@@ -222,7 +222,7 @@ onMounted(() => {
   .status-tag {
     position: absolute;
     right: 16px;
-    top: 20px;
+    top: 13px;
   }
 }
 .dropdown-custom-switch {

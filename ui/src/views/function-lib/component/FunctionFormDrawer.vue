@@ -19,7 +19,7 @@
             placeholder="请输入函数名称"
             maxlength="64"
             show-word-limit
-            @blur="form.name = form.name.trim()"
+            @blur="form.name = form.name?.trim()"
           />
         </el-form-item>
         <el-form-item label="描述">
@@ -30,10 +30,10 @@
             maxlength="128"
             show-word-limit
             :autosize="{ minRows: 3 }"
-            @blur="form.desc = form.desc.trim()"
+            @blur="form.desc = form.desc?.trim()"
           />
         </el-form-item>
-        <el-form-item prop="permission_type" :rules="form.permission_type">
+        <el-form-item prop="permission_type">
           <template #label>
             <span>权限</span>
           </template>
@@ -207,7 +207,8 @@ watch(visible, (bool) => {
 })
 
 const rules = reactive({
-  name: [{ required: true, message: '请输入函数名称', trigger: 'blur' }]
+  name: [{ required: true, message: '请输入函数名称', trigger: 'blur' }],
+  permission_type: [{ required: true, message: '请选择', trigger: 'change' }]
 })
 
 function openCodemirrorDialog() {
