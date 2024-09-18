@@ -51,7 +51,7 @@ import { useRoute } from 'vue-router'
 const platforms = reactive([
   {
     key: 'wecom',
-    logoSrc: '/ui/src/assets/logo_wechat-work.svg',
+    logoSrc: new URL(`../../assets/logo_wechat-work.svg`, import.meta.url).href,
     name: '企业微信',
     description: '打造企业微信智能应用',
     isActive: false,
@@ -59,7 +59,7 @@ const platforms = reactive([
   },
   {
     key: 'dingtalk',
-    logoSrc: '/ui/src/assets/logo_dingtalk.svg',
+    logoSrc: new URL(`../../assets/logo_dingtalk.svg`, import.meta.url).href,
     name: '钉钉',
     description: '打造钉钉智能应用',
     isActive: false,
@@ -67,7 +67,7 @@ const platforms = reactive([
   },
   {
     key: 'wechat',
-    logoSrc: '/ui/src/assets/logo_wechat.svg',
+    logoSrc: new URL(`../../assets/logo_wechat.svg`, import.meta.url).href,
     name: '公众号',
     description: '打造公众号智能应用',
     isActive: false,
@@ -75,7 +75,7 @@ const platforms = reactive([
   },
   {
     key: 'feishu',
-    logoSrc: '/ui/src/assets/logo_lark.svg',
+    logoSrc: new URL(`../../assets/logo_lark.svg`, import.meta.url).href,
     name: '飞书',
     description: '打造飞书智能应用',
     isActive: false,
