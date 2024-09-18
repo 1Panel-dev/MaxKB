@@ -238,6 +238,7 @@ import 'recorder-core/src/engine/mp3-engine'
 import { MsgWarning } from '@/utils/message'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormField } from '@/components/dynamics-form/type'
+import { MsgAlert } from '@/utils/message'
 
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
@@ -845,7 +846,21 @@ const startRecording = async () => {
       }
     )
   } catch (error) {
-    console.error('无法获取音频权限：', error)
+    // console.error('无法获取音频权限：', error)
+    MsgAlert(
+      `提示`,
+      `<p>该功能需要使用麦克风，浏览器禁止不安全页面录音，解决方案如下：<br/>
+1、可开启 https 解决；<br/>
+2、若无 https 配置则需要修改浏览器安全配置，Chrome 设置如下：<br/>
+(1) 地址栏输入chrome://flags/#unsafely-treat-insecure-origin-as-secure；<br/>
+(2) 将 http 站点配置在文本框中，例如: http://127.0.0.1:8080。</p>
+    <img src="${new URL(`../../assets/tipIMG.jpg`, import.meta.url).href}" width="750"/>`,
+      {
+        confirmButtonText: '我知道了',
+        dangerouslyUseHTMLString: true,
+        customClass: 'record-tip-confirm'
+      }
+    )
   }
 }
 
