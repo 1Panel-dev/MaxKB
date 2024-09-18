@@ -5,6 +5,7 @@ ARG DEPENDENCIES="                    \
         libexpat1-dev                 \
         libffi-dev                    \
         curl                          \
+        ca-certificates               \
         vim                           \
         postgresql-15-pgvector"
 
