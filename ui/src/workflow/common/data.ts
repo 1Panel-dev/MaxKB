@@ -1,4 +1,5 @@
 import { WorkflowType } from '@/enums/workflow'
+import { t } from '@/locales'
 
 export const startNode = {
   id: WorkflowType.Start,
@@ -37,8 +38,7 @@ export const baseNode = {
     node_data: {
       name: '',
       desc: '',
-      prologue:
-        '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
+      prologue: t('views.application.prompt.defaultPrologue')
     },
     config: {}
   }

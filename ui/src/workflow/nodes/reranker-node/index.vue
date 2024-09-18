@@ -8,11 +8,21 @@
         require-asterisk-position="right"
         label-width="auto"
         ref="rerankerNodeFormRef"
+        hide-required-asterisk
       >
-        <el-form-item label="知识库检索结果">
+        <el-form-item
+          label="重排内容"
+          prop="reranker_reference_list"
+          :rules="{
+            type: 'array',
+            message: '请选择重排内容',
+            trigger: 'change',
+            required: true
+          }"
+        >
           <template #label>
             <div class="flex-between">
-              <span>知识库检索结果</span>
+              <span>重排内容<span class="danger">*</span></span>
               <el-button @click="add_reranker_reference" link type="primary">
                 <el-icon class="mr-4"><Plus /></el-icon>
               </el-button>
@@ -39,7 +49,7 @@
                   ref="nodeCascaderRef"
                   :nodeModel="nodeModel"
                   class="w-full"
-                  placeholder="请选择检索问题输入"
+                  placeholder="请选择重排内容"
                   v-model="form_data.reranker_reference_list[index]"
                 />
               </el-form-item>
@@ -84,6 +94,11 @@
             required: true
           }"
         >
+          <template #label>
+            <div class="flex-between">
+              <span>检索问题<span class="danger">*</span></span>
+            </div>
+          </template>
           <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
@@ -101,6 +116,11 @@
             trigger: 'change'
           }"
         >
+          <template #label>
+            <div class="flex-between">
+              <span>AI 模型<span class="danger">*</span></span>
+            </div>
+          </template>
           <el-select
             @wheel="wheel"
             :teleported="false"
@@ -202,7 +222,7 @@ const {
   params: { id }
 } = app.config.globalProperties.$route as any
 const form = {
-  reranker_reference_list: [],
+  reranker_reference_list: [[]],
   reranker_model_id: '',
   reranker_setting: {
     top_n: 3,
