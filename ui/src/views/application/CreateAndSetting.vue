@@ -162,14 +162,14 @@
                   :placeholder="defaultPrompt"
                 />
               </el-form-item>
-              <el-form-item
-                :label="$t('views.application.applicationForm.form.multipleRoundsDialogue')"
-                @click.prevent
-              >
-                <el-switch
-                  size="small"
-                  v-model="applicationForm.multiple_rounds_dialogue"
-                ></el-switch>
+              <el-form-item label="历史聊天记录" @click.prevent>
+                <el-input-number
+                  v-model="applicationForm.dialogue_number"
+                  :min="0"
+                  :value-on-clear="0"
+                  controls-position="right"
+                  class="w-full"
+                />
               </el-form-item>
               <el-form-item
                 label="$t('views.application.applicationForm.form.relatedKnowledgeBase')"
@@ -355,7 +355,7 @@ const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
   model_id: '',
-  multiple_rounds_dialogue: false,
+  dialogue_number: 0,
   prologue: t('views.application.prompt.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
