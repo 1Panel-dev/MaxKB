@@ -37,21 +37,13 @@
         />
       </el-form-item>
       <el-form-item label="开场白">
-        <MdEditor
+        <MdEditorMagnify
           @wheel="wheel"
-          style="height: 150px"
+          title="开场白"
           v-model="form_data.prologue"
-          :preview="false"
-          :toolbars="[]"
-          class="reply-node-editor"
-          :footers="footers"
-        >
-          <template #defFooters>
-            <el-button text type="info" @click="openDialog">
-              <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
-            </el-button>
-          </template>
-        </MdEditor>
+          style="height: 150px"
+          @submitDialog="submitDialog"
+        />
       </el-form-item>
       <div class="flex-between mb-8">
         <h5 class="lighter">全局变量</h5>
@@ -248,68 +240,11 @@
       </el-form-item>
     </el-form>
 
-    <div class="flex-between">
-      全局变量
-      <el-button link type="primary" @click="openAddDialog()">
-        <el-icon class="mr-4"><Plus /></el-icon> 添加
-      </el-button>
-    </div>
-    <el-table :data="props.nodeModel.properties.input_field_list" class="mb-16">
-      <el-table-column prop="name" label="变量名" />
-      <el-table-column prop="variable" label="变量" />
-      <el-table-column label="输入类型">
-        <template #default="{ row }">
-          <el-tag type="info" class="info-tag" v-if="row.type === 'input'">文本框</el-tag>
-          <el-tag type="info" class="info-tag" v-if="row.type === 'date'">日期</el-tag>
-          <el-tag type="info" class="info-tag" v-if="row.type === 'select'">下拉选项</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="必填">
-        <template #default="{ row }">
-          <div @click.stop>
-            <el-switch size="small" v-model="row.is_required" />
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="source" label="赋值方式">
-        <template #default="{ row }">
-          {{ row.source === 'user_input' ? '用户输入' : '接口传参' }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="left" width="80">
-        <template #default="{ row, $index }">
-          <span class="mr-4">
-            <el-tooltip effect="dark" content="修改" placement="top">
-              <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
-                <el-icon><EditPen /></el-icon>
-              </el-button>
-            </el-tooltip>
-          </span>
-          <el-tooltip effect="dark" content="删除" placement="top">
-            <el-button type="primary" text @click="deleteField($index)">
-              <el-icon>
-                <Delete />
-              </el-icon>
-            </el-button>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-    </el-table>
-    <!-- 回复内容弹出层 -->
-    <el-dialog v-model="dialogVisible" title="开场白" append-to-body>
-      <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"></MdEditor>
-      <template #footer>
-        <div class="dialog-footer mt-24">
-          <el-button type="primary" @click="submitDialog"> 确认</el-button>
-        </div>
-      </template>
-    </el-dialog>
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </NodeContainer>
 </template>
 <script setup lang="ts">
 import { app } from '@/main'
-
 import { groupBy, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
@@ -348,16 +283,9 @@ const wheel = (e: any) => {
     return true
   }
 }
-const dialogVisible = ref(false)
-const cloneContent = ref('')
-const footers: any = [null, '=', 0]
-function openDialog() {
-  cloneContent.value = form_data.value.prologue
-  dialogVisible.value = true
-}
-function submitDialog() {
-  set(props.nodeModel.properties.node_data, 'prologue', cloneContent.value)
-  dialogVisible.value = false
+
+function submitDialog(val: string) {
+  set(props.nodeModel.properties.node_data, 'prologue', val)
 }
 const form_data = computed({
   get: () => {
@@ -446,10 +374,4 @@ onMounted(() => {
   getSTTModel()
 })
 </script>
-<style lang="scss" scoped>
-.reply-node-editor {
-  :deep(.md-editor-footer) {
-    border: none !important;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

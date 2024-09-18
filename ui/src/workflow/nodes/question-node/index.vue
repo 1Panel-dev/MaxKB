@@ -128,21 +128,13 @@
               </el-tooltip>
             </div>
           </template>
-          <MdEditor
+          <MdEditorMagnify
             @wheel="wheel"
-            class="reply-node-editor"
-            style="height: 150px"
+            title="提示词"
             v-model="form_data.prompt"
-            :preview="false"
-            :toolbars="[]"
-            :footers="footers"
-          >
-            <template #defFooters>
-              <el-button text type="info" @click="openDialog">
-                <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
-              </el-button>
-            </template>
-          </MdEditor>
+            style="height: 150px"
+            @submitDialog="submitDialog"
+          />
         </el-form-item>
         <el-form-item label="历史聊天记录">
           <el-input-number
@@ -172,15 +164,7 @@
         </el-form-item>
       </el-form>
     </el-card>
-    <!-- 回复内容弹出层 -->
-    <el-dialog v-model="dialogVisible" title="提示词" append-to-body>
-      <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"> </MdEditor>
-      <template #footer>
-        <div class="dialog-footer mt-24">
-          <el-button type="primary" @click="submitDialog"> 确认 </el-button>
-        </div>
-      </template>
-    </el-dialog>
+
     <!-- 添加模版 -->
     <CreateModelDialog
       ref="createModelRef"
@@ -218,13 +202,7 @@ const wheel = (e: any) => {
     return true
   }
 }
-const dialogVisible = ref(false)
-const cloneContent = ref('')
-const footers: any = [null, '=', 0]
-function openDialog() {
-  cloneContent.value = form_data.value.prompt
-  dialogVisible.value = true
-}
+
 const model_change = (model_id?: string) => {
   if (model_id) {
     AIModeParamSettingDialogRef.value?.reset_default(model_id, id)
@@ -232,9 +210,8 @@ const model_change = (model_id?: string) => {
     refreshParam({})
   }
 }
-function submitDialog() {
-  set(props.nodeModel.properties.node_data, 'prompt', cloneContent.value)
-  dialogVisible.value = false
+function submitDialog(val: string) {
+  set(props.nodeModel.properties.node_data, 'prompt', val)
 }
 const {
   params: { id }
@@ -324,10 +301,4 @@ onMounted(() => {
   set(props.nodeModel, 'validate', validate)
 })
 </script>
-<style lang="scss" scoped>
-.reply-node-editor {
-  :deep(.md-editor-footer) {
-    border: none !important;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

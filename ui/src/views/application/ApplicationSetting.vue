@@ -149,11 +149,11 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="角色设定">
-                <el-input
+                <MdEditorMagnify
+                  title="角色设定"
                   v-model="applicationForm.model_setting.system"
-                  :rows="6"
-                  type="textarea"
-                  maxlength="2048"
+                  style="height: 120px"
+                  @submitDialog="submitSystemDialog"
                   placeholder="你是 xxx 小助手"
                 />
               </el-form-item>
@@ -177,11 +177,12 @@
                     </div>
                   </div>
                 </template>
-                <el-input
+
+                <MdEditorMagnify
+                  title="提示词(无引用知识库)"
                   v-model="applicationForm.model_setting.no_references_prompt"
-                  :rows="6"
-                  type="textarea"
-                  maxlength="2048"
+                  style="height: 120px"
+                  @submitDialog="submitNoReferencesPromptDialog"
                   placeholder="{question}"
                 />
               </el-form-item>
@@ -281,21 +282,22 @@
                     </div>
                   </div>
                 </template>
-                <el-input
+
+                <MdEditorMagnify
+                  title="提示词(引用知识库)"
                   v-model="applicationForm.model_setting.prompt"
-                  :rows="6"
-                  type="textarea"
-                  maxlength="2048"
+                  style="height: 150px"
+                  @submitDialog="submitPromptDialog"
                   :placeholder="defaultPrompt"
                 />
               </el-form-item>
               <el-form-item :label="$t('views.application.applicationForm.form.prologue')">
-                <MdEditor
-                  class="prologue-md-editor"
+                <MdEditorMagnify
+                  title="开场白"
                   v-model="applicationForm.prologue"
-                  :preview="false"
-                  :toolbars="[]"
-                  :footers="[]"
+                  style="height: 150px"
+                  @submitDialog="submitPrologueDialog"
+                  :placeholder="defaultPrompt"
                 />
               </el-form-item>
 
@@ -617,6 +619,19 @@ const datasetList = ref([])
 const sttModelOptions = ref<any>(null)
 const ttsModelOptions = ref<any>(null)
 const showEditIcon = ref(false)
+
+function submitPrologueDialog(val: string) {
+  applicationForm.value.prologue = val
+}
+function submitPromptDialog(val: string) {
+  applicationForm.value.model_setting.prompt = val
+}
+function submitNoReferencesPromptDialog(val: string) {
+  applicationForm.value.model_setting.no_references_prompt = val
+}
+function submitSystemDialog(val: string) {
+  applicationForm.value.model_setting.system = val
+}
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
