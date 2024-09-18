@@ -51,7 +51,11 @@
           <el-icon class="mr-4"><Plus /></el-icon> 添加
         </el-button>
       </div>
-      <el-table :data="props.nodeModel.properties.input_field_list" class="mb-16">
+      <el-table
+        v-if="props.nodeModel.properties.input_field_list > 0"
+        :data="props.nodeModel.properties.input_field_list"
+        class="mb-16"
+      >
         <el-table-column prop="name" label="变量名" />
         <el-table-column prop="variable" label="变量" />
         <el-table-column label="输入类型">
@@ -114,7 +118,7 @@
           v-model="form_data.stt_model_id"
           class="w-full"
           popper-class="select-model"
-          placeholder="请输入"
+          placeholder="请选择语音识别模型"
         >
           <el-option-group
             v-for="(value, label) in sttModelOptions"
@@ -255,6 +259,7 @@ import applicationApi from '@/api/application'
 import type { Provider } from '@/api/type/model'
 import FieldFormDialog from './component/FieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
+import { t } from '@/locales'
 const { model } = useStore()
 
 const {
@@ -270,8 +275,7 @@ const providerOptions = ref<Array<Provider>>([])
 const form = {
   name: '',
   desc: '',
-  prologue:
-    '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
+  prologue: t('views.application.prompt.defaultPrologue')
 }
 
 const wheel = (e: any) => {

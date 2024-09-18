@@ -39,7 +39,7 @@ export default {
       },
       appDescription: {
         label: '应用描述',
-        placeholder: '描述该应用的应用场景及用途，如：MaxKB 小助手回答用户提出的 MaxKB 产品使用问题'
+        placeholder: '描述该应用的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题'
       },
       aiModel: {
         label: 'AI 模型',
@@ -109,6 +109,6 @@ export default {
 回答要求：
  - 请使用中文回答用户问题`,
     defaultPrologue:
-      '您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？'
+      '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务'
   }
 }
