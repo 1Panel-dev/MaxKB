@@ -198,7 +198,7 @@ onMounted(() => {
   .delete-button {
     position: absolute;
     right: 12px;
-    top: 18px;
+    top: 13px;
     height: auto;
   }
   .footer-content {
