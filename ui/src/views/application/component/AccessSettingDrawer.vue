@@ -249,7 +249,7 @@ const open = async (id: string, type: 'wechat' | 'dingtalk' | 'wecom' | 'feishu'
     MsgError('加载配置失败，请检查输入或稍后再试')
   } finally {
     loading.value = false
-    form[configType.value].callback_url = `${window.location.origin}/${type}/${id}`
+    form[configType.value].callback_url = `${window.location.origin}/api/${type}/${id}`
   }
 }
 
