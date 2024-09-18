@@ -22,6 +22,7 @@
             :gutter="8"
             style="margin-bottom: 8px"
             v-for="(reranker_reference, index) in form_data.reranker_reference_list"
+            :key="index"
           >
             <el-col :span="22">
               <el-form-item
@@ -212,7 +213,7 @@ const form = {
 const providerOptions = ref<Array<Provider>>([])
 const modelOptions = ref<any>(null)
 const openParamSettingDialog = () => {
-  ParamSettingDialogRef.value?.open(form_data.value.dataset_setting, 'WORK_FLOW')
+  ParamSettingDialogRef.value?.open(form_data.value, 'WORK_FLOW')
 }
 const deleteCondition = (index: number) => {
   const list = cloneDeep(props.nodeModel.properties.node_data.reranker_reference_list)
@@ -242,7 +243,7 @@ const form_data = computed({
   }
 })
 function refreshParam(data: any) {
-  set(props.nodeModel.properties.node_data, 'reranker_setting', data)
+  set(props.nodeModel.properties.node_data, 'reranker_setting', data.dataset_setting)
 }
 function getModel() {
   if (id) {

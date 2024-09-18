@@ -11,6 +11,7 @@ import base64
 import gzip
 import hmac
 import json
+import os
 import uuid
 import wave
 from enum import Enum
@@ -144,6 +145,7 @@ def parse_response(res):
         result['code'] = code
         payload_size = int.from_bytes(payload[4:8], "big", signed=False)
         payload_msg = payload[8:]
+        print(f"Error code: {code}, message: {payload_msg}")
     if payload_msg is None:
         return result
     if message_compression == GZIP:
@@ -321,14 +323,9 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         return result['payload_msg']['result'][0]['text']
 
     def check_auth(self):
-        header = self.token_auth()
-
-        async def check():
-            async with websockets.connect(self.volcanic_api_url, extra_headers=header, max_size=1000000000,
-                                          ssl=ssl_context) as ws:
-                pass
-
-        asyncio.run(check())
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        with open(f'{cwd}/iat_mp3_16k.mp3', 'rb') as f:
+            self.speech_to_text(f)
 
     def speech_to_text(self, file):
         data = file.read()
