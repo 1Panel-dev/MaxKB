@@ -297,7 +297,6 @@
                   v-model="applicationForm.prologue"
                   style="height: 150px"
                   @submitDialog="submitPrologueDialog"
-                  :placeholder="defaultPrompt"
                 />
               </el-form-item>
 
@@ -322,6 +321,7 @@
                   v-model="applicationForm.stt_model_id"
                   class="w-full"
                   popper-class="select-model"
+                  placeholder="请选择语音识别模型"
                 >
                   <el-option-group
                     v-for="(value, label) in sttModelOptions"
@@ -704,7 +704,7 @@ function getDetail() {
     applicationForm.value.tts_model_id = res.data.tts_model
     applicationForm.value.tts_type = res.data.tts_type
     applicationForm.value.model_setting.no_references_prompt =
-      res.data.model_setting.no_references_prompt || ''
+      res.data.model_setting.no_references_prompt || '{question}'
   })
 }
 
