@@ -316,6 +316,7 @@
                   </div>
                 </template>
                 <el-select
+                  v-if="applicationForm.stt_model_enable"
                   v-model="applicationForm.stt_model_id"
                   class="w-full"
                   popper-class="select-model"
@@ -382,12 +383,15 @@
                     <el-switch size="small" v-model="applicationForm.tts_model_enable" />
                   </div>
                 </template>
-                <el-radio-group v-model="applicationForm.tts_type">
+                <el-radio-group
+                  v-model="applicationForm.tts_type"
+                  v-if="applicationForm.tts_model_enable"
+                >
                   <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
                   <el-radio value="TTS">TTS模型</el-radio>
                 </el-radio-group>
                 <el-select
-                  v-if="applicationForm.tts_type === 'TTS'"
+                  v-if="applicationForm.tts_type === 'TTS' && applicationForm.tts_model_enable"
                   v-model="applicationForm.tts_model_id"
                   class="w-full"
                   popper-class="select-model"
@@ -612,7 +616,7 @@ const providerOptions = ref<Array<Provider>>([])
 const datasetList = ref([])
 const sttModelOptions = ref<any>(null)
 const ttsModelOptions = ref<any>(null)
-  const showEditIcon = ref(false)
+const showEditIcon = ref(false)
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return

@@ -118,6 +118,7 @@
         </template>
 
         <el-select
+          v-if="form_data.stt_model_enable"
           v-model="form_data.stt_model_id"
           class="w-full"
           popper-class="select-model"
@@ -182,12 +183,12 @@
             <el-switch size="small" v-model="form_data.tts_model_enable" />
           </div>
         </template>
-        <el-radio-group v-model="form_data.tts_type">
+        <el-radio-group v-model="form_data.tts_type" v-if="form_data.tts_model_enable">
           <el-radio label="浏览器播放(免费)" value="BROWSER" />
           <el-radio label="TTS模型" value="TTS" />
         </el-radio-group>
         <el-select
-          v-if="form_data.tts_type === 'TTS'"
+          v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
           v-model="form_data.tts_model_id"
           class="w-full"
           popper-class="select-model"
