@@ -27,11 +27,14 @@ class XlsSplitHandle(BaseParseTableHandle):
                 rows = iter([sheet.row_values(i) for i in range(sheet.nrows)])
                 if not rows: continue
                 ti = next(rows)
+                last_line = {}
                 for r in rows:
                     l = []
                     for i, c in enumerate(r):
                         if not c:
-                            continue
+                            c = last_line[i]
+                        else:
+                            last_line[i] = c
                         t = str(ti[i]) if i < len(ti) else ""
                         t += (": " if t else "") + str(c)
                         l.append(t)

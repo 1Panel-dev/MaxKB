@@ -33,13 +33,16 @@ class XlsxSplitHandle(BaseParseTableHandle):
                 rows = list(ws.rows)
                 if not rows: continue
                 ti = list(rows[0])
+                last_line = {}
                 for r in list(rows[1:]):
                     l = []
                     for i, c in enumerate(r):
                         if not c.value:
-                            continue
+                            cvalue = last_line[i]
+                        else:
+                            last_line[i] = c.value
                         t = str(ti[i].value) if i < len(ti) else ""
-                        content = str(c.value)
+                        content = str(c.value if c.value else cvalue)
                         image = image_dict.get(content, None)
                         if image is not None:
                             content = f'![](/api/image/{image.id})'
