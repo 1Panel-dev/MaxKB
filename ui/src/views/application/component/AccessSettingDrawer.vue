@@ -35,7 +35,7 @@
 
       <h4 class="title-decoration-1 mb-16">回调地址</h4>
       <el-form-item label="URL" prop="callback_url">
-        <el-input v-model="form[configType].callback_url" placeholder="请输入回调地址">
+        <el-input v-model="form[configType].callback_url" placeholder="请输入回调地址" readonly>
           <template #append>
             <el-button @click="copyClick(form[configType].callback_url)">
               <AppIcon iconName="app-copy"></AppIcon>
