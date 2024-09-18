@@ -23,6 +23,9 @@
             <el-button @click="openDatasetDialog()" :disabled="multipleSelection.length === 0">
               迁移
             </el-button>
+            <el-button @click="batchRefresh" :disabled="multipleSelection.length === 0">
+              重新向量化
+            </el-button>
             <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0">
               设置
             </el-button>
@@ -535,6 +538,19 @@ function deleteMulDocument() {
     MsgSuccess('批量删除成功')
     multipleTableRef.value?.clearSelection()
     getList()
+  })
+}
+
+function batchRefresh() {
+  const arr: string[] = []
+  multipleSelection.value.map((v) => {
+    if (v) {
+      arr.push(v.id)
+    }
+  })
+  documentApi.batchRefresh(id, arr, loading).then(() => {
+    MsgSuccess('批量重新向量化成功')
+    multipleTableRef.value?.clearSelection()
   })
 }
 

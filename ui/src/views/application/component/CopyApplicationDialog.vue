@@ -72,7 +72,7 @@ const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
   model_id: '',
-  multiple_rounds_dialogue: false,
+  dialogue_number: 0,
   prologue: t('views.application.prompt.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
@@ -108,7 +108,7 @@ watch(dialogVisible, (bool) => {
       name: '',
       desc: '',
       model_id: '',
-      multiple_rounds_dialogue: false,
+      dialogue_number: 0,
       prologue: t('views.application.prompt.defaultPrologue'),
       dataset_id_list: [],
       dataset_setting: {

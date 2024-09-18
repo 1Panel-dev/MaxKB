@@ -69,14 +69,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         )
 
     def check_auth(self):
-        header = self.token_auth()
-
-        async def check():
-            async with websockets.connect(self.volcanic_api_url, extra_headers=header, ping_interval=None,
-                                          ssl=ssl_context) as ws:
-                pass
-
-        asyncio.run(check())
+        self.text_to_speech('你好')
 
     def text_to_speech(self, text):
         request_json = {
@@ -159,7 +152,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 if message_compression == 1:
                     error_msg = gzip.decompress(error_msg)
                 error_msg = str(error_msg, "utf-8")
-                break
+                raise Exception(f"Error code: {code}, message: {error_msg}")
             elif message_type == 0xc:
                 msg_size = int.from_bytes(payload[:4], "big", signed=False)
                 payload = payload[4:]

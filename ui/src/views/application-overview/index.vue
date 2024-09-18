@@ -332,14 +332,5 @@ onMounted(() => {
     right: 16px;
     top: 21px;
   }
-
-  .edit-avatar {
-    position: relative;
-    .edit-mask {
-      position: absolute;
-      left: 0;
-      background: rgba(0, 0, 0, 0.4);
-    }
-  }
 }
 </style>
