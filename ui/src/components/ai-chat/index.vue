@@ -15,6 +15,7 @@
         <el-collapse-transition>
           <div v-show="showUserInput" class="mt-16">
             <DynamicsForm
+              :key="dynamicsFormRefresh"
               v-model="form_data"
               :model="form_data"
               label-position="left"
@@ -346,7 +347,19 @@ watch(
   { deep: true }
 )
 
+// 用于刷新动态表单
+const dynamicsFormRefresh = ref(0)
 function handleInputFieldList() {
+  dynamicsFormRefresh.value++
+  // 给变量赋默认值, 最后一个对话记录的值
+  const record = chatList.value[chatList.value.length - 1]
+  let default_value: any = {}
+  if (record) {
+    record.execution_details[0].global_fields.reduce((pre: any, next: any) => {
+      pre[next.key] = next.value
+      return pre
+    }, default_value)
+  }
   props.data.work_flow?.nodes
     ?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
@@ -360,6 +373,7 @@ function handleInputFieldList() {
                     field: v.variable,
                     input_type: 'TextInput',
                     label: v.name,
+                    default_value: default_value[v.variable],
                     required: v.is_required
                   }
                 case 'select':
@@ -367,6 +381,7 @@ function handleInputFieldList() {
                     field: v.variable,
                     input_type: 'SingleSelect',
                     label: v.name,
+                    default_value: default_value[v.variable],
                     required: v.is_required,
                     option_list: v.optionList.map((o: any) => {
                       return { key: o, value: o }
@@ -377,6 +392,7 @@ function handleInputFieldList() {
                     field: v.variable,
                     input_type: 'DatePicker',
                     label: v.name,
+                    default_value: default_value[v.variable],
                     required: v.is_required,
                     attrs: {
                       format: 'YYYY-MM-DD HH:mm:ss',
@@ -399,6 +415,7 @@ function handleInputFieldList() {
                     field: v.variable,
                     input_type: 'TextInput',
                     label: v.name,
+                    default_value: default_value[v.variable],
                     required: v.is_required
                   }
                 case 'select':
@@ -406,6 +423,7 @@ function handleInputFieldList() {
                     field: v.variable,
                     input_type: 'SingleSelect',
                     label: v.name,
+                    default_value: default_value[v.variable],
                     required: v.is_required,
                     option_list: v.optionList.map((o: any) => {
                       return { key: o, value: o }
@@ -416,6 +434,7 @@ function handleInputFieldList() {
                     field: v.variable,
                     input_type: 'DatePicker',
                     label: v.name,
+                    default_value: default_value[v.variable],
                     required: v.is_required,
                     attrs: {
                       format: 'YYYY-MM-DD HH:mm:ss',
@@ -444,6 +463,7 @@ watch(
   () => props.record,
   (value) => {
     chatList.value = value
+    handleInputFieldList()
   },
   {
     immediate: true
