@@ -23,14 +23,14 @@
               </div>
             </div>
             <div>
-              <el-button class="mr-4" @click="openDrawer(item.key)">配置</el-button>
-              <el-divider direction="vertical" />
               <el-switch
-                size="large"
+                size="small"
                 v-model="item.isActive"
                 @change="changeStatus(item.key, item.isActive)"
                 :disabled="!item.exists"
               />
+              <el-divider direction="vertical" />
+              <el-button class="mr-4" @click="openDrawer(item.key)">配置</el-button>
             </div>
           </div>
         </el-card>
