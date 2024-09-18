@@ -73,7 +73,7 @@
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitValid" :loading="loading">
+        <el-button type="primary" @click="submitHandle" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.create') }}
         </el-button>
       </span>
@@ -124,19 +124,6 @@ const open = () => {
   dialogVisible.value = true
 }
 
-const submitValid = () => {
-  if (user.isEnterprise()) {
-    submitHandle()
-  } else {
-    common.asyncGetValid(ValidType.Dataset, ValidCount.Dataset, loading).then(async (res: any) => {
-      if (res?.data) {
-        submitHandle()
-      } else {
-        MsgAlert('提示', '社区版最多支持 50 个知识库，如需拥有更多知识库，请升级为专业版。')
-      }
-    })
-  }
-}
 const submitHandle = async () => {
   if (await BaseFormRef.value?.validate()) {
     await DatasetFormRef.value.validate((valid: any) => {

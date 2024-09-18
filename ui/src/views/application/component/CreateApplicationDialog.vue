@@ -67,7 +67,7 @@
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitValid(applicationFormRef)" :loading="loading">
+        <el-button type="primary" @click="submitHandle(applicationFormRef)" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.create') }}
         </el-button>
       </span>
@@ -177,7 +177,8 @@ watch(dialogVisible, (bool) => {
       },
       model_params_setting: {},
       problem_optimization: false,
-      problem_optimization_prompt: '',
+      problem_optimization_prompt:
+        '()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中',
       stt_model_id: '',
       tts_model_id: '',
       stt_model_enable: false,
@@ -193,21 +194,6 @@ const open = () => {
   dialogVisible.value = true
 }
 
-const submitValid = (formEl: FormInstance | undefined) => {
-  if (user.isEnterprise()) {
-    submitHandle(formEl)
-  } else {
-    common
-      .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
-      .then(async (res: any) => {
-        if (res?.data) {
-          submitHandle(formEl)
-        } else {
-          MsgAlert('提示', '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。')
-        }
-      })
-  }
-}
 const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {

@@ -131,9 +131,11 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { isAppIcon } from '@/utils/application'
 import { useRouter } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
-import useStore from '@/stores'
+import { ValidType, ValidCount } from '@/enums/common'
 import { t } from '@/locales'
-const { application, user } = useStore()
+import useStore from '@/stores'
+
+const { application, user, common } = useStore()
 const router = useRouter()
 
 const CopyApplicationDialogRef = ref()
@@ -168,7 +170,27 @@ function settingApplication(row: any) {
 }
 
 function openCreateDialog() {
-  CreateApplicationDialogRef.value.open()
+  if (user.isEnterprise()) {
+    CreateApplicationDialogRef.value.open()
+  } else {
+    MsgConfirm(`提示`, '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。', {
+      cancelButtonText: '确定',
+      confirmButtonText: '购买专业版',
+      confirmButtonClass: 'primary'
+    })
+      .then(() => {
+        window.open('https://maxkb.cn/pricing.html', '_blank')
+      })
+      .catch(() => {
+        common
+          .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
+          .then(async (res: any) => {
+            if (res?.data) {
+              CreateApplicationDialogRef.value.open()
+            }
+          })
+      })
+  }
 }
 
 function searchHandle() {
