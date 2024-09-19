@@ -46,7 +46,6 @@
               >
                 <NodeCascader
                   :key="index"
-                  ref="nodeCascaderRef"
                   :nodeModel="nodeModel"
                   class="w-full"
                   placeholder="请选择重排内容"
@@ -233,7 +232,7 @@ const form = {
 const providerOptions = ref<Array<Provider>>([])
 const modelOptions = ref<any>(null)
 const openParamSettingDialog = () => {
-  ParamSettingDialogRef.value?.open(form_data.value, 'WORK_FLOW')
+  ParamSettingDialogRef.value?.open(form_data.value.reranker_setting)
 }
 const deleteCondition = (index: number) => {
   const list = cloneDeep(props.nodeModel.properties.node_data.reranker_reference_list)
@@ -263,7 +262,7 @@ const form_data = computed({
   }
 })
 function refreshParam(data: any) {
-  set(props.nodeModel.properties.node_data, 'reranker_setting', data.dataset_setting)
+  set(props.nodeModel.properties.node_data, 'reranker_setting', data)
 }
 function getModel() {
   if (id) {
