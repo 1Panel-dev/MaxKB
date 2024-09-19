@@ -8,8 +8,11 @@
     <!-- 语音播放 -->
     <span v-if="tts">
       <el-tooltip effect="dark" content="语音播放" placement="top">
-        <el-button text :disabled="!data?.write_ed" @click="playAnswerText(data?.answer_text)">
-          <AppIcon iconName="app-video-play"></AppIcon>
+        <el-button v-if="!audioPlayerStatus" text :disabled="!data?.write_ed" @click="playAnswerText(data?.answer_text)">
+          <AppIcon iconName="app-video-play" ></AppIcon>
+        </el-button>
+        <el-button v-else text :disabled="!data?.write_ed" @click="pausePlayAnswerText()">
+          <el-icon ><VideoPause /></el-icon>
         </el-button>
       </el-tooltip>
       <el-divider direction="vertical" />
@@ -102,6 +105,7 @@ const props = defineProps({
 const emit = defineEmits(['update:data', 'regeneration'])
 
 const audioPlayer = ref<HTMLAudioElement | null>(null)
+const audioPlayerStatus = ref(false)
 const buttonData = ref(props.data)
 const loading = ref(false)
 
@@ -151,6 +155,12 @@ const playAnswerText = (text: string) => {
     window.speechSynthesis.speak(utterance)
   }
   if (props.tts_type === 'TTS') {
+    audioPlayerStatus.value = true
+    // 恢复上次暂停的播放
+    if (audioPlayer.value?.src) {
+      audioPlayer.value?.play()
+      return
+    }
     applicationApi
       .postTextToSpeech(props.applicationId as string, { text: text }, loading)
       .then((res: any) => {
@@ -171,6 +181,9 @@ const playAnswerText = (text: string) => {
         if (audioPlayer.value instanceof HTMLAudioElement) {
           audioPlayer.value.src = url
           audioPlayer.value.play() // 自动播放音频
+          audioPlayer.value.onended = () => {
+            audioPlayerStatus.value = false
+          }
         } else {
           console.error('audioPlayer.value is not an instance of HTMLAudioElement')
         }
@@ -178,6 +191,13 @@ const playAnswerText = (text: string) => {
       .catch((err) => {
         console.log('err: ', err)
       })
+  }
+}
+
+const pausePlayAnswerText = () => {
+  if (props.tts_type === 'TTS') {
+    audioPlayerStatus.value = false
+    audioPlayer.value?.pause()
   }
 }
 </script>
