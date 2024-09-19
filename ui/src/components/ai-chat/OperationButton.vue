@@ -118,7 +118,32 @@ function voteHandle(val: string) {
     })
 }
 
+function markdownToPlainText(md: string) {
+    return md
+        // 移除图片 ![alt](url)
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        // 移除链接 [text](url)
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        // 移除 Markdown 标题符号 (#, ##, ###)
+        .replace(/^#{1,6}\s+/gm, '')
+        // 移除加粗 **text** 或 __text__
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/__(.*?)__/g, '$1')
+        // 移除斜体 *text* 或 _text_
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/_(.*?)_/g, '$1')
+        // 移除行内代码 `code`
+        .replace(/`(.*?)`/g, '$1')
+        // 移除代码块 ```code```
+        .replace(/```[\s\S]*?```/g, '')
+        // 移除多余的换行符
+        .replace(/\n{2,}/g, '\n')
+        .trim();
+}
+
 const playAnswerText = (text: string) => {
+  // text 处理成纯文本
+  text = markdownToPlainText(text)
   if (props.tts_type === 'BROWSER') {
     // 创建一个新的 SpeechSynthesisUtterance 实例
     const utterance = new SpeechSynthesisUtterance(text)
