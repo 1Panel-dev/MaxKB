@@ -716,6 +716,19 @@ class ApplicationSerializer(serializers.Serializer):
             application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application.id).first()
             if application_access_token is None:
                 raise AppUnauthorizedFailed(500, "非法用户")
+            application_setting_model = DBModelManage.get_model('application_setting')
+            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
+                                                                                  'XPACK_LICENSE_IS_VALID') else False)
+            application_setting_dict = {}
+            if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
+                application_setting = QuerySet(application_setting_model).filter(
+                    application_id=application_access_token.application_id).first()
+                application_setting_dict = {'show_source': application_access_token.show_source,
+                                            'show_history': application_setting.show_history,
+                                            'draggable': application_setting.draggable,
+                                            'show_guide': application_setting.show_guide,
+                                            'avatar': application_setting.avatar,
+                                            'float_icon': application_setting.float_icon}
             return ApplicationSerializer.Query.reset_application(
                 {**ApplicationSerializer.ApplicationModel(application).data,
                  'stt_model_id': application.stt_model_id,
@@ -724,7 +737,8 @@ class ApplicationSerializer(serializers.Serializer):
                  'tts_model_enable': application.tts_model_enable,
                  'tts_type': application.tts_type,
                  'work_flow': application.work_flow,
-                 'show_source': application_access_token.show_source})
+                 'show_source': application_access_token.show_source,
+                 **application_setting_dict})
 
         @transaction.atomic
         def edit(self, instance: Dict, with_valid=True):

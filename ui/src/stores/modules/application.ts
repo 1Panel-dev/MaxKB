@@ -79,25 +79,14 @@ const useApplicationStore = defineStore({
     async asyncGetAppProfile(loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         const user = useUserStore()
-        if (user.isEnterprise()) {
-          applicationXpackApi
-            .getAppXpackProfile(loading)
-            .then((data) => {
-              resolve(data)
-            })
-            .catch((error) => {
-              reject(error)
-            })
-        } else {
-          applicationApi
-            .getAppProfile(loading)
-            .then((data) => {
-              resolve(data)
-            })
-            .catch((error) => {
-              reject(error)
-            })
-        }
+        applicationApi
+          .getAppProfile(loading)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     },
 
