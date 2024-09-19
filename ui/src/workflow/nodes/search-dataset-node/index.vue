@@ -68,7 +68,7 @@
               >
               <el-col :span="12" class="color-secondary lighter"> 相似度高于</el-col>
               <el-col :span="12" class="lighter">
-                {{ form_data.dataset_setting.similarity }}</el-col
+                {{ form_data.dataset_setting.similarity?.toFixed(3) }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter"> 引用分段 Top</el-col>
               <el-col :span="12" class="lighter"> {{ form_data.dataset_setting.top_n }}</el-col>

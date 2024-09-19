@@ -16,10 +16,8 @@
                 <el-form-item>
                   <template #label>
                     <div class="flex align-center">
-                      <span class="mr-4">{{
-                        $t('views.application.applicationForm.dialogues.similarityThreshold')
-                      }}</span>
-                      <el-tooltip effect="dark" content="相似度越高相关性越强。" placement="right">
+                      <span class="mr-4">Score 高于</span>
+                      <el-tooltip effect="dark" content="Score越高相关性越强。" placement="right">
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip>
                     </div>
@@ -41,7 +39,7 @@
                   :label="$t('views.application.applicationForm.dialogues.topReferences')"
                 >
                   <el-input-number
-                    v-model="form.dataset_setting.top_n"
+                    v-model="form.top_n"
                     :min="1"
                     :max="100"
                     :value-on-clear="1"
