@@ -357,7 +357,7 @@ function handleInputFieldList() {
   const record = chatList.value[chatList.value.length - 1]
   let default_value: any = {}
   if (record) {
-    record.execution_details[0].global_fields.reduce((pre: any, next: any) => {
+    record.execution_details[0].global_fields?.reduce((pre: any, next: any) => {
       pre[next.key] = next.value
       return pre
     }, default_value)
