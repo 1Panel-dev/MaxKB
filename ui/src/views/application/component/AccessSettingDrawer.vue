@@ -29,8 +29,8 @@
         </el-form-item>
       </template>
       <div v-if="configType === 'wechat'" class="flex align-center" style="margin-bottom: 8px">
-        <span class="el-form-item__label">是否是订阅号</span>
-        <el-switch v-if="configType === 'wechat'" v-model="form[configType].is_personal" />
+        <span class="el-form-item__label">认证通过</span>
+        <el-switch v-if="configType === 'wechat'" v-model="form[configType].is_certification" />
       </div>
 
       <h4 class="title-decoration-1 mb-16">回调地址</h4>
@@ -111,7 +111,7 @@ const form = reactive<any>({
     app_secret: '',
     token: '',
     encoding_aes_key: '',
-    is_personal: false,
+    is_certification: false,
     callback_url: ''
   },
   dingtalk: { client_id: '', client_secret: '', callback_url: '' },
@@ -184,17 +184,17 @@ const drawerTitle = computed(
       wechat: '公众号配置',
       dingtalk: '钉钉应用配置',
       wecom: '企业微信应用配置',
-      feishu: '飞书配置'
+      feishu: '飞书应用配置'
     })[configType.value]
 )
 
 const infoTitle = computed(
   () =>
     ({
-      wechat: '微信公众号应用信息',
-      dingtalk: '钉钉应用信息',
-      wecom: '企业微信应用信息',
-      feishu: '飞书应用信息'
+      wechat: '应用信息',
+      dingtalk: '应用信息',
+      wecom: '应用信息',
+      feishu: '应用信息'
     })[configType.value]
 )
 

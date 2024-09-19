@@ -39,14 +39,16 @@ class QwenChatModel(MaxKBBaseModel, ChatTongyi):
         )
         return chat_tong_yi
 
+    usage_metadata: dict = {}
+
     def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
-        return self.__dict__.get('_last_generation_info')
+        return self.usage_metadata
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        return self.get_last_generation_info().get('input_tokens', 0)
+        return self.usage_metadata.get('input_tokens', 0)
 
     def get_num_tokens(self, text: str) -> int:
-        return self.get_last_generation_info().get('output_tokens', 0)
+        return self.usage_metadata.get('output_tokens', 0)
 
     def _stream(
             self,
@@ -69,7 +71,7 @@ class QwenChatModel(MaxKBBaseModel, ChatTongyi):
                     and message["content"] == ""
             ) or (choice["finish_reason"] == "length"):
                 token_usage = stream_resp["usage"]
-                self.__dict__.setdefault('_last_generation_info', {}).update(token_usage)
+                self.usage_metadata = token_usage
             if (
                     choice["finish_reason"] == "null"
                     and message["content"] == ""
@@ -108,5 +110,5 @@ class QwenChatModel(MaxKBBaseModel, ChatTongyi):
                 **kwargs,
             ).generations[0][0],
         ).message
-        self.__dict__.setdefault('_last_generation_info', {}).update(chat_result.response_metadata['token_usage'])
+        self.usage_metadata = chat_result.response_metadata['token_usage']
         return chat_result

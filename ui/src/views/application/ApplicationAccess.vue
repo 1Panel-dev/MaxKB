@@ -52,7 +52,7 @@ const platforms = reactive([
   {
     key: 'wecom',
     logoSrc: new URL(`../../assets/logo_wechat-work.svg`, import.meta.url).href,
-    name: '企业微信',
+    name: '企业微信应用',
     description: '打造企业微信智能应用',
     isActive: false,
     exists: false
@@ -60,7 +60,7 @@ const platforms = reactive([
   {
     key: 'dingtalk',
     logoSrc: new URL(`../../assets/logo_dingtalk.svg`, import.meta.url).href,
-    name: '钉钉',
+    name: '钉钉应用',
     description: '打造钉钉智能应用',
     isActive: false,
     exists: false
@@ -76,7 +76,7 @@ const platforms = reactive([
   {
     key: 'feishu',
     logoSrc: new URL(`../../assets/logo_lark.svg`, import.meta.url).href,
-    name: '飞书',
+    name: '飞书应用',
     description: '打造飞书智能应用',
     isActive: false,
     exists: false
