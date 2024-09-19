@@ -95,13 +95,27 @@
                 </el-text>
               </div>
               <div class="mt-4 mb-16 url-height">
-                <a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
-                  {{ apiUrl }}
-                </a>
+                <div>
+                  <el-text>API 文档：</el-text
+                  ><el-button
+                    type="primary"
+                    link
+                    @click="toUrl(apiUrl)"
+                    class="vertical-middle lighter break-all"
+                  >
+                    {{ apiUrl }}
+                  </el-button>
+                </div>
+                <div>
+                  <el-text>Base URL：</el-text
+                  ><a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
+                    {{ baseUrl + id }}
+                  </a>
 
-                <el-button type="primary" text @click="copyClick(apiUrl)">
-                  <AppIcon iconName="app-copy"></AppIcon>
-                </el-button>
+                  <el-button type="primary" text @click="copyClick(baseUrl + id)">
+                    <AppIcon iconName="app-copy"></AppIcon>
+                  </el-button>
+                </div>
               </div>
               <div>
                 <el-button @click="openAPIKeyDialog">{{
@@ -172,6 +186,8 @@ const {
 
 const apiUrl = window.location.origin + '/doc/chat/'
 
+const baseUrl = window.location.origin + '/api/application/'
+
 const DisplaySettingDialogRef = ref()
 const EditAvatarDialogRef = ref()
 const LimitDialogRef = ref()
@@ -225,6 +241,9 @@ const statisticsData = ref([])
 
 const showEditIcon = ref(false)
 
+function toUrl(url: string) {
+  window.open(url, '_blank')
+}
 function openDisplaySettingDialog() {
   DisplaySettingDialogRef.value.open(accessToken.value)
 }
