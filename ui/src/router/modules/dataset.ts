@@ -43,6 +43,7 @@ const datasetRouter = {
           name: 'Problem',
           meta: {
             icon: 'app-problems',
+            iconActive: 'QuestionFilled',
             title: '问题',
             active: 'problem',
             parentPath: '/dataset/:id',
