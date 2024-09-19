@@ -14,59 +14,61 @@
       </el-tooltip>
       <el-divider direction="vertical" />
     </span>
-    <el-tooltip effect="dark" content="换个答案" placement="top">
-      <el-button :disabled="chat_loading" text @click="regeneration">
-        <el-icon><RefreshRight /></el-icon>
-      </el-button>
-    </el-tooltip>
-    <el-divider direction="vertical" />
-    <el-tooltip effect="dark" content="复制" placement="top">
-      <el-button text @click="copyClick(data?.answer_text)">
-        <AppIcon iconName="app-copy"></AppIcon>
-      </el-button>
-    </el-tooltip>
-    <el-divider direction="vertical" />
-    <el-tooltip
-      effect="dark"
-      content="赞同"
-      placement="top"
-      v-if="buttonData?.vote_status === '-1'"
-    >
-      <el-button text @click="voteHandle('0')" :disabled="loading">
-        <AppIcon iconName="app-like"></AppIcon>
-      </el-button>
-    </el-tooltip>
-    <el-tooltip
-      effect="dark"
-      content="取消赞同"
-      placement="top"
-      v-if="buttonData?.vote_status === '0'"
-    >
-      <el-button text @click="voteHandle('-1')" :disabled="loading">
-        <AppIcon iconName="app-like-color"></AppIcon>
-      </el-button>
-    </el-tooltip>
-    <el-divider direction="vertical" v-if="buttonData?.vote_status === '-1'" />
-    <el-tooltip
-      effect="dark"
-      content="反对"
-      placement="top"
-      v-if="buttonData?.vote_status === '-1'"
-    >
-      <el-button text @click="voteHandle('1')" :disabled="loading">
-        <AppIcon iconName="app-oppose"></AppIcon>
-      </el-button>
-    </el-tooltip>
-    <el-tooltip
-      effect="dark"
-      content="取消反对"
-      placement="top"
-      v-if="buttonData?.vote_status === '1'"
-    >
-      <el-button text @click="voteHandle('-1')" :disabled="loading">
-        <AppIcon iconName="app-oppose-color"></AppIcon>
-      </el-button>
-    </el-tooltip>
+    <span v-if="applicationId">
+      <el-tooltip effect="dark" content="换个答案" placement="top">
+        <el-button :disabled="chat_loading" text @click="regeneration">
+          <el-icon><RefreshRight /></el-icon>
+        </el-button>
+      </el-tooltip>
+      <el-divider direction="vertical" />
+      <el-tooltip effect="dark" content="复制" placement="top">
+        <el-button text @click="copyClick(data?.answer_text)">
+          <AppIcon iconName="app-copy"></AppIcon>
+        </el-button>
+      </el-tooltip>
+      <el-divider direction="vertical" />
+      <el-tooltip
+        effect="dark"
+        content="赞同"
+        placement="top"
+        v-if="buttonData?.vote_status === '-1'"
+      >
+        <el-button text @click="voteHandle('0')" :disabled="loading">
+          <AppIcon iconName="app-like"></AppIcon>
+        </el-button>
+      </el-tooltip>
+      <el-tooltip
+        effect="dark"
+        content="取消赞同"
+        placement="top"
+        v-if="buttonData?.vote_status === '0'"
+      >
+        <el-button text @click="voteHandle('-1')" :disabled="loading">
+          <AppIcon iconName="app-like-color"></AppIcon>
+        </el-button>
+      </el-tooltip>
+      <el-divider direction="vertical" v-if="buttonData?.vote_status === '-1'" />
+      <el-tooltip
+        effect="dark"
+        content="反对"
+        placement="top"
+        v-if="buttonData?.vote_status === '-1'"
+      >
+        <el-button text @click="voteHandle('1')" :disabled="loading">
+          <AppIcon iconName="app-oppose"></AppIcon>
+        </el-button>
+      </el-tooltip>
+      <el-tooltip
+        effect="dark"
+        content="取消反对"
+        placement="top"
+        v-if="buttonData?.vote_status === '1'"
+      >
+        <el-button text @click="voteHandle('-1')" :disabled="loading">
+          <AppIcon iconName="app-oppose-color"></AppIcon>
+        </el-button>
+      </el-tooltip>
+    </span>
   </div>
   <!-- 先渲染，不然不能播放   -->
   <audio ref="audioPlayer" controls hidden="hidden"></audio>

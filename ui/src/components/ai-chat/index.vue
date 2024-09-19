@@ -148,7 +148,7 @@
                   </el-button>
                 </div>
               </div>
-              <div v-if="item.write_ed && props.appId && 500 != item.status" class="flex-between">
+              <div v-if="item.write_ed && 500 != item.status" class="flex-between">
                 <OperationButton
                   :tts="props.data.tts_model_enable"
                   :tts_type="props.data.tts_type"
