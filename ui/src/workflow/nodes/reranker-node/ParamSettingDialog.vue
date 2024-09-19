@@ -41,7 +41,7 @@
                   :label="$t('views.application.applicationForm.dialogues.topReferences')"
                 >
                   <el-input-number
-                    v-model="form.top_n"
+                    v-model="form.dataset_setting.top_n"
                     :min="1"
                     :max="100"
                     :value-on-clear="1"
