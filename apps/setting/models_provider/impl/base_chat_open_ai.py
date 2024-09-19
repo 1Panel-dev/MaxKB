@@ -1,9 +1,11 @@
 # coding=utf-8
 
-from typing import List, Dict, Optional, Any, Iterator, Type
+from typing import List, Dict, Optional, Any, Iterator, Type, cast
 from langchain_core.callbacks import CallbackManagerForLLMRun
+from langchain_core.language_models import LanguageModelInput
 from langchain_core.messages import BaseMessage, AIMessageChunk, BaseMessageChunk
-from langchain_core.outputs import ChatGenerationChunk
+from langchain_core.outputs import ChatGenerationChunk, ChatGeneration
+from langchain_core.runnables import RunnableConfig, ensure_config
 from langchain_openai import ChatOpenAI
 from langchain_openai.chat_models.base import _convert_delta_to_message_chunk
 
@@ -76,3 +78,28 @@ class BaseChatOpenAI(ChatOpenAI):
                     )
                 is_first_chunk = False
                 yield generation_chunk
+
+    def invoke(
+            self,
+            input: LanguageModelInput,
+            config: Optional[RunnableConfig] = None,
+            *,
+            stop: Optional[List[str]] = None,
+            **kwargs: Any,
+    ) -> BaseMessage:
+        config = ensure_config(config)
+        chat_result = cast(
+            ChatGeneration,
+            self.generate_prompt(
+                [self._convert_input(input)],
+                stop=stop,
+                callbacks=config.get("callbacks"),
+                tags=config.get("tags"),
+                metadata=config.get("metadata"),
+                run_name=config.get("run_name"),
+                run_id=config.pop("run_id", None),
+                **kwargs,
+            ).generations[0][0],
+        ).message
+        self.__dict__.setdefault('_last_generation_info', {}).update(chat_result.response_metadata['token_usage'])
+        return chat_result
