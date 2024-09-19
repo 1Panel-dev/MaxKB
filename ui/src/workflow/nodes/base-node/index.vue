@@ -373,7 +373,9 @@ onMounted(() => {
     })
   }
   set(props.nodeModel.properties, 'input_field_list', inputFieldList)
-  set(props.nodeModel.properties.node_data, 'tts_type', 'BROWSER')
+  if (!props.nodeModel.properties.node_data.tts_type) {
+    set(props.nodeModel.properties.node_data, 'tts_type', 'BROWSER')
+  }
   getProvider()
   getTTSModel()
   getSTTModel()
