@@ -195,6 +195,7 @@
       @submit="getModel"
       @change="openCreateModel($event)"
     ></CreateModelDialog>
+    <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)" />
   </NodeContainer>
 </template>
 <script setup lang="ts">
