@@ -9,7 +9,7 @@
     <span v-if="tts">
       <el-tooltip effect="dark" content="语音播放" placement="top">
         <el-button text :disabled="!data?.write_ed" @click="playAnswerText(data?.answer_text)">
-          <AppIcon iconName="VideoPlay"></AppIcon>
+          <AppIcon iconName="app-video-play"></AppIcon>
         </el-button>
       </el-tooltip>
       <el-divider direction="vertical" />
