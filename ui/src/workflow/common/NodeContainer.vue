@@ -34,9 +34,9 @@
             v-if="showOperate(nodeModel.type)"
           >
             <el-button text @click="showNode = !showNode" class="mr-4">
-              <el-icon class="mr-8 arrow-icon" :class="showNode ? 'rotate-90' : ''"
-                ><CaretRight
-              /></el-icon>
+              <el-icon class="arrow-icon" :class="showNode ? 'rotate-180' : ''"
+                ><ArrowDownBold />
+              </el-icon>
             </el-button>
             <el-dropdown :teleported="false" trigger="click">
               <el-button text>

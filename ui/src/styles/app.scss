@@ -429,7 +429,9 @@ h5 {
 .rotate-90 {
   transform: rotateZ(90deg);
 }
-
+.rotate-180 {
+  transform: rotateZ(180deg);
+}
 /*
   表格第一行插入自定义行
 */
