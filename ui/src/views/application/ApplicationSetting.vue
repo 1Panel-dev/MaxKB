@@ -543,7 +543,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationFormType } from '@/api/type/application'
 import type { Provider } from '@/api/type/model'
 import { relatedObject } from '@/utils/utils'
-import { MsgSuccess } from '@/utils/message'
+import { MsgSuccess, MsgWarning } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
 
@@ -634,6 +634,14 @@ function submitSystemDialog(val: string) {
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
+  if (applicationForm.value.tts_model_enable && !applicationForm.value.tts_model_id && applicationForm.value.tts_type === 'TTS') {
+    MsgWarning(t('请选择语音播放模型'))
+    return
+  }
+  if (applicationForm.value.stt_model_enable && !applicationForm.value.stt_model_id) {
+    MsgWarning(t('请选择语音输入模型'))
+    return
+  }
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {

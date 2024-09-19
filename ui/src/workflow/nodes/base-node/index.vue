@@ -258,7 +258,7 @@ import useStore from '@/stores'
 import applicationApi from '@/api/application'
 import type { Provider } from '@/api/type/model'
 import FieldFormDialog from './component/FieldFormDialog.vue'
-import { MsgError } from '@/utils/message'
+import { MsgError, MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
 const { model } = useStore()
 
@@ -308,6 +308,14 @@ const form_data = computed({
 const baseNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
+  if (form_data.value.tts_model_enable && !form_data.value.tts_model_id && form_data.value.tts_type === 'TTS') {
+    MsgWarning(t('请选择语音播放模型'))
+    return
+  }
+  if (form_data.value.stt_model_enable && !form_data.value.stt_model_id) {
+    MsgWarning(t('请选择语音输入模型'))
+    return
+  }
   return baseNodeFormRef.value?.validate().catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
