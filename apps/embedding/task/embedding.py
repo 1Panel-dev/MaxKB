@@ -111,6 +111,11 @@ def embedding_by_problem(args, model_id):
     ListenerManagement.embedding_by_problem(args, embedding_model)
 
 
+def embedding_by_data_list(args: List, model_id):
+    embedding_model = get_embedding_model(model_id)
+    ListenerManagement.embedding_by_data_list(args, embedding_model)
+
+
 def delete_embedding_by_document(document_id):
     """
     删除指定文档id的向量

@@ -138,6 +138,11 @@ class ListenerManagement:
             max_kb.info(f'结束--->向量化段落:{paragraph_id}')
 
     @staticmethod
+    def embedding_by_data_list(data_list: List, embedding_model: Embeddings):
+        # 批量向量化
+        VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, lambda: True)
+
+    @staticmethod
     def embedding_by_document(document_id, embedding_model: Embeddings):
         """
         向量化文档
