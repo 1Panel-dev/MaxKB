@@ -15,7 +15,7 @@ from langchain_core.messages import (
     ChatMessage,
     ChatMessageChunk,
     HumanMessage,
-    HumanMessageChunk,
+    HumanMessageChunk, SystemMessage,
 )
 from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResult
 from langchain_core.pydantic_v1 import Field, SecretStr, root_validator
@@ -37,6 +37,8 @@ def _convert_message_to_dict(message: BaseMessage) -> dict:
         message_dict = {"Role": "user", "Content": message.content}
     elif isinstance(message, AIMessage):
         message_dict = {"Role": "assistant", "Content": message.content}
+    elif isinstance(message, SystemMessage):
+        message_dict = {"Role": "system", "Content": message.content}
     else:
         raise TypeError(f"Got unknown type {message}")
 
