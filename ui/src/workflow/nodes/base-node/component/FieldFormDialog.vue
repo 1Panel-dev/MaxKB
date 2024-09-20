@@ -64,6 +64,34 @@
       <el-form-item label="是否必填" @click.prevent>
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
+       <el-form-item label="默认值" prop="default_value">
+        <el-input
+          v-if="form.type === 'input'"
+          v-model="form.default_value"
+          placeholder="请输入默认值"
+          maxlength="64"
+          show-word-limit
+          @blur="form.name = form.name.trim()"
+        />
+        <el-date-picker
+          v-else-if="form.type === 'date'"
+          v-model="form.default_value"
+          type="datetime"
+          placeholder="选择日期"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
+        />
+        <el-select
+          v-else-if="form.type === 'select'"
+          v-model="form.default_value"
+          placeholder="请选择">
+          <el-option
+            v-for="(option, index) in form.optionList"
+            :key="index"
+            :label="option"
+            :value="option"/>
+        </el-select>
+      </el-form-item>
       <el-form-item label="赋值方式">
         <el-radio-group v-model="form.assignment_method">
           <el-radio value="user_input">用户输入</el-radio>
@@ -104,8 +132,19 @@ const form = ref<any>({
 
 const rules = reactive({
   name: [{ required: true, message: '请输入变量名', trigger: 'blur' }],
-  variable: [{ required: true, message: '请输入变量', trigger: 'blur' }]
+  variable: [{ required: true, message: '请输入变量', trigger: 'blur' }],
+  default_value: [{ required: true, message: '请输入默认值', trigger: 'blur' }]
 })
+
+watch(
+  form,
+  (val) => {
+    rules.default_value[0].required = !!val.is_required
+  },
+  {
+    deep: true
+  }
+)
 
 const dialogVisible = ref<boolean>(false)
 
