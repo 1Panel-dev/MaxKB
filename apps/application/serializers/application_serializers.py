@@ -259,7 +259,7 @@ class ApplicationSerializer(serializers.Serializer):
             if application.work_flow is not None:
                 work_flow = application.work_flow
                 if work_flow is not None:
-                    for node in work_flow['nodes']:
+                    for node in work_flow.get('nodes', []):
                         if node['id'] == 'base-node':
                             input_field_list = node['properties']['input_field_list']
                             if input_field_list is not None:
