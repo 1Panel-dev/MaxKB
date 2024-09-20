@@ -39,7 +39,7 @@ def handle_sheet(file_name, sheet, image_dict):
         if image is not None:
             content = f'![](/api/image/{image.id})'
         paragraph_list.append({'title': title[0:255],
-                               'content': content[0:4096],
+                               'content': content[0:102400],
                                'problem_list': problem_list})
     return {'name': file_name, 'paragraphs': paragraph_list}
 
