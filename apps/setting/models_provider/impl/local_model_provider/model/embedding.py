@@ -35,7 +35,7 @@ class WebLocalEmbedding(MaxKBBaseModel, BaseModel, Embeddings):
         result = res.json()
         if result.get('code', 500) == 200:
             return result.get('data')
-        raise Exception(result.get('msg'))
+        raise Exception(result.get('message'))
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
@@ -44,7 +44,7 @@ class WebLocalEmbedding(MaxKBBaseModel, BaseModel, Embeddings):
         result = res.json()
         if result.get('code', 500) == 200:
             return result.get('data')
-        raise Exception(result.get('msg'))
+        raise Exception(result.get('message'))
 
 
 class LocalEmbedding(MaxKBBaseModel, HuggingFaceEmbeddings):

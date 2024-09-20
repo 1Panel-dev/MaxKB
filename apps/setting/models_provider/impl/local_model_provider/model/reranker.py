@@ -61,7 +61,7 @@ class WebLocalBaseReranker(MaxKBBaseModel, BaseDocumentCompressor):
         if result.get('code', 500) == 200:
             return [Document(page_content=document.get('page_content'), metadata=document.get('metadata')) for document
                     in result.get('data')]
-        raise Exception(result.get('msg'))
+        raise Exception(result.get('message'))
 
 
 class LocalBaseReranker(MaxKBBaseModel, BaseDocumentCompressor):
