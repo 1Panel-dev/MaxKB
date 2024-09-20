@@ -21,7 +21,7 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <div class="mt-8">
+            <div class="mt-8 pre-wrap">
               {{ source1 }}
             </div>
           </div>
