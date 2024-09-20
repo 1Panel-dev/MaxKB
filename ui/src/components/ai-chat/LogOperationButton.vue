@@ -8,8 +8,11 @@
     <!-- 语音播放 -->
     <span v-if="tts">
       <el-tooltip effect="dark" content="语音播放" placement="top">
-        <el-button text @click="playAnswerText(data?.answer_text)">
+        <el-button v-if="!audioPlayerStatus" text @click="playAnswerText(data?.answer_text)">
           <AppIcon iconName="app-video-play"></AppIcon>
+        </el-button>
+        <el-button v-else text @click="pausePlayAnswerText()">
+          <el-icon ><VideoPause /></el-icon>
         </el-button>
       </el-tooltip>
       <el-divider direction="vertical" />
@@ -58,6 +61,13 @@ import EditContentDialog from '@/views/log/component/EditContentDialog.vue'
 import EditMarkDialog from '@/views/log/component/EditMarkDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import applicationApi from '@/api/application'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const {
+  params: { id },
+} = route as any
+
 
 const props = defineProps({
   data: {
@@ -68,7 +78,8 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  tts: Boolean
+  tts: Boolean,
+  tts_type: String
 })
 
 const emit = defineEmits(['update:data'])
@@ -89,16 +100,25 @@ function editMark(data: any) {
   EditMarkDialogRef.value.open(data)
 }
 
+const audioPlayerStatus = ref(false)
+
 const playAnswerText = (text: string) => {
-  if (props.data.tts_type === 'BROWSER') {
+  console.log(props.data)
+  if (props.tts_type === 'BROWSER') {
     // 创建一个新的 SpeechSynthesisUtterance 实例
     const utterance = new SpeechSynthesisUtterance(text)
     // 调用浏览器的朗读功能
     window.speechSynthesis.speak(utterance)
   }
-  if (props.data.tts_type === 'TTS') {
+  if (props.tts_type === 'TTS') {
+    audioPlayerStatus.value = true
+    // 恢复上次暂停的播放
+    if (audioPlayer.value?.src) {
+      audioPlayer.value?.play()
+      return
+    }
     applicationApi
-      .postTextToSpeech(props.data.id as string, { text: text }, loading)
+      .postTextToSpeech(id || props.applicationId as string, { text: text }, loading)
       .then((res: any) => {
         // 假设我们有一个 MP3 文件的字节数组
         // 创建 Blob 对象
@@ -117,6 +137,9 @@ const playAnswerText = (text: string) => {
         if (audioPlayer.value instanceof HTMLAudioElement) {
           audioPlayer.value.src = url
           audioPlayer.value.play() // 自动播放音频
+          audioPlayer.value.onended = () => {
+            audioPlayerStatus.value = false
+          }
         } else {
           console.error('audioPlayer.value is not an instance of HTMLAudioElement')
         }
@@ -124,6 +147,13 @@ const playAnswerText = (text: string) => {
       .catch((err) => {
         console.log('err: ', err)
       })
+  }
+}
+
+const pausePlayAnswerText = () => {
+  if (props.tts_type === 'TTS') {
+    audioPlayerStatus.value = false
+    audioPlayer.value?.pause()
   }
 }
 
