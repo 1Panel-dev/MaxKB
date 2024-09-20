@@ -153,7 +153,7 @@
         </div>
       </div>
     </el-scrollbar>
-    <EmbedDialog ref="EmbedDialogRef" />
+    <EmbedDialog ref="EmbedDialogRef" :data="detail" />
     <APIKeyDialog ref="APIKeyDialogRef" />
     <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
