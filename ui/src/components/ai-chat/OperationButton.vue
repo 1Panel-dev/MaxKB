@@ -81,6 +81,13 @@ import { ref } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const {
+  params: { id },
+} = route as any
+
 const props = defineProps({
   data: {
     type: Object,
@@ -162,7 +169,7 @@ const playAnswerText = (text: string) => {
       return
     }
     applicationApi
-      .postTextToSpeech(props.applicationId as string, { text: text }, loading)
+      .postTextToSpeech(id || props.applicationId as string, { text: text }, loading)
       .then((res: any) => {
         // 假设我们有一个 MP3 文件的字节数组
         // 创建 Blob 对象
