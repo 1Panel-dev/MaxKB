@@ -215,6 +215,9 @@ class FunctionLibSerializer(serializers.Serializer):
 
         def one(self, with_valid=True):
             if with_valid:
-                self.is_valid(raise_exception=True)
+                super().is_valid(raise_exception=True)
+                if not QuerySet(FunctionLib).filter(id=self.data.get('id')).filter(
+                        Q(user_id=self.data.get('user_id')) | Q(permission_type='PUBLIC')).exists():
+                    raise AppApiException(500, '函数不存在')
             function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
             return FunctionLibModelSerializer(function_lib).data
