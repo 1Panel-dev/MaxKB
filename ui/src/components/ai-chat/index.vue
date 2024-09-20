@@ -94,7 +94,7 @@
             </div>
 
             <div class="content">
-              <div class="flex" v-if="!item.answer_text">
+              <div v-if="!item.answer_text">
                 <el-card
                   v-if="item.write_ed === undefined || item.write_ed === true"
                   shadow="always"

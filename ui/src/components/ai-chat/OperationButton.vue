@@ -8,11 +8,16 @@
     <!-- 语音播放 -->
     <span v-if="tts">
       <el-tooltip effect="dark" content="语音播放" placement="top">
-        <el-button v-if="!audioPlayerStatus" text :disabled="!data?.write_ed" @click="playAnswerText(data?.answer_text)">
-          <AppIcon iconName="app-video-play" ></AppIcon>
+        <el-button
+          v-if="!audioPlayerStatus"
+          text
+          :disabled="!data?.write_ed"
+          @click="playAnswerText(data?.answer_text)"
+        >
+          <AppIcon iconName="app-video-play"></AppIcon>
         </el-button>
         <el-button v-else text :disabled="!data?.write_ed" @click="pausePlayAnswerText()">
-          <el-icon ><VideoPause /></el-icon>
+          <el-icon><VideoPause /></el-icon>
         </el-button>
       </el-tooltip>
       <el-divider direction="vertical" />
@@ -78,14 +83,14 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
-import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const {
-  params: { id },
+  params: { id }
 } = route as any
 
 const props = defineProps({
@@ -130,26 +135,28 @@ function voteHandle(val: string) {
 }
 
 function markdownToPlainText(md: string) {
-    return md
-        // 移除图片 ![alt](url)
-        .replace(/!\[.*?\]\(.*?\)/g, '')
-        // 移除链接 [text](url)
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-        // 移除 Markdown 标题符号 (#, ##, ###)
-        .replace(/^#{1,6}\s+/gm, '')
-        // 移除加粗 **text** 或 __text__
-        .replace(/\*\*(.*?)\*\*/g, '$1')
-        .replace(/__(.*?)__/g, '$1')
-        // 移除斜体 *text* 或 _text_
-        .replace(/\*(.*?)\*/g, '$1')
-        .replace(/_(.*?)_/g, '$1')
-        // 移除行内代码 `code`
-        .replace(/`(.*?)`/g, '$1')
-        // 移除代码块 ```code```
-        .replace(/```[\s\S]*?```/g, '')
-        // 移除多余的换行符
-        .replace(/\n{2,}/g, '\n')
-        .trim();
+  return (
+    md
+      // 移除图片 ![alt](url)
+      .replace(/!\[.*?\]\(.*?\)/g, '')
+      // 移除链接 [text](url)
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // 移除 Markdown 标题符号 (#, ##, ###)
+      .replace(/^#{1,6}\s+/gm, '')
+      // 移除加粗 **text** 或 __text__
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/__(.*?)__/g, '$1')
+      // 移除斜体 *text* 或 _text_
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/_(.*?)_/g, '$1')
+      // 移除行内代码 `code`
+      .replace(/`(.*?)`/g, '$1')
+      // 移除代码块 ```code```
+      .replace(/```[\s\S]*?```/g, '')
+      // 移除多余的换行符
+      .replace(/\n{2,}/g, '\n')
+      .trim()
+  )
 }
 
 const playAnswerText = (text: string) => {
@@ -169,7 +176,7 @@ const playAnswerText = (text: string) => {
       return
     }
     applicationApi
-      .postTextToSpeech(id || props.applicationId as string, { text: text }, loading)
+      .postTextToSpeech((props.applicationId as string) || (id as string), { text: text }, loading)
       .then((res: any) => {
         // 假设我们有一个 MP3 文件的字节数组
         // 创建 Blob 对象

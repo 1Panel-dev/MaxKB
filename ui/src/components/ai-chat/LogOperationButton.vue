@@ -12,7 +12,7 @@
           <AppIcon iconName="app-video-play"></AppIcon>
         </el-button>
         <el-button v-else text @click="pausePlayAnswerText()">
-          <el-icon ><VideoPause /></el-icon>
+          <el-icon><VideoPause /></el-icon>
         </el-button>
       </el-tooltip>
       <el-divider direction="vertical" />
@@ -65,9 +65,8 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const {
-  params: { id },
+  params: { id }
 } = route as any
-
 
 const props = defineProps({
   data: {
@@ -118,7 +117,7 @@ const playAnswerText = (text: string) => {
       return
     }
     applicationApi
-      .postTextToSpeech(id || props.applicationId as string, { text: text }, loading)
+      .postTextToSpeech(id || (props.applicationId as string), { text: text }, loading)
       .then((res: any) => {
         // 假设我们有一个 MP3 文件的字节数组
         // 创建 Blob 对象

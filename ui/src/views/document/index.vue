@@ -155,7 +155,7 @@
                   <template #dropdown>
                     <el-dropdown-menu style="width: 100px">
                       <el-dropdown-item
-                        :class="filterMethod['is_active'] ? '' : 'is-active'"
+                        :class="filterMethod['is_active'] === '' ? 'is-active' : ''"
                         :command="beforeCommand('is_active', '')"
                         class="justify-center"
                         >全部</el-dropdown-item

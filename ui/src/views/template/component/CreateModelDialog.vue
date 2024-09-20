@@ -37,7 +37,7 @@
         <el-form-item prop="name" :rules="base_form_data_rule.name">
           <template #label>
             <div class="flex align-center" style="display: inline-flex">
-              <div class="flex-between mr-4">
+              <div class="mr-4">
                 <span>模型名称 </span>
               </div>
               <el-tooltip effect="dark" placement="right">
@@ -103,16 +103,10 @@
         <el-form-item prop="model_name" :rules="base_form_data_rule.model_name">
           <template #label>
             <div class="flex align-center" style="display: inline-flex">
-              <div class="flex-between mr-4">
+              <div class="mr-4">
                 <span>基础模型 </span>
+                <span class="danger">列表中没有列出的模型，直接输入模型名称，回车即可添加</span>
               </div>
-              <el-tooltip effect="dark" placement="right">
-                <template #content>
-                  <p>若下拉选项没有列出想要添加的LLM模型，自定义输入模型名称后回车即可</p>
-                  <p>注意，基础模型需要与供应商的模型名称一致</p>
-                </template>
-                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-              </el-tooltip>
             </div>
           </template>
           <el-select
