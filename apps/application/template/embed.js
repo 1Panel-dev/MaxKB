@@ -159,8 +159,8 @@ function initMaxkbStyle(root){
       left: 0;
   }
   #maxkb .maxkb-mask .maxkb-content {
-      width: 50px;
-      height: 50px;
+      width: 64px;
+      height: 64px;
       box-shadow: 1px 1px 1px 2000px rgba(0,0,0,.6);
       position: absolute;
       right: 0;
