@@ -131,6 +131,7 @@
                   v-model:data="chatList[index]"
                   :applicationId="appId"
                   :tts="props.data.tts_model_enable"
+                  :tts_type="props.data.tts_type"
                 />
               </div>
 
