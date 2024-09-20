@@ -305,7 +305,7 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             res = await ws.recv()
             result = parse_response(res)
             if 'payload_msg' in result and result['payload_msg']['code'] != self.success_code:
-                return result
+                raise Exception(f"Error code: {result['payload_msg']['code']}, message: {result['payload_msg']['message']}")
             for seq, (chunk, last) in enumerate(VolcanicEngineSpeechToText.slice_data(wav_data, segment_size), 1):
                 # if no compression, comment this line
                 payload_bytes = gzip.compress(chunk)
