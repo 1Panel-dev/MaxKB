@@ -97,11 +97,28 @@ const getDetailProblems: (
   return get(`${prefix}/${dataset_id}/problem/${problem_id}/paragraph`, undefined, loading)
 }
 
+/**
+ * 批量关联段落
+ * @param 参数 dataset_id,
+ * {
+      "problem_id_list": "Array",
+      "paragraph_list": "Array",
+    }
+ */
+const postMulAssociationProblem: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return post(`${prefix}/${dataset_id}/problem/_batch`, data, undefined, loading)
+}
+
 export default {
   getProblems,
   postProblems,
   delProblems,
   putProblems,
   getDetailProblems,
-  delMulProblem
+  delMulProblem,
+  postMulAssociationProblem
 }
