@@ -222,7 +222,7 @@ class ApplicationSerializer(serializers.Serializer):
                 access_token=self.data.get('token')).first()
             is_draggable = 'false'
             show_guide = 'true'
-            float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/favicon.ico"
+            float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/MaxKB.gif"
             X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
                                                                                   'XPACK_LICENSE_IS_VALID') else False)
             # 获取接入的query参数
