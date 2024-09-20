@@ -50,15 +50,11 @@
         </template>
         <template #default>
           <div
-            class="w-full flex-between"
+            class="w-full flex-between mb-8"
             :key="option"
             v-for="(option, $index) in form.optionList"
           >
-            <input
-              class="el-textarea__inner"
-              v-model.lazy="form.optionList[$index]"
-              placeholder="请输入选项值"
-            />
+            <el-input v-model.lazy="form.optionList[$index]" placeholder="请输入选项值" />
             <el-button link class="ml-8" @click="delOption($index)">
               <el-icon><Delete /></el-icon>
             </el-button>
@@ -103,7 +99,7 @@ const form = ref<any>({
   type: 'input',
   is_required: true,
   assignment_method: 'user_input',
-  optionList: []
+  optionList: ['']
 })
 
 const rules = reactive({
@@ -121,7 +117,7 @@ watch(dialogVisible, (bool) => {
       type: 'input',
       is_required: true,
       assignment_method: 'user_input',
-      optionList: []
+      optionList: ['']
     }
     isEdit.value = false
   }

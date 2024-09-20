@@ -397,6 +397,7 @@
                   v-model="applicationForm.tts_model_id"
                   class="w-full"
                   popper-class="select-model"
+                  placeholder="请选择语音合成模型"
                 >
                   <el-option-group
                     v-for="(value, label) in ttsModelOptions"
@@ -634,7 +635,11 @@ function submitSystemDialog(val: string) {
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
-  if (applicationForm.value.tts_model_enable && !applicationForm.value.tts_model_id && applicationForm.value.tts_type === 'TTS') {
+  if (
+    applicationForm.value.tts_model_enable &&
+    !applicationForm.value.tts_model_id &&
+    applicationForm.value.tts_type === 'TTS'
+  ) {
     MsgWarning(t('请选择语音播放模型'))
     return
   }

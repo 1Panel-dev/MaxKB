@@ -16,7 +16,7 @@
             <el-radio-button label="自定义" value="custom" />
           </el-radio-group>
           <div v-if="themeRadio === 'custom'">
-            <h5 class="mt-16 mb-8">平台显示主题</h5>
+            <h5 class="mt-16 mb-8">自定义主题</h5>
             <el-color-picker v-model="customColor" @change="customColorHandle" />
           </div>
         </div>

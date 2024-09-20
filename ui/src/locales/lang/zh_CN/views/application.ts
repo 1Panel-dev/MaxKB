@@ -100,7 +100,7 @@ export default {
       concent: '内容',
       concentPlaceholder: '请输入内容',
       designated_answer:
-        '你好，我是 MaxKB 小助手，我的知识库只包含了 MaxKB 产品相关知识，请重新描述您的问题。'
+        '你好，我是 XXX 小助手，我的知识库只包含了 XXX 产品相关知识，请重新描述您的问题。'
     }
   },
   prompt: {

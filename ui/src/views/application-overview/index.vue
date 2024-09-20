@@ -42,7 +42,7 @@
           </div>
 
           <el-row :gutter="12">
-            <el-col :span="12" class="mt-16">
+            <el-col :span="10" class="mt-16">
               <div class="flex">
                 <el-text type="info">{{
                   $t('views.applicationOverview.appInfo.publicAccessLink')
@@ -88,7 +88,7 @@
                 </el-button>
               </div>
             </el-col>
-            <el-col :span="12" class="mt-16">
+            <el-col :span="14" class="mt-16">
               <div class="flex">
                 <el-text type="info"
                   >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}

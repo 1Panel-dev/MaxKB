@@ -45,7 +45,7 @@
           @submitDialog="submitDialog"
         />
       </el-form-item>
-      <div class="flex-between mb-8">
+      <div class="flex-between mb-16">
         <h5 class="lighter">全局变量</h5>
         <el-button link type="primary" @click="openAddDialog()">
           <el-icon class="mr-4"><Plus /></el-icon> 添加
@@ -188,7 +188,7 @@
           v-model="form_data.tts_model_id"
           class="w-full"
           popper-class="select-model"
-          placeholder="请输入"
+          placeholder="请选择语音合成模型"
         >
           <el-option-group
             v-for="(value, label) in ttsModelOptions"
@@ -308,7 +308,11 @@ const form_data = computed({
 const baseNodeFormRef = ref<FormInstance>()
 
 const validate = () => {
-  if (form_data.value.tts_model_enable && !form_data.value.tts_model_id && form_data.value.tts_type === 'TTS') {
+  if (
+    form_data.value.tts_model_enable &&
+    !form_data.value.tts_model_id &&
+    form_data.value.tts_type === 'TTS'
+  ) {
     MsgWarning(t('请选择语音播放模型'))
     return
   }
