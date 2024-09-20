@@ -100,7 +100,7 @@ src="${window.location.origin}/api/application/embed?protocol=${window.location.
   dialogVisible.value = true
 }
 
-function mapToUrlParams(map) {
+function mapToUrlParams(map: any[]) {
     const params = new URLSearchParams();
 
     map.forEach((item: any) => {
