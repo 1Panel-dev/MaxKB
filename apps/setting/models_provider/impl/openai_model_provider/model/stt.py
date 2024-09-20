@@ -1,3 +1,5 @@
+import asyncio
+import io
 from typing import Dict
 
 from openai import OpenAI
@@ -49,5 +51,9 @@ class OpenAISpeechToText(MaxKBBaseModel, BaseSpeechToText):
             base_url=self.api_base,
             api_key=self.api_key
         )
-        res = client.audio.transcriptions.create(model=self.model, language="zh", file=audio_file)
+        audio_data = audio_file.read()
+        buffer = io.BytesIO(audio_data)
+        buffer.name = "file.mp3"  # this is the important line
+        res = client.audio.transcriptions.create(model=self.model, language="zh", file=buffer)
         return res.text
+
