@@ -179,7 +179,10 @@ class ApplicationSerializer(serializers.Serializer):
                                  error_messages=ErrMessage.char("应用描述"))
     model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      error_messages=ErrMessage.char("模型"))
-    dialogue_number = serializers.BooleanField(required=True, error_messages=ErrMessage.char("会话次数"))
+    dialogue_number = serializers.IntegerField(required=True,
+                                               min_value=0,
+                                               max_value=1024,
+                                               error_messages=ErrMessage.integer("历史聊天记录"))
     prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                      error_messages=ErrMessage.char("开场白"))
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
@@ -372,7 +375,9 @@ class ApplicationSerializer(serializers.Serializer):
         model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                          error_messages=ErrMessage.char("模型"))
         dialogue_number = serializers.IntegerField(required=False,
-                                                   error_messages=ErrMessage.boolean("多轮会话"))
+                                                   min_value=0,
+                                                   max_value=1024,
+                                                   error_messages=ErrMessage.integer("历史聊天记录"))
         prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                          error_messages=ErrMessage.char("开场白"))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
