@@ -768,6 +768,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
 }
 
 function regenerationChart(item: chatType) {
+  if (!checkInputParam()) {
+    return
+  }
   inputValue.value = item.problem_text
   if (!loading.value) {
     chatMessage(null, '', true)
