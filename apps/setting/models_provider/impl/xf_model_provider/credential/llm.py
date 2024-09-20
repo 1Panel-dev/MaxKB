@@ -28,7 +28,7 @@ class XunFeiLLMModelGeneralParams(BaseForm):
         TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
         required=True, default_value=4096,
         _min=1,
-        _max=4096,
+        _max=100000,
         _step=1,
         precision=0)
 
@@ -45,7 +45,7 @@ class XunFeiLLMModelProParams(BaseForm):
         TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
         required=True, default_value=4096,
         _min=1,
-        _max=8192,
+        _max=100000,
         _step=1,
         precision=0)
 

@@ -28,7 +28,7 @@ class WenxinLLMModelParams(BaseForm):
         TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
         required=True, default_value=1024,
         _min=2,
-        _max=2048,
+        _max=100000,
         _step=1,
         precision=0)
 
