@@ -29,7 +29,7 @@ class OpenaiToResponse(BaseToResponse):
                                                     prompt_tokens=prompt_tokens,
                                                     total_tokens=completion_tokens + prompt_tokens)
                               ).dict()
-        return JsonResponse(data=data, status=status)
+        return JsonResponse(data=data, status=_status)
 
     def to_stream_chunk_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens):
         chunk = ChatCompletionChunk(id=chat_record_id, model='', object='chat.completion.chunk',
