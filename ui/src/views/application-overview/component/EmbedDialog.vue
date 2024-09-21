@@ -70,7 +70,7 @@ const source1 = ref('')
 
 const source2 = ref('')
 
-const apiInputParams = ref({})
+const apiInputParams = ref([])
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
