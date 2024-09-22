@@ -43,7 +43,8 @@
     "vue-clipboard3": "^2.0.0",
     "vue-codemirror": "^6.1.1",
     "vue-i18n": "^9.13.1",
-    "vue-router": "^4.2.4"
+    "vue-router": "^4.2.4",
+    "recorder-core": "^1.3.24040900"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.3.2",
@@ -62,7 +63,7 @@
     "jsdom": "^22.1.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.0",
-    "sass": "^1.66.1",
+    "sass": "1.66.1",
     "typescript": "~5.1.6",
     "unplugin-vue-define-options": "^1.3.18",
     "vite": "^4.4.9",

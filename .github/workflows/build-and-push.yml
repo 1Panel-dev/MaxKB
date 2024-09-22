@@ -1,11 +1,13 @@
 name: build-and-push
 
+run-name: 构建镜像并推送仓库 ${{ github.event.inputs.dockerImageTag }} (${{ github.event.inputs.registry }})
+
 on:
   workflow_dispatch:
     inputs:
       dockerImageTag:
         description: 'Docker Image Tag'
-        default: 'v1.1.0-dev'
+        default: 'v1.6.0-dev'
         required: true
       architecture:
         description: 'Architecture'
@@ -19,11 +21,11 @@ on:
       registry:
         description: 'Push To Registry'
         required: true
-        default: 'dockerhub'
+        default: 'fit2cloud-registry'
         type: choice
         options:
-          - dockerhub
           - fit2cloud-registry
+          - dockerhub
           - dockerhub, fit2cloud-registry
 
 jobs:

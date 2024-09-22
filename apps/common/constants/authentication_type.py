@@ -16,3 +16,5 @@ class AuthenticationType(Enum):
     APPLICATION_ACCESS_TOKEN = "APPLICATION_ACCESS_TOKEN"
     # key API
     API_KEY = "API_KEY"
+    # 第三方对接
+    PLATFORM = 'PLATFORM'

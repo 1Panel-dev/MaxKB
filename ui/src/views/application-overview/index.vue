@@ -42,7 +42,7 @@
           </div>
 
           <el-row :gutter="12">
-            <el-col :span="12" class="mt-16">
+            <el-col :span="10" class="mt-16">
               <div class="flex">
                 <el-text type="info">{{
                   $t('views.applicationOverview.appInfo.publicAccessLink')
@@ -88,20 +88,34 @@
                 </el-button>
               </div>
             </el-col>
-            <el-col :span="12" class="mt-16">
+            <el-col :span="14" class="mt-16">
               <div class="flex">
                 <el-text type="info"
                   >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
                 </el-text>
               </div>
               <div class="mt-4 mb-16 url-height">
-                <a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
-                  {{ apiUrl }}
-                </a>
+                <div>
+                  <el-text>API 文档：</el-text
+                  ><el-button
+                    type="primary"
+                    link
+                    @click="toUrl(apiUrl)"
+                    class="vertical-middle lighter break-all"
+                  >
+                    {{ apiUrl }}
+                  </el-button>
+                </div>
+                <div>
+                  <el-text>Base URL：</el-text
+                  ><a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
+                    {{ baseUrl + id }}
+                  </a>
 
-                <el-button type="primary" text @click="copyClick(apiUrl)">
-                  <AppIcon iconName="app-copy"></AppIcon>
-                </el-button>
+                  <el-button type="primary" text @click="copyClick(baseUrl + id)">
+                    <AppIcon iconName="app-copy"></AppIcon>
+                  </el-button>
+                </div>
               </div>
               <div>
                 <el-button @click="openAPIKeyDialog">{{
@@ -139,7 +153,7 @@
         </div>
       </div>
     </el-scrollbar>
-    <EmbedDialog ref="EmbedDialogRef" />
+    <EmbedDialog ref="EmbedDialogRef" :data="detail" />
     <APIKeyDialog ref="APIKeyDialogRef" />
     <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
@@ -171,6 +185,8 @@ const {
 } = route as any
 
 const apiUrl = window.location.origin + '/doc/chat/'
+
+const baseUrl = window.location.origin + '/api/application/'
 
 const DisplaySettingDialogRef = ref()
 const EditAvatarDialogRef = ref()
@@ -225,6 +241,9 @@ const statisticsData = ref([])
 
 const showEditIcon = ref(false)
 
+function toUrl(url: string) {
+  window.open(url, '_blank')
+}
 function openDisplaySettingDialog() {
   DisplaySettingDialogRef.value.open(accessToken.value)
 }
@@ -331,15 +350,6 @@ onMounted(() => {
     position: absolute;
     right: 16px;
     top: 21px;
-  }
-
-  .edit-avatar {
-    position: relative;
-    .edit-mask {
-      position: absolute;
-      left: 0;
-      background: rgba(0, 0, 0, 0.4);
-    }
   }
 }
 </style>

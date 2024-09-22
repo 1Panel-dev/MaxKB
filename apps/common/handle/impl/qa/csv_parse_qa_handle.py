@@ -30,7 +30,7 @@ class CsvParseQAHandle(BaseParseQAHandle):
             return True
         return False
 
-    def handle(self, file, get_buffer):
+    def handle(self, file, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
             reader = csv.reader(io.TextIOWrapper(io.BytesIO(buffer), encoding=detect(buffer)['encoding']))
@@ -52,7 +52,7 @@ class CsvParseQAHandle(BaseParseQAHandle):
                 title = get_row_value(row, title_row_index_dict, 'title')
                 title = str(title) if title is not None else ''
                 paragraph_list.append({'title': title[0:255],
-                                       'content': content[0:4096],
+                                       'content': content[0:102400],
                                        'problem_list': problem_list})
             return [{'name': file.name, 'paragraphs': paragraph_list}]
         except Exception as e:

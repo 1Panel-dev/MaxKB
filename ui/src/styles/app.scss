@@ -304,6 +304,10 @@ h5 {
   color: var(--el-color-primary);
 }
 
+.border-none {
+  border: none;
+}
+
 .cursor {
   cursor: pointer;
 }
@@ -425,7 +429,9 @@ h5 {
 .rotate-90 {
   transform: rotateZ(90deg);
 }
-
+.rotate-180 {
+  transform: rotateZ(180deg);
+}
 /*
   表格第一行插入自定义行
 */
@@ -699,10 +705,11 @@ h5 {
     font-weight: 400;
   }
   .el-radio-button__original-radio:checked + .el-radio-button__inner {
-    color: var(--el-color-primary);
-    background: var(--el-color-primary-light-9);
-    border: none;
-    box-shadow: none;
+    color: var(--el-color-primary) !important;
+    background: var(--el-color-primary-light-9) !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-weight: 500;
   }
 }
 
@@ -727,4 +734,17 @@ h5 {
   .cm-gutters {
     display: none !important;
   }
+}
+
+.edit-avatar {
+  position: relative;
+  .edit-mask {
+    position: absolute;
+    left: 0;
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
+.record-tip-confirm {
+  max-width: 800px !important;
 }

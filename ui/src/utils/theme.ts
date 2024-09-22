@@ -35,5 +35,14 @@ export const defaultSetting = {
   loginLogo: '',
   loginImage: '',
   title: 'MaxKB',
-  slogan: '欢迎使用 MaxKB 智能知识库'
+  slogan: '欢迎使用 MaxKB 智能知识库问答系统'
+}
+
+export const defaultPlatformSetting = {
+  showUserManual: true,
+  userManualUrl: 'https://maxkb.cn/docs/',
+  showForum: true,
+  forumUrl: 'https://bbs.fit2cloud.com/c/mk/11',
+  showProject: true,
+  projectUrl: 'https://github.com/1Panel-dev/MaxKB'
 }

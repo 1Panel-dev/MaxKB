@@ -21,7 +21,7 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <div class="mt-8">
+            <div class="mt-8 pre-wrap">
               {{ source1 }}
             </div>
           </div>
@@ -58,6 +58,10 @@ import useStore from '@/stores'
 
 const { application } = useStore()
 
+const props = defineProps({
+  data: Object
+})
+
 const emit = defineEmits(['addData'])
 
 const dialogVisible = ref<boolean>(false)
@@ -65,6 +69,8 @@ const dialogVisible = ref<boolean>(false)
 const source1 = ref('')
 
 const source2 = ref('')
+
+const apiInputParams = ref([])
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -75,7 +81,7 @@ watch(dialogVisible, (bool) => {
 
 const open = (val: string) => {
   source1.value = `<iframe
-src="${application.location + val}"
+src="${application.location + val}?${mapToUrlParams(apiInputParams.value)}"
 style="width: 100%; height: 100%;"
 frameborder="0"
 allow="microphone">
@@ -88,11 +94,42 @@ defer
 src="${window.location.origin}/api/application/embed?protocol=${window.location.protocol.replace(
     ':',
     ''
-  )}&host=${window.location.host}&token=${val}">
+  )}&host=${window.location.host}&token=${val}&${mapToUrlParams(apiInputParams.value)}">
 <\/script>
 `
   dialogVisible.value = true
 }
+
+function mapToUrlParams(map: any[]) {
+    const params = new URLSearchParams();
+
+    map.forEach((item: any) => {
+        params.append(encodeURIComponent(item.name), encodeURIComponent(item.value));
+    });
+
+    return params.toString(); // 返回 URL 查询字符串
+}
+
+watch(() => props.data,
+  (val) => {
+    if (val) {
+      val.work_flow?.nodes
+        ?.filter((v: any) => v.id === 'base-node')
+        .map((v: any) => {
+          apiInputParams.value = v.properties.input_field_list
+            ? v.properties.input_field_list
+              .filter((v: any) => v.assignment_method === 'api_input')
+              .map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value
+                }
+              })
+            : []
+        })
+    }
+  }
+)
 
 defineExpose({ open })
 </script>

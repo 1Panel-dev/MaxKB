@@ -13,11 +13,15 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
     ModelTypeConst, ModelInfoManage
 from setting.models_provider.impl.openai_model_provider.credential.embedding import OpenAIEmbeddingCredential
 from setting.models_provider.impl.openai_model_provider.credential.llm import OpenAILLMModelCredential
+from setting.models_provider.impl.openai_model_provider.credential.stt import OpenAISTTModelCredential
 from setting.models_provider.impl.openai_model_provider.model.embedding import OpenAIEmbeddingModel
 from setting.models_provider.impl.openai_model_provider.model.llm import OpenAIChatModel
+from setting.models_provider.impl.openai_model_provider.model.stt import OpenAISpeechToText
+from setting.models_provider.impl.openai_model_provider.model.tts import OpenAITextToSpeech
 from smartdoc.conf import PROJECT_DIR
 
 openai_llm_model_credential = OpenAILLMModelCredential()
+openai_stt_model_credential = OpenAISTTModelCredential()
 model_info_list = [
     ModelInfo('gpt-3.5-turbo', '最新的gpt-3.5-turbo，随OpenAI调整而更新', ModelTypeConst.LLM,
               openai_llm_model_credential, OpenAIChatModel
@@ -27,6 +31,9 @@ model_info_list = [
     ModelInfo('gpt-4o', '最新的GPT-4o，比gpt-4-turbo更便宜、更快，随OpenAI调整而更新',
               ModelTypeConst.LLM, openai_llm_model_credential,
               OpenAIChatModel),
+    ModelInfo('gpt-4o-mini', '最新的gpt-4o-mini，比gpt-4o更便宜、更快，随OpenAI调整而更新',
+            ModelTypeConst.LLM, openai_llm_model_credential,
+            OpenAIChatModel),
     ModelInfo('gpt-4-turbo', '最新的gpt-4-turbo，随OpenAI调整而更新', ModelTypeConst.LLM,
               openai_llm_model_credential,
               OpenAIChatModel),
@@ -58,13 +65,26 @@ model_info_list = [
               OpenAIChatModel),
     ModelInfo('gpt-4-1106-preview', '2023年11月6日的gpt-4-turbo快照，支持上下文长度128,000 tokens',
               ModelTypeConst.LLM, openai_llm_model_credential,
-              OpenAIChatModel)
+              OpenAIChatModel),
+    ModelInfo('whisper-1', '',
+              ModelTypeConst.STT, openai_stt_model_credential,
+              OpenAISpeechToText),
+    ModelInfo('tts-1', '',
+              ModelTypeConst.TTS, openai_stt_model_credential,
+              OpenAITextToSpeech)
 ]
 open_ai_embedding_credential = OpenAIEmbeddingCredential()
 model_info_embedding_list = [
     ModelInfo('text-embedding-ada-002', '',
               ModelTypeConst.EMBEDDING, open_ai_embedding_credential,
-              OpenAIEmbeddingModel)]
+              OpenAIEmbeddingModel),
+    ModelInfo('text-embedding-3-small', '',
+              ModelTypeConst.EMBEDDING, open_ai_embedding_credential,
+              OpenAIEmbeddingModel),
+    ModelInfo('text-embedding-3-large', '',
+              ModelTypeConst.EMBEDDING, open_ai_embedding_credential,
+              OpenAIEmbeddingModel)
+]
 
 model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
     ModelInfo('gpt-3.5-turbo', '最新的gpt-3.5-turbo，随OpenAI调整而更新', ModelTypeConst.LLM,

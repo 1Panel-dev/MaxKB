@@ -167,7 +167,7 @@ class Application(APIView):
         def get(self, request: Request):
             return ApplicationSerializer.Embed(
                 data={'protocol': request.query_params.get('protocol'), 'token': request.query_params.get('token'),
-                      'host': request.query_params.get('host'), }).get_embed()
+                      'host': request.query_params.get('host'), }).get_embed(params=request.query_params)
 
     class Model(APIView):
         authentication_classes = [TokenAuth]
@@ -534,3 +534,35 @@ class Application(APIView):
                 ApplicationSerializer.Query(
                     data={**query_params_to_single_dict(request.query_params), 'user_id': request.user.id}).page(
                     current_page, page_size))
+
+    class SpeechToText(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
+                                        [lambda r, keywords: Permission(group=Group.APPLICATION,
+                                                                        operate=Operate.USE,
+                                                                        dynamic_tag=keywords.get(
+                                                                            'application_id'))],
+                                        compare=CompareConstants.AND))
+        def post(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationSerializer.Operate(data={'application_id': application_id, 'user_id': request.user.id})
+                .speech_to_text(request.FILES.getlist('file')[0]))
+
+    class TextToSpeech(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
+                                        [lambda r, keywords: Permission(group=Group.APPLICATION,
+                                                                        operate=Operate.USE,
+                                                                        dynamic_tag=keywords.get(
+                                                                            'application_id'))],
+                                        compare=CompareConstants.AND))
+        def post(self, request: Request, application_id: str):
+            byte_data = ApplicationSerializer.Operate(
+                data={'application_id': application_id, 'user_id': request.user.id}).text_to_speech(
+                request.data.get('text'))
+            return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
+                                                              'Content-Disposition': 'attachment; filename="abc.mp3"'})

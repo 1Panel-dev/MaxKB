@@ -9,6 +9,7 @@
 from typing import List, Dict
 
 from langchain.schema import BaseMessage, HumanMessage
+from langchain_core.messages import SystemMessage
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.step.generate_human_message_step.i_generate_human_message_step import \
@@ -27,6 +28,7 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
                 prompt: str,
                 padding_problem_text: str = None,
                 no_references_setting=None,
+                system=None,
                 **kwargs) -> List[BaseMessage]:
         prompt = prompt if (paragraph_list is not None and len(paragraph_list) > 0) else no_references_setting.get(
             'value')
@@ -35,6 +37,11 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
         history_message = [[history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
                            for index in
                            range(start_index if start_index > 0 else 0, len(history_chat_record))]
+        if system is not None and len(system) > 0:
+            return [SystemMessage(system), *flat_map(history_message),
+                    self.to_human_message(prompt, exec_problem_text, max_paragraph_char_number, paragraph_list,
+                                          no_references_setting)]
+
         return [*flat_map(history_message),
                 self.to_human_message(prompt, exec_problem_text, max_paragraph_char_number, paragraph_list,
                                       no_references_setting)]

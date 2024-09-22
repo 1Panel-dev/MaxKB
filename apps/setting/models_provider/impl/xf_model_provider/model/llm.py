@@ -40,14 +40,16 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
             **optional_params
         )
 
+    usage_metadata: dict = {}
+
     def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
-        return self.__dict__.get('_last_generation_info')
+        return self.usage_metadata
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        return self.get_last_generation_info().get('prompt_tokens', 0)
+        return self.usage_metadata.get('prompt_tokens', 0)
 
     def get_num_tokens(self, text: str) -> int:
-        return self.get_last_generation_info().get('completion_tokens', 0)
+        return self.usage_metadata.get('completion_tokens', 0)
 
     def _stream(
             self,
@@ -71,7 +73,7 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
                 cg_chunk = ChatGenerationChunk(message=chunk)
             elif "usage" in content:
                 generation_info = content["usage"]
-                self.__dict__.setdefault('_last_generation_info', {}).update(generation_info)
+                self.usage_metadata = generation_info
                 continue
             else:
                 continue

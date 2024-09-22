@@ -11,9 +11,10 @@ import io
 import openpyxl
 
 from common.handle.base_parse_qa_handle import BaseParseQAHandle, get_title_row_index_dict, get_row_value
+from common.handle.impl.tools import xlsx_embed_cells_images
 
 
-def handle_sheet(file_name, sheet):
+def handle_sheet(file_name, sheet, image_dict):
     rows = sheet.rows
     try:
         title_row_list = next(rows)
@@ -34,8 +35,11 @@ def handle_sheet(file_name, sheet):
         title = get_row_value(row, title_row_index_dict, 'title')
         title = str(title.value) if title is not None and title.value is not None else ''
         content = str(content.value)
+        image = image_dict.get(content, None)
+        if image is not None:
+            content = f'![](/api/image/{image.id})'
         paragraph_list.append({'title': title[0:255],
-                               'content': content[0:4096],
+                               'content': content[0:102400],
                                'problem_list': problem_list})
     return {'name': file_name, 'paragraphs': paragraph_list}
 
@@ -47,16 +51,22 @@ class XlsxParseQAHandle(BaseParseQAHandle):
             return True
         return False
 
-    def handle(self, file, get_buffer):
+    def handle(self, file, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
             workbook = openpyxl.load_workbook(io.BytesIO(buffer))
+            try:
+                image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer))
+                save_image([item for item in image_dict.values()])
+            except Exception as e:
+                image_dict = {}
             worksheets = workbook.worksheets
             worksheets_size = len(worksheets)
             return [row for row in
                     [handle_sheet(file.name,
-                                  sheet) if worksheets_size == 1 and sheet.title == 'Sheet1' else handle_sheet(
-                        sheet.title, sheet) for sheet
+                                  sheet,
+                                  image_dict) if worksheets_size == 1 and sheet.title == 'Sheet1' else handle_sheet(
+                        sheet.title, sheet, image_dict) for sheet
                      in worksheets] if row is not None]
         except Exception as e:
             return [{'name': file.name, 'paragraphs': []}]

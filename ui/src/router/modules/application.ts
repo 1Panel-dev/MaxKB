@@ -1,4 +1,5 @@
 import Layout from '@/layout/layout-template/DetailLayout.vue'
+import { ComplexPermission } from '@/utils/permission/type'
 const applicationRouter = {
   path: '/application',
   name: 'application',
@@ -50,6 +51,20 @@ const applicationRouter = {
             parentName: 'ApplicationDetail'
           },
           component: () => import('@/views/application/ApplicationSetting.vue')
+        },
+        {
+          path: 'access',
+          name: 'AppAccess',
+          meta: {
+            icon: 'app-access',
+            iconActive: 'app-access-active',
+            title: '应用接入',
+            active: 'access',
+            parentPath: '/application/:id/:type',
+            parentName: 'ApplicationDetail',
+            permission: new ComplexPermission([], ['x-pack'], 'OR')
+          },
+          component: () => import('@/views/application/ApplicationAccess.vue')
         },
         {
           path: 'hit-test',

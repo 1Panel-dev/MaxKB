@@ -132,8 +132,8 @@ class RegisterSerializer(ApiMixin, serializers.Serializer):
                                      max_length=20,
                                      min_length=6,
                                      validators=[
-                                         validators.RegexValidator(regex=re.compile("^[a-zA-Z][a-zA-Z0-9_]{5,20}$"),
-                                                                   message="用户名字符数为 6-20 个字符，必须以字母开头，可使用字母、数字、下划线等")
+                                         validators.RegexValidator(regex=re.compile("^.{6,20}$"),
+                                                                   message="用户名字符数为 6-20 个字符")
                                      ])
     password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"),
                                      validators=[validators.RegexValidator(regex=re.compile(
@@ -387,7 +387,7 @@ class SendEmailSerializer(ApiMixin, serializers.Serializer):
                                       system_setting.meta.get('email_use_ssl')
                                       )
             # 发送邮件
-            send_mail(f'【MaxKB 智能知识库-{"用户注册" if state == "register" else "修改密码"}】',
+            send_mail(f'【智能知识库问答系统-{"用户注册" if state == "register" else "修改密码"}】',
                       '',
                       html_message=f'{content.replace("${code}", code)}',
                       from_email=system_setting.meta.get('from_email'),
@@ -590,8 +590,8 @@ class UserManageSerializer(serializers.Serializer):
                                          max_length=20,
                                          min_length=6,
                                          validators=[
-                                             validators.RegexValidator(regex=re.compile("^[a-zA-Z][a-zA-Z0-9_]{5,20}$"),
-                                                                       message="用户名字符数为 6-20 个字符，必须以字母开头，可使用字母、数字、下划线等")
+                                             validators.RegexValidator(regex=re.compile("^.{6,20}$"),
+                                                                       message="用户名字符数为 6-20 个字符")
                                          ])
         password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"),
                                          validators=[validators.RegexValidator(regex=re.compile(

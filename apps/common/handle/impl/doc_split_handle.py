@@ -110,11 +110,12 @@ class DocSplitHandle(BaseSplitHandle):
     def to_md(self, doc, images_list, get_image_id):
         elements = []
         for element in doc.element.body:
-            if element.tag.endswith('tbl'):
+            tag = str(element.tag)
+            if tag.endswith('tbl'):
                 # 处理表格
                 table = Table(element, doc)
                 elements.append(table)
-            elif element.tag.endswith('p'):
+            elif tag.endswith('p'):
                 # 处理段落
                 paragraph = Paragraph(element, doc)
                 elements.append(paragraph)

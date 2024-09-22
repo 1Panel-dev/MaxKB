@@ -33,7 +33,7 @@ def handle_sheet(file_name, sheet):
         title = str(title) if title is not None else ''
         content = str(content)
         paragraph_list.append({'title': title[0:255],
-                               'content': content[0:4096],
+                               'content': content[0:102400],
                                'problem_list': problem_list})
     return {'name': file_name, 'paragraphs': paragraph_list}
 
@@ -46,7 +46,7 @@ class XlsParseQAHandle(BaseParseQAHandle):
             return True
         return False
 
-    def handle(self, file, get_buffer):
+    def handle(self, file, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
             workbook = xlrd.open_workbook(file_contents=buffer)

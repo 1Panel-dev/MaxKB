@@ -1,9 +1,10 @@
 import { Result } from '@/request/Result'
-import { get, post, postStream, del, put } from '@/request/index'
+import { get, post, postStream, del, put, request, download } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
+
 const prefix = '/application'
 
 /**
@@ -238,6 +239,48 @@ const getApplicationModel: (
 }
 
 /**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationRerankerModel: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/model`, { model_type: 'RERANKER' }, loading)
+}
+
+/**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationSTTModel: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/model`, { model_type: 'STT' }, loading)
+}
+
+/**
+ * 获取当前用户可使用的模型列表
+ * @param application_id
+ * @param loading
+ * @query  { query_text: string, top_number: number, similarity: number }
+ * @returns
+ */
+const getApplicationTTSModel: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/model`, { model_type: 'TTS' }, loading)
+}
+
+/**
  * 发布应用
  * @param 参数
  */
@@ -288,6 +331,63 @@ const getModelParamsForm: (
 ) => Promise<Result<Array<FormField>>> = (application_id, model_id, loading) => {
   return get(`${prefix}/${application_id}/model_params_form/${model_id}`, undefined, loading)
 }
+
+/**
+ * 语音转文本
+ */
+const postSpeechToText: (
+  application_id: String,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return post(`${prefix}/${application_id}/speech_to_text`, data, undefined, loading)
+}
+
+/**
+ * 语音转文本
+ */
+const postTextToSpeech: (
+  application_id: String,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, data, loading) => {
+  return download(`${prefix}/${application_id}/text_to_speech`, 'post', data, undefined, loading)
+}
+/**
+ * 获取平台状态
+ */
+const getPlatformStatus: (application_id: string) => Promise<Result<any>> = (application_id) => {
+  return get(`/platform/${application_id}/status`)
+}
+/**
+ * 获取平台配置
+ */
+const getPlatformConfig: (application_id: string, type: string) => Promise<Result<any>> = (
+  application_id,
+  type
+) => {
+  return get(`/platform/${application_id}/${type}`)
+}
+/**
+ * 更新平台配置
+ */
+const updatePlatformConfig: (
+  application_id: string,
+  type: string,
+  data: any
+) => Promise<Result<any>> = (application_id, type, data) => {
+  return post(`/platform/${application_id}/${type}`, data)
+}
+/**
+ * 更新平台状态
+ */
+const updatePlatformStatus: (application_id: string, data: any) => Promise<Result<any>> = (
+  application_id,
+  data
+) => {
+  return post(`/platform/${application_id}/status`, data)
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -310,5 +410,14 @@ export default {
   postWorkflowChatOpen,
   listFunctionLib,
   getFunctionLib,
-  getModelParamsForm
+  getModelParamsForm,
+  getApplicationRerankerModel,
+  getApplicationSTTModel,
+  getApplicationTTSModel,
+  postSpeechToText,
+  postTextToSpeech,
+  getPlatformStatus,
+  getPlatformConfig,
+  updatePlatformConfig,
+  updatePlatformStatus
 }

@@ -18,7 +18,6 @@ class AppNode extends HtmlResize.view {
   constructor(props: any, VueNode: any) {
     super(props)
     this.isMounted = false
-
     this.r = h(VueNode, {
       properties: props.model.properties,
       nodeModel: props.model
@@ -70,6 +69,12 @@ class AppNode extends HtmlResize.view {
       },
       [
         lh('div', {
+          style: { zindex: 0 },
+          onClick: () => {
+            if (!isConnect && type == 'right') {
+              this.props.model.openNodeMenu(anchorData)
+            }
+          },
           dangerouslySetInnerHTML: {
             __html: isConnect
               ? `<svg width="100%" height="100%" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">

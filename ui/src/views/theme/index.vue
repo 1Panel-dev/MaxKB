@@ -6,21 +6,26 @@
         <div class="app-card p-24">
           <h5 class="mb-16">平台显示主题</h5>
           <el-radio-group
-            v-model="themeForm.theme"
+            v-model="themeRadio"
             class="app-radio-button-group"
             @change="changeThemeHandle"
           >
             <template v-for="(item, index) in themeList" :key="index">
               <el-radio-button :label="item.label" :value="item.value" />
             </template>
+            <el-radio-button label="自定义" value="custom" />
           </el-radio-group>
+          <div v-if="themeRadio === 'custom'">
+            <h5 class="mt-16 mb-8">自定义主题</h5>
+            <el-color-picker v-model="customColor" @change="customColorHandle" />
+          </div>
         </div>
         <div class="app-card p-24 mt-16">
           <h5 class="mb-16">平台登陆设置</h5>
           <el-card shadow="never" class="layout-bg">
             <div class="flex-between">
               <h5 class="mb-16">页面预览</h5>
-              <el-button type="primary" link @click="resetForm"> 恢复默认 </el-button>
+              <el-button type="primary" link @click="resetForm('login')"> 恢复默认 </el-button>
             </div>
             <el-scrollbar>
               <div class="theme-preview">
@@ -128,6 +133,85 @@
             </div>
           </el-card>
         </div>
+        <div class="app-card p-24 mt-16">
+          <h5 class="mb-16">平台设置</h5>
+          <el-card shadow="never" class="layout-bg">
+            <div class="flex-between">
+              <h5 class="mb-16">页面预览</h5>
+              <el-button type="primary" link @click="resetForm('platform')"> 恢复默认 </el-button>
+            </div>
+            <el-scrollbar>
+              <div class="theme-preview">
+                <el-row :gutter="8">
+                  <el-col :span="16">
+                    <div class="theme-platform mr-16">
+                      <div
+                        class="theme-platform-header border-b flex-between"
+                        :class="!isDefaultTheme ? 'custom-header' : ''"
+                      >
+                        <div class="flex-center h-full">
+                          <div class="app-title-container cursor">
+                            <div class="logo flex-center">
+                              <LogoFull height="25px" />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex-center">
+                          <AppIcon
+                            iconName="app-github"
+                            class="cursor color-secondary mr-8 ml-8"
+                            style="font-size: 20px"
+                            v-if="themeForm.showProject"
+                          ></AppIcon>
+                          <AppIcon
+                            iconName="app-reading"
+                            class="cursor color-secondary mr-8 ml-8"
+                            style="font-size: 20px"
+                            v-if="themeForm.showUserManual"
+                          ></AppIcon>
+                          <AppIcon
+                            iconName="app-help"
+                            class="cursor color-secondary ml-8"
+                            style="font-size: 20px"
+                            v-if="themeForm.showForum"
+                          ></AppIcon>
+                        </div>
+                      </div>
+                    </div>
+                  </el-col>
+                  <el-col :span="8">
+                    <div class="theme-form">
+                      <div>
+                        <el-checkbox v-model="themeForm.showUserManual" label="显示用户手册" />
+                        <div class="ml-16">
+                          <el-input
+                            v-model="themeForm.userManualUrl"
+                            placeholder="请输入 URL 地址"
+                          />
+                        </div>
+                      </div>
+                      <div class="my-2">
+                        <el-checkbox v-model="themeForm.showForum" label="显示论坛求助" />
+                        <div class="ml-16">
+                          <el-input v-model="themeForm.forumUrl" placeholder="请输入 URL 地址" />
+                        </div>
+                      </div>
+                      <div class="mt-2">
+                        <el-checkbox v-model="themeForm.showProject" label="显示项目地址" />
+                        <div class="ml-16">
+                          <el-input v-model="themeForm.projectUrl" placeholder="请输入 URL 地址" />
+                        </div>
+                      </div>
+                    </div>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-scrollbar>
+            <div class="mt-16">
+              <el-text type="info">默认为 MaxKB 登录界面，支持自定义设置</el-text>
+            </div>
+          </el-card>
+        </div>
       </div>
     </el-scrollbar>
     <div class="theme-setting__operate w-full p-16-24">
@@ -138,12 +222,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import LoginPreview from './LoginPreview.vue'
-import { themeList, defaultSetting } from '@/utils/theme'
+import { themeList, defaultSetting, defaultPlatformSetting } from '@/utils/theme'
 import ThemeApi from '@/api/theme'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import useStore from '@/stores'
@@ -156,6 +240,9 @@ onBeforeRouteLeave((to, from) => {
 })
 
 const themeInfo = computed(() => user.themeInfo)
+const isDefaultTheme = computed(() => {
+  return user.isDefaultTheme()
+})
 
 const themeFormRef = ref<FormInstance>()
 const loading = ref(false)
@@ -166,8 +253,11 @@ const themeForm = ref<any>({
   loginLogo: '',
   loginImage: '',
   title: 'MaxKB',
-  slogan: '欢迎使用 MaxKB 智能知识库'
+  slogan: '欢迎使用 MaxKB 智能知识库问答系统',
+  ...defaultPlatformSetting
 })
+const themeRadio = ref('')
+const customColor = ref('')
 
 const rules = reactive<FormRules>({
   title: [{ required: true, message: '请输入网站标题', trigger: 'blur' }],
@@ -194,9 +284,16 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
       themeForm.value[attr] = file.raw
     }
   }
+  user.setTheme(themeForm.value)
 }
 
 function changeThemeHandle(val: string) {
+  if (val !== 'custom') {
+    themeForm.value.theme = val
+    user.setTheme(themeForm.value)
+  }
+}
+function customColorHandle(val: string) {
   themeForm.value.theme = val
   user.setTheme(themeForm.value)
 }
@@ -206,11 +303,20 @@ function resetTheme() {
   themeForm.value = cloneDeep(themeInfo.value)
 }
 
-function resetForm() {
-  themeForm.value = {
-    theme: themeForm.value.theme,
-    ...defaultSetting
-  }
+function resetForm(val: string) {
+  themeForm.value =
+    val === 'base'
+      ? {
+          ...themeForm.value,
+          theme: themeForm.value.theme,
+          ...defaultSetting
+        }
+      : {
+          ...themeForm.value,
+          theme: themeForm.value.theme,
+          ...defaultPlatformSetting
+        }
+
   user.setTheme(themeForm.value)
 }
 
@@ -236,7 +342,11 @@ onMounted(() => {
     router.push({ path: `/application` })
   }
   if (themeInfo.value) {
-    themeForm.value = themeInfo.value
+    themeRadio.value = themeList.some((v) => v.value === themeInfo.value.theme)
+      ? themeInfo.value.theme
+      : 'custom'
+    customColor.value = themeInfo.value.theme
+    themeForm.value = cloneDeep(themeInfo.value)
     cloneTheme.value = cloneDeep(themeInfo.value)
   }
 })
@@ -263,6 +373,14 @@ onMounted(() => {
   }
   .theme-preview {
     min-width: 1000px;
+  }
+  .theme-platform {
+    background: #ffffff;
+    height: 220px;
+    .theme-platform-header {
+      padding: 10px 20px;
+      background: var(--app-header-bg-color);
+    }
   }
 }
 </style>

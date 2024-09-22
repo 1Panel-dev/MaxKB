@@ -89,6 +89,7 @@ onMounted(() => {
         lf.value.deleteEdge(id)
       })
     })
+
     setTimeout(() => {
       lf.value?.fitView()
     }, 500)

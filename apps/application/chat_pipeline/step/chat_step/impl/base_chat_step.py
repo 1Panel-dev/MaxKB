@@ -6,7 +6,6 @@
     @date：2024/1/9 18:25
     @desc: 对话step Base实现
 """
-import json
 import logging
 import time
 import traceback
@@ -19,13 +18,13 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
 from langchain.schema.messages import HumanMessage, AIMessage
 from langchain_core.messages import AIMessageChunk
+from rest_framework import status
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
 from application.models.api_key_model import ApplicationPublicAccessClient
 from common.constants.authentication_type import AuthenticationType
-from common.response import result
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 
 
@@ -66,9 +65,9 @@ def event_content(response,
     try:
         for chunk in response:
             all_text += chunk.content
-            yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                                         'content': chunk.content, 'is_end': False}) + "\n\n"
-
+            yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), chunk.content,
+                                                                         False,
+                                                                         0, 0)
         # 获取token
         if is_ai_chat:
             try:
@@ -83,8 +82,8 @@ def event_content(response,
         write_context(step, manage, request_token, response_token, all_text)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text, client_id)
-        yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                                     'content': '', 'is_end': True}) + "\n\n"
+        yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), '', True,
+                                                                     request_token, response_token)
         add_access_num(client_id, client_type)
     except Exception as e:
         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
@@ -93,8 +92,7 @@ def event_content(response,
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text, client_id)
         add_access_num(client_id, client_type)
-        yield 'data: ' + json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                                     'content': all_text, 'is_end': True}) + "\n\n"
+        yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), all_text, True, 0, 0)
 
 
 class BaseChatStep(IChatStep):
@@ -234,13 +232,14 @@ class BaseChatStep(IChatStep):
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                           chat_result.content, manage, self, padding_problem_text, client_id)
             add_access_num(client_id, client_type)
-            return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                                   'content': chat_result.content, 'is_end': True})
+            return manage.get_base_to_response().to_block_response(str(chat_id), str(chat_record_id),
+                                                                   chat_result.content, True,
+                                                                   request_token, response_token)
         except Exception as e:
             all_text = '异常' + str(e)
             write_context(self, manage, 0, 0, all_text)
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                           all_text, manage, self, padding_problem_text, client_id)
             add_access_num(client_id, client_type)
-            return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                                   'content': all_text, 'is_end': True})
+            return manage.get_base_to_response().to_block_response(str(chat_id), str(chat_record_id), all_text, True, 0,
+                                                                   0, _status=status.HTTP_500_INTERNAL_SERVER_ERROR)

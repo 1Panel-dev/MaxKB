@@ -1,6 +1,6 @@
 <template>
   <login-layout v-if="user.isEnterprise() ? user.themeInfo : true" v-loading="loading">
-    <LoginContainer :subTitle="user.themeInfo?.slogan || '欢迎使用 MaxKB 智能知识库'">
+    <LoginContainer :subTitle="user.themeInfo?.slogan || '欢迎使用 MaxKB 智能知识库问答系统'">
       <h2 class="mb-24">{{ loginMode || '普通登录' }}</h2>
       <el-form
           class="login-form"

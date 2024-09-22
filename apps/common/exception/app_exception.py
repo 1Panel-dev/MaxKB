@@ -73,3 +73,11 @@ class AppChatNumOutOfBoundsFailed(AppApiException):
     def __init__(self, code, message):
         self.code = code
         self.message = message
+
+
+class ChatException(AppApiException):
+    status_code = 500
+
+    def __init__(self, code, message):
+        self.code = code
+        self.message = message

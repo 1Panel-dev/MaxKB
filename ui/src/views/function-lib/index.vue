@@ -11,7 +11,11 @@
         clearable
       />
     </div>
-    <div v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading">
+    <div
+      v-loading.fullscreen.lock="
+        (paginationConfig.current_page === 1 && loading) || changeStateloading
+      "
+    >
       <InfiniteScroll
         :size="functionLibList.length"
         :total="paginationConfig.total"
@@ -45,20 +49,34 @@
                   <img src="@/assets/icon_function_outlined.svg" style="width: 58%" alt="" />
                 </AppAvatar>
               </template>
-
+              <div class="status-button">
+                <el-tag class="info-tag" v-if="item.permission_type === 'PUBLIC'">公用</el-tag>
+                <el-tag class="danger-tag" v-else-if="item.permission_type === 'PRIVATE'"
+                  >私有</el-tag
+                >
+              </div>
               <template #footer>
-                <div class="footer-content">
-                  <el-tooltip effect="dark" content="复制" placement="top">
-                    <el-button text @click.stop="copyFunctionLib(item)">
-                      <AppIcon iconName="app-copy"></AppIcon>
-                    </el-button>
-                  </el-tooltip>
-                  <el-divider direction="vertical" />
-                  <el-tooltip effect="dark" content="删除" placement="top">
-                    <el-button text @click.stop="deleteFunctionLib(item)">
-                      <el-icon><Delete /></el-icon>
-                    </el-button>
-                  </el-tooltip>
+                <div class="footer-content flex-between">
+                  <div>
+                    <el-tooltip effect="dark" content="复制" placement="top">
+                      <el-button text @click.stop="copyFunctionLib(item)">
+                        <AppIcon iconName="app-copy"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+                    <el-divider direction="vertical" />
+                    <el-tooltip effect="dark" content="删除" placement="top">
+                      <el-button text @click.stop="deleteFunctionLib(item)">
+                        <el-icon><Delete /></el-icon>
+                      </el-button>
+                    </el-tooltip>
+                  </div>
+                  <div @click.stop>
+                    <el-switch
+                      v-model="item.is_active"
+                      @change="changeState($event, item)"
+                      size="small"
+                    />
+                  </div>
                 </div>
               </template>
             </CardBox>
@@ -89,6 +107,7 @@ const paginationConfig = reactive({
 
 const searchValue = ref('')
 const title = ref('')
+const changeStateloading = ref(false)
 
 function openCreateDialog(data?: any) {
   title.value = data ? '编辑函数' : '创建函数'
@@ -100,6 +119,33 @@ function searchHandle() {
   paginationConfig.current_page = 1
   functionLibList.value = []
   getList()
+}
+
+function changeState(bool: Boolean, row: any) {
+  if (!bool) {
+    MsgConfirm(
+      `是否禁用函数：${row.name} ?`,
+      `禁用后，引用了该函数的应用提问时会报错 ，请谨慎操作。`,
+      {
+        confirmButtonText: '禁用',
+        confirmButtonClass: 'danger'
+      }
+    )
+      .then(() => {
+        const obj = {
+          is_active: bool
+        }
+        functionLibApi.putFunctionLib(row.id, obj, changeStateloading).then((res) => {})
+      })
+      .catch(() => {
+        row.is_active = true
+      })
+  } else {
+    const obj = {
+      is_active: bool
+    }
+    functionLibApi.putFunctionLib(row.id, obj, changeStateloading).then((res) => {})
+  }
 }
 
 function deleteFunctionLib(row: any) {
@@ -155,4 +201,13 @@ onMounted(() => {
   getList()
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.function-lib-list-container {
+  .status-button {
+    position: absolute;
+    right: 12px;
+    top: 13px;
+    height: auto;
+  }
+}
+</style>

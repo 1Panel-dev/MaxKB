@@ -4,16 +4,22 @@ interface ApplicationFormType {
   name?: string
   desc?: string
   model_id?: string
-  multiple_rounds_dialogue?: boolean
+  dialogue_number?: number
   prologue?: string
   dataset_id_list?: string[]
   dataset_setting?: any
   model_setting?: any
   problem_optimization?: boolean
+  problem_optimization_prompt?: string
   icon?: string | undefined
   type?: string
   work_flow?: any
   model_params_setting?: any
+  stt_model_id?: string
+  tts_model_id?: string
+  stt_model_enable?: boolean
+  tts_model_enable?: boolean
+  tts_type?: string
 }
 interface chatType {
   id: string
