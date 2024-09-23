@@ -64,6 +64,7 @@ const initChat=(root)=>{
   root.insertAdjacentHTML('beforeend',getChatContainerHtml('{{protocol}}','{{host}}','{{token}}','{{query}}'))
   // 按钮元素
   const chat_button=root.querySelector('.maxkb-chat-button')
+  const chat_button_img=root.querySelector('.maxkb-chat-button > img')
   //  对话框元素
   const chat_container=root.querySelector('#maxkb-chat-container')
 
@@ -95,8 +96,11 @@ const initChat=(root)=>{
              chat_button.style.top=(e.y-25)+'px'
              chat_button.style.left=(e.x-25)+'px'
           }
+            chat_button.style.width =chat_button_img.naturalWidth+'px'
+            chat_button.style.height =chat_button_img.naturalHeight+'px'
         }
   if({{is_draggable}}){
+  console.dir(chat_button_img)
   chat_button.addEventListener("drag",drag)
   chat_button.addEventListener("dragover",(e)=>{
              e.preventDefault()
