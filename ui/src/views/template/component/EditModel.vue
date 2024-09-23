@@ -98,7 +98,7 @@
             <div class="flex align-center" style="display: inline-flex">
               <div class="mr-4">
                 <span>基础模型 </span>
-                <span class="danger">列表中没有列出的模型，直接输入模型名称，回车即可添加</span>
+                <span class="danger">列表中未列出的模型，直接输入模型名称，回车即可添加</span>
               </div>
             </div>
           </template>
