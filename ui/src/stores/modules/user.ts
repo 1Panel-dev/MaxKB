@@ -5,6 +5,7 @@ import { cloneDeep } from 'lodash'
 import UserApi from '@/api/user'
 import ThemeApi from '@/api/theme'
 import { useElementPlusTheme } from 'use-element-plus-theme'
+import { defaultPlatformSetting } from '@/utils/theme'
 
 export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
@@ -90,6 +91,10 @@ const useUserStore = defineStore({
 
             if (this.isEnterprise()) {
               await this.theme()
+            } else {
+              this.themeInfo = {
+                ...defaultPlatformSetting
+              }
             }
             resolve(ok)
           })
