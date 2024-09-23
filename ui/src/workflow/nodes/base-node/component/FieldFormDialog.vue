@@ -64,13 +64,11 @@
       <el-form-item label="是否必填" @click.prevent>
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
-       <el-form-item label="默认值" prop="default_value">
+      <el-form-item label="默认值" prop="default_value">
         <el-input
           v-if="form.type === 'input'"
           v-model="form.default_value"
           placeholder="请输入默认值"
-          maxlength="64"
-          show-word-limit
           @blur="form.name = form.name.trim()"
         />
         <el-date-picker
@@ -84,12 +82,14 @@
         <el-select
           v-else-if="form.type === 'select'"
           v-model="form.default_value"
-          placeholder="请选择">
+          placeholder="请选择"
+        >
           <el-option
             v-for="(option, index) in form.optionList"
             :key="index"
             :label="option"
-            :value="option"/>
+            :value="option"
+          />
         </el-select>
       </el-form-item>
       <el-form-item label="赋值方式">
