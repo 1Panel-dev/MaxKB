@@ -32,6 +32,7 @@ export const baseNode = {
   y: 270,
   text: '',
   properties: {
+    width: 420,
     height: 200,
     stepName: '基本信息',
     input_field_list: [],
