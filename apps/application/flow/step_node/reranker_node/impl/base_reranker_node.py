@@ -47,14 +47,15 @@ class BaseRerankerNode(IRerankerNode):
     def execute(self, question, reranker_setting, reranker_list, reranker_model_id,
                 **kwargs) -> NodeResult:
         documents = merge_reranker_list(reranker_list)
+        top_n = reranker_setting.get('top_n', 3)
         self.context['document_list'] = documents
         self.context['question'] = question
         reranker_model = get_model_instance_by_model_user_id(reranker_model_id,
-                                                             self.flow_params_serializer.data.get('user_id'))
+                                                             self.flow_params_serializer.data.get('user_id'),
+                                                             top_n=top_n)
         result = reranker_model.compress_documents(
             [Document(page_content=document) for document in documents if document is not None and len(document) > 0],
             question)
-        top_n = reranker_setting.get('top_n', 3)
         similarity = reranker_setting.get('similarity', 0.6)
         max_paragraph_char_number = reranker_setting.get('max_paragraph_char_number', 5000)
         r = filter_result(result, max_paragraph_char_number, top_n, similarity)
