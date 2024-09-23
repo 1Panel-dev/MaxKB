@@ -170,6 +170,10 @@
                   <!-- 多路召回 -->
                   <template v-if="item.type == WorkflowType.RrerankerNode">
                     <div class="card-never border-r-4">
+                      <h5 class="p-8-12">检索内容</h5>
+                      <div class="p-8-12 border-t-dashed lighter">{{ item.question || '-' }}</div>
+                    </div>
+                    <div class="card-never border-r-4 mt-8">
                       <h5 class="p-8-12">重排内容</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.document_list?.length > 0">
