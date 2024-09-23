@@ -512,7 +512,7 @@ function checkInputParam() {
     if (!api_form_data.value[f.field]) {
       api_form_data.value[f.field] = route.query[f.field]
     }
-    if (!api_form_data.value[f.field]) {
+    if (f.required && !api_form_data.value[f.field]) {
       msg.push(f.field)
     }
   }
