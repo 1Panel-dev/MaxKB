@@ -313,12 +313,10 @@ const validate = () => {
     !form_data.value.tts_model_id &&
     form_data.value.tts_type === 'TTS'
   ) {
-    MsgWarning(t('请选择语音播放模型'))
-    return
+    return Promise.reject({ node: props.nodeModel, errMessage: '请选择语音播放模型' })
   }
   if (form_data.value.stt_model_enable && !form_data.value.stt_model_id) {
-    MsgWarning(t('请选择语音输入模型'))
-    return
+    return Promise.reject({ node: props.nodeModel, errMessage: '请选择语音输入模型' })
   }
   return baseNodeFormRef.value?.validate().catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
