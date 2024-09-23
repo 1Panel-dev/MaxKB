@@ -169,9 +169,10 @@ class WorkflowManage:
                  base_to_response: BaseToResponse = SystemToResponse(), form_data=None):
         if form_data is None:
             form_data = {}
+        self.form_data = form_data
         self.params = params
         self.flow = flow
-        self.context = form_data
+        self.context = {}
         self.node_context = []
         self.work_flow_post_handler = work_flow_post_handler
         self.current_node = None
@@ -302,7 +303,7 @@ class WorkflowManage:
         """
         if self.current_node is None:
             node = self.get_start_node()
-            node_instance = get_node(node.type)(node, self.params, self.context)
+            node_instance = get_node(node.type)(node, self.params, self)
             return node_instance
         if self.current_result is not None and self.current_result.is_assertion_result():
             for edge in self.flow.edges:
@@ -367,6 +368,14 @@ class WorkflowManage:
         """
         start_node_list = [node for node in self.flow.nodes if node.type == 'start-node']
         return start_node_list[0]
+
+    def get_base_node(self):
+        """
+        获取基础节点
+        @return:
+        """
+        base_node_list = [node for node in self.flow.nodes if node.type == 'base-node']
+        return base_node_list[0]
 
     def get_node_cls_by_id(self, node_id):
         for node in self.flow.nodes:

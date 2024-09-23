@@ -224,6 +224,7 @@ const {
 const form = {
   reranker_reference_list: [[]],
   reranker_model_id: '',
+  question_reference_address: [],
   reranker_setting: {
     top_n: 3,
     similarity: 0.6,
@@ -306,12 +307,6 @@ const openCreateModel = (provider?: Provider) => {
 onMounted(() => {
   getProvider()
   getModel()
-  if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
-    if (isLastNode(props.nodeModel)) {
-      set(props.nodeModel.properties.node_data, 'is_result', true)
-    }
-  }
-
   set(props.nodeModel, 'validate', validate)
 })
 </script>
