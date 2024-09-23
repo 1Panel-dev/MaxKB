@@ -1,6 +1,6 @@
 import { WorkflowType } from '@/enums/workflow'
 
-const end_nodes = [
+const end_nodes: Array<string> = [
   WorkflowType.AiChat,
   WorkflowType.Reply,
   WorkflowType.FunctionLib,
@@ -119,6 +119,9 @@ export class WorkFlowInstance {
    * @param node 节点
    */
   private is_valid_node(node: any) {
+    if (node.properties.status && node.properties.status === 500) {
+      throw `${node.properties.stepName} 节点不可用`
+    }
     if (node.type === WorkflowType.Condition) {
       const branch_list = node.properties.node_data.branch
       for (const branch of branch_list) {
