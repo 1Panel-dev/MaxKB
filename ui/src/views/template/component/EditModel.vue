@@ -164,7 +164,7 @@ const model_form_field = ref<Array<FormField>>([])
 const dialogVisible = ref<boolean>(false)
 
 const base_form_data_rule = ref<FormRules>({
-  name: { required: true, trigger: 'blur', message: '模型名不能为空' },
+  name: { required: true, trigger: 'blur', message: '模型名称不能为空' },
   model_type: { required: true, trigger: 'change', message: '模型类型不能为空' },
   model_name: { required: true, trigger: 'change', message: '基础模型不能为空' }
 })
