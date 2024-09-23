@@ -146,6 +146,13 @@ function publicHandle() {
       const obj = {
         work_flow: getGraphData()
       }
+      const workflow = new WorkFlowInstance(obj.work_flow)
+      try {
+        workflow.is_valid()
+      } catch (e: any) {
+        MsgError(e.toString())
+        return
+      }
       applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
         getDetail()
         MsgSuccess('发布成功')
