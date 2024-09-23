@@ -166,7 +166,9 @@ class Flow:
 
 class WorkflowManage:
     def __init__(self, flow: Flow, params, work_flow_post_handler: WorkFlowPostHandler,
-                 base_to_response: BaseToResponse = SystemToResponse(), form_data = {}):
+                 base_to_response: BaseToResponse = SystemToResponse(), form_data=None):
+        if form_data is None:
+            form_data = {}
         self.params = params
         self.flow = flow
         self.context = form_data
