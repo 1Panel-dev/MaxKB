@@ -80,10 +80,10 @@
           </div>
         </el-form-item>
         <el-form-item
-          label="检索问题输入"
+          label="检索问题"
           prop="question_reference_address"
           :rules="{
-            message: '请选择检索问题输入',
+            message: '请选择检索问题',
             trigger: 'blur',
             required: true
           }"
@@ -92,7 +92,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择检索问题输入"
+            placeholder="请选择检索问题"
             v-model="form_data.question_reference_address"
           />
         </el-form-item>

@@ -88,7 +88,7 @@
           label="检索问题"
           prop="question_reference_address"
           :rules="{
-            message: '请选择检索问题输入',
+            message: '请选择检索问题',
             trigger: 'blur',
             required: true
           }"

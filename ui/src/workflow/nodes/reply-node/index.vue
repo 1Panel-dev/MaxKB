@@ -38,7 +38,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择检索问题输入"
+            placeholder="请选择检索问题"
             v-model="form_data.fields"
           />
         </el-form-item>

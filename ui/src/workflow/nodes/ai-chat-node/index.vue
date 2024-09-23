@@ -116,7 +116,15 @@
             :autosize="{ minRows: 1, maxRows: 3 }"
           />
         </el-form-item>
-        <el-form-item label="提示词" prop="prompt">
+        <el-form-item
+          label="提示词"
+          prop="prompt"
+          :rules="{
+            required: true,
+            message: '请输入提示词',
+            trigger: 'blur'
+          }"
+        >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
