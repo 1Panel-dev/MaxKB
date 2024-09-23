@@ -168,13 +168,18 @@
               >
                 <template #label>
                   <div class="flex align-center">
-                    <div class="flex-between mr-4">
-                      <span
-                        >{{ $t('views.application.applicationForm.form.prompt.label') }}
-                        (无引用知识库)
-                        <span class="danger" v-if="applicationForm.model_id">*</span>
-                      </span>
-                    </div>
+                    <span class="mr-4"
+                      >{{ $t('views.application.applicationForm.form.prompt.label') }}
+                      (无引用知识库)
+                    </span>
+                    <el-tooltip
+                      effect="dark"
+                      content="通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。可以使用变量：{question} 是用户提出问题的占位符。"
+                      placement="right"
+                    >
+                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                    </el-tooltip>
+                    <span class="danger ml-4" v-if="applicationForm.model_id">*</span>
                   </div>
                 </template>
 
@@ -273,13 +278,18 @@
               >
                 <template #label>
                   <div class="flex align-center">
-                    <div class="flex-between mr-4">
-                      <span>
-                        {{ $t('views.application.applicationForm.form.prompt.label') }}
-                        (引用知识库)
-                        <span class="danger" v-if="applicationForm.model_id">*</span>
-                      </span>
-                    </div>
+                    <span class="mr-4">
+                      {{ $t('views.application.applicationForm.form.prompt.label') }}
+                      (引用知识库)
+                    </span>
+                    <el-tooltip
+                      effect="dark"
+                      content="通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。可以使用变量：{data} 是引用知识库中分段的占位符；{question} 是用户提出问题的占位符。"
+                      placement="right"
+                    >
+                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                    </el-tooltip>
+                    <span class="danger ml-4" v-if="applicationForm.model_id">*</span>
                   </div>
                 </template>
 

@@ -11,5 +11,6 @@ export enum modelType {
   EMBEDDING = '向量模型',
   LLM = '大语言模型',
   STT = '语音识别',
-  TTS = '语音合成'
+  TTS = '语音合成',
+  RERANKER = '重排模型'
 }

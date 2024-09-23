@@ -107,11 +107,11 @@
           />
         </el-form-item>
         <el-form-item
-          label="AI 模型"
+          label="重排模型"
           prop="reranker_model_id"
           :rules="{
             required: true,
-            message: '请选择 AI 模型',
+            message: '请选择重排模型',
             trigger: 'change'
           }"
         >
