@@ -82,7 +82,21 @@
         </el-form-item>
         <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
           <template #label>
-            <span>模型类型</span>
+            <div class="flex align-center" style="display: inline-flex">
+              <span class="mr-4">模型类型 </span>
+              <el-tooltip effect="dark" placement="right">
+                <template #content>
+                  <p>大语言模型：在应用中与AI对话的推理模型。</p>
+                  <p>向量模型：在知识库中导入文档进行向量化和向量检索召回分段时使用的向量模型。</p>
+                  <p>
+                    重排模型：在二次召回中根据召回的候选分段和用户问题的匹配度重新排序，从而得到更精确的结果。
+                  </p>
+                  <p>语音识别：在应用中开启语音识别后用于语音转文字的模型。</p>
+                  <p>语音合成：在应用中开启语音播放后用于文字转语音的模型。</p>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
           </template>
           <el-select
             v-loading="model_type_loading"
