@@ -153,7 +153,7 @@
         </div>
       </div>
     </el-scrollbar>
-    <EmbedDialog ref="EmbedDialogRef" :data="detail" />
+    <EmbedDialog ref="EmbedDialogRef" :data="detail" :api-input-params="mapToUrlParams(apiInputParams)"/>
     <APIKeyDialog ref="APIKeyDialogRef" />
     <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
@@ -161,7 +161,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
@@ -199,7 +199,8 @@ const detail = ref<any>(null)
 
 const loading = ref(false)
 
-const shareUrl = computed(() => application.location + accessToken.value.access_token)
+const urlParams = computed(() => mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : '')
+const shareUrl = computed(() => application.location + accessToken.value.access_token + urlParams.value)
 
 const dayOptions = [
   {
@@ -240,6 +241,7 @@ const statisticsLoading = ref(false)
 const statisticsData = ref([])
 
 const showEditIcon = ref(false)
+const apiInputParams = ref([])
 
 function toUrl(url: string) {
   window.open(url, '_blank')
@@ -326,6 +328,19 @@ function getAccessToken() {
 function getDetail() {
   application.asyncGetApplicationDetail(id, loading).then((res: any) => {
     detail.value = res.data
+    detail.value.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')
+      .map((v: any) => {
+        apiInputParams.value = v.properties.input_field_list
+          ? v.properties.input_field_list
+            .filter((v: any) => v.assignment_method === 'api_input')
+            .map((v: any) => {
+              return {
+                name: v.variable,
+                value: v.default_value
+              }
+            })
+          : []
+      })
   })
 }
 
@@ -335,6 +350,17 @@ function refresh() {
 
 function refreshIcon() {
   getDetail()
+}
+
+
+function mapToUrlParams(map: any[]) {
+    const params = new URLSearchParams();
+
+    map.forEach((item: any) => {
+        params.append(encodeURIComponent(item.name), encodeURIComponent(item.value));
+    });
+
+    return params.toString(); // 返回 URL 查询字符串
 }
 
 onMounted(() => {
