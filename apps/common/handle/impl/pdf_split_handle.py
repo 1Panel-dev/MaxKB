@@ -6,19 +6,18 @@
     @date：2024/3/27 18:19
     @desc:
 """
+import logging
+import os
 import re
+import tempfile
+import time
 from typing import List
 
 import fitz
-import os
-import tempfile
-import logging
 from langchain_community.document_loaders import PyPDFLoader
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.util.split_model import SplitModel
-
-import time
 
 default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),
@@ -48,7 +47,7 @@ class PdfSplitHandle(BaseSplitHandle):
                 return {'name': file.name, 'content': result}
 
             # 没目录但是有链接的pdf
-            result = self.handle_links(pdf_document)
+            result = self.handle_links(pdf_document, pattern_list, with_filter, limit)
             if result is not None and len(result) > 0:
                 return {'name': file.name, 'content': result}
 
@@ -168,15 +167,20 @@ class PdfSplitHandle(BaseSplitHandle):
         return title
 
     @staticmethod
-    def handle_links(doc):
+    def handle_links(doc, pattern_list, with_filter, limit):
         # 创建存储章节内容的数组
         chapters = []
-
+        toc_start_page = -1
+        page_content = ""
         # 遍历 PDF 的每一页，查找带有目录链接的页
         for page_num in range(doc.page_count):
             page = doc.load_page(page_num)
             links = page.get_links()
-
+            # 如果目录开始页码未设置，则设置为当前页码
+            if len(links) > 0:
+                toc_start_page = page_num
+            if toc_start_page < 0:
+                page_content += page.get_text('text')
             # 检查该页是否包含内部链接（即指向文档内部的页面）
             for num in range(len(links)):
                 link = links[num]
@@ -225,7 +229,13 @@ class PdfSplitHandle(BaseSplitHandle):
                         "title": link_title,
                         "content": chapter_text
                     })
-
+        if pattern_list is not None and len(pattern_list) > 0:
+            split_model = SplitModel(pattern_list, with_filter, limit)
+        else:
+            split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
+        # 插入目录前的部分
+        pre_toc = split_model.parse(page_content)
+        chapters = pre_toc + chapters
         return chapters
 
     def support(self, file, get_buffer):
