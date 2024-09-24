@@ -201,11 +201,17 @@ class WorkflowManage:
                                           'message_tokens' in row and row.get('message_tokens') is not None])
                     answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
                                          'answer_tokens' in row and row.get('answer_tokens') is not None])
+                    self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
+                                                        self.answer,
+                                                        self)
                     return self.base_to_response.to_block_response(self.params['chat_id'],
                                                                    self.params['chat_record_id'], self.answer, True
                                                                    , message_tokens, answer_tokens)
         except Exception as e:
             self.current_node.get_write_error_context(e)
+            self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
+                                                self.answer,
+                                                self)
             return self.base_to_response.to_block_response(self.params['chat_id'], self.params['chat_record_id'],
                                                            str(e), True,
                                                            0, 0, _status=status.HTTP_500_INTERNAL_SERVER_ERROR)
