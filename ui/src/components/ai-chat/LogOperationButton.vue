@@ -102,7 +102,9 @@ function editMark(data: any) {
 const audioPlayerStatus = ref(false)
 
 const playAnswerText = (text: string) => {
-  console.log(props.data)
+  if (!text) {
+    text = '抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。'
+  }
   if (props.tts_type === 'BROWSER') {
     // 创建一个新的 SpeechSynthesisUtterance 实例
     const utterance = new SpeechSynthesisUtterance(text)

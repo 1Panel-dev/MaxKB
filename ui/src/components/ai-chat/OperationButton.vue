@@ -160,6 +160,9 @@ function markdownToPlainText(md: string) {
 }
 
 const playAnswerText = (text: string) => {
+  if (!text) {
+    text = '抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。'
+  }
   // text 处理成纯文本
   text = markdownToPlainText(text)
   if (props.tts_type === 'BROWSER') {
