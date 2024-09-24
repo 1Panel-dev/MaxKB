@@ -16,34 +16,40 @@
             clearable
           />
         </div>
-        <common-list
-          :data="filterMember"
-          class="mt-8"
-          v-loading="loading"
-          @click="clickMemberHandle"
-          :default-active="currentUser"
-        >
-          <template #default="{ row }">
-            <div class="flex-between">
-              <div>
-                <span class="mr-8">{{ row.username }}</span>
-                <el-tag v-if="isManage(row.type)" class="default-tag">所有者</el-tag>
-              </div>
-              <div @click.stop style="margin-top: 5px">
-                <el-dropdown trigger="click" v-if="!isManage(row.type)">
-                  <span class="cursor">
-                    <el-icon class="rotate-90"><MoreFilled /></el-icon>
-                  </span>
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item @click.prevent="deleteMember(row)">移除</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
-              </div>
-            </div>
-          </template>
-        </common-list>
+        <div class="list-height-left">
+          <el-scrollbar>
+            <common-list
+              :data="filterMember"
+              class="mt-8"
+              v-loading="loading"
+              @click="clickMemberHandle"
+              :default-active="currentUser"
+            >
+              <template #default="{ row }">
+                <div class="flex-between">
+                  <div>
+                    <span class="mr-8">{{ row.username }}</span>
+                    <el-tag v-if="isManage(row.type)" class="default-tag">所有者</el-tag>
+                  </div>
+                  <div @click.stop style="margin-top: 5px">
+                    <el-dropdown trigger="click" v-if="!isManage(row.type)">
+                      <span class="cursor">
+                        <el-icon class="rotate-90"><MoreFilled /></el-icon>
+                      </span>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item @click.prevent="deleteMember(row)"
+                            >移除</el-dropdown-item
+                          >
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </div>
+                </div>
+              </template>
+            </common-list>
+          </el-scrollbar>
+        </div>
       </div>
       <div class="permission-setting flex" v-loading="rLoading">
         <div class="team-manage__table">
@@ -254,6 +260,9 @@ onMounted(() => {
       top: 54px;
       right: 24px;
     }
+  }
+  .list-height-left {
+    height: calc(var(--create-dataset-height) - 60px);
   }
 
   &__tabs {
