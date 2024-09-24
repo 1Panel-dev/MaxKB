@@ -52,14 +52,15 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import useStore from '@/stores'
 
 const { application } = useStore()
 
 const props = defineProps({
-  data: Object
+  data: Object,
+  apiInputParams: String
 })
 
 const emit = defineEmits(['addData'])
@@ -70,7 +71,9 @@ const source1 = ref('')
 
 const source2 = ref('')
 
-const apiInputParams = ref([])
+const urlParams1 = computed(() => props.apiInputParams ? '?' + props.apiInputParams : '')
+const urlParams2 = computed(() => props.apiInputParams ? '&' + props.apiInputParams : '')
+
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -81,7 +84,7 @@ watch(dialogVisible, (bool) => {
 
 const open = (val: string) => {
   source1.value = `<iframe
-src="${application.location + val}?${mapToUrlParams(apiInputParams.value)}"
+src="${application.location + val + urlParams1.value}"
 style="width: 100%; height: 100%;"
 frameborder="0"
 allow="microphone">
@@ -94,42 +97,12 @@ defer
 src="${window.location.origin}/api/application/embed?protocol=${window.location.protocol.replace(
     ':',
     ''
-  )}&host=${window.location.host}&token=${val}&${mapToUrlParams(apiInputParams.value)}">
+  )}&host=${window.location.host}&token=${val}${urlParams2.value}">
 <\/script>
 `
   dialogVisible.value = true
 }
 
-function mapToUrlParams(map: any[]) {
-    const params = new URLSearchParams();
-
-    map.forEach((item: any) => {
-        params.append(encodeURIComponent(item.name), encodeURIComponent(item.value));
-    });
-
-    return params.toString(); // 返回 URL 查询字符串
-}
-
-watch(() => props.data,
-  (val) => {
-    if (val) {
-      val.work_flow?.nodes
-        ?.filter((v: any) => v.id === 'base-node')
-        .map((v: any) => {
-          apiInputParams.value = v.properties.input_field_list
-            ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'api_input')
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value
-                }
-              })
-            : []
-        })
-    }
-  }
-)
 
 defineExpose({ open })
 </script>
