@@ -43,23 +43,22 @@
         <template #label>
           <div class="flex-between">
             选项值
-            <el-button link type="primary" @click="addOption()">
+            <el-button link type="primary" @click.stop="addOption()">
               <el-icon class="mr-4"><Plus /></el-icon> 添加
             </el-button>
           </div>
         </template>
-        <template #default>
-          <div
-            class="w-full flex-between mb-8"
-            :key="option"
-            v-for="(option, $index) in form.optionList"
-          >
-            <el-input v-model.lazy="form.optionList[$index]" placeholder="请输入选项值" />
-            <el-button link class="ml-8" @click="delOption($index)">
-              <el-icon><Delete /></el-icon>
-            </el-button>
-          </div>
-        </template>
+
+        <div
+          class="w-full flex-between mb-8"
+          v-for="(option, $index) in form.optionList"
+          :key="$index"
+        >
+          <el-input v-model="form.optionList[$index]" placeholder="请输入选项值" />
+          <el-button link class="ml-8" @click.stop="delOption($index)">
+            <el-icon><Delete /></el-icon>
+          </el-button>
+        </div>
       </el-form-item>
       <el-form-item label="是否必填" @click.prevent>
         <el-switch size="small" v-model="form.is_required"></el-switch>

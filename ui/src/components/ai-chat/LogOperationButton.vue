@@ -7,12 +7,14 @@
   <div>
     <!-- 语音播放 -->
     <span v-if="tts">
-      <el-tooltip effect="dark" content="语音播放" placement="top">
-        <el-button v-if="!audioPlayerStatus" text @click="playAnswerText(data?.answer_text)">
+      <el-tooltip effect="dark" content="点击播放" placement="top" v-if="!audioPlayerStatus">
+        <el-button text @click="playAnswerText(data?.answer_text)">
           <AppIcon iconName="app-video-play"></AppIcon>
         </el-button>
-        <el-button v-else text @click="pausePlayAnswerText()">
-          <el-icon><VideoPause /></el-icon>
+      </el-tooltip>
+      <el-tooltip v-else effect="dark" content="停止" placement="top">
+        <el-button type="primary" text @click="pausePlayAnswerText()">
+          <AppIcon iconName="app-video-pause"></AppIcon>
         </el-button>
       </el-tooltip>
       <el-divider direction="vertical" />

@@ -196,9 +196,7 @@
                 >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
               >
               <el-button text type="primary" @click="stopRecording" :loading="recorderLoading">
-                <el-icon>
-                  <VideoPause />
-                </el-icon>
+                <AppIcon iconName="app-video-stop"></AppIcon>
               </el-button>
             </div>
             <el-divider v-if="!startRecorderTime && !recorderLoading" direction="vertical" />
@@ -853,7 +851,7 @@ const startRecording = async () => {
 2、若无 https 配置则需要修改浏览器安全配置，Chrome 设置如下：<br/>
 (1) 地址栏输入chrome://flags/#unsafely-treat-insecure-origin-as-secure；<br/>
 (2) 将 http 站点配置在文本框中，例如: http://127.0.0.1:8080。</p>
-    <img src="${new URL(`../../assets/tipIMG.jpg`, import.meta.url).href}" width="750"/>`,
+    <img src="${new URL(`../../assets/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
           {
             confirmButtonText: '我知道了',
             dangerouslyUseHTMLString: true,
@@ -871,7 +869,7 @@ const startRecording = async () => {
 2、若无 https 配置则需要修改浏览器安全配置，Chrome 设置如下：<br/>
 (1) 地址栏输入chrome://flags/#unsafely-treat-insecure-origin-as-secure；<br/>
 (2) 将 http 站点配置在文本框中，例如: http://127.0.0.1:8080。</p>
-    <img src="${new URL(`../../assets/tipIMG.jpg`, import.meta.url).href}" width="750"/>`,
+    <img src="${new URL(`../../assets/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
       {
         confirmButtonText: '我知道了',
         dangerouslyUseHTMLString: true,

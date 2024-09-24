@@ -225,7 +225,7 @@ function initMaxkbStyle(root){
   
   }
   #maxkb-chat-container {
-        width: 420px;
+        width: 450px;
         height: 600px;
         display:none;
       }
