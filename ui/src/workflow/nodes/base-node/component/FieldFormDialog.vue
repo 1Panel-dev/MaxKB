@@ -142,7 +142,7 @@ const rules = reactive({
   name: [{ required: true, message: '请输入变量名', trigger: 'blur' }],
   variable: [
     { required: true, message: '请输入变量', trigger: 'blur' },
-    { pattern: /^[a-zA-Z_]+$/, message: '只能输入字母和下划线', trigger: 'blur' }
+    { pattern: /^[a-zA-Z0-9_]+$/, message: '只能输入字母数字和下划线', trigger: 'blur' }
   ]
 })
 
