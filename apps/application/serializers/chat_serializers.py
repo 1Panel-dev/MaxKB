@@ -451,8 +451,8 @@ class ChatRecordSerializer(serializers.Serializer):
         def page(self, current_page: int, page_size: int, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            order_by = 'create_time' if self.data.get('order_asc') is None or self.data.get(
-                'order_asc') else '-create_time'
+            order_by = '-create_time' if self.data.get('order_asc') is None or self.data.get(
+                'order_asc') else 'create_time'
             page = page_search(current_page, page_size,
                                QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by(order_by),
                                post_records_handler=lambda chat_record: self.reset_chat_record(chat_record))
