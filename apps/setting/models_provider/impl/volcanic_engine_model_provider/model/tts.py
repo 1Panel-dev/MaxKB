@@ -90,31 +90,36 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             },
             "request": {
                 "reqid": str(uuid.uuid4()),
-                "text": text,
+                "text": '',
                 "text_type": "plain",
                 "operation": "xxx"
             }
         }
 
-        return asyncio.run(self.submit(request_json))
+        return asyncio.run(self.submit(request_json, text))
 
     def token_auth(self):
         return {'Authorization': 'Bearer; {}'.format(self.volcanic_token)}
 
-    async def submit(self, request_json):
+    async def submit(self, request_json, text):
         submit_request_json = copy.deepcopy(request_json)
-        submit_request_json["request"]["reqid"] = str(uuid.uuid4())
         submit_request_json["request"]["operation"] = "submit"
-        payload_bytes = str.encode(json.dumps(submit_request_json))
-        payload_bytes = gzip.compress(payload_bytes)  # if no compression, comment this line
-        full_client_request = bytearray(default_header)
-        full_client_request.extend((len(payload_bytes)).to_bytes(4, 'big'))  # payload size(4 bytes)
-        full_client_request.extend(payload_bytes)  # payload
         header = {"Authorization": f"Bearer; {self.volcanic_token}"}
+        result = b''
         async with websockets.connect(self.volcanic_api_url, extra_headers=header, ping_interval=None,
                                       ssl=ssl_context) as ws:
-            await ws.send(full_client_request)
-            return await self.parse_response(ws)
+            lines = text.split('\n')
+            for line in lines:
+                submit_request_json["request"]["reqid"] = str(uuid.uuid4())
+                submit_request_json["request"]["text"] = line
+                payload_bytes = str.encode(json.dumps(submit_request_json))
+                payload_bytes = gzip.compress(payload_bytes)  # if no compression, comment this line
+                full_client_request = bytearray(default_header)
+                full_client_request.extend((len(payload_bytes)).to_bytes(4, 'big'))  # payload size(4 bytes)
+                full_client_request.extend(payload_bytes)  # payload
+                await ws.send(full_client_request)
+                result += await self.parse_response(ws)
+        return result
 
     @staticmethod
     async def parse_response(ws):
