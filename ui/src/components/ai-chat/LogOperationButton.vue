@@ -90,6 +90,7 @@ const EditMarkDialogRef = ref()
 
 const buttonData = ref(props.data)
 const loading = ref(false)
+const utterance = ref<SpeechSynthesisUtterance | null>(null)
 
 function editContent(data: any) {
   EditContentDialogRef.value.open(data)
@@ -101,18 +102,60 @@ function editMark(data: any) {
 
 const audioPlayerStatus = ref(false)
 
+function markdownToPlainText(md: string) {
+  return (
+    md
+      // 移除图片 ![alt](url)
+      .replace(/!\[.*?\]\(.*?\)/g, '')
+      // 移除链接 [text](url)
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // 移除 Markdown 标题符号 (#, ##, ###)
+      .replace(/^#{1,6}\s+/gm, '')
+      // 移除加粗 **text** 或 __text__
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/__(.*?)__/g, '$1')
+      // 移除斜体 *text* 或 _text_
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/_(.*?)_/g, '$1')
+      // 移除行内代码 `code`
+      .replace(/`(.*?)`/g, '$1')
+      // 移除代码块 ```code```
+      .replace(/```[\s\S]*?```/g, '')
+      // 移除多余的换行符
+      .replace(/\n{2,}/g, '\n')
+      .trim()
+  )
+}
+
 const playAnswerText = (text: string) => {
   if (!text) {
     text = '抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。'
   }
+  // text 处理成纯文本
+  text = markdownToPlainText(text)
+  audioPlayerStatus.value = true
   if (props.tts_type === 'BROWSER') {
+    if (text !== utterance.value?.text) {
+      window.speechSynthesis.cancel()
+    }
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume()
+      return
+    }
     // 创建一个新的 SpeechSynthesisUtterance 实例
-    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.value = new SpeechSynthesisUtterance(text)
+    utterance.value.onend = () => {
+      audioPlayerStatus.value = false
+      utterance.value = null
+    }
+    utterance.value.onerror = () => {
+      audioPlayerStatus.value = false
+      utterance.value = null
+    }
     // 调用浏览器的朗读功能
-    window.speechSynthesis.speak(utterance)
+    window.speechSynthesis.speak(utterance.value)
   }
   if (props.tts_type === 'TTS') {
-    audioPlayerStatus.value = true
     // 恢复上次暂停的播放
     if (audioPlayer.value?.src) {
       audioPlayer.value?.play()
@@ -152,9 +195,12 @@ const playAnswerText = (text: string) => {
 }
 
 const pausePlayAnswerText = () => {
+  audioPlayerStatus.value = false
   if (props.tts_type === 'TTS') {
-    audioPlayerStatus.value = false
     audioPlayer.value?.pause()
+  }
+  if (props.tts_type === 'BROWSER') {
+    window.speechSynthesis.pause()
   }
 }
 

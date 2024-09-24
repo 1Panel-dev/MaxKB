@@ -120,6 +120,7 @@ const audioPlayer = ref<HTMLAudioElement | null>(null)
 const audioPlayerStatus = ref(false)
 const buttonData = ref(props.data)
 const loading = ref(false)
+const utterance = ref<SpeechSynthesisUtterance | null>(null)
 
 function regeneration() {
   emit('regeneration')
@@ -165,14 +166,29 @@ const playAnswerText = (text: string) => {
   }
   // text 处理成纯文本
   text = markdownToPlainText(text)
+  audioPlayerStatus.value = true
   if (props.tts_type === 'BROWSER') {
+    if (text !== utterance.value?.text) {
+      window.speechSynthesis.cancel()
+    }
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume()
+      return
+    }
     // 创建一个新的 SpeechSynthesisUtterance 实例
-    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.value = new SpeechSynthesisUtterance(text)
+    utterance.value.onend = () => {
+      audioPlayerStatus.value = false
+      utterance.value = null
+    }
+    utterance.value.onerror = () => {
+      audioPlayerStatus.value = false
+      utterance.value = null
+    }
     // 调用浏览器的朗读功能
-    window.speechSynthesis.speak(utterance)
+    window.speechSynthesis.speak(utterance.value)
   }
   if (props.tts_type === 'TTS') {
-    audioPlayerStatus.value = true
     // 恢复上次暂停的播放
     if (audioPlayer.value?.src) {
       audioPlayer.value?.play()
@@ -212,9 +228,12 @@ const playAnswerText = (text: string) => {
 }
 
 const pausePlayAnswerText = () => {
+  audioPlayerStatus.value = false
   if (props.tts_type === 'TTS') {
-    audioPlayerStatus.value = false
     audioPlayer.value?.pause()
+  }
+  if (props.tts_type === 'BROWSER') {
+    window.speechSynthesis.pause()
   }
 }
 </script>
