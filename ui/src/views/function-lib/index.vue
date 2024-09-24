@@ -41,8 +41,9 @@
             <CardBox
               :title="item.name"
               :description="item.desc"
-              class="function-lib-card cursor"
+              class="function-lib-card"
               @click="openCreateDialog(item)"
+              :class="item.permission_type === 'PUBLIC' ? 'notAllowed' : 'cursor'"
             >
               <template #icon>
                 <AppAvatar class="mr-12 avatar-green" shape="square" :size="32">
@@ -65,13 +66,18 @@
                     </el-tooltip>
                     <el-divider direction="vertical" />
                     <el-tooltip effect="dark" content="删除" placement="top">
-                      <el-button text @click.stop="deleteFunctionLib(item)">
+                      <el-button
+                        :disabled="item.permission_type === 'PUBLIC'"
+                        text
+                        @click.stop="deleteFunctionLib(item)"
+                      >
                         <el-icon><Delete /></el-icon>
                       </el-button>
                     </el-tooltip>
                   </div>
                   <div @click.stop>
                     <el-switch
+                      :disabled="item.permission_type === 'PUBLIC'"
                       v-model="item.is_active"
                       @change="changeState($event, item)"
                       size="small"
@@ -111,7 +117,9 @@ const changeStateloading = ref(false)
 
 function openCreateDialog(data?: any) {
   title.value = data ? '编辑函数' : '创建函数'
-  FunctionFormDrawerRef.value.open(data)
+  if (data?.permission_type !== 'PUBLIC') {
+    FunctionFormDrawerRef.value.open(data)
+  }
 }
 
 function searchHandle() {
