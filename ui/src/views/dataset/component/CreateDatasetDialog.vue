@@ -1,5 +1,12 @@
 <template>
-  <el-dialog title="创建知识库" v-model="dialogVisible" width="680" append-to-body>
+  <el-dialog
+    title="创建知识库"
+    v-model="dialogVisible"
+    width="680"
+    append-to-body
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <!-- 基本信息 -->
     <BaseForm ref="BaseFormRef" v-if="dialogVisible" />
     <el-form

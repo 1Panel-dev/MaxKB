@@ -2,6 +2,8 @@
   <el-dialog
     :title="$t('views.applicationOverview.appInfo.LimitDialog.dialogTitle')"
     v-model="dialogVisible"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <el-form label-position="top" ref="limitFormRef" :model="form">
       <!-- <el-form-item

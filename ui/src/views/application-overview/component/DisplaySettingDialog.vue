@@ -1,5 +1,10 @@
 <template>
-  <el-dialog title="显示设置" v-model="dialogVisible">
+  <el-dialog
+    title="显示设置"
+    v-model="dialogVisible"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <el-form label-position="top" ref="displayFormRef" :model="form">
       <el-form-item>
         <el-space direction="vertical" alignment="start">

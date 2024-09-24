@@ -5,6 +5,8 @@
     width="80%"
     destroy-on-close
     class="paragraph-dialog"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <el-row v-if="isConnect">
       <el-col :span="18" class="p-24">

@@ -1,5 +1,11 @@
 <template>
-  <el-dialog title="API Key" v-model="dialogVisible" width="800">
+  <el-dialog
+    title="API Key"
+    v-model="dialogVisible"
+    width="800"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <el-button type="primary" class="mb-16" @click="createApiKey">
       {{ $t('views.applicationOverview.appInfo.APIKeyDialog.creatApiKey') }}
     </el-button>

@@ -4,6 +4,8 @@
     v-model="dialogVisible"
     width="900"
     class="embed-dialog"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <el-row :gutter="12">
       <el-col :span="12">
@@ -71,9 +73,8 @@ const source1 = ref('')
 
 const source2 = ref('')
 
-const urlParams1 = computed(() => props.apiInputParams ? '?' + props.apiInputParams : '')
-const urlParams2 = computed(() => props.apiInputParams ? '&' + props.apiInputParams : '')
-
+const urlParams1 = computed(() => (props.apiInputParams ? '?' + props.apiInputParams : ''))
+const urlParams2 = computed(() => (props.apiInputParams ? '&' + props.apiInputParams : ''))
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -102,7 +103,6 @@ src="${window.location.origin}/api/application/embed?protocol=${window.location.
 `
   dialogVisible.value = true
 }
-
 
 defineExpose({ open })
 </script>

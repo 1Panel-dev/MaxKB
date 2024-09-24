@@ -4,6 +4,8 @@
     v-model="dialogVisible"
     width="650"
     append-to-body
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <el-form
       ref="applicationFormRef"

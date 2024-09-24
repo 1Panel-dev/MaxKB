@@ -5,6 +5,8 @@
     width="80%"
     class="paragraph-dialog"
     destroy-on-close
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <el-row v-loading="loading">
       <el-col :span="6">

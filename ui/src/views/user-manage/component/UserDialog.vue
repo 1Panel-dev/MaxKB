@@ -7,6 +7,8 @@
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
     >
       <el-form-item :prop="isEdit ? '' : 'username'" label="用户名">
         <el-input
