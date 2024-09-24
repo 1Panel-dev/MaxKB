@@ -1,5 +1,11 @@
 <template>
-  <el-dialog title="修改内容" v-model="dialogVisible" width="600">
+  <el-dialog
+    title="修改内容"
+    v-model="dialogVisible"
+    width="600"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <el-form
       ref="formRef"
       :model="form"

@@ -2,7 +2,8 @@
   <NodeContainer :nodeModel="nodeModel">
     <h5 class="title-decoration-1 mb-8">全局变量</h5>
     <div
-      v-for="item in nodeModel.properties.config.globalFields"
+      v-for="(item, index) in nodeModel.properties.config.globalFields"
+      :key="index"
       class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
       @mouseenter="showicon = true"
       @mouseleave="showicon = false"

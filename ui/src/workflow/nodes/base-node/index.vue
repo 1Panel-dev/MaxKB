@@ -68,7 +68,7 @@
         <el-table-column label="必填">
           <template #default="{ row }">
             <div @click.stop>
-              <el-switch size="small" v-model="row.is_required" />
+              <el-switch disabled size="small" v-model="row.is_required" />
             </div>
           </template>
         </el-table-column>

@@ -157,7 +157,11 @@ export const rerankerNode = {
     config: {
       fields: [
         {
-          label: '结果',
+          label: '重排结果列表',
+          value: 'result_list'
+        },
+        {
+          label: '重排结果',
           value: 'result'
         }
       ]

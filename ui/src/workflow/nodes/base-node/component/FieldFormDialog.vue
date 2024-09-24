@@ -33,7 +33,7 @@
         />
       </el-form-item>
       <el-form-item label="输入类型">
-        <el-select v-model="form.type">
+        <el-select v-model="form.type" @change="changeType">
           <el-option label="文本框" value="input" />
           <el-option label="日期" value="date" />
           <el-option label="下拉选项" value="select" />
@@ -64,7 +64,15 @@
       <el-form-item label="是否必填" @click.prevent>
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
-      <el-form-item label="默认值" prop="default_value">
+      <el-form-item
+        label="默认值"
+        prop="default_value"
+        :rules="{
+          required: form.is_required,
+          message: '请输入默认值',
+          trigger: 'blur'
+        }"
+      >
         <el-input
           v-if="form.type === 'input'"
           v-model="form.default_value"
@@ -127,24 +135,17 @@ const form = ref<any>({
   type: 'input',
   is_required: true,
   assignment_method: 'user_input',
-  optionList: ['']
+  optionList: [''],
+  default_value: ''
 })
 
 const rules = reactive({
   name: [{ required: true, message: '请输入变量名', trigger: 'blur' }],
-  variable: [{ required: true, message: '请输入变量', trigger: 'blur' }, { pattern: /^[a-zA-Z_]+$/, message: '只能输入字母和下划线', trigger: 'blur' } ],
-  default_value: [{ required: true, message: '请输入默认值', trigger: 'blur' }]
+  variable: [
+    { required: true, message: '请输入变量', trigger: 'blur' },
+    { pattern: /^[a-zA-Z_]+$/, message: '只能输入字母和下划线', trigger: 'blur' }
+  ]
 })
-
-watch(
-  form,
-  (val) => {
-    rules.default_value[0].required = !!val.is_required
-  },
-  {
-    deep: true
-  }
-)
 
 const dialogVisible = ref<boolean>(false)
 
@@ -156,7 +157,8 @@ watch(dialogVisible, (bool) => {
       type: 'input',
       is_required: true,
       assignment_method: 'user_input',
-      optionList: ['']
+      optionList: [''],
+      default_value: ''
     }
     isEdit.value = false
   }
@@ -193,6 +195,11 @@ const addOption = () => {
 
 const delOption = (index: number) => {
   form.value.optionList.splice(index, 1)
+}
+
+const changeType = () => {
+  form.value.optionList = ['']
+  form.value.default_value = ''
 }
 
 defineExpose({ open, close })

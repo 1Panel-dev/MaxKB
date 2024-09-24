@@ -1,7 +1,7 @@
 import Components from '@/components'
 import ElementPlus from 'element-plus'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
-
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { HtmlResize } from '@logicflow/extension'
 
 import { h as lh } from '@logicflow/core'
@@ -26,7 +26,9 @@ class AppNode extends HtmlResize.view {
     this.app = createApp({
       render: () => this.r
     })
-    this.app.use(ElementPlus)
+    this.app.use(ElementPlus, {
+      locale: zhCn
+    })
     this.app.use(Components)
     this.app.use(directives)
     this.app.use(i18n)
