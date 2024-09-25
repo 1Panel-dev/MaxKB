@@ -227,6 +227,11 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
     fileList.splice(-1, 1)
     return false
   }
+  if (file?.size === 0) {
+    MsgError('文件不能为空')
+    fileList.splice(-1, 1)
+    return false
+  }
 }
 
 const onExceed = () => {
