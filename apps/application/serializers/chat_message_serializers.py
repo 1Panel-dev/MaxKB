@@ -208,7 +208,7 @@ class OpenAIChatSerializer(serializers.Serializer):
                   'stream': stream,
                   'application_id': application_id,
                   'client_id': client_id,
-                  'client_type': client_type}).chat(
+                  'client_type': client_type, 'form_data': instance.get('form_data', {})}).chat(
             base_to_response=OpenaiToResponse())
 
 
