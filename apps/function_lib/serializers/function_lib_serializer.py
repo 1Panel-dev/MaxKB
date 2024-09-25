@@ -27,7 +27,7 @@ function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
 class FunctionLibModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = FunctionLib
-        fields = ['id', 'name', 'desc', 'code', 'input_field_list', 'permission_type', 'is_active',
+        fields = ['id', 'name', 'desc', 'code', 'input_field_list', 'permission_type', 'is_active', 'user_id',
                   'create_time', 'update_time']
 
 
