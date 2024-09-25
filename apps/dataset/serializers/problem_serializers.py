@@ -86,7 +86,7 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
         problem_list = serializers.ListField(required=True, error_messages=ErrMessage.list("问题列表"),
                                              child=serializers.CharField(required=True,
-                                                                         max_length=255,
+                                                                         max_length=256,
                                                                          error_messages=ErrMessage.char("问题")))
 
         def batch(self, with_valid=True):
