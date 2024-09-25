@@ -105,7 +105,7 @@
       v-model:currentContent="currentContent"
       :pre_disable="pre_disable"
       :next_disable="next_disable"
-      @refresh="refresh"
+      @refresh="refreshRelate"
     />
     <RelateProblemDialog ref="RelateProblemDialogRef" @refresh="refreshRelate" />
   </LayoutContainer>

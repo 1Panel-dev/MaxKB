@@ -1095,7 +1095,7 @@ defineExpose({
 }
 
 .chat-width {
-  max-width: var(--app-chat-width, 860px);
+  max-width: 80%;
   margin: 0 auto;
 }
 </style>
