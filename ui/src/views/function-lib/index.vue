@@ -119,12 +119,16 @@ const title = ref('')
 const changeStateloading = ref(false)
 
 const canEdit = (row: any) => {
-  return user.userInfo?.id === row.user_id
+  return user.userInfo?.id === row?.user_id
 }
 
 function openCreateDialog(data?: any) {
   title.value = data ? '编辑函数' : '创建函数'
-  if (data?.permission_type !== 'PUBLIC' && !canEdit(data)) {
+  if (data) {
+    if (data?.permission_type !== 'PUBLIC' || canEdit(data)) {
+      FunctionFormDrawerRef.value.open(data)
+    }
+  } else {
     FunctionFormDrawerRef.value.open(data)
   }
 }
