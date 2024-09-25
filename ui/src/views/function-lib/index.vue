@@ -43,7 +43,7 @@
               :description="item.desc"
               class="function-lib-card"
               @click="openCreateDialog(item)"
-              :class="item.permission_type === 'PUBLIC' && !canEdit(item) ? 'notAllowed' : 'cursor'"
+              :class="item.permission_type === 'PUBLIC' && !canEdit(item) ? '' : 'cursor'"
             >
               <template #icon>
                 <AppAvatar class="mr-12 avatar-green" shape="square" :size="32">
