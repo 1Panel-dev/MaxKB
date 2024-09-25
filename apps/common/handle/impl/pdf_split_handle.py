@@ -236,14 +236,28 @@ class PdfSplitHandle(BaseSplitHandle):
 
         # 目录中没有前言部分，手动处理
         if handle_pre_toc:
-            if pattern_list is not None and len(pattern_list) > 0:
-                split_model = SplitModel(pattern_list, with_filter, limit)
-            else:
-                split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
-            # 插入目录前的部分
-            page_content = re.sub(r'(?<!。)\n+', '', page_content)
-            page_content = re.sub(r'(?<!.)\n+', '', page_content)
-            pre_toc = split_model.parse(page_content)
+            pre_toc = []
+            lines = page_content.strip().split('\n')
+            try:
+                for line in lines:
+                    if re.match(r'^前\s*言', line):
+                        pre_toc.append({'title': line, 'content': ''})
+                    else:
+                        pre_toc[-1]['content'] += line
+                for i in range(len(pre_toc)):
+                    pre_toc[i]['content'] = re.sub(r'(?<!。)\n+', '', pre_toc[i]['content'])
+                    pre_toc[i]['content'] = re.sub(r'(?<!.)\n+', '', pre_toc[i]['content'])
+            except BaseException as e:
+                max_kb.info(f'此文档没有前言部分，按照普通文本处理: {e}')
+                if pattern_list is not None and len(pattern_list) > 0:
+                    split_model = SplitModel(pattern_list, with_filter, limit)
+                else:
+                    split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
+                # 插入目录前的部分
+                page_content = re.sub(r'(?<!。)\n+', '', page_content)
+                page_content = re.sub(r'(?<!.)\n+', '', page_content)
+                page_content = page_content.strip()
+                pre_toc = split_model.parse(page_content)
             chapters = pre_toc + chapters
         return chapters
 
