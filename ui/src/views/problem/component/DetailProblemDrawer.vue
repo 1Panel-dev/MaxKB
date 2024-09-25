@@ -127,7 +127,7 @@ function disassociation(item: any) {
 }
 
 function relateProblem() {
-  RelateProblemDialogRef.value.open(props.currentId)
+  RelateProblemDialogRef.value.open([props.currentId])
 }
 
 function editParagraph(row: any) {
