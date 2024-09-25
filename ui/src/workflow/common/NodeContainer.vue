@@ -182,10 +182,11 @@ const resizeStepContainer = (wh: any) => {
 }
 
 function clickNodes(item: any) {
+  const width = item.properties.width ? item.properties.width : 214
   const nodeModel = props.nodeModel.graphModel.addNode({
     type: item.type,
     properties: item.properties,
-    x: anchorData.value?.x + props.nodeModel.width + 100,
+    x: anchorData.value?.x + width / 2 + 200,
     y: anchorData.value?.y - item.height
   })
   props.nodeModel.graphModel.addEdge({
