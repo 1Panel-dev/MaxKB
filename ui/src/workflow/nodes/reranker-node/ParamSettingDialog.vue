@@ -82,21 +82,13 @@
 import { ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
-
-import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 
 const paramFormRef = ref<FormInstance>()
 
-const defaultValue = {
-  ai_questioning: '{question}',
-  // @ts-ignore
-  designated_answer: t('views.application.applicationForm.dialogues.designated_answer')
-}
-
 const form = ref<any>({
   top_n: 3,
-  similarity: 0.6,
+  similarity: 0,
   max_paragraph_char_number: 5000
 })
 
@@ -107,7 +99,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       top_n: 3,
-      similarity: 0.6,
+      similarity: 0,
       max_paragraph_char_number: 5000
     }
   }

@@ -227,7 +227,7 @@ const form = {
   question_reference_address: [],
   reranker_setting: {
     top_n: 3,
-    similarity: 0.6,
+    similarity: 0,
     max_paragraph_char_number: 5000
   }
 }
