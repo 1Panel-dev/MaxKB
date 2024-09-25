@@ -126,7 +126,8 @@ class ChatView(APIView):
                                                'application_id': (request.auth.keywords.get(
                                                    'application_id') if request.auth.client_type == AuthenticationType.APPLICATION_ACCESS_TOKEN.value else None),
                                                'client_id': request.auth.client_id,
-                                               'form_data': (request.data.get('form_data') if 'form_data' in request.data else []),
+                                               'form_data': (request.data.get(
+                                                   'form_data') if 'form_data' in request.data else {}),
                                                'client_type': request.auth.client_type}).chat()
 
     @action(methods=['GET'], detail=False)
