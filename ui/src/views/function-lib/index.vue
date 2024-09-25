@@ -67,7 +67,7 @@
                     <el-divider direction="vertical" />
                     <el-tooltip effect="dark" content="删除" placement="top">
                       <el-button
-                        :disabled="item.permission_type === 'PUBLIC'"
+                        :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
                         text
                         @click.stop="deleteFunctionLib(item)"
                       >
@@ -77,7 +77,7 @@
                   </div>
                   <div @click.stop>
                     <el-switch
-                      :disabled="item.permission_type === 'PUBLIC'"
+                      :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
                       v-model="item.is_active"
                       @change="changeState($event, item)"
                       size="small"
@@ -99,6 +99,9 @@ import { cloneDeep } from 'lodash'
 import functionLibApi from '@/api/function-lib'
 import FunctionFormDrawer from './component/FunctionFormDrawer.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import useStore from '@/stores'
+const { user } = useStore()
+
 const loading = ref(false)
 
 const FunctionFormDrawerRef = ref()
@@ -114,6 +117,10 @@ const paginationConfig = reactive({
 const searchValue = ref('')
 const title = ref('')
 const changeStateloading = ref(false)
+
+const canEdit = (row: any) => {
+  return user.userInfo?.id === row.user_id
+}
 
 function openCreateDialog(data?: any) {
   title.value = data ? '编辑函数' : '创建函数'
