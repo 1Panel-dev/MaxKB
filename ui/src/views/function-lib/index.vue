@@ -43,7 +43,7 @@
               :description="item.desc"
               class="function-lib-card"
               @click="openCreateDialog(item)"
-              :class="item.permission_type === 'PUBLIC' ? 'notAllowed' : 'cursor'"
+              :class="item.permission_type === 'PUBLIC' && !canEdit(item) ? 'notAllowed' : 'cursor'"
             >
               <template #icon>
                 <AppAvatar class="mr-12 avatar-green" shape="square" :size="32">
@@ -124,7 +124,7 @@ const canEdit = (row: any) => {
 
 function openCreateDialog(data?: any) {
   title.value = data ? '编辑函数' : '创建函数'
-  if (data?.permission_type !== 'PUBLIC') {
+  if (data?.permission_type !== 'PUBLIC' && !canEdit(data)) {
     FunctionFormDrawerRef.value.open(data)
   }
 }
