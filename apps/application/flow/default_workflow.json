@@ -3,12 +3,13 @@
         {
             "id": "base-node",
             "type": "base-node",
-            "x": 440,
-            "y": 3040,
+            "x": 360,
+            "y": 2810,
             "properties": {
                 "config": {
 
                 },
+                "width": 502,
                 "height": 825.6,
                 "stepName": "基本信息",
                 "node_data": {
