@@ -194,15 +194,71 @@ model_info_list = [
         XinferenceChatModel
     ),
     ModelInfo(
-        'qwen2-moe-instruct',
-        'Qwen2 MOE Instruct 是 Qwen2 的指令微调版本，专为执行特定任务而设计。',
+        'qwen2-72b-instruct',
+        '',
         ModelTypeConst.LLM,
         xinference_llm_model_credential,
         XinferenceChatModel
     ),
     ModelInfo(
-        'qwen2-vl-instruct',
-        'Qwen2 VL Instruct 是 Qwen2 的指令微调版本，专为执行特定任务而设计。',
+        'qwen2-57b-a14b-instruct',
+        '',
+        ModelTypeConst.LLM,
+        xinference_llm_model_credential,
+        XinferenceChatModel
+    ),
+    ModelInfo(
+        'qwen2-7b-instruct',
+        '',
+        ModelTypeConst.LLM,
+        xinference_llm_model_credential,
+        XinferenceChatModel
+    ),
+    ModelInfo(
+        'qwen2.5-72b-instruct',
+        '',
+        ModelTypeConst.LLM,
+        xinference_llm_model_credential,
+        XinferenceChatModel
+    ),
+    ModelInfo(
+        'qwen2.5-32b-instruct',
+        '',
+        ModelTypeConst.LLM,
+        xinference_llm_model_credential,
+        XinferenceChatModel
+    ),
+    ModelInfo(
+        'qwen2.5-14b-instruct',
+        '',
+        ModelTypeConst.LLM,
+        xinference_llm_model_credential,
+        XinferenceChatModel
+    ),
+    ModelInfo(
+        'qwen2.5-7b-instruct',
+        '',
+        ModelTypeConst.LLM,
+        xinference_llm_model_credential,
+        XinferenceChatModel
+    ),
+    ModelInfo(
+        'qwen2.5-1.5b-instruct',
+        '',
+        ModelTypeConst.LLM,
+        xinference_llm_model_credential,
+        XinferenceChatModel
+    ),
+    ModelInfo(
+        'qwen2.5-0.5b-instruct',
+        '',
+        ModelTypeConst.LLM,
+        xinference_llm_model_credential,
+        XinferenceChatModel
+    ),
+    ModelInfo(
+        'qwen2.5-3b-instruct',
+        '',
         ModelTypeConst.LLM,
         xinference_llm_model_credential,
         XinferenceChatModel
