@@ -106,11 +106,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="角色设定">
-          <el-input
+          <MdEditorMagnify
+            title="角色设定"
             v-model="form_data.system"
+            style="height: 100px"
+            @submitDialog="submitSystemDialog"
             placeholder="角色设定"
-            type="textarea"
-            :autosize="{ minRows: 1, maxRows: 3 }"
           />
         </el-form-item>
         <el-form-item
@@ -220,6 +221,10 @@ const model_change = (model_id?: string) => {
 }
 function submitDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'prompt', val)
+}
+
+function submitSystemDialog(val: string) {
+  set(props.nodeModel.properties.node_data, 'system', val)
 }
 const {
   params: { id }

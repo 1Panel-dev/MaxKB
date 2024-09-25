@@ -117,14 +117,14 @@
         >
           <template #label>
             <div class="flex-between">
-              <span>AI 模型<span class="danger">*</span></span>
+              <span>重排模型<span class="danger">*</span></span>
             </div>
           </template>
           <el-select
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.reranker_model_id"
-            placeholder="请选择 AI 模型"
+            placeholder="请选择重排模型"
             class="w-full"
             popper-class="select-model"
             :clearable="true"
