@@ -728,12 +728,13 @@ class ApplicationSerializer(serializers.Serializer):
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(
                     application_id=application_access_token.application_id).first()
-                application_setting_dict = {'show_source': application_access_token.show_source,
-                                            'show_history': application_setting.show_history,
-                                            'draggable': application_setting.draggable,
-                                            'show_guide': application_setting.show_guide,
-                                            'avatar': application_setting.avatar,
-                                            'float_icon': application_setting.float_icon}
+                if application_setting is not None:
+                    application_setting_dict = {'show_source': application_access_token.show_source,
+                                                'show_history': application_setting.show_history,
+                                                'draggable': application_setting.draggable,
+                                                'show_guide': application_setting.show_guide,
+                                                'avatar': application_setting.avatar,
+                                                'float_icon': application_setting.float_icon}
             return ApplicationSerializer.Query.reset_application(
                 {**ApplicationSerializer.ApplicationModel(application).data,
                  'stt_model_id': application.stt_model_id,
