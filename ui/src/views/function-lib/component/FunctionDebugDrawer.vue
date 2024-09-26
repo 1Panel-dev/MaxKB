@@ -57,7 +57,12 @@
 
         <p class="lighter mb-8">输出</p>
 
-        <el-card class="pre-wrap danger" shadow="never" style="max-height: 350px; overflow: scroll">
+        <el-card
+          :class="isSuccess ? '' : 'danger'"
+          class="pre-wrap"
+          shadow="never"
+          style="max-height: 350px; overflow: scroll"
+        >
           {{ result || '-' }}
         </el-card>
       </div>
