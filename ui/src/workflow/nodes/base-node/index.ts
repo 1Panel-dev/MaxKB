@@ -6,8 +6,17 @@ class BaseNode extends AppNode {
     super(props, BaseNodeVue)
   }
 }
+
+class BaseModel extends AppNodeModel {
+  constructor(data: any, graphModel: any) {
+    super(data, graphModel)
+  }
+  get_width() {
+    return 600
+  }
+}
 export default {
   type: 'base-node',
-  model: AppNodeModel,
+  model: BaseModel,
   view: BaseNode
 }
