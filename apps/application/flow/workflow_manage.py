@@ -7,6 +7,7 @@
     @desc:
 """
 import json
+import traceback
 from functools import reduce
 from typing import List, Dict
 
@@ -208,6 +209,7 @@ class WorkflowManage:
                                                                    self.params['chat_record_id'], self.answer, True
                                                                    , message_tokens, answer_tokens)
         except Exception as e:
+            traceback.print_exc()
             self.current_node.get_write_error_context(e)
             self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
                                                 self.answer,

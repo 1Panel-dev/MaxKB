@@ -117,7 +117,8 @@ class ChatInfo:
                 'client_type': client_type}
 
     def append_chat_record(self, chat_record: ChatRecord, client_id=None):
-        chat_record.problem_text = chat_record.problem_text[0:1024] if chat_record.problem_text is not None else ""
+        chat_record.problem_text = chat_record.problem_text[0:10240] if chat_record.problem_text is not None else ""
+        chat_record.answer_text = chat_record.answer_text[0:40960] if chat_record.problem_text is not None else ""
         # 存入缓存中
         self.chat_record_list.append(chat_record)
         if self.application.id is not None:
@@ -187,7 +188,7 @@ class OpenAIChatSerializer(serializers.Serializer):
             chat_id = str(uuid.uuid1())
         chat = QuerySet(Chat).filter(id=chat_id).first()
         if chat is None:
-            Chat(id=chat_id, application_id=application_id, abstract=message, client_id=client_id).save()
+            Chat(id=chat_id, application_id=application_id, abstract=message[0:1024], client_id=client_id).save()
         return chat_id
 
     def chat(self, instance: Dict, with_valid=True):
