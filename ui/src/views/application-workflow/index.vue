@@ -327,5 +327,9 @@ onBeforeUnmount(() => {
     bottom: 0 !important;
     right: 0 !important;
   }
+  .chat-width {
+    max-width: 100% !important;
+    margin: 0 auto;
+  }
 }
 </style>

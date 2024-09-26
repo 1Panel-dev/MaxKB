@@ -1,7 +1,7 @@
 <template>
   <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
     <div
-      v-if="inputFieldList.length > 0 || (debug && apiInputFieldList.length > 0)"
+      v-if="(inputFieldList.length > 0 || (debug && apiInputFieldList.length > 0)) && !log"
       class="mb-16"
       style="padding: 0 24px"
     >
@@ -1097,5 +1097,11 @@ defineExpose({
 .chat-width {
   max-width: 80%;
   margin: 0 auto;
+}
+@media only screen and (max-width: 1000px) {
+  .chat-width {
+    max-width: 100% !important;
+    margin: 0 auto;
+  }
 }
 </style>

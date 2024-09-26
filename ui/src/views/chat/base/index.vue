@@ -120,7 +120,7 @@ onMounted(() => {
     }
   }
   .chat-width {
-    max-width: 80%;
+    // max-width: 80%;
     margin: 0 auto;
   }
 }
