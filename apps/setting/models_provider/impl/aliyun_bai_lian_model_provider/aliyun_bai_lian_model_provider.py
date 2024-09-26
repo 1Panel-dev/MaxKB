@@ -31,7 +31,7 @@ class AliyunBaiLianModelProvider(IModelProvider):
         return model_info_manage
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='aliyun_bai_lian_model_provider', name='阿里百炼大模型', icon=get_file_content(
+        return ModelProvideInfo(provider='aliyun_bai_lian_model_provider', name='阿里云百炼', icon=get_file_content(
             os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'aliyun_bai_lian_model_provider',
                          'icon',
                          'aliyun_bai_lian_icon_svg')))
