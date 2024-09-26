@@ -47,6 +47,11 @@ class FunctionExecutor:
         path = r'' + self.sandbox_path + ''
         _exec_code = f"""
 try:
+    import os
+    env = dict(os.environ)
+    for key in list(env.keys()):
+        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG')):
+            del os.environ[key]
     locals_v={'{}'}
     keywords={keywords}
     globals_v=globals()
