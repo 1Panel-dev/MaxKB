@@ -190,8 +190,11 @@ class AppNodeModel extends HtmlResize.model {
       edge.updatePathByAnchor()
     })
   }
+  get_width() {
+    return this.properties?.width || 340
+  }
   setAttributes() {
-    this.width = this.properties?.width || 340
+    this.width = this.get_width()
 
     const circleOnlyAsTarget = {
       message: '只允许从右边的锚点连出',
