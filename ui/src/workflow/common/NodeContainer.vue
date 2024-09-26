@@ -96,6 +96,7 @@
         @mousedown.stop
         @keydown.stop
         @click.stop
+        @wheel.stop
         :show="showAnchor"
         :id="id"
         style="left: 100%; top: 50%; transform: translate(0, -50%)"
