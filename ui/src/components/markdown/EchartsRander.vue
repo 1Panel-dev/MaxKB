@@ -4,6 +4,7 @@
 <script lang="ts" setup>
 import { onMounted, nextTick, watch, onBeforeUnmount, ref } from 'vue'
 import * as echarts from 'echarts'
+const tmp = ref()
 const props = defineProps({
   option: {
     type: String,
@@ -44,6 +45,8 @@ function jsonParseOption(option: any) {
 }
 function evalParseOption(option_json: any) {
   let option = {}
+  echarts
+  tmp.value = echarts
   eval(option_json.option)
   return option
 }
