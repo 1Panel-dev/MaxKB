@@ -42,7 +42,7 @@
           </div>
 
           <el-row :gutter="12">
-            <el-col :span="10" class="mt-16">
+            <el-col :span="12" class="mt-16">
               <div class="flex">
                 <el-text type="info">{{
                   $t('views.applicationOverview.appInfo.publicAccessLink')
@@ -58,8 +58,8 @@
                 />
               </div>
 
-              <div class="mt-4 mb-16 url-height">
-                <span class="vertical-middle lighter break-all">
+              <div class="mt-4 mb-16 url-height flex align-center" style="margin-bottom: 37px">
+                <span class="vertical-middle lighter break-all ellipsis-1">
                   {{ shareUrl }}
                 </span>
 
@@ -88,7 +88,7 @@
                 </el-button>
               </div>
             </el-col>
-            <el-col :span="14" class="mt-16">
+            <el-col :span="12" class="mt-16">
               <div class="flex">
                 <el-text type="info"
                   >{{ $t('views.applicationOverview.appInfo.apiAccessCredentials') }}
@@ -106,10 +106,13 @@
                     {{ apiUrl }}
                   </el-button>
                 </div>
-                <div>
-                  <el-text>Base URL：</el-text
-                  ><a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
-                    {{ baseUrl + id }}
+                <div class="flex align-center">
+                  <span class="flex">
+                    <el-text style="width: 80px">Base URL：</el-text>
+                  </span>
+
+                  <a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
+                    <span class="ellipsis-1">{{ baseUrl + id }}</span>
                   </a>
 
                   <el-button type="primary" text @click="copyClick(baseUrl + id)">
@@ -153,7 +156,11 @@
         </div>
       </div>
     </el-scrollbar>
-    <EmbedDialog ref="EmbedDialogRef" :data="detail" :api-input-params="mapToUrlParams(apiInputParams)"/>
+    <EmbedDialog
+      ref="EmbedDialogRef"
+      :data="detail"
+      :api-input-params="mapToUrlParams(apiInputParams)"
+    />
     <APIKeyDialog ref="APIKeyDialogRef" />
     <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
@@ -199,8 +206,12 @@ const detail = ref<any>(null)
 
 const loading = ref(false)
 
-const urlParams = computed(() => mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : '')
-const shareUrl = computed(() => application.location + accessToken.value.access_token + urlParams.value)
+const urlParams = computed(() =>
+  mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : ''
+)
+const shareUrl = computed(
+  () => application.location + accessToken.value.access_token + urlParams.value
+)
 
 const dayOptions = [
   {
@@ -328,17 +339,18 @@ function getAccessToken() {
 function getDetail() {
   application.asyncGetApplicationDetail(id, loading).then((res: any) => {
     detail.value = res.data
-    detail.value.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')
+    detail.value.work_flow?.nodes
+      ?.filter((v: any) => v.id === 'base-node')
       .map((v: any) => {
         apiInputParams.value = v.properties.input_field_list
           ? v.properties.input_field_list
-            .filter((v: any) => v.assignment_method === 'api_input')
-            .map((v: any) => {
-              return {
-                name: v.variable,
-                value: v.default_value
-              }
-            })
+              .filter((v: any) => v.assignment_method === 'api_input')
+              .map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value
+                }
+              })
           : []
       })
   })
@@ -352,15 +364,14 @@ function refreshIcon() {
   getDetail()
 }
 
-
 function mapToUrlParams(map: any[]) {
-    const params = new URLSearchParams();
+  const params = new URLSearchParams()
 
-    map.forEach((item: any) => {
-        params.append(encodeURIComponent(item.name), encodeURIComponent(item.value));
-    });
+  map.forEach((item: any) => {
+    params.append(encodeURIComponent(item.name), encodeURIComponent(item.value))
+  })
 
-    return params.toString(); // 返回 URL 查询字符串
+  return params.toString() // 返回 URL 查询字符串
 }
 
 onMounted(() => {
