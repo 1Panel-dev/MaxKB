@@ -52,7 +52,7 @@
         </el-button>
       </div>
       <el-table
-        v-if="props.nodeModel.properties.input_field_list.length > 0"
+        v-if="props.nodeModel.properties.input_field_list?.length > 0"
         :data="props.nodeModel.properties.input_field_list"
         class="mb-16"
       >
