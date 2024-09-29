@@ -681,7 +681,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                                                                                  document_list)
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="dataset.xls"'
+            response['Content-Disposition'] = 'attachment; filename="dataset.xlsx"'
             workbook.save(response)
             return response
 
