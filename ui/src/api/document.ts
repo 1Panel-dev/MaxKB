@@ -310,7 +310,7 @@ const exportDocument: (
   loading?: Ref<boolean>
 ) => Promise<any> = (document_name, dataset_id, document_id, loading) => {
   return exportExcel(
-    document_name + '.xls',
+    document_name + '.xlsx',
     `${prefix}/${dataset_id}/document/${document_id}/export`,
     {},
     loading

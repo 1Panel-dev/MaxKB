@@ -199,7 +199,7 @@ const exportDataset: (
   dataset_id: string,
   loading?: Ref<boolean>
 ) => Promise<any> = (dataset_name, dataset_id, loading) => {
-  return exportExcel(dataset_name + '.xls', `dataset/${dataset_id}/export`, undefined, loading)
+  return exportExcel(dataset_name + '.xlsx', `dataset/${dataset_id}/export`, undefined, loading)
 }
 
 export default {
