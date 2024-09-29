@@ -52,6 +52,7 @@ psutil = "^6.0.0"
 celery = { extras = ["sqlalchemy"], version = "^5.4.0" }
 django-celery-beat = "^2.6.0"
 celery-once = "^3.0.1"
+anthropic = "^0.34.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
