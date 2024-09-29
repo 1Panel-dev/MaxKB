@@ -35,7 +35,7 @@
       />
     </el-collapse-transition>
     <!-- 主画布 -->
-    <div class="workflow-main">
+    <div class="workflow-main" ref="workflowMainRef">
       <workflow ref="workflowRef" v-if="detail" :data="detail?.work_flow" />
     </div>
     <!-- 调试 -->
@@ -118,7 +118,7 @@ const {
 
 let interval: any
 const workflowRef = ref()
-
+const workflowMainRef = ref()
 const loading = ref(false)
 const detail = ref<any>(null)
 
@@ -202,8 +202,7 @@ const clickShowDebug = () => {
     })
 }
 function clickoutsideDebug(e: any) {
-  const Elm = e?.target?.className?.includes?.('el-select')
-  if (!Elm) {
+  if (workflowMainRef.value && e && e.target && workflowMainRef.value.contains(e?.target)) {
     showDebug.value = false
   }
 }
