@@ -143,7 +143,6 @@ function createUser() {
     MsgConfirm(`提示`, '社区版最多支持 2 个用户，如需拥有更多用户，请升级为专业版。', {
       cancelButtonText: '确定',
       confirmButtonText: '购买专业版',
-      confirmButtonClass: 'primary'
     })
       .then(() => {
         window.open('https://maxkb.cn/pricing.html', '_blank')

@@ -252,9 +252,13 @@
                             <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="32">
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>
-                            <div class="ellipsis">
+                            <auto-tooltip
+                              :content="relatedObject(datasetList, item, 'id')?.name"
+                              style="width: 65%"
+                            >
                               {{ relatedObject(datasetList, item, 'id')?.name }}
-                            </div>
+                            </auto-tooltip>
+                            <!-- <div class="ellipsis"></div> -->
                           </div>
                           <el-button text @click="removeDataset(item)">
                             <el-icon>

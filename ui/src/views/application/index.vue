@@ -176,7 +176,6 @@ function openCreateDialog() {
     MsgConfirm(`提示`, '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。', {
       cancelButtonText: '确定',
       confirmButtonText: '购买专业版',
-      confirmButtonClass: 'primary'
     })
       .then(() => {
         window.open('https://maxkb.cn/pricing.html', '_blank')
