@@ -33,40 +33,78 @@
         />
       </el-form-item>
       <el-form-item label="输入类型">
-        <el-select v-model="form.type">
-          <el-option label="文本框" value="input"/>
-          <el-option label="日期" value="date"/>
-          <el-option label="下拉选项" value="select"/>
+        <el-select v-model="form.type" @change="changeType">
+          <el-option label="文本框" value="input" />
+          <el-option label="日期" value="date" />
+          <el-option label="下拉选项" value="select" />
         </el-select>
       </el-form-item>
       <el-form-item v-if="form.type === 'select'">
         <template #label>
           <div class="flex-between">
             选项值
-            <el-button link type="primary" @click="addOption()">
+            <el-button link type="primary" @click.stop="addOption()">
               <el-icon class="mr-4"><Plus /></el-icon> 添加
             </el-button>
           </div>
         </template>
-        <template #default>
-          <div class="w-full flex-between" :key="option" v-for="(option, $index) in form.optionList">
-            <input class="el-textarea__inner" v-model.lazy="form.optionList[$index]" placeholder="请输入选项值"/>
-            <el-button link type="primary" @click="delOption($index)">
-              <el-icon class="mr-4"><Remove /></el-icon> 删除
-            </el-button>
-          </div>
-        </template>
+
+        <div
+          class="w-full flex-between mb-8"
+          v-for="(option, $index) in form.optionList"
+          :key="$index"
+        >
+          <el-input v-model="form.optionList[$index]" placeholder="请输入选项值" />
+          <el-button link class="ml-8" @click.stop="delOption($index)">
+            <el-icon><Delete /></el-icon>
+          </el-button>
+        </div>
       </el-form-item>
       <el-form-item label="是否必填" @click.prevent>
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
+      <el-form-item
+        label="默认值"
+        prop="default_value"
+        :rules="{
+          required: form.is_required,
+          message: '请输入默认值',
+          trigger: 'blur'
+        }"
+      >
+        <el-input
+          v-if="form.type === 'input'"
+          v-model="form.default_value"
+          placeholder="请输入默认值"
+          @blur="form.name = form.name.trim()"
+        />
+        <el-date-picker
+          v-else-if="form.type === 'date'"
+          v-model="form.default_value"
+          type="datetime"
+          placeholder="选择日期"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
+        />
+        <el-select
+          v-else-if="form.type === 'select'"
+          v-model="form.default_value"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="(option, index) in form.optionList"
+            :key="index"
+            :label="option"
+            :value="option"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="赋值方式">
         <el-radio-group v-model="form.assignment_method">
-          <el-radio label="user_input">用户输入</el-radio>
-          <el-radio label="api_input">接口传参</el-radio>
+          <el-radio value="user_input">用户输入</el-radio>
+          <el-radio value="api_input">接口传参</el-radio>
         </el-radio-group>
       </el-form-item>
-
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -96,12 +134,16 @@ const form = ref<any>({
   type: 'input',
   is_required: true,
   assignment_method: 'user_input',
-  optionList: []
+  optionList: [''],
+  default_value: ''
 })
 
 const rules = reactive({
   name: [{ required: true, message: '请输入变量名', trigger: 'blur' }],
-  variable: [{ required: true, message: '请输入变量', trigger: 'blur' }]
+  variable: [
+    { required: true, message: '请输入变量', trigger: 'blur' },
+    { pattern: /^[a-zA-Z0-9_]+$/, message: '只能输入字母数字和下划线', trigger: 'blur' }
+  ]
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -114,7 +156,8 @@ watch(dialogVisible, (bool) => {
       type: 'input',
       is_required: true,
       assignment_method: 'user_input',
-      optionList: []
+      optionList: [''],
+      default_value: ''
     }
     isEdit.value = false
   }
@@ -153,6 +196,10 @@ const delOption = (index: number) => {
   form.value.optionList.splice(index, 1)
 }
 
+const changeType = () => {
+  form.value.optionList = ['']
+  form.value.default_value = ''
+}
 
 defineExpose({ open, close })
 </script>

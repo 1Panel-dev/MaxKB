@@ -5,6 +5,8 @@
     width="80%"
     class="paragraph-dialog"
     destroy-on-close
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <el-row v-loading="loading">
       <el-col :span="6">
@@ -91,6 +93,12 @@
         </el-scrollbar>
       </el-col>
     </el-row>
+    <template #footer v-if="isMul">
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false"> 取消</el-button>
+        <el-button type="primary" @click="mulAssociation"> 确认 </el-button>
+      </div>
+    </template>
   </el-dialog>
 </template>
 <script setup lang="ts">
@@ -99,6 +107,7 @@ import { useRoute } from 'vue-router'
 import problemApi from '@/api/problem'
 import paragraphApi from '@/api/paragraph'
 import useStore from '@/stores'
+import { MsgSuccess } from '@/utils/message'
 
 const { problem, document } = useStore()
 
@@ -116,6 +125,7 @@ const documentList = ref<any[]>([])
 const cloneDocumentList = ref<any[]>([])
 const paragraphList = ref<any[]>([])
 const currentProblemId = ref<String>('')
+const currentMulProblemId = ref<string[]>([])
 
 // 回显
 const associationParagraph = ref<any[]>([])
@@ -124,6 +134,8 @@ const currentDocument = ref<String>('')
 const search = ref('')
 const searchType = ref('title')
 const filterDoc = ref('')
+// 批量
+const isMul = ref(false)
 
 const paginationConfig = reactive({
   current_page: 1,
@@ -131,31 +143,53 @@ const paginationConfig = reactive({
   total: 0
 })
 
+function mulAssociation() {
+  const data = {
+    problem_id_list: currentMulProblemId.value,
+    paragraph_list: associationParagraph.value.map((item) => ({
+      paragraph_id: item.id,
+      document_id: item.document_id
+    }))
+  }
+  problemApi.postMulAssociationProblem(id, data, loading).then(() => {
+    MsgSuccess('批量关联分段成功')
+    dialogVisible.value = false
+  })
+}
+
 function associationClick(item: any) {
-  if (isAssociation(item.id)) {
-    problem
-      .asyncDisassociationProblem(
-        id,
-        item.document_id,
-        item.id,
-        currentProblemId.value as string,
-        loading
-      )
-      .then(() => {
-        getRecord(currentProblemId.value)
-      })
+  if (isMul.value) {
+    if (isAssociation(item.id)) {
+      associationParagraph.value.splice(associationParagraph.value.indexOf(item.id), 1)
+    } else {
+      associationParagraph.value.push(item)
+    }
   } else {
-    problem
-      .asyncAssociationProblem(
-        id,
-        item.document_id,
-        item.id,
-        currentProblemId.value as string,
-        loading
-      )
-      .then(() => {
-        getRecord(currentProblemId.value)
-      })
+    if (isAssociation(item.id)) {
+      problem
+        .asyncDisassociationProblem(
+          id,
+          item.document_id,
+          item.id,
+          currentProblemId.value as string,
+          loading
+        )
+        .then(() => {
+          getRecord(currentProblemId.value)
+        })
+    } else {
+      problem
+        .asyncAssociationProblem(
+          id,
+          item.document_id,
+          item.id,
+          currentProblemId.value as string,
+          loading
+        )
+        .then(() => {
+          getRecord(currentProblemId.value)
+        })
+    }
   }
 }
 
@@ -216,6 +250,7 @@ watch(dialogVisible, (bool) => {
     cloneDocumentList.value = []
     paragraphList.value = []
     associationParagraph.value = []
+    isMul.value = false
 
     currentDocument.value = ''
     search.value = ''
@@ -232,10 +267,15 @@ watch(filterDoc, (val) => {
   currentDocument.value = documentList.value?.length > 0 ? documentList.value[0].id : ''
 })
 
-const open = (problemId: string) => {
-  currentProblemId.value = problemId
+const open = (problemId: any) => {
   getDocument()
-  getRecord(problemId)
+  if (problemId.length == 1) {
+    currentProblemId.value = problemId[0]
+    getRecord(problemId)
+  } else if (problemId.length > 1) {
+    currentMulProblemId.value = problemId
+    isMul.value = true
+  }
   dialogVisible.value = true
 }
 

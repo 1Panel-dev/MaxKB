@@ -38,10 +38,10 @@ class TencentModel(MaxKBBaseModel, ChatHunyuan):
         return TencentModel(model_name=model_name, credentials=model_credential, streaming=streaming, **model_kwargs)
 
     def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
-        return self.__dict__.get('_last_generation_info')
+        return self.usage_metadata
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        return self.get_last_generation_info().get('PromptTokens', 0)
+        return self.usage_metadata.get('PromptTokens', 0)
 
     def get_num_tokens(self, text: str) -> int:
-        return self.get_last_generation_info().get('CompletionTokens', 0)
+        return self.usage_metadata.get('CompletionTokens', 0)

@@ -6,6 +6,8 @@
     v-model="dialogVisible"
     style="width: 550px"
     append-to-body
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <div class="dialog-max-height">
       <el-scrollbar always>
@@ -14,7 +16,11 @@
             <el-form-item
               :label="$t('views.application.applicationForm.dialogues.selectSearchMode')"
             >
-              <el-radio-group v-model="form.search_mode" class="card__radio" @change="changeHandle">
+              <el-radio-group
+                v-model="form.dataset_setting.search_mode"
+                class="card__radio"
+                @change="changeHandle"
+              >
                 <el-card
                   shadow="never"
                   class="mb-16"
@@ -32,7 +38,7 @@
                 <el-card
                   shadow="never"
                   class="mb-16"
-                  :class="form.search_mode === 'keywords' ? 'active' : ''"
+                  :class="form.dataset_setting.search_mode === 'keywords' ? 'active' : ''"
                 >
                   <el-radio value="keywords" size="large">
                     <p class="mb-4">
@@ -43,7 +49,10 @@
                     }}</el-text>
                   </el-radio>
                 </el-card>
-                <el-card shadow="never" :class="form.search_mode === 'blend' ? 'active' : ''">
+                <el-card
+                  shadow="never"
+                  :class="form.dataset_setting.search_mode === 'blend' ? 'active' : ''"
+                >
                   <el-radio value="blend" size="large">
                     <p class="mb-4">
                       {{ $t('views.application.applicationForm.dialogues.hybridSearch') }}
@@ -69,7 +78,7 @@
                     </div>
                   </template>
                   <el-input-number
-                    v-model="form.similarity"
+                    v-model="form.dataset_setting.similarity"
                     :min="0"
                     :max="form.search_mode === 'blend' ? 2 : 1"
                     :precision="3"
@@ -85,7 +94,7 @@
                   :label="$t('views.application.applicationForm.dialogues.topReferences')"
                 >
                   <el-input-number
-                    v-model="form.top_n"
+                    v-model="form.dataset_setting.top_n"
                     :min="1"
                     :max="100"
                     :value-on-clear="1"
@@ -98,7 +107,7 @@
 
             <el-form-item :label="$t('views.application.applicationForm.dialogues.maxCharacters')">
               <el-slider
-                v-model="form.max_paragraph_char_number"
+                v-model="form.dataset_setting.max_paragraph_char_number"
                 show-input
                 :show-input-controls="false"
                 :min="500"
@@ -119,34 +128,23 @@
                 :hide-required-asterisk="true"
               >
                 <el-radio-group
-                  v-model="form.no_references_setting.status"
-                  class="radio-block mb-16"
+                  v-model="form.dataset_setting.no_references_setting.status"
+                  class="radio-block"
                 >
                   <div>
                     <el-radio value="ai_questioning">
                       <p>
                         {{ $t('views.application.applicationForm.dialogues.continueQuestioning') }}
                       </p>
-                      <el-form-item
-                        v-if="form.no_references_setting.status === 'ai_questioning'"
-                        :label="$t('views.application.applicationForm.form.prompt.label')"
-                        prop="ai_questioning"
-                      >
-                        <el-input
-                          v-model="noReferencesform.ai_questioning"
-                          :rows="2"
-                          type="textarea"
-                          maxlength="2048"
-                          :placeholder="defaultValue['ai_questioning']"
-                        />
-                      </el-form-item>
                     </el-radio>
                   </div>
-                  <div class="mt-8">
+                  <div>
                     <el-radio value="designated_answer">
                       <p>{{ $t('views.application.applicationForm.dialogues.provideAnswer') }}</p>
                       <el-form-item
-                        v-if="form.no_references_setting.status === 'designated_answer'"
+                        v-if="
+                          form.dataset_setting.no_references_setting.status === 'designated_answer'
+                        "
                         prop="designated_answer"
                       >
                         <el-input
@@ -161,6 +159,29 @@
                   </div>
                 </el-radio-group>
               </el-form>
+            </el-form-item>
+
+            <el-form-item @click.prevent v-if="!isWorkflowType">
+              <template #label>
+                <div class="flex align-center">
+                  <span class="mr-4">{{
+                    $t('views.application.applicationForm.form.problemOptimization.label')
+                  }}</span>
+                </div>
+              </template>
+              <el-switch size="small" v-model="form.problem_optimization"></el-switch>
+            </el-form-item>
+            <el-form-item
+              v-if="form.problem_optimization"
+              :label="$t('views.application.applicationForm.form.prompt.label')"
+            >
+              <el-input
+                v-model="form.problem_optimization_prompt"
+                :rows="6"
+                type="textarea"
+                maxlength="2048"
+                :placeholder="defaultPrompt"
+              />
             </el-form-item>
           </el-form>
         </div>
@@ -195,15 +216,21 @@ const defaultValue = {
   designated_answer: t('views.application.applicationForm.dialogues.designated_answer')
 }
 
+const defaultPrompt = `()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中`
+
 const form = ref<any>({
-  search_mode: 'embedding',
-  top_n: 3,
-  similarity: 0.6,
-  max_paragraph_char_number: 5000,
-  no_references_setting: {
-    status: 'ai_questioning',
-    value: '{question}'
-  }
+  dataset_setting: {
+    search_mode: 'embedding',
+    top_n: 3,
+    similarity: 0.6,
+    max_paragraph_char_number: 5000,
+    no_references_setting: {
+      status: 'ai_questioning',
+      value: '{question}'
+    }
+  },
+  problem_optimization: false,
+  problem_optimization_prompt: defaultPrompt
 })
 
 const noReferencesform = ref<any>({
@@ -236,14 +263,18 @@ const isWorkflowType = ref(false)
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
-      search_mode: 'embedding',
-      top_n: 3,
-      similarity: 0.6,
-      max_paragraph_char_number: 5000,
-      no_references_setting: {
-        status: 'ai_questioning',
-        value: ''
-      }
+      dataset_setting: {
+        search_mode: 'embedding',
+        top_n: 3,
+        similarity: 0.6,
+        max_paragraph_char_number: 5000,
+        no_references_setting: {
+          status: 'ai_questioning',
+          value: '{question}'
+        }
+      },
+      problem_optimization: false,
+      problem_optimization_prompt: ''
     }
     noReferencesform.value = {
       ai_questioning: defaultValue['ai_questioning'],
@@ -255,9 +286,16 @@ watch(dialogVisible, (bool) => {
 
 const open = (data: any, type?: string) => {
   isWorkflowType.value = isWorkFlow(type)
-  form.value = { ...form.value, ...cloneDeep(data) }
-  noReferencesform.value[form.value.no_references_setting.status] =
-    form.value.no_references_setting.value
+  form.value = {
+    dataset_setting: { ...data.dataset_setting },
+    problem_optimization: data.problem_optimization,
+    problem_optimization_prompt: data.problem_optimization_prompt
+  }
+  if (!isWorkflowType.value) {
+    noReferencesform.value[form.value.dataset_setting.no_references_setting.status] =
+      form.value.dataset_setting.no_references_setting.value
+  }
+
   dialogVisible.value = true
 }
 
@@ -270,8 +308,8 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return
     await formEl.validate((valid, fields) => {
       if (valid) {
-        form.value.no_references_setting.value =
-          noReferencesform.value[form.value.no_references_setting.status]
+        form.value.dataset_setting.no_references_setting.value =
+          noReferencesform.value[form.value.dataset_setting.no_references_setting.status]
         emit('refresh', form.value)
         dialogVisible.value = false
       }
@@ -281,9 +319,9 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 function changeHandle(val: string) {
   if (val === 'keywords') {
-    form.value.similarity = 0
+    form.value.dataset_setting.similarity = 0
   } else {
-    form.value.similarity = 0.6
+    form.value.dataset_setting.similarity = 0.6
   }
 }
 

@@ -5,6 +5,9 @@
         <div class="flex-between">
           <div>
             <el-button type="primary" @click="createProblem">创建问题</el-button>
+            <el-button @click="relateProblem()" :disabled="multipleSelection.length === 0"
+              >关联分段</el-button
+            >
             <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
               >批量删除</el-button
             >
@@ -102,9 +105,9 @@
       v-model:currentContent="currentContent"
       :pre_disable="pre_disable"
       :next_disable="next_disable"
-      @refresh="refresh"
+      @refresh="refreshRelate"
     />
-    <RelateProblemDialog ref="RelateProblemDialogRef" @refresh="refresh" />
+    <RelateProblemDialog ref="RelateProblemDialogRef" @refresh="refreshRelate" />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -157,8 +160,19 @@ const problemIndexMap = computed<Dict<number>>(() => {
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
 
-function relateProblem(row: any) {
-  RelateProblemDialogRef.value.open(row.id)
+function relateProblem(row?: any) {
+  const arr: string[] = []
+  if (row) {
+    arr.push(row.id)
+  } else {
+    multipleSelection.value.map((v) => {
+      if (v) {
+        arr.push(v.id)
+      }
+    })
+  }
+
+  RelateProblemDialogRef.value.open(arr)
 }
 
 function createProblem() {
@@ -330,7 +344,10 @@ function getList() {
       paginationConfig.total = res.data.total
     })
 }
-
+function refreshRelate() {
+  getList()
+  multipleTableRef.value?.clearSelection()
+}
 function refresh() {
   paginationConfig.current_page = 1
   getList()

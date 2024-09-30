@@ -1,5 +1,12 @@
 <template>
-  <el-dialog title="选择知识库" v-model="dialogVisible" width="600" class="select-dataset-dialog">
+  <el-dialog
+    title="选择知识库"
+    v-model="dialogVisible"
+    width="600"
+    class="select-dataset-dialog"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <template #header="{ titleId, titleClass }">
       <div class="my-header flex">
         <h4 :id="titleId" :class="titleClass">选择知识库</h4>

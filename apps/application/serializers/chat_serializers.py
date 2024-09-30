@@ -15,13 +15,11 @@ from io import BytesIO
 from typing import Dict
 
 import openpyxl
-import xlwt
 from django.core import validators
 from django.core.cache import caches
 from django.db import transaction, models
 from django.db.models import QuerySet, Q
-from django.http import HttpResponse, StreamingHttpResponse, HttpResponseServerError
-from openpyxl.workbook import Workbook
+from django.http import StreamingHttpResponse
 from rest_framework import serializers
 
 from application.flow.workflow_manage import Flow
@@ -453,8 +451,8 @@ class ChatRecordSerializer(serializers.Serializer):
         def page(self, current_page: int, page_size: int, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            order_by = 'create_time' if self.data.get('order_asc') is None or self.data.get(
-                'order_asc') else '-create_time'
+            order_by = '-create_time' if self.data.get('order_asc') is None or self.data.get(
+                'order_asc') else 'create_time'
             page = page_search(current_page, page_size,
                                QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id')).order_by(order_by),
                                post_records_handler=lambda chat_record: self.reset_chat_record(chat_record))

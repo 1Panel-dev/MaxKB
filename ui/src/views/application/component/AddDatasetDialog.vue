@@ -6,6 +6,8 @@
     append-to-body
     class="addDataset-dialog"
     align-center
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <template #header="{ titleId, titleClass }">
       <div class="flex-between mb-8">

@@ -4,6 +4,8 @@
     v-model="dialogVisible"
     width="650"
     append-to-body
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <el-form
       ref="applicationFormRef"
@@ -11,6 +13,7 @@
       :rules="rules"
       label-position="top"
       require-asterisk-position="right"
+      @submit.prevent
     >
       <el-form-item :label="$t('views.application.applicationForm.form.appName.label')" prop="name">
         <el-input
@@ -67,7 +70,7 @@
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitValid(applicationFormRef)" :loading="loading">
+        <el-button type="primary" @click="submitHandle(applicationFormRef)" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.create') }}
         </el-button>
       </span>
@@ -104,7 +107,7 @@ const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
   model_id: '',
-  multiple_rounds_dialogue: false,
+  dialogue_number: 1,
   prologue: t('views.application.prompt.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
@@ -118,9 +121,19 @@ const applicationForm = ref<ApplicationFormType>({
     }
   },
   model_setting: {
-    prompt: defaultPrompt
+    prompt: defaultPrompt,
+    system: '你是 xxx 小助手',
+    no_references_prompt: '{question}'
   },
+  model_params_setting: {},
   problem_optimization: false,
+  problem_optimization_prompt:
+    '()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中',
+  stt_model_id: '',
+  tts_model_id: '',
+  stt_model_enable: false,
+  tts_model_enable: false,
+  tts_type: 'BROWSER',
   type: 'SIMPLE'
 })
 
@@ -147,7 +160,7 @@ watch(dialogVisible, (bool) => {
       name: '',
       desc: '',
       model_id: '',
-      multiple_rounds_dialogue: false,
+      dialogue_number: 1,
       prologue: t('views.application.prompt.defaultPrologue'),
       dataset_id_list: [],
       dataset_setting: {
@@ -161,9 +174,19 @@ watch(dialogVisible, (bool) => {
         }
       },
       model_setting: {
-        prompt: defaultPrompt
+        prompt: defaultPrompt,
+        system: '你是 xxx 小助手',
+        no_references_prompt: '{question}'
       },
+      model_params_setting: {},
       problem_optimization: false,
+      problem_optimization_prompt:
+        '()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中',
+      stt_model_id: '',
+      tts_model_id: '',
+      stt_model_enable: false,
+      tts_model_enable: false,
+      tts_type: 'BROWSER',
       type: 'SIMPLE'
     }
     applicationFormRef.value?.clearValidate()
@@ -174,21 +197,6 @@ const open = () => {
   dialogVisible.value = true
 }
 
-const submitValid = (formEl: FormInstance | undefined) => {
-  if (user.isEnterprise()) {
-    submitHandle(formEl)
-  } else {
-    common
-      .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
-      .then(async (res: any) => {
-        if (res?.data) {
-          submitHandle(formEl)
-        } else {
-          MsgAlert('提示', '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。')
-        }
-      })
-  }
-}
 const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {

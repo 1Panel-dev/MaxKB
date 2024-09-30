@@ -68,7 +68,7 @@
               >
               <el-col :span="12" class="color-secondary lighter"> 相似度高于</el-col>
               <el-col :span="12" class="lighter">
-                {{ form_data.dataset_setting.similarity }}</el-col
+                {{ form_data.dataset_setting.similarity?.toFixed(3) }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter"> 引用分段 Top</el-col>
               <el-col :span="12" class="lighter"> {{ form_data.dataset_setting.top_n }}</el-col>
@@ -80,10 +80,10 @@
           </div>
         </el-form-item>
         <el-form-item
-          label="检索问题输入"
+          label="检索问题"
           prop="question_reference_address"
           :rules="{
-            message: '请选择检索问题输入',
+            message: '请选择检索问题',
             trigger: 'blur',
             required: true
           }"
@@ -92,7 +92,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择检索问题输入"
+            placeholder="请选择检索问题"
             v-model="form_data.question_reference_address"
           />
         </el-form-item>
@@ -159,11 +159,11 @@ const datasetList = ref<any>([])
 const datasetLoading = ref(false)
 
 function refreshParam(data: any) {
-  set(props.nodeModel.properties.node_data, 'dataset_setting', data)
+  set(props.nodeModel.properties.node_data, 'dataset_setting', data.dataset_setting)
 }
 
 const openParamSettingDialog = () => {
-  ParamSettingDialogRef.value?.open(form_data.value.dataset_setting, 'WORK_FLOW')
+  ParamSettingDialogRef.value?.open(form_data.value, 'WORK_FLOW')
 }
 
 function removeDataset(id: any) {

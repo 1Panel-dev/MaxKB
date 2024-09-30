@@ -25,69 +25,17 @@
     </div>
     <!-- 下拉框 -->
     <el-collapse-transition>
-      <div
-        v-show="showPopover"
-        class="workflow-dropdown-menu border border-r-4"
+      <DropdownMenu
+        :show="showPopover"
+        :id="id"
         v-click-outside="clickoutside"
-      >
-        <el-tabs v-model="activeName" class="workflow-dropdown-tabs">
-          <el-tab-pane label="基础组件" name="base">
-            <template v-for="(item, index) in menuNodes" :key="index">
-              <div
-                class="workflow-dropdown-item cursor flex p-8-12"
-                @click="clickNodes(item)"
-                @mousedown="onmousedown(item)"
-              >
-                <component :is="iconComponent(`${item.type}-icon`)" class="mr-8 mt-4" :size="32" />
-                <div class="pre-wrap">
-                  <div class="lighter">{{ item.label }}</div>
-                  <el-text type="info" size="small">{{ item.text }}</el-text>
-                </div>
-              </div>
-            </template>
-          </el-tab-pane>
-          <el-tab-pane label="函数库" name="function">
-            <el-scrollbar max-height="300">
-              <div
-                class="workflow-dropdown-item cursor flex p-8-12"
-                @click="clickNodes(functionNode)"
-                @mousedown="onmousedown(functionNode)"
-              >
-                <component
-                  :is="iconComponent(`function-lib-node-icon`)"
-                  class="mr-8 mt-4"
-                  :size="32"
-                />
-                <div class="pre-wrap">
-                  <div class="lighter">{{ functionNode.label }}</div>
-                  <el-text type="info" size="small">{{ functionNode.text }}</el-text>
-                </div>
-              </div>
-
-              <template v-for="(item, index) in functionLibList" :key="index">
-                <div
-                  class="workflow-dropdown-item cursor flex p-8-12"
-                  @click="clickNodes(functionLibNode, item)"
-                  @mousedown="onmousedown(functionLibNode, item)"
-                >
-                  <component
-                    :is="iconComponent(`function-lib-node-icon`)"
-                    class="mr-8 mt-4"
-                    :size="32"
-                  />
-                  <div class="pre-wrap">
-                    <div class="lighter">{{ item.name }}</div>
-                    <el-text type="info" size="small">{{ item.desc }}</el-text>
-                  </div>
-                </div>
-              </template>
-            </el-scrollbar>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
+        @clickNodes="clickNodes"
+        @onmousedown="onmousedown"
+        :workflowRef="workflowRef"
+      />
     </el-collapse-transition>
     <!-- 主画布 -->
-    <div class="workflow-main">
+    <div class="workflow-main" ref="workflowMainRef">
       <workflow ref="workflowRef" v-if="detail" :data="detail?.work_flow" />
     </div>
     <!-- 调试 -->
@@ -138,7 +86,7 @@
           </div>
         </div>
         <div class="scrollbar-height">
-          <AiChat :data="detail"></AiChat>
+          <AiChat :data="detail" :debug="true"></AiChat>
         </div>
       </div>
     </el-collapse-transition>
@@ -148,8 +96,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Workflow from '@/workflow/index.vue'
-import { menuNodes, functionLibNode, functionNode } from '@/workflow/common/data'
-import { iconComponent } from '@/workflow/icons/utils'
+import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import applicationApi from '@/api/application'
 import { isAppIcon } from '@/utils/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
@@ -171,7 +118,7 @@ const {
 
 let interval: any
 const workflowRef = ref()
-
+const workflowMainRef = ref()
 const loading = ref(false)
 const detail = ref<any>(null)
 
@@ -179,15 +126,32 @@ const showPopover = ref(false)
 const showDebug = ref(false)
 const enlarge = ref(false)
 const saveTime = ref<any>('')
-const activeName = ref('base')
-const functionLibList = ref<any[]>([])
 
+function clickNodes(item: any) {
+  // workflowRef.value?.addNode(item)
+  showPopover.value = false
+}
+
+function onmousedown(item: any) {
+  // workflowRef.value?.onmousedown(item)
+  showPopover.value = false
+}
+function clickoutside() {
+  showPopover.value = false
+}
 function publicHandle() {
   workflowRef.value
     ?.validate()
     .then(() => {
       const obj = {
         work_flow: getGraphData()
+      }
+      const workflow = new WorkFlowInstance(obj.work_flow)
+      try {
+        workflow.is_valid()
+      } catch (e: any) {
+        MsgError(e.toString())
+        return
       }
       applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
         getDetail()
@@ -206,9 +170,6 @@ function publicHandle() {
     })
 }
 
-function clickoutside() {
-  showPopover.value = false
-}
 const clickShowDebug = () => {
   workflowRef.value
     ?.validate()
@@ -240,40 +201,10 @@ const clickShowDebug = () => {
       }
     })
 }
-function clickoutsideDebug() {
-  showDebug.value = false
-}
-
-function clickNodes(item: any, data?: any) {
-  if (data) {
-    item['properties']['stepName'] = data.name
-    item['properties']['node_data'] = {
-      ...data,
-      function_lib_id: data.id,
-      input_field_list: data.input_field_list.map((field: any) => ({
-        ...field,
-        value: field.source == 'reference' ? [] : ''
-      }))
-    }
+function clickoutsideDebug(e: any) {
+  if (workflowMainRef.value && e && e.target && workflowMainRef.value.contains(e?.target)) {
+    showDebug.value = false
   }
-  workflowRef.value?.addNode(item)
-  showPopover.value = false
-}
-
-function onmousedown(item: any, data?: any) {
-  if (data) {
-    item['properties']['stepName'] = data.name
-    item['properties']['node_data'] = {
-      ...data,
-      function_lib_id: data.id,
-      input_field_list: data.input_field_list.map((field: any) => ({
-        ...field,
-        value: field.source == 'reference' ? [] : ''
-      }))
-    }
-  }
-  workflowRef.value?.onmousedown(item)
-  showPopover.value = false
 }
 
 function getGraphData() {
@@ -305,12 +236,6 @@ function saveApplication(bool?: boolean) {
   })
 }
 
-function getList() {
-  applicationApi.listFunctionLib(id, loading).then((res: any) => {
-    functionLibList.value = res.data
-  })
-}
-
 /**
  * 定时保存
  */
@@ -331,7 +256,7 @@ const closeInterval = () => {
 
 onMounted(() => {
   getDetail()
-  getList()
+
   // 初始化定时任务
   if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND')) {
     initInterval()
@@ -355,31 +280,7 @@ onBeforeUnmount(() => {
     height: calc(100vh - 62px);
     box-sizing: border-box;
   }
-  .workflow-dropdown-menu {
-    -moz-user-select: none; /* Firefox */
-    -webkit-user-select: none; /* WebKit内核 */
-    -ms-user-select: none; /* IE10及以后 */
-    -khtml-user-select: none; /* 早期浏览器 */
-    -o-user-select: none; /* Opera */
-    user-select: none; /* CSS3属性 */
-    position: absolute;
-    top: 49px;
-    right: 90px;
-    z-index: 99;
-    width: 268px;
-    box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
-    background: #ffffff;
-    padding-bottom: 8px;
 
-    .title {
-      padding: 12px 12px 4px;
-    }
-    .workflow-dropdown-item {
-      &:hover {
-        background: var(--app-text-color-light-1);
-      }
-    }
-  }
   .workflow-dropdown-tabs {
     .el-tabs__nav-wrap {
       padding: 0 16px;
@@ -406,7 +307,7 @@ onBeforeUnmount(() => {
   bottom: 16px;
   right: 16px;
   overflow: hidden;
-  width: 420px;
+  width: 450px;
   height: 600px;
   .workflow-debug-header {
     background: var(--app-header-bg-color);
@@ -424,6 +325,10 @@ onBeforeUnmount(() => {
     height: 100% !important;
     bottom: 0 !important;
     right: 0 !important;
+  }
+  .chat-width {
+    max-width: 100% !important;
+    margin: 0 auto;
   }
 }
 </style>

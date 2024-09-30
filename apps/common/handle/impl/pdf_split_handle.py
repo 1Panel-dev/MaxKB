@@ -6,19 +6,18 @@
     @date：2024/3/27 18:19
     @desc:
 """
+import logging
+import os
 import re
+import tempfile
+import time
 from typing import List
 
 import fitz
-import os
-import tempfile
-import logging
 from langchain_community.document_loaders import PyPDFLoader
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.util.split_model import SplitModel
-
-import time
 
 default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),
@@ -48,7 +47,7 @@ class PdfSplitHandle(BaseSplitHandle):
                 return {'name': file.name, 'content': result}
 
             # 没目录但是有链接的pdf
-            result = self.handle_links(pdf_document)
+            result = self.handle_links(pdf_document, pattern_list, with_filter, limit)
             if result is not None and len(result) > 0:
                 return {'name': file.name, 'content': result}
 
@@ -168,15 +167,21 @@ class PdfSplitHandle(BaseSplitHandle):
         return title
 
     @staticmethod
-    def handle_links(doc):
+    def handle_links(doc, pattern_list, with_filter, limit):
         # 创建存储章节内容的数组
         chapters = []
-
+        toc_start_page = -1
+        page_content = ""
+        handle_pre_toc = True
         # 遍历 PDF 的每一页，查找带有目录链接的页
         for page_num in range(doc.page_count):
             page = doc.load_page(page_num)
             links = page.get_links()
-
+            # 如果目录开始页码未设置，则设置为当前页码
+            if len(links) > 0:
+                toc_start_page = page_num
+            if toc_start_page < 0:
+                page_content += page.get_text('text')
             # 检查该页是否包含内部链接（即指向文档内部的页面）
             for num in range(len(links)):
                 link = links[num]
@@ -184,6 +189,9 @@ class PdfSplitHandle(BaseSplitHandle):
                     # 获取链接目标的页面
                     dest_page = link['page']
                     rect = link['from']  # 获取链接的矩形区域
+                    # 如果目录开始页码包括前言部分，则不处理前言部分
+                    if dest_page < toc_start_page:
+                        handle_pre_toc = False
 
                     # 提取链接区域的文本作为标题
                     link_title = page.get_text("text", clip=rect).strip().split("\n")[0].replace('.', '').strip()
@@ -226,6 +234,31 @@ class PdfSplitHandle(BaseSplitHandle):
                         "content": chapter_text
                     })
 
+        # 目录中没有前言部分，手动处理
+        if handle_pre_toc:
+            pre_toc = []
+            lines = page_content.strip().split('\n')
+            try:
+                for line in lines:
+                    if re.match(r'^前\s*言', line):
+                        pre_toc.append({'title': line, 'content': ''})
+                    else:
+                        pre_toc[-1]['content'] += line
+                for i in range(len(pre_toc)):
+                    pre_toc[i]['content'] = re.sub(r'(?<!。)\n+', '', pre_toc[i]['content'])
+                    pre_toc[i]['content'] = re.sub(r'(?<!.)\n+', '', pre_toc[i]['content'])
+            except BaseException as e:
+                max_kb.info(f'此文档没有前言部分，按照普通文本处理: {e}')
+                if pattern_list is not None and len(pattern_list) > 0:
+                    split_model = SplitModel(pattern_list, with_filter, limit)
+                else:
+                    split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
+                # 插入目录前的部分
+                page_content = re.sub(r'(?<!。)\n+', '', page_content)
+                page_content = re.sub(r'(?<!.)\n+', '', page_content)
+                page_content = page_content.strip()
+                pre_toc = split_model.parse(page_content)
+            chapters = pre_toc + chapters
         return chapters
 
     def support(self, file, get_buffer):

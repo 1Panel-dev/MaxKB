@@ -28,10 +28,14 @@
           </el-input>
         </el-form-item>
       </template>
+      <div v-if="configType === 'wechat'" class="flex align-center" style="margin-bottom: 8px">
+        <span class="el-form-item__label">认证通过</span>
+        <el-switch v-if="configType === 'wechat'" v-model="form[configType].is_certification" />
+      </div>
 
       <h4 class="title-decoration-1 mb-16">回调地址</h4>
       <el-form-item label="URL" prop="callback_url">
-        <el-input v-model="form[configType].callback_url" placeholder="请输入回调地址">
+        <el-input v-model="form[configType].callback_url" placeholder="请输入回调地址" readonly>
           <template #append>
             <el-button @click="copyClick(form[configType].callback_url)">
               <AppIcon iconName="app-copy"></AppIcon>
@@ -102,7 +106,14 @@ const {
 } = route as any
 
 const form = reactive<any>({
-  wechat: { app_id: '', app_secret: '', token: '', encoding_aes_key: '', callback_url: '' },
+  wechat: {
+    app_id: '',
+    app_secret: '',
+    token: '',
+    encoding_aes_key: '',
+    is_certification: false,
+    callback_url: ''
+  },
   dingtalk: { client_id: '', client_secret: '', callback_url: '' },
   wecom: {
     app_id: '',
@@ -173,17 +184,17 @@ const drawerTitle = computed(
       wechat: '公众号配置',
       dingtalk: '钉钉应用配置',
       wecom: '企业微信应用配置',
-      feishu: '飞书配置'
+      feishu: '飞书应用配置'
     })[configType.value]
 )
 
 const infoTitle = computed(
   () =>
     ({
-      wechat: '微信公众号应用信息',
-      dingtalk: '钉钉应用信息',
-      wecom: '企业微信应用信息',
-      feishu: '飞书应用信息'
+      wechat: '应用信息',
+      dingtalk: '应用信息',
+      wecom: '应用信息',
+      feishu: '应用信息'
     })[configType.value]
 )
 
@@ -238,7 +249,7 @@ const open = async (id: string, type: 'wechat' | 'dingtalk' | 'wecom' | 'feishu'
     MsgError('加载配置失败，请检查输入或稍后再试')
   } finally {
     loading.value = false
-    form[configType.value].callback_url = `${window.location.origin}/${type}/${id}`
+    form[configType.value].callback_url = `${window.location.origin}/api/${type}/${id}`
   }
 }
 

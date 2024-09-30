@@ -4,6 +4,8 @@
     v-model="dialogVisible"
     width="900"
     class="embed-dialog"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <el-row :gutter="12">
       <el-col :span="12">
@@ -21,7 +23,7 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <div class="mt-8">
+            <div class="mt-8 pre-wrap">
               {{ source1 }}
             </div>
           </div>
@@ -52,11 +54,16 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import useStore from '@/stores'
 
 const { application } = useStore()
+
+const props = defineProps({
+  data: Object,
+  apiInputParams: String
+})
 
 const emit = defineEmits(['addData'])
 
@@ -65,6 +72,9 @@ const dialogVisible = ref<boolean>(false)
 const source1 = ref('')
 
 const source2 = ref('')
+
+const urlParams1 = computed(() => (props.apiInputParams ? '?' + props.apiInputParams : ''))
+const urlParams2 = computed(() => (props.apiInputParams ? '&' + props.apiInputParams : ''))
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -75,7 +85,7 @@ watch(dialogVisible, (bool) => {
 
 const open = (val: string) => {
   source1.value = `<iframe
-src="${application.location + val}"
+src="${application.location + val + urlParams1.value}"
 style="width: 100%; height: 100%;"
 frameborder="0"
 allow="microphone">
@@ -88,7 +98,7 @@ defer
 src="${window.location.origin}/api/application/embed?protocol=${window.location.protocol.replace(
     ':',
     ''
-  )}&host=${window.location.host}&token=${val}">
+  )}&host=${window.location.host}&token=${val}${urlParams2.value}">
 <\/script>
 `
   dialogVisible.value = true

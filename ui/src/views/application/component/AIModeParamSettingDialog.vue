@@ -6,6 +6,8 @@
     v-model="dialogVisible"
     style="width: 550px"
     append-to-body
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <DynamicsForm
       v-model="form_data"

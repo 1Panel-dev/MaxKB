@@ -61,6 +61,8 @@ RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     cp -f /opt/maxkb/app/installer/run-maxkb.sh /usr/bin/run-maxkb.sh && \
     cp -f /opt/maxkb/app/installer/init.sql /docker-entrypoint-initdb.d && \
     mkdir -p /opt/maxkb/app/sandbox/python-packages &&  \
+    find /opt/maxkb/app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} + && \
+    chmod 755 /tmp  && \
     useradd --no-create-home --home /opt/maxkb/app/sandbox --shell /bin/bash sandbox &&  \
     chown sandbox:sandbox /opt/maxkb/app/sandbox
 

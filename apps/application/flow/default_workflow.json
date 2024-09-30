@@ -3,24 +3,29 @@
         {
             "id": "base-node",
             "type": "base-node",
-            "x": 440,
-            "y": 3350,
+            "x": 360,
+            "y": 2810,
             "properties": {
-                "config": {},
-                "height": 517,
+                "config": {
+
+                },
+                "height": 825.6,
                 "stepName": "基本信息",
                 "node_data": {
                     "desc": "",
-                    "name": "",
+                    "name": "maxkbapplication",
                     "prologue": "您好，我是 MaxKB 小助手，您可以向我提出 MaxKB 使用问题。\n- MaxKB 主要功能有什么？\n- MaxKB 支持哪些大语言模型？\n- MaxKB 支持哪些文档类型？"
-                }
+                },
+                "input_field_list": [
+
+                ]
             }
         },
         {
             "id": "start-node",
             "type": "start-node",
-            "x": 440,
-            "y": 3710,
+            "x": 430,
+            "y": 3660,
             "properties": {
                 "config": {
                     "fields": [
@@ -31,8 +36,8 @@
                     ],
                     "globalFields": [
                         {
-                            "value": "time",
-                            "label": "当前时间"
+                            "label": "当前时间",
+                            "value": "time"
                         }
                     ]
                 },
@@ -42,7 +47,7 @@
                         "value": "question"
                     }
                 ],
-                "height": 268.533,
+                "height": 276,
                 "stepName": "开始",
                 "globalFields": [
                     {
@@ -55,8 +60,8 @@
         {
             "id": "b931efe5-5b66-46e0-ae3b-0160cb18eeb5",
             "type": "search-dataset-node",
-            "x": 830,
-            "y": 3470,
+            "x": 840,
+            "y": 3210,
             "properties": {
                 "config": {
                     "fields": [
@@ -78,10 +83,12 @@
                         }
                     ]
                 },
-                "height": 754.8,
+                "height": 794,
                 "stepName": "知识库检索",
                 "node_data": {
-                    "dataset_id_list": [],
+                    "dataset_id_list": [
+
+                    ],
                     "dataset_setting": {
                         "top_n": 3,
                         "similarity": 0.6,
@@ -91,6 +98,9 @@
                     "question_reference_address": [
                         "start-node",
                         "question"
+                    ],
+                    "source_dataset_id_list": [
+
                     ]
                 }
             }
@@ -98,8 +108,8 @@
         {
             "id": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "type": "condition-node",
-            "x": 1380,
-            "y": 3470,
+            "x": 1490,
+            "y": 3210,
             "properties": {
                 "width": 600,
                 "config": {
@@ -110,7 +120,7 @@
                         }
                     ]
                 },
-                "height": 524.6669999999999,
+                "height": 543.675,
                 "stepName": "判断器",
                 "node_data": {
                     "branch": [
@@ -148,24 +158,26 @@
                             "id": "161",
                             "type": "ELSE",
                             "condition": "and",
-                            "conditions": []
+                            "conditions": [
+
+                            ]
                         }
                     ]
                 },
                 "branch_condition_list": [
                     {
                         "index": 0,
-                        "height": 116.133,
+                        "height": 121.225,
                         "id": "1009"
                     },
                     {
                         "index": 1,
-                        "height": 116.133,
+                        "height": 121.225,
                         "id": "4908"
                     },
                     {
                         "index": 2,
-                        "height": 40,
+                        "height": 44,
                         "id": "161"
                     }
                 ]
@@ -174,8 +186,8 @@
         {
             "id": "4ffe1086-25df-4c85-b168-979b5bbf0a26",
             "type": "reply-node",
-            "x": 2090,
-            "y": 2820,
+            "x": 2170,
+            "y": 2480,
             "properties": {
                 "config": {
                     "fields": [
@@ -185,7 +197,7 @@
                         }
                     ]
                 },
-                "height": 312.267,
+                "height": 378,
                 "stepName": "指定回复",
                 "node_data": {
                     "fields": [
@@ -193,15 +205,16 @@
                         "directly_return"
                     ],
                     "content": "",
-                    "reply_type": "referencing"
+                    "reply_type": "referencing",
+                    "is_result": true
                 }
             }
         },
         {
             "id": "f1f1ee18-5a02-46f6-b4e6-226253cdffbb",
             "type": "ai-chat-node",
-            "x": 2090,
-            "y": 3460,
+            "x": 2160,
+            "y": 3200,
             "properties": {
                 "config": {
                     "fields": [
@@ -211,21 +224,22 @@
                         }
                     ]
                 },
-                "height": 681.4,
+                "height": 763,
                 "stepName": "AI 对话",
                 "node_data": {
                     "prompt": "已知信息：\n{{知识库检索.data}}\n问题：\n{{开始.question}}",
                     "system": "",
                     "model_id": "",
-                    "dialogue_number": 0
+                    "dialogue_number": 0,
+                    "is_result": true
                 }
             }
         },
         {
             "id": "309d0eef-c597-46b5-8d51-b9a28aaef4c7",
             "type": "ai-chat-node",
-            "x": 2090,
-            "y": 4180,
+            "x": 2160,
+            "y": 3970,
             "properties": {
                 "config": {
                     "fields": [
@@ -235,13 +249,14 @@
                         }
                     ]
                 },
-                "height": 681.4,
+                "height": 763,
                 "stepName": "AI 对话1",
                 "node_data": {
                     "prompt": "{{开始.question}}",
                     "system": "",
                     "model_id": "",
-                    "dialogue_number": 0
+                    "dialogue_number": 0,
+                    "is_result": true
                 }
             }
         }
@@ -253,30 +268,32 @@
             "sourceNodeId": "start-node",
             "targetNodeId": "b931efe5-5b66-46e0-ae3b-0160cb18eeb5",
             "startPoint": {
-                "x": 600,
-                "y": 3710
+                "x": 590,
+                "y": 3660
             },
             "endPoint": {
-                "x": 670,
-                "y": 3470
+                "x": 680,
+                "y": 3210
             },
-            "properties": {},
+            "properties": {
+
+            },
             "pointsList": [
                 {
-                    "x": 600,
-                    "y": 3710
+                    "x": 590,
+                    "y": 3660
                 },
                 {
-                    "x": 710,
-                    "y": 3710
+                    "x": 700,
+                    "y": 3660
                 },
                 {
-                    "x": 560,
-                    "y": 3470
+                    "x": 570,
+                    "y": 3210
                 },
                 {
-                    "x": 670,
-                    "y": 3470
+                    "x": 680,
+                    "y": 3210
                 }
             ],
             "sourceAnchorId": "start-node_right",
@@ -288,30 +305,32 @@
             "sourceNodeId": "b931efe5-5b66-46e0-ae3b-0160cb18eeb5",
             "targetNodeId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "startPoint": {
-                "x": 990,
-                "y": 3470
+                "x": 1000,
+                "y": 3210
             },
             "endPoint": {
-                "x": 1090,
-                "y": 3470
+                "x": 1200,
+                "y": 3210
             },
-            "properties": {},
+            "properties": {
+
+            },
             "pointsList": [
                 {
-                    "x": 990,
-                    "y": 3470
+                    "x": 1000,
+                    "y": 3210
                 },
                 {
-                    "x": 1100,
-                    "y": 3470
-                },
-                {
-                    "x": 980,
-                    "y": 3470
+                    "x": 1110,
+                    "y": 3210
                 },
                 {
                     "x": 1090,
-                    "y": 3470
+                    "y": 3210
+                },
+                {
+                    "x": 1200,
+                    "y": 3210
                 }
             ],
             "sourceAnchorId": "b931efe5-5b66-46e0-ae3b-0160cb18eeb5_right",
@@ -323,30 +342,32 @@
             "sourceNodeId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "targetNodeId": "4ffe1086-25df-4c85-b168-979b5bbf0a26",
             "startPoint": {
-                "x": 1670,
-                "y": 3340.733
+                "x": 1780,
+                "y": 3073.775
             },
             "endPoint": {
-                "x": 1930,
-                "y": 2820
+                "x": 2010,
+                "y": 2480
             },
-            "properties": {},
+            "properties": {
+
+            },
             "pointsList": [
                 {
-                    "x": 1670,
-                    "y": 3340.733
-                },
-                {
                     "x": 1780,
-                    "y": 3340.733
+                    "y": 3073.775
                 },
                 {
-                    "x": 1820,
-                    "y": 2820
+                    "x": 1890,
+                    "y": 3073.775
                 },
                 {
-                    "x": 1930,
-                    "y": 2820
+                    "x": 1900,
+                    "y": 2480
+                },
+                {
+                    "x": 2010,
+                    "y": 2480
                 }
             ],
             "sourceAnchorId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b_1009_right",
@@ -358,30 +379,32 @@
             "sourceNodeId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "targetNodeId": "f1f1ee18-5a02-46f6-b4e6-226253cdffbb",
             "startPoint": {
-                "x": 1670,
-                "y": 3464.866
+                "x": 1780,
+                "y": 3203
             },
             "endPoint": {
-                "x": 1930,
-                "y": 3460
+                "x": 2000,
+                "y": 3200
             },
-            "properties": {},
+            "properties": {
+
+            },
             "pointsList": [
                 {
-                    "x": 1670,
-                    "y": 3464.866
-                },
-                {
                     "x": 1780,
-                    "y": 3464.866
+                    "y": 3203
                 },
                 {
-                    "x": 1820,
-                    "y": 3460
+                    "x": 1890,
+                    "y": 3203
                 },
                 {
-                    "x": 1930,
-                    "y": 3460
+                    "x": 1890,
+                    "y": 3200
+                },
+                {
+                    "x": 2000,
+                    "y": 3200
                 }
             ],
             "sourceAnchorId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b_4908_right",
@@ -393,30 +416,32 @@
             "sourceNodeId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b",
             "targetNodeId": "309d0eef-c597-46b5-8d51-b9a28aaef4c7",
             "startPoint": {
-                "x": 1670,
-                "y": 3550.9325000000003
+                "x": 1780,
+                "y": 3293.6124999999997
             },
             "endPoint": {
-                "x": 1930,
-                "y": 4180
+                "x": 2000,
+                "y": 3970
             },
-            "properties": {},
+            "properties": {
+
+            },
             "pointsList": [
                 {
-                    "x": 1670,
-                    "y": 3550.9325000000003
-                },
-                {
                     "x": 1780,
-                    "y": 3550.9325000000003
+                    "y": 3293.6124999999997
                 },
                 {
-                    "x": 1820,
-                    "y": 4180
+                    "x": 1890,
+                    "y": 3293.6124999999997
                 },
                 {
-                    "x": 1930,
-                    "y": 4180
+                    "x": 1890,
+                    "y": 3970
+                },
+                {
+                    "x": 2000,
+                    "y": 3970
                 }
             ],
             "sourceAnchorId": "fc60863a-dec2-4854-9e5a-7a44b7187a2b_161_right",

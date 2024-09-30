@@ -88,6 +88,46 @@ model_info_list = [
         'qwen 1.5 110b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显著增强。所有规模的模型都支持32768个tokens的上下文长度。1100亿参数。',
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
+        'qwen2-72b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'qwen2-57b-a14b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'qwen2-7b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'qwen2.5-72b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'qwen2.5-32b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'qwen2.5-14b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'qwen2.5-7b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'qwen2.5-1.5b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'qwen2.5-0.5b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'qwen2.5-3b-instruct',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
         'phi3',
         'Phi-3 Mini是Microsoft的3.8B参数，轻量级，最先进的开放模型。',
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),

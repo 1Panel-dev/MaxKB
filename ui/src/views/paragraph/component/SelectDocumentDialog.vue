@@ -1,5 +1,11 @@
 <template>
-  <el-dialog title="选择知识库/文档" v-model="dialogVisible" width="500">
+  <el-dialog
+    title="选择知识库/文档"
+    v-model="dialogVisible"
+    width="500"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <el-form
       ref="formRef"
       :model="form"

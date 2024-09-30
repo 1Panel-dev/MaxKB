@@ -37,14 +37,16 @@ class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
                                 streaming=model_kwargs.get('streaming', False),
                                 init_kwargs=optional_params)
 
+    usage_metadata: dict = {}
+
     def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
-        return self.__dict__.get('_last_generation_info')
+        return self.usage_metadata
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        return self.get_last_generation_info().get('prompt_tokens', 0)
+        return self.usage_metadata.get('prompt_tokens', 0)
 
     def get_num_tokens(self, text: str) -> int:
-        return self.get_last_generation_info().get('completion_tokens', 0)
+        return self.usage_metadata.get('completion_tokens', 0)
 
     def _stream(
             self,
@@ -63,7 +65,7 @@ class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
                 additional_kwargs = msg.additional_kwargs.get("function_call", {})
                 if msg.content == "" or res.get("body").get("is_end"):
                     token_usage = res.get("body").get("usage")
-                    self.__dict__.setdefault('_last_generation_info', {}).update(token_usage)
+                    self.usage_metadata = token_usage
                 chunk = ChatGenerationChunk(
                     text=res["result"],
                     message=AIMessageChunk(  # type: ignore[call-arg]

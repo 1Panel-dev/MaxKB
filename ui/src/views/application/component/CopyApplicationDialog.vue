@@ -4,6 +4,8 @@
     v-model="dialogVisible"
     width="650"
     append-to-body
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <el-form
       ref="applicationFormRef"
@@ -72,7 +74,7 @@ const applicationForm = ref<ApplicationFormType>({
   name: '',
   desc: '',
   model_id: '',
-  multiple_rounds_dialogue: false,
+  dialogue_number: 0,
   prologue: t('views.application.prompt.defaultPrologue'),
   dataset_id_list: [],
   dataset_setting: {
@@ -108,7 +110,7 @@ watch(dialogVisible, (bool) => {
       name: '',
       desc: '',
       model_id: '',
-      multiple_rounds_dialogue: false,
+      dialogue_number: 0,
       prologue: t('views.application.prompt.defaultPrologue'),
       dataset_id_list: [],
       dataset_setting: {

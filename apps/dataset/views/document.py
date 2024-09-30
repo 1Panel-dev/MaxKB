@@ -239,7 +239,7 @@ class Document(APIView):
     class BatchRefresh(APIView):
         authentication_classes = [TokenAuth]
 
-        @action(methods=['POST'], detail=False)
+        @action(methods=['PUT'], detail=False)
         @swagger_auto_schema(operation_summary="批量刷新文档向量库",
                              operation_id="批量刷新文档向量库",
                              request_body=

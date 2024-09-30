@@ -120,7 +120,12 @@ class DatasetSettingSerializer(serializers.Serializer):
 
 
 class ModelSettingSerializer(serializers.Serializer):
-    prompt = serializers.CharField(required=True, max_length=2048, error_messages=ErrMessage.char("提示词"))
+    prompt = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
+                                   error_messages=ErrMessage.char("提示词"))
+    system = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=102400,
+                                   error_messages=ErrMessage.char("角色提示词"))
+    no_references_prompt = serializers.CharField(required=True, max_length=102400, allow_null=True, allow_blank=True,
+                                                 error_messages=ErrMessage.char("无引用分段提示词"))
 
 
 class ApplicationWorkflowSerializer(serializers.Serializer):
@@ -174,7 +179,10 @@ class ApplicationSerializer(serializers.Serializer):
                                  error_messages=ErrMessage.char("应用描述"))
     model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      error_messages=ErrMessage.char("模型"))
-    multiple_rounds_dialogue = serializers.BooleanField(required=True, error_messages=ErrMessage.char("多轮对话"))
+    dialogue_number = serializers.IntegerField(required=True,
+                                               min_value=0,
+                                               max_value=1024,
+                                               error_messages=ErrMessage.integer("历史聊天记录"))
     prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                      error_messages=ErrMessage.char("开场白"))
     dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
@@ -185,6 +193,8 @@ class ApplicationSerializer(serializers.Serializer):
     model_setting = ModelSettingSerializer(required=True)
     # 问题补全
     problem_optimization = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("问题补全"))
+    problem_optimization_prompt = serializers.CharField(required=False, max_length=102400,
+                                                        error_messages=ErrMessage.char("问题补全提示词"))
     # 应用类型
     type = serializers.CharField(required=True, error_messages=ErrMessage.char("应用类型"),
                                  validators=[
@@ -204,7 +214,7 @@ class ApplicationSerializer(serializers.Serializer):
         protocol = serializers.CharField(required=True, error_messages=ErrMessage.char("协议"))
         token = serializers.CharField(required=True, error_messages=ErrMessage.char("token"))
 
-        def get_embed(self, with_valid=True):
+        def get_embed(self, with_valid=True, params={}):
             if with_valid:
                 self.is_valid(raise_exception=True)
             index_path = os.path.join(PROJECT_DIR, 'apps', "application", 'template', 'embed.js')
@@ -215,9 +225,12 @@ class ApplicationSerializer(serializers.Serializer):
                 access_token=self.data.get('token')).first()
             is_draggable = 'false'
             show_guide = 'true'
-            float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/favicon.ico"
+            float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/MaxKB.gif"
             X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
                                                                                   'XPACK_LICENSE_IS_VALID') else False)
+            # 获取接入的query参数
+            query = self.get_query_api_input(application_access_token.application, params)
+
             application_setting_model = DBModelManage.get_model('application_setting')
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(
@@ -239,9 +252,25 @@ class ApplicationSerializer(serializers.Serializer):
                      'white_active': 'true' if application_access_token.white_active else 'false',
                      'is_draggable': is_draggable,
                      'float_icon': float_icon,
+                     'query': query,
                      'show_guide': show_guide}))
             response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
             return response
+
+        def get_query_api_input(self, application, params):
+            query = ''
+            if application.work_flow is not None:
+                work_flow = application.work_flow
+                if work_flow is not None:
+                    for node in work_flow.get('nodes', []):
+                        if node['id'] == 'base-node':
+                            input_field_list = node.get('properties', {}).get('input_field_list', [])
+                            if input_field_list is not None:
+                                for field in input_field_list:
+                                    if field['assignment_method'] == 'api_input' and field['variable'] in params:
+                                        query += f"&{field['variable']}={params[field['variable']]}"
+
+            return query
 
     class AccessTokenSerializer(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.boolean("应用id"))
@@ -345,8 +374,10 @@ class ApplicationSerializer(serializers.Serializer):
                                      error_messages=ErrMessage.char("应用描述"))
         model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                          error_messages=ErrMessage.char("模型"))
-        multiple_rounds_dialogue = serializers.BooleanField(required=False,
-                                                            error_messages=ErrMessage.boolean("多轮会话"))
+        dialogue_number = serializers.IntegerField(required=False,
+                                                   min_value=0,
+                                                   max_value=1024,
+                                                   error_messages=ErrMessage.integer("历史聊天记录"))
         prologue = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=4096,
                                          error_messages=ErrMessage.char("开场白"))
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
@@ -411,13 +442,14 @@ class ApplicationSerializer(serializers.Serializer):
         def to_application_model(user_id: str, application: Dict):
             return Application(id=uuid.uuid1(), name=application.get('name'), desc=application.get('desc'),
                                prologue=application.get('prologue'),
-                               dialogue_number=3 if application.get('multiple_rounds_dialogue') else 0,
+                               dialogue_number=application.get('dialogue_number', 0),
                                user_id=user_id, model_id=application.get('model_id'),
                                dataset_setting=application.get('dataset_setting'),
                                model_setting=application.get('model_setting'),
                                problem_optimization=application.get('problem_optimization'),
                                type=ApplicationTypeChoices.SIMPLE,
                                model_params_setting=application.get('model_params_setting', {}),
+                               problem_optimization_prompt=application.get('problem_optimization_prompt', None),
                                work_flow={}
                                )
 
@@ -582,7 +614,8 @@ class ApplicationSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
-            return FunctionLibSerializer.Query(data={'user_id': application.user_id}).list(with_valid=True)
+            return FunctionLibSerializer.Query(data={'user_id': application.user_id, 'is_active': True}).list(
+                with_valid=True)
 
         def get_function_lib(self, function_lib_id, with_valid=True):
             if with_valid:
@@ -688,6 +721,20 @@ class ApplicationSerializer(serializers.Serializer):
             application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application.id).first()
             if application_access_token is None:
                 raise AppUnauthorizedFailed(500, "非法用户")
+            application_setting_model = DBModelManage.get_model('application_setting')
+            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
+                                                                                  'XPACK_LICENSE_IS_VALID') else False)
+            application_setting_dict = {}
+            if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
+                application_setting = QuerySet(application_setting_model).filter(
+                    application_id=application_access_token.application_id).first()
+                if application_setting is not None:
+                    application_setting_dict = {'show_source': application_access_token.show_source,
+                                                'show_history': application_setting.show_history,
+                                                'draggable': application_setting.draggable,
+                                                'show_guide': application_setting.show_guide,
+                                                'avatar': application_setting.avatar,
+                                                'float_icon': application_setting.float_icon}
             return ApplicationSerializer.Query.reset_application(
                 {**ApplicationSerializer.ApplicationModel(application).data,
                  'stt_model_id': application.stt_model_id,
@@ -696,7 +743,8 @@ class ApplicationSerializer(serializers.Serializer):
                  'tts_model_enable': application.tts_model_enable,
                  'tts_type': application.tts_type,
                  'work_flow': application.work_flow,
-                 'show_source': application_access_token.show_source})
+                 'show_source': application_access_token.show_source,
+                 **application_setting_dict})
 
         @transaction.atomic
         def edit(self, instance: Dict, with_valid=True):
@@ -747,7 +795,8 @@ class ApplicationSerializer(serializers.Serializer):
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                            'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
-                           'api_key_is_active', 'icon', 'work_flow', 'model_params_setting']
+                           'api_key_is_active', 'icon', 'work_flow', 'model_params_setting',
+                           'problem_optimization_prompt']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     application.__setattr__(update_key, instance.get(update_key))

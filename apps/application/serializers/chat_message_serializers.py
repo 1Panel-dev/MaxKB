@@ -60,6 +60,17 @@ class ChatInfo:
         self.chat_record_list: List[ChatRecord] = []
         self.work_flow_version = work_flow_version
 
+    @staticmethod
+    def get_no_references_setting(dataset_setting, model_setting):
+        no_references_setting = dataset_setting.get(
+            'no_references_setting', {
+                'status': 'ai_questioning',
+                'value': '{question}'})
+        if no_references_setting.get('status') == 'ai_questioning':
+            no_references_prompt = model_setting.get('no_references_prompt', '{question}')
+            no_references_setting['value'] = no_references_prompt if len(no_references_prompt) > 0 else "{question}"
+        return no_references_setting
+
     def to_base_pipeline_manage_params(self):
         dataset_setting = self.application.dataset_setting
         model_setting = self.application.model_setting
@@ -80,8 +91,13 @@ class ChatInfo:
             'history_chat_record': self.chat_record_list,
             'chat_id': self.chat_id,
             'dialogue_number': self.application.dialogue_number,
+            'problem_optimization_prompt': self.application.problem_optimization_prompt if self.application.problem_optimization_prompt is not None and len(
+                self.application.problem_optimization_prompt) > 0 else '()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中',
             'prompt': model_setting.get(
-                'prompt') if 'prompt' in model_setting else Application.get_default_model_prompt(),
+                'prompt') if 'prompt' in model_setting and len(model_setting.get(
+                'prompt')) > 0 else Application.get_default_model_prompt(),
+            'system': model_setting.get(
+                'system', None),
             'model_id': model_id,
             'problem_optimization': self.application.problem_optimization,
             'stream': True,
@@ -89,11 +105,7 @@ class ChatInfo:
                 self.application.model_params_setting.keys()) == 0 else self.application.model_params_setting,
             'search_mode': self.application.dataset_setting.get(
                 'search_mode') if 'search_mode' in self.application.dataset_setting else 'embedding',
-            'no_references_setting': self.application.dataset_setting.get(
-                'no_references_setting') if 'no_references_setting' in self.application.dataset_setting else {
-                'status': 'ai_questioning',
-                'value': '{question}',
-            },
+            'no_references_setting': self.get_no_references_setting(self.application.dataset_setting, model_setting),
             'user_id': self.application.user_id
         }
 
@@ -105,7 +117,8 @@ class ChatInfo:
                 'client_type': client_type}
 
     def append_chat_record(self, chat_record: ChatRecord, client_id=None):
-        chat_record.problem_text = chat_record.problem_text[0:1024] if chat_record.problem_text is not None else ""
+        chat_record.problem_text = chat_record.problem_text[0:10240] if chat_record.problem_text is not None else ""
+        chat_record.answer_text = chat_record.answer_text[0:40960] if chat_record.problem_text is not None else ""
         # 存入缓存中
         self.chat_record_list.append(chat_record)
         if self.application.id is not None:
@@ -175,7 +188,7 @@ class OpenAIChatSerializer(serializers.Serializer):
             chat_id = str(uuid.uuid1())
         chat = QuerySet(Chat).filter(id=chat_id).first()
         if chat is None:
-            Chat(id=chat_id, application_id=application_id, abstract=message, client_id=client_id).save()
+            Chat(id=chat_id, application_id=application_id, abstract=message[0:1024], client_id=client_id).save()
         return chat_id
 
     def chat(self, instance: Dict, with_valid=True):
@@ -196,7 +209,7 @@ class OpenAIChatSerializer(serializers.Serializer):
                   'stream': stream,
                   'application_id': application_id,
                   'client_id': client_id,
-                  'client_type': client_type}).chat(
+                  'client_type': client_type, 'form_data': instance.get('form_data', {})}).chat(
             base_to_response=OpenaiToResponse())
 
 

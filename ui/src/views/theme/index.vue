@@ -16,7 +16,7 @@
             <el-radio-button label="自定义" value="custom" />
           </el-radio-group>
           <div v-if="themeRadio === 'custom'">
-            <h5 class="mt-16 mb-8">平台显示主题</h5>
+            <h5 class="mt-16 mb-8">自定义主题</h5>
             <el-color-picker v-model="customColor" @change="customColorHandle" />
           </div>
         </div>
@@ -254,12 +254,7 @@ const themeForm = ref<any>({
   loginImage: '',
   title: 'MaxKB',
   slogan: '欢迎使用 MaxKB 智能知识库问答系统',
-  showUserManual: false,
-  userManualUrl: '',
-  showForum: false,
-  forumUrl: '',
-  showProject: false,
-  projectUrl: ''
+  ...defaultPlatformSetting
 })
 const themeRadio = ref('')
 const customColor = ref('')

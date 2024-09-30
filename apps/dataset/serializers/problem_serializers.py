@@ -8,6 +8,7 @@
 """
 import os
 import uuid
+from functools import reduce
 from typing import Dict, List
 
 from django.db import transaction
@@ -21,7 +22,8 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from dataset.models import Problem, Paragraph, ProblemParagraphMapping, DataSet
 from dataset.serializers.common_serializers import get_embedding_model_id_by_dataset_id
-from embedding.task import delete_embedding_by_source_ids, update_problem_embedding
+from embedding.models import SourceType
+from embedding.task import delete_embedding_by_source_ids, update_problem_embedding, embedding_by_data_list
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -50,11 +52,41 @@ class ProblemInstanceSerializer(ApiMixin, serializers.Serializer):
                               })
 
 
+class AssociationParagraph(serializers.Serializer):
+    paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("段落id"))
+    document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
+
+
+class BatchAssociation(serializers.Serializer):
+    problem_id_list = serializers.ListField(required=True, error_messages=ErrMessage.list("问题id列表"),
+                                            child=serializers.UUIDField(required=True,
+                                                                        error_messages=ErrMessage.uuid("问题id")))
+    paragraph_list = AssociationParagraph(many=True)
+
+
+def is_exits(exits_problem_paragraph_mapping_list, new_paragraph_mapping):
+    filter_list = [exits_problem_paragraph_mapping for exits_problem_paragraph_mapping in
+                   exits_problem_paragraph_mapping_list if
+                   str(exits_problem_paragraph_mapping.paragraph_id) == new_paragraph_mapping.paragraph_id
+                   and str(exits_problem_paragraph_mapping.problem_id) == new_paragraph_mapping.problem_id
+                   and str(exits_problem_paragraph_mapping.dataset_id) == new_paragraph_mapping.dataset_id]
+    return len(filter_list) > 0
+
+
+def to_problem_paragraph_mapping(problem, document_id: str, paragraph_id: str, dataset_id: str):
+    return ProblemParagraphMapping(id=uuid.uuid1(),
+                                   document_id=document_id,
+                                   paragraph_id=paragraph_id,
+                                   dataset_id=dataset_id,
+                                   problem_id=str(problem.id)), problem
+
+
 class ProblemSerializers(ApiMixin, serializers.Serializer):
     class Create(serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
         problem_list = serializers.ListField(required=True, error_messages=ErrMessage.list("问题列表"),
                                              child=serializers.CharField(required=True,
+                                                                         max_length=256,
                                                                          error_messages=ErrMessage.char("问题")))
 
         def batch(self, with_valid=True):
@@ -113,6 +145,47 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             QuerySet(Problem).filter(id__in=problem_id_list).delete()
             delete_embedding_by_source_ids(source_ids)
             return True
+
+        def association(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                BatchAssociation(data=instance).is_valid(raise_exception=True)
+            dataset_id = self.data.get('dataset_id')
+            paragraph_list = instance.get('paragraph_list')
+            problem_id_list = instance.get('problem_id_list')
+            problem_list = QuerySet(Problem).filter(id__in=problem_id_list)
+            exits_problem_paragraph_mapping = QuerySet(ProblemParagraphMapping).filter(problem_id__in=problem_id_list,
+                                                                                       paragraph_id__in=[
+                                                                                           p.get('paragraph_id')
+                                                                                           for p in
+                                                                                           paragraph_list])
+            problem_paragraph_mapping_list = [(problem_paragraph_mapping, problem) for
+                                              problem_paragraph_mapping, problem in reduce(lambda x, y: [*x, *y],
+                                                                                           [[
+                                                                                               to_problem_paragraph_mapping(
+                                                                                                   problem,
+                                                                                                   paragraph.get(
+                                                                                                       'document_id'),
+                                                                                                   paragraph.get(
+                                                                                                       'paragraph_id'),
+                                                                                                   dataset_id) for
+                                                                                               paragraph in
+                                                                                               paragraph_list]
+                                                                                               for problem in
+                                                                                               problem_list], []) if
+                                              not is_exits(exits_problem_paragraph_mapping, problem_paragraph_mapping)]
+            QuerySet(ProblemParagraphMapping).bulk_create(
+                [problem_paragraph_mapping for problem_paragraph_mapping, problem in problem_paragraph_mapping_list])
+            data_list = [{'text': problem.content,
+                          'is_active': True,
+                          'source_type': SourceType.PROBLEM,
+                          'source_id': str(problem_paragraph_mapping.id),
+                          'document_id': str(problem_paragraph_mapping.document_id),
+                          'paragraph_id': str(problem_paragraph_mapping.paragraph_id),
+                          'dataset_id': dataset_id,
+                          } for problem_paragraph_mapping, problem in problem_paragraph_mapping_list]
+            model_id = get_embedding_model_id_by_dataset_id(self.data.get('dataset_id'))
+            embedding_by_data_list(data_list, model_id=model_id)
 
     class Operate(serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))

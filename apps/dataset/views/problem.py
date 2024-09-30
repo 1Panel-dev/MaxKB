@@ -88,6 +88,20 @@ class Problem(APIView):
             return result.success(
                 ProblemSerializers.BatchOperate(data={'dataset_id': dataset_id}).delete(request.data))
 
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="批量关联段落",
+                             operation_id="批量关联段落",
+                             request_body=ProblemApi.BatchAssociation.get_request_body_api(),
+                             manual_parameters=ProblemApi.BatchOperate.get_request_params_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库/文档/段落/问题"])
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def post(self, request: Request, dataset_id: str):
+            return result.success(
+                ProblemSerializers.BatchOperate(data={'dataset_id': dataset_id}).association(request.data))
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 

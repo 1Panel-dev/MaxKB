@@ -40,15 +40,15 @@ class ApplicationApi(ApiMixin):
     def get_response_body_api():
         return openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            required=['id', 'name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'user_id', 'status', 'create_time',
+            required=['id', 'name', 'desc', 'model_id', 'dialogue_number', 'user_id', 'status', 'create_time',
                       'update_time'],
             properties={
                 'id': openapi.Schema(type=openapi.TYPE_STRING, title="", description="主键id"),
                 'name': openapi.Schema(type=openapi.TYPE_STRING, title="应用名称", description="应用名称"),
                 'desc': openapi.Schema(type=openapi.TYPE_STRING, title="应用描述", description="应用描述"),
                 'model_id': openapi.Schema(type=openapi.TYPE_STRING, title="模型id", description="模型id"),
-                "multiple_rounds_dialogue": openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否开启多轮对话",
-                                                           description="是否开启多轮对话"),
+                "dialogue_number": openapi.Schema(type=openapi.TYPE_NUMBER, title="多轮对话次数",
+                                                  description="多轮对话次数"),
                 'prologue': openapi.Schema(type=openapi.TYPE_STRING, title="开场白", description="开场白"),
                 'example': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING),
                                           title="示例列表", description="示例列表"),
@@ -164,8 +164,8 @@ class ApplicationApi(ApiMixin):
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="应用名称", description="应用名称"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="应用描述", description="应用描述"),
                     'model_id': openapi.Schema(type=openapi.TYPE_STRING, title="模型id", description="模型id"),
-                    "multiple_rounds_dialogue": openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否开启多轮对话",
-                                                               description="是否开启多轮对话"),
+                    "dialogue_number": openapi.Schema(type=openapi.TYPE_NUMBER, title="多轮对话次数",
+                                                      description="多轮对话次数"),
                     'prologue': openapi.Schema(type=openapi.TYPE_STRING, title="开场白", description="开场白"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
@@ -176,7 +176,22 @@ class ApplicationApi(ApiMixin):
                                                            description="是否开启问题优化", default=True),
                     'icon': openapi.Schema(type=openapi.TYPE_STRING, title="icon",
                                            description="icon", default="/ui/favicon.ico"),
-                    'work_flow': ApplicationApi.WorkFlow.get_request_body_api()
+                    'type': openapi.Schema(type=openapi.TYPE_STRING, title="应用类型",
+                                           description="应用类型 简易:SIMPLE|工作流:WORK_FLOW"),
+                    'work_flow': ApplicationApi.WorkFlow.get_request_body_api(),
+                    'problem_optimization_prompt': openapi.Schema(type=openapi.TYPE_STRING, title='问题优化提示词',
+                                                                  description="问题优化提示词",
+                                                                  default="()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中"),
+                    'tts_model_id': openapi.Schema(type=openapi.TYPE_STRING, title="文字转语音模型ID",
+                                                   description="文字转语音模型ID"),
+                    'stt_model_id': openapi.Schema(type=openapi.TYPE_STRING, title="语音转文字模型id",
+                                                   description="语音转文字模型id"),
+                    'stt_model_enable': openapi.Schema(type=openapi.TYPE_STRING, title="语音转文字是否开启",
+                                                       description="语音转文字是否开启"),
+                    'tts_model_enable': openapi.Schema(type=openapi.TYPE_STRING, title="语音转文字是否开启",
+                                                       description="语音转文字是否开启"),
+                    'tts_type': openapi.Schema(type=openapi.TYPE_STRING, title="文字转语音类型",
+                                               description="文字转语音类型")
 
                 }
             )
@@ -248,6 +263,11 @@ class ApplicationApi(ApiMixin):
                                                       '\n问题：'
                                                       '\n{question}')),
 
+                    'system': openapi.Schema(type=openapi.TYPE_STRING, title="系统提示词(角色)",
+                                             description="系统提示词(角色)"),
+                    'no_references_prompt': openapi.Schema(type=openapi.TYPE_STRING, title="无引用分段提示词",
+                                                           default="{question}", description="无引用分段提示词")
+
                 }
             )
 
@@ -267,14 +287,14 @@ class ApplicationApi(ApiMixin):
         def get_request_body_api():
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                required=['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'dataset_setting', 'model_setting',
-                          'problem_optimization'],
+                required=['name', 'desc', 'model_id', 'dialogue_number', 'dataset_setting', 'model_setting',
+                          'problem_optimization', 'stt_model_enable', 'stt_model_enable', 'tts_type'],
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title="应用名称", description="应用名称"),
                     'desc': openapi.Schema(type=openapi.TYPE_STRING, title="应用描述", description="应用描述"),
                     'model_id': openapi.Schema(type=openapi.TYPE_STRING, title="模型id", description="模型id"),
-                    "multiple_rounds_dialogue": openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否开启多轮对话",
-                                                               description="是否开启多轮对话"),
+                    "dialogue_number": openapi.Schema(type=openapi.TYPE_NUMBER, title="多轮对话次数",
+                                                      description="多轮对话次数"),
                     'prologue': openapi.Schema(type=openapi.TYPE_STRING, title="开场白", description="开场白"),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
@@ -284,8 +304,20 @@ class ApplicationApi(ApiMixin):
                     'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="问题优化",
                                                            description="是否开启问题优化", default=True),
                     'type': openapi.Schema(type=openapi.TYPE_STRING, title="应用类型",
-                                           description="应用类型 简易:SIMPLE|工作流:WORK_FLOW")
-
+                                           description="应用类型 简易:SIMPLE|工作流:WORK_FLOW"),
+                    'problem_optimization_prompt': openapi.Schema(type=openapi.TYPE_STRING, title='问题优化提示词',
+                                                                  description="问题优化提示词",
+                                                                  default="()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中"),
+                    'tts_model_id': openapi.Schema(type=openapi.TYPE_STRING, title="文字转语音模型ID",
+                                                   description="文字转语音模型ID"),
+                    'stt_model_id': openapi.Schema(type=openapi.TYPE_STRING, title="语音转文字模型id",
+                                                   description="语音转文字模型id"),
+                    'stt_model_enable': openapi.Schema(type=openapi.TYPE_STRING, title="语音转文字是否开启",
+                                                       description="语音转文字是否开启"),
+                    'tts_model_enable': openapi.Schema(type=openapi.TYPE_STRING, title="语音转文字是否开启",
+                                                       description="语音转文字是否开启"),
+                    'tts_type': openapi.Schema(type=openapi.TYPE_STRING, title="文字转语音类型",
+                                               description="文字转语音类型")
                 }
             )
 

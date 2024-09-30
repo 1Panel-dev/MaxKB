@@ -140,14 +140,21 @@ function createUser() {
     title.value = '创建用户'
     UserDialogRef.value.open()
   } else {
-    common.asyncGetValid(ValidType.User, ValidCount.User, loading).then((res: any) => {
-      if (res?.data) {
-        title.value = '创建用户'
-        UserDialogRef.value.open()
-      } else {
-        MsgAlert('提示', '社区版最多支持 2 个用户，如需拥有更多用户，请升级为专业版。')
-      }
+    MsgConfirm(`提示`, '社区版最多支持 2 个用户，如需拥有更多用户，请升级为专业版。', {
+      cancelButtonText: '确定',
+      confirmButtonText: '购买专业版',
     })
+      .then(() => {
+        window.open('https://maxkb.cn/pricing.html', '_blank')
+      })
+      .catch(() => {
+        common.asyncGetValid(ValidType.User, ValidCount.User, loading).then(async (res: any) => {
+          if (res?.data) {
+            title.value = '创建用户'
+            UserDialogRef.value.open()
+          }
+        })
+      })
   }
 }
 

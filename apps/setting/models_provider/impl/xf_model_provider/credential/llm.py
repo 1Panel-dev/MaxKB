@@ -25,10 +25,10 @@ class XunFeiLLMModelGeneralParams(BaseForm):
                                     precision=2)
 
     max_tokens = forms.SliderField(
-        TooltipLabel('输出最大Tokens', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
+        TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
         required=True, default_value=4096,
         _min=1,
-        _max=4096,
+        _max=100000,
         _step=1,
         precision=0)
 
@@ -42,10 +42,10 @@ class XunFeiLLMModelProParams(BaseForm):
                                     precision=2)
 
     max_tokens = forms.SliderField(
-        TooltipLabel('输出最大Tokens', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
+        TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
         required=True, default_value=4096,
         _min=1,
-        _max=8192,
+        _max=100000,
         _step=1,
         precision=0)
 

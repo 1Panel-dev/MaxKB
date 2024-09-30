@@ -7,6 +7,8 @@
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
     >
       <el-form-item label="新密码" prop="password">
         <el-input

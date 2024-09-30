@@ -1,5 +1,10 @@
 <template>
-  <el-dialog :title="title" v-model="dialogVisible">
+  <el-dialog
+    :title="title"
+    v-model="dialogVisible"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <el-form
       ref="userFormRef"
       :model="userForm"
@@ -7,6 +12,8 @@
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
     >
       <el-form-item :prop="isEdit ? '' : 'username'" label="用户名">
         <el-input

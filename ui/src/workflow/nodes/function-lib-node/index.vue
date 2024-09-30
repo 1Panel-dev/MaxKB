@@ -124,7 +124,7 @@ const update_field = () => {
         return { ...item, value: item.source == 'reference' ? [] : '' }
       })
       set(props.nodeModel.properties.node_data, 'input_field_list', merge_input_field_list)
-      set(props.nodeModel.properties, 'status', 200)
+      set(props.nodeModel.properties, 'status', ok.data.is_active ? 200 : 500)
     })
     .catch((err) => {
       set(props.nodeModel.properties, 'status', 500)

@@ -6,6 +6,8 @@
     destroy-on-close
     append-to-body
     align-center
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <div class="mb-8">
       <el-scrollbar>

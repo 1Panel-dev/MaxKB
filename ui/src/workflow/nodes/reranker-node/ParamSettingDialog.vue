@@ -6,6 +6,8 @@
     v-model="dialogVisible"
     style="width: 550px"
     append-to-body
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <div>
       <el-scrollbar always>
@@ -16,10 +18,8 @@
                 <el-form-item>
                   <template #label>
                     <div class="flex align-center">
-                      <span class="mr-4">{{
-                        $t('views.application.applicationForm.dialogues.similarityThreshold')
-                      }}</span>
-                      <el-tooltip effect="dark" content="相似度越高相关性越强。" placement="right">
+                      <span class="mr-4">Score 高于</span>
+                      <el-tooltip effect="dark" content="Score越高相关性越强。" placement="right">
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip>
                     </div>
@@ -62,62 +62,6 @@
                 class="custom-slider"
               />
             </el-form-item>
-            <el-form-item
-              v-if="!isWorkflowType"
-              :label="$t('views.application.applicationForm.dialogues.noReferencesAction')"
-            >
-              <el-form
-                label-position="top"
-                ref="noReferencesformRef"
-                :model="noReferencesform"
-                :rules="noReferencesRules"
-                class="w-full"
-                :hide-required-asterisk="true"
-              >
-                <el-radio-group
-                  v-model="form.no_references_setting.status"
-                  class="radio-block mb-16"
-                >
-                  <div>
-                    <el-radio value="ai_questioning">
-                      <p>
-                        {{ $t('views.application.applicationForm.dialogues.continueQuestioning') }}
-                      </p>
-                      <el-form-item
-                        v-if="form.no_references_setting.status === 'ai_questioning'"
-                        :label="$t('views.application.applicationForm.form.prompt.label')"
-                        prop="ai_questioning"
-                      >
-                        <el-input
-                          v-model="noReferencesform.ai_questioning"
-                          :rows="2"
-                          type="textarea"
-                          maxlength="2048"
-                          :placeholder="defaultValue['ai_questioning']"
-                        />
-                      </el-form-item>
-                    </el-radio>
-                  </div>
-                  <div class="mt-8">
-                    <el-radio value="designated_answer">
-                      <p>{{ $t('views.application.applicationForm.dialogues.provideAnswer') }}</p>
-                      <el-form-item
-                        v-if="form.no_references_setting.status === 'designated_answer'"
-                        prop="designated_answer"
-                      >
-                        <el-input
-                          v-model="noReferencesform.designated_answer"
-                          :rows="2"
-                          type="textarea"
-                          maxlength="2048"
-                          :placeholder="defaultValue['designated_answer']"
-                        />
-                      </el-form-item>
-                    </el-radio>
-                  </div>
-                </el-radio-group>
-              </el-form>
-            </el-form-item>
           </el-form>
         </div>
       </el-scrollbar>
@@ -127,7 +71,7 @@
         <el-button @click.prevent="dialogVisible = false">{{
           $t('views.application.applicationForm.buttons.cancel')
         }}</el-button>
-        <el-button type="primary" @click="submit(noReferencesformRef)" :loading="loading">
+        <el-button type="primary" @click="submit()" :loading="loading">
           {{ $t('views.application.applicationForm.buttons.save') }}
         </el-button>
       </span>
@@ -135,112 +79,44 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
+import { ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
-import { isWorkFlow } from '@/utils/application'
-import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 
-const paramFormRef = ref()
-const noReferencesformRef = ref()
-
-const defaultValue = {
-  ai_questioning: '{question}',
-  // @ts-ignore
-  designated_answer: t('views.application.applicationForm.dialogues.designated_answer')
-}
+const paramFormRef = ref<FormInstance>()
 
 const form = ref<any>({
-  search_mode: 'embedding',
   top_n: 3,
-  similarity: 0.6,
-  max_paragraph_char_number: 5000,
-  no_references_setting: {
-    status: 'ai_questioning',
-    value: '{question}'
-  }
-})
-
-const noReferencesform = ref<any>({
-  ai_questioning: defaultValue['ai_questioning'],
-  designated_answer: defaultValue['designated_answer']
-})
-
-const noReferencesRules = reactive<FormRules<any>>({
-  ai_questioning: [
-    {
-      required: true,
-      message: t('views.application.applicationForm.dialogues.promptPlaceholder'),
-      trigger: 'blur'
-    }
-  ],
-  designated_answer: [
-    {
-      required: true,
-      message: t('views.application.applicationForm.dialogues.concentPlaceholder'),
-      trigger: 'blur'
-    }
-  ]
+  similarity: 0,
+  max_paragraph_char_number: 5000
 })
 
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 
-const isWorkflowType = ref(false)
-
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
-      search_mode: 'embedding',
       top_n: 3,
-      similarity: 0.6,
-      max_paragraph_char_number: 5000,
-      no_references_setting: {
-        status: 'ai_questioning',
-        value: ''
-      }
+      similarity: 0,
+      max_paragraph_char_number: 5000
     }
-    noReferencesform.value = {
-      ai_questioning: defaultValue['ai_questioning'],
-      designated_answer: defaultValue['designated_answer']
-    }
-    noReferencesformRef.value?.clearValidate()
   }
 })
 
-const open = (data: any, type?: string) => {
-  isWorkflowType.value = isWorkFlow(type)
+const open = (data: any) => {
   form.value = { ...form.value, ...cloneDeep(data) }
-  noReferencesform.value[form.value.no_references_setting.status] =
-    form.value.no_references_setting.value
   dialogVisible.value = true
 }
 
-const submit = async (formEl: FormInstance | undefined) => {
-  if (isWorkflowType.value) {
-    delete form.value['no_references_setting']
-    emit('refresh', form.value)
-    dialogVisible.value = false
-  } else {
-    if (!formEl) return
-    await formEl.validate((valid, fields) => {
-      if (valid) {
-        form.value.no_references_setting.value =
-          noReferencesform.value[form.value.no_references_setting.status]
-        emit('refresh', form.value)
-        dialogVisible.value = false
-      }
-    })
-  }
-}
-
-function changeHandle(val: string) {
-  if (val === 'keywords') {
-    form.value.similarity = 0
-  } else {
-    form.value.similarity = 0.6
-  }
+const submit = () => {
+  paramFormRef?.value?.validate((valid: boolean, fields: any) => {
+    if (valid) {
+      emit('refresh', cloneDeep(form.value))
+      dialogVisible.value = false
+    }
+  })
 }
 
 defineExpose({ open })

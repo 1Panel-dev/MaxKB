@@ -1,5 +1,11 @@
 <template>
-  <el-dialog title="修改内容" v-model="dialogVisible" width="600">
+  <el-dialog
+    title="修改内容"
+    v-model="dialogVisible"
+    width="600"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <el-form
       ref="formRef"
       :model="form"
@@ -18,15 +24,20 @@
         </el-input>
       </el-form-item>
       <el-form-item label="内容" prop="content">
-        <el-input
+        <MdEditor
           v-model="form.content"
           placeholder="请输入内容"
-          maxlength="100000"
-          show-word-limit
-          :rows="8"
-          type="textarea"
+          :maxLength="100000"
+          :preview="false"
+          :toolbars="toolbars"
+          style="height: 300px"
+          @onUploadImg="onUploadImg"
+          :footers="footers"
         >
-        </el-input>
+          <template #defFooters>
+            <span style="margin-left: -6px">/ 100000</span>
+          </template>
+        </MdEditor>
       </el-form-item>
       <el-form-item label="标题">
         <el-input
@@ -99,6 +110,7 @@ import { ref, watch, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import logApi from '@/api/log'
+import imageApi from '@/api/image'
 import useStore from '@/stores'
 
 const { application, document } = useStore()
@@ -110,6 +122,38 @@ const {
 
 const emit = defineEmits(['refresh'])
 const formRef = ref()
+
+const toolbars = [
+  'bold',
+  'underline',
+  'italic',
+  '-',
+  'title',
+  'strikeThrough',
+  'sub',
+  'sup',
+  'quote',
+  'unorderedList',
+  'orderedList',
+  'task',
+  '-',
+  'codeRow',
+  'code',
+  'link',
+  'image',
+  'table',
+  'mermaid',
+  'katex',
+  '-',
+  'revoke',
+  'next',
+  '=',
+  'pageFullscreen',
+  'preview',
+  'htmlPreview'
+] as any[]
+
+const footers = ['markdownTotal', 0, '=', 1, 'scrollSwitch']
 
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
@@ -150,6 +194,26 @@ watch(dialogVisible, (bool) => {
     formRef.value?.clearValidate()
   }
 })
+
+const onUploadImg = async (files: any, callback: any) => {
+  const res = await Promise.all(
+    files.map((file: any) => {
+      return new Promise((rev, rej) => {
+        const fd = new FormData()
+        fd.append('file', file)
+
+        imageApi
+          .postImage(fd)
+          .then((res: any) => {
+            rev(res)
+          })
+          .catch((error) => rej(error))
+      })
+    })
+  )
+
+  callback(res.map((item) => item.data))
+}
 
 function changeDataset(id: string) {
   form.value.document_id = ''

@@ -23,6 +23,7 @@ urlpatterns = [
     path('dataset/<str:dataset_id>/document/_bach', views.Document.Batch.as_view()),
     path('dataset/<str:dataset_id>/document/batch_hit_handling', views.Document.BatchEditHitHandling.as_view()),
     path('dataset/<str:dataset_id>/document/<int:current_page>/<int:page_size>', views.Document.Page.as_view()),
+    path('dataset/<str:dataset_id>/document/batch_refresh', views.Document.BatchRefresh.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>', views.Document.Operate.as_view(),
          name="document_operate"),
     path('dataset/document/split', views.Document.Split.as_view(),
@@ -34,7 +35,6 @@ urlpatterns = [
          name="document_export"),
     path('dataset/<str:dataset_id>/document/<str:document_id>/sync', views.Document.SyncWeb.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/refresh', views.Document.Refresh.as_view()),
-    path('dataset/<str:dataset_id>/document/batch_refresh', views.Document.BatchRefresh.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph', views.Paragraph.as_view()),
     path(
         'dataset/<str:dataset_id>/document/<str:document_id>/paragraph/migrate/dataset/<str:target_dataset_id>/document/<str:target_document_id>',

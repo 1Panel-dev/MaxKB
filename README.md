@@ -1,3 +1,5 @@
+[English](README_EN.md) | [中文](README.md)
+
 <p align="center"><img src= "https://github.com/1Panel-dev/maxkb/assets/52996290/c0694996-0eed-40d8-b369-322bf2a380bf" alt="MaxKB" width="300" /></p>
 <h3 align="center">基于大语言模型和 RAG 的知识库问答系统</h3>
 <p align="center"><a href="https://trendshift.io/repositories/9113" target="_blank"><img src="https://trendshift.io/api/badge/repositories/9113" alt="1Panel-dev%2FMaxKB | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a></p>
@@ -20,7 +22,7 @@ MaxKB = Max Knowledge Base，是一款基于大语言模型和 RAG 的开源知�
 ## 快速开始
 
 ```
-docker run -d --name=maxkb -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data -v ~/.python-packages:/opt/maxkb/app/sandbox/python-packages cr2.fit2cloud.com/1panel/maxkb
+docker run -d --name=maxkb --restart=always -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data -v ~/.python-packages:/opt/maxkb/app/sandbox/python-packages cr2.fit2cloud.com/1panel/maxkb
 
 # 用户名: admin
 # 密码: MaxKB@123..

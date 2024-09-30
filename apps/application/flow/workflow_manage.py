@@ -7,6 +7,7 @@
     @desc:
 """
 import json
+import traceback
 from functools import reduce
 from typing import List, Dict
 
@@ -166,10 +167,13 @@ class Flow:
 
 class WorkflowManage:
     def __init__(self, flow: Flow, params, work_flow_post_handler: WorkFlowPostHandler,
-                 base_to_response: BaseToResponse = SystemToResponse(), form_data = {}):
+                 base_to_response: BaseToResponse = SystemToResponse(), form_data=None):
+        if form_data is None:
+            form_data = {}
+        self.form_data = form_data
         self.params = params
         self.flow = flow
-        self.context = form_data
+        self.context = {}
         self.node_context = []
         self.work_flow_post_handler = work_flow_post_handler
         self.current_node = None
@@ -198,11 +202,18 @@ class WorkflowManage:
                                           'message_tokens' in row and row.get('message_tokens') is not None])
                     answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
                                          'answer_tokens' in row and row.get('answer_tokens') is not None])
+                    self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
+                                                        self.answer,
+                                                        self)
                     return self.base_to_response.to_block_response(self.params['chat_id'],
                                                                    self.params['chat_record_id'], self.answer, True
                                                                    , message_tokens, answer_tokens)
         except Exception as e:
+            traceback.print_exc()
             self.current_node.get_write_error_context(e)
+            self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
+                                                self.answer,
+                                                self)
             return self.base_to_response.to_block_response(self.params['chat_id'], self.params['chat_record_id'],
                                                            str(e), True,
                                                            0, 0, _status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -300,7 +311,7 @@ class WorkflowManage:
         """
         if self.current_node is None:
             node = self.get_start_node()
-            node_instance = get_node(node.type)(node, self.params, self.context)
+            node_instance = get_node(node.type)(node, self.params, self)
             return node_instance
         if self.current_result is not None and self.current_result.is_assertion_result():
             for edge in self.flow.edges:
@@ -365,6 +376,14 @@ class WorkflowManage:
         """
         start_node_list = [node for node in self.flow.nodes if node.type == 'start-node']
         return start_node_list[0]
+
+    def get_base_node(self):
+        """
+        获取基础节点
+        @return:
+        """
+        base_node_list = [node for node in self.flow.nodes if node.type == 'base-node']
+        return base_node_list[0]
 
     def get_node_cls_by_id(self, node_id):
         for node in self.flow.nodes:

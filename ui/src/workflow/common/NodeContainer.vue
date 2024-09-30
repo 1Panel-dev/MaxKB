@@ -6,7 +6,7 @@
       style="overflow: visible"
     >
       <div v-resize="resizeStepContainer">
-        <div class="flex-between mb-16">
+        <div class="flex-between">
           <div
             class="flex align-center"
             :style="{ maxWidth: node_status == 200 ? 'calc(100% - 55px)' : 'calc(100% - 85px)' }"
@@ -33,6 +33,11 @@
             @click.stop
             v-if="showOperate(nodeModel.type)"
           >
+            <el-button text @click="showNode = !showNode" class="mr-4">
+              <el-icon class="arrow-icon" :class="showNode ? 'rotate-180' : ''"
+                ><ArrowDownBold />
+              </el-icon>
+            </el-button>
             <el-dropdown :teleported="false" trigger="click">
               <el-button text>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
@@ -46,51 +51,74 @@
             </el-dropdown>
           </div>
         </div>
-
-        <div @mousedown.stop @keydown.stop @click.stop>
-          <el-alert
-            v-if="node_status != 200"
-            class="mb-16"
-            title="该函数不可用"
-            type="error"
-            show-icon
-            :closable="false"
-          />
-          <slot></slot>
-          <template v-if="nodeFields.length > 0">
-            <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
-            <template v-for="(item, index) in nodeFields" :key="index">
-              <div
-                class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
-                @mouseenter="showicon = index"
-                @mouseleave="showicon = null"
-              >
-                <span style="max-width: 92%">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-                <el-tooltip
-                  effect="dark"
-                  content="复制参数"
-                  placement="top"
-                  v-if="showicon === index"
+        <el-collapse-transition>
+          <div @mousedown.stop @keydown.stop @click.stop v-if="showNode" class="mt-16">
+            <el-alert
+              v-if="node_status != 200"
+              class="mb-16"
+              title="该函数不可用"
+              type="error"
+              show-icon
+              :closable="false"
+            />
+            <slot></slot>
+            <template v-if="nodeFields.length > 0">
+              <h5 class="title-decoration-1 mb-8 mt-8">参数输出</h5>
+              <template v-for="(item, index) in nodeFields" :key="index">
+                <div
+                  class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter"
+                  @mouseenter="showicon = index"
+                  @mouseleave="showicon = null"
                 >
-                  <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
-                    <AppIcon iconName="app-copy"></AppIcon>
-                  </el-button>
-                </el-tooltip>
-              </div>
+                  <span style="max-width: 92%">{{ item.label }} {{ '{' + item.value + '}' }}</span>
+                  <el-tooltip
+                    effect="dark"
+                    content="复制参数"
+                    placement="top"
+                    v-if="showicon === index"
+                  >
+                    <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
+                      <AppIcon iconName="app-copy"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </template>
             </template>
-          </template>
-        </div>
+          </div>
+        </el-collapse-transition>
       </div>
     </div>
+
+    <el-collapse-transition>
+      <DropdownMenu
+        v-if="showAnchor"
+        @mousemove.stop
+        @mousedown.stop
+        @keydown.stop
+        @click.stop
+        @wheel.stop
+        :show="showAnchor"
+        :id="id"
+        style="left: 100%; top: 50%; transform: translate(0, -50%)"
+        @clickNodes="clickNodes"
+      />
+    </el-collapse-transition>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { app } from '@/main'
+import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
 import { WorkflowType } from '@/enums/workflow'
 import { MsgError, MsgConfirm } from '@/utils/message'
+
+const {
+  params: { id }
+} = app.config.globalProperties.$route as any
+
 const height = ref<{
   stepContainerHeight: number
   inputContainerHeight: number
@@ -100,7 +128,9 @@ const height = ref<{
   inputContainerHeight: 0,
   outputContainerHeight: 0
 })
-
+const showAnchor = ref<boolean>(false)
+const anchorData = ref<any>()
+const showNode = ref<boolean>(true)
 const node_status = computed(() => {
   if (props.nodeModel.properties.status) {
     return props.nodeModel.properties.status
@@ -152,6 +182,24 @@ const resizeStepContainer = (wh: any) => {
   }
 }
 
+function clickNodes(item: any) {
+  const width = item.properties.width ? item.properties.width : 214
+  const nodeModel = props.nodeModel.graphModel.addNode({
+    type: item.type,
+    properties: item.properties,
+    x: anchorData.value?.x + width / 2 + 200,
+    y: anchorData.value?.y - item.height
+  })
+  props.nodeModel.graphModel.addEdge({
+    type: 'app-edge',
+    sourceNodeId: props.nodeModel.id,
+    sourceAnchorId: anchorData.value?.id,
+    targetNodeId: nodeModel.id
+  })
+
+  closeNodeMenu()
+}
+
 const props = defineProps<{
   nodeModel: any
 }>()
@@ -173,6 +221,19 @@ const nodeFields = computed(() => {
 function showOperate(type: string) {
   return type !== WorkflowType.Base && type !== WorkflowType.Start
 }
+const openNodeMenu = (anchorValue: any) => {
+  showAnchor.value = true
+  anchorData.value = anchorValue
+}
+const closeNodeMenu = () => {
+  showAnchor.value = false
+  anchorData.value = undefined
+}
+onMounted(() => {
+  set(props.nodeModel, 'openNodeMenu', (anchorData: any) => {
+    showAnchor.value ? closeNodeMenu() : openNodeMenu(anchorData)
+  })
+})
 </script>
 <style lang="scss" scoped>
 .workflow-node-container {
@@ -188,6 +249,9 @@ function showOperate(type: string) {
     &.error {
       border: 1px solid #f54a45 !important;
     }
+  }
+  .arrow-icon {
+    transition: 0.2s;
   }
 }
 :deep(.el-card) {

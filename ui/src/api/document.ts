@@ -3,6 +3,7 @@ import { get, post, del, put, exportExcel } from '@/request/index'
 import type { Ref } from 'vue'
 import type { KeyValue } from '@/api/type/common'
 import type { pageRequest } from '@/api/type/common'
+
 const prefix = '/dataset'
 
 /**
@@ -26,14 +27,14 @@ const listSplitPattern: (
 
 /**
  * 文档分页列表
- * @param 参数  dataset_id,   
+ * @param 参数  dataset_id,
  * page {
-              "current_page": "string",
-              "page_size": "string",
-            }
-* param {
-          "name": "string",
-        }
+ "current_page": "string",
+ "page_size": "string",
+ }
+ * param {
+ "name": "string",
+ }
  */
 
 const getDocument: (
@@ -58,22 +59,22 @@ const getAllDocument: (dataset_id: string, loading?: Ref<boolean>) => Promise<Re
 
 /**
  * 创建批量文档
- * @param 参数 
+ * @param 参数
  * {
-  "name": "string",
-  "paragraphs": [
-    {
-      "content": "string",
-      "title": "string",
-      "problem_list": [
-          {
-            "id": "string",
-              "content": "string"
-          }
-      ]
-    }
-  ]
-}
+ "name": "string",
+ "paragraphs": [
+ {
+ "content": "string",
+ "title": "string",
+ "problem_list": [
+ {
+ "id": "string",
+ "content": "string"
+ }
+ ]
+ }
+ ]
+ }
  */
 const postDocument: (
   dataset_id: string,
@@ -85,13 +86,13 @@ const postDocument: (
 
 /**
  * 修改文档
- * @param 参数 
- * dataset_id, document_id, 
+ * @param 参数
+ * dataset_id, document_id,
  * {
-      "name": "string",
-      "is_active": true,
-      "meta": {}
-    }
+ "name": "string",
+ "is_active": true,
+ "meta": {}
+ }
  */
 const putDocument: (
   dataset_id: string,
@@ -123,6 +124,19 @@ const delMulDocument: (
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
   return del(`${prefix}/${dataset_id}/document/_bach`, undefined, { id_list: data }, loading)
+}
+
+const batchRefresh: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return put(
+    `${prefix}/${dataset_id}/document/batch_refresh`,
+    { id_list: data },
+    undefined,
+    loading
+  )
 }
 /**
  * 文档详情
@@ -180,14 +194,14 @@ const delMulSyncDocument: (
 
 /**
  * 创建Web站点文档
- * @param 参数 
+ * @param 参数
  * {
-    "source_url_list": [
-    "string"
-  ],
-  "selector": "string"
+ "source_url_list": [
+ "string"
+ ],
+ "selector": "string"
  }
-}
+ }
  */
 const postWebDocument: (
   dataset_id: string,
@@ -199,9 +213,9 @@ const postWebDocument: (
 
 /**
  * 导入QA文档
- * @param 参数 
+ * @param 参数
  * file
-}
+ }
  */
 const postQADocument: (
   dataset_id: string,
@@ -296,7 +310,7 @@ const exportDocument: (
   loading?: Ref<boolean>
 ) => Promise<any> = (document_name, dataset_id, document_id, loading) => {
   return exportExcel(
-    document_name + '.xls',
+    document_name + '.xlsx',
     `${prefix}/${dataset_id}/document/${document_id}/export`,
     {},
     loading
@@ -323,5 +337,6 @@ export default {
   exportTableTemplate,
   postQADocument,
   postTableDocument,
-  exportDocument
+  exportDocument,
+  batchRefresh
 }

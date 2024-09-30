@@ -19,7 +19,7 @@
             placeholder="请输入函数名称"
             maxlength="64"
             show-word-limit
-            @blur="form.name = form.name.trim()"
+            @blur="form.name = form.name?.trim()"
           />
         </el-form-item>
         <el-form-item label="描述">
@@ -30,8 +30,34 @@
             maxlength="128"
             show-word-limit
             :autosize="{ minRows: 3 }"
-            @blur="form.desc = form.desc.trim()"
+            @blur="form.desc = form.desc?.trim()"
           />
+        </el-form-item>
+        <el-form-item prop="permission_type">
+          <template #label>
+            <span>权限</span>
+          </template>
+
+          <el-radio-group v-model="form.permission_type" class="card__radio">
+            <el-row :gutter="16">
+              <template v-for="(value, key) of PermissionType" :key="key">
+                <el-col :span="12">
+                  <el-card
+                    shadow="never"
+                    class="mb-16"
+                    :class="form.permission_type === key ? 'active' : ''"
+                  >
+                    <el-radio :value="key" size="large">
+                      <p class="mb-4">{{ value }}</p>
+                      <el-text type="info">
+                        {{ PermissionDesc[key] }}
+                      </el-text>
+                    </el-radio>
+                  </el-card>
+                </el-col>
+              </template>
+            </el-row>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <div class="flex-between">
@@ -137,7 +163,7 @@ import functionLibApi from '@/api/function-lib'
 import type { FormInstance } from 'element-plus'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { cloneDeep } from 'lodash'
-
+import { PermissionType, PermissionDesc } from '@/enums/model'
 const props = defineProps({
   title: String
 })
@@ -158,7 +184,8 @@ const form = ref<functionLibData>({
   name: '',
   desc: '',
   code: '',
-  input_field_list: []
+  input_field_list: [],
+  permission_type: 'PRIVATE'
 })
 
 const dialogVisible = ref(false)
@@ -173,13 +200,15 @@ watch(visible, (bool) => {
       name: '',
       desc: '',
       code: '',
-      input_field_list: []
+      input_field_list: [],
+      permission_type: 'PRIVATE'
     }
   }
 })
 
 const rules = reactive({
-  name: [{ required: true, message: '请输入函数名称', trigger: 'blur' }]
+  name: [{ required: true, message: '请输入函数名称', trigger: 'blur' }],
+  permission_type: [{ required: true, message: '请选择', trigger: 'change' }]
 })
 
 function openCodemirrorDialog() {

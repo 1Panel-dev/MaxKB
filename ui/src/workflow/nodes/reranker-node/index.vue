@@ -8,11 +8,21 @@
         require-asterisk-position="right"
         label-width="auto"
         ref="rerankerNodeFormRef"
+        hide-required-asterisk
       >
-        <el-form-item label="知识库检索结果">
+        <el-form-item
+          label="重排内容"
+          prop="reranker_reference_list"
+          :rules="{
+            type: 'array',
+            message: '请选择重排内容',
+            trigger: 'change',
+            required: true
+          }"
+        >
           <template #label>
             <div class="flex-between">
-              <span>知识库检索结果</span>
+              <span>重排内容<span class="danger">*</span></span>
               <el-button @click="add_reranker_reference" link type="primary">
                 <el-icon class="mr-4"><Plus /></el-icon>
               </el-button>
@@ -22,6 +32,7 @@
             :gutter="8"
             style="margin-bottom: 8px"
             v-for="(reranker_reference, index) in form_data.reranker_reference_list"
+            :key="index"
           >
             <el-col :span="22">
               <el-form-item
@@ -35,10 +46,9 @@
               >
                 <NodeCascader
                   :key="index"
-                  ref="nodeCascaderRef"
                   :nodeModel="nodeModel"
                   class="w-full"
-                  placeholder="请选择检索问题输入"
+                  placeholder="请选择重排内容"
                   v-model="form_data.reranker_reference_list[index]"
                 />
               </el-form-item>
@@ -61,9 +71,9 @@
           </template>
           <div class="w-full">
             <el-row>
-              <el-col :span="12" class="color-secondary lighter"> 相似度高于</el-col>
+              <el-col :span="12" class="color-secondary lighter"> Score 高于</el-col>
               <el-col :span="12" class="lighter">
-                {{ form_data.reranker_setting.similarity }}</el-col
+                {{ form_data.reranker_setting.similarity?.toFixed(3) }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter"> 引用分段 Top</el-col>
               <el-col :span="12" class="lighter"> {{ form_data.reranker_setting.top_n }}</el-col>
@@ -78,11 +88,16 @@
           label="检索问题"
           prop="question_reference_address"
           :rules="{
-            message: '请选择检索问题输入',
+            message: '请选择检索问题',
             trigger: 'blur',
             required: true
           }"
         >
+          <template #label>
+            <div class="flex-between">
+              <span>检索问题<span class="danger">*</span></span>
+            </div>
+          </template>
           <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
@@ -92,19 +107,24 @@
           />
         </el-form-item>
         <el-form-item
-          label="AI 模型"
+          label="重排模型"
           prop="reranker_model_id"
           :rules="{
             required: true,
-            message: '请选择 AI 模型',
+            message: '请选择重排模型',
             trigger: 'change'
           }"
         >
+          <template #label>
+            <div class="flex-between">
+              <span>重排模型<span class="danger">*</span></span>
+            </div>
+          </template>
           <el-select
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.reranker_model_id"
-            placeholder="请选择 AI 模型"
+            placeholder="请选择重排模型"
             class="w-full"
             popper-class="select-model"
             :clearable="true"
@@ -175,6 +195,7 @@
       @submit="getModel"
       @change="openCreateModel($event)"
     ></CreateModelDialog>
+    <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)" />
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -201,18 +222,19 @@ const {
   params: { id }
 } = app.config.globalProperties.$route as any
 const form = {
-  reranker_reference_list: [],
+  reranker_reference_list: [[]],
   reranker_model_id: '',
+  question_reference_address: [],
   reranker_setting: {
     top_n: 3,
-    similarity: 0.6,
+    similarity: 0,
     max_paragraph_char_number: 5000
   }
 }
 const providerOptions = ref<Array<Provider>>([])
 const modelOptions = ref<any>(null)
 const openParamSettingDialog = () => {
-  ParamSettingDialogRef.value?.open(form_data.value.dataset_setting, 'WORK_FLOW')
+  ParamSettingDialogRef.value?.open(form_data.value.reranker_setting)
 }
 const deleteCondition = (index: number) => {
   const list = cloneDeep(props.nodeModel.properties.node_data.reranker_reference_list)
@@ -285,12 +307,6 @@ const openCreateModel = (provider?: Provider) => {
 onMounted(() => {
   getProvider()
   getModel()
-  if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
-    if (isLastNode(props.nodeModel)) {
-      set(props.nodeModel.properties.node_data, 'is_result', true)
-    }
-  }
-
   set(props.nodeModel, 'validate', validate)
 })
 </script>

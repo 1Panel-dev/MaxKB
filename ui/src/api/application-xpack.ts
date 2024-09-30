@@ -35,19 +35,7 @@ const putAccessToken: (
   return put(`${prefix}/${application_id}/setting`, data, undefined, loading)
 }
 
-/**
- * 对话获取应用相关信息
- * @param 参数 
- {
-  "access_token": "string"
-}
- */
-const getAppXpackProfile: (loading?: Ref<boolean>) => Promise<any> = (loading) => {
-  return get(`${prefix}/xpack/profile`, undefined, loading)
-}
-
 export default {
   getAccessToken,
-  putAccessToken,
-  getAppXpackProfile
+  putAccessToken
 }

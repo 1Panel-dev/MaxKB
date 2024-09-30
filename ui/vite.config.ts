@@ -9,6 +9,7 @@ const envDir = './env'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const ENV = loadEnv(mode, envDir)
+  const prefix = process.env.VITE_DYNAMIC_PREFIX || ENV.VITE_BASE_PATH;
   const proxyConf: Record<string, string | ProxyOptions> = {}
   proxyConf['/api'] = {
     target: 'http://127.0.0.1:8080',
@@ -18,7 +19,7 @@ export default defineConfig(({ mode }) => {
   return {
     preflight: false,
     lintOnSave: false,
-    base: ENV.VITE_BASE_PATH,
+    base: prefix,
     envDir: envDir,
     plugins: [vue(), DefineOptions()],
     server: {

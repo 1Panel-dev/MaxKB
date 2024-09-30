@@ -311,6 +311,9 @@ h5 {
 .cursor {
   cursor: pointer;
 }
+.notAllowed {
+  cursor: not-allowed;
+}
 
 /*
   超出省略号
@@ -429,7 +432,9 @@ h5 {
 .rotate-90 {
   transform: rotateZ(90deg);
 }
-
+.rotate-180 {
+  transform: rotateZ(180deg);
+}
 /*
   表格第一行插入自定义行
 */
@@ -732,4 +737,17 @@ h5 {
   .cm-gutters {
     display: none !important;
   }
+}
+
+.edit-avatar {
+  position: relative;
+  .edit-mask {
+    position: absolute;
+    left: 0;
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
+.record-tip-confirm {
+  max-width: 800px !important;
 }

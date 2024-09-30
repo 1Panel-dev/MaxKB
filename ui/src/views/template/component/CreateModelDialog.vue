@@ -37,7 +37,7 @@
         <el-form-item prop="name" :rules="base_form_data_rule.name">
           <template #label>
             <div class="flex align-center" style="display: inline-flex">
-              <div class="flex-between mr-4">
+              <div class="mr-4">
                 <span>模型名称 </span>
               </div>
               <el-tooltip effect="dark" placement="right">
@@ -82,7 +82,21 @@
         </el-form-item>
         <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
           <template #label>
-            <span>模型类型</span>
+            <div class="flex align-center" style="display: inline-flex">
+              <span class="mr-4">模型类型 </span>
+              <el-tooltip effect="dark" placement="right">
+                <template #content>
+                  <p>大语言模型：在应用中与AI对话的推理模型。</p>
+                  <p>向量模型：在知识库中导入文档进行向量化和向量检索召回分段时使用的向量模型。</p>
+                  <p>
+                    重排模型：在二次召回中根据召回的候选分段和用户问题的匹配度重新排序，从而得到更精确的结果。
+                  </p>
+                  <p>语音识别：在应用中开启语音识别后用于语音转文字的模型。</p>
+                  <p>语音合成：在应用中开启语音播放后用于文字转语音的模型。</p>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
           </template>
           <el-select
             v-loading="model_type_loading"
@@ -103,16 +117,10 @@
         <el-form-item prop="model_name" :rules="base_form_data_rule.model_name">
           <template #label>
             <div class="flex align-center" style="display: inline-flex">
-              <div class="flex-between mr-4">
+              <div class="mr-4">
                 <span>基础模型 </span>
+                <span class="danger">列表中未列出的模型，直接输入模型名称，回车即可添加</span>
               </div>
-              <el-tooltip effect="dark" placement="right">
-                <template #content>
-                  <p>若下拉选项没有列出想要添加的LLM模型，自定义输入模型名称后回车即可</p>
-                  <p>注意，基础模型需要与供应商的模型名称一致</p>
-                </template>
-                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-              </el-tooltip>
             </div>
           </template>
           <el-select
@@ -176,7 +184,7 @@ const model_form_field = ref<Array<FormField>>([])
 const dialogVisible = ref<boolean>(false)
 
 const base_form_data_rule = ref<FormRules>({
-  name: { required: true, trigger: 'blur', message: '模型名不能为空' },
+  name: { required: true, trigger: 'blur', message: '模型名称不能为空' },
   permission_type: { required: true, trigger: 'change', message: '权限不能为空' },
   model_type: { required: true, trigger: 'change', message: '模型类型不能为空' },
   model_name: { required: true, trigger: 'change', message: '基础模型不能为空' }

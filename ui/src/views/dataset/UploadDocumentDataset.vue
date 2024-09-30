@@ -25,7 +25,7 @@
       <el-button @click="router.go(-1)" :disabled="loading">取消</el-button>
       <el-button @click="prev" v-if="active === 1" :disabled="loading">上一步</el-button>
       <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading">
-        创建并导入
+        {{ documentsType === 'txt' ? '下一步' : '开始导入' }}
       </el-button>
       <el-button @click="submit" type="primary" v-if="active === 1" :disabled="loading">
         开始导入

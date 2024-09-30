@@ -91,6 +91,8 @@ def convert_value(name: str, value, _type, is_required, source, node):
 class BaseFunctionLibNodeNode(IFunctionLibNode):
     def execute(self, function_lib_id, input_field_list, **kwargs) -> NodeResult:
         function_lib = QuerySet(FunctionLib).filter(id=function_lib_id).first()
+        if not function_lib.is_active:
+            raise Exception(f'函数:{function_lib.name}  不可用')
         params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'),
                                                    field.get('is_required'),
                                                    field.get('source'), self)

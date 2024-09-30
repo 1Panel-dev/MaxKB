@@ -23,14 +23,14 @@
               </div>
             </div>
             <div>
-              <el-button class="mr-4" @click="openDrawer(item.key)">配置</el-button>
-              <el-divider direction="vertical" />
               <el-switch
-                size="large"
+                size="small"
                 v-model="item.isActive"
                 @change="changeStatus(item.key, item.isActive)"
                 :disabled="!item.exists"
               />
+              <el-divider direction="vertical" />
+              <el-button class="mr-4" @click="openDrawer(item.key)">配置</el-button>
             </div>
           </div>
         </el-card>
@@ -51,23 +51,23 @@ import { useRoute } from 'vue-router'
 const platforms = reactive([
   {
     key: 'wecom',
-    logoSrc: '/ui/src/assets/logo_wechat-work.svg',
-    name: '企业微信',
+    logoSrc: new URL(`../../assets/logo_wechat-work.svg`, import.meta.url).href,
+    name: '企业微信应用',
     description: '打造企业微信智能应用',
     isActive: false,
     exists: false
   },
   {
     key: 'dingtalk',
-    logoSrc: '/ui/src/assets/logo_dingtalk.svg',
-    name: '钉钉',
+    logoSrc: new URL(`../../assets/logo_dingtalk.svg`, import.meta.url).href,
+    name: '钉钉应用',
     description: '打造钉钉智能应用',
     isActive: false,
     exists: false
   },
   {
     key: 'wechat',
-    logoSrc: '/ui/src/assets/logo_wechat.svg',
+    logoSrc: new URL(`../../assets/logo_wechat.svg`, import.meta.url).href,
     name: '公众号',
     description: '打造公众号智能应用',
     isActive: false,
@@ -75,8 +75,8 @@ const platforms = reactive([
   },
   {
     key: 'feishu',
-    logoSrc: '/ui/src/assets/logo_lark.svg',
-    name: '飞书',
+    logoSrc: new URL(`../../assets/logo_lark.svg`, import.meta.url).href,
+    name: '飞书应用',
     description: '打造飞书智能应用',
     isActive: false,
     exists: false

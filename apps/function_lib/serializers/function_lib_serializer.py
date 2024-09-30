@@ -11,7 +11,7 @@ import re
 import uuid
 
 from django.core import validators
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from rest_framework import serializers
 
 from common.db.search import page_search
@@ -27,7 +27,7 @@ function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
 class FunctionLibModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = FunctionLib
-        fields = ['id', 'name', 'desc', 'code', 'input_field_list',
+        fields = ['id', 'name', 'desc', 'code', 'input_field_list', 'permission_type', 'is_active', 'user_id',
                   'create_time', 'update_time']
 
 
@@ -68,6 +68,8 @@ class EditFunctionLib(serializers.Serializer):
 
     input_field_list = FunctionLibInputField(required=False, many=True)
 
+    is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char('是否可用'))
+
 
 class CreateFunctionLib(serializers.Serializer):
     name = serializers.CharField(required=True, error_messages=ErrMessage.char("函数名称"))
@@ -79,6 +81,12 @@ class CreateFunctionLib(serializers.Serializer):
 
     input_field_list = FunctionLibInputField(required=True, many=True)
 
+    permission_type = serializers.CharField(required=True, error_messages=ErrMessage.char("权限"), validators=[
+        validators.RegexValidator(regex=re.compile("^PUBLIC|PRIVATE$"),
+                                  message="权限只支持PUBLIC|PRIVATE", code=500)
+    ])
+    is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char('是否可用'))
+
 
 class FunctionLibSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
@@ -87,15 +95,19 @@ class FunctionLibSerializer(serializers.Serializer):
 
         desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      error_messages=ErrMessage.char("函数描述"))
+        is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char("是否可用"))
 
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
 
         def get_query_set(self):
-            query_set = QuerySet(FunctionLib).filter(user_id=self.data.get('user_id'))
+            query_set = QuerySet(FunctionLib).filter(
+                (Q(user_id=self.data.get('user_id')) | Q(permission_type='PUBLIC')))
             if self.data.get('name') is not None:
                 query_set = query_set.filter(name__contains=self.data.get('name'))
             if self.data.get('desc') is not None:
                 query_set = query_set.filter(desc__contains=self.data.get('desc'))
+            if self.data.get('is_active') is not None:
+                query_set = query_set.filter(is_active=self.data.get('is_active'))
             query_set = query_set.order_by("-create_time")
             return query_set
 
@@ -120,7 +132,9 @@ class FunctionLibSerializer(serializers.Serializer):
             function_lib = FunctionLib(id=uuid.uuid1(), name=instance.get('name'), desc=instance.get('desc'),
                                        code=instance.get('code'),
                                        user_id=self.data.get('user_id'),
-                                       input_field_list=instance.get('input_field_list'))
+                                       input_field_list=instance.get('input_field_list'),
+                                       permission_type=instance.get('permission_type'),
+                                       is_active=instance.get('is_active', True))
             function_lib.save()
             return FunctionLibModelSerializer(function_lib).data
 
@@ -193,7 +207,7 @@ class FunctionLibSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 EditFunctionLib(data=instance).is_valid(raise_exception=True)
-            edit_field_list = ['name', 'desc', 'code', 'input_field_list']
+            edit_field_list = ['name', 'desc', 'code', 'input_field_list', 'permission_type', 'is_active']
             edit_dict = {field: instance.get(field) for field in edit_field_list if (
                     field in instance and instance.get(field) is not None)}
             QuerySet(FunctionLib).filter(id=self.data.get('id')).update(**edit_dict)
@@ -201,6 +215,9 @@ class FunctionLibSerializer(serializers.Serializer):
 
         def one(self, with_valid=True):
             if with_valid:
-                self.is_valid(raise_exception=True)
+                super().is_valid(raise_exception=True)
+                if not QuerySet(FunctionLib).filter(id=self.data.get('id')).filter(
+                        Q(user_id=self.data.get('user_id')) | Q(permission_type='PUBLIC')).exists():
+                    raise AppApiException(500, '函数不存在')
             function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
             return FunctionLibModelSerializer(function_lib).data

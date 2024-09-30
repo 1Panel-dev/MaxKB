@@ -1,12 +1,17 @@
 <template>
-  <el-dialog v-model="resetPasswordDialog" :title="$t('layout.topbar.avatar.resetPassword')">
+  <el-dialog
+    v-model="resetPasswordDialog"
+    :title="$t('layout.topbar.avatar.resetPassword')"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <el-form
       class="reset-password-form mb-24"
       ref="resetPasswordFormRef"
       :model="resetPasswordForm"
       :rules="rules"
     >
-      <p class="mb-8 lighter">{{ $t("layout.topbar.avatar.dialog.newPassword") }}</p>
+      <p class="mb-8 lighter">{{ $t('layout.topbar.avatar.dialog.newPassword') }}</p>
       <el-form-item prop="password" style="margin-bottom: 8px">
         <el-input
           type="password"
@@ -27,7 +32,7 @@
         >
         </el-input>
       </el-form-item>
-      <p class="mb-8 lighter">{{ $t("layout.topbar.avatar.dialog.useEmail") }}</p>
+      <p class="mb-8 lighter">{{ $t('layout.topbar.avatar.dialog.useEmail') }}</p>
       <el-form-item style="margin-bottom: 8px">
         <el-input
           class="input-item"
@@ -39,7 +44,11 @@
       </el-form-item>
       <el-form-item prop="code">
         <div class="flex-between w-full">
-          <el-input class="code-input" v-model="resetPasswordForm.code" :placeholder="$t('layout.topbar.avatar.dialog.enterVerificationCode')">
+          <el-input
+            class="code-input"
+            v-model="resetPasswordForm.code"
+            :placeholder="$t('layout.topbar.avatar.dialog.enterVerificationCode')"
+          >
           </el-input>
           <el-button
             :disabled="isDisabled"
@@ -47,15 +56,23 @@
             @click="sendEmail"
             :loading="loading"
           >
-            {{ isDisabled ? $t('layout.topbar.avatar.dialog.resend', { time }) : $t('layout.topbar.avatar.dialog.getVerificationCode') }}
+            {{
+              isDisabled
+                ? $t('layout.topbar.avatar.dialog.resend', { time })
+                : $t('layout.topbar.avatar.dialog.getVerificationCode')
+            }}
           </el-button>
         </div>
       </el-form-item>
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="resetPasswordDialog = false">{{ $t('layout.topbar.avatar.dialog.cancel') }}</el-button>
-        <el-button type="primary" @click="resetPassword"> {{ $t('layout.topbar.avatar.dialog.save') }} </el-button>
+        <el-button @click="resetPasswordDialog = false">{{
+          $t('layout.topbar.avatar.dialog.cancel')
+        }}</el-button>
+        <el-button type="primary" @click="resetPassword">
+          {{ $t('layout.topbar.avatar.dialog.save') }}
+        </el-button>
       </div>
     </template>
   </el-dialog>
@@ -88,7 +105,13 @@ const time = ref<number>(60)
 
 const rules = ref<FormRules<ResetCurrentUserPasswordRequest>>({
   // @ts-ignore
-  code: [{ required: true, message: t('layout.topbar.avatar.dialog.enterVerificationCode'), trigger: 'blur' }],
+  code: [
+    {
+      required: true,
+      message: t('layout.topbar.avatar.dialog.enterVerificationCode'),
+      trigger: 'blur'
+    }
+  ],
   password: [
     {
       required: true,
@@ -131,7 +154,7 @@ const rules = ref<FormRules<ResetCurrentUserPasswordRequest>>({
  */
 const sendEmail = () => {
   UserApi.sendEmailToCurrent(loading).then(() => {
-    MsgSuccess(t('verificationCodeSentSuccess'))
+    MsgSuccess(t('layout.topbar.avatar.dialog.verificationCodeSentSuccess'))
     isDisabled.value = true
     handleTimeChange()
   })
@@ -176,7 +199,5 @@ const close = () => {
 }
 
 defineExpose({ open, close })
-
-
 </script>
 <style lang="scss" scope></style>

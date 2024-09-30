@@ -35,7 +35,7 @@ def get_dataset_setting_dict():
 
 
 def get_model_setting_dict():
-    return {'prompt': Application.get_default_model_prompt()}
+    return {'prompt': Application.get_default_model_prompt(), 'no_references_prompt': '{question}'}
 
 
 class Application(AppModelMixin):
@@ -54,8 +54,13 @@ class Application(AppModelMixin):
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
     type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
                             default=ApplicationTypeChoices.SIMPLE, max_length=256)
-    tts_model = models.ForeignKey(Model, related_name='tts_model_id', on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
-    stt_model = models.ForeignKey(Model, related_name='stt_model_id', on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
+    problem_optimization_prompt = models.CharField(verbose_name="问题优化提示词", max_length=102400, blank=True,
+                                                   null=True,
+                                                   default="()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中")
+    tts_model = models.ForeignKey(Model, related_name='tts_model_id', on_delete=models.SET_NULL, db_constraint=False,
+                                  blank=True, null=True)
+    stt_model = models.ForeignKey(Model, related_name='stt_model_id', on_delete=models.SET_NULL, db_constraint=False,
+                                  blank=True, null=True)
     tts_model_enable = models.BooleanField(verbose_name="语音合成模型是否启用", default=False)
     stt_model_enable = models.BooleanField(verbose_name="语音识别模型是否启用", default=False)
     tts_type = models.CharField(verbose_name="语音播放类型", max_length=20, default="BROWSER")
@@ -132,7 +137,7 @@ class ChatRecord(AppModelMixin):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
     vote_status = models.CharField(verbose_name='投票', max_length=10, choices=VoteChoices.choices,
                                    default=VoteChoices.UN_VOTE)
-    problem_text = models.CharField(max_length=1024, verbose_name="问题")
+    problem_text = models.CharField(max_length=10240, verbose_name="问题")
     answer_text = models.CharField(max_length=40960, verbose_name="答案")
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)

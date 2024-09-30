@@ -1,5 +1,7 @@
 name: build-and-push
 
+run-name: 构建镜像并推送仓库 ${{ github.event.inputs.dockerImageTag }} (${{ github.event.inputs.registry }})
+
 on:
   workflow_dispatch:
     inputs:
@@ -19,7 +21,7 @@ on:
       registry:
         description: 'Push To Registry'
         required: true
-        default: 'dockerhub'
+        default: 'fit2cloud-registry'
         type: choice
         options:
           - fit2cloud-registry
@@ -52,7 +54,7 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          DOCKER_IMAGE=registry-hkproxy.fit2cloud.com/maxkb/maxkb
+          DOCKER_IMAGE=${{ secrets.FIT2CLOUD_REGISTRY_HOST }}/maxkb/maxkb
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
           if [[ ${TAG_NAME} == *dev* ]]; then
@@ -76,7 +78,7 @@ jobs:
       - name: Login to FIT2CLOUD Registry
         uses: docker/login-action@v3
         with:
-          registry: registry-hkproxy.fit2cloud.com
+          registry: ${{ secrets.FIT2CLOUD_REGISTRY_HOST }}
           username: ${{ secrets.FIT2CLOUD_REGISTRY_USERNAME }}
           password: ${{ secrets.FIT2CLOUD_REGISTRY_PASSWORD }}
       - name: Docker Buildx (build-and-push)

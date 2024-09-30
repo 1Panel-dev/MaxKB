@@ -107,7 +107,7 @@
       </InfiniteScroll>
     </div>
     <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
-    <CreateDatasetDialog ref="CreateDatasetDialogRef"/>
+    <CreateDatasetDialog ref="CreateDatasetDialogRef" />
   </div>
 </template>
 <script setup lang="ts">
@@ -118,6 +118,10 @@ import datasetApi from '@/api/dataset'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { useRouter } from 'vue-router'
 import { numberFormat } from '@/utils/utils'
+import { ValidType, ValidCount } from '@/enums/common'
+import useStore from '@/stores'
+
+const { user, common } = useStore()
 const router = useRouter()
 
 const CreateDatasetDialogRef = ref()
@@ -133,7 +137,26 @@ const paginationConfig = reactive({
 const searchValue = ref('')
 
 function openCreateDialog() {
-  CreateDatasetDialogRef.value.open()
+  if (user.isEnterprise()) {
+    CreateDatasetDialogRef.value.open()
+  } else {
+    MsgConfirm(`提示`, '社区版最多支持 50 个知识库，如需拥有更多知识库，请升级为专业版。', {
+      cancelButtonText: '确定',
+      confirmButtonText: '购买专业版'
+    })
+      .then(() => {
+        window.open('https://maxkb.cn/pricing.html', '_blank')
+      })
+      .catch(() => {
+        common
+          .asyncGetValid(ValidType.Dataset, ValidCount.Dataset, loading)
+          .then(async (res: any) => {
+            if (res?.data) {
+              CreateDatasetDialogRef.value.open()
+            }
+          })
+      })
+  }
 }
 
 function refresh() {
@@ -198,7 +221,7 @@ onMounted(() => {
   .delete-button {
     position: absolute;
     right: 12px;
-    top: 18px;
+    top: 13px;
     height: auto;
   }
   .footer-content {

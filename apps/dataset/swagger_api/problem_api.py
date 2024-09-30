@@ -36,6 +36,36 @@ class ProblemApi(ApiMixin):
             }
         )
 
+    class BatchAssociation(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return ProblemApi.BatchOperate.get_request_params_api()
+
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['problem_id_list'],
+                properties={
+                    'problem_id_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="问题id列表",
+                                                      description="问题id列表",
+                                                      items=openapi.Schema(type=openapi.TYPE_STRING)),
+                    'paragraph_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="关联段落信息列表",
+                                                     description="关联段落信息列表",
+                                                     items=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                                          required=['paragraph_id', 'document_id'],
+                                                                          properties={
+                                                                              'paragraph_id': openapi.Schema(
+                                                                                  type=openapi.TYPE_STRING,
+                                                                                  title="段落id"),
+                                                                              'document_id': openapi.Schema(
+                                                                                  type=openapi.TYPE_STRING,
+                                                                                  title="文档id")
+                                                                          }))
+
+                }
+            )
+
     class BatchOperate(ApiMixin):
         @staticmethod
         def get_request_params_api():

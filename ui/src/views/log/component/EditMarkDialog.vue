@@ -1,5 +1,12 @@
 <template>
-  <el-dialog title="修改标注" v-model="dialogVisible" width="600" class="edit-mark-dialog">
+  <el-dialog
+    title="修改标注"
+    v-model="dialogVisible"
+    width="600"
+    class="edit-mark-dialog"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <template #header="{ titleId, titleClass }">
       <div class="flex-between">
         <h4 :id="titleId" :class="titleClass">修改标注</h4>

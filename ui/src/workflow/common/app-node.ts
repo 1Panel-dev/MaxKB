@@ -1,7 +1,7 @@
 import Components from '@/components'
 import ElementPlus from 'element-plus'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
-
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { HtmlResize } from '@logicflow/extension'
 
 import { h as lh } from '@logicflow/core'
@@ -18,7 +18,6 @@ class AppNode extends HtmlResize.view {
   constructor(props: any, VueNode: any) {
     super(props)
     this.isMounted = false
-
     this.r = h(VueNode, {
       properties: props.model.properties,
       nodeModel: props.model
@@ -27,7 +26,9 @@ class AppNode extends HtmlResize.view {
     this.app = createApp({
       render: () => this.r
     })
-    this.app.use(ElementPlus)
+    this.app.use(ElementPlus, {
+      locale: zhCn
+    })
     this.app.use(Components)
     this.app.use(directives)
     this.app.use(i18n)
@@ -70,6 +71,12 @@ class AppNode extends HtmlResize.view {
       },
       [
         lh('div', {
+          style: { zindex: 0 },
+          onClick: () => {
+            if (!isConnect && type == 'right') {
+              this.props.model.openNodeMenu(anchorData)
+            }
+          },
           dangerouslySetInnerHTML: {
             __html: isConnect
               ? `<svg width="100%" height="100%" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -183,8 +190,11 @@ class AppNodeModel extends HtmlResize.model {
       edge.updatePathByAnchor()
     })
   }
+  get_width() {
+    return this.properties?.width || 340
+  }
   setAttributes() {
-    this.width = this.properties?.width || 340
+    this.width = this.get_width()
 
     const circleOnlyAsTarget = {
       message: '只允许从右边的锚点连出',
