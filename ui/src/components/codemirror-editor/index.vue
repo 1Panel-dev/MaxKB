@@ -14,7 +14,7 @@ import { ref } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 import { python } from '@codemirror/lang-python'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { linter, Diagnostic } from '@codemirror/lint'
+import { linter, type Diagnostic } from '@codemirror/lint'
 import FunctionApi from '@/api/function-lib'
 
 defineOptions({ name: 'CodemirrorEditor' })
