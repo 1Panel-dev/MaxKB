@@ -102,36 +102,21 @@ watch(debugVisible, (bool) => {
 })
 
 const submit = async (formEl: FormInstance | undefined) => {
-  if (!formEl) {
-    functionLibApi
-      .postFunctionLibDebug(form.value, loading)
-      .then((res) => {
+  console.log(formEl)
+  const validate = formEl ? formEl.validate() : Promise.resolve()
+  validate.then(() => {
+    functionLibApi.postFunctionLibDebug(form.value, loading).then((res) => {
+      if (res.code === 500) {
+        showResult.value = true
+        isSuccess.value = false
+        result.value = res.message
+      } else {
         showResult.value = true
         isSuccess.value = true
         result.value = res.data
-      })
-      .catch((res) => {
-        showResult.value = true
-        isSuccess.value = false
-        result.value = res.data
-      })
-  } else {
-    await formEl.validate((valid: any) => {
-      if (valid) {
-        functionLibApi.postFunctionLibDebug(form.value, loading).then((res) => {
-          if (res.code === 500) {
-            showResult.value = true
-            isSuccess.value = false
-            result.value = res.message
-          } else {
-            showResult.value = true
-            isSuccess.value = true
-            result.value = res.data
-          }
-        })
       }
     })
-  }
+  })
 }
 
 const open = (data: any) => {
