@@ -26,6 +26,9 @@
             <el-button @click="batchRefresh" :disabled="multipleSelection.length === 0">
               重新向量化
             </el-button>
+            <el-button @click="openGenerateDialog()" :disabled="multipleSelection.length === 0">
+              生成关联问题
+            </el-button>
             <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0">
               设置
             </el-button>
@@ -137,6 +140,9 @@
               </el-text>
               <el-text v-else-if="row.status === '3'">
                 <el-icon class="is-loading primary"><Loading /></el-icon> 排队中
+              </el-text>
+              <el-text v-else-if="row.status === '4'">
+                <el-icon class="is-loading primary"><Loading /></el-icon> 生成问题中
               </el-text>
             </template>
           </el-table-column>
@@ -258,6 +264,10 @@
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
+                        <el-dropdown-item @click="openGenerateDialog(row)">
+                          <el-icon><Connection /></el-icon>
+                          生成关联问题
+                        </el-dropdown-item>
                         <el-dropdown-item @click="openDatasetDialog(row)">
                           <AppIcon iconName="app-migrate"></AppIcon>
                           迁移
@@ -300,6 +310,10 @@
                         <el-dropdown-item icon="Setting" @click="settingDoc(row)"
                           >设置</el-dropdown-item
                         >
+                        <el-dropdown-item @click="openGenerateDialog(row)">
+                          <el-icon><Connection /></el-icon>
+                          生成关联问题
+                        </el-dropdown-item>
                         <el-dropdown-item @click="openDatasetDialog(row)">
                           <AppIcon iconName="app-migrate"></AppIcon>
                           迁移</el-dropdown-item
@@ -324,6 +338,7 @@
       <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
       <!-- 选择知识库 -->
       <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
+      <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
     </div>
   </LayoutContainer>
 </template>
@@ -340,6 +355,7 @@ import { datetimeFormat } from '@/utils/time'
 import { hitHandlingMethod } from '@/enums/document'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
+import GenerateRelatedDialog from '@/views/document/component/GenerateRelatedDialog.vue'
 const router = useRouter()
 const route = useRoute()
 const {
@@ -554,6 +570,19 @@ function batchRefresh() {
   })
 }
 
+function batchGenerateRelated() {
+  const arr: string[] = []
+  multipleSelection.value.map((v) => {
+    if (v) {
+      arr.push(v.id)
+    }
+  })
+  documentApi.batchGenerateRelated(id, arr, loading).then(() => {
+    MsgSuccess('批量生成关联问题成功')
+    multipleTableRef.value?.clearSelection()
+  })
+}
+
 function deleteDocument(row: any) {
   MsgConfirm(
     `是否删除文档：${row.name} ?`,
@@ -642,6 +671,23 @@ function refresh() {
   paginationConfig.value.current_page = 1
   getList()
 }
+
+const GenerateRelatedDialogRef = ref()
+function openGenerateDialog(row?: any) {
+  const arr: string[] = []
+  if (row) {
+    arr.push(row.id)
+  } else {
+    multipleSelection.value.map((v) => {
+      if (v) {
+        arr.push(v.id)
+      }
+    })
+  }
+
+  GenerateRelatedDialogRef.value.open(arr)
+}
+
 
 onMounted(() => {
   getDetail()

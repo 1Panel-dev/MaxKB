@@ -121,6 +121,10 @@
                           </el-button>
                           <template #dropdown>
                             <el-dropdown-menu>
+                              <el-dropdown-item @click="openGenerateDialog(item)">
+                                <el-icon><Connection /></el-icon>
+                                生成关联问题</el-dropdown-item
+                              >
                               <el-dropdown-item @click="openSelectDocumentDialog(item)">
                                 <AppIcon iconName="app-migrate"></AppIcon>
                                 迁移</el-dropdown-item
@@ -142,6 +146,9 @@
       </el-scrollbar>
 
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
+        <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
+          生成关联问题
+        </el-button>
         <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog()">
           迁移
         </el-button>
@@ -154,6 +161,8 @@
     </div>
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
+
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -166,6 +175,7 @@ import SelectDocumentDialog from './component/SelectDocumentDialog.vue'
 import { numberFormat } from '@/utils/utils'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
+import GenerateRelatedDialog from './component/GenerateRelatedDialog.vue'
 const { paragraph } = useStore()
 const route = useRoute()
 const {
@@ -316,6 +326,23 @@ function refresh(data: any) {
     paragraphDetail.value = []
     getParagraphList()
   }
+}
+
+
+const GenerateRelatedDialogRef = ref()
+function openGenerateDialog(row?: any) {
+  const arr: string[] = []
+  if (row) {
+    arr.push(row.id)
+  } else {
+    multipleSelection.value.map((v) => {
+      if (v) {
+        arr.push(v)
+      }
+    })
+  }
+
+  GenerateRelatedDialogRef.value.open(arr)
 }
 
 onMounted(() => {

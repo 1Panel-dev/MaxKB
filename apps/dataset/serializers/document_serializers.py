@@ -47,7 +47,7 @@ from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type,
 from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer, ProblemParagraphManage, \
     get_embedding_model_id_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
-from dataset.task import sync_web_document
+from dataset.task import sync_web_document, generate_related_by_document_id
 from embedding.task.embedding import embedding_by_document, delete_embedding_by_document_list, \
     delete_embedding_by_document, update_embedding_dataset_id, delete_embedding_by_paragraph_ids, \
     embedding_by_document_list
@@ -959,6 +959,37 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                         embedding_by_document.delay(document_id, embedding_model_id)
                     except AlreadyQueued as e:
                         raise AppApiException(500, "任务正在执行中,请勿重复下发")
+
+    class GenerateRelated(ApiMixin, serializers.Serializer):
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            document_id = self.data.get('document_id')
+            if not QuerySet(Document).filter(id=document_id).exists():
+                raise AppApiException(500, "文档id不存在")
+
+        def generate_related(self, model_id, prompt, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id = self.data.get('document_id')
+            QuerySet(Document).filter(id=document_id).update(status=Status.queue_up)
+            generate_related_by_document_id.delay(document_id, model_id, prompt)
+
+
+
+    class BatchGenerateRelated(ApiMixin, serializers.Serializer):
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
+
+        @transaction.atomic
+        def batch_generate_related(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id_list = instance.get("document_id_list")
+            model_id = instance.get("model_id")
+            prompt = instance.get("prompt")
+            for document_id in document_id_list:
+                DocumentSerializers.GenerateRelated(data={'document_id': document_id}).generate_related(model_id, prompt)
 
 
 class FileBufferHandle:

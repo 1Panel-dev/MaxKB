@@ -226,6 +226,21 @@ const disassociationProblem: (
   )
 }
 
+const batchGenerateRelated: (
+  dataset_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, document_id, data, loading) => {
+  return put(
+    `${prefix}/${dataset_id}/document/${document_id}/paragraph/batch_generate_related`,
+    data,
+    undefined,
+    loading
+  )
+}
+
+
 export default {
   getParagraph,
   delParagraph,
@@ -236,5 +251,6 @@ export default {
   disassociationProblem,
   associationProblem,
   delMulParagraph,
-  putMigrateMulParagraph
+  putMigrateMulParagraph,
+  batchGenerateRelated
 }

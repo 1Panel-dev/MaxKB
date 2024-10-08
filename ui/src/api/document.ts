@@ -317,6 +317,19 @@ const exportDocument: (
   )
 }
 
+const batchGenerateRelated: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return put(
+    `${prefix}/${dataset_id}/document/batch_generate_related`,
+    data,
+    undefined,
+    loading
+  )
+}
+
 export default {
   postSplitDocument,
   getDocument,
@@ -338,5 +351,6 @@ export default {
   postQADocument,
   postTableDocument,
   exportDocument,
-  batchRefresh
+  batchRefresh,
+  batchGenerateRelated
 }

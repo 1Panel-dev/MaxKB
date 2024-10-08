@@ -8,6 +8,7 @@
 """
 
 import logging
+import re
 import traceback
 
 from common.util.fork import ChildLink, Fork
@@ -60,3 +61,23 @@ def get_sync_web_document_handler(dataset_id):
                      status=Status.error).save()
 
     return handler
+
+
+def save_problem(dataset_id, document_id, paragraph_id, problem):
+    from dataset.serializers.paragraph_serializers import ParagraphSerializers
+    # print(f"dataset_id: {dataset_id}")
+    # print(f"document_id: {document_id}")
+    # print(f"paragraph_id: {paragraph_id}")
+    # print(f"problem: {problem}")
+    problem = re.sub(r"^\d+\.\s*", "", problem)
+    pattern = r"<question>(.*?)</question>"
+    match = re.search(pattern, problem)
+    problem = match.group(1) if match else None
+    if problem is None or len(problem) == 0:
+        return
+    try:
+        ParagraphSerializers.Problem(
+            data={"dataset_id": dataset_id, 'document_id': document_id,
+                  'paragraph_id': paragraph_id}).save(instance={"content": problem}, with_valid=True)
+    except Exception as e:
+        max_kb_error.error(f'关联问题失败: {e}')
