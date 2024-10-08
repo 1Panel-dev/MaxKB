@@ -305,4 +305,13 @@ defineExpose({
   open
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.function-CodemirrorEditor__footer {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+.function-CodemirrorEditor {
+  position: relative;
+}
+</style>

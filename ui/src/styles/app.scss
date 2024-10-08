@@ -721,24 +721,6 @@ h5 {
   background: var(--el-color-primary-light-9) !important;
 }
 
-// Codemirror 编辑器
-.function-CodemirrorEditor {
-  border: 1px solid #bbbfc4;
-  border-radius: 4px;
-  position: relative;
-  padding-bottom: 20px;
-  &__footer {
-    .magnify {
-      position: absolute;
-      bottom: 5px;
-      right: 5px;
-    }
-  }
-  .cm-gutters {
-    display: none !important;
-  }
-}
-
 .edit-avatar {
   position: relative;
   .edit-mask {
