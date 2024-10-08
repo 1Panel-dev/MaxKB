@@ -21,7 +21,8 @@ defineOptions({ name: 'CodemirrorEditor' })
 
 function getRangeFromLineAndColumn(state: any, line: number, column: number, end_column?: number) {
   const l = state.doc.line(line)
-  return { form: l.from + column, to: end_column ? l.from + end_column : l.to }
+  const form = l.from + column
+  return { form: form > l.to ? l.to : form, to: end_column ? l.from + end_column : l.to }
 }
 
 const regexpLinter = linter(async (view) => {
