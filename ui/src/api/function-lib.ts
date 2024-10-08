@@ -95,6 +95,9 @@ const getFunctionLibById: (
 ) => Promise<Result<any>> = (function_lib_id, loading) => {
   return get(`${prefix}/${function_lib_id}`, undefined, loading)
 }
+const pylint: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (code, loading) => {
+  return post(`${prefix}/pylint`, { code }, {}, loading)
+}
 
 export default {
   getFunctionLib,
@@ -103,5 +106,6 @@ export default {
   postFunctionLibDebug,
   getAllFunctionLib,
   delFunctionLib,
-  getFunctionLibById
+  getFunctionLibById,
+  pylint
 }

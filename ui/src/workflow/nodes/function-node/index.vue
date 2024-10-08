@@ -221,4 +221,13 @@ onMounted(() => {
   }, 100)
 })
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.function-CodemirrorEditor__footer {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+.function-CodemirrorEditor {
+  position: relative;
+}
+</style>

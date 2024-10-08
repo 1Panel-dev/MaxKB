@@ -1,27 +1,55 @@
 <template>
-  <Codemirror v-bind="$attrs" border :options="cmOption" ref="cmRef" :style="codemirrorStyle" />
+  <Codemirror
+    v-bind="$attrs"
+    ref="cmRef"
+    :extensions="extensions"
+    :style="codemirrorStyle"
+    :tab-size="4"
+    :autofocus="true"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { Codemirror } from 'vue-codemirror'
+import { python } from '@codemirror/lang-python'
+import { oneDark } from '@codemirror/theme-one-dark'
+import { linter, Diagnostic } from '@codemirror/lint'
+import FunctionApi from '@/api/function-lib'
 
 defineOptions({ name: 'CodemirrorEditor' })
-const cmOption = {
-  tabSize: 4,
-  lineWrapping: true,
-  lineNumbers: true,
-  line: true
+
+function getRangeFromLineAndColumn(state: any, line: number, column: number, end_column?: number) {
+  const l = state.doc.line(line)
+  return { form: l.from + column, to: end_column ? l.from + end_column : l.to }
 }
+
+const regexpLinter = linter(async (view) => {
+  let diagnostics: Diagnostic[] = []
+  await FunctionApi.pylint(view.state.doc.toString()).then((ok) => {
+    ok.data.forEach((element: any) => {
+      const range = getRangeFromLineAndColumn(
+        view.state,
+        element.line,
+        element.column,
+        element.endColumn
+      )
+
+      diagnostics.push({
+        from: range.form,
+        to: range.to,
+        severity: element.type,
+        message: element.message
+      })
+    })
+  })
+  return diagnostics
+})
+const extensions = [python(), regexpLinter, oneDark]
 const codemirrorStyle = {
   height: '210px!important'
 }
-const cmRef = ref()
-onMounted(() => {})
-
-onUnmounted(() => {
-  cmRef.value?.destroy()
-})
+const cmRef = ref<InstanceType<typeof Codemirror>>()
 </script>
 
 <style lang="scss"></style>
