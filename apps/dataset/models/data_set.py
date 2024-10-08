@@ -22,6 +22,7 @@ class Status(models.TextChoices):
     success = 1, '已完成'
     error = 2, '导入失败'
     queue_up = 3, '排队中'
+    generating = 4, '生成问题中'
 
 
 class Type(models.TextChoices):

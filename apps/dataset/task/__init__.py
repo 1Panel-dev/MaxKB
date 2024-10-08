@@ -7,3 +7,4 @@
     @desc:
 """
 from .sync import *
+from .generate import *

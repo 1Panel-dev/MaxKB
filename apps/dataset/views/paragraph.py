@@ -232,3 +232,15 @@ class Paragraph(APIView):
                       'document_id': document_id})
             d.is_valid(raise_exception=True)
             return result.success(d.page(current_page, page_size))
+
+    class BatchGenerateRelated(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def put(self, request: Request, dataset_id: str, document_id: str):
+            return result.success(
+                ParagraphSerializers.BatchGenerateRelated(data={'dataset_id': dataset_id, 'document_id': document_id})
+                .batch_generate_related(request.data))
