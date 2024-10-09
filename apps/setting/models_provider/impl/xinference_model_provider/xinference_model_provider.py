@@ -371,10 +371,13 @@ class XinferenceModelProvider(IModelProvider):
                          'xinference_icon_svg')))
 
     @staticmethod
-    def get_base_model_list(api_base, model_type):
+    def get_base_model_list(api_base, api_key, model_type):
         base_url = get_base_url(api_base)
         base_url = base_url if base_url.endswith('/v1') else (base_url + '/v1')
-        r = requests.request(method="GET", url=f"{base_url}/models", timeout=5)
+        headers = {}
+        if api_key:
+            headers['Authorization'] = f"Bearer {api_key}"
+        r = requests.request(method="GET", url=f"{base_url}/models", headers=headers, timeout=5)
         r.raise_for_status()
         model_list = r.json().get('data')
         return [model for model in model_list if model.get('model_type') == model_type]
