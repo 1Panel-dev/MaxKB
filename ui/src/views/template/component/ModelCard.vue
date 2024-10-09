@@ -47,6 +47,12 @@
             {{ model.model_name }}</span
           >
         </li>
+        <li class="flex mt-12">
+          <el-text type="info">创建者</el-text>
+          <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
+            {{ model.username }}</span
+          >
+        </li>
       </ul>
     </div>
     <!-- progress -->

@@ -54,6 +54,7 @@ interface Model {
    */
   model_type: string
   user_id: string
+  username: string
   permission_type: 'PUBLIC' | 'PRIVATE'
   /**
    * 基础模型

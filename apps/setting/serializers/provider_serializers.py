@@ -94,7 +94,7 @@ class ModelSerializer(serializers.Serializer):
             return [
                 {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
                  'model_name': model.model_name, 'status': model.status, 'meta': model.meta,
-                 'permission_type': model.permission_type, 'user_id': model.user_id} for model in
+                 'permission_type': model.permission_type, 'user_id': model.user_id, 'username': model.user.username} for model in
                 model_query_set.filter(**query_params).order_by("-create_time")]
 
     class Edit(serializers.Serializer):
