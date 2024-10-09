@@ -28,14 +28,15 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="管理" align="center" width="60" fixed="right">
-        <!-- <template #header>
-        <el-checkbox
-          v-model="allChecked[MANAGE]"
-          label="管理"
-          @change="handleCheckAllChange($event, MANAGE)"
-        />
-      </template> -->
+      <el-table-column label="管理" align="center" width="80" fixed="right">
+        <template #header>
+          <el-checkbox
+            :disabled="props.manage"
+            v-model="allChecked[TeamEnum.MANAGE]"
+            label="管理"
+            @change="handleCheckAllChange($event, TeamEnum.MANAGE)"
+          />
+        </template>
         <template #default="{ row }">
           <el-checkbox
             :disabled="props.manage"
@@ -44,14 +45,15 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="使用" align="center" width="60" fixed="right">
-        <!-- <template #header>
-        <el-checkbox
-          v-model="allChecked[USE]"
-          label="使用"
-          @change="handleCheckAllChange($event, USE)"
-        />
-      </template> -->
+      <el-table-column label="使用" align="center" width="80" fixed="right">
+        <template #header>
+          <el-checkbox
+            :disabled="props.manage"
+            v-model="allChecked[TeamEnum.USE]"
+            label="使用"
+            @change="handleCheckAllChange($event, TeamEnum.USE)"
+          />
+        </template>
         <template #default="{ row }">
           <el-checkbox
             :disabled="props.manage"
