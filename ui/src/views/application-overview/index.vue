@@ -111,9 +111,9 @@
                     <el-text style="width: 80px">Base URL：</el-text>
                   </span>
 
-                  <a target="_blank" :href="apiUrl" class="vertical-middle lighter break-all">
-                    <span class="ellipsis-1">{{ baseUrl + id }}</span>
-                  </a>
+                  <span class="vertical-middle lighter break-all ellipsis-1">{{
+                    baseUrl + id
+                  }}</span>
 
                   <el-button type="primary" text @click="copyClick(baseUrl + id)">
                     <AppIcon iconName="app-copy"></AppIcon>
