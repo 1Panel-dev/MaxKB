@@ -14,7 +14,7 @@
         <h4 :id="titleId" :class="titleClass">
           {{ $t('views.application.applicationForm.dialogues.addDataset') }}
         </h4>
-        <div class="flex align-center">
+        <div class="flex align-center mr-8">
           <el-button link class="ml-16" @click="refresh">
             <el-icon class="mr-4"><Refresh /></el-icon
             >{{ $t('views.application.applicationForm.dialogues.refresh') }}
@@ -22,9 +22,18 @@
           <el-divider direction="vertical" />
         </div>
       </div>
-      <el-text type="info" class="color-secondary">
-        所选知识库必须使用相同的 Embedding 模型
-      </el-text>
+      <div class="flex-between">
+        <el-text type="info" class="color-secondary">
+          所选知识库必须使用相同的 Embedding 模型
+        </el-text>
+        <el-input
+          v-model="searchValue"
+          placeholder="搜索"
+          prefix-icon="Search"
+          class="w-240"
+          clearable
+        />
+      </div>
     </template>
     <el-scrollbar>
       <div class="max-height">
@@ -76,17 +85,28 @@ const emit = defineEmits(['addData', 'refresh'])
 const dialogVisible = ref<boolean>(false)
 const checkList = ref([])
 const currentEmbedding = ref('')
+const searchValue = ref('')
+const searchDate = ref<any[]>([])
 
 const filterData = computed(() => {
   return currentEmbedding.value
-    ? props.data.filter((v) => v.embedding_mode_id === currentEmbedding.value)
-    : props.data
+    ? searchDate.value.filter((v) => v.embedding_mode_id === currentEmbedding.value)
+    : searchDate.value
 })
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
     checkList.value = []
     currentEmbedding.value = ''
+    searchValue.value = ''
+  }
+})
+
+watch(searchValue, (val) => {
+  if (val) {
+    searchDate.value = props.data.filter((v) => v.name.includes(val))
+  } else {
+    searchDate.value = props.data
   }
 })
 
@@ -105,6 +125,7 @@ function clearCheck() {
 }
 
 const open = (checked: any) => {
+  searchDate.value = props.data
   checkList.value = checked
   if (checkList.value.length > 0) {
     currentEmbedding.value = props.data.filter(
@@ -137,9 +158,7 @@ defineExpose({ open })
   .el-dialog__footer {
     padding: 8px 24px 24px 24px;
   }
-  .el-dialog__header.show-close {
-    padding-right: 34px;
-  }
+
   .el-dialog__headerbtn {
     top: 13px;
   }
