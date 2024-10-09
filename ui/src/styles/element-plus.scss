@@ -274,6 +274,12 @@
   padding: 0 14px;
 }
 
+.el-tabs__nav-wrap:after {
+  height: 1px;
+}
+.el-tabs__active-bar {
+  height: 3px;
+}
 .el-drawer {
   .el-drawer__header {
     padding: 16px 24px;

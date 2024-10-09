@@ -129,6 +129,20 @@ const useUserStore = defineStore({
         return this.profile()
       })
     },
+    async dingCallback(code: string) {
+      return UserApi.getDingCallback(code).then((ok) => {
+        this.token = ok.data
+        localStorage.setItem('token', ok.data)
+        return this.profile()
+      })
+    },
+    async wecomCallback(code: string) {
+      return UserApi.getWecomCallback(code).then((ok) => {
+        this.token = ok.data
+        localStorage.setItem('token', ok.data)
+        return this.profile()
+      })
+    },
 
     async logout() {
       return UserApi.logout().then(() => {
@@ -138,6 +152,11 @@ const useUserStore = defineStore({
     },
     async getAuthType() {
       return UserApi.getAuthType().then((ok) => {
+        return ok.data
+      })
+    },
+    async getQrType() {
+      return UserApi.getQrType().then((ok) => {
         return ok.data
       })
     }

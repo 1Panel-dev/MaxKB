@@ -267,14 +267,9 @@ onMounted(() => {
 
   &__tabs {
     margin-top: 10px;
-    :deep(.el-tabs__nav-wrap::after) {
-      height: 1px;
-    }
+
     :deep(.el-tabs__nav-scroll) {
       padding: 0 24px;
-    }
-    :deep(.el-tabs__active-bar) {
-      height: 3px;
     }
   }
   &__table {

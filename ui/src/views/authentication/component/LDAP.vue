@@ -1,61 +1,65 @@
 <template>
-  <div class="p-24" v-loading="loading">
-    <el-form
-      ref="authFormRef"
-      :rules="rules"
-      :model="form"
-      label-position="top"
-      require-asterisk-position="right"
-    >
-      <el-form-item :label="$t('login.ldap.address')" prop="config_data.ldap_server">
-        <el-input
-          v-model="form.config_data.ldap_server"
-          :placeholder="$t('login.ldap.serverPlaceholder')"
-        />
-      </el-form-item>
-      <el-form-item :label="$t('login.ldap.bindDN')" prop="config_data.base_dn">
-        <el-input
-          v-model="form.config_data.base_dn"
-          :placeholder="$t('login.ldap.bindDNPlaceholder')"
-        />
-      </el-form-item>
-      <el-form-item :label="$t('login.ldap.password')" prop="config_data.password">
-        <el-input
-          v-model="form.config_data.password"
-          :placeholder="$t('login.ldap.passwordPlaceholder')"
-          show-password
-        />
-      </el-form-item>
-      <el-form-item :label="$t('login.ldap.ou')" prop="config_data.ou">
-        <el-input v-model="form.config_data.ou" :placeholder="$t('login.ldap.ouPlaceholder')" />
-      </el-form-item>
-      <el-form-item :label="$t('login.ldap.ldap_filter')" prop="config_data.ldap_filter">
-        <el-input
-          v-model="form.config_data.ldap_filter"
-          :placeholder="$t('login.ldap.ldap_filterPlaceholder')"
-        />
-      </el-form-item>
-      <el-form-item :label="$t('login.ldap.ldap_mapping')" prop="config_data.ldap_mapping">
-        <el-input
-          v-model="form.config_data.ldap_mapping"
-          placeholder='{"name":"name","email":"mail","username":"cn"}'
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-checkbox v-model="form.is_active">{{
-          $t('login.ldap.enableAuthentication')
-        }}</el-checkbox>
-      </el-form-item>
-      <el-button @click="submit(authFormRef, 'test')" :disabled="loading">
-        {{ $t('login.ldap.test') }}</el-button
-      >
-    </el-form>
+  <div class="authentication-setting__main main-calc-height">
+    <el-scrollbar>
+      <div class="form-container p-24" v-loading="loading">
+        <el-form
+          ref="authFormRef"
+          :rules="rules"
+          :model="form"
+          label-position="top"
+          require-asterisk-position="right"
+        >
+          <el-form-item :label="$t('login.ldap.address')" prop="config_data.ldap_server">
+            <el-input
+              v-model="form.config_data.ldap_server"
+              :placeholder="$t('login.ldap.serverPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('login.ldap.bindDN')" prop="config_data.base_dn">
+            <el-input
+              v-model="form.config_data.base_dn"
+              :placeholder="$t('login.ldap.bindDNPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('login.ldap.password')" prop="config_data.password">
+            <el-input
+              v-model="form.config_data.password"
+              :placeholder="$t('login.ldap.passwordPlaceholder')"
+              show-password
+            />
+          </el-form-item>
+          <el-form-item :label="$t('login.ldap.ou')" prop="config_data.ou">
+            <el-input v-model="form.config_data.ou" :placeholder="$t('login.ldap.ouPlaceholder')" />
+          </el-form-item>
+          <el-form-item :label="$t('login.ldap.ldap_filter')" prop="config_data.ldap_filter">
+            <el-input
+              v-model="form.config_data.ldap_filter"
+              :placeholder="$t('login.ldap.ldap_filterPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('login.ldap.ldap_mapping')" prop="config_data.ldap_mapping">
+            <el-input
+              v-model="form.config_data.ldap_mapping"
+              placeholder='{"name":"name","email":"mail","username":"cn"}'
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-checkbox v-model="form.is_active">{{
+              $t('login.ldap.enableAuthentication')
+            }}</el-checkbox>
+          </el-form-item>
+          <el-button @click="submit(authFormRef, 'test')" :disabled="loading">
+            {{ $t('login.ldap.test') }}</el-button
+          >
+        </el-form>
 
-    <div class="text-right">
-      <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
-        {{ $t('login.ldap.save') }}
-      </el-button>
-    </div>
+        <div class="text-right">
+          <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
+            {{ $t('login.ldap.save') }}
+          </el-button>
+        </div>
+      </div>
+    </el-scrollbar>
   </div>
 </template>
 <script setup lang="ts">
