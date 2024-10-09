@@ -18,6 +18,7 @@
     "@logicflow/core": "^1.2.27",
     "@logicflow/extension": "^1.2.27",
     "@vueuse/core": "^10.9.0",
+    "@wecom/jssdk": "^2.1.0",
     "axios": "^0.28.0",
     "codemirror": "^6.0.1",
     "cropperjs": "^1.6.2",

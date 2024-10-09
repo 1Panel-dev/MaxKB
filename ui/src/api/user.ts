@@ -1,14 +1,14 @@
-import {Result} from '@/request/Result'
-import {get, post} from '@/request/index'
+import { Result } from '@/request/Result'
+import { get, post } from '@/request/index'
 import type {
-    LoginRequest,
-    RegisterRequest,
-    CheckCodeRequest,
-    ResetPasswordRequest,
-    User,
-    ResetCurrentUserPasswordRequest
+  LoginRequest,
+  RegisterRequest,
+  CheckCodeRequest,
+  ResetPasswordRequest,
+  User,
+  ResetCurrentUserPasswordRequest
 } from '@/api/type/user'
-import type {Ref} from 'vue'
+import type { Ref } from 'vue'
 
 /**
  * 登录
@@ -17,15 +17,15 @@ import type {Ref} from 'vue'
  * @param loading 接口加载器
  * @returns 认证数据
  */
-const login: (auth_type: string, request: LoginRequest, loading?: Ref<boolean>) => Promise<Result<string>> = (
-    auth_type,
-    request,
-    loading
-) => {
-    if (auth_type !== '') {
-        return post(`/${auth_type}/login`, request, undefined, loading)
-    }
-    return post('/user/login', request, undefined, loading)
+const login: (
+  auth_type: string,
+  request: LoginRequest,
+  loading?: Ref<boolean>
+) => Promise<Result<string>> = (auth_type, request, loading) => {
+  if (auth_type !== '') {
+    return post(`/${auth_type}/login`, request, undefined, loading)
+  }
+  return post('/user/login', request, undefined, loading)
 }
 /**
  * 登出
@@ -33,7 +33,7 @@ const login: (auth_type: string, request: LoginRequest, loading?: Ref<boolean>) 
  * @returns
  */
 const logout: (loading?: Ref<boolean>) => Promise<Result<boolean>> = (loading) => {
-    return post('/user/logout', undefined, undefined, loading)
+  return post('/user/logout', undefined, undefined, loading)
 }
 
 /**
@@ -43,10 +43,10 @@ const logout: (loading?: Ref<boolean>) => Promise<Result<boolean>> = (loading) =
  * @returns
  */
 const register: (request: RegisterRequest, loading?: Ref<boolean>) => Promise<Result<string>> = (
-    request,
-    loading
+  request,
+  loading
 ) => {
-    return post('/user/register', request, undefined, loading)
+  return post('/user/register', request, undefined, loading)
 }
 
 /**
@@ -56,10 +56,10 @@ const register: (request: RegisterRequest, loading?: Ref<boolean>) => Promise<Re
  * @returns
  */
 const checkCode: (request: CheckCodeRequest, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
-    request,
-    loading
+  request,
+  loading
 ) => {
-    return post('/user/check_code', request, undefined, loading)
+  return post('/user/check_code', request, undefined, loading)
 }
 
 /**
@@ -69,11 +69,11 @@ const checkCode: (request: CheckCodeRequest, loading?: Ref<boolean>) => Promise<
  * @returns
  */
 const sendEmit: (
-    email: string,
-    type: 'register' | 'reset_password',
-    loading?: Ref<boolean>
+  email: string,
+  type: 'register' | 'reset_password',
+  loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (email, type, loading) => {
-    return post('/user/send_email', {email, type}, undefined, loading)
+  return post('/user/send_email', { email, type }, undefined, loading)
 }
 /**
  * 发送邮件到当前用户
@@ -81,7 +81,7 @@ const sendEmit: (
  * @returns
  */
 const sendEmailToCurrent: (loading?: Ref<boolean>) => Promise<Result<boolean>> = (loading) => {
-    return post('/user/current/send_email', undefined, undefined, loading)
+  return post('/user/current/send_email', undefined, undefined, loading)
 }
 /**
  * 修改当前用户密码
@@ -90,10 +90,10 @@ const sendEmailToCurrent: (loading?: Ref<boolean>) => Promise<Result<boolean>> =
  * @returns
  */
 const resetCurrentUserPassword: (
-    request: ResetCurrentUserPasswordRequest,
-    loading?: Ref<boolean>
+  request: ResetCurrentUserPasswordRequest,
+  loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (request, loading) => {
-    return post('/user/current/reset_password', request, undefined, loading)
+  return post('/user/current/reset_password', request, undefined, loading)
 }
 /**
  * 获取用户基本信息
@@ -101,7 +101,7 @@ const resetCurrentUserPassword: (
  * @returns 用户基本信息
  */
 const profile: (loading?: Ref<boolean>) => Promise<Result<User>> = (loading) => {
-    return get('/user', undefined, loading)
+  return get('/user', undefined, loading)
 }
 
 /**
@@ -111,10 +111,10 @@ const profile: (loading?: Ref<boolean>) => Promise<Result<User>> = (loading) => 
  * @returns
  */
 const resetPassword: (
-    request: ResetPasswordRequest,
-    loading?: Ref<boolean>
+  request: ResetPasswordRequest,
+  loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (request, loading) => {
-    return post('/user/re_password', request, undefined, loading)
+  return post('/user/re_password', request, undefined, loading)
 }
 
 /**
@@ -123,17 +123,17 @@ const resetPassword: (
  * email_or_username
  */
 const getUserList: (email_or_username: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
-    email_or_username,
-    loading
+  email_or_username,
+  loading
 ) => {
-    return get('/user/list', {email_or_username}, loading)
+  return get('/user/list', { email_or_username }, loading)
 }
 
 /**
  * 获取profile
  */
 const getProfile: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-    return get('/profile', undefined, loading)
+  return get('/profile', undefined, loading)
 }
 
 /**
@@ -142,31 +142,55 @@ const getProfile: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) =
  * @param valid_count 校验数量: 5 | 50 | 2
  */
 const getValid: (
-    valid_type: string,
-    valid_count: number,
-    loading?: Ref<boolean>
+  valid_type: string,
+  valid_count: number,
+  loading?: Ref<boolean>
 ) => Promise<Result<any>> = (valid_type, valid_count, loading) => {
-    return get(`/valid/${valid_type}/${valid_count}`, undefined, loading)
+  return get(`/valid/${valid_type}/${valid_count}`, undefined, loading)
 }
 /**
  * 获取登录方式
  */
 const getAuthType: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
-    return get('auth/types', undefined, loading)
+  return get('auth/types', undefined, loading)
+}
+
+/**
+ * 获取二维码类型
+ */
+const getQrType: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get('qr_type', undefined, loading)
+}
+
+const getDingCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  code,
+  loading
+) => {
+  return get('dingtalk', { code }, loading)
+}
+
+const getWecomCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  code,
+  loading
+) => {
+  return get('wecom', { code }, loading)
 }
 
 export default {
-    login,
-    register,
-    sendEmit,
-    checkCode,
-    profile,
-    resetPassword,
-    sendEmailToCurrent,
-    resetCurrentUserPassword,
-    logout,
-    getUserList,
-    getProfile,
-    getValid,
-    getAuthType
+  login,
+  register,
+  sendEmit,
+  checkCode,
+  profile,
+  resetPassword,
+  sendEmailToCurrent,
+  resetCurrentUserPassword,
+  logout,
+  getUserList,
+  getProfile,
+  getValid,
+  getAuthType,
+  getDingCallback,
+  getQrType,
+  getWecomCallback
 }

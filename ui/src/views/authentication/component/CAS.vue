@@ -1,36 +1,40 @@
 <template>
-  <div class="p-24" v-loading="loading">
-    <el-form
-      ref="authFormRef"
-      :rules="rules"
-      :model="form"
-      label-position="top"
-      require-asterisk-position="right"
-    >
-      <el-form-item :label="$t('login.cas.ldpUri')" prop="config_data.ldpUri">
-        <el-input
-          v-model="form.config_data.ldpUri"
-          :placeholder="$t('login.cas.ldpUriPlaceholder')"
-        />
-      </el-form-item>
-      <el-form-item :label="$t('login.cas.redirectUrl')" prop="config_data.redirectUrl">
-        <el-input
-          v-model="form.config_data.redirectUrl"
-          :placeholder="$t('login.cas.redirectUrlPlaceholder')"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-checkbox v-model="form.is_active"
-          >{{ $t('login.cas.enableAuthentication') }}
-        </el-checkbox>
-      </el-form-item>
-    </el-form>
+  <div class="authentication-setting__main main-calc-height">
+    <el-scrollbar>
+      <div class="form-container p-24" v-loading="loading">
+        <el-form
+          ref="authFormRef"
+          :rules="rules"
+          :model="form"
+          label-position="top"
+          require-asterisk-position="right"
+        >
+          <el-form-item :label="$t('login.cas.ldpUri')" prop="config_data.ldpUri">
+            <el-input
+              v-model="form.config_data.ldpUri"
+              :placeholder="$t('login.cas.ldpUriPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('login.cas.redirectUrl')" prop="config_data.redirectUrl">
+            <el-input
+              v-model="form.config_data.redirectUrl"
+              :placeholder="$t('login.cas.redirectUrlPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-checkbox v-model="form.is_active"
+              >{{ $t('login.cas.enableAuthentication') }}
+            </el-checkbox>
+          </el-form-item>
+        </el-form>
 
-    <div class="text-right">
-      <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
-        {{ $t('login.cas.save') }}
-      </el-button>
-    </div>
+        <div class="text-right">
+          <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
+            {{ $t('login.cas.save') }}
+          </el-button>
+        </div>
+      </div>
+    </el-scrollbar>
   </div>
 </template>
 <script setup lang="ts">

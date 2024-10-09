@@ -285,9 +285,6 @@ onBeforeUnmount(() => {
     .el-tabs__nav-wrap {
       padding: 0 16px;
     }
-    .el-tabs__nav-wrap:after {
-      height: 1px;
-    }
   }
 }
 
