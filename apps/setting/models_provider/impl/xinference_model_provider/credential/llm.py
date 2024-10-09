@@ -34,7 +34,7 @@ class XinferenceLLMModelCredential(BaseForm, BaseModelCredential):
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
         try:
-            model_list = provider.get_base_model_list(model_credential.get('api_base'), model_type)
+            model_list = provider.get_base_model_list(model_credential.get('api_base'), model_credential.get('api_key'), model_type)
         except Exception as e:
             raise AppApiException(ValidCode.valid_error.value, "API 域名无效")
         exist = provider.get_model_info_by_name(model_list, model_name)
