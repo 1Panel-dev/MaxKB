@@ -831,6 +831,8 @@ const mediaRecorderStatus = ref(true)
 // 开始录音
 const startRecording = async () => {
   try {
+    // 取消录音控制台日志
+    Recorder.CLog=function(){}
     mediaRecorderStatus.value = false
     handleTimeChange()
     mediaRecorder.value = new Recorder({
@@ -908,7 +910,6 @@ const uploadRecording = async (audioBlob: Blob) => {
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
     applicationApi.postSpeechToText(props.data.id as string, formData, loading).then((response) => {
-      console.log('上传成功:', response.data)
       recorderLoading.value = false
       mediaRecorder.value.close()
       inputValue.value = typeof response.data === 'string' ? response.data : ''
