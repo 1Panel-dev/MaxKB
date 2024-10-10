@@ -11,12 +11,17 @@ from setting.models_provider.impl.xinference_model_provider.credential.embedding
     XinferenceEmbeddingModelCredential
 from setting.models_provider.impl.xinference_model_provider.credential.llm import XinferenceLLMModelCredential
 from setting.models_provider.impl.xinference_model_provider.credential.reranker import XInferenceRerankerModelCredential
+from setting.models_provider.impl.xinference_model_provider.credential.stt import XInferenceSTTModelCredential
 from setting.models_provider.impl.xinference_model_provider.model.embedding import XinferenceEmbedding
 from setting.models_provider.impl.xinference_model_provider.model.llm import XinferenceChatModel
 from setting.models_provider.impl.xinference_model_provider.model.reranker import XInferenceReranker
+from setting.models_provider.impl.xinference_model_provider.model.stt import XInferenceSpeechToText
+from setting.models_provider.impl.xinference_model_provider.model.tts import XInferenceTextToSpeech
 from smartdoc.conf import PROJECT_DIR
 
 xinference_llm_model_credential = XinferenceLLMModelCredential()
+xinference_stt_model_credential = XInferenceSTTModelCredential()
+
 model_info_list = [
     ModelInfo(
         'code-llama',
@@ -269,6 +274,20 @@ model_info_list = [
         ModelTypeConst.LLM,
         xinference_llm_model_credential,
         XinferenceChatModel
+    ),
+    ModelInfo(
+        'CosyVoice-300M-SFT',
+        'CosyVoice-300M-SFT是一个小型的语音合成模型。',
+        ModelTypeConst.TTS,
+        xinference_stt_model_credential,
+        XInferenceTextToSpeech
+    ),
+    ModelInfo(
+        'Belle-whisper-large-v3-zh',
+        'Belle Whisper Large V3 是一个中文大型语音识别模型。',
+        ModelTypeConst.STT,
+        xinference_stt_model_credential,
+        XInferenceSpeechToText
     ),
 ]
 
