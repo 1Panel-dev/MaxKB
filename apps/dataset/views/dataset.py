@@ -235,7 +235,6 @@ class Dataset(APIView):
                                             dynamic_tag=keywords.get('dataset_id'))],
             compare=CompareConstants.AND))
         def get(self, request: Request, dataset_id: str):
-            print(dataset_id)
             return result.success(
                 ModelSerializer.Query(
                     data={'user_id': request.user.id, 'model_type': 'LLM'}).list(
