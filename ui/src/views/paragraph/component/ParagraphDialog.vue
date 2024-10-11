@@ -12,8 +12,7 @@
       <el-col :span="18">
         <el-scrollbar height="500" wrap-class="paragraph-scrollbar">
           <div class="p-24" style="padding-bottom: 8px">
-            <div class="flex-between mb-16">
-              <div class="bold title align-center">分段内容</div>
+            <div style="position: absolute; right: 20px; top: 20px; ">
               <el-button text @click="isEdit = true" v-if="problemId && !isEdit">
                 <el-icon><EditPen /></el-icon>
               </el-button>

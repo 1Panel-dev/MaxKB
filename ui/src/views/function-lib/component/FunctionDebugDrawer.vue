@@ -12,7 +12,7 @@
     </template>
     <div>
       <div v-if="form.debug_field_list.length > 0" class="mb-16">
-        <h4 class="title-decoration-1 mb-16">输入变量</h4>
+        <h4 class="title-decoration-1 mb-16">输入参数</h4>
         <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
           <el-form
             ref="FormRef"
@@ -28,7 +28,7 @@
                 :prop="'debug_field_list.' + index + '.value'"
                 :rules="{
                   required: item.is_required,
-                  message: '请输入变量值',
+                  message: '请输入参数值',
                   trigger: 'blur'
                 }"
               >
@@ -40,7 +40,7 @@
                     <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
                   </div>
                 </template>
-                <el-input v-model="item.value" placeholder="请输入变量值" />
+                <el-input v-model="item.value" placeholder="请输入参数值" />
               </el-form-item>
             </template>
           </el-form>

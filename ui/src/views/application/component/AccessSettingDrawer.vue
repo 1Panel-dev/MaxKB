@@ -58,7 +58,7 @@
             href="https://open-dev.dingtalk.com/fe/app?hash=%23%2Fcorp%2Fapp#/corp/app"
             target="_blank"
             >钉钉开放平台</a
-          >-机器人页面，设置 "消息接收模式" 为 HTTP模式 ，并把下面URL填写到"消息接收地址"中
+          >-机器人页面，设置 "消息接收模式" 为 HTTP模式 ，并把上面URL填写到"消息接收地址"中
         </el-text>
         <el-text type="info" v-if="configType === 'wecom'">
           复制链接填入到
@@ -67,7 +67,7 @@
             href="https://work.weixin.qq.com/wework_admin/frame#apps"
             target="_blank"
             >企业微信后台</a
-          >-应用管理-自建-创建的应用-接受消息-设置 API 接收的 "URL" 中
+          >-应用管理-自建-创建的应用-接收消息-设置 API 接收的 "URL" 中
         </el-text>
         <el-text type="info" v-if="configType === 'feishu'">
           复制链接填入到

@@ -14,15 +14,6 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item label="变量名" prop="name">
-        <el-input
-          v-model="form.name"
-          placeholder="请输入变量名"
-          maxlength="64"
-          show-word-limit
-          @blur="form.name = form.name.trim()"
-        />
-      </el-form-item>
       <el-form-item label="变量" prop="variable">
         <el-input
           v-model="form.variable"
@@ -32,6 +23,16 @@
           @blur="form.variable = form.variable.trim()"
         />
       </el-form-item>
+      <el-form-item label="显示名称" prop="name">
+        <el-input
+          v-model="form.name"
+          placeholder="请输入显示名称"
+          maxlength="64"
+          show-word-limit
+          @blur="form.name = form.name.trim()"
+        />
+      </el-form-item>
+
       <el-form-item label="输入类型">
         <el-select v-model="form.type" @change="changeType">
           <el-option label="文本框" value="input" />
@@ -139,7 +140,7 @@ const form = ref<any>({
 })
 
 const rules = reactive({
-  name: [{ required: true, message: '请输入变量名', trigger: 'blur' }],
+  name: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
   variable: [
     { required: true, message: '请输入变量', trigger: 'blur' },
     { pattern: /^[a-zA-Z0-9_]+$/, message: '只能输入字母数字和下划线', trigger: 'blur' }

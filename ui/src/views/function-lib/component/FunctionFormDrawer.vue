@@ -62,7 +62,7 @@
       </el-form>
       <div class="flex-between">
         <h4 class="title-decoration-1 mb-16">
-          输入变量 <el-text type="info" class="color-secondary"> 使用函数时显示 </el-text>
+          输入参数 <el-text type="info" class="color-secondary"> 使用函数时显示 </el-text>
         </h4>
         <el-button link type="primary" @click="openAddDialog()">
           <el-icon class="mr-4"><Plus /></el-icon> 添加
@@ -70,7 +70,7 @@
       </div>
 
       <el-table :data="form.input_field_list" class="mb-16">
-        <el-table-column prop="name" label="变量名" />
+        <el-table-column prop="name" label="参数名" />
         <el-table-column label="数据类型">
           <template #default="{ row }">
             <el-tag type="info" class="info-tag">{{ row.type }}</el-tag>
@@ -85,7 +85,7 @@
         </el-table-column>
         <el-table-column prop="source" label="来源">
           <template #default="{ row }">
-            {{ row.source === 'custom' ? '自定义' : '引用变量' }}
+            {{ row.source === 'custom' ? '自定义' : '引用参数' }}
           </template>
         </el-table-column>
         <el-table-column label="操作" align="left" width="80">
@@ -120,7 +120,7 @@
         </div>
       </div>
       <h4 class="title-decoration-1 mb-16 mt-16">
-        输出变量 <el-text type="info" class="color-secondary"> 使用函数时显示 </el-text>
+        输出参数 <el-text type="info" class="color-secondary"> 使用函数时显示 </el-text>
       </h4>
       <div class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter">
         <span>结果 {result}</span>

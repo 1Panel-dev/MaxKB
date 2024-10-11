@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="isEdit ? '编辑变量' : '添加变量'"
+    :title="isEdit ? '编辑参数' : '添加参数'"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -14,10 +14,10 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item label="变量名" prop="name">
+      <el-form-item label="参数名" prop="name">
         <el-input
           v-model="form.name"
-          placeholder="请输入变量名"
+          placeholder="请输入参数名"
           maxlength="64"
           show-word-limit
           @blur="form.name = form.name.trim()"
@@ -69,7 +69,7 @@ const form = ref<any>({
 })
 
 const rules = reactive({
-  name: [{ required: true, message: '请输入变量名', trigger: 'blur' }]
+  name: [{ required: true, message: '请输入参数名', trigger: 'blur' }]
 })
 
 const dialogVisible = ref<boolean>(false)

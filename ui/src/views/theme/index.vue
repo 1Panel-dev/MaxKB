@@ -52,7 +52,7 @@
                           </el-upload>
                         </div>
                         <el-text type="info" size="small"
-                          >顶部网站显示的 Logo，建议尺寸 48 x 48，支持 JPG、PNG、SVG，大小不超过
+                          >顶部网站显示的 Logo，建议尺寸 48*48，支持 JPG、PNG、SVG，大小不超过
                           200KB</el-text
                         >
                       </el-card>
@@ -94,7 +94,7 @@
                           </el-upload>
                         </div>
                         <el-text type="info" size="small">
-                          左侧背景图，矢量图建议尺寸 576*900，位图建议尺寸1152*1800；支持
+                          左侧背景图，矢量图建议尺寸 576*900，位图建议尺寸 1152*1800；支持
                           JPG、PNG、SVG，大小不超过 5M
                         </el-text>
                       </el-card>
@@ -120,7 +120,7 @@
                             show-word-limit
                           >
                           </el-input>
-                          <el-text type="info"> 产品 Logo 下的 欢迎语 </el-text>
+                          <el-text type="info"> 产品 Logo 下的欢迎语 </el-text>
                         </el-form-item>
                       </el-form>
                     </div></el-col

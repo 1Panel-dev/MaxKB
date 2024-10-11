@@ -56,8 +56,8 @@
         :data="props.nodeModel.properties.input_field_list"
         class="mb-16"
       >
-        <el-table-column prop="name" label="变量名" />
         <el-table-column prop="variable" label="变量" />
+        <el-table-column prop="name" label="显示名称" />
         <el-table-column label="输入类型">
           <template #default="{ row }">
             <el-tag type="info" class="info-tag" v-if="row.type === 'input'">文本框</el-tag>
