@@ -75,12 +75,26 @@ class ModelSerializer(serializers.Serializer):
 
         provider = serializers.CharField(required=False, error_messages=ErrMessage.char("供应商"))
 
+        permission_type = serializers.CharField(required=False, error_messages=ErrMessage.char("权限"))
+
+        create_user = serializers.CharField(required=False, error_messages=ErrMessage.char("创建者"))
+
+
         def list(self, with_valid):
             if with_valid:
                 self.is_valid(raise_exception=True)
             user_id = self.data.get('user_id')
             name = self.data.get('name')
-            model_query_set = QuerySet(Model).filter((Q(user_id=user_id) | Q(permission_type='PUBLIC')))
+            create_user = self.data.get('create_user')
+            if create_user is not None:
+                # 当前用户能查看自己的模型，包括公开和私有的
+                if create_user == user_id:
+                    model_query_set = QuerySet(Model).filter(Q(user_id=create_user))
+                # 当前用户能查看其他人的模型，只能查看公开的
+                else:
+                    model_query_set = QuerySet(Model).filter((Q(user_id=self.data.get('create_user')) & Q(permission_type='PUBLIC')))
+            else:
+                model_query_set = QuerySet(Model).filter((Q(user_id=user_id) | Q(permission_type='PUBLIC')))
             query_params = {}
             if name is not None:
                 query_params['name__contains'] = name
@@ -90,6 +104,9 @@ class ModelSerializer(serializers.Serializer):
                 query_params['model_name'] = self.data.get('model_name')
             if self.data.get('provider') is not None:
                 query_params['provider'] = self.data.get('provider')
+            if self.data.get('permission_type') is not None:
+                query_params['permission_type'] = self.data.get('permission_type')
+
 
             return [
                 {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,

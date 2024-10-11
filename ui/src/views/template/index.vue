@@ -41,14 +41,42 @@
           <h4>{{ active_provider?.name }}</h4>
           <div class="flex-between mt-16 mb-16">
             <el-button type="primary" @click="openCreateModel(active_provider)">添加模型</el-button>
-            <el-input
-              v-model="model_search_form.name"
-              @change="list_model"
-              placeholder="按名称搜索"
-              prefix-icon="Search"
-              style="max-width: 240px"
-              clearable
-            />
+            <div class="flex-between">
+              <el-select v-model="search_type" style="width: 200px" @change="search_type_change">
+                <el-option label="创建者" value="create_user" />
+                <el-option label="权限" value="permission_type" />
+                <el-option label="模型类型" value="model_type" />
+                <el-option label="模型名称" value="name" />
+              </el-select>
+              <el-input
+                v-if="search_type === 'name'"
+                v-model="model_search_form.name"
+                @change="list_model"
+                placeholder="按名称搜索"
+                prefix-icon="Search"
+                style="max-width: 240px"
+                clearable
+              />
+              <el-select v-else-if="search_type === 'create_user'" v-model="model_search_form.create_user" @change="list_model"
+                         clearable>
+                <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+              </el-select>
+              <el-select v-else-if="search_type === 'permission_type'" v-model="model_search_form.permission_type"
+                         clearable
+                         @change="list_model">
+                <el-option label="公有" value="PUBLIC" />
+                <el-option label="私有" value="PRIVATE" />
+              </el-select>
+              <el-select v-else-if="search_type === 'model_type'" v-model="model_search_form.model_type"
+                         clearable
+                         @change="list_model">
+                <el-option label="大语言模型" value="LLM" />
+                <el-option label="向量模型" value="EMBEDDING" />
+                <el-option label="重排模型" value="RERANKER" />
+                <el-option label="语音识别" value="STT" />
+                <el-option label="语音合成" value="TTS" />
+              </el-select>
+            </div>
           </div>
         </div>
         <div class="model-list-height">
@@ -114,7 +142,14 @@ const allObj = {
 const loading = ref<boolean>(false)
 
 const active_provider = ref<Provider>()
-const model_search_form = ref<{ name: string }>({ name: '' })
+const search_type = ref('name')
+const model_search_form = ref<{ name: string, create_user: string, permission_type: string, model_type: string }>({
+  name: '',
+  create_user: '',
+  permission_type: '',
+  model_type: ''
+})
+const user_options = ref<any[]>([])
 const list_model_loading = ref<boolean>(false)
 const provider_list = ref<Array<Provider>>([])
 
@@ -150,8 +185,19 @@ const list_model = () => {
   const params = active_provider.value?.provider ? { provider: active_provider.value.provider } : {}
   ModelApi.getModel({ ...model_search_form.value, ...params }, list_model_loading).then((ok) => {
     model_list.value = ok.data
+    const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))
+    if (user_options.value.length === 0){
+      user_options.value = Array.from(
+        new Map(v.map(item => [item.id, item])).values()
+      )
+    }
   })
 }
+
+const search_type_change = () => {
+  model_search_form.value = { name: '', create_user: '', permission_type: '', model_type: '' }
+}
+
 
 onMounted(() => {
   ModelApi.getProvider(loading).then((ok) => {
@@ -173,6 +219,7 @@ onMounted(() => {
   .model-list-height {
     height: calc(var(--create-dataset-height) - 70px);
   }
+
   .model-list-height-left {
     height: calc(var(--create-dataset-height));
   }
