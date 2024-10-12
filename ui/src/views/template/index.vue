@@ -2,37 +2,79 @@
   <LayoutContainer header="模型设置">
     <div class="template-manage flex main-calc-height">
       <div class="template-manage__left p-8 border-r">
-        <h4 class="p-16" style="padding-bottom: 8px">供应商</h4>
+        <h4 style="padding-bottom: 8px">供应商</h4>
         <div class="model-list-height-left">
+          <ul class="mb-8">
+            <li @click="clickListHandle" class="cursor">
+              <div class="flex">
+                <AppIcon
+                  class="mr-8"
+                  style="height: 20px; width: 20px"
+                  :iconName="'app-all-menu-active'"
+                ></AppIcon>
+                <span>全部模型</span>
+              </div>
+            </li>
+          </ul>
           <el-scrollbar>
-            <common-list
-              :data="provider_list"
-              v-loading="loading"
-              @click="clickListHandle"
-              value-key="provider"
-              default-active=""
-              style="overflow-y: auto"
-            >
-              <template #default="{ row, index }">
-                <div class="flex" v-if="index === 0">
-                  <AppIcon
-                    class="mr-8"
-                    style="height: 20px; width: 20px"
-                    :iconName="active_provider === row ? 'app-all-menu-active' : 'app-all-menu'"
-                  ></AppIcon>
-                  <span>全部模型</span>
-                </div>
-                <div class="flex" v-else>
-                  <span
-                    :innerHTML="row.icon"
-                    alt=""
-                    style="height: 20px; width: 20px"
-                    class="mr-8"
-                  />
-                  <span>{{ row.name }}</span>
-                </div>
-              </template>
-            </common-list>
+            <el-collapse>
+              <el-collapse-item title="在线模型" name="1">
+                <template #title>
+                  <el-icon class="mr-4">
+                    <Folder />
+                  </el-icon>
+                  在线模型
+                </template>
+                <common-list
+                  :data="online_provider_list"
+                  v-loading="loading"
+                  @click="clickListHandle"
+                  value-key="provider"
+                  default-active=""
+                  style="overflow-y: auto"
+                >
+                  <template #default="{ row }">
+                    <div class="flex">
+                      <span
+                        :innerHTML="row.icon"
+                        alt=""
+                        style="height: 20px; width: 20px"
+                        class="mr-8"
+                      />
+                      <span>{{ row.name }}</span>
+                    </div>
+                  </template>
+                </common-list>
+              </el-collapse-item>
+              <el-collapse-item title="私有模型" name="2">
+                <template #title>
+                  <el-icon class="mr-4">
+                    <Folder />
+                  </el-icon>
+                  私有模型
+                </template>
+                <common-list
+                  :data="local_provider_list"
+                  v-loading="loading"
+                  @click="clickListHandle"
+                  value-key="provider"
+                  default-active=""
+                  style="overflow-y: auto"
+                >
+                  <template #default="{ row }">
+                    <div class="flex">
+                      <span
+                        :innerHTML="row.icon"
+                        alt=""
+                        style="height: 20px; width: 20px"
+                        class="mr-8"
+                      />
+                      <span>{{ row.name }}</span>
+                    </div>
+                  </template>
+                </common-list>
+              </el-collapse-item>
+            </el-collapse>
           </el-scrollbar>
         </div>
       </div>
@@ -57,7 +99,8 @@
                 style="max-width: 240px"
                 clearable
               />
-              <el-select v-else-if="search_type === 'create_user'" v-model="model_search_form.create_user" @change="list_model"
+              <el-select v-else-if="search_type === 'create_user'" v-model="model_search_form.create_user"
+                         @change="list_model"
                          clearable>
                 <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
               </el-select>
@@ -152,6 +195,8 @@ const model_search_form = ref<{ name: string, create_user: string, permission_ty
 const user_options = ref<any[]>([])
 const list_model_loading = ref<boolean>(false)
 const provider_list = ref<Array<Provider>>([])
+const online_provider_list = ref<Array<Provider>>([])
+const local_provider_list = ref<Array<Provider>>([])
 
 const model_list = ref<Array<Model>>([])
 
@@ -186,7 +231,7 @@ const list_model = () => {
   ModelApi.getModel({ ...model_search_form.value, ...params }, list_model_loading).then((ok) => {
     model_list.value = ok.data
     const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))
-    if (user_options.value.length === 0){
+    if (user_options.value.length === 0) {
       user_options.value = Array.from(
         new Map(v.map(item => [item.id, item])).values()
       )
@@ -203,6 +248,17 @@ onMounted(() => {
   ModelApi.getProvider(loading).then((ok) => {
     active_provider.value = allObj
     provider_list.value = [allObj, ...ok.data]
+
+    const local_provider = ['model_ollama_provider', 'model_local_provider', 'model_xinference_provider', 'model_vllm_provider']
+    ok.data.forEach((item) => {
+      if (local_provider.indexOf(item.provider) > -1) {
+        local_provider_list.value.push(item)
+      } else {
+        online_provider_list.value.push(item)
+      }
+    })
+    online_provider_list.value.sort((a, b) => a.provider.localeCompare(b.provider))
+    local_provider_list.value.sort((a, b) => a.provider.localeCompare(b.provider))
     list_model()
   })
 })
