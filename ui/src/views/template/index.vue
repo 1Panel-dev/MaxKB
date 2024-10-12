@@ -5,7 +5,7 @@
         <h4 style="padding-bottom: 8px">供应商</h4>
         <div class="model-list-height-left">
           <ul class="mb-8">
-            <li @click="clickListHandle" class="cursor">
+            <li @click="clickListHandle(allObj as Provider)" class="cursor">
               <div class="flex">
                 <AppIcon
                   class="mr-8"
