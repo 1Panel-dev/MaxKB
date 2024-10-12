@@ -22,7 +22,9 @@
       </slot>
     </div>
     <slot />
-    <slot name="mouseEnter" v-if="$slots.mouseEnter && show" />
+    <div @mouseenter="subHoveredEnter">
+      <slot name="mouseEnter" v-if="$slots.mouseEnter && show" />
+    </div>
     <div class="card-footer" v-if="$slots.footer">
       <slot name="footer" />
     </div>
@@ -52,12 +54,21 @@ const props = withDefaults(
 )
 
 const show = ref(false)
+// card上面存在dropdown菜单
+const subHovered = ref(false)
 function cardEnter() {
   show.value = true
+  subHovered.value = false
 }
+
 function cardLeave() {
-  show.value = false
+  show.value = subHovered.value;
 }
+
+function subHoveredEnter() {
+  subHovered.value = true
+}
+
 </script>
 <style lang="scss" scoped>
 .card-box {
