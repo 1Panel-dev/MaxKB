@@ -27,6 +27,30 @@
           $t('views.applicationOverview.appInfo.LimitDialog.timesDays')
         }}</span>
       </el-form-item>
+      <!--     身份验证 -->
+      <el-form-item
+        :label="$t('views.applicationOverview.appInfo.LimitDialog.authentication')"
+        v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')"
+      >
+        <el-switch size="small" v-model="form.authentication"></el-switch>
+      </el-form-item>
+      <el-form-item
+        v-if="form.authentication"
+        :label="$t('views.applicationOverview.appInfo.LimitDialog.authenticationValue')"
+        v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')"
+      >
+        <el-input
+          v-model="form.authentication_value"
+          readonly
+          style="width: 300px; margin-right: 10px"
+        ></el-input>
+        <el-button type="primary" text @click="copyClick(form.authentication_value)">
+          <AppIcon iconName="app-copy"></AppIcon>
+        </el-button>
+        <el-button @click="refreshAuthentication" type="primary" text style="margin-left: 1px">
+          <el-icon><RefreshRight /></el-icon>
+        </el-button>
+      </el-form-item>
       <el-form-item
         :label="$t('views.applicationOverview.appInfo.LimitDialog.whitelistLabel')"
         @click.prevent
@@ -61,6 +85,8 @@ import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
+import { copyClick } from '@/utils/clipboard'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const route = useRoute()
 const {
@@ -73,7 +99,9 @@ const limitFormRef = ref()
 const form = ref<any>({
   access_num: 0,
   white_active: true,
-  white_list: ''
+  white_list: '',
+  authentication_value: '',
+  authentication: false
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -93,6 +121,8 @@ const open = (data: any) => {
   form.value.access_num = data.access_num
   form.value.white_active = data.white_active
   form.value.white_list = data.white_list?.length ? data.white_list?.join('\n') : ''
+  form.value.authentication_value = data.authentication_value
+  form.value.authentication = data.authentication
   dialogVisible.value = true
 }
 
@@ -103,7 +133,9 @@ const submit = async (formEl: FormInstance | undefined) => {
       const obj = {
         white_list: form.value.white_list ? form.value.white_list.split('\n') : [],
         white_active: form.value.white_active,
-        access_num: form.value.access_num
+        access_num: form.value.access_num,
+        authentication: form.value.authentication,
+        authentication_value: form.value.authentication_value
       }
       applicationApi.putAccessToken(id as string, obj, loading).then((res) => {
         emit('refresh')
@@ -113,6 +145,17 @@ const submit = async (formEl: FormInstance | undefined) => {
       })
     }
   })
+}
+function generateAuthenticationValue(length: number = 10) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const randomValues = new Uint8Array(length)
+  window.crypto.getRandomValues(randomValues)
+  return Array.from(randomValues)
+    .map((value) => chars[value % chars.length])
+    .join('')
+}
+function refreshAuthentication() {
+  form.value.authentication_value = generateAuthenticationValue()
 }
 
 defineExpose({ open })

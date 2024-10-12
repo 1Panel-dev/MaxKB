@@ -1,101 +1,130 @@
 <template>
   <div class="chat-embed layout-bg" v-loading="loading">
-    <div class="chat-embed__header" :class="!isDefaultTheme ? 'custom-header' : ''">
-      <div class="chat-width flex align-center">
-        <div class="mr-12 ml-24 flex">
-          <AppAvatar
-            v-if="isAppIcon(applicationDetail?.icon)"
-            shape="square"
-            :size="32"
-            style="background: none"
-          >
-            <img :src="applicationDetail?.icon" alt="" />
-          </AppAvatar>
-          <AppAvatar
-            v-else-if="applicationDetail?.name"
-            :name="applicationDetail?.name"
-            pinyinColor
-            shape="square"
-            :size="32"
-          />
-        </div>
-
-        <h4>{{ applicationDetail?.name }}</h4>
-      </div>
-    </div>
-    <div class="chat-embed__main">
-      <AiChat
-        ref="AiChatRef"
-        v-model:data="applicationDetail"
-        :available="applicationAvailable"
-        :appId="applicationDetail?.id"
-        :record="currentRecordList"
-        :chatId="currentChatId"
-        @refresh="refresh"
-        @scroll="handleScroll"
-        class="AiChat-embed"
-      >
-        <template #operateBefore>
-          <div class="chat-width">
-            <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
-              <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
-            </el-button>
-          </div>
-        </template>
-      </AiChat>
-    </div>
-
-    <!-- 历史记录弹出层 -->
-    <div
-      v-if="applicationDetail.show_history || !user.isEnterprise()"
-      @click.prevent.stop="show = !show"
-      class="chat-popover-button cursor color-secondary"
+    <el-dialog
+      v-model="isPasswordDialogVisible"
+      width="480px"
+      height="236px"
+      title="输入密码打开链接"
+      custom-class="no-close-button"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      center
+      :modal="true"
     >
-      <AppIcon iconName="app-history-outlined"></AppIcon>
-    </div>
+      <el-input
+        style="width: 400px; height: 40px"
+        v-model="password"
+        :placeholder="$t('login.ldap.passwordPlaceholder')"
+        show-password
+      />
+      <span class="input-error" v-if="passwordError">{{ passwordError }}</span>
+      <el-button
+        type="primary"
+        @click="validatePassword"
+        style="width: 400px; height: 40px; margin-top: 24px"
+        >确定</el-button
+      >
+    </el-dialog>
 
-    <el-collapse-transition>
-      <div v-show="show" class="chat-popover w-full" v-click-outside="clickoutside">
-        <div class="border-b p-16-24">
-          <span>历史记录</span>
-        </div>
-
-        <el-scrollbar max-height="300">
-          <div class="p-8">
-            <common-list
-              :data="chatLogeData"
-              v-loading="left_loading"
-              :defaultActive="currentChatId"
-              @click="clickListHandle"
-              @mouseenter="mouseenter"
-              @mouseleave="mouseId = ''"
+    <div v-if="isAuthenticated">
+      <div class="chat-embed__header" :class="!isDefaultTheme ? 'custom-header' : ''">
+        <div class="chat-width flex align-center">
+          <div class="mr-12 ml-24 flex">
+            <AppAvatar
+              v-if="isAppIcon(applicationDetail?.icon)"
+              shape="square"
+              :size="32"
+              style="background: none"
             >
-              <template #default="{ row }">
-                <div class="flex-between">
-                  <auto-tooltip :content="row.abstract">
-                    {{ row.abstract }}
-                  </auto-tooltip>
-                  <div @click.stop v-if="mouseId === row.id && row.id !== 'new'">
-                    <el-button style="padding: 0" link @click.stop="deleteLog(row)">
-                      <el-icon><Delete /></el-icon>
-                    </el-button>
-                  </div>
-                </div>
-              </template>
-              <template #empty>
-                <div class="text-center">
-                  <el-text type="info">暂无历史记录</el-text>
-                </div>
-              </template>
-            </common-list>
+              <img :src="applicationDetail?.icon" alt="" />
+            </AppAvatar>
+            <AppAvatar
+              v-else-if="applicationDetail?.name"
+              :name="applicationDetail?.name"
+              pinyinColor
+              shape="square"
+              :size="32"
+            />
           </div>
-          <div v-if="chatLogeData.length" class="gradient-divider lighter mt-8">
-            <span>仅显示最近 20 条对话</span>
-          </div>
-        </el-scrollbar>
+
+          <h4>{{ applicationDetail?.name }}</h4>
+        </div>
       </div>
-    </el-collapse-transition>
-    <div class="chat-popover-mask" v-show="show"></div>
+      <div class="chat-embed__main">
+        <AiChat
+          ref="AiChatRef"
+          v-model:data="applicationDetail"
+          :available="applicationAvailable"
+          :appId="applicationDetail?.id"
+          :record="currentRecordList"
+          :chatId="currentChatId"
+          @refresh="refresh"
+          @scroll="handleScroll"
+          class="AiChat-embed"
+        >
+          <template #operateBefore>
+            <div class="chat-width">
+              <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
+                <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
+              </el-button>
+            </div>
+          </template>
+        </AiChat>
+      </div>
+
+      <!-- 历史记录弹出层 -->
+      <div
+        v-if="applicationDetail.show_history || !user.isEnterprise()"
+        @click.prevent.stop="show = !show"
+        class="chat-popover-button cursor color-secondary"
+      >
+        <AppIcon iconName="app-history-outlined"></AppIcon>
+      </div>
+
+      <el-collapse-transition>
+        <div v-show="show" class="chat-popover w-full" v-click-outside="clickoutside">
+          <div class="border-b p-16-24">
+            <span>历史记录</span>
+          </div>
+
+          <el-scrollbar max-height="300">
+            <div class="p-8">
+              <common-list
+                :data="chatLogeData"
+                v-loading="left_loading"
+                :defaultActive="currentChatId"
+                @click="clickListHandle"
+                @mouseenter="mouseenter"
+                @mouseleave="mouseId = ''"
+              >
+                <template #default="{ row }">
+                  <div class="flex-between">
+                    <auto-tooltip :content="row.abstract">
+                      {{ row.abstract }}
+                    </auto-tooltip>
+                    <div @click.stop v-if="mouseId === row.id && row.id !== 'new'">
+                      <el-button style="padding: 0" link @click.stop="deleteLog(row)">
+                        <el-icon><Delete /></el-icon>
+                      </el-button>
+                    </div>
+                  </div>
+                </template>
+                <template #empty>
+                  <div class="text-center">
+                    <el-text type="info">暂无历史记录</el-text>
+                  </div>
+                </template>
+              </common-list>
+            </div>
+            <div v-if="chatLogeData.length" class="gradient-divider lighter mt-8">
+              <span>仅显示最近 20 条对话</span>
+            </div>
+          </el-scrollbar>
+        </div>
+      </el-collapse-transition>
+      <div class="chat-popover-mask" v-show="show"></div>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -121,6 +150,10 @@ const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
 const chatLogeData = ref<any[]>([])
 const show = ref(false)
+const isPasswordDialogVisible = ref(false)
+const password = ref('')
+const passwordError = ref('')
+const isAuthenticated = ref(false)
 
 const paginationConfig = reactive({
   current_page: 1,
@@ -171,6 +204,20 @@ function newChat() {
   currentRecordList.value = []
   currentChatId.value = 'new'
 }
+function validatePassword() {
+  if (!password.value) {
+    passwordError.value = '密码不能为空'
+    return // 终止后续执行
+  }
+  application.validatePassword(applicationDetail?.value.id, password.value).then((res: any) => {
+    if (res?.data.is_valid) {
+      isAuthenticated.value = true
+      isPasswordDialogVisible.value = false
+    } else {
+      passwordError.value = '密码错误'
+    }
+  })
+}
 
 function getAccessToken(token: string) {
   application
@@ -189,6 +236,12 @@ function getAppProfile() {
     .asyncGetAppProfile(loading)
     .then((res: any) => {
       applicationDetail.value = res.data
+      if (user.isEnterprise()) {
+        isPasswordDialogVisible.value = applicationDetail?.value.authentication
+      }
+      if (!isPasswordDialogVisible.value) {
+        isAuthenticated.value = true
+      }
       if (res.data?.show_history || !user.isEnterprise()) {
         getChatLog(applicationDetail.value.id)
       }

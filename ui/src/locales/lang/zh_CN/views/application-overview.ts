@@ -65,6 +65,8 @@ export default {
       showSourceLabel: '显示知识来源',
       clientQueryLimitLabel: '每个客户端提问限制',
       timesDays: '次/天',
+      authentication: '身份验证',
+      authenticationValue: '验证密码',
       whitelistLabel: '白名单',
       whitelistPlaceholder:
         '请输入允许嵌入第三方的源地址，一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io',

@@ -65,6 +65,8 @@ export default {
       dialogTitle: 'Access Restrictions',
       showSourceLabel: 'Show Source',
       clientQueryLimitLabel: 'Each Client Query Limit',
+      authentication: 'Authentication',
+      authenticationValue: 'Authentication Password',
       timesDays: 'Times/Day',
       whitelistLabel: 'Whitelist',
       whitelistPlaceholder:

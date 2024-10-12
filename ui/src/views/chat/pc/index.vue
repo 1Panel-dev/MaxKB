@@ -1,128 +1,155 @@
 <template>
   <div class="chat-pc layout-bg" :class="classObj" v-loading="loading">
-    <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
-      <div class="flex align-center">
-        <div class="mr-12 ml-24 flex">
-          <AppAvatar
-            v-if="isAppIcon(applicationDetail?.icon)"
-            shape="square"
-            :size="32"
-            style="background: none"
-          >
-            <img :src="applicationDetail?.icon" alt="" />
-          </AppAvatar>
-          <AppAvatar
-            v-else-if="applicationDetail?.name"
-            :name="applicationDetail?.name"
-            pinyinColor
-            shape="square"
-            :size="32"
-          />
-        </div>
+    <el-dialog
+      v-model="isPasswordDialogVisible"
+      width="480px"
+      height="236px"
+      title="输入密码打开链接"
+      custom-class="no-close-button"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      center
+      :modal="true"
+    >
+      <el-input
+        style="width: 400px; height: 40px"
+        v-model="password"
+        :placeholder="$t('login.ldap.passwordPlaceholder')"
+        show-password
+      />
+      <span class="input-error" v-if="passwordError">{{ passwordError }}</span>
+      <el-button
+        type="primary"
+        @click="validatePassword"
+        style="width: 400px; height: 40px; margin-top: 24px"
+        >确定</el-button
+      >
+    </el-dialog>
 
-        <h4>{{ applicationDetail?.name }}</h4>
-      </div>
-    </div>
-    <div class="flex">
-      <div class="chat-pc__left border-r">
-        <div class="p-24 pb-0">
-          <el-button class="add-button w-full primary" @click="newChat">
-            <el-icon>
-              <Plus />
-            </el-icon>
-            <span class="ml-4">新建对话</span>
-          </el-button>
-          <p class="mt-20 mb-8">历史记录</p>
+    <div v-if="isAuthenticated">
+      <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
+        <div class="flex align-center">
+          <div class="mr-12 ml-24 flex">
+            <AppAvatar
+              v-if="isAppIcon(applicationDetail?.icon)"
+              shape="square"
+              :size="32"
+              style="background: none"
+            >
+              <img :src="applicationDetail?.icon" alt="" />
+            </AppAvatar>
+            <AppAvatar
+              v-else-if="applicationDetail?.name"
+              :name="applicationDetail?.name"
+              pinyinColor
+              shape="square"
+              :size="32"
+            />
+          </div>
+          <h4>{{ applicationDetail?.name }}</h4>
         </div>
-        <div class="left-height pt-0">
-          <el-scrollbar>
-            <div class="p-8 pt-0">
-              <common-list
-                :data="chatLogeData"
-                class="mt-8"
-                v-loading="left_loading"
-                :defaultActive="currentChatId"
-                @click="clickListHandle"
-                @mouseenter="mouseenter"
-                @mouseleave="mouseId = ''"
-              >
-                <template #default="{ row }">
-                  <div class="flex-between">
-                    <auto-tooltip :content="row.abstract">
-                      {{ row.abstract }}
-                    </auto-tooltip>
-                    <div @click.stop v-if="mouseId === row.id && row.id !== 'new'">
-                      <el-button style="padding: 0" link @click.stop="deleteLog(row)">
-                        <el-icon><Delete /></el-icon>
-                      </el-button>
+      </div>
+      <div class="flex">
+        <div class="chat-pc__left border-r">
+          <div class="p-24 pb-0">
+            <el-button class="add-button w-full primary" @click="newChat">
+              <el-icon>
+                <Plus />
+              </el-icon>
+              <span class="ml-4">新建对话</span>
+            </el-button>
+            <p class="mt-20 mb-8">历史记录</p>
+          </div>
+          <div class="left-height pt-0">
+            <el-scrollbar>
+              <div class="p-8 pt-0">
+                <common-list
+                  :data="chatLogeData"
+                  class="mt-8"
+                  v-loading="left_loading"
+                  :defaultActive="currentChatId"
+                  @click="clickListHandle"
+                  @mouseenter="mouseenter"
+                  @mouseleave="mouseId = ''"
+                >
+                  <template #default="{ row }">
+                    <div class="flex-between">
+                      <auto-tooltip :content="row.abstract">
+                        {{ row.abstract }}
+                      </auto-tooltip>
+                      <div @click.stop v-if="mouseId === row.id && row.id !== 'new'">
+                        <el-button style="padding: 0" link @click.stop="deleteLog(row)">
+                          <el-icon><Delete /></el-icon>
+                        </el-button>
+                      </div>
                     </div>
-                  </div>
-                </template>
+                  </template>
 
-                <template #empty>
-                  <div class="text-center">
-                    <el-text type="info">暂无历史记录</el-text>
-                  </div>
-                </template>
-              </common-list>
-            </div>
-            <div v-if="chatLogeData.length" class="gradient-divider lighter mt-8">
-              <span>仅显示最近 20 条对话</span>
-            </div>
-          </el-scrollbar>
+                  <template #empty>
+                    <div class="text-center">
+                      <el-text type="info">暂无历史记录</el-text>
+                    </div>
+                  </template>
+                </common-list>
+              </div>
+              <div v-if="chatLogeData.length" class="gradient-divider lighter mt-8">
+                <span>仅显示最近 20 条对话</span>
+              </div>
+            </el-scrollbar>
+          </div>
         </div>
-      </div>
-      <div class="chat-pc__right">
-        <div class="right-header border-b mb-24 p-16-24 flex-between">
-          <h4 class="ellipsis-1" style="width: 70%">
-            {{ currentChatName }}
-          </h4>
+        <div class="chat-pc__right">
+          <div class="right-header border-b mb-24 p-16-24 flex-between">
+            <h4 class="ellipsis-1" style="width: 70%">
+              {{ currentChatName }}
+            </h4>
 
-          <span class="flex align-center" v-if="currentRecordList.length">
-            <AppIcon
-              v-if="paginationConfig.total"
-              iconName="app-chat-record"
-              class="info mr-8"
-              style="font-size: 16px"
-            ></AppIcon>
-            <span v-if="paginationConfig.total" class="lighter">
-              {{ paginationConfig.total }} 条提问
+            <span class="flex align-center" v-if="currentRecordList.length">
+              <AppIcon
+                v-if="paginationConfig.total"
+                iconName="app-chat-record"
+                class="info mr-8"
+                style="font-size: 16px"
+              ></AppIcon>
+              <span v-if="paginationConfig.total" class="lighter">
+                {{ paginationConfig.total }} 条提问
+              </span>
+              <el-dropdown class="ml-8">
+                <AppIcon iconName="app-export" class="cursor" title="导出聊天记录"></AppIcon>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click="exportMarkdown">导出 Markdown</el-dropdown-item>
+                    <el-dropdown-item @click="exportHTML">导出 HTML</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </span>
-            <el-dropdown class="ml-8">
-              <AppIcon iconName="app-export" class="cursor" title="导出聊天记录"></AppIcon>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="exportMarkdown">导出 Markdown</el-dropdown-item>
-                  <el-dropdown-item @click="exportHTML">导出 HTML</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </span>
-        </div>
-        <div class="right-height">
-          <!-- 对话 -->
-          <AiChat
-            ref="AiChatRef"
-            v-model:data="applicationDetail"
-            :available="applicationAvailable"
-            :appId="applicationDetail?.id"
-            :record="currentRecordList"
-            :chatId="currentChatId"
-            @refresh="refresh"
-            @scroll="handleScroll"
-          >
-          </AiChat>
+          </div>
+          <div class="right-height">
+            <AiChat
+              ref="AiChatRef"
+              v-model:data="applicationDetail"
+              :available="applicationAvailable"
+              :appId="applicationDetail?.id"
+              :record="currentRecordList"
+              :chatId="currentChatId"
+              @refresh="refresh"
+              @scroll="handleScroll"
+            >
+            </AiChat>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="collapse">
-      <el-button @click="isCollapse = !isCollapse">
-        <el-icon> <component :is="isCollapse ? 'Fold' : 'Expand'" /></el-icon>
-      </el-button>
+      <div class="collapse">
+        <el-button @click="isCollapse = !isCollapse">
+          <el-icon> <component :is="isCollapse ? 'Fold' : 'Expand'" /></el-icon>
+        </el-button>
+      </div>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { reactive, ref, onMounted, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -130,8 +157,11 @@ import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
-
 import useResize from '@/layout/hooks/useResize'
+import type { FormInstance, FormRules } from 'element-plus'
+import { t } from '@/locales'
+import authApi from '@/api/auth-setting'
+import { MsgSuccess } from '@/utils/message'
 useResize()
 
 const route = useRoute()
@@ -147,6 +177,10 @@ const isDefaultTheme = computed(() => {
 })
 
 const isCollapse = ref(false)
+const isPasswordDialogVisible = ref(false)
+const password = ref('')
+const passwordError = ref('')
+const isAuthenticated = ref(false)
 
 const classObj = computed(() => {
   return {
@@ -225,6 +259,12 @@ function getAppProfile() {
     .asyncGetAppProfile(loading)
     .then((res: any) => {
       applicationDetail.value = res.data
+      if (user.isEnterprise()) {
+        isPasswordDialogVisible.value = applicationDetail?.value.authentication
+      }
+      if (!isPasswordDialogVisible.value) {
+        isAuthenticated.value = true
+      }
       if (res.data?.show_history || !user.isEnterprise()) {
         getChatLog(applicationDetail.value.id)
       }
@@ -334,6 +374,21 @@ async function exportHTML(): Promise<void> {
 
   const blob: Blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' })
   saveAs(blob, suggestedName)
+}
+
+function validatePassword() {
+  if (!password.value) {
+    passwordError.value = '密码不能为空'
+    return // 终止后续执行
+  }
+  application.validatePassword(applicationDetail?.value.id, password.value).then((res: any) => {
+    if (res?.data.is_valid) {
+      isAuthenticated.value = true
+      isPasswordDialogVisible.value = false
+    } else {
+      passwordError.value = '密码错误'
+    }
+  })
 }
 
 onMounted(() => {
@@ -454,5 +509,9 @@ onMounted(() => {
       z-index: 99;
     }
   }
+}
+.input-error {
+  color: red;
+  display: block;
 }
 </style>
