@@ -33,7 +33,7 @@ const getData = () => {
 }
 defineExpose({ getData })
 onMounted(() => {
-  formValue.value.default_value = false
+  formValue.value.default_value = formValue.value.default_value || false
 })
 </script>
 <style lang="scss"></style>

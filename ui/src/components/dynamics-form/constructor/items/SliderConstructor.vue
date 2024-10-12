@@ -60,11 +60,11 @@ const getData = () => {
 }
 defineExpose({ getData })
 onBeforeMount(() => {
-  formValue.value.min = 0
-  formValue.value.max = 20
-  formValue.value.step = 0.1
-  formValue.value.precision = 1
-  formValue.value.default_value = 1
+  formValue.value.min = props.modelValue.attrs?.min || 0
+  formValue.value.max = props.modelValue.attrs?.max || 20
+  formValue.value.step = props.modelValue.attrs?.step || 0.1
+  formValue.value.precision = props.modelValue.attrs?.precision || 1
+  formValue.value.default_value = props.modelValue.default_value || 1
 })
 </script>
 <style lang="scss"></style>

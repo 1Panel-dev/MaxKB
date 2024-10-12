@@ -50,9 +50,10 @@ const getData = () => {
 }
 defineExpose({ getData })
 onMounted(() => {
-  formValue.value.min_length = 0
-  formValue.value.max_length = 20
-  formValue.value.default_value = ''
+  formValue.value.required = props.modelValue.required
+  formValue.value.min_length = props.modelValue.attrs?.min_length || 0
+  formValue.value.max_length = props.modelValue.attrs?.max_length || 20
+  formValue.value.default_value = props.modelValue.default_value || ''
 })
 </script>
 <style lang="scss"></style>

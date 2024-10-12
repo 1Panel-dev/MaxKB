@@ -87,14 +87,25 @@
             </el-icon>
           </el-button>
         </el-tooltip>
-        <el-tooltip effect="dark" content="删除" placement="top">
-          <el-button :disabled="!is_permisstion" text @click.stop="deleteModel">
-            <el-icon><Delete /></el-icon>
+        <el-dropdown trigger="click">
+          <el-button text @click.stop>
+            <el-icon><MoreFilled /></el-icon>
           </el-button>
-        </el-tooltip>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item icon="Setting" @click.stop="openParamSetting">
+                模型参数设置
+              </el-dropdown-item>
+              <el-dropdown-item icon="Delete" :disabled="!is_permisstion" text @click.stop="deleteModel">
+                删除
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
     </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
+    <ParamSettingDialog ref="paramSettingRef"/>
   </card-box>
 </template>
 <script setup lang="ts">
@@ -106,6 +117,8 @@ import DownloadLoading from '@/components/loading/DownloadLoading.vue'
 import { MsgConfirm } from '@/utils/message'
 import { modelType } from '@/enums/model'
 import useStore from '@/stores'
+import ParamSettingDialog from './ParamSettingDialog.vue'
+
 const props = defineProps<{
   model: Model
   provider_list: Array<Provider>
@@ -193,6 +206,13 @@ const closeInterval = () => {
     clearInterval(interval)
   }
 }
+
+
+const paramSettingRef = ref<InstanceType<typeof ParamSettingDialog>>()
+const openParamSetting = () => {
+  paramSettingRef.value?.open(props.model)
+}
+
 onMounted(() => {
   initInterval()
 })

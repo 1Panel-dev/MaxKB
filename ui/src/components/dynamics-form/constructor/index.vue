@@ -38,13 +38,20 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
+
+const props = defineProps<{
+  modelValue: any
+}>()
+const emit = defineEmits(['update:modelValue'])
+
 const ruleFormRef = ref<FormInstance>()
 const input_type_list = [
   { label: '文本框', value: 'TextInputConstructor' },
   { label: '滑块', value: 'SliderConstructor' },
-  {label: '开关',value:'SwitchInputConstructor'}
+  { label: '开关', value: 'SwitchInputConstructor' },
+  { label: '单选框', value: 'SingleSelectConstructor' }
 ]
 const componentFormRef = ref<any>()
 const form_data = ref<any>({
@@ -78,12 +85,41 @@ const getData = () => {
     ...componentFormRef.value.getData()
   }
 }
+
+const resetFields = () => {
+  console.log(123)
+  form_data.value = {
+    label: '',
+    field: '',
+    tooltip: '',
+    required: false,
+    input_type: ''
+  }
+}
+
 const validate = () => {
   if (ruleFormRef.value) {
     return ruleFormRef.value?.validate()
   }
   return Promise.resolve()
 }
-defineExpose({ getData, validate })
+
+onMounted(() => {
+  if (props.modelValue) {
+    const data = props.modelValue
+    // console.log(data)
+    form_data.value = data
+    // 处理option
+    form_data.value.input_type = data.input_type + 'Constructor'
+    if (data.label && data.label.input_type === 'TooltipLabel') {
+      form_data.value.tooltip = data.label.attrs.tooltip
+      form_data.value.label = data.label.label
+    } else {
+      form_data.value.label = data.label
+    }
+  }
+})
+
+defineExpose({ getData, resetFields, validate })
 </script>
 <style lang="scss"></style>
