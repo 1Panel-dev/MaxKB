@@ -312,6 +312,20 @@ class ApplicationSerializer(serializers.Serializer):
             if 'show_source' in instance and instance.get('show_source') is not None:
                 application_access_token.show_source = instance.get('show_source')
             application_access_token.save()
+            application_setting_model = DBModelManage.get_model('application_setting')
+            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
+                                                                                  'XPACK_LICENSE_IS_VALID') else False)
+            if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
+                application_setting, _ = application_setting_model.objects.get_or_create(
+                    application_id=self.data.get('application_id'))
+                if application_setting is not None:
+                    application_setting.authentication = instance.get('authentication')
+                    application_setting.authentication_value = {
+                        "type": "password",
+                        "value": instance.get('authentication_value')
+                    }
+                    application_setting.save()
+
             get_application_access_token(application_access_token.access_token, False)
             return self.one(with_valid=False)
 
@@ -734,7 +748,8 @@ class ApplicationSerializer(serializers.Serializer):
                                                 'draggable': application_setting.draggable,
                                                 'show_guide': application_setting.show_guide,
                                                 'avatar': application_setting.avatar,
-                                                'float_icon': application_setting.float_icon}
+                                                'float_icon': application_setting.float_icon,
+                                                'authentication': application_setting.authentication}
             return ApplicationSerializer.Query.reset_application(
                 {**ApplicationSerializer.ApplicationModel(application).data,
                  'stt_model_id': application.stt_model_id,

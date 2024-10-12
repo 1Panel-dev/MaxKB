@@ -387,6 +387,15 @@ const updatePlatformStatus: (application_id: string, data: any) => Promise<Resul
 ) => {
   return post(`/platform/${application_id}/status`, data)
 }
+/**
+ * 验证密码
+ */
+const validatePassword: (application_id: string, password: string) => Promise<Result<any>> = (
+  application_id,
+  password
+) => {
+  return get(`/application/${application_id}/auth/${password}`, undefined)
+}
 
 export default {
   getAllAppilcation,
@@ -419,5 +428,6 @@ export default {
   getPlatformStatus,
   getPlatformConfig,
   updatePlatformConfig,
-  updatePlatformStatus
+  updatePlatformStatus,
+  validatePassword
 }

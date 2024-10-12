@@ -119,6 +119,18 @@ const useApplicationStore = defineStore({
             reject(error)
           })
       })
+    },
+    async validatePassword(id: string, password: string, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        applicationApi
+          .validatePassword(id, password)
+          .then((data) => {
+            resolve(data)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     }
   }
 })
