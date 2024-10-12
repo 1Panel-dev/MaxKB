@@ -73,7 +73,7 @@ class AppNode extends HtmlResize.view {
         lh('div', {
           style: { zindex: 0 },
           onClick: () => {
-            if (!isConnect && type == 'right') {
+            if (type == 'right') {
               this.props.model.openNodeMenu(anchorData)
             }
           },
@@ -202,16 +202,6 @@ class AppNodeModel extends HtmlResize.model {
         return sourceAnchor.type === 'right'
       }
     }
-
-    this.sourceRules.push({
-      message: '只允许连一个节点',
-      validate: (sourceNode: any, targetNode: any, sourceAnchor: any, targetAnchor: any) => {
-        return !this.graphModel.edges.some(
-          (item) =>
-            item.sourceAnchorId === sourceAnchor.id || item.targetAnchorId === targetAnchor.id
-        )
-      }
-    })
 
     this.sourceRules.push(circleOnlyAsTarget)
     this.targetRules.push({

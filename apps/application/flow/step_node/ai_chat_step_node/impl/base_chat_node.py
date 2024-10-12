@@ -31,7 +31,7 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['history_message'] = node_variable['history_message']
     node.context['question'] = node_variable['question']
     node.context['run_time'] = time.time() - node.context['start_time']
-    if workflow.is_result():
+    if workflow.is_result(node, NodeResult(node_variable, workflow_variable)):
         workflow.answer += answer
 
 
