@@ -28,7 +28,7 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
     if step_variable is not None:
         for key in step_variable:
             node.context[key] = step_variable[key]
-        if workflow.is_result() and 'answer' in step_variable:
+        if workflow.is_result(node, NodeResult(step_variable, global_variable)) and 'answer' in step_variable:
             answer = step_variable['answer']
             yield answer
             workflow.answer += answer
@@ -166,6 +166,7 @@ class INode:
     def get_write_error_context(self, e):
         self.status = 500
         self.err_message = str(e)
+        self.context['run_time'] = time.time() - self.context['start_time']
 
         def write_error_context(answer, status=200):
             pass
