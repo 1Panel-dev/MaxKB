@@ -66,7 +66,7 @@ const currentPlatform = reactive<Platform>({
   config: {}
 })
 
-const formatFieldName = (key?: string): string => {
+const formatFieldName = (key?: any): string => {
   const fieldNames: { [key: string]: string } = {
     app_key: 'APP Key',
     app_secret: 'APP Secret',
@@ -80,7 +80,7 @@ const formatFieldName = (key?: string): string => {
   )
 }
 
-const getValidationRules = (key: string) => {
+const getValidationRules = (key: any) => {
   switch (key) {
     case 'app_key':
       return [{ required: true, message: '请输入 APP Key', trigger: ['blur', 'change'] }]

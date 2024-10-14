@@ -143,7 +143,7 @@ function createPlatform(key: string, name: string): Platform {
   }
 }
 
-function formatFieldName(key?: string): string {
+function formatFieldName(key?: any): string {
   const fieldNames: { [key: string]: string } = {
     app_key: 'APP Key',
     app_secret: 'APP Secret',
