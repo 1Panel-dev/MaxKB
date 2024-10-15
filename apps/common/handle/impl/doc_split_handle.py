@@ -15,6 +15,7 @@ from typing import List
 from docx import Document, ImagePart
 from docx.table import Table
 from docx.text.paragraph import Paragraph
+from docx.oxml import ns
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.util.split_model import SplitModel
@@ -27,9 +28,15 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile("(?<=\\n)(?<!#)##### (?!#).*|(?<=^)(?<!#)##### (?!#).*"),
                         re.compile("(?<=\\n)(?<!#)###### (?!#).*|(?<=^)(?<!#)###### (?!#).*")]
 
+old_docx_nsmap = {'v': 'urn:schemas-microsoft-com:vml'}
+combine_nsmap = {**ns.nsmap, **old_docx_nsmap}
 
-def image_to_mode(image, doc: Document, images_list, get_image_id):
-    for img_id in image.xpath('.//a:blip/@r:embed'):  # 获取图片id
+def image_to_mode(image, doc: Document, images_list, get_image_id, is_new_docx=True):
+    if is_new_docx:
+        image_ids = image.xpath('.//a:blip/@r:embed')
+    else:
+        image_ids = image.xpath('.//v:imagedata/@r:id', namespaces=combine_nsmap)
+    for img_id in image_ids:  # 获取图片id
         part = doc.part.related_parts[img_id]  # 根据图片id获取对应的图片
         if isinstance(part, ImagePart):
             image_uuid = get_image_id(img_id)
@@ -42,9 +49,14 @@ def image_to_mode(image, doc: Document, images_list, get_image_id):
 def get_paragraph_element_txt(paragraph_element, doc: Document, images_list, get_image_id):
     try:
         images = paragraph_element.xpath(".//pic:pic")
+        old_docx_images = paragraph_element.xpath(".//w:pict")
         if len(images) > 0:
             return "".join(
                 [item for item in [image_to_mode(image, doc, images_list, get_image_id) for image in images] if
+                 item is not None])
+        elif len(old_docx_images) > 0:
+            return "".join(
+                [item for item in [image_to_mode(image, doc, images_list, get_image_id, is_new_docx=False) for image in old_docx_images] if
                  item is not None])
         elif paragraph_element.text is not None:
             return paragraph_element.text
