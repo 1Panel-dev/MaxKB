@@ -20,6 +20,7 @@ from django.core.cache import caches
 from django.db import transaction, models
 from django.db.models import QuerySet, Q
 from django.http import StreamingHttpResponse
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
 
 from application.flow.workflow_manage import Flow
@@ -205,6 +206,8 @@ class ChatSerializers(serializers.Serializer):
                     for row_idx, row in enumerate(batch_data, start=i + 2):
                         for col_idx, value in enumerate(self.to_row(row), 1):
                             cell = worksheet.cell(row=row_idx, column=col_idx)
+                            if isinstance(value, str):
+                                value = re.sub(ILLEGAL_CHARACTERS_RE, '', value)
                             cell.value = value
 
                 output = BytesIO()
