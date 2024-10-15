@@ -1,23 +1,33 @@
 <template>
   <div v-show="show" class="workflow-dropdown-menu border border-r-4">
     <el-tabs v-model="activeName" class="workflow-dropdown-tabs">
+      <div style="display: flex; width: 100%; justify-content: center">
+        <el-input v-model="search_text" style="width: 240px" placeholder="按名称搜索">
+          <template #suffix>
+            <el-icon class="el-input__icon"><search /></el-icon>
+          </template>
+        </el-input>
+      </div>
+
       <el-tab-pane label="基础组件" name="base">
-        <template v-for="(item, index) in menuNodes" :key="index">
-          <div
-            class="workflow-dropdown-item cursor flex p-8-12"
-            @click.stop="clickNodes(item)"
-            @mousedown.stop="onmousedown(item)"
-          >
-            <component :is="iconComponent(`${item.type}-icon`)" class="mr-8 mt-4" :size="32" />
-            <div class="pre-wrap">
-              <div class="lighter">{{ item.label }}</div>
-              <el-text type="info" size="small">{{ item.text }}</el-text>
+        <el-scrollbar height="400">
+          <template v-for="(item, index) in filter_menu_nodes" :key="index">
+            <div
+              class="workflow-dropdown-item cursor flex p-8-12"
+              @click.stop="clickNodes(item)"
+              @mousedown.stop="onmousedown(item)"
+            >
+              <component :is="iconComponent(`${item.type}-icon`)" class="mr-8 mt-4" :size="32" />
+              <div class="pre-wrap">
+                <div class="lighter">{{ item.label }}</div>
+                <el-text type="info" size="small">{{ item.text }}</el-text>
+              </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </el-scrollbar>
       </el-tab-pane>
       <el-tab-pane label="函数库" name="function">
-        <el-scrollbar max-height="300">
+        <el-scrollbar height="400">
           <div
             class="workflow-dropdown-item cursor flex p-8-12"
             @click.stop="clickNodes(functionNode)"
@@ -30,7 +40,7 @@
             </div>
           </div>
 
-          <template v-for="(item, index) in functionLibList" :key="index">
+          <template v-for="(item, index) in filter_function_lib_list" :key="index">
             <div
               class="workflow-dropdown-item cursor flex p-8-12"
               @click.stop="clickNodes(functionLibNode, item)"
@@ -53,11 +63,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { menuNodes, functionLibNode, functionNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application'
-
+const search_text = ref<string>('')
 const props = defineProps({
   show: {
     type: Boolean,
@@ -76,7 +86,16 @@ const loading = ref(false)
 const activeName = ref('base')
 
 const functionLibList = ref<any[]>([])
-
+const filter_function_lib_list = computed(() => {
+  return functionLibList.value.filter((item: any) =>
+    item.name.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
+  )
+})
+const filter_menu_nodes = computed(() => {
+  return menuNodes.filter((item) =>
+    item.label.toLocaleLowerCase().includes(search_text.value.toLocaleLowerCase())
+  )
+})
 function clickNodes(item: any, data?: any) {
   if (data) {
     item['properties']['stepName'] = data.name
