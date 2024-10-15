@@ -21,6 +21,7 @@ from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpResponse
 from drf_yasg import openapi
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
 from xlwt import Utils
 
@@ -510,6 +511,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 for row_idx, row in enumerate(data):
                     for col_idx, col in enumerate(row):
                         cell = worksheet.cell(row=row_idx + 1, column=col_idx + 1)
+                        if isinstance(col, str):
+                            col = re.sub(ILLEGAL_CHARACTERS_RE, '', col)
                         cell.value = col
                     # 创建HttpResponse对象返回Excel文件
             return workbook
