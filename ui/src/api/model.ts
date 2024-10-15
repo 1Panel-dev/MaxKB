@@ -119,6 +119,20 @@ const updateModel: (
 }
 
 /**
+ * 修改模型参数配置
+ * @param request 請求對象
+ * @param loading 加載器
+ * @returns
+ */
+const updateModelParamsForm: (
+  model_id: string,
+  request: any[],
+  loading?: Ref<boolean>
+) => Promise<Result<Model>> = (model_id, request, loading) => {
+  return put(`${prefix}/${model_id}/model_params_form`, request, {}, loading)
+}
+
+/**
  * 获取模型详情根据模型id 包括认证信息
  * @param model_id 模型id
  * @param loading  加载器
@@ -172,5 +186,6 @@ export default {
   getModelById,
   getModelMetaById,
   pauseDownload,
-  getModelParamsForm
+  getModelParamsForm,
+  updateModelParamsForm
 }

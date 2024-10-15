@@ -8,6 +8,7 @@
 """
 from typing import List, Dict
 
+from common.forms import BaseLabel
 from common.forms.base_field import TriggerType, BaseExecField
 
 
@@ -17,7 +18,7 @@ class SingleSelect(BaseExecField):
     """
 
     def __init__(self,
-                 label: str,
+                 label: str or BaseLabel,
                  text_field: str,
                  value_field: str,
                  option_list: List[str:object],

@@ -94,6 +94,17 @@ class Model(APIView):
             return result.success(
                 ModelSerializer.ModelParams(data={'id': model_id, 'user_id': request.user.id}).get_model_params())
 
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="保存模型参数表单",
+                             operation_id="保存模型参数表单",
+                             manual_parameters=ProvideApi.ModelForm.get_request_params_api(),
+                             tags=["模型"])
+        @has_permissions(PermissionConstants.MODEL_READ)
+        def put(self, request: Request, model_id: str):
+            return result.success(
+                ModelSerializer.ModelParamsForm(data={'id': model_id, 'user_id': request.user.id})
+                .save_model_params_form(request.data))
+
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 

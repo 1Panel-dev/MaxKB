@@ -244,7 +244,38 @@ class ModelSerializer(serializers.Serializer):
             model_id = self.data.get('id')
             model = QuerySet(Model).filter(id=model_id).first()
             credential = get_model_credential(model.provider, model.model_type, model.model_name)
-            return credential.get_model_params_setting_form(model.model_name).to_form_list()
+            # 已经保存过的模型参数表单
+            if model.model_params_form is not None and len(model.model_params_form) > 0:
+                return model.model_params_form
+            # 没有保存过的LLM类型的
+            if credential.get_model_params_setting_form(model.model_name) is not None:
+                return credential.get_model_params_setting_form(model.model_name).to_form_list()
+            # 其他的
+            return model.model_params_form
+
+    class ModelParamsForm(serializers.Serializer):
+        id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
+
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            model = QuerySet(Model).filter(id=self.data.get("id")).first()
+            if model is None:
+                raise AppApiException(500, '模型不存在')
+            if model.permission_type == PermissionType.PRIVATE and self.data.get('user_id') != str(model.user_id):
+                raise AppApiException(500, '没有权限访问到此模型')
+
+        def save_model_params_form(self, model_params_form, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            if model_params_form is None:
+                model_params_form = []
+            model_id = self.data.get('id')
+            model = QuerySet(Model).filter(id=model_id).first()
+            model.model_params_form = model_params_form
+            model.save()
+            return True
 
     class Operate(serializers.Serializer):
         id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))

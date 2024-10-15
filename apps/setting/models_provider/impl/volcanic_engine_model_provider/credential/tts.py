@@ -4,8 +4,36 @@ from typing import Dict
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
+
+
+class VolcanicEngineTTSModelGeneralParams(BaseForm):
+    voice_type = forms.SingleSelect(
+        TooltipLabel('音色', '中文音色可支持中英文混合场景'),
+        required=True, default_value='BV002_streaming',
+        text_field='text',
+        value_field='value',
+        option_list=[
+            {'text': '灿灿 2.0', 'value': 'BV700_V2_streaming'},
+            {'text': '炀炀', 'value': 'BV705_streaming'},
+            {'text': '擎苍 2.0', 'value': 'BV701_V2_streaming'},
+            {'text': '通用女声 2.0', 'value': 'BV001_V2_streaming'},
+            {'text': '灿灿', 'value': 'BV700_streaming'},
+            {'text': '超自然音色-梓梓2.0', 'value': 'BV406_V2_streaming'},
+            {'text': '超自然音色-梓梓', 'value': 'BV406_streaming'},
+            {'text': '超自然音色-燃燃2.0', 'value': 'BV407_V2_streaming'},
+            {'text': '超自然音色-燃燃', 'value': 'BV407_streaming'},
+            {'text': '通用女声', 'value': 'BV001_streaming'},
+            {'text': '通用男声', 'value': 'BV002_streaming'},
+        ])
+    speed_ratio = forms.SliderField(
+        TooltipLabel('语速', '[0.2,3]，默认为1，通常保留一位小数即可'),
+        required=True, default_value=1,
+        _min=0.2,
+        _max=3,
+        _step=0.1,
+        precision=1)
 
 
 class VolcanicEngineTTSModelCredential(BaseForm, BaseModelCredential):
@@ -42,4 +70,4 @@ class VolcanicEngineTTSModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'volcanic_token': super().encryption(model.get('volcanic_token', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        pass
+        return VolcanicEngineTTSModelGeneralParams()

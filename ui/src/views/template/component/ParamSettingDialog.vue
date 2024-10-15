@@ -12,16 +12,16 @@
       添加参数
     </el-button>
     <el-table
-      :data="modelParams"
+      :data="modelParamsForm"
       class="mb-16"
     >
-      <el-table-column prop="label" label="参数">
+      <el-table-column prop="label" label="显示名称">
         <template #default="{ row }">
           <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{ row.label.label }}</span>
           <span v-else>{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="field" label="显示名称" />
+      <el-table-column prop="field" label="参数" />
       <el-table-column label="组件类型">
         <template #default="{ row }">
           <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">文本框</el-tag>
@@ -72,15 +72,31 @@
 import type { Model } from '@/api/type/model'
 import { ref } from 'vue'
 import AddParamDrawer from './AddParamDrawer.vue'
-import { MsgError } from '@/utils/message'
+import { MsgError, MsgSuccess } from '@/utils/message'
+import ModelApi from '@/api/model'
+
+
+const props = defineProps<{
+  model: Model
+}>()
 
 const loading = ref<boolean>(false)
 const dialogVisible = ref<boolean>(false)
-const modelParams = ref<any[]>([])
+const modelParamsForm = ref<any[]>([])
 const AddParamRef = ref()
 
-const open = (model: Model) => {
+const open = () => {
   dialogVisible.value = true
+  loading.value = true
+  ModelApi.getModelParamsForm(
+    props.model.id,
+    loading
+  ).then((ok) => {
+    loading.value = false
+    modelParamsForm.value = ok.data
+  }).catch(() => {
+    loading.value = false
+  })
 }
 
 const close = () => {
@@ -93,27 +109,49 @@ function openAddDrawer(data?: any, index?: any) {
 }
 
 function deleteParam(index: any) {
-  modelParams.value.splice(index, 1)
+  modelParamsForm.value.splice(index, 1)
 }
 
 function refresh(data: any, index: any) {
   // console.log(data, index)
-  for (let i = 0; i < modelParams.value.length; i++) {
-    if (modelParams.value[i].field === data.field && index !== i) {
+  for (let i = 0; i < modelParamsForm.value.length; i++) {
+    let field = modelParamsForm.value[i].field
+    let label = modelParamsForm.value[i].label
+    if (label && label.input_type === 'TooltipLabel') {
+      label = label.label
+    }
+    let label2 = data.label
+    if (label2 && label2.input_type === 'TooltipLabel') {
+      label2 = label2.label
+    }
+
+    if (field === data.field && index !== i) {
       MsgError('变量已存在: ' + data.field)
+      return
+    }
+    if (label === label2 && index !== i) {
+      MsgError('变量已存在: ' + label)
       return
     }
   }
   if (index !== null) {
-    modelParams.value.splice(index, 1, data)
+    modelParamsForm.value.splice(index, 1, data)
   } else {
-    modelParams.value.push(data)
+    modelParamsForm.value.push(data)
   }
-  console.log(modelParams.value)
 }
 
 function submit() {
-  console.log('submit')
+  // console.log('submit: ', modelParamsForm.value)
+  ModelApi.updateModelParamsForm(
+    props.model.id,
+    modelParamsForm.value,
+    loading
+  ).then((ok) => {
+    MsgSuccess('模型参数保存成功')
+    close()
+    // emit('submit')
+  })
 }
 
 defineExpose({ open, close })

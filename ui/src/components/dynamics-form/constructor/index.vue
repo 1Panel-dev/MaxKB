@@ -7,11 +7,11 @@
     :model="form_data"
     v-bind="$attrs"
   >
-    <el-form-item label="参数" :required="true" prop="label" :rules="rules.label">
-      <el-input v-model="form_data.label" placeholder="请输入参数" />
+    <el-form-item label="显示名称" :required="true" prop="label" :rules="rules.label">
+      <el-input v-model="form_data.label" placeholder="请输入显示名称" />
     </el-form-item>
-    <el-form-item label="显示名称" :required="true" prop="field" :rules="rules.field">
-      <el-input v-model="form_data.field" placeholder="请输入显示名称" />
+    <el-form-item label="参数" :required="true" prop="field" :rules="rules.field">
+      <el-input v-model="form_data.field" placeholder="请输入参数" />
     </el-form-item>
     <el-form-item label="参数提示说明">
       <el-input v-model="form_data.tooltip" placeholder="请输入参数提示说明" />
@@ -19,8 +19,8 @@
     <el-form-item label="是否必填" :required="true" prop="required" :rules="rules.required">
       <el-switch v-model="form_data.required" />
     </el-form-item>
-    <el-form-item label="组建类型" :required="true" prop="input_type" :rules="rules.input_type">
-      <el-select v-model="form_data.input_type" placeholder="请选择组建类型">
+    <el-form-item label="组件类型" :required="true" prop="input_type" :rules="rules.input_type">
+      <el-select v-model="form_data.input_type" placeholder="请选择组件类型">
         <el-option
           v-for="input_type in input_type_list"
           :key="input_type.value"
@@ -86,17 +86,6 @@ const getData = () => {
   }
 }
 
-const resetFields = () => {
-  console.log(123)
-  form_data.value = {
-    label: '',
-    field: '',
-    tooltip: '',
-    required: false,
-    input_type: ''
-  }
-}
-
 const validate = () => {
   if (ruleFormRef.value) {
     return ruleFormRef.value?.validate()
@@ -120,6 +109,6 @@ onMounted(() => {
   }
 })
 
-defineExpose({ getData, resetFields, validate })
+defineExpose({ getData, validate })
 </script>
 <style lang="scss"></style>
