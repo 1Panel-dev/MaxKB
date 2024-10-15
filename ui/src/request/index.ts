@@ -240,6 +240,45 @@ export const exportExcel: (
     .catch((e) => {})
 }
 
+export const exportExcelPost: (
+  fileName: string,
+  url: string,
+  params: any,
+  data: any,
+  loading?: NProgress | Ref<boolean>
+) => Promise<any> = (
+  fileName: string,
+  url: string,
+  params: any,
+  data: any,
+  loading?: NProgress | Ref<boolean>
+) => {
+  return promise(
+    request({
+      url: url,
+      method: 'post',
+      params, // 查询字符串参数
+      data, // 请求体数据
+      responseType: 'blob'
+    }),
+    loading
+  )
+    .then((res: any) => {
+      if (res) {
+        const blob = new Blob([res], {
+          type: 'application/vnd.ms-excel'
+        })
+        const link = document.createElement('a')
+        link.href = window.URL.createObjectURL(blob)
+        link.download = fileName
+        link.click()
+        // 释放内存
+        window.URL.revokeObjectURL(link.href)
+      }
+      return true
+    })
+    .catch((e) => {})
+}
 
 export const download: (
   url: string,

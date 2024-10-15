@@ -97,7 +97,8 @@ class ChatSerializers(serializers.Serializer):
 
     class Query(serializers.Serializer):
         abstract = serializers.CharField(required=False, error_messages=ErrMessage.char("摘要"))
-        history_day = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("历史天数"))
+        start_time = serializers.DateField(format='%Y-%m-%d', error_messages=ErrMessage.date("开始时间"))
+        end_time = serializers.DateField(format='%Y-%m-%d', error_messages=ErrMessage.date("结束时间"))
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
         min_star = serializers.IntegerField(required=False, min_value=0,
@@ -110,23 +111,34 @@ class ChatSerializers(serializers.Serializer):
         ])
 
         def get_end_time(self):
-            history_day = self.data.get('history_day')
-            return datetime.datetime.now() - datetime.timedelta(days=history_day)
+            return datetime.datetime.combine(
+                datetime.datetime.strptime(self.data.get('end_time'), '%Y-%m-%d'),
+                datetime.datetime.max.time())
 
-        def get_query_set(self):
+        def get_start_time(self):
+            return self.data.get('start_time')
+
+        def get_query_set(self, select_ids=None):
             end_time = self.get_end_time()
+            start_time = self.get_start_time()
             query_set = QuerySet(model=get_dynamics_model(
                 {'application_chat.application_id': models.CharField(),
                  'application_chat.abstract': models.CharField(),
                  "star_num": models.IntegerField(),
                  'trample_num': models.IntegerField(),
                  'comparer': models.CharField(),
-                 'application_chat.create_time': models.DateTimeField()}))
+                 'application_chat.create_time': models.DateTimeField(),
+                 'application_chat.id': models.UUIDField(), }))
 
             base_query_dict = {'application_chat.application_id': self.data.get("application_id"),
-                               'application_chat.create_time__gte': end_time}
+                               'application_chat.create_time__gte': start_time,
+                               'application_chat.create_time__lte': end_time,
+                               }
             if 'abstract' in self.data and self.data.get('abstract') is not None:
                 base_query_dict['application_chat.abstract__icontains'] = self.data.get('abstract')
+
+            if select_ids is not None and len(select_ids) > 0:
+                base_query_dict['application_chat.id__in'] = select_ids
             base_condition = Q(**base_query_dict)
             min_star_query = None
             min_trample_query = None
@@ -176,11 +188,11 @@ class ChatSerializers(serializers.Serializer):
                     row.get('message_tokens') + row.get('answer_tokens'), row.get('run_time'),
                     str(row.get('create_time'))]
 
-        def export(self, with_valid=True):
+        def export(self, data, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
 
-            data_list = native_search(self.get_query_set(),
+            data_list = native_search(self.get_query_set(data.get('select_ids')),
                                       select_string=get_file_content(
                                           os.path.join(PROJECT_DIR, "apps", "application", 'sql',
                                                        'export_application_chat.sql')),

@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, del, put, exportExcel } from '@/request/index'
+import { get, del, put, exportExcel, exportExcelPost } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import { type Ref } from 'vue'
 
@@ -34,9 +34,10 @@ const exportChatLog: (
   application_id: string,
   application_name: string,
   param: any,
+  data: any,
   loading?: Ref<boolean>
-) => void = (application_id, application_name, param, loading) => {
-  exportExcel(application_name, `${prefix}/${application_id}/chat/export`, param, loading)
+) => void = (application_id, application_name, param, data, loading) => {
+  exportExcelPost(application_name, `${prefix}/${application_id}/chat/export`, param, data, loading)
 }
 
 /**
