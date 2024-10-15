@@ -12,6 +12,7 @@ from setting.models_provider.impl.xinference_model_provider.credential.embedding
 from setting.models_provider.impl.xinference_model_provider.credential.llm import XinferenceLLMModelCredential
 from setting.models_provider.impl.xinference_model_provider.credential.reranker import XInferenceRerankerModelCredential
 from setting.models_provider.impl.xinference_model_provider.credential.stt import XInferenceSTTModelCredential
+from setting.models_provider.impl.xinference_model_provider.credential.tts import XInferenceTTSModelCredential
 from setting.models_provider.impl.xinference_model_provider.model.embedding import XinferenceEmbedding
 from setting.models_provider.impl.xinference_model_provider.model.llm import XinferenceChatModel
 from setting.models_provider.impl.xinference_model_provider.model.reranker import XInferenceReranker
@@ -21,6 +22,7 @@ from smartdoc.conf import PROJECT_DIR
 
 xinference_llm_model_credential = XinferenceLLMModelCredential()
 xinference_stt_model_credential = XInferenceSTTModelCredential()
+xinference_tts_model_credential = XInferenceTTSModelCredential()
 
 model_info_list = [
     ModelInfo(
@@ -279,7 +281,7 @@ model_info_list = [
         'CosyVoice-300M-SFT',
         'CosyVoice-300M-SFT是一个小型的语音合成模型。',
         ModelTypeConst.TTS,
-        xinference_stt_model_credential,
+        xinference_tts_model_credential,
         XInferenceTextToSpeech
     ),
     ModelInfo(

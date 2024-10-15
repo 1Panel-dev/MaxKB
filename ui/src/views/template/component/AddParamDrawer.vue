@@ -57,10 +57,11 @@ function confirmClick() {
   const formEl = DynamicsFormConstructorRef.value
   formEl?.validate().then((valid) => {
     if (valid) {
+      emit('refresh', formEl?.getData(), currentIndex.value)
       drawer.value = false
       isEdit.value = false
       currentItem.value = null
-      emit('refresh', formEl?.getData(), currentIndex.value)
+      currentIndex.value = null
     }
   })
 }

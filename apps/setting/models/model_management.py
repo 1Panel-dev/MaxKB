@@ -29,6 +29,13 @@ class PermissionType(models.TextChoices):
     PUBLIC = "PUBLIC", '公开'
     PRIVATE = "PRIVATE", "私有"
 
+class ModelParam(models.Model):
+    label = models.CharField(max_length=128, verbose_name="参数")
+    field = models.CharField(max_length=256, verbose_name="显示名称")
+    default_value = models.CharField(max_length=1000, verbose_name="默认值")
+    input_type = models.CharField(max_length=32, verbose_name="组件类型")
+    attrs = models.JSONField(verbose_name="属性")
+    required = models.BooleanField(verbose_name="必填")
 
 class Model(AppModelMixin):
     """
@@ -55,6 +62,9 @@ class Model(AppModelMixin):
 
     permission_type = models.CharField(max_length=20, verbose_name='权限类型', choices=PermissionType.choices,
                                        default=PermissionType.PRIVATE)
+
+    model_params_form = models.JSONField(verbose_name="模型参数配置", default=list)
+
 
     def is_permission(self, user_id):
         if self.permission_type == PermissionType.PUBLIC or str(user_id) == str(self.user_id):

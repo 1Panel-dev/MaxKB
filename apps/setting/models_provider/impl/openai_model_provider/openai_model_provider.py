@@ -14,6 +14,7 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
 from setting.models_provider.impl.openai_model_provider.credential.embedding import OpenAIEmbeddingCredential
 from setting.models_provider.impl.openai_model_provider.credential.llm import OpenAILLMModelCredential
 from setting.models_provider.impl.openai_model_provider.credential.stt import OpenAISTTModelCredential
+from setting.models_provider.impl.openai_model_provider.credential.tts import OpenAITTSModelCredential
 from setting.models_provider.impl.openai_model_provider.model.embedding import OpenAIEmbeddingModel
 from setting.models_provider.impl.openai_model_provider.model.llm import OpenAIChatModel
 from setting.models_provider.impl.openai_model_provider.model.stt import OpenAISpeechToText
@@ -22,6 +23,7 @@ from smartdoc.conf import PROJECT_DIR
 
 openai_llm_model_credential = OpenAILLMModelCredential()
 openai_stt_model_credential = OpenAISTTModelCredential()
+openai_tts_model_credential = OpenAITTSModelCredential()
 model_info_list = [
     ModelInfo('gpt-3.5-turbo', '最新的gpt-3.5-turbo，随OpenAI调整而更新', ModelTypeConst.LLM,
               openai_llm_model_credential, OpenAIChatModel
@@ -70,7 +72,7 @@ model_info_list = [
               ModelTypeConst.STT, openai_stt_model_credential,
               OpenAISpeechToText),
     ModelInfo('tts-1', '',
-              ModelTypeConst.TTS, openai_stt_model_credential,
+              ModelTypeConst.TTS, openai_tts_model_credential,
               OpenAITextToSpeech)
 ]
 open_ai_embedding_credential = OpenAIEmbeddingCredential()

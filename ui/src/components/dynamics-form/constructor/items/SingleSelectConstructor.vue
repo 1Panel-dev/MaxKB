@@ -14,10 +14,10 @@
 
     <div
       class="w-full flex-between mb-8"
-      v-for="(option, $index) in formValue.optionList"
+      v-for="(option, $index) in formValue.option_list"
       :key="$index"
     >
-      <el-input v-model="formValue.optionList[$index]" placeholder="请输入选项值" />
+      <el-input v-model="formValue.option_list[$index].value" placeholder="请输入选项值" />
       <el-button link class="ml-8" @click.stop="delOption($index)">
         <el-icon>
           <Delete />
@@ -33,7 +33,7 @@
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
   >
     <el-select v-model="formValue.default_value">
-      <el-option v-for="(option, index) in formValue.optionList" :key="index" :label="option" :value="option" />
+      <el-option v-for="(option, index) in formValue.option_list" :key="index" :label="option.value" :value="option.value" />
     </el-select>
   </el-form-item>
 </template>
@@ -54,11 +54,11 @@ const formValue = computed({
 })
 
 const addOption = () => {
-  formValue.value.optionList.push('')
+  formValue.value.option_list.push('')
 }
 
 const delOption = (index: number) => {
-  formValue.value.optionList.splice(index, 1)
+  formValue.value.option_list.splice(index, 1)
 }
 
 
@@ -67,13 +67,14 @@ const getData = () => {
     input_type: 'SingleSelect',
     attrs: {},
     default_value: formValue.value.default_value,
-    optionList: formValue.value.optionList
+    text_field: formValue.value.text_field,
+    value_field: formValue.value.value_field,
+    option_list: formValue.value.option_list
   }
 }
 defineExpose({ getData })
 onMounted(() => {
-  console.log('props.modelValue', props.modelValue)
-  formValue.value.optionList = props.modelValue.optionList || []
+  formValue.value.option_list = props.modelValue.option_list || []
 })
 </script>
 <style lang="scss"></style>

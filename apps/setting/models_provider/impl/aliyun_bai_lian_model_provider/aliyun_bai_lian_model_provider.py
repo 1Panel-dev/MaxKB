@@ -35,7 +35,8 @@ model_info_list = [ModelInfo('gte-rerank',
                              ModelTypeConst.TTS, aliyun_bai_lian_tts_model_credential, AliyunBaiLianTextToSpeech),
                    ]
 
-model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).build()
+model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
+    model_info_list[1]).append_default_model_info(model_info_list[2]).build()
 
 
 class AliyunBaiLianModelProvider(IModelProvider):

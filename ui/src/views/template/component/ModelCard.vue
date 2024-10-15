@@ -93,7 +93,11 @@
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item icon="Setting" @click.stop="openParamSetting">
+              <el-dropdown-item
+                v-if="currentModel.model_type === 'TTS' || currentModel.model_type === 'LLM'"
+                :disabled="!is_permisstion"
+                icon="Setting" @click.stop="openParamSetting"
+              >
                 模型参数设置
               </el-dropdown-item>
               <el-dropdown-item icon="Delete" :disabled="!is_permisstion" text @click.stop="deleteModel">
@@ -105,7 +109,7 @@
       </div>
     </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
-    <ParamSettingDialog ref="paramSettingRef"/>
+    <ParamSettingDialog ref="paramSettingRef" :model="model"/>
   </card-box>
 </template>
 <script setup lang="ts">

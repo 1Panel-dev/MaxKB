@@ -76,6 +76,10 @@ interface Model {
    * 元数据
    */
   meta: Dict<any>
+  /**
+   * 模型参数配置
+   */
+  model_params_form: Dict<any>[]
 }
 interface CreateModelRequest {
   /**

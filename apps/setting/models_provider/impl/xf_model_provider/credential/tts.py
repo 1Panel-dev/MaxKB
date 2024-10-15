@@ -4,8 +4,30 @@ from typing import Dict
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
+
+
+class XunFeiTTSModelGeneralParams(BaseForm):
+    vcn = forms.SingleSelect(
+        TooltipLabel('发音人', '发音人，可选值：请到控制台添加试用或购买发音人，添加后即显示发音人参数值'),
+        required=True, default_value='xiaoyan',
+        text_field='text',
+        value_field='value',
+        option_list=[
+            {'text': '讯飞小燕', 'value': 'xiaoyan'},
+            {'text': '讯飞许久', 'value': 'aisjiuxu'},
+            {'text': '讯飞小萍', 'value': 'aisxping'},
+            {'text': '讯飞小婧', 'value': 'aisjinger'},
+            {'text': '讯飞许小宝', 'value': 'aisbabyxu'},
+        ])
+    speed = forms.SliderField(
+        TooltipLabel('语速', '语速，可选值：[0-100]，默认为50'),
+        required=True, default_value=50,
+        _min=1,
+        _max=100,
+        _step=5,
+        precision=1)
 
 
 class XunFeiTTSModelCredential(BaseForm, BaseModelCredential):
@@ -41,6 +63,5 @@ class XunFeiTTSModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'spark_api_secret': super().encryption(model.get('spark_api_secret', ''))}
 
-
     def get_model_params_setting_form(self, model_name):
-        pass
+        return XunFeiTTSModelGeneralParams()
