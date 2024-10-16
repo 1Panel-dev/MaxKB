@@ -8,3 +8,4 @@
 """
 from .application_views import *
 from .chat_views import *
+from .application_version_views import *
