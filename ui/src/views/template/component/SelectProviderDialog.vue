@@ -8,7 +8,7 @@
     :before-close="close"
     append-to-body
   >
-    <template #title>
+    <template #header>
       <div class="flex-between">
         <h4>选择供应商</h4>
         <el-dropdown>
