@@ -178,10 +178,11 @@
             <span class="mr-4">语音播放</span>
             <div>
               <el-button
-              type="primary"
-              link
-              @click="openTTSParamSettingDialog"
-              :disabled="!form_data.tts_model_id || form_data.tts_type === 'BROWSER'"
+                v-if="form_data.tts_type === 'TTS'"
+                type="primary"
+                link
+                @click="openTTSParamSettingDialog"
+                :disabled="!form_data.tts_model_id"
               >
                 <el-icon class="mr-4"><Setting /></el-icon>
                 设置
