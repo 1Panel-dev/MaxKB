@@ -7,7 +7,9 @@
     @desc:
 """
 from .client_access_num_job import *
+from .clean_chat_job import *
 
 
 def run():
     client_access_num_job.run()
+    clean_chat_job.run()

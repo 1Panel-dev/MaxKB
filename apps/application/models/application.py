@@ -65,6 +65,7 @@ class Application(AppModelMixin):
     tts_model_enable = models.BooleanField(verbose_name="语音合成模型是否启用", default=False)
     stt_model_enable = models.BooleanField(verbose_name="语音识别模型是否启用", default=False)
     tts_type = models.CharField(verbose_name="语音播放类型", max_length=20, default="BROWSER")
+    clean_time = models.IntegerField(verbose_name="清理时间", default=180)
 
     @staticmethod
     def get_default_model_prompt():
