@@ -35,6 +35,13 @@ const getProvider: (loading?: Ref<boolean>) => Promise<Result<Array<Provider>>> 
 }
 
 /**
+ * 获得供应商列表
+ */
+const getProviderByModelType: (model_type: string, loading?: Ref<boolean>) => Promise<Result<Array<Provider>>> = (model_type, loading) => {
+  return get(`${prefix_provider}`, {model_type}, loading)
+}
+
+/**
  * 获取模型创建表单
  * @param provider
  * @param model_type
@@ -187,5 +194,6 @@ export default {
   getModelMetaById,
   pauseDownload,
   getModelParamsForm,
-  updateModelParamsForm
+  updateModelParamsForm,
+  getProviderByModelType
 }
