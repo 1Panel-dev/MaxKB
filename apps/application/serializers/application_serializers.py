@@ -743,13 +743,30 @@ class ApplicationSerializer(serializers.Serializer):
                 application_setting = QuerySet(application_setting_model).filter(
                     application_id=application_access_token.application_id).first()
                 if application_setting is not None:
+                    custom_theme = getattr(application_setting, 'custom_theme', {})
+                    float_location = getattr(application_setting, 'float_location', {})
+                    if not custom_theme:
+                        application_setting.custom_theme = {
+                            'theme_color': '',
+                            'header_font_color': ''
+                        }
+                    if not float_location:
+                        application_setting.float_location = {
+                            'x': {'type': '', 'value': ''},
+                            'y': {'type': '', 'value': ''}
+                        }
                     application_setting_dict = {'show_source': application_access_token.show_source,
                                                 'show_history': application_setting.show_history,
                                                 'draggable': application_setting.draggable,
                                                 'show_guide': application_setting.show_guide,
                                                 'avatar': application_setting.avatar,
                                                 'float_icon': application_setting.float_icon,
-                                                'authentication': application_setting.authentication}
+                                                'authentication': application_setting.authentication,
+                                                'disclaimer': application_setting.disclaimer,
+                                                'disclaimer_value': application_setting.disclaimer_value,
+                                                'custom_theme': application_setting.custom_theme,
+                                                'user_avatar': application_setting.user_avatar,
+                                                'float_location': application_setting.float_location}
             return ApplicationSerializer.Query.reset_application(
                 {**ApplicationSerializer.ApplicationModel(application).data,
                  'stt_model_id': application.stt_model_id,
@@ -810,8 +827,8 @@ class ApplicationSerializer(serializers.Serializer):
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                            'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
-                           'api_key_is_active', 'icon', 'work_flow', 'model_params_setting','tts_model_params_setting',
-                           'problem_optimization_prompt']
+                           'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
+                           'problem_optimization_prompt', 'clean_time']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     application.__setattr__(update_key, instance.get(update_key))
@@ -952,7 +969,8 @@ class ApplicationSerializer(serializers.Serializer):
             application_id = self.data.get('application_id')
             application = QuerySet(Application).filter(id=application_id).first()
             if application.tts_model_enable:
-                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id, **application.tts_model_params_setting)
+                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id,
+                                                            **application.tts_model_params_setting)
                 return model.text_to_speech(text)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
