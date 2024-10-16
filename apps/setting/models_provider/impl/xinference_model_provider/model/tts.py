@@ -16,20 +16,20 @@ class XInferenceTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     api_base: str
     api_key: str
     model: str
+    voice: str
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.api_base = kwargs.get('api_base')
         self.model = kwargs.get('model')
+        self.voice = kwargs.get('voice', '中文女')
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        if 'voice' in model_kwargs and model_kwargs['voice'] is not None:
+            optional_params['voice'] = model_kwargs['voice']
         return XInferenceTextToSpeech(
             model=model_name,
             api_base=model_credential.get('api_base'),
@@ -54,7 +54,7 @@ class XInferenceTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
         with client.audio.speech.with_streaming_response.create(
                 model=self.model,
-                voice="中文女",
+                voice=self.voice,
                 input=text,
         ) as response:
             return response.read()

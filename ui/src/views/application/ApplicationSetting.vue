@@ -395,7 +395,18 @@
                 <template #label>
                   <div class="flex-between">
                     <span class="mr-4">语音播放</span>
-                    <el-switch size="small" v-model="applicationForm.tts_model_enable" />
+                    <div>
+                      <el-button
+                      type="primary"
+                      link
+                      @click="openTTSParamSettingDialog"
+                      :disabled="!applicationForm.tts_model_id && form_data.tts_type === 'BROWSER'"
+                      >
+                        <el-icon class="mr-4"><Setting /></el-icon>
+                        设置
+                      </el-button>
+                      <el-switch size="small" v-model="applicationForm.tts_model_enable" />
+                    </div>
                   </div>
                 </template>
                 <el-radio-group
@@ -521,6 +532,7 @@
     </el-row>
 
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm" />
+    <AIModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
@@ -574,6 +586,7 @@ const defaultPrompt = t('views.application.prompt.defaultPrompt', {
 })
 
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+const TTSModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
 const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
@@ -685,6 +698,15 @@ const openAIParamSettingDialog = () => {
   AIModeParamSettingDialogRef.value?.open(model_id, id, applicationForm.value.model_params_setting)
 }
 
+const openTTSParamSettingDialog = () => {
+  const model_id = applicationForm.value.tts_model_id
+  if (!model_id) {
+    MsgSuccess(t('请选择语音播放模型'))
+    return
+  }
+  TTSModeParamSettingDialogRef.value?.open(model_id, id, applicationForm.value.tts_model_params_setting)
+}
+
 const openParamSettingDialog = () => {
   ParamSettingDialogRef.value?.open(applicationForm.value)
 }
@@ -695,6 +717,10 @@ function refreshParam(data: any) {
 
 function refreshForm(data: any) {
   applicationForm.value.model_params_setting = data
+}
+
+function refreshTTSForm(data: any) {
+  applicationForm.value.tts_model_params_setting = data
 }
 
 const openCreateModel = (provider?: Provider) => {

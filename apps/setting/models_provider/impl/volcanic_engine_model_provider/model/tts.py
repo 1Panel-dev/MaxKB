@@ -45,6 +45,8 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     volcanic_cluster: str
     volcanic_api_url: str
     volcanic_token: str
+    speed_ratio: float
+    voice_type: str
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -52,14 +54,16 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         self.volcanic_token = kwargs.get('volcanic_token')
         self.volcanic_app_id = kwargs.get('volcanic_app_id')
         self.volcanic_cluster = kwargs.get('volcanic_cluster')
+        self.voice_type = kwargs.get('voice_type', 'BV002_streaming')
+        self.speed_ratio = kwargs.get('speed_ratio', 1.0)
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        if 'voice_type' in model_kwargs and model_kwargs['voice_type'] is not None:
+            optional_params['voice_type'] = model_kwargs['voice_type']
+        if 'speed_ratio' in model_kwargs and model_kwargs['speed_ratio'] is not None:
+            optional_params['speed_ratio'] = model_kwargs['speed_ratio']
         return VolcanicEngineTextToSpeech(
             volcanic_api_url=model_credential.get('volcanic_api_url'),
             volcanic_token=model_credential.get('volcanic_token'),
@@ -82,9 +86,9 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 "uid": "uid"
             },
             "audio": {
-                "voice_type": "BV002_streaming",
+                "voice_type": self.voice_type,
                 "encoding": "mp3",
-                "speed_ratio": 1.0,
+                "speed_ratio": self.speed_ratio,
                 "volume_ratio": 1.0,
                 "pitch_ratio": 1.0,
             },

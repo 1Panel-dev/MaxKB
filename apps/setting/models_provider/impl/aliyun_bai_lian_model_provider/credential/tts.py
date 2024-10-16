@@ -12,7 +12,7 @@ class AliyunBaiLianTTSModelGeneralParams(BaseForm):
     voice = forms.SingleSelect(
         TooltipLabel('音色', '中文音色可支持中英文混合场景'),
         required=True, default_value='longxiaochun',
-        text_field='text',
+        text_field='value',
         value_field='value',
         option_list=[
             {'text': '龙小淳', 'value': 'longxiaochun'},

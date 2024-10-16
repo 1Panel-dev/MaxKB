@@ -810,7 +810,7 @@ class ApplicationSerializer(serializers.Serializer):
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                            'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
-                           'api_key_is_active', 'icon', 'work_flow', 'model_params_setting',
+                           'api_key_is_active', 'icon', 'work_flow', 'model_params_setting','tts_model_params_setting',
                            'problem_optimization_prompt']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
@@ -932,6 +932,8 @@ class ApplicationSerializer(serializers.Serializer):
                         instance['tts_model_enable'] = node_data['tts_model_enable']
                     if 'tts_type' in node_data:
                         instance['tts_type'] = node_data['tts_type']
+                    if 'tts_model_params_setting' in node_data:
+                        instance['tts_model_params_setting'] = node_data['tts_model_params_setting']
                     break
 
         def speech_to_text(self, file, with_valid=True):
@@ -950,7 +952,7 @@ class ApplicationSerializer(serializers.Serializer):
             application_id = self.data.get('application_id')
             application = QuerySet(Application).filter(id=application_id).first()
             if application.tts_model_enable:
-                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id)
+                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id, **application.tts_model_params_setting)
                 return model.text_to_speech(text)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):

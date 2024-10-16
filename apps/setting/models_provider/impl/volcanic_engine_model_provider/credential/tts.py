@@ -12,7 +12,7 @@ class VolcanicEngineTTSModelGeneralParams(BaseForm):
     voice_type = forms.SingleSelect(
         TooltipLabel('音色', '中文音色可支持中英文混合场景'),
         required=True, default_value='BV002_streaming',
-        text_field='text',
+        text_field='value',
         value_field='value',
         option_list=[
             {'text': '灿灿 2.0', 'value': 'BV700_V2_streaming'},

@@ -15,6 +15,7 @@ interface ApplicationFormType {
   type?: string
   work_flow?: any
   model_params_setting?: any
+  tts_model_params_setting?: any
   stt_model_id?: string
   tts_model_id?: string
   stt_model_enable?: boolean

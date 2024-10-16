@@ -12,7 +12,7 @@ class XunFeiTTSModelGeneralParams(BaseForm):
     vcn = forms.SingleSelect(
         TooltipLabel('发音人', '发音人，可选值：请到控制台添加试用或购买发音人，添加后即显示发音人参数值'),
         required=True, default_value='xiaoyan',
-        text_field='text',
+        text_field='value',
         value_field='value',
         option_list=[
             {'text': '讯飞小燕', 'value': 'xiaoyan'},
