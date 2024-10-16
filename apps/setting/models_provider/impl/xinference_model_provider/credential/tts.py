@@ -12,7 +12,7 @@ class XInferenceTTSModelGeneralParams(BaseForm):
     voice = forms.SingleSelect(
         TooltipLabel('音色', ''),
         required=True, default_value='中文女',
-        text_field='text',
+        text_field='value',
         value_field='value',
         option_list=[
             {'text': '中文女', 'value': '中文女'},

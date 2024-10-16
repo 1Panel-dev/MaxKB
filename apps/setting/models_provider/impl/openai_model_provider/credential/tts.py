@@ -11,7 +11,7 @@ class OpenAITTSModelGeneralParams(BaseForm):
     voice = forms.SingleSelect(
         TooltipLabel('Voice', '尝试不同的声音（合金、回声、寓言、缟玛瑙、新星和闪光），找到一种适合您所需的音调和听众的声音。当前的语音针对英语进行了优化。'),
         required=True, default_value='alloy',
-        text_field='text',
+        text_field='value',
         value_field='value',
         option_list=[
             {'text': 'alloy', 'value': 'alloy'},

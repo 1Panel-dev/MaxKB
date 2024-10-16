@@ -176,7 +176,18 @@
         <template #label>
           <div class="flex-between">
             <span class="mr-4">语音播放</span>
-            <el-switch size="small" v-model="form_data.tts_model_enable" />
+            <div>
+              <el-button
+              type="primary"
+              link
+              @click="openTTSParamSettingDialog"
+              :disabled="!form_data.tts_model_id && form_data.tts_type === 'BROWSER'"
+              >
+                <el-icon class="mr-4"><Setting /></el-icon>
+                设置
+              </el-button>
+              <el-switch size="small" v-model="form_data.tts_model_enable" />
+            </div>
           </div>
         </template>
         <el-radio-group v-model="form_data.tts_type" v-show="form_data.tts_model_enable">
@@ -246,6 +257,7 @@
 
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </NodeContainer>
+  <AIModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
 </template>
 <script setup lang="ts">
 import { app } from '@/main'
@@ -258,8 +270,9 @@ import useStore from '@/stores'
 import applicationApi from '@/api/application'
 import type { Provider } from '@/api/type/model'
 import FieldFormDialog from './component/FieldFormDialog.vue'
-import { MsgError, MsgWarning } from '@/utils/message'
+import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
+import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 const { model } = useStore()
 
 const {
@@ -271,6 +284,7 @@ const props = defineProps<{ nodeModel: any }>()
 const sttModelOptions = ref<any>(null)
 const ttsModelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
+const TTSModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 
 const form = {
   name: '',
@@ -374,6 +388,20 @@ function refreshFieldList(data: any) {
   FieldFormDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList', inputFieldList.value)
 }
+
+const openTTSParamSettingDialog = () => {
+  const model_id = form_data.value.tts_model_id
+  if (!model_id) {
+    MsgSuccess(t('请选择语音播放模型'))
+    return
+  }
+  TTSModeParamSettingDialogRef.value?.open(model_id, id, form_data.value.tts_model_params_setting)
+}
+
+const refreshTTSForm = (data: any) => {
+  form_data.value.tts_model_params_setting = data
+}
+
 
 onMounted(() => {
   set(props.nodeModel, 'validate', validate)

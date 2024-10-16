@@ -37,6 +37,8 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     spark_api_key: str
     spark_api_secret: str
     spark_api_url: str
+    speed: int
+    vcn: str
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -44,14 +46,16 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         self.spark_app_id = kwargs.get('spark_app_id')
         self.spark_api_key = kwargs.get('spark_api_key')
         self.spark_api_secret = kwargs.get('spark_api_secret')
+        self.vcn = kwargs.get('vcn', 'xiaoyan')
+        self.speed = kwargs.get('speed', 50)
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        if 'vcn' in model_kwargs and model_kwargs['vcn'] is not None:
+            optional_params['vcn'] = model_kwargs['vcn']
+        if 'speed' in model_kwargs and model_kwargs['speed'] is not None:
+            optional_params['speed'] = model_kwargs['speed']
         return XFSparkTextToSpeech(
             spark_app_id=model_credential.get('spark_app_id'),
             spark_api_key=model_credential.get('spark_api_key'),
@@ -134,7 +138,7 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     async def send(self, ws, text):
         d = {
             "common": {"app_id": self.spark_app_id},
-            "business": {"aue": "lame", "sfl": 1, "auf": "audio/L16;rate=16000", "vcn": "xiaoyan", "tte": "utf8"},
+            "business": {"aue": "lame", "sfl": 1, "auf": "audio/L16;rate=16000", "vcn": self.vcn, "speed": self.speed, "tte": "utf8"},
             "data": {"status": 2, "text": str(base64.b64encode(text.encode('utf-8')), "UTF8")},
         }
         d = json.dumps(d)
