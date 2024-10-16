@@ -5,7 +5,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <el-form label-position="top" ref="limitFormRef" :model="form">
+    <el-form label-position="top" ref="limitFormRef" :model="form" :rules="rules">
       <!-- <el-form-item
         :label="$t('views.applicationOverview.appInfo.LimitDialog.showSourceLabel')"
         @click.prevent
@@ -35,6 +35,7 @@
         <el-switch size="small" v-model="form.authentication"></el-switch>
       </el-form-item>
       <el-form-item
+        prop="authentication_value"
         v-if="form.authentication"
         :label="$t('views.applicationOverview.appInfo.LimitDialog.authenticationValue')"
         v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')"
@@ -103,6 +104,15 @@ const form = ref<any>({
   authentication_value: '',
   authentication: false
 })
+const rules: FormRules = {
+  authentication_value: [
+    {
+      required: true,
+      message: '身份验证值不能为空',
+      trigger: 'blur'
+    }
+  ]
+}
 
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
