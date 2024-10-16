@@ -27,7 +27,7 @@ class OpenAITextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
+        optional_params = {'voice': 'alloy'}
         if 'voice' in model_kwargs and model_kwargs['voice'] is not None:
             optional_params['voice'] = model_kwargs['voice']
         return OpenAITextToSpeech(
