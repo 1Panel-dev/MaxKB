@@ -181,7 +181,7 @@
               type="primary"
               link
               @click="openTTSParamSettingDialog"
-              :disabled="!form_data.tts_model_id && form_data.tts_type === 'BROWSER'"
+              :disabled="!form_data.tts_model_id || form_data.tts_type === 'BROWSER'"
               >
                 <el-icon class="mr-4"><Setting /></el-icon>
                 设置
