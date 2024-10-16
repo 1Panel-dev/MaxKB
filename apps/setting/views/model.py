@@ -162,6 +162,14 @@ class Provide(APIView):
         , tags=["模型"])
     @has_permissions(PermissionConstants.MODEL_READ)
     def get(self, request: Request):
+        model_type = request.query_params.get('model_type')
+        if model_type:
+            providers = []
+            for key in ModelProvideConstants.__members__:
+                if len([item for item in ModelProvideConstants[key].value.get_model_type_list() if
+                        item['value'] == model_type]) > 0:
+                    providers.append(ModelProvideConstants[key].value.get_model_provide_info().to_dict())
+            return result.success(providers)
         return result.success(
             [ModelProvideConstants[key].value.get_model_provide_info().to_dict() for key in
              ModelProvideConstants.__members__])
