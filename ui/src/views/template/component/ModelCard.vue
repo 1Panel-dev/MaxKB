@@ -214,7 +214,7 @@ const closeInterval = () => {
 
 const paramSettingRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const openParamSetting = () => {
-  paramSettingRef.value?.open(props.model)
+  paramSettingRef.value?.open()
 }
 
 onMounted(() => {

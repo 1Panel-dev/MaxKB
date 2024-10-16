@@ -400,7 +400,7 @@
                       type="primary"
                       link
                       @click="openTTSParamSettingDialog"
-                      :disabled="!applicationForm.tts_model_id && form_data.tts_type === 'BROWSER'"
+                      :disabled="!applicationForm.tts_model_id && applicationForm.tts_type === 'BROWSER'"
                       >
                         <el-icon class="mr-4"><Setting /></el-icon>
                         设置

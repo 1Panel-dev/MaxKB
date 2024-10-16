@@ -3,6 +3,7 @@
     <el-col :span="12">
       <el-card shadow="never">
         <DynamicsFormConstructor
+          v-model="item"
           label-position="top"
           require-asterisk-position="right"
           ref="DynamicsFormConstructorRef"
@@ -38,6 +39,7 @@ const add_field = () => {
   }
 }
 const form_data = ref({})
+const item = ref({})
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
 </script>
 <style lang="scss"></style>
