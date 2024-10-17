@@ -8,6 +8,7 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
+      align-center
       center
       :modal="true"
     >
@@ -202,7 +203,6 @@ const validateName = (rule: any, value: string, callback: any) => {
 const rules = reactive({
   password: [{ required: true, validator: validateName, trigger: 'blur' }]
 })
-
 
 const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
