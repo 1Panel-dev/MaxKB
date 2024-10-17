@@ -35,7 +35,7 @@ class XFEmbeddingCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return model
+        return {**model, 'spark_api_secret': super().encryption(model.get('spark_api_secret', ''))}
 
     base_url = forms.TextInputField('API 域名', required=True, default_value="https://emb-cn-huabei-1.xf-yun.com/")
     spark_app_id = forms.TextInputField('APP ID', required=True)

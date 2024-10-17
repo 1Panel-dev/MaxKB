@@ -41,6 +41,6 @@ class AliyunBaiLianEmbeddingCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return model
+        return {**model, 'dashscope_api_key': super().encryption(model.get('dashscope_api_key', ''))}
 
     dashscope_api_key = forms.PasswordInputField('API Key', required=True)
