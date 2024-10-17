@@ -11,27 +11,25 @@ from typing import List
 
 from common.chunk.i_chunk_handle import IChunkHandle
 
-split_chunk_pattern = "！|。|\n|；|;"
-min_chunk_len = 20
+max_chunk_len = 256
+split_chunk_pattern = r'.{1,%d}[。| |\\.|！|;|；|!|\n]' % max_chunk_len
+max_chunk_pattern = r'.{1,%d}' % max_chunk_len
 
 
 class MarkChunkHandle(IChunkHandle):
     def handle(self, chunk_list: List[str]):
         result = []
         for chunk in chunk_list:
-            base_chunk = re.split(split_chunk_pattern, chunk)
-            base_chunk = [chunk.strip() for chunk in base_chunk if len(chunk.strip()) > 0]
-            result_chunk = []
-            for c in base_chunk:
-                if len(result_chunk) == 0:
-                    result_chunk.append(c)
-                else:
-                    if len(result_chunk[-1]) < min_chunk_len:
-                        result_chunk[-1] = result_chunk[-1] + c
+            chunk_result = re.findall(split_chunk_pattern, chunk, flags=re.DOTALL)
+            for c_r in chunk_result:
+                result.append(c_r)
+            other_chunk_list = re.split(split_chunk_pattern, chunk, flags=re.DOTALL)
+            for other_chunk in other_chunk_list:
+                if len(other_chunk) > 0:
+                    if len(other_chunk) < max_chunk_len:
+                        result.append(other_chunk)
                     else:
-                        if len(c) < min_chunk_len:
-                            result_chunk[-1] = result_chunk[-1] + c
-                        else:
-                            result_chunk.append(c)
-            result = [*result, *result_chunk]
+                        max_chunk_list = re.findall(max_chunk_pattern, other_chunk, flags=re.DOTALL)
+                        for m_c in max_chunk_list:
+                            result.append(m_c)
         return result
