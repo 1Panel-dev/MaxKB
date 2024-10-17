@@ -390,11 +390,12 @@ const updatePlatformStatus: (application_id: string, data: any) => Promise<Resul
 /**
  * 验证密码
  */
-const validatePassword: (application_id: string, password: string) => Promise<Result<any>> = (
-  application_id,
-  password
-) => {
-  return get(`/application/${application_id}/auth/${password}`, undefined)
+const validatePassword: (
+  application_id: string,
+  password: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, password, loading) => {
+  return get(`/application/${application_id}/auth/${password}`, undefined, loading)
 }
 
 export default {

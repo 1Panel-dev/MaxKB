@@ -320,7 +320,7 @@ onMounted(() => {
     border-bottom: none !important;
     :deep(.el-collapse-item__header) {
       border-bottom: none !important;
-      padding: 10px 0 10px 16px;
+      padding-left: 16px;
       font-size: 14px;
       &:hover {
         background: var(--app-text-color-light-1);

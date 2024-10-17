@@ -2,9 +2,8 @@
   <div class="chat-embed layout-bg" v-loading="loading">
     <el-dialog
       v-model="isPasswordDialogVisible"
-      width="480px"
-      height="236px"
-      title="输入密码打开链接"
+      width="480"
+      title="请输入密码打开链接"
       custom-class="no-close-button"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -12,21 +11,19 @@
       center
       :modal="true"
     >
-      <el-input
-        style="width: 400px; height: 40px"
-        v-model="password"
-        :placeholder="$t('login.ldap.passwordPlaceholder')"
-        show-password
-      />
-      <span class="input-error" v-if="passwordError">{{ passwordError }}</span>
-      <el-button
-        type="primary"
-        @click="validatePassword"
-        style="width: 400px; height: 40px; margin-top: 24px"
-        >确定</el-button
-      >
+      <el-form ref="FormRef" :model="form" :rules="rules" v-loading="validateLoading">
+        <el-form-item prop="password">
+          <el-input
+            v-model="form.password"
+            :placeholder="$t('login.ldap.passwordPlaceholder')"
+            show-password
+          />
+        </el-form-item>
+        <el-button class="w-full mt-8" type="primary" @click="submitHandle(FormRef)"
+          >确定</el-button
+        >
+      </el-form>
     </el-dialog>
-
     <div v-if="isAuthenticated">
       <div class="chat-embed__header" :class="!isDefaultTheme ? 'custom-header' : ''">
         <div class="chat-width flex align-center">
@@ -131,6 +128,7 @@
 import { ref, onMounted, reactive, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { isAppIcon } from '@/utils/application'
+import type { FormInstance, FormRules } from 'element-plus'
 import useStore from '@/stores'
 const route = useRoute()
 const {
@@ -150,10 +148,46 @@ const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
 const chatLogeData = ref<any[]>([])
 const show = ref(false)
+
+const FormRef = ref()
+
 const isPasswordDialogVisible = ref(false)
-const password = ref('')
-const passwordError = ref('')
+const validateLoading = ref(false)
+
+const form = ref({
+  password: ''
+})
+
 const isAuthenticated = ref(false)
+
+const validateName = (rule: any, value: string, callback: any) => {
+  if (value === '') {
+    callback(new Error('密码不能为空'))
+  } else {
+    application
+      .validatePassword(applicationDetail?.value.id, form.value.password, validateLoading)
+      .then((res: any) => {
+        if (res?.data.is_valid) {
+          callback()
+        } else {
+          callback(new Error('密码错误'))
+        }
+      })
+  }
+}
+const rules = reactive({
+  password: [{ required: true, validator: validateName, trigger: 'blur' }]
+})
+
+const submitHandle = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid) => {
+    if (valid) {
+      isAuthenticated.value = true
+      isPasswordDialogVisible.value = false
+    }
+  })
+}
 
 const paginationConfig = reactive({
   current_page: 1,
@@ -203,20 +237,6 @@ function newChat() {
   paginationConfig.current_page = 1
   currentRecordList.value = []
   currentChatId.value = 'new'
-}
-function validatePassword() {
-  if (!password.value) {
-    passwordError.value = '密码不能为空'
-    return // 终止后续执行
-  }
-  application.validatePassword(applicationDetail?.value.id, password.value).then((res: any) => {
-    if (res?.data.is_valid) {
-      isAuthenticated.value = true
-      isPasswordDialogVisible.value = false
-    } else {
-      passwordError.value = '密码错误'
-    }
-  })
 }
 
 function getAccessToken(token: string) {

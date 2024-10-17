@@ -45,12 +45,12 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="使用" align="center" width="80" fixed="right">
+      <el-table-column label="查看" align="center" width="80" fixed="right">
         <template #header>
           <el-checkbox
             :disabled="props.manage"
             v-model="allChecked[TeamEnum.USE]"
-            label="使用"
+            label="查看"
             @change="handleCheckAllChange($event, TeamEnum.USE)"
           />
         </template>

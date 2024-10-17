@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
 import applicationApi from '@/api/application'
 import applicationXpackApi from '@/api/application-xpack'
-import { type Ref, type UnwrapRef } from 'vue'
+import { type Ref } from 'vue'
 
 import useUserStore from './user'
-import type { ApplicationFormType } from '@/api/type/application'
 
 const useApplicationStore = defineStore({
   id: 'application',
@@ -123,7 +122,7 @@ const useApplicationStore = defineStore({
     async validatePassword(id: string, password: string, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
         applicationApi
-          .validatePassword(id, password)
+          .validatePassword(id, password, loading)
           .then((data) => {
             resolve(data)
           })
