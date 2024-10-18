@@ -245,6 +245,12 @@ h5 {
   align-items: center;
 }
 
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-between;
+}
+
 .align-center {
   align-items: center;
 }
