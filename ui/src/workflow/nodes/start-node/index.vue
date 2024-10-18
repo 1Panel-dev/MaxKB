@@ -38,11 +38,18 @@ const globalFields = [
 const inputFieldList = ref<any[]>([])
 
 const getRefreshFieldList = () => {
-  return props.nodeModel.graphModel.nodes
+  const user_input_fields = props.nodeModel.graphModel.nodes
     .filter((v: any) => v.id === 'base-node')
-    .map((v: any) => cloneDeep(v.properties.input_field_list))
+    .map((v: any) => cloneDeep(v.properties.user_input_field_list))
     .reduce((x: any, y: any) => [...x, ...y], [])
     .map((i: any) => ({ label: i.name, value: i.variable }))
+  const api_input_fields = props.nodeModel.graphModel.nodes
+    .filter((v: any) => v.id === 'base-node')
+    .map((v: any) => cloneDeep(v.properties.api_input_field_list))
+    .reduce((x: any, y: any) => [...x, ...y], [])
+    .map((i: any) => ({ label: i.name, value: i.variable }))
+
+  return [...user_input_fields, ...api_input_fields]
 }
 const refreshFieldList = () => {
   const refreshFieldList = getRefreshFieldList()
