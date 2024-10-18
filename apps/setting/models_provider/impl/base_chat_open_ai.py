@@ -54,5 +54,5 @@ class BaseChatOpenAI(ChatOpenAI):
                 **kwargs,
             ).generations[0][0],
         ).message
-        self.usage_metadata = chat_result.response_metadata['token_usage']
+        self.usage_metadata = chat_result.response_metadata['token_usage'] if 'token_usage' in chat_result.response_metadata else chat_result.usage_metadata
         return chat_result
