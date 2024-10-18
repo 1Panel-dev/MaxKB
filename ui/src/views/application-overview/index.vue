@@ -164,7 +164,12 @@
     <APIKeyDialog ref="APIKeyDialogRef" />
     <LimitDialog ref="LimitDialogRef" @refresh="refresh" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
-    <DisplaySettingDialog ref="DisplaySettingDialogRef" @refresh="refresh" />
+    <XPackDisplaySettingDialog
+      ref="XPackDisplaySettingDialogRef"
+      @refresh="refresh"
+      v-if="user.isEnterprise()"
+    />
+    <DisplaySettingDialog ref="DisplaySettingDialogRef" @refresh="refresh" v-else />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -174,7 +179,7 @@ import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
 import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
-
+import XPackDisplaySettingDialog from './component/XPackDisplaySettingDialog.vue'
 import EditAvatarDialog from './component/EditAvatarDialog.vue'
 import StatisticsCharts from './component/StatisticsCharts.vue'
 import applicationApi from '@/api/application'
@@ -185,7 +190,7 @@ import { copyClick } from '@/utils/clipboard'
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 import { t } from '@/locales'
-const { application } = useStore()
+const { user, application } = useStore()
 const route = useRoute()
 const {
   params: { id }
@@ -196,6 +201,7 @@ const apiUrl = window.location.origin + '/doc/chat/'
 const baseUrl = window.location.origin + '/api/application/'
 
 const DisplaySettingDialogRef = ref()
+const XPackDisplaySettingDialogRef = ref()
 const EditAvatarDialogRef = ref()
 const LimitDialogRef = ref()
 const APIKeyDialogRef = ref()
@@ -258,7 +264,11 @@ function toUrl(url: string) {
   window.open(url, '_blank')
 }
 function openDisplaySettingDialog() {
-  DisplaySettingDialogRef.value.open(accessToken.value)
+  if (user.isEnterprise()) {
+    XPackDisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
+  } else {
+    DisplaySettingDialogRef.value?.open(accessToken.value)
+  }
 }
 function openEditAvatar() {
   EditAvatarDialogRef.value.open(detail.value)
