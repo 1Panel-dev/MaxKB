@@ -157,7 +157,7 @@ class PdfSplitHandle(BaseSplitHandle):
                 chapter_text += text  # 提取文本
 
             # 保存章节内容和章节标题
-            chapters.append({"title": chapter_title, "content": chapter_text})
+            chapters.append({"title": chapter_title, "content": chapter_text if chapter_text else chapter_title})
         return chapters
 
     @staticmethod

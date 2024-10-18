@@ -5,7 +5,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <el-form label-position="top" ref="limitFormRef" :model="form" :rules="rules">
+    <el-form label-position="top" ref="limitFormRef" :model="form">
       <!-- <el-form-item
         :label="$t('views.applicationOverview.appInfo.LimitDialog.showSourceLabel')"
         @click.prevent
@@ -21,6 +21,7 @@
           :step="1"
           :value-on-clear="0"
           controls-position="right"
+          style="width: 268px"
           step-strictly
         />
         <span class="ml-4">{{
@@ -32,7 +33,7 @@
         :label="$t('views.applicationOverview.appInfo.LimitDialog.authentication')"
         v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')"
       >
-        <el-switch size="small" v-model="form.authentication"></el-switch>
+        <el-switch size="small" v-model="form.authentication" @change="firstGeneration"></el-switch>
       </el-form-item>
       <el-form-item
         prop="authentication_value"
@@ -40,17 +41,32 @@
         :label="$t('views.applicationOverview.appInfo.LimitDialog.authenticationValue')"
         v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')"
       >
-        <el-input
-          v-model="form.authentication_value"
-          readonly
-          style="width: 300px; margin-right: 10px"
-        ></el-input>
-        <el-button type="primary" text @click="copyClick(form.authentication_value)">
-          <AppIcon iconName="app-copy"></AppIcon>
-        </el-button>
-        <el-button @click="refreshAuthentication" type="primary" text style="margin-left: 1px">
-          <el-icon><RefreshRight /></el-icon>
-        </el-button>
+        <el-input v-model="form.authentication_value" readonly style="width: 268px" disabled>
+          <template #append>
+            <div class="button-container">
+              <el-tooltip content="复制" placement="top">
+                <el-button
+                  type="primary"
+                  text
+                  @click="copyClick(form.authentication_value)"
+                  style="width: 24px; height: 24px"
+                >
+                  <AppIcon iconName="app-copy"></AppIcon>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip content="刷新" placement="top">
+                <el-button
+                  @click="refreshAuthentication"
+                  type="primary"
+                  text
+                  style="width: 24px; height: 24px; margin-left: 20px"
+                >
+                  <el-icon><RefreshRight /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </div>
+          </template>
+        </el-input>
       </el-form-item>
       <el-form-item
         :label="$t('views.applicationOverview.appInfo.LimitDialog.whitelistLabel')"
@@ -88,6 +104,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
 import { copyClick } from '@/utils/clipboard'
 import { ComplexPermission } from '@/utils/permission/type'
+import { first } from 'lodash'
 
 const route = useRoute()
 const {
@@ -104,15 +121,6 @@ const form = ref<any>({
   authentication_value: '',
   authentication: false
 })
-const rules: FormRules = {
-  authentication_value: [
-    {
-      required: true,
-      message: '身份验证值不能为空',
-      trigger: 'blur'
-    }
-  ]
-}
 
 const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
@@ -166,6 +174,12 @@ function generateAuthenticationValue(length: number = 10) {
 }
 function refreshAuthentication() {
   form.value.authentication_value = generateAuthenticationValue()
+}
+
+function firstGeneration() {
+  if (form.value.authentication && !form.value.authentication_value) {
+    form.value.authentication_value = generateAuthenticationValue()
+  }
 }
 
 defineExpose({ open })
