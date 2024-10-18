@@ -24,7 +24,7 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
     if step_variable is not None:
         for key in step_variable:
             node.context[key] = step_variable[key]
-        if workflow.is_result() and 'result' in step_variable:
+        if workflow.is_result(node, NodeResult(step_variable, global_variable)) and 'result' in step_variable:
             result = str(step_variable['result']) + '\n'
             yield result
             workflow.answer += result
