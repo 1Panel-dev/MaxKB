@@ -258,7 +258,7 @@
 
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </NodeContainer>
-  <AIModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
+  <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
 </template>
 <script setup lang="ts">
 import { app } from '@/main'
@@ -273,7 +273,7 @@ import type { Provider } from '@/api/type/model'
 import FieldFormDialog from './component/FieldFormDialog.vue'
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
-import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
+import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
 const { model } = useStore()
 
 const {

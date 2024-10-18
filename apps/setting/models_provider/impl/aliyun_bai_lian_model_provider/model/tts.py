@@ -44,3 +44,6 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             print(audio)
             raise Exception(audio)
         return audio
+
+    def is_cache_model(self):
+        return False

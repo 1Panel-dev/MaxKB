@@ -102,6 +102,9 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
         return asyncio.run(self.submit(request_json, text))
 
+    def is_cache_model(self):
+        return False
+
     def token_auth(self):
         return {'Authorization': 'Bearer; {}'.format(self.volcanic_token)}
 
