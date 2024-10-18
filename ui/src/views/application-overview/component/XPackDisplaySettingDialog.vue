@@ -381,8 +381,8 @@ const open = (data: any, content: any) => {
   xpackForm.value.user_avatar = data.user_avatar
   xpackForm.value.disclaimer = data.disclaimer
   xpackForm.value.disclaimer_value = data.disclaimer_value
-  xpackForm.value.custom_theme = JSON.parse(data.custom_theme)
-  xpackForm.value.float_location = JSON.parse(data.float_location)
+  xpackForm.value.custom_theme = data.custom_theme
+  xpackForm.value.float_location = data.float_location
   form.value = xpackForm.value
 
   dialogVisible.value = true
