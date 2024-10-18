@@ -264,7 +264,7 @@ class ApplicationSerializer(serializers.Serializer):
                 if work_flow is not None:
                     for node in work_flow.get('nodes', []):
                         if node['id'] == 'base-node':
-                            input_field_list = node.get('properties', {}).get('input_field_list', [])
+                            input_field_list = node.get('properties', {}).get('api_input_field_list', node.get('properties', {}).get('input_field_list', []))
                             if input_field_list is not None:
                                 for field in input_field_list:
                                     if field['assignment_method'] == 'api_input' and field['variable'] in params:

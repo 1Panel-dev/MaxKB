@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="isEdit ? '编辑变量' : '添加变量'"
+    :title="isEdit ? '编辑参数' : '添加参数'"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -14,10 +14,10 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item label="变量" prop="variable">
+      <el-form-item label="参数" prop="variable">
         <el-input
           v-model="form.variable"
-          placeholder="请输入变量"
+          placeholder="请输入参数"
           maxlength="64"
           show-word-limit
           @blur="form.variable = form.variable.trim()"
@@ -100,12 +100,6 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="赋值方式">
-        <el-radio-group v-model="form.assignment_method">
-          <el-radio value="user_input">用户输入</el-radio>
-          <el-radio value="api_input">接口传参</el-radio>
-        </el-radio-group>
-      </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -142,7 +136,7 @@ const form = ref<any>({
 const rules = reactive({
   name: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
   variable: [
-    { required: true, message: '请输入变量', trigger: 'blur' },
+    { required: true, message: '请输入参数', trigger: 'blur' },
     { pattern: /^[a-zA-Z0-9_]+$/, message: '只能输入字母数字和下划线', trigger: 'blur' }
   ]
 })
