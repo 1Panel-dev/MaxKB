@@ -18,7 +18,8 @@ from smartdoc.const import PROJECT_DIR
 
 
 class PyLintInstance(serializers.Serializer):
-    code = serializers.CharField(required=True, error_messages=ErrMessage.char("函数名称"))
+    code = serializers.CharField(required=True, allow_null=True, allow_blank=True,
+                                 error_messages=ErrMessage.char("函数内容"))
 
 
 def to_dict(message, file_name):
