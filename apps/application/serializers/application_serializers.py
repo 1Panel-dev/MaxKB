@@ -973,6 +973,16 @@ class ApplicationSerializer(serializers.Serializer):
                                                             **application.tts_model_params_setting)
                 return model.text_to_speech(text)
 
+        def play_demo_text(self, form_data, with_valid=True):
+            text = '你好，这里是语音播放测试'
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            application_id = self.data.get('application_id')
+            application = QuerySet(Application).filter(id=application_id).first()
+            if application.tts_model_enable:
+                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id, **form_data)
+                return model.text_to_speech(text)
+
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:
             model = ApplicationApiKey

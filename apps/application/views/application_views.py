@@ -566,3 +566,19 @@ class Application(APIView):
                 request.data.get('text'))
             return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
                                                               'Content-Disposition': 'attachment; filename="abc.mp3"'})
+
+    class PlayDemoText(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
+                                        [lambda r, keywords: Permission(group=Group.APPLICATION,
+                                                                        operate=Operate.USE,
+                                                                        dynamic_tag=keywords.get(
+                                                                            'application_id'))],
+                                        compare=CompareConstants.AND))
+        def post(self, request: Request, application_id: str):
+            byte_data = ApplicationSerializer.Operate(
+                data={'application_id': application_id, 'user_id': request.user.id}).play_demo_text(request.data)
+            return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
+                                                              'Content-Disposition': 'attachment; filename="abc.mp3"'})

@@ -70,5 +70,7 @@ urlpatterns = [
          name='application/audio'),
     path('application/<str:application_id>/text_to_speech', views.Application.TextToSpeech.as_view(),
          name='application/audio'),
+    path('application/<str:application_id>/play_demo_text', views.Application.PlayDemoText.as_view(),
+         name='application/audio'),
 
 ]

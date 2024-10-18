@@ -533,7 +533,7 @@
     </el-row>
 
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm" />
-    <AIModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
+    <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
     <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
     <AddDatasetDialog
       ref="AddDatasetDialogRef"
@@ -573,6 +573,7 @@ import { relatedObject } from '@/utils/utils'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import TTSModeParamSettingDialog from './component/TTSModeParamSettingDialog.vue'
 
 const { model, application } = useStore()
 
@@ -587,7 +588,7 @@ const defaultPrompt = t('views.application.prompt.defaultPrompt', {
 })
 
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
-const TTSModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
 const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
