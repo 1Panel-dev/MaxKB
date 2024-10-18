@@ -285,7 +285,7 @@ const props = defineProps<{ nodeModel: any }>()
 const sttModelOptions = ref<any>(null)
 const ttsModelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
-const TTSModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
 
 const form = {
   name: '',
@@ -420,4 +420,8 @@ onMounted(() => {
   getSTTModel()
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.el-form-item__label) {
+  display: block;
+}
+</style>
