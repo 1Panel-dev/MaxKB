@@ -58,3 +58,6 @@ class XInferenceTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 input=text,
         ) as response:
             return response.read()
+
+    def is_cache_model(self):
+        return False

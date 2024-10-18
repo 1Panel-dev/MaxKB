@@ -113,6 +113,9 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
         return asyncio.run(handle())
 
+    def is_cache_model(self):
+        return False
+
     @staticmethod
     async def handle_message(ws):
         audio_bytes: bytes = b''
