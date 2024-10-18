@@ -226,8 +226,8 @@ class ApplicationSerializer(serializers.Serializer):
             is_draggable = 'false'
             show_guide = 'true'
             float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/MaxKB.gif"
-            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                                  'XPACK_LICENSE_IS_VALID') else False)
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
             # 获取接入的query参数
             query = self.get_query_api_input(application_access_token.application, params)
 
@@ -313,8 +313,8 @@ class ApplicationSerializer(serializers.Serializer):
                 application_access_token.show_source = instance.get('show_source')
             application_access_token.save()
             application_setting_model = DBModelManage.get_model('application_setting')
-            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                                  'XPACK_LICENSE_IS_VALID') else False)
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get("XPACK_LICENSE_IS_VALID", False)
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting, _ = application_setting_model.objects.get_or_create(
                     application_id=self.data.get('application_id'))
@@ -736,8 +736,8 @@ class ApplicationSerializer(serializers.Serializer):
             if application_access_token is None:
                 raise AppUnauthorizedFailed(500, "非法用户")
             application_setting_model = DBModelManage.get_model('application_setting')
-            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                                  'XPACK_LICENSE_IS_VALID') else False)
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
             application_setting_dict = {}
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(

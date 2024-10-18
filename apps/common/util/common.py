@@ -10,10 +10,10 @@ import importlib
 from functools import reduce
 from typing import Dict, List
 
-from django.conf import settings
 from django.db.models import QuerySet
 
 from ..exception.app_exception import AppApiException
+from ..models.db_model_manage import DBModelManage
 
 
 def sub_array(array: List, item_num=10):
@@ -76,8 +76,8 @@ def post(post_function):
 def valid_license(model=None, count=None, message=None):
     def inner(func):
         def run(*args, **kwargs):
-            if (not (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                'XPACK_LICENSE_IS_VALID') else None)
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            if ((not False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False))
                     and QuerySet(
                         model).count() >= count):
                 error = message or f'超出限制{count},请联系我们（https://fit2cloud.com/）。'
