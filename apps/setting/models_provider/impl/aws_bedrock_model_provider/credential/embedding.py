@@ -1,64 +1,64 @@
-import json
+import os
+import re
 from typing import Dict
-
-from tencentcloud.common import credential
-from tencentcloud.common.profile.client_profile import ClientProfile
-from tencentcloud.common.profile.http_profile import HttpProfile
-from tencentcloud.hunyuan.v20230901 import hunyuan_client, models
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
+from setting.models_provider.impl.aws_bedrock_model_provider.model.embedding import BedrockEmbeddingModel
 
 
-class TencentEmbeddingCredential(BaseForm, BaseModelCredential):
-    @classmethod
-    def _validate_model_type(cls, model_type: str, provider) -> bool:
-        model_type_list = provider.get_model_type_list()
-        if not any(mt.get('value') == model_type for mt in model_type_list):
-            raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
-        return True
+class BedrockEmbeddingCredential(BaseForm, BaseModelCredential):
 
-    @classmethod
-    def _validate_credential(cls, model_credential: Dict[str, object]) -> credential.Credential:
-        for key in ['SecretId', 'SecretKey']:
-            if key not in model_credential:
-                raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
-        return credential.Credential(model_credential['SecretId'], model_credential['SecretKey'])
+    @staticmethod
+    def _update_aws_credentials(profile_name, access_key_id, secret_access_key):
+        credentials_path = os.path.join(os.path.expanduser("~"), ".aws", "credentials")
+        os.makedirs(os.path.dirname(credentials_path), exist_ok=True)
 
-    @classmethod
-    def _test_credentials(cls, client, model_name: str):
-        req = models.GetEmbeddingRequest()
-        params = {
-            "Model": model_name,
-            "Input": "测试"
-        }
-        req.from_json_string(json.dumps(params))
-        try:
-            res = client.GetEmbedding(req)
-            print(res.to_json_string())
-        except Exception as e:
-            raise AppApiException(ValidCode.valid_error.value, f'校验失败,请检查参数是否正确: {str(e)}')
+        content = open(credentials_path, 'r').read() if os.path.exists(credentials_path) else ''
+        pattern = rf'\n*\[{profile_name}\]\n*(aws_access_key_id = .*)\n*(aws_secret_access_key = .*)\n*'
+        content = re.sub(pattern, '', content, flags=re.DOTALL)
+
+        if not re.search(rf'\[{profile_name}\]', content):
+            content += f"\n[{profile_name}]\naws_access_key_id = {access_key_id}\naws_secret_access_key = {secret_access_key}\n"
+
+        with open(credentials_path, 'w') as file:
+            file.write(content)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
-                 raise_exception=True) -> bool:
-        try:
-            self._validate_model_type(model_type, provider)
-            cred = self._validate_credential(model_credential)
-            httpProfile = HttpProfile(endpoint="hunyuan.tencentcloudapi.com")
-            clientProfile = ClientProfile(httpProfile=httpProfile)
-            client = hunyuan_client.HunyuanClient(cred, "", clientProfile)
-            self._test_credentials(client, model_name)
-            return True
-        except AppApiException as e:
+                 raise_exception=False):
+        model_type_list = provider.get_model_type_list()
+        if not any(mt.get('value') == model_type for mt in model_type_list):
             if raise_exception:
-                raise e
+                raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
             return False
 
-    def encryption_dict(self, model: Dict[str, object]) -> Dict[str, object]:
-        encrypted_secret_key = super().encryption(model.get('SecretKey', ''))
-        return {**model, 'SecretKey': encrypted_secret_key}
+        required_keys = ['region_name', 'access_key_id', 'secret_access_key']
+        if not all(key in model_credential for key in required_keys):
+            if raise_exception:
+                raise AppApiException(ValidCode.valid_error.value, f'以下字段为必填字段: {", ".join(required_keys)}')
+            return False
 
-    SecretId = forms.PasswordInputField('SecretId', required=True)
-    SecretKey = forms.PasswordInputField('SecretKey', required=True)
+        try:
+            self._update_aws_credentials('aws-profile', model_credential['access_key_id'],
+                                         model_credential['secret_access_key'])
+            model_credential['credentials_profile_name'] = 'aws-profile'
+            model: BedrockEmbeddingModel = provider.get_model(model_type, model_name, model_credential)
+            aa = model.embed_query('你好')
+            print(aa)
+        except AppApiException:
+            raise
+        except Exception as e:
+            if raise_exception:
+                raise AppApiException(ValidCode.valid_error.value, f'校验失败,请检查参数是否正确: {str(e)}')
+            return False
+
+        return True
+
+    def encryption_dict(self, model: Dict[str, object]):
+        return {**model, 'secret_access_key': super().encryption(model.get('secret_access_key', ''))}
+
+    region_name = forms.TextInputField('Region Name', required=True)
+    access_key_id = forms.TextInputField('Access Key ID', required=True)
+    secret_access_key = forms.PasswordInputField('Secret Access Key', required=True)
