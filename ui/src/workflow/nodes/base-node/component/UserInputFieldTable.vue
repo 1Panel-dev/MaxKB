@@ -5,7 +5,7 @@
       <el-icon class="mr-4">
         <Plus />
       </el-icon>
-      添加
+      添加参数
     </el-button>
   </div>
   <el-table
@@ -13,20 +13,27 @@
     :data="props.nodeModel.properties.user_input_field_list"
     class="mb-16"
   >
-    <el-table-column prop="variable" label="参数" />
-    <el-table-column prop="name" label="显示名称" />
-    <el-table-column label="输入类型">
+    <el-table-column prop="label" label="显示名称">
       <template #default="{ row }">
-        <el-tag type="info" class="info-tag" v-if="row.type === 'input'">文本框</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.type === 'date'">日期</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.type === 'select'">下拉选项</el-tag>
+        <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{ row.label.label }}</span>
+        <span v-else>{{ row.label }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column prop="field" label="参数" />
+    <el-table-column label="组件类型">
+      <template #default="{ row }">
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">文本框</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'">滑块</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'">开关</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'">单选框</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">日期</el-tag>
       </template>
     </el-table-column>
     <el-table-column prop="default_value" label="默认值" />
     <el-table-column label="必填">
       <template #default="{ row }">
         <div @click.stop>
-          <el-switch disabled size="small" v-model="row.is_required" />
+          <el-switch disabled size="small" v-model="row.required" />
         </div>
       </template>
     </el-table-column>
@@ -63,15 +70,11 @@ import { MsgError } from '@/utils/message'
 
 const props = defineProps<{ nodeModel: any }>()
 
-const currentIndex = ref(null)
 const UserFieldFormDialogRef = ref()
 const inputFieldList = ref<any[]>([])
 
 function openAddDialog(data?: any, index?: any) {
-  if (typeof index !== 'undefined') {
-    currentIndex.value = index
-  }
-  UserFieldFormDialogRef.value.open(data)
+  UserFieldFormDialogRef.value.open(data, index)
 }
 
 function deleteField(index: any) {
@@ -80,27 +83,26 @@ function deleteField(index: any) {
 }
 
 
-function refreshFieldList(data: any) {
+function refreshFieldList(data: any, index: any) {
   for (let i = 0; i < inputFieldList.value.length; i++) {
-    if (inputFieldList.value[i].variable === data.variable && currentIndex.value !== i) {
-      MsgError('参数已存在: ' + data.variable)
+    if (inputFieldList.value[i].field === data.field && index !== i) {
+      MsgError('参数已存在: ' + data.field)
       return
     }
   }
   // 查看另一个list又没有重复的
   let arr = props.nodeModel.properties.api_input_field_list
   for (let i = 0; i < arr.length; i++) {
-    if (arr[i].variable === data.variable) {
-      MsgError('参数已存在: ' + data.variable)
+    if (arr[i].variable === data.field) {
+      MsgError('参数已存在: ' + data.field)
       return
     }
   }
-  if (currentIndex.value !== null) {
-    inputFieldList.value.splice(currentIndex.value, 1, data)
+  if (index !== null) {
+    inputFieldList.value.splice(index, 1, data)
   } else {
     inputFieldList.value.push(data)
   }
-  currentIndex.value = null
   UserFieldFormDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
 }
@@ -119,6 +121,23 @@ onMounted(() => {
   } else {
     inputFieldList.value.push(...props.nodeModel.properties.user_input_field_list)
   }
+  // 兼容旧数据
+  inputFieldList.value.forEach((item, index) => {
+    item.label = item.label || item.name
+    item.field = item.field || item.variable
+    item.required = item.required || item.is_required
+    switch (item.type) {
+      case 'input':
+        item.input_type = 'TextInput'
+        break
+      case 'select':
+        item.input_type = 'SingleSelect'
+        break
+      case 'date':
+        item.input_type = 'DatePicker'
+        break
+    }
+  })
   set(props.nodeModel.properties, 'user_input_field_list', inputFieldList)
 })
 

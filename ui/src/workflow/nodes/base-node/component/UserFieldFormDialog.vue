@@ -7,104 +7,17 @@
     :destroy-on-close="true"
     append-to-body
   >
-    <el-form
+    <DynamicsFormConstructor
+      v-model="currentItem"
       label-position="top"
-      ref="fieldFormRef"
-      :rules="rules"
-      :model="form"
       require-asterisk-position="right"
-    >
-      <el-form-item label="参数" prop="variable">
-        <el-input
-          v-model="form.variable"
-          placeholder="请输入参数"
-          maxlength="64"
-          show-word-limit
-          @blur="form.variable = form.variable.trim()"
-        />
-      </el-form-item>
-      <el-form-item label="显示名称" prop="name">
-        <el-input
-          v-model="form.name"
-          placeholder="请输入显示名称"
-          maxlength="64"
-          show-word-limit
-          @blur="form.name = form.name.trim()"
-        />
-      </el-form-item>
-
-      <el-form-item label="输入类型">
-        <el-select v-model="form.type" @change="changeType">
-          <el-option label="文本框" value="input" />
-          <el-option label="日期" value="date" />
-          <el-option label="下拉选项" value="select" />
-        </el-select>
-      </el-form-item>
-      <el-form-item v-if="form.type === 'select'">
-        <template #label>
-          <div class="flex-between">
-            选项值
-            <el-button link type="primary" @click.stop="addOption()">
-              <el-icon class="mr-4"><Plus /></el-icon> 添加
-            </el-button>
-          </div>
-        </template>
-
-        <div
-          class="w-full flex-between mb-8"
-          v-for="(option, $index) in form.optionList"
-          :key="$index"
-        >
-          <el-input v-model="form.optionList[$index]" placeholder="请输入选项值" />
-          <el-button link class="ml-8" @click.stop="delOption($index)">
-            <el-icon><Delete /></el-icon>
-          </el-button>
-        </div>
-      </el-form-item>
-      <el-form-item label="是否必填" @click.prevent>
-        <el-switch size="small" v-model="form.is_required"></el-switch>
-      </el-form-item>
-      <el-form-item
-        label="默认值"
-        prop="default_value"
-        :rules="{
-          required: form.is_required,
-          message: '请输入默认值',
-          trigger: 'blur'
-        }"
-      >
-        <el-input
-          v-if="form.type === 'input'"
-          v-model="form.default_value"
-          placeholder="请输入默认值"
-          @blur="form.name = form.name.trim()"
-        />
-        <el-date-picker
-          v-else-if="form.type === 'date'"
-          v-model="form.default_value"
-          type="datetime"
-          placeholder="选择日期"
-          format="YYYY-MM-DD HH:mm:ss"
-          value-format="YYYY-MM-DD HH:mm:ss"
-        />
-        <el-select
-          v-else-if="form.type === 'select'"
-          v-model="form.default_value"
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="(option, index) in form.optionList"
-            :key="index"
-            :label="option"
-            :value="option"
-          />
-        </el-select>
-      </el-form-item>
-    </el-form>
+      :input_type_list="inputTypeList"
+      ref="DynamicsFormConstructorRef"
+    ></DynamicsFormConstructor>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
-        <el-button type="primary" @click="submit(fieldFormRef)" :loading="loading">
+        <el-button type="primary" @click="submit()" :loading="loading">
           {{ isEdit ? '保存' : '添加' }}
         </el-button>
       </span>
@@ -112,89 +25,100 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import type { FormInstance } from 'element-plus'
-import { cloneDeep, debounce } from 'lodash'
-import { MsgError } from '@/utils/message'
+import { ref } from 'vue'
+import { cloneDeep } from 'lodash'
+import DynamicsFormConstructor from '@/components/dynamics-form/constructor/index.vue'
+import type { FormField } from '@/components/dynamics-form/type'
 
 const emit = defineEmits(['refresh'])
 
-const fieldFormRef = ref()
+const DynamicsFormConstructorRef = ref()
 const loading = ref<boolean>(false)
 const isEdit = ref(false)
-
-const form = ref<any>({
-  name: '',
-  variable: '',
-  type: 'input',
-  is_required: true,
-  assignment_method: 'user_input',
-  optionList: [''],
-  default_value: ''
-})
-
-const rules = reactive({
-  name: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
-  variable: [
-    { required: true, message: '请输入参数', trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: '只能输入字母数字和下划线', trigger: 'blur' }
-  ]
-})
+const currentItem = ref<FormField>()
+const currentIndex = ref(null)
+const inputTypeList = ref([
+  { label: '文本框', value: 'TextInputConstructor' },
+  { label: '单选框', value: 'SingleSelectConstructor' },
+  { label: '日期', value: 'DatePickerConstructor' }
+])
 
 const dialogVisible = ref<boolean>(false)
 
-watch(dialogVisible, (bool) => {
-  if (!bool) {
-    form.value = {
-      name: '',
-      variable: '',
-      type: 'input',
-      is_required: true,
-      assignment_method: 'user_input',
-      optionList: [''],
-      default_value: ''
-    }
-    isEdit.value = false
-  }
-})
 
-const open = (row: any) => {
-  if (row) {
-    form.value = cloneDeep(row)
-    isEdit.value = true
-  }
-
+const open = (row: any, index: any) => {
   dialogVisible.value = true
+
+  if (row) {
+    isEdit.value = true
+    currentItem.value = cloneDeep(row)
+    currentIndex.value = index
+
+    // 新版本已经上线
+    if (row.input_type) {
+      return
+    }
+    // 旧版本数据兼容
+    switch (row.type) {
+      case 'input':
+        currentItem.value = {
+          field: row.field || row.variable,
+          input_type: 'TextInput',
+          label: row.label || row.name,
+          default_value: row.default_value,
+          required: row.required || row.is_required
+        }
+        break
+      case 'select':
+        currentItem.value = {
+          field: row.field || row.variable,
+          input_type: 'SingleSelect',
+          label: row.label || row.name,
+          default_value: row.default_value,
+          required: row.required || row.is_required,
+          option_list: row.optionList.map((o: any) => {
+            return { key: o, value: o }
+          })
+        }
+        break
+      case 'date':
+        currentItem.value = {
+          field: row.field || row.variable,
+          input_type: 'DatePicker',
+          label: row.label || row.name,
+          default_value: row.default_value,
+          required: row.required || row.is_required,
+          attrs: {
+            format: 'YYYY-MM-DD HH:mm:ss',
+            'value-format': 'YYYY-MM-DD HH:mm:ss',
+            type: 'datetime'
+          }
+        }
+        break
+      default:
+        break
+    }
+  }
 }
 
 const close = () => {
   dialogVisible.value = false
+  isEdit.value = false
+  currentIndex.value = null
+  currentItem.value = null as any
 }
 
-const submit = async (formEl: FormInstance | undefined) => {
+const submit = async () => {
+  const formEl = DynamicsFormConstructorRef.value
   if (!formEl) return
-  if (form.value.type === 'select' && form.value.optionList.length === 0) {
-    return MsgError('请添加选项值')
-  }
-  await formEl.validate((valid) => {
-    if (valid) {
-      emit('refresh', form.value)
-    }
+  await formEl.validate().then(() => {
+    emit('refresh', formEl?.getData(), currentIndex.value)
+    isEdit.value = false
+    currentItem.value = null as any
+    currentIndex.value = null
   })
 }
 
-const addOption = () => {
-  form.value.optionList.push('')
-}
-
-const delOption = (index: number) => {
-  form.value.optionList.splice(index, 1)
-}
-
-const changeType = () => {
-  form.value.optionList = ['']
-  form.value.default_value = ''
-}
 
 defineExpose({ open, close })
 </script>

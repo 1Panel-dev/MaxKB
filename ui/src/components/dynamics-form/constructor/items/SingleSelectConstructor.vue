@@ -54,7 +54,7 @@ const formValue = computed({
 })
 
 const addOption = () => {
-  formValue.value.option_list.push('')
+  formValue.value.option_list.push({ value: '' })
 }
 
 const delOption = (index: number) => {
@@ -77,4 +77,8 @@ onMounted(() => {
   formValue.value.option_list = props.modelValue.option_list || []
 })
 </script>
-<style lang="scss"></style>
+<style lang="scss" scoped>
+:deep(.el-form-item__label) {
+  display: block;
+}
+</style>
