@@ -2,7 +2,7 @@
   <div class="chat-embed layout-bg" v-loading="loading">
     <el-dialog
       v-model="isPasswordDialogVisible"
-      width="480"
+      width="300"
       title="请输入密码打开链接"
       custom-class="no-close-button"
       :close-on-click-modal="false"
@@ -25,30 +25,31 @@
         >
       </el-form>
     </el-dialog>
-    <div v-if="isAuthenticated">
-      <div class="chat-embed__header" :class="!isDefaultTheme ? 'custom-header' : ''">
-        <div class="chat-width flex align-center">
-          <div class="mr-12 ml-24 flex">
-            <AppAvatar
-              v-if="isAppIcon(applicationDetail?.icon)"
-              shape="square"
-              :size="32"
-              style="background: none"
-            >
-              <img :src="applicationDetail?.icon" alt="" />
-            </AppAvatar>
-            <AppAvatar
-              v-else-if="applicationDetail?.name"
-              :name="applicationDetail?.name"
-              pinyinColor
-              shape="square"
-              :size="32"
-            />
-          </div>
 
-          <h4>{{ applicationDetail?.name }}</h4>
+    <div class="chat-embed__header" :class="!isDefaultTheme ? 'custom-header' : ''">
+      <div class="chat-width flex align-center">
+        <div class="mr-12 ml-24 flex">
+          <AppAvatar
+            v-if="isAppIcon(applicationDetail?.icon)"
+            shape="square"
+            :size="32"
+            style="background: none"
+          >
+            <img :src="applicationDetail?.icon" alt="" />
+          </AppAvatar>
+          <AppAvatar
+            v-else-if="applicationDetail?.name"
+            :name="applicationDetail?.name"
+            pinyinColor
+            shape="square"
+            :size="32"
+          />
         </div>
+
+        <h4>{{ applicationDetail?.name }}</h4>
       </div>
+    </div>
+    <div v-if="isAuthenticated">
       <div class="chat-embed__main">
         <AiChat
           ref="AiChatRef"
@@ -169,7 +170,8 @@ const validateName = (rule: any, value: string, callback: any) => {
       .validatePassword(applicationDetail?.value.id, form.value.password, validateLoading)
       .then((res: any) => {
         if (res?.data.is_valid) {
-          callback()
+          isAuthenticated.value = true
+          isPasswordDialogVisible.value = false
         } else {
           callback(new Error('密码错误'))
         }
@@ -182,12 +184,7 @@ const rules = reactive({
 
 const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid) => {
-    if (valid) {
-      isAuthenticated.value = true
-      isPasswordDialogVisible.value = false
-    }
-  })
+  await formEl.validate((valid) => {})
 }
 
 const paginationConfig = reactive({
@@ -414,5 +411,10 @@ onMounted(() => {
     max-width: var(--app-chat-width, 860px);
     margin: 0 auto;
   }
+}
+</style>
+<style lang="scss" scoped>
+:deep(.el-overlay) {
+  background-color: transparent;
 }
 </style>
