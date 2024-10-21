@@ -6,7 +6,21 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     align-center
+    class="display-setting-dialog"
   >
+    <template #header="{ titleId, titleClass }">
+      <div class="flex-between mb-8">
+        <h4 :id="titleId" :class="titleClass">显示设置</h4>
+        <div class="flex align-center">
+          <el-button type="primary" @click.prevent="resetForm" link>
+            <el-icon class="mr-4"><Refresh /></el-icon>
+            恢复默认
+          </el-button>
+          <el-divider direction="vertical" />
+        </div>
+      </div>
+    </template>
+
     <el-row :gutter="8">
       <el-col :span="12">
         <div class="setting-preview border border-r-4 mr-16">
@@ -48,6 +62,38 @@
                     <el-icon :size="20" class="color-secondary"><Close /></el-icon>
                   </el-button>
                 </div>
+              </div>
+            </div>
+            <div>
+              <div class="p-16" style="position: relative">
+                <div class="flex">
+                  <div class="avatar">
+                    <el-image
+                      v-if="imgUrl.avatar"
+                      :src="imgUrl.avatar"
+                      alt=""
+                      fit="cover"
+                      style="width: 35px; height: 35px; display: block"
+                    />
+                    <LogoIcon
+                      v-else
+                      height="35px"
+                      style="width: 35px; height: 35px; display: block"
+                    />
+                  </div>
+
+                  <img src="@/assets/display-bg2.png" alt="" width="270" />
+                </div>
+                <div class="flex-between">
+                  <AppAvatar class="mr-8">
+                    <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+                  </AppAvatar>
+
+                  <img src="@/assets/display-bg3.png" alt="" width="270" />
+                </div>
+              </div>
+              <div style="position: absolute; bottom: 0">
+                <img src="@/assets/display-bg1.png" alt="" class="w-full" />
               </div>
             </div>
           </div>
@@ -186,7 +232,6 @@
 
     <template #footer>
       <span class="dialog-footer">
-        <el-button type="primary" @click.prevent="resetForm" link>恢复默认 </el-button>
         <el-button @click.prevent="dialogVisible = false"
           >{{ $t('views.applicationOverview.appInfo.LimitDialog.cancelButtonText') }}
         </el-button>
@@ -351,6 +396,14 @@ defineExpose({ open })
       box-sizing: border-box;
       border-bottom: 1px solid var(--el-border-color);
     }
+  }
+}
+.display-setting-dialog {
+  .el-dialog__header {
+    padding-right: 16px;
+  }
+  .el-dialog__headerbtn {
+    top: 13px;
   }
 }
 </style>
