@@ -31,12 +31,12 @@ class FileCache(BaseCache):
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         expire = timeout if isinstance(timeout, int) or isinstance(timeout,
-                                                                   float) else timeout.total_seconds()
+                                                                   float) or timeout is None else timeout.total_seconds()
         return self.cache.add(key, value=value, expire=expire)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         expire = timeout if isinstance(timeout, int) or isinstance(timeout,
-                                                                   float) else timeout.total_seconds()
+                                                                   float) or timeout is None else timeout.total_seconds()
         return self.cache.set(key, value=value, expire=expire)
 
     def get(self, key, default=None, version=None):
