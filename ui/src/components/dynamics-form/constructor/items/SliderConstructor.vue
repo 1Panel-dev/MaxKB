@@ -1,16 +1,19 @@
 <template>
-  <el-form-item label="最小值" required>
-    <el-input-number v-model="formValue.min" :min="0" controls-position="right" />
-  </el-form-item>
-  <el-form-item label="最大值" required>
-    <el-input-number v-model="formValue.max" :min="0" controls-position="right" />
+  <el-form-item label="取值范围" required>
+    <el-col :span="11">
+      <el-input-number style="width: 100%" v-model="formValue.min" controls-position="right" />
+    </el-col>
+    <el-col :span="2" class="text-center">
+      <span class="text-gray-500">-</span>
+    </el-col>
+    <el-col :span="11">
+      <el-input-number style="width: 100%" v-model="formValue.max" controls-position="right" />
+    </el-col>
   </el-form-item>
   <el-form-item label="步长值" required>
     <el-input-number v-model="formValue.step" :min="0" controls-position="right" />
   </el-form-item>
-  <el-form-item label="精确值" required>
-    <el-input-number v-model="formValue.precision" :min="0" controls-position="right" />
-  </el-form-item>
+
   <el-form-item
     label="默认值"
     :required="formValue.required"

@@ -1,10 +1,24 @@
 <template>
-  <el-form-item label="最小长度" required>
-    <el-input-number v-model="formValue.min_length" :min="0" controls-position="right" />
+  <el-form-item label="取值范围" required>
+    <el-col :span="11">
+      <el-input-number
+        style="width: 100%"
+        v-model="formValue.min_length"
+        controls-position="right"
+      />
+    </el-col>
+    <el-col :span="2" class="text-center">
+      <span class="text-gray-500">-</span>
+    </el-col>
+    <el-col :span="11">
+      <el-input-number
+        style="width: 100%"
+        v-model="formValue.max_length"
+        controls-position="right"
+      />
+    </el-col>
   </el-form-item>
-  <el-form-item label="最大长度" required>
-    <el-input-number v-model="formValue.max_length" :min="0" controls-position="right" />
-  </el-form-item>
+
   <el-form-item
     label="默认值"
     :required="formValue.required"
