@@ -5,7 +5,7 @@
       <el-icon class="mr-4">
         <Plus />
       </el-icon>
-      添加
+      添加参数
     </el-button>
   </div>
   <el-table
@@ -82,7 +82,7 @@ function refreshFieldList(data: any) {
   // 查看另一个list又没有重复的
   let arr = props.nodeModel.properties.user_input_field_list
   for (let i = 0; i < arr.length; i++) {
-    if (arr[i].variable === data.variable) {
+    if (arr[i].field === data.variable) {
       MsgError('参数已存在: ' + data.variable)
       return
     }

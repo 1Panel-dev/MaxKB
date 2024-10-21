@@ -401,7 +401,7 @@ function handleInputFieldList() {
                   }
                 }
               default:
-                break
+                return v
             }
           })
         : v.properties.input_field_list ? v.properties.input_field_list
