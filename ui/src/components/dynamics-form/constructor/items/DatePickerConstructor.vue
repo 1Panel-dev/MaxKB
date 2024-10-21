@@ -11,7 +11,6 @@
   </el-form-item>
   <el-form-item label="格式" required>
     <el-select
-      @change="format_change"
       v-model="formValue.format"
       filterable
       default-first-option
@@ -95,11 +94,16 @@ const getData = () => {
     default_value: formValue.value.default_value
   }
 }
-defineExpose({ getData })
+const rander = (form_data: any) => {
+  formValue.value.type = form_data.attrs.type
+  formValue.value.format = form_data.attrs?.format
+  formValue.value.default_value = form_data.default_value
+}
+defineExpose({ getData, rander })
 onMounted(() => {
-  formValue.value.type = props.modelValue.attrs?.type || 'datetime'
-  formValue.value.format = props.modelValue.attrs?.format || 'YYYY-MM-DD HH:mm:ss'
-  formValue.value.default_value = props.modelValue.default_value || ''
+  formValue.value.type = 'datetime'
+  formValue.value.format = 'YYYY-MM-DD HH:mm:ss'
+  formValue.value.default_value = ''
 })
 </script>
 <style lang="scss"></style>

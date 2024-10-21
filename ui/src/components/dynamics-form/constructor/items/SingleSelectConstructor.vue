@@ -24,7 +24,6 @@
         </el-icon>
       </el-button>
     </div>
-
   </el-form-item>
   <el-form-item
     label="默认值"
@@ -33,7 +32,12 @@
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
   >
     <el-select v-model="formValue.default_value">
-      <el-option v-for="(option, index) in formValue.option_list" :key="index" :label="option.value" :value="option.value" />
+      <el-option
+        v-for="(option, index) in formValue.option_list"
+        :key="index"
+        :label="option.value"
+        :value="option.value"
+      />
     </el-select>
   </el-form-item>
 </template>
@@ -61,7 +65,6 @@ const delOption = (index: number) => {
   formValue.value.option_list.splice(index, 1)
 }
 
-
 const getData = () => {
   return {
     input_type: 'SingleSelect',
@@ -72,9 +75,13 @@ const getData = () => {
     option_list: formValue.value.option_list
   }
 }
-defineExpose({ getData })
+const rander = (form_data: any) => {
+  formValue.value.option_list = form_data.option_list
+}
+
+defineExpose({ getData, rander })
 onMounted(() => {
-  formValue.value.option_list = props.modelValue.option_list || []
+  formValue.value.option_list = []
 })
 </script>
 <style lang="scss" scoped>

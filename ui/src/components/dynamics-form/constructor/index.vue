@@ -38,12 +38,12 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, nextTick } from 'vue'
 import type { FormInstance } from 'element-plus'
-
+import _ from 'lodash'
 const props = withDefaults(
   defineProps<{
-    modelValue: any
+    modelValue?: any
     input_type_list?: Array<{ label: string; value: string }>
   }>(),
   {
@@ -102,19 +102,24 @@ const validate = () => {
 
 onMounted(() => {
   if (props.modelValue) {
-    const data = props.modelValue
-    form_data.value = data
-    // 处理option
-    form_data.value.input_type = data.input_type + 'Constructor'
-    if (data.label && data.label.input_type === 'TooltipLabel') {
-      form_data.value.tooltip = data.label.attrs.tooltip
-      form_data.value.label = data.label.label
-    } else {
-      form_data.value.label = data.label
-    }
+    rander(props.modelValue)
   }
 })
+const rander = (data: any) => {
+  form_data.value.required = data.required
+  form_data.value.field = data.field
+  form_data.value.input_type = data.input_type + 'Constructor'
+  if (data.label && data.label.input_type === 'TooltipLabel') {
+    form_data.value.tooltip = data.label.attrs.tooltip
+    form_data.value.label = data.label.label
+  } else {
+    form_data.value.label = data.label
+  }
+  nextTick(() => {
+    componentFormRef.value?.rander(data)
+  })
+}
 
-defineExpose({ getData, validate })
+defineExpose({ getData, validate, rander })
 </script>
 <style lang="scss"></style>

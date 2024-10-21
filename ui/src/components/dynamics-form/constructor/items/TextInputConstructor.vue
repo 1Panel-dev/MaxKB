@@ -1,6 +1,6 @@
 <template>
   <el-form-item label="取值范围" required>
-    <el-col :span="11">
+    <el-col :span="11" style="padding-left: 0">
       <el-input-number
         style="width: 100%"
         v-model="formValue.min_length"
@@ -62,12 +62,17 @@ const getData = () => {
     default_value: formValue.value.default_value
   }
 }
-defineExpose({ getData })
+const rander = (form_data: any) => {
+  const attrs = form_data.attrs || {}
+  formValue.value.min_length = attrs.min_length
+  formValue.value.max_length = attrs.max_length
+  formValue.value.default_value = form_data.default_value
+}
+defineExpose({ getData, rander })
 onMounted(() => {
-  formValue.value.required = props.modelValue.required
-  formValue.value.min_length = props.modelValue.attrs?.min_length || 0
-  formValue.value.max_length = props.modelValue.attrs?.max_length || 20
-  formValue.value.default_value = props.modelValue.default_value || ''
+  formValue.value.min_length = 0
+  formValue.value.max_length = 20
+  formValue.value.default_value = ''
 })
 </script>
 <style lang="scss"></style>
