@@ -194,6 +194,9 @@ class NodeChunkManage:
     def add_node_chunk(self, node_chunk):
         self.node_chunk_list.append(node_chunk)
 
+    def contains(self, node_chunk):
+        return self.node_chunk_list.__contains__(node_chunk)
+
     def pop(self):
         if self.current_node_chunk is None:
             try:
@@ -354,12 +357,12 @@ class WorkflowManage:
             self.answer += str(e)
 
     def hand_event_node_result(self, current_node, node_result_future):
+        node_chunk = NodeChunk()
         try:
             current_result = node_result_future.result()
             result = current_result.write_context(current_node, self)
             if result is not None:
                 if self.is_result(current_node, current_result):
-                    node_chunk = NodeChunk()
                     self.node_chunk_manage.add_node_chunk(node_chunk)
                     for r in result:
                         chunk = self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
@@ -376,16 +379,16 @@ class WorkflowManage:
             # 添加节点
             self.node_context.append(current_node)
             traceback.print_exc()
-            self.status = 500
-            current_node.get_write_error_context(e)
             self.answer += str(e)
             chunk = self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
                                                                    self.params['chat_record_id'],
                                                                    str(e), False, 0, 0)
-            node_chunk = NodeChunk()
-            self.node_chunk_manage.add_node_chunk(node_chunk)
+            if not self.node_chunk_manage.contains(node_chunk):
+                self.node_chunk_manage.add_node_chunk(node_chunk)
             node_chunk.add_chunk(chunk)
             node_chunk.end()
+            current_node.get_write_error_context(e)
+            self.status = 500
 
     def run_node_async(self, node):
         future = executor.submit(self.run_node, node)
