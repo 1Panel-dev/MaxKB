@@ -9,6 +9,7 @@
 import json
 import threading
 import traceback
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from functools import reduce
 from typing import List, Dict
@@ -442,7 +443,7 @@ class WorkflowManage:
         for index in range(len(self.node_context)):
             node = self.node_context[index]
             details = node.get_details(index)
-            details_result[node.id] = details
+            details_result[str(uuid.uuid1())] = details
         return details_result
 
     def get_next_node(self):
