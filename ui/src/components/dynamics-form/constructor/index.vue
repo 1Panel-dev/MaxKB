@@ -44,7 +44,7 @@ import type { FormInstance } from 'element-plus'
 const props = withDefaults(
   defineProps<{
     modelValue: any
-    input_type_list: Array<{ label: string; value: string }>
+    input_type_list?: Array<{ label: string; value: string }>
   }>(),
   {
     input_type_list: () => [
