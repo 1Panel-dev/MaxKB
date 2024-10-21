@@ -25,30 +25,29 @@
         >
       </el-form>
     </el-dialog>
-
-    <div v-if="isAuthenticated">
-      <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
-        <div class="flex align-center">
-          <div class="mr-12 ml-24 flex">
-            <AppAvatar
-              v-if="isAppIcon(applicationDetail?.icon)"
-              shape="square"
-              :size="32"
-              style="background: none"
-            >
-              <img :src="applicationDetail?.icon" alt="" />
-            </AppAvatar>
-            <AppAvatar
-              v-else-if="applicationDetail?.name"
-              :name="applicationDetail?.name"
-              pinyinColor
-              shape="square"
-              :size="32"
-            />
-          </div>
-          <h4>{{ applicationDetail?.name }}</h4>
+    <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
+      <div class="flex align-center">
+        <div class="mr-12 ml-24 flex">
+          <AppAvatar
+            v-if="isAppIcon(applicationDetail?.icon)"
+            shape="square"
+            :size="32"
+            style="background: none"
+          >
+            <img :src="applicationDetail?.icon" alt="" />
+          </AppAvatar>
+          <AppAvatar
+            v-else-if="applicationDetail?.name"
+            :name="applicationDetail?.name"
+            pinyinColor
+            shape="square"
+            :size="32"
+          />
         </div>
+        <h4>{{ applicationDetail?.name }}</h4>
       </div>
+    </div>
+    <div v-if="isAuthenticated">
       <div class="flex">
         <div class="chat-pc__left border-r">
           <div class="p-24 pb-0">
@@ -193,7 +192,8 @@ const validateName = (rule: any, value: string, callback: any) => {
       .validatePassword(applicationDetail?.value.id, form.value.password, validateLoading)
       .then((res: any) => {
         if (res?.data.is_valid) {
-          callback()
+          isAuthenticated.value = true
+          isPasswordDialogVisible.value = false
         } else {
           callback(new Error('密码错误'))
         }
@@ -206,12 +206,7 @@ const rules = reactive({
 
 const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid) => {
-    if (valid) {
-      isAuthenticated.value = true
-      isPasswordDialogVisible.value = false
-    }
-  })
+  await formEl.validate((valid) => {})
 }
 
 const classObj = computed(() => {

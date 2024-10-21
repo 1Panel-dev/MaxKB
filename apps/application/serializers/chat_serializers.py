@@ -175,6 +175,9 @@ class ChatSerializers(serializers.Serializer):
                 'problem_padding') else ""
             paragraph_list = details.get('search_step').get(
                 'paragraph_list') if 'search_step' in details and 'paragraph_list' in details.get('search_step') else []
+            for key, node in details.items():
+                if node.get('type') == 'search-dataset-node':
+                    paragraph_list = node.get('paragraph_list')
             improve_paragraph_list = row.get('improve_paragraph_list')
             vote_status_map = {'-1': '未投票', '0': '赞同', '1': '反对'}
             return [str(row.get('chat_id')), row.get('abstract'), row.get('problem_text'), padding_problem_text,
