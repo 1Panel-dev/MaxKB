@@ -122,11 +122,17 @@ const putAccessToken: (
  "access_token": "string"
  }
  */
-const postAppAuthentication: (access_token: string, loading?: Ref<boolean>) => Promise<any> = (
-  access_token,
-  loading
-) => {
-  return post(`${prefix}/authentication`, { access_token }, undefined, loading)
+const postAppAuthentication: (
+  access_token: string,
+  loading?: Ref<boolean>,
+  authentication_value?: any
+) => Promise<any> = (access_token, loading, authentication_value) => {
+  return post(
+    `${prefix}/authentication`,
+    { access_token: access_token, authentication_value },
+    undefined,
+    loading
+  )
 }
 
 /**

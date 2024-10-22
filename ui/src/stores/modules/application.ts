@@ -89,10 +89,14 @@ const useApplicationStore = defineStore({
       })
     },
 
-    async asyncAppAuthentication(token: string, loading?: Ref<boolean>) {
+    async asyncAppAuthentication(
+      token: string,
+      loading?: Ref<boolean>,
+      authentication_value?: any
+    ) {
       return new Promise((resolve, reject) => {
         applicationApi
-          .postAppAuthentication(token, loading)
+          .postAppAuthentication(token, loading, authentication_value)
           .then((res) => {
             localStorage.setItem('accessToken', res.data)
             sessionStorage.setItem('accessToken', res.data)

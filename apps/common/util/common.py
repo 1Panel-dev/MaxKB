@@ -6,6 +6,7 @@
     @date：2023/10/16 16:42
     @desc:
 """
+import hashlib
 import importlib
 from functools import reduce
 from typing import Dict, List
@@ -59,6 +60,18 @@ def flat_map(array: List[List]):
     result = []
     for e in array:
         result += e
+    return result
+
+
+def password_encrypt(raw_password):
+    """
+    密码 md5加密
+    :param raw_password: 密码
+    :return:  加密后密码
+    """
+    md5 = hashlib.md5()  # 2，实例化md5() 方法
+    md5.update(raw_password.encode())  # 3，对字符串的字节类型加密
+    result = md5.hexdigest()  # 4，加密
     return result
 
 
