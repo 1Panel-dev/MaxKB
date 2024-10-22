@@ -14,7 +14,8 @@ from django.core import cache
 from django.core import signing
 from rest_framework.authentication import TokenAuthentication
 
-from common.exception.app_exception import AppAuthenticationFailed, AppEmbedIdentityFailed, AppChatNumOutOfBoundsFailed
+from common.exception.app_exception import AppAuthenticationFailed, AppEmbedIdentityFailed, AppChatNumOutOfBoundsFailed, \
+    ChatException, AppApiException
 
 token_cache = cache.caches['token_cache']
 
@@ -67,7 +68,8 @@ class OpenAIKeyAuth(TokenAuthentication):
             raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")
         except Exception as e:
             traceback.format_exc()
-            if isinstance(e, AppEmbedIdentityFailed) or isinstance(e, AppChatNumOutOfBoundsFailed):
+            if isinstance(e, AppEmbedIdentityFailed) or isinstance(e, AppChatNumOutOfBoundsFailed) or isinstance(e,
+                                                                                                                 AppApiException):
                 raise e
             raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")
 
@@ -87,6 +89,7 @@ class TokenAuth(TokenAuthentication):
             raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")
         except Exception as e:
             traceback.format_exc()
-            if isinstance(e, AppEmbedIdentityFailed) or isinstance(e, AppChatNumOutOfBoundsFailed):
+            if isinstance(e, AppEmbedIdentityFailed) or isinstance(e, AppChatNumOutOfBoundsFailed) or isinstance(e,
+                                                                                                                 AppApiException):
                 raise e
             raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")
