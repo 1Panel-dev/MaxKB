@@ -376,8 +376,7 @@ class ApplicationSerializer(serializers.Serializer):
                 if token_details is not None and 'client_id' in token_details and token_details.get(
                         'client_id') is not None:
                     client_id = token_details.get('client_id')
-                    authentication = {'type': token_details.get('type'),
-                                      'value': token_details.get('value')}
+                    authentication = token_details.get('authentication', {})
                 else:
                     client_id = str(uuid.uuid1())
                 if authentication_value is not None:
@@ -389,8 +388,8 @@ class ApplicationSerializer(serializers.Serializer):
                                        'user_id': str(application_access_token.application.user.id),
                                        'access_token': application_access_token.access_token,
                                        'type': AuthenticationType.APPLICATION_ACCESS_TOKEN.value,
-                                       'client_id': client_id
-                                          , **authentication})
+                                       'client_id': client_id,
+                                       'authentication': authentication})
                 return token
             else:
                 raise NotFound404(404, "无效的access_token")
