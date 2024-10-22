@@ -34,49 +34,27 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed } from 'vue'
+
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
-const route = useRoute()
-const {
-  params: { accessToken }
-} = route as any
 
-const { application, user } = useStore()
+const { user } = useStore()
 
 const isDefaultTheme = computed(() => {
   return user.isDefaultTheme()
 })
 
 const loading = ref(false)
-const applicationDetail = ref<any>({})
-const applicationAvailable = ref<boolean>(true)
-
-function getAccessToken(token: string) {
-  application
-    .asyncAppAuthentication(token, loading)
-    .then(() => {
-      getAppProfile()
-    })
-    .catch(() => {
-      applicationAvailable.value = false
-    })
-}
-function getAppProfile() {
-  application
-    .asyncGetAppProfile(loading)
-    .then((res: any) => {
-      applicationDetail.value = res.data
-    })
-    .catch(() => {
-      applicationAvailable.value = false
-    })
-}
-
-onMounted(() => {
-  user.changeUserType(2)
-  getAccessToken(accessToken)
+const props = defineProps<{
+  application_profile: any
+  applicationAvailable: boolean
+}>()
+const applicationDetail = computed({
+  get: () => {
+    return props.application_profile
+  },
+  set: (v) => {}
 })
 </script>
 <style lang="scss">

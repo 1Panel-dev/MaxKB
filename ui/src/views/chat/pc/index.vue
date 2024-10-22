@@ -1,30 +1,5 @@
 <template>
   <div class="chat-pc layout-bg" :class="classObj" v-loading="loading">
-    <el-dialog
-      v-model="isPasswordDialogVisible"
-      width="480"
-      title="请输入密码打开链接"
-      custom-class="no-close-button"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      align-center
-      center
-      :modal="true"
-    >
-      <el-form ref="FormRef" :model="form" :rules="rules" v-loading="validateLoading">
-        <el-form-item prop="password">
-          <el-input
-            v-model="form.password"
-            :placeholder="$t('login.ldap.passwordPlaceholder')"
-            show-password
-          />
-        </el-form-item>
-        <el-button class="w-full mt-8" type="primary" @click="submitHandle(FormRef)"
-          >确定</el-button
-        >
-      </el-form>
-    </el-dialog>
     <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
       <div class="flex align-center">
         <div class="mr-12 ml-24 flex">
@@ -47,7 +22,7 @@
         <h4>{{ applicationDetail?.name }}</h4>
       </div>
     </div>
-    <div v-if="isAuthenticated">
+    <div>
       <div class="flex">
         <div class="chat-pc__left border-r">
           <div class="p-24 pb-0">
@@ -149,65 +124,22 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted, nextTick, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, nextTick, computed } from 'vue'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
-import type { FormInstance, FormRules } from 'element-plus'
-import { t } from '@/locales'
+
 useResize()
 
-const route = useRoute()
-
-const {
-  params: { accessToken }
-} = route as any
-
-const { application, user, log, common } = useStore()
+const { user, log, common } = useStore()
 
 const isDefaultTheme = computed(() => {
   return user.isDefaultTheme()
 })
 
-const FormRef = ref()
-
 const isCollapse = ref(false)
-const isPasswordDialogVisible = ref(false)
-const validateLoading = ref(false)
-
-const form = ref({
-  password: ''
-})
-
-const isAuthenticated = ref(false)
-
-const validateName = (rule: any, value: string, callback: any) => {
-  if (value === '') {
-    callback(new Error('密码不能为空'))
-  } else {
-    application
-      .validatePassword(applicationDetail?.value.id, form.value.password, validateLoading)
-      .then((res: any) => {
-        if (res?.data.is_valid) {
-          isAuthenticated.value = true
-          isPasswordDialogVisible.value = false
-        } else {
-          callback(new Error('密码错误'))
-        }
-      })
-  }
-}
-const rules = reactive({
-  password: [{ required: true, validator: validateName, trigger: 'blur' }]
-})
-
-const submitHandle = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await formEl.validate((valid) => {})
-}
 
 const classObj = computed(() => {
   return {
@@ -221,12 +153,21 @@ const newObj = {
   id: 'new',
   abstract: '新建对话'
 }
-
+const props = defineProps<{
+  application_profile: any
+  applicationAvailable: boolean
+}>()
 const AiChatRef = ref()
 const loading = ref(false)
 const left_loading = ref(false)
-const applicationDetail = ref<any>({})
-const applicationAvailable = ref<boolean>(true)
+
+const applicationDetail = computed({
+  get: () => {
+    return props.application_profile
+  },
+  set: (v) => {}
+})
+
 const chatLogeData = ref<any[]>([])
 
 const paginationConfig = ref({
@@ -268,37 +209,6 @@ function handleScroll(event: any) {
       event.scrollDiv.setScrollTop(event.dialogScrollbar.offsetHeight - history_height)
     })
   }
-}
-
-function getAccessToken(token: string) {
-  application
-    .asyncAppAuthentication(token, loading)
-    .then(() => {
-      getAppProfile()
-    })
-    .catch(() => {
-      applicationAvailable.value = false
-    })
-}
-
-function getAppProfile() {
-  application
-    .asyncGetAppProfile(loading)
-    .then((res: any) => {
-      applicationDetail.value = res.data
-      if (user.isEnterprise()) {
-        isPasswordDialogVisible.value = applicationDetail?.value.authentication
-      }
-      if (!isPasswordDialogVisible.value) {
-        isAuthenticated.value = true
-      }
-      if (res.data?.show_history || !user.isEnterprise()) {
-        getChatLog(applicationDetail.value.id)
-      }
-    })
-    .catch(() => {
-      applicationAvailable.value = false
-    })
 }
 
 function newChat() {
@@ -403,9 +313,19 @@ async function exportHTML(): Promise<void> {
   saveAs(blob, suggestedName)
 }
 
+/**
+ *初始化历史对话记录
+ */
+const init = () => {
+  if (
+    (applicationDetail.value.show_history || !user.isEnterprise()) &&
+    props.applicationAvailable
+  ) {
+    getChatLog(applicationDetail.value.id)
+  }
+}
 onMounted(() => {
-  user.changeUserType(2)
-  getAccessToken(accessToken)
+  init()
 })
 </script>
 <style lang="scss">

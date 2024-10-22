@@ -1,31 +1,5 @@
 <template>
   <div class="chat-embed layout-bg" v-loading="loading">
-    <el-dialog
-      v-model="isPasswordDialogVisible"
-      width="300"
-      title="请输入密码打开链接"
-      custom-class="no-close-button"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      align-center
-      center
-      :modal="true"
-    >
-      <el-form ref="FormRef" :model="form" :rules="rules" v-loading="validateLoading">
-        <el-form-item prop="password">
-          <el-input
-            v-model="form.password"
-            :placeholder="$t('login.ldap.passwordPlaceholder')"
-            show-password
-          />
-        </el-form-item>
-        <el-button class="w-full mt-8" type="primary" @click="submitHandle(FormRef)"
-          >确定</el-button
-        >
-      </el-form>
-    </el-dialog>
-
     <div class="chat-embed__header" :class="!isDefaultTheme ? 'custom-header' : ''">
       <div class="chat-width flex align-center">
         <div class="mr-12 ml-24 flex">
@@ -49,7 +23,7 @@
         <h4>{{ applicationDetail?.name }}</h4>
       </div>
     </div>
-    <div v-if="isAuthenticated">
+    <div>
       <div class="chat-embed__main">
         <AiChat
           ref="AiChatRef"
@@ -128,16 +102,11 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive, nextTick, computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { isAppIcon } from '@/utils/application'
-import type { FormInstance, FormRules } from 'element-plus'
-import useStore from '@/stores'
-const route = useRoute()
-const {
-  params: { accessToken }
-} = route as any
 
-const { application, user, log } = useStore()
+import { isAppIcon } from '@/utils/application'
+import useStore from '@/stores'
+
+const { user, log } = useStore()
 
 const isDefaultTheme = computed(() => {
   return user.isDefaultTheme()
@@ -146,47 +115,19 @@ const isDefaultTheme = computed(() => {
 const AiChatRef = ref()
 const loading = ref(false)
 const left_loading = ref(false)
-const applicationDetail = ref<any>({})
-const applicationAvailable = ref<boolean>(true)
+
 const chatLogeData = ref<any[]>([])
 const show = ref(false)
-
-const FormRef = ref()
-
-const isPasswordDialogVisible = ref(false)
-const validateLoading = ref(false)
-
-const form = ref({
-  password: ''
+const props = defineProps<{
+  application_profile: any
+  applicationAvailable: boolean
+}>()
+const applicationDetail = computed({
+  get: () => {
+    return props.application_profile
+  },
+  set: (v) => {}
 })
-
-const isAuthenticated = ref(false)
-
-const validateName = (rule: any, value: string, callback: any) => {
-  if (value === '') {
-    callback(new Error('密码不能为空'))
-  } else {
-    application
-      .validatePassword(applicationDetail?.value.id, form.value.password, validateLoading)
-      .then((res: any) => {
-        if (res?.data.is_valid) {
-          isAuthenticated.value = true
-          isPasswordDialogVisible.value = false
-        } else {
-          callback(new Error('密码错误'))
-        }
-      })
-  }
-}
-const rules = reactive({
-  password: [{ required: true, validator: validateName, trigger: 'blur' }]
-})
-
-const submitHandle = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await formEl.validate((valid) => {})
-}
-
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
@@ -235,38 +176,6 @@ function newChat() {
   paginationConfig.current_page = 1
   currentRecordList.value = []
   currentChatId.value = 'new'
-}
-
-function getAccessToken(token: string) {
-  application
-    .asyncAppAuthentication(token, loading)
-    .then(() => {
-      setTimeout(() => {
-        getAppProfile()
-      }, 500)
-    })
-    .catch(() => {
-      applicationAvailable.value = false
-    })
-}
-function getAppProfile() {
-  application
-    .asyncGetAppProfile(loading)
-    .then((res: any) => {
-      applicationDetail.value = res.data
-      if (user.isEnterprise()) {
-        isPasswordDialogVisible.value = applicationDetail?.value.authentication
-      }
-      if (!isPasswordDialogVisible.value) {
-        isAuthenticated.value = true
-      }
-      if (res.data?.show_history || !user.isEnterprise()) {
-        getChatLog(applicationDetail.value.id)
-      }
-    })
-    .catch(() => {
-      applicationAvailable.value = false
-    })
 }
 
 function getChatLog(id: string) {
@@ -324,10 +233,16 @@ function refresh(id: string) {
   getChatLog(applicationDetail.value.id)
   currentChatId.value = id
 }
-
+/**
+ *初始化历史对话记录
+ */
+const init = () => {
+  if (applicationDetail.value.show_history || !user.isEnterprise()) {
+    getChatLog(applicationDetail.value.id)
+  }
+}
 onMounted(() => {
-  user.changeUserType(2)
-  getAccessToken(accessToken)
+  init()
 })
 </script>
 <style lang="scss">
