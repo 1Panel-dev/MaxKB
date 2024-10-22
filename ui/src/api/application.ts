@@ -397,6 +397,47 @@ const validatePassword: (application_id: string, password: string) => Promise<Re
   return get(`/application/${application_id}/auth/${password}`, undefined)
 }
 
+/**
+ * workflow历史版本
+ */
+const getWorkFlowVersion: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, loading) => {
+  return get(`/application/${application_id}/work_flow_version`, undefined, loading)
+}
+
+/**
+ * workflow历史版本详情
+ */
+const getWorkFlowVersionDetail: (
+  application_id: string,
+  application_version_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, application_version_id, loading) => {
+  return get(
+    `/application/${application_id}/work_flow_version/${application_version_id}`,
+    undefined,
+    loading
+  )
+}
+/**
+ * 修改workflow历史版本
+ */
+const putWorkFlowVersion: (
+  application_id: string,
+  application_version_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, application_version_id, data, loading) => {
+  return put(
+    `/application/${application_id}/work_flow_version/${application_version_id}`,
+    data,
+    undefined,
+    loading
+  )
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -429,5 +470,8 @@ export default {
   getPlatformConfig,
   updatePlatformConfig,
   updatePlatformStatus,
-  validatePassword
+  validatePassword,
+  getWorkFlowVersion,
+  getWorkFlowVersionDetail,
+  putWorkFlowVersion
 }

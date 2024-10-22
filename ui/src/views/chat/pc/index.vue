@@ -65,7 +65,7 @@
             <el-scrollbar>
               <div class="p-8 pt-0">
                 <common-list
-                  :data="chatLogeData"
+                  :data="chatLogData"
                   class="mt-8"
                   v-loading="left_loading"
                   :defaultActive="currentChatId"
@@ -93,7 +93,7 @@
                   </template>
                 </common-list>
               </div>
-              <div v-if="chatLogeData.length" class="gradient-divider lighter mt-8">
+              <div v-if="chatLogData.length" class="gradient-divider lighter mt-8">
                 <span>仅显示最近 20 条对话</span>
               </div>
             </el-scrollbar>
@@ -200,7 +200,7 @@ const loading = ref(false)
 const left_loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
-const chatLogeData = ref<any[]>([])
+const chatLogData = ref<any[]>([])
 
 const paginationConfig = ref({
   current_page: 1,
@@ -275,11 +275,11 @@ function getAppProfile() {
 }
 
 function newChat() {
-  if (!chatLogeData.value.some((v) => v.id === 'new')) {
+  if (!chatLogData.value.some((v) => v.id === 'new')) {
     paginationConfig.value.current_page = 1
     paginationConfig.value.total = 0
     currentRecordList.value = []
-    chatLogeData.value.unshift(newObj)
+    chatLogData.value.unshift(newObj)
   } else {
     paginationConfig.value.current_page = 1
     paginationConfig.value.total = 0
@@ -299,9 +299,9 @@ function getChatLog(id: string, refresh?: boolean) {
   }
 
   log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
-    chatLogeData.value = res.data.records
+    chatLogData.value = res.data.records
     if (refresh) {
-      currentChatName.value = chatLogeData.value[0].abstract
+      currentChatName.value = chatLogData.value[0].abstract
     }
   })
 }

@@ -6,8 +6,8 @@
           @click.prevent="clickHandle(item, index)"
           :class="current === item[props.valueKey] ? 'active' : ''"
           class="cursor"
-          @mouseenter="mouseenter(item)"
-          @mouseleave="mouseleave()"
+          @mouseenter.stop="mouseenter(item)"
+          @mouseleave.stop="mouseleave()"
         >
           <slot :row="item" :index="index"> </slot>
         </li>
@@ -71,6 +71,13 @@ function clickHandle(row: any, index: number) {
       border-radius: 4px;
       color: var(--el-color-primary);
       font-weight: 500;
+      &:hover {
+        background: var(--el-color-primary-light-9);
+      }
+    }
+    &:hover {
+      border-radius: 4px;
+      background: var(--app-text-color-light-1);
     }
   }
 }

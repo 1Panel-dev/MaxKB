@@ -91,7 +91,7 @@
           <el-scrollbar max-height="300">
             <div class="p-8">
               <common-list
-                :data="chatLogeData"
+                :data="chatLogData"
                 v-loading="left_loading"
                 :defaultActive="currentChatId"
                 @click="clickListHandle"
@@ -117,7 +117,7 @@
                 </template>
               </common-list>
             </div>
-            <div v-if="chatLogeData.length" class="gradient-divider lighter mt-8">
+            <div v-if="chatLogData.length" class="gradient-divider lighter mt-8">
               <span>仅显示最近 20 条对话</span>
             </div>
           </el-scrollbar>
@@ -148,7 +148,7 @@ const loading = ref(false)
 const left_loading = ref(false)
 const applicationDetail = ref<any>({})
 const applicationAvailable = ref<boolean>(true)
-const chatLogeData = ref<any[]>([])
+const chatLogData = ref<any[]>([])
 const show = ref(false)
 const isPasswordDialogVisible = ref(false)
 const password = ref('')
@@ -258,7 +258,7 @@ function getChatLog(id: string) {
   }
 
   log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
-    chatLogeData.value = res.data.records
+    chatLogData.value = res.data.records
   })
 }
 
