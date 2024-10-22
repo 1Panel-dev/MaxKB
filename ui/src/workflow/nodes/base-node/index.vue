@@ -45,7 +45,7 @@
           @submitDialog="submitDialog"
         />
       </el-form-item>
-      <UserInputFieldTable ref="UserInputFieldTableFef" :node-model="nodeModel"  />
+      <UserInputFieldTable ref="UserInputFieldTableFef" :node-model="nodeModel" />
       <ApiInputFieldTable ref="ApiInputFieldTableFef" :node-model="nodeModel" />
       <el-form-item>
         <template #label>
@@ -90,7 +90,7 @@
                 ></span>
                 <span>{{ item.name }}</span>
                 <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
-                >公用
+                  >公用
                 </el-tag>
               </div>
               <el-icon class="check-icon" v-if="item.id === form_data.stt_model_id">
@@ -113,8 +113,8 @@
                 ></span>
                 <span>{{ item.name }}</span>
                 <span class="danger">{{
-                    $t('views.application.applicationForm.form.aiModel.unavailable')
-                  }}</span>
+                  $t('views.application.applicationForm.form.aiModel.unavailable')
+                }}</span>
               </div>
               <el-icon class="check-icon" v-if="item.id === form_data.stt_model_id">
                 <Check />
@@ -174,7 +174,7 @@
                 ></span>
                 <span>{{ item.name }}</span>
                 <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
-                >公用
+                  >公用
                 </el-tag>
               </div>
               <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
@@ -197,8 +197,8 @@
                 ></span>
                 <span>{{ item.name }}</span>
                 <span class="danger">{{
-                    $t('views.application.applicationForm.form.aiModel.unavailable')
-                  }}</span>
+                  $t('views.application.applicationForm.form.aiModel.unavailable')
+                }}</span>
               </div>
               <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
                 <Check />
@@ -208,9 +208,8 @@
         </el-select>
       </el-form-item>
     </el-form>
-
+    <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
   </NodeContainer>
-  <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
 </template>
 <script setup lang="ts">
 import { app } from '@/main'
@@ -313,7 +312,6 @@ function getTTSModel() {
   })
 }
 
-
 const openTTSParamSettingDialog = () => {
   const model_id = form_data.value.tts_model_id
   if (!model_id) {
@@ -326,7 +324,6 @@ const openTTSParamSettingDialog = () => {
 const refreshTTSForm = (data: any) => {
   form_data.value.tts_model_params_setting = data
 }
-
 
 onMounted(() => {
   set(props.nodeModel, 'validate', validate)

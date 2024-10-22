@@ -8,7 +8,7 @@
     append-to-body
   >
     <DynamicsFormConstructor
-      v-model="currentItem"
+      v-model="currentRow"
       label-position="top"
       require-asterisk-position="right"
       :input_type_list="inputTypeList"
@@ -25,17 +25,89 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { cloneDeep } from 'lodash'
 import DynamicsFormConstructor from '@/components/dynamics-form/constructor/index.vue'
 import type { FormField } from '@/components/dynamics-form/type'
-
+import _ from 'lodash'
 const emit = defineEmits(['refresh'])
 
 const DynamicsFormConstructorRef = ref()
 const loading = ref<boolean>(false)
 const isEdit = ref(false)
-const currentItem = ref<FormField>()
+const currentItem = ref<FormField | any>()
+const check_field = (field_list: Array<string>, obj: any) => {
+  return field_list.every((field) => _.get(obj, field, undefined) !== undefined)
+}
+const currentRow = computed(() => {
+  if (currentItem.value) {
+    const row = currentItem.value
+    switch (row.type) {
+      case 'input':
+        if (check_field(['field', 'input_type', 'label', 'required'], currentItem.value)) {
+          return currentItem.value
+        }
+        return {
+          field: row.field || row.variable,
+          input_type: 'TextInput',
+          label: row.label || row.name,
+          default_value: row.default_value,
+          required: row.required != undefined ? row.required : row.is_required
+        }
+      case 'select':
+        if (
+          check_field(
+            ['field', 'input_type', 'label', 'required', 'option_list'],
+            currentItem.value
+          )
+        ) {
+          return currentItem.value
+        }
+        return {
+          field: row.field || row.variable,
+          input_type: 'SingleSelect',
+          label: row.label || row.name,
+          default_value: row.default_value,
+          required: row.required != undefined ? row.required : row.is_required,
+          option_list: row.optionList.map((o: any) => {
+            return { key: o, value: o }
+          })
+        }
+
+      case 'date':
+        if (
+          check_field(
+            [
+              'field',
+              'input_type',
+              'label',
+              'required',
+              'attrs.format',
+              'attrs.value-format',
+              'attrs.type'
+            ],
+            currentItem.value
+          )
+        ) {
+          return currentItem.value
+        }
+        return {
+          field: row.field || row.variable,
+          input_type: 'DatePicker',
+          label: row.label || row.name,
+          default_value: row.default_value,
+          required: row.required != undefined ? row.required : row.is_required,
+          attrs: {
+            format: 'YYYY-MM-DD HH:mm:ss',
+            'value-format': 'YYYY-MM-DD HH:mm:ss',
+            type: 'datetime'
+          }
+        }
+      default:
+        return currentItem.value
+    }
+  }
+})
 const currentIndex = ref(null)
 const inputTypeList = ref([
   { label: '文本框', value: 'TextInputConstructor' },
@@ -45,7 +117,6 @@ const inputTypeList = ref([
 
 const dialogVisible = ref<boolean>(false)
 
-
 const open = (row: any, index: any) => {
   dialogVisible.value = true
 
@@ -53,51 +124,6 @@ const open = (row: any, index: any) => {
     isEdit.value = true
     currentItem.value = cloneDeep(row)
     currentIndex.value = index
-
-    // 新版本已经上线
-    if (row.input_type) {
-      return
-    }
-    // 旧版本数据兼容
-    switch (row.type) {
-      case 'input':
-        currentItem.value = {
-          field: row.field || row.variable,
-          input_type: 'TextInput',
-          label: row.label || row.name,
-          default_value: row.default_value,
-          required: row.required || row.is_required
-        }
-        break
-      case 'select':
-        currentItem.value = {
-          field: row.field || row.variable,
-          input_type: 'SingleSelect',
-          label: row.label || row.name,
-          default_value: row.default_value,
-          required: row.required || row.is_required,
-          option_list: row.optionList.map((o: any) => {
-            return { key: o, value: o }
-          })
-        }
-        break
-      case 'date':
-        currentItem.value = {
-          field: row.field || row.variable,
-          input_type: 'DatePicker',
-          label: row.label || row.name,
-          default_value: row.default_value,
-          required: row.required || row.is_required,
-          attrs: {
-            format: 'YYYY-MM-DD HH:mm:ss',
-            'value-format': 'YYYY-MM-DD HH:mm:ss',
-            type: 'datetime'
-          }
-        }
-        break
-      default:
-        break
-    }
   }
 }
 
@@ -118,7 +144,6 @@ const submit = async () => {
     currentIndex.value = null
   })
 }
-
 
 defineExpose({ open, close })
 </script>

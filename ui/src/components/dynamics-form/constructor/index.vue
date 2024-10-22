@@ -17,7 +17,7 @@
       <el-input v-model="form_data.tooltip" placeholder="请输入参数提示说明" />
     </el-form-item>
     <el-form-item label="是否必填" :required="true" prop="required" :rules="rules.required">
-      <el-switch v-model="form_data.required" />
+      <el-switch v-model="form_data.required" :active-value="true" :inactive-value="false" />
     </el-form-item>
     <el-form-item label="组件类型" :required="true" prop="input_type" :rules="rules.input_type">
       <el-select v-model="form_data.input_type" placeholder="请选择组件类型">
@@ -106,7 +106,7 @@ onMounted(() => {
   }
 })
 const rander = (data: any) => {
-  form_data.value.required = data.required
+  form_data.value.required = data.required ? data.required : false
   form_data.value.field = data.field
   form_data.value.input_type = data.input_type + 'Constructor'
   if (data.label && data.label.input_type === 'TooltipLabel') {
