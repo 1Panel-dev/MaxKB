@@ -10,7 +10,7 @@ SET "name" =  TO_CHAR(create_time, 'YYYY-MM-DD HH24:MI:SS');
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('application', '0016_alter_chatrecord_problem_text'),
+        ('application', '0017_application_tts_model_params_setting'),
     ]
 
     operations = [
