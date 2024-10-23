@@ -76,7 +76,14 @@
           <!-- 问题 -->
           <div class="item-content mb-16 lighter">
             <div class="avatar">
-              <AppAvatar>
+              <el-image
+                v-if="data.user_avatar"
+                :src="data.user_avatar"
+                alt=""
+                fit="cover"
+                style="width: 30px; height: 30px; display: block"
+              />
+              <AppAvatar v-else>
                 <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
               </AppAvatar>
             </div>
@@ -213,6 +220,13 @@
             <SendIcon v-show="!isDisabledChart && !loading" />
           </el-button>
         </div>
+      </div>
+      <div
+        class="chat-width"
+        v-if="data.disclaimer"
+        style="align-items: center; text-align: center; margin-top: 10px"
+      >
+        {{ data.disclaimer_value }}
       </div>
     </div>
   </div>
