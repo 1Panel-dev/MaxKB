@@ -322,7 +322,8 @@ class ApplicationSerializer(serializers.Serializer):
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting, _ = application_setting_model.objects.get_or_create(
                     application_id=self.data.get('application_id'))
-                if application_setting is not None:
+                if application_setting is not None and instance.get('authentication') is not None and instance.get(
+                        'authentication_value') is not None:
                     application_setting.authentication = instance.get('authentication')
                     application_setting.authentication_value = {
                         "type": "password",
