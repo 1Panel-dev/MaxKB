@@ -19,5 +19,15 @@ class Migration(migrations.Migration):
             name='name',
             field=models.CharField(default='', max_length=128, verbose_name='版本名称'),
         ),
-        migrations.RunSQL(sql)
+        migrations.RunSQL(sql),
+        migrations.AddField(
+            model_name='workflowversion',
+            name='publish_user_id',
+            field=models.UUIDField(default=None, null=True, verbose_name='发布者id'),
+        ),
+        migrations.AddField(
+            model_name='workflowversion',
+            name='publish_user_name',
+            field=models.CharField(default='', max_length=128, verbose_name='发布者名称'),
+        ),
     ]

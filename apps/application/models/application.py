@@ -88,6 +88,8 @@ class WorkFlowVersion(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     name = models.CharField(verbose_name="版本名称", max_length=128, default="")
+    publish_user_id = models.UUIDField(verbose_name="发布者id", max_length=128, default=None, null=True)
+    publish_user_name = models.CharField(verbose_name="发布者名称", max_length=128, default="")
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
 
     class Meta:

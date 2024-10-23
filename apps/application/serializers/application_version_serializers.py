@@ -20,7 +20,8 @@ from common.util.field_message import ErrMessage
 class ApplicationVersionModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkFlowVersion
-        fields = ['id', 'name', 'application_id', 'work_flow', 'create_time', 'update_time']
+        fields = ['id', 'name', 'application_id', 'work_flow', 'publish_user_id', 'publish_user_name', 'create_time',
+                  'update_time']
 
 
 class ApplicationVersionEditSerializer(serializers.Serializer):
@@ -38,7 +39,7 @@ class ApplicationVersionSerializer(serializers.Serializer):
             query_set = QuerySet(WorkFlowVersion).filter(application_id=self.data.get('application_id'))
             if 'name' in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(name__contains=self.data.get('name'))
-            return query_set
+            return query_set.order_by("-create_time")
 
         def list(self, with_valid=True):
             if with_valid:

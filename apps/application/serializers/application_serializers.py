@@ -6,6 +6,7 @@
     @date：2023/11/7 10:02
     @desc:
 """
+import datetime
 import hashlib
 import json
 import os
@@ -50,6 +51,7 @@ from setting.models_provider.constants.model_provider_constants import ModelProv
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
+from users.models import User
 
 chat_cache = cache.caches['chat_cache']
 
@@ -655,6 +657,8 @@ class ApplicationSerializer(serializers.Serializer):
         def publish(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid()
+            user_id = self.data.get('user_id')
+            user = QuerySet(User).filter(id=user_id).first()
             application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
             work_flow = instance.get('work_flow')
             if work_flow is None:
@@ -674,7 +678,10 @@ class ApplicationSerializer(serializers.Serializer):
             application.save()
             # 插入知识库关联关系
             self.save_application_mapping(application_dataset_id_list, dataset_id_list, application.id)
-            work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application)
+            work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application,
+                                                name=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                                publish_user_id=user_id,
+                                                publish_user_name=user.username)
             chat_cache.clear_by_application_id(str(application.id))
             work_flow_version.save()
             return True
@@ -810,7 +817,7 @@ class ApplicationSerializer(serializers.Serializer):
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                            'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
-                           'api_key_is_active', 'icon', 'work_flow', 'model_params_setting','tts_model_params_setting',
+                           'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
                            'problem_optimization_prompt']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
@@ -952,7 +959,8 @@ class ApplicationSerializer(serializers.Serializer):
             application_id = self.data.get('application_id')
             application = QuerySet(Application).filter(id=application_id).first()
             if application.tts_model_enable:
-                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id, **application.tts_model_params_setting)
+                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id,
+                                                            **application.tts_model_params_setting)
                 return model.text_to_speech(text)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):

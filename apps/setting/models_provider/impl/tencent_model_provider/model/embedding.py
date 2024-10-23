@@ -1,6 +1,6 @@
-from setting.models_provider.base_model_provider import MaxKBBaseModel
 from typing import Dict
-import requests
+
+from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 
 class TencentEmbeddingModel(MaxKBBaseModel):
@@ -18,7 +18,6 @@ class TencentEmbeddingModel(MaxKBBaseModel):
             api_base=model_credential.get('api_base'),
             model_name=model_name,
         )
-
 
     def _generate_auth_token(self):
         # Example method to generate an authentication token for the model API
