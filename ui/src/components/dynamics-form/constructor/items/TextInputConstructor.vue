@@ -3,7 +3,7 @@
     <el-col :span="11" style="padding-left: 0">
       <el-input-number
         style="width: 100%"
-        v-model="formValue.min_length"
+        v-model="formValue.minlength"
         controls-position="right"
       />
     </el-col>
@@ -13,7 +13,7 @@
     <el-col :span="11">
       <el-input-number
         style="width: 100%"
-        v-model="formValue.max_length"
+        v-model="formValue.maxlength"
         controls-position="right"
       />
     </el-col>
@@ -27,8 +27,8 @@
   >
     <el-input
       v-model="formValue.default_value"
-      :maxlength="formValue.max_length"
-      :minlength="formValue.min_length"
+      :maxlength="formValue.maxlength"
+      :minlength="formValue.minlength"
       placeholder="请输入默认值"
       show-word-limit
       type="text"
@@ -55,8 +55,8 @@ const getData = () => {
   return {
     input_type: 'TextInput',
     attrs: {
-      maxlength: formValue.value.max_length,
-      minlength: formValue.value.min_length,
+      maxlength: formValue.value.maxlength,
+      minlength: formValue.value.minlength,
       'show-word-limit': true
     },
     default_value: formValue.value.default_value
@@ -64,14 +64,14 @@ const getData = () => {
 }
 const rander = (form_data: any) => {
   const attrs = form_data.attrs || {}
-  formValue.value.min_length = attrs.min_length
-  formValue.value.max_length = attrs.max_length
+  formValue.value.minlength = attrs.minlength
+  formValue.value.maxlength = attrs.maxlength
   formValue.value.default_value = form_data.default_value
 }
 defineExpose({ getData, rander })
 onMounted(() => {
-  formValue.value.min_length = 0
-  formValue.value.max_length = 20
+  formValue.value.minlength = 0
+  formValue.value.maxlength = 20
   formValue.value.default_value = ''
 })
 </script>
