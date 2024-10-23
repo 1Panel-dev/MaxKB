@@ -15,6 +15,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
+            model_name='application',
+            name='clean_time',
+            field=models.IntegerField(default=180, verbose_name='清理时间'),
+        ),
+        migrations.AddField(
             model_name='workflowversion',
             name='name',
             field=models.CharField(default='', max_length=128, verbose_name='版本名称'),
