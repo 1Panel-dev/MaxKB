@@ -25,7 +25,7 @@
       <el-col :span="12">
         <div class="setting-preview border border-r-4 mr-16">
           <div class="setting-preview-container">
-            <div class="setting-preview-header" :class="!isDefaultTheme ? 'custom-header' : ''">
+            <div class="setting-preview-header" :style="customStyle">
               <div class="flex-between">
                 <div class="flex align-center">
                   <div class="mr-12 ml-24 flex">
@@ -54,12 +54,21 @@
                   <el-button link>
                     <AppIcon
                       :iconName="'app-magnify'"
-                      class="color-secondary"
+                      :style="{
+                        color: xpackForm.custom_theme?.header_font_color
+                      }"
                       style="font-size: 20px"
                     ></AppIcon>
                   </el-button>
                   <el-button link>
-                    <el-icon :size="20" class="color-secondary"><Close /></el-icon>
+                    <el-icon
+                      :size="20"
+                      class="color-secondary"
+                      :style="{
+                        color: xpackForm.custom_theme?.header_font_color
+                      }"
+                      ><Close
+                    /></el-icon>
                   </el-button>
                 </div>
               </div>
@@ -93,15 +102,12 @@
                       fit="cover"
                       style="width: 35px; height: 35px; display: block"
                     />
-                    <LogoIcon
-                      v-else
-                      height="35px"
-                      style="width: 35px; height: 35px; display: block"
-                    />
+                    <AppAvatar v-else>
+                      <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+                    </AppAvatar>
                   </div>
-                  <img src="@/assets/user-icon.svg" width="270" alt="" />
 
-                  <img src="@/assets/display-bg3.png" alt="" width="270" />
+                  <img src="@/assets/display-bg3.png" alt="" width="270" class="ml-8" />
                 </div>
               </div>
               <div style="position: absolute; bottom: 0">
@@ -132,8 +138,11 @@
           <el-row class="w-full mb-8">
             <el-col :span="12">
               <h5 class="mb-8">自定义主题色</h5>
-              <el-color-picker v-model="form.custom_theme.theme_color"
-            /></el-col>
+              <div>
+                <el-color-picker v-model="form.custom_theme.theme_color" />
+                {{ !form.custom_theme.theme_color ? '默认' : '' }}
+              </div>
+            </el-col>
             <el-col :span="12">
               <h5 class="mb-8">头部标题字体颜色</h5>
               <el-color-picker v-model="form.custom_theme.header_font_color" />
@@ -260,7 +269,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import { isAppIcon } from '@/utils/application'
@@ -289,11 +298,11 @@ const defaultSetting = {
   disclaimer_value: '「以上内容均由AI生成，仅供参考和借鉴」',
   custom_theme: {
     theme_color: '',
-    header_font_color: ''
+    header_font_color: '#1f2329'
   },
   float_location: {
-    x: { type: '', value: '' },
-    y: { type: '', value: '' }
+    x: { type: '', value: 0 },
+    y: { type: '', value: 0 }
   }
 }
 
@@ -314,11 +323,11 @@ const xpackForm = ref<any>({
   disclaimer_value: '「以上内容均由AI生成，仅供参考和借鉴」',
   custom_theme: {
     theme_color: '',
-    header_font_color: ''
+    header_font_color: '#1f2329'
   },
   float_location: {
-    x: { type: '', value: '' },
-    y: { type: '', value: '' }
+    x: { type: '', value: 0 },
+    y: { type: '', value: 0 }
   }
 })
 
@@ -331,6 +340,13 @@ const dialogVisible = ref<boolean>(false)
 const loading = ref(false)
 
 const detail = ref<any>(null)
+
+const customStyle = computed(() => {
+  return {
+    background: xpackForm.value.custom_theme?.theme_color,
+    color: xpackForm.value.custom_theme?.header_font_color
+  }
+})
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -381,7 +397,9 @@ const open = (data: any, content: any) => {
   xpackForm.value.user_avatar = data.user_avatar
   xpackForm.value.disclaimer = data.disclaimer
   xpackForm.value.disclaimer_value = data.disclaimer_value
-  xpackForm.value.custom_theme = data.custom_theme
+  xpackForm.value.custom_theme.theme_color = data.custom_theme?.theme_color
+  xpackForm.value.custom_theme.header_font_color = data.custom_theme?.header_font_color || '#1f2329'
+
   xpackForm.value.float_location = data.float_location
   form.value = xpackForm.value
 

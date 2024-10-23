@@ -1,6 +1,11 @@
 <template>
-  <div class="chat-pc layout-bg" :class="classObj" v-loading="loading">
-    <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
+  <div
+    class="chat-pc layout-bg"
+    :class="classObj"
+    v-loading="loading"
+    :style="{ '--el-color-primary': applicationDetail?.custom_theme?.theme_color }"
+  >
+    <div class="chat-pc__header" :style="customStyle">
       <div class="flex align-center">
         <div class="mr-12 ml-24 flex">
           <AppAvatar
@@ -66,7 +71,7 @@
                   </template>
                 </common-list>
               </div>
-              <div v-if="chatLogData.length" class="gradient-divider lighter mt-8">
+              <div v-if="chatLogData?.length" class="gradient-divider lighter mt-8">
                 <span>仅显示最近 20 条对话</span>
               </div>
             </el-scrollbar>
@@ -141,6 +146,13 @@ const isDefaultTheme = computed(() => {
 
 const isCollapse = ref(false)
 
+const customStyle = computed(() => {
+  return {
+    background: applicationDetail.value?.custom_theme?.theme_color,
+    color: applicationDetail.value?.custom_theme?.header_font_color
+  }
+})
+
 const classObj = computed(() => {
   return {
     mobile: common.isMobile(),
@@ -161,7 +173,6 @@ const AiChatRef = ref()
 const loading = ref(false)
 const left_loading = ref(false)
 
-
 const applicationDetail = computed({
   get: () => {
     return props.application_profile
@@ -169,7 +180,7 @@ const applicationDetail = computed({
   set: (v) => {}
 })
 
-const chatLogeData = ref<any[]>([])
+const chatLogData = ref<any[]>([])
 
 const paginationConfig = ref({
   current_page: 1,
@@ -239,7 +250,7 @@ function getChatLog(id: string, refresh?: boolean) {
   log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
     chatLogData.value = res.data.records
     if (refresh) {
-      currentChatName.value = chatLogData.value[0].abstract
+      currentChatName.value = chatLogData.value?.[0].abstract
     }
   })
 }

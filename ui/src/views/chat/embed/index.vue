@@ -1,6 +1,10 @@
 <template>
-  <div class="chat-embed layout-bg" v-loading="loading">
-    <div class="chat-embed__header" :class="!isDefaultTheme ? 'custom-header' : ''">
+  <div
+    class="chat-embed layout-bg"
+    v-loading="loading"
+    :style="{ '--el-color-primary': applicationDetail?.custom_theme?.theme_color }"
+  >
+    <div class="chat-embed__header" :style="customStyle">
       <div class="chat-width flex align-center">
         <div class="mr-12 ml-24 flex">
           <AppAvatar
@@ -52,7 +56,12 @@
         @click.prevent.stop="show = !show"
         class="chat-popover-button cursor color-secondary"
       >
-        <AppIcon iconName="app-history-outlined"></AppIcon>
+        <AppIcon
+          iconName="app-history-outlined"
+          :style="{
+            color: applicationDetail?.custom_theme?.header_font_color
+          }"
+        ></AppIcon>
       </div>
 
       <el-collapse-transition>
@@ -108,14 +117,10 @@ import useStore from '@/stores'
 
 const { user, log } = useStore()
 
-const isDefaultTheme = computed(() => {
-  return user.isDefaultTheme()
-})
-
 const AiChatRef = ref()
 const loading = ref(false)
 const left_loading = ref(false)
-const chatLogeData = ref<any[]>([])
+const chatLogData = ref<any[]>([])
 const show = ref(false)
 const props = defineProps<{
   application_profile: any
@@ -137,6 +142,13 @@ const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
 
 const mouseId = ref('')
+
+const customStyle = computed(() => {
+  return {
+    background: applicationDetail.value?.custom_theme?.theme_color,
+    color: applicationDetail.value?.custom_theme?.header_font_color
+  }
+})
 
 function mouseenter(row: any) {
   mouseId.value = row.id
