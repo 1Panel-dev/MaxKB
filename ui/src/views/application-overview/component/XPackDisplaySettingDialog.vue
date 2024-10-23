@@ -326,8 +326,8 @@ const xpackForm = ref<any>({
     header_font_color: '#1f2329'
   },
   float_location: {
-    x: { type: '', value: 0 },
-    y: { type: '', value: 0 }
+    x: { type: 'bottom', value: 30 },
+    y: { type: 'right', value: 0 }
   }
 })
 
@@ -389,12 +389,9 @@ const open = (data: any, content: any) => {
   xpackForm.value.show_history = data.show_history
   xpackForm.value.draggable = data.draggable
   xpackForm.value.show_guide = data.show_guide
-  xpackForm.value.avatar = data.avatar
-  xpackForm.value.float_icon = data.float_icon
   imgUrl.value.avatar = data.avatar
   imgUrl.value.float_icon = data.float_icon
   imgUrl.value.user_avatar = data.user_avatar
-  xpackForm.value.user_avatar = data.user_avatar
   xpackForm.value.disclaimer = data.disclaimer
   xpackForm.value.disclaimer_value = data.disclaimer_value
   xpackForm.value.custom_theme.theme_color = data.custom_theme?.theme_color
@@ -411,10 +408,12 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       let fd = new FormData()
-      form.value.custom_theme = JSON.stringify(form.value.custom_theme)
-      form.value.float_location = JSON.stringify(form.value.float_location)
       Object.keys(form.value).map((item) => {
-        fd.append(item, form.value[item])
+        if (['custom_theme', 'float_location'].includes(item)) {
+          fd.append(item, JSON.stringify(form.value[item]))
+        } else {
+          fd.append(item, form.value[item])
+        }
       })
       applicationXpackApi.putAccessToken(id as string, fd, loading).then((res) => {
         emit('refresh')
