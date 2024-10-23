@@ -6,11 +6,24 @@
           @click="router.push({ path: `/application/${id}/WORK_FLOW/overview` })"
         ></back-button>
         <h4>{{ detail?.name }}</h4>
-        <el-text type="info" class="ml-16 color-secondary" v-if="saveTime"
+        <div v-if="showHistory && disablePublic">
+          <el-text type="info" class="ml-16 color-secondary"
+            >预览版本：
+            {{ currentVersion.name || datetimeFormat(currentVersion.update_time) }}</el-text
+          >
+        </div>
+        <el-text type="info" class="ml-16 color-secondary" v-else-if="saveTime"
           >保存时间：{{ datetimeFormat(saveTime) }}</el-text
         >
       </div>
-      <div>
+      <div v-if="showHistory && disablePublic">
+        <el-button type="primary" class="mr-8" @click="refreshVersion()"> 恢复版本 </el-button>
+        <el-divider direction="vertical" />
+        <el-button text @click="closeHistory">
+          <el-icon><Close /></el-icon>
+        </el-button>
+      </div>
+      <div v-else>
         <el-button icon="Plus" @click="showPopover = !showPopover"> 添加组件 </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug">
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
@@ -21,6 +34,27 @@
           保存
         </el-button>
         <el-button type="primary" @click="publicHandle"> 发布 </el-button>
+
+        <el-dropdown trigger="click">
+          <el-button text @click.stop class="ml-8 mt-4">
+            <el-icon class="rotate-90"><MoreFilled /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="openHistory">
+                <AppIcon iconName="app-history-outlined"></AppIcon>
+                发布历史
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <AppIcon iconName="app-save-outlined"></AppIcon>
+                自动保存
+                <div @click.stop class="ml-4">
+                  <el-switch size="small" v-model="isSave" @change="changeSave" />
+                </div>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
     </div>
     <!-- 下拉框 -->
@@ -90,6 +124,13 @@
         </div>
       </div>
     </el-collapse-transition>
+    <!-- 发布历史 -->
+    <PublishHistory
+      v-if="showHistory"
+      @click="checkVersion"
+      v-click-outside="clickoutsideHistory"
+      @refreshVersion="refreshVersion"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -97,6 +138,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
+import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
 import applicationApi from '@/api/application'
 import { isAppIcon } from '@/utils/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
@@ -126,6 +168,57 @@ const showPopover = ref(false)
 const showDebug = ref(false)
 const enlarge = ref(false)
 const saveTime = ref<any>('')
+const isSave = ref(false)
+const showHistory = ref(false)
+const disablePublic = ref(false)
+const currentVersion = ref<any>({})
+
+function clickoutsideHistory() {
+  if (!disablePublic.value) {
+    showHistory.value = false
+  }
+}
+
+function refreshVersion(item?: any) {
+  if (item) { 
+    getHistortyDetail(item.id)
+  }
+  initInterval()
+  showHistory.value = false
+  disablePublic.value = false
+}
+function checkVersion(item: any) {
+  disablePublic.value = true
+  getHistortyDetail(item.id)
+  currentVersion.value = item
+  closeInterval()
+}
+
+function getHistortyDetail(versionId: string) {
+  applicationApi.getWorkFlowVersionDetail(id, versionId, loading).then((res: any) => {
+    res.data?.work_flow['nodes'].map((v: any) => {
+      v['properties']['noRender'] = true
+    })
+    detail.value.stt_model_id = res.data.stt_model
+    detail.value.tts_model_id = res.data.tts_model
+    detail.value.tts_type = res.data.tts_type
+    saveTime.value = res.data?.update_time
+  })
+}
+
+function closeHistory() {
+  getDetail()
+  showHistory.value = false
+}
+
+function openHistory() {
+  showHistory.value = true
+}
+
+function changeSave(bool: boolean) {
+  bool ? initInterval() : closeInterval()
+  localStorage.setItem('workflowAutoSave', bool.toString())
+}
 
 function clickNodes(item: any) {
   // workflowRef.value?.addNode(item)
@@ -136,6 +229,7 @@ function onmousedown(item: any) {
   // workflowRef.value?.onmousedown(item)
   showPopover.value = false
 }
+
 function clickoutside() {
   showPopover.value = false
 }
@@ -256,9 +350,10 @@ const closeInterval = () => {
 
 onMounted(() => {
   getDetail()
-
+  const workflowAutoSave = localStorage.getItem('workflowAutoSave')
+  isSave.value = workflowAutoSave === 'true' ? true : false
   // 初始化定时任务
-  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND')) {
+  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && workflowAutoSave) {
     initInterval()
   }
 })

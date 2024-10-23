@@ -65,24 +65,43 @@ const props = defineProps({
   trigger: {
     type: String,
     default: 'default',
-    validator: (value: string) => ['default', 'dblclick'].includes(value)
+    validator: (value: string) => ['default', 'dblclick', 'manual'].includes(value)
+  },
+  write: {
+    type: Boolean,
+    default: false
   }
 })
-const emit = defineEmits(['change'])
+const emit = defineEmits(['change', 'close'])
 const inputRef = ref()
 const isEdit = ref(false)
 const writeValue = ref('')
 const loading = ref(false)
 
 watch(isEdit, (bool) => {
+  console.log(bool)
   if (!bool) {
     writeValue.value = ''
+    emit('close')
   } else {
-    nextTick(() => {
-      inputRef.value?.focus()
-    })
+    setTimeout(() => {
+      nextTick(() => {
+        inputRef.value?.focus()
+      })
+    }, 200)
   }
 })
+
+watch(
+  () => props.write,
+  (bool) => {
+    if (bool && props.trigger === 'manual') {
+      editNameHandle()
+    } else {
+      isEdit.value = false
+    }
+  }
+)
 
 function dblclick() {
   if (props.trigger === 'dblclick') {

@@ -1,3 +1,4 @@
+ 
 from typing import Dict, List
 
 from langchain_core.embeddings import Embeddings
@@ -34,3 +35,7 @@ class TencentEmbeddingModel(MaxKBBaseModel, Embeddings):
             secret_key=model_credential.get('SecretKey'),
             model_name=model_name,
         )
+
+    def _generate_auth_token(self):
+        # Example method to generate an authentication token for the model API
+        return f"{self.secret_id}:{self.secret_key}"

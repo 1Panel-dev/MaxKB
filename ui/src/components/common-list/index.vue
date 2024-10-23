@@ -3,11 +3,11 @@
     <ul v-if="data.length > 0">
       <template v-for="(item, index) in data" :key="index">
         <li
-          @click.prevent="clickHandle(item, index)"
+          @click.stop="clickHandle(item, index)"
           :class="current === item[props.valueKey] ? 'active' : ''"
           class="cursor"
-          @mouseenter="mouseenter(item)"
-          @mouseleave="mouseleave()"
+          @mouseenter.stop="mouseenter(item)"
+          @mouseleave.stop="mouseleave()"
         >
           <slot :row="item" :index="index"> </slot>
         </li>
@@ -78,6 +78,13 @@ defineExpose({
       border-radius: 4px;
       color: var(--el-color-primary);
       font-weight: 500;
+      &:hover {
+        background: var(--el-color-primary-light-9);
+      }
+    }
+    &:hover {
+      border-radius: 4px;
+      background: var(--app-text-color-light-1);
     }
   }
 }

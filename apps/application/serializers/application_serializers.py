@@ -6,6 +6,7 @@
     @date：2023/11/7 10:02
     @desc:
 """
+import datetime
 import hashlib
 import json
 import os
@@ -50,6 +51,7 @@ from setting.models_provider.constants.model_provider_constants import ModelProv
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
+from users.models import User
 
 chat_cache = cache.caches['chat_cache']
 
@@ -684,6 +686,8 @@ class ApplicationSerializer(serializers.Serializer):
         def publish(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid()
+            user_id = self.data.get('user_id')
+            user = QuerySet(User).filter(id=user_id).first()
             application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
             work_flow = instance.get('work_flow')
             if work_flow is None:
@@ -703,7 +707,10 @@ class ApplicationSerializer(serializers.Serializer):
             application.save()
             # 插入知识库关联关系
             self.save_application_mapping(application_dataset_id_list, dataset_id_list, application.id)
-            work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application)
+            work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application,
+                                                name=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                                publish_user_id=user_id,
+                                                publish_user_name=user.username)
             chat_cache.clear_by_application_id(str(application.id))
             work_flow_version.save()
             return True
@@ -1002,6 +1009,7 @@ class ApplicationSerializer(serializers.Serializer):
             if application.tts_model_enable:
                 model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id,
                                                             **application.tts_model_params_setting)
+
                 return model.text_to_speech(text)
 
         def play_demo_text(self, form_data, with_valid=True):
