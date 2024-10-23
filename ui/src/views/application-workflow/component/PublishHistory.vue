@@ -1,5 +1,5 @@
 <template>
-  <div class="workflow-publish-history">
+  <div class="workflow-publish-history border-l">
     <h4 class="border-b p-16-24">发布历史</h4>
     <div class="left-height pt-0">
       <el-scrollbar>
@@ -8,18 +8,20 @@
             :data="LogData"
             class="mt-8"
             v-loading="loading"
-            @click="clickListHandle"
+            @click.stop="clickListHandle"
             @mouseenter="mouseenter"
             @mouseleave="mouseId = ''"
           >
             <template #default="{ row, index }">
               <div class="flex-between">
-                <div>
+                <div style="max-width: 80%">
                   <h5 :class="index === 0 ? 'primary' : ''" class="flex">
                     <ReadWrite
-                      @change="editName($event, row.id)"
-                      :data="row.name || datetimeFormat(row.create_time)"
-                      :showEditIcon="true"
+                      @change="editName($event, row)"
+                      :data="row.name || datetimeFormat(row.update_time)"
+                      trigger="manual"
+                      :write="row.writeStatus"
+                      @close="closeWrite(row)"
                     />
                     <el-tag v-if="index === 0" class="default-tag ml-4">最近发布</el-tag>
                   </h5>
@@ -27,18 +29,18 @@
                     <AppAvatar :size="20" class="avatar-grey mr-4">
                       <el-icon><UserFilled /></el-icon>
                     </AppAvatar>
-                    XXX
+                    {{ row.publish_user_name }}
                   </el-text>
                 </div>
 
-                <!-- <div @click.stop v-show="mouseId === row.id">
-                  <el-dropdown trigger="click">
+                <div @click.stop v-show="mouseId === row.id">
+                  <el-dropdown trigger="click" :teleported="false">
                     <el-button text>
                       <el-icon><MoreFilled /></el-icon>
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item>
+                        <el-dropdown-item @click.stop="openEditVersion(row)">
                           <el-icon><EditPen /></el-icon>
                           编辑
                         </el-dropdown-item>
@@ -49,7 +51,7 @@
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
-                </div> -->
+                </div>
               </div>
             </template>
 
@@ -77,7 +79,7 @@ const {
 
 const emit = defineEmits(['click', 'refreshVersion'])
 const loading = ref(false)
-const LogData = ref([])
+const LogData = ref<any[]>([])
 
 const mouseId = ref('')
 
@@ -93,13 +95,22 @@ function refreshVersion(item: any) {
   emit('refreshVersion', item)
 }
 
-function editName(val: string, currentId: string) {
+function openEditVersion(item: any) {
+  item['writeStatus'] = true
+}
+
+function closeWrite(item: any) {
+  item['writeStatus'] = false
+}
+
+function editName(val: string, item: any) {
   if (val) {
     const obj = {
       name: val
     }
-    applicationApi.putWorkFlowVersion(id as string, currentId, obj, loading).then(() => {
+    applicationApi.putWorkFlowVersion(id as string, item.id, obj, loading).then(() => {
       MsgSuccess('修改成功')
+      item['writeStatus'] = false
       getList()
     })
   } else {

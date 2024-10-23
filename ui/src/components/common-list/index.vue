@@ -3,7 +3,7 @@
     <ul v-if="data.length > 0">
       <template v-for="(item, index) in data" :key="index">
         <li
-          @click.prevent="clickHandle(item, index)"
+          @click.stop="clickHandle(item, index)"
           :class="current === item[props.valueKey] ? 'active' : ''"
           class="cursor"
           @mouseenter.stop="mouseenter(item)"

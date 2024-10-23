@@ -9,7 +9,7 @@
         <div v-if="showHistory && disablePublic">
           <el-text type="info" class="ml-16 color-secondary"
             >预览版本：
-            {{ currentVersion.name || datetimeFormat(currentVersion.create_time) }}</el-text
+            {{ currentVersion.name || datetimeFormat(currentVersion.update_time) }}</el-text
           >
         </div>
         <el-text type="info" class="ml-16 color-secondary" v-else-if="saveTime"
@@ -17,7 +17,7 @@
         >
       </div>
       <div v-if="showHistory && disablePublic">
-        <el-button type="primary" class="mr-8" @click='refreshVersion'> 恢复版本 </el-button>
+        <el-button type="primary" class="mr-8" @click="refreshVersion()"> 恢复版本 </el-button>
         <el-divider direction="vertical" />
         <el-button text @click="closeHistory">
           <el-icon><Close /></el-icon>
@@ -125,9 +125,12 @@
       </div>
     </el-collapse-transition>
     <!-- 发布历史 -->
-    <Transition name="slide-fade">
-      <PublishHistory v-if="showHistory" @click="checkVersion" @refreshVersion="refreshVersion" />
-    </Transition>
+    <PublishHistory
+      v-if="showHistory"
+      @click="checkVersion"
+      v-click-outside="clickoutsideHistory"
+      @refreshVersion="refreshVersion"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -170,7 +173,16 @@ const showHistory = ref(false)
 const disablePublic = ref(false)
 const currentVersion = ref<any>({})
 
-function refreshVersion() {
+function clickoutsideHistory() {
+  if (!disablePublic.value) {
+    showHistory.value = false
+  }
+}
+
+function refreshVersion(item?: any) {
+  if (item) { 
+    getHistortyDetail(item.id)
+  }
   initInterval()
   showHistory.value = false
   disablePublic.value = false
@@ -187,7 +199,6 @@ function getHistortyDetail(versionId: string) {
     res.data?.work_flow['nodes'].map((v: any) => {
       v['properties']['noRender'] = true
     })
-    detail.value = res.data
     detail.value.stt_model_id = res.data.stt_model
     detail.value.tts_model_id = res.data.tts_model
     detail.value.tts_type = res.data.tts_type
@@ -218,6 +229,7 @@ function onmousedown(item: any) {
   // workflowRef.value?.onmousedown(item)
   showPopover.value = false
 }
+
 function clickoutside() {
   showPopover.value = false
 }
@@ -410,23 +422,5 @@ onBeforeUnmount(() => {
     max-width: 100% !important;
     margin: 0 auto;
   }
-}
-
-/*
-  Enter and leave animations can use different
-  durations and timing functions.
-*/
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
-}
-
-.slide-fade-leave-active {
-  transition: all 0.3s ease-out;
-}
-
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateX(20px);
-  opacity: 0;
 }
 </style>
