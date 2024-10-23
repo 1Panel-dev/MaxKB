@@ -141,7 +141,7 @@
                   </div>
                   <el-tooltip effect="dark" placement="right" v-if="item.desc">
                     <template #content>
-                      <p>{{ item.desc }}</p>
+                      <p class="w-280">{{ item.desc }}</p>
                     </template>
                     <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                   </el-tooltip>
