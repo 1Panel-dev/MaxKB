@@ -44,10 +44,11 @@ const currentRow = computed(() => {
     const row = currentItem.value
     switch (row.type) {
       case 'input':
-        if (check_field(['field', 'input_type', 'label', 'required'], currentItem.value)) {
+        if (check_field(['field', 'input_type', 'label', 'required', 'attrs'], currentItem.value)) {
           return currentItem.value
         }
         return {
+          attrs: row.attrs || { maxlength: 20, minlength: 0 },
           field: row.field || row.variable,
           input_type: 'TextInput',
           label: row.label || row.name,
@@ -64,12 +65,13 @@ const currentRow = computed(() => {
           return currentItem.value
         }
         return {
+          attrs: row.attrs || {},
           field: row.field || row.variable,
           input_type: 'SingleSelect',
           label: row.label || row.name,
           default_value: row.default_value,
           required: row.required != undefined ? row.required : row.is_required,
-          option_list: row.optionList.map((o: any) => {
+          option_list: row.option_list ? row.option_list: row.optionList.map((o: any) => {
             return { key: o, value: o }
           })
         }
@@ -106,6 +108,8 @@ const currentRow = computed(() => {
       default:
         return currentItem.value
     }
+  } else {
+    return { input_type: 'TextInput', required: true, attrs: { maxlength: 20, minlength: 0 } }
   }
 })
 const currentIndex = ref(null)
@@ -124,6 +128,8 @@ const open = (row: any, index: any) => {
     isEdit.value = true
     currentItem.value = cloneDeep(row)
     currentIndex.value = index
+  } else {
+    currentItem.value = null
   }
 }
 
