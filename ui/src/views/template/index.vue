@@ -4,25 +4,24 @@
       <div class="template-manage__left p-8 border-r">
         <h4 style="padding-bottom: 8px">供应商</h4>
         <div class="model-list-height-left">
-          <ul class="mb-8">
-            <li @click="clickListHandle(allObj as Provider)" class="cursor">
-              <div class="flex">
-                <AppIcon
-                  class="mr-8"
-                  style="height: 20px; width: 20px"
-                  :iconName="'app-all-menu-active'"
-                ></AppIcon>
-                <span>全部模型</span>
-              </div>
-            </li>
-          </ul>
+          <div
+            class="all-mode flex cursor"
+            @click="clickListHandle(allObj as Provider)"
+            :class="!active_provider?.provider ? 'all-mode-active' : ''"
+          >
+            <AppIcon
+              class="mr-8"
+              style="height: 20px; width: 20px"
+              :iconName="'app-all-menu-active'"
+            ></AppIcon>
+            <span>全部模型</span>
+          </div>
+
           <el-scrollbar>
-            <el-collapse>
+            <el-collapse class="template-collapse">
               <el-collapse-item title="在线模型" name="1">
                 <template #title>
-                  <el-icon class="mr-4">
-                    <Folder />
-                  </el-icon>
+                  <img src="@/assets/icon_file-folder_colorful.svg" class="mr-8" />
                   在线模型
                 </template>
                 <common-list
@@ -31,7 +30,7 @@
                   @click="clickListHandle"
                   value-key="provider"
                   default-active=""
-                  style="overflow-y: auto"
+                  ref="commonList1"
                 >
                   <template #default="{ row }">
                     <div class="flex">
@@ -48,9 +47,7 @@
               </el-collapse-item>
               <el-collapse-item title="私有模型" name="2">
                 <template #title>
-                  <el-icon class="mr-4">
-                    <Folder />
-                  </el-icon>
+                  <img src="@/assets/icon_file-folder_colorful.svg" class="mr-8" />
                   私有模型
                 </template>
                 <common-list
@@ -59,7 +56,7 @@
                   @click="clickListHandle"
                   value-key="provider"
                   default-active=""
-                  style="overflow-y: auto"
+                  ref="commonList2"
                 >
                   <template #default="{ row }">
                     <div class="flex">
@@ -84,7 +81,7 @@
           <div class="flex-between mt-16 mb-16">
             <el-button type="primary" @click="openCreateModel(active_provider)">添加模型</el-button>
             <div class="flex-between">
-              <el-select v-model="search_type" style="width: 200px" @change="search_type_change">
+              <el-select v-model="search_type" style="width: 120px" @change="search_type_change">
                 <el-option label="创建者" value="create_user" />
                 <el-option label="权限" value="permission_type" />
                 <el-option label="模型类型" value="model_type" />
@@ -96,23 +93,40 @@
                 @change="list_model"
                 placeholder="按名称搜索"
                 prefix-icon="Search"
-                style="max-width: 240px"
+                style="width: 220px"
                 clearable
               />
-              <el-select v-else-if="search_type === 'create_user'" v-model="model_search_form.create_user"
-                         @change="list_model"
-                         clearable>
-                <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.username" />
+              <el-select
+                v-else-if="search_type === 'create_user'"
+                v-model="model_search_form.create_user"
+                @change="list_model"
+                clearable
+                style="width: 220px"
+              >
+                <el-option
+                  v-for="u in user_options"
+                  :key="u.id"
+                  :value="u.id"
+                  :label="u.username"
+                />
               </el-select>
-              <el-select v-else-if="search_type === 'permission_type'" v-model="model_search_form.permission_type"
-                         clearable
-                         @change="list_model">
+              <el-select
+                v-else-if="search_type === 'permission_type'"
+                v-model="model_search_form.permission_type"
+                clearable
+                @change="list_model"
+                style="width: 220px"
+              >
                 <el-option label="公有" value="PUBLIC" />
                 <el-option label="私有" value="PRIVATE" />
               </el-select>
-              <el-select v-else-if="search_type === 'model_type'" v-model="model_search_form.model_type"
-                         clearable
-                         @change="list_model">
+              <el-select
+                v-else-if="search_type === 'model_type'"
+                v-model="model_search_form.model_type"
+                clearable
+                @change="list_model"
+                style="width: 220px"
+              >
                 <el-option label="大语言模型" value="LLM" />
                 <el-option label="向量模型" value="EMBEDDING" />
                 <el-option label="重排模型" value="RERANKER" />
@@ -126,7 +140,7 @@
           <el-scrollbar>
             <div class="p-24 pt-0">
               <el-row v-if="model_split_list.length > 0" :gutter="15">
-                <template v-for="row in model_split_list" :key="row.id">
+                <template v-for="(row, index) in model_split_list" :key="index">
                   <el-col
                     :xs="24"
                     :sm="24"
@@ -182,11 +196,18 @@ const allObj = {
   name: '全部模型'
 }
 
+const commonList1 = ref()
+const commonList2 = ref()
 const loading = ref<boolean>(false)
 
 const active_provider = ref<Provider>()
 const search_type = ref('name')
-const model_search_form = ref<{ name: string, create_user: string, permission_type: string, model_type: string }>({
+const model_search_form = ref<{
+  name: string
+  create_user: string
+  permission_type: string
+  model_type: string
+}>({
   name: '',
   create_user: '',
   permission_type: '',
@@ -216,6 +237,10 @@ const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 const clickListHandle = (item: Provider) => {
   active_provider.value = item
   list_model()
+  if (active_provider.value.provider === '') {
+    commonList1.value.clearCurrent()
+    commonList2.value.clearCurrent()
+  }
 }
 
 const openCreateModel = (provider?: Provider) => {
@@ -232,9 +257,7 @@ const list_model = () => {
     model_list.value = ok.data
     const v = model_list.value.map((m) => ({ id: m.user_id, username: m.username }))
     if (user_options.value.length === 0) {
-      user_options.value = Array.from(
-        new Map(v.map(item => [item.id, item])).values()
-      )
+      user_options.value = Array.from(new Map(v.map((item) => [item.id, item])).values())
     }
   })
 }
@@ -243,13 +266,17 @@ const search_type_change = () => {
   model_search_form.value = { name: '', create_user: '', permission_type: '', model_type: '' }
 }
 
-
 onMounted(() => {
   ModelApi.getProvider(loading).then((ok) => {
     active_provider.value = allObj
     provider_list.value = [allObj, ...ok.data]
 
-    const local_provider = ['model_ollama_provider', 'model_local_provider', 'model_xinference_provider', 'model_vllm_provider']
+    const local_provider = [
+      'model_ollama_provider',
+      'model_local_provider',
+      'model_xinference_provider',
+      'model_vllm_provider'
+    ]
     ok.data.forEach((item) => {
       if (local_provider.indexOf(item.provider) > -1) {
         local_provider_list.value.push(item)
@@ -278,6 +305,38 @@ onMounted(() => {
 
   .model-list-height-left {
     height: calc(var(--create-dataset-height));
+  }
+  .all-mode {
+    padding: 10px 16px;
+  }
+  .all-mode-active {
+    background: var(--el-color-primary-light-9);
+    border-radius: 4px;
+    color: var(--el-color-primary);
+    font-weight: 500;
+  }
+  .template-collapse {
+    border-top: none !important;
+    border-bottom: none !important;
+    :deep(.el-collapse-item__header) {
+      border-bottom: none !important;
+      padding-left: 16px;
+      font-size: 14px;
+      &:hover {
+        background: var(--app-text-color-light-1);
+      }
+    }
+    :deep(.el-collapse-item) {
+      margin-top: 2px;
+    }
+    :deep(.common-list) {
+      li {
+        padding-left: 30px !important;
+      }
+    }
+    :deep(.el-collapse-item__wrap) {
+      border-bottom: none !important;
+    }
   }
 }
 </style>

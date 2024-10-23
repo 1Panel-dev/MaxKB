@@ -162,11 +162,6 @@ const rules = reactive({
   prompt: [{ required: true, message: '请输入提示词', trigger: 'blur' }]
 })
 
-watch(dialogVisible, (bool) => {
-  if (!bool) {
-    form.value.model_id = ''
-  }
-})
 
 const open = (document_ids: string[]) => {
   getProvider()

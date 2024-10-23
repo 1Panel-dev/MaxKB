@@ -1,20 +1,36 @@
 <template>
-  <component :is="currentTemplate" :key="route.fullPath" />
+  <component
+    v-if="chat_show && init_data_end"
+    :applicationAvailable="applicationAvailable"
+    :is="currentTemplate"
+    :application_profile="application_profile"
+    :key="route.fullPath"
+    v-loading="loading"
+  />
+  <Auth
+    v-else
+    :application_profile="application_profile"
+    :auth_type="application_profile.authentication_type"
+    v-model="is_auth"
+  ></Auth>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onBeforeMount, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
+import Auth from '@/views/chat/auth/index.vue'
+const route = useRoute()
 const { application, user } = useStore()
 
 const components: any = import.meta.glob('@/views/chat/**/index.vue', {
   eager: true
 })
-const route = useRoute()
-const {
-  query: { mode }
-} = route as any
 
+const {
+  query: { mode },
+  params: { accessToken }
+} = route as any
+const is_auth = ref<boolean>(false)
 const currentTemplate = computed(() => {
   let modeName = ''
   if (mode && mode === 'embed') {
@@ -22,26 +38,57 @@ const currentTemplate = computed(() => {
   } else {
     modeName = show_history.value || !user.isEnterprise() ? 'pc' : 'base'
   }
-
   const name = `/src/views/chat/${modeName}/index.vue`
   return components[name].default
+})
+/**
+ * 是否显示对话
+ */
+const chat_show = computed(() => {
+  if (init_data_end.value) {
+    if (!applicationAvailable.value) {
+      return true
+    }
+    if (application_profile.value) {
+      if (application_profile.value.authentication && is_auth.value) {
+        return true
+      } else if (!application_profile.value.authentication) {
+        return true
+      }
+    }
+  }
+  return false
 })
 const loading = ref(false)
 
 const show_history = ref(false)
 
+const application_profile = ref<any>({})
+/**
+
+ * 初始化结束
+ */
+const init_data_end = ref<boolean>(false)
+
+const applicationAvailable = ref<boolean>(true)
 function getAppProfile() {
-  application.asyncGetAppProfile(loading).then((res: any) => {
+  return application.asyncGetAppProfile(loading).then((res: any) => {
     show_history.value = res.data?.show_history
+    application_profile.value = res.data
   })
 }
-
-onMounted(() => {
-  user.asyncGetProfile().then(() => {
-    if (user.isEnterprise()) {
-      getAppProfile()
-    }
+function getAccessToken(token: string) {
+  return application.asyncAppAuthentication(token, loading).then(() => {
+    return getAppProfile()
   })
+}
+onBeforeMount(() => {
+  user.changeUserType(2)
+  Promise.all([user.asyncGetProfile(), getAccessToken(accessToken)])
+    .catch(() => {
+      applicationAvailable.value = false
+    })
+    .finally(() => (init_data_end.value = true))
 })
 </script>
 <style lang="scss"></style>

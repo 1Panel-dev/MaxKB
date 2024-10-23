@@ -12,7 +12,9 @@ from application.models.api_key_model import ApplicationAccessToken
 from common.auth.handle.auth_base_handle import AuthBaseHandle
 from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import RoleConstants, Permission, Group, Operate, Auth
-from common.exception.app_exception import AppAuthenticationFailed
+from common.exception.app_exception import AppAuthenticationFailed, ChatException
+from common.models.db_model_manage import DBModelManage
+from common.util.common import password_encrypt
 
 
 class PublicAccessToken(AuthBaseHandle):
@@ -29,6 +31,21 @@ class PublicAccessToken(AuthBaseHandle):
         auth_details = get_token_details()
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=auth_details.get('application_id')).first()
+        if request.path != '/api/application/profile':
+            application_setting_model = DBModelManage.get_model('application_setting')
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
+            if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
+                application_setting = QuerySet(application_setting_model).filter(application_id=str(
+                    application_access_token.application_id)).first()
+                if application_setting.authentication:
+                    authentication = auth_details.get('authentication', {})
+                    if authentication is None:
+                        authentication = {}
+                    if application_setting.authentication_value.get('type') != authentication.get(
+                            'type') or password_encrypt(
+                        application_setting.authentication_value.get('value')) != authentication.get('value'):
+                        raise ChatException(1002, "身份验证信息不正确")
         if application_access_token is None:
             raise AppAuthenticationFailed(1002, "身份验证信息不正确")
         if not application_access_token.is_active:

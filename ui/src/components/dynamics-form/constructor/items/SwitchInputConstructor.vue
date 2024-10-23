@@ -31,9 +31,13 @@ const getData = () => {
     default_value: formValue.value.default_value
   }
 }
-defineExpose({ getData })
+
+const rander = (form_data: any) => {
+  formValue.value.default_value = form_data.default_value
+}
+defineExpose({ getData, rander })
 onMounted(() => {
-  formValue.value.default_value = formValue.value.default_value || false
+  formValue.value.default_value = false
 })
 </script>
 <style lang="scss"></style>

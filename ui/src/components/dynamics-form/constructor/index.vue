@@ -7,17 +7,17 @@
     :model="form_data"
     v-bind="$attrs"
   >
-    <el-form-item label="显示名称" :required="true" prop="label" :rules="rules.label">
-      <el-input v-model="form_data.label" placeholder="请输入显示名称" />
-    </el-form-item>
     <el-form-item label="参数" :required="true" prop="field" :rules="rules.field">
       <el-input v-model="form_data.field" placeholder="请输入参数" />
+    </el-form-item>
+    <el-form-item label="显示名称" :required="true" prop="label" :rules="rules.label">
+      <el-input v-model="form_data.label" placeholder="请输入显示名称" />
     </el-form-item>
     <el-form-item label="参数提示说明">
       <el-input v-model="form_data.tooltip" placeholder="请输入参数提示说明" />
     </el-form-item>
     <el-form-item label="是否必填" :required="true" prop="required" :rules="rules.required">
-      <el-switch v-model="form_data.required" />
+      <el-switch v-model="form_data.required" :active-value="true" :inactive-value="false" />
     </el-form-item>
     <el-form-item label="组件类型" :required="true" prop="input_type" :rules="rules.input_type">
       <el-select v-model="form_data.input_type" placeholder="请选择组件类型">
@@ -38,21 +38,28 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, nextTick } from 'vue'
 import type { FormInstance } from 'element-plus'
-
-const props = defineProps<{
-  modelValue: any
-}>()
+import _ from 'lodash'
+const props = withDefaults(
+  defineProps<{
+    modelValue?: any
+    input_type_list?: Array<{ label: string; value: string }>
+  }>(),
+  {
+    input_type_list: () => [
+      { label: '文本框', value: 'TextInputConstructor' },
+      { label: '滑块', value: 'SliderConstructor' },
+      { label: '开关', value: 'SwitchInputConstructor' },
+      { label: '单选框', value: 'SingleSelectConstructor' },
+      { label: '日期', value: 'DatePickerConstructor' }
+    ]
+  }
+)
 const emit = defineEmits(['update:modelValue'])
 
 const ruleFormRef = ref<FormInstance>()
-const input_type_list = [
-  { label: '文本框', value: 'TextInputConstructor' },
-  { label: '滑块', value: 'SliderConstructor' },
-  { label: '开关', value: 'SwitchInputConstructor' },
-  { label: '单选框', value: 'SingleSelectConstructor' }
-]
+
 const componentFormRef = ref<any>()
 const form_data = ref<any>({
   label: '',
@@ -95,20 +102,24 @@ const validate = () => {
 
 onMounted(() => {
   if (props.modelValue) {
-    const data = props.modelValue
-    // console.log(data)
-    form_data.value = data
-    // 处理option
-    form_data.value.input_type = data.input_type + 'Constructor'
-    if (data.label && data.label.input_type === 'TooltipLabel') {
-      form_data.value.tooltip = data.label.attrs.tooltip
-      form_data.value.label = data.label.label
-    } else {
-      form_data.value.label = data.label
-    }
+    rander(props.modelValue)
   }
 })
+const rander = (data: any) => {
+  form_data.value.required = data.required ? data.required : false
+  form_data.value.field = data.field
+  form_data.value.input_type = data.input_type + 'Constructor'
+  if (data.label && data.label.input_type === 'TooltipLabel') {
+    form_data.value.tooltip = data.label.attrs.tooltip
+    form_data.value.label = data.label.label
+  } else {
+    form_data.value.label = data.label
+  }
+  nextTick(() => {
+    componentFormRef.value?.rander(data)
+  })
+}
 
-defineExpose({ getData, validate })
+defineExpose({ getData, validate, rander })
 </script>
 <style lang="scss"></style>

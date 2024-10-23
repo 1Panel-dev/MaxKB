@@ -70,7 +70,7 @@ def _initialize_model_info():
 
     tencent_embedding_model_info = _create_model_info(
         'hunyuan-embedding',
-        '',
+        '腾讯混元 Embedding 接口，可以将文本转化为高质量的向量数据。向量维度为1024维。',
         ModelTypeConst.EMBEDDING,
         TencentEmbeddingCredential,
         TencentEmbeddingModel
@@ -80,6 +80,7 @@ def _initialize_model_info():
 
     model_info_manage = ModelInfoManage.builder() \
         .append_model_info_list(model_info_list) \
+        .append_model_info_list(model_info_embedding_list) \
         .append_default_model_info(model_info_list[0]) \
         .build()
 

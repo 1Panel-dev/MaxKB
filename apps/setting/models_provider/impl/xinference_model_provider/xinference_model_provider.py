@@ -407,4 +407,4 @@ class XinferenceModelProvider(IModelProvider):
     def get_model_info_by_name(model_list, model_name):
         if model_list is None:
             return []
-        return [model for model in model_list if model.get('model_name') == model_name]
+        return [model for model in model_list if model.get('model_name') == model_name or model.get('id') == model_name]

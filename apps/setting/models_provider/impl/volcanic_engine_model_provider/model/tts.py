@@ -54,12 +54,12 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         self.volcanic_token = kwargs.get('volcanic_token')
         self.volcanic_app_id = kwargs.get('volcanic_app_id')
         self.volcanic_cluster = kwargs.get('volcanic_cluster')
-        self.voice_type = kwargs.get('voice_type', 'BV002_streaming')
-        self.speed_ratio = kwargs.get('speed_ratio', 1.0)
+        self.voice_type = kwargs.get('voice_type')
+        self.speed_ratio = kwargs.get('speed_ratio')
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
+        optional_params = {'voice_type': 'BV002_streaming', 'speed_ratio': 1.0}
         if 'voice_type' in model_kwargs and model_kwargs['voice_type'] is not None:
             optional_params['voice_type'] = model_kwargs['voice_type']
         if 'speed_ratio' in model_kwargs and model_kwargs['speed_ratio'] is not None:
@@ -101,6 +101,9 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         }
 
         return asyncio.run(self.submit(request_json, text))
+
+    def is_cache_model(self):
+        return False
 
     def token_auth(self):
         return {'Authorization': 'Bearer; {}'.format(self.volcanic_token)}

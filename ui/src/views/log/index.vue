@@ -29,7 +29,10 @@
           style="margin-left: 10px"
           clearable
         />
-        <el-button class="float-right" @click="exportLog">导出</el-button>
+        <div style="display: flex; align-items: center" class="float-right">
+          <el-button @click="dialogVisible = true" type="primary">清除策略</el-button>
+          <el-button @click="exportLog">导出</el-button>
+        </div>
       </div>
 
       <app-table
@@ -145,6 +148,33 @@
       :next_disable="next_disable"
       @refresh="refresh"
     />
+    <el-dialog
+      title="清除策略"
+      v-model="dialogVisible"
+      width="25%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <span>删除</span>
+      <el-input-number
+        v-model="days"
+        controls-position="right"
+        min="1"
+        max="100000"
+        style="width: 110px; margin-left: 8px; margin-right: 8px"
+      ></el-input-number>
+      <span>天之前的对话记录</span>
+      <template #footer>
+        <div class="dialog-footer" style="margin-top: 16px">
+          <el-button @click="dialogVisible = false">{{
+            $t('layout.topbar.avatar.dialog.cancel')
+          }}</el-button>
+          <el-button type="primary" @click="saveCleanTime">
+            {{ $t('layout.topbar.avatar.dialog.save') }}
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -203,6 +233,8 @@ const paginationConfig = reactive({
   page_size: 20,
   total: 0
 })
+const dialogVisible = ref(false)
+const days = ref<number>(180)
 const tableData = ref<any[]>([])
 const tableIndexMap = computed<Dict<number>>(() => {
   return tableData.value
@@ -355,9 +387,9 @@ function getList() {
 function getDetail() {
   application.asyncGetApplicationDetail(id as string, loading).then((res: any) => {
     detail.value = res.data
+    days.value = res.data.clean_time
   })
 }
-
 const exportLog = () => {
   const arr: string[] = []
   multipleSelection.value.map((v) => {
@@ -395,6 +427,21 @@ function changeDayHandle(val: number | string) {
     daterange.value.end_time = nowDate
     getList()
   }
+}
+
+function saveCleanTime() {
+  const data = detail.value
+  data.clean_time = days.value
+  application
+    .asyncPutApplication(id as string, data, loading)
+    .then(() => {
+      MsgSuccess('保存成功')
+      dialogVisible.value = false
+      getDetail()
+    })
+    .catch(() => {
+      dialogVisible.value = false
+    })
 }
 
 onMounted(() => {

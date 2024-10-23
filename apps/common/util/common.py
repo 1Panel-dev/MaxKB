@@ -6,14 +6,15 @@
     @date：2023/10/16 16:42
     @desc:
 """
+import hashlib
 import importlib
 from functools import reduce
 from typing import Dict, List
 
-from django.conf import settings
 from django.db.models import QuerySet
 
 from ..exception.app_exception import AppApiException
+from ..models.db_model_manage import DBModelManage
 
 
 def sub_array(array: List, item_num=10):
@@ -62,6 +63,18 @@ def flat_map(array: List[List]):
     return result
 
 
+def password_encrypt(raw_password):
+    """
+    密码 md5加密
+    :param raw_password: 密码
+    :return:  加密后密码
+    """
+    md5 = hashlib.md5()  # 2，实例化md5() 方法
+    md5.update(raw_password.encode())  # 3，对字符串的字节类型加密
+    result = md5.hexdigest()  # 4，加密
+    return result
+
+
 def post(post_function):
     def inner(func):
         def run(*args, **kwargs):
@@ -76,12 +89,14 @@ def post(post_function):
 def valid_license(model=None, count=None, message=None):
     def inner(func):
         def run(*args, **kwargs):
-            if (not (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                'XPACK_LICENSE_IS_VALID') else None)
-                    and QuerySet(
-                        model).count() >= count):
-                error = message or f'超出限制{count},请联系我们（https://fit2cloud.com/）。'
-                raise AppApiException(400, error)
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            is_license_valid = xpack_cache.get('XPACK_LICENSE_IS_VALID', False) if xpack_cache is not None else False
+            record_count = QuerySet(model).count()
+
+            if not is_license_valid and record_count >= count:
+                error_message = message or f'超出限制{count}, 请联系我们（https://fit2cloud.com/）。'
+                raise AppApiException(400, error_message)
+
             return func(*args, **kwargs)
 
         return run

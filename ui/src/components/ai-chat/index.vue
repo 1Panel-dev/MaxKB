@@ -364,90 +364,169 @@ function handleInputFieldList() {
   props.data.work_flow?.nodes
     ?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
-      inputFieldList.value = v.properties.input_field_list
-        ? v.properties.input_field_list
-            .filter((v: any) => v.assignment_method === 'user_input')
-            .map((v: any) => {
-              switch (v.type) {
-                case 'input':
-                  return {
-                    field: v.variable,
-                    input_type: 'TextInput',
-                    label: v.name,
-                    default_value: default_value[v.variable],
-                    required: v.is_required
+      inputFieldList.value = v.properties.user_input_field_list
+        ? v.properties.user_input_field_list.map((v: any) => {
+            switch (v.type) {
+              case 'input':
+                return {
+                  field: v.variable,
+                  input_type: 'TextInput',
+                  label: v.name,
+                  default_value: default_value[v.variable],
+                  required: v.is_required
+                }
+              case 'select':
+                return {
+                  field: v.variable,
+                  input_type: 'SingleSelect',
+                  label: v.name,
+                  default_value: default_value[v.variable],
+                  required: v.is_required,
+                  option_list: v.optionList.map((o: any) => {
+                    return { key: o, value: o }
+                  })
+                }
+              case 'date':
+                return {
+                  field: v.variable,
+                  input_type: 'DatePicker',
+                  label: v.name,
+                  default_value: default_value[v.variable],
+                  required: v.is_required,
+                  attrs: {
+                    format: 'YYYY-MM-DD HH:mm:ss',
+                    'value-format': 'YYYY-MM-DD HH:mm:ss',
+                    type: 'datetime'
                   }
-                case 'select':
-                  return {
-                    field: v.variable,
-                    input_type: 'SingleSelect',
-                    label: v.name,
-                    default_value: default_value[v.variable],
-                    required: v.is_required,
-                    option_list: v.optionList.map((o: any) => {
-                      return { key: o, value: o }
-                    })
-                  }
-                case 'date':
-                  return {
-                    field: v.variable,
-                    input_type: 'DatePicker',
-                    label: v.name,
-                    default_value: default_value[v.variable],
-                    required: v.is_required,
-                    attrs: {
-                      format: 'YYYY-MM-DD HH:mm:ss',
-                      'value-format': 'YYYY-MM-DD HH:mm:ss',
-                      type: 'datetime'
+                }
+              default:
+                return v
+            }
+          })
+        : v.properties.input_field_list
+          ? v.properties.input_field_list
+              .filter((v: any) => v.assignment_method === 'user_input')
+              .map((v: any) => {
+                switch (v.type) {
+                  case 'input':
+                    return {
+                      field: v.variable,
+                      input_type: 'TextInput',
+                      label: v.name,
+                      default_value: default_value[v.variable],
+                      required: v.is_required
                     }
-                  }
-                default:
-                  break
-              }
-            })
-        : []
-      apiInputFieldList.value = v.properties.input_field_list
-        ? v.properties.input_field_list
-            .filter((v: any) => v.assignment_method === 'api_input')
-            .map((v: any) => {
-              switch (v.type) {
-                case 'input':
-                  return {
-                    field: v.variable,
-                    input_type: 'TextInput',
-                    label: v.name,
-                    default_value: default_value[v.variable],
-                    required: v.is_required
-                  }
-                case 'select':
-                  return {
-                    field: v.variable,
-                    input_type: 'SingleSelect',
-                    label: v.name,
-                    default_value: default_value[v.variable],
-                    required: v.is_required,
-                    option_list: v.optionList.map((o: any) => {
-                      return { key: o, value: o }
-                    })
-                  }
-                case 'date':
-                  return {
-                    field: v.variable,
-                    input_type: 'DatePicker',
-                    label: v.name,
-                    default_value: default_value[v.variable],
-                    required: v.is_required,
-                    attrs: {
-                      format: 'YYYY-MM-DD HH:mm:ss',
-                      'value-format': 'YYYY-MM-DD HH:mm:ss',
-                      type: 'datetime'
+                  case 'select':
+                    return {
+                      field: v.variable,
+                      input_type: 'SingleSelect',
+                      label: v.name,
+                      default_value: default_value[v.variable],
+                      required: v.is_required,
+                      option_list: v.optionList.map((o: any) => {
+                        return { key: o, value: o }
+                      })
                     }
+                  case 'date':
+                    return {
+                      field: v.variable,
+                      input_type: 'DatePicker',
+                      label: v.name,
+                      default_value: default_value[v.variable],
+                      required: v.is_required,
+                      attrs: {
+                        format: 'YYYY-MM-DD HH:mm:ss',
+                        'value-format': 'YYYY-MM-DD HH:mm:ss',
+                        type: 'datetime'
+                      }
+                    }
+                  default:
+                    break
+                }
+              })
+          : []
+
+      apiInputFieldList.value = v.properties.api_input_field_list
+        ? v.properties.api_input_field_list.map((v: any) => {
+            switch (v.type) {
+              case 'input':
+                return {
+                  field: v.variable,
+                  input_type: 'TextInput',
+                  label: v.variable,
+                  default_value: default_value[v.variable],
+                  required: v.is_required
+                }
+              case 'select':
+                return {
+                  field: v.variable,
+                  input_type: 'SingleSelect',
+                  label: v.variable,
+                  default_value: default_value[v.variable],
+                  required: v.is_required,
+                  option_list: v.optionList.map((o: any) => {
+                    return { key: o, value: o }
+                  })
+                }
+              case 'date':
+                return {
+                  field: v.variable,
+                  input_type: 'DatePicker',
+                  label: v.variable,
+                  default_value: default_value[v.variable],
+                  required: v.is_required,
+                  attrs: {
+                    format: 'YYYY-MM-DD HH:mm:ss',
+                    'value-format': 'YYYY-MM-DD HH:mm:ss',
+                    type: 'datetime'
                   }
-                default:
-                  break
-              }
-            })
-        : []
+                }
+              default:
+                break
+            }
+          })
+        : v.properties.input_field_list
+          ? v.properties.input_field_list
+              .filter((v: any) => v.assignment_method === 'api_input')
+              .map((v: any) => {
+                switch (v.type) {
+                  case 'input':
+                    return {
+                      field: v.variable,
+                      input_type: 'TextInput',
+                      label: v.name,
+                      default_value: default_value[v.variable],
+                      required: v.is_required
+                    }
+                  case 'select':
+                    return {
+                      field: v.variable,
+                      input_type: 'SingleSelect',
+                      label: v.name,
+                      default_value: default_value[v.variable],
+                      required: v.is_required,
+                      option_list: v.optionList.map((o: any) => {
+                        return { key: o, value: o }
+                      })
+                    }
+                  case 'date':
+                    return {
+                      field: v.variable,
+                      input_type: 'DatePicker',
+                      label: v.name,
+                      default_value: default_value[v.variable],
+                      required: v.is_required,
+                      attrs: {
+                        format: 'YYYY-MM-DD HH:mm:ss',
+                        'value-format': 'YYYY-MM-DD HH:mm:ss',
+                        type: 'datetime'
+                      }
+                    }
+                  default:
+                    break
+                }
+              })
+          : []
     })
 }
 
@@ -832,7 +911,7 @@ const mediaRecorderStatus = ref(true)
 const startRecording = async () => {
   try {
     // 取消录音控制台日志
-    Recorder.CLog=function(){}
+    Recorder.CLog = function () {}
     mediaRecorderStatus.value = false
     handleTimeChange()
     mediaRecorder.value = new Recorder({

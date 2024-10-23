@@ -376,7 +376,9 @@ class Application(APIView):
                              security=[])
         def post(self, request: Request):
             return result.success(
-                ApplicationSerializer.Authentication(data={'access_token': request.data.get("access_token")}).auth(
+                ApplicationSerializer.Authentication(data={'access_token': request.data.get("access_token"),
+                                                           'authentication_value': request.data.get(
+                                                               'authentication_value')}).auth(
                     request),
                 headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
                          "Access-Control-Allow-Methods": "POST",
@@ -539,12 +541,13 @@ class Application(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['POST'], detail=False)
-        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
-                                        [lambda r, keywords: Permission(group=Group.APPLICATION,
-                                                                        operate=Operate.USE,
-                                                                        dynamic_tag=keywords.get(
-                                                                            'application_id'))],
-                                        compare=CompareConstants.AND))
+        @has_permissions(
+            ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
+                           [lambda r, keywords: Permission(group=Group.APPLICATION,
+                                                           operate=Operate.USE,
+                                                           dynamic_tag=keywords.get(
+                                                               'application_id'))],
+                           compare=CompareConstants.AND))
         def post(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.Operate(data={'application_id': application_id, 'user_id': request.user.id})
@@ -554,15 +557,33 @@ class Application(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['POST'], detail=False)
-        @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
-                                        [lambda r, keywords: Permission(group=Group.APPLICATION,
-                                                                        operate=Operate.USE,
-                                                                        dynamic_tag=keywords.get(
-                                                                            'application_id'))],
-                                        compare=CompareConstants.AND))
+        @has_permissions(
+            ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
+                           [lambda r, keywords: Permission(group=Group.APPLICATION,
+                                                           operate=Operate.USE,
+                                                           dynamic_tag=keywords.get(
+                                                               'application_id'))],
+                           compare=CompareConstants.AND))
         def post(self, request: Request, application_id: str):
             byte_data = ApplicationSerializer.Operate(
                 data={'application_id': application_id, 'user_id': request.user.id}).text_to_speech(
                 request.data.get('text'))
             return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
-                                                              'Content-Disposition': 'attachment; filename="abc.mp3"'})
+                                                                'Content-Disposition': 'attachment; filename="abc.mp3"'})
+
+    class PlayDemoText(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @has_permissions(
+            ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
+                           [lambda r, keywords: Permission(group=Group.APPLICATION,
+                                                           operate=Operate.USE,
+                                                           dynamic_tag=keywords.get(
+                                                               'application_id'))],
+                           compare=CompareConstants.AND))
+        def post(self, request: Request, application_id: str):
+            byte_data = ApplicationSerializer.Operate(
+                data={'application_id': application_id, 'user_id': request.user.id}).play_demo_text(request.data)
+            return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
+                                                                'Content-Disposition': 'attachment; filename="abc.mp3"'})

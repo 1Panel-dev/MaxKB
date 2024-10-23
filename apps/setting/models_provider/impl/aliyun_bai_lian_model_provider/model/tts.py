@@ -17,12 +17,12 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.model = kwargs.get('model')
-        self.voice = kwargs.get('voice', 'longxiaochun')
-        self.speech_rate = kwargs.get('speech_rate', 1.0)
+        self.voice = kwargs.get('voice')
+        self.speech_rate = kwargs.get('speech_rate')
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
+        optional_params = {'voice': 'longxiaochun', 'speech_rate': 1.0}
         if 'voice' in model_kwargs and model_kwargs['voice'] is not None:
             optional_params['voice'] = model_kwargs['voice']
         if 'speech_rate' in model_kwargs and model_kwargs['speech_rate'] is not None:
@@ -44,3 +44,6 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             print(audio)
             raise Exception(audio)
         return audio
+
+    def is_cache_model(self):
+        return False

@@ -28,6 +28,7 @@ from common.constants.permission_constants import RoleConstants, get_permission_
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
+from common.models.db_model_manage import DBModelManage
 from common.response.result import get_api_response
 from common.util.common import valid_license
 from common.util.field_message import ErrMessage
@@ -45,9 +46,10 @@ class SystemSerializer(ApiMixin, serializers.Serializer):
     @staticmethod
     def get_profile():
         version = os.environ.get('MAXKB_VERSION')
+        xpack_cache = DBModelManage.get_model('xpack_cache')
         return {'version': version, 'IS_XPACK': hasattr(settings, 'IS_XPACK'),
-                'XPACK_LICENSE_IS_VALID': (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                                      'XPACK_LICENSE_IS_VALID') else False)}
+                'XPACK_LICENSE_IS_VALID': False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID',
+                                                                                            False)}
 
     @staticmethod
     def get_response_body_api():

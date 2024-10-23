@@ -1,13 +1,13 @@
 # coding=utf-8
 
 from typing import List, Dict, Optional, Any, Iterator, Type, cast
-from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models import LanguageModelInput
-from langchain_core.messages import BaseMessage, AIMessageChunk, BaseMessageChunk
+from langchain_core.messages import BaseMessage, get_buffer_string
 from langchain_core.outputs import ChatGenerationChunk, ChatGeneration
 from langchain_core.runnables import RunnableConfig, ensure_config
 from langchain_openai import ChatOpenAI
-from langchain_openai.chat_models.base import _convert_delta_to_message_chunk
+
+from common.config.tokenizer_manage_config import TokenizerManage
 
 
 class BaseChatOpenAI(ChatOpenAI):
@@ -17,9 +17,21 @@ class BaseChatOpenAI(ChatOpenAI):
         return self.usage_metadata
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
+        if self.usage_metadata is None or self.usage_metadata == {}:
+            try:
+                return super().get_num_tokens_from_messages(messages)
+            except Exception as e:
+                tokenizer = TokenizerManage.get_tokenizer()
+                return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
         return self.usage_metadata.get('input_tokens', 0)
 
     def get_num_tokens(self, text: str) -> int:
+        if self.usage_metadata is None or self.usage_metadata == {}:
+            try:
+                return super().get_num_tokens(text)
+            except Exception as e:
+                tokenizer = TokenizerManage.get_tokenizer()
+                return len(tokenizer.encode(text))
         return self.get_last_generation_info().get('output_tokens', 0)
 
     def _stream(
@@ -54,5 +66,6 @@ class BaseChatOpenAI(ChatOpenAI):
                 **kwargs,
             ).generations[0][0],
         ).message
-        self.usage_metadata = chat_result.response_metadata['token_usage']
+        self.usage_metadata = chat_result.response_metadata[
+            'token_usage'] if 'token_usage' in chat_result.response_metadata else chat_result.usage_metadata
         return chat_result

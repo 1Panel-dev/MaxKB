@@ -1,55 +1,28 @@
 <template>
   <div class="chat-pc layout-bg" :class="classObj" v-loading="loading">
-    <el-dialog
-      v-model="isPasswordDialogVisible"
-      width="480px"
-      height="236px"
-      title="输入密码打开链接"
-      custom-class="no-close-button"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      center
-      :modal="true"
-    >
-      <el-input
-        style="width: 400px; height: 40px"
-        v-model="password"
-        :placeholder="$t('login.ldap.passwordPlaceholder')"
-        show-password
-      />
-      <span class="input-error" v-if="passwordError">{{ passwordError }}</span>
-      <el-button
-        type="primary"
-        @click="validatePassword"
-        style="width: 400px; height: 40px; margin-top: 24px"
-        >确定</el-button
-      >
-    </el-dialog>
-
-    <div v-if="isAuthenticated">
-      <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
-        <div class="flex align-center">
-          <div class="mr-12 ml-24 flex">
-            <AppAvatar
-              v-if="isAppIcon(applicationDetail?.icon)"
-              shape="square"
-              :size="32"
-              style="background: none"
-            >
-              <img :src="applicationDetail?.icon" alt="" />
-            </AppAvatar>
-            <AppAvatar
-              v-else-if="applicationDetail?.name"
-              :name="applicationDetail?.name"
-              pinyinColor
-              shape="square"
-              :size="32"
-            />
-          </div>
-          <h4>{{ applicationDetail?.name }}</h4>
+    <div class="chat-pc__header" :class="!isDefaultTheme ? 'custom-header' : ''">
+      <div class="flex align-center">
+        <div class="mr-12 ml-24 flex">
+          <AppAvatar
+            v-if="isAppIcon(applicationDetail?.icon)"
+            shape="square"
+            :size="32"
+            style="background: none"
+          >
+            <img :src="applicationDetail?.icon" alt="" />
+          </AppAvatar>
+          <AppAvatar
+            v-else-if="applicationDetail?.name"
+            :name="applicationDetail?.name"
+            pinyinColor
+            shape="square"
+            :size="32"
+          />
         </div>
+        <h4>{{ applicationDetail?.name }}</h4>
       </div>
+    </div>
+    <div>
       <div class="flex">
         <div class="chat-pc__left border-r">
           <div class="p-24 pb-0">
@@ -151,36 +124,22 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted, nextTick, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, nextTick, computed } from 'vue'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
-import type { FormInstance, FormRules } from 'element-plus'
-import { t } from '@/locales'
-import authApi from '@/api/auth-setting'
-import { MsgSuccess } from '@/utils/message'
+
 useResize()
 
-const route = useRoute()
-
-const {
-  params: { accessToken }
-} = route as any
-
-const { application, user, log, common } = useStore()
+const { user, log, common } = useStore()
 
 const isDefaultTheme = computed(() => {
   return user.isDefaultTheme()
 })
 
 const isCollapse = ref(false)
-const isPasswordDialogVisible = ref(false)
-const password = ref('')
-const passwordError = ref('')
-const isAuthenticated = ref(false)
 
 const classObj = computed(() => {
   return {
@@ -194,13 +153,23 @@ const newObj = {
   id: 'new',
   abstract: '新建对话'
 }
-
+const props = defineProps<{
+  application_profile: any
+  applicationAvailable: boolean
+}>()
 const AiChatRef = ref()
 const loading = ref(false)
 const left_loading = ref(false)
-const applicationDetail = ref<any>({})
-const applicationAvailable = ref<boolean>(true)
-const chatLogData = ref<any[]>([])
+
+
+const applicationDetail = computed({
+  get: () => {
+    return props.application_profile
+  },
+  set: (v) => {}
+})
+
+const chatLogeData = ref<any[]>([])
 
 const paginationConfig = ref({
   current_page: 1,
@@ -241,37 +210,6 @@ function handleScroll(event: any) {
       event.scrollDiv.setScrollTop(event.dialogScrollbar.offsetHeight - history_height)
     })
   }
-}
-
-function getAccessToken(token: string) {
-  application
-    .asyncAppAuthentication(token, loading)
-    .then(() => {
-      getAppProfile()
-    })
-    .catch(() => {
-      applicationAvailable.value = false
-    })
-}
-
-function getAppProfile() {
-  application
-    .asyncGetAppProfile(loading)
-    .then((res: any) => {
-      applicationDetail.value = res.data
-      if (user.isEnterprise()) {
-        isPasswordDialogVisible.value = applicationDetail?.value.authentication
-      }
-      if (!isPasswordDialogVisible.value) {
-        isAuthenticated.value = true
-      }
-      if (res.data?.show_history || !user.isEnterprise()) {
-        getChatLog(applicationDetail.value.id)
-      }
-    })
-    .catch(() => {
-      applicationAvailable.value = false
-    })
 }
 
 function newChat() {
@@ -376,24 +314,19 @@ async function exportHTML(): Promise<void> {
   saveAs(blob, suggestedName)
 }
 
-function validatePassword() {
-  if (!password.value) {
-    passwordError.value = '密码不能为空'
-    return // 终止后续执行
+/**
+ *初始化历史对话记录
+ */
+const init = () => {
+  if (
+    (applicationDetail.value.show_history || !user.isEnterprise()) &&
+    props.applicationAvailable
+  ) {
+    getChatLog(applicationDetail.value.id)
   }
-  application.validatePassword(applicationDetail?.value.id, password.value).then((res: any) => {
-    if (res?.data.is_valid) {
-      isAuthenticated.value = true
-      isPasswordDialogVisible.value = false
-    } else {
-      passwordError.value = '密码错误'
-    }
-  })
 }
-
 onMounted(() => {
-  user.changeUserType(2)
-  getAccessToken(accessToken)
+  init()
 })
 </script>
 <style lang="scss">
@@ -509,9 +442,5 @@ onMounted(() => {
       z-index: 99;
     }
   }
-}
-.input-error {
-  color: red;
-  display: block;
 }
 </style>

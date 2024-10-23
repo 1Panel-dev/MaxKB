@@ -46,12 +46,12 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         self.spark_app_id = kwargs.get('spark_app_id')
         self.spark_api_key = kwargs.get('spark_api_key')
         self.spark_api_secret = kwargs.get('spark_api_secret')
-        self.vcn = kwargs.get('vcn', 'xiaoyan')
-        self.speed = kwargs.get('speed', 50)
+        self.vcn = kwargs.get('vcn')
+        self.speed = kwargs.get('speed')
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
+        optional_params = {'vcn': 'xiaoyan', 'speed': 50}
         if 'vcn' in model_kwargs and model_kwargs['vcn'] is not None:
             optional_params['vcn'] = model_kwargs['vcn']
         if 'speed' in model_kwargs and model_kwargs['speed'] is not None:
@@ -112,6 +112,9 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 return await self.handle_message(ws)
 
         return asyncio.run(handle())
+
+    def is_cache_model(self):
+        return False
 
     @staticmethod
     async def handle_message(ws):

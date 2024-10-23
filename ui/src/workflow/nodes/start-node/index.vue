@@ -35,14 +35,25 @@ const globalFields = [
   { label: '历史聊天记录', value: 'history_context' },
   { label: '对话id', value: 'chat_id' }
 ]
-const inputFieldList = ref<any[]>([])
 
 const getRefreshFieldList = () => {
-  return props.nodeModel.graphModel.nodes
+  const user_input_fields = props.nodeModel.graphModel.nodes
     .filter((v: any) => v.id === 'base-node')
-    .map((v: any) => cloneDeep(v.properties.input_field_list))
+    .map((v: any) => cloneDeep(v.properties.user_input_field_list))
     .reduce((x: any, y: any) => [...x, ...y], [])
-    .map((i: any) => ({ label: i.name, value: i.variable }))
+    .map((i: any) => {
+      if (i.label && i.label.input_type === 'TooltipLabel') {
+        return { label: i.label.label, value: i.field || i.variable }
+      }
+      return { label: i.label || i.name, value: i.field || i.variable }
+    })
+  const api_input_fields = props.nodeModel.graphModel.nodes
+    .filter((v: any) => v.id === 'base-node')
+    .map((v: any) => cloneDeep(v.properties.api_input_field_list))
+    .reduce((x: any, y: any) => [...x, ...y], [])
+    .map((i: any) => ({ label: i.name || i.variable, value: i.variable }))
+
+  return [...user_input_fields, ...api_input_fields]
 }
 const refreshFieldList = () => {
   const refreshFieldList = getRefreshFieldList()

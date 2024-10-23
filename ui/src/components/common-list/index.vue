@@ -59,6 +59,13 @@ function clickHandle(row: any, index: number) {
   current.value = row[props.valueKey]
   emit('click', row)
 }
+
+function clearCurrent() {
+  current.value = 0
+}
+defineExpose({
+  clearCurrent
+})
 </script>
 <style lang="scss" scoped>
 /* 通用 ui li样式 */

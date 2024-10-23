@@ -74,6 +74,8 @@ urlpatterns = [
     path('application/<str:application_id>/work_flow_version/<int:current_page>/<int:page_size>',
          views.ApplicationVersionView.Page.as_view()),
     path('application/<str:application_id>/work_flow_version/<str:work_flow_version_id>',
-         views.ApplicationVersionView.Operate.as_view())
+         views.ApplicationVersionView.Operate.as_view()),
+    path('application/<str:application_id>/play_demo_text', views.Application.PlayDemoText.as_view(),
+         name='application/audio')
 
 ]

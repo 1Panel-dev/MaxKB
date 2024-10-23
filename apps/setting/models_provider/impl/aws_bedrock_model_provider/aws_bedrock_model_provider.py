@@ -6,12 +6,10 @@ from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import (
     IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, ModelInfoManage
 )
+from setting.models_provider.impl.aws_bedrock_model_provider.credential.embedding import BedrockEmbeddingCredential
 from setting.models_provider.impl.aws_bedrock_model_provider.credential.llm import BedrockLLMModelCredential
+from setting.models_provider.impl.aws_bedrock_model_provider.model.embedding import BedrockEmbeddingModel
 from setting.models_provider.impl.aws_bedrock_model_provider.model.llm import BedrockModel
-from setting.models_provider.impl.tencent_model_provider.credential.embedding import TencentEmbeddingCredential
-from setting.models_provider.impl.tencent_model_provider.credential.llm import TencentLLMModelCredential
-from setting.models_provider.impl.tencent_model_provider.model.embedding import TencentEmbeddingModel
-from setting.models_provider.impl.tencent_model_provider.model.llm import TencentModel
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -118,10 +116,21 @@ def _initialize_model_info():
             BedrockLLMModelCredential,
             BedrockModel),
     ]
+    embedded_model_info_list = [
+        _create_model_info(
+            'amazon.titan-embed-text-v1',
+            'Titan Embed Text 是 Amazon Titan Embed 系列中最大的嵌入模型，可以处理各种文本嵌入任务，如文本分类、文本相似度计算等。',
+            ModelTypeConst.EMBEDDING,
+            BedrockEmbeddingCredential,
+            BedrockEmbeddingModel
+        ),
+    ]
 
     model_info_manage = ModelInfoManage.builder() \
         .append_model_info_list(model_info_list) \
         .append_default_model_info(model_info_list[0]) \
+        .append_model_info_list(embedded_model_info_list) \
+        .append_default_model_info(embedded_model_info_list[0]) \
         .build()
 
     return model_info_manage

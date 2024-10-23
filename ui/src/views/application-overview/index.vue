@@ -342,7 +342,15 @@ function getDetail() {
     detail.value.work_flow?.nodes
       ?.filter((v: any) => v.id === 'base-node')
       .map((v: any) => {
-        apiInputParams.value = v.properties.input_field_list
+        apiInputParams.value = v.properties.api_input_field_list
+          ? v.properties.api_input_field_list
+              .map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value
+                }
+              })
+          : v.properties.input_field_list
           ? v.properties.input_field_list
               .filter((v: any) => v.assignment_method === 'api_input')
               .map((v: any) => {

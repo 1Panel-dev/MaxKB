@@ -14,9 +14,9 @@ from rest_framework import serializers
 
 from application.models import Application
 from common.exception.app_exception import AppApiException
+from common.models.db_model_manage import DBModelManage
 from common.util.field_message import ErrMessage
 from dataset.models import DataSet
-from smartdoc import settings
 from users.models import User
 
 model_message_dict = {
@@ -40,8 +40,9 @@ class ValidSerializer(serializers.Serializer):
         if is_valid:
             self.is_valid(raise_exception=True)
         model_value = model_message_dict.get(self.data.get('valid_type'))
-        if not (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                           'XPACK_LICENSE_IS_VALID') else None):
+        xpack_cache = DBModelManage.get_model('xpack_cache')
+        is_license_valid = xpack_cache.get('XPACK_LICENSE_IS_VALID', False) if xpack_cache is not None else False
+        if not is_license_valid:
             if self.data.get('valid_count') != model_value.get('count'):
                 raise AppApiException(400, model_value.get('message'))
             if QuerySet(

@@ -37,7 +37,7 @@ from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed
 from common.field.common import UploadedImageField
 from common.models.db_model_manage import DBModelManage
-from common.util.common import valid_license
+from common.util.common import valid_license, password_encrypt
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from dataset.models import DataSet, Document, Image
@@ -228,8 +228,8 @@ class ApplicationSerializer(serializers.Serializer):
             is_draggable = 'false'
             show_guide = 'true'
             float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/MaxKB.gif"
-            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                                  'XPACK_LICENSE_IS_VALID') else False)
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
             # 获取接入的query参数
             query = self.get_query_api_input(application_access_token.application, params)
 
@@ -266,7 +266,9 @@ class ApplicationSerializer(serializers.Serializer):
                 if work_flow is not None:
                     for node in work_flow.get('nodes', []):
                         if node['id'] == 'base-node':
-                            input_field_list = node.get('properties', {}).get('input_field_list', [])
+                            input_field_list = node.get('properties', {}).get('api_input_field_list',
+                                                                              node.get('properties', {}).get(
+                                                                                  'input_field_list', []))
                             if input_field_list is not None:
                                 for field in input_field_list:
                                     if field['assignment_method'] == 'api_input' and field['variable'] in params:
@@ -315,8 +317,8 @@ class ApplicationSerializer(serializers.Serializer):
                 application_access_token.show_source = instance.get('show_source')
             application_access_token.save()
             application_setting_model = DBModelManage.get_model('application_setting')
-            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                                  'XPACK_LICENSE_IS_VALID') else False)
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get("XPACK_LICENSE_IS_VALID", False)
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting, _ = application_setting_model.objects.get_or_create(
                     application_id=self.data.get('application_id'))
@@ -354,6 +356,8 @@ class ApplicationSerializer(serializers.Serializer):
 
     class Authentication(serializers.Serializer):
         access_token = serializers.CharField(required=True, error_messages=ErrMessage.char("access_token"))
+        authentication_value = serializers.JSONField(required=False, allow_null=True,
+                                                     error_messages=ErrMessage.char("认证信息"))
 
         def auth(self, request, with_valid=True):
             token = request.META.get('HTTP_AUTHORIZATION')
@@ -368,20 +372,45 @@ class ApplicationSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             access_token = self.data.get("access_token")
             application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
+            authentication_value = self.data.get('authentication_value', None)
+            authentication = {}
             if application_access_token is not None and application_access_token.is_active:
                 if token_details is not None and 'client_id' in token_details and token_details.get(
                         'client_id') is not None:
                     client_id = token_details.get('client_id')
+                    authentication = token_details.get('authentication', {})
                 else:
                     client_id = str(uuid.uuid1())
+                if authentication_value is not None:
+                    # 认证用户token
+                    self.auth_authentication_value(authentication_value, str(application_access_token.application_id))
+                    authentication = {'type': authentication_value.get('type'),
+                                      'value': password_encrypt(authentication_value.get('value'))}
                 token = signing.dumps({'application_id': str(application_access_token.application_id),
                                        'user_id': str(application_access_token.application.user.id),
                                        'access_token': application_access_token.access_token,
                                        'type': AuthenticationType.APPLICATION_ACCESS_TOKEN.value,
-                                       'client_id': client_id})
+                                       'client_id': client_id,
+                                       'authentication': authentication})
                 return token
             else:
                 raise NotFound404(404, "无效的access_token")
+
+        def auth_authentication_value(self, authentication_value, application_id):
+            application_setting_model = DBModelManage.get_model('application_setting')
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
+            if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
+                application_setting = QuerySet(application_setting_model).filter(application_id=application_id).first()
+                if application_setting.authentication and authentication_value is not None:
+                    if authentication_value.get('type') == 'password':
+                        if not self.auth_password(authentication_value, application_setting.authentication_value):
+                            raise AppApiException(1005, "密码错误")
+            return True
+
+        @staticmethod
+        def auth_password(source_authentication_value, authentication_value):
+            return source_authentication_value.get('value') == authentication_value.get('value')
 
     class Edit(serializers.Serializer):
         name = serializers.CharField(required=False, max_length=64, min_length=1,
@@ -743,20 +772,39 @@ class ApplicationSerializer(serializers.Serializer):
             if application_access_token is None:
                 raise AppUnauthorizedFailed(500, "非法用户")
             application_setting_model = DBModelManage.get_model('application_setting')
-            X_PACK_LICENSE_IS_VALID = (settings.XPACK_LICENSE_IS_VALID if hasattr(settings,
-                                                                                  'XPACK_LICENSE_IS_VALID') else False)
+            xpack_cache = DBModelManage.get_model('xpack_cache')
+            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
             application_setting_dict = {}
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(
                     application_id=application_access_token.application_id).first()
                 if application_setting is not None:
+                    custom_theme = getattr(application_setting, 'custom_theme', {})
+                    float_location = getattr(application_setting, 'float_location', {})
+                    if not custom_theme:
+                        application_setting.custom_theme = {
+                            'theme_color': '',
+                            'header_font_color': ''
+                        }
+                    if not float_location:
+                        application_setting.float_location = {
+                            'x': {'type': '', 'value': ''},
+                            'y': {'type': '', 'value': ''}
+                        }
                     application_setting_dict = {'show_source': application_access_token.show_source,
                                                 'show_history': application_setting.show_history,
                                                 'draggable': application_setting.draggable,
                                                 'show_guide': application_setting.show_guide,
                                                 'avatar': application_setting.avatar,
                                                 'float_icon': application_setting.float_icon,
-                                                'authentication': application_setting.authentication}
+                                                'authentication': application_setting.authentication,
+                                                'authentication_type': application_setting.authentication_value.get(
+                                                    'type', 'password'),
+                                                'disclaimer': application_setting.disclaimer,
+                                                'disclaimer_value': application_setting.disclaimer_value,
+                                                'custom_theme': application_setting.custom_theme,
+                                                'user_avatar': application_setting.user_avatar,
+                                                'float_location': application_setting.float_location}
             return ApplicationSerializer.Query.reset_application(
                 {**ApplicationSerializer.ApplicationModel(application).data,
                  'stt_model_id': application.stt_model_id,
@@ -818,7 +866,7 @@ class ApplicationSerializer(serializers.Serializer):
                            'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                            'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
                            'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
-                           'problem_optimization_prompt']
+                           'problem_optimization_prompt', 'clean_time']
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
                     application.__setattr__(update_key, instance.get(update_key))
@@ -961,6 +1009,17 @@ class ApplicationSerializer(serializers.Serializer):
             if application.tts_model_enable:
                 model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id,
                                                             **application.tts_model_params_setting)
+
+                return model.text_to_speech(text)
+
+        def play_demo_text(self, form_data, with_valid=True):
+            text = '你好，这里是语音播放测试'
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            application_id = self.data.get('application_id')
+            application = QuerySet(Application).filter(id=application_id).first()
+            if application.tts_model_enable:
+                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id, **form_data)
                 return model.text_to_speech(text)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):

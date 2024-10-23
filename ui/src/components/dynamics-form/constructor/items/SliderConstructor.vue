@@ -1,16 +1,19 @@
 <template>
-  <el-form-item label="最小值" required>
-    <el-input-number v-model="formValue.min" :min="0" controls-position="right" />
-  </el-form-item>
-  <el-form-item label="最大值" required>
-    <el-input-number v-model="formValue.max" :min="0" controls-position="right" />
+  <el-form-item label="取值范围" required>
+    <el-col :span="11" style="padding-left: 0">
+      <el-input-number style="width: 100%" v-model="formValue.min" controls-position="right" />
+    </el-col>
+    <el-col :span="2" class="text-center">
+      <span class="text-gray-500">-</span>
+    </el-col>
+    <el-col :span="11">
+      <el-input-number style="width: 100%" v-model="formValue.max" controls-position="right" />
+    </el-col>
   </el-form-item>
   <el-form-item label="步长值" required>
     <el-input-number v-model="formValue.step" :min="0" controls-position="right" />
   </el-form-item>
-  <el-form-item label="精确值" required>
-    <el-input-number v-model="formValue.precision" :min="0" controls-position="right" />
-  </el-form-item>
+
   <el-form-item
     label="默认值"
     :required="formValue.required"
@@ -58,13 +61,22 @@ const getData = () => {
     default_value: formValue.value.default_value
   }
 }
-defineExpose({ getData })
+
+const rander = (form_data: any) => {
+  const attrs = form_data.attrs
+  formValue.value.option_list = form_data.option_list
+  formValue.value.min = attrs.min
+  formValue.value.max = attrs.max
+  formValue.value.step = attrs.step
+  formValue.value.default_value = form_data.default_value
+}
+
+defineExpose({ getData, rander })
 onBeforeMount(() => {
-  formValue.value.min = props.modelValue.attrs?.min || 0
-  formValue.value.max = props.modelValue.attrs?.max || 20
-  formValue.value.step = props.modelValue.attrs?.step || 0.1
-  formValue.value.precision = props.modelValue.attrs?.precision || 1
-  formValue.value.default_value = props.modelValue.default_value || 1
+  formValue.value.min = 0
+  formValue.value.max = 20
+  formValue.value.step = 0.1
+  formValue.value.default_value = 1
 })
 </script>
 <style lang="scss"></style>
