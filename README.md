@@ -19,6 +19,8 @@ MaxKB = Max Knowledge Base，是一款基于大语言模型和 RAG 的开源知�
 - **灵活编排**：内置强大的工作流引擎和函数库，支持编排 AI 工作过程，满足复杂业务场景下的需求；
 - **无缝嵌入**：支持零编码快速嵌入到第三方业务系统，让已有系统快速拥有智能问答能力，提高用户满意度。
 
+三分钟视频介绍：https://www.bilibili.com/video/BV18JypYeEkj/
+
 ## 快速开始
 
 ```
@@ -36,7 +38,6 @@ docker run -d --name=maxkb --restart=always -p 8080:8080 -v ~/.maxkb:/var/lib/po
 如你有更多问题，可以查看使用手册，或者通过论坛与我们交流。
 
 - [使用手册](https://maxkb.cn/docs/)
-- [演示视频](https://www.bilibili.com/video/BV1BE421M7YM/)
 - [论坛求助](https://bbs.fit2cloud.com/c/mk/11)
 - 技术交流群
 
