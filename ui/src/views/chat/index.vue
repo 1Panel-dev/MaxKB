@@ -1,6 +1,6 @@
 <template>
   <component
-    v-if="chat_show"
+    v-if="chat_show && init_data_end"
     :applicationAvailable="applicationAvailable"
     :is="currentTemplate"
     :application_profile="application_profile"
@@ -15,7 +15,7 @@
   ></Auth>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onBeforeMount, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import Auth from '@/views/chat/auth/index.vue'
@@ -79,16 +79,16 @@ function getAppProfile() {
 }
 function getAccessToken(token: string) {
   return application.asyncAppAuthentication(token, loading).then(() => {
-    getAppProfile()
+    return getAppProfile()
   })
 }
-onMounted(() => {
-  Promise.all([user.changeUserType(2), getAccessToken(accessToken)])
+onBeforeMount(() => {
+  user.changeUserType(2)
+  Promise.all([user.asyncGetProfile(), getAccessToken(accessToken)])
     .catch(() => {
       applicationAvailable.value = false
     })
     .finally(() => (init_data_end.value = true))
-  user.asyncGetProfile()
 })
 </script>
 <style lang="scss"></style>
