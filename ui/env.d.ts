@@ -11,4 +11,4 @@ declare module 'katex'
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
-declare type Recordable<T = any> = Record<string, T>;
+declare type Recordable<T = any> = Record<string, T>
