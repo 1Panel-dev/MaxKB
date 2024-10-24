@@ -22,6 +22,7 @@ import type { Dict } from '@/api/type/common'
 
 const damo_data: Array<FormField> = [
   { field: 'name', input_type: 'PasswordInput', label: '用戶名', required: false },
+  { field: 'json_text', input_type: 'JsonInput', label: 'aa', required: false },
   {
     field: 'array_object_card_field',
     input_type: 'ArrayObjectCard',
