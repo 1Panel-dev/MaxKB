@@ -113,6 +113,13 @@
               </div>
               <div style="position: absolute; bottom: 0">
                 <img src="@/assets/display-bg1.png" alt="" class="w-full" />
+                <div
+                  class="chat-width"
+                  v-if="xpackForm.disclaimer"
+                  style="align-items: center; text-align: center"
+                >
+                  {{ xpackForm.disclaimer_value }}
+                </div>
               </div>
             </div>
           </div>
@@ -304,8 +311,8 @@ const defaultSetting = {
     header_font_color: '#1f2329'
   },
   float_location: {
-    x: { type: '', value: 0 },
-    y: { type: '', value: 0 }
+    y: { type: 'bottom', value: 30 },
+    x: { type: 'right', value: 0 }
   }
 }
 
@@ -329,8 +336,8 @@ const xpackForm = ref<any>({
     header_font_color: '#1f2329'
   },
   float_location: {
-    x: { type: 'bottom', value: 30 },
-    y: { type: 'right', value: 0 }
+    y: { type: 'bottom', value: 30 },
+    x: { type: 'right', value: 0 }
   }
 })
 
@@ -355,9 +362,13 @@ function resetForm() {
   form.value = {
     ...defaultSetting
   }
+  xpackForm.value = {
+    ...defaultSetting
+  }
   imgUrl.value = {
     avatar: '',
-    float_icon: ''
+    float_icon: '',
+    user_avatar: ''
   }
 }
 
