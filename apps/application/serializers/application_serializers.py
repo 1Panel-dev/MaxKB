@@ -216,7 +216,9 @@ class ApplicationSerializer(serializers.Serializer):
         protocol = serializers.CharField(required=True, error_messages=ErrMessage.char("协议"))
         token = serializers.CharField(required=True, error_messages=ErrMessage.char("token"))
 
-        def get_embed(self, with_valid=True, params={}):
+        def get_embed(self, with_valid=True, params=None):
+            if params is None:
+                params = {}
             if with_valid:
                 self.is_valid(raise_exception=True)
             index_path = os.path.join(PROJECT_DIR, 'apps', "application", 'template', 'embed.js')
@@ -232,7 +234,7 @@ class ApplicationSerializer(serializers.Serializer):
             X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
             # 获取接入的query参数
             query = self.get_query_api_input(application_access_token.application, params)
-
+            float_location = {"x": {"type": "right", "value": 0}, "y": {"type": "bottom", "value": 30}}
             application_setting_model = DBModelManage.get_model('application_setting')
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(
@@ -242,6 +244,8 @@ class ApplicationSerializer(serializers.Serializer):
                     if application_setting.float_icon is not None and len(application_setting.float_icon) > 0:
                         float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}{application_setting.float_icon}"
                     show_guide = 'true' if application_setting.show_guide else 'false'
+                    if application_setting.float_location is not None:
+                        float_location = application_setting.float_location
 
             is_auth = 'true' if application_access_token is not None and application_access_token.is_active else 'false'
             t = Template(content)
@@ -255,7 +259,11 @@ class ApplicationSerializer(serializers.Serializer):
                      'is_draggable': is_draggable,
                      'float_icon': float_icon,
                      'query': query,
-                     'show_guide': show_guide}))
+                     'show_guide': show_guide,
+                     'x_type': float_location.get('x', {}).get('type', 'right'),
+                     'x_value': float_location.get('x', {}).get('value', 0),
+                     'y_type': float_location.get('y', {}).get('type', 'bottom'),
+                     'y_value': float_location.get('y', {}).get('value', 30)}))
             response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
             return response
 
