@@ -167,8 +167,8 @@ function initMaxkbStyle(root){
       height: 64px;
       box-shadow: 1px 1px 1px 2000px rgba(0,0,0,.6);
       position: absolute;
-      right: 0;
-      bottom: 30px;
+      {{x_type}}: {{x_value}}px;
+      {{y_type}}: {{y_value}}px;
       z-index: 1000;
   }
   #maxkb .maxkb-tips {
@@ -239,8 +239,8 @@ function initMaxkbStyle(root){
       
       #maxkb .maxkb-chat-button{
         position: fixed;
-        bottom: 30px;
-        right: 0;
+        {{x_type}}: {{x_value}}px;
+        {{y_type}}: {{y_value}}px;
         cursor: pointer;
         max-height:500px;
         max-width:500px;
