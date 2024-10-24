@@ -422,6 +422,7 @@
                   v-model="applicationForm.tts_model_id"
                   class="w-full"
                   popper-class="select-model"
+                  @change="ttsModelChange()"
                   placeholder="请选择语音合成模型"
                 >
                   <el-option-group
@@ -805,6 +806,14 @@ function getTTSModel() {
     .catch(() => {
       loading.value = false
     })
+}
+
+function ttsModelChange() {
+  if (applicationForm.value.tts_model_id) {
+    TTSModeParamSettingDialogRef.value?.reset_default(applicationForm.value.tts_model_id, id)
+  } else {
+    refreshTTSForm({})
+  }
 }
 
 function getProvider() {

@@ -45,8 +45,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     volcanic_cluster: str
     volcanic_api_url: str
     volcanic_token: str
-    speed_ratio: float
-    voice_type: str
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -54,16 +53,14 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         self.volcanic_token = kwargs.get('volcanic_token')
         self.volcanic_app_id = kwargs.get('volcanic_app_id')
         self.volcanic_cluster = kwargs.get('volcanic_cluster')
-        self.voice_type = kwargs.get('voice_type')
-        self.speed_ratio = kwargs.get('speed_ratio')
+        self.params = kwargs.get('params')
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'voice_type': 'BV002_streaming', 'speed_ratio': 1.0}
-        if 'voice_type' in model_kwargs and model_kwargs['voice_type'] is not None:
-            optional_params['voice_type'] = model_kwargs['voice_type']
-        if 'speed_ratio' in model_kwargs and model_kwargs['speed_ratio'] is not None:
-            optional_params['speed_ratio'] = model_kwargs['speed_ratio']
+        optional_params = {'params': {'voice_type': 'BV002_streaming', 'speed_ratio': 1.0}}
+        for key, value in model_kwargs.items():
+            if key not in ['model_id', 'use_local', 'streaming']:
+                optional_params['params'][key] = value
         return VolcanicEngineTextToSpeech(
             volcanic_api_url=model_credential.get('volcanic_api_url'),
             volcanic_token=model_credential.get('volcanic_token'),
@@ -86,12 +83,10 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 "uid": "uid"
             },
             "audio": {
-                "voice_type": self.voice_type,
                 "encoding": "mp3",
-                "speed_ratio": self.speed_ratio,
                 "volume_ratio": 1.0,
                 "pitch_ratio": 1.0,
-            },
+            } | self.params,
             "request": {
                 "reqid": str(uuid.uuid4()),
                 "text": '',

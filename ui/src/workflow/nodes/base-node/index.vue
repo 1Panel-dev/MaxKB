@@ -153,6 +153,7 @@
           v-model="form_data.tts_model_id"
           class="w-full"
           popper-class="select-model"
+          @change="ttsModelChange()"
           placeholder="请选择语音合成模型"
         >
           <el-option-group
@@ -311,6 +312,15 @@ function getTTSModel() {
     ttsModelOptions.value = groupBy(res?.data, 'provider')
   })
 }
+
+function ttsModelChange() {
+  if (form_data.value.tts_model_id) {
+    TTSModeParamSettingDialogRef.value?.reset_default(form_data.value.tts_model_id, id)
+  } else {
+    refreshTTSForm({})
+  }
+}
+
 
 const openTTSParamSettingDialog = () => {
   const model_id = form_data.value.tts_model_id
