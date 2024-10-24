@@ -277,6 +277,9 @@ model_info_list = [
         xinference_llm_model_credential,
         XinferenceChatModel
     ),
+]
+
+voice_model_info = [
     ModelInfo(
         'CosyVoice-300M-SFT',
         'CosyVoice-300M-SFT是一个小型的语音合成模型。',
@@ -359,18 +362,22 @@ embedding_model_info = [
 rerank_list = [ModelInfo('bce-reranker-base_v1',
                          '发布新的重新排名器，建立在强大的 M3 和LLM （GEMMA 和 MiniCPM，实际上没那么大）骨干上，支持多语言处理和更大的输入，大幅提高 BEIR、C-MTEB/Retrieval 的排名性能、MIRACL、LlamaIndex 评估',
                          ModelTypeConst.RERANKER, XInferenceRerankerModelCredential(), XInferenceReranker)]
-model_info_manage = (ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
-    ModelInfo(
-        'phi3',
-        'Phi-3 Mini是Microsoft的3.8B参数，轻量级，最先进的开放模型。',
-        ModelTypeConst.LLM, xinference_llm_model_credential, XinferenceChatModel))
-                     .append_model_info_list(
-    embedding_model_info).append_default_model_info(
-    ModelInfo(
-        '',
-        '',
-        ModelTypeConst.EMBEDDING, xinference_embedding_model_credential, XinferenceEmbedding))
-                     .append_model_info_list(rerank_list).append_default_model_info(rerank_list[0])
+model_info_manage = (ModelInfoManage.builder()
+                     .append_model_info_list(model_info_list)
+                     .append_model_info_list(voice_model_info)
+                     .append_default_model_info(voice_model_info[0])
+                     .append_default_model_info(voice_model_info[1])
+                     .append_default_model_info(ModelInfo('phi3',
+                                                          'Phi-3 Mini是Microsoft的3.8B参数，轻量级，最先进的开放模型。',
+                                                          ModelTypeConst.LLM, xinference_llm_model_credential,
+                                                          XinferenceChatModel))
+                     .append_model_info_list(embedding_model_info)
+                     .append_default_model_info(ModelInfo('',
+                                                          '',
+                                                          ModelTypeConst.EMBEDDING,
+                                                          xinference_embedding_model_credential, XinferenceEmbedding))
+                     .append_model_info_list(rerank_list)
+                     .append_default_model_info(rerank_list[0])
                      .build())
 
 
