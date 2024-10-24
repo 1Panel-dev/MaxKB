@@ -16,20 +16,21 @@ class OpenAITextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     api_base: str
     api_key: str
     model: str
-    voice: str
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.api_base = kwargs.get('api_base')
         self.model = kwargs.get('model')
-        self.voice = kwargs.get('voice', 'alloy')
+        self.params = kwargs.get('params')
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'voice': 'alloy'}
-        if 'voice' in model_kwargs and model_kwargs['voice'] is not None:
-            optional_params['voice'] = model_kwargs['voice']
+        optional_params = {'params': {'voice': 'alloy'}}
+        for key, value in model_kwargs.items():
+            if key not in ['model_id', 'use_local', 'streaming']:
+                optional_params['params'][key] = value
         return OpenAITextToSpeech(
             model=model_name,
             api_base=model_credential.get('api_base'),
@@ -52,8 +53,8 @@ class OpenAITextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         )
         with client.audio.speech.with_streaming_response.create(
                 model=self.model,
-                voice=self.voice,
                 input=text,
+                **self.params
         ) as response:
             return response.read()
 

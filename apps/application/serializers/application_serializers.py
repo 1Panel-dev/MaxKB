@@ -1028,7 +1028,11 @@ class ApplicationSerializer(serializers.Serializer):
             application_id = self.data.get('application_id')
             application = QuerySet(Application).filter(id=application_id).first()
             if application.tts_model_enable:
-                model = get_model_instance_by_model_user_id(application.tts_model_id, application.user_id, **form_data)
+                tts_model_id = application.tts_model_id
+                if 'tts_model_id' in form_data:
+                    tts_model_id = form_data.get('tts_model_id')
+                    del form_data['tts_model_id']
+                model = get_model_instance_by_model_user_id(tts_model_id, application.user_id, **form_data)
                 return model.text_to_speech(text)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):

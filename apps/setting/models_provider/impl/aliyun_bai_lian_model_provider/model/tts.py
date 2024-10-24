@@ -10,23 +10,21 @@ from setting.models_provider.impl.base_tts import BaseTextToSpeech
 class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     api_key: str
     model: str
-    voice: str
-    speech_rate: float
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.model = kwargs.get('model')
-        self.voice = kwargs.get('voice')
-        self.speech_rate = kwargs.get('speech_rate')
+        self.params = kwargs.get('params')
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'voice': 'longxiaochun', 'speech_rate': 1.0}
-        if 'voice' in model_kwargs and model_kwargs['voice'] is not None:
-            optional_params['voice'] = model_kwargs['voice']
-        if 'speech_rate' in model_kwargs and model_kwargs['speech_rate'] is not None:
-            optional_params['speech_rate'] = model_kwargs['speech_rate']
+        optional_params = {'params': {'voice': 'longxiaochun', 'speech_rate': 1.0}}
+        for key, value in model_kwargs.items():
+            if key not in ['model_id', 'use_local', 'streaming']:
+                optional_params['params'][key] = value
+
         return AliyunBaiLianTextToSpeech(
             model=model_name,
             api_key=model_credential.get('api_key'),
@@ -38,7 +36,7 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     def text_to_speech(self, text):
         dashscope.api_key = self.api_key
-        synthesizer = SpeechSynthesizer(model=self.model, voice=self.voice, speech_rate=self.speech_rate)
+        synthesizer = SpeechSynthesizer(model=self.model, **self.params)
         audio = synthesizer.call(text)
         if type(audio) == str:
             print(audio)

@@ -50,11 +50,13 @@ import applicationApi from '@/api/application'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import { keys } from 'lodash'
 import { app } from '@/main'
+import { MsgError } from '@/utils/message'
 
 const {
   params: { id }
 } = app.config.globalProperties.$route as any
 
+const tts_model_id = ref('')
 const model_form_field = ref<Array<FormField>>([])
 const emit = defineEmits(['refresh'])
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
@@ -69,6 +71,7 @@ const getApi = (model_id: string, application_id?: string) => {
 }
 const open = (model_id: string, application_id?: string, model_setting_data?: any) => {
   form_data.value = {}
+  tts_model_id.value = model_id
   const api = getApi(model_id, application_id)
   api.then((ok) => {
     model_form_field.value = ok.data
@@ -104,9 +107,18 @@ const submit = async () => {
 
 const audioPlayer = ref<HTMLAudioElement | null>(null)
 const testPlay = () => {
+  const data = {
+    ...form_data.value,
+    tts_model_id: tts_model_id.value
+  }
   applicationApi
-    .playDemoText(id as string, form_data.value, playLoading)
-    .then((res: any) => {
+    .playDemoText(id as string, data, playLoading)
+    .then(async (res: any) => {
+      if (res.type === 'application/json') {
+        const text = await res.text();
+        MsgError(text)
+        return
+      }
       // 创建 Blob 对象
       const blob = new Blob([res], { type: 'audio/mp3' })
 
