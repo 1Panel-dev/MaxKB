@@ -54,7 +54,7 @@ const init = async () => {
         })
       },
       onLoginFail(err) {
-        MsgError(`errorMsg of errorCbk: ${err.errMsg}`)
+        MsgError(`${err.errMsg}`)
       }
     })
   } catch (error) {
