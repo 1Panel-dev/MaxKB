@@ -5,6 +5,7 @@
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    destroy-on-close
     align-center
     class="display-setting-dialog"
   >
@@ -218,6 +219,7 @@
                     <el-input-number
                       v-model="form.float_location.x.value"
                       :min="0"
+                      :step="1"
                       controls-position="right"
                     />
                     <span class="ml-4">px</span>
@@ -232,6 +234,7 @@
                     <el-input-number
                       v-model="form.float_location.y.value"
                       :min="0"
+                      :step="1"
                       controls-position="right"
                     />
                     <span class="ml-4">px</span>
@@ -348,18 +351,6 @@ const customStyle = computed(() => {
   }
 })
 
-watch(dialogVisible, (bool) => {
-  if (!bool) {
-    form.value = {
-      show_source: false
-    }
-    imgUrl.value = {
-      avatar: '',
-      float_icon: ''
-    }
-  }
-})
-
 function resetForm() {
   form.value = {
     ...defaultSetting
@@ -394,9 +385,10 @@ const open = (data: any, content: any) => {
   imgUrl.value.user_avatar = data.user_avatar
   xpackForm.value.disclaimer = data.disclaimer
   xpackForm.value.disclaimer_value = data.disclaimer_value
-  xpackForm.value.custom_theme.theme_color = data.custom_theme?.theme_color
-  xpackForm.value.custom_theme.header_font_color = data.custom_theme?.header_font_color || '#1f2329'
-
+  xpackForm.value.custom_theme = {
+    theme_color: data.custom_theme?.theme_color || '',
+    header_font_color: data.custom_theme?.header_font_color || '#1f2329'
+  }
   xpackForm.value.float_location = data.float_location
   form.value = xpackForm.value
 
