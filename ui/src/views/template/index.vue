@@ -19,10 +19,10 @@
 
           <el-scrollbar>
             <el-collapse class="template-collapse">
-              <el-collapse-item title="在线模型" name="1">
+              <el-collapse-item title="公有模型" name="1">
                 <template #title>
                   <img src="@/assets/icon_file-folder_colorful.svg" class="mr-8" />
-                  在线模型
+                  公有模型
                 </template>
                 <common-list
                   :data="online_provider_list"

@@ -28,6 +28,8 @@ class CsvSplitHandle(BaseParseTableHandle):
         # 第一行为标题
         title = csv_model[0].split(',')
         for row in csv_model[1:]:
+            if not row:
+                continue
             line = '; '.join([f'{key}:{value}' for key, value in zip(title, row.split(','))])
             paragraphs.append({'title': '', 'content': line})
 
