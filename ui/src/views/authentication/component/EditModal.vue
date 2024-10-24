@@ -1,6 +1,6 @@
 template
 <template>
-  <el-drawer v-model="visible" size="60%" :append-to-body="true">
+  <el-drawer v-model="visible" size="60%" :append-to-body="true" destroy-on-close>
     <template #header>
       <div class="flex align-center" style="margin-left: -8px">
         <h4>{{ currentPlatform.name + '设置' }}</h4>
@@ -120,6 +120,7 @@ const open = async (platform: Platform) => {
     default:
       break
   }
+  formRef.value?.clearValidate()
 }
 defineExpose({ open })
 
@@ -148,6 +149,7 @@ function saveConfig() {
     MsgSuccess('保存成功')
 
     visible.value = false
+    formRef.value?.clearValidate()
   })
 }
 </script>
