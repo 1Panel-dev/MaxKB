@@ -111,15 +111,21 @@
                   <img src="@/assets/display-bg3.png" alt="" width="270" class="ml-8" />
                 </div>
               </div>
-              <div style="position: absolute; bottom: 0">
+              <div
+                style="position: absolute; bottom: 0; padding-bottom: 8px; box-sizing: border-box"
+                class="p-16 text-center w-full"
+              >
                 <img src="@/assets/display-bg1.png" alt="" class="w-full" />
-                <div
-                  class="chat-width"
+                <el-text
+                  type="info"
                   v-if="xpackForm.disclaimer"
-                  style="align-items: center; text-align: center"
+                  class="mt-8"
+                  style="font-size: 12px"
                 >
-                  {{ xpackForm.disclaimer_value }}
-                </div>
+                  <auto-tooltip :content="xpackForm.disclaimer_value">
+                    {{ xpackForm.disclaimer_value }}
+                  </auto-tooltip>
+                </el-text>
               </div>
             </div>
           </div>

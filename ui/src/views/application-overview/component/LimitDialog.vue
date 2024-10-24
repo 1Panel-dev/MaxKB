@@ -43,28 +43,26 @@
       >
         <el-input v-model="form.authentication_value" readonly style="width: 268px" disabled>
           <template #append>
-            <div class="button-container">
-              <el-tooltip content="复制" placement="top">
-                <el-button
-                  type="primary"
-                  text
-                  @click="copyClick(form.authentication_value)"
-                  style="width: 24px; height: 24px"
-                >
-                  <AppIcon iconName="app-copy"></AppIcon>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip content="刷新" placement="top">
-                <el-button
-                  @click="refreshAuthentication"
-                  type="primary"
-                  text
-                  style="width: 24px; height: 24px; margin-left: 20px"
-                >
-                  <el-icon><RefreshRight /></el-icon>
-                </el-button>
-              </el-tooltip>
-            </div>
+            <el-tooltip content="复制" placement="top">
+              <el-button
+                type="primary"
+                text
+                @click="copyClick(form.authentication_value)"
+                style="margin: 0 4px !important"
+              >
+                <AppIcon iconName="app-copy"></AppIcon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip content="刷新" placement="top">
+              <el-button
+                @click="refreshAuthentication"
+                type="primary"
+                text
+                style="margin: 0 4px 0 0 !important"
+              >
+                <el-icon><RefreshRight /></el-icon>
+              </el-button>
+            </el-tooltip>
           </template>
         </el-input>
       </el-form-item>

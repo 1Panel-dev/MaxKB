@@ -172,7 +172,7 @@
         </template>
       </div>
     </el-scrollbar>
-    <div class="ai-chat__operate p-24" v-if="!log">
+    <div class="ai-chat__operate p-16-24" v-if="!log">
       <slot name="operateBefore" />
       <div class="operate-textarea flex chat-width">
         <el-input
@@ -221,12 +221,12 @@
           </el-button>
         </div>
       </div>
-      <div
-        class="chat-width"
-        v-if="data.disclaimer"
-        style="align-items: center; text-align: center; margin-top: 10px"
-      >
-        {{ data.disclaimer_value }}
+      <div class="chat-width text-center" v-if="data.disclaimer" style="margin-top: 8px">
+        <el-text type="info" v-if="data.disclaimer" style="font-size: 12px">
+          <auto-tooltip :content="data.disclaimer_value">
+            {{ data.disclaimer_value }}
+          </auto-tooltip>
+        </el-text>
       </div>
     </div>
   </div>
