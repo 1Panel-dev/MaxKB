@@ -21,8 +21,10 @@
           :render_data="form_item_list"
           ref="dynamicsFormRef"
         >
-        </DynamicsForm> </el-card
-    ></el-col>
+        </DynamicsForm>
+        <el-button @click="validate">校验</el-button>
+      </el-card></el-col
+    >
   </el-row>
 </template>
 <script setup lang="ts">
@@ -30,6 +32,7 @@ import { ref } from 'vue'
 import DynamicsFormConstructor from '@/components/dynamics-form/constructor/index.vue'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 const DynamicsFormConstructorRef = ref<InstanceType<typeof DynamicsFormConstructor>>()
+
 const form_item_list = ref<Array<any>>([])
 const add_field = () => {
   if (DynamicsFormConstructorRef.value) {
@@ -38,8 +41,20 @@ const add_field = () => {
     })
   }
 }
+
 const form_data = ref({})
 const item = ref({})
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
+const validate = () => {
+  console.log('asda')
+  dynamicsFormRef.value
+    ?.validate()
+    .then((ok) => {
+      console.log('ok')
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+}
 </script>
 <style lang="scss"></style>
