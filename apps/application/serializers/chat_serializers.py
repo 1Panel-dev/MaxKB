@@ -189,7 +189,8 @@ class ChatSerializers(serializers.Serializer):
                         f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
                         for index in range(len(improve_paragraph_list))]),
                     row.get('message_tokens') + row.get('answer_tokens'), row.get('run_time'),
-                    str(row.get('create_time'))]
+                    str(row.get('create_time').strftime('%Y-%m-%d %H:%M:%S')
+                        )]
 
         def export(self, data, with_valid=True):
             if with_valid:
