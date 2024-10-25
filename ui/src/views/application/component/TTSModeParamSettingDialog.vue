@@ -100,8 +100,12 @@ const reset_default = (model_id: string, application_id?: string) => {
 }
 
 const submit = async () => {
-  emit('refresh', form_data.value)
-  dialogVisible.value = false
+  dynamicsFormRef.value?.validate().then((ok) => {
+    if (ok) {
+      emit('refresh', form_data.value)
+      dialogVisible.value = false
+    }
+  })
 }
 
 
