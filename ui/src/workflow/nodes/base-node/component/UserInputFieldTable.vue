@@ -5,7 +5,7 @@
       <el-icon class="mr-4">
         <Plus />
       </el-icon>
-      添加参数
+      添加
     </el-button>
   </div>
   <el-table

@@ -1,7 +1,7 @@
 <template>
   <div class="workflow-publish-history border-l">
     <h4 class="border-b p-16-24">发布历史</h4>
-    <div class="left-height pt-0">
+    <div class="list-height pt-0">
       <el-scrollbar>
         <div class="p-8 pt-0">
           <common-list
@@ -137,5 +137,8 @@ onMounted(() => {
   background: #ffffff;
   height: calc(100vh - 57px);
   z-index: 9;
+  .list-height {
+    height: calc(100vh - 120px);
+  }
 }
 </style>

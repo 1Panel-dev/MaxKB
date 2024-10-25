@@ -49,6 +49,10 @@ const graphData = computed({
 
 const lf = ref()
 onMounted(() => {
+  renderGraphData()
+})
+
+const renderGraphData = () => {
   const container: any = document.querySelector('#container')
   if (container) {
     lf.value = new LogicFlow({
@@ -94,7 +98,7 @@ onMounted(() => {
       lf.value?.fitView()
     }, 500)
   }
-})
+}
 const validate = () => {
   return Promise.all(lf.value.graphModel.nodes.map((element: any) => element?.validate?.()))
 }
@@ -137,7 +141,8 @@ defineExpose({
   validate,
   getGraphData,
   addNode,
-  clearGraphData
+  clearGraphData,
+  renderGraphData
 })
 </script>
 <style lang="scss">

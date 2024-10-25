@@ -180,7 +180,7 @@ function clickoutsideHistory() {
 }
 
 function refreshVersion(item?: any) {
-  if (item) { 
+  if (item) {
     getHistortyDetail(item.id)
   }
   initInterval()
@@ -199,10 +199,12 @@ function getHistortyDetail(versionId: string) {
     res.data?.work_flow['nodes'].map((v: any) => {
       v['properties']['noRender'] = true
     })
+    detail.value.work_flow = res.data.work_flow
     detail.value.stt_model_id = res.data.stt_model
     detail.value.tts_model_id = res.data.tts_model
     detail.value.tts_type = res.data.tts_type
     saveTime.value = res.data?.update_time
+    workflowRef.value?.renderGraphData()
   })
 }
 
