@@ -12,7 +12,7 @@
     center
     :modal="true"
   >
-    <el-form ref="FormRef" :model="form">
+    <el-form ref="FormRef" :model="form" @submit.prevent="validator">
       <el-form-item prop="value" :rules="rules.value">
         <el-input show-password v-model="form.value" />
       </el-form-item>
