@@ -1,5 +1,5 @@
 <template>
-  <div id="wecom-qr" class="wecom-qr"></div>
+  <div id="wecom-qr" class="wecom-qr" style="margin-left: 60px"></div>
 </template>
 
 <script lang="ts" setup>
