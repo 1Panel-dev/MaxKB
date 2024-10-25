@@ -146,7 +146,8 @@ const initDefaultData = (formField: FormField) => {
     formField.default_value &&
     (formValue.value[formField.field] === undefined ||
       formValue.value[formField.field] === null ||
-      !formValue.value[formField.field])
+      !formValue.value[formField.field]) &&
+    formValue.value[formField.field] != false
   ) {
     formValue.value[formField.field] = formField.default_value
   }
