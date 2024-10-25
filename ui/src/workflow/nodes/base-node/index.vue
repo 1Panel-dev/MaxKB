@@ -129,11 +129,12 @@
             <span class="mr-4">语音播放</span>
             <div>
               <el-button
-                v-if="form_data.tts_type === 'TTS'"
+                v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
                 type="primary"
                 link
                 @click="openTTSParamSettingDialog"
                 :disabled="!form_data.tts_model_id"
+                class="mr-4"
               >
                 <el-icon class="mr-4">
                   <Setting />
@@ -320,7 +321,6 @@ function ttsModelChange() {
     refreshTTSForm({})
   }
 }
-
 
 const openTTSParamSettingDialog = () => {
   const model_id = form_data.value.tts_model_id
