@@ -21,7 +21,12 @@ template
         :prop="key"
         :rules="getValidationRules(key)"
       >
-        <el-input v-model="currentPlatform.config[key]" :default-value="''"></el-input>
+        <el-input
+          v-model="currentPlatform.config[key]"
+          :type="isPasswordField(key) ? 'password' : 'text'"
+          :show-password="isPasswordField(key)"
+        >
+        </el-input>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -143,6 +148,10 @@ function validateConnection() {
     }
   })
 }
+
+const passwordFields = new Set(['app_secret', 'client_secret', 'secret'])
+
+const isPasswordField = (key: any) => passwordFields.has(key)
 
 function saveConfig() {
   platformApi.updateConfig(currentPlatform, loading).then((res: any) => {
