@@ -75,12 +75,10 @@ const open = (model_id: string, application_id?: string, model_setting_data?: an
   const api = getApi(model_id, application_id)
   api.then((ok) => {
     model_form_field.value = ok.data
-    model_setting_data =
-      model_setting_data && keys(model_setting_data).length > 0
-        ? model_setting_data
-        : ok.data
+    const resp = ok.data
           .map((item: any) => ({ [item.field]: item.default_value }))
           .reduce((x, y) => ({ ...x, ...y }), {})
+    model_setting_data = { ...resp, ...model_setting_data }
     // 渲染动态表单
     dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
   })
