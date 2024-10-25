@@ -5,15 +5,16 @@
     prop="default_value"
     :rules="[default_value_rule]"
   >
-    <JsonInput v-model="formValue.default_value"> </JsonInput>
+    <JsonInput ref="jsonInputRef" v-model="formValue.default_value"> </JsonInput>
   </el-form-item>
 </template>
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import JsonInput from '@/components/dynamics-form/items/JsonInput.vue'
 const props = defineProps<{
   modelValue: any
 }>()
+const formField = ref<any>({})
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
   set: (item) => {
@@ -23,8 +24,9 @@ const formValue = computed({
     return props.modelValue
   }
 })
-
+const jsonInputRef = ref<InstanceType<typeof JsonInput>>()
 const getData = () => {
+  console.log('xx')
   return {
     input_type: 'JsonInput',
     attrs: {},
@@ -33,11 +35,8 @@ const getData = () => {
         {
           required: true,
           validator: `validator = (rule, value, callback) => {
-  try {
-    JSON.parse(value)
-  } catch (e) {
-    callback(new Error('JSON格式不正确'))
-  }
+            return componentFormRef.value?.validate_rules(rule, value, callback);
+             
 }`,
           trigger: 'blur'
         }
@@ -50,11 +49,7 @@ const getData = () => {
 const default_value_rule = {
   required: true,
   validator: (rule: any, value: any, callback: any) => {
-    try {
-      JSON.parse(value)
-    } catch (e) {
-      callback(new Error('JSON格式不正确'))
-    }
+    jsonInputRef.value?.validate_rules(rule, value, callback)
     return true
   },
   trigger: 'blur'
@@ -65,7 +60,7 @@ const rander = (form_data: any) => {
 }
 defineExpose({ getData, rander })
 onMounted(() => {
-  formValue.value.default_value = '{}'
+  formValue.value.default_value = {}
 })
 </script>
 <style lang="scss"></style>

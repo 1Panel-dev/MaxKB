@@ -114,6 +114,7 @@ const errMsg = computed(() => {
 const to_rule = (rule: any) => {
   if (rule.validator) {
     let validator = (rule: any, value: string, callback: any) => {}
+    eval(rule.validator)
     return { ...rule, validator }
   }
   return rule
