@@ -48,7 +48,7 @@
               <el-dropdown-item>
                 <AppIcon iconName="app-save-outlined"></AppIcon>
                 自动保存
-                <div @click.stop class="ml-4">
+                <div class="ml-4">
                   <el-switch size="small" v-model="isSave" @change="changeSave" />
                 </div>
               </el-dropdown-item>

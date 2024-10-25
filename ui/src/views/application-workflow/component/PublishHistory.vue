@@ -8,7 +8,7 @@
             :data="LogData"
             class="mt-8"
             v-loading="loading"
-            @click.stop="clickListHandle"
+            @click="clickListHandle"
             @mouseenter="mouseenter"
             @mouseleave="mouseId = ''"
           >
