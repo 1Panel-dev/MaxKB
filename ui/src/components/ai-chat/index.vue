@@ -468,7 +468,7 @@ function handleInputFieldList() {
                   field: v.variable,
                   input_type: 'TextInput',
                   label: v.variable,
-                  default_value: default_value[v.variable],
+                  default_value: v.default_value || default_value[v.variable],
                   required: v.is_required
                 }
               case 'select':
@@ -476,7 +476,7 @@ function handleInputFieldList() {
                   field: v.variable,
                   input_type: 'SingleSelect',
                   label: v.variable,
-                  default_value: default_value[v.variable],
+                  default_value: v.default_value || default_value[v.variable],
                   required: v.is_required,
                   option_list: v.optionList.map((o: any) => {
                     return { key: o, value: o }
@@ -487,7 +487,7 @@ function handleInputFieldList() {
                   field: v.variable,
                   input_type: 'DatePicker',
                   label: v.variable,
-                  default_value: default_value[v.variable],
+                  default_value: v.default_value || default_value[v.variable],
                   required: v.is_required,
                   attrs: {
                     format: 'YYYY-MM-DD HH:mm:ss',
