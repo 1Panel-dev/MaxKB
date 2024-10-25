@@ -11,9 +11,11 @@ import logging
 import re
 import traceback
 
+from django.db.models import QuerySet
+
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
-from dataset.models import Type, Document, Status
+from dataset.models import Type, Document, DataSet, Status
 
 max_kb_error = logging.getLogger("max_kb_error")
 max_kb = logging.getLogger("max_kb")
@@ -32,6 +34,34 @@ def get_save_handler(dataset_id, selector):
                     {'name': document_name, 'paragraphs': paragraphs,
                      'meta': {'source_url': child_link.url, 'selector': selector},
                      'type': Type.web}, with_valid=True)
+            except Exception as e:
+                logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
+
+    return handler
+
+
+def get_sync_handler(dataset_id):
+    from dataset.serializers.document_serializers import DocumentSerializers
+    dataset = QuerySet(DataSet).filter(id=dataset_id).first()
+
+    def handler(child_link: ChildLink, response: Fork.Response):
+        if response.status == 200:
+            try:
+
+                document_name = child_link.tag.text if child_link.tag is not None and len(
+                    child_link.tag.text.strip()) > 0 else child_link.url
+                paragraphs = get_split_model('web.md').parse(response.content)
+                first = QuerySet(Document).filter(meta__source_url=child_link.url.strip(),
+                                                  dataset=dataset).first()
+                if first is not None:
+                    # 如果存在,使用文档同步
+                    DocumentSerializers.Sync(data={'document_id': first.id}).sync()
+                else:
+                    # 插入
+                    DocumentSerializers.Create(data={'dataset_id': dataset.id}).save(
+                        {'name': document_name, 'paragraphs': paragraphs,
+                         'meta': {'source_url': child_link.url.strip(), 'selector': dataset.meta.get('selector')},
+                         'type': Type.web}, with_valid=True)
             except Exception as e:
                 logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
 
