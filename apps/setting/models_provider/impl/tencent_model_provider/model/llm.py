@@ -18,9 +18,7 @@ class TencentModel(MaxKBBaseModel, ChatHunyuan):
         hunyuan_secret_id = credentials.get('hunyuan_secret_id')
         hunyuan_secret_key = credentials.get('hunyuan_secret_key')
 
-        optional_params = {}
-        if 'temperature' in kwargs:
-            optional_params['temperature'] = kwargs['temperature']
+        optional_params = MaxKBBaseModel.filter_optional_params(kwargs)
 
         if not all([hunyuan_app_id, hunyuan_secret_id, hunyuan_secret_key]):
             raise ValueError(

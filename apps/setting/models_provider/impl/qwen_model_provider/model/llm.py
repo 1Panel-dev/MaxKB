@@ -27,11 +27,7 @@ class QwenChatModel(MaxKBBaseModel, ChatTongyi):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         chat_tong_yi = QwenChatModel(
             model_name=model_name,
             dashscope_api_key=model_credential.get('api_key'),

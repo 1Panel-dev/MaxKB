@@ -30,11 +30,7 @@ class GeminiChatModel(MaxKBBaseModel, ChatGoogleGenerativeAI):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
-        if 'temperature' in model_kwargs:
-            optional_params['temperature'] = model_kwargs['temperature']
-        if 'max_tokens' in model_kwargs:
-            optional_params['max_output_tokens'] = model_kwargs['max_tokens']
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
 
         gemini_chat = GeminiChatModel(
             model=model_name,

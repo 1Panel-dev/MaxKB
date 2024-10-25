@@ -26,11 +26,7 @@ class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_output_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return QianfanChatModel(model=model_name,
                                 qianfan_ak=model_credential.get('api_key'),
                                 qianfan_sk=model_credential.get('secret_key'),

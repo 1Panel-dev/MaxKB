@@ -6,11 +6,10 @@
     @date：2024/04/19 15:55
     @desc:
 """
-import json
 from typing import List, Optional, Any, Iterator, Dict
 
-from langchain_community.chat_models.sparkllm import _convert_message_to_dict, _convert_delta_to_message_chunk, \
-    ChatSparkLLM
+from langchain_community.chat_models.sparkllm import \
+    ChatSparkLLM, _convert_message_to_dict, _convert_delta_to_message_chunk
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.messages import BaseMessage, AIMessageChunk
 from langchain_core.outputs import ChatGenerationChunk
@@ -25,11 +24,7 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return XFChatSparkLLM(
             spark_app_id=model_credential.get('spark_app_id'),
             spark_api_key=model_credential.get('spark_api_key'),

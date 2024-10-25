@@ -7,43 +7,41 @@
     @desc:
 """
 
-from langchain_community.chat_models import ChatZhipuAI
-from langchain_community.chat_models.zhipuai import _truncate_params, _get_jwt_token, connect_sse, \
-    _convert_delta_to_message_chunk
-from setting.models_provider.base_model_provider import MaxKBBaseModel
 import json
 from collections.abc import Iterator
 from typing import Any, Dict, List, Optional
 
+from langchain_community.chat_models import ChatZhipuAI
+from langchain_community.chat_models.zhipuai import _truncate_params, _get_jwt_token, connect_sse, \
+    _convert_delta_to_message_chunk
 from langchain_core.callbacks import (
     CallbackManagerForLLMRun,
 )
-
 from langchain_core.messages import (
     AIMessageChunk,
     BaseMessage
 )
 from langchain_core.outputs import ChatGenerationChunk
 
+from setting.models_provider.base_model_provider import MaxKBBaseModel
+
 
 class ZhipuChatModel(MaxKBBaseModel, ChatZhipuAI):
+    optional_params: dict
+
     @staticmethod
     def is_cache_model():
         return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
-
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         zhipuai_chat = ZhipuChatModel(
             api_key=model_credential.get('api_key'),
             model=model_name,
             streaming=model_kwargs.get('streaming', False),
-            **optional_params
+            optional_params=optional_params,
+            **optional_params,
         )
         return zhipuai_chat
 
@@ -71,7 +69,7 @@ class ZhipuChatModel(MaxKBBaseModel, ChatZhipuAI):
         if self.zhipuai_api_base is None:
             raise ValueError("Did not find zhipu_api_base.")
         message_dicts, params = self._create_message_dicts(messages, stop)
-        payload = {**params, **kwargs, "messages": message_dicts, "stream": True}
+        payload = {**params, **kwargs, **self.optional_params, "messages": message_dicts, "stream": True}
         _truncate_params(payload)
         headers = {
             "Authorization": _get_jwt_token(self.zhipuai_api_key),
