@@ -12,11 +12,7 @@ class VolcanicEngineChatModel(MaxKBBaseModel, BaseChatOpenAI):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return VolcanicEngineChatModel(
             model=model_name,
             openai_api_base=model_credential.get('api_base'),

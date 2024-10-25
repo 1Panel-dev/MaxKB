@@ -1,7 +1,11 @@
 # coding=utf-8
 
-from typing import Dict
+from typing import Dict, Optional, List, Any, Iterator
 from urllib.parse import urlparse, ParseResult
+
+from langchain_core.language_models import LanguageModelInput
+from langchain_core.messages import BaseMessageChunk
+from langchain_core.runnables import RunnableConfig
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
@@ -26,11 +30,7 @@ class XinferenceChatModel(MaxKBBaseModel, BaseChatOpenAI):
         api_base = model_credential.get('api_base', '')
         base_url = get_base_url(api_base)
         base_url = base_url if base_url.endswith('/v1') else (base_url + '/v1')
-        optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return XinferenceChatModel(
             model=model_name,
             openai_api_base=base_url,

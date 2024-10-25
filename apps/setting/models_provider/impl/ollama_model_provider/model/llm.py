@@ -34,11 +34,7 @@ class OllamaChatModel(MaxKBBaseModel, ChatOpenAI):
         api_base = model_credential.get('api_base', '')
         base_url = get_base_url(api_base)
         base_url = base_url if base_url.endswith('/v1') else (base_url + '/v1')
-        optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
 
         return OllamaChatModel(model=model_name, openai_api_base=base_url,
                                openai_api_key=model_credential.get('api_key'),

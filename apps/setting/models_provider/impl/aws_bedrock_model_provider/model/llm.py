@@ -40,12 +40,7 @@ class BedrockModel(MaxKBBaseModel, BedrockChat):
     @classmethod
     def new_instance(cls, model_type: str, model_name: str, model_credential: Dict[str, str],
                      **model_kwargs) -> 'BedrockModel':
-        optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            keyword = get_max_tokens_keyword(model_name)
-            optional_params[keyword] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
 
         return cls(
             model_id=model_name,
