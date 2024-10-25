@@ -41,7 +41,13 @@
         :label="$t('views.applicationOverview.appInfo.LimitDialog.authenticationValue')"
         v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')"
       >
-        <el-input v-model="form.authentication_value" readonly style="width: 268px" disabled>
+        <el-input
+          class="authentication-append-input"
+          v-model="form.authentication_value"
+          readonly
+          style="width: 268px"
+          disabled
+        >
           <template #append>
             <el-tooltip content="复制" placement="top">
               <el-button
@@ -182,4 +188,10 @@ function firstGeneration() {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope></style>
+<style lang="scss" scope>
+.authentication-append-input {
+  .el-input-group__append {
+    padding: 0 !important;
+  }
+}
+</style>
