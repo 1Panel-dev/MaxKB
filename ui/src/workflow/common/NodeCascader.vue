@@ -59,18 +59,20 @@ function _getIncomingNode(id: String, startId: String, value: Array<any>) {
   if (list.length > 0) {
     list.forEach((item: any) => {
       if (!value.some((obj: any) => obj.id === item.id)) {
-        value.unshift({
-          value: item.id,
-          label: item.properties.stepName,
-          type: item.type,
-          children: item.properties?.config?.fields || []
-        })
-        if (item.properties?.globalFields && item.type === 'start-node') {
-          firstElement = {
-            value: 'global',
-            label: '全局变量',
-            type: 'global',
-            children: item.properties?.config?.globalFields || []
+        if (!value.some((value_item) => value_item.value === item.id)) {
+          value.unshift({
+            value: item.id,
+            label: item.properties.stepName,
+            type: item.type,
+            children: item.properties?.config?.fields || []
+          })
+          if (item.properties?.globalFields && item.type === 'start-node') {
+            firstElement = {
+              value: 'global',
+              label: '全局变量',
+              type: 'global',
+              children: item.properties?.config?.globalFields || []
+            }
           }
         }
       }
