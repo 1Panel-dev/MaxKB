@@ -15,8 +15,9 @@
         size="small"
         class="source_dataset-button"
         @click="openParagraph(data, dataset.id)"
-        >{{ dataset.name }}</el-button
       >
+        <span class="ellipsis"> {{ dataset.name }}</span>
+      </el-button>
     </el-space>
   </div>
 

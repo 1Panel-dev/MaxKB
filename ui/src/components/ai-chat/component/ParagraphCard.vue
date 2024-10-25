@@ -17,11 +17,11 @@
     </template>
     <template #footer>
       <div class="footer-content flex-between">
-        <el-text>
-          <el-icon>
+        <el-text class="flex align-center" style="width: 70%;">
+          <el-icon class="mr-4">
             <Document />
           </el-icon>
-          {{ data?.document_name }}
+          <span class="ellipsis-1">{{ data?.document_name }}</span>
         </el-text>
         <div class="flex align-center" style="line-height: 32px">
           <AppAvatar class="mr-8 avatar-blue" shape="square" :size="18">

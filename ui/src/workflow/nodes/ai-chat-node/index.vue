@@ -22,7 +22,7 @@
           }"
         >
           <template #label>
-            <div class="flex-between">
+            <div class="flex-between w-full">
               <div>
                 <span>AI 模型<span class="danger">*</span></span>
               </div>
