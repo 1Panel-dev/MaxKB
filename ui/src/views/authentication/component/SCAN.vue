@@ -54,8 +54,11 @@
                       text
                       @click="toggleShowPassword(item.key)"
                     >
-                      <el-icon>
+                      <el-icon v-if="key === 'app_secret' && !showPassword[item.key]?.[key]">
                         <Hide />
+                      </el-icon>
+                      <el-icon v-if="key === 'app_secret' && showPassword[item.key]?.[key]">
+                        <View />
                       </el-icon>
                     </el-button>
                   </div>
