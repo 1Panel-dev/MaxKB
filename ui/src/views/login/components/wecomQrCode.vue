@@ -67,9 +67,7 @@ init()
 
 <style scoped lang="scss">
 .wecom-qr {
-  margin-top: -40px;
-}
-:deep(.wwLogin_qrcode_head) {
-  padding: 0 !important;
+  margin-top: -20px;
+  height: 331px;
 }
 </style>
