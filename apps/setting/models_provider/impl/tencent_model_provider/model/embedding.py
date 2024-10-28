@@ -17,7 +17,7 @@ class TencentEmbeddingModel(MaxKBBaseModel, Embeddings):
         request = GetEmbeddingRequest()
         request.Input = text
         res = self.client.GetEmbedding(request)
-        return res.Data
+        return res.Data[0].Embedding
 
     def __init__(self, secret_id: str, secret_key: str, model_name: str):
         self.secret_id = secret_id

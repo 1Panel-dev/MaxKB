@@ -22,14 +22,19 @@ class MarkChunkHandle(IChunkHandle):
         for chunk in chunk_list:
             chunk_result = re.findall(split_chunk_pattern, chunk, flags=re.DOTALL)
             for c_r in chunk_result:
-                result.append(c_r)
+                if len(c_r.strip()) > 0:
+                    result.append(c_r.strip())
+
             other_chunk_list = re.split(split_chunk_pattern, chunk, flags=re.DOTALL)
             for other_chunk in other_chunk_list:
                 if len(other_chunk) > 0:
                     if len(other_chunk) < max_chunk_len:
-                        result.append(other_chunk)
+                        if len(other_chunk.strip()) > 0:
+                            result.append(other_chunk.strip())
                     else:
                         max_chunk_list = re.findall(max_chunk_pattern, other_chunk, flags=re.DOTALL)
                         for m_c in max_chunk_list:
-                            result.append(m_c)
+                            if len(m_c.strip()) > 0:
+                                result.append(m_c.strip())
+
         return result

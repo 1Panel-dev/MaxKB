@@ -68,9 +68,37 @@ const md_view_list = computed(() => {
       return md_img_list[Math.floor(index / 2)]
     }
   })
-  return split_echarts_rander(split_html_rander(split_quick_question(result)))
+  return split_echarts_rander(split_html_rander(split_quick_question(split_md_img(result))))
 })
+const split_md_img = (result: Array<string>) => {
+  return result
+    .map((item) => split_md_img_(item))
+    .reduce((x: any, y: any) => {
+      return [...x, ...y]
+    }, [])
+}
 
+const split_md_img_ = (source: string) => {
+  const temp_md_img_list = source.match(/(!\[.*?\]\(.*?\){.*?})|(!\[.*?\]\(.*?\))/g)
+  console.log(temp_md_img_list)
+  const md_img_list = temp_md_img_list ? temp_md_img_list.filter((i) => i) : []
+  const split_img_value = source
+    .split(/(!\[.*?\]\(.*?\){.*?})|(!\[.*?\]\(.*?\))/g)
+    .filter((item) => item !== undefined)
+    .filter((item) => !md_img_list?.includes(item))
+  const result = Array.from(
+    { length: md_img_list.length + split_img_value.length },
+    (v, i) => i
+  ).map((index) => {
+    if (index % 2 == 0) {
+      return split_img_value[Math.floor(index / 2)]
+    } else {
+      return md_img_list[Math.floor(index / 2)]
+    }
+  })
+  console.log(result)
+  return result
+}
 const split_quick_question = (result: Array<string>) => {
   return result
     .map((item) => split_quick_question_(item))
