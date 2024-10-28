@@ -3,7 +3,10 @@
     class="chat-pc layout-bg"
     :class="classObj"
     v-loading="loading"
-    :style="{ '--el-color-primary': applicationDetail?.custom_theme?.theme_color }"
+    :style="{
+      '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
+      '--el-color-primary-light-9': hexToRgba(applicationDetail?.custom_theme?.theme_color, 0.1)
+    }"
   >
     <div class="chat-pc__header" :style="customStyle">
       <div class="flex align-center">
@@ -43,6 +46,13 @@
             <el-scrollbar>
               <div class="p-8 pt-0">
                 <common-list
+                  :style="{
+                    '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
+                    '--el-color-primary-light-9': hexToRgba(
+                      applicationDetail?.custom_theme?.theme_color,
+                      0.1
+                    )
+                  }"
                   :data="chatLogData"
                   class="mt-8"
                   v-loading="left_loading"
@@ -135,6 +145,7 @@ import { saveAs } from 'file-saver'
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
+import { hexToRgba } from '@/utils/theme'
 
 useResize()
 
