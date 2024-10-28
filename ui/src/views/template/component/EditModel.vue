@@ -80,7 +80,7 @@
           </template>
           <el-select
             v-loading="model_type_loading"
-            @change="list_base_model($event)"
+            @change="list_base_model($event, true)"
             v-model="base_form_data.model_type"
             class="w-full m-2"
             placeholder="请选择模型类型"
@@ -203,7 +203,10 @@ const getModelForm = (model_name: string) => {
     })
   }
 }
-const list_base_model = (model_type: any) => {
+const list_base_model = (model_type: any, change?: boolean) => {
+  if (change) {
+    base_form_data.value.model_name = ''
+  }
   if (providerValue.value) {
     ModelApi.listBaseModel(providerValue.value.provider, model_type, base_model_loading).then(
       (ok) => {
