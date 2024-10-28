@@ -12,6 +12,7 @@ import asyncio
 import copy
 import gzip
 import json
+import re
 import uuid
 from typing import Dict
 import ssl
@@ -112,6 +113,8 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                                       ssl=ssl_context) as ws:
             lines = text.split('\n')
             for line in lines:
+                if self.is_table_format_chars_only(line):
+                    continue
                 submit_request_json["request"]["reqid"] = str(uuid.uuid4())
                 submit_request_json["request"]["text"] = line
                 payload_bytes = str.encode(json.dumps(submit_request_json))
@@ -122,6 +125,11 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 await ws.send(full_client_request)
                 result += await self.parse_response(ws)
         return result
+
+    @staticmethod
+    def is_table_format_chars_only(s):
+        # 检查是否仅包含 "|", "-", 和空格字符
+        return bool(s) and re.fullmatch(r'[|\-\s]+', s)
 
     @staticmethod
     async def parse_response(ws):
