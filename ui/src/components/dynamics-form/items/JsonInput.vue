@@ -108,8 +108,10 @@ const validate_rules = (rule: any, value: any, callback: any) => {
       JSON.parse(model_value.value)
     } catch (e) {
       callback(new Error('JSON格式不正确'))
+      return false
     }
   }
+  return true
 }
 
 defineExpose({ validate_rules: validate_rules })

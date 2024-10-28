@@ -87,6 +87,7 @@ const rander = (form_data: any) => {
 defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.option_list = []
+  formValue.value.default_value = ''
 })
 </script>
 <style lang="scss" scoped>
