@@ -33,7 +33,7 @@ const getData = () => {
 }
 
 const rander = (form_data: any) => {
-  formValue.value.default_value = form_data.default_value
+  formValue.value.default_value = form_data.default_value || false
 }
 defineExpose({ getData, rander })
 onMounted(() => {
