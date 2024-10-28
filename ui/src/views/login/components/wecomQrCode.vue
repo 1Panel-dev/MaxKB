@@ -1,5 +1,5 @@
 <template>
-  <div id="wecom-qr" class="wecom-qr" style="margin-left: 60px"></div>
+  <div id="wecom-qr" class="wecom-qr" style="margin-left: 50px"></div>
 </template>
 
 <script lang="ts" setup>
@@ -65,4 +65,11 @@ const init = async () => {
 init()
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.wecom-qr {
+  margin-top: -40px;
+}
+:deep(.wwLogin_qrcode_head) {
+  padding: 0 !important;
+}
+</style>

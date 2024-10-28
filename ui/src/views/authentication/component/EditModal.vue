@@ -152,11 +152,11 @@ function validateConnection() {
 const passwordFields = new Set(['app_secret', 'client_secret', 'secret'])
 
 const isPasswordField = (key: any) => passwordFields.has(key)
-
+const emit = defineEmits(['refresh'])
 function saveConfig() {
   platformApi.updateConfig(currentPlatform, loading).then((res: any) => {
     MsgSuccess('保存成功')
-
+    emit('refresh')
     visible.value = false
     formRef.value?.clearValidate()
   })

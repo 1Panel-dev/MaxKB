@@ -158,6 +158,7 @@ function formatFieldName(key?: any): string {
 }
 
 function getPlatformInfo() {
+  loading.value = true
   platformApi.getPlatformInfo(loading).then((res: any) => {
     if (res) {
       platforms.forEach((platform) => {
