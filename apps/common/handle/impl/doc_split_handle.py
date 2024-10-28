@@ -10,6 +10,7 @@ import io
 import re
 import traceback
 import uuid
+from functools import reduce
 from typing import List
 
 from docx import Document, ImagePart
@@ -31,6 +32,7 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
 old_docx_nsmap = {'v': 'urn:schemas-microsoft-com:vml'}
 combine_nsmap = {**ns.nsmap, **old_docx_nsmap}
 
+
 def image_to_mode(image, doc: Document, images_list, get_image_id, is_new_docx=True):
     if is_new_docx:
         image_ids = image.xpath('.//a:blip/@r:embed')
@@ -46,18 +48,31 @@ def image_to_mode(image, doc: Document, images_list, get_image_id, is_new_docx=T
             return f'![](/api/image/{image_uuid})'
 
 
+def get_paragraph_element_images(paragraph_element, doc: Document, images_list, get_image_id):
+    images_xpath_list = [".//pic:pic", ".//w:pict"]
+    images = []
+    for images_xpath in images_xpath_list:
+        try:
+            _images = paragraph_element.xpath(images_xpath)
+            if _images is not None and len(_images) > 0:
+                for image in _images:
+                    images.append(image)
+        except Exception as e:
+            pass
+    return images
+
+
+def images_to_string(images, doc: Document, images_list, get_image_id):
+    return "".join(
+        [item for item in [image_to_mode(image, doc, images_list, get_image_id) for image in images] if
+         item is not None])
+
+
 def get_paragraph_element_txt(paragraph_element, doc: Document, images_list, get_image_id):
     try:
-        images = paragraph_element.xpath(".//pic:pic")
-        old_docx_images = paragraph_element.xpath(".//w:pict")
+        images = get_paragraph_element_images(paragraph_element, doc, images_list, get_image_id)
         if len(images) > 0:
-            return "".join(
-                [item for item in [image_to_mode(image, doc, images_list, get_image_id) for image in images] if
-                 item is not None])
-        elif len(old_docx_images) > 0:
-            return "".join(
-                [item for item in [image_to_mode(image, doc, images_list, get_image_id, is_new_docx=False) for image in old_docx_images] if
-                 item is not None])
+            return images_to_string(images, doc, images_list, get_image_id)
         elif paragraph_element.text is not None:
             return paragraph_element.text
         return ""
@@ -101,8 +116,18 @@ class DocSplitHandle(BaseSplitHandle):
         try:
             psn = paragraph.style.name
             if psn.startswith('Heading'):
-                return "".join(["#" for i in range(int(psn.replace("Heading ", '')))]) + " " + paragraph.text
+                title = "".join(["#" for i in range(int(psn.replace("Heading ", '')))]) + " " + paragraph.text
+                images = reduce(lambda x, y: [*x, *y],
+                                [get_paragraph_element_images(e, doc, images_list, get_image_id) for e in
+                                 paragraph._element],
+                                [])
+
+                if len(images) > 0:
+                    return title + '\n' + images_to_string(images, doc, images_list, get_image_id) if len(
+                        paragraph.text) > 0 else images_to_string(images, doc, images_list, get_image_id)
+                return title
         except Exception as e:
+            traceback.print_exc()
             return paragraph.text
         return get_paragraph_txt(paragraph, doc, images_list, get_image_id)
 
