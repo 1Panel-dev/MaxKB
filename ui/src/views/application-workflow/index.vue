@@ -176,6 +176,7 @@ const currentVersion = ref<any>({})
 function clickoutsideHistory() {
   if (!disablePublic.value) {
     showHistory.value = false
+    disablePublic.value = false
   }
 }
 
@@ -183,7 +184,9 @@ function refreshVersion(item?: any) {
   if (item) {
     getHistortyDetail(item.id)
   }
-  initInterval()
+  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
+    initInterval()
+  }
   showHistory.value = false
   disablePublic.value = false
 }
@@ -204,13 +207,19 @@ function getHistortyDetail(versionId: string) {
     detail.value.tts_model_id = res.data.tts_model
     detail.value.tts_type = res.data.tts_type
     saveTime.value = res.data?.update_time
-    workflowRef.value?.renderGraphData()
+    setTimeout(() => {
+      workflowRef.value?.renderGraphData()
+    }, 200)
   })
 }
 
 function closeHistory() {
   getDetail()
+  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
+    initInterval()
+  }
   showHistory.value = false
+  disablePublic.value = false
 }
 
 function openHistory() {
@@ -317,6 +326,9 @@ function getDetail() {
     detail.value.tts_model_id = res.data.tts_model
     detail.value.tts_type = res.data.tts_type
     saveTime.value = res.data?.update_time
+    setTimeout(() => {
+      workflowRef.value?.renderGraphData()
+    }, 200)
   })
 }
 
@@ -355,7 +367,7 @@ onMounted(() => {
   const workflowAutoSave = localStorage.getItem('workflowAutoSave')
   isSave.value = workflowAutoSave === 'true' ? true : false
   // 初始化定时任务
-  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && workflowAutoSave) {
+  if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
     initInterval()
   }
 })
