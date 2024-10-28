@@ -205,6 +205,12 @@ onMounted(() => {
       user
         .getAuthType()
         .then((res) => {
+          //如果结果包含LDAP，把LDAP放在第一个
+          const ldapIndex = res.indexOf('LDAP')
+          if (ldapIndex !== -1) {
+            const [ldap] = res.splice(ldapIndex, 1)
+            res.unshift(ldap)
+          }
           modeList.value = [...modeList.value, ...res]
         })
         .finally(() => (loading.value = false))
