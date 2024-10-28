@@ -64,6 +64,7 @@ const open = () => {
   dialogVisible.value = true
   ModelApi.getProvider(loading).then((ok) => {
     list_provider.value = ok.data
+    list_provider.value.sort((a, b) => a.provider.localeCompare(b.provider))
   })
 }
 
@@ -75,6 +76,7 @@ const checkModelType = (model_type: string) => {
   currentModelType.value = modelTypeOptions.value.filter((item) => item.value === model_type)[0].text
   ModelApi.getProviderByModelType(model_type, loading).then((ok) => {
     list_provider.value = ok.data
+    list_provider.value.sort((a, b) => a.provider.localeCompare(b.provider))
   })
 }
 
