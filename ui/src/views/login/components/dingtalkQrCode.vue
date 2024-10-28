@@ -13,6 +13,7 @@ import { useRouter } from 'vue-router'
 import { useScriptTag } from '@vueuse/core'
 import { defineProps, onMounted, ref } from 'vue'
 import useStore from '@/stores'
+import { MsgError } from '@/utils/message'
 
 // 声明 DTFrameLogin 和 QRLogin 的类型
 declare global {
@@ -65,6 +66,7 @@ const props = defineProps<{
   config: {
     app_secret: string
     app_key: string
+    agent_id?: string
   }
 }>()
 
@@ -82,8 +84,10 @@ const initActive = async () => {
 
     const data = {
       appKey: props.config.app_key,
-      appSecret: props.config.app_secret
+      appSecret: props.config.app_secret,
+      agent_id: props.config.agent_id
     }
+    console.log(props.config)
 
     const redirectUri = encodeURIComponent(window.location.origin)
 
@@ -99,7 +103,9 @@ const initActive = async () => {
         scope: 'openid',
         response_type: 'code',
         state: 'fit2cloud-ding-qr',
-        prompt: 'consent'
+        prompt: 'consent',
+        exclusiveLogin: 'true',
+        exclusiveCorpId: 'ding7fd29779c8cf3e0224f2f5cc6abecb85'
       },
       (loginResult) => {
         const authCode = loginResult.authCode
@@ -108,7 +114,7 @@ const initActive = async () => {
         })
       },
       (errorMsg: string) => {
-        console.error(errorMsg)
+        MsgError(errorMsg)
       }
     )
   } catch (error) {

@@ -5,7 +5,7 @@
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
-    destroy-on-close
+    :destroy-on-close="true"
     align-center
     class="display-setting-dialog"
   >

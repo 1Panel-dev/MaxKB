@@ -1,6 +1,6 @@
 template
 <template>
-  <el-drawer v-model="visible" size="60%" :append-to-body="true" destroy-on-close>
+  <el-drawer v-model="visible" size="60%" :append-to-body="true" :destroy-on-close="true">
     <template #header>
       <div class="flex align-center" style="margin-left: -8px">
         <h4>{{ currentPlatform.name + '设置' }}</h4>
@@ -112,11 +112,13 @@ const open = async (platform: Platform) => {
 
   // 设置默认的 callback_url
   let defaultCallbackUrl = window.location.origin
-
-  // 根据平台设置特定的 callback_url
   switch (platform.key) {
     case 'wecom':
     case 'dingtalk':
+      if (currentPlatform.config.agent_id) {
+        currentPlatform.config.corp_id = currentPlatform.config.agent_id
+        delete currentPlatform.config.agent_id
+      }
       currentPlatform.config.callback_url = defaultCallbackUrl
       break
     case 'lark':
