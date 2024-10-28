@@ -1,8 +1,9 @@
 <template>
-  <el-select class="m-2" filterable clearable v-bind="$attrs" v-model="_modelValue">
+  <el-select filterable :teleported="false" clearable v-bind="$attrs" v-model="_modelValue">
     <el-option
       v-for="(item, index) in option_list"
       :key="index"
+      teleported
       :label="label(item)"
       :value="item[valueField]"
     >
@@ -60,4 +61,8 @@ const label = (option: any) => {
   return option[textField.value]
 }
 </script>
-<style lang="scss"></style>
+<style lang="scss" scoped>
+:deep(.el-select-dropdown) {
+  max-width: 400px;
+}
+</style>
