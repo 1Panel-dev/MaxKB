@@ -1,16 +1,45 @@
 <template>
-  <el-form-item label="取值范围" required>
+  <el-form-item label="是否带输入框" required prop="showInput">
+    <el-switch v-model="formValue.showInput" />
+  </el-form-item>
+  <el-form-item label="取值范围" required prop="min">
     <el-col :span="11" style="padding-left: 0">
-      <el-input-number style="width: 100%" v-model="formValue.min" controls-position="right" />
+      <el-form-item
+        :rules="[
+          {
+            required: true,
+            message: '最小值必填',
+            trigger: 'change'
+          }
+        ]"
+        prop="min"
+      >
+        <el-input-number style="width: 100%" v-model="formValue.min" controls-position="right"
+      /></el-form-item>
     </el-col>
     <el-col :span="2" class="text-center">
       <span class="text-gray-500">-</span>
     </el-col>
     <el-col :span="11">
-      <el-input-number style="width: 100%" v-model="formValue.max" controls-position="right" />
+      <el-form-item
+        :rules="[
+          {
+            required: true,
+            message: '最大值必填',
+            trigger: 'change'
+          }
+        ]"
+        prop="max"
+        ><el-input-number
+          prop="max"
+          style="width: 100%"
+          v-model="formValue.max"
+          :min="formValue.min > formValue.max ? formValue.min : undefined"
+          controls-position="right"
+      /></el-form-item>
     </el-col>
   </el-form-item>
-  <el-form-item label="步长值" required>
+  <el-form-item label="步长值" required prop="step">
     <el-input-number v-model="formValue.step" :min="0" controls-position="right" />
   </el-form-item>
 
@@ -22,7 +51,7 @@
   >
     <el-slider
       v-model="formValue.default_value"
-      show-input
+      :show-input="formValue.showInput"
       :show-input-controls="false"
       :max="formValue.max"
       :min="formValue.min"
@@ -32,7 +61,7 @@
   </el-form-item>
 </template>
 <script setup lang="ts">
-import { computed, onBeforeMount } from 'vue'
+import { computed, onBeforeMount, watch } from 'vue'
 
 const props = defineProps<{
   modelValue: any
@@ -56,18 +85,26 @@ const getData = () => {
       step: formValue.value.step,
       precision: formValue.value.precision,
       'show-input-controls': false,
-      'show-input': true
+      'show-input': formValue.value.showInput
     },
     default_value: formValue.value.default_value
   }
 }
-
+watch(
+  () => formValue.value.min,
+  () => {
+    if (formValue.value.min > formValue.value.max) {
+      formValue.value.max = formValue.value.min
+    }
+  }
+)
 const rander = (form_data: any) => {
   const attrs = form_data.attrs
   formValue.value.option_list = form_data.option_list
   formValue.value.min = attrs.min
   formValue.value.max = attrs.max
   formValue.value.step = attrs.step
+  formValue.value.showInput = attrs['show-input']
   formValue.value.default_value = form_data.default_value
 }
 
@@ -77,6 +114,7 @@ onBeforeMount(() => {
   formValue.value.max = 20
   formValue.value.step = 0.1
   formValue.value.default_value = 1
+  formValue.value.showInput = true
 })
 </script>
 <style lang="scss"></style>

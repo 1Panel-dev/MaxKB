@@ -26,7 +26,6 @@ const formValue = computed({
 })
 const jsonInputRef = ref<InstanceType<typeof JsonInput>>()
 const getData = () => {
-  console.log('xx')
   return {
     input_type: 'JsonInput',
     attrs: {},

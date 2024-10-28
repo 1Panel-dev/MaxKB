@@ -1,21 +1,48 @@
 <template>
-  <el-form-item label="取值范围" required>
+  <el-form-item label="文本长度" required>
     <el-col :span="11" style="padding-left: 0">
-      <el-input-number
-        style="width: 100%"
-        v-model="formValue.minlength"
-        controls-position="right"
-      />
+      <el-form-item
+        :rules="[
+          {
+            required: true,
+            message: '最小长度必填',
+            trigger: 'change'
+          }
+        ]"
+        prop="minlength"
+      >
+        <el-input-number
+          style="width: 100%"
+          :min="1"
+          :step="1"
+          step-strictly
+          v-model="formValue.minlength"
+          controls-position="right"
+        />
+      </el-form-item>
     </el-col>
     <el-col :span="2" class="text-center">
       <span class="text-gray-500">-</span>
     </el-col>
     <el-col :span="11">
-      <el-input-number
-        style="width: 100%"
-        v-model="formValue.maxlength"
-        controls-position="right"
-      />
+      <el-form-item
+        :rules="[
+          {
+            required: true,
+            message: '最大长度必填',
+            trigger: 'change'
+          }
+        ]"
+        prop="maxlength"
+      >
+        <el-input-number
+          style="width: 100%"
+          :min="formValue.minlength > formValue.maxlength ? formValue.minlength : 1"
+          step-strictly
+          :step="1"
+          v-model="formValue.maxlength"
+          controls-position="right"
+      /></el-form-item>
     </el-col>
   </el-form-item>
 
@@ -23,7 +50,9 @@
     label="默认值"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
+    :rules="
+      formValue.required ? [{ required: true, message: '默认值 为必填属性' }, ...rules] : rules
+    "
   >
     <el-input
       v-model="formValue.default_value"
@@ -36,7 +65,7 @@
   </el-form-item>
 </template>
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 
 const props = defineProps<{
   modelValue: any
@@ -50,7 +79,14 @@ const formValue = computed({
     return props.modelValue
   }
 })
-
+watch(
+  () => formValue.value.minlength,
+  () => {
+    if (formValue.value.minlength > formValue.value.maxlength) {
+      formValue.value.maxlength = formValue.value.minlength
+    }
+  }
+)
 const getData = () => {
   return {
     input_type: 'TextInput',
@@ -59,7 +95,27 @@ const getData = () => {
       minlength: formValue.value.minlength,
       'show-word-limit': true
     },
-    default_value: formValue.value.default_value
+    default_value: formValue.value.default_value,
+    props_info: {
+      rules: formValue.value.required
+        ? [
+            { required: true, message: `${formValue.value.label} 为必填属性` },
+            {
+              min: formValue.value.minlength,
+              max: formValue.value.maxlength,
+              message: `${formValue.value.label}长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`,
+              trigger: 'blur'
+            }
+          ]
+        : [
+            {
+              min: formValue.value.minlength,
+              max: formValue.value.maxlength,
+              message: `${formValue.value.label}长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`,
+              trigger: 'blur'
+            }
+          ]
+    }
   }
 }
 const rander = (form_data: any) => {
@@ -68,6 +124,30 @@ const rander = (form_data: any) => {
   formValue.value.maxlength = attrs.maxlength
   formValue.value.default_value = form_data.default_value
 }
+const rangeRules = [
+  {
+    required: true,
+    validator: (rule: any, value: any, callback: any) => {
+      if (!formValue.value.minlength) {
+        callback(new Error('文本长度为必填参数'))
+      }
+      if (!formValue.value.maxlength) {
+        callback(new Error('文本长度为必填参数'))
+      }
+      return true
+    },
+    message: `${formValue.value.label} 为必填属性`
+  }
+]
+const rules = computed(() => [
+  {
+    min: formValue.value.minlength,
+    max: formValue.value.maxlength,
+    message: `长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`,
+    trigger: 'blur'
+  }
+])
+
 defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.minlength = 0

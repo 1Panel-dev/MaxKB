@@ -62,6 +62,10 @@ const addOption = () => {
 }
 
 const delOption = (index: number) => {
+  const option = formValue.value.option_list[index]
+  if (option.value && formValue.value.default_value == option.value) {
+    formValue.value.default_value = ''
+  }
   formValue.value.option_list.splice(index, 1)
 }
 
@@ -70,13 +74,13 @@ const getData = () => {
     input_type: 'SingleSelect',
     attrs: {},
     default_value: formValue.value.default_value,
-    text_field: formValue.value.text_field,
-    value_field: formValue.value.value_field,
+    text_field: 'value',
+    value_field: 'value',
     option_list: formValue.value.option_list
   }
 }
 const rander = (form_data: any) => {
-  formValue.value.option_list = form_data.option_list
+  formValue.value.option_list = form_data.option_list || []
   formValue.value.default_value = form_data.default_value
 }
 

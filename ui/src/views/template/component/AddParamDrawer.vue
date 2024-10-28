@@ -1,5 +1,11 @@
 <template>
-  <el-drawer v-model="drawer" :direction="direction" size="600" :destroy-on-close="true" :before-close="cancelClick">
+  <el-drawer
+    v-model="drawer"
+    :direction="direction"
+    size="600"
+    :destroy-on-close="true"
+    :before-close="cancelClick"
+  >
     <template #header>
       <h4>{{ isEdit ? '编辑参数' : '添加参数' }}</h4>
     </template>
@@ -67,10 +73,6 @@ function confirmClick() {
 }
 
 defineExpose({ open })
-
 </script>
 
-
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

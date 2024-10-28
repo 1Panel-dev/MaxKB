@@ -41,7 +41,7 @@
   </el-form-item>
 </template>
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onBeforeMount } from 'vue'
 const type_list = [
   {
     label: '年',
@@ -97,10 +97,10 @@ const getData = () => {
 const rander = (form_data: any) => {
   formValue.value.type = form_data.attrs.type
   formValue.value.format = form_data.attrs?.format
-  formValue.value.default_value = form_data.default_value
+  formValue.value.default_value = form_data.default_value || ''
 }
 defineExpose({ getData, rander })
-onMounted(() => {
+onBeforeMount(() => {
   formValue.value.type = 'datetime'
   formValue.value.format = 'YYYY-MM-DD HH:mm:ss'
   formValue.value.default_value = ''

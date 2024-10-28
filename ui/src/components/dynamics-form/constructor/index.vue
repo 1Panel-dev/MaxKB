@@ -41,20 +41,15 @@
 import { onMounted, ref, nextTick } from 'vue'
 import type { FormInstance } from 'element-plus'
 import _ from 'lodash'
+import { input_type_list as input_type_list_data } from '@/components/dynamics-form/constructor/data'
 const props = withDefaults(
   defineProps<{
     modelValue?: any
     input_type_list?: Array<{ label: string; value: string }>
   }>(),
   {
-    input_type_list: () => [
-      { label: '文本框', value: 'TextInputConstructor' },
-      { label: '滑块', value: 'SliderConstructor' },
-      { label: '开关', value: 'SwitchInputConstructor' },
-      { label: '单选框', value: 'SingleSelectConstructor' },
-      { label: '日期', value: 'DatePickerConstructor' },
-      { label: 'JSON文本框', value: 'JsonInputConstructor' }
-    ]
+    input_type_list: () =>
+      input_type_list_data.map((item) => ({ label: item.label, value: item.value + 'Constructor' }))
   }
 )
 const emit = defineEmits(['update:modelValue'])
