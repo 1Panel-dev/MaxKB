@@ -28,13 +28,13 @@
           </el-button>
         </span>
         <span class="dialog-footer p-16">
-        <el-button @click.prevent="dialogVisible = false">
-          {{ $t('views.application.applicationForm.buttons.cancel') }}
-        </el-button>
-        <el-button type="primary" @click="submit" :loading="loading">
-          {{ $t('views.application.applicationForm.buttons.confirm') }}
-        </el-button>
-      </span>
+          <el-button @click.prevent="dialogVisible = false">
+            {{ $t('views.application.applicationForm.buttons.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="submit" :loading="loading">
+            {{ $t('views.application.applicationForm.buttons.confirm') }}
+          </el-button>
+        </span>
       </div>
     </template>
   </el-dialog>
@@ -76,8 +76,8 @@ const open = (model_id: string, application_id?: string, model_setting_data?: an
   api.then((ok) => {
     model_form_field.value = ok.data
     const resp = ok.data
-          .map((item: any) => ({ [item.field]: item.default_value }))
-          .reduce((x, y) => ({ ...x, ...y }), {})
+      .map((item: any) => ({ [item.field]: item.default_value }))
+      .reduce((x, y) => ({ ...x, ...y }), {})
     model_setting_data = { ...resp, ...model_setting_data }
     // 渲染动态表单
     dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
@@ -98,14 +98,11 @@ const reset_default = (model_id: string, application_id?: string) => {
 }
 
 const submit = async () => {
-  dynamicsFormRef.value?.validate().then((ok) => {
-    if (ok) {
-      emit('refresh', form_data.value)
-      dialogVisible.value = false
-    }
+  dynamicsFormRef.value?.validate().then(() => {
+    emit('refresh', form_data.value)
+    dialogVisible.value = false
   })
 }
-
 
 const audioPlayer = ref<HTMLAudioElement | null>(null)
 const testPlay = () => {
@@ -117,7 +114,7 @@ const testPlay = () => {
     .playDemoText(id as string, data, playLoading)
     .then(async (res: any) => {
       if (res.type === 'application/json') {
-        const text = await res.text();
+        const text = await res.text()
         MsgError(text)
         return
       }
@@ -138,9 +135,7 @@ const testPlay = () => {
     .catch((err) => {
       console.log('err: ', err)
     })
-
 }
-
 
 defineExpose({ open, reset_default })
 </script>
