@@ -196,8 +196,8 @@
                 <el-button size="small"> 替换 </el-button>
               </el-upload>
             </div>
-            <el-text type="info" size="small"
-              >建议尺寸 32*32，支持 JPG、PNG, GIF，大小不超过 10 MB</el-text
+            <el-text type="info" size="small">
+              建议尺寸 64*64，支持 JPG、PNG、GIF，大小不超过 10 MB</el-text
             >
           </el-card>
           <el-card shadow="never" class="mb-8">
@@ -215,7 +215,7 @@
               </el-upload>
             </div>
             <el-text type="info" size="small">
-              建议尺寸 64*64，支持 JPG、PNG, GIF，大小不超过 10 MB
+              建议尺寸 64*64，支持 JPG、PNG、GIF，大小不超过 10 MB
             </el-text>
             <div class="border-t mt-8">
               <div class="flex-between mb-8">
@@ -262,11 +262,14 @@
             <el-checkbox v-model="form.show_history" label="显示历史记录" />
             <el-checkbox v-model="form.show_guide" label="显示引导图（浮窗模式）" />
             <el-checkbox v-model="form.disclaimer" label="免责声明" />
-            <el-input
-              v-if="form.disclaimer"
-              v-model="form.disclaimer_value"
-              style="width: 422px; margin-bottom: 10px"
-            />
+            <el-tooltip :content="form.disclaimer_value" placement="top">
+              <el-input
+                v-if="form.disclaimer"
+                v-model="form.disclaimer_value"
+                style="width: 422px; margin-bottom: 10px"
+                @change="changeValue"
+              />
+            </el-tooltip>
           </el-space>
         </el-form>
       </el-col>
@@ -311,7 +314,7 @@ const defaultSetting = {
   float_icon: '',
   user_avatar: '',
   disclaimer: true,
-  disclaimer_value: '「以上内容均由AI生成，仅供参考和借鉴」',
+  disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
   custom_theme: {
     theme_color: '',
     header_font_color: '#1f2329'
@@ -336,7 +339,7 @@ const xpackForm = ref<any>({
   float_icon: '',
   user_avatar: '',
   disclaimer: true,
-  disclaimer_value: '「以上内容均由AI生成，仅供参考和借鉴」',
+  disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
   custom_theme: {
     theme_color: '',
     header_font_color: '#1f2329'
@@ -410,6 +413,10 @@ const open = (data: any, content: any) => {
   form.value = xpackForm.value
 
   dialogVisible.value = true
+}
+
+const changeValue = (value: string) => {
+  xpackForm.value.disclaimer_value = value
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
