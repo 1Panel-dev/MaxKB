@@ -161,6 +161,8 @@
         controls-position="right"
         min="1"
         max="100000"
+        :value-on-clear="0"
+        step-strictly
         style="width: 110px; margin-left: 8px; margin-right: 8px"
       ></el-input-number>
       <span>天之前的对话记录</span>
