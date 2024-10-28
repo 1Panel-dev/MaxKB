@@ -31,7 +31,7 @@
     prop="default_value"
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
   >
-    <el-select v-model="formValue.default_value">
+    <el-select v-model="formValue.default_value" :teleported="false" popper-class="default-select">
       <el-option
         v-for="(option, index) in formValue.option_list"
         :key="index"
@@ -93,5 +93,9 @@ onMounted(() => {
 <style lang="scss" scoped>
 :deep(.el-form-item__label) {
   display: block;
+}
+
+:deep(.el-select-dropdown) {
+  max-width: 400px;
 }
 </style>
