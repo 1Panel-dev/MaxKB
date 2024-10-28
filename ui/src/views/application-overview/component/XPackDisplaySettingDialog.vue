@@ -140,7 +140,7 @@
             />
             <img
               v-else
-              src="@/assets/logo/logo.svg"
+              src="/ui/public/MaxKB.gif"
               height="50px"
               style="width: 40px; height: 40px; display: block"
             />
@@ -178,7 +178,7 @@
               </el-upload>
             </div>
             <el-text type="info" size="small"
-              >建议尺寸 64*64，支持 JPG、PNG, GIF，大小不超过 10 MB</el-text
+              >建议尺寸 64*64，支持 JPG、PNG、GIF，大小不超过 10 MB</el-text
             >
           </el-card>
           <el-card shadow="never" class="mb-8">
@@ -233,6 +233,9 @@
                       v-model="form.float_location.x.value"
                       :min="0"
                       :step="1"
+                      :precision="0"
+                      :value-on-clear="0"
+                      step-strictly
                       controls-position="right"
                     />
                     <span class="ml-4">px</span>
@@ -248,6 +251,9 @@
                       v-model="form.float_location.y.value"
                       :min="0"
                       :step="1"
+                      :precision="0"
+                      :value-on-clear="0"
+                      step-strictly
                       controls-position="right"
                     />
                     <span class="ml-4">px</span>
@@ -268,6 +274,7 @@
                 v-model="form.disclaimer_value"
                 style="width: 422px; margin-bottom: 10px"
                 @change="changeValue"
+                :maxlength="128"
               />
             </el-tooltip>
           </el-space>
@@ -313,7 +320,7 @@ const defaultSetting = {
   avatar: '',
   float_icon: '',
   user_avatar: '',
-  disclaimer: true,
+  disclaimer: false,
   disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
   custom_theme: {
     theme_color: '',
@@ -338,7 +345,7 @@ const xpackForm = ref<any>({
   avatar: '',
   float_icon: '',
   user_avatar: '',
-  disclaimer: true,
+  disclaimer: false,
   disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
   custom_theme: {
     theme_color: '',
