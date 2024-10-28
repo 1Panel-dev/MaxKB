@@ -39,7 +39,7 @@
       /></el-form-item>
     </el-col>
   </el-form-item>
-  <el-form-item label="步长值" required prop="step">
+  <el-form-item label="步长值" required prop="step" :rules="step_rules">
     <el-input-number v-model="formValue.step" :min="0" controls-position="right" />
   </el-form-item>
 
@@ -55,7 +55,7 @@
       :show-input-controls="false"
       :max="formValue.max"
       :min="formValue.min"
-      :step="formValue.step"
+      :step="formValue.step == 0 ? 0.1 : formValue.step"
       :precision="formValue.precision"
     />
   </el-form-item>
@@ -107,7 +107,19 @@ const rander = (form_data: any) => {
   formValue.value.showInput = attrs['show-input']
   formValue.value.default_value = form_data.default_value
 }
-
+const step_rules = [
+  {
+    required: true,
+    validator: (rule: any, value: any, callback: any) => {
+      if (value === 0) {
+        callback(new Error('步长不能为0'))
+        return false
+      }
+      return true
+    },
+    trigger: 'blur'
+  }
+]
 defineExpose({ getData, rander })
 onBeforeMount(() => {
   formValue.value.min = 0
