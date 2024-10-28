@@ -124,7 +124,7 @@ class ChatInfo:
         if self.application.id is not None:
             # 插入数据库
             if not QuerySet(Chat).filter(id=self.chat_id).exists():
-                Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text,
+                Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text[0:1024],
                      client_id=client_id).save()
             # 插入会话记录
             chat_record.save()
