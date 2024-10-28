@@ -4,7 +4,9 @@
       <span>{{ label }}</span>
     </div>
     <el-tooltip effect="dark" placement="right">
-      <template #content>{{ tooltip }}</template>
+      <template #content
+        ><div style="width: 200px">{{ tooltip }}</div></template
+      >
       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
     </el-tooltip>
   </div>
