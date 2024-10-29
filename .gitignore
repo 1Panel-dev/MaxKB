@@ -182,3 +182,4 @@ models/
 data
 .dev
 poetry.lock
+apps/setting/models_provider/impl/*/icon/
