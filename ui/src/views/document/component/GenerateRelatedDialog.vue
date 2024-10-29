@@ -134,7 +134,7 @@ const {
   params: { id } // id为datasetID
 } = route as any
 
-const { model } = useStore()
+const { model, prompt, user } = useStore()
 
 
 const emit = defineEmits(['refresh'])
@@ -147,15 +147,9 @@ const providerOptions = ref<Array<Provider>>([])
 const documentIdList = ref<string[]>([])
 
 const FormRef = ref()
-const form = ref({
-  model_id: '',
-  prompt: '内容：{data}\n' +
-    '\n' +
-    '请总结上面的内容，并根据内容总结生成 5 个问题。\n' +
-    '回答要求：\n' +
-    '- 请只输出问题；\n' +
-    '- 请将每个问题放置<question></question>标签中。'
-})
+const userId = user.userInfo?.id as string
+const form = ref(prompt.get(userId))
+
 
 const rules = reactive({
   model_id: [{ required: true, message: '请选择AI 模型', trigger: 'blur' }],
@@ -176,6 +170,8 @@ const submitHandle = async (formEl: FormInstance) => {
   }
   await formEl.validate((valid, fields) => {
     if (valid) {
+      // 保存提示词
+      prompt.save(user.userInfo?.id as string, form.value)
       const data = { ...form.value, document_id_list: documentIdList.value }
       documentApi.batchGenerateRelated(id, data).then(() => {
         MsgSuccess('生成关联问题成功')
