@@ -38,7 +38,7 @@
       <app-table
         :data="tableData"
         :pagination-config="paginationConfig"
-        @sizeChange="handleSizeChange"
+        @sizeChange="getList"
         @changePage="getList"
         @row-click="rowClickHandle"
         v-loading="loading"
@@ -362,13 +362,7 @@ function deleteLog(row: any) {
     .catch(() => {})
 }
 
-function handleSizeChange() {
-  paginationConfig.current_page = 1
-  getList()
-}
-
 function getList() {
-  paginationConfig.current_page = 1
   let obj: any = {
     start_time: daterange.value.start_time,
     end_time: daterange.value.end_time,
