@@ -11,13 +11,12 @@
     top="25vh"
     center
     :modal="true"
-    @click.stop
   >
-    <el-form ref="FormRef" :model="form" @submit.prevent="validator" @click.stop>
+    <el-form ref="FormRef" :model="form" @submit.prevent="validator">
       <el-form-item prop="value" :rules="rules.value">
         <el-input show-password v-model="form.value" />
       </el-form-item>
-      <el-button class="w-full mt-8" type="primary" @click.stop="validator" :loading="loading"
+      <el-button class="w-full mt-8" type="primary" @click="validator" :loading="loading"
         >确定</el-button
       >
     </el-form>
