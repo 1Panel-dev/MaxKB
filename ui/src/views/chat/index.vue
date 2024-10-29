@@ -12,6 +12,10 @@
     :application_profile="application_profile"
     :auth_type="application_profile.authentication_type"
     v-model="is_auth"
+    :style="{
+      '--el-color-primary': application_profile?.custom_theme?.theme_color,
+      '--el-color-primary-light-9': hexToRgba(application_profile?.custom_theme?.theme_color, 0.1)
+    }"
   ></Auth>
 </template>
 <script setup lang="ts">
@@ -19,6 +23,7 @@ import { ref, onBeforeMount, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import Auth from '@/views/chat/auth/index.vue'
+import { hexToRgba } from '@/utils/theme'
 const route = useRoute()
 const { application, user } = useStore()
 

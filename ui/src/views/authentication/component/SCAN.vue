@@ -130,8 +130,8 @@ function createPlatform(key: string, name: string): Platform {
   }
 
   const config = {
-    ...(key === 'dingtalk' ? { corp_id: '' } : {}),
     ...(key === 'wecom' ? { corp_id: '', agent_id: '' } : { app_key: '' }),
+    ...(key === 'dingtalk' ? { corp_id: '' } : {}),
     app_secret: '',
     callback_url: ''
   }

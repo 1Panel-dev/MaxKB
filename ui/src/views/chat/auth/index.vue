@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-pc__header">
+  <div class="chat-pc__header" :style="customStyle">
     <div class="flex align-center">
       <div class="mr-12 ml-24 flex">
         <AppAvatar
@@ -21,17 +21,18 @@
       <h4>{{ application_profile?.name }}</h4>
     </div>
   </div>
-  <div>
-    <component
-      :is="auth_components[`/src/views/chat/auth/component/${auth_type}.vue`].default"
-      v-model="is_auth"
-      :applicationProfile="application_profile"
-    />
-  </div>
+
+  <component
+    :is="auth_components[`/src/views/chat/auth/component/${auth_type}.vue`].default"
+    v-model="is_auth"
+    :applicationProfile="application_profile"
+  />
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
 import { isAppIcon } from '@/utils/application'
+import { hexToRgba } from '@/utils/theme'
+
 const auth_components: any = import.meta.glob('@/views/chat/auth/component/*.vue', {
   eager: true
 })
@@ -50,6 +51,14 @@ const is_auth = computed({
   },
   set: (v) => {
     emit('update:modelValue', v)
+  }
+})
+
+const customStyle = computed(() => {
+  return {
+    background: props.application_profile?.custom_theme?.theme_color,
+    color: props.application_profile?.custom_theme?.header_font_color,
+    border: 'none'
   }
 })
 </script>

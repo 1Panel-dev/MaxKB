@@ -17,7 +17,7 @@
     </template>
     <template #footer>
       <div class="footer-content flex-between">
-        <el-text class="flex align-center" style="width: 70%;">
+        <el-text class="flex align-center" style="width: 70%">
           <el-icon class="mr-4">
             <Document />
           </el-icon>

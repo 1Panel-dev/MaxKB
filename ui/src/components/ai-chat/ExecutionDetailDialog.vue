@@ -4,6 +4,7 @@
     title="执行详情"
     v-model="dialogVisible"
     destroy-on-close
+    append-to-body
     align-center
     @click.stop
   >

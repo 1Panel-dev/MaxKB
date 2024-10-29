@@ -1,6 +1,12 @@
 template
 <template>
-  <el-drawer v-model="visible" size="60%" :append-to-body="true" :destroy-on-close="true">
+  <el-drawer
+    v-model="visible"
+    size="60%"
+    :append-to-body="true"
+    :destroy-on-close="true"
+    @close="handleClose"
+  >
     <template #header>
       <div class="flex align-center" style="margin-left: -8px">
         <h4>{{ currentPlatform.name + '设置' }}</h4>
@@ -31,7 +37,7 @@ template
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="visible = false">取 消</el-button>
+        <el-button @click="handleClose">取 消</el-button>
         <el-button @click="validateConnection">校 验</el-button>
         <el-button type="primary" @click="validateForm">保 存</el-button>
       </span>
@@ -115,7 +121,7 @@ const open = async (platform: Platform) => {
   switch (platform.key) {
     case 'wecom':
     case 'dingtalk':
-      if (currentPlatform.config.agent_id) {
+      if (currentPlatform.config.agent_id && currentPlatform.key === 'dingtalk') {
         currentPlatform.config.corp_id = currentPlatform.config.agent_id
         delete currentPlatform.config.agent_id
       }
@@ -139,6 +145,12 @@ const validateForm = () => {
       MsgError('请填写所有必填项并确保格式正确')
     }
   })
+}
+
+const handleClose = () => {
+  visible.value = false
+  formRef.value?.clearValidate()
+  emit('refresh')
 }
 
 function validateConnection() {
