@@ -330,7 +330,7 @@
                   </div>
                 </template>
                 <el-select
-                  v-if="applicationForm.stt_model_enable"
+                  v-show="applicationForm.stt_model_enable"
                   v-model="applicationForm.stt_model_id"
                   class="w-full"
                   popper-class="select-model"
@@ -342,8 +342,8 @@
                     :label="relatedObject(providerOptions, label, 'provider')?.name"
                   >
                     <el-option
-                      v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
-                      :key="item.id"
+                      v-for="(item, index) in value?.filter((v: any) => v.status === 'SUCCESS')"
+                      :key="index"
                       :label="item.name"
                       :value="item.id"
                       class="flex-between"
@@ -361,14 +361,14 @@
                           >公用
                         </el-tag>
                       </div>
-                      <el-icon class="check-icon" v-if="item.id === applicationForm.stt_model_id">
+                      <el-icon class="check-icon" v-if="item?.id === applicationForm.stt_model_id">
                         <Check />
                       </el-icon>
                     </el-option>
                     <!-- 不可用 -->
                     <el-option
-                      v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
-                      :key="item.id"
+                      v-for="(item, index) in value?.filter((v: any) => v.status !== 'SUCCESS')"
+                      :key="index"
                       :label="item.name"
                       :value="item.id"
                       class="flex-between"
@@ -384,7 +384,7 @@
                           $t('views.application.applicationForm.form.aiModel.unavailable')
                         }}</span>
                       </div>
-                      <el-icon class="check-icon" v-if="item.id === applicationForm.stt_model_id">
+                      <el-icon class="check-icon" v-if="item?.id === applicationForm.stt_model_id">
                         <Check />
                       </el-icon>
                     </el-option>
@@ -412,7 +412,7 @@
                 </template>
                 <el-radio-group
                   v-model="applicationForm.tts_type"
-                  v-if="applicationForm.tts_model_enable"
+                  v-show="applicationForm.tts_model_enable"
                 >
                   <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
                   <el-radio value="TTS">TTS模型</el-radio>
@@ -707,7 +707,11 @@ const openTTSParamSettingDialog = () => {
     MsgSuccess(t('请选择语音播放模型'))
     return
   }
-  TTSModeParamSettingDialogRef.value?.open(model_id, id, applicationForm.value.tts_model_params_setting)
+  TTSModeParamSettingDialogRef.value?.open(
+    model_id,
+    id,
+    applicationForm.value.tts_model_params_setting
+  )
 }
 
 const openParamSettingDialog = () => {

@@ -369,7 +369,7 @@ function handleInputFieldList() {
   // 给变量赋默认值, 最后一个对话记录的值
   const record = chatList.value[chatList.value.length - 1]
   let default_value: any = {}
-  if (record) {
+  if (record && record.length) {
     record.execution_details[0].global_fields?.reduce((pre: any, next: any) => {
       pre[next.key] = next.value
       return pre
