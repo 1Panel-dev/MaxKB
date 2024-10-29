@@ -9,6 +9,7 @@
 import uuid
 from typing import Dict
 
+from celery_once import AlreadyQueued
 from django.db import transaction
 from django.db.models import QuerySet
 from drf_yasg import openapi
@@ -733,7 +734,10 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             paragraph_id_list = instance.get("paragraph_id_list")
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
-            generate_related_by_paragraph_id_list.delay(paragraph_id_list, model_id, prompt)
+            try:
+                generate_related_by_paragraph_id_list.delay(paragraph_id_list, model_id, prompt)
+            except AlreadyQueued as e:
+                raise AppApiException(500, "任务正在执行中,请勿重复下发")
 
 
 
