@@ -41,4 +41,7 @@ class ImageSerializer(serializers.Serializer):
                 raise NotFound404(404, "不存在的图片")
             if image.image_name.endswith('.svg'):
                 return HttpResponse(image.image, status=200, headers={'Content-Type': 'image/svg+xml'})
+            # gif
+            elif image.image_name.endswith('.gif'):
+                return HttpResponse(image.image, status=200, headers={'Content-Type': 'image/gif'})
             return HttpResponse(image.image, status=200, headers={'Content-Type': 'image/png'})

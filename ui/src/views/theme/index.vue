@@ -305,7 +305,7 @@ function resetTheme() {
 
 function resetForm(val: string) {
   themeForm.value =
-    val === 'base'
+    val === 'login'
       ? {
           ...themeForm.value,
           theme: themeForm.value.theme,
