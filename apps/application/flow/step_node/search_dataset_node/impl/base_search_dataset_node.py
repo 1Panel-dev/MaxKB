@@ -64,7 +64,7 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
                            'is_hit_handling_method_list': [row for row in result if row.get('is_hit_handling_method')],
                            'data': '\n'.join(
                                [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in
-                                paragraph_list]),
+                                paragraph_list])[0:dataset_setting.get('max_paragraph_char_number', 5000)],
                            'directly_return': '\n'.join(
                                [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in result if
                                 paragraph.get('is_hit_handling_method')]),
