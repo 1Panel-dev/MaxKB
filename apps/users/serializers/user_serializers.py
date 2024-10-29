@@ -378,7 +378,7 @@ class SendEmailSerializer(ApiMixin, serializers.Serializer):
         system_setting = QuerySet(SystemSetting).filter(type=SettingType.EMAIL.value).first()
         if system_setting is None:
             user_cache.delete(code_cache_key_lock)
-            raise AppApiException(1004, "邮箱未设置,请联系管理员设置")
+            raise AppApiException(1004, "邮箱服务未设置，请联系管理员到【邮箱设置】中设置邮箱服务。")
         try:
             connection = EmailBackend(system_setting.meta.get("email_host"),
                                       system_setting.meta.get('email_port'),
