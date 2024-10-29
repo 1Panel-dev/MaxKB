@@ -140,7 +140,7 @@
             />
             <img
               v-else
-              src="/ui/public/MaxKB.gif"
+              src="/MaxKB.gif"
               height="50px"
               style="width: 40px; height: 40px; display: block"
             />
