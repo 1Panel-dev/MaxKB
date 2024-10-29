@@ -10,6 +10,7 @@ import useApplicationStore from './modules/application'
 import useDocumentStore from './modules/document'
 import useProblemStore from './modules/problem'
 import useLogStore from './modules/log'
+import usePromptStore from './modules/prompt'
 
 const useStore = () => ({
   common: useCommonStore(),
@@ -20,7 +21,8 @@ const useStore = () => ({
   application: useApplicationStore(),
   document: useDocumentStore(),
   problem: useProblemStore(),
-  log: useLogStore()
+  log: useLogStore(),
+  prompt: usePromptStore(),
 })
 
 export default useStore

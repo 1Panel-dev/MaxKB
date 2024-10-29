@@ -117,7 +117,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import paragraphApi from '@/api/paragraph'
 
@@ -127,7 +127,6 @@ import type { Provider } from '@/api/type/model'
 import datasetApi from '@/api/dataset'
 import { groupBy } from 'lodash'
 import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
 import type { FormInstance } from 'element-plus'
 
 const route = useRoute()
@@ -135,8 +134,7 @@ const {
   params: { id, documentId } // id为datasetID
 } = route as any
 
-const { model } = useStore()
-
+const { model, prompt, user } = useStore()
 
 const emit = defineEmits(['refresh'])
 
@@ -148,15 +146,10 @@ const providerOptions = ref<Array<Provider>>([])
 const paragraphIdList = ref<string[]>([])
 
 const FormRef = ref()
-const form = ref({
-  model_id: '',
-  prompt: '内容：{data}\n' +
-    '\n' +
-    '请总结上面的内容，并根据内容总结生成 5 个问题。\n' +
-    '回答要求：\n' +
-    '- 请只输出问题；\n' +
-    '- 请将每个问题放置<question></question>标签中。'
-})
+
+const userId = user.userInfo?.id as string
+const form = ref(prompt.get(userId))
+
 
 const rules = reactive({
   model_id: [{ required: true, message: '请选择AI 模型', trigger: 'blur' }],
@@ -176,6 +169,9 @@ const submitHandle = async (formEl: FormInstance) => {
   }
   await formEl.validate((valid, fields) => {
     if (valid) {
+      // 保存提示词
+      prompt.save(user.userInfo?.id as string, form.value)
+
       const data = { ...form.value, paragraph_id_list: paragraphIdList.value }
       paragraphApi.batchGenerateRelated(id, documentId, data).then(() => {
         MsgSuccess('生成关联问题成功')
