@@ -500,6 +500,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             # 创建工作簿对象
             workbook = openpyxl.Workbook()
             workbook.remove_sheet(workbook.active)
+            if len(data_dict.keys()) == 0:
+                data_dict['sheet'] = []
             for sheet_id in data_dict:
                 # 添加工作表
                 worksheet = workbook.create_sheet(document_dict.get(sheet_id))
@@ -982,8 +984,6 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             except AlreadyQueued as e:
                 raise AppApiException(500, "任务正在执行中,请勿重复下发")
 
-
-
     class BatchGenerateRelated(ApiMixin, serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
@@ -995,7 +995,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
             for document_id in document_id_list:
-                DocumentSerializers.GenerateRelated(data={'document_id': document_id}).generate_related(model_id, prompt)
+                DocumentSerializers.GenerateRelated(data={'document_id': document_id}).generate_related(model_id,
+                                                                                                        prompt)
 
 
 class FileBufferHandle:
