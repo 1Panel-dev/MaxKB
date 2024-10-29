@@ -197,8 +197,8 @@ function deleteField(index: any) {
 function refreshFieldList(data: any) {
   const list = cloneDeep(props.nodeModel.properties.node_data.input_field_list)
   const obj = {
-    value: data.source === 'reference' ? [] : '',
-    ...data
+    ...data,
+    value: data.source === 'reference' ? [] : ''
   }
   if (currentIndex.value !== null) {
     list.splice(currentIndex.value, 1, obj)
