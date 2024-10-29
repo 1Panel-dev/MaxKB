@@ -96,7 +96,6 @@ const split_md_img_ = (source: string) => {
       return md_img_list[Math.floor(index / 2)]
     }
   })
-  console.log(result)
   return result
 }
 const split_quick_question = (result: Array<string>) => {
