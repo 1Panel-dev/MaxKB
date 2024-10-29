@@ -267,16 +267,16 @@
             <el-checkbox v-model="form.show_source" label="显示知识来源" />
             <el-checkbox v-model="form.show_history" label="显示历史记录" />
             <el-checkbox v-model="form.show_guide" label="显示引导图（浮窗模式）" />
-            <el-checkbox v-model="form.disclaimer" label="免责声明" />
-            <el-tooltip :content="form.disclaimer_value" placement="top">
-              <el-input
-                v-if="form.disclaimer"
-                v-model="form.disclaimer_value"
-                style="width: 422px; margin-bottom: 10px"
-                @change="changeValue"
-                :maxlength="128"
-              />
-            </el-tooltip>
+            <el-checkbox v-model="form.disclaimer" label="免责声明" @change="changeDisclaimer" />
+            <span v-if="form.disclaimer"
+              ><el-tooltip :content="form.disclaimer_value" placement="top">
+                <el-input
+                  v-model="form.disclaimer_value"
+                  style="width: 422px; margin-bottom: 10px"
+                  @change="changeValue"
+                  :maxlength="128"
+                /> </el-tooltip
+            ></span>
           </el-space>
         </el-form>
       </el-col>
@@ -303,6 +303,7 @@ import applicationXpackApi from '@/api/application-xpack'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
+import { cloneDeep } from 'lodash'
 const { user } = useStore()
 
 const route = useRoute()
@@ -375,12 +376,8 @@ const customStyle = computed(() => {
 })
 
 function resetForm() {
-  form.value = {
-    ...defaultSetting
-  }
-  xpackForm.value = {
-    ...defaultSetting
-  }
+  form.value = cloneDeep(defaultSetting)
+  xpackForm.value = cloneDeep(defaultSetting)
   imgUrl.value = {
     avatar: '',
     float_icon: '',
@@ -418,12 +415,15 @@ const open = (data: any, content: any) => {
   }
   xpackForm.value.float_location = data.float_location
   form.value = xpackForm.value
-
   dialogVisible.value = true
 }
 
 const changeValue = (value: string) => {
   xpackForm.value.disclaimer_value = value
+}
+
+const changeDisclaimer = (value: boolean) => {
+  xpackForm.value.disclaimer = value
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
