@@ -46,7 +46,6 @@ const init = async () => {
       },
       onCheckWeComLogin: obj.value,
       async onLoginSuccess({ code }: any) {
-        console.log('Login success:', code)
         user.wecomCallback(code).then(() => {
           setTimeout(() => {
             router.push({ name: 'home' })

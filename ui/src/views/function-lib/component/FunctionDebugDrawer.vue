@@ -102,7 +102,6 @@ watch(debugVisible, (bool) => {
 })
 
 const submit = async (formEl: FormInstance | undefined) => {
-  console.log(formEl)
   const validate = formEl ? formEl.validate() : Promise.resolve()
   validate.then(() => {
     functionLibApi.postFunctionLibDebug(form.value, loading).then((res) => {

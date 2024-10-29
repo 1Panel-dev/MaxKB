@@ -168,24 +168,34 @@ class ChatSerializers(serializers.Serializer):
                                  with_table_name=False)
 
         @staticmethod
+        def paragraph_list_to_string(paragraph_list):
+            return "\n**********\n".join(
+                [f"{paragraph.get('title')}:\n{paragraph.get('content')}" for paragraph in paragraph_list])
+
+        @staticmethod
         def to_row(row: Dict):
             details = row.get('details')
             padding_problem_text = details.get('problem_padding').get(
                 'padding_problem_text') if 'problem_padding' in details and 'padding_problem_text' in details.get(
                 'problem_padding') else ""
-            paragraph_list = details.get('search_step').get(
-                'paragraph_list') if 'search_step' in details and 'paragraph_list' in details.get('search_step') else []
-            for key, node in details.items():
-                if node.get('type') == 'search-dataset-node' and node.get('paragraph_list') is not None and len(
-                        node.get('paragraph_list')) > 0:
-                    paragraph_list = node.get('paragraph_list')
+            search_dataset_node_list = [(key, node) for key, node in details.items() if
+                                        node.get("type") == 'search-dataset-node' or node.get(
+                                            "step_type") == 'search_step']
+            reference_paragraph_len = '\n'.join([str(len(node.get('paragraph_list',
+                                                                  []))) if key == 'search_step' else node.get(
+                'name') + ':' + str(len(node.get('paragraph_list', []))) for
+                                                 key, node in search_dataset_node_list])
+            reference_paragraph = '\n----------\n'.join(
+                [ChatSerializers.Query.paragraph_list_to_string(node.get('paragraph_list',
+                                                                         [])) if key == 'search_step' else node.get(
+                    'name') + ':\n' + ChatSerializers.Query.paragraph_list_to_string(node.get('paragraph_list',
+                                                                                            [])) for
+                 key, node in search_dataset_node_list])
             improve_paragraph_list = row.get('improve_paragraph_list')
             vote_status_map = {'-1': '未投票', '0': '赞同', '1': '反对'}
             return [str(row.get('chat_id')), row.get('abstract'), row.get('problem_text'), padding_problem_text,
-                    row.get('answer_text'), vote_status_map.get(row.get('vote_status')), len(paragraph_list), "\n".join(
-                    [f"{index}、{paragraph_list[index].get('title')}\n{paragraph_list[index].get('content')}" for index
-                     in
-                     range(len(paragraph_list))]),
+                    row.get('answer_text'), vote_status_map.get(row.get('vote_status')), reference_paragraph_len,
+                    reference_paragraph,
                     "\n".join([
                         f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
                         for index in range(len(improve_paragraph_list))]),

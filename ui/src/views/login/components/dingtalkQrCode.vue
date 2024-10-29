@@ -87,7 +87,6 @@ const initActive = async () => {
       appSecret: props.config.app_secret,
       agent_id: props.config.agent_id
     }
-    console.log(props.config)
 
     const redirectUri = encodeURIComponent(window.location.origin)
 

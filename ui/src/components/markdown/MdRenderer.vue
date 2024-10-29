@@ -80,7 +80,6 @@ const split_md_img = (result: Array<string>) => {
 
 const split_md_img_ = (source: string) => {
   const temp_md_img_list = source.match(/(!\[.*?\]\(.*?\){.*?})|(!\[.*?\]\(.*?\))/g)
-  console.log(temp_md_img_list)
   const md_img_list = temp_md_img_list ? temp_md_img_list.filter((i) => i) : []
   const split_img_value = source
     .split(/(!\[.*?\]\(.*?\){.*?})|(!\[.*?\]\(.*?\))/g)

@@ -43,7 +43,6 @@ const currentIndex = ref(null)
 const emit = defineEmits(['refresh'])
 
 const open = (row: any, index: any) => {
-  // console.log(row, index)
   if (row) {
     currentItem.value = cloneDeep(row)
     currentIndex.value = index

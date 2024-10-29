@@ -716,6 +716,7 @@ class ApplicationSerializer(serializers.Serializer):
             application.save()
             # 插入知识库关联关系
             self.save_application_mapping(application_dataset_id_list, dataset_id_list, application.id)
+            chat_cache.clear_by_application_id(str(application.id))
             work_flow_version = WorkFlowVersion(work_flow=work_flow, application=application,
                                                 name=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                                                 publish_user_id=user_id,
