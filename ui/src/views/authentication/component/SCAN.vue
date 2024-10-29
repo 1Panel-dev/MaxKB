@@ -148,9 +148,9 @@ function createPlatform(key: string, name: string): Platform {
 
 function formatFieldName(key?: any): string {
   const fieldNames: { [key: string]: string } = {
+    corp_id: 'Corp ID',
     app_key: 'APP Key',
     app_secret: 'APP Secret',
-    corp_id: 'Corp ID',
     agent_id: 'Agent ID',
     callback_url: '回调地址'
   }

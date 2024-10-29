@@ -431,11 +431,11 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       let fd = new FormData()
-      Object.keys(form.value).map((item) => {
+      Object.keys(xpackForm.value).map((item) => {
         if (['custom_theme', 'float_location'].includes(item)) {
-          fd.append(item, JSON.stringify(form.value[item]))
+          fd.append(item, JSON.stringify(xpackForm.value[item]))
         } else {
-          fd.append(item, form.value[item])
+          fd.append(item, xpackForm.value[item])
         }
       })
       applicationXpackApi.putAccessToken(id as string, fd, loading).then((res) => {

@@ -101,7 +101,7 @@ class ErrMessage:
         return {
             'required': gettext_lazy('【%s】此字段必填。' % field),
             'null': gettext_lazy('【%s】此字段不能为null。' % field),
-            'invalid_image': gettext_lazy('【%s】上载有效的图像，您上载的文件不是图像或图像已损坏。' % field),
+            'invalid_image': gettext_lazy('您上载的【%s】文件不是图像或图像已损坏，请上载有效的图像。' % field),
             'max_length': gettext_lazy('【%s】请确保此文件名最多包含 {max_length} 个字符(长度为 {length})。' % field),
             'invalid': gettext_lazy('【%s】提交的数据不是文件，请检查表单上的编码类型。' % field)
         }

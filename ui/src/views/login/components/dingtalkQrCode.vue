@@ -66,7 +66,7 @@ const props = defineProps<{
   config: {
     app_secret: string
     app_key: string
-    agent_id?: string
+    corp_id?: string
   }
 }>()
 
@@ -85,7 +85,7 @@ const initActive = async () => {
     const data = {
       appKey: props.config.app_key,
       appSecret: props.config.app_secret,
-      agent_id: props.config.agent_id
+      corp_id: props.config.corp_id
     }
 
     const redirectUri = encodeURIComponent(window.location.origin)
@@ -104,7 +104,7 @@ const initActive = async () => {
         state: 'fit2cloud-ding-qr',
         prompt: 'consent',
         exclusiveLogin: 'true',
-        exclusiveCorpId: 'ding7fd29779c8cf3e0224f2f5cc6abecb85'
+        exclusiveCorpId: data.corp_id
       },
       (loginResult) => {
         const authCode = loginResult.authCode
