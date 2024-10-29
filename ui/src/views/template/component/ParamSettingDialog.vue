@@ -107,7 +107,6 @@ function deleteParam(index: any) {
 }
 
 function refresh(data: any, index: any) {
-  // console.log(data, index)
   for (let i = 0; i < modelParamsForm.value.length; i++) {
     let field = modelParamsForm.value[i].field
     let label = modelParamsForm.value[i].label
@@ -136,7 +135,6 @@ function refresh(data: any, index: any) {
 }
 
 function submit() {
-  // console.log('submit: ', modelParamsForm.value)
   ModelApi.updateModelParamsForm(props.model.id, modelParamsForm.value, loading).then((ok) => {
     MsgSuccess('模型参数保存成功')
     close()

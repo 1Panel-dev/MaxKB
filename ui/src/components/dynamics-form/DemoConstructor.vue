@@ -46,15 +46,10 @@ const form_data = ref({})
 const item = ref({})
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
 const validate = () => {
-  console.log('asda')
   dynamicsFormRef.value
     ?.validate()
-    .then((ok) => {
-      console.log('ok')
-    })
-    .catch((e) => {
-      console.log(e)
-    })
+    .then((ok) => {})
+    .catch((e) => {})
 }
 </script>
 <style lang="scss"></style>

@@ -79,7 +79,6 @@ const writeValue = ref('')
 const loading = ref(false)
 
 watch(isEdit, (bool) => {
-  console.log(bool)
   if (!bool) {
     writeValue.value = ''
     emit('close')
