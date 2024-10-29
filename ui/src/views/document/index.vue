@@ -123,6 +123,12 @@
                         :command="beforeCommand('status', '3')"
                         >排队中</el-dropdown-item
                       >
+                      <el-dropdown-item
+                        :class="filterMethod['status'] === '4' ? 'is-active' : ''"
+                        class="justify-center"
+                        :command="beforeCommand('status', '4')"
+                        >生成问题中</el-dropdown-item
+                      >
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>

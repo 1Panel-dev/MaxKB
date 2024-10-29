@@ -1,0 +1,4 @@
+[files]
+extend-exclude = [
+    'apps/setting/models_provider/impl/*/icon/*'
+]
