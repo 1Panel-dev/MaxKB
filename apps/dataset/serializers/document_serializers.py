@@ -977,7 +977,10 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             document_id = self.data.get('document_id')
             QuerySet(Document).filter(id=document_id).update(status=Status.queue_up)
-            generate_related_by_document_id.delay(document_id, model_id, prompt)
+            try:
+                generate_related_by_document_id.delay(document_id, model_id, prompt)
+            except AlreadyQueued as e:
+                raise AppApiException(500, "任务正在执行中,请勿重复下发")
 
 
 
