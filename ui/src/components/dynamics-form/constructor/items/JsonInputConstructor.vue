@@ -32,7 +32,7 @@ const getData = () => {
     props_info: {
       rules: [
         {
-          required: true,
+          required: formValue.value.required,
           validator: `validator = (rule, value, callback) => {
             return componentFormRef.value?.validate_rules(rule, value, callback);
              
