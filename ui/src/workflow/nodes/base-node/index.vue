@@ -60,7 +60,7 @@
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip> -->
             </div>
-            <el-switch size="small" v-model="form_data.stt_model_enable" />
+            <el-switch size="small" v-model="form_data.stt_model_enable" @change="sttModelEnableChange"/>
           </div>
         </template>
 
@@ -141,7 +141,7 @@
                 </el-icon>
                 设置
               </el-button>
-              <el-switch size="small" v-model="form_data.tts_model_enable" />
+              <el-switch size="small" v-model="form_data.tts_model_enable" @change="ttsModelEnableChange"/>
             </div>
           </div>
         </template>
@@ -322,6 +322,20 @@ function ttsModelChange() {
     refreshTTSForm({})
   }
 }
+
+function ttsModelEnableChange() {
+  if (!form_data.value.tts_model_enable) {
+    form_data.value.tts_model_id = ''
+    form_data.value.tts_type = 'BROWSER'
+  }
+}
+
+function sttModelEnableChange() {
+  if (!form_data.value.stt_model_enable) {
+    form_data.value.stt_model_id = ''
+  }
+}
+
 
 const openTTSParamSettingDialog = () => {
   const model_id = form_data.value.tts_model_id
