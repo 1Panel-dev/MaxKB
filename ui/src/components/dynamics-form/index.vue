@@ -172,8 +172,17 @@ const render = (
       formFieldList.value = ok.data
     })
   }
-  if (data) {
-    formValue.value = _.cloneDeep(data)
+  const form_data = data ? data : {}
+  if (form_data) {
+    const value = formFieldList.value
+      .map((item) => {
+        if (form_data[item.field] !== undefined) {
+          return { [item.field]: form_data[item.field] }
+        }
+        return { [item.field]: item.default_value }
+      })
+      .reduce((x, y) => ({ ...x, ...y }), {})
+    formValue.value = _.cloneDeep(value)
   }
 }
 /**
