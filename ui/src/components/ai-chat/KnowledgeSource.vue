@@ -16,7 +16,7 @@
         class="source_dataset-button"
         @click="openParagraph(data, dataset.id)"
       >
-        <span class="ellipsis"> {{ dataset.name }}</span>
+        <span class="ellipsis" :title="dataset.name"> {{ dataset.name }}</span>
       </el-button>
     </el-space>
   </div>

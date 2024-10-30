@@ -25,7 +25,7 @@
             </el-text>
             <template v-for="(item, index) in form_data.dataset_id_list" :key="index" v-else>
               <div class="flex-between border border-r-4 white-bg mb-4" style="padding: 5px 8px">
-                <div class="flex align-center" style="line-height: 20px; width: 80%">
+                <div class="flex align-center" style="line-height: 20px">
                   <AppAvatar
                     v-if="relatedObject(datasetList, item, 'id')?.type === '1'"
                     class="mr-8 avatar-purple"
@@ -39,9 +39,9 @@
                     <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                   </AppAvatar>
 
-                  <auto-tooltip :content="relatedObject(datasetList, item, 'id')?.name">
+                  <div class="ellipsis" :title="relatedObject(datasetList, item, 'id')?.name">
                     {{ relatedObject(datasetList, item, 'id')?.name }}
-                  </auto-tooltip>
+                  </div>
                 </div>
                 <el-button text @click="removeDataset(item)">
                   <el-icon><Close /></el-icon>

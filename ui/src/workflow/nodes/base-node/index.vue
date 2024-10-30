@@ -52,13 +52,13 @@
           <div class="flex-between">
             <div class="flex align-center">
               <span class="mr-4">语音输入</span>
-              <el-tooltip
+              <!-- <el-tooltip
                 effect="dark"
                 content="开启后，需要设定语音转文本模型，语音输入完成后会转化为文字直接发送提问"
                 placement="right"
               >
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-              </el-tooltip>
+              </el-tooltip> -->
             </div>
             <el-switch size="small" v-model="form_data.stt_model_enable" />
           </div>
@@ -156,6 +156,7 @@
           popper-class="select-model"
           @change="ttsModelChange()"
           placeholder="请选择语音合成模型"
+          :teleported="false"
         >
           <el-option-group
             v-for="(value, label) in ttsModelOptions"

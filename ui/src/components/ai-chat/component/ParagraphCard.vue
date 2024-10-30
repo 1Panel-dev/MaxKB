@@ -21,14 +21,14 @@
           <el-icon class="mr-4">
             <Document />
           </el-icon>
-          <span class="ellipsis-1">{{ data?.document_name }}</span>
+          <span class="ellipsis" :title="data?.document_name?.trim()"> {{ data?.document_name.trim() }}</span>
         </el-text>
         <div class="flex align-center" style="line-height: 32px">
           <AppAvatar class="mr-8 avatar-blue" shape="square" :size="18">
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
 
-          <span class="ellipsis"> {{ data?.dataset_name }}</span>
+          <span class="ellipsis" :title="data?.dataset_name"> {{ data?.dataset_name }}</span>
         </div>
       </div>
     </template>

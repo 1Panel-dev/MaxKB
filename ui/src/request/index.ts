@@ -11,7 +11,7 @@ import { ref, type WritableComputedRef } from 'vue'
 const axiosConfig = {
   baseURL: '/api',
   withCredentials: false,
-  timeout: 60000,
+  timeout: 600000,
   headers: {}
 }
 
