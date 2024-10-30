@@ -1,5 +1,12 @@
 <template>
-  <el-select filterable :teleported="false" clearable v-bind="$attrs" v-model="_modelValue">
+  <el-select
+    filterable
+    :teleported="true"
+    popper-class="dynamics-single-select"
+    clearable
+    v-bind="$attrs"
+    v-model="_modelValue"
+  >
     <el-option
       v-for="(item, index) in option_list"
       :key="index"
@@ -61,8 +68,10 @@ const label = (option: any) => {
   return option[textField.value]
 }
 </script>
-<style lang="scss" scoped>
-:deep(.el-select-dropdown) {
-  max-width: 400px;
+<style lang="scss">
+.dynamics-single-select {
+  .el-select-dropdown {
+    max-width: 1px;
+  }
 }
 </style>
