@@ -1,6 +1,6 @@
 <template>
   <div class="flex-center mb-16">
-    <img src="@/assets/logo_dingtalk.svg " alt="" width="24px" class="mr-4" />
+    <img src="@/assets/logo_dingtalk.svg" alt="" width="24px" class="mr-4" />
     <h2>钉钉扫码登录</h2>
   </div>
   <div class="ding-talk-qrName">
@@ -66,7 +66,7 @@ const props = defineProps<{
   config: {
     app_secret: string
     app_key: string
-    corp_id?: string
+    crop_id: string
   }
 }>()
 
@@ -81,15 +81,15 @@ const initActive = async () => {
     if (!isConfigReady.value) {
       return
     }
+    console.log(props.config)
 
     const data = {
       appKey: props.config.app_key,
       appSecret: props.config.app_secret,
-      corp_id: props.config.corp_id
+      crop_id: props.config.crop_id
     }
 
     const redirectUri = encodeURIComponent(window.location.origin)
-
     window.DTFrameLogin(
       {
         id: 'ding-talk-qr',
@@ -98,13 +98,13 @@ const initActive = async () => {
       },
       {
         redirect_uri: redirectUri,
-        client_id: data.appKey || '',
+        client_id: data.appKey,
         scope: 'openid',
         response_type: 'code',
         state: 'fit2cloud-ding-qr',
         prompt: 'consent',
         exclusiveLogin: 'true',
-        exclusiveCorpId: data.corp_id
+        exclusiveCorpId: data.crop_id
       },
       (loginResult) => {
         const authCode = loginResult.authCode
@@ -122,7 +122,7 @@ const initActive = async () => {
 }
 
 onMounted(() => {
-  // 模拟 config 加载完成
+  // Simulate config loading completion
   setTimeout(() => {
     isConfigReady.value = true
     initActive()
