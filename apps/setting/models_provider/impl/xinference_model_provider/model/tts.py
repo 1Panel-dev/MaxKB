@@ -15,12 +15,14 @@ def custom_get_token_ids(text: str):
 class XInferenceTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     api_base: str
     api_key: str
+    model: str
     params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.api_base = kwargs.get('api_base')
+        self.model = kwargs.get('model')
         self.params = kwargs.get('params')
 
     @staticmethod
