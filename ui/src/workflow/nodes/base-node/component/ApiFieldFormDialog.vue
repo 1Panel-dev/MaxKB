@@ -5,6 +5,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :destroy-on-close="true"
+    :before-close="close"
     append-to-body
   >
     <el-form
@@ -110,6 +111,7 @@ const open = (row: any) => {
 
 const close = () => {
   dialogVisible.value = false
+  isEdit.value = false
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
