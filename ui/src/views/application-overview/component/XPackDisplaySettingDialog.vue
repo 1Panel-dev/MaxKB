@@ -319,8 +319,11 @@ const defaultSetting = {
   draggable: true,
   show_guide: true,
   avatar: '',
+  avatar_url: '',
   float_icon: '',
+  float_icon_url: '',
   user_avatar: '',
+  user_avatar_url: '',
   disclaimer: false,
   disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
   custom_theme: {
@@ -344,8 +347,11 @@ const xpackForm = ref<any>({
   draggable: false,
   show_guide: false,
   avatar: '',
+  avatar_url: '',
   float_icon: '',
+  float_icon_url: '',
   user_avatar: '',
+  user_avatar_url: '',
   disclaimer: false,
   disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
   custom_theme: {
@@ -360,7 +366,8 @@ const xpackForm = ref<any>({
 
 const imgUrl = ref<any>({
   avatar: '',
-  float_icon: ''
+  float_icon: '',
+  user_avatar: ''
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -395,6 +402,7 @@ const onChange = (file: any, fileList: UploadFiles, attr: string) => {
   } else {
     xpackForm.value[attr] = file.raw
     imgUrl.value[attr] = URL.createObjectURL(file.raw)
+    xpackForm.value[`${attr}_url`] = ''
   }
 }
 
@@ -409,6 +417,9 @@ const open = (data: any, content: any) => {
   imgUrl.value.user_avatar = data.user_avatar
   xpackForm.value.disclaimer = data.disclaimer
   xpackForm.value.disclaimer_value = data.disclaimer_value
+  xpackForm.value.avatar_url = data.avatar
+  xpackForm.value.user_avatar_url = data.user_avatar
+  xpackForm.value.float_icon_url = data.float_icon
   xpackForm.value.custom_theme = {
     theme_color: data.custom_theme?.theme_color || '',
     header_font_color: data.custom_theme?.header_font_color || '#1f2329'
