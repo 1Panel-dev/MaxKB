@@ -14,8 +14,8 @@
             {{ $t('views.applicationOverview.appInfo.EmbedDialog.fullscreenModeTitle') }}
           </p>
           <img src="@/assets/window1.png" alt="" class="ml-8" height="150" />
-          <div class="code layout-bg border-t p-16">
-            <div class="flex-between">
+          <div class="code layout-bg border-t p-8">
+            <div class="flex-between p-8">
               <span class="bold">{{
                 $t('views.applicationOverview.appInfo.EmbedDialog.copyInstructions')
               }}</span>
@@ -23,9 +23,11 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <div class="mt-8 pre-wrap">
-              {{ source1 }}
-            </div>
+            <el-scrollbar height="150" always>
+              <div class="pre-wrap p-8 pt-0">
+                {{ source1 }}
+              </div>
+            </el-scrollbar>
           </div>
         </div>
       </el-col>
@@ -35,8 +37,8 @@
             {{ $t('views.applicationOverview.appInfo.EmbedDialog.floatingModeTitle') }}
           </p>
           <img src="@/assets/window2.png" alt="" class="ml-8" height="150" />
-          <div class="code layout-bg border-t p-16">
-            <div class="flex-between">
+          <div class="code layout-bg border-t p-8">
+            <div class="flex-between p-8">
               <span class="bold">{{
                 $t('views.applicationOverview.appInfo.EmbedDialog.copyInstructions')
               }}</span>
@@ -44,9 +46,11 @@
                 <AppIcon iconName="app-copy"></AppIcon>
               </el-button>
             </div>
-            <div class="mt-8 pre-wrap">
-              {{ source2 }}
-            </div>
+            <el-scrollbar height="150" always>
+              <div class="pre-wrap p-8 pt-0">
+                {{ source2 }}
+              </div>
+            </el-scrollbar>
           </div>
         </div>
       </el-col>
@@ -118,7 +122,7 @@ defineExpose({ open })
     font-weight: 400;
     font-size: 13px;
     white-space: pre;
-    height: 180px;
+    height: 188px;
   }
 }
 </style>
