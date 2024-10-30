@@ -5,7 +5,7 @@ export const MsgSuccess = (message: string) => {
     message: message,
     type: 'success',
     showClose: true,
-    duration: 1500
+    duration: 3000
   })
 }
 
@@ -14,7 +14,7 @@ export const MsgInfo = (message: string) => {
     message: message,
     type: 'info',
     showClose: true,
-    duration: 1500
+    duration: 3000
   })
 }
 
@@ -23,7 +23,7 @@ export const MsgWarning = (message: string) => {
     message: message,
     type: 'warning',
     showClose: true,
-    duration: 1500
+    duration: 3000
   })
 }
 
@@ -32,7 +32,7 @@ export const MsgError = (message: string) => {
     message: message,
     type: 'error',
     showClose: true,
-    duration: 1500
+    duration: 3000
   })
 }
 
