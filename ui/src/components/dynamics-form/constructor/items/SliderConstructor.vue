@@ -2,7 +2,7 @@
   <el-form-item label="是否带输入框" required prop="showInput">
     <el-switch v-model="formValue.showInput" />
   </el-form-item>
-  <el-form-item label="取值范围" required prop="min">
+  <el-form-item label="取值范围" required>
     <el-col :span="11" style="padding-left: 0">
       <el-form-item
         :rules="[
@@ -39,9 +39,16 @@
       /></el-form-item>
     </el-col>
   </el-form-item>
-  <el-form-item label="步长值" required prop="step" :rules="step_rules">
-    <el-input-number v-model="formValue.step" :min="0" controls-position="right" />
-  </el-form-item>
+  <el-col :span="11" style="padding-left: 0">
+    <el-form-item label="步长值" required prop="step" :rules="step_rules">
+      <el-input-number
+        style="width: 100%"
+        v-model="formValue.step"
+        :min="0"
+        controls-position="right"
+      />
+    </el-form-item>
+  </el-col>
 
   <el-form-item
     label="默认值"
@@ -111,6 +118,10 @@ const step_rules = [
   {
     required: true,
     validator: (rule: any, value: any, callback: any) => {
+      if (!value) {
+        callback(new Error('步长值必填'))
+        return false
+      }
       if (value === 0) {
         callback(new Error('步长不能为0'))
         return false
