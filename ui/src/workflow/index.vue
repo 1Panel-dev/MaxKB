@@ -51,8 +51,13 @@ const lf = ref()
 onMounted(() => {
   renderGraphData()
 })
-
-const renderGraphData = () => {
+const render = (data: any) => {
+  lf.value.render(data)
+}
+const renderGraphData = (data?: any) => {
+  if (data) {
+    graphData.value = data
+  }
   const container: any = document.querySelector('#container')
   if (container) {
     lf.value = new LogicFlow({
@@ -133,7 +138,7 @@ const addNode = (shapeItem: ShapeItem) => {
 }
 
 const clearGraphData = () => {
-  return lf.value.graphModel.clearData()
+  return lf.value.clearData()
 }
 
 defineExpose({
@@ -142,7 +147,8 @@ defineExpose({
   getGraphData,
   addNode,
   clearGraphData,
-  renderGraphData
+  renderGraphData,
+  render
 })
 </script>
 <style lang="scss">

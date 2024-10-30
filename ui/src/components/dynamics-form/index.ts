@@ -16,7 +16,9 @@ const install = (app: App) => {
     const commentName: string = key
       .substring(key.lastIndexOf('/') + 1, key.length)
       .replace('.vue', '')
-    app.component(commentName, components[key].default)
+    if (key !== '/src/components/dynamics-form/constructor/index.vue') {
+      app.component(commentName, components[key].default)
+    }
   })
   app.component('DynamicsForm', DynamicsForm)
 }
