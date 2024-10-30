@@ -43,7 +43,7 @@
                             action="#"
                             :auto-upload="false"
                             :show-file-list="false"
-                            accept="image/*"
+                            accept="image/jpeg, image/png, image/gif"
                             :on-change="
                               (file: any, fileList: any) => onChange(file, fileList, 'icon')
                             "
@@ -52,8 +52,8 @@
                           </el-upload>
                         </div>
                         <el-text type="info" size="small"
-                          >顶部网站显示的 Logo，建议尺寸 48*48，支持 JPG、PNG、SVG，大小不超过
-                          200KB</el-text
+                          >顶部网站显示的 Logo，建议尺寸 48*48，支持 JPG、PNG、GIF，大小不超过 10
+                          MB</el-text
                         >
                       </el-card>
                       <el-card shadow="never" class="mb-8">
@@ -64,7 +64,7 @@
                             action="#"
                             :auto-upload="false"
                             :show-file-list="false"
-                            accept="image/*"
+                            accept="image/jpeg, image/png, image/gif"
                             :on-change="
                               (file: any, fileList: any) => onChange(file, fileList, 'loginLogo')
                             "
@@ -73,8 +73,8 @@
                           </el-upload>
                         </div>
                         <el-text type="info" size="small"
-                          >登录页面右侧 Logo，建议尺寸 204*52，支持 JPG、PNG、SVG，大小不超过
-                          200KB</el-text
+                          >登录页面右侧 Logo，建议尺寸 204*52，支持 JPG、PNG、GIF，大小不超过 10
+                          MB</el-text
                         >
                       </el-card>
                       <el-card shadow="never" class="mb-8">
@@ -85,7 +85,7 @@
                             action="#"
                             :auto-upload="false"
                             :show-file-list="false"
-                            accept="image/*"
+                            accept="image/jpeg, image/png, image/gif"
                             :on-change="
                               (file: any, fileList: any) => onChange(file, fileList, 'loginImage')
                             "
@@ -95,7 +95,7 @@
                         </div>
                         <el-text type="info" size="small">
                           左侧背景图，矢量图建议尺寸 576*900，位图建议尺寸 1152*1800；支持
-                          JPG、PNG、SVG，大小不超过 5M
+                          JPG、PNG、GIF，大小不超过 10 MB
                         </el-text>
                       </el-card>
 

@@ -171,7 +171,7 @@
                 action="#"
                 :auto-upload="false"
                 :show-file-list="false"
-                accept="image/*"
+                accept="image/jpeg, image/png, image/gif"
                 :on-change="(file: any, fileList: any) => onChange(file, fileList, 'user_avatar')"
               >
                 <el-button size="small"> 替换 </el-button>
@@ -190,7 +190,7 @@
                 action="#"
                 :auto-upload="false"
                 :show-file-list="false"
-                accept="image/*"
+                accept="image/jpeg, image/png, image/gif"
                 :on-change="(file: any, fileList: any) => onChange(file, fileList, 'avatar')"
               >
                 <el-button size="small"> 替换 </el-button>
@@ -208,7 +208,7 @@
                 action="#"
                 :auto-upload="false"
                 :show-file-list="false"
-                accept="image/*"
+                accept="image/jpeg, image/png, image/gif"
                 :on-change="(file: any, fileList: any) => onChange(file, fileList, 'float_icon')"
               >
                 <el-button size="small"> 替换 </el-button>

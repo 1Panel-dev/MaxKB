@@ -11,7 +11,7 @@ export default {
     embedThirdParty: '嵌入第三方',
     accessRestrictions: '访问限制',
     displaySetting: '显示设置',
-    apiAccessCredentials: 'API访问凭据',
+    apiAccessCredentials: 'API 访问凭据',
     apiKey: 'API Key',
     refreshToken: {
       msgConfirm1: '是否重新生成公开访问链接?',

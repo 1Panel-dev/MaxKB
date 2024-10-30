@@ -11,7 +11,7 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
 import { useScriptTag } from '@vueuse/core'
-import { defineProps, onMounted, ref } from 'vue'
+import { defineProps, ref, watch } from 'vue'
 import useStore from '@/stores'
 import { MsgError } from '@/utils/message'
 
@@ -121,13 +121,16 @@ const initActive = async () => {
   }
 }
 
-onMounted(() => {
-  // Simulate config loading completion
-  setTimeout(() => {
-    isConfigReady.value = true
-    initActive()
-  }, 1000)
-})
+watch(
+  () => props.config,
+  (newConfig) => {
+    if (newConfig.app_secret && newConfig.app_key && newConfig.crop_id) {
+      isConfigReady.value = true
+      initActive()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="scss">
