@@ -326,7 +326,7 @@
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip> -->
                     </div>
-                    <el-switch size="small" v-model="applicationForm.stt_model_enable" />
+                    <el-switch size="small" v-model="applicationForm.stt_model_enable" @change="sttModelEnableChange"/>
                   </div>
                 </template>
                 <el-select
@@ -406,7 +406,7 @@
                         <el-icon class="mr-4"><Setting /></el-icon>
                         设置
                       </el-button>
-                      <el-switch size="small" v-model="applicationForm.tts_model_enable" />
+                      <el-switch size="small" v-model="applicationForm.tts_model_enable" @change="ttsModelEnableChange"/>
                     </div>
                   </div>
                 </template>
@@ -817,6 +817,19 @@ function ttsModelChange() {
     TTSModeParamSettingDialogRef.value?.reset_default(applicationForm.value.tts_model_id, id)
   } else {
     refreshTTSForm({})
+  }
+}
+
+function ttsModelEnableChange() {
+  if (!applicationForm.value.tts_model_enable) {
+    applicationForm.value.tts_model_id = ''
+    applicationForm.value.tts_type = 'BROWSER'
+  }
+}
+
+function sttModelEnableChange() {
+  if (!applicationForm.value.stt_model_enable) {
+    applicationForm.value.stt_model_id = ''
   }
 }
 
