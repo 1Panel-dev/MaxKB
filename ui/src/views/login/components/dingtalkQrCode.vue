@@ -102,9 +102,7 @@ const initActive = async () => {
         scope: 'openid',
         response_type: 'code',
         state: 'fit2cloud-ding-qr',
-        prompt: 'consent',
-        exclusiveLogin: 'true',
-        exclusiveCorpId: data.corp_id
+        prompt: 'consent'
       },
       (loginResult) => {
         const authCode = loginResult.authCode
@@ -114,6 +112,7 @@ const initActive = async () => {
       },
       (errorMsg: string) => {
         MsgError(errorMsg)
+        console.log(errorMsg)
       }
     )
   } catch (error) {
