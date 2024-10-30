@@ -37,7 +37,7 @@
               action="#"
               :auto-upload="false"
               :show-file-list="false"
-              accept="image/*"
+              accept="image/jpeg, image/png, image/gif"
               :on-change="onChange"
             >
               <el-button icon="Upload" :disabled="radioType !== 'custom'">{{
