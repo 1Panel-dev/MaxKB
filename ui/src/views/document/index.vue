@@ -13,7 +13,6 @@
             <el-button v-if="datasetDetail.type === '1'" type="primary" @click="importDoc"
               >导入文档</el-button
             >
-            <el-button @click="syncDataset" v-if="datasetDetail.type === '1'">同步知识库</el-button>
             <el-button
               @click="syncMulDocument"
               :disabled="multipleSelection.length === 0"
@@ -693,7 +692,6 @@ function openGenerateDialog(row?: any) {
 
   GenerateRelatedDialogRef.value.open(arr)
 }
-
 
 onMounted(() => {
   getDetail()
