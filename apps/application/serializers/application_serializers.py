@@ -646,7 +646,6 @@ class ApplicationSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
-        model_id = serializers.UUIDField(required=False, error_messages=ErrMessage.uuid("模型id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -968,13 +967,10 @@ class ApplicationSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             application_id = self.data.get('application_id')
             application = QuerySet(Application).filter(id=application_id).first()
-            if application.tts_model_enable:
-                tts_model_id = application.tts_model_id
-                if 'tts_model_id' in form_data:
-                    tts_model_id = form_data.get('tts_model_id')
-                    del form_data['tts_model_id']
-                model = get_model_instance_by_model_user_id(tts_model_id, application.user_id, **form_data)
-                return model.text_to_speech(text)
+            if 'tts_model_id' in form_data:
+                tts_model_id = form_data.pop('tts_model_id')
+            model = get_model_instance_by_model_user_id(tts_model_id, application.user_id, **form_data)
+            return model.text_to_speech(text)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:
