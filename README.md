@@ -2,7 +2,10 @@
 
 <p align="center"><img src= "https://github.com/1Panel-dev/maxkb/assets/52996290/c0694996-0eed-40d8-b369-322bf2a380bf" alt="MaxKB" width="300" /></p>
 <h3 align="center">基于大语言模型和 RAG 的知识库问答系统</h3>
-<p align="center"><a href="https://trendshift.io/repositories/9113" target="_blank"><img src="https://trendshift.io/api/badge/repositories/9113" alt="1Panel-dev%2FMaxKB | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a></p>
+<p align="center">
+    <a href="https://trendshift.io/repositories/9113" target="_blank"><img src="https://trendshift.io/api/badge/repositories/9113" alt="1Panel-dev%2FMaxKB | Trendshift" style="width: 250px; height: auto;" /></a>
+    <a href="https://market.aliyun.com/products/53690006/cmjj00067609.html?userCode=kmemb8jp" target="_blank"><img src="https://img.alicdn.com/imgextra/i2/O1CN01H5JIwY1rZ0OobDjnJ_!!6000000005644-2-tps-1000-216.png" alt="1Panel-dev%2FMaxKB | Aliyun" style="width: 250px; height: auto;" /></a>
+</p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html#license-text"><img src="https://img.shields.io/github/license/1Panel-dev/maxkb?color=%231890FF" alt="License: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/maxkb?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/maxkb&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
