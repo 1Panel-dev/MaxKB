@@ -173,8 +173,8 @@ function initMaxkbStyle(root){
   }
   #maxkb .maxkb-tips {
       position: fixed;
-      bottom: 30px;
-      right: 66px;
+      {{x_type}}:calc({{x_value}}px + 75px);
+      {{y_type}}: calc({{y_value}}px + 0px);
       padding: 22px 24px 24px;
       border-radius: 6px;
       color: #ffffff;
@@ -191,8 +191,8 @@ function initMaxkbStyle(root){
       transform: rotate(45deg);
       box-sizing: border-box;
       /* left  */
-      right: -5px;
-      bottom: 33px;
+      {{x_type}}: -5px;
+      {{y_type}}: 33px;
       border-left-color: transparent;
       border-bottom-color: transparent
   }
