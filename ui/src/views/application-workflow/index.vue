@@ -134,14 +134,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
 import applicationApi from '@/api/application'
 import { isAppIcon } from '@/utils/application'
-import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
+import { MsgSuccess, MsgError } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
@@ -182,7 +182,7 @@ function clickoutsideHistory() {
 
 function refreshVersion(item?: any) {
   if (item) {
-    getHistortyDetail(item.id)
+    renderGraphData(item)
   }
   if (hasPermission(`APPLICATION:MANAGE:${id}`, 'AND') && isSave.value) {
     initInterval()
@@ -190,26 +190,23 @@ function refreshVersion(item?: any) {
   showHistory.value = false
   disablePublic.value = false
 }
+
 function checkVersion(item: any) {
   disablePublic.value = true
-  getHistortyDetail(item.id)
   currentVersion.value = item
+  renderGraphData(item)
   closeInterval()
 }
 
-function getHistortyDetail(versionId: string) {
-  applicationApi.getWorkFlowVersionDetail(id, versionId, loading).then((res: any) => {
-    res.data?.work_flow['nodes'].map((v: any) => {
-      v['properties']['noRender'] = true
-    })
-    detail.value.work_flow = res.data.work_flow
-    detail.value.stt_model_id = res.data.stt_model
-    detail.value.tts_model_id = res.data.tts_model
-    detail.value.tts_type = res.data.tts_type
-    saveTime.value = res.data?.update_time
-    setTimeout(() => {
-      workflowRef.value?.renderGraphData()
-    }, 200)
+function renderGraphData(item: any) {
+  item.work_flow['nodes'].map((v: any) => {
+    v['properties']['noRender'] = true
+  })
+  detail.value.work_flow = item.work_flow
+  saveTime.value = item?.update_time
+  workflowRef.value?.clearGraphData()
+  nextTick(() => {
+    workflowRef.value?.render(item.work_flow)
   })
 }
 
@@ -259,7 +256,6 @@ function publicHandle() {
         return
       }
       applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
-        getDetail()
         MsgSuccess('发布成功')
       })
     })
@@ -317,7 +313,7 @@ function getGraphData() {
 }
 
 function getDetail() {
-  application.asyncGetApplicationDetail(id, loading).then((res: any) => {
+  application.asyncGetApplicationDetail(id).then((res: any) => {
     res.data?.work_flow['nodes'].map((v: any) => {
       v['properties']['noRender'] = true
     })
@@ -326,9 +322,10 @@ function getDetail() {
     detail.value.tts_model_id = res.data.tts_model
     detail.value.tts_type = res.data.tts_type
     saveTime.value = res.data?.update_time
-    setTimeout(() => {
-      workflowRef.value?.renderGraphData()
-    }, 200)
+    workflowRef.value?.clearGraphData()
+    nextTick(() => {
+      workflowRef.value?.renderGraphData(detail.value.work_flow)
+    })
   })
 }
 
