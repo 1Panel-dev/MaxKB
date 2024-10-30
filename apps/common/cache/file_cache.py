@@ -12,7 +12,7 @@ import os
 import time
 
 from diskcache import Cache
-from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.cache.backends.base import BaseCache
 
 
 class FileCache(BaseCache):
@@ -29,35 +29,42 @@ class FileCache(BaseCache):
         finally:
             os.umask(old_umask)
 
-    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+    def add(self, key, value, timeout=None, version=None):
         expire = timeout if isinstance(timeout, int) or isinstance(timeout,
                                                                    float) or timeout is None else timeout.total_seconds()
-        return self.cache.add(key, value=value, expire=expire)
+        return self.cache.add(self.get_key(key, version), value=value, expire=expire)
 
-    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+    def set(self, key, value, timeout=None, version=None):
         expire = timeout if isinstance(timeout, int) or isinstance(timeout,
                                                                    float) or timeout is None else timeout.total_seconds()
-        return self.cache.set(key, value=value, expire=expire)
+        return self.cache.set(self.get_key(key, version), value=value, expire=expire)
 
     def get(self, key, default=None, version=None):
-        return self.cache.get(key, default=default)
+        return self.cache.get(self.get_key(key, version), default=default)
+
+    @staticmethod
+    def get_key(key, version):
+        if version is None:
+            return f"default:{key}"
+        return f"{version}:{key}"
 
     def delete(self, key, version=None):
-        return self.cache.delete(key)
+        return self.cache.delete(self.get_key(key, version))
 
-    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+    def touch(self, key, timeout=None, version=None):
         expire = timeout if isinstance(timeout, int) or isinstance(timeout,
                                                                    float) else timeout.total_seconds()
 
-        return self.cache.touch(key, expire=expire)
+        return self.cache.touch(self.get_key(key, version), expire=expire)
 
-    def ttl(self, key):
+    def ttl(self, key, version=None):
         """
         获取key的剩余时间
         :param key: key
         :return:  剩余时间
+        @param version:
         """
-        value, expire_time = self.cache.get(key, expire_time=True)
+        value, expire_time = self.cache.get(self.get_key(key, version), expire_time=True)
         if value is None:
             return None
         return datetime.timedelta(seconds=math.ceil(expire_time - time.time()))

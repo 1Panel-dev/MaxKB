@@ -6,7 +6,9 @@
     @date：2024/7/24 19:23
     @desc:
 """
-from django.core.cache import cache
+from django.core.cache import caches
+
+cache = caches['default_file']
 
 
 def get_data_by_default_cache(key: str, get_data, cache_instance=cache, version=None, kwargs=None):
@@ -43,10 +45,10 @@ def get_cache(cache_key, use_get_data: any = True, cache_instance=cache, version
                 if cache_instance.has_key(key, version=version):
                     return cache_instance.get(key, version=version)
                 data = get_data(*args, **kwargs)
-                cache_instance.add(key, data, version=version)
+                cache_instance.add(key, data, timeout=None, version=version)
                 return data
             data = get_data(*args, **kwargs)
-            cache_instance.set(key, data, version=version)
+            cache_instance.set(key, data, timeout=None, version=version)
             return data
 
         return run
