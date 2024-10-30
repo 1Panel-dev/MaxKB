@@ -5,6 +5,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :destroy-on-close="true"
+    :before-close="close"
     append-to-body
   >
     <DynamicsFormConstructor
@@ -16,7 +17,7 @@
     ></DynamicsFormConstructor>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+        <el-button @click.prevent="close"> 取消 </el-button>
         <el-button type="primary" @click="submit()" :loading="loading">
           {{ isEdit ? '保存' : '添加' }}
         </el-button>
