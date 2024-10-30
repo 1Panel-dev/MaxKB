@@ -78,6 +78,14 @@ const open = (model_id: string, application_id?: string, model_setting_data?: an
     const resp = ok.data
       .map((item: any) => ({ [item.field]: item.default_value }))
       .reduce((x, y) => ({ ...x, ...y }), {})
+    // 删除不存在的字段
+    if (model_setting_data) {
+      Object.keys(model_setting_data).forEach(key => {
+        if (!(key in resp)) {
+          delete model_setting_data[key];
+        }
+      });
+    }
     model_setting_data = { ...resp, ...model_setting_data }
     // 渲染动态表单
     dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
