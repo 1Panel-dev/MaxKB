@@ -884,7 +884,7 @@ onMounted(() => {
   }
 
   .scrollbar-height {
-    height: calc(var(--app-main-height) - 160px);
+    height: calc(var(--app-main-height) - 166px);
   }
 }
 
