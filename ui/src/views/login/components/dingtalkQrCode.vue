@@ -66,7 +66,7 @@ const props = defineProps<{
   config: {
     app_secret: string
     app_key: string
-    crop_id: string
+    corp_id: string
   }
 }>()
 
@@ -86,7 +86,7 @@ const initActive = async () => {
     const data = {
       appKey: props.config.app_key,
       appSecret: props.config.app_secret,
-      crop_id: props.config.crop_id
+      corp_id: props.config.corp_id
     }
 
     const redirectUri = encodeURIComponent(window.location.origin)
@@ -104,7 +104,7 @@ const initActive = async () => {
         state: 'fit2cloud-ding-qr',
         prompt: 'consent',
         exclusiveLogin: 'true',
-        exclusiveCorpId: data.crop_id
+        exclusiveCorpId: data.corp_id
       },
       (loginResult) => {
         const authCode = loginResult.authCode
@@ -124,7 +124,7 @@ const initActive = async () => {
 watch(
   () => props.config,
   (newConfig) => {
-    if (newConfig.app_secret && newConfig.app_key && newConfig.crop_id) {
+    if (newConfig.app_secret && newConfig.app_key && newConfig.corp_id) {
       isConfigReady.value = true
       initActive()
     }

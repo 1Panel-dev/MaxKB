@@ -265,24 +265,13 @@ const rules = reactive<FormRules>({
 })
 
 const onChange = (file: any, fileList: UploadFiles, attr: string) => {
-  if (attr === 'loginImage') {
-    const isLimit = file?.size / 1024 / 1024 < 5
-    if (!isLimit) {
-      // @ts-ignore
-      MsgError(`文件大小超过 5M`)
-      return false
-    } else {
-      themeForm.value[attr] = file.raw
-    }
+  const isLimit = file?.size / 1024 / 1024 < 10
+  if (!isLimit) {
+    // @ts-ignore
+    MsgError(`文件大小超过 10M`)
+    return false
   } else {
-    const isLimit = file?.size / 1024 < 200
-    if (!isLimit) {
-      // @ts-ignore
-      MsgError(`文件大小超过 200KB`)
-      return false
-    } else {
-      themeForm.value[attr] = file.raw
-    }
+    themeForm.value[attr] = file.raw
   }
   user.setTheme(themeForm.value)
 }
