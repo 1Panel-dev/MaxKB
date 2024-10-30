@@ -2,7 +2,7 @@
   <el-dialog
     title="模型参数设置"
     v-model="dialogVisible"
-    width="600px"
+    width="800px"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :destroy-on-close="true"
@@ -19,7 +19,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="field" label="参数" />
-      <el-table-column label="组件类型" width="100px">
+      <el-table-column label="组件类型" width="110px">
         <template #default="{ row }">
           <el-tag type="info" class="info-tag">{{
             input_type_list.find((item) => item.value === row.input_type)?.label

@@ -8,13 +8,28 @@
     v-bind="$attrs"
   >
     <el-form-item label="参数" :required="true" prop="field" :rules="rules.field">
-      <el-input v-model="form_data.field" placeholder="请输入参数" />
+      <el-input
+        v-model="form_data.field"
+        :maxlength="64"
+        placeholder="请输入参数"
+        show-word-limit
+      />
     </el-form-item>
     <el-form-item label="显示名称" :required="true" prop="label" :rules="rules.label">
-      <el-input v-model="form_data.label" :maxlength="64" placeholder="请输入显示名称" />
+      <el-input
+        v-model="form_data.label"
+        :maxlength="64"
+        show-word-limit
+        placeholder="请输入显示名称"
+      />
     </el-form-item>
     <el-form-item label="参数提示说明">
-      <el-input v-model="form_data.tooltip" :maxlength="128" placeholder="请输入参数提示说明" />
+      <el-input
+        v-model="form_data.tooltip"
+        :maxlength="128"
+        show-word-limit
+        placeholder="请输入参数提示说明"
+      />
     </el-form-item>
     <el-form-item label="是否必填" :required="true" prop="required" :rules="rules.required">
       <el-switch v-model="form_data.required" :active-value="true" :inactive-value="false" />
