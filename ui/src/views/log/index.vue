@@ -426,14 +426,8 @@ function changeDayHandle(val: number | string) {
 }
 
 function saveCleanTime() {
-  const data = detail.value
-  data.clean_time = days.value
-  let obj = { ...data, clean_time: days.value }
-  if (data.type === 'WORK_FLOW') {
-    obj = {
-      work_flow: data.work_flow,
-      clean_time: days.value
-    }
+  const obj = {
+    clean_time: days.value
   }
   application
     .asyncPutApplication(id as string, obj, loading)
