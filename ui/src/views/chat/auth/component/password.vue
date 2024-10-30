@@ -63,7 +63,7 @@ const validator = () => {
 }
 
 const rules = {
-  value: [{ required: true, validator: validator_auth, trigger: 'blur' }]
+  value: [{ required: true, validator: validator_auth, trigger: 'manual' }]
 }
 
 const form = ref({
