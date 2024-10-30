@@ -405,7 +405,6 @@ class WorkflowManage:
 
     def run_node(self, node):
         result = node.run()
-        result.write_context(node, self)
         return result
 
     def is_result(self, current_node, current_node_result):
