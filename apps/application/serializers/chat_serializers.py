@@ -170,7 +170,8 @@ class ChatSerializers(serializers.Serializer):
         @staticmethod
         def paragraph_list_to_string(paragraph_list):
             return "\n**********\n".join(
-                [f"{paragraph.get('title')}:\n{paragraph.get('content')}" for paragraph in paragraph_list])
+                [f"{paragraph.get('title')}:\n{paragraph.get('content')}" for paragraph in
+                 paragraph_list] if paragraph_list is not None else '')
 
         @staticmethod
         def to_row(row: Dict):
@@ -183,13 +184,14 @@ class ChatSerializers(serializers.Serializer):
                                             "step_type") == 'search_step']
             reference_paragraph_len = '\n'.join([str(len(node.get('paragraph_list',
                                                                   []))) if key == 'search_step' else node.get(
-                'name') + ':' + str(len(node.get('paragraph_list', []))) for
+                'name') + ':' + str(
+                len(node.get('paragraph_list', [])) if node.get('paragraph_list', []) is not None else '0') for
                                                  key, node in search_dataset_node_list])
             reference_paragraph = '\n----------\n'.join(
                 [ChatSerializers.Query.paragraph_list_to_string(node.get('paragraph_list',
                                                                          [])) if key == 'search_step' else node.get(
                     'name') + ':\n' + ChatSerializers.Query.paragraph_list_to_string(node.get('paragraph_list',
-                                                                                            [])) for
+                                                                                              [])) for
                  key, node in search_dataset_node_list])
             improve_paragraph_list = row.get('improve_paragraph_list')
             vote_status_map = {'-1': '未投票', '0': '赞同', '1': '反对'}
