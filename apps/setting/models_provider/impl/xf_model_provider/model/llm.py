@@ -9,7 +9,7 @@
 from typing import List, Optional, Any, Iterator, Dict
 
 from langchain_community.chat_models.sparkllm import \
-    ChatSparkLLM, _convert_message_to_dict, _convert_delta_to_message_chunk
+    ChatSparkLLM, convert_message_to_dict, _convert_delta_to_message_chunk
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.messages import BaseMessage, AIMessageChunk
 from langchain_core.outputs import ChatGenerationChunk
@@ -56,7 +56,7 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
         default_chunk_class = AIMessageChunk
 
         self.client.arun(
-            [_convert_message_to_dict(m) for m in messages],
+            [convert_message_to_dict(m) for m in messages],
             self.spark_user_id,
             self.model_kwargs,
             True,
