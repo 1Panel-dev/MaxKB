@@ -28,8 +28,8 @@
           </el-input>
         </el-form-item>
       </template>
-      <div v-if="configType === 'wechat'" class="flex align-center" style="margin-bottom: 8px">
-        <span class="el-form-item__label">认证通过</span>
+      <div v-if="configType === 'wechat'" class="flex align-center mb-16">
+        <span class="lighter mr-8">认证通过</span>
         <el-switch v-if="configType === 'wechat'" v-model="form[configType].is_certification" />
       </div>
 
