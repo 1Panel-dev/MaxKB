@@ -37,9 +37,8 @@ docker run -d --name=maxkb --restart=always -p 8080:8080 -v C:/maxkb:/var/lib/po
 # 密码: MaxKB@123..
 ```
 
-- 你也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB + Ollama + Llama 3 / Qwen 2，快速上线基于本地大模型的 AI 知识库问答系统；
+- 你也可以通过 [1Panel 应用商店](https://apps.fit2cloud.com/1panel) 快速部署 MaxKB；
 - 如果是内网环境，推荐使用 [离线安装包](https://community.fit2cloud.com/#/products/maxkb/downloads) 进行安装部署；
-- 你也可以在线体验：[DataEase 小助手](https://dataease.io/docs/v2/)，它是基于 MaxKB 搭建的智能 AI 问答系统，已经嵌入到 DataEase 产品及在线文档中；
 - MaxKB 产品版本分为社区版和专业版，详情请参见：[MaxKB 产品版本对比](https://maxkb.cn/pricing.html)。
 
 如你有更多问题，可以查看使用手册，或者通过论坛与我们交流。
@@ -49,6 +48,15 @@ docker run -d --name=maxkb --restart=always -p 8080:8080 -v C:/maxkb:/var/lib/po
 - 技术交流群
 
 <image height="150px" width="150px" src="https://github.com/1Panel-dev/MaxKB/assets/52996290/a083d214-02be-4178-a1db-4f428124153a"/>
+
+## 案例展示
+
+MaxKB 自发布以来，日均安装下载超过 1000 次，被广泛应用于智能客服、企业内部知识库、学术研究与教育等场景。
+
+- [华莱士智能客服](https://ai.cnhls.com/ui/chat/1fc0f6a9b5a6fb27)
+- [JumpServer 小助手](https://maxkb.fit2cloud.com/ui/chat/b4e27a6e72d349a3)
+- [信用深圳](https://www.szcredit.org.cn/#/index)
+- [重庆交通大学教务在线](http://jwc.anyquestion.cn/ui/chat/b75496390f7d935d)
 
 ## UI 展示
 
