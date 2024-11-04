@@ -10,7 +10,7 @@ import hmac
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Dict
 from urllib.parse import urlencode, urlparse
 import ssl
@@ -63,7 +63,7 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         host = urlparse(url).hostname
         # 生成RFC1123格式的时间戳
         gmt_format = '%a, %d %b %Y %H:%M:%S GMT'
-        date = datetime.utcnow().strftime(gmt_format)
+        date = datetime.now(UTC).strftime(gmt_format)
 
         # 拼接字符串
         signature_origin = "host: " + host + "\n"

@@ -132,6 +132,7 @@
                 <el-option label="重排模型" value="RERANKER" />
                 <el-option label="语音识别" value="STT" />
                 <el-option label="语音合成" value="TTS" />
+                <el-option label="图片理解" value="IMAGE" />
               </el-select>
             </div>
           </div>
