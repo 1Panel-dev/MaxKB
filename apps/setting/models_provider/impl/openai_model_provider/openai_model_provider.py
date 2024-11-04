@@ -12,10 +12,12 @@ from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, \
     ModelTypeConst, ModelInfoManage
 from setting.models_provider.impl.openai_model_provider.credential.embedding import OpenAIEmbeddingCredential
+from setting.models_provider.impl.openai_model_provider.credential.image import OpenAIImageModelCredential
 from setting.models_provider.impl.openai_model_provider.credential.llm import OpenAILLMModelCredential
 from setting.models_provider.impl.openai_model_provider.credential.stt import OpenAISTTModelCredential
 from setting.models_provider.impl.openai_model_provider.credential.tts import OpenAITTSModelCredential
 from setting.models_provider.impl.openai_model_provider.model.embedding import OpenAIEmbeddingModel
+from setting.models_provider.impl.openai_model_provider.model.image import OpenAIImage
 from setting.models_provider.impl.openai_model_provider.model.llm import OpenAIChatModel
 from setting.models_provider.impl.openai_model_provider.model.stt import OpenAISpeechToText
 from setting.models_provider.impl.openai_model_provider.model.tts import OpenAITextToSpeech
@@ -24,6 +26,7 @@ from smartdoc.conf import PROJECT_DIR
 openai_llm_model_credential = OpenAILLMModelCredential()
 openai_stt_model_credential = OpenAISTTModelCredential()
 openai_tts_model_credential = OpenAITTSModelCredential()
+openai_image_model_credential = OpenAIImageModelCredential()
 model_info_list = [
     ModelInfo('gpt-3.5-turbo', '最新的gpt-3.5-turbo，随OpenAI调整而更新', ModelTypeConst.LLM,
               openai_llm_model_credential, OpenAIChatModel
@@ -88,11 +91,20 @@ model_info_embedding_list = [
               OpenAIEmbeddingModel)
 ]
 
+model_info_image_list = [
+    ModelInfo('gpt-4o', '最新的GPT-4o，比gpt-4-turbo更便宜、更快，随OpenAI调整而更新',
+              ModelTypeConst.IMAGE, openai_image_model_credential,
+              OpenAIImage),
+    ModelInfo('gpt-4o-mini', '最新的gpt-4o-mini，比gpt-4o更便宜、更快，随OpenAI调整而更新',
+              ModelTypeConst.IMAGE, openai_image_model_credential,
+              OpenAIImage),
+]
+
 model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
     ModelInfo('gpt-3.5-turbo', '最新的gpt-3.5-turbo，随OpenAI调整而更新', ModelTypeConst.LLM,
               openai_llm_model_credential, OpenAIChatModel
               )).append_model_info_list(model_info_embedding_list).append_default_model_info(
-    model_info_embedding_list[0]).build()
+    model_info_embedding_list[0]).append_model_info_list(model_info_image_list).build()
 
 
 class OpenAIModelProvider(IModelProvider):
