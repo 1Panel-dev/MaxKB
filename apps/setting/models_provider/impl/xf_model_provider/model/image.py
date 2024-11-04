@@ -1,44 +1,36 @@
-# -*- coding:utf-8 -*-
-#
-#   author: iflytek
-#
-#  错误码链接：https://www.xfyun.cn/document/error-code （code返回错误码时必看）
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# coding=utf-8
+
 import asyncio
 import base64
 import datetime
 import hashlib
 import hmac
 import json
-import logging
 import os
+import ssl
 from datetime import datetime, UTC
 from typing import Dict
-from urllib.parse import urlencode, urlparse
-import ssl
+from urllib.parse import urlencode
+from urllib.parse import urlparse
+
 import websockets
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
-from setting.models_provider.impl.base_tts import BaseTextToSpeech
-
-max_kb = logging.getLogger("max_kb")
-
-STATUS_FIRST_FRAME = 0  # 第一帧的标识
-STATUS_CONTINUE_FRAME = 1  # 中间帧标识
-STATUS_LAST_FRAME = 2  # 最后一帧的标识
+from setting.models_provider.impl.base_image import BaseImage
 
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 
-class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
+class XFSparkImage(MaxKBBaseModel, BaseImage):
     spark_app_id: str
     spark_api_key: str
     spark_api_secret: str
     spark_api_url: str
     params: dict
 
+    # 初始化
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.spark_api_url = kwargs.get('spark_api_url')
@@ -49,11 +41,11 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {'vcn': 'xiaoyan', 'speed': 50}}
+        optional_params = {'params': {}}
         for key, value in model_kwargs.items():
             if key not in ['model_id', 'use_local', 'streaming']:
                 optional_params['params'][key] = value
-        return XFSparkTextToSpeech(
+        return XFSparkImage(
             spark_app_id=model_credential.get('spark_app_id'),
             spark_api_key=model_credential.get('spark_api_key'),
             spark_api_secret=model_credential.get('spark_api_secret'),
@@ -61,7 +53,6 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             **optional_params
         )
 
-    # 生成url
     def create_url(self):
         url = self.spark_api_url
         host = urlparse(url).hostname
@@ -72,7 +63,7 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         # 拼接字符串
         signature_origin = "host: " + host + "\n"
         signature_origin += "date: " + date + "\n"
-        signature_origin += "GET " + "/v2/tts " + "HTTP/1.1"
+        signature_origin += "GET " + "/v2.1/image " + "HTTP/1.1"
         # 进行hmac-sha256进行加密
         signature_sha = hmac.new(self.spark_api_secret.encode('utf-8'), signature_origin.encode('utf-8'),
                                  digestmod=hashlib.sha256).digest()
@@ -96,51 +87,84 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         return url
 
     def check_auth(self):
-        self.text_to_speech("你好")
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        with open(f'{cwd}/img_1.png', 'rb') as f:
+            self.image_understand(f,"一句话概述这个图片")
 
-    def text_to_speech(self, text):
-
-        # 使用小语种须使用以下方式，此处的unicode指的是 utf16小端的编码方式，即"UTF-16LE"”
-        # self.Data = {"status": 2, "text": str(base64.b64encode(self.Text.encode('utf-16')), "UTF8")}
+    def image_understand(self, image_file, question):
         async def handle():
             async with websockets.connect(self.create_url(), max_size=1000000000, ssl=ssl_context) as ws:
                 # 发送 full client request
-                await self.send(ws, text)
+                await self.send(ws, image_file, question)
                 return await self.handle_message(ws)
 
         return asyncio.run(handle())
+
+    # 收到websocket消息的处理
+    @staticmethod
+    async def handle_message(ws):
+        # print(message)
+        answer = ''
+        while True:
+            res = await ws.recv()
+            data = json.loads(res)
+            code = data['header']['code']
+            if code != 0:
+                return f'请求错误: {code}, {data}'
+            else:
+                choices = data["payload"]["choices"]
+                status = choices["status"]
+                content = choices["text"][0]["content"]
+                # print(content, end="")
+                answer += content
+                # print(1)
+                if status == 2:
+                    break
+        return answer
+
+    async def send(self, ws, image_file, question):
+        text = [
+            {"role": "user", "content": str(base64.b64encode(image_file.read()), 'utf-8'), "content_type": "image"},
+            {"role": "user", "content": question}
+        ]
+
+        data = {
+            "header": {
+                "app_id": self.spark_app_id
+            },
+            "parameter": {
+                "chat": {
+                    "domain": "image",
+                    "temperature": 0.5,
+                    "top_k": 4,
+                    "max_tokens": 2028,
+                    "auditing": "default"
+                }
+            },
+            "payload": {
+                "message": {
+                    "text": text
+                }
+            }
+        }
+
+        d = json.dumps(data)
+        await ws.send(d)
 
     def is_cache_model(self):
         return False
 
     @staticmethod
-    async def handle_message(ws):
-        audio_bytes: bytes = b''
-        while True:
-            res = await ws.recv()
-            message = json.loads(res)
-            # print(message)
-            code = message["code"]
-            sid = message["sid"]
+    def get_len(text):
+        length = 0
+        for content in text:
+            temp = content["content"]
+            leng = len(temp)
+            length += leng
+        return length
 
-            if code != 0:
-                errMsg = message["message"]
-                raise Exception(f"sid: {sid} call error: {errMsg} code is: {code}")
-            else:
-                audio = message["data"]["audio"]
-                audio = base64.b64decode(audio)
-                audio_bytes += audio
-            # 退出
-            if message["data"]["status"] == 2:
-                break
-        return audio_bytes
-
-    async def send(self, ws, text):
-        business = {"aue": "lame", "sfl": 1, "auf": "audio/L16;rate=16000", "tte": "utf8"}
-        d = {
-            "common": {"app_id": self.spark_app_id},
-            "business": business | self.params,
-            "data": {"status": 2, "text": str(base64.b64encode(text.encode('utf-8')), "UTF8")},
-        }
-        d = json.dumps(d)
-        await ws.send(d)
+    def check_len(self, text):
+        print("text-content-tokens:", self.get_len(text[1:]))
+        while (self.get_len(text[1:]) > 8000):
+            del text[1]
+        return text
