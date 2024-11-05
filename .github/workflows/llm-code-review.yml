@@ -14,12 +14,12 @@ jobs:
     steps:
       - uses: fit2cloud/LLM-CodeReview-Action@main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FIT2CLOUDRD_LLM_CODE_REVIEW_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.ALIYUN_LLM_API_KEY }}
           LANGUAGE: Chinese
           OPENAI_API_ENDPOINT: https://dashscope.aliyuncs.com/compatible-mode/v1
           MODEL: qwen2-1.5b-instruct
-          PROMPT: "请检查下面的代码差异是否有不规范、潜在的问题或者优化建议"
+          PROMPT: "请检查下面的代码差异是否有不规范、潜在的问题或者优化建议，用中文回答。"
           top_p: 1
           temperature: 1
           # max_tokens: 10000
