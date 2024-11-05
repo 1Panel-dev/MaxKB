@@ -51,7 +51,6 @@
             <CardBox
               :title="item.name"
               :description="item.desc"
-              :username="item.username"
               class="function-lib-card"
               @click="openCreateDialog(item)"
               :class="item.permission_type === 'PUBLIC' && !canEdit(item) ? '' : 'cursor'"
@@ -60,6 +59,13 @@
                 <AppAvatar class="mr-12 avatar-green" shape="square" :size="32">
                   <img src="@/assets/icon_function_outlined.svg" style="width: 58%" alt="" />
                 </AppAvatar>
+              </template>
+              <template #subTitle>
+                <el-text class="lighter mr-8" size="small">
+                  <auto-tooltip :content="item.username">
+                    创建人: {{ item.username }}
+                  </auto-tooltip>
+                </el-text>
               </template>
               <div class="status-button">
                 <el-tag
@@ -287,7 +293,7 @@ onMounted(() => {
   .status-button {
     position: absolute;
     right: 12px;
-    top: 3px;
+    top: 15px;
     height: auto;
   }
 }

@@ -2,29 +2,26 @@
   <el-card shadow="hover" class="card-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
     <div class="card-header">
       <slot name="header">
-        <div class="title flex align-center">
+        <div class="title flex" :class="slots.subTitle ? '' : 'align-center'">
           <slot name="icon">
             <AppAvatar v-if="showIcon" class="mr-12 avatar-blue" shape="square" :size="32">
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
           </slot>
-          <div>
+          <div style="width: 90%">
             <auto-tooltip :content="title" style="width: 65%; height: 22px">
               {{ title }}
             </auto-tooltip>
-            <span class="lighter mr-8">
-              <auto-tooltip
-                :content="username"
-                style="display: inline-block; width: 100%; font-size: 12px; height: 20px"
-              >
-                创建人: {{ username }}
-              </auto-tooltip></span
-            >
+            <slot name="subTitle"> </slot>
           </div>
         </div>
       </slot>
     </div>
-    <div class="description break-all mt-12" v-if="$slots.description || description">
+    <div
+      class="description break-all"
+      :class="slots.subTitle ? 'mt-24' : 'mt-12'"
+      v-if="$slots.description || description"
+    >
       <slot name="description">
         <div class="content">
           {{ description }}
@@ -59,7 +56,6 @@ const props = withDefaults(
      * 是否展示icon
      */
     showIcon?: boolean
-    username?: string
   }>(),
   { title: '标题', description: '', showIcon: true, border: true }
 )

@@ -49,7 +49,6 @@
           >
             <CardBox
               :title="item.name"
-              :username="item.username"
               :description="item.desc"
               class="application-card cursor"
               @click="router.push({ path: `/application/${item.id}/${item.type}/overview` })"
@@ -72,6 +71,13 @@
                   :size="32"
                   class="mr-8"
                 />
+              </template>
+              <template #subTitle>
+                <el-text class="lighter mr-8" size="small">
+                  <auto-tooltip :content="item.username">
+                    创建人: {{ item.username }}
+                  </auto-tooltip>
+                </el-text>
               </template>
               <div class="status-tag">
                 <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px"
@@ -296,7 +302,7 @@ onMounted(() => {
   .status-tag {
     position: absolute;
     right: 16px;
-    top: 3px;
+    top: 15px;
   }
 }
 .dropdown-custom-switch {

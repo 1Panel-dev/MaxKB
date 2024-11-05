@@ -38,7 +38,6 @@
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
               <CardBox
                 :title="item.name"
-                :username="item.username"
                 :description="item.desc"
                 class="cursor"
                 @click="router.push({ path: `/dataset/${item.id}/document` })"
@@ -55,6 +54,13 @@
                   <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="32">
                     <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                   </AppAvatar>
+                </template>
+                <template #subTitle>
+                  <el-text class="lighter mr-8" size="small">
+                    <auto-tooltip :content="item.username">
+                      创建人: {{ item.username }}
+                    </auto-tooltip>
+                  </el-text>
                 </template>
                 <div class="delete-button">
                   <el-tag class="blue-tag" v-if="item.type === '0'" style="height: 22px"
@@ -281,7 +287,7 @@ onMounted(() => {
   .delete-button {
     position: absolute;
     right: 12px;
-    top: 3px;
+    top: 15px;
     height: auto;
   }
   .footer-content {
