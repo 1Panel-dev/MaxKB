@@ -21,4 +21,5 @@ urlpatterns = [
          name="user_manage_re_password"),
     path("user_manage/<int:current_page>/<int:page_size>", views.UserManage.Page.as_view(),
          name="user_manage_re_password"),
+    path('user/list/<str:type>', views.UserListView.as_view()),
 ]

@@ -456,6 +456,13 @@ const putWorkFlowVersion: (
   )
 }
 
+const getUserList: (type: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  type,
+  loading
+) => {
+  return get(`/user/list/${type}`, undefined, loading)
+}
+
 export default {
   getAllAppilcation,
   getApplication,
@@ -492,5 +499,6 @@ export default {
   getWorkFlowVersion,
   getWorkFlowVersionDetail,
   putWorkFlowVersion,
-  playDemoText
+  playDemoText,
+  getUserList
 }

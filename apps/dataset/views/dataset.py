@@ -221,7 +221,7 @@ class Dataset(APIView):
         def get(self, request: Request, current_page, page_size):
             d = DataSetSerializers.Query(
                 data={'name': request.query_params.get('name', None), 'desc': request.query_params.get("desc", None),
-                      'user_id': str(request.user.id)})
+                      'user_id': str(request.user.id), 'select_user_id': request.query_params.get('select_user_id', None)})
             d.is_valid()
             return result.success(d.page(current_page, page_size))
 

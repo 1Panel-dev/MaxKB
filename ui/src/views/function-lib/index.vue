@@ -2,14 +2,24 @@
   <div class="function-lib-list-container p-24" style="padding-top: 16px">
     <div class="flex-between mb-16">
       <h4>函数库</h4>
-      <el-input
-        v-model="searchValue"
-        @change="searchHandle"
-        placeholder="按函数名称搜索"
-        prefix-icon="Search"
-        class="w-240"
-        clearable
-      />
+      <div class="flex-between">
+        <el-select v-model="selectUserId" class="mr-12 w-120" @change="searchHandle">
+          <el-option
+            v-for="item in userOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+        <el-input
+          v-model="searchValue"
+          @change="searchHandle"
+          placeholder="按函数名称搜索"
+          prefix-icon="Search"
+          class="w-240"
+          clearable
+        />
+      </div>
     </div>
     <div
       v-loading.fullscreen.lock="
@@ -41,6 +51,7 @@
             <CardBox
               :title="item.name"
               :description="item.desc"
+              :username="item.username"
               class="function-lib-card"
               @click="openCreateDialog(item)"
               :class="item.permission_type === 'PUBLIC' && !canEdit(item) ? '' : 'cursor'"
@@ -51,8 +62,16 @@
                 </AppAvatar>
               </template>
               <div class="status-button">
-                <el-tag class="info-tag" v-if="item.permission_type === 'PUBLIC'">公用</el-tag>
-                <el-tag class="danger-tag" v-else-if="item.permission_type === 'PRIVATE'"
+                <el-tag
+                  class="info-tag"
+                  v-if="item.permission_type === 'PUBLIC'"
+                  style="height: 22px"
+                  >公用</el-tag
+                >
+                <el-tag
+                  class="danger-tag"
+                  v-else-if="item.permission_type === 'PRIVATE'"
+                  style="height: 22px"
                   >私有</el-tag
                 >
               </div>
@@ -100,6 +119,7 @@ import functionLibApi from '@/api/function-lib'
 import FunctionFormDrawer from './component/FunctionFormDrawer.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
+import applicationApi from '@/api/application'
 const { user } = useStore()
 
 const loading = ref(false)
@@ -118,6 +138,15 @@ const searchValue = ref('')
 const title = ref('')
 const changeStateloading = ref(false)
 
+interface UserOption {
+  label: string
+  value: string
+}
+
+const userOptions = ref<UserOption[]>([])
+
+const selectUserId = ref('all')
+
 const canEdit = (row: any) => {
   return user.userInfo?.id === row?.user_id
 }
@@ -134,6 +163,9 @@ function openCreateDialog(data?: any) {
 }
 
 function searchHandle() {
+  if (user.userInfo) {
+    localStorage.setItem(user.userInfo.id + 'function', selectUserId.value)
+  }
   paginationConfig.total = 0
   paginationConfig.current_page = 1
   functionLibList.value = []
@@ -196,12 +228,22 @@ function copyFunctionLib(row: any) {
 }
 
 function getList() {
-  functionLibApi
-    .getFunctionLib(paginationConfig, searchValue.value && { name: searchValue.value }, loading)
-    .then((res: any) => {
-      functionLibList.value = [...functionLibList.value, ...res.data.records]
-      paginationConfig.total = res.data.total
+  const params = {
+    ...(searchValue.value && { name: searchValue.value }),
+    ...(selectUserId.value &&
+      selectUserId.value !== 'all' && { select_user_id: selectUserId.value })
+  }
+  functionLibApi.getFunctionLib(paginationConfig, params, loading).then((res: any) => {
+    res.data.records.forEach((item: any) => {
+      if (user.userInfo && item.user_id === user.userInfo.id) {
+        item.username = user.userInfo.username
+      } else {
+        item.username = userOptions.value.find((v) => v.value === item.user_id)?.label
+      }
     })
+    functionLibList.value = [...functionLibList.value, ...res.data.records]
+    paginationConfig.total = res.data.total
+  })
 }
 
 function refresh(data: any) {
@@ -216,8 +258,28 @@ function refresh(data: any) {
   }
 }
 
+function getUserList() {
+  applicationApi.getUserList('FUNCTION', loading).then((res) => {
+    if (res.data) {
+      userOptions.value = res.data.map((item: any) => {
+        return {
+          label: item.username,
+          value: item.id
+        }
+      })
+      if (user.userInfo) {
+        const selectUserIdValue = localStorage.getItem(user.userInfo.id + 'function')
+        if (selectUserIdValue && userOptions.value.find((v) => v.value === selectUserIdValue)) {
+          selectUserId.value = selectUserIdValue
+        }
+      }
+      getList()
+    }
+  })
+}
+
 onMounted(() => {
-  getList()
+  getUserList()
 })
 </script>
 <style lang="scss" scoped>
@@ -225,7 +287,7 @@ onMounted(() => {
   .status-button {
     position: absolute;
     right: 12px;
-    top: 13px;
+    top: 3px;
     height: auto;
   }
 }

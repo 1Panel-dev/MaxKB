@@ -19,8 +19,10 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core import cache, validators
 from django.core import signing
+from django.core.paginator import Paginator
 from django.db import transaction, models
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
+from django.forms import CharField
 from django.http import HttpResponse
 from django.template import Template, Context
 from rest_framework import serializers
@@ -44,7 +46,7 @@ from dataset.models import DataSet, Document, Image
 from dataset.serializers.common_serializers import list_paragraph, get_embedding_model_by_dataset_id_list
 from embedding.models import SearchMode
 from function_lib.serializers.function_lib_serializer import FunctionLibSerializer
-from setting.models import AuthOperate
+from setting.models import AuthOperate, TeamMember, TeamMemberPermission
 from setting.models.model_management import Model
 from setting.models_provider import get_model_credential
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
@@ -559,17 +561,22 @@ class ApplicationSerializer(serializers.Serializer):
         desc = serializers.CharField(required=False, error_messages=ErrMessage.char("应用描述"))
 
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        select_user_id = serializers.UUIDField(required=False, error_messages=ErrMessage.uuid("选择用户id"))
 
         def get_query_set(self):
             user_id = self.data.get("user_id")
             query_set_dict = {}
             query_set = QuerySet(model=get_dynamics_model(
                 {'temp_application.name': models.CharField(), 'temp_application.desc': models.CharField(),
-                 'temp_application.create_time': models.DateTimeField()}))
+                 'temp_application.create_time': models.DateTimeField(),
+                 'temp_application.user_id': models.CharField(), }))
             if "desc" in self.data and self.data.get('desc') is not None:
                 query_set = query_set.filter(**{'temp_application.desc__icontains': self.data.get("desc")})
             if "name" in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'temp_application.name__icontains': self.data.get("name")})
+            if 'select_user_id' in self.data and self.data.get('select_user_id') is not None and self.data.get(
+                    'select_user_id') != 'all':
+                query_set = query_set.filter(**{'temp_application.user_id__exact': self.data.get('select_user_id')})
             query_set = query_set.order_by("-temp_application.create_time")
             query_set_dict['default_sql'] = query_set
 
