@@ -301,3 +301,16 @@ class UserManage(APIView):
         def put(self, request: Request, user_id):
             return result.success(
                 UserManageSerializer.Operate(data={'id': user_id}).edit(request.data, with_valid=True))
+
+
+class UserListView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @swagger_auto_schema(operation_summary="通过类型获取用户列表",
+                         operation_id="通过类型获取用户列表",
+                         manual_parameters=UserSerializer.Query.get_request_params_api(),
+                         responses=result.get_api_array_response(UserSerializer.Query.get_response_body_api()),
+                         tags=['用户'])
+    @has_permissions(PermissionConstants.USER_READ)
+    def get(self, request: Request, type):
+        return result.success(UserSerializer().listByType(type, request.user.id))

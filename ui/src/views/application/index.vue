@@ -2,14 +2,24 @@
   <div class="application-list-container p-24" style="padding-top: 16px">
     <div class="flex-between mb-16">
       <h4>{{ $t('views.application.applicationList.title') }}</h4>
-      <el-input
-        v-model="searchValue"
-        @change="searchHandle"
-        :placeholder="$t('views.application.applicationList.searchBar.placeholder')"
-        prefix-icon="Search"
-        class="w-240"
-        clearable
-      />
+      <div class="flex-between">
+        <el-select v-model="selectUserId" class="mr-12 w-120" @change="searchHandle">
+          <el-option
+            v-for="item in userOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+        <el-input
+          v-model="searchValue"
+          @change="searchHandle"
+          :placeholder="$t('views.application.applicationList.searchBar.placeholder')"
+          prefix-icon="Search"
+          class="w-240"
+          clearable
+        />
+      </div>
     </div>
     <div v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading">
       <InfiniteScroll
@@ -39,6 +49,7 @@
           >
             <CardBox
               :title="item.name"
+              :username="item.username"
               :description="item.desc"
               class="application-card cursor"
               @click="router.push({ path: `/application/${item.id}/${item.type}/overview` })"
@@ -63,8 +74,10 @@
                 />
               </template>
               <div class="status-tag">
-                <el-tag type="warning" v-if="isWorkFlow(item.type)">高级编排</el-tag>
-                <el-tag class="blue-tag" v-else>简单配置</el-tag>
+                <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px"
+                  >高级编排</el-tag
+                >
+                <el-tag class="blue-tag" v-else style="height: 22px">简单配置</el-tag>
               </div>
 
               <template #footer>
@@ -149,6 +162,14 @@ const paginationConfig = reactive({
   page_size: 20,
   total: 0
 })
+interface UserOption {
+  label: string
+  value: string
+}
+
+const userOptions = ref<UserOption[]>([])
+
+const selectUserId = ref('all')
 
 const searchValue = ref('')
 
@@ -175,7 +196,7 @@ function openCreateDialog() {
   } else {
     MsgConfirm(`提示`, '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。', {
       cancelButtonText: '确定',
-      confirmButtonText: '购买专业版',
+      confirmButtonText: '购买专业版'
     })
       .then(() => {
         window.open('https://maxkb.cn/pricing.html', '_blank')
@@ -193,6 +214,9 @@ function openCreateDialog() {
 }
 
 function searchHandle() {
+  if (user.userInfo) {
+    localStorage.setItem(user.userInfo.id + 'application', selectUserId.value)
+  }
   paginationConfig.total = 0
   paginationConfig.current_page = 1
   applicationList.value = []
@@ -226,16 +250,45 @@ function deleteApplication(row: any) {
 }
 
 function getList() {
-  applicationApi
-    .getApplication(paginationConfig, searchValue.value && { name: searchValue.value }, loading)
-    .then((res) => {
-      applicationList.value = [...applicationList.value, ...res.data.records]
-      paginationConfig.total = res.data.total
+  const params = {
+    ...(searchValue.value && { name: searchValue.value }),
+    ...(selectUserId.value &&
+      selectUserId.value !== 'all' && { select_user_id: selectUserId.value })
+  }
+  applicationApi.getApplication(paginationConfig, params, loading).then((res) => {
+    res.data.records.forEach((item: any) => {
+      if (user.userInfo && item.user_id === user.userInfo.id) {
+        item.username = user.userInfo.username
+      } else {
+        item.username = userOptions.value.find((v) => v.value === item.user_id)?.label
+      }
     })
+    applicationList.value = [...applicationList.value, ...res.data.records]
+    paginationConfig.total = res.data.total
+  })
+}
+function getUserList() {
+  applicationApi.getUserList('APPLICATION', loading).then((res) => {
+    if (res.data) {
+      userOptions.value = res.data.map((item: any) => {
+        return {
+          label: item.username,
+          value: item.id
+        }
+      })
+      if (user.userInfo) {
+        const selectUserIdValue = localStorage.getItem(user.userInfo.id + 'application')
+        if (selectUserIdValue && userOptions.value.find((v) => v.value === selectUserIdValue)) {
+          selectUserId.value = selectUserIdValue
+        }
+      }
+      getList()
+    }
+  })
 }
 
 onMounted(() => {
-  getList()
+  getUserList()
 })
 </script>
 <style lang="scss" scoped>
@@ -243,7 +296,7 @@ onMounted(() => {
   .status-tag {
     position: absolute;
     right: 16px;
-    top: 13px;
+    top: 3px;
   }
 }
 .dropdown-custom-switch {

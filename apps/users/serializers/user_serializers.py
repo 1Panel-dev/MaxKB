@@ -17,7 +17,7 @@ from django.core import validators, signing, cache
 from django.core.mail import send_mail
 from django.core.mail.backends.smtp import EmailBackend
 from django.db import transaction
-from django.db.models import Q, QuerySet
+from django.db.models import Q, QuerySet, Prefetch
 from drf_yasg import openapi
 from rest_framework import serializers
 
@@ -35,6 +35,7 @@ from common.util.field_message import ErrMessage
 from common.util.lock import lock
 from dataset.models import DataSet, Document, Paragraph, Problem, ProblemParagraphMapping
 from embedding.task import delete_embedding_by_dataset_id_list
+from function_lib.models.function import FunctionLib
 from setting.models import Team, SystemSetting, SettingType, Model, TeamMember, TeamMemberPermission
 from smartdoc.conf import PROJECT_DIR
 from users.models.user import User, password_encrypt, get_user_dynamics_permission
@@ -494,6 +495,40 @@ class UserSerializer(ApiMixin, serializers.ModelSerializer):
             email_or_username = self.data.get('email_or_username')
             return [{'id': user_model.id, 'username': user_model.username, 'email': user_model.email} for user_model in
                     QuerySet(User).filter(Q(username=email_or_username) | Q(email=email_or_username))]
+
+    def listByType(self, type, user_id):
+        teamIds = TeamMember.objects.filter(user_id=user_id).values_list('id', flat=True)
+        targets = TeamMemberPermission.objects.filter(
+            member_id__in=teamIds,
+            auth_target_type=type,
+            operate__contains=['USE']
+        ).values_list('target', flat=True)
+        prefetch_users = Prefetch('user', queryset=User.objects.only('id', 'username'))
+
+        user_list = []
+        if type == 'DATASET':
+            user_list = DataSet.objects.filter(
+                Q(id__in=targets) | Q(user_id=user_id)
+            ).prefetch_related(prefetch_users).distinct('user_id')
+        elif type == 'APPLICATION':
+            user_list = Application.objects.filter(
+                Q(id__in=targets) | Q(user_id=user_id)
+            ).prefetch_related(prefetch_users).distinct('user_id')
+        elif type == 'FUNCTION':
+            user_list = FunctionLib.objects.filter(
+                Q(permission_type='PUBLIC') | Q(user_id=user_id)
+            ).prefetch_related(prefetch_users).distinct('user_id')
+
+        other_users = [
+            {'id': app.user.id, 'username': app.user.username}
+            for app in user_list if app.user.id != user_id
+        ]
+        users = [
+            {'id': 'all', 'username': '全部'},
+            {'id': user_id, 'username': '我的'}
+        ]
+        users.extend(other_users)
+        return users
 
 
 class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):

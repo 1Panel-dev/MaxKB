@@ -105,5 +105,6 @@ class FunctionLibView(APIView):
                 FunctionLibSerializer.Query(
                     data={'name': request.query_params.get('name'),
                           'desc': request.query_params.get('desc'),
-                          'user_id': request.user.id}).page(
+                          'user_id': request.user.id,
+                          'select_user_id': request.query_params.get('select_user_id')}).page(
                     current_page, page_size))

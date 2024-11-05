@@ -98,6 +98,7 @@ class FunctionLibSerializer(serializers.Serializer):
         is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char("是否可用"))
 
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        select_user_id = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
         def get_query_set(self):
             query_set = QuerySet(FunctionLib).filter(
@@ -108,6 +109,8 @@ class FunctionLibSerializer(serializers.Serializer):
                 query_set = query_set.filter(desc__contains=self.data.get('desc'))
             if self.data.get('is_active') is not None:
                 query_set = query_set.filter(is_active=self.data.get('is_active'))
+            if self.data.get('select_user_id') is not None:
+                query_set = query_set.filter(user_id=self.data.get('select_user_id'))
             query_set = query_set.order_by("-create_time")
             return query_set
 

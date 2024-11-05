@@ -8,9 +8,19 @@
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
           </slot>
-          <auto-tooltip :content="title" style="width: 65%">
-            {{ title }}
-          </auto-tooltip>
+          <div>
+            <auto-tooltip :content="title" style="width: 65%; height: 22px">
+              {{ title }}
+            </auto-tooltip>
+            <span class="lighter mr-8">
+              <auto-tooltip
+                :content="username"
+                style="display: inline-block; width: 100%; font-size: 12px; height: 20px"
+              >
+                创建人: {{ username }}
+              </auto-tooltip></span
+            >
+          </div>
         </div>
       </slot>
     </div>
@@ -49,6 +59,7 @@ const props = withDefaults(
      * 是否展示icon
      */
     showIcon?: boolean
+    username?: string
   }>(),
   { title: '标题', description: '', showIcon: true, border: true }
 )
@@ -62,13 +73,12 @@ function cardEnter() {
 }
 
 function cardLeave() {
-  show.value = subHovered.value;
+  show.value = subHovered.value
 }
 
 function subHoveredEnter() {
   subHovered.value = true
 }
-
 </script>
 <style lang="scss" scoped>
 .card-box {
