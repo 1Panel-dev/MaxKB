@@ -118,6 +118,7 @@ function submit() {
       })
     }
     documents.push({
+      id: item.id,
       name: item.name,
       paragraphs: item.content
     })
