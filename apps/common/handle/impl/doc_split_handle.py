@@ -14,9 +14,9 @@ from functools import reduce
 from typing import List
 
 from docx import Document, ImagePart
+from docx.oxml import ns
 from docx.table import Table
 from docx.text.paragraph import Paragraph
-from docx.oxml import ns
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.util.split_model import SplitModel
@@ -33,11 +33,8 @@ old_docx_nsmap = {'v': 'urn:schemas-microsoft-com:vml'}
 combine_nsmap = {**ns.nsmap, **old_docx_nsmap}
 
 
-def image_to_mode(image, doc: Document, images_list, get_image_id, is_new_docx=True):
-    if is_new_docx:
-        image_ids = image.xpath('.//a:blip/@r:embed')
-    else:
-        image_ids = image.xpath('.//v:imagedata/@r:id', namespaces=combine_nsmap)
+def image_to_mode(image, doc: Document, images_list, get_image_id):
+    image_ids = image['get_image_id_handle'](image.get('image'))
     for img_id in image_ids:  # 获取图片id
         part = doc.part.related_parts[img_id]  # 根据图片id获取对应的图片
         if isinstance(part, ImagePart):
@@ -49,14 +46,15 @@ def image_to_mode(image, doc: Document, images_list, get_image_id, is_new_docx=T
 
 
 def get_paragraph_element_images(paragraph_element, doc: Document, images_list, get_image_id):
-    images_xpath_list = [".//pic:pic", ".//w:pict"]
+    images_xpath_list = [(".//pic:pic", lambda img: img.xpath('.//a:blip/@r:embed')),
+                         (".//w:pict", lambda img: img.xpath('.//v:imagedata/@r:id', namespaces=combine_nsmap))]
     images = []
-    for images_xpath in images_xpath_list:
+    for images_xpath, get_image_id_handle in images_xpath_list:
         try:
             _images = paragraph_element.xpath(images_xpath)
             if _images is not None and len(_images) > 0:
                 for image in _images:
-                    images.append(image)
+                    images.append({'image': image, 'get_image_id_handle': get_image_id_handle})
         except Exception as e:
             pass
     return images
