@@ -234,13 +234,14 @@ class AppNodeModel extends HtmlResize.model {
   }
   getDefaultAnchor() {
     const { id, x, y, width } = this
+    const showNode = this.properties.showNode === undefined ? true : this.properties.showNode
     const anchors: any = []
 
     if (this.type !== WorkflowType.Base) {
       if (this.type !== WorkflowType.Start) {
         anchors.push({
           x: x - width / 2 + 10,
-          y: y,
+          y: showNode ? y : y - 15,
           id: `${id}_left`,
           edgeAddable: false,
           type: 'left'
@@ -248,7 +249,7 @@ class AppNodeModel extends HtmlResize.model {
       }
       anchors.push({
         x: x + width / 2 - 10,
-        y: y,
+        y: showNode ? y : y - 15,
         id: `${id}_right`,
         type: 'right'
       })

@@ -35,10 +35,11 @@ class ConditionModel extends AppNodeModel {
     if (this.height === undefined) {
       this.height = 200
     }
+    const showNode = this.properties.showNode === undefined ? true : this.properties.showNode
     const anchors: any = []
     anchors.push({
       x: x - width / 2 + 10,
-      y: y,
+      y: showNode ? y : y - 15,
       id: `${id}_left`,
       edgeAddable: false,
       type: 'left'
@@ -50,7 +51,7 @@ class ConditionModel extends AppNodeModel {
         const h = get_up_index_height(branch_condition_list, index)
         anchors.push({
           x: x + width / 2 - 10,
-          y: y - height / 2 + 75 + h + element.height / 2,
+          y: showNode ? y - height / 2 + 75 + h + element.height / 2 : y - 15,
           id: `${id}_${element.id}_right`,
           type: 'right'
         })
