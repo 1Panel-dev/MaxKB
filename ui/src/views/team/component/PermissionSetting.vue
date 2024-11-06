@@ -33,15 +33,15 @@
           <el-checkbox
             :disabled="props.manage"
             v-model="allChecked[TeamEnum.MANAGE]"
+            :indeterminate="allIndeterminate[TeamEnum.MANAGE]"
             label="管理"
-            @change="handleCheckAllChange($event, TeamEnum.MANAGE)"
           />
         </template>
         <template #default="{ row }">
           <el-checkbox
             :disabled="props.manage"
             v-model="row.operate[TeamEnum.MANAGE]"
-            @change="checkedOperateChange(TeamEnum.MANAGE, row)"
+            @change="(e: boolean) => checkedOperateChange(TeamEnum.MANAGE, row, e)"
           />
         </template>
       </el-table-column>
@@ -50,15 +50,15 @@
           <el-checkbox
             :disabled="props.manage"
             v-model="allChecked[TeamEnum.USE]"
+            :indeterminate="allIndeterminate[TeamEnum.USE]"
             label="查看"
-            @change="handleCheckAllChange($event, TeamEnum.USE)"
           />
         </template>
         <template #default="{ row }">
           <el-checkbox
             :disabled="props.manage"
             v-model="row.operate[TeamEnum.USE]"
-            @change="checkedOperateChange(TeamEnum.USE, row)"
+            @change="(e: boolean) => checkedOperateChange(TeamEnum.USE, row, e)"
           />
         </template>
       </el-table-column>
@@ -85,58 +85,67 @@ const isApplication = computed(() => props.type === TeamEnum.APPLICATION)
 
 const emit = defineEmits(['update:data'])
 const allChecked: any = ref({
-  [TeamEnum.MANAGE]: false,
-  [TeamEnum.USE]: false
+  [TeamEnum.MANAGE]: computed({
+    get: () => {
+      return filterData.value.some((item: any) => item.operate[TeamEnum.MANAGE])
+    },
+    set: (val: boolean) => {
+      if (val) {
+        filterData.value.map((item: any) => {
+          item.operate[TeamEnum.MANAGE] = true
+        })
+      } else {
+        filterData.value.map((item: any) => {
+          item.operate[TeamEnum.MANAGE] = false
+        })
+      }
+    }
+  }),
+  [TeamEnum.USE]: computed({
+    get: () => {
+      return filterData.value.some((item: any) => item.operate[TeamEnum.USE])
+    },
+    set: (val: boolean) => {
+      if (val) {
+        filterData.value.map((item: any) => {
+          item.operate[TeamEnum.USE] = true
+        })
+      } else {
+        filterData.value.map((item: any) => {
+          item.operate[TeamEnum.USE] = false
+        })
+      }
+    }
+  })
 })
 
 const filterText = ref('')
 
 const filterData = computed(() => props.data.filter((v: any) => v.name.includes(filterText.value)))
 
-watch(
-  () => props.data,
-  (val) => {
-    Object.keys(allChecked.value).map((item) => {
-      allChecked.value[item] = compare(item)
-    })
-    emit('update:data', val)
-  },
-  {
-    deep: true
-  }
-)
-
-function handleCheckAllChange(val: string | number | boolean, Name: string | number) {
-  if (val) {
-    props.data.map((item: any) => {
-      item.operate[Name] = true
-    })
-  } else {
-    props.data.map((item: any) => {
-      item.operate[Name] = false
-    })
-  }
-}
-function checkedOperateChange(Name: string | number, row: any) {
-  if (Name === TeamEnum.MANAGE && row.operate[TeamEnum.MANAGE]) {
-    props.data.map((item: any) => {
-      if (item.id === row.id) {
-        item.operate[TeamEnum.USE] = true
-      }
-    })
-  }
-  allChecked.value[Name] = compare(Name)
-}
-
-function compare(attrs: string | number) {
-  const filterData = props.data.filter((item: any) => item?.operate[attrs])
-  return props.data.length > 0 && filterData.length === props.data.length
-}
-
-onMounted(() => {
-  Object.keys(allChecked.value).map((item) => {
-    allChecked.value[item] = compare(item)
+const allIndeterminate: any = ref({
+  [TeamEnum.MANAGE]: computed(() => {
+    const all_not_checked = filterData.value.every((item: any) => !item.operate[TeamEnum.MANAGE])
+    if (all_not_checked) {
+      return false
+    }
+    return !filterData.value.every((item: any) => item.operate[TeamEnum.MANAGE])
+  }),
+  [TeamEnum.USE]: computed(() => {
+    const all_not_checked = filterData.value.every((item: any) => !item.operate[TeamEnum.USE])
+    if (all_not_checked) {
+      return false
+    }
+    return !filterData.value.every((item: any) => item.operate[TeamEnum.USE])
   })
 })
+
+function checkedOperateChange(Name: string | number, row: any, e: boolean) {
+  props.data.map((item: any) => {
+    if (item.id === row.id) {
+      item.operate[Name] = e
+    }
+  })
+}
 </script>
 <style lang="scss" scope></style>
