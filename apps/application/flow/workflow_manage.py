@@ -304,6 +304,7 @@ class WorkflowManage:
                 if chunk is None:
                     break
                 yield chunk
+            yield self.get_chunk_content('', True)
         finally:
             self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
                                                 self.answer,
