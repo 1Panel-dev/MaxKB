@@ -8,16 +8,17 @@
 """
 from .ai_chat_step_node import *
 from .condition_node import *
-from .question_node import *
-from .search_dataset_node import *
-from .start_node import *
 from .direct_reply_node import *
+from .form_node import *
 from .function_lib_node import *
 from .function_node import *
+from .question_node import *
 from .reranker_node import *
+from .search_dataset_node import *
+from .start_node import *
 
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchDatasetNode, BaseQuestionNode, BaseConditionNode, BaseReplyNode,
-             BaseFunctionNodeNode, BaseFunctionLibNodeNode, BaseRerankerNode]
+             BaseFunctionNodeNode, BaseFunctionLibNodeNode, BaseRerankerNode, BaseFormNode]
 
 
 def get_node(node_type):

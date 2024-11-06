@@ -49,7 +49,7 @@
               <template v-for="(item, index) in prologueList" :key="index">
                 <div
                   v-if="item.type === 'question'"
-                  @click="quickProblemHandle(item.str)"
+                  @click="sendMessage(item.str)"
                   class="problem-button ellipsis-2 mb-8"
                   :class="log ? 'disabled' : 'cursor'"
                 >
@@ -124,10 +124,7 @@
               </div>
 
               <el-card v-else shadow="always" class="dialog-card">
-                <MdRenderer
-                  :source="item.answer_text"
-                  :quick-problem-handle="quickProblemHandle"
-                ></MdRenderer>
+                <MdRenderer :source="item.answer_text" :send-message="sendMessage"></MdRenderer>
                 <!-- 知识来源 -->
                 <div v-if="showSource(item)">
                   <KnowledgeSource :data="item" :type="props.data.type" />
@@ -576,17 +573,17 @@ function showSource(row: any) {
   }
 }
 
-function quickProblemHandle(val: string) {
+function sendMessage(val: string, other_params_data?: any) {
   if (!checkInputParam()) {
     return
   }
   if (!loading.value && props.data?.name) {
-    handleDebounceClick(val)
+    handleDebounceClick(val, other_params_data)
   }
 }
 
-const handleDebounceClick = debounce((val) => {
-  chatMessage(null, val)
+const handleDebounceClick = debounce((val, other_params_data?: any) => {
+  chatMessage(null, val, false, other_params_data)
 }, 200)
 
 function checkInputParam() {
@@ -778,7 +775,7 @@ const errorWrite = (chat: any, message?: string) => {
   ChatManagement.close(chat.id)
 }
 
-function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
+function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_params_data?: any) {
   loading.value = true
   if (!chat) {
     chat = reactive({
@@ -809,7 +806,11 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
     const obj = {
       message: chat.problem_text,
       re_chat: re_chat || false,
-      form_data: { ...form_data.value, ...api_form_data.value }
+      ...other_params_data,
+      form_data: {
+        ...form_data.value,
+        ...api_form_data.value
+      }
     }
     // 对话
     applicationApi

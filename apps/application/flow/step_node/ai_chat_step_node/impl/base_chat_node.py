@@ -73,6 +73,10 @@ def get_default_model_params_setting(model_id):
 
 
 class BaseChatNode(IChatNode):
+    def save_context(self, details, workflow_manage):
+        self.context['answer'] = details.get('answer')
+        self.context['question'] = details.get('question')
+
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,
                 **kwargs) -> NodeResult:

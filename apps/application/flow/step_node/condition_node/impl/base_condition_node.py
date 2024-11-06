@@ -14,6 +14,10 @@ from application.flow.step_node.condition_node.i_condition_node import IConditio
 
 
 class BaseConditionNode(IConditionNode):
+    def save_context(self, details, workflow_manage):
+        self.context['branch_id'] = details.get('branch_id')
+        self.context['branch_name'] = details.get('branch_name')
+
     def execute(self, **kwargs) -> NodeResult:
         branch_list = self.node_params_serializer.data['branch']
         branch = self._execute(branch_list)

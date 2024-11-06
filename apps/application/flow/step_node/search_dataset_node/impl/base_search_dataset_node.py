@@ -38,6 +38,21 @@ def get_none_result(question):
 
 
 class BaseSearchDatasetNode(ISearchDatasetStepNode):
+    def save_context(self, details, workflow_manage):
+        result = details.get('paragraph_list', [])
+        dataset_setting = self.node_params_serializer.data.get('dataset_setting')
+        directly_return = '\n'.join(
+            [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in result if
+             paragraph.get('is_hit_handling_method')])
+        self.context['paragraph_list'] = result
+        self.context['question'] = details.get('question')
+        self.context['run_time'] = details.get('run_time')
+        self.context['is_hit_handling_method_list'] = [row for row in result if row.get('is_hit_handling_method')]
+        self.context['data'] = '\n'.join(
+            [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in
+             result])[0:dataset_setting.get('max_paragraph_char_number', 5000)]
+        self.context['directly_return'] = directly_return
+
     def execute(self, dataset_id_list, dataset_setting, question,
                 exclude_paragraph_id_list=None,
                 **kwargs) -> NodeResult:

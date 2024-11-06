@@ -44,6 +44,13 @@ def filter_result(document_list: List[Document], max_paragraph_char_number, top_
 
 
 class BaseRerankerNode(IRerankerNode):
+    def save_context(self, details, workflow_manage):
+        self.context['document_list'] = details.get('document_list', [])
+        self.context['question'] = details.get('question')
+        self.context['run_time'] = details.get('run_time')
+        self.context['result_list'] = details.get('result_list')
+        self.context['result'] = details.get('result')
+
     def execute(self, question, reranker_setting, reranker_list, reranker_model_id,
                 **kwargs) -> NodeResult:
         documents = merge_reranker_list(reranker_list)

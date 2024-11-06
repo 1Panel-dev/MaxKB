@@ -7,6 +7,7 @@
     @desc:
 """
 import time
+import uuid
 from abc import abstractmethod
 from typing import Type, Dict, List
 
@@ -118,7 +119,12 @@ class FlowParamsSerializer(serializers.Serializer):
 
 
 class INode:
-    def __init__(self, node, workflow_params, workflow_manage):
+
+    @abstractmethod
+    def save_context(self, details, workflow_manage):
+        pass
+
+    def __init__(self, node, workflow_params, workflow_manage, runtime_node_id=None):
         # 当前步骤上下文,用于存储当前步骤信息
         self.status = 200
         self.err_message = ''
@@ -130,6 +136,10 @@ class INode:
         self.flow_params_serializer = None
         self.context = {}
         self.id = node.id
+        if runtime_node_id is None:
+            self.runtime_node_id = str(uuid.uuid1())
+        else:
+            self.runtime_node_id = runtime_node_id
 
     def valid_args(self, node_params, flow_params):
         flow_params_serializer_class = self.get_flow_params_serializer_class()

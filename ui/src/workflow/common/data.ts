@@ -168,13 +168,39 @@ export const rerankerNode = {
     }
   }
 }
+export const formNode = {
+  type: WorkflowType.FormNode,
+  text: '在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程',
+  label: '表单收集',
+  height: 252,
+  properties: {
+    width: 600,
+    stepName: '表单收集',
+    node_data: {
+      is_result: true,
+      form_field_list: [],
+      form_content_format: `你好，请先填写下面表单内容：
+{{form}}
+填写后请点击【提交】按钮进行提交。`
+    },
+    config: {
+      fields: [
+        {
+          label: '表单全部内容',
+          value: 'form_data'
+        }
+      ]
+    }
+  }
+}
 export const menuNodes = [
   aiChatNode,
   searchDatasetNode,
   questionNode,
   conditionNode,
   replyNode,
-  rerankerNode
+  rerankerNode,
+  formNode
 ]
 
 /**
@@ -242,7 +268,8 @@ export const nodeDict: any = {
   [WorkflowType.Reply]: replyNode,
   [WorkflowType.FunctionLib]: functionLibNode,
   [WorkflowType.FunctionLibCustom]: functionNode,
-  [WorkflowType.RrerankerNode]: rerankerNode
+  [WorkflowType.RrerankerNode]: rerankerNode,
+  [WorkflowType.FormNode]: formNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'
