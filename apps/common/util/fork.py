@@ -25,10 +25,10 @@ class ForkManage:
         self.selector_list = selector_list
 
     def fork(self, level: int, exclude_link_url: Set[str], fork_handler):
-        self.fork_child(ChildLink(self.base_url, None), self.selector_list, level, exclude_link_url, fork_handler)
+        self.fork_child(ChildLink(self.base_url, None), self.base_url, self.selector_list, level, exclude_link_url, fork_handler)
 
     @staticmethod
-    def fork_child(child_link: ChildLink, selector_list: List[str], level: int, exclude_link_url: Set[str],
+    def fork_child(child_link: ChildLink, root_url: str, selector_list: List[str], level: int, exclude_link_url: Set[str],
                    fork_handler):
         if level < 0:
             return
@@ -37,12 +37,12 @@ class ForkManage:
             child_url = child_link.url[:-1] if child_link.url.endswith('/') else child_link.url
         if not exclude_link_url.__contains__(child_url):
             exclude_link_url.add(child_url)
-            response = Fork(child_link.url, selector_list).fork()
+            response = Fork(child_link.url, root_url, selector_list).fork()
             fork_handler(child_link, response)
             for child_link in response.child_link_list:
                 child_url = child_link.url[:-1] if child_link.url.endswith('/') else child_link.url
                 if not exclude_link_url.__contains__(child_url):
-                    ForkManage.fork_child(child_link, selector_list, level - 1, exclude_link_url, fork_handler)
+                    ForkManage.fork_child(child_link, root_url, selector_list, level - 1, exclude_link_url, fork_handler)
 
 
 def remove_fragment(url: str) -> str:
@@ -68,7 +68,7 @@ class Fork:
         def error(message: str):
             return Fork.Response('', [], 500, message)
 
-    def __init__(self, base_fork_url: str, selector_list: List[str]):
+    def __init__(self, base_fork_url: str, root_url: str, selector_list: List[str]):
         base_fork_url = remove_fragment(base_fork_url)
         self.base_fork_url = urljoin(base_fork_url if base_fork_url.endswith("/") else base_fork_url + '/', '.')
         parsed = urlsplit(base_fork_url)
@@ -81,12 +81,19 @@ class Fork:
         self.base_url = ParseResult(scheme=self.urlparse.scheme, netloc=self.urlparse.netloc, path='', params='',
                                     query='',
                                     fragment='').geturl()
+        self.root_url = root_url
 
     def get_child_link_list(self, bf: BeautifulSoup):
         pattern = "^((?!(http:|https:|tel:/|#|mailto:|javascript:))|" + self.base_fork_url + "|/).*"
         link_list = bf.find_all(name='a', href=re.compile(pattern))
-        result = [ChildLink(link.get('href'), link) if link.get('href').startswith(self.base_url) else ChildLink(
-            self.base_url + link.get('href'), link) for link in link_list]
+        result = []
+        for link in link_list:
+            if link.get('href').startswith("/"):
+                result.append(ChildLink(urljoin(self.base_url, link.get('href')), link))
+            elif link.get('href').startswith(self.root_url):
+                result.append(ChildLink(link.get('href'), link))
+            else:
+                result.append(ChildLink(self.root_url + link.get('href'), link))
         result = [row for row in result if row.url.startswith(self.base_fork_url)]
         return result
 
