@@ -37,6 +37,13 @@ def get_none_result(question):
          'directly_return': ''}, {})
 
 
+def reset_title(title):
+    if title is None or len(title.strip()) == 0:
+        return ""
+    else:
+        return f"#### {title}\n"
+
+
 class BaseSearchDatasetNode(ISearchDatasetStepNode):
     def execute(self, dataset_id_list, dataset_setting, question,
                 exclude_paragraph_id_list=None,
@@ -63,10 +70,11 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
         return NodeResult({'paragraph_list': result,
                            'is_hit_handling_method_list': [row for row in result if row.get('is_hit_handling_method')],
                            'data': '\n'.join(
-                               [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in
+                               [f"{reset_title(paragraph.get('title', ''))}{paragraph.get('content')}" for paragraph in
                                 paragraph_list])[0:dataset_setting.get('max_paragraph_char_number', 5000)],
                            'directly_return': '\n'.join(
-                               [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in result if
+                               [f"{reset_title(paragraph.get('title', ''))}{paragraph.get('content')}" for paragraph in
+                                result if
                                 paragraph.get('is_hit_handling_method')]),
                            'question': question},
 
