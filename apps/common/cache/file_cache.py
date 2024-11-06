@@ -79,7 +79,7 @@ class FileCache(BaseCache):
                         value.application.id) == application_id):
                 delete_keys.append(key)
         for key in delete_keys:
-            self.delete(key)
+            self.cache.delete(key)
 
     def clear_timeout_data(self):
         for key in self.cache.iterkeys():
