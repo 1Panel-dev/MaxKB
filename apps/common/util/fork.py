@@ -84,17 +84,19 @@ class Fork:
         self.root_url = root_url
 
     def get_child_link_list(self, bf: BeautifulSoup):
-        pattern = "^((?!(http:|https:|tel:/|#|mailto:|javascript:))|" + self.base_fork_url + "|/).*"
+        pattern = "^((?!(http:|https:|tel:/|#|mailto:|javascript:))|" + self.root_url + "|/).*"
         link_list = bf.find_all(name='a', href=re.compile(pattern))
         result = []
         for link in link_list:
             if link.get('href').startswith("/"):
-                result.append(ChildLink(urljoin(self.base_url, link.get('href')), link))
+                urlparsed = urlparse(self.root_url)
+                parsed_root_url = ParseResult(scheme=urlparsed.scheme, netloc=urlparsed.netloc, path='', params='', query='',
+                                             fragment='').geturl()
+                result.append(ChildLink(urljoin(parsed_root_url, link.get('href')), link))
             elif link.get('href').startswith(self.root_url):
                 result.append(ChildLink(link.get('href'), link))
             else:
-                result.append(ChildLink(self.root_url + link.get('href'), link))
-        result = [row for row in result if row.url.startswith(self.base_fork_url)]
+                result.append(ChildLink(self.base_url + link.get('href'), link))
         return result
 
     def get_content_html(self, bf: BeautifulSoup):
