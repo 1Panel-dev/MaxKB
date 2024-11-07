@@ -80,7 +80,7 @@ const currentPlatform = reactive<Platform>({
 const formatFieldName = (key?: any): string => {
   const fieldNames: { [key: string]: string } = {
     corp_id: 'Corp ID',
-    app_key: 'APP Key',
+    app_key: currentPlatform?.key != 'lark' ? 'APP Key' : 'App ID',
     app_secret: 'APP Secret',
     agent_id: 'Agent ID',
     callback_url: '回调地址'
