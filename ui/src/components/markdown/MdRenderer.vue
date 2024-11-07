@@ -32,6 +32,17 @@ import HtmlRander from './HtmlRander.vue'
 import EchartsRander from './EchartsRander.vue'
 config({
   markdownItConfig(md) {
+    md.renderer.rules.image = (tokens, idx, options, env, self) => {
+      tokens[idx].attrSet('style', 'display:inline-block;min-height:33px;padding:0;margin:0')
+      if (tokens[idx].content) {
+        tokens[idx].attrSet('title', tokens[idx].content)
+      }
+      tokens[idx].attrSet(
+        'onerror',
+        'this.src="/ui/assets/load_error.png";this.onerror=null;this.height="33px"'
+      )
+      return md.renderer.renderToken(tokens, idx, options)
+    }
     md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
       tokens[idx].attrSet('target', '_blank')
       return md.renderer.renderToken(tokens, idx, options)
@@ -52,51 +63,9 @@ const props = withDefaults(
 const editorRef = ref()
 const md_view_list = computed(() => {
   const temp_source = props.source
-  const temp_md_img_list = temp_source.match(/(!\[.*?\]\(img\/.*?\){.*?})|(!\[.*?\]\(img\/.*?\))/g)
-  const md_img_list = temp_md_img_list ? temp_md_img_list.filter((i) => i) : []
-  const split_img_value = temp_source
-    .split(/(!\[.*?\]\(img\/.*?\){.*?})|(!\[.*?\]\(img\/.*?\))/g)
-    .filter((item) => item !== undefined)
-    .filter((item) => !md_img_list?.includes(item))
-  const result = Array.from(
-    { length: md_img_list.length + split_img_value.length },
-    (v, i) => i
-  ).map((index) => {
-    if (index % 2 == 0) {
-      return split_img_value[Math.floor(index / 2)]
-    } else {
-      return md_img_list[Math.floor(index / 2)]
-    }
-  })
-  return split_echarts_rander(split_html_rander(split_quick_question(split_md_img(result))))
+  return split_echarts_rander(split_html_rander(split_quick_question([temp_source])))
 })
-const split_md_img = (result: Array<string>) => {
-  return result
-    .map((item) => split_md_img_(item))
-    .reduce((x: any, y: any) => {
-      return [...x, ...y]
-    }, [])
-}
 
-const split_md_img_ = (source: string) => {
-  const temp_md_img_list = source.match(/(!\[.*?\]\(.*?\){.*?})|(!\[.*?\]\(.*?\))/g)
-  const md_img_list = temp_md_img_list ? temp_md_img_list.filter((i) => i) : []
-  const split_img_value = source
-    .split(/(!\[.*?\]\(.*?\){.*?})|(!\[.*?\]\(.*?\))/g)
-    .filter((item) => item !== undefined)
-    .filter((item) => !md_img_list?.includes(item))
-  const result = Array.from(
-    { length: md_img_list.length + split_img_value.length },
-    (v, i) => i
-  ).map((index) => {
-    if (index % 2 == 0) {
-      return split_img_value[Math.floor(index / 2)]
-    } else {
-      return md_img_list[Math.floor(index / 2)]
-    }
-  })
-  return result
-}
 const split_quick_question = (result: Array<string>) => {
   return result
     .map((item) => split_quick_question_(item))
