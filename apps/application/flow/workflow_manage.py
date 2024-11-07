@@ -304,11 +304,11 @@ class WorkflowManage:
                 if chunk is None:
                     break
                 yield chunk
-            yield self.get_chunk_content('', True)
         finally:
             self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
                                                 self.answer,
                                                 self)
+        yield self.get_chunk_content('', True)
 
     def run_chain_async(self, current_node):
         future = executor.submit(self.run_chain, current_node)
