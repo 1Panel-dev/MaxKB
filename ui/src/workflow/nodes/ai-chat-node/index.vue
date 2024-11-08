@@ -305,6 +305,7 @@ const openAIParamSettingDialog = (modelId: string) => {
   if (modelId) {
     AIModeParamSettingDialogRef.value?.open(modelId, id, chat_data.value.model_params_setting)
   }
+  console.log(chat_data.value.model_params_setting)
 }
 
 function refreshParam(data: any) {
