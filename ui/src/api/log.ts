@@ -37,7 +37,13 @@ const exportChatLog: (
   data: any,
   loading?: Ref<boolean>
 ) => void = (application_id, application_name, param, data, loading) => {
-  exportExcelPost(application_name, `${prefix}/${application_id}/chat/export`, param, data, loading)
+  exportExcelPost(
+    application_name + '.xlsx',
+    `${prefix}/${application_id}/chat/export`,
+    param,
+    data,
+    loading
+  )
 }
 
 /**
