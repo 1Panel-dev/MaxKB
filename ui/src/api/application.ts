@@ -310,6 +310,18 @@ const listFunctionLib: (application_id: String, loading?: Ref<boolean>) => Promi
   return get(`${prefix}/${application_id}/function_lib`, undefined, loading)
 }
 /**
+ * 获取当前人的所有应用列表
+ * @param application_id 应用id
+ * @param loading
+ * @returns
+ */
+export const getApplicationList: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/application`, undefined, loading)
+}
+/**
  * 获取应用所属的函数库
  * @param application_id
  * @param function_lib_id
@@ -500,5 +512,6 @@ export default {
   getWorkFlowVersionDetail,
   putWorkFlowVersion,
   playDemoText,
-  getUserList
+  getUserList,
+  getApplicationList
 }

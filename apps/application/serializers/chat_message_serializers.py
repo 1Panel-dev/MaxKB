@@ -305,6 +305,8 @@ class ChatMessageSerializer(serializers.Serializer):
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(uuid.uuid1()),
                                            'stream': stream,
                                            're_chat': re_chat,
+                                           'client_id': client_id,
+                                           'client_type': client_type,
                                            'user_id': user_id}, WorkFlowPostHandler(chat_info, client_id, client_type),
                                           base_to_response, form_data)
         r = work_flow_manage.run()

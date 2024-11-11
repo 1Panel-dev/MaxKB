@@ -11,7 +11,12 @@
             class="flex align-center"
             :style="{ maxWidth: node_status == 200 ? 'calc(100% - 55px)' : 'calc(100% - 85px)' }"
           >
-            <component :is="iconComponent(`${nodeModel.type}-icon`)" class="mr-8" :size="24" />
+            <component
+              :is="iconComponent(`${nodeModel.type}-icon`)"
+              class="mr-8"
+              :size="24"
+              :item="nodeModel?.properties.node_data"
+            />
             <h4 v-if="showOperate(nodeModel.type)" style="max-width: 90%">
               <ReadWrite
                 @mousemove.stop
