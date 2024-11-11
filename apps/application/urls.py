@@ -49,6 +49,7 @@ urlpatterns = [
     path('application/<str:application_id>/chat/<int:current_page>/<int:page_size>', views.ChatView.Page.as_view()),
     path('application/<str:application_id>/chat/<chat_id>', views.ChatView.Operate.as_view()),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/', views.ChatView.ChatRecord.as_view()),
+    path('application/<str:application_id>/chat/<chat_id>/upload_file', views.ChatView.UploadFile.as_view()),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/<int:current_page>/<int:page_size>',
          views.ChatView.ChatRecord.Page.as_view()),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/<chat_record_id>',

@@ -1,5 +1,9 @@
 # coding=utf-8
+import base64
+import os
 from typing import Dict
+
+from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -25,7 +29,7 @@ class OpenAIImageModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            model.check_auth()
+            model.stream([HumanMessage(content=[{"type": "text", "text": "你好"}])])
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e

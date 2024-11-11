@@ -222,6 +222,7 @@ class ChatMessageSerializer(serializers.Serializer):
     client_id = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端id"))
     client_type = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端类型"))
     form_data = serializers.DictField(required=False, error_messages=ErrMessage.char("全局变量"))
+    image_list = serializers.ListField(required=False, error_messages=ErrMessage.list("图片仅1张"))
 
     def is_valid_application_workflow(self, *, raise_exception=False):
         self.is_valid_intraday_access_num()
@@ -299,6 +300,7 @@ class ChatMessageSerializer(serializers.Serializer):
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
         form_data = self.data.get('form_data')
+        image_list = self.data.get('image_list')
         user_id = chat_info.application.user_id
         work_flow_manage = WorkflowManage(Flow.new_instance(chat_info.work_flow_version.work_flow),
                                           {'history_chat_record': chat_info.chat_record_list, 'question': message,
@@ -308,7 +310,7 @@ class ChatMessageSerializer(serializers.Serializer):
                                            'client_id': client_id,
                                            'client_type': client_type,
                                            'user_id': user_id}, WorkFlowPostHandler(chat_info, client_id, client_type),
-                                          base_to_response, form_data)
+                                          base_to_response, form_data, image_list)
         r = work_flow_manage.run()
         return r
 

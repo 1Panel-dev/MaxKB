@@ -54,6 +54,18 @@
                         <div v-for="(f, i) in item.global_fields" :key="i">
                           {{ f.label }}: {{ f.value }}
                         </div>
+                        <div v-if="item.document_list?.length > 0">
+                          上传的文档:
+                          <div v-for="(f, i) in item.document_list" :key="i">
+                            {{ f.name }}
+                          </div>
+                        </div>
+                        <div v-if="item.image_list?.length > 0">
+                          上传的图片:
+                          <div v-for="(f, i) in item.image_list" :key="i">
+                            {{ f.name }}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </template>
@@ -96,7 +108,8 @@
                     v-if="
                       item.type == WorkflowType.AiChat ||
                       item.type == WorkflowType.Question ||
-                      item.type == WorkflowType.Application
+                      item.type == WorkflowType.Application ||
+                      item.type == WorkflowType.ImageUnderstandNode
                     "
                   >
                     <div
