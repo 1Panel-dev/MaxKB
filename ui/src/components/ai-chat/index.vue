@@ -192,6 +192,19 @@
         />
 
         <div class="operate flex align-center">
+          <span v-if="props.data.file_upload_enable" class="flex align-center">
+            <el-upload
+              action="#"
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
+            >
+              <el-button text>
+                <el-icon><Paperclip /></el-icon>
+              </el-button>
+            </el-upload>
+            <el-divider direction="vertical" />
+          </span>
           <span v-if="props.data.stt_model_enable" class="flex align-center">
             <el-button text v-if="mediaRecorderStatus" @click="startRecording">
               <el-icon>
@@ -790,7 +803,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
       is_stop: false,
       record_id: '',
       vote_status: '-1',
-      status: undefined
+      status: undefined,
     })
     chatList.value.push(chat)
     ChatManagement.addChatRecord(chat, 50, loading)
@@ -809,7 +822,8 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
     const obj = {
       message: chat.problem_text,
       re_chat: re_chat || false,
-      form_data: { ...form_data.value, ...api_form_data.value }
+      form_data: { ...form_data.value, ...api_form_data.value },
+      image_list: uploadFileList.value,
     }
     // 对话
     applicationApi
@@ -832,6 +846,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
           nextTick(() => {
             // 将滚动条滚动到最下面
             scrollDiv.value.setScrollTop(getMaxHeight())
+            uploadFileList.value = []
           })
           const reader = response.body.getReader()
           // 处理流数据
@@ -914,6 +929,42 @@ const handleScroll = () => {
       }
     }
   }
+}
+
+// 保存上传文件列表
+const uploadFileList = ref<any>([])
+const uploadFile = async (file: any, fileList: any) => {
+  const { maxFiles, fileLimit } = props.data.file_upload_setting
+  if (fileList.length > maxFiles) {
+    MsgWarning('最多上传' + maxFiles + '个文件')
+    return
+  }
+  if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) { // MB
+    MsgWarning('单个文件大小不能超过' + fileLimit + 'MB')
+    fileList.splice(0, fileList.length)
+    return
+  }
+  const formData = new FormData()
+  for (const file of fileList) {
+    formData.append('file', file.raw, file.name)
+    uploadFileList.value.push(file)
+  }
+
+  if (props.chatId === 'new' || !chartOpenId.value) {
+    const res = await applicationApi.getChatOpen(props.data.id as string)
+    chartOpenId.value = res.data
+  }
+  applicationApi.uploadFile(props.data.id as string, chartOpenId.value, formData, loading).then((response) => {
+    fileList.splice(0, fileList.length)
+    uploadFileList.value.forEach((file: any) => {
+      const f = response.data.filter((f: any) => f.name === file.name)
+      if (f.length > 0) {
+        file.url = f[0].url
+        file.file_id = f[0].file_id
+      }
+    })
+    console.log(uploadFileList.value)
+  })
 }
 
 // 定义响应式引用

@@ -9,5 +9,7 @@ export enum WorkflowType {
   FunctionLib = 'function-lib-node',
   FunctionLibCustom = 'function-node',
   RrerankerNode = 'reranker-node',
-  Application = 'application-node'
+  Application = 'application-node',
+  DocumentExtractNode = 'document-extract-node',
+  ImageUnderstandNode = 'image-understand-node',
 }

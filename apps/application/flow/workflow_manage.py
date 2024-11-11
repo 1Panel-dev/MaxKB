@@ -240,10 +240,13 @@ class NodeChunk:
 
 class WorkflowManage:
     def __init__(self, flow: Flow, params, work_flow_post_handler: WorkFlowPostHandler,
-                 base_to_response: BaseToResponse = SystemToResponse(), form_data=None):
+                 base_to_response: BaseToResponse = SystemToResponse(), form_data=None, image_list=None):
         if form_data is None:
             form_data = {}
+        if image_list is None:
+            image_list = []
         self.form_data = form_data
+        self.image_list = image_list
         self.params = params
         self.flow = flow
         self.lock = threading.Lock()

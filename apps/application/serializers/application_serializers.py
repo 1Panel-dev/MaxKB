@@ -823,6 +823,8 @@ class ApplicationSerializer(serializers.Serializer):
                  'stt_model_enable': application.stt_model_enable,
                  'tts_model_enable': application.tts_model_enable,
                  'tts_type': application.tts_type,
+                 'file_upload_enable': application.file_upload_enable,
+                 'file_upload_setting': application.file_upload_setting,
                  'work_flow': application.work_flow,
                  'show_source': application_access_token.show_source,
                  **application_setting_dict})
@@ -876,6 +878,7 @@ class ApplicationSerializer(serializers.Serializer):
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                            'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
+                           'file_upload_enable', 'file_upload_setting',
                            'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
                            'problem_optimization_prompt', 'clean_time']
             for update_key in update_keys:
@@ -941,6 +944,10 @@ class ApplicationSerializer(serializers.Serializer):
                         instance['tts_type'] = node_data['tts_type']
                     if 'tts_model_params_setting' in node_data:
                         instance['tts_model_params_setting'] = node_data['tts_model_params_setting']
+                    if 'file_upload_enable' in node_data:
+                        instance['file_upload_enable'] = node_data['file_upload_enable']
+                    if 'file_upload_setting' in node_data:
+                        instance['file_upload_setting'] = node_data['file_upload_setting']
                     break
 
         def speech_to_text(self, file, with_valid=True):

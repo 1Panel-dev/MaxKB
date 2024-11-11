@@ -22,6 +22,7 @@ from common.constants.permission_constants import Permission, Group, Operate, \
     RoleConstants, ViewPermission, CompareConstants
 from common.response import result
 from common.util.common import query_params_to_single_dict
+from dataset.serializers.file_serializers import FileSerializer
 
 
 class Openai(APIView):
@@ -128,6 +129,7 @@ class ChatView(APIView):
                                                'client_id': request.auth.client_id,
                                                'form_data': (request.data.get(
                                                    'form_data') if 'form_data' in request.data else {}),
+                                               'image_list': request.data.get('image_list') if 'image_list' in request.data else [],
                                                'client_type': request.auth.client_type}).chat()
 
     @action(methods=['GET'], detail=False)
@@ -391,3 +393,28 @@ class ChatView(APIView):
                         data={'chat_id': chat_id, 'chat_record_id': chat_record_id,
                               'dataset_id': dataset_id, 'document_id': document_id,
                               'paragraph_id': paragraph_id}).delete())
+
+    class UploadFile(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="上传文件",
+                             operation_id="上传文件",
+                             manual_parameters=ChatRecordApi.get_request_params_api(),
+                             tags=["应用/对话日志"]
+                             )
+        @has_permissions(
+            ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY,
+                            RoleConstants.APPLICATION_ACCESS_TOKEN],
+                           [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                           dynamic_tag=keywords.get('application_id'))])
+        )
+        def post(self, request: Request, application_id: str, chat_id: str):
+            files = request.FILES.getlist('file')
+            file_ids = []
+            meta = {'application_id': application_id, 'chat_id': chat_id}
+            for file in files:
+                file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
+                file_ids.append({'name': file.name, 'url': file_url, 'file_id': file_url.split('/')[-1]})
+            return result.success(file_ids)
+

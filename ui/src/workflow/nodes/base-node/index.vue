@@ -45,6 +45,36 @@
           @submitDialog="submitDialog"
         />
       </el-form-item>
+      <el-form-item >
+        <template #label>
+          <div class="flex-between">
+            <div class="flex align-center">
+              <span class="mr-4">文件上传</span>
+              <el-tooltip
+                effect="dark"
+                content="开启后，问答页面会显示上传文件的按钮。"
+                placement="right"
+              >
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+            <div>
+              <el-button
+                v-if="form_data.file_upload_enable"
+                type="primary"
+                link
+                @click="openFileUploadSettingDialog"
+                class="mr-4"
+              >
+                <el-icon class="mr-4">
+                  <Setting />
+                </el-icon>
+              </el-button>
+              <el-switch size="small" v-model="form_data.file_upload_enable"/>
+            </div>
+          </div>
+        </template>
+      </el-form-item>
       <UserInputFieldTable ref="UserInputFieldTableFef" :node-model="nodeModel" />
       <ApiInputFieldTable ref="ApiInputFieldTableFef" :node-model="nodeModel" />
       <el-form-item>
@@ -139,7 +169,6 @@
                 <el-icon class="mr-4">
                   <Setting />
                 </el-icon>
-                设置
               </el-button>
               <el-switch size="small" v-model="form_data.tts_model_enable" @change="ttsModelEnableChange"/>
             </div>
@@ -212,6 +241,7 @@
       </el-form-item>
     </el-form>
     <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
+    <FileUploadSettingDialog ref="FileUploadSettingDialogRef" :node-model="nodeModel" @refresh="refreshFileUploadForm"/>
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -229,6 +259,7 @@ import { t } from '@/locales'
 import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
 import ApiInputFieldTable from './component/ApiInputFieldTable.vue'
 import UserInputFieldTable from './component/UserInputFieldTable.vue'
+import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUploadSettingDialog.vue'
 
 const { model } = useStore()
 
@@ -244,6 +275,7 @@ const providerOptions = ref<Array<Provider>>([])
 const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
 const UserInputFieldTableFef = ref()
 const ApiInputFieldTableFef = ref()
+const FileUploadSettingDialogRef = ref<InstanceType<typeof FileUploadSettingDialog>>()
 
 const form = {
   name: '',
@@ -348,6 +380,14 @@ const openTTSParamSettingDialog = () => {
 
 const refreshTTSForm = (data: any) => {
   form_data.value.tts_model_params_setting = data
+}
+
+const openFileUploadSettingDialog = () => {
+  FileUploadSettingDialogRef.value?.open(form_data.value.file_upload_setting)
+}
+
+const refreshFileUploadForm = (data: any) => {
+  form_data.value.file_upload_setting = data
 }
 
 onMounted(() => {

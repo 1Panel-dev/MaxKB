@@ -1,4 +1,11 @@
 # coding=utf-8
+"""
+    @project: MaxKB
+    @Author：虎
+    @file： llm.py
+    @date：2024/7/11 18:41
+    @desc:
+"""
 import base64
 import os
 from typing import Dict
@@ -7,24 +14,35 @@ from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
-from setting.models_provider.impl.xf_model_provider.model.image import ImageMessage
 
 
-class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
-    spark_api_url = forms.TextInputField('API 域名', required=True, default_value='wss://spark-api.cn-huabei-1.xf-yun.com/v2.1/image')
-    spark_app_id = forms.TextInputField('APP ID', required=True)
-    spark_api_key = forms.PasswordInputField("API Key", required=True)
-    spark_api_secret = forms.PasswordInputField('API Secret', required=True)
+class QwenModelParams(BaseForm):
+    temperature = forms.SliderField(TooltipLabel('温度', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
+                                    required=True, default_value=1.0,
+                                    _min=0.1,
+                                    _max=1.9,
+                                    _step=0.01,
+                                    precision=2)
+
+    max_tokens = forms.SliderField(
+        TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
+        required=True, default_value=800,
+        _min=1,
+        _max=100000,
+        _step=1,
+        precision=0)
+
+
+class QwenVLModelCredential(BaseForm, BaseModelCredential):
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
-
-        for key in ['spark_api_url', 'spark_app_id', 'spark_api_key', 'spark_api_secret']:
+        for key in ['api_key']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
@@ -32,10 +50,7 @@ class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            cwd = os.path.dirname(os.path.abspath(__file__))
-            with open(f'{cwd}/img_1.png', 'rb') as f:
-                message_list = [ImageMessage(str(base64.b64encode(f.read()), 'utf-8')), HumanMessage('请概述这张图片')]
-                model.stream(message_list)
+            model.stream([HumanMessage(content=[{"type": "text", "text": "你好"}])])
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
@@ -46,8 +61,9 @@ class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, 'spark_api_secret': super().encryption(model.get('spark_api_secret', ''))}
+        return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
+    api_key = forms.PasswordInputField('API Key', required=True)
 
     def get_model_params_setting_form(self, model_name):
-        pass
+        return QwenModelParams()

@@ -141,6 +141,9 @@ class File(AppModelMixin):
 
     loid = models.IntegerField(verbose_name="loid")
 
+    meta = models.JSONField(verbose_name="文件关联数据", default=dict)
+
+
     class Meta:
         db_table = "file"
 
@@ -149,7 +152,6 @@ class File(AppModelMixin):
     ):
         result = select_one("SELECT lo_from_bytea(%s, %s::bytea) as loid", [0, bytea])
         self.loid = result['loid']
-        self.file_name = 'speech.mp3'
         super().save()
 
     def get_byte(self):
