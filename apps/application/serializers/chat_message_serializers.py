@@ -46,12 +46,14 @@ class ChatInfo:
                  dataset_id_list: List[str],
                  exclude_document_id_list: list[str],
                  application: Application,
-                 work_flow_version: WorkFlowVersion = None):
+                 work_flow_version: WorkFlowVersion = None,
+                 form_data: Dict = None):
         """
         :param chat_id:                     对话id
         :param dataset_id_list:             数据集列表
         :param exclude_document_id_list:    排除的文档
         :param application:                 应用信息
+        :param form_data:                   flow中全局变量
         """
         self.chat_id = chat_id
         self.application = application
@@ -59,6 +61,7 @@ class ChatInfo:
         self.exclude_document_id_list = exclude_document_id_list
         self.chat_record_list: List[ChatRecord] = []
         self.work_flow_version = work_flow_version
+        self.form_data = form_data
 
     @staticmethod
     def get_no_references_setting(dataset_setting, model_setting):

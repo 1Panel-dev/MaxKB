@@ -63,10 +63,17 @@ class WorkFlowPostHandler:
                                  answer_tokens=answer_tokens,
                                  run_time=time.time() - workflow.context['start_time'],
                                  index=0)
-        self.chat_info.append_chat_record(chat_record, self.client_id)
-        # 重新设置缓存
-        chat_cache.set(chat_id,
-                       self.chat_info, timeout=60 * 30)
+        chat_info = chat_cache.get(chat_id)
+        if chat_info is None:
+            # 重新设置缓存
+            self.chat_info.append_chat_record(chat_record, self.client_id, self.user_id)
+            chat_cache.set(chat_id,
+                           self.chat_info, timeout=60 * 30)
+        else:
+            chat_info.append_chat_record(chat_record, self.client_id, self.user_id)
+            chat_cache.set(chat_id,
+                           chat_info, timeout=60 * 30)
+
         if self.client_type == AuthenticationType.APPLICATION_ACCESS_TOKEN.value:
             application_public_access_client = QuerySet(ApplicationPublicAccessClient).filter(id=self.client_id).first()
             if application_public_access_client is not None:
@@ -155,6 +162,18 @@ class INode:
             else:
                 obj = value
         return obj
+
+    # 设置参数的值
+    def set_reference_field(self, fields: List[str], target_value: str):
+        return self.set_field(self.context, fields, target_value)
+
+    @staticmethod
+    def set_field(obj, fields: List[str], target_value: str):
+        if fields[-1] not in obj:
+            raise KeyError(f"变量 '{fields[-1]}'更新前 必须设置默认值！")
+        obj[fields[-1]] = target_value
+
+        return
 
     @abstractmethod
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:

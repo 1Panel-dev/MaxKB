@@ -14,6 +14,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import reduce
 from typing import List, Dict
 
+from django.core import cache
 from django.db.models import QuerySet
 from langchain_core.prompts import PromptTemplate
 from rest_framework import status
@@ -30,6 +31,8 @@ from setting.models import Model
 from setting.models_provider import get_model_credential
 
 executor = ThreadPoolExecutor(max_workers=50)
+
+chat_cache = cache.caches['chat_cache']
 
 
 class Edge:
@@ -53,7 +56,7 @@ class Node:
             self.__setattr__(keyword, kwargs.get(keyword))
 
 
-end_nodes = ['ai-chat-node', 'reply-node', 'function-node', 'function-lib-node']
+end_nodes = ['ai-chat-node', 'reply-node', 'function-node', 'function-lib-node','variable-update-node']
 
 
 class Flow:
@@ -505,6 +508,27 @@ class WorkflowManage:
             return INode.get_field(self.context, fields)
         else:
             return self.get_node_by_id(node_id).get_reference_field(fields)
+
+    # 设置变量值
+    def set_reference_field(self, node_id: str, fields: List[str], target_value: str):
+        """
+        @param node_id: 节点id
+        @param fields: 源参数[id,field]
+        @param target_value:  目标 值
+        @return:
+        """
+        with self.lock:
+            if node_id == 'global':
+                # 全局变量，需更新缓存
+                chat_info = chat_cache.get(self.context['chat_id'])
+                if chat_info.form_data is not None:
+                    chat_info.form_data[fields[-1]] = target_value
+                else:
+                    chat_info.form_data = {fields[-1]: target_value}
+                chat_cache.set(self.context['chat_id'], chat_info, timeout=60 * 30)
+                return INode.set_field(self.context, fields, target_value)
+            else:
+                return self.get_node_by_id(node_id).set_reference_field(fields, target_value)
 
     def generate_prompt(self, prompt: str):
         """

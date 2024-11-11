@@ -9,12 +9,14 @@
 import time
 from datetime import datetime
 from typing import List, Type
+from django.core import cache
 
 from rest_framework import serializers
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.start_node.i_start_node import IStarNode
 
+chat_cache = cache.caches['chat_cache']
 
 def get_default_global_variable(input_field_list: List):
     return {item.get('variable'): item.get('default_value') for item in input_field_list if
@@ -26,8 +28,16 @@ def get_global_variable(node):
     history_context = [{'question': chat_record.problem_text, 'answer': chat_record.answer_text} for chat_record in
                        history_chat_record]
     chat_id = node.flow_params_serializer.data.get('chat_id')
+
+    # 从会话缓存中 获取全局变量值
+    chat_info = chat_cache.get(chat_id)
+    form_data = node.workflow_manage.form_data
+    if chat_info.form_data is not None:
+        for key in chat_info.form_data:
+            form_data[key] = chat_info.form_data[key]
+
     return {'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'start_time': time.time(),
-            'history_context': history_context, 'chat_id': str(chat_id), **node.workflow_manage.form_data}
+            'history_context': history_context, 'chat_id': str(chat_id), **form_data}
 
 
 class BaseStartStepNode(IStarNode):
