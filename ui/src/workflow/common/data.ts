@@ -168,13 +168,33 @@ export const rerankerNode = {
     }
   }
 }
+
+export const variableUpdateNode = {
+  type: WorkflowType.VariableUpdate,
+  text: '可以更新指定节点的输出值或更新全局变量',
+  label: '变量更新',
+  height: 210,
+  properties: {
+    stepName: '变量更新',
+    config: {
+      fields: [
+        {
+          label: '赋值结果',
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
+
 export const menuNodes = [
   aiChatNode,
   searchDatasetNode,
   questionNode,
   conditionNode,
   replyNode,
-  rerankerNode
+  rerankerNode,
+  variableUpdateNode
 ]
 
 /**
@@ -242,7 +262,8 @@ export const nodeDict: any = {
   [WorkflowType.Reply]: replyNode,
   [WorkflowType.FunctionLib]: functionLibNode,
   [WorkflowType.FunctionLibCustom]: functionNode,
-  [WorkflowType.RrerankerNode]: rerankerNode
+  [WorkflowType.RrerankerNode]: rerankerNode,
+  [WorkflowType.VariableUpdate]: variableUpdateNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

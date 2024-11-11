@@ -233,6 +233,24 @@
                       </div>
                     </div>
                   </template>
+                  <!-- 变量更新 -->
+                  <template v-if="item.type === WorkflowType.VariableUpdate">
+                    <div class="card-never border-r-4">
+                      <h5 class="p-8-12">变量更新</h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <el-scrollbar height="150">
+                          <MdPreview
+                            v-if="item.result"
+                            ref="editorRef"
+                            editorId="preview-only"
+                            :modelValue="item.result"
+                            style="background: none"
+                          />
+                          <template v-else> - </template>
+                        </el-scrollbar>
+                      </div>
+                    </div>
+                  </template>
                 </template>
                 <template v-else>
                   <div class="card-never border-r-4">
