@@ -215,6 +215,24 @@ export const functionLibNode = {
   }
 }
 
+export const applicationNode = {
+  type: WorkflowType.Application,
+  text: '应用节点',
+  label: '应用节点',
+  height: 260,
+  properties: {
+    stepName: '应用节点',
+    config: {
+      fields: [
+        {
+          label: '结果',
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
+
 export const compareList = [
   { value: 'is_null', label: '为空' },
   { value: 'is_not_null', label: '不为空' },
@@ -242,7 +260,8 @@ export const nodeDict: any = {
   [WorkflowType.Reply]: replyNode,
   [WorkflowType.FunctionLib]: functionLibNode,
   [WorkflowType.FunctionLibCustom]: functionNode,
-  [WorkflowType.RrerankerNode]: rerankerNode
+  [WorkflowType.RrerankerNode]: rerankerNode,
+  [WorkflowType.Application]: applicationNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

@@ -15,14 +15,11 @@ import uuid
 from functools import reduce
 from typing import Dict, List
 
-from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core import cache, validators
 from django.core import signing
-from django.core.paginator import Paginator
 from django.db import transaction, models
 from django.db.models import QuerySet, Q
-from django.forms import CharField
 from django.http import HttpResponse
 from django.template import Template, Context
 from rest_framework import serializers
@@ -46,10 +43,9 @@ from dataset.models import DataSet, Document, Image
 from dataset.serializers.common_serializers import list_paragraph, get_embedding_model_by_dataset_id_list
 from embedding.models import SearchMode
 from function_lib.serializers.function_lib_serializer import FunctionLibSerializer
-from setting.models import AuthOperate, TeamMember, TeamMemberPermission
+from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.models_provider import get_model_credential
-from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
@@ -978,6 +974,17 @@ class ApplicationSerializer(serializers.Serializer):
                 tts_model_id = form_data.pop('tts_model_id')
             model = get_model_instance_by_model_user_id(tts_model_id, application.user_id, **form_data)
             return model.text_to_speech(text)
+
+        def application_list(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            user_id = self.data.get('user_id')
+            application_id = self.data.get('application_id')
+            application = Application.objects.filter(user_id=user_id).exclude(id=application_id)
+            # 把应用的type为WORK_FLOW的应用放到最上面 然后再按名称排序
+            serialized_data = ApplicationSerializerModel(application, many=True).data
+            application = sorted(serialized_data, key=lambda x: (x['type'] != 'WORK_FLOW', x['name']))
+            return list(application)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:

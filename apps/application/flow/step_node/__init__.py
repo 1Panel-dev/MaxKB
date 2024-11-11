@@ -7,6 +7,7 @@
     @desc:
 """
 from .ai_chat_step_node import *
+from .application_node import BaseApplicationNode
 from .condition_node import *
 from .question_node import *
 from .search_dataset_node import *
@@ -17,7 +18,7 @@ from .function_node import *
 from .reranker_node import *
 
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchDatasetNode, BaseQuestionNode, BaseConditionNode, BaseReplyNode,
-             BaseFunctionNodeNode, BaseFunctionLibNodeNode, BaseRerankerNode]
+             BaseFunctionNodeNode, BaseFunctionLibNodeNode, BaseRerankerNode, BaseApplicationNode]
 
 
 def get_node(node_type):

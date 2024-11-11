@@ -17,7 +17,12 @@
                 <el-icon class="mr-8 arrow-icon" :class="current === index ? 'rotate-90' : ''"
                   ><CaretRight
                 /></el-icon>
-                <component :is="iconComponent(`${item.type}-icon`)" class="mr-8" :size="24" />
+                <component
+                  :is="iconComponent(`${item.type}-icon`)"
+                  class="mr-8"
+                  :size="24"
+                  :item="item.info"
+                />
                 <h4>{{ item.name }}</h4>
               </div>
               <div class="flex align-center">
@@ -37,7 +42,11 @@
               <div class="mt-12" v-if="current === index">
                 <template v-if="item.status === 200">
                   <!-- 开始 -->
-                  <template v-if="item.type === WorkflowType.Start">
+                  <template
+                    v-if="
+                      item.type === WorkflowType.Start || item.type === WorkflowType.Application
+                    "
+                  >
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">参数输入</h5>
                       <div class="p-8-12 border-t-dashed lighter">
@@ -84,15 +93,25 @@
                   </template>
                   <!-- AI 对话 / 问题优化-->
                   <template
-                    v-if="item.type == WorkflowType.AiChat || item.type == WorkflowType.Question"
+                    v-if="
+                      item.type == WorkflowType.AiChat ||
+                      item.type == WorkflowType.Question ||
+                      item.type == WorkflowType.Application
+                    "
                   >
-                    <div class="card-never border-r-4">
+                    <div
+                      class="card-never border-r-4"
+                      v-if="item.type !== WorkflowType.Application"
+                    >
                       <h5 class="p-8-12">角色设定 (System)</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         {{ item.system || '-' }}
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div
+                      class="card-never border-r-4 mt-8"
+                      v-if="item.type !== WorkflowType.Application"
+                    >
                       <h5 class="p-8-12">历史记录</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.history_message?.length > 0">
@@ -115,7 +134,9 @@
                       </div>
                     </div>
                     <div class="card-never border-r-4 mt-8">
-                      <h5 class="p-8-12">AI 回答</h5>
+                      <h5 class="p-8-12">
+                        {{ item.type == WorkflowType.Application ? '应用回答' : 'AI 回答' }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <MdPreview
                           v-if="item.answer"
@@ -269,7 +290,7 @@ watch(dialogVisible, (bool) => {
 
 const open = (data: any) => {
   detail.value = cloneDeep(data)
-
+  console.log(detail.value)
   dialogVisible.value = true
 }
 onBeforeUnmount(() => {

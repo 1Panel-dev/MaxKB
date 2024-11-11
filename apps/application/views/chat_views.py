@@ -43,7 +43,7 @@ class ChatView(APIView):
     class Export(APIView):
         authentication_classes = [TokenAuth]
 
-        @action(methods=['GET'], detail=False)
+        @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary="导出对话",
                              operation_id="导出对话",
                              manual_parameters=ChatApi.get_request_params_api(),
