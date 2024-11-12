@@ -85,6 +85,7 @@
           filterable
           placeholder="请选择文档"
           :loading="optionLoading"
+          @change="changeDocument"
         >
           <el-option
             v-for="item in documentList"
@@ -113,7 +114,7 @@ import logApi from '@/api/log'
 import imageApi from '@/api/image'
 import useStore from '@/stores'
 
-const { application, document } = useStore()
+const { application, document, user } = useStore()
 
 const route = useRoute()
 const {
@@ -216,8 +217,17 @@ const onUploadImg = async (files: any, callback: any) => {
 }
 
 function changeDataset(id: string) {
+  if (user.userInfo) {
+    localStorage.setItem(user.userInfo.id + 'chat_dataset_id', id)
+  }
   form.value.document_id = ''
   getDocument(id)
+}
+
+function changeDocument(id: string) {
+  if (user.userInfo) {
+    localStorage.setItem(user.userInfo.id + 'chat_document_id', id)
+  }
 }
 
 function getDocument(id: string) {
@@ -229,11 +239,22 @@ function getDocument(id: string) {
 function getDataset() {
   application.asyncGetApplicationDataset(id, loading).then((res: any) => {
     datasetList.value = res.data
+    if (localStorage.getItem(user.userInfo?.id + 'chat_dataset_id')) {
+      form.value.dataset_id = localStorage.getItem(user.userInfo?.id + 'chat_dataset_id') as string
+      if (!datasetList.value.find((v) => v.id === form.value.dataset_id)) {
+        form.value.dataset_id = ''
+      } else {
+        getDocument(form.value.dataset_id)
+      }
+    }
   })
 }
 
 const open = (data: any) => {
   getDataset()
+  if (localStorage.getItem(user.userInfo?.id + 'chat_document_id')) {
+    form.value.document_id = localStorage.getItem(user.userInfo?.id + 'chat_document_id') as string
+  }
   form.value.chat_id = data.chat_id
   form.value.record_id = data.id
   form.value.problem_text = data.problem_text ? data.problem_text.substring(0, 256) : ''
