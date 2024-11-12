@@ -30,8 +30,11 @@
           clearable
         />
         <div style="display: flex; align-items: center" class="float-right">
-          <el-button @click="dialogVisible = true" type="primary">清除策略</el-button>
+          <el-button @click="dialogVisible = true">清除策略</el-button>
           <el-button @click="exportLog">导出</el-button>
+          <el-button @click="openDocumentDialog" :disabled="multipleSelection.length === 0"
+            >添加至知识库</el-button
+          >
         </div>
       </div>
 
@@ -177,6 +180,86 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog
+      title="添加至知识库"
+      v-model="documentDialogVisible"
+      width="50%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <el-form
+        ref="formRef"
+        :model="form"
+        label-position="top"
+        require-asterisk-position="right"
+        :rules="rules"
+        @submit.prevent
+      >
+        <el-form-item label="选择知识库" prop="dataset_id">
+          <el-select
+            v-model="form.dataset_id"
+            filterable
+            placeholder="请选择知识库"
+            :loading="optionLoading"
+            @change="changeDataset"
+          >
+            <el-option
+              v-for="item in datasetList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            >
+              <span class="flex align-center">
+                <AppAvatar
+                  v-if="!item.dataset_id && item.type === '1'"
+                  class="mr-12 avatar-purple"
+                  shape="square"
+                  :size="24"
+                >
+                  <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
+                </AppAvatar>
+                <AppAvatar
+                  v-else-if="!item.dataset_id && item.type === '0'"
+                  class="mr-12 avatar-blue"
+                  shape="square"
+                  :size="24"
+                >
+                  <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
+                </AppAvatar>
+                {{ item.name }}
+              </span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="保存至文档" prop="document_id">
+          <el-select
+            v-model="form.document_id"
+            filterable
+            placeholder="请选择文档"
+            :loading="optionLoading"
+            @change="changeDocument"
+          >
+            <el-option
+              v-for="item in documentList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            >
+              {{ item.name }}
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+          <el-button type="primary" @click="submitForm(formRef)" :loading="documentLoading">
+            保存
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -190,12 +273,16 @@ import { beforeDay, datetimeFormat, nowDate } from '@/utils/time'
 import useStore from '@/stores'
 import type { Dict } from '@/api/type/common'
 import { t } from '@/locales'
+import type { FormInstance, FormRules } from 'element-plus'
 
-const { application, log } = useStore()
+const { application, log, document, user } = useStore()
 const route = useRoute()
 const {
   params: { id }
-} = route
+} = route as any
+
+const emit = defineEmits(['refresh'])
+const formRef = ref()
 
 const dayOptions = [
   {
@@ -230,12 +317,14 @@ const multipleSelection = ref<any[]>([])
 
 const ChatRecordRef = ref()
 const loading = ref(false)
+const documentLoading = ref(false)
 const paginationConfig = reactive({
   current_page: 1,
   page_size: 20,
   total: 0
 })
 const dialogVisible = ref(false)
+const documentDialogVisible = ref(false)
 const days = ref<number>(180)
 const tableData = ref<any[]>([])
 const tableIndexMap = computed<Dict<number>>(() => {
@@ -264,6 +353,18 @@ const filter = ref<any>({
   comparer: 'and'
 })
 
+const form = ref<any>({
+  dataset_id: '',
+  document_id: ''
+})
+
+const rules = reactive<FormRules>({
+  dataset_id: [{ required: true, message: '请选择知识库', trigger: 'change' }],
+  document_id: [{ required: true, message: '请选择文档', trigger: 'change' }]
+})
+
+const optionLoading = ref(false)
+const documentList = ref<any[]>([])
 function filterChange(val: string) {
   if (val === 'clear') {
     filter.value = cloneDeep(defaultFilter)
@@ -441,6 +542,72 @@ function saveCleanTime() {
     })
 }
 
+function changeDataset(id: string) {
+  if (user.userInfo) {
+    localStorage.setItem(user.userInfo.id + 'chat_dataset_id', id)
+  }
+  form.value.document_id = ''
+  getDocument(id)
+}
+
+function changeDocument(id: string) {
+  if (user.userInfo) {
+    localStorage.setItem(user.userInfo.id + 'chat_document_id', id)
+  }
+}
+
+const datasetList = ref<any[]>([])
+function getDataset() {
+  application.asyncGetApplicationDataset(id, documentLoading).then((res: any) => {
+    datasetList.value = res.data
+    if (localStorage.getItem(user.userInfo?.id + 'chat_dataset_id')) {
+      form.value.dataset_id = localStorage.getItem(user.userInfo?.id + 'chat_dataset_id') as string
+      if (!datasetList.value.find((v) => v.id === form.value.dataset_id)) {
+        form.value.dataset_id = ''
+      } else {
+        getDocument(form.value.dataset_id)
+      }
+    }
+  })
+}
+
+const submitForm = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  const arr: string[] = []
+  multipleSelection.value.map((v) => {
+    if (v) {
+      arr.push(v.id)
+    }
+  })
+  await formEl.validate((valid) => {
+    if (valid) {
+      const obj = {
+        document_id: form.value.document_id,
+        dataset_id: form.value.dataset_id,
+        chat_ids: arr
+      }
+      logApi.postChatRecordLog(id, form.value.dataset_id, obj, documentLoading).then((res: any) => {
+        multipleSelection.value = []
+        documentDialogVisible.value = false
+      })
+    }
+  })
+}
+
+function getDocument(id: string) {
+  document.asyncGetAllDocument(id, documentLoading).then((res: any) => {
+    documentList.value = res.data
+  })
+}
+
+function openDocumentDialog() {
+  getDataset()
+  if (localStorage.getItem(user.userInfo?.id + 'chat_document_id')) {
+    form.value.document_id = localStorage.getItem(user.userInfo?.id + 'chat_document_id') as string
+  }
+  formRef.value?.clearValidate()
+  documentDialogVisible.value = true
+}
 onMounted(() => {
   changeDayHandle(history_day.value)
   getDetail()

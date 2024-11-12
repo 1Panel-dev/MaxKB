@@ -129,7 +129,8 @@ class ChatView(APIView):
                                                'client_id': request.auth.client_id,
                                                'form_data': (request.data.get(
                                                    'form_data') if 'form_data' in request.data else {}),
-                                               'image_list': request.data.get('image_list') if 'image_list' in request.data else [],
+                                               'image_list': request.data.get(
+                                                   'image_list') if 'image_list' in request.data else [],
                                                'client_type': request.auth.client_type}).chat()
 
     @action(methods=['GET'], detail=False)
@@ -364,6 +365,28 @@ class ChatView(APIView):
                     data={'chat_id': chat_id, 'chat_record_id': chat_record_id,
                           'dataset_id': dataset_id, 'document_id': document_id}).improve(request.data))
 
+            @action(methods=['POST'], detail=False)
+            @swagger_auto_schema(operation_summary="添加至知识库",
+                                 operation_id="添加至知识库",
+                                 manual_parameters=ImproveApi.get_request_params_api_post(),
+                                 request_body=ImproveApi.get_request_body_api_post(),
+                                 tags=["应用/对话日志/添加至知识库"]
+                                 )
+            @has_permissions(
+                ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                               [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                               dynamic_tag=keywords.get('application_id'))],
+
+                               ), ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                                                 [lambda r, keywords: Permission(group=Group.DATASET,
+                                                                                 operate=Operate.MANAGE,
+                                                                                 dynamic_tag=keywords.get(
+                                                                                     'dataset_id'))],
+                                                 compare=CompareConstants.AND
+                                                 ), compare=CompareConstants.AND)
+            def post(self, request: Request, application_id: str, dataset_id: str):
+                return result.success(ChatRecordSerializer.PostImprove().post_improve(request.data))
+
             class Operate(APIView):
                 authentication_classes = [TokenAuth]
 
@@ -417,4 +440,3 @@ class ChatView(APIView):
                 file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
                 file_ids.append({'name': file.name, 'url': file_url, 'file_id': file_url.split('/')[-1]})
             return result.success(file_ids)
-

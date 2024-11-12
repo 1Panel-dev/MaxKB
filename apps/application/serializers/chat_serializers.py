@@ -40,7 +40,7 @@ from common.util.lock import try_lock, un_lock
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
 from dataset.serializers.common_serializers import get_embedding_model_id_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
-from embedding.task import embedding_by_paragraph
+from embedding.task import embedding_by_paragraph, embedding_by_paragraph_list
 from setting.models import Model
 from setting.models_provider import get_model_credential
 from smartdoc.conf import PROJECT_DIR
@@ -658,3 +658,67 @@ class ChatRecordSerializer(serializers.Serializer):
                     data={"dataset_id": dataset_id, 'document_id': document_id, "paragraph_id": paragraph_id})
                 o.is_valid(raise_exception=True)
                 return o.delete()
+
+    class PostImprove(serializers.Serializer):
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
+        chat_ids = serializers.ListSerializer(child=serializers.UUIDField(), required=True,
+                                              error_messages=ErrMessage.list("对话id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if not Document.objects.filter(id=self.data['document_id'], dataset_id=self.data['dataset_id']).exists():
+                raise AppApiException(500, "文档id不正确")
+
+        @staticmethod
+        def post_embedding_paragraph(paragraph_ids, dataset_id):
+            model_id = get_embedding_model_id_by_dataset_id(dataset_id)
+            embedding_by_paragraph_list(paragraph_ids, model_id)
+
+        @post(post_function=post_embedding_paragraph)
+        @transaction.atomic
+        def post_improve(self, instance: Dict):
+            ChatRecordSerializer.PostImprove(data=instance).is_valid(raise_exception=True)
+
+            chat_ids = instance['chat_ids']
+            document_id = instance['document_id']
+            dataset_id = instance['dataset_id']
+
+            # 获取所有聊天记录
+            chat_record_list = list(ChatRecord.objects.filter(chat_id__in=chat_ids))
+            if len(chat_record_list) < len(chat_ids):
+                raise AppApiException(500, "存在不存在的对话记录")
+
+            # 批量创建段落和问题映射
+            paragraphs = []
+            paragraph_ids = []
+            problem_paragraph_mappings = []
+            for chat_record in chat_record_list:
+                paragraph = Paragraph(
+                    id=uuid.uuid1(),
+                    document_id=document_id,
+                    content=chat_record.answer_text,
+                    dataset_id=dataset_id,
+                    title=chat_record.problem_text
+                )
+                problem, _ = Problem.objects.get_or_create(content=chat_record.problem_text, dataset_id=dataset_id)
+                problem_paragraph_mapping = ProblemParagraphMapping(
+                    id=uuid.uuid1(),
+                    dataset_id=dataset_id,
+                    document_id=document_id,
+                    problem_id=problem.id,
+                    paragraph_id=paragraph.id
+                )
+                paragraphs.append(paragraph)
+                paragraph_ids.append(paragraph.id)
+                problem_paragraph_mappings.append(problem_paragraph_mapping)
+                chat_record.improve_paragraph_id_list.append(paragraph.id)
+
+            # 批量保存段落和问题映射
+            Paragraph.objects.bulk_create(paragraphs)
+            ProblemParagraphMapping.objects.bulk_create(problem_paragraph_mappings)
+
+            # 批量保存聊天记录
+            ChatRecord.objects.bulk_update(chat_record_list, ['improve_paragraph_id_list'])
+
+            return paragraph_ids, dataset_id
