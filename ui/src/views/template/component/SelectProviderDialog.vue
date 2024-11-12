@@ -61,7 +61,8 @@ const modelTypeOptions = ref([
   { text: '向量模型', value: 'EMBEDDING' },
   { text: '重排模型', value: 'RERANKER' },
   { text: '语音识别', value: 'STT' },
-  { text: '语音合成', value: 'TTS' }
+  { text: '语音合成', value: 'TTS' },
+  { text: '图片理解', value: 'IMAGE' },
 ])
 
 const open = () => {
