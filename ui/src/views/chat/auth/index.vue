@@ -31,7 +31,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { isAppIcon } from '@/utils/application'
-import { hexToRgba } from '@/utils/theme'
 
 const auth_components: any = import.meta.glob('@/views/chat/auth/component/*.vue', {
   eager: true
@@ -40,9 +39,10 @@ const auth_components: any = import.meta.glob('@/views/chat/auth/component/*.vue
 const emit = defineEmits(['update:modelValue'])
 
 const props = withDefaults(
-  defineProps<{ modelValue: boolean; application_profile: any; auth_type?: string }>(),
+  defineProps<{ modelValue: boolean; application_profile: any; auth_type?: string; style?: any }>(),
   {
-    auth_type: 'password'
+    auth_type: 'password',
+    style: {}
   }
 )
 const is_auth = computed({
@@ -58,7 +58,8 @@ const customStyle = computed(() => {
   return {
     background: props.application_profile?.custom_theme?.theme_color,
     color: props.application_profile?.custom_theme?.header_font_color,
-    border: 'none'
+    border: 'none',
+    ...props.style
   }
 })
 </script>

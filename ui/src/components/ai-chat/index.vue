@@ -1,368 +1,100 @@
 <template>
-  <div ref="aiChatRef" class="ai-chat" :class="log ? 'chart-log' : ''">
-    <div
-      v-if="(inputFieldList.length > 0 || (debug && apiInputFieldList.length > 0)) && !log"
-      class="mb-16"
-      style="padding: 0 24px"
-    >
-      <el-card shadow="always" class="dialog-card">
-        <div class="flex align-center cursor w-full" @click="showUserInput = !showUserInput">
-          <el-icon class="mr-8 arrow-icon" :class="showUserInput ? 'rotate-90' : ''"
-            ><CaretRight
-          /></el-icon>
-          用户输入
-        </div>
-        <el-collapse-transition>
-          <div v-show="showUserInput" class="mt-16">
-            <DynamicsForm
-              :key="dynamicsFormRefresh"
-              v-model="form_data"
-              :model="form_data"
-              label-position="left"
-              require-asterisk-position="right"
-              :render_data="inputFieldList"
-              ref="dynamicsFormRef"
-            />
-            <DynamicsForm
-              v-if="debug"
-              v-model="api_form_data"
-              :model="api_form_data"
-              label-position="left"
-              require-asterisk-position="right"
-              :render_data="apiInputFieldList"
-              ref="dynamicsFormRef2"
-            />
-          </div>
-        </el-collapse-transition>
-      </el-card>
-    </div>
+  <div ref="aiChatRef" class="ai-chat" :class="type == 'log' ? 'chart-log' : ''">
+    <UserForm
+      v-model:api_form_data="api_form_data"
+      v-model:form_data="form_data"
+      :application="applicationDetails"
+      :type="type"
+      ref="userFormRef"
+    ></UserForm>
     <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
       <div ref="dialogScrollbar" class="ai-chat__content p-24 chat-width">
-        <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
-          <div class="avatar">
-            <img v-if="data.avatar" :src="data.avatar" height="30px" />
-            <LogoIcon v-else height="30px" />
-          </div>
-
-          <div class="content">
-            <el-card shadow="always" class="dialog-card">
-              <template v-for="(item, index) in prologueList" :key="index">
-                <div
-                  v-if="item.type === 'question'"
-                  @click="quickProblemHandle(item.str)"
-                  class="problem-button ellipsis-2 mb-8"
-                  :class="log ? 'disabled' : 'cursor'"
-                >
-                  <el-icon>
-                    <EditPen />
-                  </el-icon>
-                  {{ item.str }}
-                </div>
-                <MdPreview
-                  v-else
-                  class="mb-8"
-                  ref="editorRef"
-                  editorId="preview-only"
-                  :modelValue="item.str"
-                  noIconfont
-                  no-mermaid
-                />
-              </template>
-            </el-card>
-          </div>
-        </div>
+        <PrologueContent
+          :type="type"
+          :application="applicationDetails"
+          :available="available"
+          :send-message="sendMessage"
+        ></PrologueContent>
 
         <template v-for="(item, index) in chatList" :key="index">
           <!-- 问题 -->
-          <div class="item-content mb-16 lighter">
-            <div class="avatar">
-              <el-image
-                v-if="data.user_avatar"
-                :src="data.user_avatar"
-                alt=""
-                fit="cover"
-                style="width: 30px; height: 30px; display: block"
-              />
-              <AppAvatar v-else>
-                <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
-              </AppAvatar>
-            </div>
-            <div class="content">
-              <div class="text break-all pre-wrap">
-                {{ item.problem_text }}
-              </div>
-            </div>
-          </div>
+          <QuestionContent :application="applicationDetails" :chat-record="item"></QuestionContent>
           <!-- 回答 -->
-          <div class="item-content mb-16 lighter">
-            <div class="avatar">
-              <img v-if="data.avatar" :src="data.avatar" height="30px" />
-              <LogoIcon v-else height="30px" />
-            </div>
-
-            <div class="content">
-              <div v-if="!item.answer_text">
-                <el-card
-                  v-if="item.write_ed === undefined || item.write_ed === true"
-                  shadow="always"
-                  class="dialog-card"
-                >
-                  <MdRenderer
-                    source=" 抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
-                  ></MdRenderer>
-                  <!-- 知识来源 -->
-                  <div v-if="showSource(item)">
-                    <KnowledgeSource :data="item" :type="props.data.type" />
-                  </div>
-                </el-card>
-                <el-card v-else-if="item.is_stop" shadow="always" class="dialog-card">
-                  已停止回答
-                </el-card>
-                <el-card v-else shadow="always" class="dialog-card">
-                  回答中 <span class="dotting"></span>
-                </el-card>
-              </div>
-
-              <el-card v-else shadow="always" class="dialog-card">
-                <MdRenderer
-                  :source="item.answer_text"
-                  :quick-problem-handle="quickProblemHandle"
-                ></MdRenderer>
-                <!-- 知识来源 -->
-                <div v-if="showSource(item)">
-                  <KnowledgeSource :data="item" :type="props.data.type" />
-                </div>
-              </el-card>
-              <div class="flex-between mt-8" v-if="log">
-                <LogOperationButton
-                  v-model:data="chatList[index]"
-                  :applicationId="appId"
-                  :tts="props.data.tts_model_enable"
-                  :tts_type="props.data.tts_type"
-                />
-              </div>
-
-              <div class="flex-between mt-8" v-else>
-                <div>
-                  <el-button
-                    type="primary"
-                    v-if="item.is_stop && !item.write_ed"
-                    @click="startChat(item)"
-                    link
-                    >继续
-                  </el-button>
-                  <el-button type="primary" v-else-if="!item.write_ed" @click="stopChat(item)" link
-                    >停止回答
-                  </el-button>
-                </div>
-              </div>
-              <div v-if="item.write_ed && 500 != item.status" class="flex-between">
-                <OperationButton
-                  :tts="props.data.tts_model_enable"
-                  :tts_type="props.data.tts_type"
-                  :data="item"
-                  :applicationId="appId"
-                  :chatId="chartOpenId"
-                  :chat_loading="loading"
-                  @regeneration="regenerationChart(item)"
-                />
-              </div>
-            </div>
-          </div>
+          <AnswerContent
+            :application="applicationDetails"
+            :loading="loading"
+            :chat-record="item"
+            :type="type"
+            :send-message="sendMessage"
+            :chat-management="ChatManagement"
+          ></AnswerContent>
         </template>
       </div>
     </el-scrollbar>
-    <div class="ai-chat__operate p-16-24" v-if="!log">
-      <slot name="operateBefore" />
-      <div class="operate-textarea flex chat-width">
-        <el-input
-          ref="quickInputRef"
-          v-model="inputValue"
-          :placeholder="
-            startRecorderTime
-              ? '说话中...'
-              : recorderLoading
-                ? '转文字中...'
-                : '请输入问题，Ctrl+Enter 换行，Enter发送'
-          "
-          :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
-          type="textarea"
-          :maxlength="100000"
-          @keydown.enter="sendChatHandle($event)"
-        />
 
-        <div class="operate flex align-center">
-          <span v-if="props.data.file_upload_enable" class="flex align-center">
-            <el-upload
-              action="#"
-              :auto-upload="false"
-              :show-file-list="false"
-              :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
-            >
-              <el-button text>
-                <el-icon><Paperclip /></el-icon>
-              </el-button>
-            </el-upload>
-            <el-divider direction="vertical" />
-          </span>
-          <span v-if="props.data.stt_model_enable" class="flex align-center">
-            <el-button text v-if="mediaRecorderStatus" @click="startRecording">
-              <el-icon>
-                <Microphone />
-              </el-icon>
-            </el-button>
-            <div v-else class="operate flex align-center">
-              <el-text type="info"
-                >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
-              >
-              <el-button text type="primary" @click="stopRecording" :loading="recorderLoading">
-                <AppIcon iconName="app-video-stop"></AppIcon>
-              </el-button>
-            </div>
-            <el-divider v-if="!startRecorderTime && !recorderLoading" direction="vertical" />
-          </span>
-
-          <el-button
-            v-if="!startRecorderTime && !recorderLoading"
-            text
-            class="sent-button"
-            :disabled="isDisabledChart || loading"
-            @click="sendChatHandle"
-          >
-            <img v-show="isDisabledChart || loading" src="@/assets/icon_send.svg" alt="" />
-            <SendIcon v-show="!isDisabledChart && !loading" />
-          </el-button>
-        </div>
-      </div>
-      <div class="chat-width text-center" v-if="data.disclaimer" style="margin-top: 8px">
-        <el-text type="info" v-if="data.disclaimer" style="font-size: 12px">
-          <auto-tooltip :content="data.disclaimer_value">
-            {{ data.disclaimer_value }}
-          </auto-tooltip>
-        </el-text>
-      </div>
-    </div>
+    <ChatInputOperate
+      :app-id="appId"
+      :application-details="applicationDetails"
+      :is-mobile="isMobile"
+      :type="type"
+      :send-message="sendMessage"
+      v-model:chat-id="chartOpenId"
+      v-model:loading="loading"
+      v-if="type !== 'log'"
+    ></ChatInputOperate>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, nextTick, computed, watch, reactive, onMounted } from 'vue'
+import { ref, nextTick, computed, watch, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
-import LogOperationButton from './LogOperationButton.vue'
-import OperationButton from './OperationButton.vue'
-import KnowledgeSource from './KnowledgeSource.vue'
 import applicationApi from '@/api/application'
 import logApi from '@/api/log'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
-import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import { isWorkFlow } from '@/utils/application'
 import { debounce } from 'lodash'
-import Recorder from 'recorder-core'
-import 'recorder-core/src/engine/mp3'
-import 'recorder-core/src/engine/mp3-engine'
-import { MsgWarning } from '@/utils/message'
-import DynamicsForm from '@/components/dynamics-form/index.vue'
-import type { FormField } from '@/components/dynamics-form/type'
-import { MsgAlert } from '@/utils/message'
-
+import AnswerContent from '@/components/ai-chat/component/answer-content/index.vue'
+import QuestionContent from '@/components/ai-chat/component/question-content/index.vue'
+import ChatInputOperate from '@/components/ai-chat/component/chat-input-operate/index.vue'
+import PrologueContent from '@/components/ai-chat/component/prologue-content/index.vue'
+import UserForm from '@/components/ai-chat/component/user-form/index.vue'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
   params: { accessToken, id },
   query: { mode }
 } = route as any
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => {}
-  },
-  appId: String, // 仅分享链接有
-  log: Boolean,
-  record: {
-    type: Array<chatType[]>,
-    default: () => []
-  },
-  // 应用是否可用
-  available: {
-    type: Boolean,
-    default: true
-  },
-  chatId: {
-    type: String,
-    default: ''
-  }, // 历史记录Id
-  debug: {
-    type: Boolean,
-    default: false
+const props = withDefaults(
+  defineProps<{
+    applicationDetails: any
+    type?: 'log' | 'ai-chat' | 'debug-ai-chat'
+    appId?: string
+    record?: Array<chatType>
+    available?: boolean
+    chatId?: string
+  }>(),
+  {
+    applicationDetails: () => ({}),
+    available: true,
+    type: 'ai-chat'
   }
-})
-
+)
 const emit = defineEmits(['refresh', 'scroll'])
-
 const { application, common } = useStore()
-
 const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed'
 })
-
 const aiChatRef = ref()
-const quickInputRef = ref()
 const scrollDiv = ref()
 const dialogScrollbar = ref()
 const loading = ref(false)
 const inputValue = ref<string>('')
-const chartOpenId = ref('')
+const chartOpenId = ref<string>('')
 const chatList = ref<any[]>([])
-const inputFieldList = ref<FormField[]>([])
-const apiInputFieldList = ref<FormField[]>([])
 const form_data = ref<any>({})
 const api_form_data = ref<any>({})
-
-const showUserInput = ref(true)
-const recorderTime = ref(0)
-const startRecorderTime = ref(false)
-const recorderLoading = ref(false)
-
-const isDisabledChart = computed(
-  () => !(inputValue.value.trim() && (props.appId || props.data?.name))
-)
-const isMdArray = (val: string) => val.match(/^-\s.*/m)
-const prologueList = computed(() => {
-  const temp = props.available
-    ? props.data?.prologue
-    : '抱歉，当前正在维护，无法提供服务，请稍后再试！'
-  const lines = temp?.split('\n')
-  return lines
-    .reduce((pre_array: Array<any>, current: string, index: number) => {
-      const currentObj = isMdArray(current)
-        ? {
-            type: 'question',
-            str: current.replace(/^-\s+/, ''),
-            index: index
-          }
-        : {
-            type: 'md',
-            str: current,
-            index: index
-          }
-      if (pre_array.length > 0) {
-        const pre = pre_array[pre_array.length - 1]
-        if (!isMdArray(current) && pre.type == 'md') {
-          pre.str = [pre.str, current].join('\n')
-          pre.index = index
-          return pre_array
-        } else {
-          pre_array.push(currentObj)
-        }
-      } else {
-        pre_array.push(currentObj)
-      }
-      return pre_array
-    }, [])
-    .sort((pre: any, next: any) => pre.index - next.index)
-})
-
+const userFormRef = ref<InstanceType<typeof UserForm>>()
 watch(
   () => props.chatId,
   (val) => {
@@ -375,193 +107,10 @@ watch(
   { deep: true }
 )
 
-// 用于刷新动态表单
-const dynamicsFormRefresh = ref(0)
-function handleInputFieldList() {
-  dynamicsFormRefresh.value++
-  // 给变量赋默认值, 最后一个对话记录的值
-  const record = chatList.value[chatList.value.length - 1]
-  let default_value: any = {}
-  if (record && record.length) {
-    record.execution_details[0].global_fields?.reduce((pre: any, next: any) => {
-      pre[next.key] = next.value
-      return pre
-    }, default_value)
-  }
-  props.data.work_flow?.nodes
-    ?.filter((v: any) => v.id === 'base-node')
-    .map((v: any) => {
-      inputFieldList.value = v.properties.user_input_field_list
-        ? v.properties.user_input_field_list.map((v: any) => {
-            switch (v.type) {
-              case 'input':
-                return {
-                  field: v.variable,
-                  input_type: 'TextInput',
-                  label: v.name,
-                  default_value: default_value[v.variable],
-                  required: v.is_required
-                }
-              case 'select':
-                return {
-                  field: v.variable,
-                  input_type: 'SingleSelect',
-                  label: v.name,
-                  default_value: default_value[v.variable],
-                  required: v.is_required,
-                  option_list: v.optionList.map((o: any) => {
-                    return { key: o, value: o }
-                  })
-                }
-              case 'date':
-                return {
-                  field: v.variable,
-                  input_type: 'DatePicker',
-                  label: v.name,
-                  default_value: default_value[v.variable],
-                  required: v.is_required,
-                  attrs: {
-                    format: 'YYYY-MM-DD HH:mm:ss',
-                    'value-format': 'YYYY-MM-DD HH:mm:ss',
-                    type: 'datetime'
-                  }
-                }
-              default:
-                return v
-            }
-          })
-        : v.properties.input_field_list
-          ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'user_input')
-              .map((v: any) => {
-                switch (v.type) {
-                  case 'input':
-                    return {
-                      field: v.variable,
-                      input_type: 'TextInput',
-                      label: v.name,
-                      default_value: default_value[v.variable],
-                      required: v.is_required
-                    }
-                  case 'select':
-                    return {
-                      field: v.variable,
-                      input_type: 'SingleSelect',
-                      label: v.name,
-                      default_value: default_value[v.variable],
-                      required: v.is_required,
-                      option_list: v.optionList.map((o: any) => {
-                        return { key: o, value: o }
-                      })
-                    }
-                  case 'date':
-                    return {
-                      field: v.variable,
-                      input_type: 'DatePicker',
-                      label: v.name,
-                      default_value: default_value[v.variable],
-                      required: v.is_required,
-                      attrs: {
-                        format: 'YYYY-MM-DD HH:mm:ss',
-                        'value-format': 'YYYY-MM-DD HH:mm:ss',
-                        type: 'datetime'
-                      }
-                    }
-                  default:
-                    break
-                }
-              })
-          : []
-
-      apiInputFieldList.value = v.properties.api_input_field_list
-        ? v.properties.api_input_field_list.map((v: any) => {
-            switch (v.type) {
-              case 'input':
-                return {
-                  field: v.variable,
-                  input_type: 'TextInput',
-                  label: v.variable,
-                  default_value: v.default_value || default_value[v.variable],
-                  required: v.is_required
-                }
-              case 'select':
-                return {
-                  field: v.variable,
-                  input_type: 'SingleSelect',
-                  label: v.variable,
-                  default_value: v.default_value || default_value[v.variable],
-                  required: v.is_required,
-                  option_list: v.optionList.map((o: any) => {
-                    return { key: o, value: o }
-                  })
-                }
-              case 'date':
-                return {
-                  field: v.variable,
-                  input_type: 'DatePicker',
-                  label: v.variable,
-                  default_value: v.default_value || default_value[v.variable],
-                  required: v.is_required,
-                  attrs: {
-                    format: 'YYYY-MM-DD HH:mm:ss',
-                    'value-format': 'YYYY-MM-DD HH:mm:ss',
-                    type: 'datetime'
-                  }
-                }
-              default:
-                break
-            }
-          })
-        : v.properties.input_field_list
-          ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'api_input')
-              .map((v: any) => {
-                switch (v.type) {
-                  case 'input':
-                    return {
-                      field: v.variable,
-                      input_type: 'TextInput',
-                      label: v.name,
-                      default_value: default_value[v.variable],
-                      required: v.is_required
-                    }
-                  case 'select':
-                    return {
-                      field: v.variable,
-                      input_type: 'SingleSelect',
-                      label: v.name,
-                      default_value: default_value[v.variable],
-                      required: v.is_required,
-                      option_list: v.optionList.map((o: any) => {
-                        return { key: o, value: o }
-                      })
-                    }
-                  case 'date':
-                    return {
-                      field: v.variable,
-                      input_type: 'DatePicker',
-                      label: v.name,
-                      default_value: default_value[v.variable],
-                      required: v.is_required,
-                      attrs: {
-                        format: 'YYYY-MM-DD HH:mm:ss',
-                        'value-format': 'YYYY-MM-DD HH:mm:ss',
-                        type: 'datetime'
-                      }
-                    }
-                  default:
-                    break
-                }
-              })
-          : []
-    })
-}
-
 watch(
-  () => props.data,
+  () => props.applicationDetails,
   () => {
     chartOpenId.value = ''
-    handleInputFieldList()
   },
   { deep: true }
 )
@@ -569,95 +118,32 @@ watch(
 watch(
   () => props.record,
   (value) => {
-    chatList.value = value
-    handleInputFieldList()
+    chatList.value = value ? value : []
   },
   {
     immediate: true
   }
 )
 
-function showSource(row: any) {
-  if (props.log) {
-    return true
-  } else if (row.write_ed && 500 !== row.status) {
-    if (id || props.data?.show_source) {
-      return true
-    }
-  } else {
-    return false
-  }
-}
-
-function quickProblemHandle(val: string) {
-  if (!checkInputParam()) {
+function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
+  if (!userFormRef.value?.checkInputParam()) {
     return
   }
-  if (!loading.value && props.data?.name) {
-    handleDebounceClick(val)
+  if (!loading.value && props.applicationDetails?.name) {
+    handleDebounceClick(val, other_params_data, chat)
   }
 }
 
-const handleDebounceClick = debounce((val) => {
-  chatMessage(null, val)
+const handleDebounceClick = debounce((val, other_params_data?: any, chat?: chatType) => {
+  chatMessage(chat, val, false, other_params_data)
 }, 200)
-
-function checkInputParam() {
-  // 检查inputFieldList是否有未填写的字段
-  for (let i = 0; i < inputFieldList.value.length; i++) {
-    if (inputFieldList.value[i].required && !form_data.value[inputFieldList.value[i].field]) {
-      MsgWarning('请填写所有必填字段')
-      return false
-    }
-  }
-  // 浏览器query参数找到接口传参
-  let msg = []
-  for (let f of apiInputFieldList.value) {
-    if (!api_form_data.value[f.field]) {
-      api_form_data.value[f.field] = route.query[f.field]
-    }
-    if (f.required && !api_form_data.value[f.field]) {
-      msg.push(f.field)
-    }
-  }
-  if (msg.length > 0) {
-    MsgWarning(`请在URL中填写参数 ${msg.join('、')}的值`)
-    return false
-  }
-  return true
-}
-
-function sendChatHandle(event: any) {
-  if (!checkInputParam()) {
-    return
-  }
-  if (!event.ctrlKey) {
-    // 如果没有按下组合键ctrl，则会阻止默认事件
-    event.preventDefault()
-    if (!isDisabledChart.value && !loading.value && !event.isComposing) {
-      if (inputValue.value.trim()) {
-        chatMessage()
-      }
-    }
-  } else {
-    // 如果同时按下ctrl+回车键，则会换行
-    inputValue.value += '\n'
-  }
-}
-
-const stopChat = (chat: chatType) => {
-  ChatManagement.stop(chat.id)
-}
-const startChat = (chat: chatType) => {
-  ChatManagement.write(chat.id)
-}
 
 /**
  * 对话
  */
 function getChartOpenId(chat?: any) {
   loading.value = true
-  const obj = props.data
+  const obj = props.applicationDetails
   if (props.appId) {
     return applicationApi
       .getChatOpen(props.appId)
@@ -790,20 +276,23 @@ const errorWrite = (chat: any, message?: string) => {
   ChatManagement.updateStatus(chat.id, 500)
   ChatManagement.close(chat.id)
 }
+// 保存上传文件列表
 
-function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
+function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_params_data?: any) {
   loading.value = true
   if (!chat) {
     chat = reactive({
       id: randomId(),
       problem_text: problem ? problem : inputValue.value.trim(),
       answer_text: '',
+      answer_text_list: [''],
       buffer: [],
       write_ed: false,
       is_stop: false,
       record_id: '',
+      chat_id: '',
       vote_status: '-1',
-      status: undefined,
+      status: undefined
     })
     chatList.value.push(chat)
     ChatManagement.addChatRecord(chat, 50, loading)
@@ -822,8 +311,11 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
     const obj = {
       message: chat.problem_text,
       re_chat: re_chat || false,
-      form_data: { ...form_data.value, ...api_form_data.value },
-      image_list: uploadFileList.value,
+      ...other_params_data,
+      form_data: {
+        ...form_data.value,
+        ...api_form_data.value
+      }
     }
     // 对话
     applicationApi
@@ -846,7 +338,6 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
           nextTick(() => {
             // 将滚动条滚动到最下面
             scrollDiv.value.setScrollTop(getMaxHeight())
-            uploadFileList.value = []
           })
           const reader = response.body.getReader()
           // 处理流数据
@@ -862,8 +353,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
         if (props.chatId === 'new') {
           emit('refresh', chartOpenId.value)
         }
-        quickInputRef.value.textareaStyle.height = '45px'
-        return (id || props.data?.show_source) && getSourceDetail(chat)
+        return (id || props.applicationDetails?.show_source) && getSourceDetail(chat)
       })
       .finally(() => {
         ChatManagement.close(chat.id)
@@ -874,16 +364,10 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean) {
   }
 }
 
-function regenerationChart(item: chatType) {
-  if (!checkInputParam()) {
-    return
-  }
-  inputValue.value = item.problem_text
-  if (!loading.value) {
-    chatMessage(null, '', true)
-  }
-}
-
+/**
+ * 获取对话详情
+ * @param row
+ */
 function getSourceDetail(row: any) {
   logApi.getRecordDetail(id || props.appId, row.chat_id, row.record_id, loading).then((res) => {
     const exclude_keys = ['answer_text', 'id']
@@ -906,6 +390,10 @@ const scorll = ref(true)
 const getMaxHeight = () => {
   return dialogScrollbar.value!.scrollHeight
 }
+/**
+ * 滚动滚动条到最上面
+ * @param $event
+ */
 const handleScrollTop = ($event: any) => {
   scrollTop.value = $event.scrollTop
   if (
@@ -918,9 +406,11 @@ const handleScrollTop = ($event: any) => {
   }
   emit('scroll', { ...$event, dialogScrollbar: dialogScrollbar.value, scrollDiv: scrollDiv.value })
 }
-
+/**
+ * 处理跟随滚动条
+ */
 const handleScroll = () => {
-  if (!props.log && scrollDiv.value) {
+  if (props.type !== 'log' && scrollDiv.value) {
     // 内部高度小于外部高度 就需要出滚动条
     if (scrollDiv.value.wrapRef.offsetHeight < dialogScrollbar.value.scrollHeight) {
       // 如果当前滚动条距离最下面的距离在 规定距离 滚动条就跟随
@@ -931,159 +421,12 @@ const handleScroll = () => {
   }
 }
 
-// 保存上传文件列表
-const uploadFileList = ref<any>([])
-const uploadFile = async (file: any, fileList: any) => {
-  const { maxFiles, fileLimit } = props.data.file_upload_setting
-  if (fileList.length > maxFiles) {
-    MsgWarning('最多上传' + maxFiles + '个文件')
-    return
-  }
-  if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) { // MB
-    MsgWarning('单个文件大小不能超过' + fileLimit + 'MB')
-    fileList.splice(0, fileList.length)
-    return
-  }
-  const formData = new FormData()
-  for (const file of fileList) {
-    formData.append('file', file.raw, file.name)
-    uploadFileList.value.push(file)
-  }
-
-  if (props.chatId === 'new' || !chartOpenId.value) {
-    const res = await applicationApi.getChatOpen(props.data.id as string)
-    chartOpenId.value = res.data
-  }
-  applicationApi.uploadFile(props.data.id as string, chartOpenId.value, formData, loading).then((response) => {
-    fileList.splice(0, fileList.length)
-    uploadFileList.value.forEach((file: any) => {
-      const f = response.data.filter((f: any) => f.name === file.name)
-      if (f.length > 0) {
-        file.url = f[0].url
-        file.file_id = f[0].file_id
-      }
-    })
-    console.log(uploadFileList.value)
-  })
-}
-
-// 定义响应式引用
-const mediaRecorder = ref<any>(null)
-
-const mediaRecorderStatus = ref(true)
-
-// 开始录音
-const startRecording = async () => {
-  try {
-    // 取消录音控制台日志
-    Recorder.CLog = function () {}
-    mediaRecorderStatus.value = false
-    handleTimeChange()
-    mediaRecorder.value = new Recorder({
-      type: 'mp3',
-      bitRate: 128,
-      sampleRate: 16000
-    })
-
-    mediaRecorder.value.open(
-      () => {
-        mediaRecorder.value.start()
-      },
-      (err: any) => {
-        MsgAlert(
-          `提示`,
-          `<p>该功能需要使用麦克风，浏览器禁止不安全页面录音，解决方案如下：<br/>
-1、可开启 https 解决；<br/>
-2、若无 https 配置则需要修改浏览器安全配置，Chrome 设置如下：<br/>
-(1) 地址栏输入chrome://flags/#unsafely-treat-insecure-origin-as-secure；<br/>
-(2) 将 http 站点配置在文本框中，例如: http://127.0.0.1:8080。</p>
-    <img src="${new URL(`../../assets/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
-          {
-            confirmButtonText: '我知道了',
-            dangerouslyUseHTMLString: true,
-            customClass: 'record-tip-confirm'
-          }
-        )
-      }
-    )
-  } catch (error) {
-    // console.error('无法获取音频权限：', error)
-    MsgAlert(
-      `提示`,
-      `<p>该功能需要使用麦克风，浏览器禁止不安全页面录音，解决方案如下：<br/>
-1、可开启 https 解决；<br/>
-2、若无 https 配置则需要修改浏览器安全配置，Chrome 设置如下：<br/>
-(1) 地址栏输入chrome://flags/#unsafely-treat-insecure-origin-as-secure；<br/>
-(2) 将 http 站点配置在文本框中，例如: http://127.0.0.1:8080。</p>
-    <img src="${new URL(`../../assets/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
-      {
-        confirmButtonText: '我知道了',
-        dangerouslyUseHTMLString: true,
-        customClass: 'record-tip-confirm'
-      }
-    )
-  }
-}
-
-// 停止录音
-const stopRecording = () => {
-  startRecorderTime.value = false
-  recorderTime.value = 0
-  if (mediaRecorder.value) {
-    mediaRecorderStatus.value = true
-    mediaRecorder.value.stop(
-      (blob: Blob, duration: number) => {
-        // 测试blob是否能正常播放
-        //  const link = document.createElement('a')
-        //  link.href = window.URL.createObjectURL(blob)
-        //  link.download = 'abc.mp3'
-        //  link.click()
-        uploadRecording(blob) // 上传录音文件
-      },
-      (err: any) => {
-        console.error('录音失败:', err)
-      }
-    )
-  }
-}
-
-// 上传录音文件
-const uploadRecording = async (audioBlob: Blob) => {
-  try {
-    recorderLoading.value = true
-    const formData = new FormData()
-    formData.append('file', audioBlob, 'recording.mp3')
-    applicationApi.postSpeechToText(props.data.id as string, formData, loading).then((response) => {
-      recorderLoading.value = false
-      mediaRecorder.value.close()
-      inputValue.value = typeof response.data === 'string' ? response.data : ''
-      // chatMessage(null, res.data)
-    })
-  } catch (error) {
-    recorderLoading.value = false
-    console.error('上传失败:', error)
-  }
-}
-
-const handleTimeChange = () => {
-  startRecorderTime.value = true
-
-  setTimeout(() => {
-    if (recorderTime.value === 60) {
-      recorderTime.value = 0
-      stopRecording()
-      startRecorderTime.value = false
-    }
-    if (!startRecorderTime.value) {
-      return
-    }
-    recorderTime.value++
-    handleTimeChange()
-  }, 1000)
-}
-
 onMounted(() => {
-  handleInputFieldList()
+  window.sendMessage = sendMessage
+})
+
+onBeforeUnmount(() => {
+  window.sendMessage = null
 })
 
 function setScrollBottom() {
@@ -1099,14 +442,6 @@ watch(
   { deep: true, immediate: true }
 )
 
-onMounted(() => {
-  setTimeout(() => {
-    if (quickInputRef.value && mode === 'embed') {
-      quickInputRef.value.textarea.style.height = '0'
-    }
-  }, 1800)
-})
-
 defineExpose({
   setScrollBottom
 })
@@ -1121,122 +456,6 @@ defineExpose({
   position: relative;
   color: var(--app-text-color);
   box-sizing: border-box;
-
-  &__content {
-    padding-top: 0;
-    box-sizing: border-box;
-
-    .avatar {
-      float: left;
-    }
-
-    .content {
-      padding-left: var(--padding-left);
-
-      :deep(ol) {
-        margin-left: 16px !important;
-      }
-    }
-
-    .text {
-      padding: 6px 0;
-    }
-
-    .problem-button {
-      width: 100%;
-      border: none;
-      border-radius: 8px;
-      background: var(--app-layout-bg-color);
-      height: 46px;
-      padding: 0 12px;
-      line-height: 46px;
-      box-sizing: border-box;
-      color: var(--el-text-color-regular);
-      -webkit-line-clamp: 1;
-      word-break: break-all;
-
-      &:hover {
-        background: var(--el-color-primary-light-9);
-      }
-
-      &.disabled {
-        &:hover {
-          background: var(--app-layout-bg-color);
-        }
-      }
-
-      :deep(.el-icon) {
-        color: var(--el-color-primary);
-      }
-    }
-  }
-
-  &__operate {
-    background: #f3f7f9;
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 10;
-
-    &:before {
-      background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
-      content: '';
-      position: absolute;
-      width: 100%;
-      top: -16px;
-      left: 0;
-      height: 16px;
-    }
-
-    .operate-textarea {
-      box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
-      background-color: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #ffffff;
-      box-sizing: border-box;
-
-      &:has(.el-textarea__inner:focus) {
-        border: 1px solid var(--el-color-primary);
-      }
-
-      :deep(.el-textarea__inner) {
-        border-radius: 8px !important;
-        box-shadow: none;
-        resize: none;
-        padding: 12px 16px;
-        box-sizing: border-box;
-      }
-
-      .operate {
-        padding: 6px 10px;
-        .el-icon {
-          font-size: 20px;
-        }
-
-        .sent-button {
-          max-height: none;
-          .el-icon {
-            font-size: 24px;
-          }
-        }
-
-        :deep(.el-loading-spinner) {
-          margin-top: -15px;
-
-          .circular {
-            width: 31px;
-            height: 31px;
-          }
-        }
-      }
-    }
-  }
-
-  .dialog-card {
-    border: none;
-    border-radius: 8px;
-    box-sizing: border-box;
-  }
 }
 
 .chat-width {
