@@ -19,7 +19,6 @@
 </template>
 <script setup lang="ts">
 import { isAppIcon } from '@/utils/application'
-import { defineProps } from 'vue'
 const props = defineProps<{
   item: {
     name: string

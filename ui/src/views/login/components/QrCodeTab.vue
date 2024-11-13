@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref, defineAsyncComponent } from 'vue'
+import { onMounted, ref, defineAsyncComponent } from 'vue'
 
 import platformApi from '@/api/platform-source'
 
