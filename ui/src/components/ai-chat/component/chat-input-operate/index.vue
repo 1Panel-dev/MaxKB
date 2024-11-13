@@ -20,10 +20,12 @@
 
       <div class="operate flex align-center">
         <span v-if="props.applicationDetails.file_upload_enable" class="flex align-center">
+<!--            accept="image/jpeg, image/png, image/gif"-->
           <el-upload
             action="#"
             :auto-upload="false"
             :show-file-list="false"
+            :accept="[...imageExtensions, ...documentExtensions].map((ext) => '.' + ext).join(',')"
             :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
           >
             <el-button text>
@@ -126,6 +128,13 @@ const localLoading = computed({
     emit('update:loading', v)
   }
 })
+
+
+const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
+const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html']
+const videoExtensions = ['mp4', 'avi', 'mov', 'mkv', 'flv']
+const audioExtensions = ['mp3', 'wav', 'aac', 'flac']
+
 const uploadFile = async (file: any, fileList: any) => {
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
   if (fileList.length > maxFiles) {
@@ -141,7 +150,18 @@ const uploadFile = async (file: any, fileList: any) => {
   const formData = new FormData()
   for (const file of fileList) {
     formData.append('file', file.raw, file.name)
-    uploadFileList.value.push(file)
+    //
+    const extension = file.name.split('.').pop().toLowerCase() // 获取文件后缀名并转为小写
+
+    if (imageExtensions.includes(extension)) {
+      uploadImageList.value.push(file)
+    } else if (documentExtensions.includes(extension)) {
+      uploadDocumentList.value.push(file)
+    } else if (videoExtensions.includes(extension)) {
+      // videos.push(file)
+    } else if (audioExtensions.includes(extension)) {
+      // audios.push(file)
+    }
   }
 
   if (!chatId_context.value) {
@@ -158,21 +178,22 @@ const uploadFile = async (file: any, fileList: any) => {
     )
     .then((response) => {
       fileList.splice(0, fileList.length)
-      uploadFileList.value.forEach((file: any) => {
+      uploadImageList.value.forEach((file: any) => {
         const f = response.data.filter((f: any) => f.name === file.name)
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id
         }
       })
-      console.log(uploadFileList.value)
+      console.log(uploadDocumentList.value, uploadImageList.value)
     })
 }
 const recorderTime = ref(0)
 const startRecorderTime = ref(false)
 const recorderLoading = ref(false)
 const inputValue = ref<string>('')
-const uploadFileList = ref<Array<any>>([])
+const uploadImageList = ref<Array<any>>([])
+const uploadDocumentList = ref<Array<any>>([])
 const mediaRecorderStatus = ref(true)
 // 定义响应式引用
 const mediaRecorder = ref<any>(null)
@@ -289,15 +310,20 @@ const handleTimeChange = () => {
     handleTimeChange()
   }, 1000)
 }
+
 function sendChatHandle(event: any) {
   if (!event.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
     event.preventDefault()
     if (!isDisabledChart.value && !props.loading && !event.isComposing) {
       if (inputValue.value.trim()) {
-        props.sendMessage(inputValue.value, { image_list: uploadFileList.value })
+        props.sendMessage(inputValue.value, {
+          image_list: uploadImageList.value,
+          document_list: uploadDocumentList.value
+        })
         inputValue.value = ''
-        uploadFileList.value = []
+        uploadImageList.value = []
+        uploadDocumentList.value = []
         quickInputRef.value.textareaStyle.height = '45px'
       }
     }

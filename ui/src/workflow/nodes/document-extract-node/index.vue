@@ -10,7 +10,7 @@
         label-width="auto"
         ref="DatasetNodeFormRef"
       >
-        <el-form-item label="选择文件" :rules="{
+        <el-form-item label="选择文档" :rules="{
             type: 'array',
             required: true,
             message: '请选择文件',
@@ -21,8 +21,8 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择文件"
-            v-model="form.file_list"
+            placeholder="请选择文档"
+            v-model="form.document_list"
           />
         </el-form-item>
       </el-form>
@@ -39,7 +39,7 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 const props = defineProps<{ nodeModel: any }>()
 
 const form = {
-  file_list: []
+  document_list: ["start-node", "document"]
 }
 
 
