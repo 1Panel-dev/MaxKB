@@ -9,12 +9,7 @@ from common.util.field_message import ErrMessage
 
 
 class DocumentExtractNodeSerializer(serializers.Serializer):
-    # 需要查询的数据集id列表
-    file_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
-                                      error_messages=ErrMessage.list("数据集id列表"))
-
-    def is_valid(self, *, raise_exception=False):
-        super().is_valid(raise_exception=True)
+    document_list = serializers.ListField(required=False, error_messages=ErrMessage.list("文档"))
 
 
 class IDocumentExtractNode(INode):
@@ -24,7 +19,9 @@ class IDocumentExtractNode(INode):
         return DocumentExtractNodeSerializer
 
     def _run(self):
-        return self.execute(**self.flow_params_serializer.data)
+        res = self.workflow_manage.get_reference_field(self.node_params_serializer.data.get('document_list')[0],
+                                                       self.node_params_serializer.data.get('document_list')[1:])
+        return self.execute(document=res, **self.flow_params_serializer.data)
 
-    def execute(self, file_list, **kwargs) -> NodeResult:
+    def execute(self, document, **kwargs) -> NodeResult:
         pass

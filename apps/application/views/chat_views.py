@@ -132,6 +132,8 @@ class ChatView(APIView):
 
                                                'image_list': request.data.get(
                                                    'image_list') if 'image_list' in request.data else [],
+                                               'document_list': request.data.get(
+                                                   'document_list') if 'document_list' in request.data else [],
                                                'client_type': request.auth.client_type,
                                                'runtime_node_id': request.data.get('runtime_node_id', None),
                                                'node_data': request.data.get('node_data', {}),

@@ -39,7 +39,8 @@ interface chatType {
   record_id: string
   chat_id: string
   vote_status: string
-  status?: number
+  status?: number,
+  execution_details: any[]
 }
 
 export class ChatRecordManage {
