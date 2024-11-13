@@ -11,6 +11,9 @@
     <el-button link @click="fitView">
       <AppIcon iconName="app-fitview" title="适应"></AppIcon>
     </el-button>
+    <el-button link @click="layout">
+      <AppIcon iconName="app-beautify" title="美化"></AppIcon>
+    </el-button>
   </el-card>
 </template>
 
@@ -29,6 +32,9 @@ function fitView() {
   props.lf?.resetZoom()
   props.lf?.resetTranslate()
   props.lf?.fitView()
+}
+const layout = () => {
+  props.lf?.extension.dagre.layout()
 }
 </script>
 <style scoped></style>
