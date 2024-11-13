@@ -10,6 +10,7 @@ from django_apscheduler.jobstores import DjangoJobStore
 from application.models import Application, Chat
 from django.db.models import Q
 from common.lock.impl.file_lock import FileLock
+from dataset.models import File
 
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
@@ -38,6 +39,8 @@ def clean_chat_log_job():
             if count == 0:
                 break
             deleted_count, _ = Chat.objects.filter(id__in=logs_to_delete).delete()
+            # 删除对应的文件
+            File.objects.filter(~Q(meta__chat_id__in=logs_to_delete)).delete()
             if deleted_count < batch_size:
                 break
 

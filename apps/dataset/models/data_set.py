@@ -9,6 +9,8 @@
 import uuid
 
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 from common.db.sql_execute import select_one
 from common.mixins.app_model_mixin import AppModelMixin
@@ -157,3 +159,9 @@ class File(AppModelMixin):
     def get_byte(self):
         result = select_one(f'SELECT lo_get({self.loid}) as "data"', [])
         return result['data']
+
+
+
+@receiver(pre_delete, sender=File)
+def on_delete_file(sender, instance, **kwargs):
+    select_one(f'SELECT lo_unlink({instance.loid})', [])
