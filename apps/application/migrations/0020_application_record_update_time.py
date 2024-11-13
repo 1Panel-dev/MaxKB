@@ -18,5 +18,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(batch_update_update_time),
+        migrations.RunSQL(batch_update_update_time),
     ]
