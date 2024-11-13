@@ -1,5 +1,4 @@
 <template>
-  <div></div>
   <div class="ai-chat__operate p-16-24">
     <slot name="operateBefore" />
     <div class="operate-textarea flex chat-width">
@@ -316,77 +315,5 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scope>
-.ai-chat {
-  &__operate {
-    background: #f3f7f9;
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 10;
-
-    &:before {
-      background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
-      content: '';
-      position: absolute;
-      width: 100%;
-      top: -16px;
-      left: 0;
-      height: 16px;
-    }
-
-    .operate-textarea {
-      box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
-      background-color: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #ffffff;
-      box-sizing: border-box;
-
-      &:has(.el-textarea__inner:focus) {
-        border: 1px solid var(--el-color-primary);
-      }
-
-      .el-textarea__inner {
-        border-radius: 8px !important;
-        box-shadow: none;
-        resize: none;
-        padding: 12px 16px;
-        box-sizing: border-box;
-      }
-
-      .operate {
-        padding: 6px 10px;
-        .el-icon {
-          font-size: 20px;
-        }
-
-        .sent-button {
-          max-height: none;
-          .el-icon {
-            font-size: 24px;
-          }
-        }
-
-        .el-loading-spinner {
-          margin-top: -15px;
-
-          .circular {
-            width: 31px;
-            height: 31px;
-          }
-        }
-      }
-    }
-  }
-}
-
-.chat-width {
-  max-width: 80%;
-  margin: 0 auto;
-}
-@media only screen and (max-width: 1000px) {
-  .chat-width {
-    max-width: 100% !important;
-    margin: 0 auto;
-  }
-}
+@import '../../index.scss';
 </style>

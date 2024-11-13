@@ -447,25 +447,5 @@ defineExpose({
 })
 </script>
 <style lang="scss" scoped>
-.ai-chat {
-  --padding-left: 40px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  position: relative;
-  color: var(--app-text-color);
-  box-sizing: border-box;
-}
-
-.chat-width {
-  max-width: 80%;
-  margin: 0 auto;
-}
-@media only screen and (max-width: 1000px) {
-  .chat-width {
-    max-width: 100% !important;
-    margin: 0 auto;
-  }
-}
+@import './index.scss';
 </style>

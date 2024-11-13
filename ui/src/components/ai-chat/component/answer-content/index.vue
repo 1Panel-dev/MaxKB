@@ -1,9 +1,9 @@
 <template>
   <div class="item-content mb-16 lighter">
-    <div v-for="(answer_text, index) in chatRecord.answer_text_list">
+    <div v-for="(answer_text, index) in chatRecord.answer_text_list" :key="index">
       <div class="avatar">
-        <img v-if="application.avatar" :src="application.avatar" height="30px" />
-        <LogoIcon v-else height="30px" />
+        <img v-if="application.avatar" :src="application.avatar" height="32px" width="32px" />
+        <LogoIcon v-else height="32px" width="32px" />
       </div>
       <div class="content">
         <el-card shadow="always" class="dialog-card">
@@ -23,17 +23,17 @@
             <KnowledgeSource :data="chatRecord" :type="application.type" />
           </div>
         </el-card>
+        <OperationButton
+          :type="type"
+          :application="application"
+          :chat-record="chatRecord"
+          :loading="loading"
+          :start-chat="startChat"
+          :stop-chat="stopChat"
+          :regenerationChart="regenerationChart"
+        ></OperationButton>
       </div>
     </div>
-    <OperationButton
-      :type="type"
-      :application="application"
-      :chat-record="chatRecord"
-      :loading="loading"
-      :start-chat="startChat"
-      :stop-chat="stopChat"
-      :regenerationChart="regenerationChart"
-    ></OperationButton>
   </div>
 </template>
 <script setup lang="ts">
@@ -80,15 +80,4 @@ const startChat = (chat: chatType) => {
   props.chatManagement.write(chat.id)
 }
 </script>
-<style lang="scss" scoped>
-.avatar {
-  float: left;
-}
-.content {
-  padding-left: var(--padding-left);
-
-  :deep(ol) {
-    margin-left: 16px !important;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

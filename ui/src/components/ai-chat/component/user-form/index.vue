@@ -290,15 +290,4 @@ onMounted(() => {
   handleInputFieldList()
 })
 </script>
-<style lang="scss" scoped>
-.chat-width {
-  max-width: 80%;
-  margin: 0 auto;
-}
-@media only screen and (max-width: 1000px) {
-  .chat-width {
-    max-width: 100% !important;
-    margin: 0 auto;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

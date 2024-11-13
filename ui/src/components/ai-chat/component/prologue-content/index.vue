@@ -2,8 +2,8 @@
   <!-- 开场白组件 -->
   <div class="item-content mb-16">
     <div class="avatar">
-      <img v-if="application.avatar" :src="application.avatar" height="30px" />
-      <LogoIcon v-else height="30px" />
+      <img v-if="application.avatar" :src="application.avatar" height="32px" width="32px" />
+      <LogoIcon v-else height="32px" width="32px" />
     </div>
     <div class="content">
       <el-card shadow="always" class="dialog-card">
@@ -32,4 +32,5 @@ const prologue = computed(() => {
   return temp.replace(/-\s.+/g, toQuickQuestion)
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>

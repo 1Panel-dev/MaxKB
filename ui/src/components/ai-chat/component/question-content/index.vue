@@ -7,10 +7,10 @@
         :src="application.user_avatar"
         alt=""
         fit="cover"
-        style="width: 30px; height: 30px; display: block"
+        style="width: 32px; height: 32px; display: block"
       />
       <AppAvatar v-else>
-        <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
+        <img src="@/assets/user-icon.svg" style="width: 50%" alt="" />
       </AppAvatar>
     </div>
     <div class="content">
@@ -28,54 +28,4 @@ defineProps<{
 }>()
 </script>
 <style lang="scss" scoped>
-.ai-chat {
-  &__content {
-    padding-top: 0;
-    box-sizing: border-box;
-
-    .avatar {
-      float: left;
-    }
-
-    .content {
-      padding-left: var(--padding-left);
-
-      :deep(ol) {
-        margin-left: 16px !important;
-      }
-    }
-
-    .text {
-      padding: 6px 0;
-    }
-
-    .problem-button {
-      width: 100%;
-      border: none;
-      border-radius: 8px;
-      background: var(--app-layout-bg-color);
-      height: 46px;
-      padding: 0 12px;
-      line-height: 46px;
-      box-sizing: border-box;
-      color: var(--el-text-color-regular);
-      -webkit-line-clamp: 1;
-      word-break: break-all;
-
-      &:hover {
-        background: var(--el-color-primary-light-9);
-      }
-
-      &.disabled {
-        &:hover {
-          background: var(--app-layout-bg-color);
-        }
-      }
-
-      .el-icon {
-        color: var(--el-color-primary);
-      }
-    }
-  }
-}
 </style>
