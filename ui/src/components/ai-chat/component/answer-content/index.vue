@@ -8,7 +8,11 @@
       <div class="content">
         <el-card shadow="always" class="dialog-card mb-8">
           <MdRenderer
-            v-if="answer_text"
+            v-if="chatRecord.write_ed === undefined || chatRecord.write_ed === true"
+            source=" 抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
+          ></MdRenderer>
+          <MdRenderer
+            v-else-if="answer_text"
             :source="answer_text"
             :send-message="chatMessage"
           ></MdRenderer>
