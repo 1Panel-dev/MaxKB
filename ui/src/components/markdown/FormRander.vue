@@ -20,7 +20,7 @@ import { computed, ref } from 'vue'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 const props = defineProps<{
   form_setting: string
-  sendMessage: (question: string, type: 'old' | 'new', other_params_data?: any) => void
+  sendMessage?: (question: string, type: 'old' | 'new', other_params_data?: any) => void
 }>()
 const form_setting_data = computed(() => {
   if (props.form_setting) {
@@ -68,11 +68,13 @@ const submit = () => {
   dynamicsFormRef.value?.validate().then(() => {
     _submit.value = true
     const setting = JSON.parse(props.form_setting)
-    props.sendMessage('', 'old', {
-      runtime_node_id: setting.runtime_node_id,
-      chat_record_id: setting.chat_record_id,
-      node_data: form_data.value
-    })
+    if (props.sendMessage) {
+      props.sendMessage('', 'old', {
+        runtime_node_id: setting.runtime_node_id,
+        chat_record_id: setting.chat_record_id,
+        node_data: form_data.value
+      })
+    }
   })
 }
 </script>

@@ -72,7 +72,7 @@ const props = defineProps<{
   modelValue?: Array<any>
 }>()
 const rowTemp = ref<any>()
-const evalF = (text: string, row: any) => {
+const evalF: (text: string, row: any) => string = (text: string, row: any) => {
   rowTemp.value = row
   return eval(text)
 }
@@ -167,8 +167,8 @@ watch(
 
 const activeText = computed(() => {
   if (props.modelValue) {
-    const rows = option_list.value.filter(
-      (f: any) => props.modelValue?.includes(f[valueField.value])
+    const rows = option_list.value.filter((f: any) =>
+      props.modelValue?.includes(f[valueField.value])
     )
     if (rows) {
       if (rows.length > 3) {

@@ -15,7 +15,7 @@
       :option="item.content"
     ></EchartsRander>
     <FormRander
-      :sendMessage="sendMessage"
+      :send-message="sendMessage"
       v-else-if="item.type === 'form_rander'"
       :form_setting="item.content"
     ></FormRander>

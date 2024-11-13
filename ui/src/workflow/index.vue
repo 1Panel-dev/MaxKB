@@ -5,13 +5,14 @@
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, nextTick } from 'vue'
 import AppEdge from './common/edge'
 import Control from './common/NodeControl.vue'
 import { baseNodes } from '@/workflow/common/data'
 import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
 import { initDefaultShortcut } from '@/workflow/common/shortcut'
+import Dagre from '@/workflow/plugins/dagre'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
 
 defineOptions({ name: 'WorkFlow' })
@@ -61,6 +62,7 @@ const renderGraphData = (data?: any) => {
   const container: any = document.querySelector('#container')
   if (container) {
     lf.value = new LogicFlow({
+      plugins: [Dagre],
       textEdit: false,
       adjustEdge: false,
       adjustEdgeStartAndEnd: false,
