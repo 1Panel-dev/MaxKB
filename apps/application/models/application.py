@@ -147,6 +147,9 @@ class ChatRecord(AppModelMixin):
                                    default=VoteChoices.UN_VOTE)
     problem_text = models.CharField(max_length=10240, verbose_name="问题")
     answer_text = models.CharField(max_length=40960, verbose_name="答案")
+    answer_text_list = ArrayField(verbose_name="改进标注列表",
+                                  base_field=models.CharField(max_length=40960)
+                                  , default=list)
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)
     const = models.IntegerField(verbose_name="总费用", default=0)

@@ -58,6 +58,11 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
 
 
 class BaseImageUnderstandNode(IImageUnderstandNode):
+    def save_context(self, details, workflow_manage):
+        self.context['answer'] = details.get('answer')
+        self.context['question'] = details.get('question')
+        self.answer_text = details.get('answer')
+
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 image,
                 **kwargs) -> NodeResult:

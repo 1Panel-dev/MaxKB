@@ -117,8 +117,9 @@
           <div class="right-height">
             <AiChat
               ref="AiChatRef"
-              v-model:data="applicationDetail"
+              v-model:applicationDetails="applicationDetail"
               :available="applicationAvailable"
+              type="ai-chat"
               :appId="applicationDetail?.id"
               :record="currentRecordList"
               :chatId="currentChatId"

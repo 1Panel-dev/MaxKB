@@ -168,6 +168,31 @@ export const rerankerNode = {
     }
   }
 }
+export const formNode = {
+  type: WorkflowType.FormNode,
+  text: '在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程',
+  label: '表单收集',
+  height: 252,
+  properties: {
+    width: 600,
+    stepName: '表单收集',
+    node_data: {
+      is_result: true,
+      form_field_list: [],
+      form_content_format: `你好，请先填写下面表单内容：
+{{form}}
+填写后请点击【提交】按钮进行提交。`
+    },
+    config: {
+      fields: [
+        {
+          label: '表单全部内容',
+          value: 'form_data'
+        }
+      ]
+    }
+  }
+}
 export const documentExtractNode = {
   type: WorkflowType.DocumentExtractNode,
   text: '提取文档中的内容',
@@ -180,7 +205,7 @@ export const documentExtractNode = {
         {
           label: '文件内容',
           value: 'content'
-        },
+        }
       ]
     }
   }
@@ -197,7 +222,7 @@ export const imageUnderstandNode = {
         {
           label: 'AI 回答内容',
           value: 'content'
-        },
+        }
       ]
     }
   }
@@ -208,9 +233,7 @@ export const menuNodes = [
   questionNode,
   conditionNode,
   replyNode,
-  rerankerNode,
-  documentExtractNode,
-  imageUnderstandNode
+  rerankerNode
 ]
 
 /**
@@ -297,9 +320,10 @@ export const nodeDict: any = {
   [WorkflowType.FunctionLib]: functionLibNode,
   [WorkflowType.FunctionLibCustom]: functionNode,
   [WorkflowType.RrerankerNode]: rerankerNode,
+  [WorkflowType.FormNode]: formNode,
   [WorkflowType.Application]: applicationNode,
   [WorkflowType.DocumentExtractNode]: documentExtractNode,
-  [WorkflowType.ImageUnderstandNode]: imageUnderstandNode,
+  [WorkflowType.ImageUnderstandNode]: imageUnderstandNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

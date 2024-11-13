@@ -34,11 +34,12 @@
       <div class="chat-embed__main">
         <AiChat
           ref="AiChatRef"
-          v-model:data="applicationDetail"
+          v-model:applicationDetails="applicationDetail"
           :available="applicationAvailable"
           :appId="applicationDetail?.id"
           :record="currentRecordList"
           :chatId="currentChatId"
+          type="ai-chat"
           @refresh="refresh"
           @scroll="handleScroll"
           class="AiChat-embed"

@@ -12,4 +12,5 @@ export enum WorkflowType {
   Application = 'application-node',
   DocumentExtractNode = 'document-extract-node',
   ImageUnderstandNode = 'image-understand-node',
+  FormNode = 'form-node'
 }

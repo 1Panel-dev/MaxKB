@@ -31,6 +31,17 @@ def get_global_variable(node):
 
 
 class BaseStartStepNode(IStarNode):
+    def save_context(self, details, workflow_manage):
+        base_node = self.workflow_manage.get_base_node()
+        default_global_variable = get_default_global_variable(base_node.properties.get('input_field_list', []))
+        workflow_variable = {**default_global_variable, **get_global_variable(self)}
+        self.context['question'] = details.get('question')
+        self.context['run_time'] = details.get('run_time')
+        self.status = details.get('status')
+        self.err_message = details.get('err_message')
+        for key, value in workflow_variable.items():
+            workflow_manage.context[key] = value
+
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         pass
 

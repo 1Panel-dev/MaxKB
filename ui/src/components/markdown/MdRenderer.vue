@@ -2,9 +2,9 @@
   <template v-for="(item, index) in md_view_list" :key="index">
     <div
       v-if="item.type === 'question'"
-      @click="quickProblemHandle ? quickProblemHandle(item.content) : (content: string) => {}"
+      @click="sendMessage ? sendMessage(item.content, 'new') : (content: string) => {}"
       class="problem-button ellipsis-2 mb-8"
-      :class="quickProblemHandle ? 'cursor' : 'disabled'"
+      :class="sendMessage ? 'cursor' : 'disabled'"
     >
       <el-icon><EditPen /></el-icon>
       {{ item.content }}
@@ -14,6 +14,11 @@
       v-else-if="item.type === 'echarts_rander'"
       :option="item.content"
     ></EchartsRander>
+    <FormRander
+      :sendMessage="sendMessage"
+      v-else-if="item.type === 'form_rander'"
+      :form_setting="item.content"
+    ></FormRander>
     <MdPreview
       v-else
       noIconfont
@@ -30,6 +35,7 @@ import { computed, ref } from 'vue'
 import { config } from 'md-editor-v3'
 import HtmlRander from './HtmlRander.vue'
 import EchartsRander from './EchartsRander.vue'
+import FormRander from './FormRander.vue'
 config({
   markdownItConfig(md) {
     md.renderer.rules.image = (tokens, idx, options, env, self) => {
@@ -54,7 +60,7 @@ const props = withDefaults(
   defineProps<{
     source?: string
     inner_suffix?: boolean
-    quickProblemHandle?: (q: string) => void
+    sendMessage?: (question: string, type: 'old' | 'new', other_params_data?: any) => void
   }>(),
   {
     source: ''
@@ -63,7 +69,9 @@ const props = withDefaults(
 const editorRef = ref()
 const md_view_list = computed(() => {
   const temp_source = props.source
-  return split_echarts_rander(split_html_rander(split_quick_question([temp_source])))
+  return split_form_rander(
+    split_echarts_rander(split_html_rander(split_quick_question([temp_source])))
+  )
 })
 
 const split_quick_question = (result: Array<string>) => {
@@ -163,6 +171,41 @@ const split_echarts_rander_ = (source: string, type: string) => {
         content: md_quick_question_list[Math.floor(index / 2)]
           .replace('<echarts_rander>', '')
           .replace('</echarts_rander>', '')
+      }
+    }
+  })
+  return result
+}
+
+const split_form_rander = (result: Array<any>) => {
+  return result
+    .map((item) => split_form_rander_(item.content, item.type))
+    .reduce((x: any, y: any) => {
+      return [...x, ...y]
+    }, [])
+}
+
+const split_form_rander_ = (source: string, type: string) => {
+  const temp_md_quick_question_list = source.match(/<form_rander>[\d\D]*?<\/form_rander>/g)
+  const md_quick_question_list = temp_md_quick_question_list
+    ? temp_md_quick_question_list.filter((i) => i)
+    : []
+  const split_quick_question_value = source
+    .split(/<form_rander>[\d\D]*?<\/form_rander>/g)
+    .filter((item) => item !== undefined)
+    .filter((item) => !md_quick_question_list?.includes(item))
+  const result = Array.from(
+    { length: md_quick_question_list.length + split_quick_question_value.length },
+    (v, i) => i
+  ).map((index) => {
+    if (index % 2 == 0) {
+      return { type: type, content: split_quick_question_value[Math.floor(index / 2)] }
+    } else {
+      return {
+        type: 'form_rander',
+        content: md_quick_question_list[Math.floor(index / 2)]
+          .replace('<form_rander>', '')
+          .replace('</form_rander>', '')
       }
     }
   })

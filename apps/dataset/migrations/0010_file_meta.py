@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='file',
             name='meta',
-            field=models.JSONField(default={}, verbose_name='文件关联数据'),
+            field=models.JSONField(default=dict, verbose_name='文件关联数据'),
         ),
     ]

@@ -154,7 +154,7 @@ const initDefaultData = (formField: FormField) => {
 }
 
 onBeforeMount(() => {
-  render(props.render_data, {})
+  render(props.render_data, props.modelValue)
 })
 
 const render = (

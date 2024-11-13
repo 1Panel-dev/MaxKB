@@ -16,7 +16,7 @@
         @load="getChatRecord"
         :loading="loading"
       >
-        <AiChat :data="application" :record="recordList" log></AiChat>
+        <AiChat :application-details="application" :record="recordList" type="log"></AiChat>
       </InfiniteScroll>
     </div>
     <template #footer>

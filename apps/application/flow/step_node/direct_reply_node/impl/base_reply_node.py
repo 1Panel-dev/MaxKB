@@ -13,6 +13,9 @@ from application.flow.step_node.direct_reply_node.i_reply_node import IReplyNode
 
 
 class BaseReplyNode(IReplyNode):
+    def save_context(self, details, workflow_manage):
+        self.context['answer'] = details.get('answer')
+        self.answer_text = details.get('answer')
     def execute(self, reply_type, stream, fields=None, content=None, **kwargs) -> NodeResult:
         if reply_type == 'referencing':
             result = self.get_reference_content(fields)
