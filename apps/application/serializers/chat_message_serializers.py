@@ -6,6 +6,7 @@
     @date：2023/11/14 13:51
     @desc:
 """
+from datetime import datetime
 import uuid
 from typing import List, Dict
 from uuid import UUID
@@ -125,7 +126,9 @@ class ChatInfo:
             # 插入数据库
             if not QuerySet(Chat).filter(id=self.chat_id).exists():
                 Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text[0:1024],
-                     client_id=client_id).save()
+                     client_id=client_id, update_time=datetime.now()).save()
+            else:
+                Chat.objects.filter(id=self.chat_id).update(update_time=datetime.now())
             # 插入会话记录
             chat_record.save()
 
