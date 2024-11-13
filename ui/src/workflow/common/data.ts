@@ -233,7 +233,10 @@ export const menuNodes = [
   questionNode,
   conditionNode,
   replyNode,
-  rerankerNode
+  rerankerNode,
+  documentExtractNode,
+  imageUnderstandNode,
+  formNode
 ]
 
 /**
