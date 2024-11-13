@@ -114,7 +114,7 @@
               </el-dropdown>
             </span>
           </div>
-          <div class="right-height">
+          <div class="right-height chat-width">
             <AiChat
               ref="AiChatRef"
               v-model:applicationDetails="applicationDetail"
@@ -464,6 +464,17 @@ onMounted(() => {
       right: 0;
       z-index: 99;
     }
+  }
+}
+
+.chat-width {
+  max-width: 80%;
+  margin: 0 auto;
+}
+@media only screen and (max-width: 1000px) {
+  .chat-width {
+    max-width: 100% !important;
+    margin: 0 auto;
   }
 }
 </style>
