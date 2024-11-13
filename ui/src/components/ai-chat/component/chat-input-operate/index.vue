@@ -1,7 +1,7 @@
 <template>
   <div class="ai-chat__operate p-16-24">
     <slot name="operateBefore" />
-    <div class="operate-textarea flex chat-width">
+    <div class="operate-textarea flex">
       <el-input
         ref="quickInputRef"
         v-model="inputValue"
@@ -62,7 +62,7 @@
       </div>
     </div>
     <div
-      class="chat-width text-center"
+      class="text-center"
       v-if="applicationDetails.disclaimer"
       style="margin-top: 8px"
     >

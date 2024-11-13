@@ -8,7 +8,7 @@
       ref="userFormRef"
     ></UserForm>
     <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
-      <div ref="dialogScrollbar" class="ai-chat__content p-24 chat-width">
+      <div ref="dialogScrollbar" class="ai-chat__content p-24">
         <PrologueContent
           :type="type"
           :application="applicationDetails"

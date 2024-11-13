@@ -29,8 +29,7 @@ const prologue = computed(() => {
   const temp = props.available
     ? props.application?.prologue
     : '抱歉，当前正在维护，无法提供服务，请稍后再试！'
-  return temp.replace(/-\s.+/g, toQuickQuestion)
+  return temp?.replace(/-\s.+/g, toQuickQuestion)
 })
 </script>
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
