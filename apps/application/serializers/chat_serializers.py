@@ -127,12 +127,12 @@ class ChatSerializers(serializers.Serializer):
                  "star_num": models.IntegerField(),
                  'trample_num': models.IntegerField(),
                  'comparer': models.CharField(),
-                 'application_chat.create_time': models.DateTimeField(),
+                 'application_chat.update_time': models.DateTimeField(),
                  'application_chat.id': models.UUIDField(), }))
 
             base_query_dict = {'application_chat.application_id': self.data.get("application_id"),
-                               'application_chat.create_time__gte': start_time,
-                               'application_chat.create_time__lte': end_time,
+                               'application_chat.update_time__gte': start_time,
+                               'application_chat.update_time__lte': end_time,
                                }
             if 'abstract' in self.data and self.data.get('abstract') is not None:
                 base_query_dict['application_chat.abstract__icontains'] = self.data.get('abstract')
@@ -158,7 +158,7 @@ class ChatSerializers(serializers.Serializer):
                 condition = base_condition & min_trample_query
             else:
                 condition = base_condition
-            return query_set.filter(condition).order_by("-application_chat.create_time")
+            return query_set.filter(condition).order_by("-application_chat.update_time")
 
         def list(self, with_valid=True):
             if with_valid:

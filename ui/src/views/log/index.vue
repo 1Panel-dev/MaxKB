@@ -123,9 +123,9 @@
           </template>
         </el-table-column>
         <el-table-column prop="mark_sum" label="改进标注" align="right" />
-        <el-table-column label="时间" width="180">
+        <el-table-column label="最近对话时间" width="180">
           <template #default="{ row }">
-            {{ datetimeFormat(row.create_time) }}
+            {{ datetimeFormat(row.update_time) }}
           </template>
         </el-table-column>
 
