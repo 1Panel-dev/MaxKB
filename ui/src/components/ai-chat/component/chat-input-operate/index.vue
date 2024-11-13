@@ -131,7 +131,7 @@ const localLoading = computed({
 
 
 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
-const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html']
+const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
 const videoExtensions = ['mp4', 'avi', 'mov', 'mkv', 'flv']
 const audioExtensions = ['mp3', 'wav', 'aac', 'flac']
 
@@ -179,6 +179,13 @@ const uploadFile = async (file: any, fileList: any) => {
     .then((response) => {
       fileList.splice(0, fileList.length)
       uploadImageList.value.forEach((file: any) => {
+        const f = response.data.filter((f: any) => f.name === file.name)
+        if (f.length > 0) {
+          file.url = f[0].url
+          file.file_id = f[0].file_id
+        }
+      })
+      uploadDocumentList.value.forEach((file: any) => {
         const f = response.data.filter((f: any) => f.name === file.name)
         if (f.length > 0) {
           file.url = f[0].url
