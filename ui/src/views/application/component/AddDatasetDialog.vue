@@ -40,9 +40,7 @@
         <el-row :gutter="12" v-loading="loading">
           <el-col :span="12" v-for="(item, index) in filterData" :key="index" class="mb-16">
             <CardCheckbox value-field="id" :data="item" v-model="checkList" @change="changeHandle">
-              <auto-tooltip :content="item.name" style="max-width: 170px">
-                {{ item.name }}
-              </auto-tooltip>
+              <span class="ellipsis cursor" :title="item.name"> {{ item.name }}</span>
             </CardCheckbox>
           </el-col>
         </el-row>
