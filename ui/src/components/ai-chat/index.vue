@@ -96,8 +96,8 @@
           <!-- 回答 -->
           <div class="item-content mb-16 lighter">
             <div class="avatar">
-              <img v-if="data.avatar" :src="data.avatar" height="30px" />
-              <LogoIcon v-else height="30px" />
+              <img v-if="data.avatar" :src="data.avatar" height="32px" width="32px" />
+              <LogoIcon v-else height="32px" width="32px" />
             </div>
 
             <div class="content">
