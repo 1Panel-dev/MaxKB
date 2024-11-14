@@ -40,8 +40,8 @@
       <div ref="dialogScrollbar" class="ai-chat__content p-24 chat-width">
         <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
           <div class="avatar">
-            <img v-if="data.avatar" :src="data.avatar" height="30px" />
-            <LogoIcon v-else height="30px" />
+            <img v-if="data.avatar" :src="data.avatar" height="32px" width="32px" />
+            <LogoIcon v-else height="32px" width="32px"  />
           </div>
 
           <div class="content">
