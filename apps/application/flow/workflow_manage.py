@@ -144,7 +144,6 @@ class Flow:
             if model_params_setting is None:
                 model_params_setting = model_params_setting_form.get_default_form_data()
                 node.properties.get('node_data', {})['model_params_setting'] = model_params_setting
-            model_params_setting_form.valid_form(model_params_setting)
             if node.properties.get('status', 200) != 200:
                 raise ValidationError(ErrorDetail(f'节点{node.properties.get("stepName")} 不可用'))
         node_list = [node for node in self.nodes if (node.type == 'function-lib-node')]
