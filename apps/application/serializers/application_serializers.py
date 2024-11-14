@@ -836,8 +836,6 @@ class ApplicationSerializer(serializers.Serializer):
                 ApplicationSerializer.Edit(data=instance).is_valid(
                     raise_exception=True)
             application_id = self.data.get("application_id")
-            valid_model_params_setting(instance.get('model_id'),
-                                       instance.get('model_params_setting'))
 
             application = QuerySet(Application).get(id=application_id)
             if instance.get('model_id') is None or len(instance.get('model_id')) == 0:
