@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='application',
             name='file_upload_setting',
-            field=models.JSONField(default={}, verbose_name='文件上传相关设置'),
+            field=models.JSONField(default=dict, verbose_name='文件上传相关设置'),
         ),
         migrations.AddField(
             model_name='chatrecord',
