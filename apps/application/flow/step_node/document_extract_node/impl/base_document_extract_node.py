@@ -15,7 +15,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
 
         self.context['document_list'] = document
         content = ''
-        spliter = '\n-----------------------------------\n'
+        splitter = '\n-----------------------------------\n'
         if document is None:
             return NodeResult({'content': content}, {})
 
@@ -29,7 +29,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     # 回到文件头
                     buffer.seek(0)
                     file_content = split_handle.get_content(buffer)
-                    content += spliter + '## ' + doc['name'] + '\n' + file_content
+                    content += splitter + '## ' + doc['name'] + '\n' + file_content
                     break
 
         return NodeResult({'content': content}, {})

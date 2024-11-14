@@ -38,6 +38,7 @@
       :is-mobile="isMobile"
       :type="type"
       :send-message="sendMessage"
+      :open-chat-id="openChatId"
       v-model:chat-id="chartOpenId"
       v-model:loading="loading"
       v-if="type !== 'log'"

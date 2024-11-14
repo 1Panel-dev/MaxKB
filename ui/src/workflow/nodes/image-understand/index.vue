@@ -128,7 +128,16 @@
             @submitDialog="submitDialog"
           />
         </el-form-item>
-        <el-form-item label="历史聊天记录">
+        <el-form-item>
+          <template #label>
+            <div class="flex-between">
+              <div>历史聊天记录</div>
+              <el-select v-model="form_data.dialogue_type" class="w-120">
+                <el-option label="节点" value="NODE"/>
+                <el-option label="工作流" value="WORKFLOW"/>
+              </el-select>
+            </div>
+          </template>
           <el-input-number
             v-model="form_data.dialogue_number"
             :min="0"
@@ -213,6 +222,7 @@ const form = {
   system: '',
   prompt: defaultPrompt,
   dialogue_number: 0,
+  dialogue_type: 'NODE',
   is_result: true,
   temperature: null,
   max_tokens: null,

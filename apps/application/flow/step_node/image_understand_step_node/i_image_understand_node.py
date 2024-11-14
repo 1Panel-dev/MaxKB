@@ -16,6 +16,8 @@ class ImageUnderstandNodeSerializer(serializers.Serializer):
     # 多轮对话数量
     dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("多轮对话数量"))
 
+    dialogue_type = serializers.CharField(required=True, error_messages=ErrMessage.char("对话存储类型"))
+
     is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
 
     image_list = serializers.ListField(required=False, error_messages=ErrMessage.list("图片"))
@@ -32,7 +34,7 @@ class IImageUnderstandNode(INode):
                                                        self.node_params_serializer.data.get('image_list')[1:])
         return self.execute(image=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id,
+    def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream, chat_id,
                 chat_record_id,
                 image,
                 **kwargs) -> NodeResult:
