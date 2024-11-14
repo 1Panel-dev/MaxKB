@@ -139,56 +139,49 @@ const handleDebounceClick = debounce((val, other_params_data?: any, chat?: chatT
 }, 200)
 
 /**
- * 对话
+ * 打开对话id
  */
-function getChartOpenId(chat?: any) {
-  loading.value = true
+const openChatId: () => Promise<string> = () => {
   const obj = props.applicationDetails
   if (props.appId) {
     return applicationApi
       .getChatOpen(props.appId)
       .then((res) => {
         chartOpenId.value = res.data
-        chatMessage(chat)
+        return res.data
       })
       .catch((res) => {
         if (res.response.status === 403) {
-          application.asyncAppAuthentication(accessToken).then(() => {
-            getChartOpenId(chat)
+          return application.asyncAppAuthentication(accessToken).then(() => {
+            return openChatId()
           })
-        } else {
-          loading.value = false
-          return Promise.reject(res)
         }
+        return Promise.reject(res)
       })
   } else {
     if (isWorkFlow(obj.type)) {
       const submitObj = {
         work_flow: obj.work_flow
       }
-      return applicationApi
-        .postWorkflowChatOpen(submitObj)
-        .then((res) => {
-          chartOpenId.value = res.data
-          chatMessage(chat)
-        })
-        .catch((res) => {
-          loading.value = false
-          return Promise.reject(res)
-        })
+      return applicationApi.postWorkflowChatOpen(submitObj).then((res) => {
+        chartOpenId.value = res.data
+        return res.data
+      })
     } else {
-      return applicationApi
-        .postChatOpen(obj)
-        .then((res) => {
-          chartOpenId.value = res.data
-          chatMessage(chat)
-        })
-        .catch((res) => {
-          loading.value = false
-          return Promise.reject(res)
-        })
+      return applicationApi.postChatOpen(obj).then((res) => {
+        chartOpenId.value = res.data
+        return res.data
+      })
     }
   }
+}
+/**
+ * 对话
+ */
+function getChartOpenId(chat?: any) {
+  return openChatId().then(() => {
+    chatMessage(chat)
+  })
 }
 
 /**
