@@ -30,7 +30,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     buffer.seek(0)
                     file_content = split_handle.get_content(buffer)
                     content += spliter + '## ' + doc['name'] + '\n' + file_content
-                    return NodeResult({'content': content}, {})
+                    break
 
         return NodeResult({'content': content}, {})
 
