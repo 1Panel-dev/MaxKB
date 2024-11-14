@@ -515,7 +515,7 @@ class WorkflowManage:
             if index == 0:
                 result.append(answer.get('content'))
                 continue
-            if answer.get('type') != answer_text_list[index - 1]:
+            if answer.get('type') != answer_text_list[index - 1].get('type'):
                 result.append(answer.get('content'))
             else:
                 result[-1] += answer.get('content')
