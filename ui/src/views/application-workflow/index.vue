@@ -90,7 +90,12 @@
                   :size="32"
                   style="background: none"
                 >
-                  <img :src="detail?.icon" alt="" />
+                  <el-image
+                    :src="detail?.icon"
+                    alt=""
+                    fit="cover"
+                    style="width: 32px; height: 32px; display: block"
+                  />
                 </AppAvatar>
                 <AppAvatar
                   v-else-if="detail?.name"

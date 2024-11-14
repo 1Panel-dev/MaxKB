@@ -18,7 +18,12 @@
                 :size="32"
                 style="background: none"
               >
-                <img :src="detail?.icon" alt="" />
+                <el-image
+                  :src="detail?.icon"
+                  alt=""
+                  fit="cover"
+                  style="width: 32px; height: 32px; display: block"
+                />
               </AppAvatar>
               <AppAvatar
                 v-else-if="detail?.name"
@@ -353,23 +358,22 @@ function getDetail() {
       ?.filter((v: any) => v.id === 'base-node')
       .map((v: any) => {
         apiInputParams.value = v.properties.api_input_field_list
-          ? v.properties.api_input_field_list
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value
-                }
-              })
+          ? v.properties.api_input_field_list.map((v: any) => {
+              return {
+                name: v.variable,
+                value: v.default_value
+              }
+            })
           : v.properties.input_field_list
-          ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'api_input')
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value
-                }
-              })
-          : []
+            ? v.properties.input_field_list
+                .filter((v: any) => v.assignment_method === 'api_input')
+                .map((v: any) => {
+                  return {
+                    name: v.variable,
+                    value: v.default_value
+                  }
+                })
+            : []
       })
   })
 }

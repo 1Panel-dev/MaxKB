@@ -51,7 +51,12 @@
                   style="background: none"
                   class="mr-8"
                 >
-                  <img :src="item?.icon" alt="" />
+                  <el-image
+                    :src="item?.icon"
+                    alt=""
+                    fit="cover"
+                    style="width: 32px; height: 32px; display: block"
+                  />
                 </AppAvatar>
                 <AppAvatar
                   v-else-if="item?.name"
@@ -175,7 +180,7 @@ function openCreateDialog() {
   } else {
     MsgConfirm(`提示`, '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。', {
       cancelButtonText: '确定',
-      confirmButtonText: '购买专业版',
+      confirmButtonText: '购买专业版'
     })
       .then(() => {
         window.open('https://maxkb.cn/pricing.html', '_blank')

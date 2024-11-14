@@ -8,7 +8,12 @@
           :size="32"
           style="background: none"
         >
-          <img :src="application_profile?.icon" alt="" />
+          <el-image
+            :src="application_profile?.icon"
+            alt=""
+            fit="cover"
+            style="width: 32px; height: 32px; display: block"
+          />
         </AppAvatar>
         <AppAvatar
           v-else-if="application_profile?.name"

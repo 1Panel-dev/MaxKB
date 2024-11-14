@@ -73,7 +73,12 @@
                         style="background: none"
                         class="mr-12"
                       >
-                        <img :src="item?.icon" alt="" />
+                        <el-image
+                          :src="item?.icon"
+                          alt=""
+                          fit="cover"
+                          style="width: 32px; height: 32px; display: block"
+                        />
                       </AppAvatar>
                       <AppAvatar
                         v-else-if="item?.name"

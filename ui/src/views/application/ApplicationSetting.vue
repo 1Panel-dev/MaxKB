@@ -509,7 +509,11 @@
                 :size="32"
                 style="background: none"
               >
-                <img :src="applicationForm?.icon" alt="" />
+                <img
+                  :src="applicationForm?.icon"
+                  alt=""
+                  style="width: 32px; height: 32px; display: block"
+                />
               </AppAvatar>
               <AppAvatar
                 v-else-if="applicationForm?.name"

@@ -40,8 +40,14 @@
       <div ref="dialogScrollbar" class="ai-chat__content p-24 chat-width">
         <div class="item-content mb-16" v-if="!props.available || (props.data?.prologue && !log)">
           <div class="avatar">
-            <img v-if="data.avatar" :src="data.avatar" height="32px" width="32px" />
-            <LogoIcon v-else height="32px" width="32px"  />
+            <el-image
+              v-if="data.avatar"
+              :src="data.avatar"
+              alt=""
+              fit="cover"
+              style="width: 32px; height: 32px; display: block"
+            />
+            <LogoIcon v-else height="32px" width="32px" />
           </div>
 
           <div class="content">
@@ -96,7 +102,13 @@
           <!-- 回答 -->
           <div class="item-content mb-16 lighter">
             <div class="avatar">
-              <img v-if="data.avatar" :src="data.avatar" height="32px" width="32px" />
+              <el-image
+                v-if="data.avatar"
+                :src="data.avatar"
+                alt=""
+                fit="cover"
+                style="width: 30px; height: 30px; display: block"
+              />
               <LogoIcon v-else height="32px" width="32px" />
             </div>
 
