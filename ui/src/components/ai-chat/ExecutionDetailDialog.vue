@@ -182,6 +182,25 @@
                     </div>
                   </template>
 
+                  <!-- 文档内容提取 -->
+                  <template v-if="item.type === WorkflowType.DocumentExtractNode">
+                    <div class="card-never border-r-4">
+                      <h5 class="p-8-12">参数输出</h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <el-scrollbar height="150">
+                          <MdPreview
+                            v-if="item.content"
+                            ref="editorRef"
+                            editorId="preview-only"
+                            :modelValue="item.content"
+                            style="background: none"
+                          />
+                          <template v-else> - </template>
+                        </el-scrollbar>
+                      </div>
+                    </div>
+                  </template>
+
                   <!-- 函数库 -->
                   <template
                     v-if="

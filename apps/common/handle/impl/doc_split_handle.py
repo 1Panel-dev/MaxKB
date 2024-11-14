@@ -189,3 +189,13 @@ class DocSplitHandle(BaseSplitHandle):
                 ".DOC") or file_name.endswith(".DOCX"):
             return True
         return False
+
+    def get_content(self, file):
+        try:
+            image_list = []
+            buffer = file.read()
+            doc = Document(io.BytesIO(buffer))
+            return self.to_md(doc, image_list, get_image_id_func())
+        except BaseException as e:
+            traceback.print_exception(e)
+            return ''

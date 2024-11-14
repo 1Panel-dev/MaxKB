@@ -7,6 +7,7 @@
     @desc:
 """
 import re
+import traceback
 from typing import List
 
 from bs4 import BeautifulSoup
@@ -59,3 +60,14 @@ class HTMLSplitHandle(BaseSplitHandle):
         return {'name': file.name,
                 'content': split_model.parse(content)
                 }
+
+    def get_content(self, file):
+        buffer = file.read()
+
+        try:
+            encoding = get_encoding(buffer)
+            content = buffer.decode(encoding)
+            return html2text(content)
+        except BaseException as e:
+            traceback.print_exception(e)
+            return ''
