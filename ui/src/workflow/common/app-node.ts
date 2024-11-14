@@ -137,6 +137,26 @@ class AppNode extends HtmlResize.view {
 }
 
 class AppNodeModel extends HtmlResize.model {
+  refreshDeges() {
+    // 更新节点连接边的path
+    this.incoming.edges.forEach((edge: any) => {
+      // 调用自定义的更新方案
+      edge.updatePathByAnchor()
+    })
+    this.outgoing.edges.forEach((edge: any) => {
+      edge.updatePathByAnchor()
+    })
+  }
+  set_position(position: { x?: number; y?: number }) {
+    const { x, y } = position
+    if (x) {
+      this.x = x
+    }
+    if (y) {
+      this.y = y
+    }
+    this.refreshDeges()
+  }
   getResizeOutlineStyle() {
     const style = super.getResizeOutlineStyle()
     style.stroke = 'none'

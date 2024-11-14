@@ -51,7 +51,7 @@
           </div>
         </div>
         <el-collapse-transition>
-          <div @mousedown.stop @keydown.stop @click.stop v-if="showNode" class="mt-16">
+          <div @mousedown.stop @keydown.stop @click.stop v-show="showNode" class="mt-16">
             <el-alert
               v-if="node_status != 200"
               class="mb-16"

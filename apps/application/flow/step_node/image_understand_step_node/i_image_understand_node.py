@@ -18,7 +18,7 @@ class ImageUnderstandNodeSerializer(serializers.Serializer):
 
     is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
 
-    image_list = serializers.ListField(required=False, error_messages=ErrMessage.list("图片仅1张"))
+    image_list = serializers.ListField(required=False, error_messages=ErrMessage.list("图片"))
 
 
 class IImageUnderstandNode(INode):

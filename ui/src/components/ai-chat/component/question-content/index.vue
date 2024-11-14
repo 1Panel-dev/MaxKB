@@ -22,10 +22,19 @@
 </template>
 <script setup lang="ts">
 import { type chatType } from '@/api/type/application'
-defineProps<{
+import { onMounted } from 'vue'
+const props = defineProps<{
   application: any
   chatRecord: chatType
 }>()
+
+onMounted(() => {
+  if (props.chatRecord.execution_details?.length > 0) {
+    props.chatRecord.execution_details[0].image_list.forEach((image: any) => {
+      console.log('image', image.name, image.url)
+    })
+  }
+})
 </script>
 <style lang="scss" scoped>
 </style>

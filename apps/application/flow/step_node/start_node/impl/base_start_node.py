@@ -52,8 +52,12 @@ class BaseStartStepNode(IStarNode):
         """
         开始节点 初始化全局变量
         """
-        return NodeResult({'question': question, 'image': self.workflow_manage.image_list},
-                          workflow_variable)
+        node_variable = {
+            'question': question,
+            'image': self.workflow_manage.image_list,
+            'document': self.workflow_manage.document_list
+        }
+        return NodeResult(node_variable, workflow_variable)
 
     def get_details(self, index: int, **kwargs):
         global_fields = []

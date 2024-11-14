@@ -1,14 +1,20 @@
 <template>
   <div class="item-content mb-16 lighter">
-    <div v-for="(answer_text, index) in chatRecord.answer_text_list" :key="index">
+    <template v-for="(answer_text, index) in chatRecord.answer_text_list" :key="index">
       <div class="avatar">
         <img v-if="application.avatar" :src="application.avatar" height="32px" width="32px" />
         <LogoIcon v-else height="32px" width="32px" />
       </div>
       <div class="content">
-        <el-card shadow="always" class="dialog-card">
+        <el-card shadow="always" class="dialog-card mb-8">
           <MdRenderer
-            v-if="answer_text"
+            v-if="
+              (chatRecord.write_ed === undefined || chatRecord.write_ed === true) && !answer_text
+            "
+            source=" 抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
+          ></MdRenderer>
+          <MdRenderer
+            v-else-if="answer_text"
             :source="answer_text"
             :send-message="chatMessage"
           ></MdRenderer>
@@ -23,16 +29,18 @@
             <KnowledgeSource :data="chatRecord" :type="application.type" />
           </div>
         </el-card>
-        <OperationButton
-          :type="type"
-          :application="application"
-          :chat-record="chatRecord"
-          :loading="loading"
-          :start-chat="startChat"
-          :stop-chat="stopChat"
-          :regenerationChart="regenerationChart"
-        ></OperationButton>
       </div>
+    </template>
+    <div class="content">
+      <OperationButton
+        :type="type"
+        :application="application"
+        :chat-record="chatRecord"
+        :loading="loading"
+        :start-chat="startChat"
+        :stop-chat="stopChat"
+        :regenerationChart="regenerationChart"
+      ></OperationButton>
     </div>
   </div>
 </template>

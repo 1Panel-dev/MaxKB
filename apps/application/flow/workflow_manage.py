@@ -240,16 +240,20 @@ class NodeChunk:
 class WorkflowManage:
     def __init__(self, flow: Flow, params, work_flow_post_handler: WorkFlowPostHandler,
                  base_to_response: BaseToResponse = SystemToResponse(), form_data=None, image_list=None,
+                 document_list=None,
                  start_node_id=None,
                  start_node_data=None, chat_record=None):
         if form_data is None:
             form_data = {}
         if image_list is None:
             image_list = []
+        if document_list is None:
+            document_list = []
         self.start_node = None
         self.start_node_result_future = None
         self.form_data = form_data
         self.image_list = image_list
+        self.document_list = document_list
         self.params = params
         self.flow = flow
         self.lock = threading.Lock()
@@ -511,7 +515,7 @@ class WorkflowManage:
             if index == 0:
                 result.append(answer.get('content'))
                 continue
-            if answer.get('type') != answer_text_list[index - 1]:
+            if answer.get('type') != answer_text_list[index - 1].get('type'):
                 result.append(answer.get('content'))
             else:
                 result[-1] += answer.get('content')

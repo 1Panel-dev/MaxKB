@@ -7,12 +7,7 @@
 import { onMounted, nextTick, watch, onBeforeUnmount, ref } from 'vue'
 import * as echarts from 'echarts'
 const tmp = ref()
-const props = defineProps({
-  option: {
-    type: String,
-    required: true
-  }
-})
+const props = defineProps<{ option: string }>()
 const chartsRef = ref()
 
 const style = ref({
