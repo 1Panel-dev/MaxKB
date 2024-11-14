@@ -34,3 +34,11 @@ class CsvSplitHandle(BaseParseTableHandle):
             paragraphs.append({'title': '', 'content': line})
 
         return [{'name': file.name, 'paragraphs': paragraphs}]
+
+    def get_content(self, file):
+        buffer = file.read()
+        try:
+            return buffer.decode(detect(buffer)['encoding'])
+        except BaseException as e:
+            max_kb.error(f'csv split handle error: {e}')
+            return [{'name': file.name, 'paragraphs': []}]

@@ -1,23 +1,36 @@
 # coding=utf-8
+import io
+
 from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.document_extract_node.i_document_extract_node import IDocumentExtractNode
 from dataset.models import File
+from dataset.serializers.document_serializers import split_handles, parse_table_handle_list, FileBufferHandle
 
 
 class BaseDocumentExtractNode(IDocumentExtractNode):
     def execute(self, document, **kwargs):
+        get_buffer = FileBufferHandle().get_buffer
+
         self.context['document_list'] = document
         content = ''
         spliter = '\n-----------------------------------\n'
-        if len(document) > 0:
-            for doc in document:
-                file = QuerySet(File).filter(id=doc['file_id']).first()
-                file_type = doc['name'].split('.')[-1]
-                if file_type.lower() in ['txt', 'md', 'csv', 'html']:
-                    content += spliter + doc['name'] + '\n' + file.get_byte().tobytes().decode('utf-8')
+        if document is None:
+            return NodeResult({'content': content}, {})
 
+        for doc in document:
+            file = QuerySet(File).filter(id=doc['file_id']).first()
+            buffer = io.BytesIO(file.get_byte().tobytes())
+            buffer.name = doc['name']  # this is the important line
+
+            for split_handle in (parse_table_handle_list + split_handles):
+                if split_handle.support(buffer, get_buffer):
+                    # 回到文件头
+                    buffer.seek(0)
+                    file_content = split_handle.get_content(buffer)
+                    content += spliter + '## ' + doc['name'] + '\n' + file_content
+                    return NodeResult({'content': content}, {})
 
         return NodeResult({'content': content}, {})
 

@@ -7,6 +7,7 @@
     @desc:
 """
 import re
+import traceback
 from typing import List
 
 from charset_normalizer import detect
@@ -49,3 +50,11 @@ class TextSplitHandle(BaseSplitHandle):
         return {'name': file.name,
                 'content': split_model.parse(content)
                 }
+
+    def get_content(self, file):
+        buffer = file.read()
+        try:
+           return buffer.decode(detect(buffer)['encoding'])
+        except BaseException as e:
+            traceback.print_exception(e)
+            return ''
