@@ -66,7 +66,8 @@
             :key="item"
             class="login-button-circle color-secondary"
             @click="changeMode(item)"
-            >{{ item }}
+          >
+            <span style="font-size: 10px">{{ item }}</span>
           </el-button>
           <el-button
             v-if="item === 'QR_CODE' && loginMode !== item"
@@ -161,6 +162,14 @@ function redirectAuth(authType: string) {
         }
         if (authType === 'OIDC') {
           url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=openid+profile+email`
+        }
+        if (authType === 'OAUTH2') {
+          url =
+            `${config.authEndpoint}?client_id=${config.clientId}&response_type=code` +
+            `&redirect_uri=${redirectUrl}&state=${res.data.id}`
+          if (config.scope) {
+            url += `&scope=${config.scope}`
+          }
         }
         if (url) {
           window.location.href = url
