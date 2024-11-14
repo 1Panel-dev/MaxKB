@@ -100,6 +100,7 @@ const props = withDefaults(
     appId?: string
     chatId: string
     sendMessage: (question: string, other_params_data?: any, chat?: chatType) => void
+    openChatId: () => Promise<string>
   }>(),
   {
     applicationDetails: () => ({}),
@@ -165,8 +166,14 @@ const uploadFile = async (file: any, fileList: any) => {
   }
 
   if (!chatId_context.value) {
-    const res = await applicationApi.getChatOpen(props.applicationDetails.id as string)
-    chatId_context.value = res.data
+    const res = await props.openChatId()
+    chatId_context.value = res
+  }
+
+  if (props.type === 'debug-ai-chat') {
+    formData.append('debug', 'true')
+  } else {
+    formData.append('debug', 'false')
   }
 
   applicationApi

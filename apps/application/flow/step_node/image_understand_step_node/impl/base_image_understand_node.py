@@ -63,7 +63,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
         self.context['question'] = details.get('question')
         self.answer_text = details.get('answer')
 
-    def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
+    def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream, chat_id, chat_record_id,
                 image,
                 **kwargs) -> NodeResult:
         image_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'))
@@ -71,10 +71,10 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)
         self.context['question'] = question.content
-        # todo 处理上传图片
         message_list = self.generate_message_list(image_model, system, prompt, history_message, image)
         self.context['message_list'] = message_list
         self.context['image_list'] = image
+        self.context['dialogue_type'] = dialogue_type
         if stream:
             r = image_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': image_model, 'message_list': message_list,
@@ -86,14 +86,30 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context)
 
-    @staticmethod
-    def get_history_message(history_chat_record, dialogue_number):
+    def get_history_message(self, history_chat_record, dialogue_number):
         start_index = len(history_chat_record) - dialogue_number
         history_message = reduce(lambda x, y: [*x, *y], [
-            [history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
+            [self.generate_history_human_message(history_chat_record[index]), history_chat_record[index].get_ai_message()]
             for index in
             range(start_index if start_index > 0 else 0, len(history_chat_record))], [])
         return history_message
+
+    def generate_history_human_message(self, chat_record):
+
+        for data in chat_record.details.values():
+            if self.node.id == data['node_id'] and 'image_list' in data:
+                image_list = data['image_list']
+                if len(image_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
+                    return HumanMessage(content=chat_record.problem_text)
+                file_id = image_list[0]['file_id']
+                file = QuerySet(File).filter(id=file_id).first()
+                base64_image = base64.b64encode(file.get_byte()).decode("utf-8")
+                return HumanMessage(
+                    content=[
+                        {'type': 'text', 'text': data['question']},
+                        {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{base64_image}'}},
+                    ])
+        return HumanMessage(content=chat_record.problem_text)
 
     def generate_prompt_question(self, prompt):
         return HumanMessage(self.workflow_manage.generate_prompt(prompt))
@@ -148,5 +164,6 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
             'answer_tokens': self.context.get('answer_tokens'),
             'status': self.status,
             'err_message': self.err_message,
-            'image_list': self.context.get('image_list')
+            'image_list': self.context.get('image_list'),
+            'dialogue_type': self.context.get('dialogue_type')
         }

@@ -442,7 +442,8 @@ class ChatView(APIView):
         def post(self, request: Request, application_id: str, chat_id: str):
             files = request.FILES.getlist('file')
             file_ids = []
-            meta = {'application_id': application_id, 'chat_id': chat_id}
+            debug = request.data.get("debug", "false").lower() == "true"
+            meta = {'application_id': application_id, 'chat_id': chat_id, 'debug': debug}
             for file in files:
                 file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
                 file_ids.append({'name': file.name, 'url': file_url, 'file_id': file_url.split('/')[-1]})
