@@ -30,7 +30,7 @@ const props = defineProps<{
 
 onMounted(() => {
   if (props.chatRecord.execution_details?.length > 0) {
-    props.chatRecord.execution_details[0].image_list.forEach((image: any) => {
+    props.chatRecord.execution_details[0].image_list?.forEach((image: any) => {
       console.log('image', image.name, image.url)
     })
   }
