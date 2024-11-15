@@ -15,6 +15,12 @@
               :placeholder="$t('login.cas.ldpUriPlaceholder')"
             />
           </el-form-item>
+          <el-form-item :label="$t('login.cas.validateUrl')" prop="config_data.validateUrl">
+            <el-input
+              v-model="form.config_data.validateUrl"
+              :placeholder="$t('login.cas.validateUrlPlaceholder')"
+            />
+          </el-form-item>
           <el-form-item :label="$t('login.cas.redirectUrl')" prop="config_data.redirectUrl">
             <el-input
               v-model="form.config_data.redirectUrl"
@@ -49,6 +55,7 @@ const form = ref<any>({
   auth_type: 'CAS',
   config_data: {
     ldpUri: '',
+    validateUrl: '',
     redirectUrl: ''
   },
   is_active: true
@@ -61,6 +68,9 @@ const loading = ref(false)
 const rules = reactive<FormRules<any>>({
   'config_data.ldpUri': [
     { required: true, message: t('login.cas.ldpUriPlaceholder'), trigger: 'blur' }
+  ],
+  'config_data.validateUrl': [
+    { required: true, message: t('login.cas.validateUrlPlaceholder'), trigger: 'blur' }
   ],
   'config_data.redirectUrl': [
     {
@@ -85,6 +95,9 @@ const submit = async (formEl: FormInstance | undefined) => {
 function getDetail() {
   authApi.getAuthSetting(form.value.auth_type, loading).then((res: any) => {
     if (res.data && JSON.stringify(res.data) !== '{}') {
+      if (!res.data.config_data.validateUrl) {
+        res.data.config_data.validateUrl = res.data.config_data.ldpUri
+      }
       form.value = res.data
     }
   })

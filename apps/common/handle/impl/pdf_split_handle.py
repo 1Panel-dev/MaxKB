@@ -11,6 +11,7 @@ import os
 import re
 import tempfile
 import time
+import traceback
 from typing import List
 
 import fitz
@@ -297,3 +298,17 @@ class PdfSplitHandle(BaseSplitHandle):
         if file_name.endswith(".pdf") or file_name.endswith(".PDF"):
             return True
         return False
+
+    def get_content(self, file):
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            # 将上传的文件保存到临时文件中
+            temp_file.write(file.read())
+            # 获取临时文件的路径
+            temp_file_path = temp_file.name
+
+        pdf_document = fitz.open(temp_file_path)
+        try:
+            return self.handle_pdf_content(file, pdf_document)
+        except BaseException as e:
+            traceback.print_exception(e)
+            return ''

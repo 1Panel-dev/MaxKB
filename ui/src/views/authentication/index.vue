@@ -19,6 +19,7 @@ import OIDC from './component/OIDC.vue'
 import SCAN from './component/SCAN.vue'
 import { t } from '@/locales'
 import useStore from '@/stores'
+import OAUTH2 from '@/views/authentication/component/OAUTH2.vue'
 
 const { user } = useStore()
 const router = useRouter()
@@ -39,6 +40,11 @@ const tabList = [
     label: t('login.oidc.title'),
     name: 'OIDC',
     component: OIDC
+  },
+  {
+    label: t('login.oauth2.title'),
+    name: 'OAUTH2',
+    component: OAUTH2
   },
   {
     label: '扫码登录',
