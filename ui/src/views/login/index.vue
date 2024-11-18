@@ -158,7 +158,12 @@ function redirectAuth(authType: string) {
         const redirectUrl = eval(`\`${config.redirectUrl}\``)
         let url
         if (authType === 'CAS') {
-          url = `${config.ldpUri}?service=${encodeURIComponent(redirectUrl)}`
+          url = config.ldpUri
+          if (url.indexOf('?') !== -1) {
+            url = `${config.ldpUri}&service=${encodeURIComponent(redirectUrl)}`
+          } else {
+            url = `${config.ldpUri}?service=${encodeURIComponent(redirectUrl)}`
+          }
         }
         if (authType === 'OIDC') {
           url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=openid+profile+email`
