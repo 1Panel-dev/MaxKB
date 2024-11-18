@@ -104,6 +104,9 @@ class PdfSplitHandle(BaseSplitHandle):
 
             content += page_content
 
+            # Null characters are not allowed.
+            content = content.replace('\0', '')
+
             elapsed_time = time.time() - start_time
             max_kb.debug(
                 f"File: {file.name}, Page: {page_num + 1}, Time : {elapsed_time: .3f}s,   content-length: {len(page_content)}")
@@ -156,6 +159,10 @@ class PdfSplitHandle(BaseSplitHandle):
                         text = text[:idx]
 
                 chapter_text += text  # 提取文本
+
+            # Null characters are not allowed.
+            chapter_text = chapter_text.replace('\0', '')
+
             # 限制章节内容长度
             if 0 < limit < len(chapter_text):
                 split_text = PdfSplitHandle.split_text(chapter_text, limit)
@@ -227,6 +234,9 @@ class PdfSplitHandle(BaseSplitHandle):
                             if idx > -1:
                                 text = text[:idx]
                         chapter_text += text
+
+                    # Null characters are not allowed.
+                    chapter_text = chapter_text.replace('\0', '')
 
                     # 限制章节内容长度
                     if 0 < limit < len(chapter_text):
