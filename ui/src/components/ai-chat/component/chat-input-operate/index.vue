@@ -9,7 +9,7 @@
           v-if="uploadDocumentList.length || uploadImageList.length"
         >
           <el-space wrap>
-            <!-- <template v-for="(item, index) in uploadDocumentList" :key="index">
+            <template v-for="(item, index) in uploadDocumentList" :key="index">
               <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
                 <div
                   class="flex align-center"
@@ -29,7 +29,7 @@
                   </div>
                 </div>
               </el-card>
-            </template> -->
+            </template>
             <template v-for="(item, index) in uploadImageList" :key="index">
               <div
                 class="file cursor border border-r-4"

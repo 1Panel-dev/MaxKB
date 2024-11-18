@@ -50,21 +50,48 @@
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">参数输入</h5>
                       <div class="p-8-12 border-t-dashed lighter">
-                        <div>用户问题: {{ item.question || '-' }}</div>
-                        <div v-for="(f, i) in item.global_fields" :key="i">
-                          {{ f.label }}: {{ f.value }}
+                        <div class="mb-8">
+                          <span class="color-secondary">用户问题:</span>
+                          {{ item.question || '-' }}
+                        </div>
+                        <div v-for="(f, i) in item.global_fields" :key="i" class="mb-8">
+                          <span class="color-secondary">{{ f.label }}:</span> {{ f.value }}
                         </div>
                         <div v-if="item.document_list?.length > 0">
-                          上传的文档:
-                          <div v-for="(f, i) in item.document_list" :key="i">
-                            {{ f.name }}
-                          </div>
+                          <p class="mb-8 color-secondary">上传的文档:</p>
+
+                          <el-space wrap>
+                            <template v-for="(f, i) in item.document_list" :key="i">
+                              {{ f.name }}
+                              <el-card
+                                shadow="never"
+                                style="--el-card-padding: 8px"
+                                class="file cursor"
+                              >
+                                <div class="flex align-center">
+                                  <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
+                                  <div class="ml-4 ellipsis" :title="f && f?.name">
+                                    {{ f && f?.name }}
+                                  </div>
+                                </div>
+                              </el-card>
+                            </template>
+                          </el-space>
                         </div>
                         <div v-if="item.image_list?.length > 0">
-                          上传的图片:
-                          <div v-for="(f, i) in item.image_list" :key="i">
-                            {{ f.name }}
-                          </div>
+                          <p class="mb-8 color-secondary">上传的图片:</p>
+
+                          <el-space wrap>
+                            <template v-for="(f, i) in item.image_list" :key="i">
+                              <el-image
+                                :src="f.url"
+                                alt=""
+                                fit="cover"
+                                style="width: 40px; height: 40px; display: block"
+                                class="border-r-4"
+                              />
+                            </template>
+                          </el-space>
                         </div>
                       </div>
                     </div>
@@ -308,6 +335,7 @@ import ParagraphCard from './component/ParagraphCard.vue'
 import { arraySort } from '@/utils/utils'
 import { iconComponent } from '@/workflow/icons/utils'
 import { WorkflowType } from '@/enums/workflow'
+import { getImgUrl } from '@/utils/utils'
 
 const dialogVisible = ref(false)
 const detail = ref<any[]>([])

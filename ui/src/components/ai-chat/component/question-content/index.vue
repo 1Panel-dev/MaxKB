@@ -32,7 +32,7 @@
         <div class="mb-8" v-if="image_list.length">
           <el-space wrap>
             <template v-for="(item, index) in image_list" :key="index">
-              <div class="file cursor border border-r-4" v-if="item.url">
+              <div class="file cursor border-r-4" v-if="item.url">
                 <el-image
                   :src="item.url"
                   :zoom-rate="1.2"
@@ -62,11 +62,19 @@ const props = defineProps<{
   chatRecord: chatType
 }>()
 const document_list = computed(() => {
-  return []
+  if (props.chatRecord?.upload_meta) {
+    return props.chatRecord.upload_meta?.document_list || []
+  } else if (props.chatRecord.execution_details?.length > 0) {
+    return props.chatRecord.execution_details[0]?.document_list || []
+  } else {
+    return []
+  }
 })
 const image_list = computed(() => {
-  if (props.chatRecord.execution_details?.length > 0) {
-    return props.chatRecord.execution_details[0].image_list
+  if (props.chatRecord?.upload_meta) {
+    return props.chatRecord.upload_meta?.image_list || []
+  } else if (props.chatRecord.execution_details?.length > 0) {
+    return props.chatRecord.execution_details[0]?.image_list || []
   } else {
     return []
   }
