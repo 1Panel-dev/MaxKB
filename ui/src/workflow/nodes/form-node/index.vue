@@ -39,15 +39,18 @@
         />
       </el-form-item>
       <el-form-item label="表单配置" @click.prevent>
-        <div class="flex-between mb-16">
-          <h5 class="lighter">{{ '接口传参' }}</h5>
-          <el-button link type="primary" @click="openAddFormCollect()">
-            <el-icon class="mr-4">
-              <Plus />
-            </el-icon>
-            添加
-          </el-button>
-        </div>
+        <template #label>
+          <div class="flex-between mb-16">
+            <h5 class="lighter">{{ '表单配置' }}</h5>
+            <el-button link type="primary" @click="openAddFormCollect()">
+              <el-icon class="mr-4">
+                <Plus />
+              </el-icon>
+              添加
+            </el-button>
+          </div></template
+        >
+
         <el-table
           v-if="form_data.form_field_list.length > 0"
           :data="form_data.form_field_list"
