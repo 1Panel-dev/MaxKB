@@ -63,6 +63,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import RadioRow from '@/components/dynamics-form/items/radio/RadioRow.vue'
+import type { FormField } from '@/components/dynamics-form/type'
 const props = defineProps<{
   modelValue: any
 }>()
@@ -87,8 +88,8 @@ const delOption = (index: number) => {
   }
   formValue.value.option_list.splice(index, 1)
 }
-const formField = computed(() => {
-  return getData()
+const formField = computed<FormField>(() => {
+  return { field: '', ...getData() }
 })
 const getData = () => {
   return {
