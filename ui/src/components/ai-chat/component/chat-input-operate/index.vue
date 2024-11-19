@@ -80,9 +80,7 @@
               action="#"
               :auto-upload="false"
               :show-file-list="false"
-              :accept="
-                [...imageExtensions, ...documentExtensions].map((ext) => '.' + ext).join(',')
-              "
+              :accept="getAcceptList()"
               :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
             >
               <el-button text>
@@ -190,6 +188,24 @@ const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
 const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
 const videoExtensions = ['mp4', 'avi', 'mov', 'mkv', 'flv']
 const audioExtensions = ['mp3', 'wav', 'aac', 'flac']
+
+const getAcceptList = () => {
+  const { image, document, audio, video } = props.applicationDetails.file_upload_setting
+  let accepts = ''
+  if (image) {
+    accepts += imageExtensions.map((ext) => '.' + ext).join(',')
+  }
+  if (document) {
+    accepts += documentExtensions.map((ext) => '.' + ext).join(',')
+  }
+  if (audio) {
+    accepts += audioExtensions.map((ext) => '.' + ext).join(',')
+  }
+  if (video) {
+    accepts += videoExtensions.map((ext) => '.' + ext).join(',')
+  }
+  return accepts
+}
 
 const uploadFile = async (file: any, fileList: any) => {
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
