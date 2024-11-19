@@ -88,7 +88,7 @@ const delOption = (index: number) => {
   formValue.value.option_list.splice(index, 1)
 }
 const formField = computed(() => {
-  return getData()
+  return { field: '', ...getData() }
 })
 const getData = () => {
   return {
