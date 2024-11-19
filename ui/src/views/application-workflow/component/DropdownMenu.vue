@@ -149,13 +149,20 @@ function clickNodes(item: any, data?: any, type?: string) {
     }
     if (type == 'application') {
       if (isWorkFlow(data.type)) {
-        console.log(data.work_flow.nodes[0].properties.api_input_field_list)
+        const nodeData = data.work_flow.nodes[0].properties.node_data
+        const fileUploadSetting = nodeData.file_upload_setting
         item['properties']['node_data'] = {
           name: data.name,
           icon: data.icon,
           application_id: data.id,
           api_input_field_list: data.work_flow.nodes[0].properties.api_input_field_list,
-          user_input_field_list: data.work_flow.nodes[0].properties.user_input_field_list
+          user_input_field_list: data.work_flow.nodes[0].properties.user_input_field_list,
+          ...(!fileUploadSetting
+            ? {}
+            : {
+                ...(fileUploadSetting.document ? { document_list: [] } : {}),
+                ...(fileUploadSetting.image ? { image_list: [] } : {})
+              })
         }
       } else {
         item['properties']['node_data'] = {
@@ -186,12 +193,20 @@ function onmousedown(item: any, data?: any, type?: string) {
     }
     if (type == 'application') {
       if (isWorkFlow(data.type)) {
+        const nodeData = data.work_flow.nodes[0].properties.node_data
+        const fileUploadSetting = nodeData.file_upload_setting
         item['properties']['node_data'] = {
           name: data.name,
           icon: data.icon,
           application_id: data.id,
           api_input_field_list: data.work_flow.nodes[0].properties.api_input_field_list,
-          user_input_field_list: data.work_flow.nodes[0].properties.user_input_field_list
+          user_input_field_list: data.work_flow.nodes[0].properties.user_input_field_list,
+          ...(!fileUploadSetting
+            ? {}
+            : {
+                ...(fileUploadSetting.document ? { document_list: [] } : {}),
+                ...(fileUploadSetting.image ? { image_list: [] } : {})
+              })
         }
       } else {
         item['properties']['node_data'] = {

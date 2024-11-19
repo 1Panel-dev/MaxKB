@@ -11,7 +11,6 @@
         </el-button>
       </div>
     </template>
-
     <el-row style="width: 100%" :gutter="10">
       <el-col :span="10"
         ><div class="grid-content ep-bg-purple" />
@@ -51,7 +50,16 @@
     prop="default_value"
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
   >
-    <el-select v-model="formValue.default_value" :teleported="false" popper-class="default-select">
+    <el-select
+      class="m-2"
+      multiple
+      collapse-tags
+      filterable
+      clearable
+      v-model="formValue.default_value"
+      :teleported="false"
+      popper-class="default-select"
+    >
       <el-option
         v-for="(option, index) in formValue.option_list"
         :key="index"
@@ -91,7 +99,7 @@ const delOption = (index: number) => {
 
 const getData = () => {
   return {
-    input_type: 'SingleSelect',
+    input_type: 'MultiSelect',
     attrs: {},
     default_value: formValue.value.default_value,
     textField: 'label',

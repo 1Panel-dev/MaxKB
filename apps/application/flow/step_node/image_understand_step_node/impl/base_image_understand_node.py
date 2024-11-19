@@ -116,13 +116,17 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
 
     def generate_message_list(self, image_model, system: str, prompt: str, history_message, image):
         if image is not None and len(image) > 0:
-            file_id = image[0]['file_id']
-            file = QuerySet(File).filter(id=file_id).first()
-            base64_image = base64.b64encode(file.get_byte()).decode("utf-8")
+            # 处理多张图片
+            images = []
+            for img in image:
+                file_id = img['file_id']
+                file = QuerySet(File).filter(id=file_id).first()
+                base64_image = base64.b64encode(file.get_byte()).decode("utf-8")
+                images.append({'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{base64_image}'}})
             messages = [HumanMessage(
                 content=[
                     {'type': 'text', 'text': self.workflow_manage.generate_prompt(prompt)},
-                    {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{base64_image}'}},
+                    *images
                 ])]
         else:
             messages = [HumanMessage(self.workflow_manage.generate_prompt(prompt))]

@@ -33,8 +33,8 @@
           <el-button @click="dialogVisible = true">清除策略</el-button>
           <el-button @click="exportLog">导出</el-button>
           <el-button @click="openDocumentDialog" :disabled="multipleSelection.length === 0"
-            >添加至知识库</el-button
-          >
+            >添加至知识库
+          </el-button>
         </div>
       </div>
 
@@ -171,9 +171,9 @@
       <span>天之前的对话记录</span>
       <template #footer>
         <div class="dialog-footer" style="margin-top: 16px">
-          <el-button @click="dialogVisible = false">{{
-            $t('layout.topbar.avatar.dialog.cancel')
-          }}</el-button>
+          <el-button @click="dialogVisible = false"
+            >{{ $t('layout.topbar.avatar.dialog.cancel') }}
+          </el-button>
           <el-button type="primary" @click="saveCleanTime">
             {{ $t('layout.topbar.avatar.dialog.save') }}
           </el-button>
@@ -253,7 +253,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+          <el-button @click.prevent="documentDialogVisible = false"> 取消 </el-button>
           <el-button type="primary" @click="submitForm(formRef)" :loading="documentLoading">
             保存
           </el-button>
@@ -365,6 +365,7 @@ const rules = reactive<FormRules>({
 
 const optionLoading = ref(false)
 const documentList = ref<any[]>([])
+
 function filterChange(val: string) {
   if (val === 'clear') {
     filter.value = cloneDeep(defaultFilter)
@@ -487,6 +488,7 @@ function getDetail() {
     days.value = res.data.clean_time
   })
 }
+
 const exportLog = () => {
   const arr: string[] = []
   multipleSelection.value.map((v) => {
@@ -542,28 +544,26 @@ function saveCleanTime() {
     })
 }
 
-function changeDataset(id: string) {
-  if (user.userInfo) {
-    localStorage.setItem(user.userInfo.id + 'chat_dataset_id', id)
-  }
+function changeDataset(dataset_id: string) {
+  localStorage.setItem(id + 'chat_dataset_id', dataset_id)
   form.value.document_id = ''
-  getDocument(id)
+  getDocument(dataset_id)
 }
 
-function changeDocument(id: string) {
-  if (user.userInfo) {
-    localStorage.setItem(user.userInfo.id + 'chat_document_id', id)
-  }
+function changeDocument(document_id: string) {
+  localStorage.setItem(id + 'chat_document_id', document_id)
 }
 
 const datasetList = ref<any[]>([])
+
 function getDataset() {
   application.asyncGetApplicationDataset(id, documentLoading).then((res: any) => {
     datasetList.value = res.data
-    if (localStorage.getItem(user.userInfo?.id + 'chat_dataset_id')) {
-      form.value.dataset_id = localStorage.getItem(user.userInfo?.id + 'chat_dataset_id') as string
+    if (localStorage.getItem(id + 'chat_dataset_id')) {
+      form.value.dataset_id = localStorage.getItem(id + 'chat_dataset_id') as string
       if (!datasetList.value.find((v) => v.id === form.value.dataset_id)) {
         form.value.dataset_id = ''
+        form.value.document_id = ''
       } else {
         getDocument(form.value.dataset_id)
       }
@@ -594,20 +594,24 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   })
 }
 
-function getDocument(id: string) {
-  document.asyncGetAllDocument(id, documentLoading).then((res: any) => {
+function getDocument(dataset_id: string) {
+  document.asyncGetAllDocument(dataset_id, documentLoading).then((res: any) => {
     documentList.value = res.data
+    if (localStorage.getItem(id + 'chat_document_id')) {
+      form.value.document_id = localStorage.getItem(id + 'chat_document_id') as string
+    }
+    if (!documentList.value.find((v) => v.id === form.value.document_id)) {
+      form.value.document_id = ''
+    }
   })
 }
 
 function openDocumentDialog() {
   getDataset()
-  if (localStorage.getItem(user.userInfo?.id + 'chat_document_id')) {
-    form.value.document_id = localStorage.getItem(user.userInfo?.id + 'chat_document_id') as string
-  }
   formRef.value?.clearValidate()
   documentDialogVisible.value = true
 }
+
 onMounted(() => {
   changeDayHandle(history_day.value)
   getDetail()

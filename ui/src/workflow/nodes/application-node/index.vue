@@ -27,6 +27,44 @@
             v-model="form_data.question_reference_address"
           />
         </el-form-item>
+
+        <el-form-item
+          v-if="form_data.hasOwnProperty('document_list') || 'document_list' in form_data"
+          label="选择文档"
+          prop="document_list"
+          :rules="{
+            message: '请选择检索问题',
+            trigger: 'blur',
+            required: false
+          }"
+        >
+          <NodeCascader
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            placeholder="请选择检索问题"
+            v-model="form_data.document_list"
+          />
+        </el-form-item>
+
+        <el-form-item
+          v-if="form_data.hasOwnProperty('image_list') || 'image_list' in form_data"
+          label="选择图片"
+          prop="image_list"
+          :rules="{
+            message: '请选择检索问题',
+            trigger: 'blur',
+            required: false
+          }"
+        >
+          <NodeCascader
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            placeholder="请选择检索问题"
+            v-model="form_data.image_list"
+          />
+        </el-form-item>
         <div v-for="(field, index) in form_data.api_input_field_list" :key="'api-input-' + index">
           <el-form-item
             :label="field.variable"
@@ -45,7 +83,6 @@
           </el-form-item>
         </div>
 
-        <!-- Loop through dynamic fields for user_input_field_list -->
         <div v-for="(field, index) in form_data.user_input_field_list" :key="'user-input-' + index">
           <el-form-item
             :label="field.label"
@@ -94,9 +131,11 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 
 const form = {
-  question_reference_address: [],
+  question_reference_address: ['start-node', 'question'],
   api_input_field_list: [],
-  user_input_field_list: []
+  user_input_field_list: [],
+  document_list: ['start-node', 'document'],
+  image_list: ['start-node', 'image']
 }
 
 const applicationNodeFormRef = ref<FormInstance>()
@@ -124,7 +163,6 @@ const validate = () => {
 }
 
 onMounted(() => {
-  console.log(applicationNodeFormRef.value)
   set(props.nodeModel, 'validate', validate)
 })
 </script>

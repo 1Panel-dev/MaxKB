@@ -39,9 +39,12 @@ interface chatType {
   record_id: string
   chat_id: string
   vote_status: string
-  status?: number,
+  status?: number
   execution_details: any[]
-  upload_meta?: any[]
+  upload_meta?: {
+    document_list: Array<any>
+    image_list: Array<any>
+  }
 }
 
 export class ChatRecordManage {
