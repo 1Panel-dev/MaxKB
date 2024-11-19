@@ -9,6 +9,8 @@
 import uuid
 
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 from common.db.sql_execute import select_one
 from common.mixins.app_model_mixin import AppModelMixin
@@ -141,6 +143,9 @@ class File(AppModelMixin):
 
     loid = models.IntegerField(verbose_name="loid")
 
+    meta = models.JSONField(verbose_name="文件关联数据", default=dict)
+
+
     class Meta:
         db_table = "file"
 
@@ -149,9 +154,14 @@ class File(AppModelMixin):
     ):
         result = select_one("SELECT lo_from_bytea(%s, %s::bytea) as loid", [0, bytea])
         self.loid = result['loid']
-        self.file_name = 'speech.mp3'
         super().save()
 
     def get_byte(self):
         result = select_one(f'SELECT lo_get({self.loid}) as "data"', [])
         return result['data']
+
+
+
+@receiver(pre_delete, sender=File)
+def on_delete_file(sender, instance, **kwargs):
+    select_one(f'SELECT lo_unlink({instance.loid})', [])

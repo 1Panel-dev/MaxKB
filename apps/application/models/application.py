@@ -48,8 +48,8 @@ class Application(AppModelMixin):
     model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     dataset_setting = models.JSONField(verbose_name="数据集参数设置", default=get_dataset_setting_dict)
     model_setting = models.JSONField(verbose_name="模型参数相关设置", default=get_model_setting_dict)
-    model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default={})
-    tts_model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default={})
+    model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
+    tts_model_params_setting = models.JSONField(verbose_name="模型参数相关设置", default=dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="/ui/favicon.ico")
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
@@ -66,6 +66,9 @@ class Application(AppModelMixin):
     stt_model_enable = models.BooleanField(verbose_name="语音识别模型是否启用", default=False)
     tts_type = models.CharField(verbose_name="语音播放类型", max_length=20, default="BROWSER")
     clean_time = models.IntegerField(verbose_name="清理时间", default=180)
+    file_upload_enable = models.BooleanField(verbose_name="文件上传是否启用", default=False)
+    file_upload_setting = models.JSONField(verbose_name="文件上传相关设置", default=dict)
+
 
     @staticmethod
     def get_default_model_prompt():
@@ -144,6 +147,9 @@ class ChatRecord(AppModelMixin):
                                    default=VoteChoices.UN_VOTE)
     problem_text = models.CharField(max_length=10240, verbose_name="问题")
     answer_text = models.CharField(max_length=40960, verbose_name="答案")
+    answer_text_list = ArrayField(verbose_name="改进标注列表",
+                                  base_field=models.CharField(max_length=40960)
+                                  , default=list)
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)
     const = models.IntegerField(verbose_name="总费用", default=0)

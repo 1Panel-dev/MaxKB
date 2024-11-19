@@ -11,7 +11,7 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
 import { useScriptTag } from '@vueuse/core'
-import { defineProps, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import useStore from '@/stores'
 import { MsgError } from '@/utils/message'
 

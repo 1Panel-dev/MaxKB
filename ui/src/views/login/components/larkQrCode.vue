@@ -8,7 +8,7 @@
 
 <script lang="ts" setup>
 import { useScriptTag } from '@vueuse/core'
-import { defineProps, onMounted } from 'vue'
+import { onMounted } from 'vue'
 
 const { load } = useScriptTag(
   'https://lf-package-cn.feishucdn.com/obj/feishu-static/lark/passport/qrcode/LarkSSOSDKWebQRCode-1.0.3.js'

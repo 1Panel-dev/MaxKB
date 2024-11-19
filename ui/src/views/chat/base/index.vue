@@ -25,7 +25,8 @@
     </div>
     <div class="chat__main chat-width">
       <AiChat
-        v-model:data="applicationDetail"
+        v-model:applicationDetails="applicationDetail"
+        type="ai-chat"
         :available="applicationAvailable"
         :appId="applicationDetail?.id"
       ></AiChat>

@@ -286,6 +286,14 @@ const getApplicationTTSModel: (
   return get(`${prefix}/${application_id}/model`, { model_type: 'TTS' }, loading)
 }
 
+const getApplicationImageModel: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/model`, { model_type: 'IMAGE' }, loading)
+}
+
+
 /**
  * 发布应用
  * @param 参数
@@ -308,6 +316,18 @@ const listFunctionLib: (application_id: String, loading?: Ref<boolean>) => Promi
   loading
 ) => {
   return get(`${prefix}/${application_id}/function_lib`, undefined, loading)
+}
+/**
+ * 获取当前人的所有应用列表
+ * @param application_id 应用id
+ * @param loading
+ * @returns
+ */
+export const getApplicationList: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/application`, undefined, loading)
 }
 /**
  * 获取应用所属的函数库
@@ -337,6 +357,19 @@ const getModelParamsForm: (
 ) => Promise<Result<Array<FormField>>> = (application_id, model_id, loading) => {
   return get(`${prefix}/${application_id}/model_params_form/${model_id}`, undefined, loading)
 }
+
+/**
+ * 上传文档图片附件
+ */
+const uploadFile: (
+  application_id: String,
+  chat_id: String,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, chat_id, data, loading) => {
+  return post(`${prefix}/${application_id}/chat/${chat_id}/upload_file`, data, undefined, loading)
+}
+
 
 /**
  * 语音转文本
@@ -489,6 +522,7 @@ export default {
   getApplicationRerankerModel,
   getApplicationSTTModel,
   getApplicationTTSModel,
+  getApplicationImageModel,
   postSpeechToText,
   postTextToSpeech,
   getPlatformStatus,
@@ -500,5 +534,7 @@ export default {
   getWorkFlowVersionDetail,
   putWorkFlowVersion,
   playDemoText,
-  getUserList
+  getUserList,
+  getApplicationList,
+  uploadFile
 }

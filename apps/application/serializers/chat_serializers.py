@@ -40,7 +40,7 @@ from common.util.lock import try_lock, un_lock
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
 from dataset.serializers.common_serializers import get_embedding_model_id_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
-from embedding.task import embedding_by_paragraph
+from embedding.task import embedding_by_paragraph, embedding_by_paragraph_list
 from setting.models import Model
 from setting.models_provider import get_model_credential
 from smartdoc.conf import PROJECT_DIR
@@ -127,12 +127,12 @@ class ChatSerializers(serializers.Serializer):
                  "star_num": models.IntegerField(),
                  'trample_num': models.IntegerField(),
                  'comparer': models.CharField(),
-                 'application_chat.create_time': models.DateTimeField(),
+                 'application_chat.update_time': models.DateTimeField(),
                  'application_chat.id': models.UUIDField(), }))
 
             base_query_dict = {'application_chat.application_id': self.data.get("application_id"),
-                               'application_chat.create_time__gte': start_time,
-                               'application_chat.create_time__lte': end_time,
+                               'application_chat.update_time__gte': start_time,
+                               'application_chat.update_time__lte': end_time,
                                }
             if 'abstract' in self.data and self.data.get('abstract') is not None:
                 base_query_dict['application_chat.abstract__icontains'] = self.data.get('abstract')
@@ -158,7 +158,7 @@ class ChatSerializers(serializers.Serializer):
                 condition = base_condition & min_trample_query
             else:
                 condition = base_condition
-            return query_set.filter(condition).order_by("-application_chat.create_time")
+            return query_set.filter(condition).order_by("-application_chat.update_time")
 
         def list(self, with_valid=True):
             if with_valid:
@@ -294,7 +294,6 @@ class ChatSerializers(serializers.Serializer):
             return chat_id
 
         def open_simple(self, application):
-            valid_model_params_setting(application.model_id, application.model_params_setting)
             application_id = self.data.get('application_id')
             dataset_id_list = [str(row.dataset_id) for row in
                                QuerySet(ApplicationDatasetMapping).filter(
@@ -376,7 +375,6 @@ class ChatSerializers(serializers.Serializer):
             model_id = self.data.get('model_id')
             dataset_id_list = self.data.get('dataset_id_list')
             dialogue_number = 3 if self.data.get('multiple_rounds_dialogue', False) else 0
-            valid_model_params_setting(model_id, self.data.get('model_params_setting'))
             application = Application(id=None, dialogue_number=dialogue_number, model_id=model_id,
                                       dataset_setting=self.data.get('dataset_setting'),
                                       model_setting=self.data.get('model_setting'),
@@ -397,7 +395,7 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
     class Meta:
         model = ChatRecord
         fields = ['id', 'chat_id', 'vote_status', 'problem_text', 'answer_text',
-                  'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index',
+                  'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index','answer_text_list',
                   'create_time', 'update_time']
 
 
@@ -658,3 +656,67 @@ class ChatRecordSerializer(serializers.Serializer):
                     data={"dataset_id": dataset_id, 'document_id': document_id, "paragraph_id": paragraph_id})
                 o.is_valid(raise_exception=True)
                 return o.delete()
+
+    class PostImprove(serializers.Serializer):
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
+        chat_ids = serializers.ListSerializer(child=serializers.UUIDField(), required=True,
+                                              error_messages=ErrMessage.list("对话id"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            if not Document.objects.filter(id=self.data['document_id'], dataset_id=self.data['dataset_id']).exists():
+                raise AppApiException(500, "文档id不正确")
+
+        @staticmethod
+        def post_embedding_paragraph(paragraph_ids, dataset_id):
+            model_id = get_embedding_model_id_by_dataset_id(dataset_id)
+            embedding_by_paragraph_list(paragraph_ids, model_id)
+
+        @post(post_function=post_embedding_paragraph)
+        @transaction.atomic
+        def post_improve(self, instance: Dict):
+            ChatRecordSerializer.PostImprove(data=instance).is_valid(raise_exception=True)
+
+            chat_ids = instance['chat_ids']
+            document_id = instance['document_id']
+            dataset_id = instance['dataset_id']
+
+            # 获取所有聊天记录
+            chat_record_list = list(ChatRecord.objects.filter(chat_id__in=chat_ids))
+            if len(chat_record_list) < len(chat_ids):
+                raise AppApiException(500, "存在不存在的对话记录")
+
+            # 批量创建段落和问题映射
+            paragraphs = []
+            paragraph_ids = []
+            problem_paragraph_mappings = []
+            for chat_record in chat_record_list:
+                paragraph = Paragraph(
+                    id=uuid.uuid1(),
+                    document_id=document_id,
+                    content=chat_record.answer_text,
+                    dataset_id=dataset_id,
+                    title=chat_record.problem_text
+                )
+                problem, _ = Problem.objects.get_or_create(content=chat_record.problem_text, dataset_id=dataset_id)
+                problem_paragraph_mapping = ProblemParagraphMapping(
+                    id=uuid.uuid1(),
+                    dataset_id=dataset_id,
+                    document_id=document_id,
+                    problem_id=problem.id,
+                    paragraph_id=paragraph.id
+                )
+                paragraphs.append(paragraph)
+                paragraph_ids.append(paragraph.id)
+                problem_paragraph_mappings.append(problem_paragraph_mapping)
+                chat_record.improve_paragraph_id_list.append(paragraph.id)
+
+            # 批量保存段落和问题映射
+            Paragraph.objects.bulk_create(paragraphs)
+            ProblemParagraphMapping.objects.bulk_create(problem_paragraph_mappings)
+
+            # 批量保存聊天记录
+            ChatRecord.objects.bulk_update(chat_record_list, ['improve_paragraph_id_list'])
+
+            return paragraph_ids, dataset_id

@@ -11,6 +11,7 @@ import os
 import re
 import tempfile
 import time
+import traceback
 from typing import List
 
 import fitz
@@ -103,6 +104,9 @@ class PdfSplitHandle(BaseSplitHandle):
 
             content += page_content
 
+            # Null characters are not allowed.
+            content = content.replace('\0', '')
+
             elapsed_time = time.time() - start_time
             max_kb.debug(
                 f"File: {file.name}, Page: {page_num + 1}, Time : {elapsed_time: .3f}s,   content-length: {len(page_content)}")
@@ -155,6 +159,10 @@ class PdfSplitHandle(BaseSplitHandle):
                         text = text[:idx]
 
                 chapter_text += text  # 提取文本
+
+            # Null characters are not allowed.
+            chapter_text = chapter_text.replace('\0', '')
+
             # 限制章节内容长度
             if 0 < limit < len(chapter_text):
                 split_text = PdfSplitHandle.split_text(chapter_text, limit)
@@ -227,6 +235,9 @@ class PdfSplitHandle(BaseSplitHandle):
                                 text = text[:idx]
                         chapter_text += text
 
+                    # Null characters are not allowed.
+                    chapter_text = chapter_text.replace('\0', '')
+
                     # 限制章节内容长度
                     if 0 < limit < len(chapter_text):
                         split_text = PdfSplitHandle.split_text(chapter_text, limit)
@@ -297,3 +308,17 @@ class PdfSplitHandle(BaseSplitHandle):
         if file_name.endswith(".pdf") or file_name.endswith(".PDF"):
             return True
         return False
+
+    def get_content(self, file):
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            # 将上传的文件保存到临时文件中
+            temp_file.write(file.read())
+            # 获取临时文件的路径
+            temp_file_path = temp_file.name
+
+        pdf_document = fitz.open(temp_file_path)
+        try:
+            return self.handle_pdf_content(file, pdf_document)
+        except BaseException as e:
+            traceback.print_exception(e)
+            return ''

@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='application',
             name='model_params_setting',
-            field=models.JSONField(default={}, verbose_name='模型参数相关设置'),
+            field=models.JSONField(default=dict, verbose_name='模型参数相关设置'),
         ),
     ]

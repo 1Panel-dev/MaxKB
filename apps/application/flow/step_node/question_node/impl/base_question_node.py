@@ -32,7 +32,7 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['question'] = node_variable['question']
     node.context['run_time'] = time.time() - node.context['start_time']
     if workflow.is_result(node, NodeResult(node_variable, workflow_variable)):
-        workflow.answer += answer
+        node.answer_text = answer
 
 
 def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
@@ -73,6 +73,14 @@ def get_default_model_params_setting(model_id):
 
 
 class BaseQuestionNode(IQuestionNode):
+    def save_context(self, details, workflow_manage):
+        self.context['run_time'] = details.get('run_time')
+        self.context['question'] = details.get('question')
+        self.context['answer'] = details.get('answer')
+        self.context['message_tokens'] = details.get('message_tokens')
+        self.context['answer_tokens'] = details.get('answer_tokens')
+        self.answer_text = details.get('answer')
+
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,
                 **kwargs) -> NodeResult:

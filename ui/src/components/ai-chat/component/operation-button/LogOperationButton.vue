@@ -1,31 +1,25 @@
 <template>
-  <div>
-    <el-text type="info">
-      <span class="ml-4">{{ datetimeFormat(data.create_time) }}</span>
-    </el-text>
-  </div>
-  <div>
-    <!-- 语音播放 -->
-    <span v-if="tts">
-      <el-tooltip effect="dark" content="点击播放" placement="top" v-if="!audioPlayerStatus">
-        <el-button text :disabled="!data?.write_ed" @click="playAnswerText(data?.answer_text)">
-          <AppIcon iconName="app-video-play"></AppIcon>
-        </el-button>
-      </el-tooltip>
-      <el-tooltip v-else effect="dark" content="停止" placement="top">
-        <el-button type="primary" text :disabled="!data?.write_ed" @click="pausePlayAnswerText()">
-          <AppIcon iconName="app-video-pause"></AppIcon>
-        </el-button>
-      </el-tooltip>
-      <el-divider direction="vertical" />
-    </span>
-    <span v-if="applicationId">
-      <el-tooltip effect="dark" content="换个答案" placement="top">
-        <el-button :disabled="chat_loading" text @click="regeneration">
-          <el-icon><RefreshRight /></el-icon>
-        </el-button>
-      </el-tooltip>
-      <el-divider direction="vertical" />
+  <div class="flex-between mt-8">
+    <div>
+      <el-text type="info">
+        <span class="ml-4">{{ datetimeFormat(data.create_time) }}</span>
+      </el-text>
+    </div>
+    <div>
+      <!-- 语音播放 -->
+      <span v-if="tts">
+        <el-tooltip effect="dark" content="点击播放" placement="top" v-if="!audioPlayerStatus">
+          <el-button text @click="playAnswerText(data?.answer_text)">
+            <AppIcon iconName="app-video-play"></AppIcon>
+          </el-button>
+        </el-tooltip>
+        <el-tooltip v-else effect="dark" content="停止" placement="top">
+          <el-button type="primary" text @click="pausePlayAnswerText()">
+            <AppIcon iconName="app-video-pause"></AppIcon>
+          </el-button>
+        </el-tooltip>
+        <el-divider direction="vertical" />
+      </span>
       <el-tooltip effect="dark" content="复制" placement="top">
         <el-button text @click="copyClick(data?.answer_text)">
           <AppIcon iconName="app-copy"></AppIcon>
@@ -33,57 +27,45 @@
       </el-tooltip>
       <el-divider direction="vertical" />
       <el-tooltip
+        v-if="data.improve_paragraph_id_list.length === 0"
         effect="dark"
-        content="赞同"
+        content="修改内容"
         placement="top"
-        v-if="buttonData?.vote_status === '-1'"
       >
-        <el-button text @click="voteHandle('0')" :disabled="loading">
-          <AppIcon iconName="app-like"></AppIcon>
+        <el-button text @click="editContent(data)">
+          <el-icon><EditPen /></el-icon>
         </el-button>
       </el-tooltip>
-      <el-tooltip
-        effect="dark"
-        content="取消赞同"
-        placement="top"
-        v-if="buttonData?.vote_status === '0'"
-      >
-        <el-button text @click="voteHandle('-1')" :disabled="loading">
-          <AppIcon iconName="app-like-color"></AppIcon>
+
+      <el-tooltip v-else effect="dark" content="修改标注" placement="top">
+        <el-button text @click="editMark(data)">
+          <AppIcon iconName="app-document-active" class="primary"></AppIcon>
         </el-button>
       </el-tooltip>
-      <el-divider direction="vertical" v-if="buttonData?.vote_status === '-1'" />
-      <el-tooltip
-        effect="dark"
-        content="反对"
-        placement="top"
-        v-if="buttonData?.vote_status === '-1'"
-      >
-        <el-button text @click="voteHandle('1')" :disabled="loading">
-          <AppIcon iconName="app-oppose"></AppIcon>
-        </el-button>
-      </el-tooltip>
-      <el-tooltip
-        effect="dark"
-        content="取消反对"
-        placement="top"
-        v-if="buttonData?.vote_status === '1'"
-      >
-        <el-button text @click="voteHandle('-1')" :disabled="loading">
-          <AppIcon iconName="app-oppose-color"></AppIcon>
-        </el-button>
-      </el-tooltip>
-    </span>
+
+      <el-divider direction="vertical" v-if="buttonData?.vote_status !== '-1'" />
+      <el-button text disabled v-if="buttonData?.vote_status === '0'">
+        <AppIcon iconName="app-like-color"></AppIcon>
+      </el-button>
+
+      <el-button text disabled v-if="buttonData?.vote_status === '1'">
+        <AppIcon iconName="app-oppose-color"></AppIcon>
+      </el-button>
+      <EditContentDialog ref="EditContentDialogRef" @refresh="refreshContent" />
+      <EditMarkDialog ref="EditMarkDialogRef" @refresh="refreshMark" />
+      <!-- 先渲染，不然不能播放   -->
+      <audio ref="audioPlayer" controls hidden="hidden"></audio>
+    </div>
   </div>
-  <!-- 先渲染，不然不能播放   -->
-  <audio ref="audioPlayer" controls hidden="hidden"></audio>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
-import applicationApi from '@/api/application'
+import EditContentDialog from '@/views/log/component/EditContentDialog.vue'
+import EditMarkDialog from '@/views/log/component/EditMarkDialog.vue'
 import { datetimeFormat } from '@/utils/time'
+import applicationApi from '@/api/application'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const {
@@ -99,38 +81,30 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  chatId: {
-    type: String,
-    default: ''
-  },
-  chat_loading: {
-    type: Boolean
-  },
-  log: Boolean,
   tts: Boolean,
   tts_type: String
 })
 
-const emit = defineEmits(['update:data', 'regeneration'])
+const emit = defineEmits(['update:data'])
 
 const audioPlayer = ref<HTMLAudioElement | null>(null)
-const audioPlayerStatus = ref(false)
+
+const EditContentDialogRef = ref()
+const EditMarkDialogRef = ref()
+
 const buttonData = ref(props.data)
 const loading = ref(false)
 const utterance = ref<SpeechSynthesisUtterance | null>(null)
 
-function regeneration() {
-  emit('regeneration')
+function editContent(data: any) {
+  EditContentDialogRef.value.open(data)
 }
 
-function voteHandle(val: string) {
-  applicationApi
-    .putChatVote(props.applicationId, props.chatId, props.data.record_id, val, loading)
-    .then(() => {
-      buttonData.value['vote_status'] = val
-      emit('update:data', buttonData.value)
-    })
+function editMark(data: any) {
+  EditMarkDialogRef.value.open(data)
 }
+
+const audioPlayerStatus = ref(false)
 
 function markdownToPlainText(md: string) {
   return (
@@ -192,7 +166,7 @@ const playAnswerText = (text: string) => {
       return
     }
     applicationApi
-      .postTextToSpeech((props.applicationId as string) || (id as string), { text: text }, loading)
+      .postTextToSpeech(id || (props.applicationId as string), { text: text }, loading)
       .then((res: any) => {
         // 假设我们有一个 MP3 文件的字节数组
         // 创建 Blob 对象
@@ -232,6 +206,15 @@ const pausePlayAnswerText = () => {
   if (props.tts_type === 'BROWSER') {
     window.speechSynthesis.pause()
   }
+}
+
+function refreshMark() {
+  buttonData.value.improve_paragraph_id_list = []
+  emit('update:data', buttonData.value)
+}
+function refreshContent(data: any) {
+  buttonData.value = data
+  emit('update:data', buttonData.value)
 }
 </script>
 <style lang="scss" scoped></style>

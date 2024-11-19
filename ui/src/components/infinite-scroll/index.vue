@@ -12,7 +12,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 defineOptions({ name: 'InfiniteScroll' })
 const props = defineProps({
@@ -46,6 +46,15 @@ const props = defineProps({
 
 const emit = defineEmits(['update:current_page', 'load'])
 const current = ref(props.current_page)
+
+watch(
+  () => props.current_page,
+  (val) => {
+    if (val === 1) {
+      current.value = 1
+    }
+  }
+)
 
 const noMore = computed(
   () =>

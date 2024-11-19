@@ -17,6 +17,7 @@
     "@ctrl/tinycolor": "^4.1.0",
     "@logicflow/core": "^1.2.27",
     "@logicflow/extension": "^1.2.27",
+    "@antv/layout": "^0.3.1",
     "@vueuse/core": "^10.9.0",
     "@wecom/jssdk": "^2.1.0",
     "axios": "^0.28.0",

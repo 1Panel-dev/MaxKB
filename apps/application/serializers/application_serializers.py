@@ -15,14 +15,11 @@ import uuid
 from functools import reduce
 from typing import Dict, List
 
-from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core import cache, validators
 from django.core import signing
-from django.core.paginator import Paginator
 from django.db import transaction, models
 from django.db.models import QuerySet, Q
-from django.forms import CharField
 from django.http import HttpResponse
 from django.template import Template, Context
 from rest_framework import serializers
@@ -46,10 +43,9 @@ from dataset.models import DataSet, Document, Image
 from dataset.serializers.common_serializers import list_paragraph, get_embedding_model_by_dataset_id_list
 from embedding.models import SearchMode
 from function_lib.serializers.function_lib_serializer import FunctionLibSerializer
-from setting.models import AuthOperate, TeamMember, TeamMemberPermission
+from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.models_provider import get_model_credential
-from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
@@ -827,6 +823,8 @@ class ApplicationSerializer(serializers.Serializer):
                  'stt_model_enable': application.stt_model_enable,
                  'tts_model_enable': application.tts_model_enable,
                  'tts_type': application.tts_type,
+                 'file_upload_enable': application.file_upload_enable,
+                 'file_upload_setting': application.file_upload_setting,
                  'work_flow': application.work_flow,
                  'show_source': application_access_token.show_source,
                  **application_setting_dict})
@@ -838,8 +836,6 @@ class ApplicationSerializer(serializers.Serializer):
                 ApplicationSerializer.Edit(data=instance).is_valid(
                     raise_exception=True)
             application_id = self.data.get("application_id")
-            valid_model_params_setting(instance.get('model_id'),
-                                       instance.get('model_params_setting'))
 
             application = QuerySet(Application).get(id=application_id)
             if instance.get('model_id') is None or len(instance.get('model_id')) == 0:
@@ -880,6 +876,7 @@ class ApplicationSerializer(serializers.Serializer):
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                            'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
+                           'file_upload_enable', 'file_upload_setting',
                            'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
                            'problem_optimization_prompt', 'clean_time']
             for update_key in update_keys:
@@ -945,6 +942,10 @@ class ApplicationSerializer(serializers.Serializer):
                         instance['tts_type'] = node_data['tts_type']
                     if 'tts_model_params_setting' in node_data:
                         instance['tts_model_params_setting'] = node_data['tts_model_params_setting']
+                    if 'file_upload_enable' in node_data:
+                        instance['file_upload_enable'] = node_data['file_upload_enable']
+                    if 'file_upload_setting' in node_data:
+                        instance['file_upload_setting'] = node_data['file_upload_setting']
                     break
 
         def speech_to_text(self, file, with_valid=True):
@@ -978,6 +979,17 @@ class ApplicationSerializer(serializers.Serializer):
                 tts_model_id = form_data.pop('tts_model_id')
             model = get_model_instance_by_model_user_id(tts_model_id, application.user_id, **form_data)
             return model.text_to_speech(text)
+
+        def application_list(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            user_id = self.data.get('user_id')
+            application_id = self.data.get('application_id')
+            application = Application.objects.filter(user_id=user_id).exclude(id=application_id)
+            # 把应用的type为WORK_FLOW的应用放到最上面 然后再按名称排序
+            serialized_data = ApplicationSerializerModel(application, many=True).data
+            application = sorted(serialized_data, key=lambda x: (x['type'] != 'WORK_FLOW', x['name']))
+            return list(application)
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:

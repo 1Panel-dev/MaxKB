@@ -7,8 +7,10 @@ from setting.models_provider.base_model_provider import (
     IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, ModelInfoManage
 )
 from setting.models_provider.impl.tencent_model_provider.credential.embedding import TencentEmbeddingCredential
+from setting.models_provider.impl.tencent_model_provider.credential.image import TencentVisionModelCredential
 from setting.models_provider.impl.tencent_model_provider.credential.llm import TencentLLMModelCredential
 from setting.models_provider.impl.tencent_model_provider.model.embedding import TencentEmbeddingModel
+from setting.models_provider.impl.tencent_model_provider.model.image import TencentVision
 from setting.models_provider.impl.tencent_model_provider.model.llm import TencentModel
 from smartdoc.conf import PROJECT_DIR
 
@@ -78,9 +80,18 @@ def _initialize_model_info():
 
     model_info_embedding_list = [tencent_embedding_model_info]
 
+    model_info_vision_list = [_create_model_info(
+        'hunyuan-vision',
+        '混元视觉模型',
+        ModelTypeConst.IMAGE,
+        TencentVisionModelCredential,
+        TencentVision)]
+
+
     model_info_manage = ModelInfoManage.builder() \
         .append_model_info_list(model_info_list) \
         .append_model_info_list(model_info_embedding_list) \
+        .append_model_info_list(model_info_vision_list) \
         .append_default_model_info(model_info_list[0]) \
         .build()
 

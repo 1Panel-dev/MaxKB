@@ -8,16 +8,14 @@
       class="h-full"
       style="padding: 24px 0"
     >
-      <InfiniteScroll
-        :size="recordList.length"
-        :total="paginationConfig.total"
-        :page_size="paginationConfig.page_size"
-        v-model:current_page="paginationConfig.current_page"
-        @load="getChatRecord"
-        :loading="loading"
+      <AiChat
+        ref="AiChatRef"
+        :application-details="application"
+        type="log"
+        :record="recordList"
+        @scroll="handleScroll"
       >
-        <AiChat :data="application" :record="recordList" log></AiChat>
-      </InfiniteScroll>
+      </AiChat>
     </div>
     <template #footer>
       <div>
@@ -29,11 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import logApi from '@/api/log'
-import { type chatType } from '@/api/type/application'
-import { type ApplicationFormType } from '@/api/type/application'
+import { type ApplicationFormType, type chatType } from '@/api/type/application'
+import useStore from '@/stores'
+const AiChatRef = ref()
+const { log } = useStore()
 const props = withDefaults(
   defineProps<{
     /**
@@ -84,12 +83,21 @@ function closeHandle() {
 }
 
 function getChatRecord() {
-  if (props.chatId && visible.value) {
-    logApi.getChatRecordLog(id as string, props.chatId, paginationConfig, loading).then((res) => {
+  return log
+    .asyncChatRecordLog(id as string, props.chatId, paginationConfig, loading)
+    .then((res: any) => {
       paginationConfig.total = res.data.total
-      recordList.value = [...recordList.value, ...res.data.records]
+      const list = res.data.records
+      recordList.value = [...list, ...recordList.value].sort((a, b) =>
+        a.create_time.localeCompare(b.create_time)
+      )
+      if (paginationConfig.current_page === 1) {
+        nextTick(() => {
+          // 将滚动条滚动到最下面
+          AiChatRef.value.setScrollBottom()
+        })
+      }
     })
-  }
 }
 
 watch(
@@ -98,7 +106,9 @@ watch(
     recordList.value = []
     paginationConfig.total = 0
     paginationConfig.current_page = 1
-    getChatRecord()
+    if (props.chatId) {
+      getChatRecord()
+    }
   }
 )
 
@@ -110,8 +120,21 @@ watch(visible, (bool) => {
   }
 })
 
+function handleScroll(event: any) {
+  if (
+    props.chatId !== 'new' &&
+    event.scrollTop === 0 &&
+    paginationConfig.total > recordList.value.length
+  ) {
+    const history_height = event.dialogScrollbar.offsetHeight
+    paginationConfig.current_page += 1
+    getChatRecord().then(() => {
+      event.scrollDiv.setScrollTop(event.dialogScrollbar.offsetHeight - history_height)
+    })
+  }
+}
+
 const open = () => {
-  getChatRecord()
   visible.value = true
 }
 
@@ -125,11 +148,13 @@ defineExpose({
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .chat-record-drawer {
   .el-drawer__body {
     background: var(--app-layout-bg-color);
     padding: 0;
   }
+
   :deep(.el-divider__text) {
     background: var(--app-layout-bg-color);
   }

@@ -178,7 +178,7 @@
               </el-upload>
             </div>
             <el-text type="info" size="small"
-              >建议尺寸 64*64，支持 JPG、PNG、GIF，大小不超过 10 MB</el-text
+              >建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB</el-text
             >
           </el-card>
           <el-card shadow="never" class="mb-8">
@@ -197,7 +197,7 @@
               </el-upload>
             </div>
             <el-text type="info" size="small">
-              建议尺寸 64*64，支持 JPG、PNG、GIF，大小不超过 10 MB</el-text
+              建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB</el-text
             >
           </el-card>
           <el-card shadow="never" class="mb-8">
@@ -215,7 +215,7 @@
               </el-upload>
             </div>
             <el-text type="info" size="small">
-              建议尺寸 64*64，支持 JPG、PNG、GIF，大小不超过 10 MB
+              建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB
             </el-text>
             <div class="border-t mt-8">
               <div class="flex-between mb-8">

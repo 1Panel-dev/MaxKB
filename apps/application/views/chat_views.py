@@ -22,6 +22,7 @@ from common.constants.permission_constants import Permission, Group, Operate, \
     RoleConstants, ViewPermission, CompareConstants
 from common.response import result
 from common.util.common import query_params_to_single_dict
+from dataset.serializers.file_serializers import FileSerializer
 
 
 class Openai(APIView):
@@ -43,7 +44,7 @@ class ChatView(APIView):
     class Export(APIView):
         authentication_classes = [TokenAuth]
 
-        @action(methods=['GET'], detail=False)
+        @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary="导出对话",
                              operation_id="导出对话",
                              manual_parameters=ChatApi.get_request_params_api(),
@@ -128,7 +129,16 @@ class ChatView(APIView):
                                                'client_id': request.auth.client_id,
                                                'form_data': (request.data.get(
                                                    'form_data') if 'form_data' in request.data else {}),
-                                               'client_type': request.auth.client_type}).chat()
+
+                                               'image_list': request.data.get(
+                                                   'image_list') if 'image_list' in request.data else [],
+                                               'document_list': request.data.get(
+                                                   'document_list') if 'document_list' in request.data else [],
+                                               'client_type': request.auth.client_type,
+                                               'runtime_node_id': request.data.get('runtime_node_id', None),
+                                               'node_data': request.data.get('node_data', {}),
+                                               'chat_record_id': request.data.get('chat_record_id')}
+                                         ).chat()
 
     @action(methods=['GET'], detail=False)
     @swagger_auto_schema(operation_summary="获取对话列表",
@@ -362,6 +372,28 @@ class ChatView(APIView):
                     data={'chat_id': chat_id, 'chat_record_id': chat_record_id,
                           'dataset_id': dataset_id, 'document_id': document_id}).improve(request.data))
 
+            @action(methods=['POST'], detail=False)
+            @swagger_auto_schema(operation_summary="添加至知识库",
+                                 operation_id="添加至知识库",
+                                 manual_parameters=ImproveApi.get_request_params_api_post(),
+                                 request_body=ImproveApi.get_request_body_api_post(),
+                                 tags=["应用/对话日志/添加至知识库"]
+                                 )
+            @has_permissions(
+                ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                               [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                               dynamic_tag=keywords.get('application_id'))],
+
+                               ), ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
+                                                 [lambda r, keywords: Permission(group=Group.DATASET,
+                                                                                 operate=Operate.MANAGE,
+                                                                                 dynamic_tag=keywords.get(
+                                                                                     'dataset_id'))],
+                                                 compare=CompareConstants.AND
+                                                 ), compare=CompareConstants.AND)
+            def post(self, request: Request, application_id: str, dataset_id: str):
+                return result.success(ChatRecordSerializer.PostImprove().post_improve(request.data))
+
             class Operate(APIView):
                 authentication_classes = [TokenAuth]
 
@@ -391,3 +423,28 @@ class ChatView(APIView):
                         data={'chat_id': chat_id, 'chat_record_id': chat_record_id,
                               'dataset_id': dataset_id, 'document_id': document_id,
                               'paragraph_id': paragraph_id}).delete())
+
+    class UploadFile(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary="上传文件",
+                             operation_id="上传文件",
+                             manual_parameters=ChatRecordApi.get_request_params_api(),
+                             tags=["应用/对话日志"]
+                             )
+        @has_permissions(
+            ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY,
+                            RoleConstants.APPLICATION_ACCESS_TOKEN],
+                           [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                           dynamic_tag=keywords.get('application_id'))])
+        )
+        def post(self, request: Request, application_id: str, chat_id: str):
+            files = request.FILES.getlist('file')
+            file_ids = []
+            debug = request.data.get("debug", "false").lower() == "true"
+            meta = {'application_id': application_id, 'chat_id': chat_id, 'debug': debug}
+            for file in files:
+                file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
+                file_ids.append({'name': file.name, 'url': file_url, 'file_id': file_url.split('/')[-1]})
+            return result.success(file_ids)

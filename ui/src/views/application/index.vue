@@ -223,9 +223,9 @@ function searchHandle() {
   if (user.userInfo) {
     localStorage.setItem(user.userInfo.id + 'application', selectUserId.value)
   }
-  paginationConfig.total = 0
-  paginationConfig.current_page = 1
   applicationList.value = []
+  paginationConfig.current_page = 1
+  paginationConfig.total = 0
   getList()
 }
 function getAccessToken(id: string) {

@@ -252,12 +252,13 @@
                             <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="32">
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>
-                            <auto-tooltip
-                              :content="relatedObject(datasetList, item, 'id')?.name"
-                              style="width: 80%"
+
+                            <span
+                              class="ellipsis cursor"
+                              :title="relatedObject(datasetList, item, 'id')?.name"
                             >
-                              {{ relatedObject(datasetList, item, 'id')?.name }}
-                            </auto-tooltip>
+                              {{ relatedObject(datasetList, item, 'id')?.name }}</span
+                            >
                           </div>
                           <el-button text @click="removeDataset(item)">
                             <el-icon>
@@ -326,7 +327,11 @@
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip> -->
                     </div>
-                    <el-switch size="small" v-model="applicationForm.stt_model_enable" @change="sttModelEnableChange"/>
+                    <el-switch
+                      size="small"
+                      v-model="applicationForm.stt_model_enable"
+                      @change="sttModelEnableChange"
+                    />
                   </div>
                 </template>
                 <el-select
@@ -406,7 +411,11 @@
                         <el-icon class="mr-4"><Setting /></el-icon>
                         设置
                       </el-button>
-                      <el-switch size="small" v-model="applicationForm.tts_model_enable" @change="ttsModelEnableChange"/>
+                      <el-switch
+                        size="small"
+                        v-model="applicationForm.tts_model_enable"
+                        @change="ttsModelEnableChange"
+                      />
                     </div>
                   </div>
                 </template>
@@ -527,7 +536,7 @@
             </h4>
           </div>
           <div class="scrollbar-height">
-            <AiChat :data="applicationForm"></AiChat>
+            <AiChat :applicationDetails="applicationForm"></AiChat>
           </div>
         </div>
       </el-col>

@@ -28,7 +28,7 @@
             <div v-if="item.isValid" class="border-t mt-16">
               <el-row :gutter="12" class="mt-16">
                 <el-col v-for="(value, key) in item.config" :key="key" :span="12">
-                  <el-text type="info">{{ formatFieldName(key) }}</el-text>
+                  <el-text type="info">{{ formatFieldName(key, item) }}</el-text>
                   <div class="mt-4 mb-16 flex align-center">
                     <span
                       v-if="key !== 'app_secret'"
@@ -146,10 +146,10 @@ function createPlatform(key: string, name: string): Platform {
   }
 }
 
-function formatFieldName(key?: any): string {
+function formatFieldName(key?: any, item?: Platform): string {
   const fieldNames: { [key: string]: string } = {
     corp_id: 'Corp ID',
-    app_key: 'APP Key',
+    app_key: item?.key != 'lark' ? 'APP Key' : 'App ID',
     app_secret: 'APP Secret',
     agent_id: 'Agent ID',
     callback_url: '回调地址'

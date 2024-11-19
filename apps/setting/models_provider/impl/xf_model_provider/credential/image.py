@@ -1,11 +1,15 @@
 # coding=utf-8
-
+import base64
+import os
 from typing import Dict
+
+from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
+from setting.models_provider.impl.xf_model_provider.model.image import ImageMessage
 
 
 class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
@@ -28,7 +32,10 @@ class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            model.check_auth()
+            cwd = os.path.dirname(os.path.abspath(__file__))
+            with open(f'{cwd}/img_1.png', 'rb') as f:
+                message_list = [ImageMessage(str(base64.b64encode(f.read()), 'utf-8')), HumanMessage('请概述这张图片')]
+                model.stream(message_list)
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e

@@ -20,3 +20,10 @@ class CustomSwaggerAutoSchema(SwaggerAutoSchema):
         if "api" in tags and operation_keys:
             return [tags_dict.get(operation_keys[1]) if operation_keys[1] in tags_dict else operation_keys[1]]
         return tags
+    def get_schema(self, request=None, public=False):
+        schema = super().get_schema(request, public)
+        if request.is_secure():
+            schema.schemes = ['https']
+        else:
+            schema.schemes = ['http']
+        return schema

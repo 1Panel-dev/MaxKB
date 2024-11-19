@@ -168,13 +168,75 @@ export const rerankerNode = {
     }
   }
 }
+export const formNode = {
+  type: WorkflowType.FormNode,
+  text: '在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程',
+  label: '表单收集',
+  height: 252,
+  properties: {
+    width: 600,
+    stepName: '表单收集',
+    node_data: {
+      is_result: true,
+      form_field_list: [],
+      form_content_format: `你好，请先填写下面表单内容：
+{{form}}
+填写后请点击【提交】按钮进行提交。`
+    },
+    config: {
+      fields: [
+        {
+          label: '表单全部内容',
+          value: 'form_data'
+        }
+      ]
+    }
+  }
+}
+export const documentExtractNode = {
+  type: WorkflowType.DocumentExtractNode,
+  text: '提取文档中的内容',
+  label: '文档内容提取',
+  height: 252,
+  properties: {
+    stepName: '文档内容提取',
+    config: {
+      fields: [
+        {
+          label: '文件内容',
+          value: 'content'
+        }
+      ]
+    }
+  }
+}
+export const imageUnderstandNode = {
+  type: WorkflowType.ImageUnderstandNode,
+  text: '识别出图片中的对象、场景等信息回答用户问题',
+  label: '图片理解',
+  height: 252,
+  properties: {
+    stepName: '图片理解',
+    config: {
+      fields: [
+        {
+          label: 'AI 回答内容',
+          value: 'content'
+        }
+      ]
+    }
+  }
+}
 export const menuNodes = [
   aiChatNode,
   searchDatasetNode,
   questionNode,
   conditionNode,
   replyNode,
-  rerankerNode
+  rerankerNode,
+  documentExtractNode,
+  imageUnderstandNode,
+  formNode
 ]
 
 /**
@@ -215,6 +277,24 @@ export const functionLibNode = {
   }
 }
 
+export const applicationNode = {
+  type: WorkflowType.Application,
+  text: '应用节点',
+  label: '应用节点',
+  height: 260,
+  properties: {
+    stepName: '应用节点',
+    config: {
+      fields: [
+        {
+          label: '结果',
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
+
 export const compareList = [
   { value: 'is_null', label: '为空' },
   { value: 'is_not_null', label: '不为空' },
@@ -242,7 +322,11 @@ export const nodeDict: any = {
   [WorkflowType.Reply]: replyNode,
   [WorkflowType.FunctionLib]: functionLibNode,
   [WorkflowType.FunctionLibCustom]: functionNode,
-  [WorkflowType.RrerankerNode]: rerankerNode
+  [WorkflowType.RrerankerNode]: rerankerNode,
+  [WorkflowType.FormNode]: formNode,
+  [WorkflowType.Application]: applicationNode,
+  [WorkflowType.DocumentExtractNode]: documentExtractNode,
+  [WorkflowType.ImageUnderstandNode]: imageUnderstandNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

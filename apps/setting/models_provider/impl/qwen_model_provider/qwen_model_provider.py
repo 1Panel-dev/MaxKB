@@ -11,21 +11,33 @@ import os
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst, ModelInfo, IModelProvider, \
     ModelInfoManage
+from setting.models_provider.impl.qwen_model_provider.credential.image import QwenVLModelCredential
 from setting.models_provider.impl.qwen_model_provider.credential.llm import OpenAILLMModelCredential
+from setting.models_provider.impl.qwen_model_provider.model.image import QwenVLChatModel
 
 from setting.models_provider.impl.qwen_model_provider.model.llm import QwenChatModel
 from smartdoc.conf import PROJECT_DIR
 
 qwen_model_credential = OpenAILLMModelCredential()
+qwenvl_model_credential = QwenVLModelCredential()
 
 module_info_list = [
     ModelInfo('qwen-turbo', '', ModelTypeConst.LLM, qwen_model_credential, QwenChatModel),
     ModelInfo('qwen-plus', '', ModelTypeConst.LLM, qwen_model_credential, QwenChatModel),
     ModelInfo('qwen-max', '', ModelTypeConst.LLM, qwen_model_credential, QwenChatModel)
 ]
+module_info_vl_list = [
+    ModelInfo('qwen-vl-max', '', ModelTypeConst.IMAGE, qwenvl_model_credential, QwenVLChatModel),
+    ModelInfo('qwen-vl-max-0809', '', ModelTypeConst.IMAGE, qwenvl_model_credential, QwenVLChatModel),
+    ModelInfo('qwen-vl-plus-0809', '', ModelTypeConst.IMAGE, qwenvl_model_credential, QwenVLChatModel),
+]
 
-model_info_manage = ModelInfoManage.builder().append_model_info_list(module_info_list).append_default_model_info(
-    ModelInfo('qwen-turbo', '', ModelTypeConst.LLM, qwen_model_credential, QwenChatModel)).build()
+model_info_manage = (ModelInfoManage.builder()
+                     .append_model_info_list(module_info_list)
+                     .append_default_model_info(
+    ModelInfo('qwen-turbo', '', ModelTypeConst.LLM, qwen_model_credential, QwenChatModel))
+                     .append_model_info_list(module_info_vl_list)
+                     .build())
 
 
 class QwenModelProvider(IModelProvider):

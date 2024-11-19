@@ -8,7 +8,10 @@ declare module 'markdown-it-sub'
 declare module 'markdown-it-sup'
 declare module 'markdown-it-toc-done-right'
 declare module 'katex'
+interface Window {
+  sendMessage: ?((message: string, other_params_data: any) => void)
+}
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
-declare type Recordable<T = any> = Record<string, T>;
+declare type Recordable<T = any> = Record<string, T>

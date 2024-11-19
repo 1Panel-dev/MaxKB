@@ -12,18 +12,38 @@
       </div>
     </template>
 
-    <div
-      class="w-full flex-between mb-8"
+    <el-row style="width: 100%" :gutter="10">
+      <el-col :span="10"
+        ><div class="grid-content ep-bg-purple" />
+        标签</el-col
+      >
+      <el-col :span="12"
+        ><div class="grid-content ep-bg-purple" />
+        选项值</el-col
+      >
+    </el-row>
+    <el-row
+      style="width: 100%"
       v-for="(option, $index) in formValue.option_list"
       :key="$index"
+      :gutter="10"
     >
-      <el-input v-model="formValue.option_list[$index].value" placeholder="请输入选项值" />
-      <el-button link class="ml-8" @click.stop="delOption($index)">
-        <el-icon>
-          <Delete />
-        </el-icon>
-      </el-button>
-    </div>
+      <el-col :span="10"
+        ><div class="grid-content ep-bg-purple" />
+        <el-input v-model="formValue.option_list[$index].label" placeholder="请输入选项标签"
+      /></el-col>
+      <el-col :span="12"
+        ><div class="grid-content ep-bg-purple" />
+        <el-input v-model="formValue.option_list[$index].value" placeholder="请输入选项值"
+      /></el-col>
+      <el-col :span="1"
+        ><div class="grid-content ep-bg-purple" />
+        <el-button link class="ml-8" @click.stop="delOption($index)">
+          <el-icon>
+            <Delete />
+          </el-icon> </el-button
+      ></el-col>
+    </el-row>
   </el-form-item>
   <el-form-item
     label="默认值"
@@ -58,7 +78,7 @@ const formValue = computed({
 })
 
 const addOption = () => {
-  formValue.value.option_list.push({ value: '' })
+  formValue.value.option_list.push({ value: '', label: '' })
 }
 
 const delOption = (index: number) => {
@@ -74,8 +94,8 @@ const getData = () => {
     input_type: 'SingleSelect',
     attrs: {},
     default_value: formValue.value.default_value,
-    text_field: 'value',
-    value_field: 'value',
+    textField: 'label',
+    valueField: 'value',
     option_list: formValue.value.option_list
   }
 }

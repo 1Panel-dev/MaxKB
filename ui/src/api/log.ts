@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, del, put, exportExcel, exportExcelPost } from '@/request/index'
+import { get, del, put, exportExcel, exportExcelPost, post } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import { type Ref } from 'vue'
 
@@ -37,7 +37,13 @@ const exportChatLog: (
   data: any,
   loading?: Ref<boolean>
 ) => void = (application_id, application_name, param, data, loading) => {
-  exportExcelPost(application_name, `${prefix}/${application_id}/chat/export`, param, data, loading)
+  exportExcelPost(
+    application_name + '.xlsx',
+    `${prefix}/${application_id}/chat/export`,
+    param,
+    data,
+    loading
+  )
 }
 
 /**
@@ -108,7 +114,22 @@ const putChatRecordLog: (
     loading
   )
 }
+/**
+ * 对话记录提交至知识库
+ * @param data
+ * @param loading
+ * @param application_id
+ * @param dataset_id
+ */
 
+const postChatRecordLog: (
+  application_id: string,
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, dataset_id, data, loading) => {
+  return post(`${prefix}/${application_id}/dataset/${dataset_id}/improve`, data, undefined, loading)
+}
 /**
  * 获取标注段落列表信息
  * @param 参数
@@ -209,5 +230,6 @@ export default {
   delMarkRecord,
   exportChatLog,
   getChatLogClient,
-  delChatClientLog
+  delChatClientLog,
+  postChatRecordLog
 }

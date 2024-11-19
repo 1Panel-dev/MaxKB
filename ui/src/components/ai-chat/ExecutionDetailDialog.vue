@@ -17,7 +17,12 @@
                 <el-icon class="mr-8 arrow-icon" :class="current === index ? 'rotate-90' : ''"
                   ><CaretRight
                 /></el-icon>
-                <component :is="iconComponent(`${item.type}-icon`)" class="mr-8" :size="24" />
+                <component
+                  :is="iconComponent(`${item.type}-icon`)"
+                  class="mr-8"
+                  :size="24"
+                  :item="item.info"
+                />
                 <h4>{{ item.name }}</h4>
               </div>
               <div class="flex align-center">
@@ -37,13 +42,56 @@
               <div class="mt-12" v-if="current === index">
                 <template v-if="item.status === 200">
                   <!-- 开始 -->
-                  <template v-if="item.type === WorkflowType.Start">
+                  <template
+                    v-if="
+                      item.type === WorkflowType.Start || item.type === WorkflowType.Application
+                    "
+                  >
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">参数输入</h5>
                       <div class="p-8-12 border-t-dashed lighter">
-                        <div>用户问题: {{ item.question || '-' }}</div>
-                        <div v-for="(f, i) in item.global_fields" :key="i">
-                          {{ f.label }}: {{ f.value }}
+                        <div class="mb-8">
+                          <span class="color-secondary">用户问题:</span>
+                          {{ item.question || '-' }}
+                        </div>
+                        <div v-for="(f, i) in item.global_fields" :key="i" class="mb-8">
+                          <span class="color-secondary">{{ f.label }}:</span> {{ f.value }}
+                        </div>
+                        <div v-if="item.document_list?.length > 0">
+                          <p class="mb-8 color-secondary">上传的文档:</p>
+
+                          <el-space wrap>
+                            <template v-for="(f, i) in item.document_list" :key="i">
+                              {{ f.name }}
+                              <el-card
+                                shadow="never"
+                                style="--el-card-padding: 8px"
+                                class="file cursor"
+                              >
+                                <div class="flex align-center">
+                                  <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
+                                  <div class="ml-4 ellipsis" :title="f && f?.name">
+                                    {{ f && f?.name }}
+                                  </div>
+                                </div>
+                              </el-card>
+                            </template>
+                          </el-space>
+                        </div>
+                        <div v-if="item.image_list?.length > 0">
+                          <p class="mb-8 color-secondary">上传的图片:</p>
+
+                          <el-space wrap>
+                            <template v-for="(f, i) in item.image_list" :key="i">
+                              <el-image
+                                :src="f.url"
+                                alt=""
+                                fit="cover"
+                                style="width: 40px; height: 40px; display: block"
+                                class="border-r-4"
+                              />
+                            </template>
+                          </el-space>
                         </div>
                       </div>
                     </div>
@@ -84,15 +132,26 @@
                   </template>
                   <!-- AI 对话 / 问题优化-->
                   <template
-                    v-if="item.type == WorkflowType.AiChat || item.type == WorkflowType.Question"
+                    v-if="
+                      item.type == WorkflowType.AiChat ||
+                      item.type == WorkflowType.Question ||
+                      item.type == WorkflowType.Application ||
+                      item.type == WorkflowType.ImageUnderstandNode
+                    "
                   >
-                    <div class="card-never border-r-4">
+                    <div
+                      class="card-never border-r-4"
+                      v-if="item.type !== WorkflowType.Application"
+                    >
                       <h5 class="p-8-12">角色设定 (System)</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         {{ item.system || '-' }}
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div
+                      class="card-never border-r-4 mt-8"
+                      v-if="item.type !== WorkflowType.Application"
+                    >
                       <h5 class="p-8-12">历史记录</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.history_message?.length > 0">
@@ -115,7 +174,9 @@
                       </div>
                     </div>
                     <div class="card-never border-r-4 mt-8">
-                      <h5 class="p-8-12">AI 回答</h5>
+                      <h5 class="p-8-12">
+                        {{ item.type == WorkflowType.Application ? '应用回答' : 'AI 回答' }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <MdPreview
                           v-if="item.answer"
@@ -140,6 +201,25 @@
                             ref="editorRef"
                             editorId="preview-only"
                             :modelValue="item.answer"
+                            style="background: none"
+                          />
+                          <template v-else> - </template>
+                        </el-scrollbar>
+                      </div>
+                    </div>
+                  </template>
+
+                  <!-- 文档内容提取 -->
+                  <template v-if="item.type === WorkflowType.DocumentExtractNode">
+                    <div class="card-never border-r-4">
+                      <h5 class="p-8-12">参数输出</h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <el-scrollbar height="150">
+                          <MdPreview
+                            v-if="item.content"
+                            ref="editorRef"
+                            editorId="preview-only"
+                            :modelValue="item.content"
                             style="background: none"
                           />
                           <template v-else> - </template>
@@ -255,6 +335,7 @@ import ParagraphCard from './component/ParagraphCard.vue'
 import { arraySort } from '@/utils/utils'
 import { iconComponent } from '@/workflow/icons/utils'
 import { WorkflowType } from '@/enums/workflow'
+import { getImgUrl } from '@/utils/utils'
 
 const dialogVisible = ref(false)
 const detail = ref<any[]>([])
@@ -269,7 +350,7 @@ watch(dialogVisible, (bool) => {
 
 const open = (data: any) => {
   detail.value = cloneDeep(data)
-
+  console.log(detail.value)
   dialogVisible.value = true
 }
 onBeforeUnmount(() => {

@@ -61,8 +61,31 @@ const refreshFieldList = () => {
 }
 props.nodeModel.graphModel.eventCenter.on('refreshFieldList', refreshFieldList)
 
+const refreshFileUploadConfig = () => {
+  let fields = cloneDeep(props.nodeModel.properties.config.fields)
+  const form_data = props.nodeModel.graphModel.nodes
+    .filter((v: any) => v.id === 'base-node')
+    .map((v: any) => cloneDeep(v.properties.node_data.file_upload_setting))
+    .filter((v: any) => v)
+  if (form_data.length === 0) {
+    return
+  }
+  fields = fields.filter((item: any) => item.value !== 'image' && item.value !== 'document')
+  let fileUploadFields = []
+  if (form_data[0].document) {
+    fileUploadFields.push({ label: '文档', value: 'document' })
+  }
+  if (form_data[0].image) {
+    fileUploadFields.push({ label: '图片', value: 'image' })
+  }
+
+  set(props.nodeModel.properties.config, 'fields', [...fields, ...fileUploadFields])
+}
+props.nodeModel.graphModel.eventCenter.on('refreshFileUploadConfig', refreshFileUploadConfig)
+
 onMounted(() => {
   refreshFieldList()
+  refreshFileUploadConfig()
 })
 </script>
 <style lang="scss" scoped></style>

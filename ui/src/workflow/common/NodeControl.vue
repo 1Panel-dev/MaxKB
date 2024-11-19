@@ -6,10 +6,24 @@
     <el-button link @click="zoomIn">
       <el-icon :size="16" title="放大"><ZoomIn /></el-icon>
     </el-button>
-
-    <el-divider direction="vertical" />
     <el-button link @click="fitView">
       <AppIcon iconName="app-fitview" title="适应"></AppIcon>
+    </el-button>
+    <el-divider direction="vertical" />
+    <el-button link @click="retract">
+      <el-tooltip class="box-item" effect="dark" content="收起全部节点" placement="top">
+        <AppIcon iconName="app-retract" title="收起全部节点"></AppIcon>
+      </el-tooltip>
+    </el-button>
+    <el-button link @click="extend">
+      <el-tooltip class="box-item" effect="dark" content="展开全部节点" placement="top">
+        <AppIcon iconName="app-extend" title="展开全部节点"></AppIcon>
+      </el-tooltip>
+    </el-button>
+    <el-button link @click="layout">
+      <el-tooltip class="box-item" effect="dark" content="一键美化" placement="top">
+        <AppIcon iconName="app-beautify" title="一键美化"></AppIcon>
+      </el-tooltip>
     </el-button>
   </el-card>
 </template>
@@ -29,6 +43,19 @@ function fitView() {
   props.lf?.resetZoom()
   props.lf?.resetTranslate()
   props.lf?.fitView()
+}
+const layout = () => {
+  props.lf?.extension.dagre.layout()
+}
+const retract = () => {
+  props.lf?.graphModel.nodes.forEach((element: any) => {
+    element.properties.showNode = false
+  })
+}
+const extend = () => {
+  props.lf?.graphModel.nodes.forEach((element: any) => {
+    element.properties.showNode = true
+  })
 }
 </script>
 <style scoped></style>

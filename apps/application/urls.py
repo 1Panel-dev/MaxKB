@@ -22,6 +22,7 @@ urlpatterns = [
     path('application/<str:application_id>/function_lib', views.Application.FunctionLib.as_view()),
     path('application/<str:application_id>/function_lib/<str:function_lib_id>',
          views.Application.FunctionLib.Operate.as_view()),
+    path('application/<str:application_id>/application', views.Application.Application.as_view()),
     path('application/<str:application_id>/model_params_form/<str:model_id>',
          views.Application.ModelParamsForm.as_view()),
     path('application/<str:application_id>/hit_test', views.Application.HitTest.as_view()),
@@ -48,6 +49,7 @@ urlpatterns = [
     path('application/<str:application_id>/chat/<int:current_page>/<int:page_size>', views.ChatView.Page.as_view()),
     path('application/<str:application_id>/chat/<chat_id>', views.ChatView.Operate.as_view()),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/', views.ChatView.ChatRecord.as_view()),
+    path('application/<str:application_id>/chat/<chat_id>/upload_file', views.ChatView.UploadFile.as_view()),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/<int:current_page>/<int:page_size>',
          views.ChatView.ChatRecord.Page.as_view()),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/<chat_record_id>',
@@ -57,6 +59,10 @@ urlpatterns = [
          name=''),
     path(
         'application/<str:application_id>/chat/<chat_id>/chat_record/<str:chat_record_id>/dataset/<str:dataset_id>/document_id/<str:document_id>/improve',
+        views.ChatView.ChatRecord.Improve.as_view(),
+        name=''),
+    path(
+        'application/<str:application_id>/dataset/<str:dataset_id>/improve',
         views.ChatView.ChatRecord.Improve.as_view(),
         name=''),
     path('application/<str:application_id>/chat/<chat_id>/chat_record/<str:chat_record_id>/improve',

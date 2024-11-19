@@ -243,6 +243,24 @@ class Application(APIView):
                         data={'application_id': application_id,
                               'user_id': request.user.id}).get_function_lib(function_lib_id))
 
+    class Application(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取当前人创建的应用列表",
+                             operation_id="获取当前人创建的应用列表",
+                             tags=["应用/会话"])
+        @has_permissions(ViewPermission(
+            [RoleConstants.ADMIN, RoleConstants.USER],
+            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                            dynamic_tag=keywords.get('application_id'))],
+            compare=CompareConstants.AND))
+        def get(self, request: Request, application_id: str):
+            return result.success(
+                ApplicationSerializer.Operate(
+                    data={'application_id': application_id,
+                          'user_id': request.user.id}).application_list())
+
     class Profile(APIView):
         authentication_classes = [TokenAuth]
 
