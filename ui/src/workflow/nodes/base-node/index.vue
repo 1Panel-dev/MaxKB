@@ -70,7 +70,7 @@
                   <Setting />
                 </el-icon>
               </el-button>
-              <el-switch size="small" v-model="form_data.file_upload_enable"/>
+              <el-switch size="small" v-model="form_data.file_upload_enable" @change="switchFileUpload"/>
             </div>
           </div>
         </template>
@@ -382,6 +382,22 @@ const refreshTTSForm = (data: any) => {
   form_data.value.tts_model_params_setting = data
 }
 
+
+const switchFileUpload = () => {
+  const default_upload_setting = {
+    maxFiles: 3,
+    fileLimit: 50,
+    document: true,
+    image: false,
+    audio: false,
+    video: false
+  }
+
+  if (form_data.value.file_upload_enable) {
+    form_data.value.file_upload_setting = form_data.value.file_upload_setting || default_upload_setting
+    props.nodeModel.graphModel.eventCenter.emit('refreshFileUploadConfig')
+  }
+}
 const openFileUploadSettingDialog = () => {
   FileUploadSettingDialogRef.value?.open(form_data.value.file_upload_setting)
 }
