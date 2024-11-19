@@ -51,19 +51,18 @@
     prop="default_value"
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
   >
-    <el-select v-model="formValue.default_value" :teleported="false" popper-class="default-select">
-      <el-option
-        v-for="(option, index) in formValue.option_list"
-        :key="index"
-        :label="option.value"
-        :value="option.value"
-      />
-    </el-select>
+    <RadioRow
+      :form-field="formField"
+      v-model="formValue.default_value"
+      :other-params="{}"
+      field="default_value"
+    >
+    </RadioRow>
   </el-form-item>
 </template>
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-
+import RadioRow from '@/components/dynamics-form/items/radio/RadioRow.vue'
 const props = defineProps<{
   modelValue: any
 }>()
@@ -88,14 +87,16 @@ const delOption = (index: number) => {
   }
   formValue.value.option_list.splice(index, 1)
 }
-
+const formField = computed(() => {
+  return getData()
+})
 const getData = () => {
   return {
-    input_type: 'SingleSelect',
+    input_type: 'RadioCard',
     attrs: {},
     default_value: formValue.value.default_value,
-    textField: 'label',
-    valueField: 'value',
+    text_field: 'label',
+    value_field: 'value',
     option_list: formValue.value.option_list
   }
 }

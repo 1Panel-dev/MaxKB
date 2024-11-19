@@ -16,12 +16,24 @@ const input_type_list = [
     value: 'SingleSelect'
   },
   {
+    label: '多选框',
+    value: 'MultiSelect'
+  },
+  {
     label: '日期',
     value: 'DatePicker'
   },
   {
     label: 'JSON文本框',
     value: 'JsonInput'
+  },
+  {
+    label: '选项卡',
+    value: 'RadioCard'
+  },
+  {
+    label: '单行选项卡',
+    value: 'RadioRow'
   }
 ]
 export { input_type_list }
