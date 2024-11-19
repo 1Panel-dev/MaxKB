@@ -1,73 +1,127 @@
 <template>
   <div class="ai-chat__operate p-16-24">
     <slot name="operateBefore" />
-    <div class="operate-textarea flex">
-      <el-input
-        ref="quickInputRef"
-        v-model="inputValue"
-        :placeholder="
-          startRecorderTime
-            ? '说话中...'
-            : recorderLoading
-              ? '转文字中...'
-              : '请输入问题，Ctrl+Enter 换行，Enter发送'
-        "
-        :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
-        type="textarea"
-        :maxlength="100000"
-        @keydown.enter="sendChatHandle($event)"
-      />
-
-      <div class="operate flex align-center">
-        <span v-if="props.applicationDetails.file_upload_enable" class="flex align-center">
-<!--            accept="image/jpeg, image/png, image/gif"-->
-          <el-upload
-            action="#"
-            :auto-upload="false"
-            :show-file-list="false"
-            :accept="[...imageExtensions, ...documentExtensions].map((ext) => '.' + ext).join(',')"
-            :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
-          >
-            <el-button text>
-              <el-icon><Paperclip /></el-icon>
-            </el-button>
-          </el-upload>
-          <el-divider direction="vertical" />
-        </span>
-        <span v-if="props.applicationDetails.stt_model_enable" class="flex align-center">
-          <el-button text v-if="mediaRecorderStatus" @click="startRecording">
-            <el-icon>
-              <Microphone />
-            </el-icon>
-          </el-button>
-          <div v-else class="operate flex align-center">
-            <el-text type="info"
-              >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
-            >
-            <el-button text type="primary" @click="stopRecording" :loading="recorderLoading">
-              <AppIcon iconName="app-video-stop"></AppIcon>
-            </el-button>
-          </div>
-          <el-divider v-if="!startRecorderTime && !recorderLoading" direction="vertical" />
-        </span>
-
-        <el-button
-          v-if="!startRecorderTime && !recorderLoading"
-          text
-          class="sent-button"
-          :disabled="isDisabledChart || loading"
-          @click="sendChatHandle"
+    <div class="operate-textarea">
+      <el-scrollbar max-height="136">
+        <div
+          class="p-8-12"
+          v-loading="localLoading"
+          v-if="uploadDocumentList.length || uploadImageList.length"
         >
-          <img v-show="isDisabledChart || loading" src="@/assets/icon_send.svg" alt="" />
-          <SendIcon v-show="!isDisabledChart && !loading" />
-        </el-button>
+          <el-space wrap>
+            <template v-for="(item, index) in uploadDocumentList" :key="index">
+              <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
+                <div
+                  class="flex align-center"
+                  @mouseenter.stop="mouseenter(item)"
+                  @mouseleave.stop="mouseleave()"
+                >
+                  <div
+                    @click="deleteFile(index, 'document')"
+                    class="delete-icon color-secondary"
+                    v-if="showDelete === item.url"
+                  >
+                    <el-icon><CircleCloseFilled /></el-icon>
+                  </div>
+                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                  <div class="ml-4 ellipsis" :title="item && item?.name">
+                    {{ item && item?.name }}
+                  </div>
+                </div>
+              </el-card>
+            </template>
+            <template v-for="(item, index) in uploadImageList" :key="index">
+              <div
+                class="file cursor border border-r-4"
+                v-if="item.url"
+                @mouseenter.stop="mouseenter(item)"
+                @mouseleave.stop="mouseleave()"
+              >
+                <div
+                  @click="deleteFile(index, 'image')"
+                  class="delete-icon color-secondary"
+                  v-if="showDelete === item.url"
+                >
+                  <el-icon><CircleCloseFilled /></el-icon>
+                </div>
+                <el-image
+                  :src="item.url"
+                  alt=""
+                  fit="cover"
+                  style="width: 40px; height: 40px; display: block"
+                  class="border-r-4"
+                />
+              </div>
+            </template>
+          </el-space>
+        </div>
+      </el-scrollbar>
+      <div class="flex">
+        <el-input
+          ref="quickInputRef"
+          v-model="inputValue"
+          :placeholder="
+            startRecorderTime
+              ? '说话中...'
+              : recorderLoading
+                ? '转文字中...'
+                : '请输入问题，Ctrl+Enter 换行，Enter发送'
+          "
+          :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
+          type="textarea"
+          :maxlength="100000"
+          @keydown.enter="sendChatHandle($event)"
+        />
+
+        <div class="operate flex align-center">
+          <span v-if="props.applicationDetails.file_upload_enable" class="flex align-center">
+            <!--            accept="image/jpeg, image/png, image/gif"-->
+            <el-upload
+              action="#"
+              :auto-upload="false"
+              :show-file-list="false"
+              :accept="
+                [...imageExtensions, ...documentExtensions].map((ext) => '.' + ext).join(',')
+              "
+              :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
+            >
+              <el-button text>
+                <el-icon><Paperclip /></el-icon>
+              </el-button>
+            </el-upload>
+            <el-divider direction="vertical" />
+          </span>
+          <span v-if="props.applicationDetails.stt_model_enable" class="flex align-center">
+            <el-button text v-if="mediaRecorderStatus" @click="startRecording">
+              <el-icon>
+                <Microphone />
+              </el-icon>
+            </el-button>
+            <div v-else class="operate flex align-center">
+              <el-text type="info"
+                >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
+              >
+              <el-button text type="primary" @click="stopRecording" :loading="recorderLoading">
+                <AppIcon iconName="app-video-stop"></AppIcon>
+              </el-button>
+            </div>
+            <el-divider v-if="!startRecorderTime && !recorderLoading" direction="vertical" />
+          </span>
+
+          <el-button
+            v-if="!startRecorderTime && !recorderLoading"
+            text
+            class="sent-button"
+            :disabled="isDisabledChart || loading"
+            @click="sendChatHandle"
+          >
+            <img v-show="isDisabledChart || loading" src="@/assets/icon_send.svg" alt="" />
+            <SendIcon v-show="!isDisabledChart && !loading" />
+          </el-button>
+        </div>
       </div>
     </div>
-    <div
-      class="text-center"
-      v-if="applicationDetails.disclaimer"
-      style="margin-top: 8px"
-    >
+    <div class="text-center" v-if="applicationDetails.disclaimer" style="margin-top: 8px">
       <el-text type="info" v-if="applicationDetails.disclaimer" style="font-size: 12px">
         <auto-tooltip :content="applicationDetails.disclaimer_value">
           {{ applicationDetails.disclaimer_value }}
@@ -83,7 +137,9 @@ import applicationApi from '@/api/application'
 import { MsgAlert } from '@/utils/message'
 import { type chatType } from '@/api/type/application'
 import { useRoute } from 'vue-router'
+import { getImgUrl } from '@/utils/utils'
 import 'recorder-core/src/engine/mp3'
+
 import 'recorder-core/src/engine/mp3-engine'
 import { MsgWarning } from '@/utils/message'
 const route = useRoute()
@@ -129,7 +185,6 @@ const localLoading = computed({
     emit('update:loading', v)
   }
 })
-
 
 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
 const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
@@ -209,6 +264,8 @@ const inputValue = ref<string>('')
 const uploadImageList = ref<Array<any>>([])
 const uploadDocumentList = ref<Array<any>>([])
 const mediaRecorderStatus = ref(true)
+const showDelete = ref('')
+
 // 定义响应式引用
 const mediaRecorder = ref<any>(null)
 const isDisabledChart = computed(
@@ -346,6 +403,21 @@ function sendChatHandle(event: any) {
     inputValue.value += '\n'
   }
 }
+
+function deleteFile(index: number, val: string) {
+  if (val === 'image') {
+    uploadImageList.value.splice(index, 1)
+  } else if (val === 'document') {
+    uploadDocumentList.value.splice(index, 1)
+  }
+}
+function mouseenter(row: any) {
+  showDelete.value = row.url
+}
+function mouseleave() {
+  showDelete.value = ''
+}
+
 onMounted(() => {
   setTimeout(() => {
     if (quickInputRef.value && mode === 'embed') {
@@ -356,4 +428,14 @@ onMounted(() => {
 </script>
 <style lang="scss" scope>
 @import '../../index.scss';
+.file {
+  position: relative;
+  overflow: inherit;
+  .delete-icon {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    z-index: 1;
+  }
+}
 </style>

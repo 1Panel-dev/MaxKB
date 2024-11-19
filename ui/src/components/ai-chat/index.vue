@@ -39,6 +39,7 @@
       :type="type"
       :send-message="sendMessage"
       :open-chat-id="openChatId"
+      :chat-management="ChatManagement"
       v-model:chat-id="chartOpenId"
       v-model:loading="loading"
       v-if="type !== 'log'"
@@ -286,7 +287,15 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
       record_id: '',
       chat_id: '',
       vote_status: '-1',
-      status: undefined
+      status: undefined,
+      upload_meta: {
+        image_list:
+          other_params_data && other_params_data.image_list ? other_params_data.image_list : [],
+        document_list:
+          other_params_data && other_params_data.document_list
+            ? other_params_data.document_list
+            : []
+      }
     })
     chatList.value.push(chat)
     ChatManagement.addChatRecord(chat, 50, loading)
