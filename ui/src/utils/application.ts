@@ -8,3 +8,7 @@ export function isAppIcon(url: string | undefined) {
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'
 }
+
+export function isDepartment(type: string | undefined) {
+  return type === 'DEPARTMENT'
+}

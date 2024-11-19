@@ -80,9 +80,8 @@
                 </el-text>
               </template>
               <div class="status-tag">
-                <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px"
-                  >高级编排</el-tag
-                >
+                <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">高级编排</el-tag>
+                <el-tag type="warning" v-if="isDepartment(item.type)" style="height: 22px">高级编排</el-tag>
                 <el-tag class="blue-tag" v-else style="height: 22px">简单配置</el-tag>
               </div>
 
@@ -147,7 +146,7 @@ import applicationApi from '@/api/application'
 import CreateApplicationDialog from './component/CreateApplicationDialog.vue'
 import CopyApplicationDialog from './component/CopyApplicationDialog.vue'
 import { MsgSuccess, MsgConfirm, MsgAlert } from '@/utils/message'
-import { isAppIcon } from '@/utils/application'
+import {isAppIcon, isDepartment} from '@/utils/application'
 import { useRouter } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
 import { ValidType, ValidCount } from '@/enums/common'

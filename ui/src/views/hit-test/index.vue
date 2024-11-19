@@ -208,8 +208,8 @@ const paragraphDetail = ref<any[]>([])
 const title = ref('')
 const inputValue = ref('')
 const formInline = ref({
-  similarity: 0.6,
-  top_number: 5,
+  similarity: 0.0,
+  top_number: 10,
   search_mode: 'embedding'
 })
 

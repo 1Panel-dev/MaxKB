@@ -61,6 +61,18 @@
                 </el-radio>
               </el-card>
             </el-col>
+            <el-col :span="12">
+              <el-card
+                  shadow="never"
+                  class="mb-16"
+                  :class="isWorkFlow(applicationForm.type) ? 'active' : ''"
+              >
+                <el-radio value="DEPARTMENT" size="large">
+                  <p class="mb-4">部门机构</p>
+                  <el-text type="info">适合特定的知识领域场景</el-text>
+                </el-radio>
+              </el-card>
+            </el-col>
           </el-row>
         </el-radio-group>
       </el-form-item>
