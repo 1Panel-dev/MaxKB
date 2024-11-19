@@ -12,6 +12,8 @@ class ApplicationNodeSerializer(serializers.Serializer):
     question_reference_address = serializers.ListField(required=True, error_messages=ErrMessage.list("用户问题"))
     api_input_field_list = serializers.ListField(required=False, error_messages=ErrMessage.list("api输入字段"))
     user_input_field_list = serializers.ListField(required=False, error_messages=ErrMessage.uuid("用户输入字段"))
+    image_list = serializers.ListField(required=False, error_messages=ErrMessage.list("图片"))
+    document_list = serializers.ListField(required=False, error_messages=ErrMessage.list("文档"))
 
 
 class IApplicationNode(INode):
@@ -31,10 +33,27 @@ class IApplicationNode(INode):
         for user_input_field in self.node_params_serializer.data.get('user_input_field_list', []):
             kwargs[user_input_field['field']] = self.workflow_manage.get_reference_field(user_input_field['value'][0],
                                                                                          user_input_field['value'][1:])
-
+        # 判断是否包含这个属性
+        app_document_list = self.node_params_serializer.data.get('document_list', [])
+        if app_document_list and len(app_document_list) > 0:
+            app_document_list = self.workflow_manage.get_reference_field(
+                app_document_list[0],
+                app_document_list[1:])
+            for document in app_document_list:
+                if 'file_id' not in document:
+                    raise ValueError("参数值错误: 上传的文档中缺少file_id")
+        app_image_list = self.node_params_serializer.data.get('image_list', [])
+        if app_image_list and len(app_image_list) > 0:
+            app_image_list = self.workflow_manage.get_reference_field(
+                app_image_list[0],
+                app_image_list[1:])
+            for image in app_image_list:
+                if 'file_id' not in image:
+                    raise ValueError("参数值错误: 上传的图片中缺少file_id")
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
+                            app_document_list=app_document_list, app_image_list=app_image_list,
                             message=str(question), **kwargs)
 
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat, client_id, client_type,
-                **kwargs) -> NodeResult:
+                app_document_list=None, app_image_list=None, **kwargs) -> NodeResult:
         pass
