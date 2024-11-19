@@ -52,7 +52,7 @@ class Node:
             self.__setattr__(keyword, kwargs.get(keyword))
 
 
-end_nodes = ['ai-chat-node', 'reply-node', 'function-node', 'function-lib-node', 'application-node']
+end_nodes = ['ai-chat-node', 'reply-node', 'function-node', 'function-lib-node', 'application-node', 'image-understand-node']
 
 
 class Flow:
