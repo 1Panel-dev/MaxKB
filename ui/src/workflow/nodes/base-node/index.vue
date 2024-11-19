@@ -382,8 +382,17 @@ const refreshTTSForm = (data: any) => {
   form_data.value.tts_model_params_setting = data
 }
 
+const default_upload_setting = {
+  maxFiles: 3,
+  fileLimit: 50,
+  document: true,
+  image: false,
+  audio: false,
+  video: false
+}
+
 const openFileUploadSettingDialog = () => {
-  FileUploadSettingDialogRef.value?.open(form_data.value.file_upload_setting)
+  FileUploadSettingDialogRef.value?.open(form_data.value.file_upload_setting || default_upload_setting)
 }
 
 const refreshFileUploadForm = (data: any) => {
