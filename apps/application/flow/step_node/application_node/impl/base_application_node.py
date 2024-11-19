@@ -71,6 +71,7 @@ class BaseApplicationNode(IApplicationNode):
         self.answer_text = details.get('answer')
 
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat, client_id, client_type,
+                app_document_list=None, app_image_list=None,
                 **kwargs) -> NodeResult:
         from application.serializers.chat_message_serializers import ChatMessageSerializer
         # 生成嵌入应用的chat_id
@@ -79,13 +80,20 @@ class BaseApplicationNode(IApplicationNode):
             'application_id': application_id,
             'abstract': message
         })
+        if app_document_list is None:
+            app_document_list = []
+        if app_image_list is None:
+            app_image_list = []
         response = ChatMessageSerializer(
             data={'chat_id': current_chat_id, 'message': message,
                   're_chat': re_chat,
                   'stream': stream,
                   'application_id': application_id,
                   'client_id': client_id,
-                  'client_type': client_type, 'form_data': kwargs}).chat(base_to_response=OpenaiToResponse())
+                  'client_type': client_type,
+                  'document_list': app_document_list,
+                  'image_list': app_image_list,
+                  'form_data': kwargs}).chat(base_to_response=OpenaiToResponse())
         if response.status_code == 200:
             if stream:
                 content_generator = response.streaming_content

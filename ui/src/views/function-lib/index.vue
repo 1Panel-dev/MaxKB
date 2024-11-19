@@ -3,7 +3,12 @@
     <div class="flex-between mb-16">
       <h4>函数库</h4>
       <div class="flex-between">
-        <el-select v-model="selectUserId" class="mr-12 w-120" @change="searchHandle">
+        <el-select
+          v-model="selectUserId"
+          class="mr-12"
+          style="max-width: 240px; width: 150px"
+          @change="searchHandle"
+        >
           <el-option
             v-for="item in userOptions"
             :key="item.value"
@@ -17,6 +22,7 @@
           placeholder="按函数名称搜索"
           prefix-icon="Search"
           class="w-240"
+          style="max-width: 240px"
           clearable
         />
       </div>
