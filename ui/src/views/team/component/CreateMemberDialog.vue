@@ -81,12 +81,16 @@ const submitMember = async (formEl: FormInstance | undefined) => {
     if (valid) {
       loading.value = true
       let idsArray = memberForm.value.users.map((obj: any) => obj.id)
-      TeamApi.postCreatTeamMember(idsArray).then((res) => {
-        MsgSuccess('提交成功')
-        emit('refresh', idsArray)
-        dialogVisible.value = false
-        loading.value = false
-      })
+      TeamApi.postCreatTeamMember(idsArray)
+        .then((res) => {
+          MsgSuccess('提交成功')
+          emit('refresh', idsArray)
+          dialogVisible.value = false
+          loading.value = false
+        })
+        .finally(() => {
+          loading.value = false
+        })
     }
   })
 }
