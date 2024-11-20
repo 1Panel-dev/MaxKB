@@ -134,5 +134,7 @@ class BaseApplicationNode(IApplicationNode):
             'answer_tokens': self.context.get('answer_tokens'),
             'status': self.status,
             'err_message': self.err_message,
-            'global_fields': global_fields
+            'global_fields': global_fields,
+            'document_list': self.workflow_manage.document_list,
+            'image_list': self.workflow_manage.image_list
         }
