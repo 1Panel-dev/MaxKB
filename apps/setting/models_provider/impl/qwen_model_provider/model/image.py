@@ -13,10 +13,11 @@ class QwenVLChatModel(MaxKBBaseModel, ChatOpenAI):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         chat_tong_yi = QwenVLChatModel(
-            model=model_name,
+            model_name=model_name,
             openai_api_key=model_credential.get('api_key'),
             openai_api_base='https://dashscope.aliyuncs.com/compatible-mode/v1',
-            stream_options={"include_usage": True},
+            # stream_options={"include_usage": True},
+            streaming=True,
             model_kwargs=optional_params,
         )
         return chat_tong_yi
