@@ -22,7 +22,7 @@
             :nodeModel="nodeModel"
             class="w-full"
             placeholder="请选择文档"
-            v-model="form.document_list"
+            v-model="form_data.document_list"
           />
         </el-form-item>
       </el-form>
