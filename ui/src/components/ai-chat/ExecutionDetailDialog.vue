@@ -372,7 +372,7 @@
                             </template>
                           </el-space>
                           <p class="mb-8 color-secondary">提示词:</p>
-                          {{ item.prompt || '-' }}
+                          {{ item.question || '-' }}
                         </div>
                       </div>
                     </div>
