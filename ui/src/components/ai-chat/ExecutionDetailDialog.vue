@@ -175,7 +175,7 @@
                     </div>
                     <div class="card-never border-r-4 mt-8">
                       <h5 class="p-8-12">
-                        {{ item.type == WorkflowType.Application ? '应用回答' : 'AI 回答' }}
+                        {{ item.type == WorkflowType.Application ? '参数输出' : 'AI 回答' }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <MdPreview
