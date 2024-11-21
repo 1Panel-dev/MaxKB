@@ -313,6 +313,19 @@
                       </div>
                     </div>
                   </template>
+
+                  <!-- 表单收集 -->
+                  <template v-if="item.type === WorkflowType.FormNode">
+                    <div class="card-never border-r-4">
+                      <h5 class="p-8-12">参数输入</h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <div v-for="(f, i) in item.form_field_list" :key="i" class="mb-8">
+                          <span class="color-secondary">{{ f.label.label }}:</span>
+                          {{ item.form_data[f.field] }}
+                        </div>
+                      </div>
+                    </div>
+                  </template>
                 </template>
                 <template v-else>
                   <div class="card-never border-r-4">
