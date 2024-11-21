@@ -9,7 +9,7 @@ import router from '@/router'
 import { ref, type WritableComputedRef } from 'vue'
 
 const axiosConfig = {
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   withCredentials: false,
   timeout: 600000,
   headers: {}

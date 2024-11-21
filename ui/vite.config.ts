@@ -8,7 +8,10 @@ import DefineOptions from 'unplugin-vue-define-options/vite'
 const envDir = './env'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+  console.log('Current Mode:', mode);
+  console.log('Loading Environment Variables from:', process.cwd());
   const ENV = loadEnv(mode, envDir)
+  console.log('Loaded ENV:', ENV);
   const prefix = process.env.VITE_DYNAMIC_PREFIX || ENV.VITE_BASE_PATH;
   const proxyConf: Record<string, string | ProxyOptions> = {}
   proxyConf['/api'] = {

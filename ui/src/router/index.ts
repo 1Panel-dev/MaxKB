@@ -1,16 +1,17 @@
-import { hasPermission } from '@/utils/permission/index'
+import {hasPermission} from '@/utils/permission/index'
 import {
   createRouter,
-  createWebHistory,
+  createWebHashHistory,
   type NavigationGuardNext,
   type RouteLocationNormalized,
-  type RouteRecordRaw,
-  type RouteRecordName
+  type RouteRecordName,
+  type RouteRecordRaw
 } from 'vue-router'
 import useStore from '@/stores'
-import { routes } from '@/router/routes'
+import {routes} from '@/router/routes'
+
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: routes
 })
 
