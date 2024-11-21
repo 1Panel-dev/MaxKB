@@ -87,7 +87,7 @@
               </template>
               <div class="status-tag">
                 <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">高级编排</el-tag>
-                <el-tag type="warning" v-if="isDepartment(item.type)" style="height: 22px">高级编排</el-tag>
+                <el-tag type="warning" v-if="isDepartment(item.type)" style="height: 22px">部门机构</el-tag>
                 <el-tag class="blue-tag" v-else style="height: 22px">简单配置</el-tag>
               </div>
 

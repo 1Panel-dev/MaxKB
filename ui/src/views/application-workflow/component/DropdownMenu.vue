@@ -83,6 +83,9 @@
                 <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px"
                   >高级编排</el-tag
                 >
+                <el-tag type="warning" v-else-if="isDepartment(item.type)" style="height: 22px"
+                >部门机构</el-tag
+                >
                 <el-tag class="blue-tag" v-else style="height: 22px">简单配置</el-tag>
               </div>
             </div>
@@ -97,7 +100,7 @@ import { ref, onMounted, computed } from 'vue'
 import { menuNodes, functionLibNode, functionNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application'
-import { isWorkFlow } from '@/utils/application'
+import {isDepartment, isWorkFlow} from '@/utils/application'
 const search_text = ref<string>('')
 const props = defineProps({
   show: {

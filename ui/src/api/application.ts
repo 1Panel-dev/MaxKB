@@ -187,7 +187,8 @@ const getChatOpen: (application_id: String) => Promise<Result<any>> = (applicati
  * data
  */
 const postChatMessage: (chat_id: string, data: any) => Promise<any> = (chat_id, data) => {
-  return postStream(`/api${prefix}/chat_message/${chat_id}`, data)
+  const server=import.meta.env.VITE_API_BASE_URL || '/api';
+  return postStream(`${server}${prefix}/chat_message/${chat_id}`, data)
 }
 
 /**
