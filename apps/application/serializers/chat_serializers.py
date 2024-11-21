@@ -38,7 +38,7 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
 from dataset.models import Document, Problem, Paragraph, ProblemParagraphMapping
-from dataset.serializers.common_serializers import get_embedding_model_id_by_dataset_id
+from dataset.serializers.common_serializers import get_embedding_model_id_by_dataset_id, update_document_char_length
 from dataset.serializers.paragraph_serializers import ParagraphSerializers
 from embedding.task import embedding_by_paragraph, embedding_by_paragraph_list
 from setting.models import Model
@@ -620,6 +620,7 @@ class ChatRecordSerializer(serializers.Serializer):
             # 插入关联问题
             problem_paragraph_mapping.save()
             chat_record.improve_paragraph_id_list.append(paragraph.id)
+            update_document_char_length(document_id)
             # 添加标注
             chat_record.save()
             return ChatRecordSerializerModel(chat_record).data, paragraph.id, dataset_id
@@ -718,5 +719,6 @@ class ChatRecordSerializer(serializers.Serializer):
 
             # 批量保存聊天记录
             ChatRecord.objects.bulk_update(chat_record_list, ['improve_paragraph_id_list'])
+            update_document_char_length(document_id)
 
             return paragraph_ids, dataset_id

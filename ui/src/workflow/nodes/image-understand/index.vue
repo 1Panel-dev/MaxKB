@@ -193,6 +193,7 @@ import applicationApi from '@/api/application'
 import { app } from '@/main'
 import useStore from '@/stores'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
+import type { FormInstance } from 'element-plus'
 
 const { model } = useStore()
 
@@ -204,6 +205,12 @@ const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 
+const aiChatNodeFormRef = ref<FormInstance>()
+const validate = () => {
+  return aiChatNodeFormRef.value?.validate().catch((err) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
+}
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
@@ -277,6 +284,8 @@ function submitDialog(val: string) {
 onMounted(() => {
   getModel()
   getProvider()
+
+  set(props.nodeModel, 'validate', validate)
 })
 
 </script>

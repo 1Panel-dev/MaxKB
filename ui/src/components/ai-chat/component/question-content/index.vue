@@ -81,12 +81,12 @@ const image_list = computed(() => {
 })
 
 onMounted(() => {
-  console.log(props.chatRecord.execution_details)
-  if (props.chatRecord.execution_details?.length > 0) {
-    props.chatRecord.execution_details[0].image_list?.forEach((image: any) => {
-      console.log('image', image.name, image.url)
-    })
-  }
+  // console.log(props.chatRecord.execution_details)
+  // if (props.chatRecord.execution_details?.length > 0) {
+  //   props.chatRecord.execution_details[0].image_list?.forEach((image: any) => {
+  //     console.log('image', image.name, image.url)
+  //   })
+  // }
 })
 </script>
 <style lang="scss" scoped></style>
