@@ -348,8 +348,23 @@
                             v-for="(history, historyIndex) in item.history_message"
                             :key="historyIndex"
                           >
-                            <span class="color-secondary mr-4">{{ history.role }}:</span
-                            ><span>{{ history.content }}</span>
+                            <span class="color-secondary mr-4">{{ history.role }}:</span>
+
+                            <span v-if="Array.isArray(history.content)">
+                              <template v-for="(h, i) in history.content" :key="i">
+                                <el-image
+                                  v-if="h.type === 'image_url'"
+                                  :src="h.image_url.url"
+                                  alt=""
+                                  fit="cover"
+                                  style="width: 40px; height: 40px; display: block"
+                                  class="border-r-4"
+                                />
+                                <span v-else>{{ h.text }}</span>
+                              </template>
+                            </span>
+
+                            <span v-else>{{ history.content }}</span>
                           </p>
                         </template>
                         <template v-else> - </template>
@@ -359,7 +374,7 @@
                       <h5 class="p-8-12">本次对话</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         <div v-if="item.image_list?.length > 0">
-                          <p class="mb-8 color-secondary">文件:</p>
+                          <p class="mb-8 color-secondary">图片:</p>
                           <el-space wrap>
                             <template v-for="(f, i) in item.image_list" :key="i">
                               <el-image
@@ -371,7 +386,6 @@
                               />
                             </template>
                           </el-space>
-                          <p class="mb-8 color-secondary">提示词:</p>
                           {{ item.question || '-' }}
                         </div>
                       </div>
