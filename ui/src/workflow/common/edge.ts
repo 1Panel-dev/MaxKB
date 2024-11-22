@@ -71,7 +71,11 @@ class CustomEdge2 extends BezierEdge {
     delete style.stroke
 
     return h('g', {}, [
-      h('style', { type: 'text/css' }, '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}'),
+      h(
+        'style' as any,
+        { type: 'text/css' },
+        '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}'
+      ),
       h('path', {
         d: path,
         ...style,
