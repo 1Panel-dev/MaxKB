@@ -82,7 +82,7 @@
             </div>
           </el-scrollbar>
           <div>
-            <el-checkbox v-model="checkedConnect" @change="changeHandle">
+            <el-checkbox v-model="checkedConnect" @change="changeHandle" style="white-space: normal;">
               导入时添加分段标题为关联问题（适用于标题为问题的问答对）
             </el-checkbox>
           </div>
