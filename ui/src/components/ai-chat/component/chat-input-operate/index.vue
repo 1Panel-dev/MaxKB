@@ -24,7 +24,7 @@
                     <el-icon><CircleCloseFilled /></el-icon>
                   </div>
                   <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis" :title="item && item?.name">
+                  <div class="ml-4 ellipsis" style="max-width: 160px" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
                 </div>
