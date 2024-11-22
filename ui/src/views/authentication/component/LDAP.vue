@@ -48,12 +48,12 @@
               $t('login.ldap.enableAuthentication')
             }}</el-checkbox>
           </el-form-item>
-          <el-button @click="submit(authFormRef, 'test')" :disabled="loading">
-            {{ $t('login.ldap.test') }}</el-button
-          >
         </el-form>
 
         <div class="text-right">
+          <el-button @click="submit(authFormRef, 'test')" :disabled="loading">
+            {{ $t('login.ldap.test') }}</el-button
+          >
           <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
             {{ $t('login.ldap.save') }}
           </el-button>
