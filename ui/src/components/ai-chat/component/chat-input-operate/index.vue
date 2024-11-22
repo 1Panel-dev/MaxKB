@@ -209,7 +209,9 @@ const getAcceptList = () => {
 
 const uploadFile = async (file: any, fileList: any) => {
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
-  if (fileList.length > maxFiles) {
+  // 单次上传文件数量限制
+  const file_limit_once = uploadImageList.value.length + uploadDocumentList.value.length
+  if (file_limit_once >= maxFiles) {
     MsgWarning('最多上传' + maxFiles + '个文件')
     return
   }
