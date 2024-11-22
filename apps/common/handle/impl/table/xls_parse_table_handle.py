@@ -63,21 +63,26 @@ class XlsSplitHandle(BaseParseTableHandle):
 
     def get_content(self, file):
         # 打开 .xls 文件
-        workbook = xlrd.open_workbook(file_contents=file.read(), formatting_info=True)
-        sheets = workbook.sheets()
-        md_tables = ''
-        for sheet in sheets:
+        try:
+            workbook = xlrd.open_workbook(file_contents=file.read(), formatting_info=True)
+            sheets = workbook.sheets()
+            md_tables = ''
+            for sheet in sheets:
 
-            # 获取表头和内容
-            headers = sheet.row_values(0)
-            data = [sheet.row_values(row_idx) for row_idx in range(1, sheet.nrows)]
+                # 获取表头和内容
+                headers = sheet.row_values(0)
+                data = [sheet.row_values(row_idx) for row_idx in range(1, sheet.nrows)]
 
-            # 构建 Markdown 表格
-            md_table = '| ' + ' | '.join(headers) + ' |\n'
-            md_table += '| ' + ' | '.join(['---'] * len(headers)) + ' |\n'
-            for row in data:
-                # 将每个单元格中的内容替换换行符为 <br> 以保留原始格式
-                md_table += '| ' + ' | '.join([str(cell).replace('\n', '<br>') if cell else '' for cell in row]) + ' |\n'
-            md_tables += md_table + '\n\n'
+                # 构建 Markdown 表格
+                md_table = '| ' + ' | '.join(headers) + ' |\n'
+                md_table += '| ' + ' | '.join(['---'] * len(headers)) + ' |\n'
+                for row in data:
+                    # 将每个单元格中的内容替换换行符为 <br> 以保留原始格式
+                    md_table += '| ' + ' | '.join(
+                        [str(cell).replace('\n', '<br>') if cell else '' for cell in row]) + ' |\n'
+                md_tables += md_table + '\n\n'
 
-        return md_tables
+            return md_tables
+        except Exception as e:
+            max_kb.error(f'excel split handle error: {e}')
+            return f'error: {e}'
