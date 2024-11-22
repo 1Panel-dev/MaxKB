@@ -213,6 +213,7 @@ const uploadFile = async (file: any, fileList: any) => {
   const file_limit_once = uploadImageList.value.length + uploadDocumentList.value.length
   if (file_limit_once >= maxFiles) {
     MsgWarning('最多上传' + maxFiles + '个文件')
+    fileList.splice(0, fileList.length)
     return
   }
   if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) {
