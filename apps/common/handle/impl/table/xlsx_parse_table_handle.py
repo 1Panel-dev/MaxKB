@@ -75,28 +75,32 @@ class XlsxSplitHandle(BaseParseTableHandle):
 
 
     def get_content(self, file):
-        # 加载 Excel 文件
-        workbook = load_workbook(file)
-        md_tables = ''
-        # 如果未指定 sheet_name，则使用第一个工作表
-        for sheetname in workbook.sheetnames:
-            sheet = workbook[sheetname] if sheetname else workbook.active
+        try:
+            # 加载 Excel 文件
+            workbook = load_workbook(file)
+            md_tables = ''
+            # 如果未指定 sheet_name，则使用第一个工作表
+            for sheetname in workbook.sheetnames:
+                sheet = workbook[sheetname] if sheetname else workbook.active
 
-            # 获取工作表的所有行
-            rows = list(sheet.iter_rows(values_only=True))
-            if not rows:
-                continue
+                # 获取工作表的所有行
+                rows = list(sheet.iter_rows(values_only=True))
+                if not rows:
+                    continue
 
-            # 提取表头和内容
-            headers = rows[0]
-            data = rows[1:]
+                # 提取表头和内容
+                headers = rows[0]
+                data = rows[1:]
 
-            # 构建 Markdown 表格
-            md_table = '| ' + ' | '.join(headers) + ' |\n'
-            md_table += '| ' + ' | '.join(['---'] * len(headers)) + ' |\n'
-            for row in data:
-                md_table += '| ' + ' | '.join(
-                    [str(cell).replace('\n', '<br>') if cell is not None else '' for cell in row]) + ' |\n'
+                # 构建 Markdown 表格
+                md_table = '| ' + ' | '.join(headers) + ' |\n'
+                md_table += '| ' + ' | '.join(['---'] * len(headers)) + ' |\n'
+                for row in data:
+                    md_table += '| ' + ' | '.join(
+                        [str(cell).replace('\n', '<br>') if cell is not None else '' for cell in row]) + ' |\n'
 
-            md_tables += md_table + '\n\n'
-        return md_tables
+                md_tables += md_table + '\n\n'
+            return md_tables
+        except Exception as e:
+            max_kb.error(f'excel split handle error: {e}')
+            return f'error: {e}'

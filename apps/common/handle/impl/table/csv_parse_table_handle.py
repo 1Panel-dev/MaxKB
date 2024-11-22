@@ -41,4 +41,4 @@ class CsvSplitHandle(BaseParseTableHandle):
             return buffer.decode(detect(buffer)['encoding'])
         except BaseException as e:
             max_kb.error(f'csv split handle error: {e}')
-            return [{'name': file.name, 'paragraphs': []}]
+            return f'error: {e}'
