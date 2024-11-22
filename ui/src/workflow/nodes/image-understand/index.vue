@@ -7,7 +7,6 @@
         :model="form_data"
         label-position="top"
         require-asterisk-position="right"
-        class="mb-24"
         label-width="auto"
         ref="aiChatNodeFormRef"
         hide-required-asterisk
@@ -132,7 +131,7 @@
           <template #label>
             <div class="flex-between">
               <div>历史聊天记录</div>
-              <el-select v-model="form_data.dialogue_type" class="w-120">
+              <el-select v-model="form_data.dialogue_type" type="small" style="width: 100px;">
                 <el-option label="节点" value="NODE"/>
                 <el-option label="工作流" value="WORKFLOW"/>
               </el-select>

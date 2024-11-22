@@ -83,18 +83,29 @@
               :accept="getAcceptList()"
               :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
             >
-              <el-button text>
-                <el-icon><Paperclip /></el-icon>
-              </el-button>
+              <el-tooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
+                <template #content
+                  >上传文件：最多{{
+                    props.applicationDetails.file_upload_setting.maxFiles
+                  }}个，每个文件限制
+                  {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />文件类型：{{
+                    getAcceptList()
+                  }}</template
+                >
+                <el-button text>
+                  <el-icon><Paperclip /></el-icon>
+                </el-button>
+              </el-tooltip>
             </el-upload>
             <el-divider direction="vertical" />
           </span>
           <span v-if="props.applicationDetails.stt_model_enable" class="flex align-center">
-            <el-button text v-if="mediaRecorderStatus" @click="startRecording">
+            <el-button text @click="startRecording" v-if="mediaRecorderStatus">
               <el-icon>
                 <Microphone />
               </el-icon>
             </el-button>
+
             <div v-else class="operate flex align-center">
               <el-text type="info"
                 >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
@@ -456,5 +467,8 @@ onMounted(() => {
     top: -5px;
     z-index: 1;
   }
+}
+.upload-tooltip-width {
+  width: 300px;
 }
 </style>

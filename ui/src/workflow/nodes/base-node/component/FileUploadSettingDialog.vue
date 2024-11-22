@@ -7,34 +7,64 @@
     :destroy-on-close="true"
     :before-close="close"
     append-to-body
+    width="600"
   >
     <el-form
       label-position="top"
       ref="fieldFormRef"
       :model="form_data"
-      require-asterisk-position="right">
+      require-asterisk-position="right"
+    >
       <el-form-item label="单次上传最多文件数">
-        <el-slider v-model="form_data.maxFiles" show-input :show-input-controls="false" :min="1" :max="10" />
+        <el-slider
+          v-model="form_data.maxFiles"
+          show-input
+          :show-input-controls="false"
+          :min="1"
+          :max="10"
+        />
       </el-form-item>
       <el-form-item label="每个文件最大（MB）">
-        <el-slider v-model="form_data.fileLimit" show-input :show-input-controls="false" :min="1" :max="100" />
+        <el-slider
+          v-model="form_data.fileLimit"
+          show-input
+          :show-input-controls="false"
+          :min="1"
+          :max="100"
+        />
       </el-form-item>
       <el-form-item label="上传的文件类型">
-        <el-card style="width: 100%" class="mb-8">
+        <el-card
+          shadow="hover"
+          class="card-checkbox cursor w-full mb-8"
+          :class="form_data.document ? 'active' : ''"
+          style="--el-card-padding: 8px 16px"
+        >
           <div class="flex-between">
-            <p>
-              文档（TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF）
-              需要与文档内容提取节点配合使用
-            </p>
+            <div class="flex align-center">
+              <img class="mr-12" src="@/assets/icon_file-doc.svg" alt="" />
+              <div>
+                <p>文档（TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF）</p>
+                <el-text class="color-secondary">需要与文档内容提取节点配合使用</el-text>
+              </div>
+            </div>
             <el-checkbox v-model="form_data.document" />
           </div>
         </el-card>
-        <el-card style="width: 100%" class="mb-8">
+        <el-card
+          shadow="hover"
+          class="card-checkbox cursor w-full mb-8"
+          :class="form_data.image ? 'active' : ''"
+          style="--el-card-padding: 8px 16px"
+        >
           <div class="flex-between">
-            <p>
-              图片（JPG、JPEG、PNG、GIF）
-              所选模型需要支持接收图片
-            </p>
+            <div class="flex align-center">
+              <img class="mr-12" src="@/assets/icon_file-image.svg" alt="" />
+              <div>
+                <p>图片（JPG、JPEG、PNG、GIF）</p>
+                <el-text class="color-secondary">所选模型需要支持接收图片</el-text>
+              </div>
+            </div>
             <el-checkbox v-model="form_data.image" />
           </div>
         </el-card>
@@ -43,9 +73,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="close"> 取消 </el-button>
-        <el-button type="primary" @click="submit()" :loading="loading">
-          确定
-        </el-button>
+        <el-button type="primary" @click="submit()" :loading="loading"> 确定 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -68,7 +96,6 @@ const form_data = ref({
   audio: false,
   video: false
 })
-
 
 function open(data: any) {
   dialogVisible.value = true
@@ -96,6 +123,4 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>
