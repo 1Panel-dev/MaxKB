@@ -67,11 +67,13 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 image,
                 **kwargs) -> NodeResult:
         image_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'))
-        history_message = self.get_history_message(history_chat_record, dialogue_number)
+        # 执行详情中的历史消息不需要图片内容
+        history_message =self.get_history_message_for_details(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)
         self.context['question'] = question.content
-        message_list = self.generate_message_list(image_model, system, prompt, history_message, image)
+        # 生成消息列表, 真实的history_message
+        message_list = self.generate_message_list(image_model, system, prompt, self.get_history_message(history_chat_record, dialogue_number), image)
         self.context['message_list'] = message_list
         self.context['image_list'] = image
         self.context['dialogue_type'] = dialogue_type
@@ -85,6 +87,15 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
             return NodeResult({'result': r, 'chat_model': image_model, 'message_list': message_list,
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context)
+
+    @staticmethod
+    def get_history_message_for_details(history_chat_record, dialogue_number):
+        start_index = len(history_chat_record) - dialogue_number
+        history_message = reduce(lambda x, y: [*x, *y], [
+            [history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
+            for index in
+            range(start_index if start_index > 0 else 0, len(history_chat_record))], [])
+        return history_message
 
     def get_history_message(self, history_chat_record, dialogue_number):
         start_index = len(history_chat_record) - dialogue_number
