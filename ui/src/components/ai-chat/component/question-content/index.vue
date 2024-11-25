@@ -18,10 +18,13 @@
         <div class="mb-8" v-if="document_list.length">
           <el-space wrap>
             <template v-for="(item, index) in document_list" :key="index">
-              <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
-                <div class="flex align-center">
+              <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
+                <div class="download-button flex align-center" @click="downloadFile(item)">
+                  <el-icon class="mr-4"><Download /></el-icon>点击下载文件
+                </div>
+                <div class="show flex align-center">
                   <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis" :title="item && item?.name">
+                  <div class="ml-4 ellipsis" style="max-width: 150px" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
                 </div>
@@ -55,7 +58,7 @@
 </template>
 <script setup lang="ts">
 import { type chatType } from '@/api/type/application'
-import { getImgUrl, getAttrsArray } from '@/utils/utils'
+import { getImgUrl, getAttrsArray, downloadByURL } from '@/utils/utils'
 import { onMounted, computed } from 'vue'
 const props = defineProps<{
   application: any
@@ -80,13 +83,33 @@ const image_list = computed(() => {
   }
 })
 
-onMounted(() => {
-  console.log(props.chatRecord.execution_details)
-  if (props.chatRecord.execution_details?.length > 0) {
-    props.chatRecord.execution_details[0].image_list?.forEach((image: any) => {
-      console.log('image', image.name, image.url)
-    })
-  }
-})
+function downloadFile(item: any) {
+  downloadByURL(item.url, item.name)
+}
+
+onMounted(() => {})
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.download-file {
+  width: 200px;
+  height: 43px;
+  &:hover {
+    color: var(--el-color-primary);
+    border: 1px solid var(--el-color-primary);
+    .download-button {
+      display: block;
+      text-align: center;
+      line-height: 26px;
+    }
+    .show {
+      display: none;
+    }
+  }
+  .show {
+    display: block;
+  }
+  .download-button {
+    display: none;
+  }
+}
+</style>

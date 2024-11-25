@@ -221,7 +221,7 @@ export const imageUnderstandNode = {
       fields: [
         {
           label: 'AI 回答内容',
-          value: 'content'
+          value: 'answer'
         }
       ]
     }

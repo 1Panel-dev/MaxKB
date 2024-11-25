@@ -14,8 +14,8 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
         get_buffer = FileBufferHandle().get_buffer
 
         self.context['document_list'] = document
-        content = ''
-        splitter = '\n-----------------------------------\n'
+        content = []
+        splitter = '\n`-----------------------------------`\n'
         if document is None:
             return NodeResult({'content': content}, {})
 
@@ -29,10 +29,10 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     # 回到文件头
                     buffer.seek(0)
                     file_content = split_handle.get_content(buffer)
-                    content += splitter + '## ' + doc['name'] + '\n' + file_content
+                    content.append( '## ' + doc['name'] + '\n' + file_content)
                     break
 
-        return NodeResult({'content': content}, {})
+        return NodeResult({'content': splitter.join(content)}, {})
 
     def get_details(self, index: int, **kwargs):
         return {

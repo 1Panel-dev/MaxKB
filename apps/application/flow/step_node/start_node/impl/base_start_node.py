@@ -77,5 +77,6 @@ class BaseStartStepNode(IStarNode):
             'status': self.status,
             'err_message': self.err_message,
             'image_list': self.context.get('image'),
+            'document_list': self.context.get('document'),
             'global_fields': global_fields
         }

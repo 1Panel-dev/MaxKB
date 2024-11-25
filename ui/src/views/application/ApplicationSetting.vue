@@ -198,6 +198,8 @@
                   :value-on-clear="0"
                   controls-position="right"
                   class="w-full"
+                  :step="1"
+                  :step-strictly="true"
                 />
               </el-form-item>
               <el-form-item

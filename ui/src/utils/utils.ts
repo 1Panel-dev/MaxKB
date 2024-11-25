@@ -88,3 +88,14 @@ export function getAttrsArray(array: Array<any>, attr: string) {
 export function getSum(array: Array<any>) {
   return array.reduce((total, item) => total + item, 0)
 }
+
+// 下载
+export function downloadByURL(url: string, name: string) {
+  const a = document.createElement('a')
+  a.setAttribute('href', url)
+  a.setAttribute('target', '_blank')
+  a.setAttribute('download', name)
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}

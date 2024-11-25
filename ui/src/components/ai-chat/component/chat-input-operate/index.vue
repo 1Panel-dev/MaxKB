@@ -24,7 +24,7 @@
                     <el-icon><CircleCloseFilled /></el-icon>
                   </div>
                   <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis" :title="item && item?.name">
+                  <div class="ml-4 ellipsis" style="max-width: 160px" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
                 </div>
@@ -83,18 +83,29 @@
               :accept="getAcceptList()"
               :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
             >
-              <el-button text>
-                <el-icon><Paperclip /></el-icon>
-              </el-button>
+              <el-tooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
+                <template #content
+                  >上传文件：最多{{
+                    props.applicationDetails.file_upload_setting.maxFiles
+                  }}个，每个文件限制
+                  {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />文件类型：{{
+                    getAcceptList()
+                  }}</template
+                >
+                <el-button text>
+                  <el-icon><Paperclip /></el-icon>
+                </el-button>
+              </el-tooltip>
             </el-upload>
             <el-divider direction="vertical" />
           </span>
           <span v-if="props.applicationDetails.stt_model_enable" class="flex align-center">
-            <el-button text v-if="mediaRecorderStatus" @click="startRecording">
+            <el-button text @click="startRecording" v-if="mediaRecorderStatus">
               <el-icon>
                 <Microphone />
               </el-icon>
             </el-button>
+
             <div v-else class="operate flex align-center">
               <el-text type="info"
                 >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
@@ -191,26 +202,30 @@ const audioExtensions = ['mp3', 'wav', 'aac', 'flac']
 
 const getAcceptList = () => {
   const { image, document, audio, video } = props.applicationDetails.file_upload_setting
-  let accepts = ''
+  let accepts: any = []
   if (image) {
-    accepts += imageExtensions.map((ext) => '.' + ext).join(',')
+    accepts = [...imageExtensions]
   }
   if (document) {
-    accepts += documentExtensions.map((ext) => '.' + ext).join(',')
+    accepts = [...accepts, ...documentExtensions]
   }
   if (audio) {
-    accepts += audioExtensions.map((ext) => '.' + ext).join(',')
+    accepts = [...accepts, ...audioExtensions]
   }
   if (video) {
-    accepts += videoExtensions.map((ext) => '.' + ext).join(',')
+    accepts = [...accepts, ...videoExtensions]
   }
-  return accepts
+  // console.log(accepts)
+  return accepts.map((ext: any) => '.' + ext).join(',')
 }
 
 const uploadFile = async (file: any, fileList: any) => {
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
-  if (fileList.length > maxFiles) {
+  // 单次上传文件数量限制
+  const file_limit_once = uploadImageList.value.length + uploadDocumentList.value.length
+  if (file_limit_once >= maxFiles) {
     MsgWarning('最多上传' + maxFiles + '个文件')
+    fileList.splice(0, fileList.length)
     return
   }
   if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) {
@@ -453,5 +468,8 @@ onMounted(() => {
     top: -5px;
     z-index: 1;
   }
+}
+.upload-tooltip-width {
+  width: 300px;
 }
 </style>

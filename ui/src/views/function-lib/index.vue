@@ -67,9 +67,9 @@
                 </AppAvatar>
               </template>
               <template #subTitle>
-                <el-text class="lighter mr-8" size="small">
+                <el-text class="color-secondary" size="small">
                   <auto-tooltip :content="item.username">
-                    创建人: {{ item.username }}
+                    创建者: {{ item.username }}
                   </auto-tooltip>
                 </el-text>
               </template>

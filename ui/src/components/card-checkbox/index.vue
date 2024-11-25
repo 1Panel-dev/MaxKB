@@ -60,7 +60,7 @@ function checkboxChange() {
   emit('change')
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .card-checkbox {
   &.active {
     border: 1px solid var(--el-color-primary);
