@@ -117,6 +117,7 @@ const currentIndex = ref(null)
 const inputTypeList = ref([
   { label: '文本框', value: 'TextInputConstructor' },
   { label: '单选框', value: 'SingleSelectConstructor' },
+  { label: '多选框', value: 'MultiSelectConstructor' },
   { label: '日期', value: 'DatePickerConstructor' }
 ])
 
