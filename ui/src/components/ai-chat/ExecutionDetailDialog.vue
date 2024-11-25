@@ -386,6 +386,9 @@
                               />
                             </template>
                           </el-space>
+                        </div>
+                        <div>
+                          <p class="mb-8 color-secondary">提示词：</p>
                           {{ item.question || '-' }}
                         </div>
                       </div>
