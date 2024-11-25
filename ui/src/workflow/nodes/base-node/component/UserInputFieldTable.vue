@@ -27,6 +27,7 @@
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'">开关</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'">单选框</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'MultiSelect'">多选框</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'RadioCard'">选项卡</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">日期</el-tag>
       </template>
     </el-table-column>
