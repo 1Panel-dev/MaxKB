@@ -202,20 +202,21 @@ const audioExtensions = ['mp3', 'wav', 'aac', 'flac']
 
 const getAcceptList = () => {
   const { image, document, audio, video } = props.applicationDetails.file_upload_setting
-  let accepts = ''
+  let accepts: any = []
   if (image) {
-    accepts += imageExtensions.map((ext) => '.' + ext).join(',')
+    accepts = [...imageExtensions]
   }
   if (document) {
-    accepts += documentExtensions.map((ext) => '.' + ext).join(',')
+    accepts = [...accepts, ...documentExtensions]
   }
   if (audio) {
-    accepts += audioExtensions.map((ext) => '.' + ext).join(',')
+    accepts = [...accepts, ...audioExtensions]
   }
   if (video) {
-    accepts += videoExtensions.map((ext) => '.' + ext).join(',')
+    accepts = [...accepts, ...videoExtensions]
   }
-  return accepts
+  // console.log(accepts)
+  return accepts.map((ext: any) => '.' + ext).join(',')
 }
 
 const uploadFile = async (file: any, fileList: any) => {
