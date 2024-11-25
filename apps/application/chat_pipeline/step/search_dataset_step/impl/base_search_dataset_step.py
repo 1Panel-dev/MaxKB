@@ -79,6 +79,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
                     .add_document_name(paragraph.get('document_name'))
                     .add_hit_handling_method(paragraph.get('hit_handling_method'))
                     .add_directly_return_similarity(paragraph.get('directly_return_similarity'))
+                    .add_meta(paragraph.get('meta'))
                     .build())
 
     @staticmethod
