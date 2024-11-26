@@ -36,8 +36,9 @@ def update_execute(sql: str, params):
       """
     with connection.cursor() as cursor:
         cursor.execute(sql, params)
+        affected_rows = cursor.rowcount
         cursor.close()
-        return None
+        return affected_rows
 
 
 def select_list(sql: str, params: List):

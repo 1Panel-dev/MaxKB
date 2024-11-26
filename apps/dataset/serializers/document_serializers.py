@@ -613,7 +613,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             document_id = self.data.get("document_id")
             ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
                                              State.PENDING)
-            ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id=document_id), TaskType.EMBEDDING,
+            ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id=document_id),
+                                             TaskType.EMBEDDING,
                                              State.PENDING)
             ListenerManagement.get_aggregation_document_status(document_id)()
             embedding_model_id = get_embedding_model_id_by_dataset_id(dataset_id=self.data.get('dataset_id'))
@@ -708,8 +709,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
         @staticmethod
         def post_embedding(result, document_id, dataset_id):
-            model_id = get_embedding_model_id_by_dataset_id(dataset_id)
-            embedding_by_document.delay(document_id, model_id)
+            DocumentSerializers.Operate(
+                data={'dataset_id': dataset_id, 'document_id': document_id}).refresh()
             return result
 
         @staticmethod
@@ -907,8 +908,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         @staticmethod
         def post_embedding(document_list, dataset_id):
             for document_dict in document_list:
-                model_id = get_embedding_model_id_by_dataset_id(dataset_id)
-                embedding_by_document.delay(document_dict.get('id'), model_id)
+                DocumentSerializers.Operate(
+                    data={'dataset_id': dataset_id, 'document_id': document_dict.get('id')}).refresh()
             return document_list
 
         @post(post_function=post_embedding)
