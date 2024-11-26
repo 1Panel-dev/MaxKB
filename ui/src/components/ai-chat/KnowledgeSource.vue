@@ -98,15 +98,6 @@ const uniqueParagraphList = computed(() => {
     }) || []
   )
 })
-function fileType(name: string) {
-  const suffix = name.split('.')
-  return suffix[suffix.length - 1]
-}
-const typeList: any = {
-  txt: ['txt', 'pdf', 'docx', 'csv', 'md', 'html'],
-  table: ['xlsx', 'xls', 'csv'],
-  QA: ['xlsx', 'csv', 'xls']
-}
 
 function openLink(url: string) {
   // 如果url不是以/结尾，加上/
