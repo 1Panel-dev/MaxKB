@@ -608,13 +608,11 @@ class ChatRecordSerializer(serializers.Serializer):
                                   title=instance.get("title") if 'title' in instance else '')
             problem_text = instance.get('problem_text') if instance.get(
                 'problem_text') is not None else chat_record.problem_text
-            problem = Problem(id=uuid.uuid1(), content=problem_text, dataset_id=dataset_id)
+            problem, _ = Problem.objects.get_or_create(content=problem_text, dataset_id=dataset_id)
             problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid1(), dataset_id=dataset_id,
                                                                 document_id=document_id,
                                                                 problem_id=problem.id,
                                                                 paragraph_id=paragraph.id)
-            # 插入问题
-            problem.save()
             # 插入段落
             paragraph.save()
             # 插入关联问题

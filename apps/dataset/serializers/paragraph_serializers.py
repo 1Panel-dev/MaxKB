@@ -540,8 +540,16 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             paragraph_id = self.data.get('paragraph_id')
-            QuerySet(Paragraph).filter(id=paragraph_id).delete()
-            QuerySet(ProblemParagraphMapping).filter(paragraph_id=paragraph_id).delete()
+            Paragraph.objects.filter(id=paragraph_id).delete()
+
+            problem_id = ProblemParagraphMapping.objects.filter(paragraph_id=paragraph_id).values_list('problem_id',
+                                                                                                       flat=True).first()
+
+            if problem_id is not None:
+                if ProblemParagraphMapping.objects.filter(problem_id=problem_id).count() == 1:
+                    Problem.objects.filter(id=problem_id).delete()
+            ProblemParagraphMapping.objects.filter(paragraph_id=paragraph_id).delete()
+
             update_document_char_length(self.data.get('document_id'))
             delete_embedding_by_paragraph(paragraph_id)
 
