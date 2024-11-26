@@ -28,7 +28,12 @@
               <div class="flex align-center">
                 <span
                   class="mr-16 color-secondary"
-                  v-if="item.type === WorkflowType.Question || item.type === WorkflowType.AiChat || item.type === WorkflowType.ImageUnderstandNode"
+                  v-if="
+                    item.type === WorkflowType.Question ||
+                    item.type === WorkflowType.AiChat ||
+                    item.type === WorkflowType.ImageUnderstandNode ||
+                    item.type === WorkflowType.Application
+                  "
                   >{{ item?.message_tokens + item?.answer_tokens }} tokens</span
                 >
                 <span class="mr-16 color-secondary">{{ item?.run_time?.toFixed(2) || 0.0 }} s</span>
@@ -166,7 +171,10 @@
                         <template v-else> - </template>
                       </div>
                     </div>
-                    <div class="card-never border-r-4 mt-8">
+                    <div
+                      class="card-never border-r-4 mt-8"
+                      v-if="item.type !== WorkflowType.Application"
+                    >
                       <h5 class="p-8-12">本次对话</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.question || '-' }}
