@@ -8,30 +8,31 @@
     >
   </div>
   <div class="mt-8" v-if="!isWorkFlow(props.type)">
-    <el-space wrap>
-      <div v-for="(paragraph, index) in uniqueParagraphList" :key="index">
-        <el-icon class="mr-4" :size="25">
-          <img :src="getIconPath(paragraph.document_name)" style="width: 90%" alt="" />
-        </el-icon>
-        <span
-          v-if="!paragraph.source_url"
-          class="ellipsis"
-          :title="paragraph?.document_name?.trim()"
-        >
-          {{ paragraph?.document_name }}
-        </span>
-        <a
-          v-else
-          @click="openLink(paragraph.source_url)"
-          class="ellipsis"
-          :title="paragraph?.document_name?.trim()"
-        >
-          <span :title="paragraph?.document_name?.trim()">
-            {{ paragraph?.document_name }}
-          </span>
-        </a>
-      </div>
-    </el-space>
+    <el-row :gutter="8" v-if="uniqueParagraphList?.length">
+      <template v-for="(item, index) in uniqueParagraphList" :key="index">
+        <el-col :span="12" class="mb-8">
+          <el-card shadow="never" class="file-List-card" data-width="40">
+            <div class="flex-between">
+              <div class="flex">
+                <img :src="getImgUrl(item && item?.document_name)" alt="" width="20" />
+                <div class="ml-4" v-if="!item.source_url">
+                  <p>{{ item && item?.document_name }}</p>
+                </div>
+                <div class="ml-8" v-else>
+                  <a
+                    @click="openLink(item.source_url)"
+                    class="ellipsis"
+                    :title="item?.document_name?.trim()"
+                  >
+                    <span :title="item?.document_name?.trim()">{{ item?.document_name }}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+      </template>
+    </el-row>
   </div>
 
   <div class="border-t color-secondary flex-between mt-12" style="padding-top: 12px">
@@ -59,7 +60,7 @@ import { computed, ref } from 'vue'
 import ParagraphSourceDialog from './ParagraphSourceDialog.vue'
 import ExecutionDetailDialog from './ExecutionDetailDialog.vue'
 import { isWorkFlow } from '@/utils/application'
-
+import { getImgUrl } from '@/utils/utils'
 const props = defineProps({
   data: {
     type: Object,
@@ -70,15 +71,6 @@ const props = defineProps({
     default: ''
   }
 })
-const iconMap: { [key: string]: string } = {
-  doc: '../../assets/doc-icon.svg',
-  docx: '../../assets/docx-icon.svg',
-  pdf: '../../assets/pdf-icon.svg',
-  md: '../../assets/md-icon.svg',
-  txt: '../../assets/txt-icon.svg',
-  xls: '../../assets/xls-icon.svg',
-  xlsx: '../../assets/xlsx-icon.svg'
-}
 
 const ParagraphSourceDialogRef = ref()
 const ExecutionDetailDialogRef = ref()
@@ -107,14 +99,6 @@ const uniqueParagraphList = computed(() => {
   )
 })
 
-function getIconPath(documentName: string) {
-  const extension = documentName.split('.').pop()?.toLowerCase()
-  if (!documentName || !extension) return new URL(`${iconMap['doc']}`, import.meta.url).href
-  if (iconMap && extension && iconMap[extension]) {
-    return new URL(`${iconMap[extension]}`, import.meta.url).href
-  }
-  return new URL(`${iconMap['doc']}`, import.meta.url).href
-}
 function openLink(url: string) {
   // 如果url不是以/结尾，加上/
   if (url && !url.endsWith('/')) {

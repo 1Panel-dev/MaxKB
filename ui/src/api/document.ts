@@ -322,8 +322,17 @@ const batchGenerateRelated: (
   data: any,
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return put(`${prefix}/${dataset_id}/document/batch_generate_related`, data, undefined, loading)
+}
+
+const cancelTask: (
+  dataset_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, document_id, data, loading) => {
   return put(
-    `${prefix}/${dataset_id}/document/batch_generate_related`,
+    `${prefix}/${dataset_id}/document/${document_id}/cancel_task`,
     data,
     undefined,
     loading
@@ -352,5 +361,6 @@ export default {
   postTableDocument,
   exportDocument,
   batchRefresh,
-  batchGenerateRelated
+  batchGenerateRelated,
+  cancelTask
 }

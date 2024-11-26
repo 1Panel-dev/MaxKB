@@ -26,3 +26,14 @@ class DocumentApi(ApiMixin):
                     'directly_return_similarity': openapi.Schema(type=openapi.TYPE_NUMBER, title="直接返回相似度")
                 }
             )
+
+    class Cancel(ApiMixin):
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'type': openapi.Schema(type=openapi.TYPE_INTEGER, title="任务类型",
+                                           description="1|2|3 1:向量化|2:生成问题|3:同步文档")
+                }
+            )

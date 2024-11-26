@@ -16,11 +16,12 @@ from drf_yasg import openapi
 from rest_framework import serializers
 
 from common.db.search import page_search
+from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post
 from common.util.field_message import ErrMessage
-from dataset.models import Paragraph, Problem, Document, ProblemParagraphMapping, DataSet
+from dataset.models import Paragraph, Problem, Document, ProblemParagraphMapping, DataSet, TaskType, State
 from dataset.serializers.common_serializers import update_document_char_length, BatchSerializer, ProblemParagraphObject, \
     ProblemParagraphManage, get_embedding_model_id_by_dataset_id
 from dataset.serializers.problem_serializers import ProblemInstanceSerializer, ProblemSerializer, ProblemSerializers
@@ -722,7 +723,6 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 }
             )
 
-
     class BatchGenerateRelated(ApiMixin, serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
         document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
@@ -734,10 +734,16 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
             paragraph_id_list = instance.get("paragraph_id_list")
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
+            document_id = self.data.get('document_id')
+            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                             TaskType.GENERATE_PROBLEM,
+                                             State.PENDING)
+            ListenerManagement.update_status(QuerySet(Paragraph).filter(id__in=paragraph_id_list),
+                                             TaskType.GENERATE_PROBLEM,
+                                             State.PENDING)
+            ListenerManagement.get_aggregation_document_status(document_id)()
             try:
-                generate_related_by_paragraph_id_list.delay(paragraph_id_list, model_id, prompt)
+                generate_related_by_paragraph_id_list.delay(document_id, paragraph_id_list, model_id,
+                                                            prompt)
             except AlreadyQueued as e:
                 raise AppApiException(500, "任务正在执行中,请勿重复下发")
-
-
-

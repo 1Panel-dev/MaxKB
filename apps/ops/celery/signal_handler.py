@@ -5,7 +5,7 @@ import os
 
 from celery import subtask
 from celery.signals import (
-    worker_ready, worker_shutdown, after_setup_logger
+    worker_ready, worker_shutdown, after_setup_logger, task_revoked, task_prerun
 )
 from django.core.cache import cache
 from django_celery_beat.models import PeriodicTask
@@ -61,3 +61,15 @@ def add_celery_logger_handler(sender=None, logger=None, loglevel=None, format=No
     formatter = logging.Formatter(format)
     task_handler.setFormatter(formatter)
     logger.addHandler(task_handler)
+
+
+@task_revoked.connect
+def on_task_revoked(request, terminated, signum, expired, **kwargs):
+    print('task_revoked', terminated)
+
+
+@task_prerun.connect
+def on_taskaa_start(sender, task_id, **kwargs):
+    pass
+    # sender.update_state(state='REVOKED',
+#                     meta={'exc_type': 'Exception', 'exc': 'Exception', 'message': '暂停任务', 'exc_message': ''})

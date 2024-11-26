@@ -218,6 +218,26 @@ class Document(APIView):
                 DocumentSerializers.Sync(data={'document_id': document_id, 'dataset_id': dataset_id}).sync(
                 ))
 
+    class CancelTask(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary="取消任务",
+                             operation_id="取消任务",
+                             manual_parameters=DocumentSerializers.Operate.get_request_params_api(),
+                             request_body=DocumentApi.Cancel.get_request_body_api(),
+                             responses=result.get_default_response(),
+                             tags=["知识库/文档"]
+                             )
+        @has_permissions(
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                    dynamic_tag=k.get('dataset_id')))
+        def put(self, request: Request, dataset_id: str, document_id: str):
+            return result.success(
+                DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).cancel(
+                    request.data
+                    ))
+
     class Refresh(APIView):
         authentication_classes = [TokenAuth]
 
