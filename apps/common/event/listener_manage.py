@@ -170,8 +170,7 @@ class ListenerManagement:
         def aggregation_document_status():
             sql = get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_document_status_meta.sql'))
-            native_update({'document_custom_sql': QuerySet(Document).filter(id=document_id),
-                           'default_sql': QuerySet(Document).filter(id=document_id)}, sql, with_table_name=True)
+            native_update({'document_custom_sql': QuerySet(Document).filter(id=document_id)}, sql, with_table_name=True)
 
         return aggregation_document_status
 
@@ -180,8 +179,7 @@ class ListenerManagement:
         def aggregation_document_status():
             sql = get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_document_status_meta.sql'))
-            native_update({'document_custom_sql': QuerySet(Document).filter(dataset_id=dataset_id),
-                           'default_sql': QuerySet(Document).filter(dataset_id=dataset_id)}, sql)
+            native_update({'document_custom_sql': QuerySet(Document).filter(dataset_id=dataset_id)}, sql)
 
         return aggregation_document_status
 
@@ -190,7 +188,7 @@ class ListenerManagement:
         def aggregation_document_status():
             sql = get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_document_status_meta.sql'))
-            native_update({'document_custom_sql': queryset, 'default_sql': queryset}, sql)
+            native_update({'document_custom_sql': queryset}, sql)
 
         return aggregation_document_status
 
