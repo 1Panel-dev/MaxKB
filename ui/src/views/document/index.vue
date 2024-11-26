@@ -235,7 +235,25 @@
             <template #default="{ row }">
               <div v-if="datasetDetail.type === '0'">
                 <span class="mr-4">
-                  <el-tooltip effect="dark" content="向量化" placement="top">
+                  <el-tooltip
+                    effect="dark"
+                    v-if="
+                      ([State.STARTED, State.PENDING] as Array<string>).includes(
+                        getTaskState(row.status, TaskType.EMBEDDING)
+                      )
+                    "
+                    content="取消向量化"
+                    placement="top"
+                  >
+                    <el-button
+                      type="primary"
+                      text
+                      @click.stop="cancelTask(row, TaskType.EMBEDDING)"
+                    >
+                      <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                  <el-tooltip v-else effect="dark" content="向量化" placement="top">
                     <el-button type="primary" text @click.stop="refreshDocument(row)">
                       <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
                     </el-button>
@@ -255,9 +273,20 @@
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item @click="openGenerateDialog(row)">
+                        <el-dropdown-item
+                          v-if="
+                            ([State.STARTED, State.PENDING] as Array<string>).includes(
+                              getTaskState(row.status, TaskType.GENERATE_PROBLEM)
+                            )
+                          "
+                          @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
+                        >
                           <el-icon><Connection /></el-icon>
-                          生成关联问题
+                          取消生成问题
+                        </el-dropdown-item>
+                        <el-dropdown-item v-else @click="openGenerateDialog(row)">
+                          <el-icon><Connection /></el-icon>
+                          生成问题
                         </el-dropdown-item>
                         <el-dropdown-item @click="openDatasetDialog(row)">
                           <AppIcon iconName="app-migrate"></AppIcon>
@@ -286,7 +315,11 @@
                 <span class="mr-4">
                   <el-tooltip
                     effect="dark"
-                    v-if="getTaskState(row.status, TaskType.EMBEDDING) == State.STARTED"
+                    v-if="
+                      ([State.STARTED, State.PENDING] as Array<string>).includes(
+                        getTaskState(row.status, TaskType.EMBEDDING)
+                      )
+                    "
                     content="取消向量化"
                     placement="top"
                   >
@@ -318,7 +351,9 @@
                         >
                         <el-dropdown-item
                           v-if="
-                            getTaskState(row.status, TaskType.GENERATE_PROBLEM) == State.STARTED
+                            ([State.STARTED, State.PENDING] as Array<string>).includes(
+                              getTaskState(row.status, TaskType.GENERATE_PROBLEM)
+                            )
                           "
                           @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
                         >

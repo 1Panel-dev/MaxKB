@@ -7,6 +7,11 @@ import dataset
 from common.event import ListenerManagement
 from dataset.models import State, TaskType
 
+sql = """
+UPDATE "document"
+SET status ="replace"(status, '1', '3')
+"""
+
 
 def updateDocumentStatus(apps, schema_editor):
     ParagraphModel = apps.get_model('dataset', 'Paragraph')
@@ -43,5 +48,6 @@ class Migration(migrations.Migration):
             name='status',
             field=models.CharField(default=dataset.models.data_set.Status.__str__, max_length=20, verbose_name='状态'),
         ),
+        migrations.RunSQL(sql),
         migrations.RunPython(updateDocumentStatus)
     ]

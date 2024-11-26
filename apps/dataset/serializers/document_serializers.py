@@ -297,6 +297,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 ListenerManagement.update_status(QuerySet(Document).filter(id__in=document_id_list),
                                                  TaskType.EMBEDDING,
                                                  State.PENDING)
+                ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id__in=document_id_list),
+                                                 TaskType.EMBEDDING,
+                                                 State.PENDING)
                 embedding_by_document_list.delay(document_id_list, model_id)
             else:
                 update_embedding_dataset_id(pid_list, target_dataset_id)

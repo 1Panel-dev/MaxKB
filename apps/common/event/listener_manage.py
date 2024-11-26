@@ -181,7 +181,8 @@ class ListenerManagement:
         def aggregation_document_status():
             sql = get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_document_status_meta.sql'))
-            native_update({'document_custom_sql': QuerySet(Document).filter(dataset_id=dataset_id)}, sql)
+            native_update({'document_custom_sql': QuerySet(Document).filter(dataset_id=dataset_id)}, sql,
+                          with_table_name=True)
 
         return aggregation_document_status
 
@@ -190,7 +191,7 @@ class ListenerManagement:
         def aggregation_document_status():
             sql = get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_document_status_meta.sql'))
-            native_update({'document_custom_sql': queryset}, sql)
+            native_update({'document_custom_sql': queryset}, sql, with_table_name=True)
 
         return aggregation_document_status
 
@@ -249,18 +250,22 @@ class ListenerManagement:
         """
         if not try_lock('embedding' + str(document_id)):
             return
-        max_kb.info(f"开始--->向量化文档:{document_id}")
-        # 批量修改状态为PADDING
-        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.STARTED)
         try:
-            # 删除文档向量数据
-            VectorStore.get_embedding_vector().delete_by_document_id(document_id)
-
             def is_the_task_interrupted():
                 document = QuerySet(Document).filter(id=document_id).first()
                 if document is None or Status(document.status)[TaskType.EMBEDDING] == State.REVOKE:
                     return True
                 return False
+
+            if is_the_task_interrupted():
+                return
+            max_kb.info(f"开始--->向量化文档:{document_id}")
+            # 批量修改状态为PADDING
+            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
+                                             State.STARTED)
+
+            # 删除文档向量数据
+            VectorStore.get_embedding_vector().delete_by_document_id(document_id)
 
             # 根据段落进行向量化处理
             page(QuerySet(Paragraph).filter(document_id=document_id).values('id'), 5,
