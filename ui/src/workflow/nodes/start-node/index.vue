@@ -65,12 +65,16 @@ const refreshFileUploadConfig = () => {
   let fields = cloneDeep(props.nodeModel.properties.config.fields)
   const form_data = props.nodeModel.graphModel.nodes
     .filter((v: any) => v.id === 'base-node')
+    .filter((v: any) => v.properties.node_data.file_upload_enable)
     .map((v: any) => cloneDeep(v.properties.node_data.file_upload_setting))
     .filter((v: any) => v)
+
+  fields = fields.filter((item: any) => item.value !== 'image' && item.value !== 'document')
+
   if (form_data.length === 0) {
+    set(props.nodeModel.properties.config, 'fields', fields)
     return
   }
-  fields = fields.filter((item: any) => item.value !== 'image' && item.value !== 'document')
   let fileUploadFields = []
   if (form_data[0].document) {
     fileUploadFields.push({ label: '文档', value: 'document' })

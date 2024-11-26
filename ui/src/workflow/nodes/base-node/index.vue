@@ -395,8 +395,8 @@ const switchFileUpload = () => {
 
   if (form_data.value.file_upload_enable) {
     form_data.value.file_upload_setting = form_data.value.file_upload_setting || default_upload_setting
-    props.nodeModel.graphModel.eventCenter.emit('refreshFileUploadConfig')
   }
+  props.nodeModel.graphModel.eventCenter.emit('refreshFileUploadConfig')
 }
 const openFileUploadSettingDialog = () => {
   FileUploadSettingDialogRef.value?.open(form_data.value.file_upload_setting)
