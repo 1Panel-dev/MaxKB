@@ -40,7 +40,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
             "index": index,
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
-            # 'content': self.context.get('content'), # 不保存content内容，因为content内容可能会很大
+            'content': self.context.get('content')[:500] + '...', # 不保存content全部内容，因为content内容可能会很大
             'status': self.status,
             'err_message': self.err_message,
             'document_list': self.context.get('document_list')
