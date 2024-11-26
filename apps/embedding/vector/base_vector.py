@@ -86,20 +86,20 @@ class BaseVectorStore(ABC):
         for child_array in result:
             self._batch_save(child_array, embedding, lambda: True)
 
-    def batch_save(self, data_list: List[Dict], embedding: Embeddings, is_save_function):
+    def batch_save(self, data_list: List[Dict], embedding: Embeddings, is_the_task_interrupted):
         """
         批量插入
         @param data_list: 数据列表
         @param embedding: 向量化处理器
-        @param is_save_function:
+        @param is_the_task_interrupted: 判断是否中断任务
         :return: bool
         """
         self.save_pre_handler()
         chunk_list = chunk_data_list(data_list)
         result = sub_array(chunk_list)
         for child_array in result:
-            if is_save_function():
-                self._batch_save(child_array, embedding, is_save_function)
+            if not is_the_task_interrupted():
+                self._batch_save(child_array, embedding, is_the_task_interrupted)
             else:
                 break
 
@@ -110,7 +110,7 @@ class BaseVectorStore(ABC):
         pass
 
     @abstractmethod
-    def _batch_save(self, text_list: List[Dict], embedding: Embeddings, is_save_function):
+    def _batch_save(self, text_list: List[Dict], embedding: Embeddings, is_the_task_interrupted):
         pass
 
     def search(self, query_text, dataset_id_list: list[str], exclude_document_id_list: list[str],

@@ -134,21 +134,7 @@
               </div>
             </template>
             <template #default="{ row }">
-              <el-text v-if="row.status === '1'">
-                <el-icon class="success"><SuccessFilled /></el-icon> 成功
-              </el-text>
-              <el-text v-else-if="row.status === '2'">
-                <el-icon class="danger"><CircleCloseFilled /></el-icon> 失败
-              </el-text>
-              <el-text v-else-if="row.status === '0'">
-                <el-icon class="is-loading primary"><Loading /></el-icon> 索引中
-              </el-text>
-              <el-text v-else-if="row.status === '3'">
-                <el-icon class="is-loading primary"><Loading /></el-icon> 排队中
-              </el-text>
-              <el-text v-else-if="row.status === '4'">
-                <el-icon class="is-loading primary"><Loading /></el-icon> 生成问题中
-              </el-text>
+              <StatusVlue :status="row.status" :status-meta="row.status_meta"></StatusVlue>
             </template>
           </el-table-column>
           <el-table-column width="130">
@@ -249,7 +235,7 @@
             <template #default="{ row }">
               <div v-if="datasetDetail.type === '0'">
                 <span class="mr-4">
-                  <el-tooltip effect="dark" content="重新向量化" placement="top">
+                  <el-tooltip effect="dark" content="向量化" placement="top">
                     <el-button type="primary" text @click.stop="refreshDocument(row)">
                       <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
                     </el-button>
@@ -298,7 +284,22 @@
                   </el-tooltip>
                 </span>
                 <span class="mr-4">
-                  <el-tooltip effect="dark" content="重新向量化" placement="top">
+                  <el-tooltip
+                    effect="dark"
+                    v-if="getTaskState(row.status, TaskType.EMBEDDING) == State.STARTED"
+                    content="取消向量化"
+                    placement="top"
+                  >
+                    <el-button
+                      type="primary"
+                      text
+                      @click.stop="cancelTask(row, TaskType.EMBEDDING)"
+                    >
+                      <AppIcon iconName="app-close" style="font-size: 16px"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+
+                  <el-tooltip effect="dark" v-else content="向量化" placement="top">
                     <el-button type="primary" text @click.stop="refreshDocument(row)">
                       <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
                     </el-button>
@@ -315,9 +316,18 @@
                         <el-dropdown-item icon="Setting" @click="settingDoc(row)"
                           >设置</el-dropdown-item
                         >
-                        <el-dropdown-item @click="openGenerateDialog(row)">
+                        <el-dropdown-item
+                          v-if="
+                            getTaskState(row.status, TaskType.GENERATE_PROBLEM) == State.STARTED
+                          "
+                          @click="cancelTask(row, TaskType.GENERATE_PROBLEM)"
+                        >
                           <el-icon><Connection /></el-icon>
-                          生成关联问题
+                          取消生成问题
+                        </el-dropdown-item>
+                        <el-dropdown-item v-else @click="openGenerateDialog(row)">
+                          <el-icon><Connection /></el-icon>
+                          生成问题
                         </el-dropdown-item>
                         <el-dropdown-item @click="openDatasetDialog(row)">
                           <AppIcon iconName="app-migrate"></AppIcon>
@@ -360,7 +370,9 @@ import { datetimeFormat } from '@/utils/time'
 import { hitHandlingMethod } from '@/enums/document'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
+import StatusVlue from '@/views/document/component/Status.vue'
 import GenerateRelatedDialog from '@/views/document/component/GenerateRelatedDialog.vue'
+import { TaskType, State } from '@/utils/status'
 const router = useRouter()
 const route = useRoute()
 const {
@@ -368,9 +380,11 @@ const {
 } = route as any
 
 const { common, dataset, document } = useStore()
-
 const storeKey = 'documents'
-
+const getTaskState = (status, taskType) => {
+  const statusList = status.split('').reverse()
+  return taskType - 1 > statusList.length + 1 ? 'n' : statusList[taskType - 1]
+}
 onBeforeRouteUpdate(() => {
   common.savePage(storeKey, null)
   common.saveCondition(storeKey, null)
@@ -441,7 +455,11 @@ function beforeCommand(attr: string, val: any) {
     command: val
   }
 }
-
+const cancelTask = (row: any, task_type: number) => {
+  documentApi.cancelTask(row.dataset_id, row.id, { type: task_type }).then(() => {
+    MsgSuccess('发送成功')
+  })
+}
 function syncDataset() {
   SyncWebDialogRef.value.open(id)
 }

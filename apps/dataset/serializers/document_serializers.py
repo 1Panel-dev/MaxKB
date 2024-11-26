@@ -19,6 +19,7 @@ from celery_once import AlreadyQueued
 from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet
+from django.db.models.functions import Substr, Reverse
 from django.http import HttpResponse
 from drf_yasg import openapi
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
@@ -26,6 +27,7 @@ from rest_framework import serializers
 from xlwt import Utils
 
 from common.db.search import native_search, native_page_search
+from common.event import ListenerManagement
 from common.event.common import work_thread_pool
 from common.exception.app_exception import AppApiException
 from common.handle.impl.doc_split_handle import DocSplitHandle
@@ -44,7 +46,8 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
 from common.util.split_model import get_split_model
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, Status, ProblemParagraphMapping, Image
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping, Image, \
+    TaskType, State
 from dataset.serializers.common_serializers import BatchSerializer, MetaSerializer, ProblemParagraphManage, \
     get_embedding_model_id_by_dataset_id
 from dataset.serializers.paragraph_serializers import ParagraphSerializers, ParagraphInstanceSerializer
@@ -65,6 +68,19 @@ class FileBufferHandle:
         if self.buffer is None:
             self.buffer = file.read()
         return self.buffer
+
+
+class CancelInstanceSerializer(serializers.Serializer):
+    type = serializers.IntegerField(required=True, error_messages=ErrMessage.boolean(
+        "任务类型"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        _type = self.data.get('type')
+        try:
+            TaskType(_type)
+        except Exception as e:
+            raise AppApiException(500, '任务类型不支持')
 
 
 class DocumentEditInstanceSerializer(ApiMixin, serializers.Serializer):
@@ -278,7 +294,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             # 修改向量信息
             if model_id:
                 delete_embedding_by_paragraph_ids(pid_list)
-                QuerySet(Document).filter(id__in=document_id_list).update(status=Status.queue_up)
+                ListenerManagement.update_status(QuerySet(Document).filter(id__in=document_id_list),
+                                                 TaskType.EMBEDDING,
+                                                 State.PENDING)
                 embedding_by_document_list.delay(document_id_list, model_id)
             else:
                 update_embedding_dataset_id(pid_list, target_dataset_id)
@@ -404,11 +422,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             document_id = self.data.get('document_id')
             document = QuerySet(Document).filter(id=document_id).first()
+            state = State.SUCCESS
             if document.type != Type.web:
                 return True
             try:
-                document.status = Status.queue_up
-                document.save()
+                ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                                 TaskType.SYNC,
+                                                 State.PENDING)
                 source_url = document.meta.get('source_url')
                 selector_list = document.meta.get('selector').split(
                     " ") if 'selector' in document.meta and document.meta.get('selector') is not None else []
@@ -442,13 +462,18 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     if with_embedding:
                         embedding_model_id = get_embedding_model_id_by_dataset_id(document.dataset_id)
                         embedding_by_document.delay(document_id, embedding_model_id)
+
                 else:
-                    document.status = Status.error
-                    document.save()
+                    state = State.FAILURE
             except Exception as e:
                 logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
-                document.status = Status.error
-                document.save()
+                state = State.FAILURE
+            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                             TaskType.SYNC,
+                                             state)
+            ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id=document_id),
+                                             TaskType.SYNC,
+                                             state)
             return True
 
     class Operate(ApiMixin, serializers.Serializer):
@@ -586,13 +611,34 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
-            QuerySet(Document).filter(id=document_id).update(**{'status': Status.queue_up})
-            QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': Status.queue_up})
+            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
+                                             State.PENDING)
+            ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id=document_id), TaskType.EMBEDDING,
+                                             State.PENDING)
+            ListenerManagement.get_aggregation_document_status(document_id)()
             embedding_model_id = get_embedding_model_id_by_dataset_id(dataset_id=self.data.get('dataset_id'))
             try:
                 embedding_by_document.delay(document_id, embedding_model_id)
             except AlreadyQueued as e:
                 raise AppApiException(500, "任务正在执行中,请勿重复下发")
+
+        def cancel(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                CancelInstanceSerializer(data=instance).is_valid()
+            document_id = self.data.get("document_id")
+            ListenerManagement.update_status(QuerySet(Paragraph).annotate(
+                reversed_status=Reverse('status'),
+                task_type_status=Substr('reversed_status', TaskType(instance.get('type')).value,
+                                        TaskType(instance.get('type')).value),
+            ).filter(task_type_status__in=[State.PENDING.value, State.STARTED.value]).filter(
+                document_id=document_id).values('id'),
+                                             TaskType(instance.get('type')),
+                                             State.REVOKE)
+            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType(instance.get('type')),
+                                             State.REVOKE)
+
+            return True
 
         @transaction.atomic
         def delete(self):
@@ -955,15 +1001,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             document_id_list = instance.get("id_list")
             with transaction.atomic():
-                Document.objects.filter(id__in=document_id_list).update(status=Status.queue_up)
-                Paragraph.objects.filter(document_id__in=document_id_list).update(status=Status.queue_up)
                 dataset_id = self.data.get('dataset_id')
-                embedding_model_id = get_embedding_model_id_by_dataset_id(dataset_id=dataset_id)
                 for document_id in document_id_list:
                     try:
-                        embedding_by_document.delay(document_id, embedding_model_id)
+                        DocumentSerializers.Operate(
+                            data={'dataset_id': dataset_id, 'document_id': document_id}).refresh()
                     except AlreadyQueued as e:
-                        raise AppApiException(500, "任务正在执行中,请勿重复下发")
+                        pass
 
     class GenerateRelated(ApiMixin, serializers.Serializer):
         document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
@@ -978,7 +1022,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get('document_id')
-            QuerySet(Document).filter(id=document_id).update(status=Status.queue_up)
+            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                             TaskType.GENERATE_PROBLEM,
+                                             State.PENDING)
+            ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id=document_id),
+                                             TaskType.GENERATE_PROBLEM,
+                                             State.PENDING)
+            ListenerManagement.get_aggregation_document_status(document_id)()
             try:
                 generate_related_by_document_id.delay(document_id, model_id, prompt)
             except AlreadyQueued as e:

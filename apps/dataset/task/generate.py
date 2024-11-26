@@ -1,12 +1,14 @@
 import logging
-from math import ceil
+import traceback
 
 from celery_once import QueueOnce
 from django.db.models import QuerySet
 from langchain_core.messages import HumanMessage
 
 from common.config.embedding_config import ModelManage
-from dataset.models import Paragraph, Document, Status
+from common.event import ListenerManagement
+from common.util.page_utils import page
+from dataset.models import Paragraph, Document, Status, TaskType, State
 from dataset.task.tools import save_problem
 from ops import celery_app
 from setting.models import Model
@@ -21,44 +23,79 @@ def get_llm_model(model_id):
     return ModelManage.get_model(model_id, lambda _id: get_model(model))
 
 
+def generate_problem_by_paragraph(paragraph, llm_model, prompt):
+    try:
+        ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph.id), TaskType.GENERATE_PROBLEM,
+                                         State.STARTED)
+        res = llm_model.invoke([HumanMessage(content=prompt.replace('{data}', paragraph.content))])
+        if (res.content is None) or (len(res.content) == 0):
+            return
+        problems = res.content.split('\n')
+        for problem in problems:
+            save_problem(paragraph.dataset_id, paragraph.document_id, paragraph.id, problem)
+        ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph.id), TaskType.GENERATE_PROBLEM,
+                                         State.SUCCESS)
+    except Exception as e:
+        ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph.id), TaskType.GENERATE_PROBLEM,
+                                         State.FAILURE)
+
+
+def get_generate_problem(llm_model, prompt, post_apply=lambda: None, is_the_task_interrupted=lambda: False):
+    def generate_problem(paragraph_list):
+        for paragraph in paragraph_list:
+            if is_the_task_interrupted():
+                return
+            generate_problem_by_paragraph(paragraph, llm_model, prompt)
+            post_apply()
+
+    return generate_problem
+
+
 @celery_app.task(base=QueueOnce, once={'keys': ['document_id']},
                  name='celery:generate_related_by_document')
 def generate_related_by_document_id(document_id, model_id, prompt):
-    llm_model = get_llm_model(model_id)
-    offset = 0
-    page_size = 10
-    QuerySet(Document).filter(id=document_id).update(status=Status.generating)
+    try:
+        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                         TaskType.GENERATE_PROBLEM,
+                                         State.STARTED)
+        llm_model = get_llm_model(model_id)
 
-    count = QuerySet(Paragraph).filter(document_id=document_id).count()
-    for i in range(0, ceil(count / page_size)):
-        paragraph_list = QuerySet(Paragraph).filter(document_id=document_id).all()[offset:offset + page_size]
-        offset += page_size
-        for paragraph in paragraph_list:
-            res = llm_model.invoke([HumanMessage(content=prompt.replace('{data}', paragraph.content))])
-            if (res.content is None) or (len(res.content) == 0):
-                continue
-            problems = res.content.split('\n')
-            for problem in problems:
-                save_problem(paragraph.dataset_id, paragraph.document_id, paragraph.id, problem)
+        def is_the_task_interrupted():
+            document = QuerySet(Document).filter(id=document_id).first()
+            if document is None or Status(document.status)[TaskType.GENERATE_PROBLEM] == State.REVOKE:
+                return True
+            return False
 
-    QuerySet(Document).filter(id=document_id).update(status=Status.success)
-
+        # 生成问题函数
+        generate_problem = get_generate_problem(llm_model, prompt,
+                                                ListenerManagement.get_aggregation_document_status(
+                                                    document_id), is_the_task_interrupted)
+        page(QuerySet(Paragraph).filter(document_id=document_id), 10, generate_problem, is_the_task_interrupted)
+    except Exception as e:
+        max_kb_error.error(f'根据文档生成问题:{document_id}出现错误{str(e)}{traceback.format_exc()}')
+    finally:
+        ListenerManagement.post_update_document_status(document_id, TaskType.GENERATE_PROBLEM)
+        max_kb.info(f"结束--->生成问题:{document_id}")
 
 
 @celery_app.task(base=QueueOnce, once={'keys': ['paragraph_id_list']},
                  name='celery:generate_related_by_paragraph_list')
-def generate_related_by_paragraph_id_list(paragraph_id_list, model_id, prompt):
-    llm_model = get_llm_model(model_id)
-    offset = 0
-    page_size = 10
-    count = QuerySet(Paragraph).filter(id__in=paragraph_id_list).count()
-    for i in range(0, ceil(count / page_size)):
-        paragraph_list = QuerySet(Paragraph).filter(id__in=paragraph_id_list).all()[offset:offset + page_size]
-        offset += page_size
-        for paragraph in paragraph_list:
-            res = llm_model.invoke([HumanMessage(content=prompt.replace('{data}', paragraph.content))])
-            if (res.content is None) or (len(res.content) == 0):
-                continue
-            problems = res.content.split('\n')
-            for problem in problems:
-                save_problem(paragraph.dataset_id, paragraph.document_id, paragraph.id, problem)
+def generate_related_by_paragraph_id_list(document_id, paragraph_id_list, model_id, prompt):
+    try:
+        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                         TaskType.GENERATE_PROBLEM,
+                                         State.STARTED)
+        llm_model = get_llm_model(model_id)
+        # 生成问题函数
+        generate_problem = get_generate_problem(llm_model, prompt, ListenerManagement.get_aggregation_document_status(
+            document_id))
+
+        def is_the_task_interrupted():
+            document = QuerySet(Document).filter(id=document_id).first()
+            if document is None or Status(document.status)[TaskType.GENERATE_PROBLEM] == State.REVOKE:
+                return True
+            return False
+
+        page(QuerySet(Paragraph).filter(id__in=paragraph_id_list), 10, generate_problem, is_the_task_interrupted)
+    finally:
+        ListenerManagement.post_update_document_status(document_id, TaskType.GENERATE_PROBLEM)

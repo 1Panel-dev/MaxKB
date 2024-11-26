@@ -12,7 +12,7 @@ from django.db import DEFAULT_DB_ALIAS, models, connections
 from django.db.models import QuerySet
 
 from common.db.compiler import AppSQLCompiler
-from common.db.sql_execute import select_one, select_list
+from common.db.sql_execute import select_one, select_list, update_execute
 from common.response.result import Page
 
 
@@ -107,6 +107,24 @@ def native_search(queryset: QuerySet | Dict[str, QuerySet], select_string: str,
         return select_one(exec_sql, exec_params)
     else:
         return select_list(exec_sql, exec_params)
+
+
+def native_update(queryset: QuerySet | Dict[str, QuerySet], select_string: str,
+                  field_replace_dict: None | Dict[str, Dict[str, str]] | Dict[str, str] = None,
+                  with_table_name=False):
+    """
+    复杂查询
+    :param with_table_name:     生成sql是否包含表名
+    :param queryset:            查询条件构造器
+    :param select_string:       查询前缀 不包括 where limit 等信息
+    :param field_replace_dict:  需要替换的字段
+    :return: 查询结果
+    """
+    if isinstance(queryset, Dict):
+        exec_sql, exec_params = generate_sql_by_query_dict(queryset, select_string, field_replace_dict, with_table_name)
+    else:
+        exec_sql, exec_params = generate_sql_by_query(queryset, select_string, field_replace_dict, with_table_name)
+    return update_execute(exec_sql, exec_params)
 
 
 def page_search(current_page: int, page_size: int, queryset: QuerySet, post_records_handler):
