@@ -154,6 +154,7 @@ def get_post_handler(chat_info: ChatInfo):
                                      details=manage.get_details(),
                                      message_tokens=manage.context['message_tokens'],
                                      answer_tokens=manage.context['answer_tokens'],
+                                     answer_text_list=[answer_text],
                                      run_time=manage.context['run_time'],
                                      index=len(chat_info.chat_record_list) + 1)
             chat_info.append_chat_record(chat_record, client_id)
