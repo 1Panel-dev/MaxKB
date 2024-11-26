@@ -27,6 +27,7 @@ from application.models import ApplicationDatasetMapping
 from common.config.embedding_config import VectorStore
 from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.db.sql_execute import select_list
+from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
 from common.util.common import post, flat_map, valid_license
@@ -34,7 +35,8 @@ from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping, Status
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping, Status, \
+    TaskType, State
 from dataset.serializers.common_serializers import list_paragraph, MetaSerializer, ProblemParagraphManage, \
     get_embedding_model_by_dataset_id, get_embedding_model_id_by_dataset_id
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
@@ -733,9 +735,13 @@ class DataSetSerializers(serializers.ModelSerializer):
         def re_embedding(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-
-            QuerySet(Document).filter(dataset_id=self.data.get('id')).update(**{'status': Status.queue_up})
-            QuerySet(Paragraph).filter(dataset_id=self.data.get('id')).update(**{'status': Status.queue_up})
+            ListenerManagement.update_status(QuerySet(Document).filter(dataset_id=self.data.get('id')),
+                                             TaskType.EMBEDDING,
+                                             State.PENDING)
+            ListenerManagement.update_status(QuerySet(Paragraph).filter(dataset_id=self.data.get('id')),
+                                             TaskType.EMBEDDING,
+                                             State.PENDING)
+            ListenerManagement.get_aggregation_document_status_by_dataset_id(self.data.get('id'))()
             embedding_model_id = get_embedding_model_id_by_dataset_id(self.data.get('id'))
             embedding_by_dataset.delay(self.data.get('id'), embedding_model_id)
 

@@ -9,24 +9,29 @@
 import datetime
 import logging
 import os
+import threading
 import traceback
 from typing import List
 
 import django.db.models
+from django.db import models
 from django.db.models import QuerySet
+from django.db.models.functions import Substr, Reverse
 from langchain_core.embeddings import Embeddings
 
 from common.config.embedding_config import VectorStore
-from common.db.search import native_search, get_dynamics_model
-from common.event.common import embedding_poxy
+from common.db.search import native_search, get_dynamics_model, native_update
+from common.db.sql_execute import sql_execute, update_execute
 from common.util.file_util import get_file_content
 from common.util.lock import try_lock, un_lock
-from dataset.models import Paragraph, Status, Document, ProblemParagraphMapping
+from common.util.page_utils import page
+from dataset.models import Paragraph, Status, Document, ProblemParagraphMapping, TaskType, State
 from embedding.models import SourceType, SearchMode
 from smartdoc.conf import PROJECT_DIR
 
 max_kb_error = logging.getLogger(__file__)
 max_kb = logging.getLogger(__file__)
+lock = threading.Lock()
 
 
 class SyncWebDatasetArgs:
@@ -114,7 +119,8 @@ class ListenerManagement:
         @param embedding_model:  向量模型
         """
         max_kb.info(f"开始--->向量化段落:{paragraph_id}")
-        status = Status.success
+        # 更新到开始状态
+        ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.STARTED)
         try:
             data_list = native_search(
                 {'problem': QuerySet(get_dynamics_model({'paragraph.id': django.db.models.CharField()})).filter(
@@ -125,22 +131,113 @@ class ListenerManagement:
             # 删除段落
             VectorStore.get_embedding_vector().delete_by_paragraph_id(paragraph_id)
 
-            def is_save_function():
-                return QuerySet(Paragraph).filter(id=paragraph_id).exists()
+            def is_the_task_interrupted():
+                _paragraph = QuerySet(Paragraph).filter(id=paragraph_id).first()
+                if _paragraph is None or Status(_paragraph.status)[TaskType.EMBEDDING] == State.REVOKE:
+                    return True
+                return False
 
             # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
+            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_the_task_interrupted)
+            # 更新到开始状态
+            ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING,
+                                             State.SUCCESS)
         except Exception as e:
             max_kb_error.error(f'向量化段落:{paragraph_id}出现错误{str(e)}{traceback.format_exc()}')
-            status = Status.error
+            ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING,
+                                             State.FAILURE)
         finally:
-            QuerySet(Paragraph).filter(id=paragraph_id).update(**{'status': status})
             max_kb.info(f'结束--->向量化段落:{paragraph_id}')
 
     @staticmethod
     def embedding_by_data_list(data_list: List, embedding_model: Embeddings):
         # 批量向量化
         VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, lambda: True)
+
+    @staticmethod
+    def get_embedding_paragraph_apply(embedding_model, is_the_task_interrupted, post_apply=lambda: None):
+        def embedding_paragraph_apply(paragraph_list):
+            for paragraph in paragraph_list:
+                if is_the_task_interrupted():
+                    break
+                ListenerManagement.embedding_by_paragraph(str(paragraph.get('id')), embedding_model)
+                post_apply()
+
+        return embedding_paragraph_apply
+
+    @staticmethod
+    def get_aggregation_document_status(document_id):
+        def aggregation_document_status():
+            sql = get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_document_status_meta.sql'))
+            native_update({'document_custom_sql': QuerySet(Document).filter(id=document_id),
+                           'default_sql': QuerySet(Document).filter(id=document_id)}, sql, with_table_name=True)
+
+        return aggregation_document_status
+
+    @staticmethod
+    def get_aggregation_document_status_by_dataset_id(dataset_id):
+        def aggregation_document_status():
+            sql = get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_document_status_meta.sql'))
+            native_update({'document_custom_sql': QuerySet(Document).filter(dataset_id=dataset_id),
+                           'default_sql': QuerySet(Document).filter(dataset_id=dataset_id)}, sql)
+
+        return aggregation_document_status
+
+    @staticmethod
+    def get_aggregation_document_status_by_query_set(queryset):
+        def aggregation_document_status():
+            sql = get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_document_status_meta.sql'))
+            native_update({'document_custom_sql': queryset, 'default_sql': queryset}, sql)
+
+        return aggregation_document_status
+
+    @staticmethod
+    def post_update_document_status(document_id, task_type: TaskType):
+        _document = QuerySet(Document).filter(id=document_id).first()
+
+        status = Status(_document.status)
+        if status[task_type] == State.REVOKE:
+            status[task_type] = State.REVOKED
+        else:
+            status[task_type] = State.SUCCESS
+        for item in _document.status_meta.get('aggs', []):
+            agg_status = item.get('status')
+            agg_count = item.get('count')
+            if Status(agg_status)[task_type] == State.FAILURE and agg_count > 0:
+                status[task_type] = State.FAILURE
+        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), task_type, status[task_type])
+
+        ListenerManagement.update_status(QuerySet(Paragraph).annotate(
+            reversed_status=Reverse('status'),
+            task_type_status=Substr('reversed_status', task_type.value,
+                                    task_type.value),
+        ).filter(task_type_status=State.REVOKE.value).filter(document_id=document_id).values('id'),
+                                         task_type,
+                                         State.REVOKED)
+
+    @staticmethod
+    def update_status(query_set: QuerySet, taskType: TaskType, state: State):
+        exec_sql = get_file_content(
+            os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_paragraph_status.sql'))
+        bit_number = len(TaskType)
+        up_index = taskType.value - 1
+        next_index = taskType.value + 1
+        current_index = taskType.value
+        status_number = state.value
+        params_dict = {'${bit_number}': bit_number, '${up_index}': up_index,
+                       '${status_number}': status_number, '${next_index}': next_index,
+                       '${table_name}': query_set.model._meta.db_table, '${current_index}': current_index}
+        for key in params_dict:
+            _value_ = params_dict[key]
+            exec_sql = exec_sql.replace(key, str(_value_))
+        lock.acquire()
+        try:
+            native_update(query_set, exec_sql)
+        finally:
+            lock.release()
 
     @staticmethod
     def embedding_by_document(document_id, embedding_model: Embeddings):
@@ -153,33 +250,29 @@ class ListenerManagement:
         if not try_lock('embedding' + str(document_id)):
             return
         max_kb.info(f"开始--->向量化文档:{document_id}")
-        QuerySet(Document).filter(id=document_id).update(**{'status': Status.embedding})
-        QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': Status.embedding})
-        status = Status.success
+        # 批量修改状态为PADDING
+        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.STARTED)
         try:
-            data_list = native_search(
-                {'problem': QuerySet(
-                    get_dynamics_model({'paragraph.document_id': django.db.models.CharField()})).filter(
-                    **{'paragraph.document_id': document_id}),
-                    'paragraph': QuerySet(Paragraph).filter(document_id=document_id)},
-                select_string=get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
             # 删除文档向量数据
             VectorStore.get_embedding_vector().delete_by_document_id(document_id)
 
-            def is_save_function():
-                return QuerySet(Document).filter(id=document_id).exists()
+            def is_the_task_interrupted():
+                document = QuerySet(Document).filter(id=document_id).first()
+                if document is None or Status(document.status)[TaskType.EMBEDDING] == State.REVOKE:
+                    return True
+                return False
 
-            # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
+            # 根据段落进行向量化处理
+            page(QuerySet(Paragraph).filter(document_id=document_id).values('id'), 5,
+                 ListenerManagement.get_embedding_paragraph_apply(embedding_model, is_the_task_interrupted,
+                                                                  ListenerManagement.get_aggregation_document_status(
+                                                                      document_id)),
+                 is_the_task_interrupted)
         except Exception as e:
             max_kb_error.error(f'向量化文档:{document_id}出现错误{str(e)}{traceback.format_exc()}')
-            status = Status.error
         finally:
-            # 修改状态
-            QuerySet(Document).filter(id=document_id).update(
-                **{'status': status, 'update_time': datetime.datetime.now()})
-            QuerySet(Paragraph).filter(document_id=document_id).update(**{'status': status})
+            ListenerManagement.post_update_document_status(document_id, TaskType.EMBEDDING)
+            ListenerManagement.get_aggregation_document_status(document_id)()
             max_kb.info(f"结束--->向量化文档:{document_id}")
             un_lock('embedding' + str(document_id))
 

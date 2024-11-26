@@ -7,6 +7,7 @@
     @desc: 数据集
 """
 import uuid
+from enum import Enum
 
 from django.db import models
 from django.db.models.signals import pre_delete
@@ -18,13 +19,62 @@ from setting.models import Model
 from users.models import User
 
 
-class Status(models.TextChoices):
-    """订单类型"""
-    embedding = 0, '导入中'
-    success = 1, '已完成'
-    error = 2, '导入失败'
-    queue_up = 3, '排队中'
-    generating = 4, '生成问题中'
+class TaskType(Enum):
+    # 向量
+    EMBEDDING = 1
+    # 生成问题
+    GENERATE_PROBLEM = 2
+    # 同步
+    SYNC = 3
+
+
+class State(Enum):
+    # 等待
+    PENDING = '0'
+    # 执行中
+    STARTED = '1'
+    # 成功
+    SUCCESS = '2'
+    # 失败
+    FAILURE = '3'
+    # 取消任务
+    REVOKE = '4'
+    # 取消成功
+    REVOKED = '5'
+    # 忽略
+    IGNORED = 'n'
+
+
+class Status:
+    type_cls = TaskType
+    state_cls = State
+
+    def __init__(self, status: str = None):
+        self.task_status = {}
+        status_list = list(status[::-1] if status is not None else '')
+        for _type in self.type_cls:
+            index = _type.value - 1
+            _state = self.state_cls(status_list[index] if len(status_list) > index else 'n')
+            self.task_status[_type] = _state
+
+    @staticmethod
+    def of(status: str):
+        return Status(status)
+
+    def __str__(self):
+        result = []
+        for _type in sorted(self.type_cls, key=lambda item: item.value, reverse=True):
+            result.insert(len(self.type_cls) - _type.value, self.task_status[_type].value)
+        return ''.join(result)
+
+    def __setitem__(self, key, value):
+        self.task_status[key] = value
+
+    def __getitem__(self, item):
+        return self.task_status[item]
+
+    def update_status(self, task_type: TaskType, state: State):
+        self.task_status[task_type] = state
 
 
 class Type(models.TextChoices):
@@ -40,6 +90,10 @@ class HitHandlingMethod(models.TextChoices):
 
 def default_model():
     return uuid.UUID('42f63a3d-427e-11ef-b3ec-a8a1595801ab')
+
+
+def default_status_meta():
+    return {"state_time": {}}
 
 
 class DataSet(AppModelMixin):
@@ -68,8 +122,8 @@ class Document(AppModelMixin):
     dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=150, verbose_name="文档名称")
     char_length = models.IntegerField(verbose_name="文档字符数 冗余字段")
-    status = models.CharField(verbose_name='状态', max_length=1, choices=Status.choices,
-                              default=Status.queue_up)
+    status = models.CharField(verbose_name='状态', max_length=20, default=Status('').__str__)
+    status_meta = models.JSONField(verbose_name="状态统计数据", default=default_status_meta)
     is_active = models.BooleanField(default=True)
 
     type = models.CharField(verbose_name='类型', max_length=1, choices=Type.choices,
@@ -94,8 +148,8 @@ class Paragraph(AppModelMixin):
     dataset = models.ForeignKey(DataSet, on_delete=models.DO_NOTHING)
     content = models.CharField(max_length=102400, verbose_name="段落内容")
     title = models.CharField(max_length=256, verbose_name="标题", default="")
-    status = models.CharField(verbose_name='状态', max_length=1, choices=Status.choices,
-                              default=Status.embedding)
+    status = models.CharField(verbose_name='状态', max_length=20, default=Status('').__str__)
+    status_meta = models.JSONField(verbose_name="状态数据", default=default_status_meta)
     hit_num = models.IntegerField(verbose_name="命中次数", default=0)
     is_active = models.BooleanField(default=True)
 
@@ -145,7 +199,6 @@ class File(AppModelMixin):
 
     meta = models.JSONField(verbose_name="文件关联数据", default=dict)
 
-
     class Meta:
         db_table = "file"
 
@@ -159,7 +212,6 @@ class File(AppModelMixin):
     def get_byte(self):
         result = select_one(f'SELECT lo_get({self.loid}) as "data"', [])
         return result['data']
-
 
 
 @receiver(pre_delete, sender=File)

@@ -37,6 +37,7 @@ urlpatterns = [
          name="document_export"),
     path('dataset/<str:dataset_id>/document/<str:document_id>/sync', views.Document.SyncWeb.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/refresh', views.Document.Refresh.as_view()),
+    path('dataset/<str:dataset_id>/document/<str:document_id>/cancel_task', views.Document.CancelTask.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph', views.Paragraph.as_view()),
     path('dataset/<str:dataset_id>/document/batch_generate_related', views.Document.BatchGenerateRelated.as_view()),
     path(
@@ -45,7 +46,8 @@ urlpatterns = [
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/_batch', views.Paragraph.Batch.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<int:current_page>/<int:page_size>',
          views.Paragraph.Page.as_view(), name='paragraph_page'),
-    path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/batch_generate_related', views.Paragraph.BatchGenerateRelated.as_view()),
+    path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/batch_generate_related',
+         views.Paragraph.BatchGenerateRelated.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<paragraph_id>',
          views.Paragraph.Operate.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph/<str:paragraph_id>/problem',
