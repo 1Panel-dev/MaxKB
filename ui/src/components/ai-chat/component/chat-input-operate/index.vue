@@ -89,7 +89,7 @@
                     props.applicationDetails.file_upload_setting.maxFiles
                   }}个，每个文件限制
                   {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />文件类型：{{
-                    getAcceptList()
+                    getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase()
                   }}</template
                 >
                 <el-button text>
