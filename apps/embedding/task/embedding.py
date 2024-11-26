@@ -102,6 +102,7 @@ def embedding_by_dataset(dataset_id, model_id):
         max_kb.info(f"数据集文档:{[d.name for d in document_list]}")
         for document in document_list:
             try:
+                print(document.id, model_id)
                 embedding_by_document.delay(document.id, model_id)
             except Exception as e:
                 pass

@@ -24,13 +24,19 @@
       </el-text>
     </el-col>
     <el-col :span="7">
-      完成
-      {{
-        Object.keys(status.aggs ? status.aggs : {})
-          .filter((k) => k == State.SUCCESS)
-          .map((k) => status.aggs[k])
-          .reduce((x: any, y: any) => x + y, 0)
-      }}/{{ Object.values(status.aggs ? status.aggs : {}).reduce((x: any, y: any) => x + y, 0) }}
+      <span
+        :style="{ color: [State.FAILURE, State.REVOKED].includes(status.state) ? '#F54A45' : '' }"
+      >
+        完成
+        {{
+          Object.keys(status.aggs ? status.aggs : {})
+            .filter((k) => k == State.SUCCESS)
+            .map((k) => status.aggs[k])
+            .reduce((x: any, y: any) => x + y, 0)
+        }}/{{
+          Object.values(status.aggs ? status.aggs : {}).reduce((x: any, y: any) => x + y, 0)
+        }}</span
+      >
     </el-col>
     <el-col :span="9">
       {{
