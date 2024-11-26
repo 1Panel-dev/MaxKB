@@ -28,7 +28,7 @@
               <div class="flex align-center">
                 <span
                   class="mr-16 color-secondary"
-                  v-if="item.type === WorkflowType.Question || item.type === WorkflowType.AiChat"
+                  v-if="item.type === WorkflowType.Question || item.type === WorkflowType.AiChat || item.type === WorkflowType.ImageUnderstandNode"
                   >{{ item?.message_tokens + item?.answer_tokens }} tokens</span
                 >
                 <span class="mr-16 color-secondary">{{ item?.run_time?.toFixed(2) || 0.0 }} s</span>
