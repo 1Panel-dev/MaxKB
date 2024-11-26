@@ -381,7 +381,7 @@ const {
 
 const { common, dataset, document } = useStore()
 const storeKey = 'documents'
-const getTaskState = (status, taskType) => {
+const getTaskState = (status: string, taskType: number) => {
   const statusList = status.split('').reverse()
   return taskType - 1 > statusList.length + 1 ? 'n' : statusList[taskType - 1]
 }

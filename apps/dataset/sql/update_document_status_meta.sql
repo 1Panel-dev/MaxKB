@@ -22,4 +22,4 @@ FROM
 	GROUP BY
 		document_id
 	) tmp
-${default_sql}
+WHERE "document".id="tmp".document_id

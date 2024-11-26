@@ -65,4 +65,4 @@ class Status {
     return r.reverse().join('')
   }
 }
-export { Status, State, TaskType, TaskTypeInterface, StateInterface }
+export { Status, State, TaskType, type TaskTypeInterface, type StateInterface }
