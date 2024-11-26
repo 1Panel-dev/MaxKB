@@ -63,11 +63,10 @@
                           <span class="color-secondary">{{ f.label }}:</span> {{ f.value }}
                         </div>
                         <div v-if="item.document_list?.length > 0">
-                          <p class="mb-8 color-secondary">上传的文档:</p>
+                          <p class="mb-8 color-secondary">文档:</p>
 
                           <el-space wrap>
                             <template v-for="(f, i) in item.document_list" :key="i">
-                              {{ f.name }}
                               <el-card
                                 shadow="never"
                                 style="--el-card-padding: 8px"
@@ -84,7 +83,7 @@
                           </el-space>
                         </div>
                         <div v-if="item.image_list?.length > 0">
-                          <p class="mb-8 color-secondary">上传的图片:</p>
+                          <p class="mb-8 color-secondary">图片:</p>
 
                           <el-space wrap>
                             <template v-for="(f, i) in item.image_list" :key="i">
