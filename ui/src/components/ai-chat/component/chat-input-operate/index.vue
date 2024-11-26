@@ -84,14 +84,15 @@
               :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
             >
               <el-tooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
-                <template #content
-                  >上传文件：最多{{
-                    props.applicationDetails.file_upload_setting.maxFiles
-                  }}个，每个文件限制
-                  {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />文件类型：{{
-                    getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase()
-                  }}</template
-                >
+                <template #content>
+                  <div class="break-all pre-wrap">上传文件：最多{{
+                      props.applicationDetails.file_upload_setting.maxFiles
+                    }}个，每个文件限制
+                    {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />文件类型：{{
+                      getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase()
+                    }}
+                  </div>
+                </template>
                 <el-button text>
                   <el-icon><Paperclip /></el-icon>
                 </el-button>
