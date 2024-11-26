@@ -10,11 +10,12 @@ import datetime
 import logging
 import os
 import threading
+import time
 import traceback
 from typing import List
 
 import django.db.models
-from django.db import models
+from django.db import models, transaction
 from django.db.models import QuerySet
 from django.db.models.functions import Substr, Reverse
 from langchain_core.embeddings import Embeddings
@@ -168,6 +169,7 @@ class ListenerManagement:
     @staticmethod
     def get_aggregation_document_status(document_id):
         def aggregation_document_status():
+            pass
             sql = get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'update_document_status_meta.sql'))
             native_update({'document_custom_sql': QuerySet(Document).filter(id=document_id)}, sql, with_table_name=True)
