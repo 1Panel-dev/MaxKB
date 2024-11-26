@@ -218,7 +218,16 @@
                   <!-- 文档内容提取 -->
                   <template v-if="item.type === WorkflowType.DocumentExtractNode">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">参数输出</h5>
+                      <h5 class="p-8-12">
+                        参数输出
+                        <el-tooltip
+                            effect="dark"
+                            content="每个文档仅支持预览500字"
+                            placement="right"
+                        >
+                          <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                        </el-tooltip>
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <el-scrollbar height="150">
                           <MdPreview
