@@ -57,4 +57,4 @@ class TextSplitHandle(BaseSplitHandle):
            return buffer.decode(detect(buffer)['encoding'])
         except BaseException as e:
             traceback.print_exception(e)
-            return ''
+            return f'{e}'

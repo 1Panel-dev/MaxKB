@@ -198,4 +198,4 @@ class DocSplitHandle(BaseSplitHandle):
             return self.to_md(doc, image_list, get_image_id_func())
         except BaseException as e:
             traceback.print_exception(e)
-            return ''
+            return f'{e}'
