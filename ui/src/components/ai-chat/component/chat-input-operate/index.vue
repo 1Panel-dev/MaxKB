@@ -217,6 +217,9 @@ const getAcceptList = () => {
     accepts = [...accepts, ...videoExtensions]
   }
   // console.log(accepts)
+  if (accepts.length === 0) {
+    return '.请在文件上传配置中选择文件类型'
+  }
   return accepts.map((ext: any) => '.' + ext).join(',')
 }
 
