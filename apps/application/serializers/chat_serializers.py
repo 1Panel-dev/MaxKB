@@ -395,7 +395,8 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
     class Meta:
         model = ChatRecord
         fields = ['id', 'chat_id', 'vote_status', 'problem_text', 'answer_text',
-                  'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index','answer_text_list',
+                  'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index',
+                  'answer_text_list',
                   'create_time', 'update_time']
 
 
@@ -457,6 +458,7 @@ class ChatRecordSerializer(serializers.Serializer):
         def reset_chat_record(chat_record):
             dataset_list = []
             paragraph_list = []
+
             if 'search_step' in chat_record.details and chat_record.details.get('search_step').get(
                     'paragraph_list') is not None:
                 paragraph_list = chat_record.details.get('search_step').get(
@@ -468,6 +470,14 @@ class ChatRecordSerializer(serializers.Serializer):
                                                                                                     row in
                                                                                                     paragraph_list],
                                                                                                 {}).items()]
+            if len(chat_record.improve_paragraph_id_list) > 0:
+                paragraph_model_list = QuerySet(Paragraph).filter(id__in=chat_record.improve_paragraph_id_list)
+                if len(paragraph_model_list) < len(chat_record.improve_paragraph_id_list):
+                    paragraph_model_id_list = [str(p.id) for p in paragraph_model_list]
+                    chat_record.improve_paragraph_id_list = list(
+                        filter(lambda p_id: paragraph_model_id_list.__contains__(p_id),
+                               chat_record.improve_paragraph_id_list))
+                    chat_record.save()
 
             return {
                 **ChatRecordSerializerModel(chat_record).data,
@@ -608,13 +618,11 @@ class ChatRecordSerializer(serializers.Serializer):
                                   title=instance.get("title") if 'title' in instance else '')
             problem_text = instance.get('problem_text') if instance.get(
                 'problem_text') is not None else chat_record.problem_text
-            problem = Problem(id=uuid.uuid1(), content=problem_text, dataset_id=dataset_id)
+            problem, _ = Problem.objects.get_or_create(content=problem_text, dataset_id=dataset_id)
             problem_paragraph_mapping = ProblemParagraphMapping(id=uuid.uuid1(), dataset_id=dataset_id,
                                                                 document_id=document_id,
                                                                 problem_id=problem.id,
                                                                 paragraph_id=paragraph.id)
-            # 插入问题
-            problem.save()
             # 插入段落
             paragraph.save()
             # 插入关联问题

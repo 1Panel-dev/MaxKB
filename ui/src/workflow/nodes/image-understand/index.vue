@@ -56,7 +56,7 @@
                   ></span>
                   <span>{{ item.name }}</span>
                   <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
-                  >公用
+                    >公用
                   </el-tag>
                 </div>
                 <el-icon class="check-icon" v-if="item.id === form_data.model_id">
@@ -113,7 +113,7 @@
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。
+                  >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -131,9 +131,9 @@
           <template #label>
             <div class="flex-between">
               <div>历史聊天记录</div>
-              <el-select v-model="form_data.dialogue_type" type="small" style="width: 100px;">
-                <el-option label="节点" value="NODE"/>
-                <el-option label="工作流" value="WORKFLOW"/>
+              <el-select v-model="form_data.dialogue_type" type="small" style="width: 100px">
+                <el-option label="节点" value="NODE" />
+                <el-option label="工作流" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -143,9 +143,13 @@
             :value-on-clear="0"
             controls-position="right"
             class="w-full"
+            :step="1"
+            :step-strictly="true"
           />
         </el-form-item>
-        <el-form-item label="选择图片" :rules="{
+        <el-form-item
+          label="选择图片"
+          :rules="{
             type: 'array',
             required: true,
             message: '请选择图片',
@@ -232,7 +236,7 @@ const form = {
   is_result: true,
   temperature: null,
   max_tokens: null,
-  image_list: ["start-node", "image"]
+  image_list: ['start-node', 'image']
 }
 
 const form_data = computed({
@@ -248,7 +252,6 @@ const form_data = computed({
     set(props.nodeModel.properties, 'node_data', value)
   }
 })
-
 
 function getModel() {
   if (id) {
@@ -268,9 +271,7 @@ function getProvider() {
   })
 }
 
-const model_change = (model_id?: string) => {
-
-}
+const model_change = (model_id?: string) => {}
 
 function submitSystemDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'system', val)
@@ -286,10 +287,6 @@ onMounted(() => {
 
   set(props.nodeModel, 'validate', validate)
 })
-
 </script>
 
-
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

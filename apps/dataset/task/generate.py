@@ -51,20 +51,27 @@ def get_generate_problem(llm_model, prompt, post_apply=lambda: None, is_the_task
     return generate_problem
 
 
+def get_is_the_task_interrupted(document_id):
+    def is_the_task_interrupted():
+        document = QuerySet(Document).filter(id=document_id).first()
+        if document is None or Status(document.status)[TaskType.GENERATE_PROBLEM] == State.REVOKE:
+            return True
+        return False
+
+    return is_the_task_interrupted
+
+
 @celery_app.task(base=QueueOnce, once={'keys': ['document_id']},
                  name='celery:generate_related_by_document')
 def generate_related_by_document_id(document_id, model_id, prompt):
     try:
+        is_the_task_interrupted = get_is_the_task_interrupted(document_id)
+        if is_the_task_interrupted():
+            return
         ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
                                          TaskType.GENERATE_PROBLEM,
                                          State.STARTED)
         llm_model = get_llm_model(model_id)
-
-        def is_the_task_interrupted():
-            document = QuerySet(Document).filter(id=document_id).first()
-            if document is None or Status(document.status)[TaskType.GENERATE_PROBLEM] == State.REVOKE:
-                return True
-            return False
 
         # 生成问题函数
         generate_problem = get_generate_problem(llm_model, prompt,
@@ -82,6 +89,12 @@ def generate_related_by_document_id(document_id, model_id, prompt):
                  name='celery:generate_related_by_paragraph_list')
 def generate_related_by_paragraph_id_list(document_id, paragraph_id_list, model_id, prompt):
     try:
+        is_the_task_interrupted = get_is_the_task_interrupted(document_id)
+        if is_the_task_interrupted():
+            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                             TaskType.GENERATE_PROBLEM,
+                                             State.REVOKED)
+            return
         ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
                                          TaskType.GENERATE_PROBLEM,
                                          State.STARTED)

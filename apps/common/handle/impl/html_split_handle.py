@@ -70,4 +70,4 @@ class HTMLSplitHandle(BaseSplitHandle):
             return html2text(content)
         except BaseException as e:
             traceback.print_exception(e)
-            return ''
+            return f'{e}'

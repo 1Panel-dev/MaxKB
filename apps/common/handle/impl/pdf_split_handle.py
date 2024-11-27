@@ -321,4 +321,4 @@ class PdfSplitHandle(BaseSplitHandle):
             return self.handle_pdf_content(file, pdf_document)
         except BaseException as e:
             traceback.print_exception(e)
-            return ''
+            return f'{e}'

@@ -538,7 +538,7 @@
             </h4>
           </div>
           <div class="scrollbar-height">
-            <AiChat :applicationDetails="applicationForm"></AiChat>
+            <AiChat :applicationDetails="applicationForm" :type="'debug-ai-chat'"></AiChat>
           </div>
         </div>
       </el-col>

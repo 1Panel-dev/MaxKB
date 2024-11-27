@@ -63,11 +63,10 @@
                           <span class="color-secondary">{{ f.label }}:</span> {{ f.value }}
                         </div>
                         <div v-if="item.document_list?.length > 0">
-                          <p class="mb-8 color-secondary">上传的文档:</p>
+                          <p class="mb-8 color-secondary">文档:</p>
 
                           <el-space wrap>
                             <template v-for="(f, i) in item.document_list" :key="i">
-                              {{ f.name }}
                               <el-card
                                 shadow="never"
                                 style="--el-card-padding: 8px"
@@ -84,7 +83,7 @@
                           </el-space>
                         </div>
                         <div v-if="item.image_list?.length > 0">
-                          <p class="mb-8 color-secondary">上传的图片:</p>
+                          <p class="mb-8 color-secondary">图片:</p>
 
                           <el-space wrap>
                             <template v-for="(f, i) in item.image_list" :key="i">
@@ -219,7 +218,16 @@
                   <!-- 文档内容提取 -->
                   <template v-if="item.type === WorkflowType.DocumentExtractNode">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">参数输出</h5>
+                      <h5 class="p-8-12">
+                        参数输出
+                        <el-tooltip
+                            effect="dark"
+                            content="每个文档仅支持预览500字"
+                            placement="right"
+                        >
+                          <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                        </el-tooltip>
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <el-scrollbar height="150">
                           <MdPreview

@@ -203,7 +203,7 @@ export const documentExtractNode = {
     config: {
       fields: [
         {
-          label: '文件内容',
+          label: '文档内容',
           value: 'content'
         }
       ]
