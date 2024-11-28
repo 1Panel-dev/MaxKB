@@ -190,12 +190,16 @@ class DocSplitHandle(BaseSplitHandle):
             return True
         return False
 
-    def get_content(self, file):
+    def get_content(self, file, save_image):
         try:
             image_list = []
             buffer = file.read()
             doc = Document(io.BytesIO(buffer))
-            return self.to_md(doc, image_list, get_image_id_func())
+            content = self.to_md(doc, image_list, get_image_id_func())
+            if len(image_list) > 0:
+                content = content.replace('/api/image/', '/api/file/')
+                save_image(image_list)
+            return content
         except BaseException as e:
             traceback.print_exception(e)
             return f'{e}'

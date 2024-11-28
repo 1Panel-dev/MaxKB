@@ -309,7 +309,7 @@ class PdfSplitHandle(BaseSplitHandle):
             return True
         return False
 
-    def get_content(self, file):
+    def get_content(self, file, save_image):
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             # 将上传的文件保存到临时文件中
             temp_file.write(file.read())
