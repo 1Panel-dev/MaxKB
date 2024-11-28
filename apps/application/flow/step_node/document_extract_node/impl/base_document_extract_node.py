@@ -16,7 +16,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
         self.context['document_list'] = document
         content = []
         splitter = '\n`-----------------------------------`\n'
-        if document is None:
+        if document is None or not isinstance(document, list):
             return NodeResult({'content': content}, {})
 
         for doc in document:
