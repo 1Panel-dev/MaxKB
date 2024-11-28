@@ -74,7 +74,7 @@ class XlsxSplitHandle(BaseParseTableHandle):
         return result
 
 
-    def get_content(self, file):
+    def get_content(self, file, save_image):
         try:
             # 加载 Excel 文件
             workbook = load_workbook(file)

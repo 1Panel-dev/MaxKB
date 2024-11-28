@@ -61,7 +61,7 @@ class XlsSplitHandle(BaseParseTableHandle):
             return [{'name': file.name, 'paragraphs': []}]
         return result
 
-    def get_content(self, file):
+    def get_content(self, file, save_image):
         # 打开 .xls 文件
         try:
             workbook = xlrd.open_workbook(file_contents=file.read(), formatting_info=True)
