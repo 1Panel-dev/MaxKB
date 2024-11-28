@@ -20,7 +20,12 @@
                 </div>
                 <div class="ml-8" v-else>
                   <a
-                    @click="openLink(item.source_url)"
+                    :href="
+                      item.source_url && !item.source_url.endsWith('/')
+                        ? item.source_url + '/'
+                        : item.source_url
+                    "
+                    target="_blank"
                     class="ellipsis"
                     :title="item?.document_name?.trim()"
                   >
@@ -98,14 +103,6 @@ const uniqueParagraphList = computed(() => {
     }) || []
   )
 })
-
-function openLink(url: string) {
-  // 如果url不是以/结尾，加上/
-  if (url && !url.endsWith('/')) {
-    url += '/'
-  }
-  window.open(url, '_blank')
-}
 </script>
 <style lang="scss" scoped>
 .source_dataset-button {
