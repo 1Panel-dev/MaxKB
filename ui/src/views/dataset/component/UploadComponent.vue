@@ -129,7 +129,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        accept=".txt, .md, .csv, .log, .docx, .pdf, .html"
+        accept=".txt, .md, .log, .docx, .pdf, .html"
         :limit="50"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
