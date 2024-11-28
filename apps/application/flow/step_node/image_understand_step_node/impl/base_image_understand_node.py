@@ -66,6 +66,10 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
     def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream, chat_id, chat_record_id,
                 image,
                 **kwargs) -> NodeResult:
+        # 处理不正确的参数
+        if image is None or not isinstance(image, list):
+            image = []
+
         image_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'))
         # 执行详情中的历史消息不需要图片内容
         history_message =self.get_history_message_for_details(history_chat_record, dialogue_number)
