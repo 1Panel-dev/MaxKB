@@ -242,6 +242,9 @@ function clickoutside() {
   showPopover.value = false
 }
 function publicHandle() {
+  // 先执行保存
+  saveApplication()
+  // 后执行发布
   workflowRef.value
     ?.validate()
     .then(() => {
