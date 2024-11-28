@@ -25,7 +25,7 @@
             </div>
             <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
               <template #content>
-                `设置执行该节点输出的内容，{{ '{ from }' }}为表单的占位符。`
+                设置执行该节点输出的内容，{{ '{ form }' }}为表单的占位符。
               </template>
               <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
             </el-tooltip>

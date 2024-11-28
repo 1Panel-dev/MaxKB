@@ -7,35 +7,37 @@
     class="mb-16"
     style="padding: 0 24px"
   >
-    <el-card shadow="always" class="dialog-card">
-      <div class="flex align-center cursor w-full" @click="showUserInput = !showUserInput">
+    <el-card shadow="always" class="dialog-card" style="--el-card-padding: 16px 8px">
+      <div class="flex align-center cursor w-full" style="padding: 0 8px;" @click="showUserInput = !showUserInput">
         <el-icon class="mr-8 arrow-icon" :class="showUserInput ? 'rotate-90' : ''"
           ><CaretRight
         /></el-icon>
         用户输入
       </div>
-      <el-collapse-transition>
-        <div v-show="showUserInput" class="mt-16">
-          <DynamicsForm
-            :key="dynamicsFormRefresh"
-            v-model="form_data_context"
-            :model="form_data_context"
-            label-position="top"
-            require-asterisk-position="right"
-            :render_data="inputFieldList"
-            ref="dynamicsFormRef"
-          />
-          <DynamicsForm
-            v-if="type === 'debug-ai-chat'"
-            v-model="api_form_data_context"
-            :model="api_form_data_context"
-            label-position="top"
-            require-asterisk-position="right"
-            :render_data="apiInputFieldList"
-            ref="dynamicsFormRef2"
-          />
-        </div>
-      </el-collapse-transition>
+      <el-scrollbar max-height="160">
+        <el-collapse-transition>
+          <div v-show="showUserInput" class="mt-16" style="padding: 0 8px;">
+            <DynamicsForm
+              :key="dynamicsFormRefresh"
+              v-model="form_data_context"
+              :model="form_data_context"
+              label-position="top"
+              require-asterisk-position="right"
+              :render_data="inputFieldList"
+              ref="dynamicsFormRef"
+            />
+            <DynamicsForm
+              v-if="type === 'debug-ai-chat'"
+              v-model="api_form_data_context"
+              :model="api_form_data_context"
+              label-position="top"
+              require-asterisk-position="right"
+              :render_data="apiInputFieldList"
+              ref="dynamicsFormRef2"
+            />
+          </div>
+        </el-collapse-transition>
+      </el-scrollbar>
     </el-card>
   </div>
 </template>

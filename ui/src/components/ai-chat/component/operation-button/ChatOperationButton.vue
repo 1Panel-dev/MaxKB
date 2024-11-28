@@ -19,7 +19,7 @@
       </el-tooltip>
       <el-divider direction="vertical" />
     </span>
-    <span v-if="applicationId && type == 'log'">
+    <span v-if="type == 'ai-chat' || type == 'log'">
       <el-tooltip effect="dark" content="换个答案" placement="top">
         <el-button :disabled="chat_loading" text @click="regeneration">
           <el-icon><RefreshRight /></el-icon>
