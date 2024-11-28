@@ -7,7 +7,6 @@ from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.document_extract_node.i_document_extract_node import IDocumentExtractNode
-from application.models import Chat
 from dataset.models import File
 from dataset.serializers.document_serializers import split_handles, parse_table_handle_list, FileBufferHandle
 from dataset.serializers.file_serializers import FileSerializer
@@ -36,15 +35,16 @@ def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
     return uploaded_file
 
 
+splitter = '\n`-----------------------------------`\n'
+
 class BaseDocumentExtractNode(IDocumentExtractNode):
     def execute(self, document, chat_id, **kwargs):
         get_buffer = FileBufferHandle().get_buffer
 
         self.context['document_list'] = document
         content = []
-        splitter = '\n`-----------------------------------`\n'
         if document is None or not isinstance(document, list):
-            return NodeResult({'content': content}, {})
+            return NodeResult({'content': ''}, {})
 
         application = self.workflow_manage.work_flow_post_handler.chat_info.application
 
@@ -76,14 +76,14 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
         return NodeResult({'content': splitter.join(content)}, {})
 
     def get_details(self, index: int, **kwargs):
+        content = self.context.get('content', '').split(splitter)
         # 不保存content全部内容，因为content内容可能会很大
-        content = (self.context.get('content')[:500] + '...') if len(self.context.get('content')) > 0 else ''
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
-            'content': content,
+            'content': [file_content[:500] for file_content in content],
             'status': self.status,
             'err_message': self.err_message,
             'document_list': self.context.get('document_list')

@@ -231,12 +231,13 @@
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <el-scrollbar height="150">
-                          <el-card shadow="never" style="--el-card-padding: 8px">
+                          <el-card shadow="never" style="--el-card-padding: 8px" v-for="(file_content, index) in item.content"
+                                   :key="index" class="mb-8">
                             <MdPreview
-                              v-if="item.content"
+                              v-if="file_content"
                               ref="editorRef"
                               editorId="preview-only"
-                              :modelValue="item.content"
+                              :modelValue="file_content"
                               style="background: none"
                             />
                             <template v-else> - </template>
