@@ -178,7 +178,7 @@ const putSyncWebDataset: (
 }
 
 /**
- * 重新向量化知识库
+ * 向量化知识库
  * @param 参数 dataset_id
  */
 const putReEmbeddingDataset: (
