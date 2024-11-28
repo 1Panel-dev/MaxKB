@@ -4,6 +4,7 @@ import logging
 import datetime
 
 from django.db import transaction
+from django.db.models.fields.json import KeyTextTransform
 from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore
@@ -11,6 +12,8 @@ from application.models import Application, Chat
 from django.db.models import Q
 from common.lock.impl.file_lock import FileLock
 from dataset.models import File
+from django.db.models.functions import Cast
+from django.db import models
 
 scheduler = BackgroundScheduler()
 scheduler.add_jobstore(DjangoJobStore(), "default")
@@ -40,7 +43,7 @@ def clean_chat_log_job():
                 break
             deleted_count, _ = Chat.objects.filter(id__in=logs_to_delete).delete()
             # 删除对应的文件
-            File.objects.filter(~Q(meta__chat_id__in=logs_to_delete)).delete()
+            File.objects.filter(meta__chat_id__in=[str(uuid) for uuid in logs_to_delete]).delete()
             if deleted_count < batch_size:
                 break
 
