@@ -61,7 +61,7 @@ class HTMLSplitHandle(BaseSplitHandle):
                 'content': split_model.parse(content)
                 }
 
-    def get_content(self, file):
+    def get_content(self, file, save_image):
         buffer = file.read()
 
         try:

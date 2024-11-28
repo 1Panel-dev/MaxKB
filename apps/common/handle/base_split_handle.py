@@ -20,5 +20,5 @@ class BaseSplitHandle(ABC):
         pass
 
     @abstractmethod
-    def get_content(self, file):
+    def get_content(self, file, save_image):
         pass
