@@ -1,12 +1,12 @@
 <template>
   <AppAvatar
-    v-if="isAppIcon(item.icon)"
+    v-if="isAppIcon(item?.icon)"
     shape="square"
     :size="32"
     style="background: none"
     class="mr-8"
   >
-    <img :src="item.icon" alt="" />
+    <img :src="item?.icon" alt="" />
   </AppAvatar>
   <AppAvatar
     v-else-if="item?.name"

@@ -18,6 +18,7 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['message_tokens'] = result.get('usage', {}).get('prompt_tokens', 0)
     node.context['answer_tokens'] = result.get('usage', {}).get('completion_tokens', 0)
     node.context['answer'] = answer
+    node.context['result'] = answer
     node.context['question'] = node_variable['question']
     node.context['run_time'] = time.time() - node.context['start_time']
     if workflow.is_result(node, NodeResult(node_variable, workflow_variable)):
