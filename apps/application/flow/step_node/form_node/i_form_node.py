@@ -21,6 +21,7 @@ class FormNodeParamsSerializer(serializers.Serializer):
 
 class IFormNode(INode):
     type = 'form-node'
+    view_type = 'single_view'
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return FormNodeParamsSerializer

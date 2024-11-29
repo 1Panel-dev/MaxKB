@@ -52,7 +52,6 @@ const is_submit = computed(() => {
 const _form_data = ref<any>({})
 const form_data = computed({
   get: () => {
-    console.log(form_setting_data.value)
     if (form_setting_data.value.is_submit) {
       return form_setting_data.value.form_data
     } else {

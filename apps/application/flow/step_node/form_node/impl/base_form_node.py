@@ -34,6 +34,8 @@ class BaseFormNode(IFormNode):
         self.context['form_field_list'] = details.get('form_field_list')
         self.context['run_time'] = details.get('run_time')
         self.context['start_time'] = details.get('start_time')
+        self.context['form_data'] = details.get('form_data')
+        self.context['is_submit'] = details.get('is_submit')
         self.answer_text = details.get('result')
 
     def execute(self, form_field_list, form_content_format, **kwargs) -> NodeResult:
@@ -77,6 +79,7 @@ class BaseFormNode(IFormNode):
             "form_field_list": self.context.get('form_field_list'),
             'form_data': self.context.get('form_data'),
             'start_time': self.context.get('start_time'),
+            'is_submit': self.context.get('is_submit'),
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
             'status': self.status,

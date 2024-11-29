@@ -14,12 +14,15 @@ from rest_framework import status
 class BaseToResponse(ABC):
 
     @abstractmethod
-    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens,
+    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens,
+                          prompt_tokens, other_params: dict = None,
                           _status=status.HTTP_200_OK):
         pass
 
     @abstractmethod
-    def to_stream_chunk_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens):
+    def to_stream_chunk_response(self, chat_id, chat_record_id, node_id, up_node_id_list, content, is_end,
+                                 completion_tokens,
+                                 prompt_tokens, other_params: dict = None):
         pass
 
     @staticmethod
