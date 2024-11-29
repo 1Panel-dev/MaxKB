@@ -241,9 +241,12 @@ function onmousedown(item: any) {
 function clickoutside() {
   showPopover.value = false
 }
-function publicHandle() {
+async function publicHandle() {
   // 先执行保存
-  saveApplication()
+  const obj = {
+    work_flow: getGraphData()
+  }
+  await application.asyncPutApplication(id, obj)
   // 后执行发布
   workflowRef.value
     ?.validate()
