@@ -10,7 +10,7 @@
   >
     <el-button type="primary" @click="openAddDrawer()" class="mb-12"> 添加参数 </el-button>
     <el-table :data="modelParamsForm" class="mb-16">
-      <el-table-column prop="label" label="显示名称">
+      <el-table-column prop="label" label="显示名称" show-overflow-tooltip>
         <template #default="{ row }">
           <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
             row.label.label
@@ -18,7 +18,7 @@
           <span v-else>{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="field" label="参数" />
+      <el-table-column prop="field" label="参数" show-overflow-tooltip />
       <el-table-column label="组件类型" width="110px">
         <template #default="{ row }">
           <el-tag type="info" class="info-tag">{{
@@ -26,7 +26,7 @@
           }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="default_value" label="默认值" />
+      <el-table-column prop="default_value" label="默认值" show-overflow-tooltip />
       <el-table-column label="必填">
         <template #default="{ row }">
           <div @click.stop>
