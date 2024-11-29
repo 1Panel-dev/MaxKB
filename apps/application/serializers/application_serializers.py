@@ -147,9 +147,9 @@ class ApplicationWorkflowSerializer(serializers.Serializer):
             default_workflow = json.loads(default_workflow_json)
         for node in default_workflow.get('nodes'):
             if node.get('id') == 'base-node':
-                node.get('properties')['node_data'] = {"desc": application.get('desc'),
-                                                       "name": application.get('name'),
-                                                       "prologue": application.get('prologue')}
+                node.get('properties')['node_data']['desc'] = application.get('desc')
+                node.get('properties')['node_data']['name'] = application.get('name')
+                node.get('properties')['node_data']['prologue'] = application.get('prologue')
         return Application(id=uuid.uuid1(),
                            name=application.get('name'),
                            desc=application.get('desc'),
@@ -160,6 +160,14 @@ class ApplicationWorkflowSerializer(serializers.Serializer):
                            model_setting={},
                            problem_optimization=False,
                            type=ApplicationTypeChoices.WORK_FLOW,
+                           stt_model_enable=application.get('stt_model_enable', False),
+                           stt_model_id=application.get('stt_model', None),
+                           tts_model_id=application.get('tts_model', None),
+                           tts_model_enable=application.get('tts_model_enable', False),
+                           tts_model_params_setting=application.get('tts_model_params_setting', {}),
+                           tts_type=application.get('tts_type', None),
+                           file_upload_enable=application.get('file_upload_enable', False),
+                           file_upload_setting=application.get('file_upload_setting', {}),
                            work_flow=default_workflow
                            )
 
@@ -502,6 +510,14 @@ class ApplicationSerializer(serializers.Serializer):
                                type=ApplicationTypeChoices.SIMPLE,
                                model_params_setting=application.get('model_params_setting', {}),
                                problem_optimization_prompt=application.get('problem_optimization_prompt', None),
+                               stt_model_enable=application.get('stt_model_enable', False),
+                               stt_model_id=application.get('stt_model', None),
+                               tts_model_id=application.get('tts_model', None),
+                               tts_model_enable=application.get('tts_model_enable', False),
+                               tts_model_params_setting=application.get('tts_model_params_setting', {}),
+                               tts_type=application.get('tts_type', None),
+                               file_upload_enable=application.get('file_upload_enable', False),
+                               file_upload_setting=application.get('file_upload_setting', {}),
                                work_flow={}
                                )
 

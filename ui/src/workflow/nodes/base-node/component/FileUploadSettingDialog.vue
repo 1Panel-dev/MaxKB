@@ -45,7 +45,7 @@
               <img class="mr-12" src="@/assets/icon_file-doc.svg" alt="" />
               <div>
                 <p>文档（TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF）</p>
-                <el-text class="color-secondary">需要与文档内容提取节点配合使用</el-text>
+                <el-text class="color-secondary">需要使用“文档内容提取”节点解析文档内容</el-text>
               </div>
             </div>
             <el-checkbox v-model="form_data.document" />
@@ -62,7 +62,7 @@
               <img class="mr-12" src="@/assets/icon_file-image.svg" alt="" />
               <div>
                 <p>图片（JPG、JPEG、PNG、GIF）</p>
-                <el-text class="color-secondary">所选模型需要支持接收图片</el-text>
+                <el-text class="color-secondary">需要使用“图片理解”节点解析图片内容</el-text>
               </div>
             </div>
             <el-checkbox v-model="form_data.image" />

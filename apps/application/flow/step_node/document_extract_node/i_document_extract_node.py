@@ -23,5 +23,5 @@ class IDocumentExtractNode(INode):
                                                        self.node_params_serializer.data.get('document_list')[1:])
         return self.execute(document=res, **self.flow_params_serializer.data)
 
-    def execute(self, document, **kwargs) -> NodeResult:
+    def execute(self, document, chat_id, **kwargs) -> NodeResult:
         pass

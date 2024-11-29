@@ -218,26 +218,30 @@
                   <!-- 文档内容提取 -->
                   <template v-if="item.type === WorkflowType.DocumentExtractNode">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">
-                        参数输出
+                      <h5 class="p-8-12 flex align-center">
+                        <span class="mr-4">参数输出</span>
+
                         <el-tooltip
-                            effect="dark"
-                            content="每个文档仅支持预览500字"
-                            placement="right"
+                          effect="dark"
+                          content="每个文档仅支持预览500字"
+                          placement="right"
                         >
                           <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                         </el-tooltip>
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <el-scrollbar height="150">
-                          <MdPreview
-                            v-if="item.content"
-                            ref="editorRef"
-                            editorId="preview-only"
-                            :modelValue="item.content"
-                            style="background: none"
-                          />
-                          <template v-else> - </template>
+                          <el-card shadow="never" style="--el-card-padding: 8px" v-for="(file_content, index) in item.content"
+                                   :key="index" class="mb-8">
+                            <MdPreview
+                              v-if="file_content"
+                              ref="editorRef"
+                              editorId="preview-only"
+                              :modelValue="file_content"
+                              style="background: none"
+                            />
+                            <template v-else> - </template>
+                          </el-card>
                         </el-scrollbar>
                       </div>
                     </div>
@@ -333,6 +337,7 @@
                   <template v-if="item.type === WorkflowType.FormNode">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">参数输入</h5>
+
                       <div class="p-8-12 border-t-dashed lighter">
                         <div v-for="(f, i) in item.form_field_list" :key="i" class="mb-8">
                           <span class="color-secondary">{{ f.label.label }}:</span>

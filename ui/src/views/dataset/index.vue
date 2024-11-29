@@ -109,7 +109,7 @@
                                 iconName="app-document-refresh"
                                 style="font-size: 16px"
                               ></AppIcon>
-                              重新向量化</el-dropdown-item
+                              向量化</el-dropdown-item
                             >
                             <el-dropdown-item
                               icon="Setting"

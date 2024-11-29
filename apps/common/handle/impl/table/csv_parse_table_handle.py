@@ -35,7 +35,7 @@ class CsvSplitHandle(BaseParseTableHandle):
 
         return [{'name': file.name, 'paragraphs': paragraphs}]
 
-    def get_content(self, file):
+    def get_content(self, file, save_image):
         buffer = file.read()
         try:
             return buffer.decode(detect(buffer)['encoding'])
