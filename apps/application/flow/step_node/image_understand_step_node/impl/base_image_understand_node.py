@@ -92,14 +92,23 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context)
 
-    @staticmethod
-    def get_history_message_for_details(history_chat_record, dialogue_number):
+
+    def get_history_message_for_details(self, history_chat_record, dialogue_number):
         start_index = len(history_chat_record) - dialogue_number
         history_message = reduce(lambda x, y: [*x, *y], [
-            [history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
+            [self.generate_history_human_message_for_details(history_chat_record[index]), history_chat_record[index].get_ai_message()]
             for index in
             range(start_index if start_index > 0 else 0, len(history_chat_record))], [])
         return history_message
+
+    def generate_history_human_message_for_details(self, chat_record):
+        for data in chat_record.details.values():
+            if self.node.id == data['node_id'] and 'image_list' in data:
+                image_list = data['image_list']
+                if len(image_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
+                    return HumanMessage(content=chat_record.problem_text)
+                return HumanMessage(content=data['question'])
+        return HumanMessage(content=chat_record.problem_text)
 
     def get_history_message(self, history_chat_record, dialogue_number):
         start_index = len(history_chat_record) - dialogue_number
