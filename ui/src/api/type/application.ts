@@ -22,6 +22,17 @@ interface ApplicationFormType {
   tts_model_enable?: boolean
   tts_type?: string
 }
+interface Chunk {
+  chat_id: string
+  id: string
+  content: string
+  node_id: string
+  up_node_id: string
+  is_end: boolean
+  node_is_end: boolean
+  node_type: string
+  view_type: string
+}
 interface chatType {
   id: string
   problem_text: string
@@ -47,6 +58,21 @@ interface chatType {
   }
 }
 
+interface Node {
+  buffer: Array<string>
+  node_id: string
+  up_node_id: string
+  node_type: string
+  view_type: string
+  index: number
+  is_end: boolean
+}
+interface WriteNodeInfo {
+  current_node: any
+  answer_text_list_index: number
+  current_up_node?: any
+  divider_content?: Array<string>
+}
 export class ChatRecordManage {
   id?: any
   ms: number
@@ -55,6 +81,8 @@ export class ChatRecordManage {
   write_ed?: boolean
   is_stop?: boolean
   loading?: Ref<boolean>
+  node_list: Array<any>
+  write_node_info?: WriteNodeInfo
   constructor(chat: chatType, ms?: number, loading?: Ref<boolean>) {
     this.ms = ms ? ms : 10
     this.chat = chat
@@ -62,11 +90,81 @@ export class ChatRecordManage {
     this.is_stop = false
     this.is_close = false
     this.write_ed = false
+    this.node_list = []
   }
-  append_answer(chunk_answer: String) {
-    this.chat.answer_text_list[this.chat.answer_text_list.length - 1] =
-      this.chat.answer_text_list[this.chat.answer_text_list.length - 1] + chunk_answer
+  append_answer(chunk_answer: string, index?: number) {
+    this.chat.answer_text_list[index != undefined ? index : this.chat.answer_text_list.length - 1] =
+      this.chat.answer_text_list[
+        index !== undefined ? index : this.chat.answer_text_list.length - 1
+      ]
+        ? this.chat.answer_text_list[
+            index !== undefined ? index : this.chat.answer_text_list.length - 1
+          ] + chunk_answer
+        : chunk_answer
     this.chat.answer_text = this.chat.answer_text + chunk_answer
+  }
+
+  get_run_node() {
+    if (
+      this.write_node_info &&
+      (this.write_node_info.current_node.buffer.length > 0 ||
+        !this.write_node_info.current_node.is_end)
+    ) {
+      return this.write_node_info
+    }
+    const run_node = this.node_list.filter((item) => item.buffer.length > 0 || !item.is_end).at(0)
+
+    if (run_node) {
+      const index = this.node_list.indexOf(run_node)
+      let current_up_node = undefined
+      if (index > 0) {
+        current_up_node = this.node_list[index - 1]
+      }
+      let answer_text_list_index = 0
+
+      if (
+        current_up_node == undefined ||
+        run_node.view_type == 'single_view' ||
+        (run_node.view_type == 'many_view' && current_up_node.view_type == 'single_view')
+      ) {
+        const none_index = this.chat.answer_text_list.indexOf('')
+        if (none_index > -1) {
+          answer_text_list_index = none_index
+        } else {
+          answer_text_list_index = this.chat.answer_text_list.length
+        }
+      } else {
+        const none_index = this.chat.answer_text_list.indexOf('')
+        if (none_index > -1) {
+          answer_text_list_index = none_index
+        } else {
+          answer_text_list_index = this.chat.answer_text_list.length - 1
+        }
+      }
+
+      this.write_node_info = {
+        current_node: run_node,
+        divider_content: ['\n\n'],
+        current_up_node: current_up_node,
+        answer_text_list_index: answer_text_list_index
+      }
+      return this.write_node_info
+    }
+    return undefined
+  }
+  closeInterval() {
+    this.chat.write_ed = true
+    this.write_ed = true
+    if (this.loading) {
+      this.loading.value = false
+    }
+    if (this.id) {
+      clearInterval(this.id)
+    }
+    const last_index = this.chat.answer_text_list.lastIndexOf('')
+    if (last_index > 0) {
+      this.chat.answer_text_list.splice(last_index, 1)
+    }
   }
   write() {
     this.chat.is_stop = false
@@ -78,22 +176,45 @@ export class ChatRecordManage {
       this.loading.value = true
     }
     this.id = setInterval(() => {
-      if (this.chat.buffer.length > 20) {
-        this.append_answer(this.chat.buffer.splice(0, this.chat.buffer.length - 20).join(''))
+      const node_info = this.get_run_node()
+      if (node_info == undefined) {
+        if (this.is_close) {
+          this.closeInterval()
+        }
+        return
+      }
+      const { current_node, answer_text_list_index, divider_content } = node_info
+      if (current_node.buffer.length > 20) {
+        const context = current_node.is_end
+          ? current_node.buffer.splice(0)
+          : current_node.buffer.splice(
+              0,
+              current_node.is_end ? undefined : current_node.buffer.length - 20
+            )
+        this.append_answer(
+          (divider_content ? divider_content.splice(0).join('') : '') + context.join(''),
+          answer_text_list_index
+        )
       } else if (this.is_close) {
-        this.append_answer(this.chat.buffer.splice(0).join(''))
-        this.chat.write_ed = true
-        this.write_ed = true
-        if (this.loading) {
-          this.loading.value = false
+        while (true) {
+          const node_info = this.get_run_node()
+          if (node_info == undefined) {
+            break
+          }
+          this.append_answer(
+            (node_info.divider_content ? node_info.divider_content.splice(0).join('') : '') +
+              node_info.current_node.buffer.splice(0).join(''),
+            node_info.answer_text_list_index
+          )
         }
-        if (this.id) {
-          clearInterval(this.id)
-        }
+        this.closeInterval()
       } else {
-        const s = this.chat.buffer.shift()
+        const s = current_node.buffer.shift()
         if (s !== undefined) {
-          this.append_answer(s)
+          this.append_answer(
+            (divider_content ? divider_content.splice(0).join('') : '') + s,
+            answer_text_list_index
+          )
         }
       }
     }, this.ms)
@@ -113,6 +234,28 @@ export class ChatRecordManage {
     this.is_close = false
     this.is_stop = false
   }
+  appendChunk(chunk: Chunk) {
+    let n = this.node_list.find(
+      (item) => item.node_id == chunk.node_id && item.up_node_id === chunk.up_node_id
+    )
+    if (n) {
+      n.buffer.push(...chunk.content)
+    } else {
+      n = {
+        buffer: [...chunk.content],
+        node_id: chunk.node_id,
+        up_node_id: chunk.up_node_id,
+        node_type: chunk.node_type,
+        index: this.node_list.length,
+        view_type: chunk.view_type,
+        is_end: false
+      }
+      this.node_list.push(n)
+    }
+    if (chunk.node_is_end) {
+      n['is_end'] = true
+    }
+  }
   append(answer_text_block: string) {
     for (let index = 0; index < answer_text_block.length; index++) {
       this.chat.buffer.push(answer_text_block[index])
@@ -125,6 +268,12 @@ export class ChatManagement {
 
   static addChatRecord(chat: chatType, ms: number, loading?: Ref<boolean>) {
     this.chatMessageContainer[chat.id] = new ChatRecordManage(chat, ms, loading)
+  }
+  static appendChunk(chatRecordId: string, chunk: Chunk) {
+    const chatRecord = this.chatMessageContainer[chatRecordId]
+    if (chatRecord) {
+      chatRecord.appendChunk(chunk)
+    }
   }
   static append(chatRecordId: string, content: string) {
     const chatRecord = this.chatMessageContainer[chatRecordId]
@@ -144,6 +293,7 @@ export class ChatManagement {
    */
   static write(chatRecordId: string) {
     const chatRecord = this.chatMessageContainer[chatRecordId]
+    console.log('chatRecord', chatRecordId, this.chatMessageContainer, chatRecord)
     if (chatRecord) {
       chatRecord.write()
     }

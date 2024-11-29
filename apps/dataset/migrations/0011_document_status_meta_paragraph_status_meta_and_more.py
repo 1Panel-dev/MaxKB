@@ -17,6 +17,8 @@ def updateDocumentStatus(apps, schema_editor):
     ParagraphModel = apps.get_model('dataset', 'Paragraph')
     DocumentModel = apps.get_model('dataset', 'Document')
     success_list = QuerySet(DocumentModel).filter(status='2')
+    if len(success_list) == 0:
+        return
     ListenerManagement.update_status(QuerySet(ParagraphModel).filter(document_id__in=[d.id for d in success_list]),
                                      TaskType.EMBEDDING, State.SUCCESS)
     ListenerManagement.get_aggregation_document_status_by_query_set(QuerySet(DocumentModel))()
