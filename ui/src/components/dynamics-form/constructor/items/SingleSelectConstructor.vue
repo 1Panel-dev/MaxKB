@@ -108,6 +108,8 @@ defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.option_list = []
   formValue.value.default_value = ''
+
+  addOption()
 })
 </script>
 <style lang="scss" scoped>
