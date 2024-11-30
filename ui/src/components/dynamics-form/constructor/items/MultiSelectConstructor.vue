@@ -63,7 +63,7 @@
       <el-option
         v-for="(option, index) in formValue.option_list"
         :key="index"
-        :label="option.value"
+        :label="option.label"
         :value="option.value"
       />
     </el-select>
@@ -102,8 +102,8 @@ const getData = () => {
     input_type: 'MultiSelect',
     attrs: {},
     default_value: formValue.value.default_value,
-    textField: 'label',
-    valueField: 'value',
+    text_field: 'label',
+    value_field: 'value',
     option_list: formValue.value.option_list
   }
 }
