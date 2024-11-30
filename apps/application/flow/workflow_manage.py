@@ -460,11 +460,12 @@ class WorkflowManage:
                                                                    self.params['chat_record_id'],
                                                                    current_node.id,
                                                                    current_node.up_node_id_list,
-                                                                   str(e), False, 0, 0, {'node_is_end': True})
+                                                                   str(e), False, 0, 0,
+                                                                   {'node_is_end': True, 'node_type': current_node.type,
+                                                                    'view_type': current_node.view_type})
             if not self.node_chunk_manage.contains(node_chunk):
                 self.node_chunk_manage.add_node_chunk(node_chunk)
-            node_chunk.add_chunk(chunk)
-            node_chunk.end()
+            node_chunk.end(chunk)
             current_node.get_write_error_context(e)
             self.status = 500
 

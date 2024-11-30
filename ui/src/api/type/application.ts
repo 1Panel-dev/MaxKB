@@ -293,7 +293,6 @@ export class ChatManagement {
    */
   static write(chatRecordId: string) {
     const chatRecord = this.chatMessageContainer[chatRecordId]
-    console.log('chatRecord', chatRecordId, this.chatMessageContainer, chatRecord)
     if (chatRecord) {
       chatRecord.write()
     }

@@ -6,7 +6,9 @@
       class="problem-button ellipsis-2 mb-8"
       :class="sendMessage ? 'cursor' : 'disabled'"
     >
-      <el-icon><EditPen /></el-icon>
+      <el-icon>
+        <EditPen />
+      </el-icon>
       {{ item.content }}
     </div>
     <HtmlRander v-else-if="item.type === 'html_rander'" :source="item.content"></HtmlRander>
@@ -15,6 +17,7 @@
       :option="item.content"
     ></EchartsRander>
     <FormRander
+      :loading="loading"
       :send-message="sendMessage"
       v-else-if="item.type === 'form_rander'"
       :form_setting="item.content"
@@ -61,9 +64,11 @@ const props = withDefaults(
     source?: string
     inner_suffix?: boolean
     sendMessage?: (question: string, type: 'old' | 'new', other_params_data?: any) => void
+    loading?: boolean
   }>(),
   {
-    source: ''
+    source: '',
+    loading: false
   }
 )
 const editorRef = ref()
@@ -225,14 +230,17 @@ const split_form_rander_ = (source: string, type: string) => {
   color: var(--el-text-color-regular);
   -webkit-line-clamp: 1;
   word-break: break-all;
+
   &:hover {
     background: var(--el-color-primary-light-9);
   }
+
   &.disabled {
     &:hover {
       background: var(--app-layout-bg-color);
     }
   }
+
   :deep(.el-icon) {
     color: var(--el-color-primary);
   }

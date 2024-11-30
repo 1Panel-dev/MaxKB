@@ -10,7 +10,7 @@
       v-model="form_data"
       :model="form_data"
     ></DynamicsForm>
-    <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit" @click="submit"
+    <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit||loading" @click="submit"
       >提交</el-button
     >
   </div>
@@ -18,10 +18,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   form_setting: string
+  loading?:boolean
   sendMessage?: (question: string, type: 'old' | 'new', other_params_data?: any) => void
-}>()
+}>(),{
+  loading:false
+})
 const form_setting_data = computed(() => {
   if (props.form_setting) {
     return JSON.parse(props.form_setting)
