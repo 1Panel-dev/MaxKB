@@ -341,7 +341,7 @@
                       <div class="p-8-12 border-t-dashed lighter">
                         <div v-for="(f, i) in item.form_field_list" :key="i" class="mb-8">
                           <span class="color-secondary">{{ f.label.label }}:</span>
-                          {{ item.form_data[f.field] }}
+                          {{ (item.form_data?item.form_data:{})[f.field] }}
                         </div>
                       </div>
                     </div>
@@ -467,7 +467,6 @@ watch(dialogVisible, (bool) => {
 
 const open = (data: any) => {
   detail.value = cloneDeep(data)
-  console.log(detail.value)
   dialogVisible.value = true
 }
 onBeforeUnmount(() => {

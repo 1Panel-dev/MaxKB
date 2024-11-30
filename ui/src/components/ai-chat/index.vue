@@ -273,7 +273,6 @@ const errorWrite = (chat: any, message?: string) => {
 
 function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_params_data?: any) {
   loading.value = true
-  console.log(chat)
   if (!chat) {
     chat = reactive({
       id: randomId(),
