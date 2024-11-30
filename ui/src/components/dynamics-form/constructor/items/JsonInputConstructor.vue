@@ -14,7 +14,6 @@ import JsonInput from '@/components/dynamics-form/items/JsonInput.vue'
 const props = defineProps<{
   modelValue: any
 }>()
-const formField = ref<any>({})
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
   set: (item) => {
