@@ -120,8 +120,15 @@ class ChatInfo:
     def append_chat_record(self, chat_record: ChatRecord, client_id=None):
         chat_record.problem_text = chat_record.problem_text[0:10240] if chat_record.problem_text is not None else ""
         chat_record.answer_text = chat_record.answer_text[0:40960] if chat_record.problem_text is not None else ""
+        is_save = True
         # 存入缓存中
-        self.chat_record_list.append(chat_record)
+        for index in range(len(self.chat_record_list)):
+            record = self.chat_record_list[index]
+            if record.id == chat_record.id:
+                self.chat_record_list[index] = chat_record
+                is_save = False
+        if is_save:
+            self.chat_record_list.append(chat_record)
         if self.application.id is not None:
             # 插入数据库
             if not QuerySet(Chat).filter(id=self.chat_id).exists():
