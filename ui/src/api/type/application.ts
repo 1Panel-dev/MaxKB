@@ -257,9 +257,9 @@ export class ChatRecordManage {
     }
   }
   append(answer_text_block: string) {
-    for (let index = 0; index < answer_text_block.length; index++) {
-      this.chat.buffer.push(answer_text_block[index])
-    }
+    const index =this.chat.answer_text_list.indexOf("")
+    this.chat.answer_text_list[index]=answer_text_block
+   
   }
 }
 

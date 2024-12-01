@@ -65,9 +65,12 @@ def event_content(response,
     try:
         for chunk in response:
             all_text += chunk.content
-            yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), chunk.content,
+            yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), 'ai-chat-node',
+                                                                         [], chunk.content,
                                                                          False,
-                                                                         0, 0)
+                                                                         0, 0, {'node_is_end': False,
+                                                                                'view_type': 'many_view',
+                                                                                'node_type': 'ai-chat-node'})
         # 获取token
         if is_ai_chat:
             try:
@@ -82,8 +85,11 @@ def event_content(response,
         write_context(step, manage, request_token, response_token, all_text)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text, client_id)
-        yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), '', True,
-                                                                     request_token, response_token)
+        yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), 'ai-chat-node',
+                                                                     [], '', True,
+                                                                     request_token, response_token,
+                                                                     {'node_is_end': True, 'view_type': 'many_view',
+                                                                      'node_type': 'ai-chat-node'})
         add_access_num(client_id, client_type)
     except Exception as e:
         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
@@ -92,7 +98,11 @@ def event_content(response,
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text, client_id)
         add_access_num(client_id, client_type)
-        yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), all_text, True, 0, 0)
+        yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), all_text,
+                                                                     'ai-chat-node',
+                                                                     [], True, 0, 0,
+                                                                     {'node_is_end': True, 'view_type': 'many_view',
+                                                                      'node_type': 'ai-chat-node'})
 
 
 class BaseChatStep(IChatStep):
