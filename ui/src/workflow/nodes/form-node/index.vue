@@ -133,7 +133,7 @@ const addFormField = (form_field_data: any) => {
     MsgError('参数已存在:' + form_field_data.field)
     return
   }
-  form_data.value.form_field_list = [...form_data.value.form_field_list, form_field_data]
+  form_data.value.form_field_list = cloneDeep([...form_data.value.form_field_list, form_field_data])
   sync_form_field_list()
 }
 const sync_form_field_list = () => {
