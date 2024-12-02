@@ -37,7 +37,7 @@
         :loading="loading"
       >
         <el-row :gutter="15">
-          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
+          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16">
             <CardAdd
               :title="$t('views.application.applicationList.card.createApplication')"
               @click="openCreateDialog"
@@ -48,7 +48,7 @@
             :sm="12"
             :md="8"
             :lg="6"
-            :xl="4"
+            :xl="6"
             v-for="(item, index) in applicationList"
             :key="index"
             class="mb-16"

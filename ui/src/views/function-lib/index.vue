@@ -41,7 +41,7 @@
         :loading="loading"
       >
         <el-row :gutter="15">
-          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb-16">
+          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16">
             <CardAdd title="创建函数" @click="openCreateDialog()" />
           </el-col>
           <el-col
