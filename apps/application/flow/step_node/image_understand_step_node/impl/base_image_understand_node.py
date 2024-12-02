@@ -115,7 +115,11 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 image_list = data['image_list']
                 if len(image_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
-                return HumanMessage(content=data['question'])
+                file_id = image_list[0]['file_id']
+                return HumanMessage(content=[
+                        {'type': 'text', 'text': data['question']},
+                        {'type': 'image_url', 'image_url': {'url': f'/api/file/{file_id}'}},
+                    ])
         return HumanMessage(content=chat_record.problem_text)
 
     def get_history_message(self, history_chat_record, dialogue_number):

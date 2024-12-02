@@ -39,11 +39,12 @@ def clean_chat_log_job():
         with transaction.atomic():
             logs_to_delete = Chat.objects.filter(query_conditions).values_list('id', flat=True)[:batch_size]
             count = logs_to_delete.count()
+            logs_to_delete_str = [str(uuid) for uuid in logs_to_delete]
             if count == 0:
                 break
             deleted_count, _ = Chat.objects.filter(id__in=logs_to_delete).delete()
             # 删除对应的文件
-            File.objects.filter(meta__chat_id__in=[str(uuid) for uuid in logs_to_delete]).delete()
+            File.objects.filter(meta__chat_id__in=logs_to_delete_str).delete()
             if deleted_count < batch_size:
                 break
 
@@ -57,6 +58,6 @@ def run():
             existing_job = scheduler.get_job(job_id='clean_chat_log')
             if existing_job is not None:
                 existing_job.remove()
-            scheduler.add_job(clean_chat_log_job, 'cron', hour='0', minute='5', id='clean_chat_log')
+            scheduler.add_job(clean_chat_log_job, 'cron',  hour='0', minute='5', id='clean_chat_log')
         finally:
             lock.un_lock('clean_chat_log_job')

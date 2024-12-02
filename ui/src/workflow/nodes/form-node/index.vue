@@ -113,18 +113,16 @@ import { type FormInstance } from 'element-plus'
 import { ref, onMounted, computed } from 'vue'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import { MsgError } from '@/utils/message'
-import { set,cloneDeep } from 'lodash'
+import { set, cloneDeep } from 'lodash'
 const props = defineProps<{ nodeModel: any }>()
 const formNodeFormRef = ref<FormInstance>()
 const editFormField = (form_field_data: any, field_index: number) => {
-  const _value=form_data.value.form_field_list.map(
-    (item: any, index: number) => {
-      if (field_index === index) {
-        return cloneDeep(form_field_data)
-      }
-      return cloneDeep(item)
+  const _value = form_data.value.form_field_list.map((item: any, index: number) => {
+    if (field_index === index) {
+      return cloneDeep(form_field_data)
     }
-  )
+    return cloneDeep(item)
+  })
   form_data.value.form_field_list = _value
   sync_form_field_list()
 }
@@ -161,6 +159,7 @@ const deleteField = (form_field_data: any) => {
   form_data.value.form_field_list = form_data.value.form_field_list.filter(
     (field: any) => field.field !== form_field_data.field
   )
+  sync_form_field_list()
 }
 const form = ref<any>({
   is_result: true,
