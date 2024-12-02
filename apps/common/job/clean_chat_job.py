@@ -58,6 +58,6 @@ def run():
             existing_job = scheduler.get_job(job_id='clean_chat_log')
             if existing_job is not None:
                 existing_job.remove()
-            scheduler.add_job(clean_chat_log_job, 'cron',  minute='*/5', id='clean_chat_log')
+            scheduler.add_job(clean_chat_log_job, 'cron',  hour='0', minute='5', id='clean_chat_log')
         finally:
             lock.un_lock('clean_chat_log_job')

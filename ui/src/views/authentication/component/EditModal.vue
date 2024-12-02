@@ -125,7 +125,12 @@ const open = async (platform: Platform) => {
         currentPlatform.config.corp_id = currentPlatform.config.agent_id
         delete currentPlatform.config.agent_id
       }
-      currentPlatform.config.callback_url = defaultCallbackUrl
+      currentPlatform.config = {
+        corp_id: currentPlatform.config.corp_id,
+        app_key: currentPlatform.config.app_key,
+        app_secret: currentPlatform.config.app_secret,
+        callback_url: defaultCallbackUrl
+      }
       break
     case 'lark':
       currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/feishu`
