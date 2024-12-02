@@ -37,6 +37,8 @@ class BaseStartStepNode(IStarNode):
         workflow_variable = {**default_global_variable, **get_global_variable(self)}
         self.context['question'] = details.get('question')
         self.context['run_time'] = details.get('run_time')
+        self.context['document'] = details.get('document_list')
+        self.context['image'] = details.get('image_list')
         self.status = details.get('status')
         self.err_message = details.get('err_message')
         for key, value in workflow_variable.items():
