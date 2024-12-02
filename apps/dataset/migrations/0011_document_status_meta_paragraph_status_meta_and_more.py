@@ -9,7 +9,7 @@ from dataset.models import State, TaskType
 
 sql = """
 UPDATE "document"
-SET status ="replace"(status, '1', '3')
+SET status ="replace"("replace"("replace"(status, '1', '2'),'0','3'),'2','3')
 """
 
 
