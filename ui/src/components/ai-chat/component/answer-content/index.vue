@@ -14,6 +14,7 @@
             source=" 抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
           ></MdRenderer>
           <MdRenderer
+            :loading="loading"
             v-else-if="answer_text"
             :source="answer_text"
             :send-message="chatMessage"
@@ -60,12 +61,15 @@ const props = defineProps<{
 
 const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: any) => {
   if (type === 'old') {
-    props.chatRecord.answer_text_list.push('')
+    add_answer_text_list(props.chatRecord.answer_text_list)
     props.sendMessage(question, other_params_data, props.chatRecord)
     props.chatManagement.write(props.chatRecord.id)
   } else {
     props.sendMessage(question, other_params_data)
   }
+}
+const add_answer_text_list = (answer_text_list: Array<string>) => {
+  answer_text_list.push('')
 }
 
 function showSource(row: any) {
@@ -78,8 +82,8 @@ function showSource(row: any) {
   }
   return false
 }
-const regenerationChart = (question: string) => {
-  props.sendMessage(question, { rechat: true })
+const regenerationChart = (chat: chatType) => {
+  props.sendMessage(chat.problem_text, { rechat: true })
 }
 const stopChat = (chat: chatType) => {
   props.chatManagement.stop(chat.id)

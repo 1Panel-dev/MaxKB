@@ -84,7 +84,7 @@ class BaseVectorStore(ABC):
         chunk_list = chunk_data(data)
         result = sub_array(chunk_list)
         for child_array in result:
-            self._batch_save(child_array, embedding, lambda: True)
+            self._batch_save(child_array, embedding, lambda: False)
 
     def batch_save(self, data_list: List[Dict], embedding: Embeddings, is_the_task_interrupted):
         """

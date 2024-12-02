@@ -223,10 +223,8 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
             const chunk = JSON?.parse(split[index].replace('data:', ''))
             chat.chat_id = chunk.chat_id
             chat.record_id = chunk.id
-            const content = chunk?.content
-            if (content) {
-              ChatManagement.append(chat.id, content)
-            }
+            ChatManagement.appendChunk(chat.id, chunk)
+
             if (chunk.is_end) {
               // 流处理成功 返回成功回调
               return Promise.resolve()
@@ -305,6 +303,10 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
       // 将滚动条滚动到最下面
       scrollDiv.value.setScrollTop(getMaxHeight())
     })
+  }
+  if (chat.run_time) {
+    ChatManagement.addChatRecord(chat, 50, loading)
+    ChatManagement.write(chat.id)
   }
   if (!chartOpenId.value) {
     getChartOpenId(chat).catch(() => {

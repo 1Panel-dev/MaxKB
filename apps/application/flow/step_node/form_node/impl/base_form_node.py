@@ -29,12 +29,18 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
 
 class BaseFormNode(IFormNode):
     def save_context(self, details, workflow_manage):
+        form_data = details.get('form_data', None)
         self.context['result'] = details.get('result')
         self.context['form_content_format'] = details.get('form_content_format')
         self.context['form_field_list'] = details.get('form_field_list')
         self.context['run_time'] = details.get('run_time')
         self.context['start_time'] = details.get('start_time')
+        self.context['form_data'] = form_data
+        self.context['is_submit'] = details.get('is_submit')
         self.answer_text = details.get('result')
+        if form_data is not None:
+            for key in form_data:
+                self.context[key] = form_data[key]
 
     def execute(self, form_field_list, form_content_format, **kwargs) -> NodeResult:
         form_setting = {"form_field_list": form_field_list, "runtime_node_id": self.runtime_node_id,
@@ -77,6 +83,7 @@ class BaseFormNode(IFormNode):
             "form_field_list": self.context.get('form_field_list'),
             'form_data': self.context.get('form_data'),
             'start_time': self.context.get('start_time'),
+            'is_submit': self.context.get('is_submit'),
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
             'status': self.status,

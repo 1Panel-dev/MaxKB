@@ -13,8 +13,8 @@
     :data="props.nodeModel.properties.user_input_field_list"
     class="mb-16"
   >
-    <el-table-column prop="field" label="参数" />
-    <el-table-column prop="label" label="显示名称">
+    <el-table-column prop="field" label="参数" show-overflow-tooltip />
+    <el-table-column prop="label" label="显示名称" show-overflow-tooltip >
       <template #default="{ row }">
         <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{ row.label.label }}</span>
         <span v-else>{{ row.label }}</span>
@@ -31,7 +31,7 @@
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">日期</el-tag>
       </template>
     </el-table-column>
-    <el-table-column prop="default_value" label="默认值" />
+    <el-table-column prop="default_value" label="默认值" show-overflow-tooltip />
     <el-table-column label="必填">
       <template #default="{ row }">
         <div @click.stop>

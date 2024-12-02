@@ -9,6 +9,7 @@
 import time
 import uuid
 from abc import abstractmethod
+from hashlib import sha1
 from typing import Type, Dict, List
 
 from django.core import cache
@@ -131,6 +132,7 @@ class FlowParamsSerializer(serializers.Serializer):
 
 
 class INode:
+    view_type = 'many_view'
 
     @abstractmethod
     def save_context(self, details, workflow_manage):
@@ -139,7 +141,7 @@ class INode:
     def get_answer_text(self):
         return self.answer_text
 
-    def __init__(self, node, workflow_params, workflow_manage, runtime_node_id=None):
+    def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None):
         # 当前步骤上下文,用于存储当前步骤信息
         self.status = 200
         self.err_message = ''
@@ -152,10 +154,13 @@ class INode:
         self.context = {}
         self.answer_text = None
         self.id = node.id
-        if runtime_node_id is None:
-            self.runtime_node_id = str(uuid.uuid1())
-        else:
-            self.runtime_node_id = runtime_node_id
+        if up_node_id_list is None:
+            up_node_id_list = []
+        self.up_node_id_list = up_node_id_list
+        self.runtime_node_id = sha1(uuid.NAMESPACE_DNS.bytes + bytes(str(uuid.uuid5(uuid.NAMESPACE_DNS,
+                                                                                    "".join([*sorted(up_node_id_list),
+                                                                                             node.id]))),
+                                                                     "utf-8")).hexdigest()
 
     def valid_args(self, node_params, flow_params):
         flow_params_serializer_class = self.get_flow_params_serializer_class()

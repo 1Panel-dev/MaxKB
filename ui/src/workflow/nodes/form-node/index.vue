@@ -56,8 +56,8 @@
           :data="form_data.form_field_list"
           class="mb-16"
         >
-          <el-table-column prop="field" label="参数" />
-          <el-table-column prop="label" label="显示名称">
+          <el-table-column prop="field" label="参数" show-overflow-tooltip />
+          <el-table-column prop="label" label="显示名称" show-overflow-tooltip>
             <template #default="{ row }">
               <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
                 row.label.label
@@ -72,7 +72,7 @@
               }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="default_value" label="默认值" />
+          <el-table-column prop="default_value" label="默认值" show-overflow-tooltip />
           <el-table-column label="必填">
             <template #default="{ row }">
               <div @click.stop>
@@ -113,18 +113,19 @@ import { type FormInstance } from 'element-plus'
 import { ref, onMounted, computed } from 'vue'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import { MsgError } from '@/utils/message'
-import { set } from 'lodash'
+import { set,cloneDeep } from 'lodash'
 const props = defineProps<{ nodeModel: any }>()
 const formNodeFormRef = ref<FormInstance>()
 const editFormField = (form_field_data: any, field_index: number) => {
-  form_data.value.form_field_list = form_data.value.form_field_list.map(
+  const _value=form_data.value.form_field_list.map(
     (item: any, index: number) => {
       if (field_index === index) {
-        return form_field_data
+        return cloneDeep(form_field_data)
       }
-      return item
+      return cloneDeep(item)
     }
   )
+  form_data.value.form_field_list = _value
   sync_form_field_list()
 }
 const addFormField = (form_field_data: any) => {
@@ -132,7 +133,7 @@ const addFormField = (form_field_data: any) => {
     MsgError('参数已存在:' + form_field_data.field)
     return
   }
-  form_data.value.form_field_list = [...form_data.value.form_field_list, form_field_data]
+  form_data.value.form_field_list = cloneDeep([...form_data.value.form_field_list, form_field_data])
   sync_form_field_list()
 }
 const sync_form_field_list = () => {

@@ -139,14 +139,14 @@ class DataSetSerializers(serializers.ModelSerializer):
             query_set = QuerySet(model=get_dynamics_model(
                 {'temp.name': models.CharField(), 'temp.desc': models.CharField(),
                  "document_temp.char_length": models.IntegerField(), 'temp.create_time': models.DateTimeField(),
-                 'temp.user_id': models.CharField(), }))
+                 'temp.user_id': models.CharField(), 'temp.id': models.CharField()}))
             if "desc" in self.data and self.data.get('desc') is not None:
                 query_set = query_set.filter(**{'temp.desc__icontains': self.data.get("desc")})
             if "name" in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'temp.name__icontains': self.data.get("name")})
             if "select_user_id" in self.data and self.data.get('select_user_id') is not None:
                 query_set = query_set.filter(**{'temp.user_id__exact': self.data.get("select_user_id")})
-            query_set = query_set.order_by("-temp.create_time")
+            query_set = query_set.order_by("-temp.create_time", "temp.id")
             query_set_dict['default_sql'] = query_set
 
             query_set_dict['dataset_custom_sql'] = QuerySet(model=get_dynamics_model(

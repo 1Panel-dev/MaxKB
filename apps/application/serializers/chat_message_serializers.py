@@ -120,8 +120,15 @@ class ChatInfo:
     def append_chat_record(self, chat_record: ChatRecord, client_id=None):
         chat_record.problem_text = chat_record.problem_text[0:10240] if chat_record.problem_text is not None else ""
         chat_record.answer_text = chat_record.answer_text[0:40960] if chat_record.problem_text is not None else ""
+        is_save = True
         # 存入缓存中
-        self.chat_record_list.append(chat_record)
+        for index in range(len(self.chat_record_list)):
+            record = self.chat_record_list[index]
+            if record.id == chat_record.id:
+                self.chat_record_list[index] = chat_record
+                is_save = False
+        if is_save:
+            self.chat_record_list.append(chat_record)
         if self.application.id is not None:
             # 插入数据库
             if not QuerySet(Chat).filter(id=self.chat_id).exists():
@@ -224,8 +231,13 @@ class ChatMessageSerializer(serializers.Serializer):
     re_chat = serializers.BooleanField(required=True, error_messages=ErrMessage.char("是否重新回答"))
     chat_record_id = serializers.UUIDField(required=False, allow_null=True,
                                            error_messages=ErrMessage.uuid("对话记录id"))
+
+    node_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
+                                    error_messages=ErrMessage.char("节点id"))
+
     runtime_node_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                            error_messages=ErrMessage.char("节点id"))
+                                            error_messages=ErrMessage.char("运行时节点id"))
+
     node_data = serializers.DictField(required=False, error_messages=ErrMessage.char("节点参数"))
     application_id = serializers.UUIDField(required=False, allow_null=True, error_messages=ErrMessage.uuid("应用id"))
     client_id = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端id"))
@@ -339,7 +351,8 @@ class ChatMessageSerializer(serializers.Serializer):
                                            'client_id': client_id,
                                            'client_type': client_type,
                                            'user_id': user_id}, WorkFlowPostHandler(chat_info, client_id, client_type),
-                                          base_to_response, form_data, image_list, document_list, self.data.get('runtime_node_id'),
+                                          base_to_response, form_data, image_list, document_list,
+                                          self.data.get('runtime_node_id'),
                                           self.data.get('node_data'), chat_record)
         r = work_flow_manage.run()
         return r

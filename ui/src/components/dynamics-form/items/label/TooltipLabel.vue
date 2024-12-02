@@ -7,7 +7,7 @@
       <template #content
         ><div style="width: 200px">{{ tooltip }}</div></template
       >
-      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+      <AppIcon iconName="app-warning" class="app-warning-icon" style="flex-shrink: 0"></AppIcon>
     </el-tooltip>
   </div>
 </template>

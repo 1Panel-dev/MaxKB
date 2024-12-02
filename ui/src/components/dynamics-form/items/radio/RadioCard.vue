@@ -68,6 +68,7 @@ const option_list = computed(() => {
   width: 100%;
   .active {
     border: 1px solid var(--el-color-primary);
+    color: var(--el-color-primary);
   }
   .item {
     cursor: pointer;
