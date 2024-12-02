@@ -131,7 +131,6 @@ function createPlatform(key: string, name: string): Platform {
 
   const config = {
     ...(key === 'wecom' ? { corp_id: '', agent_id: '' } : { app_key: '' }),
-    ...(key === 'dingtalk' ? { corp_id: '' } : {}),
     app_secret: '',
     callback_url: ''
   }
@@ -172,6 +171,15 @@ function getPlatformInfo() {
             isActive: data.is_active,
             config: data.config
           })
+          if (platform.key === 'dingtalk') {
+            const { corp_id, app_key, app_secret } = platform.config
+            platform.config = {
+              corp_id,
+              app_key,
+              app_secret,
+              callback_url: platform.config.callback_url
+            }
+          }
           showPassword[platform.key] = {}
           showPassword[platform.key]['app_secret'] = false
         }
