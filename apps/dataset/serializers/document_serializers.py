@@ -374,7 +374,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 query_set = query_set.filter(**{'is_active': self.data.get('is_active')})
             if 'status' in self.data and self.data.get('status') is not None:
                 query_set = query_set.filter(**{'status': self.data.get('status')})
-            query_set = query_set.order_by('-create_time')
+            query_set = query_set.order_by('-create_time', 'id')
             return query_set
 
         def list(self, with_valid=False):
