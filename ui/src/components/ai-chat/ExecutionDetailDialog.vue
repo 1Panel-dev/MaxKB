@@ -410,7 +410,6 @@
                       <h5 class="p-8-12">本次对话</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         <div v-if="item.image_list?.length > 0">
-                          <p class="mb-8 color-secondary">图片:</p>
                           <el-space wrap>
                             <template v-for="(f, i) in item.image_list" :key="i">
                               <el-image
@@ -424,7 +423,6 @@
                           </el-space>
                         </div>
                         <div>
-                          <p class="mb-8 color-secondary">提示词：</p>
                           {{ item.question || '-' }}
                         </div>
                       </div>
