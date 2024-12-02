@@ -231,8 +231,13 @@
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <el-scrollbar height="150">
-                          <el-card shadow="never" style="--el-card-padding: 8px" v-for="(file_content, index) in item.content"
-                                   :key="index" class="mb-8">
+                          <el-card
+                            shadow="never"
+                            style="--el-card-padding: 8px"
+                            v-for="(file_content, index) in item.content"
+                            :key="index"
+                            class="mb-8"
+                          >
                             <MdPreview
                               v-if="file_content"
                               ref="editorRef"
@@ -336,13 +341,23 @@
                   <!-- 表单收集 -->
                   <template v-if="item.type === WorkflowType.FormNode">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">参数输入</h5>
+                      <h5 class="p-8-12">
+                        参数输入<span style="color: #f54a45">{{
+                          item.is_submit ? '' : '(用户未提交)'
+                        }}</span>
+                      </h5>
 
                       <div class="p-8-12 border-t-dashed lighter">
-                        <div v-for="(f, i) in item.form_field_list" :key="i" class="mb-8">
-                          <span class="color-secondary">{{ f.label.label }}:</span>
-                          {{ (item.form_data?item.form_data:{})[f.field] }}
-                        </div>
+                        <DynamicsForm
+                          :disabled="true"
+                          label-position="top"
+                          require-asterisk-position="right"
+                          ref="dynamicsFormRef"
+                          :render_data="item.form_field_list"
+                          label-suffix=":"
+                          v-model="item.form_data"
+                          :model="item.form_data"
+                        ></DynamicsForm>
                       </div>
                     </div>
                   </template>
@@ -453,7 +468,7 @@ import { arraySort } from '@/utils/utils'
 import { iconComponent } from '@/workflow/icons/utils'
 import { WorkflowType } from '@/enums/workflow'
 import { getImgUrl } from '@/utils/utils'
-
+import DynamicsForm from '@/components/dynamics-form/index.vue'
 const dialogVisible = ref(false)
 const detail = ref<any[]>([])
 
