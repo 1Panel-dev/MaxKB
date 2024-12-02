@@ -244,6 +244,7 @@ function initMaxkbStyle(root){
         cursor: pointer;
         max-height:500px;
         max-width:500px;
+        z-index:10000;
     }
     #maxkb #maxkb-chat-container{
         z-index:10000;position: relative;
