@@ -432,6 +432,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
                                                  TaskType.SYNC,
                                                  State.PENDING)
+                ListenerManagement.get_aggregation_document_status(document_id)()
                 source_url = document.meta.get('source_url')
                 selector_list = document.meta.get('selector').split(
                     " ") if 'selector' in document.meta and document.meta.get('selector') is not None else []
@@ -444,10 +445,10 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     # 删除向量库
                     delete_embedding_by_document(document_id)
                     paragraphs = get_split_model('web.md').parse(result.content)
-                    document.char_length = reduce(lambda x, y: x + y,
-                                                  [len(p.get('content')) for p in paragraphs],
-                                                  0)
-                    document.save()
+                    char_length = reduce(lambda x, y: x + y,
+                                         [len(p.get('content')) for p in paragraphs],
+                                         0)
+                    QuerySet(Document).filter(id=document_id).update(char_length=char_length)
                     document_paragraph_model = DocumentSerializers.Create.get_paragraph_model(document, paragraphs)
 
                     paragraph_model_list = document_paragraph_model.get('paragraph_model_list')
@@ -464,6 +465,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     # 向量化
                     if with_embedding:
                         embedding_model_id = get_embedding_model_id_by_dataset_id(document.dataset_id)
+                        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+                                                         TaskType.EMBEDDING,
+                                                         State.PENDING)
+                        ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id=document_id),
+                                                         TaskType.EMBEDDING,
+                                                         State.PENDING)
+                        ListenerManagement.get_aggregation_document_status(document_id)()
                         embedding_by_document.delay(document_id, embedding_model_id)
 
                 else:
@@ -477,6 +485,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id=document_id),
                                              TaskType.SYNC,
                                              state)
+            ListenerManagement.get_aggregation_document_status(document_id)()
             return True
 
     class Operate(ApiMixin, serializers.Serializer):
