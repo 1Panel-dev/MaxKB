@@ -9,18 +9,16 @@ from dataset.models import State, TaskType
 
 sql = """
 UPDATE "document"
-SET status ="replace"("replace"("replace"(status, '1', '2'),'0','3'),'2','3')
+SET status ="replace"("replace"("replace"(status, '2', '3'),'0','3'),'1','2')
+"""
+sql_paragraph = """
+UPDATE "paragraph"
+SET status ="replace"("replace"("replace"(status, '2', '3'),'0','3'),'1','2')
 """
 
 
 def updateDocumentStatus(apps, schema_editor):
-    ParagraphModel = apps.get_model('dataset', 'Paragraph')
     DocumentModel = apps.get_model('dataset', 'Document')
-    success_list = QuerySet(DocumentModel).filter(status='2')
-    if len(success_list) == 0:
-        return
-    ListenerManagement.update_status(QuerySet(ParagraphModel).filter(document_id__in=[d.id for d in success_list]),
-                                     TaskType.EMBEDDING, State.SUCCESS)
     ListenerManagement.get_aggregation_document_status_by_query_set(QuerySet(DocumentModel))()
 
 
@@ -50,6 +48,7 @@ class Migration(migrations.Migration):
             name='status',
             field=models.CharField(default=dataset.models.data_set.Status.__str__, max_length=20, verbose_name='状态'),
         ),
+        migrations.RunSQL(sql_paragraph),
         migrations.RunSQL(sql),
         migrations.RunPython(updateDocumentStatus)
     ]
