@@ -552,10 +552,15 @@ class WorkflowManage:
                     up_node.id):
                     result.append(node.get_answer_text())
                 else:
-                    content = result[len(result) - 1]
-                    answer_text = node.get_answer_text()
-                    result[len(result) - 1] += answer_text if len(
-                        content) == 0 else ('\n\n' + answer_text)
+                    if len(result) > 0:
+                        exec_index = len(result) - 1
+                        content = result[exec_index]
+                        result[exec_index] += answer_text if len(
+                            content) == 0 else ('\n\n' + answer_text)
+                    else:
+                        answer_text = node.get_answer_text()
+                        result.insert(0, answer_text)
+
         return result
 
     def get_next_node(self):
