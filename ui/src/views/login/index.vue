@@ -67,7 +67,13 @@
             class="login-button-circle color-secondary"
             @click="changeMode(item)"
           >
-            <span :style="{ 'font-size': item === 'OAUTH2' ? '8px' : '10px' }">{{ item }}</span>
+            <span
+              :style="{
+                'font-size': item === 'OAUTH2' ? '8px' : '10px',
+                color: user.themeInfo?.theme
+              }"
+              >{{ item }}</span
+            >
           </el-button>
           <el-button
             v-if="item === 'QR_CODE' && loginMode !== item"
