@@ -142,7 +142,10 @@ class Fork:
         if len(charset_list) > 0:
             charset = charset_list[0]
             if charset != encoding:
-                html_content = response.content.decode(charset)
+                try:
+                    html_content = response.content.decode(charset)
+                except Exception as e:
+                    logging.getLogger("max_kb").error(f'{e}')
                 return BeautifulSoup(html_content, "html.parser")
         return beautiful_soup
 
