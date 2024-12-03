@@ -1,7 +1,7 @@
 <template>
   <div v-show="show" class="workflow-dropdown-menu border border-r-4">
     <el-tabs v-model="activeName" class="workflow-dropdown-tabs">
-      <div style="display: flex; width: 100%; justify-content: center">
+      <div style="display: flex; width: 100%; justify-content: center" class="mb-4">
         <el-input v-model="search_text" style="width: 240px" placeholder="按名称搜索">
           <template #suffix>
             <el-icon class="el-input__icon"><search /></el-icon>
@@ -61,32 +61,37 @@
       </el-tab-pane>
       <el-tab-pane label="应用" name="application">
         <el-scrollbar height="400">
-          <template v-for="(item, index) in filter_application_list" :key="index">
-            <div
-              class="workflow-dropdown-item cursor flex p-8-12"
-              @click.stop="clickNodes(applicationNode, item, 'application')"
-              @mousedown.stop="onmousedown(applicationNode, item, 'application')"
-            >
-              <component
-                :is="iconComponent(`application-node-icon`)"
-                class="mr-8 mt-4"
-                :size="32"
-                :item="item"
-              />
-              <div class="pre-wrap" style="width: 60%">
-                <auto-tooltip :content="item.name" style="width: 80%" class="lighter">
-                  {{ item.name }}
-                </auto-tooltip>
-                <el-text type="info" size="small" style="width: 80%">{{ item.desc }}</el-text>
+          <div v-if="filter_application_list.length > 0">
+            <template v-for="(item, index) in filter_application_list" :key="index">
+              <div
+                class="workflow-dropdown-item cursor flex p-8-12"
+                @click.stop="clickNodes(applicationNode, item, 'application')"
+                @mousedown.stop="onmousedown(applicationNode, item, 'application')"
+              >
+                <component
+                  :is="iconComponent(`application-node-icon`)"
+                  class="mr-8 mt-4"
+                  :size="32"
+                  :item="item"
+                />
+                <div class="pre-wrap" style="width: 60%">
+                  <auto-tooltip :content="item.name" style="width: 80%" class="lighter">
+                    {{ item.name }}
+                  </auto-tooltip>
+                  <el-text type="info" size="small" style="width: 80%">{{ item.desc }}</el-text>
+                </div>
+                <div class="status-tag" style="margin-left: auto">
+                  <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px"
+                    >高级编排</el-tag
+                  >
+                  <el-tag class="blue-tag" v-else style="height: 22px">简单配置</el-tag>
+                </div>
               </div>
-              <div class="status-tag" style="margin-left: auto">
-                <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px"
-                  >高级编排</el-tag
-                >
-                <el-tag class="blue-tag" v-else style="height: 22px">简单配置</el-tag>
-              </div>
-            </div>
-          </template>
+            </template>
+          </div>
+          <div v-else class="ml-16 mt-8">
+            <el-text type="info">没有找到相关结果</el-text>
+          </div>
         </el-scrollbar>
       </el-tab-pane>
     </el-tabs>

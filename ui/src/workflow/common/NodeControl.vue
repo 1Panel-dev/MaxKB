@@ -12,17 +12,17 @@
     <el-divider direction="vertical" />
     <el-button link @click="retract">
       <el-tooltip class="box-item" effect="dark" content="收起全部节点" placement="top">
-        <AppIcon iconName="app-retract" title="收起全部节点"></AppIcon>
+        <AppIcon style="font-size: 16px" iconName="app-retract" title="收起全部节点"></AppIcon>
       </el-tooltip>
     </el-button>
     <el-button link @click="extend">
       <el-tooltip class="box-item" effect="dark" content="展开全部节点" placement="top">
-        <AppIcon iconName="app-extend" title="展开全部节点"></AppIcon>
+        <AppIcon style="font-size: 16px" iconName="app-extend" title="展开全部节点"></AppIcon>
       </el-tooltip>
     </el-button>
     <el-button link @click="layout">
       <el-tooltip class="box-item" effect="dark" content="一键美化" placement="top">
-        <AppIcon iconName="app-beautify" title="一键美化"></AppIcon>
+        <AppIcon style="font-size: 16px" iconName="app-beautify" title="一键美化"></AppIcon>
       </el-tooltip>
     </el-button>
   </el-card>

@@ -1,7 +1,7 @@
 <template>
-  <el-row :gutter="3" v-for="status in statusTable" :key="status.type">
-    <el-col :span="4">{{ taskTypeMap[status.type] }} </el-col>
-    <el-col :span="4">
+  <div v-for="status in statusTable" :key="status.type">
+    <span> {{ taskTypeMap[status.type] }}：</span>
+    <span>
       <el-text v-if="status.state === State.SUCCESS || status.state === State.REVOKED">
         <el-icon class="success"><SuccessFilled /></el-icon>
         {{ stateMap[status.state](status.type) }}
@@ -22,23 +22,22 @@
         <el-icon class="is-loading primary"><Loading /></el-icon>
         {{ stateMap[status.state](status.type) }}
       </el-text>
-    </el-col>
-    <el-col :span="7">
-      <span
-        :style="{ color: [State.FAILURE, State.REVOKED].includes(status.state) ? '#F54A45' : '' }"
-      >
-        完成
-        {{
-          Object.keys(status.aggs ? status.aggs : {})
-            .filter((k) => k == State.SUCCESS)
-            .map((k) => status.aggs[k])
-            .reduce((x: any, y: any) => x + y, 0)
-        }}/{{
-          Object.values(status.aggs ? status.aggs : {}).reduce((x: any, y: any) => x + y, 0)
-        }}</span
-      >
-    </el-col>
-    <el-col :span="9">
+    </span>
+    <span
+      class="ml-8 lighter"
+      :style="{ color: [State.FAILURE, State.REVOKED].includes(status.state) ? '#F54A45' : '' }"
+    >
+      完成
+      {{
+        Object.keys(status.aggs ? status.aggs : {})
+          .filter((k) => k == State.SUCCESS)
+          .map((k) => status.aggs[k])
+          .reduce((x: any, y: any) => x + y, 0)
+      }}/{{
+        Object.values(status.aggs ? status.aggs : {}).reduce((x: any, y: any) => x + y, 0)
+      }}</span
+    >
+    <el-text type="info" class="ml-4">
       {{
         status.time
           ? status.time[status.state == State.REVOKED ? State.REVOKED : State.PENDING]?.substring(
@@ -47,8 +46,8 @@
             )
           : undefined
       }}
-    </el-col>
-  </el-row>
+    </el-text>
+  </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'

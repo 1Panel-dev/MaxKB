@@ -342,7 +342,7 @@
                   <template v-if="item.type === WorkflowType.FormNode">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        参数输入<span style="color: #f54a45">{{
+                        参数输出<span style="color: #f54a45">{{
                           item.is_submit ? '' : '(用户未提交)'
                         }}</span>
                       </h5>
