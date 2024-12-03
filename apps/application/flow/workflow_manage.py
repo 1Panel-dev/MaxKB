@@ -359,9 +359,19 @@ class WorkflowManage:
                     break
                 yield chunk
         finally:
+            details = self.get_runtime_details()
+            message_tokens = sum([row.get('message_tokens') for row in details.values() if
+                                  'message_tokens' in row and row.get('message_tokens') is not None])
+            answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
+                                 'answer_tokens' in row and row.get('answer_tokens') is not None])
             self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
                                                 self.answer,
                                                 self)
+            yield self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
+                                                                 self.params['chat_record_id'],
+                                                                 '',
+                                                                 [],
+                                                                 '', True, message_tokens, answer_tokens, {})
 
     def run_chain_async(self, current_node, node_result_future):
         future = executor.submit(self.run_chain, current_node, node_result_future)
@@ -430,14 +440,14 @@ class WorkflowManage:
 
     def hand_event_node_result(self, current_node, node_result_future):
         node_chunk = NodeChunk()
+        real_node_id = current_node.runtime_node_id
+        child_node = {}
         try:
             current_result = node_result_future.result()
             result = current_result.write_context(current_node, self)
             if result is not None:
                 if self.is_result(current_node, current_result):
                     self.node_chunk_manage.add_node_chunk(node_chunk)
-                    child_node = {}
-                    real_node_id = current_node.runtime_node_id
                     for r in result:
                         content = r
                         child_node = {}
@@ -487,8 +497,12 @@ class WorkflowManage:
                                                                    current_node.id,
                                                                    current_node.up_node_id_list,
                                                                    str(e), False, 0, 0,
-                                                                   {'node_is_end': True, 'node_type': current_node.type,
-                                                                    'view_type': current_node.view_type})
+                                                                   {'node_is_end': True,
+                                                                    'runtime_node_id': current_node.runtime_node_id,
+                                                                    'node_type': current_node.type,
+                                                                    'view_type': current_node.view_type,
+                                                                    'child_node': {},
+                                                                    'real_node_id': real_node_id})
             if not self.node_chunk_manage.contains(node_chunk):
                 self.node_chunk_manage.add_node_chunk(node_chunk)
             node_chunk.end(chunk)

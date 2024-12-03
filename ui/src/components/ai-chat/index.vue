@@ -223,8 +223,9 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
             const chunk = JSON?.parse(split[index].replace('data:', ''))
             chat.chat_id = chunk.chat_id
             chat.record_id = chunk.chat_record_id
-            ChatManagement.appendChunk(chat.id, chunk)
-
+            if (!chunk.is_end) {
+              ChatManagement.appendChunk(chat.id, chunk)
+            }
             if (chunk.is_end) {
               // 流处理成功 返回成功回调
               return Promise.resolve()
