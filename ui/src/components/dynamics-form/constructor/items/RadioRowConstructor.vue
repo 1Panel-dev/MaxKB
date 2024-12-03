@@ -93,7 +93,7 @@ const formField = computed<FormField>(() => {
 })
 const getData = () => {
   return {
-    input_type: 'RadioCard',
+    input_type: 'RadioRow',
     attrs: {},
     default_value: formValue.value.default_value,
     text_field: 'label',
