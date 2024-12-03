@@ -26,6 +26,7 @@
       v-for="(option, $index) in formValue.option_list"
       :key="$index"
       :gutter="10"
+      class="mb-8"
     >
       <el-col :span="10"
         ><div class="grid-content ep-bg-purple" />
