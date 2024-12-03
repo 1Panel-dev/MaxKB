@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="生成关联问题"
+    title="生成问题"
     v-model="dialogVisible"
     width="600"
     class="select-dataset-dialog"
@@ -9,7 +9,7 @@
   >
     <template #header="{ titleId, titleClass }">
       <div class="my-header flex">
-        <h4 :id="titleId" :class="titleClass">生成关联问题</h4>
+        <h4 :id="titleId" :class="titleClass">生成问题</h4>
       </div>
     </template>
     <div class="content-height">
@@ -174,7 +174,7 @@ const submitHandle = async (formEl: FormInstance) => {
       prompt.save(user.userInfo?.id as string, form.value)
       const data = { ...form.value, document_id_list: documentIdList.value }
       documentApi.batchGenerateRelated(id, data).then(() => {
-        MsgSuccess('生成关联问题成功')
+        MsgSuccess('生成问题成功')
         emit('refresh')
         dialogVisible.value = false
       })
