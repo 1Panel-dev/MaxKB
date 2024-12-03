@@ -6,7 +6,6 @@
     @date：2024/8/19 14:13
     @desc:
 """
-import datetime
 import logging
 import traceback
 from typing import List
@@ -17,7 +16,7 @@ from django.db.models import QuerySet
 from common.config.embedding_config import ModelManage
 from common.event import ListenerManagement, UpdateProblemArgs, UpdateEmbeddingDatasetIdArgs, \
     UpdateEmbeddingDocumentIdArgs
-from dataset.models import Document, Status, TaskType, State
+from dataset.models import Document, TaskType, State
 from ops import celery_app
 from setting.models import Model
 from setting.models_provider import get_model

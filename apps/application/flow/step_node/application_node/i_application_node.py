@@ -14,6 +14,8 @@ class ApplicationNodeSerializer(serializers.Serializer):
     user_input_field_list = serializers.ListField(required=False, error_messages=ErrMessage.uuid("用户输入字段"))
     image_list = serializers.ListField(required=False, error_messages=ErrMessage.list("图片"))
     document_list = serializers.ListField(required=False, error_messages=ErrMessage.list("文档"))
+    child_node = serializers.DictField(required=False, allow_null=True, error_messages=ErrMessage.dict("子节点"))
+    node_data = serializers.DictField(required=False, allow_null=True, error_messages=ErrMessage.dict("表单数据"))
 
 
 class IApplicationNode(INode):
@@ -55,5 +57,5 @@ class IApplicationNode(INode):
                             message=str(question), **kwargs)
 
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat, client_id, client_type,
-                app_document_list=None, app_image_list=None, **kwargs) -> NodeResult:
+                app_document_list=None, app_image_list=None, child_node=None, node_data=None, **kwargs) -> NodeResult:
         pass

@@ -35,7 +35,7 @@ class OpenaiToResponse(BaseToResponse):
     def to_stream_chunk_response(self, chat_id, chat_record_id, node_id, up_node_id_list, content, is_end, completion_tokens,
                                  prompt_tokens, other_params: dict = None):
         chunk = ChatCompletionChunk(id=chat_record_id, model='', object='chat.completion.chunk',
-                                    created=datetime.datetime.now().second, choices=[
+                                    created=datetime.datetime.now().second,choices=[
                 Choice(delta=ChoiceDelta(content=content, chat_id=chat_id), finish_reason='stop' if is_end else None,
                        index=0)],
                                     usage=CompletionUsage(completion_tokens=completion_tokens,

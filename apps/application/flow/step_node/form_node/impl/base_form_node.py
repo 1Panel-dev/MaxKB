@@ -42,7 +42,12 @@ class BaseFormNode(IFormNode):
             for key in form_data:
                 self.context[key] = form_data[key]
 
-    def execute(self, form_field_list, form_content_format, **kwargs) -> NodeResult:
+    def execute(self, form_field_list, form_content_format, form_data, **kwargs) -> NodeResult:
+        if form_data is not None:
+            self.context['is_submit'] = True
+            self.context['form_data'] = form_data
+        else:
+            self.context['is_submit'] = False
         form_setting = {"form_field_list": form_field_list, "runtime_node_id": self.runtime_node_id,
                         "chat_record_id": self.flow_params_serializer.data.get("chat_record_id"),
                         "is_submit": self.context.get("is_submit", False)}
@@ -63,7 +68,8 @@ class BaseFormNode(IFormNode):
         form = f'<form_rander>{json.dumps(form_setting)}</form_rander>'
         prompt_template = PromptTemplate.from_template(form_content_format, template_format='jinja2')
         value = prompt_template.format(form=form)
-        return value
+        return {'content': value, 'runtime_node_id': self.runtime_node_id,
+                'chat_record_id': self.workflow_params['chat_record_id']}
 
     def get_details(self, index: int, **kwargs):
         form_content_format = self.context.get('form_content_format')

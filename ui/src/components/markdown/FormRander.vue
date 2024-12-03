@@ -10,7 +10,10 @@
       v-model="form_data"
       :model="form_data"
     ></DynamicsForm>
-    <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit||loading" @click="submit"
+    <el-button
+      :type="is_submit ? 'info' : 'primary'"
+      :disabled="is_submit || loading"
+      @click="submit"
       >提交</el-button
     >
   </div>
@@ -18,13 +21,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-const props = withDefaults(defineProps<{
-  form_setting: string
-  loading?:boolean
-  sendMessage?: (question: string, type: 'old' | 'new', other_params_data?: any) => void
-}>(),{
-  loading:false
-})
+const props = withDefaults(
+  defineProps<{
+    form_setting: string
+    loading?: boolean
+    sendMessage?: (question: string, type: 'old' | 'new', other_params_data?: any) => void
+    child_node?: any
+    chat_record_id?: string
+    runtime_node_id?: string
+  }>(),
+  {
+    loading: false
+  }
+)
 const form_setting_data = computed(() => {
   if (props.form_setting) {
     return JSON.parse(props.form_setting)
@@ -69,11 +78,11 @@ const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
 const submit = () => {
   dynamicsFormRef.value?.validate().then(() => {
     _submit.value = true
-    const setting = JSON.parse(props.form_setting)
     if (props.sendMessage) {
       props.sendMessage('', 'old', {
-        runtime_node_id: setting.runtime_node_id,
-        chat_record_id: setting.chat_record_id,
+        child_node: props.child_node,
+        runtime_node_id: props.runtime_node_id,
+        chat_record_id: props.chat_record_id,
         node_data: form_data.value
       })
     }

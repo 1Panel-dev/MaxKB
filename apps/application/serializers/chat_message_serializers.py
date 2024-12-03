@@ -238,13 +238,14 @@ class ChatMessageSerializer(serializers.Serializer):
     runtime_node_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                             error_messages=ErrMessage.char("运行时节点id"))
 
-    node_data = serializers.DictField(required=False, error_messages=ErrMessage.char("节点参数"))
+    node_data = serializers.DictField(required=False, allow_null=True, error_messages=ErrMessage.char("节点参数"))
     application_id = serializers.UUIDField(required=False, allow_null=True, error_messages=ErrMessage.uuid("应用id"))
     client_id = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端id"))
     client_type = serializers.CharField(required=True, error_messages=ErrMessage.char("客户端类型"))
     form_data = serializers.DictField(required=False, error_messages=ErrMessage.char("全局变量"))
     image_list = serializers.ListField(required=False, error_messages=ErrMessage.list("图片"))
     document_list = serializers.ListField(required=False, error_messages=ErrMessage.list("文档"))
+    child_node = serializers.DictField(required=False, allow_null=True, error_messages=ErrMessage.dict("子节点"))
 
     def is_valid_application_workflow(self, *, raise_exception=False):
         self.is_valid_intraday_access_num()
@@ -353,7 +354,7 @@ class ChatMessageSerializer(serializers.Serializer):
                                            'user_id': user_id}, WorkFlowPostHandler(chat_info, client_id, client_type),
                                           base_to_response, form_data, image_list, document_list,
                                           self.data.get('runtime_node_id'),
-                                          self.data.get('node_data'), chat_record)
+                                          self.data.get('node_data'), chat_record, self.data.get('child_node'))
         r = work_flow_manage.run()
         return r
 

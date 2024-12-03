@@ -222,7 +222,7 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
           for (const index in split) {
             const chunk = JSON?.parse(split[index].replace('data:', ''))
             chat.chat_id = chunk.chat_id
-            chat.record_id = chunk.id
+            chat.record_id = chunk.chat_record_id
             ChatManagement.appendChunk(chat.id, chunk)
 
             if (chunk.is_end) {
@@ -278,7 +278,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
       id: randomId(),
       problem_text: problem ? problem : inputValue.value.trim(),
       answer_text: '',
-      answer_text_list: [''],
+      answer_text_list: [{ content: '' }],
       buffer: [],
       write_ed: false,
       is_stop: false,

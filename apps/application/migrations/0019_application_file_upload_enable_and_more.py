@@ -4,8 +4,8 @@ import django.contrib.postgres.fields
 from django.db import migrations, models
 
 sql = """
-UPDATE "public".application_chat_record
-SET "answer_text_list" = ARRAY[answer_text];
+UPDATE application_chat_record
+SET answer_text_list=ARRAY[jsonb_build_object('content',answer_text)]
 """
 
 
@@ -28,8 +28,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='chatrecord',
             name='answer_text_list',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=40960), default=list,
-                                                            size=None, verbose_name='改进标注列表'),
+            field=django.contrib.postgres.fields.ArrayField(base_field=models.JSONField(), default=list, size=None, verbose_name='改进标注列表')
         ),
         migrations.RunSQL(sql)
     ]
