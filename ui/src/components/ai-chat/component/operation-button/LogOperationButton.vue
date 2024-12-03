@@ -27,7 +27,7 @@
       </el-tooltip>
       <el-divider direction="vertical" />
       <el-tooltip
-        v-if="data.improve_paragraph_id_list.length === 0"
+        v-if="buttonData.improve_paragraph_id_list.length === 0"
         effect="dark"
         content="修改内容"
         placement="top"
@@ -59,7 +59,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 import EditContentDialog from '@/views/log/component/EditContentDialog.vue'
 import EditMarkDialog from '@/views/log/component/EditMarkDialog.vue'
