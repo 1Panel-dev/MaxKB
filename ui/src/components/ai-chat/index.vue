@@ -23,7 +23,7 @@
           <AnswerContent
             :application="applicationDetails"
             :loading="loading"
-            :chat-record="item"
+            v-model:chat-record="chatList[index]"
             :type="type"
             :send-message="sendMessage"
             :chat-management="ChatManagement"
