@@ -144,6 +144,9 @@ function checkedOperateChange(Name: string | number, row: any, e: boolean) {
   props.data.map((item: any) => {
     if (item.id === row.id) {
       item.operate[Name] = e
+      if (Name === TeamEnum.MANAGE && e) {
+        item.operate[TeamEnum.USE] = true
+      }
     }
   })
 }

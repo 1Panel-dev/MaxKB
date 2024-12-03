@@ -36,7 +36,8 @@
       <OperationButton
         :type="type"
         :application="application"
-        :chat-record="chatRecord"
+        :chatRecord="chatRecord"
+        @update:chatRecord="(event: any) => emit('update:chatRecord', event)"
         :loading="loading"
         :start-chat="startChat"
         :stop-chat="stopChat"
@@ -58,6 +59,8 @@ const props = defineProps<{
   chatManagement: any
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
 }>()
+
+const emit = defineEmits(['update:chatRecord'])
 
 const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: any) => {
   if (type === 'old') {
