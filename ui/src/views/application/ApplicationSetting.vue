@@ -409,6 +409,7 @@
                         link
                         @click="openTTSParamSettingDialog"
                         :disabled="!applicationForm.tts_model_id"
+                        class="mr-8"
                       >
                         <el-icon class="mr-4"><Setting /></el-icon>
                         设置
@@ -424,6 +425,7 @@
                 <el-radio-group
                   v-model="applicationForm.tts_type"
                   v-show="applicationForm.tts_model_enable"
+                  class="mb-8"
                 >
                   <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
                   <el-radio value="TTS">TTS模型</el-radio>

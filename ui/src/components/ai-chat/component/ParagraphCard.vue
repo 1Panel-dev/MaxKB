@@ -17,7 +17,7 @@
     </template>
     <template #footer>
       <div class="footer-content flex-between">
-        <el-text class="flex align-center" style="width: 70%">
+        <el-text class="flex align-center" style="width: 50%">
           <img :src="getImgUrl(data?.document_name?.trim())" alt="" width="20" class="mr-4" />
 
           <template v-if="meta?.source_url">
