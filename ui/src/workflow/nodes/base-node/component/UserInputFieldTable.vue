@@ -13,11 +13,24 @@
     :data="props.nodeModel.properties.user_input_field_list"
     class="mb-16"
   >
-    <el-table-column prop="field" label="参数" show-overflow-tooltip />
-    <el-table-column prop="label" label="显示名称" show-overflow-tooltip >
+    <el-table-column prop="field" label="参数">
       <template #default="{ row }">
-        <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{ row.label.label }}</span>
-        <span v-else>{{ row.label }}</span>
+        <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
+      </template>
+    </el-table-column>
+
+    <el-table-column prop="label" label="显示名称">
+      <template #default="{ row }">
+        <span v-if="row.label && row.label.input_type === 'TooltipLabel'">
+          <span :title="row.label.label" class="ellipsis-1">
+            {{ row.label.label }}
+          </span>
+        </span>
+        <span v-else>
+          <span :title="row.label" class="ellipsis-1">
+            {{ row.label }}
+          </span></span
+        >
       </template>
     </el-table-column>
     <el-table-column label="组件类型">
@@ -25,13 +38,20 @@
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">文本框</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'">滑块</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'">开关</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'">单选框</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'"
+          >单选框</el-tag
+        >
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'MultiSelect'">多选框</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'RadioCard'">选项卡</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">日期</el-tag>
       </template>
     </el-table-column>
-    <el-table-column prop="default_value" label="默认值" show-overflow-tooltip />
+
+    <el-table-column prop="default_value" label="默认值">
+      <template #default="{ row }">
+        <span :title="row.default_value" class="ellipsis-1">{{ row.default_value }}</span>
+      </template>
+    </el-table-column>
     <el-table-column label="必填">
       <template #default="{ row }">
         <div @click.stop>
@@ -41,13 +61,13 @@
     </el-table-column>
     <el-table-column label="操作" align="left" width="80">
       <template #default="{ row, $index }">
-            <span class="mr-4">
-              <el-tooltip effect="dark" content="修改" placement="top">
-                <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
-                  <el-icon><EditPen /></el-icon>
-                </el-button>
-              </el-tooltip>
-            </span>
+        <span class="mr-4">
+          <el-tooltip effect="dark" content="修改" placement="top">
+            <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
+              <el-icon><EditPen /></el-icon>
+            </el-button>
+          </el-tooltip>
+        </span>
         <el-tooltip effect="dark" content="删除" placement="top">
           <el-button type="primary" text @click="deleteField($index)">
             <el-icon>
@@ -60,11 +80,9 @@
   </el-table>
 
   <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshFieldList" />
-
 </template>
 
 <script setup lang="ts">
-
 import { onMounted, ref } from 'vue'
 import { set } from 'lodash'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
@@ -83,7 +101,6 @@ function deleteField(index: any) {
   inputFieldList.value.splice(index, 1)
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
 }
-
 
 function refreshFieldList(data: any, index: any) {
   for (let i = 0; i < inputFieldList.value.length; i++) {
@@ -142,10 +159,6 @@ onMounted(() => {
   })
   set(props.nodeModel.properties, 'user_input_field_list', inputFieldList)
 })
-
 </script>
 
-
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

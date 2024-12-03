@@ -56,15 +56,26 @@
           :data="form_data.form_field_list"
           class="mb-16"
         >
-          <el-table-column prop="field" label="参数" show-overflow-tooltip />
-          <el-table-column prop="label" label="显示名称" show-overflow-tooltip>
+          <el-table-column prop="field" label="参数">
             <template #default="{ row }">
-              <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
-                row.label.label
-              }}</span>
-              <span v-else>{{ row.label }}</span>
+              <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
             </template>
           </el-table-column>
+          <el-table-column prop="label" label="显示名称">
+            <template #default="{ row }">
+              <span v-if="row.label && row.label.input_type === 'TooltipLabel'">
+                <span :title="row.label.label" class="ellipsis-1">
+                  {{ row.label.label }}
+                </span>
+              </span>
+              <span v-else>
+                <span :title="row.label" class="ellipsis-1">
+                  {{ row.label }}
+                </span></span
+              >
+            </template>
+          </el-table-column>
+
           <el-table-column label="组件类型" width="110px">
             <template #default="{ row }">
               <el-tag type="info" class="info-tag">{{
@@ -72,7 +83,12 @@
               }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="default_value" label="默认值" show-overflow-tooltip />
+
+          <el-table-column prop="default_value" label="默认值">
+            <template #default="{ row }">
+              <span :title="row.default_value" class="ellipsis-1">{{ row.default_value }}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="必填">
             <template #default="{ row }">
               <div @click.stop>
