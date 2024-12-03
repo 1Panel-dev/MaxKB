@@ -4,7 +4,7 @@
       v-for="item in option_list"
       :key="item.value"
       class="item"
-      :class="[modelValue == item[valueField] ? 'active' : '']"
+      :class="[inputDisabled ? 'is-disabled' : '', modelValue == item[valueField] ? 'active' : '']"
       @click="selected(item[valueField])"
     >
       {{ item[textField] }}
@@ -14,6 +14,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
+import { useFormDisabled } from 'element-plus'
+const inputDisabled = useFormDisabled()
 const props = defineProps<{
   formValue?: any
   formfieldList?: Array<FormField>
@@ -54,7 +56,15 @@ const option_list = computed(() => {
   padding: 3px 4px;
   box-sizing: border-box;
   white-space: nowrap;
-
+  .is-disabled {
+    border: 1px solid var(--el-card-border-color);
+    background-color: var(--el-fill-color-light);
+    color: var(--el-text-color-placeholder);
+    cursor: not-allowed;
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
   .active {
     border-radius: 4px;
     background: var(--el-color-primary-light-9);
