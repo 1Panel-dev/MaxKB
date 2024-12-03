@@ -1,6 +1,6 @@
 <template>
   <div class="item-content mb-16 lighter">
-    <template v-for="(answer_text, index) in chatRecord.answer_text_list" :key="index">
+    <template v-for="(answer_text, index) in answer_text_list" :key="index">
       <div class="avatar">
         <img v-if="application.avatar" :src="application.avatar" height="32px" width="32px" />
         <LogoIcon v-else height="32px" width="32px" />
@@ -9,14 +9,18 @@
         <el-card shadow="always" class="dialog-card mb-8">
           <MdRenderer
             v-if="
-              (chatRecord.write_ed === undefined || chatRecord.write_ed === true) && !answer_text
+              (chatRecord.write_ed === undefined || chatRecord.write_ed === true) &&
+              !answer_text.content
             "
             source=" 抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
           ></MdRenderer>
           <MdRenderer
+            :chat_record_id="answer_text.chat_record_id"
+            :child_node="answer_text.child_node"
+            :runtime_node_id="answer_text.runtime_node_id"
             :loading="loading"
-            v-else-if="answer_text"
-            :source="answer_text"
+            v-else-if="answer_text.content"
+            :source="answer_text.content"
             :send-message="chatMessage"
           ></MdRenderer>
           <span v-else-if="chatRecord.is_stop" shadow="always" class="dialog-card">
@@ -51,6 +55,7 @@ import KnowledgeSource from '@/components/ai-chat/KnowledgeSource.vue'
 import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import OperationButton from '@/components/ai-chat/component/operation-button/index.vue'
 import { type chatType } from '@/api/type/application'
+import { computed } from 'vue'
 const props = defineProps<{
   chatRecord: chatType
   application: any
@@ -71,9 +76,17 @@ const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: 
     props.sendMessage(question, other_params_data)
   }
 }
-const add_answer_text_list = (answer_text_list: Array<string>) => {
-  answer_text_list.push('')
+const add_answer_text_list = (answer_text_list: Array<any>) => {
+  answer_text_list.push({ content: '' })
 }
+const answer_text_list = computed(() => {
+  return props.chatRecord.answer_text_list.map((item) => {
+    if (typeof item == 'string') {
+      return { content: item }
+    }
+    return item
+  })
+})
 
 function showSource(row: any) {
   if (props.type === 'log') {
