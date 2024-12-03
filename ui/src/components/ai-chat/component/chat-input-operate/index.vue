@@ -93,7 +93,7 @@
                     }}
                   </div>
                 </template>
-                <el-button text>
+                <el-button text :disabled="checkMaxFilesLimit()">
                   <el-icon><Paperclip /></el-icon>
                 </el-button>
               </el-tooltip>
@@ -221,6 +221,10 @@ const getAcceptList = () => {
     return '.请在文件上传配置中选择文件类型'
   }
   return accepts.map((ext: any) => '.' + ext).join(',')
+}
+
+const checkMaxFilesLimit = () => {
+  return props.applicationDetails.file_upload_setting.maxFiles <= (uploadImageList.value.length + uploadDocumentList.value.length)
 }
 
 const uploadFile = async (file: any, fileList: any) => {
