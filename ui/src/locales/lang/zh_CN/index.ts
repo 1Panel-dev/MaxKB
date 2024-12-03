@@ -65,7 +65,7 @@ export default {
     jump_tip: '即将跳转至认证源页面进行认证',
     jump: '跳转',
     oauth2: {
-      title: 'OAUTH2 设置',
+      title: 'OAuth2 设置',
       authEndpoint: '授权端地址',
       authEndpointPlaceholder: '请输入授权端地址',
       tokenEndpoint: 'Token 端地址',
@@ -82,7 +82,7 @@ export default {
       redirectUrlPlaceholder: '请输入回调地址',
       filedMapping: '字段映射',
       filedMappingPlaceholder: '请输入字段映射',
-      enableAuthentication: '启用 OAUTH2 认证',
+      enableAuthentication: '启用 OAuth2 认证',
       save: '保存',
       saveSuccess: '保存成功'
     }
