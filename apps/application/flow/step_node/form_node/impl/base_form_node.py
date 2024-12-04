@@ -46,6 +46,8 @@ class BaseFormNode(IFormNode):
         if form_data is not None:
             self.context['is_submit'] = True
             self.context['form_data'] = form_data
+            for key in form_data:
+                self.context[key] = form_data.get(key)
         else:
             self.context['is_submit'] = False
         form_setting = {"form_field_list": form_field_list, "runtime_node_id": self.runtime_node_id,
