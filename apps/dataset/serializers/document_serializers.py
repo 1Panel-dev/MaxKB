@@ -1091,17 +1091,15 @@ def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):
 
 
 def delete_problems_and_mappings(document_ids):
-    # 获取所有需要删除的问题ID
-    problem_ids = list(
-        ProblemParagraphMapping.objects.filter(document_id__in=document_ids).values_list('problem_id', flat=True))
+    problem_paragraph_mappings = ProblemParagraphMapping.objects.filter(document_id__in=document_ids)
+    problem_ids = set(problem_paragraph_mappings.values_list('problem_id', flat=True))
 
     if problem_ids:
-        ProblemParagraphMapping.objects.filter(document_id__in=document_ids).delete()
+        problem_paragraph_mappings.delete()
         remaining_problem_counts = ProblemParagraphMapping.objects.filter(problem_id__in=problem_ids).values(
             'problem_id').annotate(count=Count('problem_id'))
-
-        problem_ids_to_delete = [pid for pid in problem_ids if
-                                 not any(pc['problem_id'] == pid for pc in remaining_problem_counts)]
+        remaining_problem_ids = {pc['problem_id'] for pc in remaining_problem_counts}
+        problem_ids_to_delete = problem_ids - remaining_problem_ids
         Problem.objects.filter(id__in=problem_ids_to_delete).delete()
     else:
-        ProblemParagraphMapping.objects.filter(document_id__in=document_ids).delete()
+        problem_paragraph_mappings.delete()
