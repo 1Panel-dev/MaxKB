@@ -621,6 +621,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             _document.save()
             return self.one()
 
+        @transaction.atomic
         def refresh(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)

@@ -15,6 +15,7 @@ from functools import reduce
 from typing import Dict, List
 from urllib.parse import urlparse
 
+from celery_once import AlreadyQueued, QueueOnce
 from django.contrib.postgres.fields import ArrayField
 from django.core import validators
 from django.db import transaction, models
@@ -732,6 +733,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             delete_embedding_by_dataset(self.data.get('id'))
             return True
 
+        @transaction.atomic
         def re_embedding(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -743,7 +745,10 @@ class DataSetSerializers(serializers.ModelSerializer):
                                              State.PENDING)
             ListenerManagement.get_aggregation_document_status_by_dataset_id(self.data.get('id'))()
             embedding_model_id = get_embedding_model_id_by_dataset_id(self.data.get('id'))
-            embedding_by_dataset.delay(self.data.get('id'), embedding_model_id)
+            try:
+                embedding_by_dataset.delay(self.data.get('id'), embedding_model_id)
+            except AlreadyQueued as e:
+                raise AppApiException(500, "向量化任务发送失败，请稍后再试！")
 
         def list_application(self, with_valid=True):
             if with_valid:
