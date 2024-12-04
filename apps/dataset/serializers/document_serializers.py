@@ -41,7 +41,7 @@ from common.handle.impl.table.xls_parse_table_handle import XlsSplitHandle
 from common.handle.impl.table.xlsx_parse_table_handle import XlsxSplitHandle
 from common.handle.impl.text_split_handle import TextSplitHandle
 from common.mixins.api_mixin import ApiMixin
-from common.util.common import post, flat_map
+from common.util.common import post, flat_map, bulk_create_in_batches
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
@@ -955,12 +955,11 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             # 插入文档
             QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
             # 批量插入段落
-            QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+            bulk_create_in_batches(Paragraph, paragraph_model_list, batch_size=1000)
             # 批量插入问题
-            QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+            bulk_create_in_batches(Problem, problem_model_list, batch_size=1000)
             # 批量插入关联问题
-            QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
-                problem_paragraph_mapping_list) > 0 else None
+            bulk_create_in_batches(ProblemParagraphMapping, problem_paragraph_mapping_list, batch_size=1000)
             # 查询文档
             query_set = QuerySet(model=Document)
             if len(document_model_list) == 0:

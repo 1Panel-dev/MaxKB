@@ -102,3 +102,12 @@ def valid_license(model=None, count=None, message=None):
         return run
 
     return inner
+
+
+def bulk_create_in_batches(model, data, batch_size=1000):
+    if len(data) == 0:
+        return
+    for i in range(0, len(data), batch_size):
+        batch = data[i:i + batch_size]
+        model.objects.bulk_create(batch)
+
