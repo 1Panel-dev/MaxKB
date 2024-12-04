@@ -75,9 +75,9 @@
 
         <div class="operate flex align-center">
           <span v-if="props.applicationDetails.file_upload_enable" class="flex align-center">
-            <!--            accept="image/jpeg, image/png, image/gif"-->
             <el-upload
               action="#"
+              multiple
               :auto-upload="false"
               :show-file-list="false"
               :accept="getAcceptList()"
@@ -246,22 +246,22 @@ const uploadFile = async (file: any, fileList: any) => {
     fileList.splice(0, fileList.length)
     return
   }
-  const formData = new FormData()
-  for (const file of fileList) {
-    formData.append('file', file.raw, file.name)
-    //
-    const extension = file.name.split('.').pop().toLowerCase() // 获取文件后缀名并转为小写
 
-    if (imageExtensions.includes(extension)) {
-      uploadImageList.value.push(file)
-    } else if (documentExtensions.includes(extension)) {
-      uploadDocumentList.value.push(file)
-    } else if (videoExtensions.includes(extension)) {
-      // videos.push(file)
-    } else if (audioExtensions.includes(extension)) {
-      // audios.push(file)
-    }
+  const formData = new FormData()
+  formData.append('file', file.raw, file.name)
+  //
+  const extension = file.name.split('.').pop().toLowerCase() // 获取文件后缀名并转为小写
+
+  if (imageExtensions.includes(extension)) {
+    uploadImageList.value.push(file)
+  } else if (documentExtensions.includes(extension)) {
+    uploadDocumentList.value.push(file)
+  } else if (videoExtensions.includes(extension)) {
+    // videos.push(file)
+  } else if (audioExtensions.includes(extension)) {
+    // audios.push(file)
   }
+
 
   if (!chatId_context.value) {
     const res = await props.openChatId()
