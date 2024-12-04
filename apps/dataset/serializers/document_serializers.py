@@ -18,7 +18,7 @@ import openpyxl
 from celery_once import AlreadyQueued
 from django.core import validators
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Count
 from django.db.models.functions import Substr, Reverse
 from django.http import HttpResponse
 from drf_yasg import openapi
@@ -1091,11 +1091,17 @@ def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):
 
 
 def delete_problems_and_mappings(document_ids):
-    problem_ids = ProblemParagraphMapping.objects.filter(document_id__in=document_ids).values_list('problem_id',
-                                                                                                   flat=True)
+    # 获取所有需要删除的问题ID
+    problem_ids = list(
+        ProblemParagraphMapping.objects.filter(document_id__in=document_ids).values_list('problem_id', flat=True))
+
     if problem_ids:
-        problem_counts = ProblemParagraphMapping.objects.filter(problem_id__in=problem_ids).values(
-            'problem_id').annotate(count=models.Count('id'))
-        problem_ids_to_delete = [item['problem_id'] for item in problem_counts if item['count'] == 1]
+        ProblemParagraphMapping.objects.filter(document_id__in=document_ids).delete()
+        remaining_problem_counts = ProblemParagraphMapping.objects.filter(problem_id__in=problem_ids).values(
+            'problem_id').annotate(count=Count('problem_id'))
+
+        problem_ids_to_delete = [pid for pid in problem_ids if
+                                 not any(pc['problem_id'] == pid for pc in remaining_problem_counts)]
         Problem.objects.filter(id__in=problem_ids_to_delete).delete()
-    ProblemParagraphMapping.objects.filter(document_id__in=document_ids).delete()
+    else:
+        ProblemParagraphMapping.objects.filter(document_id__in=document_ids).delete()

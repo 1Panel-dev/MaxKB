@@ -11,7 +11,7 @@ from typing import Dict
 
 from celery_once import AlreadyQueued
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Count
 from drf_yasg import openapi
 from rest_framework import serializers
 
@@ -291,7 +291,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             paragraph_id_list = instance.get("id_list")
             QuerySet(Paragraph).filter(id__in=paragraph_id_list).delete()
-            QuerySet(ProblemParagraphMapping).filter(paragraph_id__in=paragraph_id_list).delete()
+            delete_problems_and_mappings(paragraph_id_list)
             update_document_char_length(self.data.get('document_id'))
             # 删除向量库
             delete_embedding_by_paragraph_ids(paragraph_id_list)
@@ -541,14 +541,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             paragraph_id = self.data.get('paragraph_id')
             Paragraph.objects.filter(id=paragraph_id).delete()
-
-            problem_id = ProblemParagraphMapping.objects.filter(paragraph_id=paragraph_id).values_list('problem_id',
-                                                                                                       flat=True).first()
-
-            if problem_id is not None:
-                if ProblemParagraphMapping.objects.filter(problem_id=problem_id).count() == 1:
-                    Problem.objects.filter(id=problem_id).delete()
-            ProblemParagraphMapping.objects.filter(paragraph_id=paragraph_id).delete()
+            delete_problems_and_mappings([paragraph_id])
 
             update_document_char_length(self.data.get('document_id'))
             delete_embedding_by_paragraph(paragraph_id)
@@ -755,3 +748,19 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                                                             prompt)
             except AlreadyQueued as e:
                 raise AppApiException(500, "任务正在执行中,请勿重复下发")
+
+
+def delete_problems_and_mappings(paragraph_ids):
+    problem_ids = list(
+        ProblemParagraphMapping.objects.filter(paragraph_id__in=paragraph_ids).values_list('problem_id', flat=True))
+
+    if problem_ids:
+        ProblemParagraphMapping.objects.filter(paragraph_id__in=paragraph_ids).delete()
+        remaining_problem_counts = ProblemParagraphMapping.objects.filter(problem_id__in=problem_ids).values(
+            'problem_id').annotate(count=Count('problem_id'))
+
+        problem_ids_to_delete = [pid for pid in problem_ids if
+                                 not any(pc['problem_id'] == pid for pc in remaining_problem_counts)]
+        Problem.objects.filter(id__in=problem_ids_to_delete).delete()
+    else:
+        ProblemParagraphMapping.objects.filter(paragraph_id__in=paragraph_ids).delete()
