@@ -42,6 +42,7 @@
                   :max-scale="7"
                   :min-scale="0.2"
                   :preview-src-list="getAttrsArray(image_list, 'url')"
+                  :initial-index="index"
                   alt=""
                   fit="cover"
                   style="width: 170px; height: 170px; display: block"
