@@ -18,7 +18,7 @@ import openpyxl
 from celery_once import AlreadyQueued
 from django.core import validators
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Count
 from django.db.models.functions import Substr, Reverse
 from django.http import HttpResponse
 from drf_yasg import openapi
@@ -56,6 +56,7 @@ from embedding.task.embedding import embedding_by_document, delete_embedding_by_
     delete_embedding_by_document, update_embedding_dataset_id, delete_embedding_by_paragraph_ids, \
     embedding_by_document_list
 from smartdoc.conf import PROJECT_DIR
+from django.db import models
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle()]
 parse_table_handle_list = [CsvSplitHandle(), XlsSplitHandle(), XlsxSplitHandle()]
@@ -442,6 +443,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     QuerySet(model=Paragraph).filter(document_id=document_id).delete()
                     # 删除问题
                     QuerySet(model=ProblemParagraphMapping).filter(document_id=document_id).delete()
+                    delete_problems_and_mappings([document_id])
                     # 删除向量库
                     delete_embedding_by_document(document_id)
                     paragraphs = get_split_model('web.md').parse(result.content)
@@ -660,7 +662,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             # 删除段落
             QuerySet(model=Paragraph).filter(document_id=document_id).delete()
             # 删除问题
-            QuerySet(model=ProblemParagraphMapping).filter(document_id=document_id).delete()
+            delete_problems_and_mappings([document_id])
             # 删除向量库
             delete_embedding_by_document(document_id)
             return True
@@ -987,7 +989,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             document_id_list = instance.get("id_list")
             QuerySet(Document).filter(id__in=document_id_list).delete()
             QuerySet(Paragraph).filter(document_id__in=document_id_list).delete()
-            QuerySet(ProblemParagraphMapping).filter(document_id__in=document_id_list).delete()
+            delete_problems_and_mappings(document_id_list)
             # 删除向量库
             delete_embedding_by_document_list(document_id_list)
             return True
@@ -1086,3 +1088,18 @@ def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):
         if split_handle.support(file, get_buffer):
             return split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, save_image)
     return default_split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, save_image)
+
+
+def delete_problems_and_mappings(document_ids):
+    problem_paragraph_mappings = ProblemParagraphMapping.objects.filter(document_id__in=document_ids)
+    problem_ids = set(problem_paragraph_mappings.values_list('problem_id', flat=True))
+
+    if problem_ids:
+        problem_paragraph_mappings.delete()
+        remaining_problem_counts = ProblemParagraphMapping.objects.filter(problem_id__in=problem_ids).values(
+            'problem_id').annotate(count=Count('problem_id'))
+        remaining_problem_ids = {pc['problem_id'] for pc in remaining_problem_counts}
+        problem_ids_to_delete = problem_ids - remaining_problem_ids
+        Problem.objects.filter(id__in=problem_ids_to_delete).delete()
+    else:
+        problem_paragraph_mappings.delete()

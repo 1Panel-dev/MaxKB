@@ -9,7 +9,7 @@
   >
     <template #defFooters>
       <el-button text type="info" @click="openDialog">
-        <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
+        <AppIcon class="color-secondary"  iconName="app-magnify" style="font-size: 16px"></AppIcon>
       </el-button>
     </template>
   </MdEditor>

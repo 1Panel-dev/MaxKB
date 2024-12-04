@@ -169,7 +169,7 @@ function initMaxkbStyle(root){
       position: absolute;
       {{x_type}}: {{x_value}}px;
       {{y_type}}: {{y_value}}px;
-      z-index: 1000;
+      z-index: 10001;
   }
   #maxkb .maxkb-tips {
       position: fixed;
@@ -180,7 +180,7 @@ function initMaxkbStyle(root){
       color: #ffffff;
       font-size: 14px;
       background: #3370FF;
-      z-index: 1000;
+      z-index: 10001;
   }
   #maxkb .maxkb-tips .maxkb-arrow {
       position: absolute;

@@ -69,7 +69,6 @@ class Application(AppModelMixin):
     file_upload_enable = models.BooleanField(verbose_name="文件上传是否启用", default=False)
     file_upload_setting = models.JSONField(verbose_name="文件上传相关设置", default=dict)
 
-
     @staticmethod
     def get_default_model_prompt():
         return ('已知信息：'
@@ -148,7 +147,7 @@ class ChatRecord(AppModelMixin):
     problem_text = models.CharField(max_length=10240, verbose_name="问题")
     answer_text = models.CharField(max_length=40960, verbose_name="答案")
     answer_text_list = ArrayField(verbose_name="改进标注列表",
-                                  base_field=models.CharField(max_length=40960)
+                                  base_field=models.JSONField()
                                   , default=list)
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)

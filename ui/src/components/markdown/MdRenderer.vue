@@ -17,6 +17,9 @@
       :option="item.content"
     ></EchartsRander>
     <FormRander
+      :chat_record_id="chat_record_id"
+      :runtime_node_id="runtime_node_id"
+      :child_node="child_node"
       :loading="loading"
       :send-message="sendMessage"
       v-else-if="item.type === 'form_rander'"
@@ -64,6 +67,9 @@ const props = withDefaults(
     source?: string
     inner_suffix?: boolean
     sendMessage?: (question: string, type: 'old' | 'new', other_params_data?: any) => void
+    child_node?: any
+    chat_record_id?: string
+    runtime_node_id?: string
     loading?: boolean
   }>(),
   {

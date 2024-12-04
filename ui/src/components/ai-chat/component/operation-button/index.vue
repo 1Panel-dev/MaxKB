@@ -3,6 +3,7 @@
     <LogOperationButton
       v-if="type === 'log'"
       v-bind:data="chatRecord"
+      @update:data="(event: any) => emit('update:chatRecord', event)"
       :applicationId="application.id"
       :tts="application.tts_model_enable"
       :tts_type="application.tts_type"
@@ -54,5 +55,6 @@ defineProps<{
   stopChat: (chat_record: any) => void
   regenerationChart: (chat_record: any) => void
 }>()
+const emit = defineEmits(['update:chatRecord'])
 </script>
 <style lang="scss" scoped></style>

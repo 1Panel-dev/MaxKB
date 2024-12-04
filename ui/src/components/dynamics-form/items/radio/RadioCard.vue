@@ -5,8 +5,8 @@
       :key="item.value"
       class="item"
       shadow="never"
-      :class="[modelValue == item[valueField] ? 'active' : '']"
-      @click="selected(item[valueField])"
+      :class="[inputDisabled ? 'is-disabled' : '', modelValue == item[valueField] ? 'active' : '']"
+      @click="inputDisabled ? () => {} : selected(item[valueField])"
     >
       {{ item[textField] }}
     </el-card>
@@ -15,6 +15,9 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
+import { useFormDisabled } from 'element-plus'
+const inputDisabled = useFormDisabled()
+
 const props = defineProps<{
   formValue?: any
   formfieldList?: Array<FormField>
@@ -24,6 +27,7 @@ const props = defineProps<{
   view?: boolean
   // 选中的值
   modelValue?: any
+  disabled?: boolean
 }>()
 
 const selected = (activeValue: string | number) => {
@@ -66,6 +70,16 @@ const option_list = computed(() => {
   flex-wrap: wrap;
   justify-content: flex-start;
   width: 100%;
+
+  .is-disabled {
+    border: 1px solid var(--el-card-border-color);
+    background-color: var(--el-fill-color-light);
+    color: var(--el-text-color-placeholder);
+    cursor: not-allowed;
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
   .active {
     border: 1px solid var(--el-color-primary);
     color: var(--el-color-primary);

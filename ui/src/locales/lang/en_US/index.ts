@@ -65,7 +65,7 @@ export default {
     jump_tip: 'Jumping to the authentication source page for authentication',
     jump: 'Jump',
     oauth2: {
-      title: 'OAUTH2 Settings',
+      title: 'OAuth2 Settings',
       authEndpoint: 'Auth Endpoint',
       authEndpointPlaceholder: 'Please enter Auth Endpoint',
       tokenEndpoint: 'Token Endpoint',
@@ -82,7 +82,7 @@ export default {
       redirectUrlPlaceholder: 'Please enter Redirect URL',
       filedMapping: 'Field Mapping',
       filedMappingPlaceholder: 'Please enter Field Mapping',
-      enableAuthentication: 'Enable OAUTH2 Authentication',
+      enableAuthentication: 'Enable OAuth2 Authentication',
       save: 'Save',
       saveSuccess: 'Save Success'
     }

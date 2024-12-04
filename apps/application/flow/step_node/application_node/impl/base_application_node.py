@@ -2,19 +2,25 @@
 import json
 import time
 import uuid
-from typing import List, Dict
+from typing import Dict
+
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.application_node.i_application_node import IApplicationNode
 from application.models import Chat
-from common.handle.impl.response.openai_to_response import OpenaiToResponse
 
 
 def string_to_uuid(input_str):
     return str(uuid.uuid5(uuid.NAMESPACE_DNS, input_str))
 
 
+def _is_interrupt_exec(node, node_variable: Dict, workflow_variable: Dict):
+    return node_variable.get('is_interrupt_exec', False)
+
+
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
     result = node_variable.get('result')
+    node.context['child_node'] = node_variable['child_node']
+    node.context['is_interrupt_exec'] = node_variable['is_interrupt_exec']
     node.context['message_tokens'] = result.get('usage', {}).get('prompt_tokens', 0)
     node.context['answer_tokens'] = result.get('usage', {}).get('completion_tokens', 0)
     node.context['answer'] = answer
@@ -36,17 +42,34 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     response = node_variable.get('result')
     answer = ''
     usage = {}
+    node_child_node = {}
+    is_interrupt_exec = False
     for chunk in response:
         # 先把流转成字符串
         response_content = chunk.decode('utf-8')[6:]
         response_content = json.loads(response_content)
-        choices = response_content.get('choices')
-        if choices and isinstance(choices, list) and len(choices) > 0:
-            content = choices[0].get('delta', {}).get('content', '')
-            answer += content
-            yield content
+        content = response_content.get('content', '')
+        runtime_node_id = response_content.get('runtime_node_id', '')
+        chat_record_id = response_content.get('chat_record_id', '')
+        child_node = response_content.get('child_node')
+        node_type = response_content.get('node_type')
+        real_node_id = response_content.get('real_node_id')
+        node_is_end = response_content.get('node_is_end', False)
+        if node_type == 'form-node':
+            is_interrupt_exec = True
+        answer += content
+        node_child_node = {'runtime_node_id': runtime_node_id, 'chat_record_id': chat_record_id,
+                           'child_node': child_node}
+        yield {'content': content,
+               'node_type': node_type,
+               'runtime_node_id': runtime_node_id, 'chat_record_id': chat_record_id,
+               'child_node': child_node,
+               'real_node_id': real_node_id,
+               'node_is_end': node_is_end}
         usage = response_content.get('usage', {})
     node_variable['result'] = {'usage': usage}
+    node_variable['is_interrupt_exec'] = is_interrupt_exec
+    node_variable['child_node'] = node_child_node
     _write_context(node_variable, workflow_variable, node, workflow, answer)
 
 
@@ -64,6 +87,11 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
 
 
 class BaseApplicationNode(IApplicationNode):
+    def get_answer_text(self):
+        if self.answer_text is None:
+            return None
+        return {'content': self.answer_text, 'runtime_node_id': self.runtime_node_id,
+                'chat_record_id': self.workflow_params['chat_record_id'], 'child_node': self.context.get('child_node')}
 
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
@@ -72,7 +100,7 @@ class BaseApplicationNode(IApplicationNode):
         self.answer_text = details.get('answer')
 
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat, client_id, client_type,
-                app_document_list=None, app_image_list=None,
+                app_document_list=None, app_image_list=None, child_node=None, node_data=None,
                 **kwargs) -> NodeResult:
         from application.serializers.chat_message_serializers import ChatMessageSerializer
         # 生成嵌入应用的chat_id
@@ -85,6 +113,14 @@ class BaseApplicationNode(IApplicationNode):
             app_document_list = []
         if app_image_list is None:
             app_image_list = []
+        runtime_node_id = None
+        record_id = None
+        child_node_value = None
+        if child_node is not None:
+            runtime_node_id = child_node.get('runtime_node_id')
+            record_id = child_node.get('chat_record_id')
+            child_node_value = child_node.get('child_node')
+
         response = ChatMessageSerializer(
             data={'chat_id': current_chat_id, 'message': message,
                   're_chat': re_chat,
@@ -94,16 +130,20 @@ class BaseApplicationNode(IApplicationNode):
                   'client_type': client_type,
                   'document_list': app_document_list,
                   'image_list': app_image_list,
-                  'form_data': kwargs}).chat(base_to_response=OpenaiToResponse())
+                  'runtime_node_id': runtime_node_id,
+                  'chat_record_id': record_id,
+                  'child_node': child_node_value,
+                  'node_data': node_data,
+                  'form_data': kwargs}).chat()
         if response.status_code == 200:
             if stream:
                 content_generator = response.streaming_content
                 return NodeResult({'result': content_generator, 'question': message}, {},
-                                  _write_context=write_context_stream)
+                                  _write_context=write_context_stream, _is_interrupt=_is_interrupt_exec)
             else:
                 data = json.loads(response.content)
                 return NodeResult({'result': data, 'question': message}, {},
-                                  _write_context=write_context)
+                                  _write_context=write_context, _is_interrupt=_is_interrupt_exec)
 
     def get_details(self, index: int, **kwargs):
         global_fields = []

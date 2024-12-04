@@ -20,9 +20,12 @@
               <el-input v-model="detail.padding_problem_text" disabled />
             </el-form-item>
             <el-form-item label="引用分段">
-              <template v-for="(item, index) in detail.paragraph_list" :key="index">
-                <ParagraphCard :data="item" :index="index" />
-              </template>
+              <div v-if="detail.paragraph_list.length > 0">
+                <template v-for="(item, index) in detail.paragraph_list" :key="index">
+                  <ParagraphCard :data="item" :index="index" />
+                </template>
+              </div>
+              <span v-else> - </span>
             </el-form-item>
           </el-form>
         </div>

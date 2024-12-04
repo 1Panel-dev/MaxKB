@@ -93,6 +93,7 @@ const allChecked: any = ref({
       if (val) {
         filterData.value.map((item: any) => {
           item.operate[TeamEnum.MANAGE] = true
+          item.operate[TeamEnum.USE] = true
         })
       } else {
         filterData.value.map((item: any) => {
@@ -113,6 +114,7 @@ const allChecked: any = ref({
       } else {
         filterData.value.map((item: any) => {
           item.operate[TeamEnum.USE] = false
+          item.operate[TeamEnum.MANAGE] = false
         })
       }
     }
@@ -144,6 +146,11 @@ function checkedOperateChange(Name: string | number, row: any, e: boolean) {
   props.data.map((item: any) => {
     if (item.id === row.id) {
       item.operate[Name] = e
+      if (Name === TeamEnum.MANAGE && e) {
+        item.operate[TeamEnum.USE] = true
+      } else if (Name === TeamEnum.USE && !e) {
+        item.operate[TeamEnum.MANAGE] = false
+      }
     }
   })
 }

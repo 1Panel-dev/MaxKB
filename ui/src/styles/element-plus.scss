@@ -256,6 +256,9 @@
   }
 }
 
+.el-select__placeholder {
+  font-weight: 400;
+}
 .el-select__placeholder.is-transparent {
   color: var(--app-input-color-placeholder);
   font-weight: 400;

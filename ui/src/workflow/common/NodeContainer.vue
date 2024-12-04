@@ -33,7 +33,7 @@
 
           <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode" class="mr-4">
-              <el-icon class="arrow-icon" :class="showNode ? 'rotate-180' : ''"
+              <el-icon class="arrow-icon color-secondary" :class="showNode ? 'rotate-180' : ''"
                 ><ArrowDownBold />
               </el-icon>
             </el-button>

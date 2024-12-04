@@ -23,8 +23,9 @@ interface ApplicationFormType {
   tts_type?: string
 }
 interface Chunk {
+  real_node_id: string
   chat_id: string
-  id: string
+  chat_record_id: string
   content: string
   node_id: string
   up_node_id: string
@@ -32,13 +33,20 @@ interface Chunk {
   node_is_end: boolean
   node_type: string
   view_type: string
+  runtime_node_id: string
+  child_node: any
 }
 interface chatType {
   id: string
   problem_text: string
   answer_text: string
   buffer: Array<String>
-  answer_text_list: Array<string>
+  answer_text_list: Array<{
+    content: string
+    chat_record_id?: string
+    runtime_node_id?: string
+    child_node?: any
+  }>
   /**
    * 是否写入结束
    */
@@ -92,15 +100,24 @@ export class ChatRecordManage {
     this.write_ed = false
     this.node_list = []
   }
-  append_answer(chunk_answer: string, index?: number) {
-    this.chat.answer_text_list[index != undefined ? index : this.chat.answer_text_list.length - 1] =
-      this.chat.answer_text_list[
-        index !== undefined ? index : this.chat.answer_text_list.length - 1
-      ]
-        ? this.chat.answer_text_list[
-            index !== undefined ? index : this.chat.answer_text_list.length - 1
-          ] + chunk_answer
-        : chunk_answer
+  append_answer(
+    chunk_answer: string,
+    index?: number,
+    chat_record_id?: string,
+    runtime_node_id?: string,
+    child_node?: any
+  ) {
+    const set_index = index != undefined ? index : this.chat.answer_text_list.length - 1
+    const content = this.chat.answer_text_list[set_index]
+      ? this.chat.answer_text_list[set_index].content + chunk_answer
+      : chunk_answer
+    this.chat.answer_text_list[set_index] = {
+      content: content,
+      chat_record_id,
+      runtime_node_id,
+      child_node
+    }
+
     this.chat.answer_text = this.chat.answer_text + chunk_answer
   }
 
@@ -127,14 +144,22 @@ export class ChatRecordManage {
         run_node.view_type == 'single_view' ||
         (run_node.view_type == 'many_view' && current_up_node.view_type == 'single_view')
       ) {
-        const none_index = this.chat.answer_text_list.indexOf('')
+        const none_index = this.findIndex(
+          this.chat.answer_text_list,
+          (item) => item.content == '',
+          'index'
+        )
         if (none_index > -1) {
           answer_text_list_index = none_index
         } else {
           answer_text_list_index = this.chat.answer_text_list.length
         }
       } else {
-        const none_index = this.chat.answer_text_list.indexOf('')
+        const none_index = this.findIndex(
+          this.chat.answer_text_list,
+          (item) => item.content === '',
+          'index'
+        )
         if (none_index > -1) {
           answer_text_list_index = none_index
         } else {
@@ -152,6 +177,19 @@ export class ChatRecordManage {
     }
     return undefined
   }
+  findIndex<T>(array: Array<T>, find: (item: T) => boolean, type: 'last' | 'index') {
+    let set_index = -1
+    for (let index = 0; index < array.length; index++) {
+      const element = array[index]
+      if (find(element)) {
+        set_index = index
+        if (type == 'index') {
+          break
+        }
+      }
+    }
+    return set_index
+  }
   closeInterval() {
     this.chat.write_ed = true
     this.write_ed = true
@@ -161,7 +199,11 @@ export class ChatRecordManage {
     if (this.id) {
       clearInterval(this.id)
     }
-    const last_index = this.chat.answer_text_list.lastIndexOf('')
+    const last_index = this.findIndex(
+      this.chat.answer_text_list,
+      (item) => item.content == '',
+      'last'
+    )
     if (last_index > 0) {
       this.chat.answer_text_list.splice(last_index, 1)
     }
@@ -193,19 +235,29 @@ export class ChatRecordManage {
             )
         this.append_answer(
           (divider_content ? divider_content.splice(0).join('') : '') + context.join(''),
-          answer_text_list_index
+          answer_text_list_index,
+          current_node.chat_record_id,
+          current_node.runtime_node_id,
+          current_node.child_node
         )
       } else if (this.is_close) {
         while (true) {
           const node_info = this.get_run_node()
+
           if (node_info == undefined) {
             break
           }
           this.append_answer(
             (node_info.divider_content ? node_info.divider_content.splice(0).join('') : '') +
               node_info.current_node.buffer.splice(0).join(''),
-            node_info.answer_text_list_index
+            node_info.answer_text_list_index,
+            current_node.chat_record_id,
+            current_node.runtime_node_id,
+            current_node.child_node
           )
+          if (node_info.current_node.buffer.length == 0) {
+            node_info.current_node.is_end = true
+          }
         }
         this.closeInterval()
       } else {
@@ -213,7 +265,10 @@ export class ChatRecordManage {
         if (s !== undefined) {
           this.append_answer(
             (divider_content ? divider_content.splice(0).join('') : '') + s,
-            answer_text_list_index
+            answer_text_list_index,
+            current_node.chat_record_id,
+            current_node.runtime_node_id,
+            current_node.child_node
           )
         }
       }
@@ -235,16 +290,18 @@ export class ChatRecordManage {
     this.is_stop = false
   }
   appendChunk(chunk: Chunk) {
-    let n = this.node_list.find(
-      (item) => item.node_id == chunk.node_id && item.up_node_id === chunk.up_node_id
-    )
+    let n = this.node_list.find((item) => item.real_node_id == chunk.real_node_id)
     if (n) {
       n.buffer.push(...chunk.content)
     } else {
       n = {
         buffer: [...chunk.content],
+        real_node_id: chunk.real_node_id,
         node_id: chunk.node_id,
+        chat_record_id: chunk.chat_record_id,
         up_node_id: chunk.up_node_id,
+        runtime_node_id: chunk.runtime_node_id,
+        child_node: chunk.child_node,
         node_type: chunk.node_type,
         index: this.node_list.length,
         view_type: chunk.view_type,
@@ -257,9 +314,12 @@ export class ChatRecordManage {
     }
   }
   append(answer_text_block: string) {
-    const index =this.chat.answer_text_list.indexOf("")
-    this.chat.answer_text_list[index]=answer_text_block
-   
+    let set_index = this.findIndex(
+      this.chat.answer_text_list,
+      (item) => item.content == '',
+      'index'
+    )
+    this.chat.answer_text_list[set_index] = { content: answer_text_block }
   }
 }
 

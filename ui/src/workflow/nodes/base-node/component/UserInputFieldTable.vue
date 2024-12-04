@@ -49,7 +49,7 @@
 
     <el-table-column prop="default_value" label="默认值">
       <template #default="{ row }">
-        <span :title="row.default_value" class="ellipsis-1">{{ row.default_value }}</span>
+        <span :title="row.default_value" class="ellipsis-1">{{ getDefaultValue(row) }}</span>
       </template>
     </el-table-column>
     <el-table-column label="必填">
@@ -125,6 +125,18 @@ function refreshFieldList(data: any, index: any) {
   UserFieldFormDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
 }
+
+const getDefaultValue = (row: any) => {
+  if (row.default_value) {
+    const default_value = row.option_list?.filter((v: any) => row.default_value.indexOf(v.value) > -1)
+      .map((v: any) => v.label).join(',')
+    if (default_value) {
+      return default_value
+    }
+    return row.default_value
+  }
+}
+
 
 onMounted(() => {
   if (!props.nodeModel.properties.user_input_field_list) {

@@ -78,7 +78,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch, onMounted } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import authApi from '@/api/auth-setting'
 import type { FormInstance, FormRules } from 'element-plus'
 import { t } from '@/locales'
@@ -86,7 +86,7 @@ import { MsgSuccess } from '@/utils/message'
 
 const form = ref<any>({
   id: '',
-  auth_type: 'OAUTH2',
+  auth_type: 'OAuth2',
   config_data: {
     authEndpoint: '',
     tokenEndpoint: '',

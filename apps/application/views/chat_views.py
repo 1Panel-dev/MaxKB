@@ -138,7 +138,8 @@ class ChatView(APIView):
                                                'node_id': request.data.get('node_id', None),
                                                'runtime_node_id': request.data.get('runtime_node_id', None),
                                                'node_data': request.data.get('node_data', {}),
-                                               'chat_record_id': request.data.get('chat_record_id')}
+                                               'chat_record_id': request.data.get('chat_record_id'),
+                                               'child_node': request.data.get('child_node')}
                                          ).chat()
 
     @action(methods=['GET'], detail=False)

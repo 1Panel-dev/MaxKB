@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "run-p --max_old_space_size=4096 type-check build-only",
+    "build": "set NODE_OPTIONS=--max_old_space_size=4096 && run-p type-check build-only",
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",

@@ -85,7 +85,8 @@
             >
               <el-tooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
                 <template #content>
-                  <div class="break-all pre-wrap">上传文件：最多{{
+                  <div class="break-all pre-wrap">
+                    上传文件：最多{{
                       props.applicationDetails.file_upload_setting.maxFiles
                     }}个，每个文件限制
                     {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />文件类型：{{
@@ -93,7 +94,7 @@
                     }}
                   </div>
                 </template>
-                <el-button text>
+                <el-button text :disabled="checkMaxFilesLimit()" class="mt-4">
                   <el-icon><Paperclip /></el-icon>
                 </el-button>
               </el-tooltip>
@@ -221,6 +222,13 @@ const getAcceptList = () => {
     return '.请在文件上传配置中选择文件类型'
   }
   return accepts.map((ext: any) => '.' + ext).join(',')
+}
+
+const checkMaxFilesLimit = () => {
+  return (
+    props.applicationDetails.file_upload_setting.maxFiles <=
+    uploadImageList.value.length + uploadDocumentList.value.length
+  )
 }
 
 const uploadFile = async (file: any, fileList: any) => {

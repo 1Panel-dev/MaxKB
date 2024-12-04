@@ -23,7 +23,7 @@
           <AnswerContent
             :application="applicationDetails"
             :loading="loading"
-            :chat-record="item"
+            v-model:chat-record="chatList[index]"
             :type="type"
             :send-message="sendMessage"
             :chat-management="ChatManagement"
@@ -222,9 +222,10 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
           for (const index in split) {
             const chunk = JSON?.parse(split[index].replace('data:', ''))
             chat.chat_id = chunk.chat_id
-            chat.record_id = chunk.id
-            ChatManagement.appendChunk(chat.id, chunk)
-
+            chat.record_id = chunk.chat_record_id
+            if (!chunk.is_end) {
+              ChatManagement.appendChunk(chat.id, chunk)
+            }
             if (chunk.is_end) {
               // 流处理成功 返回成功回调
               return Promise.resolve()
@@ -278,7 +279,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
       id: randomId(),
       problem_text: problem ? problem : inputValue.value.trim(),
       answer_text: '',
-      answer_text_list: [''],
+      answer_text_list: [{ content: '' }],
       buffer: [],
       write_ed: false,
       is_stop: false,

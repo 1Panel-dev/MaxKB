@@ -40,6 +40,10 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
     node.context['run_time'] = time.time() - node.context['start_time']
 
 
+def is_interrupt(node, step_variable: Dict, global_variable: Dict):
+    return node.type == 'form-node' and not node.context.get('is_submit', False)
+
+
 class WorkFlowPostHandler:
     def __init__(self, chat_info, client_id, client_type):
         self.chat_info = chat_info
@@ -57,7 +61,7 @@ class WorkFlowPostHandler:
         answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
                              'answer_tokens' in row and row.get('answer_tokens') is not None])
         answer_text_list = workflow.get_answer_text_list()
-        answer_text = '\n\n'.join(answer_text_list)
+        answer_text = '\n\n'.join(answer['content'] for answer in answer_text_list)
         if workflow.chat_record is not None:
             chat_record = workflow.chat_record
             chat_record.answer_text = answer_text
@@ -91,16 +95,25 @@ class WorkFlowPostHandler:
 
 class NodeResult:
     def __init__(self, node_variable: Dict, workflow_variable: Dict,
-                 _write_context=write_context):
+                 _write_context=write_context, _is_interrupt=is_interrupt):
         self._write_context = _write_context
         self.node_variable = node_variable
         self.workflow_variable = workflow_variable
+        self._is_interrupt = _is_interrupt
 
     def write_context(self, node, workflow):
         return self._write_context(self.node_variable, self.workflow_variable, node, workflow)
 
     def is_assertion_result(self):
         return 'branch_id' in self.node_variable
+
+    def is_interrupt_exec(self, current_node):
+        """
+        是否中断执行
+        @param current_node:
+        @return:
+        """
+        return self._is_interrupt(current_node, self.node_variable, self.workflow_variable)
 
 
 class ReferenceAddressSerializer(serializers.Serializer):
@@ -139,14 +152,18 @@ class INode:
         pass
 
     def get_answer_text(self):
-        return self.answer_text
+        if self.answer_text is None:
+            return None
+        return {'content': self.answer_text, 'runtime_node_id': self.runtime_node_id,
+                'chat_record_id': self.workflow_params['chat_record_id']}
 
-    def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None):
+    def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None,
+                 get_node_params=lambda node: node.properties.get('node_data')):
         # 当前步骤上下文,用于存储当前步骤信息
         self.status = 200
         self.err_message = ''
         self.node = node
-        self.node_params = node.properties.get('node_data')
+        self.node_params = get_node_params(node)
         self.workflow_params = workflow_params
         self.workflow_manage = workflow_manage
         self.node_params_serializer = None

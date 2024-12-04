@@ -123,7 +123,7 @@
                             <el-dropdown-menu>
                               <el-dropdown-item @click="openGenerateDialog(item)">
                                 <el-icon><Connection /></el-icon>
-                                生成关联问题</el-dropdown-item
+                                生成问题</el-dropdown-item
                               >
                               <el-dropdown-item @click="openSelectDocumentDialog(item)">
                                 <AppIcon iconName="app-migrate"></AppIcon>
@@ -147,7 +147,7 @@
 
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
         <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
-          生成关联问题
+          生成问题
         </el-button>
         <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog()">
           迁移

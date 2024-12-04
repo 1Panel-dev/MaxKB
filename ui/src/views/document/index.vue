@@ -26,7 +26,7 @@
               向量化
             </el-button>
             <el-button @click="openGenerateDialog()" :disabled="multipleSelection.length === 0">
-              关联问题
+              生成问题
             </el-button>
             <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0">
               设置
@@ -636,7 +636,7 @@ function batchGenerateRelated() {
     }
   })
   documentApi.batchGenerateRelated(id, arr, loading).then(() => {
-    MsgSuccess('批量关联问题成功')
+    MsgSuccess('批量生成问题成功')
     multipleTableRef.value?.clearSelection()
   })
 }

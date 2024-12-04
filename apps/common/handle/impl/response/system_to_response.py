@@ -28,7 +28,7 @@ class SystemToResponse(BaseToResponse):
                                  prompt_tokens, other_params: dict = None):
         if other_params is None:
             other_params = {}
-        chunk = json.dumps({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
+        chunk = json.dumps({'chat_id': str(chat_id), 'chat_record_id': str(chat_record_id), 'operate': True,
                             'content': content, 'node_id': node_id, 'up_node_id_list': up_node_id_list, 'is_end': is_end,
                             'usage': {'completion_tokens': completion_tokens,
                                       'prompt_tokens': prompt_tokens,
