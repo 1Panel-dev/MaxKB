@@ -43,8 +43,8 @@ const checkList: Array<string> = [
   State.REVOKE,
   State.STARTED,
   State.PENDING,
-  State.REVOKED,
   State.FAILURE,
+  State.REVOKED,
   State.SUCCESS
 ]
 const aggStatus = computed(() => {
