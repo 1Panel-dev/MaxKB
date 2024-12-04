@@ -185,6 +185,8 @@ const selectUserId = ref('all')
 
 const searchValue = ref('')
 
+const apiInputParams = ref([])
+
 function copyApplication(row: any) {
   application.asyncGetApplicationDetail(row.id, loading).then((res: any) => {
     CopyApplicationDialogRef.value.open({ ...res.data, model_id: res.data.model })
@@ -234,9 +236,44 @@ function searchHandle() {
   paginationConfig.total = 0
   getList()
 }
+
+function mapToUrlParams(map: any[]) {
+  const params = new URLSearchParams()
+
+  map.forEach((item: any) => {
+    params.append(encodeURIComponent(item.name), encodeURIComponent(item.value))
+  })
+
+  return params.toString() // 返回 URL 查询字符串
+}
+
 function getAccessToken(id: string) {
+  applicationList.value.filter((app)=>app.id === id)[0]?.work_flow?.nodes
+      ?.filter((v: any) => v.id === 'base-node')
+      .map((v: any) => {
+        apiInputParams.value = v.properties.api_input_field_list
+          ? v.properties.api_input_field_list
+              .map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value
+                }
+              })
+          : v.properties.input_field_list
+          ? v.properties.input_field_list
+              .filter((v: any) => v.assignment_method === 'api_input')
+              .map((v: any) => {
+                return {
+                  name: v.variable,
+                  value: v.default_value
+                }
+              })
+          : []
+      })
+
+  const apiParams = mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : ''
   application.asyncGetAccessToken(id, loading).then((res: any) => {
-    window.open(application.location + res?.data?.access_token)
+    window.open(application.location + res?.data?.access_token + apiParams)
   })
 }
 
