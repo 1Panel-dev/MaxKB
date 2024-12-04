@@ -1,5 +1,10 @@
 <template>
-  <el-popover v-model:visible="visible" placement="top" :width="450" trigger="hover">
+  <el-popover
+    v-model:visible="visible"
+    placement="top"
+    trigger="hover"
+    :popper-style="{ width: 'auto' }"
+  >
     <template #default
       ><StatusTable
         v-if="visible"
@@ -48,13 +53,16 @@ const checkList: Array<string> = [
   State.SUCCESS
 ]
 const aggStatus = computed(() => {
+  let obj = { key: 0, value: '' }
   for (const i in checkList) {
     const state = checkList[i]
     const index = props.status.indexOf(state)
     if (index > -1) {
-      return { key: props.status.length - index, value: state }
+      obj = { key: props.status.length - index, value: state }
+      break
     }
   }
+  return obj
 })
 const startedMap = {
   [TaskType.EMBEDDING]: '索引中',

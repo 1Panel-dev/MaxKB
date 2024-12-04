@@ -1,5 +1,5 @@
 <template>
-  <div v-for="status in statusTable" :key="status.type">
+  <div v-for="status in statusTable" :key="status.type" >
     <span> {{ taskTypeMap[status.type] }}：</span>
     <span>
       <el-text v-if="status.state === State.SUCCESS || status.state === State.REVOKED">
@@ -37,7 +37,7 @@
         Object.values(status.aggs ? status.aggs : {}).reduce((x: any, y: any) => x + y, 0)
       }}</span
     >
-    <el-text type="info" class="ml-4">
+    <el-text type="info" class="ml-12">
       {{
         status.time
           ? status.time[status.state == State.REVOKED ? State.REVOKED : State.PENDING]?.substring(
