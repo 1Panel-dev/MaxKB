@@ -168,7 +168,7 @@ const openAddFormCollect = () => {
   addFormCollectRef.value?.open()
 }
 const openEditFormCollect = (form_field_data: any, index: number) => {
-  editFormCollectRef.value?.open(form_field_data, index)
+  editFormCollectRef.value?.open(cloneDeep(form_field_data), index)
 }
 const deleteField = (form_field_data: any) => {
   form_data.value.form_field_list = form_data.value.form_field_list.filter(
@@ -199,8 +199,10 @@ const form_data = computed({
 
 const getDefaultValue = (row: any) => {
   if (row.default_value) {
-    const default_value = row.option_list?.filter((v: any) => row.default_value.indexOf(v.value) > -1)
-      .map((v: any) => v.label).join(',')
+    const default_value = row.option_list
+      ?.filter((v: any) => row.default_value.indexOf(v.value) > -1)
+      .map((v: any) => v.label)
+      .join(',')
     if (default_value) {
       return default_value
     }
@@ -217,6 +219,7 @@ function submitDialog(val: string) {
 onMounted(() => {
   set(props.nodeModel, 'validate', validate)
   sync_form_field_list()
+  props.nodeModel.graphModel.eventCenter.emit('refresh_incoming_node_field')
 })
 </script>
 <style lang="scss" scoped></style>

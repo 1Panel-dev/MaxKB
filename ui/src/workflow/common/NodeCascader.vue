@@ -112,6 +112,9 @@ const validate = () => {
   }
   return Promise.resolve('')
 }
+props.nodeModel.graphModel.eventCenter.on('refresh_incoming_node_field', () => {
+  getIncomingNode(props.nodeModel.id)
+})
 defineExpose({ validate })
 onMounted(() => {
   options.value = getIncomingNode(props.nodeModel.id)
