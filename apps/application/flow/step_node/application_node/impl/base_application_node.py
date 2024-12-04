@@ -19,8 +19,8 @@ def _is_interrupt_exec(node, node_variable: Dict, workflow_variable: Dict):
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
     result = node_variable.get('result')
-    node.context['child_node'] = node_variable['child_node']
-    node.context['is_interrupt_exec'] = node_variable['is_interrupt_exec']
+    node.context['child_node'] = node_variable.get('child_node')
+    node.context['is_interrupt_exec'] = node_variable.get('is_interrupt_exec')
     node.context['message_tokens'] = result.get('usage', {}).get('prompt_tokens', 0)
     node.context['answer_tokens'] = result.get('usage', {}).get('completion_tokens', 0)
     node.context['answer'] = answer
@@ -81,7 +81,9 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     @param node:               节点实例对象
     @param workflow:           工作流管理器
     """
-    response = node_variable.get('result')['choices'][0]['message']
+    response = node_variable.get('result', {}).get('data', {})
+    node_variable['result'] = {'usage': {'completion_tokens': response.get('completion_tokens'),
+                                         'prompt_tokens': response.get('prompt_tokens')}}
     answer = response.get('content', '') or "抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
     _write_context(node_variable, workflow_variable, node, workflow, answer)
 
