@@ -3,7 +3,7 @@
     <div
       v-if="item.type === 'question'"
       @click="sendMessage ? sendMessage(item.content, 'new') : (content: string) => {}"
-      class="problem-button ellipsis-2 mb-8"
+      class="problem-button ellipsis-2 mt-8"
       :class="sendMessage ? 'cursor' : 'disabled'"
     >
       <el-icon>

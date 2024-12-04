@@ -26,34 +26,6 @@
     .text {
       padding: 6px 0;
     }
-
-    .problem-button {
-      width: 100%;
-      border: none;
-      border-radius: 8px;
-      background: var(--app-layout-bg-color);
-      height: 46px;
-      padding: 0 12px;
-      line-height: 46px;
-      box-sizing: border-box;
-      color: var(--el-text-color-regular);
-      -webkit-line-clamp: 1;
-      word-break: break-all;
-
-      &:hover {
-        background: var(--el-color-primary-light-9);
-      }
-
-      &.disabled {
-        &:hover {
-          background: var(--app-layout-bg-color);
-        }
-      }
-
-      .el-icon {
-        color: var(--el-color-primary);
-      }
-    }
   }
   &__operate {
     background: #f3f7f9;

@@ -32,4 +32,6 @@ const prologue = computed(() => {
   return temp?.replace(/-\s.+/g, toQuickQuestion)
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>

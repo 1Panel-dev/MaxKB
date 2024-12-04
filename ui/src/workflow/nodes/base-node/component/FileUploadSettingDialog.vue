@@ -44,7 +44,7 @@
             <div class="flex align-center">
               <img class="mr-12" src="@/assets/icon_file-doc.svg" alt="" />
               <div>
-                <p>文档（TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF）</p>
+                <p class="line-height-22 mt-4">文档（TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF）</p>
                 <el-text class="color-secondary">需要使用“文档内容提取”节点解析文档内容</el-text>
               </div>
             </div>
@@ -61,7 +61,7 @@
             <div class="flex align-center">
               <img class="mr-12" src="@/assets/icon_file-image.svg" alt="" />
               <div>
-                <p>图片（JPG、JPEG、PNG、GIF）</p>
+                <p class="line-height-22 mt-4">图片（JPG、JPEG、PNG、GIF）</p>
                 <el-text class="color-secondary">需要使用“图片理解”节点解析图片内容</el-text>
               </div>
             </div>
