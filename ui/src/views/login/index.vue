@@ -252,11 +252,6 @@ onMounted(() => {
     }
   })
 })
-onBeforeMount(() => {
-  if (user.isEnterprise()) {
-    user.theme(loading)
-  }
-})
 </script>
 <style lang="scss" scope>
 .login-gradient-divider {
