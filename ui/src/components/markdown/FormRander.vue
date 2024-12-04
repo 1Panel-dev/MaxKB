@@ -1,7 +1,7 @@
 <template>
   <div>
     <DynamicsForm
-      :disabled="is_submit"
+      :disabled="is_submit || disabled"
       label-position="top"
       require-asterisk-position="right"
       ref="dynamicsFormRef"
@@ -12,7 +12,7 @@
     ></DynamicsForm>
     <el-button
       :type="is_submit ? 'info' : 'primary'"
-      :disabled="is_submit || loading"
+      :disabled="is_submit || disabled"
       @click="submit"
       >提交</el-button
     >
@@ -24,14 +24,14 @@ import DynamicsForm from '@/components/dynamics-form/index.vue'
 const props = withDefaults(
   defineProps<{
     form_setting: string
-    loading?: boolean
+    disabled?: boolean
     sendMessage?: (question: string, type: 'old' | 'new', other_params_data?: any) => void
     child_node?: any
     chat_record_id?: string
     runtime_node_id?: string
   }>(),
   {
-    loading: false
+    disabled: false
   }
 )
 const form_setting_data = computed(() => {

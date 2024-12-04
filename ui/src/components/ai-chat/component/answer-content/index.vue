@@ -18,7 +18,7 @@
             :chat_record_id="answer_text.chat_record_id"
             :child_node="answer_text.child_node"
             :runtime_node_id="answer_text.runtime_node_id"
-            :loading="loading"
+            :disabled="loading || type == 'log'"
             v-else-if="answer_text.content"
             :source="answer_text.content"
             :send-message="chatMessage"

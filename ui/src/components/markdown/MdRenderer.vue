@@ -20,7 +20,7 @@
       :chat_record_id="chat_record_id"
       :runtime_node_id="runtime_node_id"
       :child_node="child_node"
-      :loading="loading"
+      :disabled="disabled"
       :send-message="sendMessage"
       v-else-if="item.type === 'form_rander'"
       :form_setting="item.content"
@@ -70,11 +70,11 @@ const props = withDefaults(
     child_node?: any
     chat_record_id?: string
     runtime_node_id?: string
-    loading?: boolean
+    disabled?: boolean
   }>(),
   {
     source: '',
-    loading: false
+    disabled: false
   }
 )
 const editorRef = ref()
