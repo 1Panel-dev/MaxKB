@@ -6,7 +6,7 @@
       <LogoIcon v-else height="32px" width="32px" />
     </div>
     <div class="content">
-      <el-card shadow="always" class="dialog-card">
+      <el-card shadow="always" class="dialog-card" style="--el-card-padding: 10px 16px 12px">
         <MdRenderer :source="prologue" :send-message="sendMessage"></MdRenderer>
       </el-card>
     </div>
@@ -32,6 +32,4 @@ const prologue = computed(() => {
   return temp?.replace(/-\s.+/g, toQuickQuestion)
 })
 </script>
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
