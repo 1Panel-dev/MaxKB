@@ -86,7 +86,7 @@ import { MsgSuccess } from '@/utils/message'
 
 const form = ref<any>({
   id: '',
-  auth_type: 'OAUTH2',
+  auth_type: 'OAuth2',
   config_data: {
     authEndpoint: '',
     tokenEndpoint: '',
