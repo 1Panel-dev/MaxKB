@@ -1,3 +1,5 @@
+import math
+
 from django.core.management.base import BaseCommand
 from django.db.models import TextChoices
 
@@ -93,7 +95,8 @@ class BaseActionCommand(BaseCommand):
             'services', nargs='+', choices=Services.export_services_values(), help='Service',
         )
         parser.add_argument('-d', '--daemon', nargs="?", const=True)
-        parser.add_argument('-w', '--worker', type=int, nargs="?", default=3 if os.cpu_count() > 3 else os.cpu_count())
+        parser.add_argument('-w', '--worker', type=int, nargs="?",
+                            default=3 if os.cpu_count() > 6 else math.floor(os.cpu_count() / 2))
         parser.add_argument('-f', '--force', nargs="?", const=True)
 
     def initial_util(self, *args, **options):
