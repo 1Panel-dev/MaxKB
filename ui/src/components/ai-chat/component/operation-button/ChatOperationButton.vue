@@ -152,12 +152,22 @@ function markdownToPlainText(md: string) {
   )
 }
 
+function removeFormRander(text: string) {
+  return text
+    .replace('你好，请先填写下面表单内容：', '')
+    .replace(/<formrander>[\s\S]*?<\/formrander>/, '')
+    .replace('填写后请点击【提交】按钮进行提交。', '')
+    .trim()
+}
+
 const playAnswerText = (text: string) => {
   if (!text) {
     text = '抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。'
   }
   // text 处理成纯文本
   text = markdownToPlainText(text)
+  // 移除表单渲染器
+  text = removeFormRander(text)
   audioPlayerStatus.value = true
   if (props.tts_type === 'BROWSER') {
     if (text !== utterance.value?.text) {
