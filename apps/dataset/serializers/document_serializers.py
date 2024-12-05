@@ -653,7 +653,13 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 document_id=document_id).values('id'),
                                              TaskType(instance.get('type')),
                                              State.REVOKE)
-            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType(instance.get('type')),
+            ListenerManagement.update_status(QuerySet(Document).annotate(
+                reversed_status=Reverse('status'),
+                task_type_status=Substr('reversed_status', TaskType(instance.get('type')).value,
+                                        TaskType(instance.get('type')).value),
+            ).filter(task_type_status__in=[State.PENDING.value, State.STARTED.value]).filter(
+                id=document_id).values('id'),
+                                             TaskType(instance.get('type')),
                                              State.REVOKE)
 
             return True
