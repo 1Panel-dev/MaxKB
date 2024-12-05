@@ -387,17 +387,19 @@
                             <span class="color-secondary mr-4">{{ history.role }}:</span>
 
                             <span v-if="Array.isArray(history.content)">
-                              <template v-for="(h, i) in history.content" :key="i">
-                                <el-image
-                                  v-if="h.type === 'image_url'"
-                                  :src="h.image_url.url"
-                                  alt=""
-                                  fit="cover"
-                                  style="width: 40px; height: 40px; display: block"
-                                  class="border-r-4"
-                                />
-                                <span v-else>{{ h.text }}</span>
-                              </template>
+                              <el-space wrap>
+                                <template v-for="(h, i) in history.content" :key="i">
+                                  <el-image
+                                    v-if="h.type === 'image_url'"
+                                    :src="h.image_url.url"
+                                    alt=""
+                                    fit="cover"
+                                    style="width: 40px; height: 40px; display: block"
+                                    class="border-r-4"
+                                  />
+                                  <span v-else>{{ h.text }}</span>
+                                </template>
+                              </el-space>
                             </span>
 
                             <span v-else>{{ history.content }}</span>
