@@ -393,10 +393,11 @@
                                   :src="h.image_url.url"
                                   alt=""
                                   fit="cover"
-                                  style="width: 40px; height: 40px; display: block"
-                                  class="border-r-4"
+                                  style="width: 40px; height: 40px; display: inline-block"
+                                  class="border-r-4 mr-8"
                                 />
-                                <span v-else>{{ h.text }}</span>
+
+                                <span v-else>{{ h.text }}<br /></span>
                               </template>
                             </span>
 
