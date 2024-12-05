@@ -3,7 +3,7 @@
     <div
       v-if="item.type === 'question'"
       @click="sendMessage ? sendMessage(item.content, 'new') : (content: string) => {}"
-      class="problem-button ellipsis-2 mb-8"
+      class="problem-button ellipsis-2 mt-4 mb-4"
       :class="sendMessage ? 'cursor' : 'disabled'"
     >
       <el-icon>
@@ -20,7 +20,7 @@
       :chat_record_id="chat_record_id"
       :runtime_node_id="runtime_node_id"
       :child_node="child_node"
-      :loading="loading"
+      :disabled="disabled"
       :send-message="sendMessage"
       v-else-if="item.type === 'form_rander'"
       :form_setting="item.content"
@@ -70,11 +70,11 @@ const props = withDefaults(
     child_node?: any
     chat_record_id?: string
     runtime_node_id?: string
-    loading?: boolean
+    disabled?: boolean
   }>(),
   {
     source: '',
-    loading: false
+    disabled: false
   }
 )
 const editorRef = ref()

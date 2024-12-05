@@ -90,7 +90,8 @@ class XlsxSplitHandle(BaseParseTableHandle):
             for sheetname in workbook.sheetnames:
                 sheet = workbook[sheetname] if sheetname else workbook.active
                 rows = self.fill_merged_cells(sheet, image_dict)
-
+                if len(rows) == 0:
+                    continue
                 # 提取表头和内容
 
                 headers = [f"{key}" for key, value in rows[0].items()]
