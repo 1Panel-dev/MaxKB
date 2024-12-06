@@ -120,6 +120,8 @@ const open = async (platform: Platform) => {
   let defaultCallbackUrl = window.location.origin
   switch (platform.key) {
     case 'wecom':
+      currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/wecom`
+      break
     case 'dingtalk':
       if (currentPlatform.config.agent_id && currentPlatform.key === 'dingtalk') {
         currentPlatform.config.corp_id = currentPlatform.config.agent_id
