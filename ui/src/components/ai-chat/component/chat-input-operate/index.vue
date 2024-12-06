@@ -6,7 +6,7 @@
         <div
           class="p-8-12"
           v-loading="localLoading"
-          v-if="uploadDocumentList.length || uploadImageList.length"
+          v-if="uploadDocumentList.length || uploadImageList.length || uploadAudioList.length || uploadVideoList.length"
         >
           <el-space wrap>
             <template v-for="(item, index) in uploadDocumentList" :key="index">
@@ -52,6 +52,27 @@
                   class="border-r-4"
                 />
               </div>
+            </template>
+            <template v-for="(item, index) in uploadAudioList" :key="index">
+              <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
+                <div
+                  class="flex align-center"
+                  @mouseenter.stop="mouseenter(item)"
+                  @mouseleave.stop="mouseleave()"
+                >
+                  <div
+                    @click="deleteFile(index, 'audio')"
+                    class="delete-icon color-secondary"
+                    v-if="showDelete === item.url"
+                  >
+                    <el-icon><CircleCloseFilled /></el-icon>
+                  </div>
+                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                  <div class="ml-4 ellipsis" style="max-width: 160px" :title="item && item?.name">
+                    {{ item && item?.name }}
+                  </div>
+                </div>
+              </el-card>
             </template>
           </el-space>
         </div>
@@ -200,7 +221,7 @@ const localLoading = computed({
 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
 const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
 const videoExtensions = ['mp4', 'avi', 'mov', 'mkv', 'flv']
-const audioExtensions = ['mp3', 'wav', 'aac', 'flac']
+const audioExtensions = ['mp3']
 
 const getAcceptList = () => {
   const { image, document, audio, video } = props.applicationDetails.file_upload_setting
@@ -227,14 +248,14 @@ const getAcceptList = () => {
 const checkMaxFilesLimit = () => {
   return (
     props.applicationDetails.file_upload_setting.maxFiles <=
-    uploadImageList.value.length + uploadDocumentList.value.length
+    uploadImageList.value.length + uploadDocumentList.value.length + uploadAudioList.value.length + uploadVideoList.value.length
   )
 }
 
 const uploadFile = async (file: any, fileList: any) => {
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
   // 单次上传文件数量限制
-  const file_limit_once = uploadImageList.value.length + uploadDocumentList.value.length
+  const file_limit_once = uploadImageList.value.length + uploadDocumentList.value.length + uploadAudioList.value.length + uploadVideoList.value.length
   if (file_limit_once >= maxFiles) {
     MsgWarning('最多上传' + maxFiles + '个文件')
     fileList.splice(0, fileList.length)
@@ -257,9 +278,9 @@ const uploadFile = async (file: any, fileList: any) => {
   } else if (documentExtensions.includes(extension)) {
     uploadDocumentList.value.push(file)
   } else if (videoExtensions.includes(extension)) {
-    // videos.push(file)
+    uploadVideoList.value.push(file)
   } else if (audioExtensions.includes(extension)) {
-    // audios.push(file)
+    uploadAudioList.value.push(file)
   }
 
 
@@ -297,7 +318,20 @@ const uploadFile = async (file: any, fileList: any) => {
           file.file_id = f[0].file_id
         }
       })
-      console.log(uploadDocumentList.value, uploadImageList.value)
+      uploadAudioList.value.forEach((file: any) => {
+        const f = response.data.filter((f: any) => f.name === file.name)
+        if (f.length > 0) {
+          file.url = f[0].url
+          file.file_id = f[0].file_id
+        }
+      })
+      uploadVideoList.value.forEach((file: any) => {
+        const f = response.data.filter((f: any) => f.name === file.name)
+        if (f.length > 0) {
+          file.url = f[0].url
+          file.file_id = f[0].file_id
+        }
+      })
     })
 }
 const recorderTime = ref(0)
@@ -306,6 +340,8 @@ const recorderLoading = ref(false)
 const inputValue = ref<string>('')
 const uploadImageList = ref<Array<any>>([])
 const uploadDocumentList = ref<Array<any>>([])
+const uploadVideoList = ref<Array<any>>([])
+const uploadAudioList = ref<Array<any>>([])
 const mediaRecorderStatus = ref(true)
 const showDelete = ref('')
 
@@ -433,11 +469,15 @@ function sendChatHandle(event: any) {
       if (inputValue.value.trim()) {
         props.sendMessage(inputValue.value, {
           image_list: uploadImageList.value,
-          document_list: uploadDocumentList.value
+          document_list: uploadDocumentList.value,
+          audio_list: uploadAudioList.value,
+          video_list: uploadVideoList.value,
         })
         inputValue.value = ''
         uploadImageList.value = []
         uploadDocumentList.value = []
+        uploadAudioList.value = []
+        uploadVideoList.value = []
         quickInputRef.value.textareaStyle.height = '45px'
       }
     }
@@ -452,6 +492,10 @@ function deleteFile(index: number, val: string) {
     uploadImageList.value.splice(index, 1)
   } else if (val === 'document') {
     uploadDocumentList.value.splice(index, 1)
+  } else if (val === 'video') {
+    uploadVideoList.value.splice(index, 1)
+  } else if (val === 'audio') {
+    uploadAudioList.value.splice(index, 1)
   }
 }
 function mouseenter(row: any) {
