@@ -31,6 +31,16 @@ default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
 max_kb = logging.getLogger("max_kb")
 
 
+def check_links_in_pdf(doc):
+    for page_number in range(len(doc)):
+        page = doc[page_number]
+        links = page.get_links()
+        if links:
+            for link in links:
+                if link['kind'] == 1:
+                    return True
+    return False
+
 class PdfSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
@@ -175,6 +185,9 @@ class PdfSplitHandle(BaseSplitHandle):
 
     @staticmethod
     def handle_links(doc, pattern_list, with_filter, limit):
+        # 检查文档是否包含内部链接
+        if not check_links_in_pdf(doc):
+            return
         # 创建存储章节内容的数组
         chapters = []
         toc_start_page = -1
