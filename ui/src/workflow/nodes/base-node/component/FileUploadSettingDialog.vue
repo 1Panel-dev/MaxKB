@@ -68,6 +68,23 @@
             <el-checkbox v-model="form_data.image" />
           </div>
         </el-card>
+        <el-card
+          shadow="hover"
+          class="card-checkbox cursor w-full mb-8"
+          :class="form_data.audio ? 'active' : ''"
+          style="--el-card-padding: 8px 16px"
+        >
+          <div class="flex-between">
+            <div class="flex align-center">
+              <img class="mr-12" src="@/assets/icon_file-image.svg" alt="" />
+              <div>
+                <p class="line-height-22 mt-4">音频（MP3）</p>
+                <el-text class="color-secondary">所选模型支持接收音频或与语音转文本节点配合使用</el-text>
+              </div>
+            </div>
+            <el-checkbox v-model="form_data.audio" />
+          </div>
+        </el-card>
       </el-form-item>
     </el-form>
     <template #footer>
