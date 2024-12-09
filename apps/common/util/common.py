@@ -8,9 +8,12 @@
 """
 import hashlib
 import importlib
+import mimetypes
+import io
 from functools import reduce
 from typing import Dict, List
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
 
 from ..exception.app_exception import AppApiException
@@ -111,3 +114,25 @@ def bulk_create_in_batches(model, data, batch_size=1000):
         batch = data[i:i + batch_size]
         model.objects.bulk_create(batch)
 
+
+def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
+    content_type, _ = mimetypes.guess_type(file_name)
+    if content_type is None:
+        # 如果未能识别，设置为默认的二进制文件类型
+        content_type = "application/octet-stream"
+    # 创建一个内存中的字节流对象
+    file_stream = io.BytesIO(file_bytes)
+
+    # 获取文件大小
+    file_size = len(file_bytes)
+
+    # 创建 InMemoryUploadedFile 对象
+    uploaded_file = InMemoryUploadedFile(
+        file=file_stream,
+        field_name=None,
+        name=file_name,
+        content_type=content_type,
+        size=file_size,
+        charset=None,
+    )
+    return uploaded_file

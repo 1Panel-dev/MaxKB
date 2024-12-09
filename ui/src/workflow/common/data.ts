@@ -227,6 +227,28 @@ export const imageUnderstandNode = {
     }
   }
 }
+
+export const imageGenerateNode = {
+  type: WorkflowType.ImageGenerateNode,
+  text: '根据提供的文本内容生成图片',
+  label: '图片生成',
+  height: 252,
+  properties: {
+    stepName: '图片生成',
+    config: {
+      fields: [
+        {
+          label: 'AI 回答内容',
+          value: 'answer'
+        },
+        {
+          label: '图片',
+          value: 'image'
+        }
+      ]
+    }
+  }
+}
 export const menuNodes = [
   aiChatNode,
   searchDatasetNode,
@@ -236,6 +258,7 @@ export const menuNodes = [
   rerankerNode,
   documentExtractNode,
   imageUnderstandNode,
+  imageGenerateNode,
   formNode
 ]
 
@@ -326,7 +349,8 @@ export const nodeDict: any = {
   [WorkflowType.FormNode]: formNode,
   [WorkflowType.Application]: applicationNode,
   [WorkflowType.DocumentExtractNode]: documentExtractNode,
-  [WorkflowType.ImageUnderstandNode]: imageUnderstandNode
+  [WorkflowType.ImageUnderstandNode]: imageUnderstandNode,
+  [WorkflowType.ImageGenerateNode]: imageGenerateNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

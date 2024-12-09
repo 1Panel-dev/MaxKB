@@ -18,6 +18,7 @@ from .reranker_node import *
 
 from .document_extract_node import *
 from .image_understand_step_node import *
+from .image_generate_step_node import *
 
 from .search_dataset_node import *
 from .start_node import *
@@ -25,7 +26,7 @@ from .start_node import *
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchDatasetNode, BaseQuestionNode, BaseConditionNode, BaseReplyNode,
              BaseFunctionNodeNode, BaseFunctionLibNodeNode, BaseRerankerNode, BaseApplicationNode,
              BaseDocumentExtractNode,
-             BaseImageUnderstandNode, BaseFormNode]
+             BaseImageUnderstandNode, BaseImageGenerateNode, BaseFormNode]
 
 
 def get_node(node_type):
