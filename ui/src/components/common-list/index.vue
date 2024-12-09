@@ -73,6 +73,8 @@ defineExpose({
   li {
     padding: 10px 16px;
     font-weight: 400;
+    color: var(--el-text-color-regular);
+    font-size: 14px;
     &.active {
       background: var(--el-color-primary-light-9);
       border-radius: 4px;

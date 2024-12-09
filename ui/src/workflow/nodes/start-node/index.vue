@@ -82,6 +82,12 @@ const refreshFileUploadConfig = () => {
   if (form_data[0].image) {
     fileUploadFields.push({ label: '图片', value: 'image' })
   }
+  if (form_data[0].audio) {
+    fileUploadFields.push({ label: '音频', value: 'audio' })
+  }
+  if (form_data[0].video) {
+    fileUploadFields.push({ label: '视频', value: 'video' })
+  }
 
   set(props.nodeModel.properties.config, 'fields', [...fields, ...fileUploadFields])
 }

@@ -133,6 +133,7 @@
 
 .el-card {
   --el-card-padding: calc(var(--app-base-px) * 2);
+  color: var(--el-text-color-regular);
 }
 .el-dropdown {
   color: var(--app-text-color);
@@ -266,6 +267,9 @@
 
 .el-select-group .el-select-dropdown__item {
   padding-left: 11px;
+}
+.el-select-dropdown__item {
+  font-weight: 400;
 }
 
 .el-select__caret {
