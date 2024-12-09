@@ -148,6 +148,15 @@
           />
         </el-form-item>
         <el-form-item label="历史聊天记录">
+          <template #label>
+            <div class="flex-between">
+              <div>历史聊天记录</div>
+              <el-select v-model="chat_data.dialogue_type" type="small" style="width: 100px">
+                <el-option label="节点" value="NODE" />
+                <el-option label="工作流" value="WORKFLOW" />
+              </el-select>
+            </div>
+          </template>
           <el-input-number
             v-model="chat_data.dialogue_number"
             :min="0"
@@ -246,7 +255,8 @@ const form = {
   dialogue_number: 1,
   is_result: false,
   temperature: null,
-  max_tokens: null
+  max_tokens: null,
+  dialogue_type: 'WORKFLOW'
 }
 
 const chat_data = computed({
