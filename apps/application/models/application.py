@@ -167,5 +167,8 @@ class ChatRecord(AppModelMixin):
     def get_ai_message(self):
         return AIMessage(content=self.answer_text)
 
+    def get_node_details_runtime_node_id(self, runtime_node_id):
+        return self.details.get(runtime_node_id, None)
+
     class Meta:
         db_table = "application_chat_record"
