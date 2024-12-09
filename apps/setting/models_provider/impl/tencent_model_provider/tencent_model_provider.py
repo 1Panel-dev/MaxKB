@@ -9,9 +9,11 @@ from setting.models_provider.base_model_provider import (
 from setting.models_provider.impl.tencent_model_provider.credential.embedding import TencentEmbeddingCredential
 from setting.models_provider.impl.tencent_model_provider.credential.image import TencentVisionModelCredential
 from setting.models_provider.impl.tencent_model_provider.credential.llm import TencentLLMModelCredential
+from setting.models_provider.impl.tencent_model_provider.credential.tti import TencentTTIModelCredential
 from setting.models_provider.impl.tencent_model_provider.model.embedding import TencentEmbeddingModel
 from setting.models_provider.impl.tencent_model_provider.model.image import TencentVision
 from setting.models_provider.impl.tencent_model_provider.model.llm import TencentModel
+from setting.models_provider.impl.tencent_model_provider.model.tti import TencentTextToImageModel
 from smartdoc.conf import PROJECT_DIR
 
 
@@ -87,11 +89,19 @@ def _initialize_model_info():
         TencentVisionModelCredential,
         TencentVision)]
 
+    model_info_tti_list = [_create_model_info(
+        'hunyuan-dit',
+        '混元生图模型',
+        ModelTypeConst.TTI,
+        TencentTTIModelCredential,
+        TencentTextToImageModel)]
+
 
     model_info_manage = ModelInfoManage.builder() \
         .append_model_info_list(model_info_list) \
         .append_model_info_list(model_info_embedding_list) \
         .append_model_info_list(model_info_vision_list) \
+        .append_model_info_list(model_info_tti_list) \
         .append_default_model_info(model_info_list[0]) \
         .build()
 

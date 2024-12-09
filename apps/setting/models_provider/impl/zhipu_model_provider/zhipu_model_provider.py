@@ -13,12 +13,15 @@ from setting.models_provider.base_model_provider import ModelProvideInfo, ModelT
     ModelInfoManage
 from setting.models_provider.impl.zhipu_model_provider.credential.image import ZhiPuImageModelCredential
 from setting.models_provider.impl.zhipu_model_provider.credential.llm import ZhiPuLLMModelCredential
+from setting.models_provider.impl.zhipu_model_provider.credential.tti import ZhiPuTextToImageModelCredential
 from setting.models_provider.impl.zhipu_model_provider.model.image import ZhiPuImage
 from setting.models_provider.impl.zhipu_model_provider.model.llm import ZhipuChatModel
+from setting.models_provider.impl.zhipu_model_provider.model.tti import ZhiPuTextToImage
 from smartdoc.conf import PROJECT_DIR
 
 qwen_model_credential = ZhiPuLLMModelCredential()
 zhipu_image_model_credential = ZhiPuImageModelCredential()
+zhipu_tti_model_credential = ZhiPuTextToImageModelCredential()
 
 model_info_list = [
     ModelInfo('glm-4', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel),
@@ -38,11 +41,21 @@ model_info_image_list = [
               ZhiPuImage),
 ]
 
+model_info_tti_list = [
+    ModelInfo('cogview-3', '根据用户文字描述快速、精准生成图像。分辨率支持1024x1024',
+              ModelTypeConst.TTI, zhipu_tti_model_credential,
+              ZhiPuTextToImage),
+    ModelInfo('cogview-3-plus', '根据用户文字描述生成高质量图像，支持多图片尺寸',
+              ModelTypeConst.TTI, zhipu_tti_model_credential,
+              ZhiPuTextToImage),
+]
+
 model_info_manage = (
     ModelInfoManage.builder()
     .append_model_info_list(model_info_list)
     .append_default_model_info(ModelInfo('glm-4', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel))
     .append_model_info_list(model_info_image_list)
+    .append_model_info_list(model_info_tti_list)
     .build()
 )
 
