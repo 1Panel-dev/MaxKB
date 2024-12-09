@@ -12,7 +12,7 @@ from typing import List, Dict
 
 from django.db.models import QuerySet
 from langchain.schema import HumanMessage, SystemMessage
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, AIMessage
 
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
@@ -72,6 +72,22 @@ def get_default_model_params_setting(model_id):
     return model_params_setting
 
 
+def get_node_message(chat_record, runtime_node_id):
+    node_details = chat_record.get_node_details_runtime_node_id(runtime_node_id)
+    if node_details is None:
+        return []
+    return [HumanMessage(node_details.get('question')), AIMessage(node_details.get('answer'))]
+
+
+def get_workflow_message(chat_record):
+    return [chat_record.get_human_message(), chat_record.get_ai_message()]
+
+
+def get_message(chat_record, dialogue_type, runtime_node_id):
+    return get_node_message(chat_record, runtime_node_id) if dialogue_type == 'NODE' else get_workflow_message(
+        chat_record)
+
+
 class BaseChatNode(IChatNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
@@ -80,12 +96,17 @@ class BaseChatNode(IChatNode):
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,
+                dialogue_type=None,
                 **kwargs) -> NodeResult:
+        if dialogue_type is None:
+            dialogue_type = 'WORKFLOW'
+
         if model_params_setting is None:
             model_params_setting = get_default_model_params_setting(model_id)
         chat_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'),
                                                          **model_params_setting)
-        history_message = self.get_history_message(history_chat_record, dialogue_number)
+        history_message = self.get_history_message(history_chat_record, dialogue_number, dialogue_type,
+                                                   self.runtime_node_id)
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)
         self.context['question'] = question.content
@@ -103,10 +124,10 @@ class BaseChatNode(IChatNode):
                               _write_context=write_context)
 
     @staticmethod
-    def get_history_message(history_chat_record, dialogue_number):
+    def get_history_message(history_chat_record, dialogue_number, dialogue_type, runtime_node_id):
         start_index = len(history_chat_record) - dialogue_number
         history_message = reduce(lambda x, y: [*x, *y], [
-            [history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
+            get_message(history_chat_record[index], dialogue_type, runtime_node_id)
             for index in
             range(start_index if start_index > 0 else 0, len(history_chat_record))], [])
         return history_message
