@@ -8,7 +8,8 @@ const datasetRouter = {
   children: [
     {
       path: '/dataset',
-      name: 'dataset',
+      name: 'dataset-index',
+      meta: { title: '知识库主页', activeMenu: '/dataset' },
       component: () => import('@/views/dataset/index.vue')
     },
     {
