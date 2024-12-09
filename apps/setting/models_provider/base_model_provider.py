@@ -150,6 +150,7 @@ class ModelTypeConst(Enum):
     STT = {'code': 'STT', 'message': '语音识别'}
     TTS = {'code': 'TTS', 'message': '语音合成'}
     IMAGE = {'code': 'IMAGE', 'message': '图片理解'}
+    TTI = {'code': 'TTI', 'message': '图片生成'}
     RERANKER = {'code': 'RERANKER', 'message': '重排模型'}
 
 

@@ -13,5 +13,6 @@ export enum modelType {
   STT = '语音识别',
   TTS = '语音合成',
   IMAGE = '图片理解',
+  TTI = '图片生成',
   RERANKER = '重排模型'
 }

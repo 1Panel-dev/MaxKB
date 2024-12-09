@@ -53,7 +53,7 @@ class Node:
 
 
 end_nodes = ['ai-chat-node', 'reply-node', 'function-node', 'function-lib-node', 'application-node',
-             'image-understand-node']
+             'image-understand-node', 'image-generate-node']
 
 
 class Flow:
