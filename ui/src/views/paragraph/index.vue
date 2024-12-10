@@ -104,8 +104,9 @@
                 >
                   <div class="active-button" @click.stop>
                     <el-switch
+                      :loading="loading"
                       v-model="item.is_active"
-                      @change="changeState($event, item)"
+                      :before-change="() => changeState(item)"
                       size="small"
                     />
                   </div>
@@ -162,7 +163,6 @@
     <ParagraphDialog ref="ParagraphDialogRef" :title="title" @refresh="refresh" />
     <SelectDocumentDialog ref="SelectDocumentDialogRef" @refresh="refreshMigrateParagraph" />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
-
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -258,11 +258,20 @@ function searchHandle() {
   getParagraphList()
 }
 
-function changeState(bool: Boolean, row: any) {
+function changeState(row: any) {
   const obj = {
-    is_active: bool
+    is_active: !row.is_active
   }
-  paragraph.asyncPutParagraph(id, documentId, row.id, obj, changeStateloading).then((res) => {})
+  paragraph
+    .asyncPutParagraph(id, documentId, row.id, obj, changeStateloading)
+    .then((res) => {
+      const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
+      paragraphDetail.value[index].is_active = !paragraphDetail.value[index].is_active
+      return true
+    })
+    .catch(() => {
+      return false
+    })
 }
 
 function deleteParagraph(row: any) {
@@ -327,7 +336,6 @@ function refresh(data: any) {
     getParagraphList()
   }
 }
-
 
 const GenerateRelatedDialogRef = ref()
 function openGenerateDialog(row?: any) {
