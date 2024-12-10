@@ -8,6 +8,7 @@
 """
 from typing import Dict
 
+from common.forms import BaseLabel
 from common.forms.base_field import BaseField, TriggerType
 
 
@@ -16,7 +17,7 @@ class TextInputField(BaseField):
     文本输入框
     """
 
-    def __init__(self, label: str,
+    def __init__(self, label: str or BaseLabel,
                  required: bool = False,
                  default_value=None,
                  relation_show_field_dict: Dict = None,

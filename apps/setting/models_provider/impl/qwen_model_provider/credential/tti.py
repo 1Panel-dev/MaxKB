@@ -19,20 +19,19 @@ from setting.models_provider.base_model_provider import BaseModelCredential, Val
 
 
 class QwenModelParams(BaseForm):
-    temperature = forms.SliderField(TooltipLabel('温度', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
-                                    required=True, default_value=1.0,
-                                    _min=0.1,
-                                    _max=1.9,
-                                    _step=0.01,
-                                    precision=2)
-
-    max_tokens = forms.SliderField(
-        TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
-        required=True, default_value=800,
+    size = forms.TextInputField(
+        TooltipLabel('图片尺寸', '指定生成图片的尺寸, 如: 1024x1024'),
+        required=True, default_value='1024x1024')
+    n = forms.SliderField(
+        TooltipLabel('图片数量', '指定生成图片的数量'),
+        required=True, default_value=1,
         _min=1,
-        _max=100000,
+        _max=4,
         _step=1,
         precision=0)
+    style = forms.TextInputField(
+        TooltipLabel('风格', '指定生成图片的风格'),
+        required=True, default_value='<auto>')
 
 
 class QwenTextToImageModelCredential(BaseForm, BaseModelCredential):
