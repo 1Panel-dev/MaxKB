@@ -236,7 +236,7 @@ class Document(APIView):
             return result.success(
                 DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).cancel(
                     request.data
-                    ))
+                ))
 
     class Refresh(APIView):
         authentication_classes = [TokenAuth]
@@ -309,7 +309,7 @@ class Document(APIView):
                              manual_parameters=DocumentSerializers.Operate.get_request_params_api(),
                              tags=["知识库/文档"])
         @has_permissions(
-            lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
+            lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
         def get(self, request: Request, dataset_id: str, document_id: str):
             return DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).export()
