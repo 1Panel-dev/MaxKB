@@ -28,6 +28,11 @@ from setting.models_provider import get_model, get_model_credential
 from setting.models_provider.base_model_provider import ValidCode, DownModelChunkStatus
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
 
+def get_default_model_params_setting(provider, model_type, model_name):
+    credential = get_model_credential(provider, model_type, model_name)
+    model_params_setting = credential.get_model_params_setting_form(model_name).to_form_list()
+    return model_params_setting
+
 
 class ModelPullManage:
 
@@ -206,6 +211,7 @@ class ModelSerializer(serializers.Serializer):
             model = Model(id=uuid.uuid1(), status=status, user_id=user_id, name=name,
                           credential=rsa_long_encrypt(model_credential_str),
                           provider=provider, model_type=model_type, model_name=model_name,
+                          model_params_form=get_default_model_params_setting(provider, model_type, model_name),
                           permission_type=permission_type)
             model.save()
             if status == Status.DOWNLOAD:

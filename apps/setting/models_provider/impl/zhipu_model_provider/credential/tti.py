@@ -1,12 +1,17 @@
 # coding=utf-8
 from typing import Dict
 
-from langchain_core.messages import HumanMessage
-
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
+
+
+class ZhiPuTTIModelParams(BaseForm):
+    size = forms.TextInputField(
+        TooltipLabel('图片尺寸',
+                     '图片尺寸，仅 cogview-3-plus 支持该参数。可选范围：[1024x1024,768x1344,864x1152,1344x768,1152x864,1440x720,720x1440]，默认是1024x1024。'),
+        required=True, default_value='1024x1024')
 
 
 class ZhiPuTextToImageModelCredential(BaseForm, BaseModelCredential):
@@ -41,4 +46,4 @@ class ZhiPuTextToImageModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        pass
+        return ZhiPuTTIModelParams()

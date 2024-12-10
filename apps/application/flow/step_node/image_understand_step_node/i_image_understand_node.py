@@ -22,6 +22,9 @@ class ImageUnderstandNodeSerializer(serializers.Serializer):
 
     image_list = serializers.ListField(required=False, error_messages=ErrMessage.list("图片"))
 
+    model_params_setting = serializers.JSONField(required=False, default=dict, error_messages=ErrMessage.json("模型参数设置"))
+
+
 
 class IImageUnderstandNode(INode):
     type = 'image-understand-node'
@@ -35,6 +38,7 @@ class IImageUnderstandNode(INode):
         return self.execute(image=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream, chat_id,
+                model_params_setting,
                 chat_record_id,
                 image,
                 **kwargs) -> NodeResult:

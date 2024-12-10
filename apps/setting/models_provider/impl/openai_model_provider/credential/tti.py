@@ -7,8 +7,25 @@ from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
+
+class OpenAITTIModelParams(BaseForm):
+    size = forms.TextInputField(
+        TooltipLabel('图片尺寸', '指定生成图片的尺寸, 如: 1024x1024'),
+        required=True, default_value='1024x1024')
+
+    quality = forms.TextInputField(
+        TooltipLabel('图片质量', ''),
+        required=True, default_value='standard')
+
+    n = forms.SliderField(
+        TooltipLabel('图片数量', '指定生成图片的数量'),
+        required=True, default_value=1,
+        _min=1,
+        _max=10,
+        _step=1,
+        precision=0)
 
 
 class OpenAITextToImageModelCredential(BaseForm, BaseModelCredential):
@@ -44,4 +61,4 @@ class OpenAITextToImageModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        pass
+        return OpenAITTIModelParams()

@@ -94,7 +94,7 @@
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item
-                v-if="currentModel.model_type === 'TTS' || currentModel.model_type === 'LLM'"
+                v-if="currentModel.model_type === 'TTS' || currentModel.model_type === 'LLM' || currentModel.model_type === 'IMAGE' || currentModel.model_type === 'TTI'"
                 :disabled="!is_permisstion"
                 icon="Setting" @click.stop="openParamSetting"
               >
