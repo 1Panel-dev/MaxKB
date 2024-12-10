@@ -6,7 +6,12 @@
         <div
           class="p-8-12"
           v-loading="localLoading"
-          v-if="uploadDocumentList.length || uploadImageList.length || uploadAudioList.length || uploadVideoList.length"
+          v-if="
+            uploadDocumentList.length ||
+            uploadImageList.length ||
+            uploadAudioList.length ||
+            uploadVideoList.length
+          "
         >
           <el-space wrap>
             <template v-for="(item, index) in uploadDocumentList" :key="index">
@@ -248,14 +253,21 @@ const getAcceptList = () => {
 const checkMaxFilesLimit = () => {
   return (
     props.applicationDetails.file_upload_setting.maxFiles <=
-    uploadImageList.value.length + uploadDocumentList.value.length + uploadAudioList.value.length + uploadVideoList.value.length
+    uploadImageList.value.length +
+      uploadDocumentList.value.length +
+      uploadAudioList.value.length +
+      uploadVideoList.value.length
   )
 }
 
 const uploadFile = async (file: any, fileList: any) => {
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
   // 单次上传文件数量限制
-  const file_limit_once = uploadImageList.value.length + uploadDocumentList.value.length + uploadAudioList.value.length + uploadVideoList.value.length
+  const file_limit_once =
+    uploadImageList.value.length +
+    uploadDocumentList.value.length +
+    uploadAudioList.value.length +
+    uploadVideoList.value.length
   if (file_limit_once >= maxFiles) {
     MsgWarning('最多上传' + maxFiles + '个文件')
     fileList.splice(0, fileList.length)
@@ -282,7 +294,6 @@ const uploadFile = async (file: any, fileList: any) => {
   } else if (audioExtensions.includes(extension)) {
     uploadAudioList.value.push(file)
   }
-
 
   if (!chatId_context.value) {
     const res = await props.openChatId()
@@ -332,6 +343,9 @@ const uploadFile = async (file: any, fileList: any) => {
           file.file_id = f[0].file_id
         }
       })
+      if (!inputValue.value && uploadImageList.value.length > 0) {
+        inputValue.value = '请解析图片内容'
+      }
     })
 }
 const recorderTime = ref(0)
@@ -471,7 +485,7 @@ function sendChatHandle(event: any) {
           image_list: uploadImageList.value,
           document_list: uploadDocumentList.value,
           audio_list: uploadAudioList.value,
-          video_list: uploadVideoList.value,
+          video_list: uploadVideoList.value
         })
         inputValue.value = ''
         uploadImageList.value = []
