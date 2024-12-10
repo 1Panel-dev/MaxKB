@@ -99,33 +99,43 @@
                         >全部</el-dropdown-item
                       >
                       <el-dropdown-item
-                        :class="filterMethod['status'] === '1' ? 'is-active' : ''"
+                        :class="filterMethod['status'] === State.SUCCESS ? 'is-active' : ''"
                         class="justify-center"
-                        :command="beforeCommand('status', '1')"
+                        :command="beforeCommand('status', State.SUCCESS)"
                         >成功</el-dropdown-item
                       >
                       <el-dropdown-item
-                        :class="filterMethod['status'] === '2' ? 'is-active' : ''"
+                        :class="filterMethod['status'] === State.FAILURE ? 'is-active' : ''"
                         class="justify-center"
-                        :command="beforeCommand('status', '2')"
+                        :command="beforeCommand('status', State.FAILURE)"
                         >失败</el-dropdown-item
                       >
                       <el-dropdown-item
-                        :class="filterMethod['status'] === '0' ? 'is-active' : ''"
+                        :class="
+                          filterMethod['status'] === State.STARTED &&
+                          filterMethod['task_type'] == TaskType.EMBEDDING
+                            ? 'is-active'
+                            : ''
+                        "
                         class="justify-center"
-                        :command="beforeCommand('status', '0')"
+                        :command="beforeCommand('status', State.STARTED, TaskType.EMBEDDING)"
                         >索引中</el-dropdown-item
                       >
                       <el-dropdown-item
-                        :class="filterMethod['status'] === '3' ? 'is-active' : ''"
+                        :class="filterMethod['status'] === State.PENDING ? 'is-active' : ''"
                         class="justify-center"
-                        :command="beforeCommand('status', '3')"
+                        :command="beforeCommand('status', State.PENDING)"
                         >排队中</el-dropdown-item
                       >
                       <el-dropdown-item
-                        :class="filterMethod['status'] === '4' ? 'is-active' : ''"
+                        :class="
+                          filterMethod['status'] === State.STARTED &&
+                          filterMethod['task_type'] === TaskType.GENERATE_PROBLEM
+                            ? 'is-active'
+                            : ''
+                        "
                         class="justify-center"
-                        :command="beforeCommand('status', '4')"
+                        :command="beforeCommand('status', State.STARTED, TaskType.GENERATE_PROBLEM)"
                         >生成问题中</el-dropdown-item
                       >
                     </el-dropdown-menu>
@@ -481,13 +491,18 @@ function openDatasetDialog(row?: any) {
 
 function dropdownHandle(obj: any) {
   filterMethod.value[obj.attr] = obj.command
+  if (obj.attr == 'status') {
+    filterMethod.value['task_type'] = obj.task_type
+  }
+
   getList()
 }
 
-function beforeCommand(attr: string, val: any) {
+function beforeCommand(attr: string, val: any, task_type?: number) {
   return {
     attr: attr,
-    command: val
+    command: val,
+    task_type
   }
 }
 const cancelTask = (row: any, task_type: number) => {
