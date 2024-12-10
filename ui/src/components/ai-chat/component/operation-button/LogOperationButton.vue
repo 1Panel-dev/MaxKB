@@ -134,8 +134,8 @@ function markdownToPlainText(md: string) {
 function removeFormRander(text: string) {
   return text
     .replace('你好，请先填写下面表单内容：', '')
-    .replace(/<formrander>[\s\S]*?<\/formrander>/, '')
-    .replace(/<form_rander>[\s\S]*?<\/form_rander>/, '')
+    .replace('请先填写以下表单并点击提交按钮', '')
+    .replace(/<[^>]+>.*?<\/[^>]+>/gs, '')
     .replace('填写后请点击【提交】按钮进行提交。', '')
     .trim()
 }
@@ -149,6 +149,7 @@ const playAnswerText = (text: string) => {
   text = markdownToPlainText(text)
   // 移除表单渲染器
   text = removeFormRander(text)
+  console.log(text)
   audioPlayerStatus.value = true
   if (props.tts_type === 'BROWSER') {
     if (text !== utterance.value?.text) {
