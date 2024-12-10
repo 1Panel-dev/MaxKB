@@ -171,7 +171,7 @@ const applicationList = ref<any[]>([])
 
 const paginationConfig = reactive({
   current_page: 1,
-  page_size: 20,
+  page_size: 30,
   total: 0
 })
 interface UserOption {
@@ -248,18 +248,18 @@ function mapToUrlParams(map: any[]) {
 }
 
 function getAccessToken(id: string) {
-  applicationList.value.filter((app)=>app.id === id)[0]?.work_flow?.nodes
-      ?.filter((v: any) => v.id === 'base-node')
-      .map((v: any) => {
-        apiInputParams.value = v.properties.api_input_field_list
-          ? v.properties.api_input_field_list
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value
-                }
-              })
-          : v.properties.input_field_list
+  applicationList.value
+    .filter((app) => app.id === id)[0]
+    ?.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')
+    .map((v: any) => {
+      apiInputParams.value = v.properties.api_input_field_list
+        ? v.properties.api_input_field_list.map((v: any) => {
+            return {
+              name: v.variable,
+              value: v.default_value
+            }
+          })
+        : v.properties.input_field_list
           ? v.properties.input_field_list
               .filter((v: any) => v.assignment_method === 'api_input')
               .map((v: any) => {
@@ -269,9 +269,11 @@ function getAccessToken(id: string) {
                 }
               })
           : []
-      })
+    })
 
-  const apiParams = mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : ''
+  const apiParams = mapToUrlParams(apiInputParams.value)
+    ? '?' + mapToUrlParams(apiInputParams.value)
+    : ''
   application.asyncGetAccessToken(id, loading).then((res: any) => {
     window.open(application.location + res?.data?.access_token + apiParams)
   })
