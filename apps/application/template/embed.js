@@ -67,6 +67,20 @@ const initChat=(root)=>{
   const chat_button_img=root.querySelector('.maxkb-chat-button > img')
   //  对话框元素
   const chat_container=root.querySelector('#maxkb-chat-container')
+    // 引导层
+  const mask_content = root.querySelector('.maxkb-mask > .maxkb-content')
+  const mask_tips = root.querySelector('.maxkb-tips')
+ chat_button_img.onload=(event)=>{
+ if(mask_content){
+    mask_content.style.width = chat_button_img.width + 'px'
+    mask_content.style.height = chat_button_img.height + 'px'
+    if('{{x_type}}'=='left'){
+     mask_tips.style.marginLeft = (chat_button_img.naturalWidth>500?500:chat_button_img.naturalWidth)-64 + 'px'
+    }else{
+    mask_tips.style.marginRight = (chat_button_img.naturalWidth>500?500:chat_button_img.naturalWidth)-64 + 'px'
+    }
+   }
+  }
 
   const viewport=root.querySelector('.maxkb-openviewport')
   const closeviewport=root.querySelector('.maxkb-closeviewport')
@@ -90,17 +104,16 @@ const initChat=(root)=>{
   }
      const drag=(e)=>{
             if (['touchmove','touchstart'].includes(e.type)) {
-             chat_button.style.top=(e.touches[0].clientY-25)+'px'
-             chat_button.style.left=(e.touches[0].clientX-25)+'px'
+             chat_button.style.top=(e.touches[0].clientY-chat_button_img.naturalHeight/2)+'px'
+             chat_button.style.left=(e.touches[0].clientX-chat_button_img.naturalWidth/2)+'px'
           } else {
-             chat_button.style.top=(e.y-25)+'px'
-             chat_button.style.left=(e.x-25)+'px'
+             chat_button.style.top=(e.y-chat_button_img.naturalHeight/2)+'px'
+             chat_button.style.left=(e.x-chat_button_img.naturalWidth/2)+'px'
           }
             chat_button.style.width =chat_button_img.naturalWidth+'px'
             chat_button.style.height =chat_button_img.naturalHeight+'px'
         }
   if({{is_draggable}}){
-  console.dir(chat_button_img)
   chat_button.addEventListener("drag",drag)
   chat_button.addEventListener("dragover",(e)=>{
              e.preventDefault()
@@ -155,7 +168,7 @@ function initMaxkbStyle(root){
   
   #maxkb .maxkb-mask {
       position: fixed;
-      z-index: 999;
+      z-index: 10001;
       background-color: transparent;
       height: 100%;
       width: 100%;
@@ -242,8 +255,6 @@ function initMaxkbStyle(root){
         {{x_type}}: {{x_value}}px;
         {{y_type}}: {{y_value}}px;
         cursor: pointer;
-        max-height:500px;
-        max-width:500px;
         z-index:10000;
     }
     #maxkb #maxkb-chat-container{
@@ -306,4 +317,4 @@ function embedChatbot() {
     initMaxkb()
   } else console.error('invalid parameter')
 }
-window.onload = embedChatbot
+window.addEventListener('load',embedChatbot)
