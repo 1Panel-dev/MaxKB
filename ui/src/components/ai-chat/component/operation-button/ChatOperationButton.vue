@@ -156,6 +156,7 @@ function removeFormRander(text: string) {
   return text
     .replace('你好，请先填写下面表单内容：', '')
     .replace(/<formrander>[\s\S]*?<\/formrander>/, '')
+    .replace(/<form_rander>[\s\S]*?<\/form_rander>/, '')
     .replace('填写后请点击【提交】按钮进行提交。', '')
     .trim()
 }
