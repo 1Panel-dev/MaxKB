@@ -341,10 +341,12 @@ class ChatMessageSerializer(serializers.Serializer):
         user_id = chat_info.application.user_id
         chat_record_id = self.data.get('chat_record_id')
         chat_record = None
+        history_chat_record = chat_info.chat_record_list
         if chat_record_id is not None:
             chat_record = self.get_chat_record(chat_info, chat_record_id)
+            history_chat_record = [r for r in chat_info.chat_record_list if str(r.id) != chat_record_id]
         work_flow_manage = WorkflowManage(Flow.new_instance(chat_info.work_flow_version.work_flow),
-                                          {'history_chat_record': chat_info.chat_record_list, 'question': message,
+                                          {'history_chat_record': history_chat_record, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(
                                               uuid.uuid1()) if chat_record is None else chat_record.id,
                                            'stream': stream,
