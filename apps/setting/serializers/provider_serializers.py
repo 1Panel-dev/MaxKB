@@ -30,8 +30,10 @@ from setting.models_provider.constants.model_provider_constants import ModelProv
 
 def get_default_model_params_setting(provider, model_type, model_name):
     credential = get_model_credential(provider, model_type, model_name)
-    model_params_setting = credential.get_model_params_setting_form(model_name).to_form_list()
-    return model_params_setting
+    setting_form = credential.get_model_params_setting_form(model_name)
+    if setting_form is not None:
+        return setting_form.to_form_list()
+    return []
 
 
 class ModelPullManage:
@@ -178,6 +180,8 @@ class ModelSerializer(serializers.Serializer):
 
         model_name = serializers.CharField(required=True, error_messages=ErrMessage.char("基础模型"))
 
+        model_params_form = serializers.ListField(required=False, default=list, error_messages=ErrMessage.char("参数配置"))
+
         credential = serializers.DictField(required=True, error_messages=ErrMessage.dict("认证信息"))
 
         def is_valid(self, *, raise_exception=False):
@@ -207,11 +211,12 @@ class ModelSerializer(serializers.Serializer):
             model_type = self.data.get('model_type')
             model_name = self.data.get('model_name')
             permission_type = self.data.get('permission_type')
+            model_params_form = self.data.get('model_params_form')
             model_credential_str = json.dumps(credential)
             model = Model(id=uuid.uuid1(), status=status, user_id=user_id, name=name,
                           credential=rsa_long_encrypt(model_credential_str),
                           provider=provider, model_type=model_type, model_name=model_name,
-                          model_params_form=get_default_model_params_setting(provider, model_type, model_name),
+                          model_params_form=model_params_form,
                           permission_type=permission_type)
             model.save()
             if status == Status.DOWNLOAD:

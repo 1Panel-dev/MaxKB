@@ -1,13 +1,8 @@
 from typing import Dict
 
-import requests
-from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI
 from openai import OpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
-from common.util.common import bytes_to_uploaded_file
-from dataset.serializers.file_serializers import FileSerializer
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tti import BaseTextToImage
 
@@ -32,7 +27,7 @@ class OpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {}}
+        optional_params = {'params': {'size': '1024x1024', 'quality': 'standard', 'n': 1}}
         for key, value in model_kwargs.items():
             if key not in ['model_id', 'use_local', 'streaming']:
                 optional_params['params'][key] = value
@@ -43,6 +38,9 @@ class OpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
             **optional_params,
         )
 
+    def is_cache_model(self):
+        return False
+
     def check_auth(self):
         chat = OpenAI(api_key=self.api_key, base_url=self.api_base)
         response_list = chat.models.with_raw_response.list()
@@ -50,18 +48,11 @@ class OpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
         # self.generate_image('生成一个小猫图片')
 
     def generate_image(self, prompt: str, negative_prompt: str = None):
-
         chat = OpenAI(api_key=self.api_key, base_url=self.api_base)
         res = chat.images.generate(model=self.model, prompt=prompt, **self.params)
-
         file_urls = []
         for content in res.data:
             url = content.url
-            print(url)
-            file_name = 'generated_image.png'
-            file = bytes_to_uploaded_file(requests.get(url).content, file_name)
-            meta = {'debug': True}
-            file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
-            file_urls.append(file_url)
+            file_urls.append(url)
 
         return file_urls

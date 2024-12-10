@@ -10,14 +10,32 @@ from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 
-class OpenAITTIModelParams(BaseForm):
-    size = forms.TextInputField(
-        TooltipLabel('图片尺寸', '指定生成图片的尺寸, 如: 1024x1024'),
-        required=True, default_value='1024x1024')
 
-    quality = forms.TextInputField(
+class OpenAITTIModelParams(BaseForm):
+    size = forms.SingleSelect(
+        TooltipLabel('图片尺寸', '指定生成图片的尺寸, 如: 1024x1024'),
+        required=True,
+        default_value='1024x1024',
+        option_list=[
+            {'value': '1024x1024', 'label': '1024x1024'},
+            {'value': '1024x1792', 'label': '1024x1792'},
+            {'value': '1792x1024', 'label': '1792x1024'},
+        ],
+        text_field='label',
+        value_field='value'
+    )
+
+    quality = forms.SingleSelect(
         TooltipLabel('图片质量', ''),
-        required=True, default_value='standard')
+        required=True,
+        default_value='standard',
+        option_list=[
+            {'value': 'standard', 'label': 'standard'},
+            {'value': 'hd', 'label': 'hd'},
+        ],
+        text_field='label',
+        value_field='value'
+    )
 
     n = forms.SliderField(
         TooltipLabel('图片数量', '指定生成图片的数量'),

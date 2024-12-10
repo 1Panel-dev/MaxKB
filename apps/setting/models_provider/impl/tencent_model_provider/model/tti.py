@@ -3,15 +3,12 @@
 import json
 from typing import Dict
 
-import requests
 from tencentcloud.common import credential
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.hunyuan.v20230901 import hunyuan_client, models
 
-from common.util.common import bytes_to_uploaded_file
-from dataset.serializers.file_serializers import FileSerializer
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tti import BaseTextToImage
 from setting.models_provider.impl.tencent_model_provider.model.hunyuan import ChatHunyuan
@@ -87,12 +84,8 @@ class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
             # 输出json格式的字符串回包
             print(resp.to_json_string())
             file_urls = []
-            file_name = 'generated_image.png'
-            file = bytes_to_uploaded_file(requests.get(resp.ResultImage).content, file_name)
-            meta = {'debug': True}
-            file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
-            file_urls.append(file_url)
+
+            file_urls.append(resp.ResultImage)
             return file_urls
         except TencentCloudSDKException as err:
             print(err)
-

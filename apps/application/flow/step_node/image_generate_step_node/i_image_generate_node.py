@@ -21,6 +21,8 @@ class ImageGenerateNodeSerializer(serializers.Serializer):
 
     is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
 
+    model_params_setting = serializers.JSONField(required=False, default=dict, error_messages=ErrMessage.json("模型参数设置"))
+
 
 class IImageGenerateNode(INode):
     type = 'image-generate-node'
@@ -32,6 +34,7 @@ class IImageGenerateNode(INode):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, model_id, prompt, negative_prompt, dialogue_number, dialogue_type, history_chat_record, chat_id,
+                model_params_setting,
                 chat_record_id,
                 **kwargs) -> NodeResult:
         pass

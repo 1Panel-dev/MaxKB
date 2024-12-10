@@ -8,10 +8,22 @@ from setting.models_provider.base_model_provider import BaseModelCredential, Val
 
 
 class ZhiPuTTIModelParams(BaseForm):
-    size = forms.TextInputField(
+    size = forms.SingleSelect(
         TooltipLabel('图片尺寸',
                      '图片尺寸，仅 cogview-3-plus 支持该参数。可选范围：[1024x1024,768x1344,864x1152,1344x768,1152x864,1440x720,720x1440]，默认是1024x1024。'),
-        required=True, default_value='1024x1024')
+        required=True,
+        default_value='1024x1024',
+        option_list=[
+            {'value': '1024x1024', 'label': '1024x1024'},
+            {'value': '768x1344', 'label': '768x1344'},
+            {'value': '864x1152', 'label': '864x1152'},
+            {'value': '1344x768', 'label': '1344x768'},
+            {'value': '1152x864', 'label': '1152x864'},
+            {'value': '1440x720', 'label': '1440x720'},
+            {'value': '720x1440', 'label': '720x1440'},
+        ],
+        text_field='label',
+        value_field='value')
 
 
 class ZhiPuTextToImageModelCredential(BaseForm, BaseModelCredential):
