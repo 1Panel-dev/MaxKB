@@ -1,13 +1,10 @@
 from typing import Dict
 
-import requests
 from langchain_community.chat_models import ChatZhipuAI
 from langchain_core.messages import HumanMessage
 from zhipuai import ZhipuAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
-from common.util.common import bytes_to_uploaded_file
-from dataset.serializers.file_serializers import FileSerializer
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tti import BaseTextToImage
 
@@ -30,7 +27,7 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {}}
+        optional_params = {'params': {'size': '1024x1024'}}
         for key, value in model_kwargs.items():
             if key not in ['model_id', 'use_local', 'streaming']:
                 optional_params['params'][key] = value
@@ -39,6 +36,9 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
             api_key=model_credential.get('api_key'),
             **optional_params,
         )
+
+    def is_cache_model(self):
+        return False
 
     def check_auth(self):
         chat = ChatZhipuAI(
@@ -58,16 +58,11 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
         response = chat.images.generations(
             model=self.model,  # 填写需要调用的模型编码
             prompt=prompt,  # 填写需要生成图片的文本
-            **self.params # 填写额外参数
+            **self.params  # 填写额外参数
         )
         file_urls = []
         for content in response.data:
-            url = content['url']
-            print(url)
-            file_name = url.split('/')[-1]
-            file = bytes_to_uploaded_file(requests.get(url).content, file_name)
-            meta = {'debug': True}
-            file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
-            file_urls.append(file_url)
+            url = content.url
+            file_urls.append(url)
 
         return file_urls

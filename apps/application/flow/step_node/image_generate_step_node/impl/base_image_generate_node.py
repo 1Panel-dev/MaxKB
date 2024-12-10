@@ -2,10 +2,13 @@
 from functools import reduce
 from typing import List
 
+import requests
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.image_generate_step_node.i_image_generate_node import IImageGenerateNode
+from common.util.common import bytes_to_uploaded_file
+from dataset.serializers.file_serializers import FileSerializer
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 
 
@@ -16,10 +19,12 @@ class BaseImageGenerateNode(IImageGenerateNode):
         self.answer_text = details.get('answer')
 
     def execute(self, model_id, prompt, negative_prompt, dialogue_number, dialogue_type, history_chat_record, chat_id,
+                model_params_setting,
                 chat_record_id,
                 **kwargs) -> NodeResult:
-
-        tti_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'))
+        print(model_params_setting)
+        application = self.workflow_manage.work_flow_post_handler.chat_info.application
+        tti_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'), **model_params_setting)
         history_message = self.get_history_message(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)
@@ -28,10 +33,21 @@ class BaseImageGenerateNode(IImageGenerateNode):
         self.context['message_list'] = message_list
         self.context['dialogue_type'] = dialogue_type
         print(message_list)
-        print(negative_prompt)
         image_urls = tti_model.generate_image(question, negative_prompt)
-        self.context['image_list'] = image_urls
-        answer = '\n'.join([f"![Image]({path})" for path in image_urls])
+        # 保存图片
+        file_urls = []
+        for image_url in image_urls:
+            file_name = 'generated_image.png'
+            file = bytes_to_uploaded_file(requests.get(image_url).content, file_name)
+            meta = {
+                'debug': False if application.id else True,
+                'chat_id': chat_id,
+                'application_id': str(application.id) if application.id else None,
+            }
+            file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
+            file_urls.append(file_url)
+        self.context['image_list'] = file_urls
+        answer = '\n'.join([f"![Image]({path})" for path in file_urls])
         return NodeResult({'answer': answer, 'chat_model': tti_model, 'message_list': message_list,
                            'image': [{'file_id': path.split('/')[-1], 'file_url': path} for path in file_urls],
                            'history_message': history_message, 'question': question}, {})

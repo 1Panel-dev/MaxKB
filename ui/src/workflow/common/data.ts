@@ -39,6 +39,7 @@ export const baseNode = {
     node_data: {
       name: '',
       desc: '',
+      // @ts-ignore
       prologue: t('views.application.prompt.defaultPrologue')
     },
     config: {}

@@ -98,6 +98,15 @@ const listBaseModel: (
   return get(`${prefix_provider}/model_list`, { provider, model_type }, loading)
 }
 
+const listBaseModelParamsForm: (
+  provider: string,
+  model_type: string,
+  model_name: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<BaseModel>>> = (provider, model_type, model_name, loading) => {
+  return get(`${prefix_provider}/model_params_form`, { provider, model_type, model_name}, loading)
+}
+
 /**
  * 创建模型
  * @param request 请求对象
@@ -187,6 +196,7 @@ export default {
   getModelCreateForm,
   listModelType,
   listBaseModel,
+  listBaseModelParamsForm,
   createModel,
   updateModel,
   deleteModel,

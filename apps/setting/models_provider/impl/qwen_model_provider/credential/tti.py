@@ -19,9 +19,18 @@ from setting.models_provider.base_model_provider import BaseModelCredential, Val
 
 
 class QwenModelParams(BaseForm):
-    size = forms.TextInputField(
+    size = forms.SingleSelect(
         TooltipLabel('图片尺寸', '指定生成图片的尺寸, 如: 1024x1024'),
-        required=True, default_value='1024x1024')
+        required=True,
+        default_value='1024*1024',
+        option_list=[
+            {'value': '1024*1024', 'label': '1024*1024'},
+            {'value': '720*1280', 'label': '720*1280'},
+            {'value': '768*1152', 'label': '768*1152'},
+            {'value': '1280*720', 'label': '1280*720'},
+        ],
+        text_field='label',
+        value_field='value')
     n = forms.SliderField(
         TooltipLabel('图片数量', '指定生成图片的数量'),
         required=True, default_value=1,
@@ -29,9 +38,25 @@ class QwenModelParams(BaseForm):
         _max=4,
         _step=1,
         precision=0)
-    style = forms.TextInputField(
+    style = forms.SingleSelect(
         TooltipLabel('风格', '指定生成图片的风格'),
-        required=True, default_value='<auto>')
+        required=True,
+        default_value='<auto>',
+        option_list=[
+            {'value': '<auto>', 'label': '默认值，由模型随机输出图像风格'},
+            {'value': '<photography>', 'label': '摄影'},
+            {'value': '<portrait>', 'label': '人像写真'},
+            {'value': '<3d cartoon>', 'label': '3D卡通'},
+            {'value': '<anime>', 'label': '动画'},
+            {'value': '<oil painting>', 'label': '油画'},
+            {'value': '<watercolor>', 'label': '水彩'},
+            {'value': '<sketch>', 'label': '素描'},
+            {'value': '<chinese painting>', 'label': '中国画'},
+            {'value': '<flat illustration>', 'label': '扁平插画'},
+        ],
+        text_field='label',
+        value_field='value'
+    )
 
 
 class QwenTextToImageModelCredential(BaseForm, BaseModelCredential):
