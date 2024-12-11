@@ -8,10 +8,11 @@
 """
 import json
 import time
-from typing import Dict
+from typing import Dict, List
 
 from langchain_core.prompts import PromptTemplate
 
+from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.form_node.i_form_node import IFormNode
 
@@ -60,7 +61,7 @@ class BaseFormNode(IFormNode):
             {'result': value, 'form_field_list': form_field_list, 'form_content_format': form_content_format}, {},
             _write_context=write_context)
 
-    def get_answer_text(self):
+    def get_answer_list(self) -> List[Answer] | None:
         form_content_format = self.context.get('form_content_format')
         form_field_list = self.context.get('form_field_list')
         form_setting = {"form_field_list": form_field_list, "runtime_node_id": self.runtime_node_id,
@@ -70,8 +71,7 @@ class BaseFormNode(IFormNode):
         form = f'<form_rander>{json.dumps(form_setting)}</form_rander>'
         prompt_template = PromptTemplate.from_template(form_content_format, template_format='jinja2')
         value = prompt_template.format(form=form)
-        return {'content': value, 'runtime_node_id': self.runtime_node_id,
-                'chat_record_id': self.workflow_params['chat_record_id']}
+        return [Answer(value, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], None)]
 
     def get_details(self, index: int, **kwargs):
         form_content_format = self.context.get('form_content_format')
