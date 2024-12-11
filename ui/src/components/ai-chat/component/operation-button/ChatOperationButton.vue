@@ -154,10 +154,7 @@ function markdownToPlainText(md: string) {
 
 function removeFormRander(text: string) {
   return text
-    .replace('你好，请先填写下面表单内容：', '')
-    .replace('请先填写以下表单并点击提交按钮', '')
     .replace(/<form_rander>[\s\S]*?<\/form_rander>/g, '')
-    .replace('填写后请点击【提交】按钮进行提交。', '')
     .trim()
 }
 
