@@ -198,7 +198,7 @@ const multipleSelection = ref<any[]>([])
 
 const paginationConfig = reactive({
   current_page: 1,
-  page_size: 20,
+  page_size: 30,
   total: 0
 })
 
