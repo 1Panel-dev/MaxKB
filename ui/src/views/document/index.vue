@@ -136,7 +136,7 @@
                         "
                         class="justify-center"
                         :command="beforeCommand('status', State.STARTED, TaskType.GENERATE_PROBLEM)"
-                        >生成问题中</el-dropdown-item
+                        >生成中</el-dropdown-item
                       >
                     </el-dropdown-menu>
                   </template>
