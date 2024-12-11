@@ -187,9 +187,10 @@
             <template #default="{ row }">
               <div @click.stop>
                 <el-switch
+                  :loading="loading"
                   size="small"
                   v-model="row.is_active"
-                  @change="changeState($event, row)"
+                  :before-change="() => changeState(row)"
                 />
               </div>
             </template>
@@ -678,18 +679,24 @@ function deleteDocument(row: any) {
   更新名称或状态
 */
 function updateData(documentId: string, data: any, msg: string) {
-  documentApi.putDocument(id, documentId, data, loading).then((res) => {
-    const index = documentData.value.findIndex((v) => v.id === documentId)
-    documentData.value.splice(index, 1, res.data)
-    MsgSuccess(msg)
-  })
+  documentApi
+    .putDocument(id, documentId, data, loading)
+    .then((res) => {
+      const index = documentData.value.findIndex((v) => v.id === documentId)
+      documentData.value.splice(index, 1, res.data)
+      MsgSuccess(msg)
+      return true
+    })
+    .catch(() => {
+      return false
+    })
 }
 
-function changeState(bool: Boolean, row: any) {
+function changeState(row: any) {
   const obj = {
-    is_active: bool
+    is_active: !row.is_active
   }
-  const str = bool ? '启用成功' : '禁用成功'
+  const str = !row.is_active ? '启用成功' : '禁用成功'
   currentMouseId.value && updateData(row.id, obj, str)
 }
 

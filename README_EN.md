@@ -1,5 +1,5 @@
 <p align="center"><img src= "https://github.com/1Panel-dev/maxkb/assets/52996290/c0694996-0eed-40d8-b369-322bf2a380bf" alt="MaxKB" width="300" /></p>
-<h3 align="center">Knowledge base, question answering system, based on LLM large language models</h3>
+<h3 align="center">Top-Rated Retrieval-Augmented Generation (RAG) Chatbot.</h3>
 <p align="center"><a href="https://trendshift.io/repositories/9113" target="_blank"><img src="https://trendshift.io/api/badge/repositories/9113" alt="1Panel-dev%2FMaxKB | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a></p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html#license-text"><img src="https://img.shields.io/github/license/1Panel-dev/maxkb?color=%231890FF" alt="License: GPL v3"></a>
@@ -10,12 +10,13 @@
 </p>
 <hr/>
 
-MaxKB = Max Knowledge Base，It is an open source knowledge base question and answer system based on the LLM large language model. It is widely used in enterprise internal knowledge bases, customer services, academic research and education and other scenarios.
+MaxKB = Max Knowledge Base, it is a Chatbot based on Large Language Models (LLM) and Retrieval-Augmented Generation (RAG). MaxKB is widely applied in scenarios such as intelligent customer service, corporate internal knowledge bases, academic research, and education.
 
-- **Out-of-the-box**: Supports direct uploading of documents, automatic crawling of online documents, automatic text splitting, vectorization, RAG (retrieval enhancement generation), and a good interactive experience in intelligent question and answer;
-- **Model neutral**: Supports docking with various large language models, including local private large models (Llama 3/Qwen 2, etc.), domestic public large models (Tongyi Qianwen/Zhipu AI/Baidu Qianfan/Kimi/DeepSeek, etc.) and foreign public models Large models (OpenAI / Azure OpenAI / Gemini, etc.);
-- **Flexible Orchestration**: Built-in powerful workflow engine supports the orchestration of AI work processes to meet the needs of complex business scenarios;
-- **Seamless Embedding**: Supports rapid embedding into third-party business systems with zero coding, allowing existing systems to quickly have intelligent question and answer capabilities and improve user satisfaction
+- **Ready-to-Use**: Supports direct uploading of documents / automatic crawling of online documents, with features for automatic text splitting, vectorization, and RAG (Retrieval-Augmented Generation). This effectively reduces hallucinations in large models, providing a superior smart Q&A interaction experience.
+- **Model-Agnostic**: Supports various large models, including private models (such as Llama 3, Qwen 2, etc.) and public models (like OpenAI, Claude, Gemini, etc.).
+- **Flexible Orchestration**: Equipped with a powerful workflow engine and function library, enabling the orchestration of AI processes to meet the needs of complex business scenarios. 
+- **Seamless Integration**: Facilitates zero-coding rapid integration into third-party business systems, quickly equipping existing systems with intelligent Q&A capabilities to enhance user satisfaction.
+
 ## Quick start
 
 ```
@@ -25,20 +26,7 @@ docker run -d --name=maxkb --restart=always -p 8080:8080 -v ~/.maxkb:/var/lib/po
 # pass: MaxKB@123..
 ```
 
-- You can also quickly deploy MaxKB + Ollama + Llama 3 through [1Panel App Store](https://apps.fit2cloud.com/1panel). A knowledge base question and answer system based on a local large model can be launched within 30 minutes and embedded into In third-party business systems;
-- If it is an intranet environment, it is recommended to use [offline installation package](https://community.fit2cloud.com/#/products/maxkb/downloads) for installation and deployment;
-- You can also experience it online: [DataEase Assistant](https://dataease.io/docs/v2/), which is an intelligent question and answer system based on MaxKB and has been embedded in DataEase products and online documents.；
-- MaxKB's product version is divided into community version and professional version. For details, please see: [MaxKB product version comparison](https://maxkb.cn/pricing.html).
-
-If you have more questions, you can check the user manual or communicate with us through the forum. If you need to build a technical blog or knowledge base, it is recommended to use [Halo open source website building tool](https://github.com/halo-dev/halo/). You can experience Feizhiyun’s official [Technical Blog](https://blog.fit2cloud.com/) and [Knowledge Base](https://kb.fit2cloud.com) cases.
-- [Docs](https://maxkb.cn/docs/)
-- [Demo Vid](https://www.bilibili.com/video/BV1BE421M7YM/)
-- [Forum](https://bbs.fit2cloud.com/c/mk/11)
-- Technical exchange group
-
-<image height="150px" width="150px" src="https://github.com/1Panel-dev/MaxKB/assets/52996290/a083d214-02be-4178-a1db-4f428124153a"/>
-
-## UI Screenshots
+## Screenshots
 
 <table style="border-collapse: collapse; border: 1px solid black;">
   <tr>
@@ -51,25 +39,14 @@ If you have more questions, you can check the user manual or communicate with us
   </tr>
 </table>
 
-## Stack Used
+## Technical Stack
 
-- Frontend：[Vue.js](https://cn.vuejs.org/)
+- Frontend：[Vue.js](https://vuejs.org/)
 - Backend：[Python / Django](https://www.djangoproject.com/)
 - LangChain：[LangChain](https://www.langchain.com/)
 - Vector DB：[PostgreSQL / pgvector](https://www.postgresql.org/)
-- Large models: various local private or public large models
-
-## Other Projects From Feizhiyun
-
-- [1Panel](https://github.com/1panel-dev/1panel/) - Modern, open source Linux server operation and maintenance management panel
-- [JumpServer](https://github.com/jumpserver/jumpserver/) - Popular open source bastion host
-- [DataEase](https://github.com/dataease/dataease/) - Open source data visualization analysis tools available to everyone
-- [MeterSphere](https://github.com/metersphere/metersphere/) - New generation of open-source test tools
-- [Halo](https://github.com/halo-dev/halo/) - Powerful and easy-to-use open source website building tool
 
 ## License
-
-Copyright (c) 2014-2024 Feizhiyun FIT2CLOUD, All rights reserved.
 
 Licensed under The GNU General Public License version 3 (GPLv3)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

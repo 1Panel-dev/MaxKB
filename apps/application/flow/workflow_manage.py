@@ -454,6 +454,7 @@ class WorkflowManage:
                         content = r
                         child_node = {}
                         node_is_end = False
+                        view_type = current_node.view_type
                         if isinstance(r, dict):
                             content = r.get('content')
                             child_node = {'runtime_node_id': r.get('runtime_node_id'),
@@ -461,6 +462,7 @@ class WorkflowManage:
                                 , 'child_node': r.get('child_node')}
                             real_node_id = r.get('real_node_id')
                             node_is_end = r.get('node_is_end')
+                            view_type = r.get('view_type')
                         chunk = self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
                                                                                self.params['chat_record_id'],
                                                                                current_node.id,
@@ -468,7 +470,7 @@ class WorkflowManage:
                                                                                content, False, 0, 0,
                                                                                {'node_type': current_node.type,
                                                                                 'runtime_node_id': current_node.runtime_node_id,
-                                                                                'view_type': current_node.view_type,
+                                                                                'view_type': view_type,
                                                                                 'child_node': child_node,
                                                                                 'node_is_end': node_is_end,
                                                                                 'real_node_id': real_node_id})

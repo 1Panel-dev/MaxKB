@@ -272,6 +272,7 @@ function initMaxkbStyle(root){
      position: absolute;
      display: flex;
      align-items: center;
+         line-height: 18px;
      }
     #maxkb #maxkb-chat-container .maxkb-operate .maxkb-chat-close{
             margin-left:15px;

@@ -331,8 +331,10 @@ onMounted(() => {
       set(props.nodeModel.properties.node_data, 'is_result', true)
     }
   }
-
   set(props.nodeModel, 'validate', validate)
+  if (!chat_data.value.dialogue_type) {
+    chat_data.value.dialogue_type = 'WORKFLOW'
+  }
 })
 </script>
 <style lang="scss" scoped></style>

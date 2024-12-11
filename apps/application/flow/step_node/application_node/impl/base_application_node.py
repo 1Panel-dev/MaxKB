@@ -52,6 +52,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         runtime_node_id = response_content.get('runtime_node_id', '')
         chat_record_id = response_content.get('chat_record_id', '')
         child_node = response_content.get('child_node')
+        view_type = response_content.get('view_type')
         node_type = response_content.get('node_type')
         real_node_id = response_content.get('real_node_id')
         node_is_end = response_content.get('node_is_end', False)
@@ -65,7 +66,8 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
                'runtime_node_id': runtime_node_id, 'chat_record_id': chat_record_id,
                'child_node': child_node,
                'real_node_id': real_node_id,
-               'node_is_end': node_is_end}
+               'node_is_end': node_is_end,
+               'view_type': view_type}
         usage = response_content.get('usage', {})
     node_variable['result'] = {'usage': usage}
     node_variable['is_interrupt_exec'] = is_interrupt_exec

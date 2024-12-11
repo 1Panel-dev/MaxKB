@@ -143,6 +143,18 @@ class DocumentWebInstanceSerializer(ApiMixin, serializers.Serializer):
                                   required=True,
                                   description='知识库id'),
                 ]
+    @staticmethod
+    def get_request_body_api():
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['source_url_list'],
+            properties={
+                'source_url_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档地址列表", description="文档地址列表",
+                                                  items=openapi.Schema(type=openapi.TYPE_STRING)),
+                'selector': openapi.Schema(type=openapi.TYPE_STRING, title="选择器", description="选择器")
+            }
+        )
+
 
 
 class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
