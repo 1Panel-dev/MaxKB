@@ -1,9 +1,11 @@
 # coding=utf-8
 import json
+import re
 import time
 import uuid
-from typing import Dict
+from typing import Dict, List
 
+from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.application_node.i_application_node import IApplicationNode
 from application.models import Chat
@@ -19,7 +21,8 @@ def _is_interrupt_exec(node, node_variable: Dict, workflow_variable: Dict):
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
     result = node_variable.get('result')
-    node.context['child_node'] = node_variable.get('child_node')
+    node.context['application_node_dict'] = node_variable.get('application_node_dict')
+    node.context['node_dict'] = node_variable.get('node_dict', {})
     node.context['is_interrupt_exec'] = node_variable.get('is_interrupt_exec')
     node.context['message_tokens'] = result.get('usage', {}).get('prompt_tokens', 0)
     node.context['answer_tokens'] = result.get('usage', {}).get('completion_tokens', 0)
@@ -43,6 +46,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     answer = ''
     usage = {}
     node_child_node = {}
+    application_node_dict = node.context.get('application_node_dict', {})
     is_interrupt_exec = False
     for chunk in response:
         # 先把流转成字符串
@@ -61,6 +65,20 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         answer += content
         node_child_node = {'runtime_node_id': runtime_node_id, 'chat_record_id': chat_record_id,
                            'child_node': child_node}
+
+        if real_node_id is not None:
+            application_node = application_node_dict.get(real_node_id, None)
+            if application_node is None:
+
+                application_node_dict[real_node_id] = {'content': content,
+                                                       'runtime_node_id': runtime_node_id,
+                                                       'chat_record_id': chat_record_id,
+                                                       'child_node': child_node,
+                                                       'index': len(application_node_dict),
+                                                       'view_type': view_type}
+            else:
+                application_node['content'] += content
+
         yield {'content': content,
                'node_type': node_type,
                'runtime_node_id': runtime_node_id, 'chat_record_id': chat_record_id,
@@ -72,6 +90,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     node_variable['result'] = {'usage': usage}
     node_variable['is_interrupt_exec'] = is_interrupt_exec
     node_variable['child_node'] = node_child_node
+    node_variable['application_node_dict'] = application_node_dict
     _write_context(node_variable, workflow_variable, node, workflow, answer)
 
 
@@ -90,12 +109,43 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     _write_context(node_variable, workflow_variable, node, workflow, answer)
 
 
+def reset_application_node_dict(application_node_dict, runtime_node_id, node_data):
+    try:
+        if application_node_dict is None:
+            return
+        for key in application_node_dict:
+            application_node = application_node_dict[key]
+            if application_node.get('runtime_node_id') == runtime_node_id:
+                content: str = application_node.get('content')
+                match = re.search('<form_rander>.*?</form_rander>', content)
+                if match:
+                    form_setting_str = match.group().replace('<form_rander>', '').replace('</form_rander>', '')
+                    form_setting = json.loads(form_setting_str)
+                    form_setting['is_submit'] = True
+                    form_setting['form_data'] = node_data
+                    value = f'<form_rander>{json.dumps(form_setting)}</form_rander>'
+                    res = re.sub('<form_rander>.*?</form_rander>',
+                                 '${value}', content)
+                    application_node['content'] = res.replace('${value}', value)
+    except Exception as e:
+        pass
+
+
 class BaseApplicationNode(IApplicationNode):
-    def get_answer_text(self):
+    def get_answer_list(self) -> List[Answer] | None:
         if self.answer_text is None:
             return None
-        return {'content': self.answer_text, 'runtime_node_id': self.runtime_node_id,
-                'chat_record_id': self.workflow_params['chat_record_id'], 'child_node': self.context.get('child_node')}
+        application_node_dict = self.context.get('application_node_dict')
+        if application_node_dict is None:
+            return [
+                Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'],
+                       self.context.get('child_node'))]
+        else:
+            return [Answer(n.get('content'), n.get('view_type'), self.runtime_node_id,
+                           self.workflow_params['chat_record_id'], {'runtime_node_id': n.get('runtime_node_id'),
+                                                                    'chat_record_id': n.get('chat_record_id')
+                               , 'child_node': n.get('child_node')}) for n in
+                    sorted(application_node_dict.values(), key=lambda item: item.get('index'))]
 
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
@@ -124,6 +174,8 @@ class BaseApplicationNode(IApplicationNode):
             runtime_node_id = child_node.get('runtime_node_id')
             record_id = child_node.get('chat_record_id')
             child_node_value = child_node.get('child_node')
+            application_node_dict = self.context.get('application_node_dict')
+            reset_application_node_dict(application_node_dict, runtime_node_id, node_data)
 
         response = ChatMessageSerializer(
             data={'chat_id': current_chat_id, 'message': message,
@@ -181,5 +233,6 @@ class BaseApplicationNode(IApplicationNode):
             'err_message': self.err_message,
             'global_fields': global_fields,
             'document_list': self.workflow_manage.document_list,
-            'image_list': self.workflow_manage.image_list
+            'image_list': self.workflow_manage.image_list,
+            'application_node_dict': self.context.get('application_node_dict')
         }

@@ -17,6 +17,7 @@ from django.db.models import QuerySet
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, ErrorDetail
 
+from application.flow.common import Answer
 from application.models import ChatRecord
 from application.models.api_key_model import ApplicationPublicAccessClient
 from common.constants.authentication_type import AuthenticationType
@@ -151,11 +152,11 @@ class INode:
     def save_context(self, details, workflow_manage):
         pass
 
-    def get_answer_text(self):
+    def get_answer_list(self) -> List[Answer] | None:
         if self.answer_text is None:
             return None
-        return {'content': self.answer_text, 'runtime_node_id': self.runtime_node_id,
-                'chat_record_id': self.workflow_params['chat_record_id']}
+        return [
+            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], {})]
 
     def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None,
                  get_node_params=lambda node: node.properties.get('node_data')):
