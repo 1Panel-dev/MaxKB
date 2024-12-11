@@ -120,7 +120,15 @@ export class ChatRecordManage {
 
     this.chat.answer_text = this.chat.answer_text + chunk_answer
   }
-
+  get_current_up_node() {
+    for (let i = this.node_list.length - 2; i >= 0; i--) {
+      const n = this.node_list[i]
+      if (n.content.length > 0) {
+        return n
+      }
+    }
+    return undefined
+  }
   get_run_node() {
     if (
       this.write_node_info &&
@@ -135,7 +143,7 @@ export class ChatRecordManage {
       const index = this.node_list.indexOf(run_node)
       let current_up_node = undefined
       if (index > 0) {
-        current_up_node = this.node_list[index - 1]
+        current_up_node = this.get_current_up_node()
       }
       let answer_text_list_index = 0
 
@@ -293,9 +301,11 @@ export class ChatRecordManage {
     let n = this.node_list.find((item) => item.real_node_id == chunk.real_node_id)
     if (n) {
       n.buffer.push(...chunk.content)
+      n.content += chunk.content
     } else {
       n = {
         buffer: [...chunk.content],
+        content: chunk.content,
         real_node_id: chunk.real_node_id,
         node_id: chunk.node_id,
         chat_record_id: chunk.chat_record_id,

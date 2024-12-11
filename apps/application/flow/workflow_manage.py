@@ -19,6 +19,7 @@ from rest_framework import status
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from application.flow import tools
+from application.flow.common import Answer
 from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
 from application.flow.step_node import get_node
 from common.exception.app_exception import AppApiException
@@ -302,6 +303,9 @@ class WorkflowManage:
                                                           get_node_params=get_node_params)
                 self.start_node.valid_args(
                     {**self.start_node.node_params, 'form_data': start_node_data}, self.start_node.workflow_params)
+                if self.start_node.type == 'application-node':
+                    application_node_dict = node_details.get('application_node_dict', {})
+                    self.start_node.context['application_node_dict'] = application_node_dict
                 self.node_context.append(self.start_node)
                 continue
 
@@ -482,7 +486,7 @@ class WorkflowManage:
                                                                            '', False, 0, 0, {'node_is_end': True,
                                                                                              'runtime_node_id': current_node.runtime_node_id,
                                                                                              'node_type': current_node.type,
-                                                                                             'view_type': current_node.view_type,
+                                                                                             'view_type': view_type,
                                                                                              'child_node': child_node,
                                                                                              'real_node_id': real_node_id})
                     node_chunk.end(chunk)
@@ -577,35 +581,29 @@ class WorkflowManage:
 
     def get_answer_text_list(self):
         result = []
-        next_node_id_list = []
-        if self.start_node is not None:
-            next_node_id_list = [edge.targetNodeId for edge in self.flow.edges if
-                                 edge.sourceNodeId == self.start_node.id]
-        for index in range(len(self.node_context)):
-            node = self.node_context[index]
-            up_node = None
-            if index > 0:
-                up_node = self.node_context[index - 1]
-            answer_text = node.get_answer_text()
-            if answer_text is not None:
-                if up_node is None or node.view_type == 'single_view' or (
-                        node.view_type == 'many_view' and up_node.view_type == 'single_view'):
-                    result.append(node.get_answer_text())
-                elif self.chat_record is not None and next_node_id_list.__contains__(
-                        node.id) and up_node is not None and not next_node_id_list.__contains__(
-                    up_node.id):
-                    result.append(node.get_answer_text())
+        answer_list = reduce(lambda x, y: [*x, *y],
+                             [n.get_answer_list() for n in self.node_context if n.get_answer_list() is not None],
+                             [])
+        up_node = None
+        for index in range(len(answer_list)):
+            current_answer = answer_list[index]
+            if len(current_answer.content) > 0:
+                if up_node is None or current_answer.view_type == 'single_view' or (
+                        current_answer.view_type == 'many_view' and up_node.view_type == 'single_view'):
+                    result.append(current_answer)
                 else:
                     if len(result) > 0:
                         exec_index = len(result) - 1
-                        content = result[exec_index]['content']
-                        result[exec_index]['content'] += answer_text['content'] if len(
-                            content) == 0 else ('\n\n' + answer_text['content'])
+                        content = result[exec_index].content
+                        result[exec_index].content += current_answer.content if len(
+                            content) == 0 else ('\n\n' + current_answer.content)
                     else:
-                        answer_text = node.get_answer_text()
-                        result.insert(0, answer_text)
-
-        return result
+                        result.insert(0, current_answer)
+                up_node = current_answer
+        if len(result) == 0:
+            # 如果没有响应 就响应一个空数据
+            return [Answer('', '', '', '', {}).to_dict()]
+        return [r.to_dict() for r in result]
 
     def get_next_node(self):
         """
