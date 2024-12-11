@@ -143,18 +143,19 @@ class DocumentWebInstanceSerializer(ApiMixin, serializers.Serializer):
                                   required=True,
                                   description='知识库id'),
                 ]
+
     @staticmethod
     def get_request_body_api():
         return openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=['source_url_list'],
             properties={
-                'source_url_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档地址列表", description="文档地址列表",
+                'source_url_list': openapi.Schema(type=openapi.TYPE_ARRAY, title="文档地址列表",
+                                                  description="文档地址列表",
                                                   items=openapi.Schema(type=openapi.TYPE_STRING)),
                 'selector': openapi.Schema(type=openapi.TYPE_STRING, title="选择器", description="选择器")
             }
         )
-
 
 
 class DocumentInstanceSerializer(ApiMixin, serializers.Serializer):
@@ -396,8 +397,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     query_set = query_set.annotate(
                         reversed_status=Reverse('status'),
                         task_type_status=Substr('reversed_status', TaskType(task_type).value,
-                                                TaskType(task_type).value),
-                    ).filter(task_type_status__in=[State(status).value]).values('id')
+                                                1),
+                    ).filter(task_type_status=State(status).value).values('id')
                 else:
                     if status != State.SUCCESS.value:
                         query_set = query_set.filter(status__icontains=status)
@@ -674,7 +675,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             ListenerManagement.update_status(QuerySet(Paragraph).annotate(
                 reversed_status=Reverse('status'),
                 task_type_status=Substr('reversed_status', TaskType(instance.get('type')).value,
-                                        TaskType(instance.get('type')).value),
+                                        1),
             ).filter(task_type_status__in=[State.PENDING.value, State.STARTED.value]).filter(
                 document_id=document_id).values('id'),
                                              TaskType(instance.get('type')),
@@ -682,7 +683,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             ListenerManagement.update_status(QuerySet(Document).annotate(
                 reversed_status=Reverse('status'),
                 task_type_status=Substr('reversed_status', TaskType(instance.get('type')).value,
-                                        TaskType(instance.get('type')).value),
+                                        1),
             ).filter(task_type_status__in=[State.PENDING.value, State.STARTED.value]).filter(
                 id=document_id).values('id'),
                                              TaskType(instance.get('type')),
