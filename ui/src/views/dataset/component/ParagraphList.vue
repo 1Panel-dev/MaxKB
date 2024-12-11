@@ -48,7 +48,7 @@ import { cloneDeep } from 'lodash'
 import { ref, computed } from 'vue'
 import EditParagraphDialog from './EditParagraphDialog.vue'
 import { MsgConfirm } from '@/utils/message'
-const page_size = ref<number>(20)
+const page_size = ref<number>(30)
 const current_page = ref<number>(1)
 const currentCIndex = ref<number>(0)
 const EditParagraphDialogRef = ref()
