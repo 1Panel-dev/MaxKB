@@ -12,6 +12,7 @@ from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.image_understand_step_node.i_image_understand_node import IImageUnderstandNode
 from dataset.models import File
 from setting.models_provider.tools import get_model_instance_by_model_user_id
+from imghdr import what
 
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
@@ -59,8 +60,9 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
 
 def file_id_to_base64(file_id: str):
     file = QuerySet(File).filter(id=file_id).first()
-    base64_image = base64.b64encode(file.get_byte()).decode("utf-8")
-    return base64_image
+    file_bytes = file.get_byte()
+    base64_image = base64.b64encode(file_bytes).decode("utf-8")
+    return [base64_image, what(None, file_bytes.tobytes())]
 
 
 class BaseImageUnderstandNode(IImageUnderstandNode):
@@ -77,7 +79,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
         # 处理不正确的参数
         if image is None or not isinstance(image, list):
             image = []
-
+        print(model_params_setting)
         image_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'), **model_params_setting)
         # 执行详情中的历史消息不需要图片内容
         history_message = self.get_history_message_for_details(history_chat_record, dialogue_number)
@@ -152,7 +154,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 return HumanMessage(
                     content=[
                         {'type': 'text', 'text': data['question']},
-                        *[{'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{base64_image}'}} for
+                        *[{'type': 'image_url', 'image_url': {'url': f'data:image/{base64_image[1]};base64,{base64_image[0]}'}} for
                           base64_image in image_base64_list]
                     ])
         return HumanMessage(content=chat_record.problem_text)
@@ -167,8 +169,10 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
             for img in image:
                 file_id = img['file_id']
                 file = QuerySet(File).filter(id=file_id).first()
-                base64_image = base64.b64encode(file.get_byte()).decode("utf-8")
-                images.append({'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{base64_image}'}})
+                image_bytes = file.get_byte()
+                base64_image = base64.b64encode(image_bytes).decode("utf-8")
+                image_format = what(None, image_bytes.tobytes())
+                images.append({'type': 'image_url', 'image_url': {'url': f'data:image/{image_format};base64,{base64_image}'}})
             messages = [HumanMessage(
                 content=[
                     {'type': 'text', 'text': self.workflow_manage.generate_prompt(prompt)},

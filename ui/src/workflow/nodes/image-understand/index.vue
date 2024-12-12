@@ -25,6 +25,15 @@
               <div>
                 <span>图片理解模型<span class="danger">*</span></span>
               </div>
+              <el-button
+                :disabled="!form_data.model_id"
+                type="primary"
+                link
+                @click="openAIParamSettingDialog(form_data.model_id)"
+                @refreshForm="refreshParam"
+              >
+                {{ $t('views.application.applicationForm.form.paramSetting') }}
+              </el-button>
             </div>
           </template>
           <el-select
@@ -183,6 +192,7 @@
         </el-form-item>
       </el-form>
     </el-card>
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
   </NodeContainer>
 </template>
 
@@ -197,6 +207,7 @@ import { app } from '@/main'
 import useStore from '@/stores'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
+import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 
 const { model } = useStore()
 
@@ -207,6 +218,7 @@ const {
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
+const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 
 const aiChatNodeFormRef = ref<FormInstance>()
 const validate = () => {
@@ -279,6 +291,16 @@ function submitSystemDialog(val: string) {
 
 function submitDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'prompt', val)
+}
+
+const openAIParamSettingDialog = (modelId: string) => {
+  if (modelId) {
+    AIModeParamSettingDialogRef.value?.open(modelId, id, form_data.value.model_params_setting)
+  }
+}
+
+function refreshParam(data: any) {
+  set(props.nodeModel.properties.node_data, 'model_params_setting', data)
 }
 
 onMounted(() => {
