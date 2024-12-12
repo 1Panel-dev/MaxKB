@@ -55,6 +55,20 @@
             </template>
           </el-space>
         </div>
+        <div class="mb-8" v-if="audio_list.length">
+          <el-space wrap>
+            <template v-for="(item, index) in audio_list" :key="index">
+              <div class="file cursor border-r-4" v-if="item.url">
+                <audio
+                  :src="item.url"
+                  controls
+                  style="width: 350px; height: 43px"
+                  class="border-r-4"
+                />
+              </div>
+            </template>
+          </el-space>
+        </div>
         {{ chatRecord.problem_text }}
       </div>
     </div>
@@ -86,6 +100,15 @@ const image_list = computed(() => {
     (detail) => detail.type === 'start-node'
   )
   return startNode?.image_list || []
+})
+const audio_list = computed(() => {
+  if (props.chatRecord?.upload_meta) {
+    return props.chatRecord.upload_meta?.audio_list || []
+  }
+  const startNode = props.chatRecord.execution_details?.find(
+    (detail) => detail.type === 'start-node'
+  )
+  return startNode?.audio_list || []
 })
 
 function downloadFile(item: any) {

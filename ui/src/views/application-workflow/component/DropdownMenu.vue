@@ -171,7 +171,8 @@ function clickNodes(item: any, data?: any, type?: string) {
             ? {}
             : {
                 ...(fileUploadSetting.document ? { document_list: [] } : {}),
-                ...(fileUploadSetting.image ? { image_list: [] } : {})
+                ...(fileUploadSetting.image ? { image_list: [] } : {}),
+                ...(fileUploadSetting.audio ? { audio_list: [] } : {})
               })
         }
       } else {
@@ -215,7 +216,8 @@ function onmousedown(item: any, data?: any, type?: string) {
             ? {}
             : {
                 ...(fileUploadSetting.document ? { document_list: [] } : {}),
-                ...(fileUploadSetting.image ? { image_list: [] } : {})
+                ...(fileUploadSetting.image ? { image_list: [] } : {}),
+                ...(fileUploadSetting.audio ? { audio_list: [] } : {})
               })
         }
       } else {

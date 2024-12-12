@@ -77,5 +77,9 @@ class FileSerializer(serializers.Serializer):
             file = QuerySet(File).filter(id=file_id).first()
             if file is None:
                 raise NotFound404(404, "不存在的文件")
+            # 如果是mp3文件，直接返回文件流
+            if file.file_name.split(".")[-1] == 'mp3':
+                return HttpResponse(file.get_byte(), status=200, headers={'Content-Type': 'audio/mp3',
+                                                                          'Content-Disposition': 'attachment; filename="abc.mp3"'})
             return HttpResponse(file.get_byte(), status=200,
                                 headers={'Content-Type': mime_types.get(file.file_name.split(".")[-1], 'text/plain')})

@@ -12,6 +12,8 @@ export enum WorkflowType {
   Application = 'application-node',
   DocumentExtractNode = 'document-extract-node',
   ImageUnderstandNode = 'image-understand-node',
-  ImageGenerateNode = 'image-generate-node',
-  FormNode = 'form-node'
+  FormNode = 'form-node',
+  TextToSpeechNode = 'text-to-speech-node',
+  SpeechToTextNode = 'speech-to-text-node',
+    ImageGenerateNode = 'image-generate-node'
 }

@@ -21,12 +21,14 @@ from .image_understand_step_node import *
 from .image_generate_step_node import *
 
 from .search_dataset_node import *
+from .speech_to_text_step_node import BaseSpeechToTextNode
 from .start_node import *
+from .text_to_speech_step_node.impl.base_text_to_speech_node import BaseTextToSpeechNode
 
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchDatasetNode, BaseQuestionNode, BaseConditionNode, BaseReplyNode,
              BaseFunctionNodeNode, BaseFunctionLibNodeNode, BaseRerankerNode, BaseApplicationNode,
              BaseDocumentExtractNode,
-             BaseImageUnderstandNode, BaseImageGenerateNode, BaseFormNode]
+             BaseImageUnderstandNode, BaseFormNode, BaseSpeechToTextNode, BaseTextToSpeechNode,BaseImageGenerateNode]
 
 
 def get_node(node_type):

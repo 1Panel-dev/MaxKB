@@ -250,6 +250,41 @@ export const imageGenerateNode = {
     }
   }
 }
+
+export const speechToTextNode = {
+  type: WorkflowType.SpeechToTextNode,
+  text: '将音频通过语音识别模型转换为文本',
+  label: '语音转文本',
+  height: 252,
+  properties: {
+    stepName: '语音转文本',
+    config: {
+      fields: [
+        {
+          label: '结果',
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
+export const textToSpeechNode = {
+  type: WorkflowType.TextToSpeechNode,
+  text: '将文本通过语音合成模型转换为音频文件',
+  label: '文本转语音',
+  height: 252,
+  properties: {
+    stepName: '文本转语音',
+    config: {
+      fields: [
+        {
+          label: '结果',
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
 export const menuNodes = [
   aiChatNode,
   searchDatasetNode,
@@ -259,8 +294,10 @@ export const menuNodes = [
   rerankerNode,
   documentExtractNode,
   imageUnderstandNode,
-  imageGenerateNode,
-  formNode
+  formNode,
+  speechToTextNode,
+  textToSpeechNode,
+      imageGenerateNode
 ]
 
 /**
@@ -351,7 +388,9 @@ export const nodeDict: any = {
   [WorkflowType.Application]: applicationNode,
   [WorkflowType.DocumentExtractNode]: documentExtractNode,
   [WorkflowType.ImageUnderstandNode]: imageUnderstandNode,
-  [WorkflowType.ImageGenerateNode]: imageGenerateNode
+  [WorkflowType.TextToSpeechNode]: textToSpeechNode,
+  [WorkflowType.SpeechToTextNode]: speechToTextNode,
+    [WorkflowType.ImageGenerateNode]: imageGenerateNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

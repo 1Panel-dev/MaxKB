@@ -154,7 +154,7 @@ class BaseApplicationNode(IApplicationNode):
         self.answer_text = details.get('answer')
 
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat, client_id, client_type,
-                app_document_list=None, app_image_list=None, child_node=None, node_data=None,
+                app_document_list=None, app_image_list=None, app_audio_list=None, child_node=None, node_data=None,
                 **kwargs) -> NodeResult:
         from application.serializers.chat_message_serializers import ChatMessageSerializer
         # 生成嵌入应用的chat_id
@@ -167,6 +167,8 @@ class BaseApplicationNode(IApplicationNode):
             app_document_list = []
         if app_image_list is None:
             app_image_list = []
+        if app_audio_list is None:
+            app_audio_list = []
         runtime_node_id = None
         record_id = None
         child_node_value = None
@@ -186,6 +188,7 @@ class BaseApplicationNode(IApplicationNode):
                   'client_type': client_type,
                   'document_list': app_document_list,
                   'image_list': app_image_list,
+                  'audio_list': app_audio_list,
                   'runtime_node_id': runtime_node_id,
                   'chat_record_id': record_id,
                   'child_node': child_node_value,
@@ -234,5 +237,6 @@ class BaseApplicationNode(IApplicationNode):
             'global_fields': global_fields,
             'document_list': self.workflow_manage.document_list,
             'image_list': self.workflow_manage.image_list,
+            'audio_list': self.workflow_manage.audio_list,
             'application_node_dict': self.context.get('application_node_dict')
         }

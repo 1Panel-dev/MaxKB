@@ -54,7 +54,7 @@ class Node:
 
 
 end_nodes = ['ai-chat-node', 'reply-node', 'function-node', 'function-lib-node', 'application-node',
-             'image-understand-node', 'image-generate-node']
+             'image-understand-node', 'speech-to-text-node', 'text-to-speech-node', 'image-generate-node']
 
 
 class Flow:
@@ -244,6 +244,7 @@ class WorkflowManage:
     def __init__(self, flow: Flow, params, work_flow_post_handler: WorkFlowPostHandler,
                  base_to_response: BaseToResponse = SystemToResponse(), form_data=None, image_list=None,
                  document_list=None,
+                 audio_list=None,
                  start_node_id=None,
                  start_node_data=None, chat_record=None, child_node=None):
         if form_data is None:
@@ -252,11 +253,14 @@ class WorkflowManage:
             image_list = []
         if document_list is None:
             document_list = []
+        if audio_list is None:
+            audio_list = []
         self.start_node_id = start_node_id
         self.start_node = None
         self.form_data = form_data
         self.image_list = image_list
         self.document_list = document_list
+        self.audio_list = audio_list
         self.params = params
         self.flow = flow
         self.lock = threading.Lock()
