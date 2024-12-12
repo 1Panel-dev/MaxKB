@@ -10,7 +10,7 @@ from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 
-class ZhiPuImageModelParams(BaseForm):
+class VolcanicEngineImageModelParams(BaseForm):
     temperature = forms.SliderField(TooltipLabel('温度', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
                                     required=True, default_value=0.95,
                                     _min=0.1,
@@ -26,8 +26,9 @@ class ZhiPuImageModelParams(BaseForm):
         _step=1,
         precision=0)
 
-class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
+class VolcanicEngineImageModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField('API Key', required=True)
+    api_base = forms.TextInputField('API 域名', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
                  raise_exception=False):
@@ -35,7 +36,7 @@ class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
 
-        for key in ['api_key']:
+        for key in ['api_key', 'api_base']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
@@ -59,4 +60,4 @@ class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        return ZhiPuImageModelParams()
+        return VolcanicEngineImageModelParams()

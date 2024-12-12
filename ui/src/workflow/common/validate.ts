@@ -6,6 +6,7 @@ const end_nodes: Array<string> = [
   WorkflowType.FunctionLib,
   WorkflowType.FunctionLibCustom,
   WorkflowType.ImageUnderstandNode,
+  WorkflowType.ImageGenerateNode,
   WorkflowType.Application
 ]
 export class WorkFlowInstance {

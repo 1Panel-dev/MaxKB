@@ -16,7 +16,7 @@ from common.constants.permission_constants import PermissionConstants
 from common.response import result
 from common.util.common import query_params_to_single_dict
 from setting.models_provider.constants.model_provider_constants import ModelProvideConstants
-from setting.serializers.provider_serializers import ProviderSerializer, ModelSerializer
+from setting.serializers.provider_serializers import ProviderSerializer, ModelSerializer, get_default_model_params_setting
 from setting.swagger_api.provide_api import ProvideApi, ModelCreateApi, ModelQueryApi, ModelEditApi
 
 
@@ -206,6 +206,24 @@ class Provide(APIView):
             return result.success(
                 ModelProvideConstants[provider].value.get_model_list(
                     model_type))
+
+    class ModelParamsForm(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @swagger_auto_schema(operation_summary="获取模型默认参数",
+                             operation_id="获取模型创建表单",
+                             manual_parameters=ProvideApi.ModelList.get_request_params_api(),
+                             responses=result.get_api_array_response(ProvideApi.ModelList.get_response_body_api())
+            , tags=["模型"]
+                             )
+        @has_permissions(PermissionConstants.MODEL_READ)
+        def get(self, request: Request):
+            provider = request.query_params.get('provider')
+            model_type = request.query_params.get('model_type')
+            model_name = request.query_params.get('model_name')
+
+            return result.success(get_default_model_params_setting(provider, model_type, model_name))
 
     class ModelForm(APIView):
         authentication_classes = [TokenAuth]

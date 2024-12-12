@@ -14,6 +14,8 @@ urlpatterns = [
     path('provider/model_type_list', views.Provide.ModelTypeList.as_view(), name="provider/model_type_list"),
     path('provider/model_list', views.Provide.ModelList.as_view(),
          name="provider/model_name_list"),
+    path('provider/model_params_form', views.Provide.ModelParamsForm.as_view(),
+         name="provider/model_params_form"),
     path('provider/model_form', views.Provide.ModelForm.as_view(),
          name="provider/model_form"),
     path('model', views.Model.as_view(), name='model'),

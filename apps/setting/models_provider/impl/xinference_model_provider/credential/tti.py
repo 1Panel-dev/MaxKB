@@ -10,23 +10,44 @@ from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 
-class ZhiPuImageModelParams(BaseForm):
-    temperature = forms.SliderField(TooltipLabel('温度', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
-                                    required=True, default_value=0.95,
-                                    _min=0.1,
-                                    _max=1.0,
-                                    _step=0.01,
-                                    precision=2)
 
-    max_tokens = forms.SliderField(
-        TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
-        required=True, default_value=1024,
+class XinferenceTTIModelParams(BaseForm):
+    size = forms.SingleSelect(
+        TooltipLabel('图片尺寸', '指定生成图片的尺寸, 如: 1024x1024'),
+        required=True,
+        default_value='1024x1024',
+        option_list=[
+            {'value': '1024x1024', 'label': '1024x1024'},
+            {'value': '1024x1792', 'label': '1024x1792'},
+            {'value': '1792x1024', 'label': '1792x1024'},
+        ],
+        text_field='label',
+        value_field='value'
+    )
+
+    quality = forms.SingleSelect(
+        TooltipLabel('图片质量', ''),
+        required=True,
+        default_value='standard',
+        option_list=[
+            {'value': 'standard', 'label': 'standard'},
+            {'value': 'hd', 'label': 'hd'},
+        ],
+        text_field='label',
+        value_field='value'
+    )
+
+    n = forms.SliderField(
+        TooltipLabel('图片数量', '指定生成图片的数量'),
+        required=True, default_value=1,
         _min=1,
-        _max=100000,
+        _max=10,
         _step=1,
         precision=0)
 
-class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
+
+class XinferenceTextToImageModelCredential(BaseForm, BaseModelCredential):
+    api_base = forms.TextInputField('API 域名', required=True)
     api_key = forms.PasswordInputField('API Key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
@@ -35,7 +56,7 @@ class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
 
-        for key in ['api_key']:
+        for key in ['api_base', 'api_key']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
@@ -43,9 +64,8 @@ class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            res = model.stream([HumanMessage(content=[{"type": "text", "text": "你好"}])])
-            for chunk in res:
-                print(chunk)
+            res = model.check_auth()
+            print(res)
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
@@ -59,4 +79,4 @@ class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        return ZhiPuImageModelParams()
+        return XinferenceTTIModelParams()

@@ -9,20 +9,26 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
     ModelInfoManage
 from setting.models_provider.impl.xinference_model_provider.credential.embedding import \
     XinferenceEmbeddingModelCredential
+from setting.models_provider.impl.xinference_model_provider.credential.image import XinferenceImageModelCredential
 from setting.models_provider.impl.xinference_model_provider.credential.llm import XinferenceLLMModelCredential
 from setting.models_provider.impl.xinference_model_provider.credential.reranker import XInferenceRerankerModelCredential
 from setting.models_provider.impl.xinference_model_provider.credential.stt import XInferenceSTTModelCredential
+from setting.models_provider.impl.xinference_model_provider.credential.tti import XinferenceTextToImageModelCredential
 from setting.models_provider.impl.xinference_model_provider.credential.tts import XInferenceTTSModelCredential
 from setting.models_provider.impl.xinference_model_provider.model.embedding import XinferenceEmbedding
+from setting.models_provider.impl.xinference_model_provider.model.image import XinferenceImage
 from setting.models_provider.impl.xinference_model_provider.model.llm import XinferenceChatModel
 from setting.models_provider.impl.xinference_model_provider.model.reranker import XInferenceReranker
 from setting.models_provider.impl.xinference_model_provider.model.stt import XInferenceSpeechToText
+from setting.models_provider.impl.xinference_model_provider.model.tti import XinferenceTextToImage
 from setting.models_provider.impl.xinference_model_provider.model.tts import XInferenceTextToSpeech
 from smartdoc.conf import PROJECT_DIR
 
 xinference_llm_model_credential = XinferenceLLMModelCredential()
 xinference_stt_model_credential = XInferenceSTTModelCredential()
 xinference_tts_model_credential = XInferenceTTSModelCredential()
+xinference_image_model_credential = XinferenceImageModelCredential()
+xinference_tti_model_credential = XinferenceTextToImageModelCredential()
 
 model_info_list = [
     ModelInfo(
@@ -296,6 +302,159 @@ voice_model_info = [
     ),
 ]
 
+image_model_info = [
+    ModelInfo(
+        'qwen-vl-chat',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'deepseek-vl-chat',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'yi-vl-chat',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'omnilmm',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'internvl-chat',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'cogvlm2',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'MiniCPM-Llama3-V-2_5',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'GLM-4V',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'MiniCPM-V-2.6',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'internvl2',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'qwen2-vl-instruct',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'llama-3.2-vision',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'llama-3.2-vision-instruct',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+    ModelInfo(
+        'glm-edge-v',
+        '',
+        ModelTypeConst.IMAGE,
+        xinference_image_model_credential,
+        XinferenceImage
+    ),
+]
+
+tti_model_info = [
+    ModelInfo(
+        'sd-turbo',
+        '',
+        ModelTypeConst.TTI,
+        xinference_tti_model_credential,
+        XinferenceTextToImage
+    ),
+    ModelInfo(
+        'sdxl-turbo',
+        '',
+        ModelTypeConst.TTI,
+        xinference_tti_model_credential,
+        XinferenceTextToImage
+    ),
+    ModelInfo(
+        'stable-diffusion-v1.5',
+        '',
+        ModelTypeConst.TTI,
+        xinference_tti_model_credential,
+        XinferenceTextToImage
+    ),
+    ModelInfo(
+        'stable-diffusion-xl-base-1.0',
+        '',
+        ModelTypeConst.TTI,
+        xinference_tti_model_credential,
+        XinferenceTextToImage
+    ),
+    ModelInfo(
+        'sd3-medium',
+        '',
+        ModelTypeConst.TTI,
+        xinference_tti_model_credential,
+        XinferenceTextToImage
+    ),
+    ModelInfo(
+        'FLUX.1-schnell',
+        '',
+        ModelTypeConst.TTI,
+        xinference_tti_model_credential,
+        XinferenceTextToImage
+    ),
+    ModelInfo(
+        'FLUX.1-dev',
+        '',
+        ModelTypeConst.TTI,
+        xinference_tti_model_credential,
+        XinferenceTextToImage
+    ),
+]
+
 xinference_embedding_model_credential = XinferenceEmbeddingModelCredential()
 
 # 生成embedding_model_info列表
@@ -377,6 +536,8 @@ model_info_manage = (ModelInfoManage.builder()
                                                           ModelTypeConst.EMBEDDING,
                                                           xinference_embedding_model_credential, XinferenceEmbedding))
                      .append_model_info_list(rerank_list)
+                     .append_model_info_list(image_model_info)
+                     .append_model_info_list(tti_model_info)
                      .append_default_model_info(rerank_list[0])
                      .build())
 

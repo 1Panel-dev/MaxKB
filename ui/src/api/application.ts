@@ -293,6 +293,13 @@ const getApplicationImageModel: (
   return get(`${prefix}/${application_id}/model`, { model_type: 'IMAGE' }, loading)
 }
 
+const getApplicationTTIModel: (
+  application_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (application_id, loading) => {
+  return get(`${prefix}/${application_id}/model`, { model_type: 'TTI' }, loading)
+}
+
 
 /**
  * 发布应用
@@ -523,6 +530,7 @@ export default {
   getApplicationSTTModel,
   getApplicationTTSModel,
   getApplicationImageModel,
+  getApplicationTTIModel,
   postSpeechToText,
   postTextToSpeech,
   getPlatformStatus,

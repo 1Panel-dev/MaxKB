@@ -63,6 +63,7 @@ const modelTypeOptions = ref([
   { text: '语音识别', value: 'STT' },
   { text: '语音合成', value: 'TTS' },
   { text: '图片理解', value: 'IMAGE' },
+  { text: '图片生成', value: 'TTI' },
 ])
 
 const open = () => {

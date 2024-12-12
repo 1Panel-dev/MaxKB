@@ -1,32 +1,32 @@
 # coding=utf-8
-import base64
-import os
 from typing import Dict
-
-from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 
-class ZhiPuImageModelParams(BaseForm):
-    temperature = forms.SliderField(TooltipLabel('温度', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
-                                    required=True, default_value=0.95,
-                                    _min=0.1,
-                                    _max=1.0,
-                                    _step=0.01,
-                                    precision=2)
 
-    max_tokens = forms.SliderField(
-        TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
-        required=True, default_value=1024,
-        _min=1,
-        _max=100000,
-        _step=1,
-        precision=0)
+class ZhiPuTTIModelParams(BaseForm):
+    size = forms.SingleSelect(
+        TooltipLabel('图片尺寸',
+                     '图片尺寸，仅 cogview-3-plus 支持该参数。可选范围：[1024x1024,768x1344,864x1152,1344x768,1152x864,1440x720,720x1440]，默认是1024x1024。'),
+        required=True,
+        default_value='1024x1024',
+        option_list=[
+            {'value': '1024x1024', 'label': '1024x1024'},
+            {'value': '768x1344', 'label': '768x1344'},
+            {'value': '864x1152', 'label': '864x1152'},
+            {'value': '1344x768', 'label': '1344x768'},
+            {'value': '1152x864', 'label': '1152x864'},
+            {'value': '1440x720', 'label': '1440x720'},
+            {'value': '720x1440', 'label': '720x1440'},
+        ],
+        text_field='label',
+        value_field='value')
 
-class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
+
+class ZhiPuTextToImageModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField('API Key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
@@ -43,9 +43,8 @@ class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            res = model.stream([HumanMessage(content=[{"type": "text", "text": "你好"}])])
-            for chunk in res:
-                print(chunk)
+            res = model.check_auth()
+            print(res)
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
@@ -59,4 +58,4 @@ class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        return ZhiPuImageModelParams()
+        return ZhiPuTTIModelParams()

@@ -133,6 +133,7 @@
                 <el-option label="语音识别" value="STT" />
                 <el-option label="语音合成" value="TTS" />
                 <el-option label="图片理解" value="IMAGE" />
+                <el-option label="图片生成" value="TTI" />
               </el-select>
             </div>
           </div>
