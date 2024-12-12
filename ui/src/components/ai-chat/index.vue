@@ -293,7 +293,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         document_list:
           other_params_data && other_params_data.document_list
             ? other_params_data.document_list
-            : []
+            : [],
+        audio_list:
+          other_params_data && other_params_data.audio_list ? other_params_data.audio_list : []
       }
     })
     chatList.value.push(chat)

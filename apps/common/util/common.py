@@ -8,13 +8,15 @@
 """
 import hashlib
 import importlib
-import mimetypes
 import io
+import shutil
+import mimetypes
 from functools import reduce
 from typing import Dict, List
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
+from pydub import AudioSegment
 
 from ..exception.app_exception import AppApiException
 from ..models.db_model_manage import DBModelManage
@@ -136,3 +138,61 @@ def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
         charset=None,
     )
     return uploaded_file
+
+def any_to_amr(any_path, amr_path):
+    """
+    把任意格式转成amr文件
+    """
+    if any_path.endswith(".amr"):
+        shutil.copy2(any_path, amr_path)
+        return
+    if any_path.endswith(".sil") or any_path.endswith(".silk") or any_path.endswith(".slk"):
+        raise NotImplementedError("Not support file type: {}".format(any_path))
+    audio = AudioSegment.from_file(any_path)
+    audio = audio.set_frame_rate(8000)  # only support 8000
+    audio.export(amr_path, format="amr")
+    return audio.duration_seconds * 1000
+
+
+def any_to_mp3(any_path, mp3_path):
+    """
+    把任意格式转成mp3文件
+    """
+    if any_path.endswith(".mp3"):
+        shutil.copy2(any_path, mp3_path)
+        return
+    if any_path.endswith(".sil") or any_path.endswith(".silk") or any_path.endswith(".slk"):
+        sil_to_wav(any_path, any_path)
+        any_path = mp3_path
+    audio = AudioSegment.from_file(any_path)
+    audio.export(mp3_path, format="mp3")
+
+
+def sil_to_wav(silk_path, wav_path, rate: int = 24000):
+    """
+    silk 文件转 wav
+    """
+    try:
+        import pysilk
+    except ImportError:
+        raise AppApiException("import pysilk failed, wechaty voice message will not be supported.")
+    wav_data = pysilk.decode_file(silk_path, to_wav=True, sample_rate=rate)
+    with open(wav_path, "wb") as f:
+        f.write(wav_data)
+
+
+def split_and_transcribe(file_path, model, max_segment_length_ms=59000, format="mp3"):
+    audio_data = AudioSegment.from_file(file_path, format=format)
+    audio_length_ms = len(audio_data)
+
+    if audio_length_ms <= max_segment_length_ms:
+        return model.speech_to_text(io.BytesIO(audio_data.export(format=format).read()))
+
+    full_text = []
+    for start_ms in range(0, audio_length_ms, max_segment_length_ms):
+        end_ms = min(audio_length_ms, start_ms + max_segment_length_ms)
+        segment = audio_data[start_ms:end_ms]
+        text = model.speech_to_text(io.BytesIO(segment.export(format=format).read()))
+        if isinstance(text, str):
+            full_text.append(text)
+    return ' '.join(full_text)

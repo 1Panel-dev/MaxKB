@@ -33,7 +33,7 @@
           label="选择文档"
           prop="document_list"
           :rules="{
-            message: '请选择检索问题',
+            message: '请选择文档',
             trigger: 'blur',
             required: false
           }"
@@ -42,7 +42,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择检索问题"
+            placeholder="请选择文档"
             v-model="form_data.document_list"
           />
         </el-form-item>
@@ -52,7 +52,7 @@
           label="选择图片"
           prop="image_list"
           :rules="{
-            message: '请选择检索问题',
+            message: '请选择图片',
             trigger: 'blur',
             required: false
           }"
@@ -61,8 +61,27 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择检索问题"
+            placeholder="请选择图片"
             v-model="form_data.image_list"
+          />
+        </el-form-item>
+
+        <el-form-item
+          v-if="form_data.hasOwnProperty('audio_list') || 'audio_list' in form_data"
+          label="选择语音文件"
+          prop="audio_list"
+          :rules="{
+            message: '请选择语音文件',
+            trigger: 'blur',
+            required: false
+          }"
+        >
+          <NodeCascader
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            placeholder="请选择语音文件"
+            v-model="form_data.audio_list"
           />
         </el-form-item>
         <div v-for="(field, index) in form_data.api_input_field_list" :key="'api-input-' + index">
@@ -135,7 +154,8 @@ const form = {
   api_input_field_list: [],
   user_input_field_list: [],
   document_list: ['start-node', 'document'],
-  image_list: ['start-node', 'image']
+  image_list: ['start-node', 'image'],
+  audio_list: ['start-node', 'audio']
 }
 
 const applicationNodeFormRef = ref<FormInstance>()

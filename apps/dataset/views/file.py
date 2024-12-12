@@ -36,8 +36,8 @@ class FileView(APIView):
 
     class Operate(APIView):
         @action(methods=['GET'], detail=False)
-        @swagger_auto_schema(operation_summary="获取图片",
-                             operation_id="获取图片",
+        @swagger_auto_schema(operation_summary="获取文件",
+                             operation_id="获取文件",
                              tags=["文件"])
         def get(self, request: Request, file_id: str):
             return FileSerializer.Operate(data={'id': file_id}).get()

@@ -63,6 +63,7 @@ interface chatType {
   upload_meta?: {
     document_list: Array<any>
     image_list: Array<any>
+    audio_list: Array<any>
   }
 }
 
