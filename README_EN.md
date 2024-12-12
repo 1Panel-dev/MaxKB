@@ -3,14 +3,13 @@
 <p align="center"><a href="https://trendshift.io/repositories/9113" target="_blank"><img src="https://trendshift.io/api/badge/repositories/9113" alt="1Panel-dev%2FMaxKB | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a></p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html#license-text"><img src="https://img.shields.io/github/license/1Panel-dev/maxkb?color=%231890FF" alt="License: GPL v3"></a>
-  <a href="https://app.codacy.com/gh/1Panel-dev/maxkb?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/maxkb&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
   <a href="https://github.com/1Panel-dev/maxkb/releases/latest"><img src="https://img.shields.io/github/v/release/1Panel-dev/maxkb" alt="Latest release"></a>
   <a href="https://github.com/1Panel-dev/maxkb"><img src="https://img.shields.io/github/stars/1Panel-dev/maxkb?color=%231890FF&style=flat-square" alt="Stars"></a>    
   <a href="https://hub.docker.com/r/1panel/maxkb"><img src="https://img.shields.io/docker/pulls/1panel/maxkb?label=downloads" alt="Download"></a>  
 </p>
 <hr/>
 
-MaxKB = Max Knowledge Base, it is a Chatbot based on Large Language Models (LLM) and Retrieval-Augmented Generation (RAG). MaxKB is widely applied in scenarios such as intelligent customer service, corporate internal knowledge bases, academic research, and education.
+MaxKB = Max Knowledge Base, it is a chatbot based on Large Language Models (LLM) and Retrieval-Augmented Generation (RAG). MaxKB is widely applied in scenarios such as intelligent customer service, corporate internal knowledge bases, academic research, and education.
 
 - **Ready-to-Use**: Supports direct uploading of documents / automatic crawling of online documents, with features for automatic text splitting, vectorization, and RAG (Retrieval-Augmented Generation). This effectively reduces hallucinations in large models, providing a superior smart Q&A interaction experience.
 - **Model-Agnostic**: Supports various large models, including private models (such as Llama 3, Qwen 2, etc.) and public models (like OpenAI, Claude, Gemini, etc.).
@@ -39,7 +38,7 @@ docker run -d --name=maxkb --restart=always -p 8080:8080 -v ~/.maxkb:/var/lib/po
   </tr>
 </table>
 
-## Technical Stack
+## Technical stack
 
 - Frontend：[Vue.js](https://vuejs.org/)
 - Backend：[Python / Django](https://www.djangoproject.com/)
