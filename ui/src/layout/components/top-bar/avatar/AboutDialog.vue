@@ -45,8 +45,6 @@
         >
           <el-button class="border-primary mr-16">更新 License</el-button>
         </el-upload>
-
-        <el-button class="border-primary" @click="toSupport">获取技术支持</el-button>
       </div>
     </div>
     <div class="border-t text-center mt-16 p-16 pb-0">
@@ -98,11 +96,6 @@ function getLicenseInfo() {
   licenseApi.getLicense(loading).then((res: any) => {
     licenseInfo.value = res.data?.license
   })
-}
-
-function toSupport() {
-  const url = 'https://support.fit2cloud.com/'
-  window.open(url, '_blank')
 }
 
 defineExpose({ open })
