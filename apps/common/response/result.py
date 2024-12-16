@@ -157,10 +157,10 @@ def success(data, **kwargs):
     return Result(data=data, **kwargs)
 
 
-def error(message):
+def error(message, **kwargs):
     """
     获取一个失败的响应对象
     :param message: 错误提示
     :return: 接口响应对象
     """
-    return Result(code=500, message=message)
+    return Result(code=500, message=message, **kwargs)

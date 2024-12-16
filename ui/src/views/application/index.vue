@@ -3,6 +3,18 @@
     <div class="flex-between mb-16">
       <h4>{{ $t('views.application.applicationList.title') }}</h4>
       <div class="flex-between">
+        <el-upload
+          :file-list="[]"
+          class="flex-between"
+          action="#"
+          multiple
+          :auto-upload="false"
+          :show-file-list="false"
+          :limit="1"
+          :on-change="(file: any, fileList: any) => importApplication(file)"
+        >
+          <el-button>导入应用</el-button>
+        </el-upload>
         <el-select
           v-model="selectUserId"
           class="mr-12"
@@ -128,7 +140,9 @@
                             <AppIcon iconName="app-copy"></AppIcon>
                             复制</el-dropdown-item
                           >
-
+                          <el-dropdown-item icon="Delete" @click.stop="exportApplication(item)">
+                            导出
+                          </el-dropdown-item>
                           <el-dropdown-item icon="Delete" @click.stop="deleteApplication(item)">{{
                             $t('views.application.applicationList.card.delete.tooltip')
                           }}</el-dropdown-item>
@@ -152,7 +166,7 @@ import { ref, onMounted, reactive } from 'vue'
 import applicationApi from '@/api/application'
 import CreateApplicationDialog from './component/CreateApplicationDialog.vue'
 import CopyApplicationDialog from './component/CopyApplicationDialog.vue'
-import { MsgSuccess, MsgConfirm, MsgAlert } from '@/utils/message'
+import { MsgSuccess, MsgConfirm, MsgAlert, MsgError } from '@/utils/message'
 import { isAppIcon } from '@/utils/application'
 import { useRouter } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
@@ -203,7 +217,20 @@ function settingApplication(row: any) {
     router.push({ path: `/application/${row.id}/${row.type}/setting` })
   }
 }
-
+const exportApplication = (application: any) => {
+  applicationApi.exportApplication(application.id, application.name, loading).catch((e) => {
+    e.response.data.text().then((res: string) => {
+      MsgError(`导出失败:${JSON.parse(res).message}`)
+    })
+  })
+}
+const importApplication = (file: any) => {
+  const formData = new FormData()
+  formData.append('file', file.raw, file.name)
+  applicationApi.importApplication(formData, loading).then((ok) => {
+    searchHandle()
+  })
+}
 function openCreateDialog() {
   if (user.isEnterprise()) {
     CreateApplicationDialogRef.value.open()

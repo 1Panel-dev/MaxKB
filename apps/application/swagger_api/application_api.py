@@ -336,6 +336,27 @@ class ApplicationApi(ApiMixin):
                                       description='应用描述')
                     ]
 
+    class Export(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='application_id',
+                                      in_=openapi.IN_PATH,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description='应用id'),
+
+                    ]
+
+    class Import(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='file',
+                                      in_=openapi.IN_FORM,
+                                      type=openapi.TYPE_FILE,
+                                      required=True,
+                                      description='上传图片文件')
+                    ]
+
     class Operate(ApiMixin):
         @staticmethod
         def get_request_params_api():

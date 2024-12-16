@@ -10,6 +10,7 @@ import datetime
 import hashlib
 import json
 import os
+import pickle
 import re
 import uuid
 from functools import reduce
@@ -19,10 +20,10 @@ from django.contrib.postgres.fields import ArrayField
 from django.core import cache, validators
 from django.core import signing
 from django.db import transaction, models
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.template import Template, Context
-from rest_framework import serializers
+from rest_framework import serializers, status
 
 from application.flow.workflow_manage import Flow
 from application.models import Application, ApplicationDatasetMapping, ApplicationTypeChoices, WorkFlowVersion
@@ -34,15 +35,17 @@ from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed
-from common.field.common import UploadedImageField
+from common.field.common import UploadedImageField, UploadedFileField
 from common.models.db_model_manage import DBModelManage
+from common.response import result
 from common.util.common import valid_license, password_encrypt
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from dataset.models import DataSet, Document, Image
 from dataset.serializers.common_serializers import list_paragraph, get_embedding_model_by_dataset_id_list
 from embedding.models import SearchMode
-from function_lib.serializers.function_lib_serializer import FunctionLibSerializer
+from function_lib.models.function import FunctionLib, PermissionType
+from function_lib.serializers.function_lib_serializer import FunctionLibSerializer, FunctionLibModelSerializer
 from setting.models import AuthOperate
 from setting.models.model_management import Model
 from setting.models_provider import get_model_credential
@@ -52,6 +55,13 @@ from smartdoc.conf import PROJECT_DIR
 from users.models import User
 
 chat_cache = cache.caches['chat_cache']
+
+
+class MKInstance:
+    def __init__(self, application: dict, function_lib_list: List[dict], version: str):
+        self.application = application
+        self.function_lib_list = function_lib_list
+        self.version = version
 
 
 class ModelDatasetAssociation(serializers.Serializer):
@@ -662,6 +672,72 @@ class ApplicationSerializer(serializers.Serializer):
             get_application_access_token(application_access_token.access_token, False)
             return {**ApplicationSerializer.Query.reset_application(ApplicationSerializerModel(application).data)}
 
+    class Import(serializers.Serializer):
+        file = UploadedFileField(required=True, error_messages=ErrMessage.image("文件"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+
+        @valid_license(model=Application, count=5,
+                       message='社区版最多支持 5 个应用，如需拥有更多应用，请联系我们（https://fit2cloud.com/）。')
+        @transaction.atomic
+        def import_(self, with_valid=True):
+            if with_valid:
+                self.is_valid()
+            user_id = self.data.get('user_id')
+            mk_instance_bytes = self.data.get('file').read()
+            mk_instance = pickle.loads(mk_instance_bytes)
+            application = mk_instance.application
+            function_lib_list = mk_instance.function_lib_list
+            if len(function_lib_list) > 0:
+                function_lib_id_list = [function_lib.get('id') for function_lib in function_lib_list]
+                exits_function_lib_id_list = [str(function_lib.id) for function_lib in
+                                              QuerySet(FunctionLib).filter(id__in=function_lib_id_list)]
+                # 获取到需要插入的函数
+                function_lib_list = [function_lib for function_lib in function_lib_list if
+                                     not exits_function_lib_id_list.__contains__(function_lib.get('id'))]
+            application_model = self.to_application(application, user_id)
+            function_lib_model_list = [self.to_function_lib(f, user_id) for f in function_lib_list]
+            application_model.save()
+            QuerySet(FunctionLib).bulk_create(function_lib_model_list) if len(function_lib_model_list) > 0 else None
+            return True
+
+        @staticmethod
+        def to_application(application, user_id):
+            work_flow = application.get('work_flow')
+            for node in work_flow.get('nodes', []):
+                if node.get('type') == 'search-dataset-node':
+                    node.get('properties', {}).get('node_data', {})['dataset_id_list'] = []
+            return Application(id=uuid.uuid1(), user_id=user_id, name=application.get('name'),
+                               desc=application.get('desc'),
+                               prologue=application.get('prologue'), dialogue_number=application.get('dialogue_number'),
+                               dataset_setting=application.get('dataset_setting'),
+                               model_params_setting=application.get('model_params_setting'),
+                               tts_model_params_setting=application.get('tts_model_params_setting'),
+                               problem_optimization=application.get('problem_optimization'),
+                               icon=application.get('icon'),
+                               work_flow=work_flow,
+                               type=application.get('type'),
+                               problem_optimization_prompt=application.get('problem_optimization_prompt'),
+                               tts_model_enable=application.get('tts_model_enable'),
+                               stt_model_enable=application.get('stt_model_enable'),
+                               tts_type=application.get('tts_type'),
+                               clean_time=application.get('clean_time'),
+                               file_upload_enable=application.get('file_upload_enable'),
+                               file_upload_setting=application.get('file_upload_setting'),
+                               )
+
+        @staticmethod
+        def to_function_lib(function_lib, user_id):
+            """
+
+            @param user_id: 用户id
+            @param function_lib: 函数库
+            @return:
+            """
+            return FunctionLib(id=function_lib.get('id'), user_id=user_id, name=function_lib.get('name'),
+                               code=function_lib.get('code'), input_field_list=function_lib.get('input_field_list'),
+                               is_active=function_lib.get('is_active'),
+                               permission_type=PermissionType.PRIVATE)
+
     class Operate(serializers.Serializer):
         application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
@@ -707,6 +783,31 @@ class ApplicationSerializer(serializers.Serializer):
                 self.is_valid()
             QuerySet(Application).filter(id=self.data.get('application_id')).delete()
             return True
+
+        def export(self, with_valid=True):
+            try:
+                if with_valid:
+                    self.is_valid()
+                application_id = self.data.get('application_id')
+                application = QuerySet(Application).filter(id=application_id).first()
+                function_lib_id_list = [node.get('properties', {}).get('node_data', {}).get('function_lib_id') for node
+                                        in
+                                        application.work_flow.get('nodes', []) if
+                                        node.get('type') == 'function-lib-node']
+                function_lib_list = []
+                if len(function_lib_id_list) > 0:
+                    function_lib_list = QuerySet(FunctionLib).filter(id__in=function_lib_id_list)
+                application_dict = ApplicationSerializerModel(application).data
+
+                mk_instance = MKInstance(application_dict,
+                                         [FunctionLibModelSerializer(function_lib).data for function_lib in
+                                          function_lib_list], 'v1')
+                application_pickle = pickle.dumps(mk_instance)
+                response = HttpResponse(content_type='text/plain', content=application_pickle)
+                response['Content-Disposition'] = f'attachment; filename="{application.name}.mk"'
+                return response
+            except Exception as e:
+                return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         @transaction.atomic
         def publish(self, instance, with_valid=True):

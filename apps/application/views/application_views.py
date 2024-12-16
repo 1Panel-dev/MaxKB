@@ -27,7 +27,6 @@ from common.response import result
 from common.swagger_api.common_api import CommonApi
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.dataset_serializers import DataSetSerializers
-from setting.swagger_api.provide_api import ProvideApi
 
 chat_cache = cache.caches['chat_cache']
 
@@ -157,6 +156,34 @@ class Application(APIView):
                 ApplicationSerializer.IconOperate(
                     data={'application_id': application_id, 'user_id': request.user.id,
                           'image': request.FILES.get('file')}).edit(request.data))
+
+    class Import(APIView):
+        authentication_classes = [TokenAuth]
+        parser_classes = [MultiPartParser]
+
+        @action(methods="GET", detail=False)
+        @swagger_auto_schema(operation_summary="导入应用", operation_id="导入应用",
+                             manual_parameters=ApplicationApi.Import.get_request_params_api(),
+                             tags=["应用"]
+                             )
+        @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
+        def post(self, request: Request):
+            return result.success(ApplicationSerializer.Import(
+                data={'user_id': request.user.id, 'file': request.FILES.get('file')}).import_())
+
+    class Export(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods="GET", detail=False)
+        @swagger_auto_schema(operation_summary="导出应用", operation_id="导出应用",
+                             manual_parameters=ApplicationApi.Export.get_request_params_api(),
+                             tags=["应用"]
+                             )
+        @has_permissions(lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
+                                                        dynamic_tag=keywords.get('application_id')))
+        def get(self, request: Request, application_id: str):
+            return ApplicationSerializer.Operate(
+                data={'application_id': application_id, 'user_id': request.user.id}).export()
 
     class Embed(APIView):
         @action(methods=["GET"], detail=False)
@@ -362,7 +389,8 @@ class Application(APIView):
             compare=CompareConstants.AND))
         def put(self, request: Request, application_id: str):
             return result.success(
-                ApplicationSerializer.AccessTokenSerializer(data={'application_id': application_id}).edit(request.data))
+                ApplicationSerializer.AccessTokenSerializer(data={'application_id': application_id}).edit(
+                    request.data))
 
         @action(methods=['GET'], detail=False)
         @swagger_auto_schema(operation_summary="获取应用 AccessToken信息",
@@ -382,9 +410,10 @@ class Application(APIView):
     class Authentication(APIView):
         @action(methods=['OPTIONS'], detail=False)
         def options(self, request, *args, **kwargs):
-            return HttpResponse(headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
-                                         "Access-Control-Allow-Methods": "POST",
-                                         "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}, )
+            return HttpResponse(
+                headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
+                         "Access-Control-Allow-Methods": "POST",
+                         "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}, )
 
         @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary="应用认证",
@@ -404,6 +433,7 @@ class Application(APIView):
             )
 
     @action(methods=['POST'], detail=False)
+
     @swagger_auto_schema(operation_summary="创建应用",
                          operation_id="创建应用",
                          request_body=ApplicationApi.Create.get_request_body_api(),
@@ -444,7 +474,8 @@ class Application(APIView):
                                                     "query_text": request.query_params.get("query_text"),
                                                     "top_number": request.query_params.get("top_number"),
                                                     'similarity': request.query_params.get('similarity'),
-                                                    'search_mode': request.query_params.get('search_mode')}).hit_test(
+                                                    'search_mode': request.query_params.get(
+                                                        'search_mode')}).hit_test(
                 ))
 
     class Publish(APIView):
@@ -502,7 +533,8 @@ class Application(APIView):
             compare=CompareConstants.AND))
         def put(self, request: Request, application_id: str):
             return result.success(
-                ApplicationSerializer.Operate(data={'application_id': application_id, 'user_id': request.user.id}).edit(
+                ApplicationSerializer.Operate(
+                    data={'application_id': application_id, 'user_id': request.user.id}).edit(
                     request.data))
 
         @action(methods=['GET'], detail=False)
@@ -528,11 +560,14 @@ class Application(APIView):
         @swagger_auto_schema(operation_summary="获取当前应用可使用的知识库",
                              operation_id="获取当前应用可使用的知识库",
                              manual_parameters=ApplicationApi.Operate.get_request_params_api(),
-                             responses=result.get_api_array_response(DataSetSerializers.Query.get_response_body_api()),
+                             responses=result.get_api_array_response(
+                                 DataSetSerializers.Query.get_response_body_api()),
                              tags=['应用'])
         @has_permissions(ViewPermission([RoleConstants.ADMIN, RoleConstants.USER],
-                                        [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
-                                                                        dynamic_tag=keywords.get('application_id'))],
+                                        [lambda r, keywords: Permission(group=Group.APPLICATION,
+                                                                        operate=Operate.USE,
+                                                                        dynamic_tag=keywords.get(
+                                                                            'application_id'))],
                                         compare=CompareConstants.AND))
         def get(self, request: Request, application_id: str):
             return result.success(ApplicationSerializer.Operate(
