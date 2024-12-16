@@ -13,15 +13,19 @@ from setting.models_provider.base_model_provider import ModelProvideInfo, ModelT
     ModelInfoManage
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.credential.embedding import \
     AliyunBaiLianEmbeddingCredential
+from setting.models_provider.impl.aliyun_bai_lian_model_provider.credential.image import QwenVLModelCredential
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.credential.llm import BaiLianLLMModelCredential
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.credential.reranker import \
     AliyunBaiLianRerankerCredential
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.credential.stt import AliyunBaiLianSTTModelCredential
+from setting.models_provider.impl.aliyun_bai_lian_model_provider.credential.tti import QwenTextToImageModelCredential
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.credential.tts import AliyunBaiLianTTSModelCredential
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.embedding import AliyunBaiLianEmbedding
+from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.image import QwenVLChatModel
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.llm import BaiLianChatModel
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.reranker import AliyunBaiLianReranker
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.stt import AliyunBaiLianSpeechToText
+from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.tti import QwenTextToImageModel
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.tts import AliyunBaiLianTextToSpeech
 from smartdoc.conf import PROJECT_DIR
 
@@ -30,6 +34,8 @@ aliyun_bai_lian_tts_model_credential = AliyunBaiLianTTSModelCredential()
 aliyun_bai_lian_stt_model_credential = AliyunBaiLianSTTModelCredential()
 aliyun_bai_lian_embedding_model_credential = AliyunBaiLianEmbeddingCredential()
 aliyun_bai_lian_llm_model_credential = BaiLianLLMModelCredential()
+qwenvl_model_credential = QwenVLModelCredential()
+qwentti_model_credential = QwenTextToImageModelCredential()
 
 model_info_list = [ModelInfo('gte-rerank',
                              '阿里巴巴通义实验室开发的GTE-Rerank文本排序系列模型，开发者可以通过LlamaIndex框架进行集成高质量文本检索、排序。',
@@ -52,9 +58,28 @@ model_info_list = [ModelInfo('gte-rerank',
                              BaiLianChatModel)
                    ]
 
-model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
-    model_info_list[1]).append_default_model_info(model_info_list[2]).append_default_model_info(
-    model_info_list[3]).append_default_model_info(model_info_list[4]).build()
+module_info_vl_list = [
+    ModelInfo('qwen-vl-max', '', ModelTypeConst.IMAGE, qwenvl_model_credential, QwenVLChatModel),
+    ModelInfo('qwen-vl-max-0809', '', ModelTypeConst.IMAGE, qwenvl_model_credential, QwenVLChatModel),
+    ModelInfo('qwen-vl-plus-0809', '', ModelTypeConst.IMAGE, qwenvl_model_credential, QwenVLChatModel),
+]
+module_info_tti_list = [
+    ModelInfo('wanx-v1',
+              '通义万相-文本生成图像大模型，支持中英文双语输入，支持输入参考图片进行参考内容或者参考风格迁移，重点风格包括但不限于水彩、油画、中国画、素描、扁平插画、二次元、3D卡通。',
+              ModelTypeConst.TTI, qwentti_model_credential, QwenTextToImageModel),
+]
+
+model_info_manage = (
+    ModelInfoManage.builder()
+    .append_model_info_list(model_info_list)
+    .append_model_info_list(module_info_vl_list)
+    .append_model_info_list(module_info_tti_list)
+    .append_default_model_info(model_info_list[1])
+    .append_default_model_info(model_info_list[2])
+    .append_default_model_info(model_info_list[3])
+    .append_default_model_info(model_info_list[4])
+    .build()
+)
 
 
 class AliyunBaiLianModelProvider(IModelProvider):
