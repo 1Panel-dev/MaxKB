@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, postStream, del, put, request, download } from '@/request/index'
+import { get, post, postStream, del, put, request, download, exportFile } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
@@ -300,7 +300,6 @@ const getApplicationTTIModel: (
   return get(`${prefix}/${application_id}/model`, { model_type: 'TTI' }, loading)
 }
 
-
 /**
  * 发布应用
  * @param 参数
@@ -376,7 +375,6 @@ const uploadFile: (
 ) => Promise<Result<any>> = (application_id, chat_id, data, loading) => {
   return post(`${prefix}/${application_id}/chat/${chat_id}/upload_file`, data, undefined, loading)
 }
-
 
 /**
  * 语音转文本
@@ -503,6 +501,28 @@ const getUserList: (type: string, loading?: Ref<boolean>) => Promise<Result<any>
   return get(`/user/list/${type}`, undefined, loading)
 }
 
+const exportApplication = (
+  application_id: string,
+  application_name: string,
+  loading?: Ref<boolean>
+) => {
+  return exportFile(
+    application_name + '.mk',
+    `/application/${application_id}/export`,
+    undefined,
+    loading
+  )
+}
+
+/**
+ * 导入应用
+ */
+const importApplication: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading
+) => {
+  return post(`${prefix}/import`, data, undefined, loading)
+}
 export default {
   getAllAppilcation,
   getApplication,
@@ -544,5 +564,7 @@ export default {
   playDemoText,
   getUserList,
   getApplicationList,
-  uploadFile
+  uploadFile,
+  exportApplication,
+  importApplication
 }

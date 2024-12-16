@@ -5,11 +5,13 @@ from . import views
 app_name = "application"
 urlpatterns = [
     path('application', views.Application.as_view(), name="application"),
+    path('application/import', views.Application.Import.as_view()),
     path('application/profile', views.Application.Profile.as_view(), name='application/profile'),
     path('application/embed', views.Application.Embed.as_view()),
     path('application/authentication', views.Application.Authentication.as_view()),
     path('application/<str:application_id>/publish', views.Application.Publish.as_view()),
     path('application/<str:application_id>/edit_icon', views.Application.EditIcon.as_view()),
+    path('application/<str:application_id>/export', views.Application.Export.as_view()),
     path('application/<str:application_id>/statistics/customer_count',
          views.ApplicationStatistics.CustomerCount.as_view()),
     path('application/<str:application_id>/statistics/customer_count_trend',

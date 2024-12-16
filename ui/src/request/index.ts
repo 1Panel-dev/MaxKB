@@ -227,10 +227,38 @@ export const exportExcel: (
 ) => {
   return promise(request({ url: url, method: 'get', params, responseType: 'blob' }), loading).then(
     (res: any) => {
-      console.log(res)
       if (res) {
         const blob = new Blob([res], {
           type: 'application/vnd.ms-excel'
+        })
+        const link = document.createElement('a')
+        link.href = window.URL.createObjectURL(blob)
+        link.download = fileName
+        link.click()
+        //释放内存
+        window.URL.revokeObjectURL(link.href)
+      }
+      return true
+    }
+  )
+}
+
+export const exportFile: (
+  fileName: string,
+  url: string,
+  params: any,
+  loading?: NProgress | Ref<boolean>
+) => Promise<any> = (
+  fileName: string,
+  url: string,
+  params: any,
+  loading?: NProgress | Ref<boolean>
+) => {
+  return promise(request({ url: url, method: 'get', params, responseType: 'blob' }), loading).then(
+    (res: any) => {
+      if (res) {
+        const blob = new Blob([res], {
+          type: 'application/octet-stream'
         })
         const link = document.createElement('a')
         link.href = window.URL.createObjectURL(blob)
