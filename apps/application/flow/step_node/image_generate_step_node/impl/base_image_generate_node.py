@@ -57,7 +57,10 @@ class BaseImageGenerateNode(IImageGenerateNode):
             if self.node.id == val['node_id'] and 'image_list' in val:
                 if val['dialogue_type'] == 'WORKFLOW':
                     return chat_record.get_ai_message()
-                return AIMessage(content=val['answer'])
+                image_list = val['image_list']
+                return AIMessage(content=[
+                    *[{'type': 'image_url', 'image_url': {'url': f'{file_url}'}} for file_url in image_list]
+                ])
         return chat_record.get_ai_message()
 
     def get_history_message(self, history_chat_record, dialogue_number):
