@@ -13,11 +13,11 @@ class ImageGenerateNodeSerializer(serializers.Serializer):
 
     prompt = serializers.CharField(required=True, error_messages=ErrMessage.char("提示词(正向)"))
 
-    negative_prompt = serializers.CharField(required=False, default='', error_messages=ErrMessage.char("提示词(负向)"))
+    negative_prompt = serializers.CharField(required=False, error_messages=ErrMessage.char("提示词(负向)"), allow_null=True, allow_blank=True,)
     # 多轮对话数量
-    dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("多轮对话数量"))
+    dialogue_number = serializers.IntegerField(required=False, default=0, error_messages=ErrMessage.integer("多轮对话数量"))
 
-    dialogue_type = serializers.CharField(required=True, error_messages=ErrMessage.char("对话存储类型"))
+    dialogue_type = serializers.CharField(required=False, default='NODE', error_messages=ErrMessage.char("对话存储类型"))
 
     is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
 
