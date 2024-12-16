@@ -18,6 +18,6 @@ class QwenVLChatModel(MaxKBBaseModel, ChatOpenAI):
             openai_api_base='https://dashscope.aliyuncs.com/compatible-mode/v1',
             # stream_options={"include_usage": True},
             streaming=True,
-            model_kwargs=optional_params,
+            **optional_params,
         )
         return chat_tong_yi
