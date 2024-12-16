@@ -64,7 +64,8 @@ RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     find /opt/maxkb/app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} + && \
     chmod 755 /tmp  && \
     useradd --no-create-home --home /opt/maxkb/app/sandbox --shell /bin/bash sandbox &&  \
-    chown sandbox:sandbox /opt/maxkb/app/sandbox
+    chown sandbox:sandbox /opt/maxkb/app/sandbox && \
+    curl -L --connect-timeout 120 -m 1800 https://fit2cloud-support.oss-cn-beijing.aliyuncs.com/ffmpeg/get-ffmpeg-linux | sh
 
 
 EXPOSE 8080
