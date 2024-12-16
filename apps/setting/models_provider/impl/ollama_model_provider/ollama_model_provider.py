@@ -21,8 +21,10 @@ from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, \
     BaseModelCredential, DownModelChunk, DownModelChunkStatus, ValidCode, ModelInfoManage
 from setting.models_provider.impl.ollama_model_provider.credential.embedding import OllamaEmbeddingModelCredential
+from setting.models_provider.impl.ollama_model_provider.credential.image import OllamaImageModelCredential
 from setting.models_provider.impl.ollama_model_provider.credential.llm import OllamaLLMModelCredential
 from setting.models_provider.impl.ollama_model_provider.model.embedding import OllamaEmbedding
+from setting.models_provider.impl.ollama_model_provider.model.image import OllamaImage
 from setting.models_provider.impl.ollama_model_provider.model.llm import OllamaChatModel
 from smartdoc.conf import PROJECT_DIR
 
@@ -133,6 +135,7 @@ model_info_list = [
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
 ]
 ollama_embedding_model_credential = OllamaEmbeddingModelCredential()
+ollama_image_model_credential = OllamaImageModelCredential()
 embedding_model_info = [
     ModelInfo(
         'nomic-embed-text',
@@ -140,15 +143,36 @@ embedding_model_info = [
         ModelTypeConst.EMBEDDING, ollama_embedding_model_credential, OllamaEmbedding),
 ]
 
-model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_model_info_list(
-    embedding_model_info).append_default_model_info(
+image_model_info = [
     ModelInfo(
+        'llava:7b',
+        '',
+        ModelTypeConst.IMAGE, ollama_image_model_credential, OllamaImage),
+    ModelInfo(
+        'llava:13b',
+        '',
+        ModelTypeConst.IMAGE, ollama_image_model_credential, OllamaImage),
+    ModelInfo(
+        'llava:34b',
+        '',
+        ModelTypeConst.IMAGE, ollama_image_model_credential, OllamaImage),
+]
+
+model_info_manage = (
+    ModelInfoManage.builder()
+    .append_model_info_list(model_info_list)
+    .append_model_info_list(embedding_model_info)
+    .append_default_model_info(ModelInfo(
         'phi3',
         'Phi-3 Mini是Microsoft的3.8B参数，轻量级，最先进的开放模型。',
-        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel)).append_default_model_info(ModelInfo(
-    'nomic-embed-text',
-    '一个具有大令牌上下文窗口的高性能开放嵌入模型。',
-    ModelTypeConst.EMBEDDING, ollama_embedding_model_credential, OllamaEmbedding), ).build()
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel))
+    .append_default_model_info(ModelInfo(
+        'nomic-embed-text',
+        '一个具有大令牌上下文窗口的高性能开放嵌入模型。',
+        ModelTypeConst.EMBEDDING, ollama_embedding_model_credential, OllamaEmbedding), )
+    .append_model_info_list(image_model_info)
+    .build()
+)
 
 
 def get_base_url(url: str):
