@@ -154,10 +154,12 @@
             @wheel="wheel"
             title="提示词(负向)"
             v-model="form_data.negative_prompt"
+            placeholder="请描述不想生成的图片内容，比如：颜色、血腥内容"
             style="height: 150px"
             @submitDialog="submitDialog"
           />
         </el-form-item>
+        <!--
         <el-form-item>
           <template #label>
             <div class="flex-between">
@@ -178,6 +180,7 @@
             :step-strictly="true"
           />
         </el-form-item>
+        -->
         <el-form-item label="返回内容" @click.prevent>
           <template #label>
             <div class="flex align-center">
