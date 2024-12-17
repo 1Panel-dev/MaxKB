@@ -45,10 +45,13 @@ class VllmModelProvider(IModelProvider):
                          'vllm_icon_svg')))
 
     @staticmethod
-    def get_base_model_list(api_base):
+    def get_base_model_list(api_base, api_key):
         base_url = get_base_url(api_base)
         base_url = base_url if base_url.endswith('/v1') else (base_url + '/v1')
-        r = requests.request(method="GET", url=f"{base_url}/models", timeout=5)
+        headers = {}
+        if api_key:
+            headers['Authorization'] = f"Bearer {api_key}"
+        r = requests.request(method="GET", url=f"{base_url}/models", headers=headers, timeout=5)
         r.raise_for_status()
         return r.json().get('data')
 

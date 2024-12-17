@@ -10,7 +10,7 @@ from pydub import AudioSegment
 from concurrent.futures import ThreadPoolExecutor
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.speech_to_text_step_node.i_speech_to_text_node import ISpeechToTextNode
-from common.util.common import split_and_transcribe
+from common.util.common import split_and_transcribe, any_to_mp3
 from dataset.models import File
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 
@@ -26,16 +26,21 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
         audio_list = audio
         self.context['audio_list'] = audio
 
-
         def process_audio_item(audio_item, model):
             file = QuerySet(File).filter(id=audio_item['file_id']).first()
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as temp_file:
+            # 根据file_name 吧文件转成mp3格式
+            file_format = file.file_name.split('.')[-1]
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f'.{file_format}') as temp_file:
                 temp_file.write(file.get_byte().tobytes())
                 temp_file_path = temp_file.name
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as temp_amr_file:
+                temp_mp3_path = temp_amr_file.name
+            any_to_mp3(temp_file_path, temp_mp3_path)
             try:
                 return split_and_transcribe(temp_file_path, model)
             finally:
                 os.remove(temp_file_path)
+                os.remove(temp_mp3_path)
 
         def process_audio_items(audio_list, model):
             with ThreadPoolExecutor(max_workers=5) as executor:
