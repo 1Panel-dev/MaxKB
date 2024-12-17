@@ -88,7 +88,9 @@
                   <el-tooltip effect="dark" placement="right">
                     <template #content>
                       <p>大语言模型：在应用中与AI对话的推理模型。</p>
-                      <p>向量模型：在知识库中导入文档进行向量化和向量检索召回分段时使用的向量模型。</p>
+                      <p>
+                        向量模型：在知识库中导入文档进行向量化和向量检索召回分段时使用的向量模型。
+                      </p>
                       <p>
                         重排模型：在二次召回中根据召回的候选分段和用户问题的匹配度重新排序，从而得到更精确的结果。
                       </p>
@@ -155,13 +157,17 @@
         </DynamicsForm>
       </el-tab-pane>
       <el-tab-pane label="高级设置" name="advanced-info">
-        <div class="flex-between">
+        <div class="flex-between mb-8">
           <h5>模型参数</h5>
-          <el-button type="text" @click="openAddDrawer()" :disabled="form_data.model_type !== 'LLM' && form_data.model_type !== 'IMAGE' && form_data.model_type !== 'TTS' && form_data.model_type !== 'TTI'">
+          <el-button type="text" @click.stop="openAddDrawer()">
             <AppIcon iconName="Plus" class="add-icon" />添加
           </el-button>
         </div>
-        <el-table :data="base_form_data.model_params_form" v-if="base_form_data.model_params_form?.length > 0" class="mb-16">
+        <el-table
+          :data="base_form_data.model_params_form"
+          v-if="base_form_data.model_params_form?.length > 0"
+          class="mb-16"
+        >
           <el-table-column prop="label" label="显示名称" show-overflow-tooltip>
             <template #default="{ row }">
               <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
@@ -216,7 +222,6 @@
     </template>
   </el-dialog>
   <AddParamDrawer ref="AddParamRef" @refresh="refresh" />
-
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
@@ -244,7 +249,6 @@ const model_form_field = ref<Array<FormField>>([])
 const dialogVisible = ref<boolean>(false)
 const activeName = ref('base-info')
 const AddParamRef = ref()
-
 
 const base_form_data_rule = ref<FormRules>({
   name: { required: true, trigger: 'blur', message: '模型名称不能为空' },
@@ -296,10 +300,14 @@ const getModelForm = (model_name: string) => {
       dynamicsFormRef.value?.render(model_form_field.value, undefined)
     })
 
-    ModelApi.listBaseModelParamsForm(providerValue.value.provider, form_data.value.model_type, model_name, base_model_loading)
-      .then((ok) => {
-        base_form_data.value.model_params_form = ok.data
-      })
+    ModelApi.listBaseModelParamsForm(
+      providerValue.value.provider,
+      form_data.value.model_type,
+      model_name,
+      base_model_loading
+    ).then((ok) => {
+      base_form_data.value.model_params_form = ok.data
+    })
   }
 }
 
@@ -325,7 +333,13 @@ const list_base_model = (model_type: any, change?: boolean) => {
 }
 
 const close = () => {
-  base_form_data.value = { name: '', model_type: '', model_name: '', permission_type: 'PRIVATE', model_params_form: [] }
+  base_form_data.value = {
+    name: '',
+    model_type: '',
+    model_name: '',
+    permission_type: 'PRIVATE',
+    model_params_form: []
+  }
   credential_form_data.value = {}
   model_form_field.value = []
   base_model_list.value = []
@@ -385,7 +399,6 @@ function refresh(data: any, index: any) {
     base_form_data.value.model_params_form.push(data)
   }
 }
-
 
 const toSelectProvider = () => {
   close()

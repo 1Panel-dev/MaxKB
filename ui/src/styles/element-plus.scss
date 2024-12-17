@@ -31,6 +31,12 @@
     border: none;
   }
 }
+.el-button--text {
+  border: none !important;
+  &:focus {
+    border: none !important;
+  }
+}
 .el-button--large {
   font-size: 16px;
 }
