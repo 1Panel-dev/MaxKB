@@ -16,10 +16,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.FIT2CLOUDRD_LLM_CODE_REVIEW_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.ALIYUN_LLM_API_KEY }}
-          LANGUAGE: Chinese
+          LANGUAGE: English
           OPENAI_API_ENDPOINT: https://dashscope.aliyuncs.com/compatible-mode/v1
           MODEL: qwen2.5-coder-3b-instruct
-          PROMPT: "请检查下面的代码差异是否有不规范、潜在的问题或者优化建议，用中文回答。"
+          PROMPT: "Please check the following code for any irregularities, potential issues, or optimization suggestions, and provide your answers in English."
           top_p: 1
           temperature: 1
           # max_tokens: 10000
