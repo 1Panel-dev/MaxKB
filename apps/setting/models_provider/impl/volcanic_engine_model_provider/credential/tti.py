@@ -28,8 +28,8 @@ class VolcanicEngineTTIModelGeneralParams(BaseForm):
 
 
 class VolcanicEngineTTIModelCredential(BaseForm, BaseModelCredential):
-    access_key = forms.PasswordInputField('Access Key', required=True)
-    secret_key = forms.PasswordInputField('Secret Key', required=True)
+    access_key = forms.PasswordInputField('Access Key ID', required=True)
+    secret_key = forms.PasswordInputField('Secret Access Key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
                  raise_exception=False):
