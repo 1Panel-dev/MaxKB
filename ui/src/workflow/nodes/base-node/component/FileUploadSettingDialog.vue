@@ -39,6 +39,7 @@
           class="card-checkbox cursor w-full mb-8"
           :class="form_data.document ? 'active' : ''"
           style="--el-card-padding: 8px 16px"
+          @click.stop="form_data.document = !form_data.document"
         >
           <div class="flex-between">
             <div class="flex align-center">
@@ -48,7 +49,10 @@
                 <el-text class="color-secondary">需要使用“文档内容提取”节点解析文档内容</el-text>
               </div>
             </div>
-            <el-checkbox v-model="form_data.document" />
+            <el-checkbox
+              v-model="form_data.document"
+              @change="form_data.document = !form_data.document"
+            />
           </div>
         </el-card>
         <el-card
@@ -56,6 +60,7 @@
           class="card-checkbox cursor w-full mb-8"
           :class="form_data.image ? 'active' : ''"
           style="--el-card-padding: 8px 16px"
+          @click.stop="form_data.image = !form_data.image"
         >
           <div class="flex-between">
             <div class="flex align-center">
@@ -65,24 +70,26 @@
                 <el-text class="color-secondary">需要使用“图片理解”节点解析图片内容</el-text>
               </div>
             </div>
-            <el-checkbox v-model="form_data.image" />
+            <el-checkbox v-model="form_data.image" @change="form_data.image = !form_data.image" />
           </div>
         </el-card>
+
         <el-card
           shadow="hover"
           class="card-checkbox cursor w-full mb-8"
           :class="form_data.audio ? 'active' : ''"
           style="--el-card-padding: 8px 16px"
+          @click.stop="form_data.audio = !form_data.audio"
         >
           <div class="flex-between">
             <div class="flex align-center">
-              <img class="mr-12" src="@/assets/icon_file-image.svg" alt="" />
+              <img class="mr-12" src="@/assets/icon_file-audio.svg" alt="" />
               <div>
                 <p class="line-height-22 mt-4">音频（MP3）</p>
-                <el-text class="color-secondary">所选模型支持接收音频或与语音转文本节点配合使用</el-text>
+                <el-text class="color-secondary">需要使用“语音转文本”节点解析音频内容</el-text>
               </div>
             </div>
-            <el-checkbox v-model="form_data.audio" />
+            <el-checkbox v-model="form_data.audio" @change="form_data.audio = !form_data.audio" />
           </div>
         </el-card>
       </el-form-item>

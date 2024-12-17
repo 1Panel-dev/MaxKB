@@ -129,7 +129,7 @@ defineExpose({
     cursor: pointer;
     min-height: var(--card-min-height);
     border: 1px dashed var(--el-color-primary);
-    background: #eff0f1;
+    background: var(--el-disabled-bg-color);;
     padding-bottom: 20px;
 
     .add-icon {

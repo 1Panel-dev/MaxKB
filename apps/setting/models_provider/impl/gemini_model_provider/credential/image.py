@@ -1,35 +1,35 @@
 # coding=utf-8
-
+import base64
+import os
 from typing import Dict
+
+from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 
+class GeminiImageModelParams(BaseForm):
+    temperature = forms.SliderField(TooltipLabel('温度', '较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定'),
+                                    required=True, default_value=0.7,
+                                    _min=0.1,
+                                    _max=1.0,
+                                    _step=0.01,
+                                    precision=2)
 
-class VolcanicEngineTTIModelGeneralParams(BaseForm):
-    size = forms.SingleSelect(
-        TooltipLabel('图片尺寸',
-                     '宽、高与512差距过大，则出图效果不佳、延迟过长概率显著增加。超分前建议比例及对应宽高：width*height'),
-        required=True,
-        default_value='512*512',
-        option_list=[
-            {'value': '512*512', 'label': '512*512'},
-            {'value': '512*384', 'label': '512*384'},
-            {'value': '384*512', 'label': '384*512'},
-            {'value': '512*341', 'label': '512*341'},
-            {'value': '341*512', 'label': '341*512'},
-            {'value': '512*288', 'label': '512*288'},
-            {'value': '288*512', 'label': '288*512'},
-        ],
-        text_field='label',
-        value_field='value')
+    max_tokens = forms.SliderField(
+        TooltipLabel('输出最大Tokens', '指定模型可生成的最大token个数'),
+        required=True, default_value=800,
+        _min=1,
+        _max=100000,
+        _step=1,
+        precision=0)
 
 
-class VolcanicEngineTTIModelCredential(BaseForm, BaseModelCredential):
-    access_key = forms.PasswordInputField('Access Key ID', required=True)
-    secret_key = forms.PasswordInputField('Secret Access Key', required=True)
+
+class GeminiImageModelCredential(BaseForm, BaseModelCredential):
+    api_key = forms.PasswordInputField('API Key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
                  raise_exception=False):
@@ -37,7 +37,7 @@ class VolcanicEngineTTIModelCredential(BaseForm, BaseModelCredential):
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
 
-        for key in ['access_key', 'secret_key']:
+        for key in ['api_key']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
@@ -45,7 +45,9 @@ class VolcanicEngineTTIModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            model.check_auth()
+            res = model.stream([HumanMessage(content=[{"type": "text", "text": "你好"}])])
+            for chunk in res:
+                print(chunk)
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
@@ -56,7 +58,7 @@ class VolcanicEngineTTIModelCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, 'secret_key': super().encryption(model.get('secret_key', ''))}
+        return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
-        return VolcanicEngineTTIModelGeneralParams()
+        return GeminiImageModelParams()
