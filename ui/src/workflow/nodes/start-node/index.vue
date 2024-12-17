@@ -69,7 +69,7 @@ const refreshFileUploadConfig = () => {
     .map((v: any) => cloneDeep(v.properties.node_data.file_upload_setting))
     .filter((v: any) => v)
 
-  fields = fields.filter((item: any) => item.value !== 'image' && item.value !== 'document')
+  fields = fields.filter((item: any) => item.value !== 'image' && item.value !== 'document' && item.value !== 'audio' && item.value !== 'video')
 
   if (form_data.length === 0) {
     set(props.nodeModel.properties.config, 'fields', fields)
