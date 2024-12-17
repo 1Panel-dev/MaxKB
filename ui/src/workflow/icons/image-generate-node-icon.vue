@@ -1,6 +1,6 @@
 <template>
-  <AppAvatar shape="square" style="background: #14C0FF;">
-    <img src="@/assets/icon_image.svg" style="width: 65%" alt="" />
+  <AppAvatar shape="square" style="background: #FF8800;">
+    <img src="@/assets/icon_text-image.svg" style="width: 65%" alt="" />
   </AppAvatar>
 </template>
 <script setup lang="ts"></script>
