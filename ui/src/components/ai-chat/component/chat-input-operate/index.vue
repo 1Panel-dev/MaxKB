@@ -27,7 +27,9 @@
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
-                    <el-icon><CircleCloseFilled /></el-icon>
+                    <el-icon>
+                      <CircleCloseFilled />
+                    </el-icon>
                   </div>
                   <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
                   <div class="ml-4 ellipsis" style="max-width: 160px" :title="item && item?.name">
@@ -48,7 +50,9 @@
                   class="delete-icon color-secondary"
                   v-if="showDelete === item.url"
                 >
-                  <el-icon><CircleCloseFilled /></el-icon>
+                  <el-icon>
+                    <CircleCloseFilled />
+                  </el-icon>
                 </div>
                 <el-image
                   :src="item.url"
@@ -71,7 +75,9 @@
                     class="delete-icon color-secondary"
                     v-if="showDelete === item.url"
                   >
-                    <el-icon><CircleCloseFilled /></el-icon>
+                    <el-icon>
+                      <CircleCloseFilled />
+                    </el-icon>
                   </div>
                   <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
                   <div class="ml-4 ellipsis" style="max-width: 160px" :title="item && item?.name">
@@ -180,6 +186,7 @@ import 'recorder-core/src/engine/mp3'
 
 import 'recorder-core/src/engine/mp3-engine'
 import { MsgWarning } from '@/utils/message'
+
 const route = useRoute()
 const {
   query: { mode }
@@ -227,7 +234,7 @@ const localLoading = computed({
 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
 const documentExtensions = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
 const videoExtensions = ['mp4', 'avi', 'mov', 'mkv', 'flv']
-const audioExtensions = ['mp3']
+const audioExtensions = ['mp3', 'wav', 'ogg', 'aac']
 
 const getAcceptList = () => {
   const { image, document, audio, video } = props.applicationDetails.file_upload_setting
@@ -513,9 +520,11 @@ function deleteFile(index: number, val: string) {
     uploadAudioList.value.splice(index, 1)
   }
 }
+
 function mouseenter(row: any) {
   showDelete.value = row.url
 }
+
 function mouseleave() {
   showDelete.value = ''
 }
@@ -530,9 +539,11 @@ onMounted(() => {
 </script>
 <style lang="scss" scope>
 @import '../../index.scss';
+
 .file {
   position: relative;
   overflow: inherit;
+
   .delete-icon {
     position: absolute;
     right: -5px;
@@ -540,6 +551,7 @@ onMounted(() => {
     z-index: 1;
   }
 }
+
 .upload-tooltip-width {
   width: 300px;
 }

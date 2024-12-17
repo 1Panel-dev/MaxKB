@@ -85,7 +85,7 @@
             <div class="flex align-center">
               <img class="mr-12" src="@/assets/icon_file-audio.svg" alt="" />
               <div>
-                <p class="line-height-22 mt-4">音频（MP3）</p>
+                <p class="line-height-22 mt-4">音频（MP3、WAV、OGG、ACC）</p>
                 <el-text class="color-secondary">需要使用“语音转文本”节点解析音频内容</el-text>
               </div>
             </div>

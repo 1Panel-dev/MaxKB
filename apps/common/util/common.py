@@ -181,18 +181,18 @@ def sil_to_wav(silk_path, wav_path, rate: int = 24000):
         f.write(wav_data)
 
 
-def split_and_transcribe(file_path, model, max_segment_length_ms=59000, format="mp3"):
-    audio_data = AudioSegment.from_file(file_path, format=format)
+def split_and_transcribe(file_path, model, max_segment_length_ms=59000, audio_format="mp3"):
+    audio_data = AudioSegment.from_file(file_path, format=audio_format)
     audio_length_ms = len(audio_data)
 
     if audio_length_ms <= max_segment_length_ms:
-        return model.speech_to_text(io.BytesIO(audio_data.export(format=format).read()))
+        return model.speech_to_text(io.BytesIO(audio_data.export(format=audio_format).read()))
 
     full_text = []
     for start_ms in range(0, audio_length_ms, max_segment_length_ms):
         end_ms = min(audio_length_ms, start_ms + max_segment_length_ms)
         segment = audio_data[start_ms:end_ms]
-        text = model.speech_to_text(io.BytesIO(segment.export(format=format).read()))
+        text = model.speech_to_text(io.BytesIO(segment.export(format=audio_format).read()))
         if isinstance(text, str):
             full_text.append(text)
     return ' '.join(full_text)
