@@ -43,7 +43,9 @@
       v-model:chat-id="chartOpenId"
       v-model:loading="loading"
       v-if="type !== 'log'"
-    ></ChatInputOperate>
+    >
+      <template #operateBefore> <slot name="operateBefore" /> </template>
+    </ChatInputOperate>
   </div>
 </template>
 <script setup lang="ts">
