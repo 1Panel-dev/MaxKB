@@ -5,6 +5,9 @@
   --el-border-color: #dee0e3;
   --el-text-color-regular: #1f2329;
   --el-color-info: #8f959e !important;
+  --el-disabled-bg-color: #eff0f1;
+  --el-disabled-border-color: #bbbfc4;
+  --el-text-color-primary: #1f2329;
 }
 
 .el-button {
@@ -249,6 +252,9 @@
 
 .el-input__wrapper {
   padding: 1px 12px !important;
+}
+
+.el-input.is-disabled .el-input__wrapper {
 }
 
 .el-input--large {

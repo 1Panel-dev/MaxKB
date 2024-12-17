@@ -526,41 +526,6 @@
                   </template>
                   <!-- 图片生成 -->
                   <template v-if="item.type == WorkflowType.ImageGenerateNode">
-                    <div
-                      class="card-never border-r-4 mt-8"
-                      v-if="item.type !== WorkflowType.Application"
-                    >
-                      <h5 class="p-8-12">历史记录</h5>
-                      <div class="p-8-12 border-t-dashed lighter">
-                        <template v-if="item.history_message?.length > 0">
-                          <p
-                            class="mt-4 mb-4"
-                            v-for="(history, historyIndex) in item.history_message"
-                            :key="historyIndex"
-                          >
-                            <span class="color-secondary mr-4">{{ history.role }}:</span>
-
-                            <span v-if="Array.isArray(history.content)">
-                              <template v-for="(h, i) in history.content" :key="i">
-                                <el-image
-                                  v-if="h.type === 'image_url'"
-                                  :src="h.image_url.url"
-                                  alt=""
-                                  fit="cover"
-                                  style="width: 40px; height: 40px; display: inline-block"
-                                  class="border-r-4 mr-8"
-                                />
-
-                                <span v-else>{{ h.text }}<br /></span>
-                              </template>
-                            </span>
-
-                            <span v-else>{{ history.content }}</span>
-                          </p>
-                        </template>
-                        <template v-else> - </template>
-                      </div>
-                    </div>
                     <div class="card-never border-r-4 mt-8">
                       <h5 class="p-8-12">本次对话</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">

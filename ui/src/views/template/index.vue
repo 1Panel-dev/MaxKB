@@ -324,8 +324,10 @@ onMounted(() => {
       border-bottom: none !important;
       padding-left: 16px;
       font-size: 14px;
+      height: 40px;
       &:hover {
         background: var(--app-text-color-light-1);
+        border-radius: 4px;
       }
     }
     :deep(.el-collapse-item) {
@@ -340,7 +342,7 @@ onMounted(() => {
       border-bottom: none !important;
     }
     :deep(.el-collapse-item__content) {
-      padding-bottom: 0 !important;;
+      padding-bottom: 0 !important;
     }
   }
 }
