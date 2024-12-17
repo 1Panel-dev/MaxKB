@@ -60,13 +60,14 @@ RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     cp -r /opt/maxkb/model/base/hub /opt/maxkb/model/tokenizer && \
     cp -f /opt/maxkb/app/installer/run-maxkb.sh /usr/bin/run-maxkb.sh && \
     cp -f /opt/maxkb/app/installer/init.sql /docker-entrypoint-initdb.d && \
+    curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh && \
     mkdir -p /opt/maxkb/app/sandbox/python-packages &&  \
     find /opt/maxkb/app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} + && \
-    chmod 755 /tmp  && \
-    useradd --no-create-home --home /opt/maxkb/app/sandbox --shell /bin/bash sandbox &&  \
-    chown sandbox:sandbox /opt/maxkb/app/sandbox && \
-    curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh
-
+    chmod 755 /tmp && \
+    useradd --no-create-home --home /opt/maxkb/app/sandbox sandbox -g root && \
+    chown -R sandbox:root /opt/maxkb/app/sandbox && \
+    chmod g-x /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/15/bin/* && \
+    chmod g+x /usr/local/bin/python* /bin/sh
 
 EXPOSE 8080
 
