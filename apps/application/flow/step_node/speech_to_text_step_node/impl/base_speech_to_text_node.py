@@ -37,7 +37,7 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
                 temp_mp3_path = temp_amr_file.name
             any_to_mp3(temp_file_path, temp_mp3_path)
             try:
-                return split_and_transcribe(temp_file_path, model)
+                return split_and_transcribe(temp_mp3_path, model)
             finally:
                 os.remove(temp_file_path)
                 os.remove(temp_mp3_path)
