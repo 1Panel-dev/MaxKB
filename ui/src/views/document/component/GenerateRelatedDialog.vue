@@ -2,16 +2,10 @@
   <el-dialog
     title="生成问题"
     v-model="dialogVisible"
-    width="600"
-    class="select-dataset-dialog"
+    width="650"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <template #header="{ titleId, titleClass }">
-      <div class="my-header flex">
-        <h4 :id="titleId" :class="titleClass">生成问题</h4>
-      </div>
-    </template>
     <div class="content-height">
       <el-form
         ref="FormRef"
@@ -20,11 +14,11 @@
         label-position="top"
         require-asterisk-position="right"
       >
-        <div class="update-info flex border-r-4 mb-16 w-full">
+        <div class="update-info flex border-r-4 mb-16 p-8-12">
           <div class="mt-4">
             <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
           </div>
-          <div class="ml-16 lighter">
+          <div class="ml-12 lighter">
             <p>提示词中的 {data} 为分段内容的占位符，执行时替换为分段内容发送给 AI 模型；</p>
             <p>AI 模型根据分段内容生成相关问题，请将生成的问题放至&lt;question&gt;&lt;/question&gt;标签中，系统会自动关联标签中的问题；</p>
             <p>生成效果依赖于所选模型和提示词，用户可自行调整至最佳效果。</p>

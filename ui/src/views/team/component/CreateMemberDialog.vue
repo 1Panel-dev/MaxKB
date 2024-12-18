@@ -88,7 +88,7 @@ const submitMember = async (formEl: FormInstance | undefined) => {
           dialogVisible.value = false
           loading.value = false
         })
-        .finally(() => {
+        .catch(() => {
           loading.value = false
         })
     }

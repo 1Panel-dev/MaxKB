@@ -5,11 +5,12 @@
     width="800"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    align-center
   >
     <el-button type="primary" class="mb-16" @click="createApiKey">
       {{ $t('views.applicationOverview.appInfo.APIKeyDialog.creatApiKey') }}
     </el-button>
-    <el-table :data="apiKey" class="mb-16" :loading="loading">
+    <el-table :data="apiKey" class="mb-16" :loading="loading" height="420">
       <el-table-column prop="secret_key" label="API Key">
         <template #default="{ row }">
           <span class="vertical-middle lighter break-all">

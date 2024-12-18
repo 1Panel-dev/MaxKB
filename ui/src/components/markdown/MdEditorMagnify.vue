@@ -14,7 +14,7 @@
     </template>
   </MdEditor>
   <!-- 回复内容弹出层 -->
-  <el-dialog v-model="dialogVisible" :title="title" append-to-body>
+  <el-dialog v-model="dialogVisible" :title="title" append-to-body align-center>
     <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"></MdEditor>
     <template #footer>
       <div class="dialog-footer mt-24">

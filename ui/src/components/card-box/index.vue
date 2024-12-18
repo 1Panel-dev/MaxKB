@@ -8,7 +8,7 @@
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
           </slot>
-          <div style="width: 90%">
+          <div style="width: 90%;margin-top: -5px;">
             <auto-tooltip :content="title" style="width: 65%; height: 22px">
               {{ title }}
             </auto-tooltip>
@@ -85,6 +85,7 @@ function subHoveredEnter() {
   border-radius: 8px;
   .title {
     height: 20px;
+
   }
   .description {
     color: var(--app-text-color-secondary);

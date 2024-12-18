@@ -24,18 +24,20 @@
                 shadow="never"
                 class="mb-16"
                 :class="datasetForm.type === '0' ? 'active' : ''"
+                @click="datasetForm.type = '0'"
               >
-                <el-radio value="0" size="large">
+                <div class="flex-between">
                   <div class="flex align-center">
                     <AppAvatar class="mr-8 avatar-blue" shape="square" :size="32">
                       <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                     </AppAvatar>
                     <div>
-                      <p class="mb-4">通用型</p>
+                      <p><el-text>通用型</el-text></p>
                       <el-text type="info">上传本地文件或手动录入</el-text>
                     </div>
                   </div>
-                </el-radio>
+                  <el-radio value="0" size="large" style="width: 16px"></el-radio>
+                </div>
               </el-card>
             </el-col>
             <el-col :span="12">
@@ -43,18 +45,20 @@
                 shadow="never"
                 class="mb-16"
                 :class="datasetForm.type === '1' ? 'active' : ''"
+                @click="datasetForm.type = '1'"
               >
-                <el-radio value="1" size="large">
+                <div class="flex-between">
                   <div class="flex align-center">
                     <AppAvatar class="mr-8 avatar-purple" shape="square" :size="32">
                       <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
                     </AppAvatar>
                     <div>
-                      <p class="mb-4">Web 站点</p>
-                      <el-text type="info">同步Web网站文本数据 </el-text>
+                      <p><el-text>Web 站点</el-text></p>
+                      <el-text type="info">同步Web网站文本数据</el-text>
                     </div>
                   </div>
-                </el-radio>
+                  <el-radio value="1" size="large" style="width: 16px"></el-radio>
+                </div>
               </el-card>
             </el-col>
           </el-row>

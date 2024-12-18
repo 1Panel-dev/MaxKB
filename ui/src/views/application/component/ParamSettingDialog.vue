@@ -10,7 +10,7 @@
     :close-on-press-escape="false"
   >
     <div class="dialog-max-height">
-      <el-scrollbar always>
+      <el-scrollbar>
         <div class="p-16">
           <el-form label-position="top" ref="paramFormRef" :model="form">
             <el-form-item
@@ -337,7 +337,7 @@ defineExpose({ open })
     padding: 0 !important;
   }
   .dialog-max-height {
-    height: 550px;
+    height: 560px;
   }
   .custom-slider {
     .el-input-number.is-without-controls .el-input__wrapper {

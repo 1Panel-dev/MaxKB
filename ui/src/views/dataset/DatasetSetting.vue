@@ -150,7 +150,6 @@ async function submit() {
         if (cloneModelId.value !== BaseFormRef.value.form.embedding_mode_id) {
           MsgConfirm(`提示`, `修改知识库向量模型后，需要对知识库向量化，是否继续保存？`, {
             confirmButtonText: '向量化',
-            confirmButtonClass: 'primary'
           })
             .then(() => {
               datasetApi.putDataset(id, obj, loading).then((res) => {
