@@ -23,3 +23,7 @@ class AzureOpenAIEmbeddingModel(MaxKBBaseModel, AzureOpenAIEmbeddings):
             openai_api_version=model_credential.get('api_version'),
             openai_api_type="azure",
         )
+
+
+    def is_cache_model(self):
+        return True
