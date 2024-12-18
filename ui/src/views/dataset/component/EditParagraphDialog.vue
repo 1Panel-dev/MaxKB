@@ -98,9 +98,14 @@ function delProblemHandle(item: any, index: number) {
 }
 function addProblemHandle() {
   if (problemValue.value.trim()) {
-    detail.value?.problem_list?.push({
-      content: problemValue.value.trim()
-    })
+    if (
+      !detail.value?.problem_list.some((item: any) => item.content === problemValue.value.trim())
+    ) {
+      detail.value?.problem_list?.push({
+        content: problemValue.value.trim()
+      })
+    }
+
     problemValue.value = ''
     isAddProblem.value = false
   }
