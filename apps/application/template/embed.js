@@ -1,3 +1,4 @@
+(function() {
 const guideHtml=`
 <div class="maxkb-mask">
   <div class="maxkb-content"></div>
@@ -23,7 +24,7 @@ const chatButtonHtml=
 <img style="height:100%;width:100%;" src="{{float_icon}}">
 </div>`
 
- 
+
 
 const getChatContainerHtml=(protocol,host,token,query)=>{
  return `<div id="maxkb-chat-container">
@@ -43,7 +44,7 @@ const getChatContainerHtml=(protocol,host,token,query)=>{
 }
 /**
  * 初始化引导
- * @param {*} root  
+ * @param {*} root
  */
 const initGuide=(root)=>{
    root.insertAdjacentHTML("beforeend",guideHtml)
@@ -131,8 +132,9 @@ const initChat=(root)=>{
 function initMaxkb(){
   const maxkb=document.createElement('div')
   const root=document.createElement('div')
-  root.id="maxkb"
-  initMaxkbStyle(maxkb)
+  const maxkbId = 'maxkb-'+crypto.randomUUID().split('-')[0]
+  root.id=maxkbId
+  initMaxkbStyle(maxkb, maxkbId)
   maxkb.appendChild(root)
   document.body.appendChild(maxkb)
   const maxkbMaskTip=localStorage.getItem('maxkbMaskTip')
@@ -142,9 +144,9 @@ function initMaxkb(){
   initChat(root)
 }
 
- 
+
 // 初始化全局样式
-function initMaxkbStyle(root){
+function initMaxkbStyle(root, maxkbId){
   style=document.createElement('style')
   style.type='text/css'
   style.innerText=  `
@@ -306,6 +308,7 @@ function initMaxkbStyle(root){
                   height: 600px;
                 }
               }`
+      .replaceAll('#maxkb ',`#${maxkbId} `)
   root.appendChild(style)
 }
 
@@ -319,3 +322,4 @@ function embedChatbot() {
   } else console.error('invalid parameter')
 }
 window.addEventListener('load',embedChatbot)
+})();
