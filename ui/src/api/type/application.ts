@@ -138,7 +138,7 @@ export class ChatRecordManage {
     ) {
       return this.write_node_info
     }
-    const run_node = this.node_list.filter((item) => item.buffer.length > 0 || !item.is_end).at(0)
+    const run_node = this.node_list.filter((item) => item.buffer.length > 0 || !item.is_end)[0]
 
     if (run_node) {
       const index = this.node_list.indexOf(run_node)
