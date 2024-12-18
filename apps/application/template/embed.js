@@ -310,6 +310,9 @@ function initMaxkbStyle(root){
 }
 
 function embedChatbot() {
+  if (document.getElementById('maxkb')) {
+    return
+  }
   white_list_str='{{white_list_str}}'
   white_list=white_list_str.split(',')
 
