@@ -11,8 +11,8 @@
     />
     <div class="function-CodemirrorEditor__format">
       <el-button text type="info" @click="format" class="magnify">
-        <el-icon><DocumentChecked /></el-icon
-      ></el-button>
+        <el-icon><DocumentChecked /></el-icon>
+      </el-button>
     </div>
     <div class="function-CodemirrorEditor__footer">
       <el-button text type="info" @click="openCodemirrorDialog" class="magnify">

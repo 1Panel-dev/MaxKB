@@ -140,7 +140,8 @@
                             <AppIcon iconName="app-copy"></AppIcon>
                             复制</el-dropdown-item
                           >
-                          <el-dropdown-item icon="Delete" @click.stop="exportApplication(item)">
+                          <el-dropdown-item @click.stop="exportApplication(item)">
+                            <AppIcon iconName="app-export"></AppIcon>
                             导出
                           </el-dropdown-item>
                           <el-dropdown-item icon="Delete" @click.stop="deleteApplication(item)">{{
