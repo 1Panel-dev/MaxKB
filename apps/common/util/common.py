@@ -150,6 +150,7 @@ def any_to_amr(any_path, amr_path):
         raise NotImplementedError("Not support file type: {}".format(any_path))
     audio = AudioSegment.from_file(any_path)
     audio = audio.set_frame_rate(8000)  # only support 8000
+    audio = audio.set_channels(1)
     audio.export(amr_path, format="amr")
     return audio.duration_seconds * 1000
 
@@ -165,6 +166,7 @@ def any_to_mp3(any_path, mp3_path):
         sil_to_wav(any_path, any_path)
         any_path = mp3_path
     audio = AudioSegment.from_file(any_path)
+    audio = audio.set_channels(1)
     audio.export(mp3_path, format="mp3")
 
 
