@@ -6,16 +6,19 @@
     @date：2023/9/21 16:14
     @desc:
 """
+import io
 import logging
 import os.path
 import re
 import traceback
 import uuid
+import zipfile
 from functools import reduce
+from tempfile import TemporaryDirectory
 from typing import Dict, List
 from urllib.parse import urlparse
 
-from celery_once import AlreadyQueued, QueueOnce
+from celery_once import AlreadyQueued
 from django.contrib.postgres.fields import ArrayField
 from django.core import validators
 from django.db import transaction, models
@@ -31,15 +34,15 @@ from common.db.sql_execute import select_list
 from common.event import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.mixins.api_mixin import ApiMixin
-from common.util.common import post, flat_map, valid_license
+from common.util.common import post, flat_map, valid_license, parse_image
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
-from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping, Status, \
-    TaskType, State
+from dataset.models.data_set import DataSet, Document, Paragraph, Problem, Type, ProblemParagraphMapping, TaskType, \
+    State, File, Image
 from dataset.serializers.common_serializers import list_paragraph, MetaSerializer, ProblemParagraphManage, \
-    get_embedding_model_by_dataset_id, get_embedding_model_id_by_dataset_id
+    get_embedding_model_by_dataset_id, get_embedding_model_id_by_dataset_id, write_image, zip_dir
 from dataset.serializers.document_serializers import DocumentSerializers, DocumentInstanceSerializer
 from dataset.task import sync_web_dataset, sync_replace_web_dataset
 from embedding.models import SearchMode
@@ -693,6 +696,33 @@ class DataSetSerializers(serializers.ModelSerializer):
             response = HttpResponse(content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="dataset.xlsx"'
             workbook.save(response)
+            return response
+
+        def export_zip(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_list = QuerySet(Document).filter(dataset_id=self.data.get('id'))
+            paragraph_list = native_search(QuerySet(Paragraph).filter(dataset_id=self.data.get("id")), get_file_content(
+                os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_paragraph_document_name.sql')))
+            problem_mapping_list = native_search(
+                QuerySet(ProblemParagraphMapping).filter(dataset_id=self.data.get("id")), get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True)
+            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(paragraph_list, problem_mapping_list,
+                                                                                 document_list)
+            res = [parse_image(paragraph.get('content')) for paragraph in paragraph_list]
+
+            workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
+            response = HttpResponse(content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename="archive.zip"'
+            zip_buffer = io.BytesIO()
+            with TemporaryDirectory() as tempdir:
+                dataset_file = os.path.join(tempdir, 'dataset.xlsx')
+                workbook.save(dataset_file)
+                for r in res:
+                    write_image(tempdir, r)
+                zip_dir(tempdir, zip_buffer)
+            response.write(zip_buffer.getvalue())
             return response
 
         @staticmethod

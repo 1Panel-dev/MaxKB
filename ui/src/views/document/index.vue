@@ -305,7 +305,11 @@
                         </el-dropdown-item>
                         <el-dropdown-item @click="exportDocument(row)">
                           <AppIcon iconName="app-export"></AppIcon>
-                          导出
+                          导出Excel
+                        </el-dropdown-item>
+                        <el-dropdown-item @click="exportDocumentZip(row)">
+                          <AppIcon iconName="app-export"></AppIcon>
+                          导出Zip
                         </el-dropdown-item>
                         <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
                           >删除</el-dropdown-item
@@ -381,7 +385,11 @@
                         >
                         <el-dropdown-item @click="exportDocument(row)">
                           <AppIcon iconName="app-export"></AppIcon>
-                          导出
+                          导出Excel
+                        </el-dropdown-item>
+                        <el-dropdown-item @click="exportDocumentZip(row)">
+                          <AppIcon iconName="app-export"></AppIcon>
+                          导出Zip
                         </el-dropdown-item>
                         <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
                           >删除</el-dropdown-item
@@ -474,6 +482,13 @@ const exportDocument = (document: any) => {
   documentApi.exportDocument(document.name, document.dataset_id, document.id, loading).then(() => {
     MsgSuccess('导出成功')
   })
+}
+const exportDocumentZip = (document: any) => {
+  documentApi
+    .exportDocumentZip(document.name, document.dataset_id, document.id, loading)
+    .then(() => {
+      MsgSuccess('导出成功')
+    })
 }
 function openDatasetDialog(row?: any) {
   const arr: string[] = []

@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put, exportExcel } from '@/request/index'
+import { get, post, del, put, exportExcel, exportFile } from '@/request/index'
 import type { datasetData } from '@/api/type/dataset'
 import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
@@ -201,7 +201,20 @@ const exportDataset: (
 ) => Promise<any> = (dataset_name, dataset_id, loading) => {
   return exportExcel(dataset_name + '.xlsx', `dataset/${dataset_id}/export`, undefined, loading)
 }
-
+/**
+ *导出Zip知识库
+ * @param dataset_name 知识库名称
+ * @param dataset_id   知识库id
+ * @param loading      加载器
+ * @returns
+ */
+const exportZipDataset: (
+  dataset_name: string,
+  dataset_id: string,
+  loading?: Ref<boolean>
+) => Promise<any> = (dataset_name, dataset_id, loading) => {
+  return exportFile(dataset_name + '.zip', `dataset/${dataset_id}/export_zip`, undefined, loading)
+}
 
 /**
  * 获取当前用户可使用的模型列表
@@ -217,7 +230,6 @@ const getDatasetModel: (
   return get(`${prefix}/${dataset_id}/model`, loading)
 }
 
-
 export default {
   getDataset,
   getAllDataset,
@@ -232,5 +244,6 @@ export default {
   putReEmbeddingDataset,
   postQADataset,
   exportDataset,
-  getDatasetModel
+  getDatasetModel,
+  exportZipDataset
 }
