@@ -38,9 +38,9 @@ export function fileType(name: string) {
   获得文件对应图片
 */
 const typeList: any = {
-  txt: ['txt', 'pdf', 'docx', 'md', 'html'],
+  txt: ['txt', 'pdf', 'docx', 'md', 'html', 'zip', 'xlsx', 'xls', 'csv'],
   table: ['xlsx', 'xls', 'csv'],
-  QA: ['xlsx', 'csv', 'xls']
+  QA: ['xlsx', 'csv', 'xls', 'zip']
 }
 
 export function getImgUrl(name: string) {
@@ -51,6 +51,7 @@ export function getImgUrl(name: string) {
 }
 // 是否是白名单后缀
 export function isRightType(name: string, type: string) {
+  console.log(name, type)
   return typeList[type].includes(fileType(name).toLowerCase())
 }
 

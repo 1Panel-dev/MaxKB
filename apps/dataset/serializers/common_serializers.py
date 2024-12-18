@@ -7,7 +7,9 @@
     @desc:
 """
 import os
+import re
 import uuid
+import zipfile
 from typing import List
 
 from django.db.models import QuerySet
@@ -22,9 +24,44 @@ from common.mixins.api_mixin import ApiMixin
 from common.util.field_message import ErrMessage
 from common.util.file_util import get_file_content
 from common.util.fork import Fork
-from dataset.models import Paragraph, Problem, ProblemParagraphMapping, DataSet
+from dataset.models import Paragraph, Problem, ProblemParagraphMapping, DataSet, File, Image
 from setting.models_provider import get_model
 from smartdoc.conf import PROJECT_DIR
+
+
+def zip_dir(zip_path, output=None):
+    output = output or os.path.basename(zip_path) + '.zip'
+    zip = zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED)
+    for root, dirs, files in os.walk(zip_path):
+        relative_root = '' if root == zip_path else root.replace(zip_path, '') + os.sep
+        for filename in files:
+            zip.write(os.path.join(root, filename), relative_root + filename)
+    zip.close()
+
+
+def write_image(zip_path: str, image_list: List[str]):
+    for image in image_list:
+        search = re.search("\(.*\)", image)
+        if search:
+            text = search.group()
+            if text.startswith('(/api/file/'):
+                r = text.replace('(/api/file/', '').replace(')', '')
+                file = QuerySet(File).filter(id=r).first()
+                zip_inner_path = os.path.join('api', 'file', r)
+                file_path = os.path.join(zip_path, zip_inner_path)
+                if not os.path.exists(os.path.dirname(file_path)):
+                    os.makedirs(os.path.dirname(file_path))
+                with open(os.path.join(zip_path, file_path), 'wb') as f:
+                    f.write(file.get_byte())
+            else:
+                r = text.replace('(/api/image/', '').replace(')', '')
+                image_model = QuerySet(Image).filter(id=r).first()
+                zip_inner_path = os.path.join('api', 'image', r)
+                file_path = os.path.join(zip_path, zip_inner_path)
+                if not os.path.exists(os.path.dirname(file_path)):
+                    os.makedirs(os.path.dirname(file_path))
+                with open(file_path, 'wb') as f:
+                    f.write(image_model.image)
 
 
 def update_document_char_length(document_id: str):

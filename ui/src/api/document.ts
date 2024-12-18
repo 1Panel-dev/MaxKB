@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put, exportExcel } from '@/request/index'
+import { get, post, del, put, exportExcel, exportFile } from '@/request/index'
 import type { Ref } from 'vue'
 import type { KeyValue } from '@/api/type/common'
 import type { pageRequest } from '@/api/type/common'
@@ -316,7 +316,27 @@ const exportDocument: (
     loading
   )
 }
-
+/**
+ * 导出文档
+ * @param document_name 文档名称
+ * @param dataset_id    数据集id
+ * @param document_id   文档id
+ * @param loading       加载器
+ * @returns
+ */
+const exportDocumentZip: (
+  document_name: string,
+  dataset_id: string,
+  document_id: string,
+  loading?: Ref<boolean>
+) => Promise<any> = (document_name, dataset_id, document_id, loading) => {
+  return exportFile(
+    document_name + '.zip',
+    `${prefix}/${dataset_id}/document/${document_id}/export_zip`,
+    {},
+    loading
+  )
+}
 const batchGenerateRelated: (
   dataset_id: string,
   data: any,
@@ -362,5 +382,6 @@ export default {
   exportDocument,
   batchRefresh,
   batchGenerateRelated,
-  cancelTask
+  cancelTask,
+  exportDocumentZip
 }

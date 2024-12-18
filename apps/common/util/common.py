@@ -9,6 +9,7 @@
 import hashlib
 import importlib
 import io
+import re
 import shutil
 import mimetypes
 from functools import reduce
@@ -109,6 +110,18 @@ def valid_license(model=None, count=None, message=None):
     return inner
 
 
+def parse_image(content: str):
+    matches = re.finditer("!\[.*?\]\(\/api\/(image|file)\/.*?\)", content)
+    image_list = [match.group() for match in matches]
+    return image_list
+
+
+def parse_md_image(content: str):
+    matches = re.finditer("!\[.*?\]\(.*?\)", content)
+    image_list = [match.group() for match in matches]
+    return image_list
+
+
 def bulk_create_in_batches(model, data, batch_size=1000):
     if len(data) == 0:
         return
@@ -138,6 +151,7 @@ def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
         charset=None,
     )
     return uploaded_file
+
 
 def any_to_amr(any_path, amr_path):
     """

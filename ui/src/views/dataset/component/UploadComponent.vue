@@ -43,7 +43,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        accept=".xlsx, .xls, .csv"
+        accept=".xlsx, .xls, .csv,.zip"
         :limit="50"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
@@ -129,7 +129,7 @@
         action="#"
         :auto-upload="false"
         :show-file-list="false"
-        accept=".txt, .md, .log, .docx, .pdf, .html"
+        accept=".txt, .md, .log, .docx, .pdf, .html,.zip,.xlsx,.xls,.csv"
         :limit="50"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
@@ -143,7 +143,7 @@
             <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>支持格式：TXT、Markdown、PDF、DOCX、HTML</p>
+            <p>支持格式：TXT、Markdown、PDF、DOCX、HTML、ZIP、XLSX、XLS、CSV</p>
           </div>
         </div>
       </el-upload>
