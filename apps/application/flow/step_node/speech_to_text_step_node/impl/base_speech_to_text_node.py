@@ -14,6 +14,7 @@ from common.util.common import split_and_transcribe, any_to_mp3
 from dataset.models import File
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 
+
 class BaseSpeechToTextNode(ISpeechToTextNode):
 
     def save_context(self, details, workflow_manage):
