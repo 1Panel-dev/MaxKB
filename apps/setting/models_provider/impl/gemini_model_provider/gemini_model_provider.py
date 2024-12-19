@@ -64,6 +64,10 @@ model_embedding_info_list = [
               ModelTypeConst.EMBEDDING,
               gemini_embedding_model_credential,
               GeminiEmbeddingModel),
+    ModelInfo('models/text-embedding-004', '',
+              ModelTypeConst.EMBEDDING,
+              gemini_embedding_model_credential,
+              GeminiEmbeddingModel),
 ]
 
 model_info_manage = (
