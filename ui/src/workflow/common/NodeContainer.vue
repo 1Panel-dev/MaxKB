@@ -37,6 +37,27 @@
                 ><ArrowDownBold />
               </el-icon>
             </el-button>
+            <el-dropdown
+              v-if="showOperate(nodeModel.type)"
+              :teleported="false"
+              trigger="click"
+              placement="bottom-start"
+            >
+              <el-button text>{{ condition }}</el-button>
+              <template #dropdown>
+                <div style="width: 280px" class="p-12-16">
+                  <h5>执行条件</h5>
+                  <p class="mt-8 lighter">
+                    <span>前置</span>
+                    <el-select v-model="condition" size="small" style="width: 60px; margin: 0 8px">
+                      <el-option label="所有" value="AND" />
+                      <el-option label="任一" value="OR" />
+                    </el-select>
+                    <span>连线节点执行完，执行当前节点</span>
+                  </p>
+                </div>
+              </template>
+            </el-dropdown>
             <el-dropdown v-if="showOperate(nodeModel.type)" :teleported="false" trigger="click">
               <el-button text>
                 <el-icon class="color-secondary"><MoreFilled /></el-icon>
@@ -128,7 +149,8 @@ const height = ref<{
 })
 const showAnchor = ref<boolean>(false)
 const anchorData = ref<any>()
-// const showNode = ref<boolean>(true)
+const condition = ref('AND')
+
 const showNode = computed({
   set: (v) => {
     set(props.nodeModel.properties, 'showNode', v)
