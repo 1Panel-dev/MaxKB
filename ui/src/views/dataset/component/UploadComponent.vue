@@ -57,7 +57,7 @@
             <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>支持格式：EXCEL、CSV</p>
+            <p>支持格式：XLS、XLSX、CSV、ZIP</p>
           </div>
         </div>
       </el-upload>
@@ -105,7 +105,7 @@
             <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>支持格式：EXCEL 和 CSV</p>
+            <p>支持格式：XLS、XLSX、CSV、ZIP</p>
           </div>
         </div>
       </el-upload>
@@ -143,7 +143,7 @@
             <em class="hover" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
           </p>
           <div class="upload__decoration">
-            <p>支持格式：TXT、Markdown、PDF、DOCX、HTML、ZIP、XLSX、XLS、CSV</p>
+            <p>支持格式：TXT、Markdown、PDF、DOCX、HTML、XLS、XLSX、CSV、ZIP</p>
           </div>
         </div>
       </el-upload>
