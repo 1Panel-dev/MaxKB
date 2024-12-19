@@ -14,6 +14,8 @@ from common.util.common import split_and_transcribe, any_to_mp3
 from dataset.models import File
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 
+splitter = '\n`-----------------------------------`\n'
+
 
 class BaseSpeechToTextNode(ISpeechToTextNode):
 
@@ -37,7 +39,8 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
                 temp_mp3_path = temp_amr_file.name
             any_to_mp3(temp_file_path, temp_mp3_path)
             try:
-                return split_and_transcribe(temp_mp3_path, model)
+                transcription = split_and_transcribe(temp_mp3_path, model)
+                return {file.file_name: transcription}
             finally:
                 os.remove(temp_file_path)
                 os.remove(temp_mp3_path)
@@ -45,10 +48,17 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
         def process_audio_items(audio_list, model):
             with ThreadPoolExecutor(max_workers=5) as executor:
                 results = list(executor.map(lambda item: process_audio_item(item, model), audio_list))
-            return '\n\n'.join(results)
+            return results
 
         result = process_audio_items(audio_list, stt_model)
-        return NodeResult({'answer': result, 'result': result}, {})
+        content = []
+        result_content = []
+        for item in result:
+            for key, value in item.items():
+                content.append(f'### {key}\n{value}')
+                result_content.append(value)
+        return NodeResult({'answer': '\n'.join(result_content), 'result': '\n'.join(result_content),
+                           'content': content}, {})
 
     def get_details(self, index: int, **kwargs):
         return {
@@ -56,6 +66,7 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
             "index": index,
             'run_time': self.context.get('run_time'),
             'answer': self.context.get('answer'),
+            'content': self.context.get('content'),
             'type': self.node.type,
             'status': self.status,
             'err_message': self.err_message,

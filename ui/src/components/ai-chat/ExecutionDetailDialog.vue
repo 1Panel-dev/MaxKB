@@ -293,15 +293,22 @@
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">参数输出</h5>
                       <div class="p-8-12 border-t-dashed lighter">
-                        <p class="mb-8 color-secondary">文本内容:</p>
-                        <div v-if="item.answer">
+                        <el-card
+                          shadow="never"
+                          style="--el-card-padding: 8px"
+                          v-for="(file_content, index) in item.content"
+                          :key="index"
+                          class="mb-8"
+                        >
                           <MdPreview
+                            v-if="file_content"
                             ref="editorRef"
                             editorId="preview-only"
-                            :modelValue="item.answer"
+                            :modelValue="file_content"
                             style="background: none"
                           />
-                        </div>
+                          <template v-else> -</template>
+                        </el-card>
                       </div>
                     </div>
                   </template>
@@ -544,7 +551,7 @@
                           :modelValue="item.answer"
                           style="background: none"
                         />
-                        <template v-else> - </template>
+                        <template v-else> -</template>
                       </div>
                     </div>
                   </template>
