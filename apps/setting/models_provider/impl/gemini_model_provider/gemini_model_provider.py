@@ -13,12 +13,15 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
     ModelInfoManage
 from setting.models_provider.impl.gemini_model_provider.credential.image import GeminiImageModelCredential
 from setting.models_provider.impl.gemini_model_provider.credential.llm import GeminiLLMModelCredential
+from setting.models_provider.impl.gemini_model_provider.credential.stt import GeminiSTTModelCredential
 from setting.models_provider.impl.gemini_model_provider.model.image import GeminiImage
 from setting.models_provider.impl.gemini_model_provider.model.llm import GeminiChatModel
+from setting.models_provider.impl.gemini_model_provider.model.stt import GeminiSpeechToText
 from smartdoc.conf import PROJECT_DIR
 
 gemini_llm_model_credential = GeminiLLMModelCredential()
 gemini_image_model_credential = GeminiImageModelCredential()
+gemini_stt_model_credential = GeminiSTTModelCredential()
 
 model_info_list = [
     ModelInfo('gemini-1.0-pro', '最新的Gemini 1.0 Pro模型，随Google更新而更新',
@@ -42,14 +45,25 @@ model_image_info_list = [
               GeminiImage),
 ]
 
-
+model_stt_info_list = [
+    ModelInfo('gemini-1.5-flash', '最新的Gemini 1.5 Flash模型，随Google更新而更新',
+              ModelTypeConst.STT,
+              gemini_stt_model_credential,
+              GeminiSpeechToText),
+    ModelInfo('gemini-1.5-pro', '最新的Gemini 1.5 Flash模型，随Google更新而更新',
+              ModelTypeConst.STT,
+              gemini_stt_model_credential,
+              GeminiSpeechToText),
+]
 
 model_info_manage = (
     ModelInfoManage.builder()
     .append_model_info_list(model_info_list)
     .append_model_info_list(model_image_info_list)
+    .append_model_info_list(model_stt_info_list)
     .append_default_model_info(model_info_list[0])
     .append_default_model_info(model_image_info_list[0])
+    .append_default_model_info(model_stt_info_list[0])
     .build()
 )
 
