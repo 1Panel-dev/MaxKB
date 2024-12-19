@@ -11,9 +11,11 @@ import os
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, \
     ModelInfoManage
+from setting.models_provider.impl.gemini_model_provider.credential.embedding import GeminiEmbeddingCredential
 from setting.models_provider.impl.gemini_model_provider.credential.image import GeminiImageModelCredential
 from setting.models_provider.impl.gemini_model_provider.credential.llm import GeminiLLMModelCredential
 from setting.models_provider.impl.gemini_model_provider.credential.stt import GeminiSTTModelCredential
+from setting.models_provider.impl.gemini_model_provider.model.embedding import GeminiEmbeddingModel
 from setting.models_provider.impl.gemini_model_provider.model.image import GeminiImage
 from setting.models_provider.impl.gemini_model_provider.model.llm import GeminiChatModel
 from setting.models_provider.impl.gemini_model_provider.model.stt import GeminiSpeechToText
@@ -22,6 +24,7 @@ from smartdoc.conf import PROJECT_DIR
 gemini_llm_model_credential = GeminiLLMModelCredential()
 gemini_image_model_credential = GeminiImageModelCredential()
 gemini_stt_model_credential = GeminiSTTModelCredential()
+gemini_embedding_model_credential = GeminiEmbeddingCredential()
 
 model_info_list = [
     ModelInfo('gemini-1.0-pro', '最新的Gemini 1.0 Pro模型，随Google更新而更新',
@@ -56,14 +59,23 @@ model_stt_info_list = [
               GeminiSpeechToText),
 ]
 
+model_embedding_info_list = [
+    ModelInfo('models/embedding-001', '',
+              ModelTypeConst.EMBEDDING,
+              gemini_embedding_model_credential,
+              GeminiEmbeddingModel),
+]
+
 model_info_manage = (
     ModelInfoManage.builder()
     .append_model_info_list(model_info_list)
     .append_model_info_list(model_image_info_list)
     .append_model_info_list(model_stt_info_list)
+    .append_model_info_list(model_embedding_info_list)
     .append_default_model_info(model_info_list[0])
     .append_default_model_info(model_image_info_list[0])
     .append_default_model_info(model_stt_info_list[0])
+    .append_default_model_info(model_embedding_info_list[0])
     .build()
 )
 
