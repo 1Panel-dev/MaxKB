@@ -70,7 +70,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     # 回到文件头
                     buffer.seek(0)
                     file_content = split_handle.get_content(buffer, save_image)
-                    content.append('## ' + doc['name'] + '\n' + file_content)
+                    content.append('### ' + doc['name'] + '\n' + file_content)
                     break
 
         return NodeResult({'content': splitter.join(content)}, {})
