@@ -80,9 +80,9 @@
                   :item="item"
                 />
                 <div class="pre-wrap" style="width: 60%">
-                  <auto-tooltip :content="item.name" style="width: 80%" class="lighter">
+                  <div class="lighter ellipsis" :title="item.name">
                     {{ item.name }}
-                  </auto-tooltip>
+                  </div>
                   <el-text type="info" size="small" style="width: 80%">{{ item.desc }}</el-text>
                 </div>
                 <div class="status-tag" style="margin-left: auto">

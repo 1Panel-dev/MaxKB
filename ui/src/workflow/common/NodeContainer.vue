@@ -32,7 +32,7 @@
           </div>
 
           <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
-            <el-button text @click="showNode = !showNode" class="mr-4">
+            <el-button text @click="showNode = !showNode">
               <el-icon class="arrow-icon color-secondary" :class="showNode ? 'rotate-180' : ''"
                 ><ArrowDownBold />
               </el-icon>
@@ -43,7 +43,10 @@
               trigger="click"
               placement="bottom-start"
             >
-              <el-button text>{{ condition }}</el-button>
+              <el-button text>
+                <img src="@/assets/icon_or.svg" alt="" v-if="condition==='OR'">
+                <img src="@/assets/icon_and.svg" alt="" v-if="condition==='AND'">
+              </el-button>
               <template #dropdown>
                 <div style="width: 280px" class="p-12-16">
                   <h5>执行条件</h5>
