@@ -92,7 +92,7 @@
           prop="audio_list"
           :rules="{
             message: '选择语音文件',
-            trigger: 'blur',
+            trigger: 'change',
             required: true
           }"
         >
@@ -175,7 +175,7 @@ const wheel = (e: any) => {
 const form = {
   stt_model_id: '',
   is_result: true,
-  audio_list: ['start-node', 'audio']
+  audio_list: []
 }
 
 const form_data = computed({
@@ -210,9 +210,7 @@ function getProvider() {
   })
 }
 
-const model_change = (model_id?: string) => {
-  console.log(modelOptions.value)
-}
+const model_change = (model_id?: string) => {}
 
 onMounted(() => {
   getModel()

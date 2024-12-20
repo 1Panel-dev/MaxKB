@@ -189,7 +189,7 @@ const wheel = (e: any) => {
 const form = {
   tts_model_id: '',
   is_result: true,
-  content_list: ['start-node', 'content'],
+  content_list: [],
   model_params_setting: {}
 }
 

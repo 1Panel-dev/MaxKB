@@ -13,7 +13,7 @@ class TextToSpeechNodeSerializer(serializers.Serializer):
 
     is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
 
-    content_list = serializers.ListField(required=False, error_messages=ErrMessage.list("文本内容"))
+    content_list = serializers.ListField(required=True, error_messages=ErrMessage.list("文本内容"))
     model_params_setting = serializers.DictField(required=False,
                                                  error_messages=ErrMessage.integer("模型参数相关设置"))
 
