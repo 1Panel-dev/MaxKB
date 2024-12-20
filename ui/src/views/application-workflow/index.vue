@@ -242,18 +242,14 @@ function clickoutside() {
   showPopover.value = false
 }
 async function publicHandle() {
-  // 先执行保存
-  const obj = {
-    work_flow: getGraphData()
-  }
-  await application.asyncPutApplication(id, obj)
   // 后执行发布
   workflowRef.value
     ?.validate()
-    .then(() => {
+    .then(async () => {
       const obj = {
         work_flow: getGraphData()
       }
+      await application.asyncPutApplication(id, obj)
       const workflow = new WorkFlowInstance(obj.work_flow)
       try {
         workflow.is_valid()

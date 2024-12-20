@@ -13,7 +13,7 @@ class SpeechToTextNodeSerializer(serializers.Serializer):
 
     is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
 
-    audio_list = serializers.ListField(required=False, error_messages=ErrMessage.list("音频"))
+    audio_list = serializers.ListField(required=True, error_messages=ErrMessage.list("音频文件不能为空", ))
 
 
 class ISpeechToTextNode(INode):
