@@ -317,6 +317,7 @@ const open = (provider: Provider) => {
   })
   providerValue.value = provider
   dialogVisible.value = true
+  activeName.value = 'base-info'
 }
 
 const list_base_model = (model_type: any, change?: boolean) => {
