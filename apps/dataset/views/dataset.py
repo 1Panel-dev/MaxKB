@@ -103,7 +103,8 @@ class Dataset(APIView):
                          tags=["知识库"])
     @has_permissions(PermissionConstants.DATASET_READ, compare=CompareConstants.AND)
     def get(self, request: Request):
-        d = DataSetSerializers.Query(data={**request.query_params, 'user_id': str(request.user.id)})
+        data = {key: str(value) for key, value in request.query_params.items()}
+        d = DataSetSerializers.Query(data={**data, 'user_id': str(request.user.id)})
         d.is_valid()
         return result.success(d.list())
 
