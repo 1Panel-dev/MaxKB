@@ -633,17 +633,28 @@ function syncMulDocument() {
 }
 
 function deleteMulDocument() {
-  const arr: string[] = []
-  multipleSelection.value.map((v) => {
-    if (v) {
-      arr.push(v.id)
+  MsgConfirm(
+    `是否批量删除 ${multipleSelection.value.length} 个文档?`,
+    `所选文档中的分段会跟随删除，请谨慎操作。`,
+    {
+      confirmButtonText: '删除',
+      confirmButtonClass: 'danger'
     }
-  })
-  documentApi.delMulDocument(id, arr, loading).then(() => {
-    MsgSuccess('批量删除成功')
-    multipleTableRef.value?.clearSelection()
-    getList()
-  })
+  )
+    .then(() => {
+      const arr: string[] = []
+      multipleSelection.value.map((v) => {
+        if (v) {
+          arr.push(v.id)
+        }
+      })
+      documentApi.delMulDocument(id, arr, loading).then(() => {
+        MsgSuccess('批量删除成功')
+        multipleTableRef.value?.clearSelection()
+        getList()
+      })
+    })
+    .catch(() => {})
 }
 
 function batchRefresh() {
