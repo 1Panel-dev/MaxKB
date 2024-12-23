@@ -41,6 +41,7 @@ class AliyunBaiLianSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         dashscope.api_key = self.api_key
         recognition = Recognition(model=self.model,
                                   format='mp3',
+                                  sample_rate=16000,
                                   callback=None)
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             # 将上传的文件保存到临时文件中
