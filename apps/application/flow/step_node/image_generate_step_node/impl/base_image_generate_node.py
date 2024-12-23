@@ -46,7 +46,7 @@ class BaseImageGenerateNode(IImageGenerateNode):
             }
             file_url = FileSerializer(data={'file': file, 'meta': meta}).upload()
             file_urls.append(file_url)
-        self.context['image_list'] = file_urls
+        self.context['image_list'] = [{'file_id': path.split('/')[-1], 'url': path} for path in file_urls]
         answer = '\n'.join([f"![Image]({path})" for path in file_urls])
         return NodeResult({'answer': answer, 'chat_model': tti_model, 'message_list': message_list,
                            'image': [{'file_id': path.split('/')[-1], 'file_url': path} for path in file_urls],
