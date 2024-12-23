@@ -19,7 +19,6 @@ def clean(path_str: str):
                 fullname = os.path.join(parent, dir_str)
                 try:
                     shutil.rmtree(fullname)
-                    print("Success clean Folder:%s" % fullname)
                 except Exception as e:
                     print("Can't clean Folder:%s, reason:%s" % (fullname, e))
 
@@ -33,7 +32,6 @@ def compile_pyc(path_str: str):
                     if compile(fullname):
                         if cfile != 'settings.py' and cfile != 'wsgi.py':
                             os.remove(fullname)  # 删除原文件，保留settings.py和wsgi.py
-                        print("Success compile and remove file:%s" % fullname)
                     else:
                         print("Can't compile file:%s,The original file has been retained" % fullname)
                 except Exception as e:
@@ -49,7 +47,6 @@ def move(path_str: str):
                     if parent.endswith('__pycache__'):
                         parent_path = os.path.dirname(parent)
                         shutil.move(fullname, parent_path)
-                        print('update the dir of file successfully')
                 except Exception as e:
                     print("Can't move file:%s, reason:%s" % (fullname, e))
 
@@ -72,7 +69,6 @@ def replace_name(path_str: str):
                             continue
                         cfile_name += '.'
                     shutil.move(fullname, os.path.join(parent, cfile_name))
-                    print('update the name of the file successfully')
                 except Exception as e:
                     print("Can't remove file:%s, reason:%s" % (fullname, e))
 
