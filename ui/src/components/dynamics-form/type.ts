@@ -127,6 +127,10 @@ interface FormField {
    */
   default_value?: any
   /**
+   * 是否显示默认值
+   */
+  show_default_value?: boolean
+  /**
    *  {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才显示
    */
   relation_show_field_dict?: Dict<Array<any>>

@@ -47,13 +47,18 @@
   </el-form-item>
 
   <el-form-item
-    label="默认值"
     :required="formValue.required"
     prop="default_value"
     :rules="
       formValue.required ? [{ required: true, message: '默认值 为必填属性' }, ...rules] : rules
     "
   >
+    <template #label>
+      <div class="flex-between">
+        默认值
+        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+      </div>
+    </template>
     <el-input
       v-model="formValue.default_value"
       :maxlength="formValue.maxlength"
@@ -96,6 +101,7 @@ const getData = () => {
       'show-word-limit': true
     },
     default_value: formValue.value.default_value,
+    show_default_value: formValue.value.show_default_value,
     props_info: {
       rules: formValue.value.required
         ? [
@@ -153,6 +159,7 @@ onMounted(() => {
   formValue.value.minlength = 0
   formValue.value.maxlength = 20
   formValue.value.default_value = ''
+  formValue.value.show_default_value = true
 })
 </script>
 <style lang="scss"></style>

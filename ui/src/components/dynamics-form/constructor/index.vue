@@ -100,6 +100,7 @@ const getData = () => {
     required: form_data.value.required,
     field: form_data.value.field,
     default_value: form_data.value.default_value,
+    show_default_value: form_data.value.show_default_value,
     ...componentFormRef.value.getData()
   }
 }
