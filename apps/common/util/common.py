@@ -179,6 +179,7 @@ def any_to_mp3(any_path, mp3_path):
         sil_to_wav(any_path, any_path)
         any_path = mp3_path
     audio = AudioSegment.from_file(any_path)
+    audio = audio.set_frame_rate(16000)
     audio.export(mp3_path, format="mp3")
 
 
