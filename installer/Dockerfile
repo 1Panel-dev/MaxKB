@@ -61,6 +61,7 @@ RUN chmod 755 /opt/maxkb/app/installer/run-maxkb.sh && \
     cp -f /opt/maxkb/app/installer/run-maxkb.sh /usr/bin/run-maxkb.sh && \
     cp -f /opt/maxkb/app/installer/init.sql /docker-entrypoint-initdb.d && \
     curl -L --connect-timeout 120 -m 1800 https://resource.fit2cloud.com/maxkb/ffmpeg/get-ffmpeg-linux | sh && \
+    python3 /opt/maxkb/app/installer/compile.py && \
     mkdir -p /opt/maxkb/app/sandbox/python-packages &&  \
     find /opt/maxkb/app -mindepth 1 -not -name 'sandbox' -exec chmod 700 {} + && \
     chmod 755 /tmp && \
