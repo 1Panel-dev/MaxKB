@@ -49,7 +49,7 @@ class BaseImageGenerateNode(IImageGenerateNode):
         self.context['image_list'] = [{'file_id': path.split('/')[-1], 'url': path} for path in file_urls]
         answer = '\n'.join([f"![Image]({path})" for path in file_urls])
         return NodeResult({'answer': answer, 'chat_model': tti_model, 'message_list': message_list,
-                           'image': [{'file_id': path.split('/')[-1], 'file_url': path} for path in file_urls],
+                           'image': [{'file_id': path.split('/')[-1], 'url': path} for path in file_urls],
                            'history_message': history_message, 'question': question}, {})
 
     def generate_history_ai_message(self, chat_record):
