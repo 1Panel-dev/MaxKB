@@ -47,11 +47,16 @@
     </el-row>
   </el-form-item>
   <el-form-item
-    label="默认值"
     :required="formValue.required"
     prop="default_value"
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
   >
+    <template #label>
+      <div class="flex-between">
+        默认值
+        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+      </div>
+    </template>
     <el-select v-model="formValue.default_value" :teleported="false" popper-class="default-select">
       <el-option
         v-for="(option, index) in formValue.option_list"
@@ -95,6 +100,7 @@ const getData = () => {
     input_type: 'SingleSelect',
     attrs: {},
     default_value: formValue.value.default_value,
+    show_default_value: formValue.value.show_default_value,
     text_field: 'label',
     value_field: 'value',
     option_list: formValue.value.option_list
@@ -109,6 +115,7 @@ defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.option_list = []
   formValue.value.default_value = ''
+  formValue.value.show_default_value = true
 
   addOption()
 })

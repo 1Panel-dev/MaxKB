@@ -151,6 +151,12 @@ const initDefaultData = (formField: FormField) => {
   ) {
     formValue.value[formField.field] = formField.default_value
   }
+
+  // 配置不展示默认值,则设置为undefined
+  if (formField.show_default_value === false) {
+    formValue.value[formField.field] = undefined
+    console.log(formField.show_default_value, formValue.value[formField.field])
+  }
 }
 
 onBeforeMount(() => {
