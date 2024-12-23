@@ -45,7 +45,9 @@
             effect="plain"
             closable
           >
-            {{ item.content }}
+            <auto-tooltip :content="item.content">
+              {{ item.content }}
+            </auto-tooltip>
           </TagEllipsis>
         </template>
       </div>
