@@ -676,9 +676,17 @@ class WorkflowManage:
                             self.get_node_cls_by_id(edge.targetNodeId, self.get_up_node_id_list(edge.targetNodeId)))
         else:
             for edge in self.flow.edges:
-                if edge.sourceNodeId == current_node.id and self.dependent_node_been_executed(edge.targetNodeId):
-                    node_list.append(
-                        self.get_node_cls_by_id(edge.targetNodeId, self.get_up_node_id_list(edge.targetNodeId)))
+                if edge.sourceNodeId == current_node.id:
+                    next_node = [node for node in self.flow.nodes if node.id == edge.targetNodeId]
+                    if len(next_node) == 0:
+                        continue
+                    if next_node[0].properties.get('condition', "AND") == 'AND':
+                        if self.dependent_node_been_executed(edge.targetNodeId):
+                            node_list.append(
+                                self.get_node_cls_by_id(edge.targetNodeId, self.get_up_node_id_list(edge.targetNodeId)))
+                    else:
+                        node_list.append(
+                            self.get_node_cls_by_id(edge.targetNodeId, self.get_up_node_id_list(edge.targetNodeId)))
         return node_list
 
     def get_reference_field(self, node_id: str, fields: List[str]):

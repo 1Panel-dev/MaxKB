@@ -44,8 +44,8 @@
               placement="bottom-start"
             >
               <el-button text>
-                <img src="@/assets/icon_or.svg" alt="" v-if="condition==='OR'">
-                <img src="@/assets/icon_and.svg" alt="" v-if="condition==='AND'">
+                <img src="@/assets/icon_or.svg" alt="" v-if="condition === 'OR'" />
+                <img src="@/assets/icon_and.svg" alt="" v-if="condition === 'AND'" />
               </el-button>
               <template #dropdown>
                 <div style="width: 280px" class="p-12-16">
@@ -152,8 +152,19 @@ const height = ref<{
 })
 const showAnchor = ref<boolean>(false)
 const anchorData = ref<any>()
-const condition = ref('AND')
 
+const condition = computed({
+  set: (v) => {
+    set(props.nodeModel.properties, 'condition', v)
+  },
+  get: () => {
+    if (props.nodeModel.properties.condition) {
+      return props.nodeModel.properties.condition
+    }
+    set(props.nodeModel.properties, 'condition', 'AND')
+    return true
+  }
+})
 const showNode = computed({
   set: (v) => {
     set(props.nodeModel.properties, 'showNode', v)
