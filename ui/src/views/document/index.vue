@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer header="文档">
+  <LayoutContainer header="文档" class="document-main">
     <div class="main-calc-height">
       <div class="p-24">
         <div class="flex-between">
@@ -403,11 +403,24 @@
           </el-table-column>
         </app-table>
       </div>
+
       <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
       <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
       <!-- 选择知识库 -->
       <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
       <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
+    </div>
+    <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
+      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1)">
+        取消向量化
+      </el-button>
+      <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(2)">
+        取消生成
+      </el-button>
+      <el-text type="info" class="secondary ml-24">
+        已选 {{ multipleSelection.length }} 项
+      </el-text>
+      <el-button class="ml-16" type="primary" link @click="clearSelection"> 清空 </el-button>
     </div>
   </LayoutContainer>
 </template>
@@ -478,6 +491,7 @@ const multipleSelection = ref<any[]>([])
 const title = ref('')
 
 const SelectDatasetDialogRef = ref()
+
 const exportDocument = (document: any) => {
   documentApi.exportDocument(document.name, document.dataset_id, document.id, loading).then(() => {
     MsgSuccess('导出成功')
@@ -490,6 +504,28 @@ const exportDocumentZip = (document: any) => {
       MsgSuccess('导出成功')
     })
 }
+
+function cancelTaskHandle(val: any) {
+  const arr: string[] = []
+  multipleSelection.value.map((v) => {
+    if (v) {
+      arr.push(v.id)
+    }
+  })
+  const obj = {
+    id_list: arr,
+    type: val
+  }
+  documentApi.batchCancelTask(id, obj, loading).then(() => {
+    MsgSuccess('批量取消成功')
+    multipleTableRef.value?.clearSelection()
+  })
+}
+
+function clearSelection() {
+  multipleTableRef.value?.clearSelection()
+}
+
 function openDatasetDialog(row?: any) {
   const arr: string[] = []
   if (row) {
@@ -813,4 +849,20 @@ onBeforeUnmount(() => {
   closeInterval()
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.document-main {
+  box-sizing: border-box;
+  .mul-operation {
+    position: fixed;
+    margin-left: var(--sidebar-width);
+    bottom: 0;
+    right: 24px;
+    width: calc(100% - var(--sidebar-width) - 48px);
+    padding: 16px 24px;
+    box-sizing: border-box;
+    background: #ffffff;
+    z-index: 22;
+    box-shadow: 0px -2px 4px 0px rgba(31, 35, 41, 0.08);
+  }
+}
+</style>

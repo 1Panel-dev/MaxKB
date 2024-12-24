@@ -77,8 +77,23 @@ class FileBufferHandle:
         return self.buffer
 
 
+class BatchCancelInstanceSerializer(serializers.Serializer):
+    id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
+                                    error_messages=ErrMessage.char("id列表"))
+    type = serializers.IntegerField(required=True, error_messages=ErrMessage.integer(
+        "任务类型"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        _type = self.data.get('type')
+        try:
+            TaskType(_type)
+        except Exception as e:
+            raise AppApiException(500, '任务类型不支持')
+
+
 class CancelInstanceSerializer(serializers.Serializer):
-    type = serializers.IntegerField(required=True, error_messages=ErrMessage.boolean(
+    type = serializers.IntegerField(required=True, error_messages=ErrMessage.integer(
         "任务类型"))
 
     def is_valid(self, *, raise_exception=False):
@@ -1063,6 +1078,28 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             # 删除向量库
             delete_embedding_by_document_list(document_id_list)
             return True
+
+        def batch_cancel(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                BatchCancelInstanceSerializer(data=instance).is_valid(raise_exception=True)
+            document_id_list = instance.get("id_list")
+            ListenerManagement.update_status(QuerySet(Paragraph).annotate(
+                reversed_status=Reverse('status'),
+                task_type_status=Substr('reversed_status', TaskType(instance.get('type')).value,
+                                        1),
+            ).filter(task_type_status__in=[State.PENDING.value, State.STARTED.value]).filter(
+                document_id__in=document_id_list).values('id'),
+                                             TaskType(instance.get('type')),
+                                             State.REVOKE)
+            ListenerManagement.update_status(QuerySet(Document).annotate(
+                reversed_status=Reverse('status'),
+                task_type_status=Substr('reversed_status', TaskType(instance.get('type')).value,
+                                        1),
+            ).filter(task_type_status__in=[State.PENDING.value, State.STARTED.value]).filter(
+                id__in=document_id_list).values('id'),
+                                             TaskType(instance.get('type')),
+                                             State.REVOKE)
 
         def batch_edit_hit_handling(self, instance: Dict, with_valid=True):
             if with_valid:
