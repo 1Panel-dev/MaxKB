@@ -359,6 +359,14 @@ const cancelTask: (
   )
 }
 
+const batchCancelTask: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return put(`${prefix}/${dataset_id}/document/cancel_task/_batch`, data, undefined, loading)
+}
+
 export default {
   postSplitDocument,
   getDocument,
@@ -383,5 +391,6 @@ export default {
   batchRefresh,
   batchGenerateRelated,
   cancelTask,
-  exportDocumentZip
+  exportDocumentZip,
+  batchCancelTask
 }
