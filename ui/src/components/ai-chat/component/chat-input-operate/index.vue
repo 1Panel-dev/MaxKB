@@ -189,7 +189,7 @@ import { MsgWarning } from '@/utils/message'
 
 const route = useRoute()
 const {
-  query: { mode }
+  query: { mode, question }
 } = route as any
 const quickInputRef = ref()
 const props = withDefaults(
@@ -483,11 +483,11 @@ const handleTimeChange = () => {
   }, 1000)
 }
 
-function sendChatHandle(event: any) {
-  if (!event.ctrlKey) {
+function sendChatHandle(event?: any) {
+  if (!event?.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
-    event.preventDefault()
-    if (!isDisabledChart.value && !props.loading && !event.isComposing) {
+    event?.preventDefault()
+    if (!isDisabledChart.value && !props.loading && !event?.isComposing) {
       if (inputValue.value.trim()) {
         props.sendMessage(inputValue.value, {
           image_list: uploadImageList.value,
@@ -530,6 +530,10 @@ function mouseleave() {
 }
 
 onMounted(() => {
+  if (question) {
+    inputValue.value = decodeURIComponent(question.trim())
+    sendChatHandle()
+  }
   setTimeout(() => {
     if (quickInputRef.value && mode === 'embed') {
       quickInputRef.value.textarea.style.height = '0'
