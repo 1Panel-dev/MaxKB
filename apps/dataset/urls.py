@@ -41,6 +41,8 @@ urlpatterns = [
     path('dataset/<str:dataset_id>/document/<str:document_id>/sync', views.Document.SyncWeb.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/refresh', views.Document.Refresh.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/cancel_task', views.Document.CancelTask.as_view()),
+    path('dataset/<str:dataset_id>/document/cancel_task/_batch',
+         views.Document.CancelTask.Batch.as_view()),
     path('dataset/<str:dataset_id>/document/<str:document_id>/paragraph', views.Paragraph.as_view()),
     path('dataset/<str:dataset_id>/document/batch_generate_related', views.Document.BatchGenerateRelated.as_view()),
     path(

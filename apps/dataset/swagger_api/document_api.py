@@ -37,3 +37,17 @@ class DocumentApi(ApiMixin):
                                            description="1|2|3 1:向量化|2:生成问题|3:同步文档")
                 }
             )
+
+    class BatchCancel(ApiMixin):
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'id_list': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING),
+                                              title="文档id列表",
+                                              description="文档id列表"),
+                    'type': openapi.Schema(type=openapi.TYPE_INTEGER, title="任务类型",
+                                           description="1|2|3 1:向量化|2:生成问题|3:同步文档", default=1)
+                }
+            )

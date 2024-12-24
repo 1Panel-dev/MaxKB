@@ -238,6 +238,24 @@ class Document(APIView):
                     request.data
                 ))
 
+        class Batch(APIView):
+            authentication_classes = [TokenAuth]
+
+            @action(methods=['PUT'], detail=False)
+            @swagger_auto_schema(operation_summary="批量取消任务",
+                                 operation_id="批量取消任务",
+                                 request_body=DocumentApi.BatchCancel.get_request_body_api(),
+                                 manual_parameters=DocumentSerializers.Create.get_request_params_api(),
+                                 responses=result.get_default_response(),
+                                 tags=["知识库/文档"]
+                                 )
+            @has_permissions(
+                lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
+                                        dynamic_tag=k.get('dataset_id')))
+            def put(self, request: Request, dataset_id: str):
+                return result.success(
+                    DocumentSerializers.Batch(data={'dataset_id': dataset_id}).batch_cancel(request.data))
+
     class Refresh(APIView):
         authentication_classes = [TokenAuth]
 
