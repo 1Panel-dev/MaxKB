@@ -176,9 +176,8 @@ class ChatSerializers(serializers.Serializer):
         @staticmethod
         def to_row(row: Dict):
             details = row.get('details')
-            padding_problem_text = details.get('problem_padding').get(
-                'padding_problem_text') if 'problem_padding' in details and 'padding_problem_text' in details.get(
-                'problem_padding') else ""
+            padding_problem_text = ' '.join(node.get("answer", "") for key, node in details.items() if
+                                            node.get("type") == 'question-node')
             search_dataset_node_list = [(key, node) for key, node in details.items() if
                                         node.get("type") == 'search-dataset-node' or node.get(
                                             "step_type") == 'search_step']
@@ -194,6 +193,7 @@ class ChatSerializers(serializers.Serializer):
                                                                                               [])) for
                  key, node in search_dataset_node_list])
             improve_paragraph_list = row.get('improve_paragraph_list')
+
             vote_status_map = {'-1': '未投票', '0': '赞同', '1': '反对'}
             return [str(row.get('chat_id')), row.get('abstract'), row.get('problem_text'), padding_problem_text,
                     row.get('answer_text'), vote_status_map.get(row.get('vote_status')), reference_paragraph_len,
