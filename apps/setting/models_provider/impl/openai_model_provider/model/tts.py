@@ -3,6 +3,7 @@ from typing import Dict
 from openai import OpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
+from common.util.common import _remove_empty_lines
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tts import BaseTextToSpeech
 
@@ -51,6 +52,7 @@ class OpenAITextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             base_url=self.api_base,
             api_key=self.api_key
         )
+        text = _remove_empty_lines(text)
         with client.audio.speech.with_streaming_response.create(
                 model=self.model,
                 input=text,

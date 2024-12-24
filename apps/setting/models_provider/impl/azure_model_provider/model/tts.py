@@ -5,6 +5,7 @@ from dashscope.common.env import api_version
 from openai import OpenAI, AzureOpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
+from common.util.common import _remove_empty_lines
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tts import BaseTextToSpeech
 
@@ -58,6 +59,7 @@ class AzureOpenAITextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             api_key=self.api_key,
             api_version=self.api_version
         )
+        text = _remove_empty_lines(text)
         with client.audio.speech.with_streaming_response.create(
                 model=self.model,
                 input=text,

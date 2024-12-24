@@ -429,9 +429,10 @@ const getPlatformConfig: (application_id: string, type: string) => Promise<Resul
 const updatePlatformConfig: (
   application_id: string,
   type: string,
-  data: any
-) => Promise<Result<any>> = (application_id, type, data) => {
-  return post(`/platform/${application_id}/${type}`, data)
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, type, data, loading) => {
+  return post(`/platform/${application_id}/${type}`, data, undefined, loading)
 }
 /**
  * 更新平台状态
