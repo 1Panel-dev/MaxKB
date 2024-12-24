@@ -697,6 +697,9 @@ class ApplicationSerializer(serializers.Serializer):
             application_model = self.to_application(application, user_id)
             function_lib_model_list = [self.to_function_lib(f, user_id) for f in function_lib_list]
             application_model.save()
+            # 插入认证信息
+            ApplicationAccessToken(application_id=application_model.id,
+                                   access_token=hashlib.md5(str(uuid.uuid1()).encode()).hexdigest()[8:24]).save()
             QuerySet(FunctionLib).bulk_create(function_lib_model_list) if len(function_lib_model_list) > 0 else None
             return True
 
