@@ -263,7 +263,6 @@ class WorkflowManage:
         self.audio_list = audio_list
         self.params = params
         self.flow = flow
-        self.lock = threading.Lock()
         self.context = {}
         self.node_chunk_manage = NodeChunkManage(self)
         self.work_flow_post_handler = work_flow_post_handler
@@ -391,6 +390,8 @@ class WorkflowManage:
             start_node = self.get_start_node()
             current_node = get_node(start_node.type)(start_node, self.params, self)
         result = self.run_chain(current_node, node_result_future)
+        if result is None:
+            return
         node_list = self.get_next_node_list(current_node, result)
         if len(node_list) == 1:
             self.run_chain_manage(node_list[0], None)
@@ -424,7 +425,7 @@ class WorkflowManage:
             return result
         except Exception as e:
             traceback.print_exc()
-        return []
+        return None
 
     def hand_node_result(self, current_node, node_result_future):
         try:
@@ -507,7 +508,6 @@ class WorkflowManage:
             # 添加节点
             self.append_node(current_node)
             traceback.print_exc()
-            self.answer += str(e)
             chunk = self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
                                                                    self.params['chat_record_id'],
                                                                    current_node.id,
@@ -524,6 +524,7 @@ class WorkflowManage:
             node_chunk.end(chunk)
             current_node.get_write_error_context(e)
             self.status = 500
+            return None
 
     def run_node_async(self, node):
         future = executor.submit(self.run_node, node)
