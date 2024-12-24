@@ -222,10 +222,13 @@ const submit = async () => {
   formRef.value?.validate(async (valid) => {
     if (valid) {
       try {
-        await applicationApi.updatePlatformConfig(id, configType.value, form[configType.value])
-        MsgSuccess('配置保存成功')
-        closeDrawer()
-        emit('refresh')
+        applicationApi
+          .updatePlatformConfig(id, configType.value, form[configType.value], loading)
+          .then(() => {
+            MsgSuccess('配置保存成功')
+            closeDrawer()
+            emit('refresh')
+          })
       } catch {
         MsgError('保存失败，请检查输入或稍后再试')
       }

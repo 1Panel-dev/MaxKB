@@ -3,6 +3,7 @@ from typing import Dict
 import dashscope
 from dashscope.audio.tts_v2 import *
 
+from common.util.common import _remove_empty_lines
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tts import BaseTextToSpeech
 
@@ -37,6 +38,7 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     def text_to_speech(self, text):
         dashscope.api_key = self.api_key
         synthesizer = SpeechSynthesizer(model=self.model, **self.params)
+        text = _remove_empty_lines(text)
         audio = synthesizer.call(text)
         if type(audio) == str:
             print(audio)

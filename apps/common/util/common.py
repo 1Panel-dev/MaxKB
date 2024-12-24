@@ -211,3 +211,7 @@ def split_and_transcribe(file_path, model, max_segment_length_ms=59000, audio_fo
         if isinstance(text, str):
             full_text.append(text)
     return ' '.join(full_text)
+
+
+def _remove_empty_lines(text):
+    return '\n'.join(line for line in text.split('\n') if line.strip())

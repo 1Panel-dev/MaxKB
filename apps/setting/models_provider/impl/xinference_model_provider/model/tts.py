@@ -3,6 +3,7 @@ from typing import Dict
 from openai import OpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
+from common.util.common import _remove_empty_lines
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tts import BaseTextToSpeech
 
@@ -52,7 +53,7 @@ class XInferenceTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             api_key=self.api_key
         )
         # ['中文女', '中文男', '日语男', '粤语女', '英文女', '英文男', '韩语女']
-
+        text = _remove_empty_lines(text)
         with client.audio.speech.with_streaming_response.create(
                 model=self.model,
                 input=text,

@@ -18,6 +18,7 @@ from typing import Dict
 import ssl
 import websockets
 
+from common.util.common import _remove_empty_lines
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tts import BaseTextToSpeech
 
@@ -95,6 +96,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 "operation": "xxx"
             }
         }
+        text = _remove_empty_lines(text)
 
         return asyncio.run(self.submit(request_json, text))
 
