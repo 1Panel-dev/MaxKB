@@ -79,6 +79,7 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
     region_name = forms.TextInputField('Region Name', required=True)
     access_key_id = forms.TextInputField('Access Key ID', required=True)
     secret_access_key = forms.PasswordInputField('Secret Access Key', required=True)
+    base_url = forms.TextInputField('Proxy URL', required=False)
 
     def get_model_params_setting_form(self, model_name):
         return BedrockLLMModelParams()
