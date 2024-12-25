@@ -50,10 +50,31 @@
       >
         <el-row :gutter="15">
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16">
-            <CardAdd
+            <!-- <CardAdd
               :title="$t('views.application.applicationList.card.createApplication')"
               @click="openCreateDialog"
-            />
+            /> -->
+            <el-card shadow="hover" class="application-card-add" style="--el-card-padding: 8px">
+              <div class="card-add-button flex align-center cursor p-8" @click="openCreateDialog">
+                <AppIcon iconName="app-add-application" class="mr-8"></AppIcon>
+                创建应用
+              </div>
+              <el-divider style="margin: 8px 0" />
+              <el-upload
+                :file-list="[]"
+                action="#"
+                multiple
+                :auto-upload="false"
+                :show-file-list="false"
+                :limit="1"
+                :on-change="(file: any, fileList: any) => importApplication(file)"
+                class="card-add-button"
+              >
+                <div class="flex align-center cursor p-8">
+                  <AppIcon iconName="app-import" class="mr-8"></AppIcon>导入应用
+                </div>
+              </el-upload>
+            </el-card>
           </el-col>
           <el-col
             :xs="24"
@@ -371,6 +392,30 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
+.application-card-add {
+  width: 100%;
+  font-size: 14px;
+  min-height: var(--card-min-height);
+  border: 1px dashed var(--el-border-color);
+  background: var(--el-disabled-bg-color);
+  border-radius: 8px;
+  box-sizing: border-box;
+  &:hover {
+    border: 1px solid var(--el-card-bg-color);
+    background-color: var(--el-card-bg-color);
+  }
+  .card-add-button {
+    &:hover {
+      border-radius: 4px;
+      background: var(--app-text-color-light-1);
+    }
+    :deep(.el-upload) {
+      display: block;
+      width: 100%;
+      color: var(--el-text-color-regular);
+    }
+  }
+}
 .application-card {
   .status-tag {
     position: absolute;

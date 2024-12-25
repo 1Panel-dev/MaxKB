@@ -2,7 +2,7 @@
   <el-card shadow="hover" class="card-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
     <div class="card-header">
       <slot name="header">
-        <div class="title flex" :class="slots.subTitle ? '' : 'align-center'">
+        <div class="title flex" :class="$slots.subTitle ? '' : 'align-center'">
           <slot name="icon">
             <AppAvatar v-if="showIcon" class="mr-12 avatar-blue" shape="square" :size="32">
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
@@ -19,7 +19,7 @@
     </div>
     <div
       class="description break-all"
-      :class="slots.subTitle ? 'mt-24' : 'mt-12'"
+      :class="$slots.subTitle ? 'mt-24' : 'mt-12'"
       v-if="$slots.description || description"
     >
       <slot name="description">
@@ -40,7 +40,6 @@
 <script setup lang="ts">
 import { ref, useSlots } from 'vue'
 
-const slots = useSlots()
 defineOptions({ name: 'CardBox' })
 const props = withDefaults(
   defineProps<{
