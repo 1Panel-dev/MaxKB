@@ -3,18 +3,6 @@
     <div class="flex-between mb-16">
       <h4>{{ $t('views.application.applicationList.title') }}</h4>
       <div class="flex-between">
-        <el-upload
-          :file-list="[]"
-          class="flex-between mr-12"
-          action="#"
-          multiple
-          :auto-upload="false"
-          :show-file-list="false"
-          :limit="1"
-          :on-change="(file: any, fileList: any) => importApplication(file)"
-        >
-          <el-button>导入应用</el-button>
-        </el-upload>
         <el-select
           v-model="selectUserId"
           class="mr-12"
@@ -50,10 +38,6 @@
       >
         <el-row :gutter="15">
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16">
-            <!-- <CardAdd
-              :title="$t('views.application.applicationList.card.createApplication')"
-              @click="openCreateDialog"
-            /> -->
             <el-card shadow="hover" class="application-card-add" style="--el-card-padding: 8px">
               <div class="card-add-button flex align-center cursor p-8" @click="openCreateDialog">
                 <AppIcon iconName="app-add-application" class="mr-8"></AppIcon>
