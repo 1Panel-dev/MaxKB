@@ -98,7 +98,7 @@
                   </div>
                 </template>
                 <template #empty>
-                  <div class="text-center">
+                  <div class="text-center mt-24">
                     <el-text type="info">暂无历史记录</el-text>
                   </div>
                 </template>

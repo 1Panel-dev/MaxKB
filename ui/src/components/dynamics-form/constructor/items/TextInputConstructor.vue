@@ -1,64 +1,66 @@
 <template>
   <el-form-item label="文本长度" required>
-    <el-col :span="11" style="padding-left: 0">
-      <el-form-item
-        :rules="[
-          {
-            required: true,
-            message: '最小长度必填',
-            trigger: 'change'
-          }
-        ]"
-        prop="minlength"
-      >
-        <el-input-number
-          style="width: 100%"
-          :min="1"
-          :step="1"
-          step-strictly
-          v-model="formValue.minlength"
-          controls-position="right"
-        />
-      </el-form-item>
-    </el-col>
-    <el-col :span="2" class="text-center">
-      <span class="text-gray-500">-</span>
-    </el-col>
-    <el-col :span="11">
-      <el-form-item
-        :rules="[
-          {
-            required: true,
-            message: '最大长度必填',
-            trigger: 'change'
-          }
-        ]"
-        prop="maxlength"
-      >
-        <el-input-number
-          style="width: 100%"
-          :min="formValue.minlength > formValue.maxlength ? formValue.minlength : 1"
-          step-strictly
-          :step="1"
-          v-model="formValue.maxlength"
-          controls-position="right"
-      /></el-form-item>
-    </el-col>
+    <el-row class="w-full">
+      <el-col :span="11">
+        <el-form-item
+          :rules="[
+            {
+              required: true,
+              message: '最小长度必填',
+              trigger: 'change'
+            }
+          ]"
+          prop="minlength"
+        >
+          <el-input-number
+            style="width: 100%"
+            :min="1"
+            :step="1"
+            step-strictly
+            v-model="formValue.minlength"
+            controls-position="right"
+          />
+        </el-form-item>
+      </el-col>
+      <el-col :span="2" class="text-center">
+        <span>-</span>
+      </el-col>
+      <el-col :span="11">
+        <el-form-item
+          :rules="[
+            {
+              required: true,
+              message: '最大长度必填',
+              trigger: 'change'
+            }
+          ]"
+          prop="maxlength"
+        >
+          <el-input-number
+            style="width: 100%"
+            :min="formValue.minlength > formValue.maxlength ? formValue.minlength : 1"
+            step-strictly
+            :step="1"
+            v-model="formValue.maxlength"
+            controls-position="right"
+        /></el-form-item>
+      </el-col>
+    </el-row>
   </el-form-item>
 
   <el-form-item
+    class="defaultValueItem"
     :required="formValue.required"
     prop="default_value"
+    label="默认值"
     :rules="
       formValue.required ? [{ required: true, message: '默认值 为必填属性' }, ...rules] : rules
     "
   >
-    <template #label>
-      <div class="flex-between">
-        默认值
-        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
-      </div>
-    </template>
+    <div class="defaultValueCheckbox">
+      <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+    </div>
+
     <el-input
       v-model="formValue.default_value"
       :maxlength="formValue.maxlength"
@@ -166,4 +168,13 @@ onMounted(() => {
   }
 })
 </script>
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.defaultValueItem {
+  position: relative;
+  .defaultValueCheckbox {
+    position: absolute;
+    right: 0;
+    top: -35px;
+  }
+}
+</style>
