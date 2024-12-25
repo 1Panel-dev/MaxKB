@@ -120,6 +120,9 @@ onMounted(() => {
 const rander = (data: any) => {
   form_data.value.required = data.required ? data.required : false
   form_data.value.field = data.field
+  if (data.show_default_value !== undefined) {
+    form_data.value.show_default_value = data.show_default_value
+  }
   if (data.input_type) {
     form_data.value.input_type = data.input_type + 'Constructor'
   }

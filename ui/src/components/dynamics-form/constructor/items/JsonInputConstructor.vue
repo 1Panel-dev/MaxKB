@@ -1,9 +1,5 @@
 <template>
-  <el-form-item
-    :required="formValue.required"
-    prop="default_value"
-    :rules="[default_value_rule]"
-  >
+  <el-form-item :required="formValue.required" prop="default_value" :rules="[default_value_rule]">
     <template #label>
       <div class="flex-between">
         默认值
@@ -46,7 +42,7 @@ const getData = () => {
       ]
     },
     default_value: formValue.value.default_value,
-    show_default_value: formValue.value.show_default_value,
+    show_default_value: formValue.value.show_default_value
   }
 }
 
@@ -61,12 +57,13 @@ const default_value_rule = {
 
 const rander = (form_data: any) => {
   formValue.value.default_value = form_data.default_value
-  formValue.value.show_default_value = form_data.show_default_value
 }
 defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.default_value = {}
-  formValue.value.show_default_value = true
+  if (formValue.value.show_default_value === undefined) {
+    formValue.value.show_default_value = true
+  }
 })
 </script>
 <style lang="scss"></style>

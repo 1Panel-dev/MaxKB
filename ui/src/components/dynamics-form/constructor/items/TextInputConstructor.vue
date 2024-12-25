@@ -160,7 +160,10 @@ onMounted(() => {
   formValue.value.minlength = 0
   formValue.value.maxlength = 20
   formValue.value.default_value = ''
-  formValue.value.show_default_value = true
+  console.log(formValue.value.show_default_value)
+  if (formValue.value.show_default_value === undefined) {
+    formValue.value.show_default_value = true
+  }
 })
 </script>
 <style lang="scss"></style>

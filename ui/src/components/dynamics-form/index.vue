@@ -149,13 +149,9 @@ const initDefaultData = (formField: FormField) => {
       !formValue.value[formField.field]) &&
     formValue.value[formField.field] != false
   ) {
-    formValue.value[formField.field] = formField.default_value
-  }
-
-  // 配置不展示默认值,则设置为undefined
-  if (formField.show_default_value === false) {
-    formValue.value[formField.field] = undefined
-    console.log(formField.show_default_value, formValue.value[formField.field])
+    if (formField.show_default_value === true) {
+      formValue.value[formField.field] = formField.default_value
+    }
   }
 }
 
@@ -185,7 +181,10 @@ const render = (
         if (form_data[item.field] !== undefined) {
           return { [item.field]: form_data[item.field] }
         }
-        return { [item.field]: item.default_value }
+        if (item.show_default_value) {
+          return { [item.field]: item.default_value }
+        }
+        return {}
       })
       .reduce((x, y) => ({ ...x, ...y }), {})
     formValue.value = _.cloneDeep(value)

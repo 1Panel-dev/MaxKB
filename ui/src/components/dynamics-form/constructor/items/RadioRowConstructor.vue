@@ -52,6 +52,12 @@
     prop="default_value"
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
   >
+    <template #label>
+      <div class="flex-between">
+        默认值
+        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+      </div>
+    </template>
     <RadioRow
       :form-field="formField"
       v-model="formValue.default_value"
@@ -111,7 +117,9 @@ defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.option_list = []
   formValue.value.default_value = ''
-
+  if (formValue.value.show_default_value === undefined) {
+    formValue.value.show_default_value = true
+  }
   addOption()
 })
 </script>
