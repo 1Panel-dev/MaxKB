@@ -97,21 +97,22 @@ const getData = () => {
       'value-format': formValue.value.format
     },
     default_value: formValue.value.default_value,
-    show_default_value: formValue.value.show_default_value,
+    show_default_value: formValue.value.show_default_value
   }
 }
 const rander = (form_data: any) => {
   formValue.value.type = form_data.attrs.type
   formValue.value.format = form_data.attrs?.format
   formValue.value.default_value = form_data.default_value || ''
-  formValue.value.show_default_value = form_data.show_default_value
 }
 defineExpose({ getData, rander })
 onBeforeMount(() => {
   formValue.value.type = 'datetime'
   formValue.value.format = 'YYYY-MM-DD HH:mm:ss'
   formValue.value.default_value = ''
-  formValue.value.show_default_value = true
+  if (formValue.value.show_default_value === undefined) {
+    formValue.value.show_default_value = true
+  }
 })
 </script>
 <style lang="scss"></style>

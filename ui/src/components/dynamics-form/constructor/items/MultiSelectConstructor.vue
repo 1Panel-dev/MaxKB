@@ -117,15 +117,15 @@ const getData = () => {
 const rander = (form_data: any) => {
   formValue.value.option_list = form_data.option_list || []
   formValue.value.default_value = form_data.default_value
-  formValue.value.show_default_value = form_data.show_default_value
 }
 
 defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.option_list = []
   formValue.value.default_value = ''
-  formValue.value.show_default_value = true
-
+  if (formValue.value.show_default_value === undefined) {
+    formValue.value.show_default_value = true
+  }
   addOption()
 })
 </script>
