@@ -17,7 +17,7 @@ from setting.models_provider.base_model_provider import BaseModelCredential, Val
 
 
 class XInferenceRerankerModelCredential(BaseForm, BaseModelCredential):
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
+    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=True):
         if not model_type == 'RERANKER':
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')

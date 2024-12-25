@@ -29,7 +29,7 @@ class ZhiPuImageModelParams(BaseForm):
 class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField('API Key', required=True)
 
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
+    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
@@ -42,7 +42,7 @@ class ZhiPuImageModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            model = provider.get_model(model_type, model_name, model_credential)
+            model = provider.get_model(model_type, model_name, model_credential, **model_params)
             res = model.stream([HumanMessage(content=[{"type": "text", "text": "你好"}])])
             for chunk in res:
                 print(chunk)

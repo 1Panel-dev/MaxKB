@@ -28,7 +28,7 @@ class BaiLianLLMModelParams(BaseForm):
 
 class BaiLianLLMModelCredential(BaseForm, BaseModelCredential):
 
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
+    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
@@ -41,7 +41,7 @@ class BaiLianLLMModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            model = provider.get_model(model_type, model_name, model_credential)
+            model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.invoke([HumanMessage(content='你好')])
         except Exception as e:
             if isinstance(e, AppApiException):

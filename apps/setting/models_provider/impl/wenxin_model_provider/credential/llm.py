@@ -34,12 +34,12 @@ class WenxinLLMModelParams(BaseForm):
 
 
 class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
+    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
-        model = provider.get_model(model_type, model_name, model_credential)
+        model = provider.get_model(model_type, model_name, model_credential, **model_params)
         model_info = [model.lower() for model in model.client.models()]
         if not model_info.__contains__(model_name.lower()):
             raise AppApiException(ValidCode.valid_error.value, f'{model_name} 模型不支持')

@@ -189,9 +189,11 @@ class ModelSerializer(serializers.Serializer):
             if QuerySet(Model).filter(user_id=self.data.get('user_id'),
                                       name=self.data.get('name')).exists():
                 raise AppApiException(500, f'模型名称【{self.data.get("name")}】已存在')
+            default_params = {item['field']: item['default_value'] for item in self.data.get('model_params_form')}
             ModelProvideConstants[self.data.get('provider')].value.is_valid_credential(self.data.get('model_type'),
                                                                                        self.data.get('model_name'),
                                                                                        self.data.get('credential'),
+                                                                                       default_params,
                                                                                        raise_exception=True
                                                                                        )
 
@@ -354,10 +356,12 @@ class ModelSerializer(serializers.Serializer):
                     model=model)
                 try:
                     model.status = Status.SUCCESS
+                    default_params = {item['field']: item['default_value'] for item in model.model_params_form}
                     # 校验模型认证数据
                     provider_handler.is_valid_credential(model.model_type,
                                                          instance.get("model_name"),
                                                          credential,
+                                                         default_params,
                                                          raise_exception=True)
 
                 except AppApiException as e:

@@ -14,7 +14,7 @@ class XunFeiSTTModelCredential(BaseForm, BaseModelCredential):
     spark_api_key = forms.PasswordInputField("API Key", required=True)
     spark_api_secret = forms.PasswordInputField('API Secret', required=True)
 
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
+    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):

@@ -28,7 +28,7 @@ class XinferenceLLMModelParams(BaseForm):
 
 
 class XinferenceLLMModelCredential(BaseForm, BaseModelCredential):
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
+    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
@@ -40,7 +40,7 @@ class XinferenceLLMModelCredential(BaseForm, BaseModelCredential):
         exist = provider.get_model_info_by_name(model_list, model_name)
         if len(exist) == 0:
             raise AppApiException(ValidCode.valid_error.value, "模型不存在,请先下载模型")
-        model = provider.get_model(model_type, model_name, model_credential)
+        model = provider.get_model(model_type, model_name, model_credential, **model_params)
         model.invoke([HumanMessage(content='你好')])
         return True
 
