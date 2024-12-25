@@ -81,7 +81,7 @@ def get_model_type_list(provider):
     return get_provider(provider).get_model_type_list()
 
 
-def is_valid_credential(provider, model_type, model_name, model_credential: Dict[str, object], raise_exception=False):
+def is_valid_credential(provider, model_type, model_name, model_credential: Dict[str, object], model_params, raise_exception=False):
     """
     校验模型认证参数
     @param provider:         供应商字符串
@@ -91,4 +91,4 @@ def is_valid_credential(provider, model_type, model_name, model_credential: Dict
     @param raise_exception:  是否抛出错误
     @return: True|False
     """
-    return get_provider(provider).is_valid_credential(model_type, model_name, model_credential, raise_exception)
+    return get_provider(provider).is_valid_credential(model_type, model_name, model_credential, model_params, raise_exception)

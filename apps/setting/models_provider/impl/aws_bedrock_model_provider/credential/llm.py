@@ -44,7 +44,7 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
         with open(credentials_path, 'w') as file:
             file.write(content)
 
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], provider,
+    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(mt.get('value') == model_type for mt in model_type_list):
@@ -62,7 +62,7 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
             self._update_aws_credentials('aws-profile', model_credential['access_key_id'],
                                          model_credential['secret_access_key'])
             model_credential['credentials_profile_name'] = 'aws-profile'
-            model = provider.get_model(model_type, model_name, model_credential)
+            model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.invoke([HumanMessage(content='你好')])
         except AppApiException:
             raise

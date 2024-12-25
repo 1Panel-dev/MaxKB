@@ -67,9 +67,13 @@ class IModelProvider(ABC):
         model_info = self.get_model_info_manage().get_model_info(model_type, model_name)
         return model_info.model_credential
 
-    def is_valid_credential(self, model_type, model_name, model_credential: Dict[str, object], raise_exception=False):
+    def get_model_params(self, model_type, model_name):
         model_info = self.get_model_info_manage().get_model_info(model_type, model_name)
-        return model_info.model_credential.is_valid(model_type, model_name, model_credential, self,
+        return model_info.model_credential
+
+    def is_valid_credential(self, model_type, model_name, model_credential: Dict[str, object], model_params: Dict[str, object], raise_exception=False):
+        model_info = self.get_model_info_manage().get_model_info(model_type, model_name)
+        return model_info.model_credential.is_valid(model_type, model_name, model_credential, model_params, self,
                                                     raise_exception=raise_exception)
 
     def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> BaseModel:
@@ -105,7 +109,7 @@ class MaxKBBaseModel(ABC):
 class BaseModelCredential(ABC):
 
     @abstractmethod
-    def is_valid(self, model_type: str, model_name, model: Dict[str, object], provider, raise_exception=True):
+    def is_valid(self, model_type: str, model_name, model: Dict[str, object], model_params, provider, raise_exception=True):
         pass
 
     @abstractmethod
