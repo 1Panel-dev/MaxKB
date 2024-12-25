@@ -97,6 +97,7 @@
           </el-select>
         </el-form-item>
         <el-form-item
+          prop="content_list"
           label="选择文本内容"
           :rules="{
             message: '选择文本内容',

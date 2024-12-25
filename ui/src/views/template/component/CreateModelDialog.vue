@@ -91,7 +91,9 @@
                       <p>向量模型：在知识库中对文档内容进行向量化的模型。</p>
                       <p>语音识别：在应用中开启语音识别后用于语音转文字的模型。</p>
                       <p>语音合成：在应用中开启语音播放后用于文字转语音的模型。</p>
-                      <p>重排模型：在高级编排应用中使用多路召回时，对候选分段进行重新排序的模型。</p>
+                      <p>
+                        重排模型：在高级编排应用中使用多路召回时，对候选分段进行重新排序的模型。
+                      </p>
                       <p>图片理解：在高级编排应用中用于图片理解的视觉模型。</p>
                       <p>图片生成：在高级编排应用中用于图片生成的视觉模型。</p>
                     </template>
@@ -155,7 +157,11 @@
         </DynamicsForm>
       </el-tab-pane>
       <el-tab-pane label="高级设置" name="advanced-info">
-        <div class="flex-between mb-8">
+        <el-empty
+          v-if="base_form_data.model_params_form?.length === 0"
+          description="请先选择基础信息的模型类型和基础模型"
+        />
+        <div class="flex-between mb-8" v-else>
           <h5>模型参数</h5>
           <el-button type="text" @click.stop="openAddDrawer()">
             <AppIcon iconName="Plus" class="add-icon" />添加
@@ -215,7 +221,14 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="close">取消</el-button>
-        <el-button type="primary" @click="submit" :loading="loading"> 添加 </el-button>
+        <el-button
+          v-if="base_form_data.model_params_form?.length === 0"
+          type="primary"
+          @click="openAddDrawer"
+        >
+          添加
+        </el-button>
+        <el-button v-else type="primary" @click="submit" :loading="loading"> 添加 </el-button>
       </span>
     </template>
   </el-dialog>
@@ -360,6 +373,8 @@ const submit = () => {
         emit('submit')
       })
     }
+  }).catch(() => { 
+    MsgError('基础信息有填写错误')
   })
 }
 
