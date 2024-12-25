@@ -85,10 +85,10 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 "uid": "uid"
             },
             "audio": {
-                "encoding": "mp3",
-                "volume_ratio": 1.0,
-                "pitch_ratio": 1.0,
-            } | self.params,
+                         "encoding": "mp3",
+                         "volume_ratio": 1.0,
+                         "pitch_ratio": 1.0,
+                     } | self.params,
             "request": {
                 "reqid": str(uuid.uuid4()),
                 "text": '',
@@ -113,7 +113,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         result = b''
         async with websockets.connect(self.volcanic_api_url, extra_headers=header, ping_interval=None,
                                       ssl=ssl_context) as ws:
-            lines = text.split('\n')
+            lines = [text[i:i + 200] for i in range(0, len(text), 200)]
             for line in lines:
                 if self.is_table_format_chars_only(line):
                     continue

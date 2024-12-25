@@ -27,7 +27,7 @@ class ISpeechToTextNode(INode):
                                                        self.node_params_serializer.data.get('audio_list')[1:])
         for audio in res:
             if 'file_id' not in audio:
-                raise ValueError("参数值错误: 上传的图片中缺少file_id，音频上传失败")
+                raise ValueError("参数值错误: 上传的音频中缺少file_id，音频上传失败")
 
         return self.execute(audio=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
