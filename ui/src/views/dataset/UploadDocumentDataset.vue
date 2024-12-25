@@ -22,12 +22,17 @@
       </div>
     </div>
     <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
-      <el-button @click="router.go(-1)" :disabled="loading">取消</el-button>
-      <el-button @click="prev" v-if="active === 1" :disabled="loading">上一步</el-button>
-      <el-button @click="next" type="primary" v-if="active === 0" :disabled="loading">
+      <el-button @click="router.go(-1)" :disabled="SetRulesRef?.loading || loading">取消</el-button>
+      <el-button @click="prev" v-if="active === 1" :disabled="SetRulesRef?.loading || loading">上一步</el-button>
+      <el-button @click="next" type="primary" v-if="active === 0" :disabled="SetRulesRef?.loading || loading">
         {{ documentsType === 'txt' ? '下一步' : '开始导入' }}
       </el-button>
-      <el-button @click="submit" type="primary" v-if="active === 1" :disabled="loading">
+      <el-button
+        @click="submit"
+        type="primary"
+        v-if="active === 1"
+        :disabled="SetRulesRef?.loading || loading"
+      >
         开始导入
       </el-button>
     </div>

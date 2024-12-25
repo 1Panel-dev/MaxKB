@@ -209,7 +209,8 @@ onMounted(() => {
 
 defineExpose({
   paragraphList,
-  checkedConnect
+  checkedConnect,
+  loading
 })
 </script>
 <style scoped lang="scss">
