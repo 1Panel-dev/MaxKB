@@ -214,4 +214,36 @@ def split_and_transcribe(file_path, model, max_segment_length_ms=59000, audio_fo
 
 
 def _remove_empty_lines(text):
-    return '\n'.join(line for line in text.split('\n') if line.strip())
+    result = '\n'.join(line for line in text.split('\n') if line.strip())
+    return markdown_to_plain_text(result)
+
+
+def markdown_to_plain_text(md: str) -> str:
+    # 移除图片 ![alt](url)
+    text = re.sub(r'!\[.*?\]\(.*?\)', '', md)
+    # 移除链接 [text](url)
+    text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+    # 移除 Markdown 标题符号 (#, ##, ###)
+    text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)
+    # 移除加粗 **text** 或 __text__
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
+    text = re.sub(r'__(.*?)__', r'\1', text)
+    # 移除斜体 *text* 或 _text_
+    text = re.sub(r'\*(.*?)\*', r'\1', text)
+    text = re.sub(r'_(.*?)_', r'\1', text)
+    # 移除行内代码 `code`
+    text = re.sub(r'`(.*?)`', r'\1', text)
+    # 移除代码块 ```code```
+    text = re.sub(r'```[\s\S]*?```', '', text)
+    # 移除多余的换行符
+    text = re.sub(r'\n{2,}', '\n', text)
+    # 使用正则表达式去除所有 HTML 标签
+    text = re.sub(r'<[^>]+>', '', text)
+    # 去除多余的空白字符（包括换行符、制表符等）
+    text = re.sub(r'\s+', ' ', text)
+    # 去除表单渲染
+    re.sub(r'<form_rander>[\s\S]*?<\/form_rander>', '', text)
+    # 去除首尾空格
+    text = text.strip()
+    return text
+
