@@ -129,6 +129,7 @@ const rander = (form_data: any) => {
   formValue.value.minlength = attrs.minlength
   formValue.value.maxlength = attrs.maxlength
   formValue.value.default_value = form_data.default_value
+  formValue.value.show_default_value = form_data.show_default_value
 }
 const rangeRules = [
   {
