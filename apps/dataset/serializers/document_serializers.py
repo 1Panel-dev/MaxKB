@@ -1159,16 +1159,25 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
     class BatchGenerateRelated(ApiMixin, serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
 
-        @transaction.atomic
         def batch_generate_related(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id_list = instance.get("document_id_list")
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
-            for document_id in document_id_list:
-                DocumentSerializers.GenerateRelated(data={'document_id': document_id}).generate_related(model_id,
-                                                                                                        prompt)
+            ListenerManagement.update_status(QuerySet(Document).filter(id__in=document_id_list),
+                                             TaskType.GENERATE_PROBLEM,
+                                             State.PENDING)
+            ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id__in=document_id_list),
+                                             TaskType.GENERATE_PROBLEM,
+                                             State.PENDING)
+            ListenerManagement.get_aggregation_document_status_by_query_set(
+                QuerySet(Document).filter(id__in=document_id_list))()
+            try:
+                for document_id in document_id_list:
+                    generate_related_by_document_id.delay(document_id, model_id, prompt)
+            except AlreadyQueued as e:
+                pass
 
 
 class FileBufferHandle:
