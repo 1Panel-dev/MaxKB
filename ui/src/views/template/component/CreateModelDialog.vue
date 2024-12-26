@@ -331,6 +331,7 @@ const open = (provider: Provider) => {
 const list_base_model = (model_type: any, change?: boolean) => {
   if (change) {
     base_form_data.value.model_name = ''
+    base_form_data.value.model_params_form = []
   }
   if (providerValue.value) {
     ModelApi.listBaseModel(providerValue.value.provider, model_type, base_model_loading).then(
