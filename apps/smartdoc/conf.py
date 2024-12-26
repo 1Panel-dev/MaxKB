@@ -111,7 +111,7 @@ class Config(dict):
             "ENGINE": self.get('DB_ENGINE'),
             "POOL_OPTIONS": {
                 "POOL_SIZE": 20,
-                "MAX_OVERFLOW": 5
+                "MAX_OVERFLOW": 80
             }
         }
 
