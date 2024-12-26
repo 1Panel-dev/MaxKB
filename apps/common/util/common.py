@@ -214,6 +214,8 @@ def split_and_transcribe(file_path, model, max_segment_length_ms=59000, audio_fo
 
 
 def _remove_empty_lines(text):
+    if not text:
+        raise AppApiException(500, '文本转语音节点，文本内容不能为空')
     result = '\n'.join(line for line in text.split('\n') if line.strip())
     return markdown_to_plain_text(result)
 
