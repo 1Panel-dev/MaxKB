@@ -80,7 +80,7 @@ class Config(dict):
         "DB_PORT": 5432,
         "DB_USER": "root",
         "DB_PASSWORD": "Password123@postgres",
-        "DB_ENGINE": "django.db.backends.postgresql_psycopg2",
+        "DB_ENGINE": "dj_db_conn_pool.backends.postgresql",
         # 向量模型
         "EMBEDDING_MODEL_NAME": "shibing624/text2vec-base-chinese",
         "EMBEDDING_DEVICE": "cpu",
@@ -108,7 +108,11 @@ class Config(dict):
             "PORT": self.get('DB_PORT'),
             "USER": self.get('DB_USER'),
             "PASSWORD": self.get('DB_PASSWORD'),
-            "ENGINE": self.get('DB_ENGINE')
+            "ENGINE": self.get('DB_ENGINE'),
+            "POOL_OPTIONS": {
+                "POOL_SIZE": 20,
+                "MAX_OVERFLOW": 5
+            }
         }
 
     def __init__(self, *args):

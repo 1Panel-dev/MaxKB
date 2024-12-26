@@ -6,6 +6,7 @@
     @date：2024/7/22 11:18
     @desc:
 """
+from django.db import connection
 from django.db.models import QuerySet
 
 from common.config.embedding_config import ModelManage
@@ -15,6 +16,8 @@ from setting.models_provider import get_model
 
 def get_model_by_id(_id, user_id):
     model = QuerySet(Model).filter(id=_id).first()
+    # 手动关闭数据库连接
+    connection.close()
     if model is None:
         raise Exception("模型不存在")
     if model.permission_type == 'PRIVATE' and str(model.user_id) != str(user_id):

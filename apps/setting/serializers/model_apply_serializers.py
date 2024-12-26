@@ -6,6 +6,7 @@
     @date：2024/8/20 20:39
     @desc:
 """
+from django.db import connection
 from django.db.models import QuerySet
 from langchain_core.documents import Document
 from rest_framework import serializers
@@ -18,6 +19,8 @@ from setting.models_provider import get_model
 
 def get_embedding_model(model_id):
     model = QuerySet(Model).filter(id=model_id).first()
+    # 手动关闭数据库连接
+    connection.close()
     embedding_model = ModelManage.get_model(model_id,
                                             lambda _id: get_model(model, use_local=True))
     return embedding_model
