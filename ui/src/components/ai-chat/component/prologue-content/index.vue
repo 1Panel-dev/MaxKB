@@ -1,11 +1,11 @@
 <template>
   <!-- 开场白组件 -->
   <div class="item-content mb-16">
-    <div class="avatar">
+    <div class="avatar" v-if="prologue">
       <img v-if="application.avatar" :src="application.avatar" height="32px" width="32px" />
       <LogoIcon v-else height="32px" width="32px" />
     </div>
-    <div class="content">
+    <div class="content" v-if="prologue">
       <el-card shadow="always" class="dialog-card" style="--el-card-padding: 10px 16px 12px">
         <MdRenderer :source="prologue" :send-message="sendMessage"></MdRenderer>
       </el-card>

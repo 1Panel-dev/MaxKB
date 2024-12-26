@@ -48,6 +48,7 @@
         :row-class-name="setRowClass"
         @selection-change="handleSelectionChange"
         class="log-table"
+        ref="multipleTableRef"
       >
         <el-table-column type="selection" width="55" />
         <el-table-column prop="abstract" label="摘要" show-overflow-tooltip />
@@ -274,6 +275,7 @@ import useStore from '@/stores'
 import type { Dict } from '@/api/type/common'
 import { t } from '@/locales'
 import type { FormInstance, FormRules } from 'element-plus'
+import { ElTable } from 'element-plus'
 
 const { application, log, document, user } = useStore()
 const route = useRoute()
@@ -313,6 +315,8 @@ const daterange = ref({
   start_time: '',
   end_time: ''
 })
+
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<any[]>([])
 
 const ChatRecordRef = ref()
@@ -587,7 +591,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         chat_ids: arr
       }
       logApi.postChatRecordLog(id, form.value.dataset_id, obj, documentLoading).then((res: any) => {
-        multipleSelection.value = []
+        multipleTableRef.value?.clearSelection()
         documentDialogVisible.value = false
       })
     }
