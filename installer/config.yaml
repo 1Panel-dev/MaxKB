@@ -13,7 +13,7 @@ DB_HOST: 127.0.0.1
 DB_PORT: 5432
 DB_USER: root
 DB_PASSWORD: Password123@postgres
-DB_ENGINE: django.db.backends.postgresql_psycopg2
+DB_ENGINE: dj_db_conn_pool.backends.postgresql
 EMBEDDING_MODEL_PATH: /opt/maxkb/model/embedding
 EMBEDDING_MODEL_NAME: /opt/maxkb/model/embedding/shibing624_text2vec-base-chinese
 

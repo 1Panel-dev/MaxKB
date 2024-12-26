@@ -10,7 +10,7 @@ import os
 from typing import List, Dict
 
 from django.db.models import QuerySet
-
+from django.db import connection
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.search_dataset_node.i_search_dataset_node import ISearchDatasetStepNode
 from common.config.embedding_config import VectorStore
@@ -77,6 +77,8 @@ class BaseSearchDatasetNode(ISearchDatasetStepNode):
         embedding_list = vector.query(question, embedding_value, dataset_id_list, exclude_document_id_list,
                                       exclude_paragraph_id_list, True, dataset_setting.get('top_n'),
                                       dataset_setting.get('similarity'), SearchMode(dataset_setting.get('search_mode')))
+        # 手动关闭数据库连接
+        connection.close()
         if embedding_list is None:
             return get_none_result(question)
         paragraph_list = self.list_paragraph(embedding_list, vector)
