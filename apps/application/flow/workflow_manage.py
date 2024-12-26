@@ -679,7 +679,7 @@ class WorkflowManage:
                                 self.get_node_cls_by_id(edge.targetNodeId, self.get_up_node_id_list(edge.targetNodeId)))
                     else:
                         node_list.append(
-                            self.get_node_cls_by_id(edge.targetNodeId, self.get_up_node_id_list(edge.targetNodeId)))
+                            self.get_node_cls_by_id(edge.targetNodeId, [current_node.node.id]))
         return node_list
 
     def get_reference_field(self, node_id: str, fields: List[str]):
