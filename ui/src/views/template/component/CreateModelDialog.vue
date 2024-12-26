@@ -158,12 +158,12 @@
       </el-tab-pane>
       <el-tab-pane label="高级设置" name="advanced-info">
         <el-empty
-          v-if="base_form_data.model_params_form?.length === 0"
+          v-if="!base_form_data.model_type || !base_form_data.model_name"
           description="请先选择基础信息的模型类型和基础模型"
         />
         <div class="flex-between mb-8" v-else>
           <h5>模型参数</h5>
-          <el-button type="text" @click.stop="openAddDrawer()">
+          <el-button type="text" @click.stop="openAddDrawer()" :disabled="base_form_data.model_type !== 'TTS' && base_form_data.model_type !== 'LLM' && base_form_data.model_type !== 'IMAGE' && base_form_data.model_type !== 'TTI'">
             <AppIcon iconName="Plus" class="add-icon" />添加
           </el-button>
         </div>
@@ -221,14 +221,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="close">取消</el-button>
-        <el-button
-          v-if="base_form_data.model_params_form?.length === 0"
-          type="primary"
-          @click="openAddDrawer"
-        >
-          添加
-        </el-button>
-        <el-button v-else type="primary" @click="submit" :loading="loading"> 添加 </el-button>
+        <el-button type="primary" @click="submit" :loading="loading"> 添加 </el-button>
       </span>
     </template>
   </el-dialog>
