@@ -36,7 +36,7 @@ class TencentLLMModelCredential(BaseForm, BaseModelCredential):
             return False
         return True
 
-    def is_valid(self, model_type, model_name, model_credential, provider, model_params, raise_exception=False):
+    def is_valid(self, model_type, model_name, model_credential, model_params, provider,  raise_exception=False):
         if not (self._validate_model_type(model_type, provider, raise_exception) and
                 self._validate_credential_fields(model_credential, raise_exception)):
             return False
