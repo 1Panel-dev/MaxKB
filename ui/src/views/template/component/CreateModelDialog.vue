@@ -161,6 +161,10 @@
           v-if="!base_form_data.model_type || !base_form_data.model_name"
           description="请先选择基础信息的模型类型和基础模型"
         />
+        <el-empty
+          v-else-if="base_form_data.model_type === 'RERANKER' || base_form_data.model_type === 'EMBEDDING' || base_form_data.model_type === 'STT'"
+          description="所选模型不支持参数设置"
+        />
         <div class="flex-between mb-8" v-else>
           <h5>模型参数</h5>
           <el-button type="text" @click.stop="openAddDrawer()" :disabled="base_form_data.model_type !== 'TTS' && base_form_data.model_type !== 'LLM' && base_form_data.model_type !== 'IMAGE' && base_form_data.model_type !== 'TTI'">
