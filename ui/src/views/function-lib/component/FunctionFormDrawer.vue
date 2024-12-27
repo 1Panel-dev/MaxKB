@@ -138,10 +138,10 @@
     </template>
 
     <!-- Codemirror 弹出层 -->
-    <el-dialog v-model="dialogVisible" title="Python 代码" append-to-body>
+    <el-dialog v-model="dialogVisible" title="Python 代码" append-to-body fullscreen>
       <CodemirrorEditor
         v-model="cloneContent"
-        style="height: 300px !important; border: 1px solid #bbbfc4; border-radius: 4px"
+        style="height: calc(100vh - 160px) !important; border: 1px solid #bbbfc4; border-radius: 4px"
       />
       <template #footer>
         <div class="dialog-footer mt-24">

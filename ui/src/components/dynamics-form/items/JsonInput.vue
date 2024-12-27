@@ -27,7 +27,7 @@
         :style="codemirrorStyle"
         :tab-size="4"
         :autofocus="true"
-        style="height: 300px !important; border: 1px solid #bbbfc4; border-radius: 4px"
+        style="height: calc(100vh - 160px) !important; border: 1px solid #bbbfc4; border-radius: 4px"
       />
       <template #footer>
         <div class="dialog-footer mt-24">
