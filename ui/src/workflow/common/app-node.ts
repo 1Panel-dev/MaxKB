@@ -41,7 +41,17 @@ class AppNode extends HtmlResize.view {
     } else {
       const filterNodes = props.graphModel.nodes.filter((v: any) => v.type === props.model.type)
       if (filterNodes.length - 1 > 0) {
-        props.model.properties.stepName = props.model.properties.stepName + (filterNodes.length - 1)
+        getNodesName(filterNodes.length - 1)
+      }
+    }
+    function getNodesName(num: number) {
+      let number = num
+      const name = props.model.properties.stepName + number
+      if (!props.graphModel.nodes?.some((node: any) => node.properties.stepName === name.trim())) {
+        props.model.properties.stepName = name
+      } else {
+        number += 1
+        getNodesName(number)
       }
     }
     props.model.properties.config = nodeDict[props.model.type].properties.config

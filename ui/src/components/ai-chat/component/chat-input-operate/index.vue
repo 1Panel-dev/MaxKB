@@ -180,16 +180,19 @@ import Recorder from 'recorder-core'
 import applicationApi from '@/api/application'
 import { MsgAlert } from '@/utils/message'
 import { type chatType } from '@/api/type/application'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getImgUrl } from '@/utils/utils'
 import 'recorder-core/src/engine/mp3'
 
 import 'recorder-core/src/engine/mp3-engine'
 import { MsgWarning } from '@/utils/message'
-
+import useStore from '@/stores'
+const router = useRouter()
 const route = useRoute()
+const { application } = useStore()
 const {
-  query: { mode, question }
+  query: { mode, question },
+  params: { accessToken }
 } = route as any
 const quickInputRef = ref()
 const props = withDefaults(
@@ -533,6 +536,24 @@ onMounted(() => {
   if (question) {
     inputValue.value = decodeURIComponent(question.trim())
     sendChatHandle()
+    setTimeout(() => {
+      // 获取当前路由信息
+      const route = router.currentRoute.value
+      // 复制query对象
+      const query = { ...route.query }
+      // 删除特定的参数
+      delete query.question
+      const newRoute =
+        Object.entries(query)?.length > 0
+          ? route.path +
+            '?' +
+            Object.entries(query)
+              .map(([key, value]) => `${key}=${value}`)
+              .join('&')
+          : route.path
+
+      history.pushState(null, '', '/ui' + newRoute)
+    }, 100)
   }
   setTimeout(() => {
     if (quickInputRef.value && mode === 'embed') {
