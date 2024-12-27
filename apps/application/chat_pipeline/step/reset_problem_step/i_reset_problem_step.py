@@ -45,8 +45,9 @@ class IResetProblemStep(IBaseChatPipelineStep):
         manage.context['problem_text'] = source_problem_text
         manage.context['padding_problem_text'] = padding_problem
         # 累加tokens
-        manage.context['message_tokens'] = manage.context['message_tokens'] + self.context.get('message_tokens')
-        manage.context['answer_tokens'] = manage.context['answer_tokens'] + self.context.get('answer_tokens')
+        manage.context['message_tokens'] = manage.context.get('message_tokens', 0) + self.context.get('message_tokens',
+                                                                                                      0)
+        manage.context['answer_tokens'] = manage.context.get('answer_tokens', 0) + self.context.get('answer_tokens', 0)
 
     @abstractmethod
     def execute(self, problem_text: str, history_chat_record: List[ChatRecord] = None, model_id: str = None,

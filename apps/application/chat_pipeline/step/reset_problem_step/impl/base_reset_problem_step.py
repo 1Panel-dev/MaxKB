@@ -25,6 +25,8 @@ class BaseResetProblemStep(IResetProblemStep):
                 user_id=None,
                 **kwargs) -> str:
         chat_model = get_model_instance_by_model_user_id(model_id, user_id) if model_id is not None else None
+        if chat_model is None:
+            return problem_text
         start_index = len(history_chat_record) - 3
         history_message = [[history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
                            for index in
@@ -57,8 +59,8 @@ class BaseResetProblemStep(IResetProblemStep):
             'step_type': 'problem_padding',
             'run_time': self.context['run_time'],
             'model_id': str(manage.context['model_id']) if 'model_id' in manage.context else None,
-            'message_tokens': self.context['message_tokens'],
-            'answer_tokens': self.context['answer_tokens'],
+            'message_tokens': self.context.get('message_tokens', 0),
+            'answer_tokens': self.context.get('answer_tokens', 0),
             'cost': 0,
             'padding_problem_text': self.context.get('padding_problem_text'),
             'problem_text': self.context.get("step_args").get('problem_text'),
