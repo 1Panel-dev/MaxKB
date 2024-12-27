@@ -26,7 +26,8 @@ class ChatNodeSerializer(serializers.Serializer):
 
     model_params_setting = serializers.DictField(required=False, error_messages=ErrMessage.integer("模型参数相关设置"))
 
-    dialogue_type = serializers.CharField(required=True, error_messages=ErrMessage.char("上下文类型"))
+    dialogue_type = serializers.CharField(required=False, allow_blank=True, allow_null=True,
+                                          error_messages=ErrMessage.char("上下文类型"))
 
 
 class IChatNode(INode):
