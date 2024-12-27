@@ -684,7 +684,10 @@ class ApplicationSerializer(serializers.Serializer):
                 self.is_valid()
             user_id = self.data.get('user_id')
             mk_instance_bytes = self.data.get('file').read()
-            mk_instance = pickle.loads(mk_instance_bytes)
+            try:
+                mk_instance = pickle.loads(mk_instance_bytes)
+            except Exception as e:
+                raise AppApiException(1001, "不支持的文件格式")
             application = mk_instance.application
             function_lib_list = mk_instance.function_lib_list
             if len(function_lib_list) > 0:
