@@ -279,7 +279,8 @@ class ApplicationSerializer(serializers.Serializer):
                      'x_type': float_location.get('x', {}).get('type', 'right'),
                      'x_value': float_location.get('x', {}).get('value', 0),
                      'y_type': float_location.get('y', {}).get('type', 'bottom'),
-                     'y_value': float_location.get('y', {}).get('value', 30)}))
+                     'y_value': float_location.get('y', {}).get('value', 30),
+                     'max_kb_id': str(uuid.uuid1()).replace('-', '')}))
             response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
             return response
 
