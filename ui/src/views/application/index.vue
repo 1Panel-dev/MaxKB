@@ -45,6 +45,7 @@
               </div>
               <el-divider style="margin: 8px 0" />
               <el-upload
+                ref="elUploadRef"
                 :file-list="[]"
                 action="#"
                 multiple
@@ -179,7 +180,7 @@ import { isWorkFlow } from '@/utils/application'
 import { ValidType, ValidCount } from '@/enums/common'
 import { t } from '@/locales'
 import useStore from '@/stores'
-
+const elUploadRef = ref<any>()
 const { application, user, common } = useStore()
 const router = useRouter()
 
@@ -233,6 +234,7 @@ const exportApplication = (application: any) => {
 const importApplication = (file: any) => {
   const formData = new FormData()
   formData.append('file', file.raw, file.name)
+  elUploadRef.value.clearFiles()
   applicationApi.importApplication(formData, loading).then((ok) => {
     searchHandle()
   })
