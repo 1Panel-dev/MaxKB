@@ -92,6 +92,8 @@ class BaseQuestionNode(IQuestionNode):
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)
         self.context['question'] = question.content
+        system = self.workflow_manage.generate_prompt(system)
+        self.context['system'] = question.content
         message_list = self.generate_message_list(system, prompt, history_message)
         self.context['message_list'] = message_list
         if stream:
@@ -138,7 +140,7 @@ class BaseQuestionNode(IQuestionNode):
             'name': self.node.properties.get('stepName'),
             "index": index,
             'run_time': self.context.get('run_time'),
-            'system': self.node_params.get('system'),
+            'system': self.context.get('system'),
             'history_message': [{'content': message.content, 'role': message.type} for message in
                                 (self.context.get('history_message') if self.context.get(
                                     'history_message') is not None else [])],
