@@ -353,6 +353,7 @@ const close = () => {
   credential_form_data.value = {}
   model_form_field.value = []
   base_model_list.value = []
+  loading.value = false
   dialogVisible.value = false
 }
 const submit = () => {
