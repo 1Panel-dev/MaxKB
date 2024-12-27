@@ -1,5 +1,6 @@
 from typing import List, Dict
-
+import os
+import re
 from botocore.config import Config
 from langchain_community.chat_models import BedrockChat
 from setting.models_provider.base_model_provider import MaxKBBaseModel
@@ -57,12 +58,29 @@ class BedrockModel(MaxKBBaseModel, BedrockChat):
                 connect_timeout=60,
                 read_timeout=60
             )
+        _update_aws_credentials(model_credential['access_key_id'], model_credential['access_key_id'],
+                                model_credential['secret_access_key'])
 
         return cls(
             model_id=model_name,
             region_name=model_credential['region_name'],
-            credentials_profile_name=model_credential['credentials_profile_name'],
+            credentials_profile_name=model_credential['access_key_id'],
             streaming=model_kwargs.pop('streaming', True),
             model_kwargs=optional_params,
             config=config
         )
+
+
+def _update_aws_credentials(profile_name, access_key_id, secret_access_key):
+    credentials_path = os.path.join(os.path.expanduser("~"), ".aws", "credentials")
+    os.makedirs(os.path.dirname(credentials_path), exist_ok=True)
+
+    content = open(credentials_path, 'r').read() if os.path.exists(credentials_path) else ''
+    pattern = rf'\n*\[{profile_name}\]\n*(aws_access_key_id = .*)\n*(aws_secret_access_key = .*)\n*'
+    content = re.sub(pattern, '', content, flags=re.DOTALL)
+
+    if not re.search(rf'\[{profile_name}\]', content):
+        content += f"\n[{profile_name}]\naws_access_key_id = {access_key_id}\naws_secret_access_key = {secret_access_key}\n"
+
+    with open(credentials_path, 'w') as file:
+        file.write(content)
