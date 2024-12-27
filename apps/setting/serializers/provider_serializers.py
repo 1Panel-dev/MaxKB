@@ -160,7 +160,7 @@ class ModelSerializer(serializers.Serializer):
             source_encryption_model_credential = model_credential.encryption_dict(source_model_credential)
             if credential is not None:
                 for k in source_encryption_model_credential.keys():
-                    if credential[k] == source_encryption_model_credential[k]:
+                    if k in credential and credential[k] == source_encryption_model_credential[k]:
                         credential[k] = source_model_credential[k]
             return credential, model_credential, provider_handler
 

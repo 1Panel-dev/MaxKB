@@ -3,6 +3,8 @@ from langchain_community.embeddings import BedrockEmbeddings
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from typing import Dict, List
 
+from setting.models_provider.impl.aws_bedrock_model_provider.model.llm import _update_aws_credentials
+
 
 class BedrockEmbeddingModel(MaxKBBaseModel, BedrockEmbeddings):
     def __init__(self, model_id: str, region_name: str, credentials_profile_name: str,
@@ -13,10 +15,12 @@ class BedrockEmbeddingModel(MaxKBBaseModel, BedrockEmbeddings):
     @classmethod
     def new_instance(cls, model_type: str, model_name: str, model_credential: Dict[str, str],
                      **model_kwargs) -> 'BedrockModel':
+        _update_aws_credentials(model_credential['access_key_id'], model_credential['access_key_id'],
+                                model_credential['secret_access_key'])
         return cls(
             model_id=model_name,
             region_name=model_credential['region_name'],
-            credentials_profile_name=model_credential['credentials_profile_name'],
+            credentials_profile_name=model_credential['access_key_id'],
         )
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
