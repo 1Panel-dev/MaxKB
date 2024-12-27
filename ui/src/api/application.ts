@@ -349,6 +349,14 @@ const getFunctionLib: (
 ) => Promise<Result<any>> = (application_id, function_lib_id, loading) => {
   return get(`${prefix}/${application_id}/function_lib/${function_lib_id}`, undefined, loading)
 }
+
+const getApplicationById: (
+  application_id: String,
+  app_id: String,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (application_id, app_id, loading) => {
+  return get(`${prefix}/${application_id}/application/${app_id}`, undefined, loading)
+}
 /**
  * 获取模型参数表单
  * @param application_id 应用id
@@ -567,5 +575,6 @@ export default {
   getApplicationList,
   uploadFile,
   exportApplication,
-  importApplication
+  importApplication,
+  getApplicationById
 }

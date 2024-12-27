@@ -79,7 +79,7 @@
             <el-alert
               v-if="node_status != 200"
               class="mb-16"
-              title="该函数不可用"
+              :title="props.nodeModel.type === 'application-node' ? '该应用不可用' : '该函数不可用'"
               type="error"
               show-icon
               :closable="false"

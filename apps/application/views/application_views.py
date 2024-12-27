@@ -288,6 +288,25 @@ class Application(APIView):
                     data={'application_id': application_id,
                           'user_id': request.user.id}).application_list())
 
+        class Operate(APIView):
+            authentication_classes = [TokenAuth]
+
+            @action(methods=["GET"], detail=False)
+            @swagger_auto_schema(operation_summary="获取应用数据",
+                                 operation_id="获取应用数据",
+                                 tags=["应用"],
+                                 )
+            @has_permissions(ViewPermission(
+                [RoleConstants.ADMIN, RoleConstants.USER],
+                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                dynamic_tag=keywords.get('application_id'))],
+                compare=CompareConstants.AND))
+            def get(self, request: Request, application_id: str, app_id: str):
+                return result.success(
+                    ApplicationSerializer.Operate(
+                        data={'application_id': application_id,
+                              'user_id': request.user.id}).get_application(app_id))
+
     class Profile(APIView):
         authentication_classes = [TokenAuth]
 
@@ -433,7 +452,6 @@ class Application(APIView):
             )
 
     @action(methods=['POST'], detail=False)
-
     @swagger_auto_schema(operation_summary="创建应用",
                          operation_id="创建应用",
                          request_body=ApplicationApi.Create.get_request_body_api(),
