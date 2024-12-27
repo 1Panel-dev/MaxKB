@@ -5,7 +5,7 @@
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
-import { ref, onMounted, computed, nextTick } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import AppEdge from './common/edge'
 import Control from './common/NodeControl.vue'
 import { baseNodes } from '@/workflow/common/data'

@@ -112,6 +112,10 @@ const validate = () => {
 }
 
 const update_field = () => {
+  if (!props.nodeModel.properties.node_data.function_lib_id) {
+    set(props.nodeModel.properties, 'status', 500)
+    return
+  }
   applicationApi
     .getFunctionLib(id, props.nodeModel.properties.node_data.function_lib_id)
     .then((ok) => {

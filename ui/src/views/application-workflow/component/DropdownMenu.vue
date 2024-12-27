@@ -49,7 +49,7 @@
             <div
               class="workflow-dropdown-item cursor flex p-8-12"
               @click.stop="clickNodes(functionLibNode, item, 'function')"
-              @mousedown.stop="onmousedown(functionLibNode, item)"
+              @mousedown.stop="onmousedown(functionLibNode, item, 'function')"
             >
               <component
                 :is="iconComponent(`function-lib-node-icon`)"
@@ -229,6 +229,7 @@ function onmousedown(item: any, data?: any, type?: string) {
       }
     }
   }
+  console.log('xx', item)
   props.workflowRef?.onmousedown(item)
   emit('onmousedown', item)
 }
