@@ -165,6 +165,7 @@
             trigger: 'change'
           }"
         >
+          <template #label>选择图片<span class="danger">*</span></template>
           <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
