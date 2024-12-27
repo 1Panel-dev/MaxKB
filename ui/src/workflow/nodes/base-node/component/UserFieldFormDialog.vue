@@ -110,7 +110,7 @@ const currentRow = computed(() => {
         return currentItem.value
     }
   } else {
-    return { input_type: 'TextInput', required: true, attrs: { maxlength: 20, minlength: 0 } }
+    return { input_type: 'TextInput', required: false, attrs: { maxlength: 20, minlength: 0 } }
   }
 })
 const currentIndex = ref(null)
