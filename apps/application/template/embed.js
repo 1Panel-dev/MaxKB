@@ -132,7 +132,7 @@ const initChat=(root)=>{
 function initMaxkb(){
   const maxkb=document.createElement('div')
   const root=document.createElement('div')
-  const maxkbId = 'maxkb-'+crypto.randomUUID().split('-')[0]
+  const maxkbId = 'maxkb-'+'{{max_kb_id}}'
   root.id=maxkbId
   initMaxkbStyle(maxkb, maxkbId)
   maxkb.appendChild(root)
