@@ -40,12 +40,7 @@ class XInferenceTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         )
 
     def check_auth(self):
-        client = OpenAI(
-            base_url=self.api_base,
-            api_key=self.api_key
-        )
-        response_list = client.models.with_raw_response.list()
-        # print(response_list)
+        self.text_to_speech('你好')
 
     def text_to_speech(self, text):
         client = OpenAI(
