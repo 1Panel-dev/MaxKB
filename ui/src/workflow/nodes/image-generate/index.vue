@@ -156,7 +156,7 @@
             v-model="form_data.negative_prompt"
             placeholder="请描述不想生成的图片内容，比如：颜色、血腥内容"
             style="height: 150px"
-            @submitDialog="submitDialog"
+            @submitDialog="submitNegativeDialog"
           />
         </el-form-item>
         <!--
@@ -313,6 +313,10 @@ function refreshParam(data: any) {
 
 function submitDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'prompt', val)
+}
+
+function submitNegativeDialog(val: string) {
+  set(props.nodeModel.properties.node_data, 'negative_prompt', val)
 }
 
 onMounted(() => {
