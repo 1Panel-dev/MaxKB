@@ -5,7 +5,7 @@
   --el-border-color: #dee0e3;
   --el-text-color-regular: #1f2329;
   --el-color-info: #8f959e !important;
-  --el-disabled-bg-color: #eff0f1;
+  --el-disabled-bg-color: #eff0f1 !important;
   --el-text-color-primary: #1f2329;
 }
 
@@ -259,15 +259,15 @@
   padding: 1px 12px !important;
 }
 
-.el-input.is-disabled .el-input__wrapper {
-}
-
 .el-input--large {
   .el-input__inner {
     font-size: 16px;
   }
 }
 
+.el-select__wrapper.is-disabled {
+  background-color: var(--el-disabled-bg-color)!important;
+}
 .el-select__placeholder {
   font-weight: 400;
 }
@@ -346,6 +346,10 @@
 }
 .el-radio__input.is-checked + .el-radio__label {
   color: var(--app-text-color);
+}
+
+.radio_content .is-disabled {
+  background-color: var(--el-disabled-bg-color)!important;;
 }
 
 .el-input-number.is-controls-right .el-input__wrapper {
