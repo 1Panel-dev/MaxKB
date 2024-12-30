@@ -45,7 +45,7 @@
           @submitDialog="submitDialog"
         />
       </el-form-item>
-      <el-form-item >
+      <el-form-item>
         <template #label>
           <div class="flex-between">
             <div class="flex align-center">
@@ -70,7 +70,11 @@
                   <Setting />
                 </el-icon>
               </el-button>
-              <el-switch size="small" v-model="form_data.file_upload_enable" @change="switchFileUpload"/>
+              <el-switch
+                size="small"
+                v-model="form_data.file_upload_enable"
+                @change="switchFileUpload"
+              />
             </div>
           </div>
         </template>
@@ -90,7 +94,11 @@
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip> -->
             </div>
-            <el-switch size="small" v-model="form_data.stt_model_enable" @change="sttModelEnableChange"/>
+            <el-switch
+              size="small"
+              v-model="form_data.stt_model_enable"
+              @change="sttModelEnableChange"
+            />
           </div>
         </template>
 
@@ -98,6 +106,7 @@
           v-show="form_data.stt_model_enable"
           v-model="form_data.stt_model_id"
           class="w-full"
+          @wheel="wheel"
           popper-class="select-model"
           placeholder="请选择语音识别模型"
         >
@@ -170,7 +179,11 @@
                   <Setting />
                 </el-icon>
               </el-button>
-              <el-switch size="small" v-model="form_data.tts_model_enable" @change="ttsModelEnableChange"/>
+              <el-switch
+                size="small"
+                v-model="form_data.tts_model_enable"
+                @change="ttsModelEnableChange"
+              />
             </div>
           </div>
         </template>
@@ -182,6 +195,7 @@
           v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
           v-model="form_data.tts_model_id"
           class="w-full"
+          @wheel="wheel"
           popper-class="select-model"
           @change="ttsModelChange()"
           placeholder="请选择语音合成模型"
@@ -241,7 +255,11 @@
       </el-form-item>
     </el-form>
     <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
-    <FileUploadSettingDialog ref="FileUploadSettingDialogRef" :node-model="nodeModel" @refresh="refreshFileUploadForm"/>
+    <FileUploadSettingDialog
+      ref="FileUploadSettingDialogRef"
+      :node-model="nodeModel"
+      @refresh="refreshFileUploadForm"
+    />
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -368,7 +386,6 @@ function sttModelEnableChange() {
   }
 }
 
-
 const openTTSParamSettingDialog = () => {
   const model_id = form_data.value.tts_model_id
   if (!model_id) {
@@ -382,7 +399,6 @@ const refreshTTSForm = (data: any) => {
   form_data.value.tts_model_params_setting = data
 }
 
-
 const switchFileUpload = () => {
   const default_upload_setting = {
     maxFiles: 3,
@@ -394,7 +410,8 @@ const switchFileUpload = () => {
   }
 
   if (form_data.value.file_upload_enable) {
-    form_data.value.file_upload_setting = form_data.value.file_upload_setting || default_upload_setting
+    form_data.value.file_upload_setting =
+      form_data.value.file_upload_setting || default_upload_setting
   }
   props.nodeModel.graphModel.eventCenter.emit('refreshFileUploadConfig')
 }
