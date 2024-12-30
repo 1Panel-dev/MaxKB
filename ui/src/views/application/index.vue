@@ -226,9 +226,11 @@ function settingApplication(row: any) {
 }
 const exportApplication = (application: any) => {
   applicationApi.exportApplication(application.id, application.name, loading).catch((e) => {
-    e.response.data.text().then((res: string) => {
-      MsgError(`导出失败:${JSON.parse(res).message}`)
-    })
+    if (e.response.status !== 403) {
+      e.response.data.text().then((res: string) => {
+        MsgError(`导出失败:${JSON.parse(res).message}`)
+      })
+    }
   })
 }
 const importApplication = (file: any) => {
