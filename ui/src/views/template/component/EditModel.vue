@@ -79,6 +79,7 @@
             <span>模型类型</span>
           </template>
           <el-select
+            disabled
             v-loading="model_type_loading"
             @change="list_base_model($event, true)"
             v-model="base_form_data.model_type"
