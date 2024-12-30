@@ -6,8 +6,8 @@
     @date：2023/11/14 13:51
     @desc:
 """
-from datetime import datetime
 import uuid
+from datetime import datetime
 from typing import List, Dict
 from uuid import UUID
 
@@ -107,7 +107,8 @@ class ChatInfo:
             'search_mode': self.application.dataset_setting.get(
                 'search_mode') if 'search_mode' in self.application.dataset_setting else 'embedding',
             'no_references_setting': self.get_no_references_setting(self.application.dataset_setting, model_setting),
-            'user_id': self.application.user_id
+            'user_id': self.application.user_id,
+            'application_id': self.application.id
         }
 
     def to_pipeline_manage_params(self, problem_text: str, post_response_handler: PostResponseHandler,
@@ -258,9 +259,11 @@ class ChatMessageSerializer(serializers.Serializer):
 
     def is_valid_intraday_access_num(self):
         if self.data.get('client_type') == AuthenticationType.APPLICATION_ACCESS_TOKEN.value:
-            access_client = QuerySet(ApplicationPublicAccessClient).filter(id=self.data.get('client_id')).first()
+            access_client = QuerySet(ApplicationPublicAccessClient).filter(client_id=self.data.get('client_id'),
+                                                                           application_id=self.data.get(
+                                                                               'application_id')).first()
             if access_client is None:
-                access_client = ApplicationPublicAccessClient(id=self.data.get('client_id'),
+                access_client = ApplicationPublicAccessClient(client_id=self.data.get('client_id'),
                                                               application_id=self.data.get('application_id'),
                                                               access_num=0,
                                                               intraday_access_num=0)

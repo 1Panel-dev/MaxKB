@@ -50,10 +50,14 @@ class ApplicationAccessToken(AppModelMixin):
 
 
 class ApplicationPublicAccessClient(AppModelMixin):
-    id = models.UUIDField(max_length=128, primary_key=True, verbose_name="公共访问链接客户端id")
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
+    client_id = models.UUIDField(max_length=128, default=uuid.uuid1, verbose_name="公共访问链接客户端id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE, verbose_name="应用id")
     access_num = models.IntegerField(default=0, verbose_name="访问总次数次数")
     intraday_access_num = models.IntegerField(default=0, verbose_name="当日访问次数")
 
     class Meta:
         db_table = "application_public_access_client"
+        indexes = [
+            models.Index(fields=['client_id']),
+        ]

@@ -87,7 +87,9 @@ class WorkFlowPostHandler:
         chat_cache.set(chat_id,
                        self.chat_info, timeout=60 * 30)
         if self.client_type == AuthenticationType.APPLICATION_ACCESS_TOKEN.value:
-            application_public_access_client = QuerySet(ApplicationPublicAccessClient).filter(id=self.client_id).first()
+            application_public_access_client = (QuerySet(ApplicationPublicAccessClient)
+                                                .filter(client_id=self.client_id,
+                                                        application_id=self.chat_info.application.id).first())
             if application_public_access_client is not None:
                 application_public_access_client.access_num = application_public_access_client.access_num + 1
                 application_public_access_client.intraday_access_num = application_public_access_client.intraday_access_num + 1
