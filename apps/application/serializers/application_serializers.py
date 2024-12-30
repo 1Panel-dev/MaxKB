@@ -254,6 +254,7 @@ class ApplicationSerializer(serializers.Serializer):
             # 获取接入的query参数
             query = self.get_query_api_input(application_access_token.application, params)
             float_location = {"x": {"type": "right", "value": 0}, "y": {"type": "bottom", "value": 30}}
+            header_font_color = "rgb(100, 106, 115)"
             application_setting_model = DBModelManage.get_model('application_setting')
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(
@@ -265,6 +266,9 @@ class ApplicationSerializer(serializers.Serializer):
                     show_guide = 'true' if application_setting.show_guide else 'false'
                     if application_setting.float_location is not None:
                         float_location = application_setting.float_location
+                    if application_setting.custom_theme is not None and len(
+                            application_setting.custom_theme.get('header_font_color', 'rgb(100, 106, 115)')) > 0:
+                        header_font_color = application_setting.custom_theme.get('header_font_color', 'rgb(100, 106, 115)')
 
             is_auth = 'true' if application_access_token is not None and application_access_token.is_active else 'false'
             t = Template(content)
@@ -283,7 +287,8 @@ class ApplicationSerializer(serializers.Serializer):
                      'x_value': float_location.get('x', {}).get('value', 0),
                      'y_type': float_location.get('y', {}).get('type', 'bottom'),
                      'y_value': float_location.get('y', {}).get('value', 30),
-                     'max_kb_id': str(uuid.uuid1()).replace('-', '')}))
+                     'max_kb_id': str(uuid.uuid1()).replace('-', ''),
+                     'header_font_color': header_font_color}))
             response = HttpResponse(s, status=200, headers={'Content-Type': 'text/javascript'})
             return response
 
