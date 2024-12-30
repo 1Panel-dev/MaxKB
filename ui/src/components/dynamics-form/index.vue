@@ -181,12 +181,13 @@ const render = (
         if (form_data[item.field] !== undefined) {
           return { [item.field]: form_data[item.field] }
         }
-        if (item.show_default_value) {
+        if (item.show_default_value === true || item.show_default_value === undefined) {
           return { [item.field]: item.default_value }
         }
         return {}
       })
       .reduce((x, y) => ({ ...x, ...y }), {})
+
     formValue.value = _.cloneDeep(value)
   }
 }

@@ -27,6 +27,7 @@ const formValue = computed({
 const getData = () => {
   return {
     input_type: 'SwitchInput',
+    show_default_value: true,
     attrs: {},
     default_value: formValue.value.default_value
   }

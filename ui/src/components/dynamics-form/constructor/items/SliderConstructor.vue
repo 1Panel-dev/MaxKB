@@ -94,6 +94,16 @@ const getData = () => {
       'show-input-controls': false,
       'show-input': formValue.value.showInput
     },
+    props_info: {
+      rules: [
+        {
+          message: formValue.value.label + '不能为空',
+          trigger: 'blur',
+          required: formValue.value.required
+        }
+      ]
+    },
+    show_default_value: true,
     default_value: formValue.value.default_value
   }
 }

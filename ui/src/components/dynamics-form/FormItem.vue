@@ -128,7 +128,7 @@ const rules = computed(() => {
     ? props_info.value.rules.map(to_rule)
     : {
         message: errMsg.value,
-        trigger: ['blur', 'change'],
+        trigger: props.formfield.input_type === 'Slider' ? 'blur' : ['blur', 'change'],
         required: props.formfield.required === false ? false : true
       }
 })
