@@ -1,7 +1,7 @@
 <template>
   <div class="radio_content" :style="radioContentStyle">
     <el-row :gutter="12" class="w-full">
-      <template v-for="(item,index) in option_list" :key="index">
+      <template v-for="(item, index) in option_list" :key="index">
         <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
           <el-card
             :key="item.value"
@@ -21,9 +21,10 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, ref, inject } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
-import { useFormDisabled } from 'element-plus'
+import { useFormDisabled, formItemContextKey } from 'element-plus'
+
 const inputDisabled = useFormDisabled()
 
 const props = defineProps<{
@@ -37,11 +38,14 @@ const props = defineProps<{
   modelValue?: any
   disabled?: boolean
 }>()
-
+const elFormItem = inject(formItemContextKey, void 0)
 const selected = (activeValue: string | number) => {
   emit('update:modelValue', activeValue)
+  if (elFormItem?.validate) {
+    elFormItem.validate('change')
+  }
 }
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'change'])
 const width = ref<number>()
 const radioContentStyle = computed(() => {
   if (width.value) {
@@ -55,11 +59,7 @@ const radioContentStyle = computed(() => {
   }
   return {}
 })
-const resize = (wh: any) => {
-  if (wh.height) {
-    width.value = wh.width
-  }
-}
+
 const textField = computed(() => {
   return props.formField.text_field ? props.formField.text_field : 'key'
 })

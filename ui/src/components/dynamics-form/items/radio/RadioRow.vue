@@ -12,9 +12,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
-import { useFormDisabled } from 'element-plus'
+import { useFormDisabled, formItemContextKey } from 'element-plus'
 const inputDisabled = useFormDisabled()
 const props = defineProps<{
   formValue?: any
@@ -26,9 +26,12 @@ const props = defineProps<{
   // 选中的值
   modelValue?: any
 }>()
-
+const elFormItem = inject(formItemContextKey, void 0)
 const selected = (activeValue: string | number) => {
   emit('update:modelValue', activeValue)
+  if (elFormItem?.validate) {
+    elFormItem.validate('change')
+  }
 }
 const emit = defineEmits(['update:modelValue'])
 

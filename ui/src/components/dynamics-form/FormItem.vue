@@ -119,6 +119,7 @@ const to_rule = (rule: any) => {
   }
   return rule
 }
+
 /**
  * 校验
  */
@@ -127,7 +128,7 @@ const rules = computed(() => {
     ? props_info.value.rules.map(to_rule)
     : {
         message: errMsg.value,
-        trigger: 'blur',
+        trigger: ['blur', 'change'],
         required: props.formfield.required === false ? false : true
       }
 })
