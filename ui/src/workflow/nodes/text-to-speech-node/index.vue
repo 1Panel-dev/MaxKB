@@ -63,7 +63,7 @@
                     v-html="relatedObject(providerOptions, label, 'provider')?.icon"
                     class="model-icon mr-8"
                   ></span>
-                  <span>{{ item.name }}</span>
+                  <span class="ellipsis" :title="item.name">{{ item.name }}</span>
                   <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
                     >公用
                   </el-tag>
@@ -86,7 +86,8 @@
                     v-html="relatedObject(providerOptions, label, 'provider')?.icon"
                     class="model-icon mr-8"
                   ></span>
-                  <span>{{ item.name }}</span>
+
+                  <span class="ellipsis" :title="item.name">{{ item.name }}</span>
                   <span class="danger">（不可用）</span>
                 </div>
                 <el-icon class="check-icon" v-if="item.id === form_data.model_id">
