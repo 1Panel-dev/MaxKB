@@ -1,11 +1,14 @@
 <template>
-  <el-form-item :required="formValue.required" prop="default_value" :rules="[default_value_rule]">
-    <template #label>
-      <div class="flex-between">
-        默认值
-        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
-      </div>
-    </template>
+  <el-form-item
+    class="defaultValueItem"
+    label="默认值"
+    :required="formValue.required"
+    prop="default_value"
+    :rules="[default_value_rule]"
+  >
+    <div class="defaultValueCheckbox">
+      <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+    </div>
     <JsonInput ref="jsonInputRef" v-model="formValue.default_value"> </JsonInput>
   </el-form-item>
 </template>
@@ -66,4 +69,13 @@ onMounted(() => {
   }
 })
 </script>
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.defaultValueItem {
+  position: relative;
+  .defaultValueCheckbox {
+    position: absolute;
+    right: 0;
+    top: -35px;
+  }
+}
+</style>

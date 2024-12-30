@@ -47,16 +47,16 @@
     </el-row>
   </el-form-item>
   <el-form-item
+    class="defaultValueItem"
     :required="formValue.required"
     prop="default_value"
+    label="默认值"
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
   >
-    <template #label>
-      <div class="flex-between">
-        默认值
-        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
-      </div>
-    </template>
+    <div class="defaultValueCheckbox">
+      <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+    </div>
+
     <el-select v-model="formValue.default_value" :teleported="false" popper-class="default-select">
       <el-option
         v-for="(option, index) in formValue.option_list"
@@ -123,6 +123,14 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
+.defaultValueItem {
+  position: relative;
+  .defaultValueCheckbox {
+    position: absolute;
+    right: 0;
+    top: -35px;
+  }
+}
 :deep(.el-form-item__label) {
   display: block;
 }
