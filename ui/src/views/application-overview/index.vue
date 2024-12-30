@@ -71,11 +71,18 @@
                 </el-button>
               </div>
               <div>
-                <el-button :disabled="!accessToken?.is_active" type="primary">
-                  <a v-if="accessToken?.is_active" :href="shareUrl" target="_blank">
-                    {{ $t('views.applicationOverview.appInfo.demo') }}
-                  </a>
-                  <span v-else> {{ $t('views.applicationOverview.appInfo.demo') }}</span>
+                <el-button
+                  v-if="accessToken?.is_active"
+                  :disabled="!accessToken?.is_active"
+                  type="primary"
+                  tag="a"
+                  :href="shareUrl"
+                  target="_blank"
+                >
+                  {{ $t('views.applicationOverview.appInfo.demo') }}
+                </el-button>
+                <el-button v-else :disabled="!accessToken?.is_active" type="primary">
+                  {{ $t('views.applicationOverview.appInfo.demo') }}
                 </el-button>
                 <el-button :disabled="!accessToken?.is_active" @click="openDialog">
                   {{ $t('views.applicationOverview.appInfo.embedThirdParty') }}
@@ -353,23 +360,22 @@ function getDetail() {
       ?.filter((v: any) => v.id === 'base-node')
       .map((v: any) => {
         apiInputParams.value = v.properties.api_input_field_list
-          ? v.properties.api_input_field_list
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value
-                }
-              })
+          ? v.properties.api_input_field_list.map((v: any) => {
+              return {
+                name: v.variable,
+                value: v.default_value
+              }
+            })
           : v.properties.input_field_list
-          ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'api_input')
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value
-                }
-              })
-          : []
+            ? v.properties.input_field_list
+                .filter((v: any) => v.assignment_method === 'api_input')
+                .map((v: any) => {
+                  return {
+                    name: v.variable,
+                    value: v.default_value
+                  }
+                })
+            : []
       })
   })
 }
