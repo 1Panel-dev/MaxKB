@@ -59,7 +59,7 @@ def _initialize_model_info():
             TencentLLMModelCredential,
             TencentModel),
         _create_model_info(
-            'hunyuan-functioncall ',
+            'hunyuan-functioncall',
             '混元最新 MOE 架构 FunctionCall 模型，经过高质量的 FunctionCall 数据训练，上下文窗口达 32K，在多个维度的评测指标上处于领先。',
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
