@@ -47,6 +47,8 @@ def write_image(zip_path: str, image_list: List[str]):
             if text.startswith('(/api/file/'):
                 r = text.replace('(/api/file/', '').replace(')', '')
                 file = QuerySet(File).filter(id=r).first()
+                if file is None:
+                    break
                 zip_inner_path = os.path.join('api', 'file', r)
                 file_path = os.path.join(zip_path, zip_inner_path)
                 if not os.path.exists(os.path.dirname(file_path)):
@@ -56,6 +58,8 @@ def write_image(zip_path: str, image_list: List[str]):
             else:
                 r = text.replace('(/api/image/', '').replace(')', '')
                 image_model = QuerySet(Image).filter(id=r).first()
+                if image_model is None:
+                    break
                 zip_inner_path = os.path.join('api', 'image', r)
                 file_path = os.path.join(zip_path, zip_inner_path)
                 if not os.path.exists(os.path.dirname(file_path)):
