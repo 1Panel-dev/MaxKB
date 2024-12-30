@@ -34,7 +34,7 @@ def sync_web_dataset(dataset_id: str, url: str, selector: str):
         max_kb_error.error(f'同步web知识库:{dataset_id}出现错误{str(e)}{traceback.format_exc()}')
 
 
-@celery_app.task(base=QueueOnce, once={'keys': ['dataset_id']}, name='celery:sync_web_dataset')
+@celery_app.task(base=QueueOnce, once={'keys': ['dataset_id']}, name='celery:sync_replace_web_dataset')
 def sync_replace_web_dataset(dataset_id: str, url: str, selector: str):
     try:
         max_kb.info(f"开始--->开始同步web知识库:{dataset_id}")
