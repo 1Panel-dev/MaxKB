@@ -98,7 +98,7 @@ const reset_default = (model_id: string, application_id?: string) => {
   api.then((ok) => {
     model_form_field.value = ok.data
     const model_setting_data = ok.data
-      .map((item) => ({ [item.field]: item.default_value }))
+      .map((item) => ({ [item.field]: item.show_default_value !== false ? item.default_value : undefined }))
       .reduce((x, y) => ({ ...x, ...y }), {})
 
     emit('refresh', model_setting_data)
