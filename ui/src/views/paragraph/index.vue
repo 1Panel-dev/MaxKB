@@ -172,10 +172,11 @@ import documentApi from '@/api/document'
 import paragraphApi from '@/api/paragraph'
 import ParagraphDialog from './component/ParagraphDialog.vue'
 import SelectDocumentDialog from './component/SelectDocumentDialog.vue'
+import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import { numberFormat } from '@/utils/utils'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
-import GenerateRelatedDialog from './component/GenerateRelatedDialog.vue'
+
 const { paragraph } = useStore()
 const route = useRoute()
 const {
@@ -350,7 +351,7 @@ function openGenerateDialog(row?: any) {
     })
   }
 
-  GenerateRelatedDialogRef.value.open(arr)
+  GenerateRelatedDialogRef.value.open(arr, 'paragraph')
 }
 
 onMounted(() => {

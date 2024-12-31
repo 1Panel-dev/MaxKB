@@ -41,7 +41,7 @@
             <component :is="iconComponent(`function-lib-node-icon`)" class="mr-8 mt-4" :size="32" />
             <div class="pre-wrap">
               <div class="lighter">{{ functionNode.label }}</div>
-              <el-text type="info" size="small" >{{ functionNode.text }}</el-text>
+              <el-text type="info" size="small">{{ functionNode.text }}</el-text>
             </div>
           </div>
 
@@ -51,14 +51,19 @@
               @click.stop="clickNodes(functionLibNode, item, 'function')"
               @mousedown.stop="onmousedown(functionLibNode, item, 'function')"
             >
-              <component
-                :is="iconComponent(`function-lib-node-icon`)"
-                class="mr-8"
-                :size="32"
-              />
+              <component :is="iconComponent(`function-lib-node-icon`)" class="mr-8" :size="32" />
               <div class="pre-wrap">
-                <div class="lighter">{{ item.name }}</div>
-                <el-text type="info" size="small" v-if="item.desc">{{ item.desc }}</el-text>
+                <div class="lighter ellipsis-1" :title="item.name">{{ item.name }}</div>
+                <p>
+                  <el-text
+                    class="ellipsis-1"
+                    type="info"
+                    size="small"
+                    :title="item.desc"
+                    v-if="item.desc"
+                    >{{ item.desc }}</el-text
+                  >
+                </p>
               </div>
             </div>
           </template>
@@ -83,7 +88,16 @@
                   <div class="lighter ellipsis" :title="item.name">
                     {{ item.name }}
                   </div>
-                  <el-text type="info" size="small" style="width: 80%" v-if="item.desc">{{ item.desc }}</el-text>
+                  <p>
+                    <el-text
+                      class="ellipsis"
+                      type="info"
+                      size="small"
+                      :title="item.desc"
+                      v-if="item.desc"
+                      >{{ item.desc }}</el-text
+                    >
+                  </p>
                 </div>
                 <div class="status-tag" style="margin-left: auto">
                   <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px"

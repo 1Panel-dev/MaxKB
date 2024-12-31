@@ -438,7 +438,7 @@ import { hitHandlingMethod } from '@/enums/document'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import StatusVlue from '@/views/document/component/Status.vue'
-import GenerateRelatedDialog from '@/views/document/component/GenerateRelatedDialog.vue'
+import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 import { TaskType, State } from '@/utils/status'
 const router = useRouter()
 const route = useRoute()
@@ -561,9 +561,6 @@ const cancelTask = (row: any, task_type: number) => {
   documentApi.cancelTask(row.dataset_id, row.id, { type: task_type }).then(() => {
     MsgSuccess('发送成功')
   })
-}
-function syncDataset() {
-  SyncWebDialogRef.value.open(id)
 }
 
 function importDoc() {
@@ -706,18 +703,6 @@ function batchRefresh() {
   })
 }
 
-function batchGenerateRelated() {
-  const arr: string[] = []
-  multipleSelection.value.map((v) => {
-    if (v) {
-      arr.push(v.id)
-    }
-  })
-  documentApi.batchGenerateRelated(id, arr, loading).then(() => {
-    MsgSuccess('批量生成问题成功')
-    multipleTableRef.value?.clearSelection()
-  })
-}
 
 function deleteDocument(row: any) {
   MsgConfirm(
@@ -827,7 +812,7 @@ function openGenerateDialog(row?: any) {
     })
   }
 
-  GenerateRelatedDialogRef.value.open(arr)
+  GenerateRelatedDialogRef.value.open(arr, 'document')
 }
 
 onMounted(() => {
