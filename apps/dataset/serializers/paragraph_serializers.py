@@ -728,7 +728,6 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
         dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
         document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
 
-        @transaction.atomic
         def batch_generate_related(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
