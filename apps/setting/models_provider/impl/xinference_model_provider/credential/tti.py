@@ -13,7 +13,7 @@ from setting.models_provider.base_model_provider import BaseModelCredential, Val
 
 class XinferenceTTIModelParams(BaseForm):
     size = forms.SingleSelect(
-        TooltipLabel('图片尺寸', '指定生成图片的尺寸, 如: 1024x1024'),
+        TooltipLabel('图片尺寸', '图像生成端点允许您根据文本提示创建原始图像。图像的尺寸可以为 1024x1024、1024x1792 或 1792x1024 像素。'),
         required=True,
         default_value='1024x1024',
         option_list=[
@@ -26,7 +26,7 @@ class XinferenceTTIModelParams(BaseForm):
     )
 
     quality = forms.SingleSelect(
-        TooltipLabel('图片质量', ''),
+        TooltipLabel('图片质量', '默认情况下，图像以标准质量生成，您可以设置质量：“hd”以增强细节。方形、标准质量的图像生成速度最快。'),
         required=True,
         default_value='standard',
         option_list=[
@@ -38,7 +38,7 @@ class XinferenceTTIModelParams(BaseForm):
     )
 
     n = forms.SliderField(
-        TooltipLabel('图片数量', '指定生成图片的数量'),
+        TooltipLabel('图片数量', '您可以一次请求 1 个图像（通过发出并行请求来请求更多图像），或者使用 n 参数一次最多请求 10 个图像。'),
         required=True, default_value=1,
         _min=1,
         _max=10,
