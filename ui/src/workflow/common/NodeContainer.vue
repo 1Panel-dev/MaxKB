@@ -9,7 +9,7 @@
         <div class="flex-between">
           <div
             class="flex align-center"
-            :style="{ maxWidth: node_status == 200 ? 'calc(100% - 55px)' : 'calc(100% - 85px)' }"
+            :style="{ maxWidth: node_status == 200 ? 'calc(100% - 85px)' : 'calc(100% - 85px)' }"
           >
             <component
               :is="iconComponent(`${nodeModel.type}-icon`)"
@@ -31,7 +31,7 @@
             <h4 v-else>{{ nodeModel.properties.stepName }}</h4>
           </div>
 
-          <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
+          <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop >
             <el-button text @click="showNode = !showNode">
               <el-icon class="arrow-icon color-secondary" :class="showNode ? 'rotate-180' : ''"
                 ><ArrowDownBold />
