@@ -172,8 +172,12 @@ const modelOptions = ref<any>(null)
 const providerOptions = ref<Array<Provider>>([])
 
 const aiChatNodeFormRef = ref<FormInstance>()
+const nodeCascaderRef = ref()
 const validate = () => {
-  return aiChatNodeFormRef.value?.validate().catch((err) => {
+  return Promise.all([
+    nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    aiChatNodeFormRef.value?.validate()
+  ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }
