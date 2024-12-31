@@ -53,7 +53,11 @@
             </div></template
           >
 
-          <el-table class="border" v-if="form_data.form_field_list.length > 0" :data="form_data.form_field_list">
+          <el-table
+            class="border"
+            v-if="form_data.form_field_list.length > 0"
+            :data="form_data.form_field_list"
+          >
             <el-table-column prop="field" label="参数">
               <template #default="{ row }">
                 <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
@@ -84,7 +88,9 @@
 
             <el-table-column prop="default_value" label="默认值">
               <template #default="{ row }">
-                <span :title="row.default_value" class="ellipsis-1">{{ getDefaultValue(row) }}</span>
+                <span :title="row.default_value" class="ellipsis-1">{{
+                  getDefaultValue(row)
+                }}</span>
               </template>
             </el-table-column>
             <el-table-column label="必填">
@@ -206,6 +212,9 @@ const getDefaultValue = (row: any) => {
     if (default_value) {
       return default_value
     }
+    return row.default_value
+  }
+  if (row.default_value !== undefined) {
     return row.default_value
   }
 }

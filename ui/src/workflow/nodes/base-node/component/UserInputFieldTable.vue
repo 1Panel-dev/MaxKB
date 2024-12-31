@@ -128,15 +128,19 @@ function refreshFieldList(data: any, index: any) {
 
 const getDefaultValue = (row: any) => {
   if (row.default_value) {
-    const default_value = row.option_list?.filter((v: any) => row.default_value.indexOf(v.value) > -1)
-      .map((v: any) => v.label).join(',')
+    const default_value = row.option_list
+      ?.filter((v: any) => row.default_value.indexOf(v.value) > -1)
+      .map((v: any) => v.label)
+      .join(',')
     if (default_value) {
       return default_value
     }
     return row.default_value
   }
+  if (row.default_value !== undefined) {
+    return row.default_value
+  }
 }
-
 
 onMounted(() => {
   if (!props.nodeModel.properties.user_input_field_list) {
