@@ -80,8 +80,8 @@
           <h4>{{ active_provider?.name }}</h4>
           <div class="flex-between mt-16 mb-16">
             <el-button type="primary" @click="openCreateModel(active_provider)">添加模型</el-button>
-            <div class="flex-between">
-              <el-select v-model="search_type" style="width: 120px" @change="search_type_change">
+            <div class="flex-between complex-search">
+              <el-select class="complex-search__left" v-model="search_type" style="width: 120px" @change="search_type_change">
                 <el-option label="创建者" value="create_user" />
                 <el-option label="权限" value="permission_type" />
                 <el-option label="模型类型" value="model_type" />
