@@ -624,10 +624,6 @@ defineExpose({ open })
 @media only screen and (max-width: 768px) {
   .execution-details-dialog {
     width: 90% !important;
-
-    .footer-content {
-      display: block;
-    }
   }
 }
 </style>

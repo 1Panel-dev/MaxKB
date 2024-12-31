@@ -79,9 +79,7 @@ defineExpose({ open })
 @media only screen and (max-width: 768px) {
   .paragraph-source {
     width: 90% !important;
-    .footer-content {
-      display: block;
-    }
+ 
   }
 }
 </style>
