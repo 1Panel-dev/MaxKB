@@ -136,7 +136,7 @@ class BaseApplicationNode(IApplicationNode):
         if self.answer_text is None:
             return None
         application_node_dict = self.context.get('application_node_dict')
-        if application_node_dict is None:
+        if application_node_dict is None or len(application_node_dict) == 0:
             return [
                 Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'],
                        self.context.get('child_node'))]
