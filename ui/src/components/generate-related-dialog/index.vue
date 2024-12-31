@@ -160,14 +160,14 @@ const submitHandle = async (formEl: FormInstance) => {
       prompt.save(user.userInfo?.id as string, form.value)
       if (apiType.value === 'paragraph') {
         const data = { ...form.value, paragraph_id_list: idList.value }
-        paragraphApi.batchGenerateRelated(id, documentId, data).then(() => {
+        paragraphApi.batchGenerateRelated(id, documentId, data, loading).then(() => {
           MsgSuccess('生成问题成功')
           emit('refresh')
           dialogVisible.value = false
         })
       } else if (apiType.value === 'document') {
         const data = { ...form.value, document_id_list: idList.value }
-        documentApi.batchGenerateRelated(id, data).then(() => {
+        documentApi.batchGenerateRelated(id, data, loading).then(() => {
           MsgSuccess('生成问题成功')
           emit('refresh')
           dialogVisible.value = false
