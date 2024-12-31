@@ -84,6 +84,7 @@ import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
+import { MsgError } from '@/utils/message'
 
 const route = useRoute()
 const {
@@ -197,7 +198,12 @@ const playAnswerText = (text: string) => {
     }
     applicationApi
       .postTextToSpeech((props.applicationId as string) || (id as string), { text: text }, loading)
-      .then((res: any) => {
+      .then(async (res: any) => {
+        if (res.type === 'application/json') {
+          const text = await res.text()
+          MsgError(text)
+          return
+        }
         // 假设我们有一个 MP3 文件的字节数组
         // 创建 Blob 对象
         const blob = new Blob([res], { type: 'audio/mp3' })
