@@ -66,6 +66,7 @@ import EditMarkDialog from '@/views/log/component/EditMarkDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import applicationApi from '@/api/application'
 import { useRoute } from 'vue-router'
+import { MsgError } from '@/utils/message'
 
 const route = useRoute()
 const {
@@ -177,7 +178,12 @@ const playAnswerText = (text: string) => {
     }
     applicationApi
       .postTextToSpeech(id || (props.applicationId as string), { text: text }, loading)
-      .then((res: any) => {
+      .then(async (res: any) => {
+        if (res.type === 'application/json') {
+          const text = await res.text()
+          MsgError(text)
+          return
+        }
         // 假设我们有一个 MP3 文件的字节数组
         // 创建 Blob 对象
         const blob = new Blob([res], { type: 'audio/mp3' })
