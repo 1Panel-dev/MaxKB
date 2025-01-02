@@ -15,7 +15,7 @@
             <div class="flex-between">
               <div class="flex">
                 <img :src="getImgUrl(item && item?.document_name)" alt="" width="20" />
-                <div class="ml-4" v-if="!item.source_url">
+                <div class="ml-4 ellipsis-1" :title="item?.document_name" v-if="!item.source_url">
                   <p>{{ item && item?.document_name }}</p>
                 </div>
                 <div class="ml-8" v-else>
