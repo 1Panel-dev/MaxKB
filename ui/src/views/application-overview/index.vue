@@ -274,7 +274,7 @@ function openDisplaySettingDialog() {
   if (user.isEnterprise()) {
     XPackDisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
   } else {
-    DisplaySettingDialogRef.value?.open(accessToken.value)
+    DisplaySettingDialogRef.value?.open(accessToken.value, detail.value)
   }
 }
 function openEditAvatar() {

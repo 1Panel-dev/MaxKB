@@ -264,7 +264,10 @@
           </el-card>
 
           <el-space direction="vertical" alignment="start" :size="2">
-            <el-checkbox v-model="form.show_source" label="显示知识来源" />
+            <el-checkbox
+              v-model="form.show_source"
+              :label="isWorkFlow(detail.type) ? '显示执行详情' : '显示知识来源'"
+            />
             <el-checkbox v-model="form.show_history" label="显示历史记录" />
             <el-checkbox v-model="form.show_guide" label="显示引导图（浮窗模式）" />
             <el-checkbox v-model="form.disclaimer" label="免责声明" @change="changeDisclaimer" />
@@ -298,7 +301,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
-import { isAppIcon } from '@/utils/application'
+import { isAppIcon, isWorkFlow } from '@/utils/application'
 import applicationXpackApi from '@/api/application-xpack'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import { t } from '@/locales'
