@@ -28,14 +28,14 @@
                   : meta?.source_url
               "
               target="_blank"
-              class="ellipsis-1"
+              class="ellipsis-1 break-all"
               :title="data?.document_name?.trim()"
             >
               {{ data?.document_name?.trim() }}
             </a>
           </template>
           <template v-else>
-            <span class="ellipsis-1" :title="data?.document_name?.trim()">
+            <span class="ellipsis-1 break-all" :title="data?.document_name?.trim()">
               {{ data?.document_name?.trim() }}
             </span>
           </template>
@@ -45,7 +45,9 @@
             <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
           </AppAvatar>
 
-          <span class="ellipsis-1" :title="data?.dataset_name"> {{ data?.dataset_name }}</span>
+          <span class="ellipsis-1 break-all" :title="data?.dataset_name">
+            {{ data?.dataset_name }}</span
+          >
         </div>
       </div>
     </template>
@@ -80,7 +82,7 @@ const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.v
 .paragraph-source-card {
   .footer-content {
     .item {
-      width: 50%;
+      max-width: 50%;
     }
   }
 }
@@ -96,7 +98,7 @@ const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.v
     .footer-content {
       display: block;
       .item {
-        width: 100%;
+        max-width: 100%;
       }
     }
   }
