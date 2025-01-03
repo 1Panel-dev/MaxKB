@@ -21,6 +21,7 @@ interface ApplicationFormType {
   stt_model_enable?: boolean
   tts_model_enable?: boolean
   tts_type?: string
+  tts_autoplay?: boolean
 }
 interface Chunk {
   real_node_id: string

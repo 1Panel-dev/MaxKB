@@ -79,7 +79,7 @@
   <audio ref="audioPlayer" controls hidden="hidden"></audio>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
@@ -100,6 +100,7 @@ const props = withDefaults(
     applicationId: string
     tts: boolean
     tts_type: string
+    tts_autoplay: boolean
   }>(),
   {
     data: () => ({}),
@@ -243,5 +244,12 @@ const pausePlayAnswerText = () => {
     window.speechSynthesis.pause()
   }
 }
+
+onMounted(() => {
+  // 第一次回答后自动播放， 打开历史记录不自动播放
+  if (props.tts_autoplay && buttonData.value.write_ed && !buttonData.value.update_time) {
+    playAnswerText(buttonData.value.answer_text)
+  }
+})
 </script>
 <style lang="scss" scoped></style>

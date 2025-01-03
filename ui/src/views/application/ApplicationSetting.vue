@@ -403,17 +403,7 @@
                   <div class="flex-between">
                     <span class="mr-4">语音播放</span>
                     <div>
-                      <el-button
-                        v-if="applicationForm.tts_type === 'TTS'"
-                        type="primary"
-                        link
-                        @click="openTTSParamSettingDialog"
-                        :disabled="!applicationForm.tts_model_id"
-                        class="mr-8"
-                      >
-                        <el-icon class="mr-4"><Setting /></el-icon>
-                        设置
-                      </el-button>
+                      <el-checkbox v-model="applicationForm.tts_autoplay">自动播放</el-checkbox>
                       <el-switch
                         size="small"
                         v-model="applicationForm.tts_model_enable"
@@ -492,6 +482,16 @@
                     </el-option>
                   </el-option-group>
                 </el-select>
+                <el-button
+                  v-if="applicationForm.tts_type === 'TTS'"
+                  type="primary"
+                  link
+                  @click="openTTSParamSettingDialog"
+                  :disabled="!applicationForm.tts_model_id"
+                  class="mr-8"
+                >
+                  <el-icon class="mr-4"><Setting /></el-icon>
+                </el-button>
               </el-form-item>
             </el-form>
           </el-scrollbar>

@@ -32,6 +32,7 @@
       <ChatOperationButton
         :tts="application.tts_model_enable"
         :tts_type="application.tts_type"
+        :tts_autoplay="application.tts_autoplay"
         :data="chatRecord"
         :type="type"
         :applicationId="application.id"
