@@ -9,6 +9,13 @@ export default {
   views,
   components,
   zhCn,
+  common: {
+    save: '保存',
+    saveSuccess: '保存成功',
+    delete: '删除',
+    setting: '设置',
+    cancel: '取消',
+  },
   login: {
     authentication: '登录认证',
     ldap: {
