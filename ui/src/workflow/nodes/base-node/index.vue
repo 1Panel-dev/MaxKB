@@ -166,9 +166,10 @@
         <template #label>
           <div class="flex-between">
             <span class="mr-4">语音播放</span>
-            <div>
+            <div class="flex">
               <el-checkbox v-model="form_data.tts_autoplay">自动播放</el-checkbox>
               <el-switch
+                class="ml-8"
                 size="small"
                 v-model="form_data.tts_model_enable"
                 @change="ttsModelEnableChange"
@@ -176,83 +177,85 @@
             </div>
           </div>
         </template>
-        <el-radio-group v-model="form_data.tts_type" v-show="form_data.tts_model_enable">
-          <el-radio label="浏览器播放(免费)" value="BROWSER" />
-          <el-radio label="TTS模型" value="TTS" />
-        </el-radio-group>
-        <el-select
-          v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
-          v-model="form_data.tts_model_id"
-          class="w-full"
-          @wheel="wheel"
-          popper-class="select-model"
-          @change="ttsModelChange()"
-          placeholder="请选择语音合成模型"
-          :teleported="false"
-        >
-          <el-option-group
-            v-for="(value, label) in ttsModelOptions"
-            :key="value"
-            :label="relatedObject(providerOptions, label, 'provider')?.name"
+        <div class="w-full">
+          <el-radio-group v-model="form_data.tts_type" v-show="form_data.tts_model_enable">
+            <el-radio label="浏览器播放(免费)" value="BROWSER" />
+            <el-radio label="TTS模型" value="TTS" />
+          </el-radio-group>
+        </div>
+        <div class="flex-between w-full">
+          <el-select
+            v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
+            v-model="form_data.tts_model_id"
+            class="w-full"
+            @wheel="wheel"
+            popper-class="select-model"
+            @change="ttsModelChange()"
+            placeholder="请选择语音合成模型"
+            :teleported="false"
           >
-            <el-option
-              v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-              class="flex-between"
+            <el-option-group
+              v-for="(value, label) in ttsModelOptions"
+              :key="value"
+              :label="relatedObject(providerOptions, label, 'provider')?.name"
             >
-              <div class="flex align-center">
-                <span
-                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                  class="model-icon mr-8"
-                ></span>
-                <span>{{ item.name }}</span>
-                <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
-                  >公用
-                </el-tag>
-              </div>
-              <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
-                <Check />
-              </el-icon>
-            </el-option>
-            <!-- 不可用 -->
-            <el-option
-              v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-              class="flex-between"
-              disabled
-            >
-              <div class="flex">
-                <span
-                  v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                  class="model-icon mr-8"
-                ></span>
-                <span>{{ item.name }}</span>
-                <span class="danger">{{
-                  $t('views.application.applicationForm.form.aiModel.unavailable')
-                }}</span>
-              </div>
-              <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
-                <Check />
-              </el-icon>
-            </el-option>
-          </el-option-group>
-        </el-select>
-        <el-button
-          v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
-          type="primary"
-          link
-          @click="openTTSParamSettingDialog"
-          :disabled="!form_data.tts_model_id"
-          class="mr-4"
-        >
-          <el-icon class="mr-4">
-            <Setting />
-          </el-icon>
-        </el-button>
+              <el-option
+                v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+                class="flex-between"
+              >
+                <div class="flex align-center">
+                  <span
+                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                    class="model-icon mr-8"
+                  ></span>
+                  <span>{{ item.name }}</span>
+                  <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
+                    >公用
+                  </el-tag>
+                </div>
+                <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
+                  <Check />
+                </el-icon>
+              </el-option>
+              <!-- 不可用 -->
+              <el-option
+                v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+                class="flex-between"
+                disabled
+              >
+                <div class="flex">
+                  <span
+                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
+                    class="model-icon mr-8"
+                  ></span>
+                  <span>{{ item.name }}</span>
+                  <span class="danger">{{
+                    $t('views.application.applicationForm.form.aiModel.unavailable')
+                  }}</span>
+                </div>
+                <el-icon class="check-icon" v-if="item.id === form_data.tts_model_id">
+                  <Check />
+                </el-icon>
+              </el-option>
+            </el-option-group>
+          </el-select>
+          <el-button
+            v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
+            @click="openTTSParamSettingDialog"
+            :disabled="!form_data.tts_model_id"
+            class="ml-8"
+          >
+            <el-icon>
+              <el-icon><Operation /></el-icon>
+            </el-icon>
+          </el-button>
+        </div>
       </el-form-item>
     </el-form>
     <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
