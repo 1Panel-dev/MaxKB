@@ -1009,7 +1009,7 @@ class ApplicationSerializer(serializers.Serializer):
             update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                            'dataset_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                            'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
-                           'file_upload_enable', 'file_upload_setting',
+                           'tts_autoplay', 'file_upload_enable', 'file_upload_setting',
                            'api_key_is_active', 'icon', 'work_flow', 'model_params_setting', 'tts_model_params_setting',
                            'problem_optimization_prompt', 'clean_time']
             for update_key in update_keys:
@@ -1073,6 +1073,8 @@ class ApplicationSerializer(serializers.Serializer):
                         instance['tts_model_enable'] = node_data['tts_model_enable']
                     if 'tts_type' in node_data:
                         instance['tts_type'] = node_data['tts_type']
+                    if 'tts_autoplay' in node_data:
+                        instance['tts_autoplay'] = node_data['tts_autoplay']
                     if 'tts_model_params_setting' in node_data:
                         instance['tts_model_params_setting'] = node_data['tts_model_params_setting']
                     if 'file_upload_enable' in node_data:
