@@ -171,6 +171,7 @@ model_info_manage = (
         '一个具有大令牌上下文窗口的高性能开放嵌入模型。',
         ModelTypeConst.EMBEDDING, ollama_embedding_model_credential, OllamaEmbedding), )
     .append_model_info_list(image_model_info)
+    .append_default_model_info(image_model_info[0])
     .build()
 )
 
