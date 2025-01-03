@@ -48,6 +48,9 @@ model_info_tti_list = [
     ModelInfo('cogview-3-plus', '根据用户文字描述生成高质量图像，支持多图片尺寸',
               ModelTypeConst.TTI, zhipu_tti_model_credential,
               ZhiPuTextToImage),
+    ModelInfo('cogview-3-flash', '根据用户文字描述生成高质量图像，支持多图片尺寸(免费)',
+              ModelTypeConst.TTI, zhipu_tti_model_credential,
+              ZhiPuTextToImage),
 ]
 
 model_info_manage = (
@@ -56,6 +59,7 @@ model_info_manage = (
     .append_default_model_info(ModelInfo('glm-4', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel))
     .append_model_info_list(model_info_image_list)
     .append_model_info_list(model_info_tti_list)
+    .append_default_model_info(model_info_tti_list[0])
     .build()
 )
 
