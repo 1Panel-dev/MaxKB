@@ -10,6 +10,7 @@ from enum import Enum
 
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.aliyun_bai_lian_model_provider import \
     AliyunBaiLianModelProvider
+from setting.models_provider.impl.anthropic_model_provider.anthropic_model_provider import AnthropicModelProvider
 from setting.models_provider.impl.aws_bedrock_model_provider.aws_bedrock_model_provider import BedrockModelProvider
 from setting.models_provider.impl.azure_model_provider.azure_model_provider import AzureModelProvider
 from setting.models_provider.impl.deepseek_model_provider.deepseek_model_provider import DeepSeekModelProvider
@@ -47,3 +48,4 @@ class ModelProvideConstants(Enum):
     model_xinference_provider = XinferenceModelProvider()
     model_vllm_provider = VllmModelProvider()
     aliyun_bai_lian_model_provider = AliyunBaiLianModelProvider()
+    model_anthropic_provider = AnthropicModelProvider()
