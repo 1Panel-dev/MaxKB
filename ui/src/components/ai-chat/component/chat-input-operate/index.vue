@@ -175,7 +175,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import Recorder from 'recorder-core'
 import applicationApi from '@/api/application'
 import { MsgAlert } from '@/utils/message'
@@ -254,7 +254,7 @@ const getAcceptList = () => {
   if (video) {
     accepts = [...accepts, ...videoExtensions]
   }
-  // console.log(accepts)
+
   if (accepts.length === 0) {
     return '.请在文件上传配置中选择文件类型'
   }
@@ -462,7 +462,12 @@ const uploadRecording = async (audioBlob: Blob) => {
         recorderLoading.value = false
         mediaRecorder.value.close()
         inputValue.value = typeof response.data === 'string' ? response.data : ''
-        // chatMessage(null, res.data)
+        // 自动发送
+        if (props.applicationDetails.stt_autosend) {
+          nextTick(() => {
+            autoSendMessage()
+          })
+        }
       })
   } catch (error) {
     recorderLoading.value = false
@@ -486,24 +491,28 @@ const handleTimeChange = () => {
   }, 1000)
 }
 
+function autoSendMessage() {
+  props.sendMessage(inputValue.value, {
+    image_list: uploadImageList.value,
+    document_list: uploadDocumentList.value,
+    audio_list: uploadAudioList.value,
+    video_list: uploadVideoList.value
+  })
+  inputValue.value = ''
+  uploadImageList.value = []
+  uploadDocumentList.value = []
+  uploadAudioList.value = []
+  uploadVideoList.value = []
+  quickInputRef.value.textareaStyle.height = '45px'
+}
+
 function sendChatHandle(event?: any) {
   if (!event?.ctrlKey) {
     // 如果没有按下组合键ctrl，则会阻止默认事件
     event?.preventDefault()
     if (!isDisabledChart.value && !props.loading && !event?.isComposing) {
       if (inputValue.value.trim()) {
-        props.sendMessage(inputValue.value, {
-          image_list: uploadImageList.value,
-          document_list: uploadDocumentList.value,
-          audio_list: uploadAudioList.value,
-          video_list: uploadVideoList.value
-        })
-        inputValue.value = ''
-        uploadImageList.value = []
-        uploadDocumentList.value = []
-        uploadAudioList.value = []
-        uploadVideoList.value = []
-        quickInputRef.value.textareaStyle.height = '45px'
+        autoSendMessage()
       }
     }
   } else {

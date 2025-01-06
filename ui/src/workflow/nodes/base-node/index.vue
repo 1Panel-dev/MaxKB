@@ -84,21 +84,16 @@
       <el-form-item>
         <template #label>
           <div class="flex-between">
-            <div class="flex align-center">
-              <span class="mr-4">语音输入</span>
-              <!-- <el-tooltip
-                effect="dark"
-                content="开启后，需要设定语音转文本模型，语音输入完成后会转化为文字直接发送提问"
-                placement="right"
-              >
-                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-              </el-tooltip> -->
+            <span class="mr-4">语音输入</span>
+            <div class="flex">
+              <el-checkbox v-model="form_data.stt_autosend">自动发送</el-checkbox>
+              <el-switch
+                class="ml-8"
+                size="small"
+                v-model="form_data.stt_model_enable"
+                @change="sttModelEnableChange"
+              />
             </div>
-            <el-switch
-              size="small"
-              v-model="form_data.stt_model_enable"
-              @change="sttModelEnableChange"
-            />
           </div>
         </template>
 
