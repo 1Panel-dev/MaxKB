@@ -46,7 +46,9 @@ model_info_manage = (
     .append_default_model_info(
         ModelInfo('qwen-turbo', '', ModelTypeConst.LLM, qwen_model_credential, QwenChatModel))
     .append_model_info_list(module_info_vl_list)
+    .append_default_model_info(module_info_vl_list[0])
     .append_model_info_list(module_info_tti_list)
+    .append_default_model_info(module_info_tti_list[0])
     .build()
 )
 
