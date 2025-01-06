@@ -93,6 +93,9 @@ model_info_manage = (
     .append_model_info_list(model_info_list)
     .append_default_model_info(model_info_list[0])
     .append_default_model_info(model_info_list[1])
+    .append_default_model_info(model_info_list[2])
+    .append_default_model_info(model_info_list[3])
+    .append_default_model_info(model_info_list[4])
     .build()
 )
 
