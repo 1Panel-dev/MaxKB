@@ -58,6 +58,7 @@ model_info_manage = (
     .append_model_info_list(model_info_list)
     .append_default_model_info(ModelInfo('glm-4', '', ModelTypeConst.LLM, qwen_model_credential, ZhipuChatModel))
     .append_model_info_list(model_info_image_list)
+    .append_default_model_info(model_info_image_list[0])
     .append_model_info_list(model_info_tti_list)
     .append_default_model_info(model_info_tti_list[0])
     .build()
