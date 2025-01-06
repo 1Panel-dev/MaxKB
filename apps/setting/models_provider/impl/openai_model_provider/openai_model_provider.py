@@ -121,7 +121,16 @@ model_info_manage = (
     .append_model_info_list(model_info_embedding_list)
     .append_default_model_info(model_info_embedding_list[0])
     .append_model_info_list(model_info_image_list)
+    .append_default_model_info(model_info_image_list[0])
     .append_model_info_list(model_info_tti_list)
+    .append_default_model_info(model_info_tti_list[0])
+    .append_default_model_info(ModelInfo('whisper-1', '',
+              ModelTypeConst.STT, openai_stt_model_credential,
+              OpenAISpeechToText)
+    )
+    .append_default_model_info(ModelInfo('tts-1', '',
+              ModelTypeConst.TTS, openai_tts_model_credential,
+              OpenAITextToSpeech))
     .build()
 )
 
