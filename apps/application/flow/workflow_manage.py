@@ -10,6 +10,7 @@ import concurrent
 import json
 import threading
 import traceback
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from functools import reduce
 from typing import List, Dict
@@ -575,7 +576,7 @@ class WorkflowManage:
             details['node_id'] = node.id
             details['up_node_id_list'] = node.up_node_id_list
             details['runtime_node_id'] = node.runtime_node_id
-            details_result[node.runtime_node_id] = details
+            details_result[str(uuid.uuid1())] = details
         return details_result
 
     def get_answer_text_list(self):
@@ -664,9 +665,18 @@ class WorkflowManage:
             for edge in self.flow.edges:
                 if (edge.sourceNodeId == current_node.id and
                         f"{edge.sourceNodeId}_{current_node_result.node_variable.get('branch_id')}_right" == edge.sourceAnchorId):
-                    if self.dependent_node_been_executed(edge.targetNodeId):
+                    next_node = [node for node in self.flow.nodes if node.id == edge.targetNodeId]
+                    if len(next_node) == 0:
+                        continue
+                    if next_node[0].properties.get('condition', "AND") == 'AND':
+                        if self.dependent_node_been_executed(edge.targetNodeId):
+                            node_list.append(
+                                self.get_node_cls_by_id(edge.targetNodeId,
+                                                        [*current_node.up_node_id_list, current_node.node.id]))
+                    else:
                         node_list.append(
-                            self.get_node_cls_by_id(edge.targetNodeId, self.get_up_node_id_list(edge.targetNodeId)))
+                            self.get_node_cls_by_id(edge.targetNodeId,
+                                                    [*current_node.up_node_id_list, current_node.node.id]))
         else:
             for edge in self.flow.edges:
                 if edge.sourceNodeId == current_node.id:
@@ -676,10 +686,12 @@ class WorkflowManage:
                     if next_node[0].properties.get('condition', "AND") == 'AND':
                         if self.dependent_node_been_executed(edge.targetNodeId):
                             node_list.append(
-                                self.get_node_cls_by_id(edge.targetNodeId, self.get_up_node_id_list(edge.targetNodeId)))
+                                self.get_node_cls_by_id(edge.targetNodeId,
+                                                        [*current_node.up_node_id_list, current_node.node.id]))
                     else:
                         node_list.append(
-                            self.get_node_cls_by_id(edge.targetNodeId, [current_node.node.id]))
+                            self.get_node_cls_by_id(edge.targetNodeId,
+                                                    [*current_node.up_node_id_list, current_node.node.id]))
         return node_list
 
     def get_reference_field(self, node_id: str, fields: List[str]):
