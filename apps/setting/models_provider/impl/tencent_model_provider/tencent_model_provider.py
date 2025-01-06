@@ -101,7 +101,9 @@ def _initialize_model_info():
         .append_model_info_list(model_info_list) \
         .append_model_info_list(model_info_embedding_list) \
         .append_model_info_list(model_info_vision_list) \
+        .append_default_model_info(model_info_vision_list[0]) \
         .append_model_info_list(model_info_tti_list) \
+        .append_default_model_info(model_info_tti_list[0]) \
         .append_default_model_info(model_info_list[0]) \
         .build()
 
