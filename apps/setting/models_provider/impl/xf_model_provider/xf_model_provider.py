@@ -40,8 +40,18 @@ model_info_list = [
     ModelInfo('embedding', '', ModelTypeConst.EMBEDDING, embedding_model_credential, XFEmbedding)
 ]
 
-model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
-    ModelInfo('generalv3.5', '', ModelTypeConst.LLM, qwen_model_credential, XFChatSparkLLM)).build()
+model_info_manage = (
+    ModelInfoManage.builder()
+    .append_model_info_list(model_info_list)
+    .append_default_model_info(
+        ModelInfo('generalv3.5', '', ModelTypeConst.LLM, qwen_model_credential, XFChatSparkLLM))
+    .append_default_model_info(
+        ModelInfo('iat', '中英文识别', ModelTypeConst.STT, stt_model_credential, XFSparkSpeechToText),
+    )
+    .append_default_model_info(
+        ModelInfo('tts', '', ModelTypeConst.TTS, tts_model_credential, XFSparkTextToSpeech))
+    .build()
+)
 
 
 class XunFeiModelProvider(IModelProvider):
