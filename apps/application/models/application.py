@@ -66,6 +66,7 @@ class Application(AppModelMixin):
     stt_model_enable = models.BooleanField(verbose_name="语音识别模型是否启用", default=False)
     tts_type = models.CharField(verbose_name="语音播放类型", max_length=20, default="BROWSER")
     tts_autoplay = models.BooleanField(verbose_name="自动播放", default=False)
+    stt_autosend = models.BooleanField(verbose_name="自动发送", default=False)
     clean_time = models.IntegerField(verbose_name="清理时间", default=180)
     file_upload_enable = models.BooleanField(verbose_name="文件上传是否启用", default=False)
     file_upload_setting = models.JSONField(verbose_name="文件上传相关设置", default=dict)
