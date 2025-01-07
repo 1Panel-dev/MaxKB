@@ -129,11 +129,12 @@ const delMulDocument: (
 const batchRefresh: (
   dataset_id: string,
   data: any,
+  stateList: Array<string>,
   loading?: Ref<boolean>
-) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+) => Promise<Result<boolean>> = (dataset_id, data, stateList, loading) => {
   return put(
     `${prefix}/${dataset_id}/document/batch_refresh`,
-    { id_list: data },
+    { id_list: data, state_list: stateList },
     undefined,
     loading
   )
@@ -157,11 +158,12 @@ const getDocumentDetail: (dataset_id: string, document_id: string) => Promise<Re
 const putDocumentRefresh: (
   dataset_id: string,
   document_id: string,
+  state_list: Array<string>,
   loading?: Ref<boolean>
-) => Promise<Result<any>> = (dataset_id, document_id, loading) => {
+) => Promise<Result<any>> = (dataset_id, document_id, state_list, loading) => {
   return put(
     `${prefix}/${dataset_id}/document/${document_id}/refresh`,
-    undefined,
+    { state_list },
     undefined,
     loading
   )

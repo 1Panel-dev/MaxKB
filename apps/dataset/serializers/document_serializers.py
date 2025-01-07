@@ -700,20 +700,24 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             _document.save()
             return self.one()
 
-        @transaction.atomic
-        def refresh(self, with_valid=True):
+        def refresh(self, state_list, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
             ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
                                              State.PENDING)
-            ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id=document_id),
+            ListenerManagement.update_status(QuerySet(Paragraph).annotate(
+                reversed_status=Reverse('status'),
+                task_type_status=Substr('reversed_status', TaskType.EMBEDDING.value,
+                                        1),
+            ).filter(task_type_status__in=state_list, document_id=document_id)
+                                             .values('id'),
                                              TaskType.EMBEDDING,
                                              State.PENDING)
             ListenerManagement.get_aggregation_document_status(document_id)()
             embedding_model_id = get_embedding_model_id_by_dataset_id(dataset_id=self.data.get('dataset_id'))
             try:
-                embedding_by_document.delay(document_id, embedding_model_id)
+                embedding_by_document.delay(document_id, embedding_model_id, state_list)
             except AlreadyQueued as e:
                 raise AppApiException(500, "任务正在执行中,请勿重复下发")
 
@@ -1122,14 +1126,14 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id_list = instance.get("id_list")
-            with transaction.atomic():
-                dataset_id = self.data.get('dataset_id')
-                for document_id in document_id_list:
-                    try:
-                        DocumentSerializers.Operate(
-                            data={'dataset_id': dataset_id, 'document_id': document_id}).refresh()
-                    except AlreadyQueued as e:
-                        pass
+            state_list = instance.get("state_list")
+            dataset_id = self.data.get('dataset_id')
+            for document_id in document_id_list:
+                try:
+                    DocumentSerializers.Operate(
+                        data={'dataset_id': dataset_id, 'document_id': document_id}).refresh(state_list)
+                except AlreadyQueued as e:
+                    pass
 
     class GenerateRelated(ApiMixin, serializers.Serializer):
         document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
