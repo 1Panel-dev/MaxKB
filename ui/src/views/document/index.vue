@@ -422,6 +422,7 @@
       </el-text>
       <el-button class="ml-16" type="primary" link @click="clearSelection"> 清空 </el-button>
     </div>
+    <EmbeddingContentDialog ref="embeddingContentDialogRef"></EmbeddingContentDialog>
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -439,6 +440,7 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import StatusVlue from '@/views/document/component/Status.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
+import EmbeddingContentDialog from '@/views/document/component/EmbeddingContentDialog.vue'
 import { TaskType, State } from '@/utils/status'
 const router = useRouter()
 const route = useRoute()
@@ -469,7 +471,7 @@ onBeforeRouteLeave((to: any) => {
 })
 const beforePagination = computed(() => common.paginationConfig[storeKey])
 const beforeSearch = computed(() => common.search[storeKey])
-
+const embeddingContentDialogRef = ref<InstanceType<typeof EmbeddingContentDialog>>()
 const SyncWebDialogRef = ref()
 const loading = ref(false)
 let interval: any
@@ -621,10 +623,14 @@ function syncDocument(row: any) {
       .catch(() => {})
   }
 }
+
 function refreshDocument(row: any) {
-  documentApi.putDocumentRefresh(row.dataset_id, row.id).then(() => {
-    getList()
-  })
+  const embeddingDocument = (stateList: Array<string>) => {
+    return documentApi.putDocumentRefresh(row.dataset_id, row.id, stateList).then(() => {
+      getList()
+    })
+  }
+  embeddingContentDialogRef.value?.open(embeddingDocument)
 }
 
 function rowClickHandle(row: any, column: any) {
@@ -691,18 +697,15 @@ function deleteMulDocument() {
 }
 
 function batchRefresh() {
-  const arr: string[] = []
-  multipleSelection.value.map((v) => {
-    if (v) {
-      arr.push(v.id)
-    }
-  })
-  documentApi.batchRefresh(id, arr, loading).then(() => {
-    MsgSuccess('批量向量化成功')
-    multipleTableRef.value?.clearSelection()
-  })
+  const arr: string[] = multipleSelection.value.map((v) => v.id)
+  const embeddingBatchDocument = (stateList: Array<string>) => {
+    documentApi.batchRefresh(id, arr, stateList, loading).then(() => {
+      MsgSuccess('批量向量化成功')
+      multipleTableRef.value?.clearSelection()
+    })
+  }
+  embeddingContentDialogRef.value?.open(embeddingBatchDocument)
 }
-
 
 function deleteDocument(row: any) {
   MsgConfirm(

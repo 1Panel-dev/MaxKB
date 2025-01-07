@@ -51,3 +51,16 @@ class DocumentApi(ApiMixin):
                                            description="1|2|3 1:向量化|2:生成问题|3:同步文档", default=1)
                 }
             )
+
+    class EmbeddingState(ApiMixin):
+        @staticmethod
+        def get_request_body_api():
+            return openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'state_list': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                                 items=openapi.Schema(type=openapi.TYPE_STRING),
+                                                 title="状态列表",
+                                                 description="状态列表")
+                }
+            )

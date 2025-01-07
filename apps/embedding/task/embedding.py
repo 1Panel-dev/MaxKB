@@ -56,13 +56,19 @@ def embedding_by_paragraph_list(paragraph_id_list, model_id):
 
 
 @celery_app.task(base=QueueOnce, once={'keys': ['document_id']}, name='celery:embedding_by_document')
-def embedding_by_document(document_id, model_id):
+def embedding_by_document(document_id, model_id, state_list=None):
     """
     向量化文档
+    @param state_list:
     @param document_id: 文档id
     @param model_id 向量模型
     :return: None
     """
+
+    if state_list is None:
+        state_list = [State.PENDING.value, State.STARTED.value, State.SUCCESS.value, State.FAILURE.value,
+                      State.REVOKE.value,
+                      State.REVOKED.value, State.IGNORED.value]
 
     def exception_handler(e):
         ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
@@ -71,7 +77,7 @@ def embedding_by_document(document_id, model_id):
             f'获取向量模型失败：{str(e)}{traceback.format_exc()}')
 
     embedding_model = get_embedding_model(model_id, exception_handler)
-    ListenerManagement.embedding_by_document(document_id, embedding_model)
+    ListenerManagement.embedding_by_document(document_id, embedding_model, state_list)
 
 
 @celery_app.task(name='celery:embedding_by_document_list')
