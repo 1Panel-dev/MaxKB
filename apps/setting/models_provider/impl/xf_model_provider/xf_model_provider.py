@@ -50,6 +50,8 @@ model_info_manage = (
     )
     .append_default_model_info(
         ModelInfo('tts', '', ModelTypeConst.TTS, tts_model_credential, XFSparkTextToSpeech))
+    .append_default_model_info(
+        ModelInfo('embedding', '', ModelTypeConst.EMBEDDING, embedding_model_credential, XFEmbedding))
     .build()
 )
 
