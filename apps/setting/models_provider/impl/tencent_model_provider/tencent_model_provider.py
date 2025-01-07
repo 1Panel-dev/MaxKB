@@ -96,7 +96,6 @@ def _initialize_model_info():
         TencentTTIModelCredential,
         TencentTextToImageModel)]
 
-
     model_info_manage = ModelInfoManage.builder() \
         .append_model_info_list(model_info_list) \
         .append_model_info_list(model_info_embedding_list) \
@@ -105,6 +104,7 @@ def _initialize_model_info():
         .append_model_info_list(model_info_tti_list) \
         .append_default_model_info(model_info_tti_list[0]) \
         .append_default_model_info(model_info_list[0]) \
+        .append_default_model_info(tencent_embedding_model_info) \
         .build()
 
     return model_info_manage
