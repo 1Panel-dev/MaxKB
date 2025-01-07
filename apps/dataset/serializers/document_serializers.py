@@ -700,7 +700,11 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             _document.save()
             return self.one()
 
-        def refresh(self, state_list, with_valid=True):
+        def refresh(self, state_list=None, with_valid=True):
+            if state_list is None:
+                state_list = [State.PENDING.value, State.STARTED.value, State.SUCCESS.value, State.FAILURE.value,
+                              State.REVOKE.value,
+                              State.REVOKED.value, State.IGNORED.value]
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
