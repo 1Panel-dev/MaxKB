@@ -262,6 +262,7 @@ class Document(APIView):
         @action(methods=['PUT'], detail=False)
         @swagger_auto_schema(operation_summary="刷新文档向量库",
                              operation_id="刷新文档向量库",
+                             request_body=DocumentApi.EmbeddingState.get_request_body_api(),
                              manual_parameters=DocumentSerializers.Operate.get_request_params_api(),
                              responses=result.get_default_response(),
                              tags=["知识库/文档"]
@@ -272,6 +273,7 @@ class Document(APIView):
         def put(self, request: Request, dataset_id: str, document_id: str):
             return result.success(
                 DocumentSerializers.Operate(data={'document_id': document_id, 'dataset_id': dataset_id}).refresh(
+                    request.data.get('state_list')
                 ))
 
     class BatchRefresh(APIView):
