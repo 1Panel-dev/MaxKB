@@ -9,6 +9,7 @@
 import setting.models
 from setting.models import Model
 from .listener_manage import *
+from common.db.sql_execute import update_execute
 
 update_document_status_sql = """
 UPDATE "public"."document" 
