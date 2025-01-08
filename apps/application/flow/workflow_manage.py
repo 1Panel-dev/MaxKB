@@ -342,15 +342,19 @@ class WorkflowManage:
         self.run_chain_async(current_node, node_result_future)
         return tools.to_stream_response_simple(self.await_result())
 
-    def is_run(self, timeout=0.1):
-        self.lock.acquire()
+    def is_run(self, timeout=0.5):
+        future_list_len = len(self.future_list)
         try:
             r = concurrent.futures.wait(self.future_list, timeout)
-            return len(r.not_done) > 0
+            if len(r.not_done) > 0:
+                return True
+            else:
+                if future_list_len == len(self.future_list):
+                    return False
+                else:
+                    return True
         except Exception as e:
             return True
-        finally:
-            self.lock.release()
 
     def await_result(self):
         try:
@@ -403,12 +407,8 @@ class WorkflowManage:
             # 获取到可执行的子节点
             result_list = [{'node': node, 'future': executor.submit(self.run_chain_manage, node, None)} for node in
                            sorted_node_run_list]
-            try:
-                self.lock.acquire()
-                for r in result_list:
-                    self.future_list.append(r.get('future'))
-            finally:
-                self.lock.release()
+            for r in result_list:
+                self.future_list.append(r.get('future'))
 
     def run_chain(self, current_node, node_result_future=None):
         if node_result_future is None:
