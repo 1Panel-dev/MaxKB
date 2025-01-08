@@ -1,15 +1,8 @@
 from typing import Dict
 from urllib.parse import urlparse, ParseResult
 
-from langchain_openai.chat_models import ChatOpenAI
-
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
-
-
-def custom_get_token_ids(text: str):
-    tokenizer = TokenizerManage.get_tokenizer()
-    return tokenizer.encode(text)
+from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
 def get_base_url(url: str):
@@ -20,7 +13,7 @@ def get_base_url(url: str):
     return result_url[:-1] if result_url.endswith("/") else result_url
 
 
-class OllamaImage(MaxKBBaseModel, ChatOpenAI):
+class OllamaImage(MaxKBBaseModel, BaseChatOpenAI):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
@@ -34,5 +27,6 @@ class OllamaImage(MaxKBBaseModel, ChatOpenAI):
             openai_api_key=model_credential.get('api_key'),
             # stream_options={"include_usage": True},
             streaming=True,
+            stream_usage=True,
             **optional_params,
         )
