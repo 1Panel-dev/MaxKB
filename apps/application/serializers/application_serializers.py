@@ -35,7 +35,7 @@ from common.config.embedding_config import VectorStore
 from common.constants.authentication_type import AuthenticationType
 from common.db.search import get_dynamics_model, native_search, native_page_search
 from common.db.sql_execute import select_list
-from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed
+from common.exception.app_exception import AppApiException, NotFound404, AppUnauthorizedFailed, ChatException
 from common.field.common import UploadedImageField, UploadedFileField
 from common.models.db_model_manage import DBModelManage
 from common.response import result
@@ -268,7 +268,8 @@ class ApplicationSerializer(serializers.Serializer):
                         float_location = application_setting.float_location
                     if application_setting.custom_theme is not None and len(
                             application_setting.custom_theme.get('header_font_color', 'rgb(100, 106, 115)')) > 0:
-                        header_font_color = application_setting.custom_theme.get('header_font_color', 'rgb(100, 106, 115)')
+                        header_font_color = application_setting.custom_theme.get('header_font_color',
+                                                                                 'rgb(100, 106, 115)')
 
             is_auth = 'true' if application_access_token is not None and application_access_token.is_active else 'false'
             t = Template(content)
@@ -916,6 +917,12 @@ class ApplicationSerializer(serializers.Serializer):
             if application_access_token is None:
                 raise AppUnauthorizedFailed(500, "非法用户")
             application_setting_model = DBModelManage.get_model('application_setting')
+            if application.type == ApplicationTypeChoices.WORK_FLOW:
+                work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application.id).order_by(
+                    '-create_time')[0:1].first()
+                if work_flow_version is not None:
+                    application.work_flow = work_flow_version.work_flow
+
             xpack_cache = DBModelManage.get_model('xpack_cache')
             X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
             application_setting_dict = {}
@@ -1150,9 +1157,23 @@ class ApplicationSerializer(serializers.Serializer):
         def get_application(self, app_id, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
-            return ApplicationSerializer.Operate(data={'user_id': application.user_id, 'application_id': app_id}).one(
-                with_valid=True)
+            if with_valid:
+                self.is_valid()
+            embed_application = QuerySet(Application).get(id=app_id)
+            if embed_application.type == ApplicationTypeChoices.WORK_FLOW:
+                work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=embed_application.id).order_by(
+                    '-create_time')[0:1].first()
+                if work_flow_version is not None:
+                    embed_application.work_flow = work_flow_version.work_flow
+            dataset_list = self.list_dataset(with_valid=False)
+            mapping_dataset_id_list = [adm.dataset_id for adm in
+                                       QuerySet(ApplicationDatasetMapping).filter(application_id=app_id)]
+            dataset_id_list = [d.get('id') for d in
+                               list(filter(lambda row: mapping_dataset_id_list.__contains__(row.get('id')),
+                                           dataset_list))]
+            self.update_search_node(embed_application.work_flow, [str(dataset.get('id')) for dataset in dataset_list])
+            return {**ApplicationSerializer.Query.reset_application(ApplicationSerializerModel(embed_application).data),
+                    'dataset_id_list': dataset_id_list}
 
     class ApplicationKeySerializerModel(serializers.ModelSerializer):
         class Meta:
