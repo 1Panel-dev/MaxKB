@@ -214,8 +214,8 @@ const update_field = () => {
           if (find_field) {
             return {
               ...item,
-              default_value: JSON.parse(JSON.stringify(find_field.default_value)),
-              value: JSON.parse(JSON.stringify(find_field.value)),
+              default_value: find_field.default_value,
+              value: find_field.value,
               label:
                 typeof item.label === 'object' && item.label != null ? item.label.label : item.label
             }
@@ -235,8 +235,8 @@ const update_field = () => {
           if (find_field) {
             return {
               ...item,
-              default_value: JSON.parse(JSON.stringify(find_field.default_value)),
-              value: JSON.parse(JSON.stringify(find_field.value)),
+              default_value: find_field.default_value,
+              value: find_field.value,
               label:
                 typeof item.label === 'object' && item.label != null ? item.label.label : item.label
             }

@@ -243,7 +243,6 @@ function onmousedown(item: any, data?: any, type?: string) {
       }
     }
   }
-  console.log('xx', item)
   props.workflowRef?.onmousedown(item)
   emit('onmousedown', item)
 }
