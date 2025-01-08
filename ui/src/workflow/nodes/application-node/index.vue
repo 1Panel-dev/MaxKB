@@ -20,7 +20,7 @@
           }"
         >
           <NodeCascader
-            ref="nodeCascaderRef"
+            ref="applicationNodeFormRef"
             :nodeModel="nodeModel"
             class="w-full"
             placeholder="请选择检索问题"
@@ -142,10 +142,10 @@
 </template>
 
 <script setup lang="ts">
-import { set, groupBy } from 'lodash'
+import { set, groupBy, create } from 'lodash'
 import { app } from '@/main'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onActivated } from 'vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import applicationApi from '@/api/application'
@@ -214,7 +214,6 @@ const update_field = () => {
           if (find_field) {
             return {
               ...item,
-              default_value: find_field.default_value,
               value: find_field.value,
               label:
                 typeof item.label === 'object' && item.label != null ? item.label.label : item.label
@@ -223,6 +222,7 @@ const update_field = () => {
             return item
           }
         })
+        console.log(merge_api_input_field_list)
         set(
           props.nodeModel.properties.node_data,
           'api_input_field_list',
@@ -235,7 +235,6 @@ const update_field = () => {
           if (find_field) {
             return {
               ...item,
-              default_value: find_field.default_value,
               value: find_field.value,
               label:
                 typeof item.label === 'object' && item.label != null ? item.label.label : item.label
@@ -265,7 +264,7 @@ const update_field = () => {
       }
     })
     .catch((err) => {
-      set(props.nodeModel.properties, 'status', 500)
+      // set(props.nodeModel.properties, 'status', 500)
     })
 }
 
