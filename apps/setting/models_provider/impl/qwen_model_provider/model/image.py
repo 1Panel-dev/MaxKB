@@ -2,12 +2,11 @@
 
 from typing import Dict
 
-from langchain_community.chat_models import ChatOpenAI
-
 from setting.models_provider.base_model_provider import MaxKBBaseModel
+from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
-class QwenVLChatModel(MaxKBBaseModel, ChatOpenAI):
+class QwenVLChatModel(MaxKBBaseModel, BaseChatOpenAI):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
@@ -18,6 +17,7 @@ class QwenVLChatModel(MaxKBBaseModel, ChatOpenAI):
             openai_api_base='https://dashscope.aliyuncs.com/compatible-mode/v1',
             # stream_options={"include_usage": True},
             streaming=True,
+            stream_usage=True,
             **optional_params,
         )
         return chat_tong_yi

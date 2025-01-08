@@ -1,17 +1,10 @@
 from typing import Dict
 
-from langchain_openai.chat_models import ChatOpenAI
-
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
+from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
-def custom_get_token_ids(text: str):
-    tokenizer = TokenizerManage.get_tokenizer()
-    return tokenizer.encode(text)
-
-
-class VolcanicEngineImage(MaxKBBaseModel, ChatOpenAI):
+class VolcanicEngineImage(MaxKBBaseModel, BaseChatOpenAI):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
@@ -22,5 +15,6 @@ class VolcanicEngineImage(MaxKBBaseModel, ChatOpenAI):
             openai_api_base=model_credential.get('api_base'),
             # stream_options={"include_usage": True},
             streaming=True,
+            stream_usage=True,
             **optional_params,
         )
