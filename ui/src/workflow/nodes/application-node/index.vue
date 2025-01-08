@@ -202,7 +202,6 @@ const update_field = () => {
     .then((ok) => {
       const old_api_input_field_list = props.nodeModel.properties.node_data.api_input_field_list
       const old_user_input_field_list = props.nodeModel.properties.node_data.user_input_field_list
-
       if (isWorkFlow(ok.data.type)) {
         const nodeData = ok.data.work_flow.nodes[0].properties.node_data
         const new_api_input_field_list = ok.data.work_flow.nodes[0].properties.api_input_field_list
@@ -213,7 +212,13 @@ const update_field = () => {
             (old_item: any) => old_item.variable == item.variable
           )
           if (find_field) {
-            return { ...item, default_value: JSON.parse(JSON.stringify(find_field.default_value)) }
+            return {
+              ...item,
+              default_value: JSON.parse(JSON.stringify(find_field.default_value)),
+              value: JSON.parse(JSON.stringify(find_field.value)),
+              label:
+                typeof item.label === 'object' && item.label != null ? item.label.label : item.label
+            }
           } else {
             return item
           }
@@ -228,12 +233,17 @@ const update_field = () => {
             (old_item: any) => old_item.field == item.field
           )
           if (find_field) {
-            return { ...item, default_value: JSON.parse(JSON.stringify(find_field.default_value)) }
+            return {
+              ...item,
+              default_value: JSON.parse(JSON.stringify(find_field.default_value)),
+              value: JSON.parse(JSON.stringify(find_field.value)),
+              label:
+                typeof item.label === 'object' && item.label != null ? item.label.label : item.label
+            }
           } else {
             return item
           }
         })
-        console.log(merge_user_input_field_list)
         set(
           props.nodeModel.properties.node_data,
           'user_input_field_list',
