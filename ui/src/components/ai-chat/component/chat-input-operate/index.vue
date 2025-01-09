@@ -182,6 +182,7 @@ import { MsgAlert } from '@/utils/message'
 import { type chatType } from '@/api/type/application'
 import { useRoute, useRouter } from 'vue-router'
 import { getImgUrl } from '@/utils/utils'
+import bus from '@/bus'
 import 'recorder-core/src/engine/mp3'
 
 import 'recorder-core/src/engine/mp3-engine'
@@ -542,6 +543,9 @@ function mouseleave() {
 }
 
 onMounted(() => {
+  bus.on('chat-input', (message: string) => {
+    inputValue.value = message
+  })
   if (question) {
     inputValue.value = decodeURIComponent(question.trim())
     sendChatHandle()
