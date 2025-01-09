@@ -5,7 +5,7 @@
         <img v-if="application.avatar" :src="application.avatar" height="32px" width="32px" />
         <LogoIcon v-else height="32px" width="32px" />
       </div>
-      <div class="content">
+      <div class="content" @click.stop @mouseup="openControl">
         <el-card shadow="always" class="dialog-card mb-8">
           <MdRenderer
             v-if="
@@ -56,6 +56,7 @@ import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import OperationButton from '@/components/ai-chat/component/operation-button/index.vue'
 import { type chatType } from '@/api/type/application'
 import { computed } from 'vue'
+import bus from '@/bus'
 const props = defineProps<{
   chatRecord: chatType
   application: any
@@ -79,6 +80,13 @@ const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: 
 const add_answer_text_list = (answer_text_list: Array<any>) => {
   answer_text_list.push({ content: '' })
 }
+
+const openControl = (event: any) => {
+  if (props.type !== 'log') {
+    bus.emit('open-control', event)
+  }
+}
+
 const answer_text_list = computed(() => {
   return props.chatRecord.answer_text_list.map((item) => {
     if (typeof item == 'string') {

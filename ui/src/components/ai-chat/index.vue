@@ -46,6 +46,7 @@
     >
       <template #operateBefore> <slot name="operateBefore" /> </template>
     </ChatInputOperate>
+    <Control></Control>
   </div>
 </template>
 <script setup lang="ts">
@@ -63,6 +64,7 @@ import QuestionContent from '@/components/ai-chat/component/question-content/ind
 import ChatInputOperate from '@/components/ai-chat/component/chat-input-operate/index.vue'
 import PrologueContent from '@/components/ai-chat/component/prologue-content/index.vue'
 import UserForm from '@/components/ai-chat/component/user-form/index.vue'
+import Control from '@/components/ai-chat/component/control/index.vue'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
