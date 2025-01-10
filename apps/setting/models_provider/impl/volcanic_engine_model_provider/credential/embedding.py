@@ -14,7 +14,7 @@ from common.forms import BaseForm
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 
 
-class OpenAIEmbeddingCredential(BaseForm, BaseModelCredential):
+class VolcanicEmbeddingCredential(BaseForm, BaseModelCredential):
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=True):
         model_type_list = provider.get_model_type_list()
