@@ -14,10 +14,12 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
 from setting.models_provider.impl.openai_model_provider.credential.embedding import OpenAIEmbeddingCredential
 from setting.models_provider.impl.openai_model_provider.credential.llm import OpenAILLMModelCredential
 from setting.models_provider.impl.openai_model_provider.model.embedding import OpenAIEmbeddingModel
+from setting.models_provider.impl.volcanic_engine_model_provider.credential.embedding import VolcanicEmbeddingCredential
 from setting.models_provider.impl.volcanic_engine_model_provider.credential.image import \
     VolcanicEngineImageModelCredential
 from setting.models_provider.impl.volcanic_engine_model_provider.credential.tti import VolcanicEngineTTIModelCredential
 from setting.models_provider.impl.volcanic_engine_model_provider.credential.tts import VolcanicEngineTTSModelCredential
+from setting.models_provider.impl.volcanic_engine_model_provider.model.embedding import VolcanicEngineEmbeddingModel
 from setting.models_provider.impl.volcanic_engine_model_provider.model.image import VolcanicEngineImage
 from setting.models_provider.impl.volcanic_engine_model_provider.model.llm import VolcanicEngineChatModel
 from setting.models_provider.impl.volcanic_engine_model_provider.credential.stt import VolcanicEngineSTTModelCredential
@@ -81,12 +83,13 @@ model_info_list = [
               ),
 ]
 
-open_ai_embedding_credential = OpenAIEmbeddingCredential()
+open_ai_embedding_credential = VolcanicEmbeddingCredential()
 model_info_embedding_list = [
     ModelInfo('ep-xxxxxxxxxx-yyyy',
               '用户前往火山方舟的模型推理页面创建推理接入点，这里需要输入ep-xxxxxxxxxx-yyyy进行调用',
               ModelTypeConst.EMBEDDING, open_ai_embedding_credential,
-              OpenAIEmbeddingModel)]
+              VolcanicEngineEmbeddingModel)
+]
 
 model_info_manage = (
     ModelInfoManage.builder()
@@ -96,6 +99,8 @@ model_info_manage = (
     .append_default_model_info(model_info_list[2])
     .append_default_model_info(model_info_list[3])
     .append_default_model_info(model_info_list[4])
+    .append_model_info_list(model_info_embedding_list)
+    .append_default_model_info(model_info_embedding_list[0])
     .build()
 )
 
