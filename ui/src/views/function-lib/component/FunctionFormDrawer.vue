@@ -53,9 +53,9 @@
                     :class="form.permission_type === key ? 'active' : ''"
                   >
                     <el-radio :value="key" size="large">
-                      <p class="mb-4">{{ value }}</p>
+                      <p class="mb-4">{{ $t(value) }}</p>
                       <el-text type="info">
-                        {{ PermissionDesc[key] }}
+                        {{ $t(PermissionDesc[key]) }}
                       </el-text>
                     </el-radio>
                   </el-card>
@@ -87,7 +87,7 @@
             <el-tag type="info" class="info-tag">{{ row.type }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('views.functionLib.functionForm.form.param.required')">
+        <el-table-column :label="$t('common.required')">
           <template #default="{ row }">
             <div @click.stop>
               <el-switch size="small" v-model="row.is_required" />
@@ -141,7 +141,10 @@
         </div>
       </div>
       <h4 class="title-decoration-1 mb-16 mt-16">
-        {{ $t('views.functionLib.functionForm.form.param.outputParam') }} <el-text type="info" class="color-secondary">  {{ $t('views.functionLib.functionForm.form.param.paramInfo1') }} </el-text>
+        {{ $t('views.functionLib.functionForm.form.param.outputParam') }}
+        <el-text type="info" class="color-secondary">
+          {{ $t('views.functionLib.functionForm.form.param.paramInfo1') }}
+        </el-text>
       </h4>
       <div class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter">
         <span>{{ $t('views.functionLib.functionForm.form.param.result') }} {result}</span>
@@ -159,7 +162,12 @@
     </template>
 
     <!-- Codemirror 弹出层 -->
-    <el-dialog v-model="dialogVisible" :title="'Python '+ $t('views.functionLib.functionForm.form.param.code')" append-to-body fullscreen>
+    <el-dialog
+      v-model="dialogVisible"
+      :title="'Python ' + $t('views.functionLib.functionForm.form.param.code')"
+      append-to-body
+      fullscreen
+    >
       <CodemirrorEditor
         v-model="cloneContent"
         style="
@@ -233,8 +241,20 @@ watch(visible, (bool) => {
 })
 
 const rules = reactive({
-  name: [{ required: true, message: t('views.functionLib.functionForm.form.functionName.requiredMessage'), trigger: 'blur' }],
-  permission_type: [{ required: true, message: t('views.functionLib.functionForm.form.permission_type.requiredMessage'), trigger: 'change' }]
+  name: [
+    {
+      required: true,
+      message: t('views.functionLib.functionForm.form.functionName.requiredMessage'),
+      trigger: 'blur'
+    }
+  ],
+  permission_type: [
+    {
+      required: true,
+      message: t('views.functionLib.functionForm.form.permission_type.requiredMessage'),
+      trigger: 'change'
+    }
+  ]
 })
 
 function openCodemirrorDialog() {

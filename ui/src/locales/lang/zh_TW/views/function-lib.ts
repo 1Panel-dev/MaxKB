@@ -23,8 +23,6 @@ export default {
   functionForm: {
     title: {
       copy: '副本',
-      editParam: '編輯參數',
-      addParam: '添加參數',
       baseInfo: '基礎信息'
     },
     form: {
@@ -66,7 +64,6 @@ export default {
         outputParam: '輸出參數',
         paramInfo1: '使用函數時顯示',
         paramInfo2: '使用函數時不顯示',
-        required: '必填',
         code: '代碼',
         result: '結果'
       },

@@ -23,8 +23,6 @@ export default {
   functionForm: {
     title: {
       copy: '副本',
-      editParam: '编辑参数',
-      addParam: '添加参数',
       baseInfo: '基础信息'
     },
     form: {
@@ -66,7 +64,6 @@ export default {
         outputParam: '输出参数',
         paramInfo1: '使用函数时显示',
         paramInfo2: '使用函数时不显示',
-        required: '必填',
         code: '代码',
         result: '结果'
       },

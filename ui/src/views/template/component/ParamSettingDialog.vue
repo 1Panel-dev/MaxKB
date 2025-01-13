@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="模型参数设置"
+    :title="$t('views.template.templateForm.title.paramSetting')"
     v-model="dialogVisible"
     width="800px"
     :close-on-click-modal="false"
@@ -8,9 +8,11 @@
     :destroy-on-close="true"
     :before-close="close"
   >
-    <el-button type="primary" @click="openAddDrawer()" class="mb-12"> 添加参数 </el-button>
+    <el-button type="primary" @click="openAddDrawer()" class="mb-12">
+      {{ $t('views.template.templateForm.title.addParam') }}
+    </el-button>
     <el-table :data="modelParamsForm" class="mb-16">
-      <el-table-column prop="label" label="显示名称" show-overflow-tooltip>
+      <el-table-column prop="label" :label="$t('components.dynamicsForm.paramForm.name.label')" show-overflow-tooltip>
         <template #default="{ row }">
           <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
             row.label.label
@@ -18,16 +20,20 @@
           <span v-else>{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="field" label="参数" show-overflow-tooltip />
-      <el-table-column label="组件类型" width="110px">
+      <el-table-column prop="field" :label="$t('components.dynamicsForm.paramForm.field.label')" show-overflow-tooltip />
+      <el-table-column :label="$t('components.dynamicsForm.paramForm.input_type.label')" width="110px">
         <template #default="{ row }">
           <el-tag type="info" class="info-tag">{{
             input_type_list.find((item) => item.value === row.input_type)?.label
           }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="default_value" label="默认值" show-overflow-tooltip />
-      <el-table-column label="必填">
+      <el-table-column
+        prop="default_value"
+        :label="$t('components.dynamicsForm.default.label')"
+        show-overflow-tooltip
+      />
+      <el-table-column :label="$t('common.required')">
         <template #default="{ row }">
           <div @click.stop>
             <el-switch disabled size="small" v-model="row.required" />
@@ -56,8 +62,10 @@
     </el-table>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="close">{{$t('common.cancel')}}</el-button>
-        <el-button type="primary" @click="submit" :loading="loading"> {{$t('common.save')}} </el-button>
+        <el-button @click="close">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="submit" :loading="loading">
+          {{ $t('common.save') }}
+        </el-button>
       </span>
     </template>
   </el-dialog>
@@ -119,11 +127,11 @@ function refresh(data: any, index: any) {
     }
 
     if (field === data.field && index !== i) {
-      MsgError('变量已存在: ' + data.field)
+      MsgError(t('views.template.tip.errorMessage') + data.field)
       return
     }
     if (label === label2 && index !== i) {
-      MsgError('变量已存在: ' + label)
+      MsgError(t('views.template.tip.errorMessage') + label)
       return
     }
   }
@@ -136,7 +144,7 @@ function refresh(data: any, index: any) {
 
 function submit() {
   ModelApi.updateModelParamsForm(props.model.id, modelParamsForm.value, loading).then((ok) => {
-    MsgSuccess('模型参数保存成功')
+    MsgSuccess(t('views.template.tip.saveSuccessMessage'))
     close()
     // emit('submit')
   })

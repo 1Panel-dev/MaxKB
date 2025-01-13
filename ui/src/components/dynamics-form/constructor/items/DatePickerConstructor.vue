@@ -29,7 +29,7 @@
     class="defaultValueItem"
     :required="formValue.required"
     prop="default_value"
-    label="默认值"
+    :label="$t('components.dynamicsForm.default.label')"
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
   >
     <div class="defaultValueCheckbox">

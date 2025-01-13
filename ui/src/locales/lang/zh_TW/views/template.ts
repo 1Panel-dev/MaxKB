@@ -21,11 +21,12 @@ export default {
     TTI: '圖片生成'
   },
   templateForm: {
+    title: {
+      editParam: '編輯參數',
+      addParam: '添加參數',
+    },
     form: {
-      provider: {
-        label: '供應商',
-        placeholder: '選擇供應商'
-      }
+   
     }
   }
 }

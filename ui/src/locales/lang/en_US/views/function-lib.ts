@@ -25,8 +25,6 @@ export default {
   functionForm: {
     title: {
       copy: 'Copy',
-      editParam: 'Edit Parameters',
-      addParam: 'Add Parameter',
       baseInfo: 'Basic Information'
     },
     form: {
@@ -68,7 +66,6 @@ export default {
         outputParam: 'Output Parameters',
         paramInfo1: 'Displayed when using the function',
         paramInfo2: 'Not displayed when using the function',
-        required: 'Required',
         code: 'Code',
         result: 'Result'
       },

@@ -90,9 +90,18 @@
                 @change="search_type_change"
               >
                 <el-option :label="$t('common.creator')" value="create_user" />
-                <el-option label="权限" value="permission_type" />
-                <el-option label="模型类型" value="model_type" />
-                <el-option label="模型名称" value="name" />
+                <el-option
+                  :label="$t('views.template.templateForm.form.permissionType.label')"
+                  value="permission_type"
+                />
+                <el-option
+                  :label="$t('views.template.templateForm.form.model_type.label')"
+                  value="model_type"
+                />
+                <el-option
+                  :label="$t('views.template.templateForm.form.templateName.label')"
+                  value="name"
+                />
               </el-select>
               <el-input
                 v-if="search_type === 'name'"
@@ -124,8 +133,8 @@
                 @change="list_model"
                 style="width: 220px"
               >
-                <el-option label="公有" value="PUBLIC" />
-                <el-option label="私有" value="PRIVATE" />
+                <el-option :label="$t('views.template.templateForm.form.permissionType.public')" value="PUBLIC" />
+                <el-option :label="$t('views.template.templateForm.form.permissionType.private')" value="PRIVATE" />
               </el-select>
               <el-select
                 v-else-if="search_type === 'model_type'"
@@ -166,7 +175,7 @@
                   </el-col>
                 </template>
               </el-row>
-              <el-empty description="暂无数据" v-else />
+              <el-empty :description="$t('common.noData')" v-else />
             </div>
           </el-scrollbar>
         </div>
@@ -192,7 +201,7 @@ import type { Provider, Model } from '@/api/type/model'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import ModelCard from '@/views/template/component/ModelCard.vue'
 import { splitArray } from '@/utils/common'
-import { modelTypeList } from '@/views/template/component/data.ts'
+import { modelTypeList } from '@/views/template/component/data'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
 import { t } from '@/locales'

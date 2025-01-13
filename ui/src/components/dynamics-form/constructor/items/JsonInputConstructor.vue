@@ -1,7 +1,7 @@
 <template>
   <el-form-item
     class="defaultValueItem"
-    label="默认值"
+    :label="$t('components.dynamicsForm.default.label')"
     :required="formValue.required"
     prop="default_value"
     :rules="[default_value_rule]"

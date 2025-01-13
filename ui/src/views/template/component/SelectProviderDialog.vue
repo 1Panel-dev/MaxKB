@@ -49,7 +49,7 @@
 import { ref } from 'vue'
 import ModelApi from '@/api/model'
 import type { Provider } from '@/api/type/model'
-import { modelTypeList } from './data.ts'
+import { modelTypeList } from './data'
 import { t } from '@/locales'
 
 const loading = ref<boolean>(false)

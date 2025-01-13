@@ -51,7 +51,7 @@
   </el-col>
 
   <el-form-item
-    label="默认值"
+    :label="$t('components.dynamicsForm.default.label')"
     :required="formValue.required"
     prop="default_value"
     :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"

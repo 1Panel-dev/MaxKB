@@ -16,7 +16,7 @@
             <span v-if="currentModel.status === 'PAUSE_DOWNLOAD'">
               <el-tooltip
                 effect="dark"
-                :content="`基础模型: ${props.model.model_name} 下载失败`"
+                :content="`${$t('views.template.templateForm.form.base_model.label')}: ${props.model.model_name} ${$t('views.template.tip.downloadError')}`"
                 placement="top"
               >
                 <el-icon class="danger ml-4" size="18"><Warning /></el-icon>
@@ -24,9 +24,9 @@
             </span>
           </div>
           <div class="mt-4">
-            <el-tag v-if="model.permission_type === 'PRIVATE'" type="danger" class="danger-tag"
-              >私有</el-tag
-            >
+            <el-tag v-if="model.permission_type === 'PRIVATE'" type="danger" class="danger-tag">{{
+              $t('common.private')
+            }}</el-tag>
             <el-tag v-else type="info" class="info-tag"> {{ $t('common.public') }}</el-tag>
           </div>
         </div>
@@ -36,13 +36,17 @@
     <div class="mt-16">
       <ul>
         <li class="flex mt-16">
-          <el-text type="info">模型类型</el-text>
+          <el-text type="info">{{
+            $t('views.template.templateForm.form.model_type.label')
+          }}</el-text>
           <span class="ellipsis ml-16">
             {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span
           >
         </li>
         <li class="flex mt-12">
-          <el-text type="info">基础模型</el-text>
+          <el-text type="info">{{
+            $t('views.template.templateForm.form.base_model.label')
+          }}</el-text>
           <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
             {{ model.model_name }}</span
           >
@@ -60,14 +64,14 @@
       <DownloadLoading class="percentage" />
 
       <div class="percentage-label flex-center">
-        正在下载中 <span class="dotting"></span>
+        {{ $t('views.template.download.downloading') }} <span class="dotting"></span>
         <el-button
           link
           type="primary"
           class="ml-16"
           :disabled="!is_permisstion"
           @click.stop="cancelDownload"
-          >取消下载</el-button
+          >{{ $t('views.template.download.cancelDownload') }}</el-button
         >
       </div>
     </div>
@@ -104,7 +108,7 @@
                 icon="Setting"
                 @click.stop="openParamSetting"
               >
-                模型参数设置
+                {{ $t('views.template.templateForm.title.paramSetting') }}
               </el-dropdown-item>
               <el-dropdown-item
                 icon="Delete"
@@ -133,7 +137,7 @@ import { MsgConfirm } from '@/utils/message'
 import { modelType } from '@/enums/model'
 import useStore from '@/stores'
 import ParamSettingDialog from './ParamSettingDialog.vue'
-
+import { t } from '@/locales'
 const props = defineProps<{
   model: Model
   provider_list: Array<Provider>
@@ -157,7 +161,7 @@ const currentModel = computed(() => {
 const errMessage = computed(() => {
   if (currentModel.value.meta && currentModel.value.meta.message) {
     if (currentModel.value.meta.message === 'pull model manifest: file does not exist') {
-      return `${currentModel.value.model_name} 模型在Ollama不存在`
+      return `${currentModel.value.model_name} ${t('views.template.tip.noModel')}`
     }
     return currentModel.value.meta.message
   }
@@ -167,10 +171,14 @@ const emit = defineEmits(['change', 'update:model'])
 const editModelRef = ref<InstanceType<typeof EditModel>>()
 let interval: any
 const deleteModel = () => {
-  MsgConfirm(`删除模型 `, `是否删除模型：${props.model.name} ?`, {
-    confirmButtonText: t('common.delete'),
-    confirmButtonClass: 'danger'
-  })
+  MsgConfirm(
+    t('views.template.delete.confirmTitle'),
+    `${t('views.template.delete.confirmMessage')}${props.model.name} ?`,
+    {
+      confirmButtonText: t('common.delete'),
+      confirmButtonClass: 'danger'
+    }
+  )
     .then(() => {
       ModelApi.deleteModel(props.model.id).then(() => {
         emit('change')

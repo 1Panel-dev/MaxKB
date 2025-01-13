@@ -21,6 +21,10 @@ export default {
     TTI: 'Image Generation'
   },
   templateForm: {
+    title: {
+      editParam: 'Edit Parameters',
+      addParam: 'Add Parameter',
+    },
     form: {
       provider: {
         label: 'Provider',

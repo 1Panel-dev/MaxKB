@@ -47,12 +47,15 @@
       </template>
     </el-table-column>
 
-    <el-table-column prop="default_value" label="默认值">
+    <el-table-column
+      prop="default_value"
+      :label="$t('components.dynamicsForm.default.label')"
+    >
       <template #default="{ row }">
         <span :title="row.default_value" class="ellipsis-1">{{ getDefaultValue(row) }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="必填">
+    <el-table-column :label="$t('common.required')">
       <template #default="{ row }">
         <div @click.stop>
           <el-switch disabled size="small" v-model="row.required" />

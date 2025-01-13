@@ -1,11 +1,10 @@
-import { t } from '@/locales'
 export enum PermissionType {
-  PRIVATE = '私有',
-  PUBLIC = '公用'
+  PRIVATE = 'common.private',
+  PUBLIC = 'common.public'
 }
 export enum PermissionDesc {
-  PRIVATE = '仅当前用户使用',
-  PUBLIC = '所有用户都可使用，不能编辑'
+  PRIVATE = 'views.template.templateForm.form.permissionType.privateDesc',
+  PUBLIC = 'views.template.templateForm.form.permissionType.publicDesc',
 }
 
 export enum modelType {

@@ -1,6 +1,10 @@
 <template>
   <el-dialog
-    :title="isEdit ? '编辑参数' : '添加参数'"
+    :title="
+      isEdit
+        ? $t('views.template.templateForm.title.editParam')
+        : $t('views.template.templateForm.title.addParam')
+    "
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -72,9 +76,11 @@ const currentRow = computed(() => {
           label: row.label || row.name,
           default_value: row.default_value,
           required: row.required != undefined ? row.required : row.is_required,
-          option_list: row.option_list ? row.option_list: row.optionList.map((o: any) => {
-            return { key: o, value: o }
-          })
+          option_list: row.option_list
+            ? row.option_list
+            : row.optionList.map((o: any) => {
+                return { key: o, value: o }
+              })
         }
 
       case 'date':

@@ -1,6 +1,10 @@
 <template>
   <el-dialog
-    :title="isEdit ? '编辑参数' : '添加参数'"
+    :title="
+      isEdit
+        ? $t('views.template.templateForm.title.editParam')
+        : $t('views.template.templateForm.title.addParam')
+    "
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -29,17 +33,17 @@
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
       <el-form-item
-        label="默认值"
+        :label="$t('components.dynamicsForm.default.label')"
         prop="default_value"
         :rules="{
           required: form.is_required,
-          message: '请输入默认值',
+          message: $t('components.dynamicsForm.paramForm.default.requiredMessage'),
           trigger: 'blur'
         }"
       >
         <el-input
           v-model="form.default_value"
-          placeholder="请输入默认值"
+          :placeholder="$t('components.dynamicsForm.paramForm.default.placeholder')"
           @blur="form.name = form.name.trim()"
         />
       </el-form-item>

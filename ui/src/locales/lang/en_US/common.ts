@@ -36,6 +36,8 @@ export default {
   creator: 'Creator',
   debug: 'Debug',
   modify: 'Modify',
+  required: 'Required',
+  noData: 'No data',
   status: {
     label: 'Status',
     enableSuccess: 'Enable Successful',

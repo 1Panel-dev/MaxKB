@@ -14,8 +14,8 @@
     class="mb-16"
   >
     <el-table-column prop="variable" label="参数" />
-    <el-table-column prop="default_value" label="默认值" />
-    <el-table-column label="必填">
+    <el-table-column prop="default_value" :label="$t('components.dynamicsForm.default.label')" />
+    <el-table-column :label="$t('common.required')">
       <template #default="{ row }">
         <div @click.stop>
           <el-switch disabled size="small" v-model="row.is_required" />

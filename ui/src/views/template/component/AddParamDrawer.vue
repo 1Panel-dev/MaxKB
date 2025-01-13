@@ -7,7 +7,13 @@
     :before-close="cancelClick"
   >
     <template #header>
-      <h4>{{ isEdit ? '编辑参数' : '添加参数' }}</h4>
+      <h4>
+        {{
+          isEdit
+            ? $t('views.template.templateForm.title.editParam')
+            : $t('views.template.templateForm.title.addParam')
+        }}
+      </h4>
     </template>
     <template #default>
       <DynamicsFormConstructor
@@ -19,8 +25,10 @@
     </template>
     <template #footer>
       <div style="flex: auto">
-        <el-button @click="cancelClick">{{$t('common.cancel')}}</el-button>
-        <el-button type="primary" @click="confirmClick()">{{ isEdit ? $t('common.save') : $t('common.add') }}</el-button>
+        <el-button @click="cancelClick">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="confirmClick()">{{
+          isEdit ? $t('common.save') : $t('common.add')
+        }}</el-button>
       </div>
     </template>
   </el-drawer>

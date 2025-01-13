@@ -11,10 +11,10 @@
     <template #header="{ close, titleId, titleClass }">
       <el-breadcrumb separator=">">
         <el-breadcrumb-item>
-          <span @click="toSelectProvider" class="select-provider"
-            >{{ $t('views.template.providerPlaceholder') }}</span
-          ></el-breadcrumb-item
-        >
+          <span @click="toSelectProvider" class="select-provider">
+            {{ $t('views.template.providerPlaceholder') }}
+          </span>
+        </el-breadcrumb-item>
         <el-breadcrumb-item
           ><span class="active-breadcrumb">{{
             `${$t('common.add')} ${providerValue?.name}`
@@ -23,7 +23,7 @@
       </el-breadcrumb>
     </template>
     <el-tabs v-model="activeName">
-      <el-tab-pane label="基础信息" name="base-info">
+      <el-tab-pane :label="$t('views.template.templateForm.title.baseInfo')" name="base-info">
         <DynamicsForm
           v-model="form_data"
           :render_data="model_form_field"
@@ -39,11 +39,11 @@
               <template #label>
                 <div class="flex align-center" style="display: inline-flex">
                   <div class="mr-4">
-                    <span>模型名称 </span>
+                    <span> {{ $t('views.template.templateForm.form.templateName.label') }} </span>
                   </div>
                   <el-tooltip effect="dark" placement="right">
                     <template #content>
-                      <p>MaxKB 中自定义的模型名称</p>
+                      <p>{{ $t('views.template.templateForm.form.templateName.tooltip') }}</p>
                     </template>
                     <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                   </el-tooltip>
@@ -53,12 +53,12 @@
                 v-model="base_form_data.name"
                 maxlength="64"
                 show-word-limit
-                placeholder="请给基础模型设置一个名称"
+                :placeholder="$t('views.template.templateForm.form.templateName.placeholder')"
               />
             </el-form-item>
             <el-form-item prop="permission_type" :rules="base_form_data_rule.permission_type">
               <template #label>
-                <span>权限</span>
+                <span>{{ $t('views.template.templateForm.form.permissionType.label') }}</span>
               </template>
               <el-radio-group v-model="base_form_data.permission_type" class="card__radio">
                 <el-row :gutter="16">
@@ -70,9 +70,9 @@
                         :class="base_form_data.permission_type === key ? 'active' : ''"
                       >
                         <el-radio :value="key" size="large">
-                          <p class="mb-4">{{ value }}</p>
+                          <p class="mb-4">{{ $t(value) }}</p>
                           <el-text type="info">
-                            {{ PermissionDesc[key] }}
+                            {{ $t(PermissionDesc[key]) }}
                           </el-text>
                         </el-radio>
                       </el-card>
@@ -84,18 +84,18 @@
             <el-form-item prop="model_type" :rules="base_form_data_rule.model_type">
               <template #label>
                 <div class="flex align-center" style="display: inline-flex">
-                  <span class="mr-4">模型类型 </span>
+                  <span class="mr-4"
+                    >{{ $t('views.template.templateForm.form.model_type.label') }}
+                  </span>
                   <el-tooltip effect="dark" placement="right">
                     <template #content>
-                      <p>大语言模型：在应用中与AI对话的推理模型。</p>
-                      <p>向量模型：在知识库中对文档内容进行向量化的模型。</p>
-                      <p>语音识别：在应用中开启语音识别后用于语音转文字的模型。</p>
-                      <p>语音合成：在应用中开启语音播放后用于文字转语音的模型。</p>
-                      <p>
-                        重排模型：在高级编排应用中使用多路召回时，对候选分段进行重新排序的模型。
-                      </p>
-                      <p>图片理解：在高级编排应用中用于图片理解的视觉模型。</p>
-                      <p>图片生成：在高级编排应用中用于图片生成的视觉模型。</p>
+                      <p>{{ $t('views.template.templateForm.form.model_type.tooltip1') }}</p>
+                      <p>{{ $t('views.template.templateForm.form.model_type.tooltip2') }}</p>
+                      <p>{{ $t('views.template.templateForm.form.model_type.tooltip3') }}</p>
+                      <p>{{ $t('views.template.templateForm.form.model_type.tooltip4') }}</p>
+                      <p>{{ $t('views.template.templateForm.form.model_type.tooltip5') }}</p>
+                      <p>{{ $t('views.template.templateForm.form.model_type.tooltip6') }}</p>
+                      <p>{{ $t('views.template.templateForm.form.model_type.tooltip7') }}</p>
                     </template>
                     <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                   </el-tooltip>
@@ -106,7 +106,7 @@
                 @change="list_base_model($event, true)"
                 v-model="base_form_data.model_type"
                 class="w-full m-2"
-                placeholder="请选择模型类型"
+                :placeholder="$t('views.template.templateForm.form.model_type.placeholder')"
               >
                 <el-option
                   v-for="item in model_type_list"
@@ -121,8 +121,10 @@
               <template #label>
                 <div class="flex align-center" style="display: inline-flex">
                   <div class="mr-4">
-                    <span>基础模型 </span>
-                    <span class="danger">列表中未列出的模型，直接输入模型名称，回车即可添加</span>
+                    <span>{{ $t('views.template.templateForm.form.base_model.label') }} </span>
+                    <span class="danger ml-4">{{
+                      $t('views.template.templateForm.form.base_model.tooltip')
+                    }}</span>
                   </div>
                 </div>
               </template>
@@ -131,7 +133,7 @@
                 v-loading="base_model_loading"
                 v-model="base_form_data.model_name"
                 class="w-full m-2"
-                placeholder="自定义输入基础模型后回车即可"
+                :placeholder="$t('views.template.templateForm.form.base_model.placeholder')"
                 filterable
                 allow-create
                 default-first-option
@@ -156,10 +158,13 @@
           </template>
         </DynamicsForm>
       </el-tab-pane>
-      <el-tab-pane label="高级设置" name="advanced-info">
+      <el-tab-pane
+        :label="$t('views.template.templateForm.title.advancedInfo')"
+        name="advanced-info"
+      >
         <el-empty
           v-if="!base_form_data.model_type || !base_form_data.model_name"
-          description="请先选择基础信息的模型类型和基础模型"
+          :description="$t('views.template.tip.emptyMessage1')"
         />
         <el-empty
           v-else-if="
@@ -167,10 +172,10 @@
             base_form_data.model_type === 'EMBEDDING' ||
             base_form_data.model_type === 'STT'
           "
-          description="所选模型不支持参数设置"
+          :description="$t('views.template.tip.emptyMessage2')"
         />
         <div class="flex-between mb-8" v-else>
-          <h5>模型参数</h5>
+          <h5>{{ $t('views.template.templateForm.title.modelParams') }}</h5>
           <el-button
             type="text"
             @click.stop="openAddDrawer()"
@@ -181,7 +186,7 @@
               base_form_data.model_type !== 'TTI'
             "
           >
-            <AppIcon iconName="Plus" class="add-icon" />添加
+            <AppIcon iconName="Plus" class="add-icon" />{{ $t('common.add') }}
           </el-button>
         </div>
         <el-table
@@ -189,7 +194,11 @@
           v-if="base_form_data.model_params_form?.length > 0"
           class="mb-16"
         >
-          <el-table-column prop="label" label="显示名称" show-overflow-tooltip>
+          <el-table-column
+            prop="label"
+            :label="$t('components.dynamicsForm.paramForm.name.label')"
+            show-overflow-tooltip
+          >
             <template #default="{ row }">
               <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
                 row.label.label
@@ -197,16 +206,27 @@
               <span v-else>{{ row.label }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="field" label="参数" show-overflow-tooltip />
-          <el-table-column label="组件类型" width="110px">
+          <el-table-column
+            prop="field"
+            :label="$t('components.dynamicsForm.paramForm.field.label')"
+            show-overflow-tooltip
+          />
+          <el-table-column
+            :label="$t('components.dynamicsForm.paramForm.input_type.label')"
+            width="110px"
+          >
             <template #default="{ row }">
               <el-tag type="info" class="info-tag">{{
                 input_type_list.find((item) => item.value === row.input_type)?.label
               }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="default_value" label="默认值" show-overflow-tooltip />
-          <el-table-column label="必填">
+          <el-table-column
+            prop="default_value"
+            :label="$t('components.dynamicsForm.default.label')"
+            show-overflow-tooltip
+          />
+          <el-table-column :label="$t('common.required')">
             <template #default="{ row }">
               <div @click.stop>
                 <el-switch disabled size="small" v-model="row.required" />
@@ -237,8 +257,10 @@
     </el-tabs>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="close">{{$t('common.cancel')}}</el-button>
-        <el-button type="primary" @click="submit" :loading="loading"> {{$t('common.save')}} </el-button>
+        <el-button @click="close">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="submit" :loading="loading">
+          {{ $t('common.save') }}
+        </el-button>
       </span>
     </template>
   </el-dialog>
@@ -256,6 +278,7 @@ import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { PermissionType, PermissionDesc } from '@/enums/model'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import AddParamDrawer from '@/views/template/component/AddParamDrawer.vue'
+import { t } from '@/locales'
 
 const providerValue = ref<Provider>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
@@ -272,10 +295,26 @@ const activeName = ref('base-info')
 const AddParamRef = ref()
 
 const base_form_data_rule = ref<FormRules>({
-  name: { required: true, trigger: 'blur', message: '模型名称不能为空' },
-  permission_type: { required: true, trigger: 'change', message: '权限不能为空' },
-  model_type: { required: true, trigger: 'change', message: '模型类型不能为空' },
-  model_name: { required: true, trigger: 'change', message: '基础模型不能为空' }
+  name: {
+    required: true,
+    trigger: 'blur',
+    message: t('views.template.templateForm.form.templateName.requiredMessage')
+  },
+  permission_type: {
+    required: true,
+    trigger: 'change',
+    message: t('views.template.templateForm.form.permissionType.requiredMessage')
+  },
+  model_type: {
+    required: true,
+    trigger: 'change',
+    message: t('views.template.templateForm.form.model_type.requiredMessage')
+  },
+  model_name: {
+    required: true,
+    trigger: 'change',
+    message: t('views.template.templateForm.form.base_model.requiredMessage')
+  }
 })
 
 const base_form_data = ref<{
@@ -306,7 +345,7 @@ const form_data = computed({
 
 const getModelForm = (model_name: string) => {
   if (!form_data.value.model_type) {
-    MsgWarning('请先选择模型类型')
+    MsgWarning(t('views.template.templateForm.form.model_type.requiredMessage'))
     base_form_data.value.model_name = ''
     return
   }
@@ -383,13 +422,13 @@ const submit = () => {
           loading
         ).then((ok) => {
           close()
-          MsgSuccess('创建模型成功')
+          MsgSuccess(t('views.template.tip.createSuccessMessage'))
           emit('submit')
         })
       }
     })
     .catch(() => {
-      MsgError('基础信息有填写错误')
+      MsgError(t('views.template.tip.createErrorMessage'))
     })
 }
 
@@ -414,11 +453,11 @@ function refresh(data: any, index: any) {
     }
 
     if (field === data.field && index !== i) {
-      MsgError('变量已存在: ' + data.field)
+      MsgError(t('views.template.tip.errorMessage') + data.field)
       return
     }
     if (label === label2 && index !== i) {
-      MsgError('变量已存在: ' + label)
+      MsgError(t('views.template.tip.errorMessage') + label)
       return
     }
   }
