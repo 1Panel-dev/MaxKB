@@ -334,7 +334,7 @@ const submit = async () => {
         applicationApi
           .updatePlatformConfig(id, configType.value, form[configType.value], loading)
           .then(() => {
-            MsgSuccess(t('commom.saveSuccess'))
+            MsgSuccess(t('common.saveSuccess'))
             closeDrawer()
             emit('refresh')
           })
