@@ -44,7 +44,7 @@
             }}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('common.status.label')" width="60">
+        <el-table-column :label="$t('common.status.label')" width="80">
           <template #default="{ row }">
             <div @click.stop>
               <el-switch
@@ -112,6 +112,7 @@ import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { ValidType, ValidCount } from '@/enums/common'
 import { t } from '@/locales'
+
 const { common, user } = useStore()
 
 const UserDialogRef = ref()
@@ -148,6 +149,7 @@ function changeState(bool: Boolean, row: any) {
 function editPwdUser(row: any) {
   UserPwdDialogRef.value.open(row)
 }
+
 function editUser(row: any) {
   title.value = t('views.user.editUser')
   UserDialogRef.value.open(row)
