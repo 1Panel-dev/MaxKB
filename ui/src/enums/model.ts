@@ -9,11 +9,11 @@ export enum PermissionDesc {
 }
 
 export enum modelType {
-  EMBEDDING = t('views.template.model.EMBEDDING'),
-  LLM = t('views.template.model.LLM'),
-  STT = t('views.template.model.STT'),
-  TTS = t('views.template.model.TTS'),
-  IMAGE = t('views.template.model.IMAGE'),
-  TTI = t('views.template.model.TTI'),
-  RERANKER = t('views.template.model.RERANKER')
+  EMBEDDING = 'views.template.model.EMBEDDING',
+  LLM = 'views.template.model.LLM',
+  STT = 'views.template.model.STT',
+  TTS = 'views.template.model.TTS',
+  IMAGE = 'views.template.model.IMAGE',
+  TTI = 'views.template.model.TTI',
+  RERANKER = 'views.template.model.RERANKER'
 }

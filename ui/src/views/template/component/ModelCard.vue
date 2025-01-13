@@ -38,7 +38,7 @@
         <li class="flex mt-16">
           <el-text type="info">模型类型</el-text>
           <span class="ellipsis ml-16">
-            {{ modelType[model.model_type as keyof typeof modelType] }}</span
+            {{ $t(modelType[model.model_type as keyof typeof modelType]) }}</span
           >
         </li>
         <li class="flex mt-12">

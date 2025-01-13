@@ -12,12 +12,12 @@
       <el-breadcrumb separator=">">
         <el-breadcrumb-item>
           <span @click="toSelectProvider" class="select-provider"
-            >选择供应商</span
+            >{{ $t('views.template.providerPlaceholder') }}</span
           ></el-breadcrumb-item
         >
         <el-breadcrumb-item
           ><span class="active-breadcrumb">{{
-            `添加 ${providerValue?.name}`
+            `${$t('common.add')} ${providerValue?.name}`
           }}</span></el-breadcrumb-item
         >
       </el-breadcrumb>

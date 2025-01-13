@@ -21,6 +21,9 @@ export default {
     TTI: '图片生成',
   },
   templateForm: {
+    title: {
+  
+    },
     form: {
       provider: {
         label: '供应商',
