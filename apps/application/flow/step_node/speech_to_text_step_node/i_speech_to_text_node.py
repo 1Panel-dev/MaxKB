@@ -6,14 +6,15 @@ from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
 from common.util.field_message import ErrMessage
+from django.utils.translation import gettext_lazy as _
 
 
 class SpeechToTextNodeSerializer(serializers.Serializer):
-    stt_model_id = serializers.CharField(required=True, error_messages=ErrMessage.char("模型id"))
+    stt_model_id = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Model id")))
 
-    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
+    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean(_('Whether to return content')))
 
-    audio_list = serializers.ListField(required=True, error_messages=ErrMessage.list("音频文件不能为空", ))
+    audio_list = serializers.ListField(required=True, error_messages=ErrMessage.list(_("The audio file cannot be empty")))
 
 
 class ISpeechToTextNode(INode):
@@ -27,7 +28,7 @@ class ISpeechToTextNode(INode):
                                                        self.node_params_serializer.data.get('audio_list')[1:])
         for audio in res:
             if 'file_id' not in audio:
-                raise ValueError("参数值错误: 上传的音频中缺少file_id，音频上传失败")
+                raise ValueError(_("Parameter value error: The uploaded audio lacks file_id, and the audio upload fails"))
 
         return self.execute(audio=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 

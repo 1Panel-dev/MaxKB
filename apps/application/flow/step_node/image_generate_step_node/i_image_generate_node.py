@@ -6,22 +6,27 @@ from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
 from common.util.field_message import ErrMessage
+from django.utils.translation import gettext_lazy as _
 
 
 class ImageGenerateNodeSerializer(serializers.Serializer):
-    model_id = serializers.CharField(required=True, error_messages=ErrMessage.char("模型id"))
+    model_id = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Model id")))
 
-    prompt = serializers.CharField(required=True, error_messages=ErrMessage.char("提示词(正向)"))
+    prompt = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Prompt word (positive)")))
 
-    negative_prompt = serializers.CharField(required=False, error_messages=ErrMessage.char("提示词(负向)"), allow_null=True, allow_blank=True,)
+    negative_prompt = serializers.CharField(required=False, error_messages=ErrMessage.char(_("Prompt word (negative)")),
+                                            allow_null=True, allow_blank=True, )
     # 多轮对话数量
-    dialogue_number = serializers.IntegerField(required=False, default=0, error_messages=ErrMessage.integer("多轮对话数量"))
+    dialogue_number = serializers.IntegerField(required=False, default=0,
+                                               error_messages=ErrMessage.integer(_("Number of multi-round conversations")))
 
-    dialogue_type = serializers.CharField(required=False, default='NODE', error_messages=ErrMessage.char("对话存储类型"))
+    dialogue_type = serializers.CharField(required=False, default='NODE',
+                                          error_messages=ErrMessage.char(_("Conversation storage type")))
 
-    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
+    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean(_('Whether to return content')))
 
-    model_params_setting = serializers.JSONField(required=False, default=dict, error_messages=ErrMessage.json("模型参数设置"))
+    model_params_setting = serializers.JSONField(required=False, default=dict,
+                                                 error_messages=ErrMessage.json(_("Model parameter settings")))
 
 
 class IImageGenerateNode(INode):

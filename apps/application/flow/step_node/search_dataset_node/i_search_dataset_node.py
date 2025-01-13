@@ -15,30 +15,31 @@ from rest_framework import serializers
 from application.flow.i_step_node import INode, NodeResult
 from common.util.common import flat_map
 from common.util.field_message import ErrMessage
+from django.utils.translation import gettext_lazy as _
 
 
 class DatasetSettingSerializer(serializers.Serializer):
     # 需要查询的条数
     top_n = serializers.IntegerField(required=True,
-                                     error_messages=ErrMessage.integer("引用分段数"))
+                                     error_messages=ErrMessage.integer(_("Reference segment number")))
     # 相似度 0-1之间
     similarity = serializers.FloatField(required=True, max_value=2, min_value=0,
-                                        error_messages=ErrMessage.float("引用分段数"))
+                                        error_messages=ErrMessage.float(_("引用分段数")))
     search_mode = serializers.CharField(required=True, validators=[
         validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
-                                  message="类型只支持register|reset_password", code=500)
-    ], error_messages=ErrMessage.char("检索模式"))
+                                  message=_("The type only supports register|reset_password"), code=500)
+    ], error_messages=ErrMessage.char(_("Retrieval Mode")))
     max_paragraph_char_number = serializers.IntegerField(required=True,
-                                                         error_messages=ErrMessage.float("最大引用分段字数"))
+                                                         error_messages=ErrMessage.float(_("Maximum number of words in a quoted segment")))
 
 
 class SearchDatasetStepNodeSerializer(serializers.Serializer):
     # 需要查询的数据集id列表
     dataset_id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True),
-                                            error_messages=ErrMessage.list("数据集id列表"))
+                                            error_messages=ErrMessage.list(_("Dataset id list")))
     dataset_setting = DatasetSettingSerializer(required=True)
 
-    question_reference_address = serializers.ListField(required=True, )
+    question_reference_address = serializers.ListField(required=True)
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)

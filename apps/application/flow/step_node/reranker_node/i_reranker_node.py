@@ -12,17 +12,18 @@ from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
 from common.util.field_message import ErrMessage
+from django.utils.translation import gettext_lazy as _
 
 
 class RerankerSettingSerializer(serializers.Serializer):
     # 需要查询的条数
     top_n = serializers.IntegerField(required=True,
-                                     error_messages=ErrMessage.integer("引用分段数"))
+                                     error_messages=ErrMessage.integer(_("Reference segment number")))
     # 相似度 0-1之间
     similarity = serializers.FloatField(required=True, max_value=2, min_value=0,
-                                        error_messages=ErrMessage.float("引用分段数"))
+                                        error_messages=ErrMessage.float(_("Reference segment number")))
     max_paragraph_char_number = serializers.IntegerField(required=True,
-                                                         error_messages=ErrMessage.float("最大引用分段字数"))
+                                                         error_messages=ErrMessage.float(_("Maximum number of words in a quoted segment")))
 
 
 class RerankerStepNodeSerializer(serializers.Serializer):

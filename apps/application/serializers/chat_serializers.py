@@ -22,6 +22,7 @@ from django.db.models import QuerySet, Q
 from django.http import StreamingHttpResponse
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
+from rest_framework.utils.formatting import lazy_format
 
 from application.flow.workflow_manage import Flow
 from application.models import Chat, Application, ApplicationDatasetMapping, VoteChoices, ChatRecord, WorkFlowVersion, \
@@ -44,13 +45,14 @@ from embedding.task import embedding_by_paragraph, embedding_by_paragraph_list
 from setting.models import Model
 from setting.models_provider import get_model_credential
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _, gettext as __
 
 chat_cache = caches['chat_cache']
 
 
 class WorkFlowSerializers(serializers.Serializer):
-    nodes = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid("节点"))
-    edges = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid("连线"))
+    nodes = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid(_("node")))
+    edges = serializers.ListSerializer(child=serializers.DictField(), error_messages=ErrMessage.uuid(_("Connection")))
 
 
 def valid_model_params_setting(model_id, model_params_setting):
@@ -66,8 +68,8 @@ def valid_model_params_setting(model_id, model_params_setting):
 
 class ChatSerializers(serializers.Serializer):
     class Operate(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
-        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Conversation ID")))
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Application ID")))
 
         def logic_delete(self, with_valid=True):
             if with_valid:
@@ -83,8 +85,8 @@ class ChatSerializers(serializers.Serializer):
             return True
 
     class ClientChatHistory(serializers.Serializer):
-        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
-        client_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("客户端id"))
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Application ID")))
+        client_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Client id")))
 
         def page(self, current_page: int, page_size: int, with_valid=True):
             if with_valid:
@@ -96,18 +98,18 @@ class ChatSerializers(serializers.Serializer):
             return page_search(current_page, page_size, queryset, lambda row: ChatSerializerModel(row).data)
 
     class Query(serializers.Serializer):
-        abstract = serializers.CharField(required=False, error_messages=ErrMessage.char("摘要"))
-        start_time = serializers.DateField(format='%Y-%m-%d', error_messages=ErrMessage.date("开始时间"))
-        end_time = serializers.DateField(format='%Y-%m-%d', error_messages=ErrMessage.date("结束时间"))
-        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
-        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+        abstract = serializers.CharField(required=False, error_messages=ErrMessage.char(_("summary")))
+        start_time = serializers.DateField(format='%Y-%m-%d', error_messages=ErrMessage.date(_("Start time")))
+        end_time = serializers.DateField(format='%Y-%m-%d', error_messages=ErrMessage.date(_("End time")))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Application ID")))
         min_star = serializers.IntegerField(required=False, min_value=0,
-                                            error_messages=ErrMessage.integer("最小点赞数"))
+                                            error_messages=ErrMessage.integer(_("Minimum number of likes")))
         min_trample = serializers.IntegerField(required=False, min_value=0,
-                                               error_messages=ErrMessage.integer("最小点踩数"))
-        comparer = serializers.CharField(required=False, error_messages=ErrMessage.char("比较器"), validators=[
+                                               error_messages=ErrMessage.integer(_("Minimum number of clicks")))
+        comparer = serializers.CharField(required=False, error_messages=ErrMessage.char(_("Comparator")), validators=[
             validators.RegexValidator(regex=re.compile("^and|or$"),
-                                      message="只支持and|or", code=500)
+                                      message=_("Only supports and|or"), code=500)
         ])
 
         def get_end_time(self):
@@ -222,9 +224,11 @@ class ChatSerializers(serializers.Serializer):
                 worksheet = workbook.active
                 worksheet.title = 'Sheet1'
 
-                headers = ['会话ID', '摘要', '用户问题', '优化后问题', '回答', '用户反馈', '引用分段数',
-                           '分段标题+内容',
-                           '标注', '消耗tokens', '耗时（s）', '提问时间']
+                headers = [__('Conversation ID'), __('summary'), __('User Questions'), __('Problem after optimization'),
+                           __('answer'), __('User feedback'),
+                           __('Reference segment number'),
+                           __('Section title + content'),
+                           __('Annotation'), __('Consuming tokens'), __('Time consumed (s)'), __('Question Time')]
                 for col_idx, header in enumerate(headers, 1):
                     cell = worksheet.cell(row=1, column=col_idx)
                     cell.value = header
@@ -259,16 +263,16 @@ class ChatSerializers(serializers.Serializer):
                                       with_table_name=False)
 
     class OpenChat(serializers.Serializer):
-        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
 
-        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Application ID")))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
             user_id = self.data.get('user_id')
             application_id = self.data.get('application_id')
             if not QuerySet(Application).filter(id=application_id, user_id=user_id).exists():
-                raise AppApiException(500, '应用不存在')
+                raise AppApiException(500, __('Application does not exist'))
 
         def open(self):
             self.is_valid(raise_exception=True)
@@ -286,7 +290,8 @@ class ChatSerializers(serializers.Serializer):
             work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=application_id).order_by(
                 '-create_time')[0:1].first()
             if work_flow_version is None:
-                raise AppApiException(500, "应用未发布,请发布后再使用")
+                raise AppApiException(500,
+                                      __("The application has not been published. Please use it after publishing."))
             chat_cache.set(chat_id,
                            ChatInfo(chat_id, [],
                                     [],
@@ -309,8 +314,8 @@ class ChatSerializers(serializers.Serializer):
             return chat_id
 
     class OpenWorkFlowChat(serializers.Serializer):
-        work_flow = WorkFlowSerializers(error_messages=ErrMessage.uuid("工作流"))
-        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        work_flow = WorkFlowSerializers(error_messages=ErrMessage.uuid(_("Workflow")))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
 
         def open(self):
             self.is_valid(raise_exception=True)
@@ -332,26 +337,29 @@ class ChatSerializers(serializers.Serializer):
             return chat_id
 
     class OpenTempChat(serializers.Serializer):
-        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
 
         id = serializers.UUIDField(required=False, allow_null=True,
-                                   error_messages=ErrMessage.uuid("应用id"))
+                                   error_messages=ErrMessage.uuid(_("Application ID")))
         model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                         error_messages=ErrMessage.uuid("模型id"))
+                                         error_messages=ErrMessage.uuid(_("Model id")))
 
         multiple_rounds_dialogue = serializers.BooleanField(required=True,
-                                                            error_messages=ErrMessage.boolean("多轮会话"))
+                                                            error_messages=ErrMessage.boolean(
+                                                                _("Multi-round conversation")))
 
         dataset_id_list = serializers.ListSerializer(required=False, child=serializers.UUIDField(required=True),
-                                                     error_messages=ErrMessage.list("关联数据集"))
+                                                     error_messages=ErrMessage.list(_("Related Datasets")))
         # 数据集相关设置
         dataset_setting = DatasetSettingSerializer(required=True)
         # 模型相关设置
         model_setting = ModelSettingSerializer(required=True)
         # 问题补全
-        problem_optimization = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("问题补全"))
+        problem_optimization = serializers.BooleanField(required=True,
+                                                        error_messages=ErrMessage.boolean(_("Question completion")))
         # 模型相关设置
-        model_params_setting = serializers.JSONField(required=False, error_messages=ErrMessage.dict("模型参数相关设置"))
+        model_params_setting = serializers.JSONField(required=False,
+                                                     error_messages=ErrMessage.dict(_("Model parameter settings")))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -365,7 +373,7 @@ class ChatSerializers(serializers.Serializer):
             if 'id' in self.data and self.data.get('id') is not None:
                 application = QuerySet(Application).filter(id=self.data.get('id')).first()
                 if application is None:
-                    raise AppApiException(500, "应用不存在")
+                    raise AppApiException(500, __("Application does not exist"))
                 return application.user_id
             return self.data.get('user_id')
 
@@ -408,18 +416,19 @@ class ChatSerializerModel(serializers.ModelSerializer):
 
 class ChatRecordSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
-        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("应用id"))
-        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Conversation ID")))
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Application ID")))
+        chat_record_id = serializers.UUIDField(required=True,
+                                               error_messages=ErrMessage.uuid(_("Conversation record id")))
 
         def is_valid(self, *, current_role=None, raise_exception=False):
             super().is_valid(raise_exception=True)
             application_access_token = QuerySet(ApplicationAccessToken).filter(
                 application_id=self.data.get('application_id')).first()
             if application_access_token is None:
-                raise AppApiException(500, '不存在的应用认证信息')
+                raise AppApiException(500, __('Application authentication information does not exist'))
             if not application_access_token.show_source and current_role == RoleConstants.APPLICATION_ACCESS_TOKEN.value:
-                raise AppApiException(500, '未开启显示知识来源')
+                raise AppApiException(500, __('Displaying knowledge sources is not enabled'))
 
         def get_chat_record(self):
             chat_record_id = self.data.get('chat_record_id')
@@ -437,7 +446,7 @@ class ChatRecordSerializer(serializers.Serializer):
                 self.is_valid(current_role=current_role, raise_exception=True)
             chat_record = self.get_chat_record()
             if chat_record is None:
-                raise AppApiException(500, "对话不存在")
+                raise AppApiException(500, __("Conversation does not exist"))
             return ChatRecordSerializer.Query.reset_chat_record(chat_record)
 
     class Query(serializers.Serializer):
@@ -499,23 +508,26 @@ class ChatRecordSerializer(serializers.Serializer):
             return page
 
     class Vote(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Conversation ID")))
 
-        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
+        chat_record_id = serializers.UUIDField(required=True,
+                                               error_messages=ErrMessage.uuid(_("Conversation record id")))
 
-        vote_status = serializers.ChoiceField(choices=VoteChoices.choices, error_messages=ErrMessage.uuid("投标状态"))
+        vote_status = serializers.ChoiceField(choices=VoteChoices.choices,
+                                              error_messages=ErrMessage.uuid(_("Bidding Status")))
 
         @transaction.atomic
         def vote(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             if not try_lock(self.data.get('chat_record_id')):
-                raise AppApiException(500, "正在对当前会话纪要进行投票中,请勿重复发送请求")
+                raise AppApiException(500,
+                                      __("Voting on the current session minutes, please do not send repeated requests"))
             try:
                 chat_record_details_model = QuerySet(ChatRecord).get(id=self.data.get('chat_record_id'),
                                                                      chat_id=self.data.get('chat_id'))
                 if chat_record_details_model is None:
-                    raise AppApiException(500, "不存在的对话 chat_record_id")
+                    raise AppApiException(500, __("Non-existent conversation chat_record_id"))
                 vote_status = self.data.get("vote_status")
                 if chat_record_details_model.vote_status == VoteChoices.UN_VOTE:
                     if vote_status == VoteChoices.STAR:
@@ -532,18 +544,18 @@ class ChatRecordSerializer(serializers.Serializer):
                         chat_record_details_model.vote_status = VoteChoices.UN_VOTE
                         chat_record_details_model.save()
                     else:
-                        raise AppApiException(500, "已经投票过,请先取消后再进行投票")
+                        raise AppApiException(500, __("Already voted, please cancel first and then vote again"))
             finally:
                 un_lock(self.data.get('chat_record_id'))
             return True
 
     class ImproveSerializer(serializers.Serializer):
         title = serializers.CharField(required=False, max_length=256, allow_null=True, allow_blank=True,
-                                      error_messages=ErrMessage.char("段落标题"))
-        content = serializers.CharField(required=True, error_messages=ErrMessage.char("段落内容"))
+                                      error_messages=ErrMessage.char(_("Section title")))
+        content = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Paragraph content")))
 
         problem_text = serializers.CharField(required=False, max_length=256, allow_null=True, allow_blank=True,
-                                             error_messages=ErrMessage.char("问题"))
+                                             error_messages=ErrMessage.char(_("question")))
 
     class ParagraphModel(serializers.ModelSerializer):
         class Meta:
@@ -551,9 +563,10 @@ class ChatRecordSerializer(serializers.Serializer):
             fields = "__all__"
 
     class ChatRecordImprove(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Conversation ID")))
 
-        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
+        chat_record_id = serializers.UUIDField(required=True,
+                                               error_messages=ErrMessage.uuid(_("Conversation record id")))
 
         def get(self, with_valid=True):
             if with_valid:
@@ -562,7 +575,7 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_id = self.data.get('chat_id')
             chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
             if chat_record is None:
-                raise AppApiException(500, '不存在的对话记录')
+                raise AppApiException(500, __('Conversation record does not exist'))
             if chat_record.improve_paragraph_id_list is None or len(chat_record.improve_paragraph_id_list) == 0:
                 return []
 
@@ -576,19 +589,20 @@ class ChatRecordSerializer(serializers.Serializer):
             return [ChatRecordSerializer.ParagraphModel(p).data for p in paragraph_model_list]
 
     class Improve(serializers.Serializer):
-        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
+        chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Conversation ID")))
 
-        chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
+        chat_record_id = serializers.UUIDField(required=True,
+                                               error_messages=ErrMessage.uuid(_("Conversation record id")))
 
-        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Knowledge base id")))
 
-        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Document id")))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
             if not QuerySet(Document).filter(id=self.data.get('document_id'),
                                              dataset_id=self.data.get('dataset_id')).exists():
-                raise AppApiException(500, "文档id不正确")
+                raise AppApiException(500, __("The document id is incorrect"))
 
         @staticmethod
         def post_embedding_paragraph(chat_record, paragraph_id, dataset_id):
@@ -607,7 +621,7 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_id = self.data.get('chat_id')
             chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
             if chat_record is None:
-                raise AppApiException(500, '不存在的对话记录')
+                raise AppApiException(500, __('Conversation record does not exist'))
 
             document_id = self.data.get("document_id")
             dataset_id = self.data.get("dataset_id")
@@ -634,15 +648,16 @@ class ChatRecordSerializer(serializers.Serializer):
             return ChatRecordSerializerModel(chat_record).data, paragraph.id, dataset_id
 
         class Operate(serializers.Serializer):
-            chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话id"))
+            chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Conversation ID")))
 
-            chat_record_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("对话记录id"))
+            chat_record_id = serializers.UUIDField(required=True,
+                                                   error_messages=ErrMessage.uuid(_("Conversation record id")))
 
-            dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
+            dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Knowledge base id")))
 
-            document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
+            document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Document id")))
 
-            paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("段落id"))
+            paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Paragraph id")))
 
             def delete(self, with_valid=True):
                 if with_valid:
@@ -655,9 +670,12 @@ class ChatRecordSerializer(serializers.Serializer):
                 paragraph_id = self.data.get('paragraph_id')
                 chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
                 if chat_record is None:
-                    raise AppApiException(500, '不存在的对话记录')
+                    raise AppApiException(500, __('不存在的对话记录'))
                 if not chat_record.improve_paragraph_id_list.__contains__(uuid.UUID(paragraph_id)):
-                    raise AppApiException(500, f'段落id错误,当前对话记录不存在【{paragraph_id}】段落id')
+                    message = lazy_format(
+                        _('The paragraph id is wrong. The current conversation record does not exist. [{paragraph_id}] paragraph id'),
+                        paragraph_id=paragraph_id)
+                    raise AppApiException(500, message)
                 chat_record.improve_paragraph_id_list = [row for row in chat_record.improve_paragraph_id_list if
                                                          str(row) != paragraph_id]
                 chat_record.save()
@@ -667,15 +685,15 @@ class ChatRecordSerializer(serializers.Serializer):
                 return o.delete()
 
     class PostImprove(serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
-        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Knowledge base id")))
+        document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Document id")))
         chat_ids = serializers.ListSerializer(child=serializers.UUIDField(), required=True,
-                                              error_messages=ErrMessage.list("对话id"))
+                                              error_messages=ErrMessage.list(_("Conversation ID")))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
             if not Document.objects.filter(id=self.data['document_id'], dataset_id=self.data['dataset_id']).exists():
-                raise AppApiException(500, "文档id不正确")
+                raise AppApiException(500, __("The document id is incorrect"))
 
         @staticmethod
         def post_embedding_paragraph(paragraph_ids, dataset_id):
@@ -694,7 +712,7 @@ class ChatRecordSerializer(serializers.Serializer):
             # 获取所有聊天记录
             chat_record_list = list(ChatRecord.objects.filter(chat_id__in=chat_ids))
             if len(chat_record_list) < len(chat_ids):
-                raise AppApiException(500, "存在不存在的对话记录")
+                raise AppApiException(500, __("Conversation records that do not exist"))
 
             # 批量创建段落和问题映射
             paragraphs = []

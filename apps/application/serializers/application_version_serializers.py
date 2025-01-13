@@ -9,6 +9,7 @@
 from typing import Dict
 
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import WorkFlowVersion
@@ -26,14 +27,14 @@ class ApplicationVersionModelSerializer(serializers.ModelSerializer):
 
 class ApplicationVersionEditSerializer(serializers.Serializer):
     name = serializers.CharField(required=False, max_length=128, allow_null=True, allow_blank=True,
-                                 error_messages=ErrMessage.char("版本名称"))
+                                 error_messages=ErrMessage.char(_("Version Name")))
 
 
 class ApplicationVersionSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
-        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("应用id"))
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(_("Application ID")))
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                     error_messages=ErrMessage.char("摘要"))
+                                     error_messages=ErrMessage.char(_("summary")))
 
         def get_query_set(self):
             query_set = QuerySet(WorkFlowVersion).filter(application_id=self.data.get('application_id'))
@@ -55,8 +56,9 @@ class ApplicationVersionSerializer(serializers.Serializer):
                                post_records_handler=lambda v: ApplicationVersionModelSerializer(v).data)
 
     class Operate(serializers.Serializer):
-        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char("应用id"))
-        work_flow_version_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("工作流版本id"))
+        application_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(_("Application ID")))
+        work_flow_version_id = serializers.UUIDField(required=True,
+                                                     error_messages=ErrMessage.uuid(_("Workflow version id")))
 
         def one(self, with_valid=True):
             if with_valid:
@@ -66,7 +68,7 @@ class ApplicationVersionSerializer(serializers.Serializer):
             if work_flow_version is not None:
                 return ApplicationVersionModelSerializer(work_flow_version).data
             else:
-                raise AppApiException(500, '不存在的工作流版本')
+                raise AppApiException(500, _('Workflow version does not exist'))
 
         def edit(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -81,4 +83,4 @@ class ApplicationVersionSerializer(serializers.Serializer):
                 work_flow_version.save()
                 return ApplicationVersionModelSerializer(work_flow_version).data
             else:
-                raise AppApiException(500, '不存在的工作流版本')
+                raise AppApiException(500, _('Workflow version does not exist'))

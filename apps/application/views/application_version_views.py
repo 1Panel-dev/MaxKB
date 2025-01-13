@@ -17,17 +17,18 @@ from common.auth import has_permissions, TokenAuth
 from common.constants.permission_constants import PermissionConstants, CompareConstants, ViewPermission, RoleConstants, \
     Permission, Group, Operate
 from common.response import result
+from django.utils.translation import gettext_lazy as _
 
 
 class ApplicationVersionView(APIView):
     authentication_classes = [TokenAuth]
 
     @action(methods=['GET'], detail=False)
-    @swagger_auto_schema(operation_summary="获取应用列表",
-                         operation_id="获取应用列表",
+    @swagger_auto_schema(operation_summary=_("Get the application list"),
+                         operation_id=_("Get the application list"),
                          manual_parameters=ApplicationVersionApi.Query.get_request_params_api(),
                          responses=result.get_api_array_response(ApplicationVersionApi.get_response_body_api()),
-                         tags=['应用/版本'])
+                         tags=[_('Application/Version')])
     @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
     def get(self, request: Request, application_id: str):
         return result.success(
@@ -39,12 +40,12 @@ class ApplicationVersionView(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['GET'], detail=False)
-        @swagger_auto_schema(operation_summary="分页获取应用版本列表",
-                             operation_id="分页获取应用版本列表",
+        @swagger_auto_schema(operation_summary=_("Get the list of application versions by page"),
+                             operation_id=_("Get the list of application versions by page"),
                              manual_parameters=result.get_page_request_params(
                                  ApplicationVersionApi.Query.get_request_params_api()),
                              responses=result.get_page_api_response(ApplicationVersionApi.get_response_body_api()),
-                             tags=['应用/版本'])
+                             tags=[_('Application/Version')])
         @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
         def get(self, request: Request, application_id: str, current_page: int, page_size: int):
             return result.success(
@@ -57,11 +58,11 @@ class ApplicationVersionView(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['GET'], detail=False)
-        @swagger_auto_schema(operation_summary="获取应用版本详情",
-                             operation_id="获取应用版本详情",
+        @swagger_auto_schema(operation_summary=_("Get application version details"),
+                             operation_id=_("Get application version details"),
                              manual_parameters=ApplicationVersionApi.Operate.get_request_params_api(),
                              responses=result.get_api_response(ApplicationVersionApi.get_response_body_api()),
-                             tags=['应用/版本'])
+                             tags=[_('Application/Version')])
         @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
         def get(self, request: Request, application_id: str, work_flow_version_id: str):
             return result.success(
@@ -70,12 +71,12 @@ class ApplicationVersionView(APIView):
                           'application_id': application_id, 'work_flow_version_id': work_flow_version_id}).one())
 
         @action(methods=['PUT'], detail=False)
-        @swagger_auto_schema(operation_summary="修改应用版本信息",
-                             operation_id="修改应用版本信息",
+        @swagger_auto_schema(operation_summary=_("Modify application version information"),
+                             operation_id=_("Modify application version information"),
                              manual_parameters=ApplicationVersionApi.Operate.get_request_params_api(),
                              request_body=ApplicationVersionApi.Edit.get_request_body_api(),
                              responses=result.get_api_response(ApplicationVersionApi.get_response_body_api()),
-                             tags=['应用/版本'])
+                             tags=[_('Application/Version')])
         @has_permissions(ViewPermission(
             [RoleConstants.ADMIN, RoleConstants.USER],
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,

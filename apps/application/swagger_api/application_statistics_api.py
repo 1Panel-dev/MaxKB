@@ -9,7 +9,7 @@
 from drf_yasg import openapi
 
 from common.mixins.api_mixin import ApiMixin
-
+from django.utils.translation import gettext_lazy as _
 
 class ApplicationStatisticsApi(ApiMixin):
     @staticmethod
@@ -18,17 +18,17 @@ class ApplicationStatisticsApi(ApiMixin):
                                   in_=openapi.IN_PATH,
                                   type=openapi.TYPE_STRING,
                                   required=True,
-                                  description='应用id'),
+                                  description=_('Application ID')),
                 openapi.Parameter(name='start_time',
                                   in_=openapi.IN_QUERY,
                                   type=openapi.TYPE_STRING,
                                   required=True,
-                                  description='开始时间'),
+                                  description=_('Start time')),
                 openapi.Parameter(name='end_time',
                                   in_=openapi.IN_QUERY,
                                   type=openapi.TYPE_STRING,
                                   required=True,
-                                  description='结束时间'),
+                                  description=_('End time')),
                 ]
 
     class ChatRecordAggregate(ApiMixin):
@@ -38,21 +38,21 @@ class ApplicationStatisticsApi(ApiMixin):
                 type=openapi.TYPE_OBJECT,
                 required=['star_num', 'trample_num', 'tokens_num', 'chat_record_count'],
                 properties={
-                    'star_num': openapi.Schema(type=openapi.TYPE_NUMBER, title="点赞数量",
-                                               description="点赞数量"),
+                    'star_num': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("Number of Likes"),
+                                               description=_("Number of Likes")),
 
-                    'trample_num': openapi.Schema(type=openapi.TYPE_NUMBER, title="点踩数量", description="点踩数量"),
-                    'tokens_num': openapi.Schema(type=openapi.TYPE_NUMBER, title="token使用数量",
-                                                 description="token使用数量"),
-                    'chat_record_count': openapi.Schema(type=openapi.TYPE_NUMBER, title="对话次数",
-                                                        description="对话次数"),
-                    'customer_num': openapi.Schema(type=openapi.TYPE_NUMBER, title="客户数量",
-                                                   description="客户数量"),
-                    'customer_added_count': openapi.Schema(type=openapi.TYPE_NUMBER, title="客户新增数量",
-                                                           description="客户新增数量"),
+                    'trample_num': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("Number of thumbs-downs"), description=_("Number of thumbs-downs")),
+                    'tokens_num': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("Number of tokens used"),
+                                                 description=_("Number of tokens used")),
+                    'chat_record_count': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("Number of conversations"),
+                                                        description=_("Number of conversations")),
+                    'customer_num': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("Number of customers"),
+                                                   description=_("Number of customers")),
+                    'customer_added_count': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("Number of new customers"),
+                                                           description=_("Number of new customers")),
                     'day': openapi.Schema(type=openapi.TYPE_STRING,
-                                          title="日期",
-                                          description="日期,只有查询趋势的时候才有该字段"),
+                                          title=_("time"),
+                                          description=_("Time, this field is only available when querying trends")),
                 }
             )
 
@@ -63,11 +63,11 @@ class ApplicationStatisticsApi(ApiMixin):
                 type=openapi.TYPE_OBJECT,
                 required=['added_count'],
                 properties={
-                    'added_count': openapi.Schema(type=openapi.TYPE_NUMBER, title="新增数量", description="新增数量"),
+                    'added_count': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("New quantity"), description=_("New quantity")),
 
                     'day': openapi.Schema(type=openapi.TYPE_STRING,
-                                          title="时间",
-                                          description="时间"),
+                                          title=_("time"),
+                                          description=_("time")),
                 }
             )
 
@@ -78,9 +78,9 @@ class ApplicationStatisticsApi(ApiMixin):
                 type=openapi.TYPE_OBJECT,
                 required=['added_count'],
                 properties={
-                    'today_added_count': openapi.Schema(type=openapi.TYPE_NUMBER, title="今日新增数量",
-                                                        description="今日新增数量"),
-                    'added_count': openapi.Schema(type=openapi.TYPE_NUMBER, title="新增数量", description="新增数量"),
+                    'today_added_count': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("Today's new quantity"),
+                                                        description=_("Today's new quantity")),
+                    'added_count': openapi.Schema(type=openapi.TYPE_NUMBER, title=_("New quantity"), description=_("New quantity")),
 
                 }
             )
