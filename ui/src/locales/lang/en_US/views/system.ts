@@ -130,6 +130,20 @@ export default {
     saveSuccess: 'Appearance settings successfully applied'
   },
   email: {
-    title: 'Email Setting'
+    title: 'Email Setting',
+    smtpHost: 'SMTP Host',
+    smtpHostPlaceholder: 'Please enter SMTP Host',
+    smtpPort: 'SMTP Port',
+    smtpPortPlaceholder: 'Please enter SMTP Port',
+    smtpUser: 'SMTP User',
+    smtpUserPlaceholder: 'Please enter SMTP User',
+    sendEmail: 'Send Email',
+    sendEmailPlaceholder: 'Please enter Send Email',
+    smtpPassword: 'SMTP Password',
+    smtpPasswordPlaceholder: 'Please enter SMTP Password',
+    test: 'Test Connection',
+    enableSSL: 'Enable SSL (if the SMTP port is 465, you usually need to enable SSL)',
+    enableTLS: 'Enable TLS (if the SMTP port is 587, you usually need to enable TLS)',
+    testSuccess: 'Test Connection Successful'
   }
 }

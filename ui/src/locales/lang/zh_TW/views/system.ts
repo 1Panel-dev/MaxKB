@@ -129,6 +129,20 @@ export default {
     saveSuccess: '外觀設置成功'
   },
   email: {
-    title: '郵箱配置'
+    title: '郵箱設置',
+    smtpHost: 'SMTP Host',
+    smtpHostPlaceholder: '請輸入 SMTP Host',
+    smtpPort: 'SMTP Port',
+    smtpPortPlaceholder: '請輸入 SMTP Port',
+    smtpUser: 'SMTP 帳戶',
+    smtpUserPlaceholder: '請輸入 SMTP 帳戶',
+    sendEmail: '發件人信箱',
+    sendEmailPlaceholder: '請輸入發件人信箱',
+    smtpPassword: '密碼',
+    smtpPasswordPlaceholder: '請輸入發件人密碼',
+    test: '測試連接',
+    enableSSL: '啟用 SSL（如果 SMTP 端口是 465，通常需要啟用 SSL）',
+    enableTLS: '啟用 TLS（如果 SMTP 端口是 587，通常需要啟用 TLS）',
+    testSuccess: '測試連接成功'
   }
 }
