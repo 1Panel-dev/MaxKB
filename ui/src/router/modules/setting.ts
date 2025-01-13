@@ -1,6 +1,7 @@
 import { hasPermission } from '@/utils/permission/index'
 import Layout from '@/layout/layout-template/SystemLayout.vue'
 import { Role, ComplexPermission } from '@/utils/permission/type'
+import { t } from '@/locales'
 const settingRouter = {
   path: '/setting',
   name: 'setting',
@@ -70,7 +71,7 @@ const settingRouter = {
           path: '/system/theme',
           name: 'theme',
           meta: {
-            title: '外观设置',
+            title: t('views.system.theme.title'),
             activeMenu: '/setting',
             parentPath: '/setting',
             parentName: 'setting',
@@ -82,7 +83,7 @@ const settingRouter = {
           path: '/system/authentication',
           name: 'authentication',
           meta: {
-            title: '登录认证',
+            title: t('views.system.authentication.title'),
             activeMenu: '/setting',
             parentPath: '/setting',
             parentName: 'setting',
@@ -94,7 +95,7 @@ const settingRouter = {
           path: '/system/email',
           name: 'email',
           meta: {
-            title: '邮箱配置',
+            title: t('views.system.email.title'),
             activeMenu: '/setting',
             parentPath: '/setting',
             parentName: 'setting',

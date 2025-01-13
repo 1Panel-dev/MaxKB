@@ -2,51 +2,12 @@ import en from 'element-plus/es/locale/lang/en'
 import components from './components'
 import layout from './layout'
 import views from './views'
-
+import common from './common'
 export default {
   lang: 'English',
   layout,
   views,
   components,
   en,
-  common: {
-    create: 'Create',
-    createSuccess: 'Create Success',
-    copy: 'Copy',
-    copySuccess: 'Copy Success',
-    copyError: 'Copy Failed',
-    save: 'Save',
-    saveSuccess: 'Save Success',
-    delete: 'Delete',
-    deleteSuccess: 'Successfully deleted',
-    setting: 'Setting',
-    settingSuccess: 'Setting Successful',
-    submit: 'Submit',
-    submitSuccess: 'Submitted successfully',
-    edit: 'Edit',
-    editSuccess: 'Edit Successful',
-    cancel: 'Cancel',
-    confirm: 'Confirm',
-    tip: 'Prompt',
-    add: 'Add',
-    refresh: 'Refresh',
-    search: 'Search',
-    clear: 'Clear',
-    professional: 'Purchase the Professional Edition',
-    status: 'Status',
-    createDate: 'Create date',
-    operation: 'Operation',
-    document: 'Documentation',
-    character: 'characters',
-    export: 'Export',
-    exportSuccess: 'Export successful',
-    unavailable: '(Unavailable)',
-    public: 'Public',
-    private: 'Private',
-    paramSetting: 'Parameter Settings',
-    creator: 'Creator',
-    debug: 'Debug',
-    modify: 'Modify',
-  },
-
+  common
 }
