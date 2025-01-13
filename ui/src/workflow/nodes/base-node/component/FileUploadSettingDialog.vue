@@ -96,8 +96,10 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="close"> 取消 </el-button>
-        <el-button type="primary" @click="submit()" :loading="loading"> 确定 </el-button>
+        <el-button @click.prevent="close"> {{ $t('common.cancel') }} </el-button>
+        <el-button type="primary" @click="submit()" :loading="loading">
+          {{ $t('common.confirm') }}
+        </el-button>
       </span>
     </template>
   </el-dialog>

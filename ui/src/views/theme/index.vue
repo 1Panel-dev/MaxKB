@@ -1,10 +1,10 @@
 <template>
   <div class="theme-setting" v-loading="loading">
-    <h4 class="p-16-24">外观设置</h4>
+    <h4 class="p-16-24">{{ $t('views.system.theme.title') }}</h4>
     <el-scrollbar>
       <div class="p-24 pt-0">
         <div class="app-card p-24">
-          <h5 class="mb-16">平台显示主题</h5>
+          <h5 class="mb-16">{{ $t('views.system.theme.platformDisplayTheme') }}</h5>
           <el-radio-group
             v-model="themeRadio"
             class="app-radio-button-group"
@@ -13,19 +13,21 @@
             <template v-for="(item, index) in themeList" :key="index">
               <el-radio-button :label="item.label" :value="item.value" />
             </template>
-            <el-radio-button label="自定义" value="custom" />
+            <el-radio-button :label="$t('views.system.theme.custom')" value="custom" />
           </el-radio-group>
           <div v-if="themeRadio === 'custom'">
-            <h5 class="mt-16 mb-8">自定义主题</h5>
+            <h5 class="mt-16 mb-8">{{ $t('views.system.theme.customTheme') }}</h5>
             <el-color-picker v-model="customColor" @change="customColorHandle" />
           </div>
         </div>
         <div class="app-card p-24 mt-16">
-          <h5 class="mb-16">平台登陆设置</h5>
+          <h5 class="mb-16">{{ $t('views.system.theme.platformLoginSettings') }}</h5>
           <el-card shadow="never" class="layout-bg">
             <div class="flex-between">
-              <h5 class="mb-16">页面预览</h5>
-              <el-button type="primary" link @click="resetForm('login')"> 恢复默认 </el-button>
+              <h5 class="mb-16">{{ $t('views.system.theme.pagePreview') }}</h5>
+              <el-button type="primary" link @click="resetForm('login')">
+                {{ $t('views.system.theme.restoreDefaults') }}
+              </el-button>
             </div>
             <el-scrollbar>
               <div class="theme-preview">
@@ -37,7 +39,7 @@
                     <div class="theme-form">
                       <el-card shadow="never" class="mb-8">
                         <div class="flex-between mb-8">
-                          <span class="lighter">网站 Logo</span>
+                          <span class="lighter">{{ $t('views.system.theme.websiteLogo') }}</span>
                           <el-upload
                             ref="uploadRef"
                             action="#"
@@ -48,17 +50,18 @@
                               (file: any, fileList: any) => onChange(file, fileList, 'icon')
                             "
                           >
-                            <el-button size="small"> 替换图片 </el-button>
+                            <el-button size="small">
+                              {{ $t('views.system.theme.replacePicture') }}
+                            </el-button>
                           </el-upload>
                         </div>
                         <el-text type="info" size="small"
-                          >顶部网站显示的 Logo，建议尺寸 48*48，支持 JPG、PNG、GIF，大小不超过 10
-                          MB</el-text
-                        >
+                          >{{ $t('views.system.theme.websiteLogoTip') }}
+                        </el-text>
                       </el-card>
                       <el-card shadow="never" class="mb-8">
                         <div class="flex-between mb-8">
-                          <span class="lighter">登录 Logo</span>
+                          <span class="lighter"> {{ $t('views.system.theme.loginLogo') }}</span>
                           <el-upload
                             ref="uploadRef"
                             action="#"
@@ -69,17 +72,20 @@
                               (file: any, fileList: any) => onChange(file, fileList, 'loginLogo')
                             "
                           >
-                            <el-button size="small"> 替换图片 </el-button>
+                            <el-button size="small">
+                              {{ $t('views.system.theme.replacePicture') }}
+                            </el-button>
                           </el-upload>
                         </div>
                         <el-text type="info" size="small"
-                          >登录页面右侧 Logo，建议尺寸 204*52，支持 JPG、PNG、GIF，大小不超过 10
-                          MB</el-text
-                        >
+                          >{{ $t('views.system.theme.loginLogoTip') }}
+                        </el-text>
                       </el-card>
                       <el-card shadow="never" class="mb-8">
                         <div class="flex-between mb-8">
-                          <span class="lighter">登录背景图</span>
+                          <span class="lighter">{{
+                            $t('views.system.theme.loginBackground')
+                          }}</span>
                           <el-upload
                             ref="uploadRef"
                             action="#"
@@ -90,12 +96,13 @@
                               (file: any, fileList: any) => onChange(file, fileList, 'loginImage')
                             "
                           >
-                            <el-button size="small"> 替换图片 </el-button>
+                            <el-button size="small">
+                              {{ $t('views.system.theme.replacePicture') }}
+                            </el-button>
                           </el-upload>
                         </div>
                         <el-text type="info" size="small">
-                          左侧背景图，矢量图建议尺寸 576*900，位图建议尺寸 1152*1800；支持
-                          JPG、PNG、GIF，大小不超过 10 MB
+                          {{ $t('views.system.theme.loginBackgroundTip') }}
                         </el-text>
                       </el-card>
 
@@ -107,38 +114,47 @@
                         :rules="rules"
                         @submit.prevent
                       >
-                        <el-form-item label="网站名称" prop="title">
-                          <el-input v-model="themeForm.title" placeholder="请输入网站名称">
+                        <el-form-item :label="$t('views.system.theme.websiteName')" prop="title">
+                          <el-input
+                            v-model="themeForm.title"
+                            :placeholder="$t('views.system.theme.websiteNamePlaceholder')"
+                          >
                           </el-input>
-                          <el-text type="info"> 显示在网页 Tab 的平台名称 </el-text>
+                          <el-text type="info">{{
+                            $t('views.system.theme.websiteNameTip')
+                          }}</el-text>
                         </el-form-item>
-                        <el-form-item label="欢迎语" prop="slogan">
+                        <el-form-item :label="$t('views.system.theme.websiteSlogan')" prop="slogan">
                           <el-input
                             v-model="themeForm.slogan"
-                            placeholder="请输入欢迎语"
+                            :placeholder="$t('views.system.theme.websiteSloganPlaceholder')"
                             maxlength="64"
                             show-word-limit
                           >
                           </el-input>
-                          <el-text type="info"> 产品 Logo 下的欢迎语 </el-text>
+                          <el-text type="info">{{
+                            $t('views.system.theme.websiteSloganTip')
+                          }}</el-text>
                         </el-form-item>
                       </el-form>
-                    </div></el-col
-                  >
+                    </div>
+                  </el-col>
                 </el-row>
               </div>
             </el-scrollbar>
             <div class="mt-16">
-              <el-text type="info">默认为 MaxKB 登录界面，支持自定义设置</el-text>
+              <el-text type="info">{{ $t('views.system.theme.defaultTip') }}</el-text>
             </div>
           </el-card>
         </div>
         <div class="app-card p-24 mt-16">
-          <h5 class="mb-16">平台设置</h5>
+          <h5 class="mb-16">{{ $t('views.system.theme.platformSetting') }}</h5>
           <el-card shadow="never" class="layout-bg">
             <div class="flex-between">
-              <h5 class="mb-16">页面预览</h5>
-              <el-button type="primary" link @click="resetForm('platform')"> 恢复默认 </el-button>
+              <h5 class="mb-16">{{ $t('views.system.theme.pagePreview') }}</h5>
+              <el-button type="primary" link @click="resetForm('platform')">
+                {{ $t('views.system.theme.restoreDefaults') }}
+              </el-button>
             </div>
             <el-scrollbar>
               <div class="theme-preview">
@@ -182,24 +198,39 @@
                   <el-col :span="8">
                     <div class="theme-form">
                       <div>
-                        <el-checkbox v-model="themeForm.showUserManual" label="显示用户手册" />
+                        <el-checkbox
+                          v-model="themeForm.showUserManual"
+                          :label="$t('views.system.theme.showUserManual')"
+                        />
                         <div class="ml-16">
                           <el-input
                             v-model="themeForm.userManualUrl"
-                            placeholder="请输入 URL 地址"
+                            :placeholder="$t('views.system.theme.urlPlaceholder')"
                           />
                         </div>
                       </div>
                       <div class="my-2">
-                        <el-checkbox v-model="themeForm.showForum" label="显示论坛求助" />
+                        <el-checkbox
+                          v-model="themeForm.showForum"
+                          :label="$t('views.system.theme.showForum')"
+                        />
                         <div class="ml-16">
-                          <el-input v-model="themeForm.forumUrl" placeholder="请输入 URL 地址" />
+                          <el-input
+                            v-model="themeForm.forumUrl"
+                            :placeholder="$t('views.system.theme.urlPlaceholder')"
+                          />
                         </div>
                       </div>
                       <div class="mt-2">
-                        <el-checkbox v-model="themeForm.showProject" label="显示项目地址" />
+                        <el-checkbox
+                          v-model="themeForm.showProject"
+                          :label="$t('views.system.theme.showProject')"
+                        />
                         <div class="ml-16">
-                          <el-input v-model="themeForm.projectUrl" placeholder="请输入 URL 地址" />
+                          <el-input
+                            v-model="themeForm.projectUrl"
+                            :placeholder="$t('views.system.theme.urlPlaceholder')"
+                          />
                         </div>
                       </div>
                     </div>
@@ -208,15 +239,17 @@
               </div>
             </el-scrollbar>
             <div class="mt-16">
-              <el-text type="info">默认为 MaxKB 登录界面，支持自定义设置</el-text>
+              <el-text type="info">{{ $t('views.system.theme.defaultTip') }}</el-text>
             </div>
           </el-card>
         </div>
       </div>
     </el-scrollbar>
     <div class="theme-setting__operate w-full p-16-24">
-      <el-button @click="resetTheme">放弃更新</el-button>
-      <el-button type="primary" @click="updataTheme(themeFormRef)"> 保存并应用 </el-button>
+      <el-button @click="resetTheme">{{ $t('views.system.theme.abandonUpdate') }}</el-button>
+      <el-button type="primary" @click="updateTheme(themeFormRef)">
+        {{ $t('views.system.theme.saveAndApply') }}</el-button
+      >
     </div>
   </div>
 </template>
@@ -231,6 +264,7 @@ import { themeList, defaultSetting, defaultPlatformSetting } from '@/utils/theme
 import ThemeApi from '@/api/theme'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import useStore from '@/stores'
+import { t } from '@/locales'
 
 const { user } = useStore()
 const router = useRouter()
@@ -253,22 +287,26 @@ const themeForm = ref<any>({
   loginLogo: '',
   loginImage: '',
   title: 'MaxKB',
-  slogan: '欢迎使用 MaxKB 智能知识库问答系统',
+  slogan: t('views.system.theme.defaultSlogan'),
   ...defaultPlatformSetting
 })
 const themeRadio = ref('')
 const customColor = ref('')
 
 const rules = reactive<FormRules>({
-  title: [{ required: true, message: '请输入网站标题', trigger: 'blur' }],
-  slogan: [{ required: true, message: '请输入欢迎语', trigger: 'blur' }]
+  title: [
+    { required: true, message: t('views.system.theme.websiteNamePlaceholder'), trigger: 'blur' }
+  ],
+  slogan: [
+    { required: true, message: t('views.system.theme.websiteSloganPlaceholder'), trigger: 'blur' }
+  ]
 })
 
 const onChange = (file: any, fileList: UploadFiles, attr: string) => {
   const isLimit = file?.size / 1024 / 1024 < 10
   if (!isLimit) {
     // @ts-ignore
-    MsgError(`文件大小超过 10M`)
+    MsgError(t('views.system.theme.fileMessageError'))
     return false
   } else {
     themeForm.value[attr] = file.raw
@@ -282,6 +320,7 @@ function changeThemeHandle(val: string) {
     user.setTheme(themeForm.value)
   }
 }
+
 function customColorHandle(val: string) {
   themeForm.value.theme = val
   user.setTheme(themeForm.value)
@@ -309,7 +348,7 @@ function resetForm(val: string) {
   user.setTheme(themeForm.value)
 }
 
-const updataTheme = async (formEl: FormInstance | undefined, test?: string) => {
+const updateTheme = async (formEl: FormInstance | undefined, test?: string) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
@@ -320,7 +359,7 @@ const updataTheme = async (formEl: FormInstance | undefined, test?: string) => {
       ThemeApi.postThemeInfo(fd, loading).then((res) => {
         user.theme()
         cloneTheme.value = cloneDeep(themeForm.value)
-        MsgSuccess('外观设置成功')
+        MsgSuccess(t('views.system.theme.saveSuccess'))
       })
     }
   })
@@ -360,12 +399,15 @@ onMounted(() => {
     box-sizing: border-box;
     box-shadow: 0px -2px 4px 0px rgba(31, 35, 41, 0.08);
   }
+
   .theme-preview {
     min-width: 1000px;
   }
+
   .theme-platform {
     background: #ffffff;
     height: 220px;
+
     .theme-platform-header {
       padding: 10px 20px;
       background: var(--app-header-bg-color);

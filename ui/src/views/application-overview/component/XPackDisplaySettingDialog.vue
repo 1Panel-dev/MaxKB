@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="显示设置"
+    :title="$t('views.applicationOverview.appInfo.SettingDisplayDialog.dialogTitle')"
     width="900"
     v-model="dialogVisible"
     :close-on-click-modal="false"
@@ -11,11 +11,15 @@
   >
     <template #header="{ titleId, titleClass }">
       <div class="flex-between mb-8">
-        <h4 :id="titleId" :class="titleClass">显示设置</h4>
+        <h4 :id="titleId" :class="titleClass">
+          {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.dialogTitle') }}
+        </h4>
         <div class="flex align-center">
           <el-button type="primary" @click.prevent="resetForm" link>
-            <el-icon class="mr-4"><Refresh /></el-icon>
-            恢复默认
+            <el-icon class="mr-4">
+              <Refresh />
+            </el-icon>
+            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.restoreDefault') }}
           </el-button>
           <el-divider direction="vertical" />
         </div>
@@ -68,8 +72,9 @@
                       :style="{
                         color: xpackForm.custom_theme?.header_font_color
                       }"
-                      ><Close
-                    /></el-icon>
+                    >
+                      <Close />
+                    </el-icon>
                   </el-button>
                 </div>
               </div>
@@ -151,20 +156,32 @@
         <el-form ref="displayFormRef" :model="form">
           <el-row class="w-full mb-8">
             <el-col :span="12">
-              <h5 class="mb-8">自定义主题色</h5>
+              <h5 class="mb-8">
+                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.customThemeColor') }}
+              </h5>
               <div>
                 <el-color-picker v-model="form.custom_theme.theme_color" />
-                {{ !form.custom_theme.theme_color ? '默认' : '' }}
+                {{
+                  !form.custom_theme.theme_color
+                    ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.default')
+                    : ''
+                }}
               </div>
             </el-col>
             <el-col :span="12">
-              <h5 class="mb-8">头部标题字体颜色</h5>
+              <h5 class="mb-8">
+                {{
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.headerTitleFontColor')
+                }}
+              </h5>
               <el-color-picker v-model="form.custom_theme.header_font_color" />
             </el-col>
           </el-row>
           <el-card shadow="never" class="mb-8">
             <div class="flex-between mb-8">
-              <span class="lighter">提问用户头像</span>
+              <span class="lighter">{{
+                $t('views.applicationOverview.appInfo.SettingDisplayDialog.askUserAvatar')
+              }}</span>
 
               <el-upload
                 ref="uploadRef"
@@ -174,16 +191,20 @@
                 accept="image/jpeg, image/png, image/gif"
                 :on-change="(file: any, fileList: any) => onChange(file, fileList, 'user_avatar')"
               >
-                <el-button size="small"> 替换 </el-button>
+                <el-button size="small">
+                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                </el-button>
               </el-upload>
             </div>
             <el-text type="info" size="small"
-              >建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB</el-text
-            >
+              >{{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+            </el-text>
           </el-card>
           <el-card shadow="never" class="mb-8">
             <div class="flex-between mb-8">
-              <span class="lighter">AI 回复头像</span>
+              <span class="lighter">{{
+                $t('views.applicationOverview.appInfo.SettingDisplayDialog.AIAvatar')
+              }}</span>
 
               <el-upload
                 ref="uploadRef"
@@ -193,16 +214,20 @@
                 accept="image/jpeg, image/png, image/gif"
                 :on-change="(file: any, fileList: any) => onChange(file, fileList, 'avatar')"
               >
-                <el-button size="small"> 替换 </el-button>
+                <el-button size="small">
+                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                </el-button>
               </el-upload>
             </div>
             <el-text type="info" size="small">
-              建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB</el-text
-            >
+              {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+            </el-text>
           </el-card>
           <el-card shadow="never" class="mb-8">
             <div class="flex-between mb-8">
-              <span class="lighter">浮窗入口图标</span>
+              <span class="lighter">{{
+                $t('views.applicationOverview.appInfo.SettingDisplayDialog.floatIcon')
+              }}</span>
               <el-upload
                 ref="uploadRef"
                 action="#"
@@ -211,23 +236,46 @@
                 accept="image/jpeg, image/png, image/gif"
                 :on-change="(file: any, fileList: any) => onChange(file, fileList, 'float_icon')"
               >
-                <el-button size="small"> 替换 </el-button>
+                <el-button size="small">
+                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                </el-button>
               </el-upload>
             </div>
             <el-text type="info" size="small">
-              建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB
+              {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
             </el-text>
             <div class="border-t mt-8">
               <div class="flex-between mb-8">
-                <span class="lighter">图标默认位置</span>
-                <el-checkbox v-model="form.draggable" label="可拖拽位置" />
+                <span class="lighter">{{
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.iconDefaultPosition')
+                }}</span>
+                <el-checkbox
+                  v-model="form.draggable"
+                  :label="
+                    $t('views.applicationOverview.appInfo.SettingDisplayDialog.draggablePosition')
+                  "
+                />
               </div>
               <el-row :gutter="8" class="w-full mb-8">
                 <el-col :span="12">
                   <div class="flex align-center">
                     <el-select v-model="form.float_location.x.type" style="width: 80px">
-                      <el-option label="左" value="left" />
-                      <el-option label="右" value="right" />
+                      <el-option
+                        :label="
+                          $t(
+                            'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.left'
+                          )
+                        "
+                        value="left"
+                      />
+                      <el-option
+                        :label="
+                          $t(
+                            'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.right'
+                          )
+                        "
+                        value="right"
+                      />
                     </el-select>
                     <el-input-number
                       v-model="form.float_location.x.value"
@@ -244,8 +292,22 @@
                 <el-col :span="12">
                   <div class="flex align-center">
                     <el-select v-model="form.float_location.y.type" style="width: 80px">
-                      <el-option label="上" value="top" />
-                      <el-option label="下" value="bottom" />
+                      <el-option
+                        :label="
+                          $t(
+                            'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.top'
+                          )
+                        "
+                        value="top"
+                      />
+                      <el-option
+                        :label="
+                          $t(
+                            'views.applicationOverview.appInfo.SettingDisplayDialog.iconPosition.bottom'
+                          )
+                        "
+                        value="bottom"
+                      />
                     </el-select>
                     <el-input-number
                       v-model="form.float_location.y.value"
@@ -266,11 +328,25 @@
           <el-space direction="vertical" alignment="start" :size="2">
             <el-checkbox
               v-model="form.show_source"
-              :label="isWorkFlow(detail.type) ? '显示执行详情' : '显示知识来源'"
+              :label="
+                isWorkFlow(detail.type)
+                  ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')
+                  : $t('views.applicationOverview.appInfo.SettingDisplayDialog.showSourceLabel')
+              "
             />
-            <el-checkbox v-model="form.show_history" label="显示历史记录" />
-            <el-checkbox v-model="form.show_guide" label="显示引导图（浮窗模式）" />
-            <el-checkbox v-model="form.disclaimer" label="免责声明" @change="changeDisclaimer" />
+            <el-checkbox
+              v-model="form.show_history"
+              :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showHistory')"
+            />
+            <el-checkbox
+              v-model="form.show_guide"
+              :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.displayGuide')"
+            />
+            <el-checkbox
+              v-model="form.disclaimer"
+              :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimer')"
+              @change="changeDisclaimer"
+            />
             <span v-if="form.disclaimer"
               ><el-tooltip :content="form.disclaimer_value" placement="top">
                 <el-input
@@ -287,11 +363,9 @@
 
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"
-          >{{ $t('views.applicationOverview.appInfo.LimitDialog.cancelButtonText') }}
-        </el-button>
+        <el-button @click.prevent="dialogVisible = false">{{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(displayFormRef)" :loading="loading">
-          {{ $t('views.applicationOverview.appInfo.LimitDialog.saveButtonText') }}
+          {{ $t('common.save') }}
         </el-button>
       </span>
     </template>
@@ -307,6 +381,7 @@ import { MsgSuccess, MsgError } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
 import { cloneDeep } from 'lodash'
+
 const { user } = useStore()
 
 const route = useRoute()
@@ -328,7 +403,7 @@ const defaultSetting = {
   user_avatar: '',
   user_avatar_url: '',
   disclaimer: false,
-  disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
+  disclaimer_value: t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue'),
   custom_theme: {
     theme_color: '',
     header_font_color: '#1f2329'
@@ -356,7 +431,7 @@ const xpackForm = ref<any>({
   user_avatar: '',
   user_avatar_url: '',
   disclaimer: false,
-  disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
+  disclaimer_value: t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue'),
   custom_theme: {
     theme_color: '',
     header_font_color: '#1f2329'
@@ -420,6 +495,12 @@ const open = (data: any, content: any) => {
   imgUrl.value.user_avatar = data.user_avatar
   xpackForm.value.disclaimer = data.disclaimer
   xpackForm.value.disclaimer_value = data.disclaimer_value
+  console.log(xpackForm.value.disclaimer_value)
+  if (xpackForm.value.disclaimer_value === '「以上内容均由AI生成，仅供参考和借鉴」') {
+    xpackForm.value.disclaimer_value = t(
+      'views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue'
+    )
+  }
   xpackForm.value.avatar_url = data.avatar
   xpackForm.value.user_avatar_url = data.user_avatar
   xpackForm.value.float_icon_url = data.float_icon
@@ -455,7 +536,7 @@ const submit = async (formEl: FormInstance | undefined) => {
       applicationXpackApi.putAccessToken(id as string, fd, loading).then((res) => {
         emit('refresh')
         // @ts-ignore
-        MsgSuccess(t('views.applicationOverview.appInfo.LimitDialog.settingSuccessMessage'))
+        MsgSuccess(t('common.settingSuccess'))
         dialogVisible.value = false
       })
     }
@@ -469,11 +550,13 @@ defineExpose({ open })
   background: #f5f6f7;
   height: 570px;
   position: relative;
+
   .float_icon {
     position: absolute;
     right: 8px;
     bottom: 15px;
   }
+
   .setting-preview-container {
     position: absolute;
     left: 16px;
@@ -485,6 +568,7 @@ defineExpose({ open })
     overflow: hidden;
     width: 330px;
     height: 520px;
+
     .setting-preview-header {
       background: var(--app-header-bg-color);
       height: var(--app-header-height);
@@ -494,10 +578,12 @@ defineExpose({ open })
     }
   }
 }
+
 .display-setting-dialog {
   .el-dialog__header {
     padding-right: 16px;
   }
+
   .el-dialog__headerbtn {
     top: 13px;
   }

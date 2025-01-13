@@ -1,6 +1,10 @@
 <template>
   <el-dialog
-    :title="isEdit ? '编辑参数' : '添加参数'"
+    :title="
+      isEdit
+        ? $t('views.functionLib.functionForm.title.editParam')
+        : $t('views.functionLib.functionForm.title.addParam')
+    "
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -14,35 +18,44 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item label="参数名" prop="name">
+      <el-form-item :label="$t('views.functionLib.functionForm.form.paramName.label')" prop="name">
         <el-input
           v-model="form.name"
-          placeholder="请输入参数名"
+          :placeholder="$t('views.functionLib.functionForm.form.paramName.placeholder')"
           maxlength="64"
           show-word-limit
           @blur="form.name = form.name.trim()"
         />
       </el-form-item>
-      <el-form-item label="数据类型">
+      <el-form-item :label="$t('views.functionLib.functionForm.form.dataType.label')">
         <el-select v-model="form.type">
           <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
-      <el-form-item label="来源">
+      <el-form-item :label="$t('views.functionLib.functionForm.form.source.label')">
         <el-select v-model="form.source">
-          <el-option label="引用变量" value="reference" />
-          <el-option label="自定义" value="custom" />
+          <el-option
+            :label="$t('views.functionLib.functionForm.form.source.reference')"
+            value="reference"
+          />
+          <el-option
+            :label="$t('views.functionLib.functionForm.form.source.custom')"
+            value="custom"
+          />
         </el-select>
       </el-form-item>
-      <el-form-item label="是否必填" @click.prevent>
+      <el-form-item
+        :label="$t('views.functionLib.functionForm.form.required.label')"
+        @click.prevent
+      >
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(fieldFormRef)" :loading="loading">
-          {{ isEdit ? '保存' : '添加' }}
+          {{ isEdit ? $t('common.save') : $t('common.add') }}
         </el-button>
       </span>
     </template>
@@ -52,7 +65,7 @@
 import { ref, reactive, watch } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
-
+import { t } from '@/locales'
 const typeOptions = ['string', 'int', 'dict', 'array', 'float']
 
 const emit = defineEmits(['refresh'])
@@ -69,7 +82,13 @@ const form = ref<any>({
 })
 
 const rules = reactive({
-  name: [{ required: true, message: '请输入参数名', trigger: 'blur' }]
+  name: [
+    {
+      required: true,
+      message: t('views.functionLib.functionForm.form.paramName.placeholder'),
+      trigger: 'blur'
+    }
+  ]
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -94,7 +113,6 @@ const open = (row: any) => {
 
   dialogVisible.value = true
 }
-
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return

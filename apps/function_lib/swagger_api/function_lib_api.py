@@ -9,6 +9,7 @@
 from drf_yasg import openapi
 
 from common.mixins.api_mixin import ApiMixin
+from django.utils.translation import gettext_lazy as _
 
 
 class FunctionLibApi(ApiMixin):
@@ -19,13 +20,19 @@ class FunctionLibApi(ApiMixin):
             required=['id', 'name', 'desc', 'code', 'input_field_list', 'create_time',
                       'update_time'],
             properties={
-                'id': openapi.Schema(type=openapi.TYPE_STRING, title="", description="主键id"),
-                'name': openapi.Schema(type=openapi.TYPE_STRING, title="函数名称", description="函数名称"),
-                'desc': openapi.Schema(type=openapi.TYPE_STRING, title="函数描述", description="函数描述"),
-                'code': openapi.Schema(type=openapi.TYPE_STRING, title="函数内容", description="函数内容"),
-                'input_field_list': openapi.Schema(type=openapi.TYPE_STRING, title="输入字段", description="输入字段"),
-                'create_time': openapi.Schema(type=openapi.TYPE_STRING, title="创建时间", description="创建时间"),
-                'update_time': openapi.Schema(type=openapi.TYPE_STRING, title="修改时间", description="修改时间"),
+                'id': openapi.Schema(type=openapi.TYPE_STRING, title="", description=_('ID')),
+                'name': openapi.Schema(type=openapi.TYPE_STRING, title=_('function name'),
+                                       description=_('function name')),
+                'desc': openapi.Schema(type=openapi.TYPE_STRING, title=_('function description'),
+                                       description=_('function description')),
+                'code': openapi.Schema(type=openapi.TYPE_STRING, title=_('function content'),
+                                       description=_('function content')),
+                'input_field_list': openapi.Schema(type=openapi.TYPE_STRING, title=_('input field'),
+                                                   description=_('input field')),
+                'create_time': openapi.Schema(type=openapi.TYPE_STRING, title=_('create time'),
+                                              description=_('create time')),
+                'update_time': openapi.Schema(type=openapi.TYPE_STRING, title=_('update time'),
+                                              description=_('update time')),
             }
         )
 
@@ -36,12 +43,12 @@ class FunctionLibApi(ApiMixin):
                                       in_=openapi.IN_QUERY,
                                       type=openapi.TYPE_STRING,
                                       required=False,
-                                      description='函数名称'),
+                                      description=_('function name')),
                     openapi.Parameter(name='desc',
                                       in_=openapi.IN_QUERY,
                                       type=openapi.TYPE_STRING,
                                       required=False,
-                                      description='函数描述')
+                                      description=_('function description')),
                     ]
 
     class Debug(ApiMixin):
@@ -52,42 +59,45 @@ class FunctionLibApi(ApiMixin):
                 required=[],
                 properties={
                     'debug_field_list': openapi.Schema(type=openapi.TYPE_ARRAY,
-                                                       description="输入变量列表",
+                                                       description=_('Input variable list'),
                                                        items=openapi.Schema(type=openapi.TYPE_OBJECT,
                                                                             required=[],
                                                                             properties={
                                                                                 'name': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="变量名",
-                                                                                    description="变量名"),
+                                                                                    title=_('variable name'),
+                                                                                    description=_('variable name')),
                                                                                 'value': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="变量值",
-                                                                                    description="变量值"),
+                                                                                    title=_('variable value'),
+                                                                                    description=_('variable value')),
                                                                             })),
-                    'code': openapi.Schema(type=openapi.TYPE_STRING, title="函数内容", description="函数内容"),
+                    'code': openapi.Schema(type=openapi.TYPE_STRING, title=_('function content'),
+                                           description=_('function content')),
                     'input_field_list': openapi.Schema(type=openapi.TYPE_ARRAY,
-                                                       description="输入变量列表",
+                                                       description=_('Input variable list'),
                                                        items=openapi.Schema(type=openapi.TYPE_OBJECT,
                                                                             required=['name', 'is_required', 'source'],
                                                                             properties={
                                                                                 'name': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="变量名",
-                                                                                    description="变量名"),
+                                                                                    title=_('variable name'),
+                                                                                    description=_('variable name')),
                                                                                 'is_required': openapi.Schema(
                                                                                     type=openapi.TYPE_BOOLEAN,
-                                                                                    title="是否必填",
-                                                                                    description="是否必填"),
+                                                                                    title=_('required'),
+                                                                                    description=_('required')),
                                                                                 'type': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="字段类型",
-                                                                                    description="字段类型 string|int|dict|array|float"
+                                                                                    title=_('type'),
+                                                                                    description=_(
+                                                                                        'Field type string|int|dict|array|float')
                                                                                 ),
                                                                                 'source': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="来源",
-                                                                                    description="来源只支持custom|reference"),
+                                                                                    title=_('source'),
+                                                                                    description=_(
+                                                                                        'The source only supports custom|reference')),
 
                                                                             }))
                 }
@@ -100,33 +110,40 @@ class FunctionLibApi(ApiMixin):
                 type=openapi.TYPE_OBJECT,
                 required=[],
                 properties={
-                    'name': openapi.Schema(type=openapi.TYPE_STRING, title="函数名称", description="函数名称"),
-                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title="函数描述", description="函数描述"),
-                    'code': openapi.Schema(type=openapi.TYPE_STRING, title="函数内容", description="函数内容"),
-                    'permission_type': openapi.Schema(type=openapi.TYPE_STRING, title="权限", description="权限"),
-                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
+                    'name': openapi.Schema(type=openapi.TYPE_STRING, title=_('function name'),
+                                           description=_('function name')),
+                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title=_('function description'),
+                                           description=_('function description')),
+                    'code': openapi.Schema(type=openapi.TYPE_STRING, title=_('function content'),
+                                           description=_('function content')),
+                    'permission_type': openapi.Schema(type=openapi.TYPE_STRING, title=_('permission'),
+                                                      description=_('permission')),
+                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_('Is active'),
+                                                description=_('Is active')),
                     'input_field_list': openapi.Schema(type=openapi.TYPE_ARRAY,
-                                                       description="输入变量列表",
+                                                       description=_('Input variable list'),
                                                        items=openapi.Schema(type=openapi.TYPE_OBJECT,
                                                                             required=[],
                                                                             properties={
                                                                                 'name': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="变量名",
-                                                                                    description="变量名"),
+                                                                                    title=_('variable name'),
+                                                                                    description=_('variable name')),
                                                                                 'is_required': openapi.Schema(
                                                                                     type=openapi.TYPE_BOOLEAN,
-                                                                                    title="是否必填",
-                                                                                    description="是否必填"),
+                                                                                    title=_('required'),
+                                                                                    description=_('required')),
                                                                                 'type': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="字段类型",
-                                                                                    description="字段类型 string|int|dict|array|float"
+                                                                                    title=_('type'),
+                                                                                    description=_(
+                                                                                        'Field type string|int|dict|array|float')
                                                                                 ),
                                                                                 'source': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="来源",
-                                                                                    description="来源只支持custom|reference"),
+                                                                                    title=_('source'),
+                                                                                    description=_(
+                                                                                        'The source only supports custom|reference')),
 
                                                                             }))
                 }
@@ -139,33 +156,40 @@ class FunctionLibApi(ApiMixin):
                 type=openapi.TYPE_OBJECT,
                 required=['name', 'code', 'input_field_list', 'permission_type'],
                 properties={
-                    'name': openapi.Schema(type=openapi.TYPE_STRING, title="函数名称", description="函数名称"),
-                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title="函数描述", description="函数描述"),
-                    'code': openapi.Schema(type=openapi.TYPE_STRING, title="函数内容", description="函数内容"),
-                    'permission_type': openapi.Schema(type=openapi.TYPE_STRING, title="权限", description="权限"),
-                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title="是否可用", description="是否可用"),
+                    'name': openapi.Schema(type=openapi.TYPE_STRING, title=_('function name'),
+                                           description=_('function name')),
+                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title=_('function description'),
+                                           description=_('function description')),
+                    'code': openapi.Schema(type=openapi.TYPE_STRING, title=_('function content'),
+                                           description=_('function content')),
+                    'permission_type': openapi.Schema(type=openapi.TYPE_STRING, title=_('permission'),
+                                                      description=_('permission')),
+                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_('Is active'),
+                                                description=_('Is active')),
                     'input_field_list': openapi.Schema(type=openapi.TYPE_ARRAY,
-                                                       description="输入变量列表",
+                                                       description=_('Input variable list'),
                                                        items=openapi.Schema(type=openapi.TYPE_OBJECT,
                                                                             required=['name', 'is_required', 'source'],
                                                                             properties={
                                                                                 'name': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="变量名",
-                                                                                    description="变量名"),
+                                                                                    title=_('variable name'),
+                                                                                    description=_('variable name')),
                                                                                 'is_required': openapi.Schema(
                                                                                     type=openapi.TYPE_BOOLEAN,
-                                                                                    title="是否必填",
-                                                                                    description="是否必填"),
+                                                                                    title=_('required'),
+                                                                                    description=_('required')),
                                                                                 'type': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="字段类型",
-                                                                                    description="字段类型 string|int|dict|array|float"
+                                                                                    title=_('type'),
+                                                                                    description=_(
+                                                                                        'Field type string|int|dict|array|float')
                                                                                 ),
                                                                                 'source': openapi.Schema(
                                                                                     type=openapi.TYPE_STRING,
-                                                                                    title="来源",
-                                                                                    description="来源只支持custom|reference"),
+                                                                                    title=_('source'),
+                                                                                    description=_(
+                                                                                        'The source only supports custom|reference')),
 
                                                                             }))
                 }

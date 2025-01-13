@@ -82,6 +82,7 @@ class Config(dict):
         "DB_PASSWORD": "Password123@postgres",
         "DB_ENGINE": "dj_db_conn_pool.backends.postgresql",
         "DB_MAX_OVERFLOW": 80,
+        'LANGUAGE_CODE': 'en',
         # 向量模型
         "EMBEDDING_MODEL_NAME": "shibing624/text2vec-base-chinese",
         "EMBEDDING_DEVICE": "cpu",

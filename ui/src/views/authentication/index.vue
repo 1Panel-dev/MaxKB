@@ -1,6 +1,6 @@
 <template>
   <div class="authentication-setting p-16-24">
-    <h4>{{ $t('login.authentication') }}</h4>
+    <h4>{{ $t('views.system.authentication.title') }}</h4>
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
       <template v-for="(item, index) in tabList" :key="index">
         <el-tab-pane :label="item.label" :name="item.name">
@@ -27,27 +27,27 @@ const router = useRouter()
 const activeName = ref('LDAP')
 const tabList = [
   {
-    label: t('login.ldap.title'),
+    label: t('views.system.authentication.ldap.title'),
     name: 'LDAP',
     component: LDAP
   },
   {
-    label: t('login.cas.title'),
+    label: t('views.system.authentication.cas.title'),
     name: 'CAS',
     component: CAS
   },
   {
-    label: t('login.oidc.title'),
+    label: t('views.system.authentication.oidc.title'),
     name: 'OIDC',
     component: OIDC
   },
   {
-    label: t('login.oauth2.title'),
+    label: t('views.system.authentication.oauth2.title'),
     name: 'OAuth2',
     component: OAuth2
   },
   {
-    label: '扫码登录',
+    label: t('views.system.authentication.scanTheQRCode.title'),
     name: 'SCAN',
     component: SCAN
   }

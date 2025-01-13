@@ -40,7 +40,7 @@ export const baseNode = {
       name: '',
       desc: '',
       // @ts-ignore
-      prologue: t('views.application.prompt.defaultPrologue')
+      prologue: t('views.application.applicationForm.form.defaultPrologue')
     },
     config: {}
   }

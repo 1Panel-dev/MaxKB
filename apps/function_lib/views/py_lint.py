@@ -16,16 +16,17 @@ from common.constants.permission_constants import RoleConstants
 from common.response import result
 from function_lib.serializers.py_lint_serializer import PyLintSerializer
 from function_lib.swagger_api.py_lint_api import PyLintApi
+from django.utils.translation import gettext_lazy as _
 
 
 class PyLintView(APIView):
     authentication_classes = [TokenAuth]
 
     @action(methods=['POST'], detail=False)
-    @swagger_auto_schema(operation_summary="校验代码",
-                         operation_id="校验代码",
+    @swagger_auto_schema(operation_summary=_('Check code'),
+                         operation_id=_('Check code'),
                          request_body=PyLintApi.get_request_body_api(),
-                         tags=['函数库'])
+                         tags=[_('Function')])
     @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
     def post(self, request: Request):
         return result.success(PyLintSerializer(data={'user_id': request.user.id}).pylint(request.data))

@@ -28,6 +28,7 @@ from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.stt impor
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.tti import QwenTextToImageModel
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.tts import AliyunBaiLianTextToSpeech
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _
 
 aliyun_bai_lian_model_credential = AliyunBaiLianRerankerCredential()
 aliyun_bai_lian_tts_model_credential = AliyunBaiLianTTSModelCredential()
@@ -38,16 +39,18 @@ qwenvl_model_credential = QwenVLModelCredential()
 qwentti_model_credential = QwenTextToImageModelCredential()
 
 model_info_list = [ModelInfo('gte-rerank',
-                             '阿里巴巴通义实验室开发的GTE-Rerank文本排序系列模型，开发者可以通过LlamaIndex框架进行集成高质量文本检索、排序。',
+                             _('With the GTE-Rerank text sorting series model developed by Alibaba Tongyi Lab, developers can integrate high-quality text retrieval and sorting through the LlamaIndex framework.'),
                              ModelTypeConst.RERANKER, aliyun_bai_lian_model_credential, AliyunBaiLianReranker),
                    ModelInfo('paraformer-realtime-v2',
-                             '中文（含粤语等各种方言）、英文、日语、韩语支持多个语种自由切换',
+                             _('Chinese (including various dialects such as Cantonese), English, Japanese, and Korean support free switching between multiple languages.'),
                              ModelTypeConst.STT, aliyun_bai_lian_stt_model_credential, AliyunBaiLianSpeechToText),
                    ModelInfo('cosyvoice-v1',
-                             'CosyVoice基于新一代生成式语音大模型，能根据上下文预测情绪、语调、韵律等，具有更好的拟人效果',
+                             _('CosyVoice is based on a new generation of large generative speech models, which can predict emotions, intonation, rhythm, etc. based on context, and has better anthropomorphic effects.'),
                              ModelTypeConst.TTS, aliyun_bai_lian_tts_model_credential, AliyunBaiLianTextToSpeech),
                    ModelInfo('text-embedding-v1',
-                             '通用文本向量，是通义实验室基于LLM底座的多语言文本统一向量模型，面向全球多个主流语种，提供高水准的向量服务，帮助开发者将文本数据快速转换为高质量的向量数据。',
+                             _('''
+                             Universal text vector is Tongyi Lab's multi-language text unified vector model based on the LLM base. It provides high-level vector services for multiple mainstream languages around the world and helps developers quickly convert text data into high-quality vector data.
+                             '''),
                              ModelTypeConst.EMBEDDING, aliyun_bai_lian_embedding_model_credential,
                              AliyunBaiLianEmbedding),
                    ModelInfo('qwen-turbo', '', ModelTypeConst.LLM, aliyun_bai_lian_llm_model_credential,
@@ -65,7 +68,7 @@ module_info_vl_list = [
 ]
 module_info_tti_list = [
     ModelInfo('wanx-v1',
-              '通义万相-文本生成图像大模型，支持中英文双语输入，支持输入参考图片进行参考内容或者参考风格迁移，重点风格包括但不限于水彩、油画、中国画、素描、扁平插画、二次元、3D卡通。',
+              _('Tongyi Wanxiang - a large image model for text generation, supports bilingual input in Chinese and English, and supports the input of reference pictures for reference content or reference style migration. Key styles include but are not limited to watercolor, oil painting, Chinese painting, sketch, flat illustration, two-dimensional, and 3D. Cartoon.'),
               ModelTypeConst.TTI, qwentti_model_credential, QwenTextToImageModel),
 ]
 
@@ -90,7 +93,9 @@ class AliyunBaiLianModelProvider(IModelProvider):
         return model_info_manage
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='aliyun_bai_lian_model_provider', name='阿里云百炼', icon=get_file_content(
-            os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'aliyun_bai_lian_model_provider',
-                         'icon',
-                         'aliyun_bai_lian_icon_svg')))
+        return ModelProvideInfo(provider='aliyun_bai_lian_model_provider', name=_('Alibaba Cloud Bailian'),
+                                icon=get_file_content(
+                                    os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl',
+                                                 'aliyun_bai_lian_model_provider',
+                                                 'icon',
+                                                 'aliyun_bai_lian_icon_svg')))

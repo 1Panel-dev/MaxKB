@@ -7,11 +7,7 @@
     @desc:
 """
 import os
-from typing import Dict
 
-from pydantic import BaseModel
-
-from common.exception.app_exception import AppApiException
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst, ModelInfo, IModelProvider, \
     ModelInfoManage
@@ -20,6 +16,7 @@ from setting.models_provider.impl.local_model_provider.credential.reranker impor
 from setting.models_provider.impl.local_model_provider.model.embedding import LocalEmbedding
 from setting.models_provider.impl.local_model_provider.model.reranker import LocalReranker
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _
 
 embedding_text2vec_base_chinese = ModelInfo('shibing624/text2vec-base-chinese', '', ModelTypeConst.EMBEDDING,
                                             LocalEmbeddingCredential(), LocalEmbedding)
@@ -39,6 +36,6 @@ class LocalModelProvider(IModelProvider):
         return model_info_manage
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='model_local_provider', name='本地模型', icon=get_file_content(
+        return ModelProvideInfo(provider='model_local_provider', name=_('local model'), icon=get_file_content(
             os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'local_model_provider', 'icon',
                          'local_icon_svg')))

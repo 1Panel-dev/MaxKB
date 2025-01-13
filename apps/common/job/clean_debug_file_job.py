@@ -17,11 +17,12 @@ lock = FileLock()
 
 
 def clean_debug_file():
-    logging.getLogger("max_kb").info('开始清理debug文件')
+    from django.utils.translation import gettext_lazy as _
+    logging.getLogger("max_kb").info(_('start clean debug file'))
     two_hours_ago = timezone.now() - timedelta(hours=2)
     # 删除对应的文件
     File.objects.filter(Q(create_time__lt=two_hours_ago) & Q(meta__debug=True)).delete()
-    logging.getLogger("max_kb").info('结束清理debug文件')
+    logging.getLogger("max_kb").info(_('end clean debug file'))
 
 
 def run():

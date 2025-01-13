@@ -9,34 +9,43 @@
           label-position="top"
           require-asterisk-position="right"
         >
-          <el-form-item :label="$t('login.cas.ldpUri')" prop="config_data.ldpUri">
+          <el-form-item
+            :label="$t('views.system.authentication.cas.ldpUri')"
+            prop="config_data.ldpUri"
+          >
             <el-input
               v-model="form.config_data.ldpUri"
-              :placeholder="$t('login.cas.ldpUriPlaceholder')"
+              :placeholder="$t('views.system.authentication.cas.ldpUriPlaceholder')"
             />
           </el-form-item>
-          <el-form-item :label="$t('login.cas.validateUrl')" prop="config_data.validateUrl">
+          <el-form-item
+            :label="$t('views.system.authentication.cas.validateUrl')"
+            prop="config_data.validateUrl"
+          >
             <el-input
               v-model="form.config_data.validateUrl"
-              :placeholder="$t('login.cas.validateUrlPlaceholder')"
+              :placeholder="$t('views.system.authentication.cas.validateUrlPlaceholder')"
             />
           </el-form-item>
-          <el-form-item :label="$t('login.cas.redirectUrl')" prop="config_data.redirectUrl">
+          <el-form-item
+            :label="$t('views.system.authentication.cas.redirectUrl')"
+            prop="config_data.redirectUrl"
+          >
             <el-input
               v-model="form.config_data.redirectUrl"
-              :placeholder="$t('login.cas.redirectUrlPlaceholder')"
+              :placeholder="$t('views.system.authentication.cas.redirectUrlPlaceholder')"
             />
           </el-form-item>
           <el-form-item>
             <el-checkbox v-model="form.is_active"
-              >{{ $t('login.cas.enableAuthentication') }}
+              >{{ $t('views.system.authentication.cas.enableAuthentication') }}
             </el-checkbox>
           </el-form-item>
         </el-form>
 
         <div class="text-right">
           <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
-            {{ $t('login.cas.save') }}
+            {{ $t('common.save') }}
           </el-button>
         </div>
       </div>
@@ -67,15 +76,23 @@ const loading = ref(false)
 
 const rules = reactive<FormRules<any>>({
   'config_data.ldpUri': [
-    { required: true, message: t('login.cas.ldpUriPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.cas.ldpUriPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.validateUrl': [
-    { required: true, message: t('login.cas.validateUrlPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.cas.validateUrlPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.redirectUrl': [
     {
       required: true,
-      message: t('login.cas.redirectUrlPlaceholder'),
+      message: t('views.system.authentication.cas.redirectUrlPlaceholder'),
       trigger: 'blur'
     }
   ]
@@ -86,7 +103,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       authApi.putAuthSetting(form.value.auth_type, form.value, loading).then((res) => {
-        MsgSuccess(t('login.cas.saveSuccess'))
+        MsgSuccess(t('common.saveSuccess'))
       })
     }
   })

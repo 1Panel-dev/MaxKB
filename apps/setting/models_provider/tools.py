@@ -12,6 +12,7 @@ from django.db.models import QuerySet
 from common.config.embedding_config import ModelManage
 from setting.models import Model
 from setting.models_provider import get_model
+from django.utils.translation import gettext_lazy as _
 
 
 def get_model_by_id(_id, user_id):
@@ -19,9 +20,9 @@ def get_model_by_id(_id, user_id):
     # 手动关闭数据库连接
     connection.close()
     if model is None:
-        raise Exception("模型不存在")
+        raise Exception(_('Model does not exist'))
     if model.permission_type == 'PRIVATE' and str(model.user_id) != str(user_id):
-        raise Exception(f"无权限使用此模型:{model.name}")
+        raise Exception(_('No permission to use this model') + f"{model.name}")
     return model
 
 

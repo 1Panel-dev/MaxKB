@@ -33,79 +33,20 @@
                 @click="openAIParamSettingDialog(chat_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                {{ $t('views.application.applicationForm.form.paramSetting') }}
+                {{ $t('common.paramSetting') }}
               </el-button>
             </div>
           </template>
-          <el-select
+          <ModelSelect
             @change="model_change"
             @wheel="wheel"
             :teleported="false"
             v-model="chat_data.model_id"
-            placeholder="请选择 AI 模型"
-            class="w-full"
-            popper-class="select-model"
-            :clearable="true"
-          >
-            <el-option-group
-              v-for="(value, label) in modelOptions"
-              :key="value"
-              :label="relatedObject(providerOptions, label, 'provider')?.name"
-            >
-              <el-option
-                v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-                class="flex-between"
-              >
-                <div class="flex align-center">
-                  <span
-                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                    class="model-icon mr-8"
-                  ></span>
-                  <span>{{ item.name }}</span>
-                  <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
-                    >公用
-                  </el-tag>
-                </div>
-                <el-icon class="check-icon" v-if="item.id === chat_data.model_id">
-                  <Check />
-                </el-icon>
-              </el-option>
-              <!-- 不可用 -->
-              <el-option
-                v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-                class="flex-between"
-                disabled
-              >
-                <div class="flex">
-                  <span
-                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                    class="model-icon mr-8"
-                  ></span>
-                  <span>{{ item.name }}</span>
-                  <span class="danger">（不可用）</span>
-                </div>
-                <el-icon class="check-icon" v-if="item.id === chat_data.model_id">
-                  <Check />
-                </el-icon>
-              </el-option>
-            </el-option-group>
-            <template #footer>
-              <div class="w-full text-left cursor" @click="openCreateModel()">
-                <el-button type="primary" link>
-                  <el-icon class="mr-4">
-                    <Plus />
-                  </el-icon>
-                  添加模型
-                </el-button>
-              </div>
-            </template>
-          </el-select>
+            :placeholder="$t('views.application.applicationForm.form.aiModel.placeholder')"
+            :options="modelOptions"
+            @submitModel="getModel"
+            showFooter
+          ></ModelSelect>
         </el-form-item>
 
         <el-form-item label="角色设定">
@@ -187,13 +128,6 @@
       </el-form>
     </el-card>
 
-    <!-- 添加模版 -->
-    <CreateModelDialog
-      ref="createModelRef"
-      @submit="getModel"
-      @change="openCreateModel($event)"
-    ></CreateModelDialog>
-    <SelectProviderDialog ref="selectProviderRef" @change="openCreateModel($event)" />
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
   </NodeContainer>
 </template>
@@ -201,14 +135,10 @@
 import { set, groupBy } from 'lodash'
 import { app } from '@/main'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
-import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import applicationApi from '@/api/application'
 import useStore from '@/stores'
-import { relatedObject } from '@/utils/utils'
-import type { Provider } from '@/api/type/model'
 import { isLastNode } from '@/workflow/common/data'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 
@@ -275,11 +205,8 @@ const chat_data = computed({
 const props = defineProps<{ nodeModel: any }>()
 
 const aiChatNodeFormRef = ref<FormInstance>()
-const createModelRef = ref<InstanceType<typeof CreateModelDialog>>()
-const selectProviderRef = ref<InstanceType<typeof SelectProviderDialog>>()
 
 const modelOptions = ref<any>(null)
-const providerOptions = ref<Array<Provider>>([])
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 const validate = () => {
   return aiChatNodeFormRef.value?.validate().catch((err) => {
@@ -299,20 +226,6 @@ function getModel() {
   }
 }
 
-function getProvider() {
-  model.asyncGetProvider().then((res: any) => {
-    providerOptions.value = res?.data
-  })
-}
-
-const openCreateModel = (provider?: Provider) => {
-  if (provider && provider.provider) {
-    createModelRef.value?.open(provider)
-  } else {
-    selectProviderRef.value?.open()
-  }
-}
-
 const openAIParamSettingDialog = (modelId: string) => {
   if (modelId) {
     AIModeParamSettingDialogRef.value?.open(modelId, id, chat_data.value.model_params_setting)
@@ -324,7 +237,6 @@ function refreshParam(data: any) {
 }
 
 onMounted(() => {
-  getProvider()
   getModel()
   if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
     if (isLastNode(props.nodeModel)) {

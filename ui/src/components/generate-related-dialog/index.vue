@@ -28,64 +28,11 @@
           </div>
         </div>
         <el-form-item label="AI 模型" prop="model_id">
-          <el-select
+          <ModelSelect
             v-model="form.model_id"
             :placeholder="$t('views.application.applicationForm.form.aiModel.placeholder')"
-            class="w-full"
-            popper-class="select-model"
-            :clearable="true"
-          >
-            <el-option-group
-              v-for="(value, label) in modelOptions"
-              :key="value"
-              :label="relatedObject(providerOptions, label, 'provider')?.name"
-            >
-              <el-option
-                v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-                class="flex-between"
-              >
-                <div class="flex align-center">
-                  <span
-                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                    class="model-icon mr-8"
-                  ></span>
-                  <span>{{ item.name }}</span>
-                  <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
-                    >公用
-                  </el-tag>
-                </div>
-                <el-icon class="check-icon" v-if="item.id === form.model_id">
-                  <Check />
-                </el-icon>
-              </el-option>
-              <!-- 不可用 -->
-              <el-option
-                v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-                class="flex-between"
-                disabled
-              >
-                <div class="flex">
-                  <span
-                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                    class="model-icon mr-8"
-                  ></span>
-                  <span>{{ item.name }}</span>
-                  <span class="danger">{{
-                    $t('views.application.applicationForm.form.aiModel.unavailable')
-                  }}</span>
-                </div>
-                <el-icon class="check-icon" v-if="item.id === form.model_id">
-                  <Check />
-                </el-icon>
-              </el-option>
-            </el-option-group>
-          </el-select>
+            :options="modelOptions"
+          ></ModelSelect>
         </el-form-item>
         <el-form-item label="提示词" prop="prompt">
           <el-input v-model="form.prompt" placeholder="请输入提示词" :rows="7" type="textarea" />
@@ -94,9 +41,9 @@
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submitHandle(FormRef)" :disabled="!model || loading">
-          确定
+          {{ $t('common.confirm') }}
         </el-button>
       </span>
     </template>
@@ -109,8 +56,6 @@ import documentApi from '@/api/document'
 import paragraphApi from '@/api/paragraph'
 import datasetApi from '@/api/dataset'
 import useStore from '@/stores'
-import { relatedObject } from '@/utils/utils'
-import type { Provider } from '@/api/type/model'
 import { groupBy } from 'lodash'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
@@ -129,7 +74,6 @@ const loading = ref<boolean>(false)
 
 const dialogVisible = ref<boolean>(false)
 const modelOptions = ref<any>(null)
-const providerOptions = ref<Array<Provider>>([])
 const idList = ref<string[]>([])
 const apiType = ref('') // 文档document或段落paragraph
 
@@ -143,7 +87,6 @@ const rules = reactive({
 })
 
 const open = (ids: string[], type: string) => {
-  getProvider()
   getModel()
   idList.value = ids
   apiType.value = type
@@ -183,19 +126,6 @@ function getModel() {
     .getDatasetModel(id)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
-}
-
-function getProvider() {
-  loading.value = true
-  model
-    .asyncGetProvider()
-    .then((res: any) => {
-      providerOptions.value = res?.data
       loading.value = false
     })
     .catch(() => {

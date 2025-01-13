@@ -98,8 +98,8 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       MsgError(`${nodes[0].properties?.stepName}节点不允许删除`)
       return
     }
-    MsgConfirm(`提示`, `确定删除该节点？`, {
-      confirmButtonText: '删除',
+    MsgConfirm(t('common.tip'), `确定删除该节点？`, {
+      confirmButtonText: t('common.delete'),
       confirmButtonClass: 'danger'
     }).then(() => {
       if (!keyboardOptions?.enabled) return true

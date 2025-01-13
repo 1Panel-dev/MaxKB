@@ -10,10 +10,10 @@
   >
     <template #header>
       <div class="flex-between">
-        <h4>选择供应商</h4>
+        <h4>{{ $t('views.template.providerPlaceholder') }}</h4>
         <el-dropdown>
-          <span class="el-dropdown-link">
-            {{ currentModelType || '全部模型' }}
+          <span class="cursor">
+            {{ currentModelType || $t('views.template.model.allModel') }}
             <el-icon class="el-icon--right">
               <arrow-down />
             </el-icon>
@@ -49,26 +49,19 @@
 import { ref } from 'vue'
 import ModelApi from '@/api/model'
 import type { Provider } from '@/api/type/model'
+import { modelTypeList } from './data.ts'
+import { t } from '@/locales'
 
 const loading = ref<boolean>(false)
 const dialogVisible = ref<boolean>(false)
 const list_provider = ref<Array<Provider>>([])
 const currentModelType = ref('')
 
-const modelTypeOptions = ref([
-  { text: '全部模型', value: '' },
-  { text: '大语言模型', value: 'LLM' },
-  { text: '向量模型', value: 'EMBEDDING' },
-  { text: '重排模型', value: 'RERANKER' },
-  { text: '语音识别', value: 'STT' },
-  { text: '语音合成', value: 'TTS' },
-  { text: '图片理解', value: 'IMAGE' },
-  { text: '图片生成', value: 'TTI' },
-])
+const modelTypeOptions = [{ text: t('views.template.model.allModel'), value: '' }, ...modelTypeList]
 
 const open = () => {
   dialogVisible.value = true
-  const option = modelTypeOptions.value.find((item) => item.text === currentModelType.value)
+  const option = modelTypeOptions.find((item) => item.text === currentModelType.value)
   checkModelType(option ? option.value : '')
 }
 
@@ -77,7 +70,7 @@ const close = () => {
 }
 
 const checkModelType = (model_type: string) => {
-  currentModelType.value = modelTypeOptions.value.filter(
+  currentModelType.value = modelTypeOptions.filter(
     (item) => item.value === model_type
   )[0].text
   ModelApi.getProviderByModelType(model_type, loading).then((ok) => {

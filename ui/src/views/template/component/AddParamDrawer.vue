@@ -19,8 +19,8 @@
     </template>
     <template #footer>
       <div style="flex: auto">
-        <el-button @click="cancelClick">取消</el-button>
-        <el-button type="primary" @click="confirmClick()">{{ isEdit ? '保存' : '添加' }}</el-button>
+        <el-button @click="cancelClick">{{$t('common.cancel')}}</el-button>
+        <el-button type="primary" @click="confirmClick()">{{ isEdit ? $t('common.save') : $t('common.add') }}</el-button>
       </div>
     </template>
   </el-drawer>

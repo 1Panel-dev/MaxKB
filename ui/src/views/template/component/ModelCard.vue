@@ -27,7 +27,7 @@
             <el-tag v-if="model.permission_type === 'PRIVATE'" type="danger" class="danger-tag"
               >私有</el-tag
             >
-            <el-tag v-else type="info" class="info-tag">公用</el-tag>
+            <el-tag v-else type="info" class="info-tag"> {{ $t('common.public') }}</el-tag>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@
           >
         </li>
         <li class="flex mt-12">
-          <el-text type="info">创建者</el-text>
+          <el-text type="info">{{ $t('common.creator') }}</el-text>
           <span class="ellipsis-1 ml-16" style="height: 20px; width: 70%">
             {{ model.username }}</span
           >
@@ -74,7 +74,7 @@
 
     <template #mouseEnter>
       <div class="operation-button">
-        <el-tooltip effect="dark" content="修改" placement="top">
+        <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
           <el-button text :disabled="!is_permisstion" @click.stop="openEditModel">
             <el-icon>
               <component
@@ -94,14 +94,25 @@
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item
-                v-if="currentModel.model_type === 'TTS' || currentModel.model_type === 'LLM' || currentModel.model_type === 'IMAGE' || currentModel.model_type === 'TTI'"
+                v-if="
+                  currentModel.model_type === 'TTS' ||
+                  currentModel.model_type === 'LLM' ||
+                  currentModel.model_type === 'IMAGE' ||
+                  currentModel.model_type === 'TTI'
+                "
                 :disabled="!is_permisstion"
-                icon="Setting" @click.stop="openParamSetting"
+                icon="Setting"
+                @click.stop="openParamSetting"
               >
                 模型参数设置
               </el-dropdown-item>
-              <el-dropdown-item icon="Delete" :disabled="!is_permisstion" text @click.stop="deleteModel">
-                删除
+              <el-dropdown-item
+                icon="Delete"
+                :disabled="!is_permisstion"
+                text
+                @click.stop="deleteModel"
+              >
+                {{ $t('common.delete') }}
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -109,7 +120,7 @@
       </div>
     </template>
     <EditModel ref="editModelRef" @submit="emit('change')"></EditModel>
-    <ParamSettingDialog ref="paramSettingRef" :model="model"/>
+    <ParamSettingDialog ref="paramSettingRef" :model="model" />
   </card-box>
 </template>
 <script setup lang="ts">
@@ -157,7 +168,7 @@ const editModelRef = ref<InstanceType<typeof EditModel>>()
 let interval: any
 const deleteModel = () => {
   MsgConfirm(`删除模型 `, `是否删除模型：${props.model.name} ?`, {
-    confirmButtonText: '删除',
+    confirmButtonText: t('common.delete'),
     confirmButtonClass: 'danger'
   })
     .then(() => {
@@ -210,7 +221,6 @@ const closeInterval = () => {
     clearInterval(interval)
   }
 }
-
 
 const paramSettingRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const openParamSetting = () => {

@@ -1,6 +1,6 @@
 <template>
   <div class="p-16-24">
-    <h4 class="mb-16">应用接入</h4>
+    <h4 class="mb-16">{{ $t('views.application.applicationAccess.title') }}</h4>
 
     <el-row :gutter="16">
       <el-col
@@ -30,7 +30,9 @@
                 :disabled="!item.exists"
               />
               <el-divider direction="vertical" />
-              <el-button class="mr-4" @click="openDrawer(item.key)">配置</el-button>
+              <el-button class="mr-4" @click="openDrawer(item.key)">{{
+                $t('views.application.applicationAccess.setting')
+              }}</el-button>
             </div>
           </div>
         </el-card>
@@ -46,38 +48,39 @@ import AccessSettingDrawer from './component/AccessSettingDrawer.vue'
 import applicationApi from '@/api/application'
 import { MsgSuccess } from '@/utils/message'
 import { useRoute } from 'vue-router'
+import { t } from '@/locales'
 
 // 平台数据
 const platforms = reactive([
   {
     key: 'wecom',
     logoSrc: new URL(`../../assets/logo_wechat-work.svg`, import.meta.url).href,
-    name: '企业微信应用',
-    description: '打造企业微信智能应用',
+    name: t('views.application.applicationAccess.wecom'),
+    description: t('views.application.applicationAccess.wecomTip'),
     isActive: false,
     exists: false
   },
   {
     key: 'dingtalk',
     logoSrc: new URL(`../../assets/logo_dingtalk.svg`, import.meta.url).href,
-    name: '钉钉应用',
-    description: '打造钉钉智能应用',
+    name: t('views.application.applicationAccess.dingtalk'),
+    description: t('views.application.applicationAccess.dingtalkTip'),
     isActive: false,
     exists: false
   },
   {
     key: 'wechat',
     logoSrc: new URL(`../../assets/logo_wechat.svg`, import.meta.url).href,
-    name: '公众号',
-    description: '打造公众号智能应用',
+    name: t('views.application.applicationAccess.wechat'),
+    description: t('views.application.applicationAccess.wechatTip'),
     isActive: false,
     exists: false
   },
   {
     key: 'feishu',
     logoSrc: new URL(`../../assets/logo_lark.svg`, import.meta.url).href,
-    name: '飞书应用',
-    description: '打造飞书智能应用',
+    name: t('views.application.applicationAccess.lark'),
+    description: t('views.application.applicationAccess.larkTip'),
     isActive: false,
     exists: false
   }
@@ -115,7 +118,7 @@ function changeStatus(type: string, value: boolean) {
     status: value
   }
   applicationApi.updatePlatformStatus(id, data).then(() => {
-    MsgSuccess('操作成功')
+    MsgSuccess(t('common.saveSuccess'))
   })
 }
 

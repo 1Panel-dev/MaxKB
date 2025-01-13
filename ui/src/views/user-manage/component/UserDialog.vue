@@ -15,36 +15,52 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
-      <el-form-item :prop="isEdit ? '' : 'username'" label="用户名">
+      <el-form-item
+        :prop="isEdit ? '' : 'username'"
+        :label="$t('views.user.userForm.form.username.label')"
+      >
         <el-input
           v-model="userForm.username"
-          placeholder="请输入用户名"
+          :placeholder="$t('views.user.userForm.form.username.placeholder')"
           maxlength="20"
           show-word-limit
           :disabled="isEdit"
         >
         </el-input>
       </el-form-item>
-      <el-form-item label="姓名">
+      <el-form-item :label="$t('views.user.userForm.form.nick_name.label')">
         <el-input
           v-model="userForm.nick_name"
-          placeholder="请输入姓名"
+          :placeholder="$t('views.user.userForm.form.nick_name.placeholder')"
           maxlength="64"
           show-word-limit
         >
         </el-input>
       </el-form-item>
-      <el-form-item label="邮箱" prop="email">
-        <el-input type="email" v-model="userForm.email" placeholder="请输入邮箱"> </el-input>
+      <el-form-item :label="$t('views.user.userForm.form.email.label')" prop="email">
+        <el-input
+          type="email"
+          v-model="userForm.email"
+          :placeholder="$t('views.user.userForm.form.email.placeholder')"
+        >
+        </el-input>
       </el-form-item>
-      <el-form-item label="手机号">
-        <el-input type="email" v-model="userForm.phone" placeholder="请输入手机号"> </el-input>
+      <el-form-item :label="$t('views.user.userForm.form.phone.label')">
+        <el-input
+          v-model="userForm.phone"
+          :placeholder="$t('views.user.userForm.form.phone.placeholder')"
+        >
+        </el-input>
       </el-form-item>
-      <el-form-item label="登录密码" prop="password" v-if="!isEdit">
+      <el-form-item
+        :label="$t('views.user.userForm.form.password.label')"
+        prop="password"
+        v-if="!isEdit"
+      >
         <el-input
           type="password"
           v-model="userForm.password"
-          placeholder="请输入密码"
+          :placeholder="$t('views.user.userForm.form.password.placeholder')"
           show-password
         >
         </el-input>
@@ -52,8 +68,10 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
-        <el-button type="primary" @click="submit(userFormRef)" :loading="loading"> 保存 </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
+        <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
+          {{ $t('common.save') }}
+        </el-button>
       </span>
     </template>
   </el-dialog>
@@ -63,7 +81,7 @@ import { ref, reactive, watch } from 'vue'
 import type { FormInstance } from 'element-plus'
 import userApi from '@/api/user-manage'
 import { MsgSuccess } from '@/utils/message'
-
+import { t } from '@/locales'
 const props = defineProps({
   title: String
 })
@@ -81,25 +99,35 @@ const userForm = ref<any>({
 
 const rules = reactive({
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    {
-      min: 6,
-      max: 20,
-      message: '长度在 6 到 20 个字符',
-      trigger: 'blur'
-    }
-  ],
-  email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }],
-  password: [
     {
       required: true,
-      message: '请输入密码',
+      message: t('views.user.userForm.form.username.requiredMessage'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: '长度在 6 到 20 个字符',
+      message: t('views.user.userForm.form.username.lengthMessage'),
+      trigger: 'blur'
+    }
+  ],
+  email: [
+    {
+      required: true,
+      message: t('views.user.userForm.form.email.requiredMessage'),
+      trigger: 'blur'
+    }
+  ],
+  password: [
+    {
+      required: true,
+      message: t('views.user.userForm.form.password.requiredMessage'),
+      trigger: 'blur'
+    },
+    {
+      min: 6,
+      max: 20,
+      message: t('views.user.userForm.form.password.lengthMessage'),
       trigger: 'blur'
     }
   ]
@@ -142,13 +170,13 @@ const submit = async (formEl: FormInstance | undefined) => {
       if (isEdit.value) {
         userApi.putUserManage(userForm.value.id, userForm.value, loading).then((res) => {
           emit('refresh')
-          MsgSuccess('编辑成功')
+          MsgSuccess(t('common.editSuccess'))
           dialogVisible.value = false
         })
       } else {
         userApi.postUserManage(userForm.value, loading).then((res) => {
           emit('refresh')
-          MsgSuccess('创建成功')
+          MsgSuccess(t('common.createSuccess'))
           dialogVisible.value = false
         })
       }

@@ -22,16 +22,16 @@
         </div>
       </template>
     </el-table-column>
-    <el-table-column label="操作" align="left" width="80">
+    <el-table-column :label="$t('common.operation')" align="left" width="80">
       <template #default="{ row, $index }">
-            <span class="mr-4">
-              <el-tooltip effect="dark" content="修改" placement="top">
-                <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
-                  <el-icon><EditPen /></el-icon>
-                </el-button>
-              </el-tooltip>
-            </span>
-        <el-tooltip effect="dark" content="删除" placement="top">
+        <span class="mr-4">
+          <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
+            <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
+              <el-icon><EditPen /></el-icon>
+            </el-button>
+          </el-tooltip>
+        </span>
+        <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
           <el-button type="primary" text @click="deleteField($index)">
             <el-icon>
               <Delete />
@@ -43,11 +43,9 @@
   </el-table>
 
   <ApiFieldFormDialog ref="ApiFieldFormDialogRef" @refresh="refreshFieldList" />
-
 </template>
 
 <script setup lang="ts">
-
 import { onMounted, ref } from 'vue'
 import { set } from 'lodash'
 import ApiFieldFormDialog from './ApiFieldFormDialog.vue'
@@ -70,7 +68,6 @@ function deleteField(index: any) {
   inputFieldList.value.splice(index, 1)
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
 }
-
 
 function refreshFieldList(data: any) {
   for (let i = 0; i < inputFieldList.value.length; i++) {
@@ -113,10 +110,6 @@ onMounted(() => {
   }
   set(props.nodeModel.properties, 'api_input_field_list', inputFieldList)
 })
-
 </script>
 
-
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

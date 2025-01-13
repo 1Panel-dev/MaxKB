@@ -21,7 +21,7 @@ from pydub import AudioSegment
 
 from ..exception.app_exception import AppApiException
 from ..models.db_model_manage import DBModelManage
-
+from django.utils.translation import gettext_lazy as _
 
 def sub_array(array: List, item_num=10):
     result = []
@@ -215,9 +215,9 @@ def split_and_transcribe(file_path, model, max_segment_length_ms=59000, audio_fo
 
 def _remove_empty_lines(text):
     if not isinstance(text, str):
-        raise AppApiException(500, '文本转语音节点，文本内容必须是字符串类型')
+        raise AppApiException(500, _('Text-to-speech node, the text content must be of string type'))
     if not text:
-        raise AppApiException(500, '文本转语音节点，文本内容不能为空')
+        raise AppApiException(500, _('Text-to-speech node, the text content cannot be empty'))
     result = '\n'.join(line for line in text.split('\n') if line.strip())
     return markdown_to_plain_text(result)
 

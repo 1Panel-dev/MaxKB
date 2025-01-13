@@ -11,7 +11,7 @@
       <el-breadcrumb separator=">">
         <el-breadcrumb-item
           ><span class="active-breadcrumb">{{
-            `编辑 ${providerValue?.name}`
+            `${$t('common.edit')} ${providerValue?.name}`
           }}</span></el-breadcrumb-item
         >
       </el-breadcrumb>
@@ -134,8 +134,10 @@
     </DynamicsForm>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="close">取消</el-button>
-        <el-button type="primary" @click="submit" :loading="loading"> 修改 </el-button>
+        <el-button @click="close">{{$t('common.cancel')}}</el-button>
+        <el-button type="primary" @click="submit" :loading="loading">
+          {{ $t('common.modify') }}
+        </el-button>
       </span>
     </template>
   </el-dialog>

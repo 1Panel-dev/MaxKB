@@ -29,13 +29,21 @@
         </el-form-item>
       </template>
       <div v-if="configType === 'wechat'" class="flex align-center mb-16">
-        <span class="lighter mr-8">认证通过</span>
+        <span class="lighter mr-8">{{
+          $t('views.application.applicationAccess.wecomSetting.authenticationSuccessful')
+        }}</span>
         <el-switch v-if="configType === 'wechat'" v-model="form[configType].is_certification" />
       </div>
 
-      <h4 class="title-decoration-1 mb-16">回调地址</h4>
+      <h4 class="title-decoration-1 mb-16">
+        {{ $t('views.application.applicationAccess.callback') }}
+      </h4>
       <el-form-item label="URL" prop="callback_url">
-        <el-input v-model="form[configType].callback_url" placeholder="请输入回调地址" readonly>
+        <el-input
+          v-model="form[configType].callback_url"
+          :placeholder="$t('views.application.applicationAccess.callbackTip')"
+          readonly
+        >
           <template #append>
             <el-button @click="copyClick(form[configType].callback_url)">
               <AppIcon iconName="app-copy"></AppIcon>
@@ -43,44 +51,48 @@
           </template>
         </el-input>
         <el-text type="info" v-if="configType === 'wechat'">
-          复制链接填入到
+          {{ $t('views.application.applicationAccess.copyUrl') }}
           <a
             class="primary"
             href="https://mp.weixin.qq.com/advanced/advanced?action=dev&t=advanced/dev"
             target="_blank"
-            >微信公众平台</a
-          >-设置与开发-基本配置-服务器配置的 "服务器地址URL" 中
+            >{{ $t('views.application.applicationAccess.wechatPlatform') }}</a
+          >{{ $t('views.application.applicationAccess.wechatSetting.urlInfo') }}
         </el-text>
         <el-text type="info" v-if="configType === 'dingtalk'">
-          复制链接填入到
+          {{ $t('views.application.applicationAccess.copyUrl') }}
           <a
             class="primary"
             href="https://open-dev.dingtalk.com/fe/app?hash=%23%2Fcorp%2Fapp#/corp/app"
             target="_blank"
-            >钉钉开放平台</a
-          >-机器人页面，设置 "消息接收模式" 为 HTTP模式 ，并把上面URL填写到"消息接收地址"中
+            >{{ $t('views.application.applicationAccess.dingtalkPlatform') }}</a
+          >{{ $t('views.application.applicationAccess.dingtalkSetting.urlInfo') }}
         </el-text>
         <el-text type="info" v-if="configType === 'wecom'">
-          复制链接填入到
+          {{ $t('views.application.applicationAccess.copyUrl') }}
           <a
             class="primary"
             href="https://work.weixin.qq.com/wework_admin/frame#apps"
             target="_blank"
-            >企业微信后台</a
-          >-应用管理-自建-创建的应用-接收消息-设置 API 接收的 "URL" 中
+            >{{ $t('views.application.applicationAccess.wecomPlatform') }}</a
+          >{{ $t('views.application.applicationAccess.wecomSetting.urlInfo') }}
         </el-text>
         <el-text type="info" v-if="configType === 'feishu'">
-          复制链接填入到
-          <a class="primary" href="https://open.feishu.cn/app/" target="_blank">飞书开放平台</a
-          >-事件与回调-事件配置-配置订阅方式的 "请求地址" 中
+          {{ $t('views.application.applicationAccess.copyUrl') }}
+          <a class="primary" href="https://open.feishu.cn/app/" target="_blank">{{
+            $t('views.application.applicationAccess.larkPlatform')
+          }}</a
+          >{{ $t('views.application.applicationAccess.larkSetting.urlInfo') }}
         </el-text>
       </el-form-item>
     </el-form>
 
     <template #footer>
       <div>
-        <el-button @click="closeDrawer">取消</el-button>
-        <el-button type="primary" @click="submit" :disabled="loading">保存</el-button>
+        <el-button @click="closeDrawer">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="submit" :disabled="loading"
+          >{{ $t('common.save') }}
+        </el-button>
       </div>
     </template>
   </el-drawer>
@@ -93,6 +105,7 @@ import applicationApi from '@/api/application'
 import { useRoute } from 'vue-router'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
+import { t } from '@/locales'
 
 const formRef = ref<FormInstance>()
 const visible = ref(false)
@@ -128,42 +141,138 @@ const form = reactive<any>({
 
 const rules = reactive<{ [propName: string]: any }>({
   wechat: {
-    app_id: [{ required: true, message: '请输入开发者ID', trigger: 'blur' }],
-    app_secret: [{ required: true, message: '请输入开发者密码', trigger: 'blur' }],
-    token: [{ required: true, message: '请输入令牌', trigger: 'blur' }],
-    encoding_aes_key: [{ required: true, message: '请输入消息加解密密钥', trigger: 'blur' }]
+    app_id: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.wechatSetting.appIdPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    app_secret: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.wechatSetting.appSecretPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    token: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.wechatSetting.tokenPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    encoding_aes_key: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.wechatSetting.aesKeyPlaceholder'),
+        trigger: 'blur'
+      }
+    ]
   },
   dingtalk: {
-    client_id: [{ required: true, message: '请输入Client ID', trigger: 'blur' }],
-    client_secret: [{ required: true, message: '请输入Client Secret', trigger: 'blur' }]
+    client_id: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.dingtalkSetting.clientIdPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    client_secret: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.dingtalkSetting.clientSecretPlaceholder'),
+        trigger: 'blur'
+      }
+    ]
   },
   wecom: {
-    app_id: [{ required: true, message: '请输入企业ID', trigger: 'blur' }],
-    agent_id: [{ required: true, message: '请输入Agent ID', trigger: 'blur' }],
-    secret: [{ required: true, message: '请输入Secret', trigger: 'blur' }],
-    token: [{ required: true, message: '请输入Token', trigger: 'blur' }],
-    encoding_aes_key: [{ required: true, message: '请输入EncodingAESKey', trigger: 'blur' }]
+    app_id: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.wecomSetting.cropIdPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    agent_id: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.wecomSetting.agentIdPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    secret: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.wecomSetting.secretPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    token: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.wecomSetting.tokenPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    encoding_aes_key: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.wecomSetting.encodingAesKeyPlaceholder'),
+        trigger: 'blur'
+      }
+    ]
   },
   feishu: {
-    app_id: [{ required: true, message: '请输入App ID', trigger: 'blur' }],
-    app_secret: [{ required: true, message: '请输入App Secret', trigger: 'blur' }],
-    verification_token: [{ required: false, message: '请输入Verification Token', trigger: 'blur' }]
+    app_id: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.larkSetting.appIdPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    app_secret: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.larkSetting.appSecretPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    verification_token: [
+      {
+        required: false,
+        message: t('views.application.applicationAccess.larkSetting.verificationTokenPlaceholder'),
+        trigger: 'blur'
+      }
+    ]
   }
 })
 
 const configFields: { [propName: string]: { [propName: string]: any } } = {
   wechat: {
-    app_id: { label: '开发者ID (APP ID)', placeholder: '请输入开发者ID' },
-    app_secret: { label: '开发者密码 (APP Secret)', placeholder: '请输入开发者密码' },
-    token: { label: '令牌 (Token)', placeholder: '请输入令牌' },
-    encoding_aes_key: { label: '消息加解密密钥', placeholder: '请输入消息加解密密钥' }
+    app_id: {
+      label: t('views.application.applicationAccess.wechatSetting.appId'),
+      placeholder: ''
+    },
+    app_secret: {
+      label: t('views.application.applicationAccess.wechatSetting.appSecret'),
+      placeholder: ''
+    },
+    token: { label: t('views.application.applicationAccess.wechatSetting.token'), placeholder: '' },
+    encoding_aes_key: {
+      label: t('views.application.applicationAccess.wechatSetting.aesKey'),
+      placeholder: ''
+    }
   },
   dingtalk: {
     client_id: { label: 'Client ID', placeholder: '' },
     client_secret: { label: 'Client Secret', placeholder: '' }
   },
   wecom: {
-    app_id: { label: '企业ID', placeholder: '' },
+    app_id: {
+      label: t('views.application.applicationAccess.wecomSetting.cropId'),
+      placeholder: ''
+    },
     agent_id: { label: 'Agent ID', placeholder: '' },
     secret: { label: 'Secret', placeholder: '' },
     token: { label: 'Token', placeholder: '' },
@@ -181,20 +290,20 @@ const passwordFields = new Set(['app_secret', 'client_secret', 'secret'])
 const drawerTitle = computed(
   () =>
     ({
-      wechat: '公众号配置',
-      dingtalk: '钉钉应用配置',
-      wecom: '企业微信应用配置',
-      feishu: '飞书应用配置'
+      wechat: t('views.application.applicationAccess.wechatSetting.title'),
+      dingtalk: t('views.application.applicationAccess.dingtalkSetting.title'),
+      wecom: t('views.application.applicationAccess.wecomSetting.title'),
+      feishu: t('views.application.applicationAccess.larkSetting.title')
     })[configType.value]
 )
 
 const infoTitle = computed(
   () =>
     ({
-      wechat: '应用信息',
-      dingtalk: '应用信息',
-      wecom: '应用信息',
-      feishu: '应用信息'
+      wechat: t('views.application.applicationAccess.info'),
+      dingtalk: t('views.application.applicationAccess.info'),
+      wecom: t('views.application.applicationAccess.info'),
+      feishu: t('views.application.applicationAccess.info')
     })[configType.value]
 )
 
@@ -225,12 +334,12 @@ const submit = async () => {
         applicationApi
           .updatePlatformConfig(id, configType.value, form[configType.value], loading)
           .then(() => {
-            MsgSuccess('配置保存成功')
+            MsgSuccess(t('commom.saveSuccess'))
             closeDrawer()
             emit('refresh')
           })
       } catch {
-        MsgError('保存失败，请检查输入或稍后再试')
+        MsgError(t('views.application.tip.saveErrorMessage'))
       }
     }
   })
@@ -249,7 +358,7 @@ const open = async (id: string, type: 'wechat' | 'dingtalk' | 'wecom' | 'feishu'
     }
     dataLoaded.value = true
   } catch {
-    MsgError('加载配置失败，请检查输入或稍后再试')
+    MsgError(t('views.application.tip.loadingErrorMessage'))
   } finally {
     loading.value = false
     form[configType.value].callback_url = `${window.location.origin}/api/${type}/${id}`

@@ -20,13 +20,17 @@ from dataset.models import Document, TaskType, State
 from ops import celery_app
 from setting.models import Model
 from setting.models_provider import get_model
+from django.utils.translation import gettext_lazy as _
 
 max_kb_error = logging.getLogger("max_kb_error")
 max_kb = logging.getLogger("max_kb")
 
 
 def get_embedding_model(model_id, exception_handler=lambda e: max_kb_error.error(
-    f'获取向量模型失败：{str(e)}{traceback.format_exc()}')):
+    _('Failed to obtain vector model: {error} {traceback}').format(
+        error=str(e),
+        traceback=traceback.format_exc()
+    ))):
     try:
         model = QuerySet(Model).filter(id=model_id).first()
         embedding_model = ModelManage.get_model(model_id,
@@ -74,7 +78,10 @@ def embedding_by_document(document_id, model_id, state_list=None):
         ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
                                          State.FAILURE)
         max_kb_error.error(
-            f'获取向量模型失败：{str(e)}{traceback.format_exc()}')
+            _('Failed to obtain vector model: {error} {traceback}').format(
+                error=str(e),
+                traceback=traceback.format_exc()
+            ))
 
     embedding_model = get_embedding_model(model_id, exception_handler)
     ListenerManagement.embedding_by_document(document_id, embedding_model, state_list)
@@ -100,20 +107,24 @@ def embedding_by_dataset(dataset_id, model_id):
           @param model_id 向量模型
           :return: None
           """
-    max_kb.info(f"开始--->向量化数据集:{dataset_id}")
+    max_kb.info(_('Start--->Vectorized dataset: {dataset_id}').format(dataset_id=dataset_id))
     try:
         ListenerManagement.delete_embedding_by_dataset(dataset_id)
         document_list = QuerySet(Document).filter(dataset_id=dataset_id)
-        max_kb.info(f"数据集文档:{[d.name for d in document_list]}")
+        max_kb.info(_('Dataset documentation: {document_names}').format(
+            document_names=", ".join([d.name for d in document_list])))
         for document in document_list:
             try:
                 embedding_by_document.delay(document.id, model_id)
             except Exception as e:
                 pass
     except Exception as e:
-        max_kb_error.error(f'向量化数据集:{dataset_id}出现错误{str(e)}{traceback.format_exc()}')
+        max_kb_error.error(
+            _('Vectorized dataset: {dataset_id} error {error} {traceback}'.format(dataset_id=dataset_id,
+                                                                                  error=str(e),
+                                                                                  traceback=traceback.format_exc())))
     finally:
-        max_kb.info(f"结束--->向量化数据集:{dataset_id}")
+        max_kb.info(_('End--->Vectorized dataset: {dataset_id}').format(dataset_id=dataset_id))
 
 
 def embedding_by_problem(args, model_id):

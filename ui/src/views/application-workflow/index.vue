@@ -27,11 +27,11 @@
         <el-button icon="Plus" @click="showPopover = !showPopover"> 添加组件 </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug">
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
-          调试</el-button
+          {{ $t('common.debug')}}</el-button
         >
         <el-button @click="saveApplication(true)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
-          保存
+          {{ $t('common.save')}}
         </el-button>
         <el-button type="primary" @click="publicHandle"> 发布 </el-button>
 
@@ -338,7 +338,7 @@ function saveApplication(bool?: boolean) {
   application.asyncPutApplication(id, obj).then((res) => {
     saveTime.value = new Date()
     if (bool) {
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.saveSuccess'))
     }
   })
 }

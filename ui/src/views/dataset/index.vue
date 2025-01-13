@@ -1,7 +1,7 @@
 <template>
   <div class="dataset-list-container p-24" style="padding-top: 16px">
     <div class="flex-between mb-16">
-      <h4>知识库</h4>
+      <h4>{{ $t('views.dataset.title') }}</h4>
       <div class="flex-between">
         <el-select
           v-model="selectUserId"
@@ -19,7 +19,7 @@
         <el-input
           v-model="searchValue"
           @change="searchHandle"
-          :placeholder="$t('views.application.applicationList.searchBar.placeholder')"
+          :placeholder="$t('views.dataset.searchBar.placeholder')"
           prefix-icon="Search"
           class="w-240"
           style="max-width: 240px"
@@ -38,7 +38,7 @@
       >
         <el-row :gutter="15">
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16">
-            <CardAdd title="创建知识库" @click="openCreateDialog" />
+            <CardAdd :title="$t('views.dataset.createDataset')" @click="openCreateDialog" />
           </el-col>
           <template v-for="(item, index) in datasetList" :key="index">
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16">
@@ -64,20 +64,20 @@
                 <template #subTitle>
                   <el-text class="color-secondary" size="small">
                     <auto-tooltip :content="item.username">
-                      创建者: {{ item.username }}
+                      {{ $t('common.creator') }}: {{ item.username }}
                     </auto-tooltip>
                   </el-text>
                 </template>
                 <div class="delete-button">
-                  <el-tag class="blue-tag" v-if="item.type === '0'" style="height: 22px"
-                    >通用型</el-tag
-                  >
+                  <el-tag class="blue-tag" v-if="item.type === '0'" style="height: 22px">{{
+                    $t('views.dataset.general')
+                  }}</el-tag>
                   <el-tag
                     class="purple-tag"
                     v-else-if="item.type === '1'"
                     type="warning"
                     style="height: 22px"
-                    >Web 站点</el-tag
+                    >{{ $t('views.dataset.web') }}</el-tag
                   >
                 </div>
 
@@ -85,11 +85,11 @@
                   <div class="footer-content flex-between">
                     <div>
                       <span class="bold">{{ item?.document_count || 0 }}</span>
-                      文档<el-divider direction="vertical" />
+                      {{ $t('common.document') }}<el-divider direction="vertical" />
                       <span class="bold">{{ numberFormat(item?.char_length) || 0 }}</span>
-                      字符<el-divider direction="vertical" />
+                      {{ $t('common.character') }}<el-divider direction="vertical" />
                       <span class="bold">{{ item?.application_mapping_count || 0 }}</span>
-                      关联应用
+                      {{ $t('views.dataset.relatedApplications') }}
                     </div>
                     <div @click.stop>
                       <el-dropdown trigger="click">
@@ -102,30 +102,32 @@
                               icon="Refresh"
                               @click.stop="syncDataset(item)"
                               v-if="item.type === '1'"
-                              >同步</el-dropdown-item
+                              >{{ $t('views.dataset.setting.sync') }}</el-dropdown-item
                             >
                             <el-dropdown-item @click="reEmbeddingDataset(item)">
                               <AppIcon
                                 iconName="app-document-refresh"
                                 style="font-size: 16px"
                               ></AppIcon>
-                              向量化</el-dropdown-item
+                              {{ $t('views.dataset.setting.vectorization') }}</el-dropdown-item
                             >
                             <el-dropdown-item
                               icon="Setting"
                               @click.stop="router.push({ path: `/dataset/${item.id}/setting` })"
                             >
-                              设置</el-dropdown-item
+                              {{ $t('common.setting') }}</el-dropdown-item
                             >
                             <el-dropdown-item @click.stop="export_dataset(item)">
-                              <AppIcon iconName="app-export"></AppIcon>导出Excel</el-dropdown-item
+                              <AppIcon iconName="app-export"></AppIcon
+                              >{{ $t('common.export') }}Excel</el-dropdown-item
                             >
                             <el-dropdown-item @click.stop="export_zip_dataset(item)">
-                              <AppIcon iconName="app-export"></AppIcon>导出ZIP</el-dropdown-item
+                              <AppIcon iconName="app-export"></AppIcon
+                              >{{ $t('common.export') }}ZIP</el-dropdown-item
                             >
-                            <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)"
-                              >删除</el-dropdown-item
-                            >
+                            <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)">{{
+                              $t('common.delete')
+                            }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
@@ -151,6 +153,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { useRouter } from 'vue-router'
 import { numberFormat } from '@/utils/utils'
 import { ValidType, ValidCount } from '@/enums/common'
+import { t } from '@/locales'
 import useStore from '@/stores'
 import applicationApi from '@/api/application'
 
@@ -182,9 +185,9 @@ function openCreateDialog() {
   if (user.isEnterprise()) {
     CreateDatasetDialogRef.value.open()
   } else {
-    MsgConfirm(`提示`, '社区版最多支持 50 个知识库，如需拥有更多知识库，请升级为专业版。', {
-      cancelButtonText: '确定',
-      confirmButtonText: '购买专业版'
+    MsgConfirm(t('common.tip'), t('views.dataset.tip.professionalMessage'), {
+      cancelButtonText: t('common.confirm'),
+      confirmButtonText: t('common.professional')
     })
       .then(() => {
         window.open('https://maxkb.cn/pricing.html', '_blank')
@@ -202,12 +205,12 @@ function openCreateDialog() {
 }
 
 function refresh() {
-  MsgSuccess('同步任务发送成功')
+  MsgSuccess(t('views.dataset.tip.syncSuccess'))
 }
 
 function reEmbeddingDataset(row: any) {
   datasetApi.putReEmbeddingDataset(row.id).then(() => {
-    MsgSuccess('提交成功')
+    MsgSuccess(t('common.submitSuccess'))
   })
 }
 
@@ -225,21 +228,21 @@ function searchHandle() {
 }
 const export_dataset = (item: any) => {
   datasetApi.exportDataset(item.name, item.id, loading).then((ok) => {
-    MsgSuccess('导出成功')
+    MsgSuccess(t('common.exportSuccess'))
   })
 }
 const export_zip_dataset = (item: any) => {
   datasetApi.exportZipDataset(item.name, item.id, loading).then((ok) => {
-    MsgSuccess('导出成功')
+    MsgSuccess(t('common.exportSuccess'))
   })
 }
 
 function deleteDataset(row: any) {
   MsgConfirm(
-    `是否删除知识库：${row.name} ?`,
-    `此知识库关联 ${row.application_mapping_count} 个应用，删除后无法恢复，请谨慎操作。`,
+    `${t('views.dataset.delete.confirmTitle')}${row.name} ?`,
+    `${t('views.dataset.delete.confirmMessage1')} ${row.application_mapping_count} ${t('views.dataset.delete.confirmMessage2')}`,
     {
-      confirmButtonText: '删除',
+      confirmButtonText: t('common.delete'),
       confirmButtonClass: 'danger'
     }
   )
@@ -247,7 +250,7 @@ function deleteDataset(row: any) {
       datasetApi.delDataset(row.id, loading).then(() => {
         const index = datasetList.value.findIndex((v) => v.id === row.id)
         datasetList.value.splice(index, 1)
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.deleteSuccess'))
       })
     })
     .catch(() => {})

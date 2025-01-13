@@ -17,6 +17,7 @@ from common.constants.permission_constants import RoleConstants
 from common.response import result
 from setting.serializers.system_setting import SystemSettingSerializer
 from setting.swagger_api.system_setting import SystemSettingEmailApi
+from django.utils.translation import gettext_lazy as _
 
 
 class SystemSetting(APIView):
@@ -24,9 +25,9 @@ class SystemSetting(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['PUT'], detail=False)
-        @swagger_auto_schema(operation_summary="创建或者修改邮箱设置",
-                             operation_id="创建或者修改邮箱设置",
-                             request_body=SystemSettingEmailApi.get_request_body_api(), tags=["邮箱设置"],
+        @swagger_auto_schema(operation_summary=_('Create or update email settings'),
+                             operation_id=_('Create or update email settings'),
+                             request_body=SystemSettingEmailApi.get_request_body_api(), tags=[_('Email settings')],
                              responses=result.get_api_response(SystemSettingEmailApi.get_response_body_api()))
         @has_permissions(RoleConstants.ADMIN)
         def put(self, request: Request):
@@ -35,11 +36,11 @@ class SystemSetting(APIView):
                     data=request.data).update_or_save())
 
         @action(methods=['POST'], detail=False)
-        @swagger_auto_schema(operation_summary="测试邮箱设置",
-                             operation_id="测试邮箱设置",
+        @swagger_auto_schema(operation_summary=_('Test email settings'),
+                             operation_id=_('Test email settings'),
                              request_body=SystemSettingEmailApi.get_request_body_api(),
                              responses=result.get_default_response(),
-                             tags=["邮箱设置"])
+                             tags=[_('Email settings')])
         @has_permissions(RoleConstants.ADMIN)
         def post(self, request: Request):
             return result.success(
@@ -47,10 +48,10 @@ class SystemSetting(APIView):
                     data=request.data).is_valid())
 
         @action(methods=['GET'], detail=False)
-        @swagger_auto_schema(operation_summary="获取邮箱设置",
-                             operation_id="获取邮箱设置",
+        @swagger_auto_schema(operation_summary=_('Get email settings'),
+                             operation_id=_('Get email settings'),
                              responses=result.get_api_response(SystemSettingEmailApi.get_response_body_api()),
-                             tags=["邮箱设置"])
+                             tags=[_('Email settings')])
         @has_permissions(RoleConstants.ADMIN)
         def get(self, request: Request):
             return result.success(

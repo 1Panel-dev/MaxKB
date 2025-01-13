@@ -29,6 +29,7 @@ from setting.models import TeamMember, TeamMemberPermission, Team
 from smartdoc.conf import PROJECT_DIR
 from users.models.user import User
 from users.serializers.user_serializers import UserSerializer
+from django.utils.translation import gettext_lazy as _
 
 user_cache = cache.caches['user_cache']
 
@@ -38,39 +39,39 @@ def get_response_body_api():
         type=openapi.TYPE_OBJECT,
         required=['id', 'username', 'email', 'role', 'is_active', 'team_id', 'member_id'],
         properties={
-            'id': openapi.Schema(type=openapi.TYPE_STRING, title="用户id", description="用户id"),
-            'username': openapi.Schema(type=openapi.TYPE_STRING, title="用户名", description="用户名"),
-            'email': openapi.Schema(type=openapi.TYPE_STRING, title="邮箱", description="邮箱地址"),
-            'role': openapi.Schema(type=openapi.TYPE_STRING, title="角色", description="角色"),
-            'is_active': openapi.Schema(type=openapi.TYPE_STRING, title="是否可用", description="是否可用"),
-            'team_id': openapi.Schema(type=openapi.TYPE_STRING, title="团队id", description="团队id"),
-            'member_id': openapi.Schema(type=openapi.TYPE_STRING, title="成员id", description="成员id"),
+            'id': openapi.Schema(type=openapi.TYPE_STRING, title=_('user id'), description=_('user id')),
+            'username': openapi.Schema(type=openapi.TYPE_STRING, title=_('Username'), description=_('Username')),
+            'email': openapi.Schema(type=openapi.TYPE_STRING, title=_('Email'), description=_('Email')),
+            'role': openapi.Schema(type=openapi.TYPE_STRING, title=_('Role'), description=_('Role')),
+            'is_active': openapi.Schema(type=openapi.TYPE_STRING, title=_('Is active'), description=_('Is active')),
+            'team_id': openapi.Schema(type=openapi.TYPE_STRING, title=_('team id'), description=_('team id')),
+            'member_id': openapi.Schema(type=openapi.TYPE_STRING, title=_('member id'), description=_('member id')),
         }
     )
 
 
 class TeamMemberPermissionOperate(ApiMixin, serializers.Serializer):
-    USE = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("使用"))
-    MANAGE = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("管理"))
+    USE = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean(_('use')))
+    MANAGE = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean(_('manage')))
 
     def get_request_body_api(self):
         return openapi.Schema(type=openapi.TYPE_OBJECT,
-                              title="类型",
-                              description="操作权限USE,MANAGE权限",
+                              title=_('type'),
+                              description=_('Operation permissions USE, MANAGE permissions'),
                               properties={
                                   'USE': openapi.Schema(type=openapi.TYPE_BOOLEAN,
-                                                        title="使用权限",
-                                                        description="使用权限 True|False"),
+                                                        title=_('use permission'),
+                                                        description=_('use permission True|False')),
                                   'MANAGE': openapi.Schema(type=openapi.TYPE_BOOLEAN,
-                                                           title="管理权限",
-                                                           description="管理权限 True|False")
+                                                           title=_('manage permission'),
+                                                           description=_('manage permission True|False'))
                               }
                               )
 
 
 class UpdateTeamMemberItemPermissionSerializer(ApiMixin, serializers.Serializer):
-    target_id = serializers.CharField(required=True, error_messages=ErrMessage.char("目标id"))
-    type = serializers.CharField(required=True, error_messages=ErrMessage.char("目标类型"))
+    target_id = serializers.CharField(required=True, error_messages=ErrMessage.char(_('target id')))
+    type = serializers.CharField(required=True, error_messages=ErrMessage.char(_('type')))
     operate = TeamMemberPermissionOperate(required=True, many=False)
 
     def get_request_body_api(self):
@@ -78,10 +79,10 @@ class UpdateTeamMemberItemPermissionSerializer(ApiMixin, serializers.Serializer)
             type=openapi.TYPE_OBJECT,
             required=['id', 'type', 'operate'],
             properties={
-                'target_id': openapi.Schema(type=openapi.TYPE_STRING, title="知识库/应用id",
-                                            description="知识库或者应用的id"),
+                'target_id': openapi.Schema(type=openapi.TYPE_STRING, title=_('dataset id/application id'),
+                                            description=_('dataset id/application id')),
                 'type': openapi.Schema(type=openapi.TYPE_STRING,
-                                       title="类型",
+                                       title=_('type'),
                                        description="DATASET|APPLICATION",
                                        ),
                 'operate': TeamMemberPermissionOperate().get_request_body_api()
@@ -100,7 +101,7 @@ class UpdateTeamMemberPermissionSerializer(ApiMixin, serializers.Serializer):
                 os.path.join(PROJECT_DIR, "apps", "setting", 'sql', 'check_member_permission_target_exists.sql')),
             [json.dumps(permission_list), user_id, user_id])
         if illegal_target_id_list is not None and len(illegal_target_id_list) > 0:
-            raise AppApiException(500, '不存在的 应用|知识库id[' + str(illegal_target_id_list) + ']')
+            raise AppApiException(500, _('Non-existent application|knowledge base id[') + str(illegal_target_id_list) + ']')
 
     def update_or_save(self, member_id: str):
         team_member_permission_list = self.data.get("team_member_permission_list")
@@ -134,8 +135,8 @@ class UpdateTeamMemberPermissionSerializer(ApiMixin, serializers.Serializer):
             required=['id'],
             properties={
                 'team_member_permission_list':
-                    openapi.Schema(type=openapi.TYPE_ARRAY, title="权限数据",
-                                   description="权限数据",
+                    openapi.Schema(type=openapi.TYPE_ARRAY, title=_('Permission data'),
+                                   description=_('Permission data'),
                                    items=UpdateTeamMemberItemPermissionSerializer().get_request_body_api()
                                    ),
             }
@@ -143,7 +144,7 @@ class UpdateTeamMemberPermissionSerializer(ApiMixin, serializers.Serializer):
 
 
 class TeamMemberSerializer(ApiMixin, serializers.Serializer):
-    team_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("团队id"))
+    team_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('team id')))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -152,8 +153,8 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
     def get_bach_request_body_api():
         return openapi.Schema(
             type=openapi.TYPE_ARRAY,
-            title="用户id列表",
-            description="用户id列表",
+            title=_('user id list'),
+            description=_('user id list'),
             items=openapi.Schema(type=openapi.TYPE_STRING)
         )
 
@@ -163,8 +164,8 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
             type=openapi.TYPE_OBJECT,
             required=['username_or_email'],
             properties={
-                'username_or_email': openapi.Schema(type=openapi.TYPE_STRING, title="用户名或者邮箱",
-                                                    description="用户名或者邮箱"),
+                'username_or_email': openapi.Schema(type=openapi.TYPE_STRING, title=_('Username or email'),
+                                                    description=_('Username or email')),
 
             }
         )
@@ -194,11 +195,11 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
     def to_member_model(self, add_user_id, team_member_user_id_list, use_user_id_list, user_id):
         if use_user_id_list.__contains__(add_user_id):
             if team_member_user_id_list.__contains__(add_user_id) or user_id == add_user_id:
-                raise AppApiException(500, "团队中已存在当前成员,不要重复添加")
+                raise AppApiException(500, _('The current members already exist in the team, do not add them again.'))
             else:
                 return TeamMember(team_id=self.data.get("team_id"), user_id=add_user_id)
         else:
-            raise AppApiException(500, "不存在的用户")
+            raise AppApiException(500, _('User does not exist'))
 
     def add_member(self, username_or_email: str, with_valid=True):
         """
@@ -210,14 +211,14 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         if username_or_email is None:
-            raise AppApiException(500, "用户名或者邮箱必填")
+            raise AppApiException(500, _('Username or email is required'))
         user = QuerySet(User).filter(
             Q(username=username_or_email) | Q(email=username_or_email)).first()
         if user is None:
-            raise AppApiException(500, "不存在的用户")
+            raise AppApiException(500, _('User does not exist'))
         if QuerySet(TeamMember).filter(Q(team_id=self.data.get('team_id')) & Q(user=user)).exists() or self.data.get(
                 "team_id") == str(user.id):
-            raise AppApiException(500, "团队中已存在当前成员,不要重复添加")
+            raise AppApiException(500, _('The current members already exist in the team, do not add them again.'))
         TeamMember(team_id=self.data.get("team_id"), user=user).save()
         return self.list_member(with_valid=False)
 
@@ -241,22 +242,22 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
 
     def get_response_body_api(self):
         return get_api_response(openapi.Schema(
-            type=openapi.TYPE_ARRAY, title="成员列表", description="成员列表",
+            type=openapi.TYPE_ARRAY, title=_('member list'), description=_('member list'),
             items=UserSerializer().get_response_body_api()
         ))
 
     class Operate(ApiMixin, serializers.Serializer):
         # 团队 成员id
-        member_id = serializers.CharField(required=True, error_messages=ErrMessage.char("成员id"))
+        member_id = serializers.CharField(required=True, error_messages=ErrMessage.char(_('member id')))
         # 团队id
-        team_id = serializers.CharField(required=True, error_messages=ErrMessage.char("团队id"))
+        team_id = serializers.CharField(required=True, error_messages=ErrMessage.char(_('team id')))
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
             if self.data.get('member_id') != 'root' and not QuerySet(TeamMember).filter(
                     team_id=self.data.get('team_id'),
                     id=self.data.get('member_id')).exists():
-                raise AppApiException(500, "不存在的成员,请先添加成员")
+                raise AppApiException(500, _('The member does not exist, please add a member first'))
 
             return True
 
@@ -290,7 +291,7 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
             self.is_valid(raise_exception=True)
             member_id = self.data.get("member_id")
             if member_id == 'root':
-                raise AppApiException(500, "管理员权限不允许修改")
+                raise AppApiException(500, _('Administrator rights do not allow modification'))
             s = UpdateTeamMemberPermissionSerializer(data=member_permission)
             s.is_valid(user_id=self.data.get("team_id"))
             s.update_or_save(member_id)
@@ -304,7 +305,7 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
             self.is_valid(raise_exception=True)
             member_id = self.data.get("member_id")
             if member_id == 'root':
-                raise AppApiException(500, "无法移除团队管理员")
+                raise AppApiException(500, _('Unable to remove team admin'))
             # 删除成员权限
             QuerySet(TeamMemberPermission).filter(member_id=member_id).delete()
             # 删除成员
@@ -317,4 +318,4 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
                                       in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
                                       required=True,
-                                      description='团队成员id')]
+                                      description=_('member id')),]

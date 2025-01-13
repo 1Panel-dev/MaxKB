@@ -1,9 +1,11 @@
 <template>
-  <LayoutContainer header="设置">
+  <LayoutContainer :header="$t('common.setting')">
     <div class="dataset-setting main-calc-height">
       <el-scrollbar>
         <div class="p-24" v-loading="loading">
-          <h4 class="title-decoration-1 mb-16">基本信息</h4>
+          <h4 class="title-decoration-1 mb-16">
+            {{ $t('views.dataset.datasetForm.title.info') }}
+          </h4>
           <BaseForm ref="BaseFormRef" :data="detail" />
 
           <el-form
@@ -13,47 +15,58 @@
             label-position="top"
             require-asterisk-position="right"
           >
-            <el-form-item label="知识库类型" required>
-              <el-card shadow="never" class="mb-8" v-if="detail.type === '0'">
+            <el-form-item :label="$t('views.dataset.datasetForm.form.datasetType.label')" required>
+              <el-card shadow="never" class="mb-8" style="width: 50%" v-if="detail.type === '0'">
                 <div class="flex align-center">
                   <AppAvatar class="mr-8 avatar-blue" shape="square" :size="32">
                     <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                   </AppAvatar>
                   <div>
-                    <div>通用型</div>
-                    <el-text type="info">可以通过上传文件或手动录入方式构建知识库</el-text>
+                    <div>{{ $t('views.dataset.general') }}</div>
+                    <el-text type="info">{{
+                      $t('views.dataset.datasetForm.form.datasetType.generalInfo')
+                    }}</el-text>
                   </div>
                 </div>
               </el-card>
-              <el-card shadow="never" class="mb-8" v-if="detail?.type === '1'">
+              <el-card shadow="never" class="mb-8" style="width: 50%" v-if="detail?.type === '1'">
                 <div class="flex align-center">
                   <AppAvatar class="mr-8 avatar-purple" shape="square" :size="32">
                     <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
                   </AppAvatar>
                   <div>
-                    <div>Web 站点</div>
-                    <el-text type="info"> 通过网站链接同步方式构建知识库 </el-text>
+                    <div>{{ $t('views.dataset.web') }}</div>
+                    <el-text type="info">
+                      {{ $t('views.dataset.datasetForm.form.datasetType.webInfo') }}
+                    </el-text>
                   </div>
                 </div>
               </el-card>
             </el-form-item>
-            <el-form-item label="Web 根地址" prop="source_url" v-if="detail.type === '1'">
+            <el-form-item
+              :label="$t('views.dataset.datasetForm.form.source_url.label')"
+              prop="source_url"
+              v-if="detail.type === '1'"
+            >
               <el-input
                 v-model="form.source_url"
-                placeholder="请输入 Web 根地址"
+                :placeholder="$t('views.dataset.datasetForm.form.source_url.placeholder')"
                 @blur="form.source_url = form.source_url.trim()"
               />
             </el-form-item>
-            <el-form-item label="选择器" v-if="detail.type === '1'">
+            <el-form-item
+              :label="$t('views.dataset.datasetForm.form.selector.label')"
+              v-if="detail.type === '1'"
+            >
               <el-input
                 v-model="form.selector"
-                placeholder="默认为 body，可输入 .classname/#idname/tagname"
+                :placeholder="$t('views.dataset.datasetForm.form.selector.placeholder')"
                 @blur="form.selector = form.selector.trim()"
               />
             </el-form-item>
           </el-form>
           <div v-if="application_id_list.length > 0">
-            <h4 class="title-decoration-1 mb-16">关联应用</h4>
+            <h4 class="title-decoration-1 mb-16">{{ $t('views.dataset.relatedApplications') }}</h4>
             <el-row :gutter="12">
               <el-col
                 :span="12"
@@ -92,7 +105,7 @@
           </div>
 
           <div class="text-right">
-            <el-button @click="submit" type="primary"> 保存 </el-button>
+            <el-button @click="submit" type="primary"> {{ $t('common.save') }} </el-button>
           </div>
         </div>
       </el-scrollbar>
@@ -108,6 +121,7 @@ import type { ApplicationFormType } from '@/api/type/application'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
+import { t } from '@/locales'
 const route = useRoute()
 const {
   params: { id }
@@ -128,7 +142,13 @@ const form = ref<any>({
 })
 
 const rules = reactive({
-  source_url: [{ required: true, message: '请输入 Web 根地址', trigger: 'blur' }]
+  source_url: [
+    {
+      required: true,
+      message: t('views.dataset.datasetForm.form.source_url.requiredMessage'),
+      trigger: 'blur'
+    }
+  ]
 })
 
 async function submit() {
@@ -148,20 +168,20 @@ async function submit() {
               }
 
         if (cloneModelId.value !== BaseFormRef.value.form.embedding_mode_id) {
-          MsgConfirm(`提示`, `修改知识库向量模型后，需要对知识库向量化，是否继续保存？`, {
-            confirmButtonText: '向量化',
+          MsgConfirm(t('common.tip'), t('views.dataset.tip.updateModeMessage'), {
+            confirmButtonText: t('views.dataset.setting.vectorization')
           })
             .then(() => {
               datasetApi.putDataset(id, obj, loading).then((res) => {
                 datasetApi.putReEmbeddingDataset(id).then(() => {
-                  MsgSuccess('保存成功')
+                  MsgSuccess(t('common.saveSuccess'))
                 })
               })
             })
             .catch(() => {})
         } else {
           datasetApi.putDataset(id, obj, loading).then((res) => {
-            MsgSuccess('保存成功')
+            MsgSuccess(t('common.saveSuccess'))
           })
         }
       }

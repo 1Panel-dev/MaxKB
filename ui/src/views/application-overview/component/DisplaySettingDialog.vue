@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="显示设置"
+    :title="$t('views.applicationOverview.appInfo.SettingDisplayDialog.dialogTitle')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -10,18 +10,20 @@
         <el-space direction="vertical" alignment="start">
           <el-checkbox
             v-model="form.show_source"
-            :label="isWorkFlow(detail.type) ? '显示执行详情' : '显示知识来源'"
+            :label="
+              isWorkFlow(detail.type)
+                ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')
+                : $t('views.applicationOverview.appInfo.SettingDisplayDialog.showSourceLabel')
+            "
           />
         </el-space>
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"
-          >{{ $t('views.applicationOverview.appInfo.LimitDialog.cancelButtonText') }}
-        </el-button>
+        <el-button @click.prevent="dialogVisible = false">{{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(displayFormRef)" :loading="loading">
-          {{ $t('views.applicationOverview.appInfo.LimitDialog.saveButtonText') }}
+          {{ $t('common.save') }}
         </el-button>
       </span>
     </template>
@@ -42,7 +44,6 @@ const {
 } = route
 
 const emit = defineEmits(['refresh'])
-
 
 const displayFormRef = ref()
 const form = ref<any>({
@@ -79,7 +80,7 @@ const submit = async (formEl: FormInstance | undefined) => {
       applicationApi.putAccessToken(id as string, obj, loading).then((res) => {
         emit('refresh')
         // @ts-ignore
-        MsgSuccess(t('views.applicationOverview.appInfo.LimitDialog.settingSuccessMessage'))
+        MsgSuccess(t('common.settingSuccess'))
         dialogVisible.value = false
       })
     }

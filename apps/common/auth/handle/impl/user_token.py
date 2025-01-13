@@ -17,7 +17,7 @@ from users.models import User
 from django.core import cache
 
 from users.models.user import get_user_dynamics_permission
-
+from django.utils.translation import gettext_lazy as _
 token_cache = cache.caches['token_cache']
 
 
@@ -31,7 +31,7 @@ class UserToken(AuthBaseHandle):
     def handle(self, request, token: str, get_token_details):
         cache_token = token_cache.get(token)
         if cache_token is None:
-            raise AppAuthenticationFailed(1002, "登录过期")
+            raise AppAuthenticationFailed(1002, _('Login expired'))
         auth_details = get_token_details()
         user = QuerySet(User).get(id=auth_details['id'])
         # 续期

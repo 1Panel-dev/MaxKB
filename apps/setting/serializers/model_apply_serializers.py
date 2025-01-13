@@ -15,7 +15,7 @@ from common.config.embedding_config import ModelManage
 from common.util.field_message import ErrMessage
 from setting.models import Model
 from setting.models_provider import get_model
-
+from django.utils.translation import gettext_lazy as _
 
 def get_embedding_model(model_id):
     model = QuerySet(Model).filter(id=model_id).first()
@@ -29,26 +29,26 @@ def get_embedding_model(model_id):
 class EmbedDocuments(serializers.Serializer):
     texts = serializers.ListField(required=True, child=serializers.CharField(required=True,
                                                                              error_messages=ErrMessage.char(
-                                                                                 "向量文本")),
-                                  error_messages=ErrMessage.list("向量文本列表"))
+                                                                                 _('vector text'))),
+                                  error_messages=ErrMessage.list(_('vector text list')))
 
 
 class EmbedQuery(serializers.Serializer):
-    text = serializers.CharField(required=True, error_messages=ErrMessage.char("向量文本"))
+    text = serializers.CharField(required=True, error_messages=ErrMessage.char(_('vector text')))
 
 
 class CompressDocument(serializers.Serializer):
-    page_content = serializers.CharField(required=True, error_messages=ErrMessage.char("文本"))
-    metadata = serializers.DictField(required=False, error_messages=ErrMessage.dict("元数据"))
+    page_content = serializers.CharField(required=True, error_messages=ErrMessage.char(_('text')))
+    metadata = serializers.DictField(required=False, error_messages=ErrMessage.dict(_('metadata')))
 
 
 class CompressDocuments(serializers.Serializer):
     documents = CompressDocument(required=True, many=True)
-    query = serializers.CharField(required=True, error_messages=ErrMessage.char("查询query"))
+    query = serializers.CharField(required=True, error_messages=ErrMessage.char(_('query')))
 
 
 class ModelApplySerializers(serializers.Serializer):
-    model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("模型id"))
+    model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('model id')))
 
     def embed_documents(self, instance, with_valid=True):
         if with_valid:

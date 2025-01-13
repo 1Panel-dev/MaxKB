@@ -6,6 +6,7 @@ from common.config.tokenizer_manage_config import TokenizerManage
 from common.util.common import _remove_empty_lines
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tts import BaseTextToSpeech
+from django.utils.translation import gettext_lazy as _
 
 
 def custom_get_token_ids(text: str):
@@ -40,7 +41,7 @@ class XInferenceTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         )
 
     def check_auth(self):
-        self.text_to_speech('你好')
+        self.text_to_speech(_('Hello'))
 
     def text_to_speech(self, text):
         client = OpenAI(

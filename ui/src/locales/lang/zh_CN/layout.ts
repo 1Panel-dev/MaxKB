@@ -12,7 +12,8 @@ export default {
         MenuItem: {
             application: "应用",
             dataset: "知识库",
-            setting: "系统管理"
+            setting: "系统管理",
+            function_lib: "函数库"
         },
         avatar: {
             resetPassword: "修改密码",
@@ -33,8 +34,6 @@ export default {
                 getVerificationCode: "获取验证码",
                 verificationCodeSentSuccess:"验证码发送成功",
                 resend:"重新发送",
-                cancel:"取消",
-                save:"保存",
             }
         }
     },

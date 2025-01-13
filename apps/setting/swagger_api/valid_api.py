@@ -9,6 +9,7 @@
 from drf_yasg import openapi
 
 from common.mixins.api_mixin import ApiMixin
+from django.utils.translation import gettext_lazy as _
 
 
 class ValidApi(ApiMixin):
@@ -18,10 +19,10 @@ class ValidApi(ApiMixin):
                                   in_=openapi.IN_PATH,
                                   type=openapi.TYPE_STRING,
                                   required=True,
-                                  description='校验类型:application|dataset|user'),
+                                  description=_('Verification type: application|dataset|user')),
                 openapi.Parameter(name='valid_count',
                                   in_=openapi.IN_PATH,
                                   type=openapi.TYPE_STRING,
                                   required=True,
-                                  description='校验数量')
+                                  description=_('check quantity'))
                 ]

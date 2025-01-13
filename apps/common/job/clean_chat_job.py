@@ -11,6 +11,8 @@ from application.models import Application, Chat, ChatRecord
 from django.db.models import Q, Max
 from common.lock.impl.file_lock import FileLock
 from dataset.models import File
+
+
 from django.db import connection
 
 scheduler = BackgroundScheduler()
@@ -19,7 +21,8 @@ lock = FileLock()
 
 
 def clean_chat_log_job():
-    logging.getLogger("max_kb").info('开始清理对话记录')
+    from django.utils.translation import gettext_lazy as _
+    logging.getLogger("max_kb").info(_('start clean chat log'))
     now = timezone.now()
 
     applications = Application.objects.all().values('id', 'clean_time')
@@ -65,7 +68,7 @@ def clean_chat_log_job():
             if deleted_count < batch_size:
                 break
 
-    logging.getLogger("max_kb").info(f'结束清理对话记录')
+    logging.getLogger("max_kb").info(_('end clean chat log'))
 
 
 def run():
@@ -75,6 +78,6 @@ def run():
             existing_job = scheduler.get_job(job_id='clean_chat_log')
             if existing_job is not None:
                 existing_job.remove()
-            scheduler.add_job(clean_chat_log_job, 'cron',  hour='0', minute='5', id='clean_chat_log')
+            scheduler.add_job(clean_chat_log_job, 'cron', hour='0', minute='5', id='clean_chat_log')
         finally:
             lock.un_lock('clean_chat_log_job')

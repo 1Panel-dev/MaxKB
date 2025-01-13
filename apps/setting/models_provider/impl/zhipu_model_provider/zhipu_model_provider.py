@@ -18,6 +18,7 @@ from setting.models_provider.impl.zhipu_model_provider.model.image import ZhiPuI
 from setting.models_provider.impl.zhipu_model_provider.model.llm import ZhipuChatModel
 from setting.models_provider.impl.zhipu_model_provider.model.tti import ZhiPuTextToImage
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _
 
 qwen_model_credential = ZhiPuLLMModelCredential()
 zhipu_image_model_credential = ZhiPuImageModelCredential()
@@ -30,25 +31,25 @@ model_info_list = [
 ]
 
 model_info_image_list = [
-    ModelInfo('glm-4v-plus', '具有强大的多模态理解能力。能够同时理解多达五张图像，并支持视频内容理解',
+    ModelInfo('glm-4v-plus', _('Have strong multi-modal understanding capabilities. Able to understand up to five images simultaneously and supports video content understanding'),
               ModelTypeConst.IMAGE, zhipu_image_model_credential,
               ZhiPuImage),
-    ModelInfo('glm-4v', '专注于单图理解。适用于需要高效图像解析的场景',
+    ModelInfo('glm-4v', _('Focus on single picture understanding. Suitable for scenarios requiring efficient image analysis'),
               ModelTypeConst.IMAGE, zhipu_image_model_credential,
               ZhiPuImage),
-    ModelInfo('glm-4v-flash', '专注于单图理解。适用于需要高效图像解析的场景(免费)',
+    ModelInfo('glm-4v-flash', _('Focus on single picture understanding. Suitable for scenarios requiring efficient image analysis (free)'),
               ModelTypeConst.IMAGE, zhipu_image_model_credential,
               ZhiPuImage),
 ]
 
 model_info_tti_list = [
-    ModelInfo('cogview-3', '根据用户文字描述快速、精准生成图像。分辨率支持1024x1024',
+    ModelInfo('cogview-3', _('Quickly and accurately generate images based on user text descriptions. Resolution supports 1024x1024'),
               ModelTypeConst.TTI, zhipu_tti_model_credential,
               ZhiPuTextToImage),
-    ModelInfo('cogview-3-plus', '根据用户文字描述生成高质量图像，支持多图片尺寸',
+    ModelInfo('cogview-3-plus', _('Generate high-quality images based on user text descriptions, supporting multiple image sizes'),
               ModelTypeConst.TTI, zhipu_tti_model_credential,
               ZhiPuTextToImage),
-    ModelInfo('cogview-3-flash', '根据用户文字描述生成高质量图像，支持多图片尺寸(免费)',
+    ModelInfo('cogview-3-flash', _('Generate high-quality images based on user text descriptions, supporting multiple image sizes (free)'),
               ModelTypeConst.TTI, zhipu_tti_model_credential,
               ZhiPuTextToImage),
 ]
@@ -71,6 +72,6 @@ class ZhiPuModelProvider(IModelProvider):
         return model_info_manage
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='model_zhipu_provider', name='智谱AI', icon=get_file_content(
+        return ModelProvideInfo(provider='model_zhipu_provider', name=_('zhipu AI'), icon=get_file_content(
             os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'zhipu_model_provider', 'icon',
                          'zhipuai_icon_svg')))

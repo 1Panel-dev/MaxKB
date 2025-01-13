@@ -19,6 +19,7 @@ from setting.models_provider.impl.qwen_model_provider.model.image import QwenVLC
 from setting.models_provider.impl.qwen_model_provider.model.llm import QwenChatModel
 from setting.models_provider.impl.qwen_model_provider.model.tti import QwenTextToImageModel
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _
 
 qwen_model_credential = OpenAILLMModelCredential()
 qwenvl_model_credential = QwenVLModelCredential()
@@ -36,7 +37,7 @@ module_info_vl_list = [
 ]
 module_info_tti_list = [
     ModelInfo('wanx-v1',
-              '通义万相-文本生成图像大模型，支持中英文双语输入，支持输入参考图片进行参考内容或者参考风格迁移，重点风格包括但不限于水彩、油画、中国画、素描、扁平插画、二次元、3D卡通。',
+              _('Tongyi Wanxiang - a large image model for text generation, supports bilingual input in Chinese and English, and supports the input of reference pictures for reference content or reference style migration. Key styles include but are not limited to watercolor, oil painting, Chinese painting, sketch, flat illustration, two-dimensional, and 3D. Cartoon.'),
               ModelTypeConst.TTI, qwentti_model_credential, QwenTextToImageModel),
 ]
 
@@ -59,6 +60,6 @@ class QwenModelProvider(IModelProvider):
         return model_info_manage
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='model_qwen_provider', name='通义千问', icon=get_file_content(
+        return ModelProvideInfo(provider='model_qwen_provider', name=_('Tongyi Qianwen'), icon=get_file_content(
             os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'qwen_model_provider', 'icon',
                          'qwen_icon_svg')))

@@ -7,6 +7,7 @@ from zhipuai import ZhipuAI
 from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tti import BaseTextToImage
+from django.utils.translation import gettext_lazy as _
 
 
 def custom_get_token_ids(text: str):
@@ -45,7 +46,7 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
             zhipuai_api_key=self.api_key,
             model_name=self.model,
         )
-        chat.invoke([HumanMessage([{"type": "text", "text": "你好"}])])
+        chat.invoke([HumanMessage([{"type": "text", "text": _('Hello')}])])
 
         # self.generate_image('生成一个小猫图片')
 

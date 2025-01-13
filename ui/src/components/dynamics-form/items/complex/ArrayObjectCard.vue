@@ -14,7 +14,7 @@
         v-bind="attr"
         :parent_field="formField.field + '.' + index"
       ></DynamicsForm>
-      <el-tooltip effect="dark" content="删除" placement="top">
+      <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
         <el-button text @click.stop="deleteDataset(item)" class="delete-button">
           <el-icon><Delete /></el-icon>
         </el-button>

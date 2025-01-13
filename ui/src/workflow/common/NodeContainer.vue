@@ -31,7 +31,7 @@
             <h4 v-else>{{ nodeModel.properties.stepName }}</h4>
           </div>
 
-          <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop >
+          <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode">
               <el-icon class="arrow-icon color-secondary" :class="showNode ? 'rotate-180' : ''"
                 ><ArrowDownBold />
@@ -68,7 +68,9 @@
               <template #dropdown>
                 <el-dropdown-menu style="min-width: 80px">
                   <el-dropdown-item @click="copyNode" class="p-8">复制</el-dropdown-item>
-                  <el-dropdown-item @click="deleteNode" class="border-t p-8">删除</el-dropdown-item>
+                  <el-dropdown-item @click="deleteNode" class="border-t p-8">{{
+                    $t('common.delete')
+                  }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -217,8 +219,8 @@ const copyNode = () => {
   props.nodeModel.graphModel.toFront(cloneNode.id)
 }
 const deleteNode = () => {
-  MsgConfirm(`提示`, `确定删除该节点？`, {
-    confirmButtonText: '删除',
+  MsgConfirm(t('common.tip'), `确定删除该节点？`, {
+    confirmButtonText: t('common.delete'),
     confirmButtonClass: 'danger'
   }).then(() => {
     props.nodeModel.graphModel.deleteNode(props.nodeModel.id)

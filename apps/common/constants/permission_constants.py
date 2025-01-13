@@ -7,7 +7,7 @@
 """
 from enum import Enum
 from typing import List
-
+from django.utils.translation import gettext_lazy as _
 
 class Group(Enum):
     """
@@ -58,10 +58,10 @@ class Role:
 
 
 class RoleConstants(Enum):
-    ADMIN = Role("管理员", "管理员,预制目前不会使用", RoleGroup.USER)
-    USER = Role("用户", "用户所有权限", RoleGroup.USER)
-    APPLICATION_ACCESS_TOKEN = Role("会话", "只拥有应用会话框接口权限", RoleGroup.APPLICATION_ACCESS_TOKEN),
-    APPLICATION_KEY = Role("应用私钥", "应用私钥", RoleGroup.APPLICATION_KEY)
+    ADMIN = Role(_("ADMIN"), _('Admin, prefabs are not currently used'), RoleGroup.USER)
+    USER = Role(_("USER"), _('All user permissions'), RoleGroup.USER)
+    APPLICATION_ACCESS_TOKEN = Role(_('chat'), _('Only has application dialog interface permissions'), RoleGroup.APPLICATION_ACCESS_TOKEN),
+    APPLICATION_KEY = Role(_('Apply private key'), _('Apply private key'), RoleGroup.APPLICATION_KEY)
 
 
 class Permission:

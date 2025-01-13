@@ -42,7 +42,7 @@
                       <el-dropdown-menu>
                         <el-dropdown-item @click.stop="openEditVersion(row)">
                           <el-icon><EditPen /></el-icon>
-                          编辑
+                          {{ $t('common.edit') }}
                         </el-dropdown-item>
                         <el-dropdown-item @click="refreshVersion(row)">
                           <el-icon><RefreshLeft /></el-icon>

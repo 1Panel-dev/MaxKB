@@ -11,7 +11,7 @@ from typing import List
 from common.constants.permission_constants import ViewPermission, CompareConstants, RoleConstants, PermissionConstants, \
     Permission
 from common.exception.app_exception import AppUnauthorizedFailed
-
+from django.utils.translation import gettext_lazy as _
 
 def exist_permissions_by_permission_constants(user_permission: List[PermissionConstants],
                                               permission_list: List[PermissionConstants]):
@@ -91,7 +91,7 @@ def has_permissions(*permission, compare=CompareConstants.OR):
             # 判断是否有权限
             if any(exit_list) if compare == CompareConstants.OR else all(exit_list):
                 return func(view, request, **kwargs)
-            raise AppUnauthorizedFailed(403, "没有权限访问")
+            raise AppUnauthorizedFailed(403, _('No permission to access'))
 
         return run
 

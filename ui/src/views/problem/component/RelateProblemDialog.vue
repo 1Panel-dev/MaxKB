@@ -52,7 +52,7 @@
               </div>
               <el-input
                 v-model="search"
-                placeholder="搜索"
+                :placeholder="$t('common.search')"
                 class="input-with-select"
                 style="width: 260px"
                 @change="searchHandle"
@@ -95,8 +95,8 @@
     </el-row>
     <template #footer v-if="isMul">
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false"> 取消</el-button>
-        <el-button type="primary" @click="mulAssociation"> 确认 </el-button>
+        <el-button @click="dialogVisible = false"> {{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="mulAssociation"> {{ $t('common.confirm') }} </el-button>
       </div>
     </template>
   </el-dialog>

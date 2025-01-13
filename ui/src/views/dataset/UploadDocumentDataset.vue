@@ -22,9 +22,16 @@
       </div>
     </div>
     <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
-      <el-button @click="router.go(-1)" :disabled="SetRulesRef?.loading || loading">取消</el-button>
-      <el-button @click="prev" v-if="active === 1" :disabled="SetRulesRef?.loading || loading">上一步</el-button>
-      <el-button @click="next" type="primary" v-if="active === 0" :disabled="SetRulesRef?.loading || loading">
+      <el-button @click="router.go(-1)" :disabled="SetRulesRef?.loading || loading">{{$t('common.cancel')}}</el-button>
+      <el-button @click="prev" v-if="active === 1" :disabled="SetRulesRef?.loading || loading"
+        >上一步</el-button
+      >
+      <el-button
+        @click="next"
+        type="primary"
+        v-if="active === 0"
+        :disabled="SetRulesRef?.loading || loading"
+      >
         {{ documentsType === 'txt' ? '下一步' : '开始导入' }}
       </el-button>
       <el-button
@@ -46,7 +53,7 @@ import ResultSuccess from './component/ResultSuccess.vue'
 import UploadComponent from './component/UploadComponent.vue'
 import documentApi from '@/api/document'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-
+import { t } from '@/locales'
 import useStore from '@/stores'
 const { dataset, document } = useStore()
 const documentsFiles = computed(() => dataset.documentsFiles)
@@ -78,7 +85,7 @@ async function next() {
       if (id) {
         // QA文档上传
         documentApi.postQADocument(id as string, fd, loading).then((res) => {
-          MsgSuccess('提交成功')
+          MsgSuccess(t('common.submitSuccess'))
           clearStore()
           router.push({ path: `/dataset/${id}/document` })
         })
@@ -93,7 +100,7 @@ async function next() {
       if (id) {
         // table文档上传
         documentApi.postTableDocument(id as string, fd, loading).then((res) => {
-          MsgSuccess('提交成功')
+          MsgSuccess(t('common.submitSuccess'))
           clearStore()
           router.push({ path: `/dataset/${id}/document` })
         })
@@ -133,7 +140,7 @@ function submit() {
     document
       .asyncPostDocument(id as string, documents)
       .then(() => {
-        MsgSuccess('提交成功')
+        MsgSuccess(t('common.submitSuccess'))
         clearStore()
         router.push({ path: `/dataset/${id}/document` })
       })
@@ -144,8 +151,8 @@ function submit() {
 }
 function back() {
   if (documentsFiles.value?.length > 0) {
-    MsgConfirm(`提示`, `当前的更改尚未保存，确认退出吗?`, {
-      confirmButtonText: '确认',
+    MsgConfirm(t('common.tip'), `当前的更改尚未保存，确认退出吗?`, {
+      confirmButtonText: t('common.confirm'),
       type: 'warning'
     })
       .then(() => {

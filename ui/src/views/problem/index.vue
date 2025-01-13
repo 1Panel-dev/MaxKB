@@ -63,7 +63,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="create_time" label="创建时间" width="170">
+          <el-table-column prop="create_time" :label="$t('common.createTime')" width="170">
             <template #default="{ row }">
               {{ datetimeFormat(row.create_time) }}
             </template>
@@ -73,7 +73,7 @@
               {{ datetimeFormat(row.update_time) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="left" fixed="right">
+          <el-table-column :label="$t('common.operation')" align="left" fixed="right">
             <template #default="{ row }">
               <div>
                 <span class="mr-4">
@@ -84,7 +84,7 @@
                   </el-tooltip>
                 </span>
                 <span>
-                  <el-tooltip effect="dark" content="删除" placement="top">
+                  <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                     <el-button type="primary" text @click.stop="deleteProblem(row)">
                       <el-icon><Delete /></el-icon>
                     </el-button>
@@ -193,7 +193,7 @@ function creatQuickHandle(val: string) {
     .asyncPostProblem(id, obj)
     .then((res) => {
       getList()
-      MsgSuccess('创建成功')
+      MsgSuccess(t('common.createSuccess'))
     })
     .catch(() => {
       loading.value = false
@@ -219,13 +219,13 @@ function deleteProblem(row: any) {
     `是否删除问题：${row.content} ?`,
     `删除问题关联的 ${row.paragraph_count} 个分段会被取消关联，请谨慎操作。`,
     {
-      confirmButtonText: '删除',
+      confirmButtonText: t('common.delete'),
       confirmButtonClass: 'danger'
     }
   )
     .then(() => {
       problemApi.delProblems(id, row.id, loading).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.deleteSuccess'))
         getList()
       })
     })

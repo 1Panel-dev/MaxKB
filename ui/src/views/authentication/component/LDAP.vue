@@ -9,35 +9,53 @@
           label-position="top"
           require-asterisk-position="right"
         >
-          <el-form-item :label="$t('login.ldap.address')" prop="config_data.ldap_server">
+          <el-form-item
+            :label="$t('views.system.authentication.ldap.address')"
+            prop="config_data.ldap_server"
+          >
             <el-input
               v-model="form.config_data.ldap_server"
-              :placeholder="$t('login.ldap.serverPlaceholder')"
+              :placeholder="$t('views.system.authentication.ldap.serverPlaceholder')"
             />
           </el-form-item>
-          <el-form-item :label="$t('login.ldap.bindDN')" prop="config_data.base_dn">
+          <el-form-item
+            :label="$t('views.system.authentication.ldap.bindDN')"
+            prop="config_data.base_dn"
+          >
             <el-input
               v-model="form.config_data.base_dn"
-              :placeholder="$t('login.ldap.bindDNPlaceholder')"
+              :placeholder="$t('views.system.authentication.ldap.bindDNPlaceholder')"
             />
           </el-form-item>
-          <el-form-item :label="$t('login.ldap.password')" prop="config_data.password">
+          <el-form-item
+            :label="$t('views.system.authentication.ldap.password')"
+            prop="config_data.password"
+          >
             <el-input
               v-model="form.config_data.password"
-              :placeholder="$t('login.ldap.passwordPlaceholder')"
+              :placeholder="$t('views.system.authentication.ldap.passwordPlaceholder')"
               show-password
             />
           </el-form-item>
-          <el-form-item :label="$t('login.ldap.ou')" prop="config_data.ou">
-            <el-input v-model="form.config_data.ou" :placeholder="$t('login.ldap.ouPlaceholder')" />
-          </el-form-item>
-          <el-form-item :label="$t('login.ldap.ldap_filter')" prop="config_data.ldap_filter">
+          <el-form-item :label="$t('views.system.authentication.ldap.ou')" prop="config_data.ou">
             <el-input
-              v-model="form.config_data.ldap_filter"
-              :placeholder="$t('login.ldap.ldap_filterPlaceholder')"
+              v-model="form.config_data.ou"
+              :placeholder="$t('views.system.authentication.ldap.ouPlaceholder')"
             />
           </el-form-item>
-          <el-form-item :label="$t('login.ldap.ldap_mapping')" prop="config_data.ldap_mapping">
+          <el-form-item
+            :label="$t('views.system.authentication.ldap.ldap_filter')"
+            prop="config_data.ldap_filter"
+          >
+            <el-input
+              v-model="form.config_data.ldap_filter"
+              :placeholder="$t('views.system.authentication.ldap.ldap_filterPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="$t('views.system.authentication.ldap.ldap_mapping')"
+            prop="config_data.ldap_mapping"
+          >
             <el-input
               v-model="form.config_data.ldap_mapping"
               placeholder='{"name":"name","email":"mail","username":"cn"}'
@@ -45,17 +63,17 @@
           </el-form-item>
           <el-form-item>
             <el-checkbox v-model="form.is_active">{{
-              $t('login.ldap.enableAuthentication')
+              $t('views.system.authentication.ldap.enableAuthentication')
             }}</el-checkbox>
           </el-form-item>
         </el-form>
 
         <div class="text-right">
           <el-button @click="submit(authFormRef, 'test')" :disabled="loading">
-            {{ $t('login.ldap.test') }}</el-button
+            {{ $t('views.system.authentication.ldap.test') }}</el-button
           >
           <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
-            {{ $t('login.ldap.save') }}
+            {{ $t('common.save') }}
           </el-button>
         </div>
       </div>
@@ -89,20 +107,46 @@ const loading = ref(false)
 
 const rules = reactive<FormRules<any>>({
   'config_data.ldap_server': [
-    { required: true, message: t('login.ldap.serverPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.ldap.serverPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.base_dn': [
-    { required: true, message: t('login.ldap.bindDNPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.ldap.bindDNPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.password': [
-    { required: true, message: t('login.ldap.passwordPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.ldap.passwordPlaceholder'),
+      trigger: 'blur'
+    }
   ],
-  'config_data.ou': [{ required: true, message: t('login.ldap.ouPlaceholder'), trigger: 'blur' }],
+  'config_data.ou': [
+    {
+      required: true,
+      message: t('views.system.authentication.ldap.ouPlaceholder'),
+      trigger: 'blur'
+    }
+  ],
   'config_data.ldap_filter': [
-    { required: true, message: t('login.ldap.ldap_filterPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.ldap.ldap_filterPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.ldap_mapping': [
-    { required: true, message: t('login.ldap.ldap_mappingPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.ldap.ldap_mappingPlaceholder'),
+      trigger: 'blur'
+    }
   ]
 })
 
@@ -112,11 +156,11 @@ const submit = async (formEl: FormInstance | undefined, test?: string) => {
     if (valid) {
       if (test) {
         authApi.postAuthSetting(form.value, loading).then((res) => {
-          MsgSuccess(t('login.ldap.testConnectionSuccess'))
+          MsgSuccess(t('views.system.authentication.ldap.testConnectionSuccess'))
         })
       } else {
         authApi.putAuthSetting(form.value.auth_type, form.value, loading).then((res) => {
-          MsgSuccess(t('login.ldap.saveSuccess'))
+          MsgSuccess(t('common.saveSuccess'))
         })
       }
     }

@@ -17,27 +17,13 @@ export default {
       msgConfirm1: '是否重新生成公开访问链接?',
       msgConfirm2:
         '重新生成公开访问链接会影响嵌入第三方脚本变更，需要将新脚本重新嵌入第三方，请谨慎操作！',
-      confirm: '确认',
-      cancel: '取消',
       refreshSuccess: '刷新成功'
     },
-    changeState: {
-      enableSuccess: '启用成功',
-      disableSuccess: '禁用成功'
-    },
+
     APIKeyDialog: {
-      creatApiKey: '创建',
-      status: '状态',
-      creationDate: '创建日期',
-      operations: '操作',
-      settings: '设置',
-      delete: '删除',
       saveSettings: '保存设置',
       msgConfirm1: '是否删除API Key',
       msgConfirm2: '删除API Key后将无法恢复，请确认是否删除？',
-      confirmDelete: '删除',
-      deleteSuccess: '删除成功',
-      cancel: '取消',
       enabledSuccess: '已启用',
       disabledSuccess: '已禁用'
     },
@@ -48,10 +34,7 @@ export default {
       default: '默认logo',
       custom: '自定义',
       sizeTip: '建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB',
-      cancel: '取消',
-      save: '保存',
       fileSizeExceeded: '文件大小超过 10 MB',
-      setSuccess: '设置成功',
       uploadImagePrompt: '请上传一张图片'
     },
     EmbedDialog: {
@@ -69,19 +52,39 @@ export default {
       authenticationValue: '验证密码',
       whitelistLabel: '白名单',
       whitelistPlaceholder:
-        '请输入允许嵌入第三方的源地址，一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io',
-      cancelButtonText: '取消',
-      saveButtonText: '保存',
-      settingSuccessMessage: '设置成功'
+        '请输入允许嵌入第三方的源地址，一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io'
     },
     SettingAPIKeyDialog: {
       dialogTitle: '设置',
       allowCrossDomainLabel: '允许跨域地址',
       crossDomainPlaceholder:
-        '请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如：\nhttp://127.0.0.1:5678 \nhttps://dataease.io',
-      cancelButtonText: '取消',
-      saveButtonText: '保存',
-      successMessage: '设置成功'
+        '请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如：\nhttp://127.0.0.1:5678 \nhttps://dataease.io'
+    },
+    SettingDisplayDialog: {
+      dialogTitle: '显示设置',
+      showSourceLabel: '显示知识来源',
+      showExecutionDetail: '显示执行详情',
+      restoreDefault: '恢复默认',
+      customThemeColor: '自定义主题色',
+      headerTitleFontColor: '头部标题字体颜色',
+      default: '默认',
+      askUserAvatar: '提问用户头像',
+      replace: '替换',
+      imageMessage: '建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB',
+      AIAvatar: 'AI 回复头像',
+      floatIcon: '浮窗入口图标',
+      iconDefaultPosition: '图标默认位置',
+      iconPosition: {
+        left: '左',
+        right: '右',
+        bottom: '下',
+        top: '上'
+      },
+      draggablePosition: '可拖拽位置',
+      showHistory: '显示历史记录',
+      displayGuide: '显示引导图(浮窗模式)',
+      disclaimer: '免责声明',
+      disclaimerValue: '「以上内容均由 AI 生成，仅供参考和借鉴」'
     }
   },
   monitor: {
