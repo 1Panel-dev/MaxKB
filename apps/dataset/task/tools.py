@@ -16,6 +16,7 @@ from django.db.models import QuerySet
 from common.util.fork import ChildLink, Fork
 from common.util.split_model import get_split_model
 from dataset.models import Type, Document, DataSet, Status
+from django.utils.translation import gettext_lazy as _
 
 max_kb_error = logging.getLogger("max_kb_error")
 max_kb = logging.getLogger("max_kb")
@@ -110,4 +111,4 @@ def save_problem(dataset_id, document_id, paragraph_id, problem):
             data={"dataset_id": dataset_id, 'document_id': document_id,
                   'paragraph_id': paragraph_id}).save(instance={"content": problem}, with_valid=True)
     except Exception as e:
-        max_kb_error.error(f'关联问题失败: {e}')
+        max_kb_error.error(_('Association problem failed {error}').format(error=str(e)))

@@ -17,17 +17,18 @@ from common.response import result
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.problem_serializers import ProblemSerializers
 from dataset.swagger_api.problem_api import ProblemApi
+from django.utils.translation import gettext_lazy as _
 
 
 class Problem(APIView):
     authentication_classes = [TokenAuth]
 
     @action(methods=['GET'], detail=False)
-    @swagger_auto_schema(operation_summary="问题列表",
-                         operation_id="问题列表",
+    @swagger_auto_schema(operation_summary=_('Question list'),
+                         operation_id=_('Question list'),
                          manual_parameters=ProblemApi.Query.get_request_params_api(),
                          responses=result.get_api_array_response(ProblemApi.get_response_body_api()),
-                         tags=["知识库/文档/段落/问题"]
+                         tags=[_('Knowledge Base/Documentation/Paragraph/Question')]
                          )
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
@@ -39,12 +40,12 @@ class Problem(APIView):
         return result.success(q.list())
 
     @action(methods=['POST'], detail=False)
-    @swagger_auto_schema(operation_summary="创建问题",
-                         operation_id="创建问题",
+    @swagger_auto_schema(operation_summary=_('Create question'),
+                         operation_id=_('Create question'),
                          manual_parameters=ProblemApi.BatchCreate.get_request_params_api(),
                          request_body=ProblemApi.BatchCreate.get_request_body_api(),
                          responses=result.get_api_response(ProblemApi.Query.get_response_body_api()),
-                         tags=["知识库/文档/段落/问题"])
+                         tags=[_('Knowledge Base/Documentation/Paragraph/Question')])
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
@@ -57,11 +58,11 @@ class Problem(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['GET'], detail=False)
-        @swagger_auto_schema(operation_summary="获取关联段落列表",
-                             operation_id="获取关联段落列表",
+        @swagger_auto_schema(operation_summary=_('Get a list of associated paragraphs'),
+                             operation_id=_('Get a list of associated paragraphs'),
                              manual_parameters=ProblemApi.Paragraph.get_request_params_api(),
                              responses=result.get_api_array_response(ProblemApi.Paragraph.get_response_body_api()),
-                             tags=["知识库/文档/段落/问题"])
+                             tags=[_('Knowledge Base/Documentation/Paragraph/Question')])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -74,13 +75,13 @@ class Problem(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['DELETE'], detail=False)
-        @swagger_auto_schema(operation_summary="批量删除问题",
-                             operation_id="批量删除问题",
+        @swagger_auto_schema(operation_summary=_('Batch deletion issues'),
+                             operation_id=_('Batch deletion issues'),
                              request_body=
                              ProblemApi.BatchOperate.get_request_body_api(),
                              manual_parameters=ProblemApi.BatchOperate.get_request_params_api(),
                              responses=result.get_default_response(),
-                             tags=["知识库/文档/段落/问题"])
+                             tags=[_('Knowledge Base/Documentation/Paragraph/Question')])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -89,12 +90,12 @@ class Problem(APIView):
                 ProblemSerializers.BatchOperate(data={'dataset_id': dataset_id}).delete(request.data))
 
         @action(methods=['POST'], detail=False)
-        @swagger_auto_schema(operation_summary="批量关联段落",
-                             operation_id="批量关联段落",
+        @swagger_auto_schema(operation_summary=_('Batch associated paragraphs'),
+                             operation_id=_('Batch associated paragraphs'),
                              request_body=ProblemApi.BatchAssociation.get_request_body_api(),
                              manual_parameters=ProblemApi.BatchOperate.get_request_params_api(),
                              responses=result.get_default_response(),
-                             tags=["知识库/文档/段落/问题"])
+                             tags=[_('Knowledge Base/Documentation/Paragraph/Question')])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -106,11 +107,11 @@ class Problem(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['DELETE'], detail=False)
-        @swagger_auto_schema(operation_summary="删除问题",
-                             operation_id="删除问题",
+        @swagger_auto_schema(operation_summary=_('Delete question'),
+                             operation_id=_('Delete question'),
                              manual_parameters=ProblemApi.Operate.get_request_params_api(),
                              responses=result.get_default_response(),
-                             tags=["知识库/文档/段落/问题"])
+                             tags=[_('Knowledge Base/Documentation/Paragraph/Question')])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -120,12 +121,12 @@ class Problem(APIView):
                       'problem_id': problem_id}).delete())
 
         @action(methods=['PUT'], detail=False)
-        @swagger_auto_schema(operation_summary="修改问题",
-                             operation_id="修改问题",
+        @swagger_auto_schema(operation_summary=_('Modify question'),
+                             operation_id=_('Modify question'),
                              manual_parameters=ProblemApi.Operate.get_request_params_api(),
                              request_body=ProblemApi.Operate.get_request_body_api(),
                              responses=result.get_api_response(ProblemApi.get_response_body_api()),
-                             tags=["知识库/文档/段落/问题"])
+                             tags=[_('Knowledge Base/Documentation/Paragraph/Question')])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
@@ -138,12 +139,12 @@ class Problem(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['GET'], detail=False)
-        @swagger_auto_schema(operation_summary="分页获取问题列表",
-                             operation_id="分页获取问题列表",
+        @swagger_auto_schema(operation_summary=_('Get the list of questions by page'),
+                             operation_id=_('Get the list of questions by page'),
                              manual_parameters=result.get_page_request_params(
                                  ProblemApi.Query.get_request_params_api()),
                              responses=result.get_page_api_response(ProblemApi.get_response_body_api()),
-                             tags=["知识库/文档/段落/问题"])
+                             tags=[_('Knowledge Base/Documentation/Paragraph/Question')])
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                     dynamic_tag=k.get('dataset_id')))
