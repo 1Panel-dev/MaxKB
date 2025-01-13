@@ -9,6 +9,7 @@
 from abc import abstractmethod
 from typing import Type, List
 
+from django.utils.translation import gettext_lazy as _
 from langchain.schema import BaseMessage
 from rest_framework import serializers
 
@@ -23,26 +24,26 @@ from common.util.field_message import ErrMessage
 class IGenerateHumanMessageStep(IBaseChatPipelineStep):
     class InstanceSerializer(serializers.Serializer):
         # 问题
-        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.char("问题"))
+        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.char(_("question")))
         # 段落列表
         paragraph_list = serializers.ListField(child=InstanceField(model_type=ParagraphPipelineModel, required=True),
-                                               error_messages=ErrMessage.list("段落列表"))
+                                               error_messages=ErrMessage.list(_("Paragraph List")))
         # 历史对答
         history_chat_record = serializers.ListField(child=InstanceField(model_type=ChatRecord, required=True),
-                                                    error_messages=ErrMessage.list("历史对答"))
+                                                    error_messages=ErrMessage.list(_("History Questions")))
         # 多轮对话数量
-        dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("多轮对话数量"))
+        dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer(_("Number of multi-round conversations")))
         # 最大携带知识库段落长度
         max_paragraph_char_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer(
-            "最大携带知识库段落长度"))
+            _("Maximum length of the knowledge base paragraph")))
         # 模板
-        prompt = serializers.CharField(required=True, error_messages=ErrMessage.char("提示词"))
+        prompt = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Prompt word")))
         system = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                       error_messages=ErrMessage.char("系统提示词(角色)"))
+                                       error_messages=ErrMessage.char(_("System prompt words (role)")))
         # 补齐问题
-        padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.char("补齐问题"))
+        padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.char(_("Completion problem")))
         # 未查询到引用分段
-        no_references_setting = NoReferencesSetting(required=True, error_messages=ErrMessage.base("无引用分段设置"))
+        no_references_setting = NoReferencesSetting(required=True, error_messages=ErrMessage.base(_("No reference segment settings")))
 
     def get_step_serializer(self, manage: PipelineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer

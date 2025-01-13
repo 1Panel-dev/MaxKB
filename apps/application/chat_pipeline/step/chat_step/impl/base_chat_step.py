@@ -26,6 +26,7 @@ from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, Post
 from application.models.api_key_model import ApplicationPublicAccessClient
 from common.constants.authentication_type import AuthenticationType
 from setting.models_provider.tools import get_model_instance_by_model_user_id
+from django.utils.translation import gettext_lazy as _
 
 
 def add_access_num(client_id=None, client_type=None, application_id=None):
@@ -172,7 +173,8 @@ class BaseChatStep(IChatStep):
             return iter(
                 [AIMessageChunk(content=no_references_setting.get('value').replace('{question}', problem_text))]), False
         if chat_model is None:
-            return iter([AIMessageChunk('抱歉，没有配置 AI 模型，请先去应用中设置 AI 模型。')]), False
+            return iter([AIMessageChunk(
+                _('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.'))]), False
         else:
             return chat_model.stream(message_list), True
 
@@ -216,7 +218,7 @@ class BaseChatStep(IChatStep):
                 'status') == 'designated_answer':
             return AIMessage(no_references_setting.get('value').replace('{question}', problem_text)), False
         if chat_model is None:
-            return AIMessage('抱歉，没有配置 AI 模型，请先去应用中设置 AI 模型。'), False
+            return AIMessage(_('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.')), False
         else:
             return chat_model.invoke(message_list), True
 

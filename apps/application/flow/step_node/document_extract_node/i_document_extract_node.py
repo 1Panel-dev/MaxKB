@@ -2,6 +2,7 @@
 
 from typing import Type
 
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
@@ -9,7 +10,7 @@ from common.util.field_message import ErrMessage
 
 
 class DocumentExtractNodeSerializer(serializers.Serializer):
-    document_list = serializers.ListField(required=False, error_messages=ErrMessage.list("文档"))
+    document_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("document")))
 
 
 class IDocumentExtractNode(INode):

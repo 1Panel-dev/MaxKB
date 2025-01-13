@@ -8,6 +8,7 @@
 """
 from typing import Type
 
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
@@ -15,19 +16,22 @@ from common.util.field_message import ErrMessage
 
 
 class ChatNodeSerializer(serializers.Serializer):
-    model_id = serializers.CharField(required=True, error_messages=ErrMessage.char("模型id"))
+    model_id = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Model id")))
     system = serializers.CharField(required=False, allow_blank=True, allow_null=True,
-                                   error_messages=ErrMessage.char("角色设定"))
-    prompt = serializers.CharField(required=True, error_messages=ErrMessage.char("提示词"))
+                                   error_messages=ErrMessage.char(_("Role Setting")))
+    prompt = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Prompt word")))
     # 多轮对话数量
-    dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("多轮对话数量"))
+    dialogue_number = serializers.IntegerField(required=True, error_messages=ErrMessage.integer(
+        _("Number of multi-round conversations")))
 
-    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
+    is_result = serializers.BooleanField(required=False,
+                                         error_messages=ErrMessage.boolean(_('Whether to return content')))
 
-    model_params_setting = serializers.DictField(required=False, error_messages=ErrMessage.integer("模型参数相关设置"))
+    model_params_setting = serializers.DictField(required=False,
+                                                 error_messages=ErrMessage.integer(_("Model parameter settings")))
 
     dialogue_type = serializers.CharField(required=False, allow_blank=True, allow_null=True,
-                                          error_messages=ErrMessage.char("上下文类型"))
+                                          error_messages=ErrMessage.char(_("Context Type")))
 
 
 class IChatNode(INode):

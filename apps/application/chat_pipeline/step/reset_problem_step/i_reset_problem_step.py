@@ -9,12 +9,11 @@
 from abc import abstractmethod
 from typing import Type, List
 
-from langchain.chat_models.base import BaseChatModel
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep
 from application.chat_pipeline.pipeline_manage import PipelineManage
-from application.chat_pipeline.step.chat_step.i_chat_step import ModelField
 from application.models import ChatRecord
 from common.field.common import InstanceField
 from common.util.field_message import ErrMessage
@@ -23,15 +22,16 @@ from common.util.field_message import ErrMessage
 class IResetProblemStep(IBaseChatPipelineStep):
     class InstanceSerializer(serializers.Serializer):
         # 问题文本
-        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.float("问题文本"))
+        problem_text = serializers.CharField(required=True, error_messages=ErrMessage.float(_("question")))
         # 历史对答
         history_chat_record = serializers.ListField(child=InstanceField(model_type=ChatRecord, required=True),
-                                                    error_messages=ErrMessage.list("历史对答"))
+                                                    error_messages=ErrMessage.list(_("History Questions")))
         # 大语言模型
-        model_id = serializers.UUIDField(required=False, allow_null=True, error_messages=ErrMessage.uuid("模型id"))
-        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("用户id"))
+        model_id = serializers.UUIDField(required=False, allow_null=True, error_messages=ErrMessage.uuid(_("Model id")))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
         problem_optimization_prompt = serializers.CharField(required=False, max_length=102400,
-                                                            error_messages=ErrMessage.char("问题补全提示词"))
+                                                            error_messages=ErrMessage.char(
+                                                                _("Question completion prompt")))
 
     def get_step_serializer(self, manage: PipelineManage) -> Type[serializers.Serializer]:
         return self.InstanceSerializer

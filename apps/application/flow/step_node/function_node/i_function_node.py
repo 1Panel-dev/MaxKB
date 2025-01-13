@@ -16,32 +16,35 @@ from application.flow.i_step_node import INode, NodeResult
 from common.exception.app_exception import AppApiException
 from common.field.common import ObjectField
 from common.util.field_message import ErrMessage
+from django.utils.translation import gettext_lazy as _
+from rest_framework.utils.formatting import lazy_format
 
 
 class InputField(serializers.Serializer):
-    name = serializers.CharField(required=True, error_messages=ErrMessage.char('变量名'))
-    is_required = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean("是否必填"))
-    type = serializers.CharField(required=True, error_messages=ErrMessage.char("类型"), validators=[
+    name = serializers.CharField(required=True, error_messages=ErrMessage.char(_('Variable Name')))
+    is_required = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean(_("Is this field required")))
+    type = serializers.CharField(required=True, error_messages=ErrMessage.char(_("type")), validators=[
         validators.RegexValidator(regex=re.compile("^string|int|dict|array|float$"),
-                                  message="字段只支持string|int|dict|array|float", code=500)
+                                  message=_("字段只支持string|int|dict|array|float"), code=500)
     ])
-    source = serializers.CharField(required=True, error_messages=ErrMessage.char("来源"), validators=[
+    source = serializers.CharField(required=True, error_messages=ErrMessage.char(_("source")), validators=[
         validators.RegexValidator(regex=re.compile("^custom|reference$"),
-                                  message="字段只支持custom|reference", code=500)
+                                  message=_("The field only supports custom|reference"), code=500)
     ])
-    value = ObjectField(required=True, error_messages=ErrMessage.char("变量值"), model_type_list=[str, list])
+    value = ObjectField(required=True, error_messages=ErrMessage.char(_("Variable Value")), model_type_list=[str, list])
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
         is_required = self.data.get('is_required')
         if is_required and self.data.get('value') is None:
-            raise AppApiException(500, f'{self.data.get("name")}必填')
+            message = lazy_format(_('{field}, this field is required.'), field=self.data.get("name"))
+            raise AppApiException(500, message)
 
 
 class FunctionNodeParamsSerializer(serializers.Serializer):
     input_field_list = InputField(required=True, many=True)
-    code = serializers.CharField(required=True, error_messages=ErrMessage.char("函数"))
-    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
+    code = serializers.CharField(required=True, error_messages=ErrMessage.char(_("function")))
+    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean(_('Whether to return content')))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)

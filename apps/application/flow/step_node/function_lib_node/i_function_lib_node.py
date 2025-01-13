@@ -15,23 +15,24 @@ from application.flow.i_step_node import INode, NodeResult
 from common.field.common import ObjectField
 from common.util.field_message import ErrMessage
 from function_lib.models.function import FunctionLib
+from django.utils.translation import gettext_lazy as _
 
 
 class InputField(serializers.Serializer):
-    name = serializers.CharField(required=True, error_messages=ErrMessage.char('变量名'))
-    value = ObjectField(required=True, error_messages=ErrMessage.char("变量值"), model_type_list=[str, list])
+    name = serializers.CharField(required=True, error_messages=ErrMessage.char(_('Variable Name')))
+    value = ObjectField(required=True, error_messages=ErrMessage.char(_("Variable Value")), model_type_list=[str, list])
 
 
 class FunctionLibNodeParamsSerializer(serializers.Serializer):
-    function_lib_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid('函数库id'))
+    function_lib_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('Library ID')))
     input_field_list = InputField(required=True, many=True)
-    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean('是否返回内容'))
+    is_result = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean(_('Whether to return content')))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
         f_lib = QuerySet(FunctionLib).filter(id=self.data.get('function_lib_id')).first()
         if f_lib is None:
-            raise Exception('函数库已被删除')
+            raise Exception(_('The library has been deleted'))
 
 
 class IFunctionLibNode(INode):
