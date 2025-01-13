@@ -9,6 +9,7 @@
 from drf_yasg import openapi
 
 from common.mixins.api_mixin import ApiMixin
+from django.utils.translation import gettext_lazy as _
 
 
 class ImageApi(ApiMixin):
@@ -18,5 +19,5 @@ class ImageApi(ApiMixin):
                                   in_=openapi.IN_FORM,
                                   type=openapi.TYPE_FILE,
                                   required=True,
-                                  description='上传图片文件')
+                                  description=_('image file'))
                 ]

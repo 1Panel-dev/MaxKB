@@ -16,6 +16,7 @@ from rest_framework.views import Request
 from common.auth import TokenAuth
 from common.response import result
 from dataset.serializers.image_serializers import ImageSerializer
+from django.utils.translation import gettext_lazy as _
 
 
 class Image(APIView):
@@ -23,21 +24,21 @@ class Image(APIView):
     parser_classes = [MultiPartParser]
 
     @action(methods=['POST'], detail=False)
-    @swagger_auto_schema(operation_summary="上传图片",
-                         operation_id="上传图片",
+    @swagger_auto_schema(operation_summary=_('Upload image'),
+                         operation_id=_('Upload image'),
                          manual_parameters=[openapi.Parameter(name='file',
                                                               in_=openapi.IN_FORM,
                                                               type=openapi.TYPE_FILE,
                                                               required=True,
-                                                              description='上传文件')],
-                         tags=["图片"])
+                                                              description=_('Upload image'))],
+                         tags=[_('Image')])
     def post(self, request: Request):
         return result.success(ImageSerializer(data={'image': request.FILES.get('file')}).upload())
 
     class Operate(APIView):
         @action(methods=['GET'], detail=False)
-        @swagger_auto_schema(operation_summary="获取图片",
-                             operation_id="获取图片",
-                             tags=["图片"])
+        @swagger_auto_schema(operation_summary=_('Get Image'),
+                             operation_id=_('Get Image'),
+                             tags=[_('Image')])
         def get(self, request: Request, image_id: str):
             return ImageSerializer.Operate(data={'id': image_id}).get()

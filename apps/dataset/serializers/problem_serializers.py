@@ -25,6 +25,7 @@ from dataset.serializers.common_serializers import get_embedding_model_id_by_dat
 from embedding.models import SourceType
 from embedding.task import delete_embedding_by_source_ids, update_problem_embedding, embedding_by_data_list
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _
 
 
 class ProblemSerializer(serializers.ModelSerializer):
@@ -35,9 +36,9 @@ class ProblemSerializer(serializers.ModelSerializer):
 
 
 class ProblemInstanceSerializer(ApiMixin, serializers.Serializer):
-    id = serializers.CharField(required=False, error_messages=ErrMessage.char("问题id"))
+    id = serializers.CharField(required=False, error_messages=ErrMessage.char(_('problem id')))
 
-    content = serializers.CharField(required=True, max_length=256, error_messages=ErrMessage.char("问题内容"))
+    content = serializers.CharField(required=True, max_length=256, error_messages=ErrMessage.char(_('content')))
 
     @staticmethod
     def get_request_body_api():
@@ -46,21 +47,21 @@ class ProblemInstanceSerializer(ApiMixin, serializers.Serializer):
                               properties={
                                   'id': openapi.Schema(
                                       type=openapi.TYPE_STRING,
-                                      title="问题id,修改的时候传递,创建的时候不传"),
+                                      title=_('Issue ID is passed when modifying, not when creating.')),
                                   'content': openapi.Schema(
-                                      type=openapi.TYPE_STRING, title="内容")
+                                      type=openapi.TYPE_STRING, title=_('content'),)
                               })
 
 
 class AssociationParagraph(serializers.Serializer):
-    paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("段落id"))
-    document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("文档id"))
+    paragraph_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('paragraph id')))
+    document_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('document id')))
 
 
 class BatchAssociation(serializers.Serializer):
-    problem_id_list = serializers.ListField(required=True, error_messages=ErrMessage.list("问题id列表"),
+    problem_id_list = serializers.ListField(required=True, error_messages=ErrMessage.list(_('problem id list')),
                                             child=serializers.UUIDField(required=True,
-                                                                        error_messages=ErrMessage.uuid("问题id")))
+                                                                        error_messages=ErrMessage.uuid(_('problem id'))))
     paragraph_list = AssociationParagraph(many=True)
 
 
@@ -83,11 +84,11 @@ def to_problem_paragraph_mapping(problem, document_id: str, paragraph_id: str, d
 
 class ProblemSerializers(ApiMixin, serializers.Serializer):
     class Create(serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
-        problem_list = serializers.ListField(required=True, error_messages=ErrMessage.list("问题列表"),
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('dataset id')))
+        problem_list = serializers.ListField(required=True, error_messages=ErrMessage.list(_('problem list')),
                                              child=serializers.CharField(required=True,
                                                                          max_length=256,
-                                                                         error_messages=ErrMessage.char("问题")))
+                                                                         error_messages=ErrMessage.char(_('problem'))))
 
         def batch(self, with_valid=True):
             if with_valid:
@@ -108,8 +109,8 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             return [ProblemSerializer(problem_instance).data for problem_instance in problem_instance_list]
 
     class Query(serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
-        content = serializers.CharField(required=False, error_messages=ErrMessage.char("问题"))
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('dataset id')))
+        content = serializers.CharField(required=False, error_messages=ErrMessage.char(_('content')))
 
         def get_query_set(self):
             query_set = QuerySet(model=Problem)
@@ -131,7 +132,7 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_problem.sql')))
 
     class BatchOperate(serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('dataset id')))
 
         def delete(self, problem_id_list: List, with_valid=True):
             if with_valid:
@@ -188,9 +189,9 @@ class ProblemSerializers(ApiMixin, serializers.Serializer):
             embedding_by_data_list(data_list, model_id=model_id)
 
     class Operate(serializers.Serializer):
-        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("知识库id"))
+        dataset_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('dataset id')))
 
-        problem_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid("问题id"))
+        problem_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('problem id')))
 
         def list_paragraph(self, with_valid=True):
             if with_valid:

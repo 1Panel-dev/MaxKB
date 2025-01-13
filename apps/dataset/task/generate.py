@@ -13,6 +13,7 @@ from dataset.task.tools import save_problem
 from ops import celery_app
 from setting.models import Model
 from setting.models_provider import get_model
+from django.utils.translation import gettext_lazy as _
 
 max_kb_error = logging.getLogger("max_kb_error")
 max_kb = logging.getLogger("max_kb")
@@ -80,9 +81,11 @@ def generate_related_by_document_id(document_id, model_id, prompt):
         page(QuerySet(Paragraph).filter(document_id=document_id), 10, generate_problem, is_the_task_interrupted)
     except Exception as e:
         max_kb_error.error(f'根据文档生成问题:{document_id}出现错误{str(e)}{traceback.format_exc()}')
+        max_kb_error.error(_('Generate issue based on document: {document_id} error {error}{traceback}').format(
+            document_id=document_id, error=str(e), traceback=traceback.format_exc()))
     finally:
         ListenerManagement.post_update_document_status(document_id, TaskType.GENERATE_PROBLEM)
-        max_kb.info(f"结束--->生成问题:{document_id}")
+        max_kb.info(_('End--->Generate problem: {document_id}').format(document_id=document_id))
 
 
 @celery_app.task(base=QueueOnce, once={'keys': ['paragraph_id_list']},
