@@ -128,6 +128,20 @@ export default {
     saveSuccess: '外观设置成功'
   },
   email: {
-    title: '邮箱配置'
+    title: '邮箱设置',
+    smtpHost: 'SMTP Host',
+    smtpHostPlaceholder: '请输入 SMTP Host',
+    smtpPort: 'SMTP Port',
+    smtpPortPlaceholder: '请输入 SMTP Port',
+    smtpUser: 'SMTP 账户',
+    smtpUserPlaceholder: '请输入 SMTP 账户',
+    sendEmail: '发件人邮箱',
+    sendEmailPlaceholder: '请输入发件人邮箱',
+    smtpPassword: '密码',
+    smtpPasswordPlaceholder: '请输入发件人密码',
+    test: '测试连接',
+    enableSSL: '启用 SSL（如果 SMTP 端口是 465，通常需要启用 SSL）',
+    enableTLS: '启用 TLS（如果 SMTP 端口是 587，通常需要启用 TLS）',
+    testSuccess: '测试连接成功'
   }
 }
