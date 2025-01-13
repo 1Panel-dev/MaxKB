@@ -18,7 +18,8 @@
         class="mr-8"
       >
         <AppIcon iconName="app-pricing" class="mr-8" style="font-size: 20px"></AppIcon>
-        购买专业版
+
+        {{ $t('common.professional') }}
       </el-button>
       <el-tooltip
         effect="dark"
@@ -59,7 +60,7 @@
           @click="toUrl(user.themeInfo?.forumUrl)"
         ></AppIcon>
       </el-tooltip>
-      <el-dropdown v-if="false" trigger="click" type="primary">
+      <el-dropdown trigger="click" type="primary">
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item

@@ -16,14 +16,15 @@ from common.constants.permission_constants import RoleConstants
 from common.response import result
 from setting.serializers.valid_serializers import ValidSerializer
 from setting.swagger_api.valid_api import ValidApi
+from django.utils.translation import gettext_lazy as _
 
 
 class Valid(APIView):
     authentication_classes = [TokenAuth]
 
     @action(methods=['GET'], detail=False)
-    @swagger_auto_schema(operation_summary="获取校验结果",
-                         operation_id="获取校验结果",
+    @swagger_auto_schema(operation_summary=_('Get verification results'),
+                         operation_id=_('Get verification results'),
                          manual_parameters=ValidApi.get_request_params_api(),
                          responses=result.get_default_response()
         , tags=["校验"])

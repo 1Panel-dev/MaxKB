@@ -24,9 +24,9 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(problemFormRef)" :loading="loading">
-          确定
+          {{ $t('common.confirm') }}
         </el-button>
       </span>
     </template>
@@ -79,7 +79,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         return item !== ''
       })
       problem.asyncPostProblem(id, arr, loading).then((res: any) => {
-        MsgSuccess('创建成功')
+        MsgSuccess(t('common.createSuccess'))
         emit('refresh')
         dialogVisible.value = false
       })

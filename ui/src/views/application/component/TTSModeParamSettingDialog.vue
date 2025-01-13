@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     align-center
-    :title="$t('views.application.applicationForm.dialogues.paramSettings')"
+    :title="$t('common.paramSetting')"
     class="aiMode-param-dialog"
     v-model="dialogVisible"
     style="width: 550px"
@@ -23,16 +23,17 @@
       <div class="flex-between">
         <span class="p-16">
           <el-button @click="testPlay" :loading="playLoading">
-            <AppIcon iconName="app-video-play"></AppIcon>
-            试听
+            <AppIcon iconName="app-video-play" class="mr-4"></AppIcon>
+            {{ $t('views.application.applicationForm.form.voicePlay.listeningTest') }}
+            
           </el-button>
         </span>
         <span class="dialog-footer p-16">
           <el-button @click.prevent="dialogVisible = false">
-            {{ $t('views.application.applicationForm.buttons.cancel') }}
+            {{ $t('common.cancel') }}
           </el-button>
           <el-button type="primary" @click="submit" :loading="loading">
-            {{ $t('views.application.applicationForm.buttons.confirm') }}
+            {{ $t('common.confirm') }}
           </el-button>
         </span>
       </div>

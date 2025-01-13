@@ -1,4 +1,5 @@
 import { ElMessageBox, ElMessage } from 'element-plus'
+import { t } from '@/locales'
 
 export const MsgSuccess = (message: string) => {
   ElMessage.success({
@@ -38,7 +39,7 @@ export const MsgError = (message: string) => {
 
 export const MsgAlert = (title: string, description: string, options?: any) => {
   const defaultOptions: Object = {
-    confirmButtonText: '确定',
+    confirmButtonText: t('common.confirm'),
     ...options
   }
   return ElMessageBox.alert(description, title, defaultOptions)
@@ -52,8 +53,8 @@ export const MsgAlert = (title: string, description: string, options?: any) => {
 export const MsgConfirm = (title: string, description: string, options?: any) => {
   const defaultOptions: Object = {
     showCancelButton: true,
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     ...options
   }
   return ElMessageBox.confirm(description, title, defaultOptions)

@@ -9,7 +9,7 @@ template
   >
     <template #header>
       <div class="flex align-center" style="margin-left: -8px">
-        <h4>{{ currentPlatform.name + '设置' }}</h4>
+        <h4>{{ currentPlatform.name + ' ' + $t('common.setting') }}</h4>
       </div>
     </template>
 
@@ -37,9 +37,11 @@ template
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="handleClose">取 消</el-button>
-        <el-button @click="validateConnection">校 验</el-button>
-        <el-button type="primary" @click="validateForm">保 存</el-button>
+        <el-button @click="handleClose">{{ $t('common.cancel') }}</el-button>
+        <el-button @click="validateConnection">{{
+          $t('views.system.authentication.scanTheQRCode.validate')
+        }}</el-button>
+        <el-button type="primary" @click="validateForm">{{ $t('common.save') }}</el-button>
       </span>
     </template>
   </el-drawer>
@@ -50,6 +52,7 @@ import { reactive, ref } from 'vue'
 import { ElForm } from 'element-plus'
 import platformApi from '@/api/platform-source'
 import { MsgError, MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
 
 const visible = ref(false)
 const loading = ref(false)
@@ -83,7 +86,7 @@ const formatFieldName = (key?: any): string => {
     app_key: currentPlatform?.key != 'lark' ? 'APP Key' : 'App ID',
     app_secret: 'APP Secret',
     agent_id: 'Agent ID',
-    callback_url: '回调地址'
+    callback_url: t('views.application.applicationAccess.callback')
   }
   return (
     fieldNames[key as keyof typeof fieldNames] ||
@@ -94,17 +97,49 @@ const formatFieldName = (key?: any): string => {
 const getValidationRules = (key: any) => {
   switch (key) {
     case 'app_key':
-      return [{ required: true, message: '请输入 APP Key', trigger: ['blur', 'change'] }]
+      return [
+        {
+          required: true,
+          message: t('views.system.authentication.scanTheQRCode.appKeyPlaceholder'),
+          trigger: ['blur', 'change']
+        }
+      ]
     case 'app_secret':
-      return [{ required: true, message: '请输入 APP Secret', trigger: ['blur', 'change'] }]
+      return [
+        {
+          required: true,
+          message: t('views.system.authentication.scanTheQRCode.appSecretPlaceholder'),
+          trigger: ['blur', 'change']
+        }
+      ]
     case 'corp_id':
-      return [{ required: true, message: '请输入 Corp ID', trigger: ['blur', 'change'] }]
+      return [
+        {
+          required: true,
+          message: t('views.system.authentication.scanTheQRCode.corpIdPlaceholder'),
+          trigger: ['blur', 'change']
+        }
+      ]
     case 'agent_id':
-      return [{ required: true, message: '请输入 Agent ID', trigger: ['blur', 'change'] }]
+      return [
+        {
+          required: true,
+          message: t('views.system.authentication.scanTheQRCode.agentIdPlaceholder'),
+          trigger: ['blur', 'change']
+        }
+      ]
     case 'callback_url':
       return [
-        { required: true, message: '请输入回调地址', trigger: ['blur', 'change'] },
-        { pattern: /^https?:\/\/.+/, message: '请输入有效的 URL 地址', trigger: ['blur', 'change'] }
+        {
+          required: true,
+          message: t('views.application.applicationAccess.callbackTip'),
+          trigger: ['blur', 'change']
+        },
+        {
+          pattern: /^https?:\/\/.+/,
+          message: t('views.system.authentication.scanTheQRCode.callbackWarning'),
+          trigger: ['blur', 'change']
+        }
       ]
     default:
       return []
@@ -153,7 +188,7 @@ const validateForm = () => {
     if (valid) {
       saveConfig()
     } else {
-      MsgError('请填写所有必填项并确保格式正确')
+      MsgError(t('views.system.authentication.scanTheQRCode.validateFailedTip'))
     }
   })
 }
@@ -167,9 +202,9 @@ const handleClose = () => {
 function validateConnection() {
   platformApi.validateConnection(currentPlatform, loading).then((res: any) => {
     if (res.data) {
-      MsgSuccess('校验成功')
+      MsgSuccess(t('views.system.authentication.scanTheQRCode.validateSuccess'))
     } else {
-      MsgError('校验失败')
+      MsgError(t('views.system.authentication.scanTheQRCode.validateFailed'))
     }
   })
 }
@@ -178,9 +213,10 @@ const passwordFields = new Set(['app_secret', 'client_secret', 'secret'])
 
 const isPasswordField = (key: any) => passwordFields.has(key)
 const emit = defineEmits(['refresh'])
+
 function saveConfig() {
   platformApi.updateConfig(currentPlatform, loading).then((res: any) => {
-    MsgSuccess('保存成功')
+    MsgSuccess(t('common.saveSuccess'))
     emit('refresh')
     visible.value = false
     formRef.value?.clearValidate()

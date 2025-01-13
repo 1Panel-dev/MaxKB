@@ -15,7 +15,6 @@ import re
 import uuid
 from functools import reduce
 from typing import Dict, List
-
 from django.contrib.postgres.fields import ArrayField
 from django.core import cache, validators
 from django.core import signing
@@ -54,8 +53,7 @@ from setting.models_provider.tools import get_model_instance_by_model_user_id
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 from users.models import User
-from django.db.models import Value
-from django.db.models.fields.json import KeyTextTransform
+from django.utils.translation import gettext_lazy as _
 
 chat_cache = cache.caches['chat_cache']
 
@@ -194,10 +192,11 @@ def get_base_node_work_flow(work_flow):
 
 
 class ApplicationSerializer(serializers.Serializer):
-    name = serializers.CharField(required=True, max_length=64, min_length=1, error_messages=ErrMessage.char("应用名称"))
+    name = serializers.CharField(required=True, max_length=64, min_length=1,
+                                 error_messages=ErrMessage.char(_("application name")))
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                  max_length=256, min_length=1,
-                                 error_messages=ErrMessage.char("应用描述"))
+                                 error_messages=ErrMessage.char(_("application describe")))
     model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      error_messages=ErrMessage.char("模型"))
     dialogue_number = serializers.IntegerField(required=True,

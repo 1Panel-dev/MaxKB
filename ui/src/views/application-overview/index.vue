@@ -103,7 +103,7 @@
               </div>
               <div class="mt-4 mb-16 url-height">
                 <div>
-                  <el-text>API 文档：</el-text
+                  <el-text>API {{ $t('common.document') }}：</el-text
                   ><el-button
                     type="primary"
                     link
@@ -306,8 +306,8 @@ function refreshAccessToken() {
     t('views.applicationOverview.appInfo.refreshToken.msgConfirm1'),
     t('views.applicationOverview.appInfo.refreshToken.msgConfirm2'),
     {
-      confirmButtonText: t('views.applicationOverview.appInfo.refreshToken.confirm'),
-      cancelButtonText: t('views.applicationOverview.appInfo.refreshToken.cancel')
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel')
     }
   )
     .then(() => {
@@ -325,8 +325,8 @@ function changeState(bool: Boolean) {
     is_active: bool
   }
   const str = bool
-    ? t('views.applicationOverview.appInfo.changeState.enableSuccess')
-    : t('views.applicationOverview.appInfo.changeState.disableSuccess')
+    ? t('common.status.enableSuccess')
+    : t('common.status.disableSuccess')
   updateAccessToken(obj, str)
 }
 

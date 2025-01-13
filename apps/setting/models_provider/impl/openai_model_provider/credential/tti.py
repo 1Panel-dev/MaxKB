@@ -9,11 +9,11 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
-
+from django.utils.translation import gettext_lazy as _
 
 class OpenAITTIModelParams(BaseForm):
     size = forms.SingleSelect(
-        TooltipLabel('图片尺寸', '图像生成端点允许您根据文本提示创建原始图像。使用 DALL·E 3 时，图像的尺寸可以为 1024x1024、1024x1792 或 1792x1024 像素。'),
+        TooltipLabel(_('Image size'), _('The image generation endpoint allows you to create raw images based on text prompts. When using the DALL·E 3, the image size can be 1024x1024, 1024x1792 or 1792x1024 pixels.')),
         required=True,
         default_value='1024x1024',
         option_list=[
@@ -26,7 +26,9 @@ class OpenAITTIModelParams(BaseForm):
     )
 
     quality = forms.SingleSelect(
-        TooltipLabel('图片质量', '默认情况下，图像以标准质量生成，但使用 DALL·E 3 时，您可以设置质量：“hd”以增强细节。方形、标准质量的图像生成速度最快。'),
+        TooltipLabel(_('Picture quality'), _('''       
+By default, images are produced in standard quality, but with DALL·E 3 you can set quality: "hd" to enhance detail. Square, standard quality images are generated fastest.
+        ''')),
         required=True,
         default_value='standard',
         option_list=[
@@ -38,7 +40,7 @@ class OpenAITTIModelParams(BaseForm):
     )
 
     n = forms.SliderField(
-        TooltipLabel('图片数量', '您可以使用 DALL·E 3 一次请求 1 个图像（通过发出并行请求来请求更多图像），或者使用带有 n 参数的 DALL·E 2 一次最多请求 10 个图像。'),
+        TooltipLabel(_('Number of pictures'), _('You can use DALL·E 3 to request 1 image at a time (requesting more images by issuing parallel requests), or use DALL·E 2 with the n parameter to request up to 10 images at a time.')),
         required=True, default_value=1,
         _min=1,
         _max=10,
@@ -47,19 +49,19 @@ class OpenAITTIModelParams(BaseForm):
 
 
 class OpenAITextToImageModelCredential(BaseForm, BaseModelCredential):
-    api_base = forms.TextInputField('API 域名', required=True)
+    api_base = forms.TextInputField('API Url', required=True)
     api_key = forms.PasswordInputField('API Key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
+            raise AppApiException(ValidCode.valid_error.value, _('{model_type} Model type is not supported').format(model_type=model_type))
 
         for key in ['api_base', 'api_key']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
+                    raise AppApiException(ValidCode.valid_error.value, _('{key}  is required').format(key=key))
                 else:
                     return False
         try:
@@ -70,7 +72,7 @@ class OpenAITextToImageModelCredential(BaseForm, BaseModelCredential):
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value, f'校验失败,请检查参数是否正确: {str(e)}')
+                raise AppApiException(ValidCode.valid_error.value, _('Verification failed, please check whether the parameters are correct: {error}').format(error=str(e)))
             else:
                 return False
         return True

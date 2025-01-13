@@ -23,7 +23,7 @@
         <el-input
           v-model="search"
           @change="getList"
-          placeholder="搜索"
+          :placeholder="$t('common.search')"
           prefix-icon="Search"
           class="w-240"
           style="margin-left: 10px"
@@ -31,7 +31,7 @@
         />
         <div style="display: flex; align-items: center" class="float-right">
           <el-button @click="dialogVisible = true">清除策略</el-button>
-          <el-button @click="exportLog">导出</el-button>
+          <el-button @click="exportLog">{{$t('common.export')}}</el-button>
           <el-button @click="openDocumentDialog" :disabled="multipleSelection.length === 0"
             >添加至知识库
           </el-button>
@@ -104,7 +104,7 @@
                 </div>
                 <div class="text-right">
                   <el-button size="small" @click="filterChange('clear')">清除</el-button>
-                  <el-button type="primary" @click="filterChange" size="small">确认</el-button>
+                  <el-button type="primary" @click="filterChange" size="small">{{ $t('common.confirm') }}</el-button>
                 </div>
               </el-popover>
             </div>
@@ -132,7 +132,7 @@
 
         <!-- <el-table-column label="操作" width="70" align="left">
           <template #default="{ row }">
-            <el-tooltip effect="dark" content="删除" placement="top">
+            <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
               <el-button type="primary" text @click.stop="deleteLog(row)">
                 <el-icon><Delete /></el-icon>
               </el-button>
@@ -159,7 +159,7 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
-      <span>删除</span>
+      <span>{{ $t('common.delete') }}</span>
       <el-input-number
         v-model="days"
         controls-position="right"
@@ -254,9 +254,9 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click.prevent="documentDialogVisible = false"> 取消 </el-button>
+          <el-button @click.prevent="documentDialogVisible = false"> {{$t('common.cancel')}} </el-button>
           <el-button type="primary" @click="submitForm(formRef)" :loading="documentLoading">
-            保存
+            {{$t('common.save')}}
           </el-button>
         </span>
       </template>
@@ -455,13 +455,13 @@ const handleSelectionChange = (val: any[]) => {
 
 function deleteLog(row: any) {
   MsgConfirm(`是否删除对话：${row.abstract} ?`, `删除后无法恢复，请谨慎操作。`, {
-    confirmButtonText: '删除',
+    confirmButtonText: t('common.delete'),
     confirmButtonClass: 'danger'
   })
     .then(() => {
       loading.value = true
       logApi.delChatLog(id as string, row.id, loading).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.deleteSuccess'))
         getList()
       })
     })
@@ -539,7 +539,7 @@ function saveCleanTime() {
   application
     .asyncPutApplication(id as string, obj, loading)
     .then(() => {
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.saveSuccess'))
       dialogVisible.value = false
       getDetail()
     })

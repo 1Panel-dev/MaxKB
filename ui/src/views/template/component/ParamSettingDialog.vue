@@ -35,16 +35,16 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" align="left" width="80">
+      <el-table-column :label="$t('common.operation')" align="left" width="80">
         <template #default="{ row, $index }">
           <span class="mr-4">
-            <el-tooltip effect="dark" content="修改" placement="top">
+            <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
               <el-button type="primary" text @click.stop="openAddDrawer(row, $index)">
                 <el-icon><EditPen /></el-icon>
               </el-button>
             </el-tooltip>
           </span>
-          <el-tooltip effect="dark" content="删除" placement="top">
+          <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
             <el-button type="primary" text @click="deleteParam($index)">
               <el-icon>
                 <Delete />
@@ -56,8 +56,8 @@
     </el-table>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="close">取消</el-button>
-        <el-button type="primary" @click="submit" :loading="loading"> 保存 </el-button>
+        <el-button @click="close">{{$t('common.cancel')}}</el-button>
+        <el-button type="primary" @click="submit" :loading="loading"> {{$t('common.save')}} </el-button>
       </span>
     </template>
   </el-dialog>

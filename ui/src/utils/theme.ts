@@ -1,26 +1,28 @@
+import { t } from '@/locales'
+
 export const themeList = [
   {
-    label: '默认',
+    label: t('views.system.theme.default'),
     value: '#3370FF',
     loginBackground: 'default'
   },
   {
-    label: '活力橙',
+    label: t('views.system.theme.orange'),
     value: '#FF8800',
     loginBackground: 'orange'
   },
   {
-    label: '松石绿',
+    label: t('views.system.theme.green'),
     value: '#00B69D',
     loginBackground: 'green'
   },
   {
-    label: '神秘紫',
+    label: t('views.system.theme.purple'),
     value: '#7F3BF5',
     loginBackground: 'purple'
   },
   {
-    label: '胭脂红',
+    label: t('views.system.theme.red'),
     value: '#F01D94',
     loginBackground: 'red'
   }
@@ -35,7 +37,7 @@ export const defaultSetting = {
   loginLogo: '',
   loginImage: '',
   title: 'MaxKB',
-  slogan: '欢迎使用 MaxKB 智能知识库问答系统'
+  slogan: t('views.system.theme.defaultSlogan')
 }
 
 export const defaultPlatformSetting = {

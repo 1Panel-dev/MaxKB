@@ -94,7 +94,8 @@
           <template v-if="isApplication">
             <div class="w-full text-left cursor" @click="openCreateDialog">
               <el-button link>
-                <el-icon class="mr-4"><Plus /></el-icon> 创建应用
+                <el-icon class="mr-4"><Plus /></el-icon>
+                {{ $t('views.application.createApplication') }}
               </el-button>
             </div>
           </template>

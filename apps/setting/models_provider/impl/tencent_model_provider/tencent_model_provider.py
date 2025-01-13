@@ -15,7 +15,7 @@ from setting.models_provider.impl.tencent_model_provider.model.image import Tenc
 from setting.models_provider.impl.tencent_model_provider.model.llm import TencentModel
 from setting.models_provider.impl.tencent_model_provider.model.tti import TencentTextToImageModel
 from smartdoc.conf import PROJECT_DIR
-
+from django.utils.translation import gettext_lazy as _
 
 def _create_model_info(model_name, description, model_type, credential_class, model_class):
     return ModelInfo(
@@ -35,38 +35,44 @@ def _get_tencent_icon_path():
 def _initialize_model_info():
     model_info_list = [_create_model_info(
         'hunyuan-pro',
-        '当前混元模型中效果最优版本，万亿级参数规模 MOE-32K 长文模型。在各种 benchmark 上达到绝对领先的水平，复杂指令和推理，具备复杂数学能力，支持 functioncall，在多语言翻译、金融法律医疗等领域应用重点优化',
+        _('The most effective version of the current hybrid model, the trillion-level parameter scale MOE-32K long article model. Reaching the absolute leading level on various benchmarks, with complex instructions and reasoning, complex mathematical capabilities, support for function call, and application focus optimization in fields such as multi-language translation, finance, law, and medical care'),
         ModelTypeConst.LLM,
         TencentLLMModelCredential,
         TencentModel
     ),
         _create_model_info(
             'hunyuan-standard',
-            '采用更优的路由策略，同时缓解了负载均衡和专家趋同的问题。长文方面，大海捞针指标达到99.9%',
+            _('A better routing strategy is adopted to simultaneously alleviate the problems of load balancing and expert convergence. For long articles, the needle-in-a-haystack index reaches 99.9%'),
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
             TencentModel),
         _create_model_info(
             'hunyuan-lite',
-            '升级为 MOE 结构，上下文窗口为 256k ，在 NLP，代码，数学，行业等多项评测集上领先众多开源模型',
+            _('Upgraded to MOE structure, the context window is 256k, leading many open source models in multiple evaluation sets such as NLP, code, mathematics, industry, etc.'),
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
             TencentModel),
         _create_model_info(
             'hunyuan-role',
-            '混元最新版角色扮演模型，混元官方精调训练推出的角色扮演模型，基于混元模型结合角色扮演场景数据集进行增训，在角色扮演场景具有更好的基础效果',
+            _('''
+            Hunyuan's latest version of the role-playing model, a role-playing model launched by Hunyuan's official fine-tuning training, is based on the Hunyuan model combined with the role-playing scene data set for additional training, and has better basic effects in role-playing scenes.
+            '''),
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
             TencentModel),
         _create_model_info(
             'hunyuan-functioncall',
-            '混元最新 MOE 架构 FunctionCall 模型，经过高质量的 FunctionCall 数据训练，上下文窗口达 32K，在多个维度的评测指标上处于领先。',
+            _('''
+            Hunyuan's latest MOE architecture FunctionCall model has been trained with high-quality FunctionCall data and has a context window of 32K, leading in multiple dimensions of evaluation indicators.
+            '''),
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
             TencentModel),
         _create_model_info(
             'hunyuan-code',
-            '混元最新代码生成模型，经过 200B 高质量代码数据增训基座模型，迭代半年高质量 SFT 数据训练，上下文长窗口长度增大到 8K，五大语言代码生成自动评测指标上位居前列；五大语言10项考量各方面综合代码任务人工高质量评测上，性能处于第一梯队',
+            _('''
+            Hunyuan's latest code generation model, after training the base model with 200B high-quality code data, and iterating on high-quality SFT data for half a year, the context long window length has been increased to 8K, and it ranks among the top in the automatic evaluation indicators of code generation in the five major languages; the five major languages In the manual high-quality evaluation of 10 comprehensive code tasks that consider all aspects, the performance is in the first echelon.
+            '''),
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
             TencentModel),
@@ -74,7 +80,9 @@ def _initialize_model_info():
 
     tencent_embedding_model_info = _create_model_info(
         'hunyuan-embedding',
-        '腾讯混元 Embedding 接口，可以将文本转化为高质量的向量数据。向量维度为1024维。',
+        _('''
+        Tencent's Hunyuan Embedding interface can convert text into high-quality vector data. The vector dimension is 1024 dimensions.
+        '''),
         ModelTypeConst.EMBEDDING,
         TencentEmbeddingCredential,
         TencentEmbeddingModel
@@ -84,14 +92,14 @@ def _initialize_model_info():
 
     model_info_vision_list = [_create_model_info(
         'hunyuan-vision',
-        '混元视觉模型',
+        _('Mixed element visual model'),
         ModelTypeConst.IMAGE,
         TencentVisionModelCredential,
         TencentVision)]
 
     model_info_tti_list = [_create_model_info(
         'hunyuan-dit',
-        '混元生图模型',
+        _('Hunyuan graph model'),
         ModelTypeConst.TTI,
         TencentTTIModelCredential,
         TencentTextToImageModel)]
@@ -122,6 +130,6 @@ class TencentModelProvider(IModelProvider):
         icon_data = get_file_content(icon_path)
         return ModelProvideInfo(
             provider='model_tencent_provider',
-            name='腾讯混元',
+            name=_('Tencent Hunyuan'),
             icon=icon_data
         )

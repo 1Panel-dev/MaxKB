@@ -32,69 +32,18 @@
                 @click="openAIParamSettingDialog(form_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                {{ $t('views.application.applicationForm.form.paramSetting') }}
+                {{ $t('common.paramSetting') }}
               </el-button>
             </div>
           </template>
-          <el-select
-            @change="model_change"
+
+          <ModelSelect
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.model_id"
             placeholder="请选择图片理解模型"
-            class="w-full"
-            popper-class="select-model"
-            :clearable="true"
-          >
-            <el-option-group
-              v-for="(value, label) in modelOptions"
-              :key="value"
-              :label="relatedObject(providerOptions, label, 'provider')?.name"
-            >
-              <el-option
-                v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-                class="flex-between"
-              >
-                <div class="flex align-center">
-                  <span
-                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                    class="model-icon mr-8"
-                  ></span>
-                  <span>{{ item.name }}</span>
-                  <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
-                    >公用
-                  </el-tag>
-                </div>
-                <el-icon class="check-icon" v-if="item.id === form_data.model_id">
-                  <Check />
-                </el-icon>
-              </el-option>
-              <!-- 不可用 -->
-              <el-option
-                v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-                class="flex-between"
-                disabled
-              >
-                <div class="flex">
-                  <span
-                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                    class="model-icon mr-8"
-                  ></span>
-                  <span>{{ item.name }}</span>
-                  <span class="danger">（不可用）</span>
-                </div>
-                <el-icon class="check-icon" v-if="item.id === form_data.model_id">
-                  <Check />
-                </el-icon>
-              </el-option>
-            </el-option-group>
-          </el-select>
+            :options="modelOptions"
+          ></ModelSelect>
         </el-form-item>
 
         <el-form-item label="角色设定">
@@ -201,8 +150,6 @@
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref } from 'vue'
 import { groupBy, set } from 'lodash'
-import { relatedObject } from '@/utils/utils'
-import type { Provider } from '@/api/type/model'
 import applicationApi from '@/api/application'
 import { app } from '@/main'
 import useStore from '@/stores'
@@ -218,13 +165,12 @@ const {
 
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
-const providerOptions = ref<Array<Provider>>([])
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 
 const aiChatNodeFormRef = ref<FormInstance>()
 const nodeCascaderRef = ref()
 const validate = () => {
-    return Promise.all([
+  return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
     aiChatNodeFormRef.value?.validate()
   ]).catch((err: any) => {
@@ -282,14 +228,6 @@ function getModel() {
   }
 }
 
-function getProvider() {
-  model.asyncGetProvider().then((res: any) => {
-    providerOptions.value = res?.data
-  })
-}
-
-const model_change = (model_id?: string) => {}
-
 function submitSystemDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'system', val)
 }
@@ -310,7 +248,6 @@ function refreshParam(data: any) {
 
 onMounted(() => {
   getModel()
-  getProvider()
 
   set(props.nodeModel, 'validate', validate)
 })

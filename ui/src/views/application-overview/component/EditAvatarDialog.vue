@@ -54,10 +54,10 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false">
-          {{ $t('views.applicationOverview.appInfo.EditAvatarDialog.cancel') }}</el-button
+          {{ $t('common.cancel') }}</el-button
         >
         <el-button type="primary" @click="submit" :loading="loading">
-          {{ $t('views.applicationOverview.appInfo.EditAvatarDialog.save') }}</el-button
+          {{ $t('common.save') }}</el-button
         >
       </span>
     </template>

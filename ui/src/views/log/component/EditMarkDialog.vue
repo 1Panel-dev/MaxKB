@@ -51,8 +51,8 @@
 
     <template #footer>
       <span class="dialog-footer" v-if="isEdit">
-        <el-button @click.prevent="isEdit = false"> 取消 </el-button>
-        <el-button type="primary" @click="submit(formRef)" :loading="loading"> 保存 </el-button>
+        <el-button @click.prevent="isEdit = false"> {{$t('common.cancel')}} </el-button>
+        <el-button type="primary" @click="submit(formRef)" :loading="loading"> {{$t('common.save')}} </el-button>
       </span>
     </template>
   </el-dialog>
@@ -107,7 +107,7 @@ function deleteMark() {
     )
     .then(() => {
       emit('refresh')
-      MsgSuccess('删除成功')
+      MsgSuccess(t('common.deleteSuccess'))
       dialogVisible.value = false
     })
 }

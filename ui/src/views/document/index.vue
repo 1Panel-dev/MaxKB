@@ -32,7 +32,7 @@
               设置
             </el-button>
             <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0">
-              删除
+              {{ $t('common.delete') }}
             </el-button>
           </div>
 
@@ -232,7 +232,7 @@
               {{ hitHandlingMethod[row.hit_handling_method as keyof typeof hitHandlingMethod] }}
             </template>
           </el-table-column>
-          <el-table-column prop="create_time" label="创建时间" width="175">
+          <el-table-column prop="create_time" :label="$t('common.createTime')" width="175">
             <template #default="{ row }">
               {{ datetimeFormat(row.create_time) }}
             </template>
@@ -242,7 +242,7 @@
               {{ datetimeFormat(row.update_time) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" align="left" width="110" fixed="right">
+          <el-table-column :label="$t('common.operation')" align="left" width="110" fixed="right">
             <template #default="{ row }">
               <div v-if="datasetDetail.type === '0'">
                 <span class="mr-4">
@@ -311,9 +311,9 @@
                           <AppIcon iconName="app-export"></AppIcon>
                           导出Zip
                         </el-dropdown-item>
-                        <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
-                          >删除</el-dropdown-item
-                        >
+                        <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">{{
+                          $t('common.delete')
+                        }}</el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -391,9 +391,9 @@
                           <AppIcon iconName="app-export"></AppIcon>
                           导出Zip
                         </el-dropdown-item>
-                        <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)"
-                          >删除</el-dropdown-item
-                        >
+                        <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">{{
+                          $t('common.delete')
+                        }}</el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -615,8 +615,8 @@ function syncDocument(row: any) {
       })
       .catch(() => {})
   } else {
-    MsgConfirm(`提示`, `无法同步，请先去设置文档 URL地址`, {
-      confirmButtonText: '确认',
+    MsgConfirm(t('common.tip'), `无法同步，请先去设置文档 URL地址`, {
+      confirmButtonText: t('common.confirm'),
       type: 'warning'
     })
       .then(() => {})
@@ -651,7 +651,7 @@ function creatQuickHandle(val: string) {
     .asyncPostDocument(id, obj)
     .then(() => {
       getList()
-      MsgSuccess('创建成功')
+      MsgSuccess(t('common.createSuccess'))
     })
     .catch(() => {
       loading.value = false
@@ -676,7 +676,7 @@ function deleteMulDocument() {
     `是否批量删除 ${multipleSelection.value.length} 个文档?`,
     `所选文档中的分段会跟随删除，请谨慎操作。`,
     {
-      confirmButtonText: '删除',
+      confirmButtonText: t('common.delete'),
       confirmButtonClass: 'danger'
     }
   )
@@ -712,13 +712,13 @@ function deleteDocument(row: any) {
     `是否删除文档：${row.name} ?`,
     `此文档下的 ${row.paragraph_count} 个分段都会被删除，请谨慎操作。`,
     {
-      confirmButtonText: '删除',
+      confirmButtonText: t('common.delete'),
       confirmButtonClass: 'danger'
     }
   )
     .then(() => {
       documentApi.delDocument(id, row.id, loading).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.deleteSuccess'))
         getList()
       })
     })

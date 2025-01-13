@@ -20,6 +20,8 @@ from setting.models_provider.impl.gemini_model_provider.model.image import Gemin
 from setting.models_provider.impl.gemini_model_provider.model.llm import GeminiChatModel
 from setting.models_provider.impl.gemini_model_provider.model.stt import GeminiSpeechToText
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _
+
 
 gemini_llm_model_credential = GeminiLLMModelCredential()
 gemini_image_model_credential = GeminiImageModelCredential()
@@ -27,33 +29,33 @@ gemini_stt_model_credential = GeminiSTTModelCredential()
 gemini_embedding_model_credential = GeminiEmbeddingCredential()
 
 model_info_list = [
-    ModelInfo('gemini-1.0-pro', '最新的Gemini 1.0 Pro模型，随Google更新而更新',
+    ModelInfo('gemini-1.0-pro', _('Latest Gemini 1.0 Pro model, updated with Google update'),
               ModelTypeConst.LLM,
               gemini_llm_model_credential,
               GeminiChatModel),
-    ModelInfo('gemini-1.0-pro-vision', '最新的Gemini 1.0 Pro Vision模型，随Google更新而更新',
+    ModelInfo('gemini-1.0-pro-vision', _('Latest Gemini 1.0 Pro Vision model, updated with Google update'),
               ModelTypeConst.LLM,
               gemini_llm_model_credential,
               GeminiChatModel),
 ]
 
 model_image_info_list = [
-    ModelInfo('gemini-1.5-flash', '最新的Gemini 1.5 Flash模型，随Google更新而更新',
+    ModelInfo('gemini-1.5-flash', _('Latest Gemini 1.5 Flash model, updated with Google updates'),
               ModelTypeConst.IMAGE,
               gemini_image_model_credential,
               GeminiImage),
-    ModelInfo('gemini-1.5-pro', '最新的Gemini 1.5 Flash模型，随Google更新而更新',
+    ModelInfo('gemini-1.5-pro', _('Latest Gemini 1.5 Flash model, updated with Google updates'),
               ModelTypeConst.IMAGE,
               gemini_image_model_credential,
               GeminiImage),
 ]
 
 model_stt_info_list = [
-    ModelInfo('gemini-1.5-flash', '最新的Gemini 1.5 Flash模型，随Google更新而更新',
+    ModelInfo('gemini-1.5-flash', _('Latest Gemini 1.5 Flash model, updated with Google updates'),
               ModelTypeConst.STT,
               gemini_stt_model_credential,
               GeminiSpeechToText),
-    ModelInfo('gemini-1.5-pro', '最新的Gemini 1.5 Flash模型，随Google更新而更新',
+    ModelInfo('gemini-1.5-pro', _('Latest Gemini 1.5 Flash model, updated with Google updates'),
               ModelTypeConst.STT,
               gemini_stt_model_credential,
               GeminiSpeechToText),

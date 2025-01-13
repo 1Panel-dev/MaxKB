@@ -162,12 +162,25 @@
           description="请先选择基础信息的模型类型和基础模型"
         />
         <el-empty
-          v-else-if="base_form_data.model_type === 'RERANKER' || base_form_data.model_type === 'EMBEDDING' || base_form_data.model_type === 'STT'"
+          v-else-if="
+            base_form_data.model_type === 'RERANKER' ||
+            base_form_data.model_type === 'EMBEDDING' ||
+            base_form_data.model_type === 'STT'
+          "
           description="所选模型不支持参数设置"
         />
         <div class="flex-between mb-8" v-else>
           <h5>模型参数</h5>
-          <el-button type="text" @click.stop="openAddDrawer()" :disabled="base_form_data.model_type !== 'TTS' && base_form_data.model_type !== 'LLM' && base_form_data.model_type !== 'IMAGE' && base_form_data.model_type !== 'TTI'">
+          <el-button
+            type="text"
+            @click.stop="openAddDrawer()"
+            :disabled="
+              base_form_data.model_type !== 'TTS' &&
+              base_form_data.model_type !== 'LLM' &&
+              base_form_data.model_type !== 'IMAGE' &&
+              base_form_data.model_type !== 'TTI'
+            "
+          >
             <AppIcon iconName="Plus" class="add-icon" />添加
           </el-button>
         </div>
@@ -201,16 +214,16 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" align="left" width="80">
+          <el-table-column :label="$t('common.operation')" align="left" width="80">
             <template #default="{ row, $index }">
               <span class="mr-4">
-                <el-tooltip effect="dark" content="修改" placement="top">
+                <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
                   <el-button type="primary" text @click.stop="openAddDrawer(row, $index)">
                     <el-icon><EditPen /></el-icon>
                   </el-button>
                 </el-tooltip>
               </span>
-              <el-tooltip effect="dark" content="删除" placement="top">
+              <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                 <el-button type="primary" text @click="deleteParam($index)">
                   <el-icon>
                     <Delete />
@@ -224,8 +237,8 @@
     </el-tabs>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="close">取消</el-button>
-        <el-button type="primary" @click="submit" :loading="loading"> 添加 </el-button>
+        <el-button @click="close">{{$t('common.cancel')}}</el-button>
+        <el-button type="primary" @click="submit" :loading="loading"> {{$t('common.save')}} </el-button>
       </span>
     </template>
   </el-dialog>
@@ -357,24 +370,27 @@ const close = () => {
   dialogVisible.value = false
 }
 const submit = () => {
-  dynamicsFormRef.value?.validate().then(() => {
-    if (providerValue.value) {
-      ModelApi.createModel(
-        {
-          ...base_form_data.value,
-          credential: credential_form_data.value,
-          provider: providerValue.value.provider
-        },
-        loading
-      ).then((ok) => {
-        close()
-        MsgSuccess('创建模型成功')
-        emit('submit')
-      })
-    }
-  }).catch(() => { 
-    MsgError('基础信息有填写错误')
-  })
+  dynamicsFormRef.value
+    ?.validate()
+    .then(() => {
+      if (providerValue.value) {
+        ModelApi.createModel(
+          {
+            ...base_form_data.value,
+            credential: credential_form_data.value,
+            provider: providerValue.value.provider
+          },
+          loading
+        ).then((ok) => {
+          close()
+          MsgSuccess('创建模型成功')
+          emit('submit')
+        })
+      }
+    })
+    .catch(() => {
+      MsgError('基础信息有填写错误')
+    })
 }
 
 function openAddDrawer(data?: any, index?: any) {

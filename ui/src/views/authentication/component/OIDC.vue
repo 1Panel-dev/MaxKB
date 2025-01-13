@@ -9,56 +9,71 @@
           label-position="top"
           require-asterisk-position="right"
         >
-          <el-form-item :label="$t('login.oidc.authEndpoint')" prop="config_data.authEndpoint">
+          <el-form-item
+            :label="$t('views.system.authentication.oidc.authEndpoint')"
+            prop="config_data.authEndpoint"
+          >
             <el-input
               v-model="form.config_data.authEndpoint"
-              :placeholder="$t('login.oidc.authEndpointPlaceholder')"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('login.oidc.tokenEndpoint')" prop="config_data.tokenEndpoint">
-            <el-input
-              v-model="form.config_data.tokenEndpoint"
-              :placeholder="$t('login.oidc.tokenEndpointPlaceholder')"
+              :placeholder="$t('views.system.authentication.oidc.authEndpointPlaceholder')"
             />
           </el-form-item>
           <el-form-item
-            :label="$t('login.oidc.userInfoEndpoint')"
+            :label="$t('views.system.authentication.oidc.tokenEndpoint')"
+            prop="config_data.tokenEndpoint"
+          >
+            <el-input
+              v-model="form.config_data.tokenEndpoint"
+              :placeholder="$t('views.system.authentication.oidc.tokenEndpointPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="$t('views.system.authentication.oidc.userInfoEndpoint')"
             prop="config_data.userInfoEndpoint"
           >
             <el-input
               v-model="form.config_data.userInfoEndpoint"
-              :placeholder="$t('login.oidc.userInfoEndpointPlaceholder')"
+              :placeholder="$t('views.system.authentication.oidc.userInfoEndpointPlaceholder')"
             />
           </el-form-item>
-          <el-form-item :label="$t('login.oidc.clientId')" prop="config_data.clientId">
+          <el-form-item
+            :label="$t('views.system.authentication.oidc.clientId')"
+            prop="config_data.clientId"
+          >
             <el-input
               v-model="form.config_data.clientId"
-              :placeholder="$t('login.oidc.clientIdPlaceholder')"
+              :placeholder="$t('views.system.authentication.oidc.clientIdPlaceholder')"
             />
           </el-form-item>
-          <el-form-item :label="$t('login.oidc.clientSecret')" prop="config_data.clientSecret">
+          <el-form-item
+            :label="$t('views.system.authentication.oidc.clientSecret')"
+            prop="config_data.clientSecret"
+          >
             <el-input
               v-model="form.config_data.clientSecret"
-              :placeholder="$t('login.oidc.clientSecretPlaceholder')"
+              :placeholder="$t('views.system.authentication.oidc.clientSecretPlaceholder')"
               show-password
             />
           </el-form-item>
-          <el-form-item :label="$t('login.oidc.redirectUrl')" prop="config_data.redirectUrl">
+          <el-form-item
+            :label="$t('views.system.authentication.oidc.redirectUrl')"
+            prop="config_data.redirectUrl"
+          >
             <el-input
               v-model="form.config_data.redirectUrl"
-              :placeholder="$t('login.oidc.redirectUrlPlaceholder')"
+              :placeholder="$t('views.system.authentication.oidc.redirectUrlPlaceholder')"
             />
           </el-form-item>
           <el-form-item>
             <el-checkbox v-model="form.is_active"
-              >{{ $t('login.oidc.enableAuthentication') }}
+              >{{ $t('views.system.authentication.oidc.enableAuthentication') }}
             </el-checkbox>
           </el-form-item>
         </el-form>
 
         <div class="text-right">
           <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
-            {{ $t('login.ldap.save') }}
+            {{ $t('common.save') }}
           </el-button>
         </div>
       </div>
@@ -92,29 +107,53 @@ const loading = ref(false)
 
 const rules = reactive<FormRules<any>>({
   'config_data.authEndpoint': [
-    { required: true, message: t('login.oidc.authEndpointPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.oidc.authEndpointPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.tokenEndpoint': [
-    { required: true, message: t('login.oidc.tokenEndpointPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.oidc.tokenEndpointPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.userInfoEndpoint': [
     {
       required: true,
-      message: t('login.oidc.userInfoEndpointPlaceholder'),
+      message: t('views.system.authentication.oidc.userInfoEndpointPlaceholder'),
       trigger: 'blur'
     }
   ],
   'config_data.clientId': [
-    { required: true, message: t('login.oidc.clientIdPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.oidc.clientIdPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.clientSecret': [
-    { required: true, message: t('login.oidc.clientSecretPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.oidc.clientSecretPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.redirectUrl': [
-    { required: true, message: t('login.oidc.redirectUrlPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.oidc.redirectUrlPlaceholder'),
+      trigger: 'blur'
+    }
   ],
   'config_data.logoutEndpoint': [
-    { required: true, message: t('login.oidc.logoutEndpointPlaceholder'), trigger: 'blur' }
+    {
+      required: true,
+      message: t('views.system.authentication.oidc.logoutEndpointPlaceholder'),
+      trigger: 'blur'
+    }
   ]
 })
 
@@ -123,7 +162,7 @@ const submit = async (formEl: FormInstance | undefined, test?: string) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       authApi.putAuthSetting(form.value.auth_type, form.value, loading).then((res) => {
-        MsgSuccess(t('login.ldap.saveSuccess'))
+        MsgSuccess(t('common.saveSuccess'))
       })
     }
   })

@@ -9,7 +9,7 @@
   >
     <template #defFooters>
       <el-button text type="info" @click="openDialog">
-        <AppIcon class="color-secondary"  iconName="app-magnify" style="font-size: 16px"></AppIcon>
+        <AppIcon class="color-secondary" iconName="app-magnify" style="font-size: 16px"></AppIcon>
       </el-button>
     </template>
   </MdEditor>
@@ -18,7 +18,7 @@
     <MdEditor v-model="cloneContent" :preview="false" :toolbars="[]" :footers="[]"></MdEditor>
     <template #footer>
       <div class="dialog-footer mt-24">
-        <el-button type="primary" @click="submitDialog"> 确认</el-button>
+        <el-button type="primary" @click="submitDialog"> {{ $t('common.confirm') }}</el-button>
       </div>
     </template>
   </el-dialog>

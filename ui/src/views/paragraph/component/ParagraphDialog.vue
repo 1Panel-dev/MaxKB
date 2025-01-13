@@ -22,9 +22,9 @@
           </div>
         </el-scrollbar>
         <div class="text-right p-24 pt-0" v-if="problemId && isEdit">
-          <el-button @click.prevent="cancelEdit"> 取消 </el-button>
+          <el-button @click.prevent="cancelEdit"> {{$t('common.cancel')}} </el-button>
           <el-button type="primary" :disabled="loading" @click="handleDebounceClick">
-            保存
+            {{$t('common.save')}}
           </el-button>
         </div>
       </el-col>
@@ -40,9 +40,9 @@
     </el-row>
     <template #footer v-if="!problemId">
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{$t('common.cancel')}} </el-button>
         <el-button :disabled="loading" type="primary" @click="handleDebounceClick">
-          提交
+          {{$t('common.submit')}}
         </el-button>
       </span>
     </template>

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="创建知识库"
+    :title="$t('views.dataset.createDataset')"
     v-model="dialogVisible"
     width="680"
     append-to-body
@@ -16,7 +16,7 @@
       label-position="top"
       require-asterisk-position="right"
     >
-      <el-form-item label="知识库类型" required>
+      <el-form-item :label="$t('views.dataset.datasetForm.form.datasetType.label')" required>
         <el-radio-group v-model="datasetForm.type" class="card__radio" @change="radioChange">
           <el-row :gutter="20">
             <el-col :span="12">
@@ -32,8 +32,12 @@
                       <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                     </AppAvatar>
                     <div>
-                      <p><el-text>通用型</el-text></p>
-                      <el-text type="info">上传本地文件或手动录入</el-text>
+                      <p>
+                        <el-text>{{ $t('views.dataset.general') }}</el-text>
+                      </p>
+                      <el-text type="info">{{
+                        $t('views.dataset.datasetForm.form.datasetType.generalInfo')
+                      }}</el-text>
                     </div>
                   </div>
                   <el-radio value="0" size="large" style="width: 16px"></el-radio>
@@ -53,8 +57,12 @@
                       <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
                     </AppAvatar>
                     <div>
-                      <p><el-text>Web 站点</el-text></p>
-                      <el-text type="info">同步Web网站文本数据</el-text>
+                      <p>
+                        <el-text>{{ $t('views.dataset.web') }}</el-text>
+                      </p>
+                      <el-text type="info">{{
+                        $t('views.dataset.datasetForm.form.datasetType.webInfo')
+                      }}</el-text>
                     </div>
                   </div>
                   <el-radio value="1" size="large" style="width: 16px"></el-radio>
@@ -64,17 +72,24 @@
           </el-row>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="Web 根地址" prop="source_url" v-if="datasetForm.type === '1'">
+      <el-form-item
+        :label="$t('views.dataset.datasetForm.form.source_url.label')"
+        prop="source_url"
+        v-if="datasetForm.type === '1'"
+      >
         <el-input
           v-model="datasetForm.source_url"
-          placeholder="请输入 Web 根地址"
+          :placeholder="$t('views.dataset.datasetForm.form.source_url.placeholder')"
           @blur="datasetForm.source_url = datasetForm.source_url.trim()"
         />
       </el-form-item>
-      <el-form-item label="选择器" v-if="datasetForm.type === '1'">
+      <el-form-item
+        :label="$t('views.dataset.datasetForm.form.selector.label')"
+        v-if="datasetForm.type === '1'"
+      >
         <el-input
           v-model="datasetForm.selector"
-          placeholder="默认为 body，可输入 .classname/#idname/tagname"
+          :placeholder="$t('views.dataset.datasetForm.form.selector.placeholder')"
           @blur="datasetForm.selector = datasetForm.selector.trim()"
         />
       </el-form-item>
@@ -82,10 +97,10 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
-          {{ $t('views.application.applicationForm.buttons.cancel') }}
+          {{ $t('common.cancel') }}
         </el-button>
         <el-button type="primary" @click="submitHandle" :loading="loading">
-          {{ $t('views.application.applicationForm.buttons.create') }}
+          {{ $t('common.create') }}
         </el-button>
       </span>
     </template>
@@ -97,12 +112,9 @@ import { useRouter, useRoute } from 'vue-router'
 import BaseForm from './BaseForm.vue'
 import datasetApi from '@/api/dataset'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
-import useStore from '@/stores'
-import { ValidType, ValidCount } from '@/enums/common'
-
+import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 
-const { common, user } = useStore()
 const router = useRouter()
 const BaseFormRef = ref()
 const DatasetFormRef = ref()
@@ -117,7 +129,13 @@ const datasetForm = ref<any>({
 })
 
 const rules = reactive({
-  source_url: [{ required: true, message: '请输入 Web 根地址', trigger: 'blur' }]
+  source_url: [
+    {
+      required: true,
+      message: t('views.dataset.datasetForm.form.source_url.requiredMessage'),
+      trigger: 'blur'
+    }
+  ]
 })
 
 watch(dialogVisible, (bool) => {
@@ -145,14 +163,14 @@ const submitHandle = async () => {
             type: datasetForm.value.type
           }
           datasetApi.postDataset(obj, loading).then((res) => {
-            MsgSuccess('创建成功')
+            MsgSuccess(t('common.createSuccess'))
             router.push({ path: `/dataset/${res.data.id}/document` })
             emit('refresh')
           })
         } else {
           const obj = { ...BaseFormRef.value.form, ...datasetForm.value }
           datasetApi.postWebDataset(obj, loading).then((res) => {
-            MsgSuccess('创建成功')
+            MsgSuccess(t('common.createSuccess'))
             router.push({ path: `/dataset/${res.data.id}/document` })
             emit('refresh')
           })

@@ -8,7 +8,7 @@ from langchain_core.messages import HumanMessage
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tti import BaseTextToImage
-
+from django.utils.translation import gettext_lazy as _
 
 class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
     api_key: str
@@ -39,7 +39,7 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
     def check_auth(self):
         chat = ChatTongyi(api_key=self.api_key, model_name='qwen-max')
-        chat.invoke([HumanMessage([{"type": "text", "text": "你好"}])])
+        chat.invoke([HumanMessage([{"type": "text", "text": _('Hello')}])])
 
     def generate_image(self, prompt: str, negative_prompt: str = None):
         # api_base='https://dashscope.aliyuncs.com/compatible-mode/v1',

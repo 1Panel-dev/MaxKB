@@ -7,8 +7,10 @@ export default {
         forum: "Forum for help",
         MenuItem: {
             application: "Application",
-            dataset: "Knowledge base",
-            setting: "System settings"
+            dataset: "Knowledge",
+            setting: "System settings",
+            function_lib: "function library"
+            
         },
         avatar: {
             resetPassword: "Change password",
@@ -29,8 +31,6 @@ export default {
                 getVerificationCode: "Get verification code",
                 verificationCodeSentSuccess: "Verification code sent successfully",
                 resend: "Resend",
-                cancel: "Cancel",
-                save: "Save",
             }
         }
     },

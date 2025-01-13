@@ -9,6 +9,7 @@
 from enum import Enum
 
 from common.exception.app_exception import AppApiException
+from django.utils.translation import gettext_lazy as _
 
 
 class ExceptionCodeConstantsValue:
@@ -27,13 +28,16 @@ class ExceptionCodeConstantsValue:
 
 
 class ExceptionCodeConstants(Enum):
-    INCORRECT_USERNAME_AND_PASSWORD = ExceptionCodeConstantsValue(1000, "用户名或者密码不正确")
-    NOT_AUTHENTICATION = ExceptionCodeConstantsValue(1001, "请先登录,并携带用户Token")
-    EMAIL_SEND_ERROR = ExceptionCodeConstantsValue(1002, "邮件发送失败")
-    EMAIL_FORMAT_ERROR = ExceptionCodeConstantsValue(1003, "邮箱格式错误")
-    EMAIL_IS_EXIST = ExceptionCodeConstantsValue(1004, "邮箱已经被注册,请勿重复注册")
-    EMAIL_IS_NOT_EXIST = ExceptionCodeConstantsValue(1005, "邮箱尚未注册,请先注册")
-    CODE_ERROR = ExceptionCodeConstantsValue(1005, "验证码不正确,或者验证码过期")
-    USERNAME_IS_EXIST = ExceptionCodeConstantsValue(1006, "用户名已被使用,请使用其他用户名")
-    USERNAME_ERROR = ExceptionCodeConstantsValue(1006, "用户名不能为空,并且长度在6-20")
-    PASSWORD_NOT_EQ_RE_PASSWORD = ExceptionCodeConstantsValue(1007, "密码与确认密码不一致")
+    INCORRECT_USERNAME_AND_PASSWORD = ExceptionCodeConstantsValue(1000, _('The username or password is incorrect'))
+    NOT_AUTHENTICATION = ExceptionCodeConstantsValue(1001, _('Please log in first and bring the user Token'))
+    EMAIL_SEND_ERROR = ExceptionCodeConstantsValue(1002, _('Email sending failed'))
+    EMAIL_FORMAT_ERROR = ExceptionCodeConstantsValue(1003, _('Email format error'))
+    EMAIL_IS_EXIST = ExceptionCodeConstantsValue(1004, _('The email has been registered, please log in directly'))
+    EMAIL_IS_NOT_EXIST = ExceptionCodeConstantsValue(1005, _('The email is not registered, please register first'))
+    CODE_ERROR = ExceptionCodeConstantsValue(1005,
+                                             _('The verification code is incorrect or the verification code has expired'))
+    USERNAME_IS_EXIST = ExceptionCodeConstantsValue(1006, _('The username has been registered, please log in directly'))
+    USERNAME_ERROR = ExceptionCodeConstantsValue(1006,
+                                                 _('The username cannot be empty and must be between 6 and 20 characters long.'))
+    PASSWORD_NOT_EQ_RE_PASSWORD = ExceptionCodeConstantsValue(1007,
+                                                              _('Password and confirmation password are inconsistent'))

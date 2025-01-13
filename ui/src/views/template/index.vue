@@ -1,8 +1,8 @@
 <template>
-  <LayoutContainer header="模型设置">
+  <LayoutContainer :header="$t('views.template.title')">
     <div class="template-manage flex main-calc-height">
       <div class="template-manage__left p-8 border-r">
-        <h4 class="p-16">供应商</h4>
+        <h4 class="p-16">{{ $t('views.template.provider') }}</h4>
         <div class="model-list-height-left">
           <div
             class="all-mode flex cursor"
@@ -14,15 +14,15 @@
               style="height: 20px; width: 20px"
               :iconName="'app-all-menu-active'"
             ></AppIcon>
-            <span>全部模型</span>
+            <span>{{ $t('views.template.model.allModel') }}</span>
           </div>
 
           <el-scrollbar>
             <el-collapse class="template-collapse">
-              <el-collapse-item title="公有模型" name="1">
+              <el-collapse-item :title="$t('views.template.model.publicModel')" name="1">
                 <template #title>
                   <img src="@/assets/icon_file-folder_colorful.svg" class="mr-8" />
-                  公有模型
+                  {{ $t('views.template.model.publicModel') }}
                 </template>
                 <common-list
                   :data="online_provider_list"
@@ -45,10 +45,10 @@
                   </template>
                 </common-list>
               </el-collapse-item>
-              <el-collapse-item title="私有模型" name="2">
+              <el-collapse-item :title="$t('views.template.model.privateModel')" name="2">
                 <template #title>
                   <img src="@/assets/icon_file-folder_colorful.svg" class="mr-8" />
-                  私有模型
+                  {{ $t('views.template.model.privateModel') }}
                 </template>
                 <common-list
                   :data="local_provider_list"
@@ -79,10 +79,17 @@
         <div class="p-24 pb-0">
           <h4>{{ active_provider?.name }}</h4>
           <div class="flex-between mt-16 mb-16">
-            <el-button type="primary" @click="openCreateModel(active_provider)">添加模型</el-button>
+            <el-button type="primary" @click="openCreateModel(active_provider)">
+              {{ $t('views.template.addModel') }}</el-button
+            >
             <div class="flex-between complex-search">
-              <el-select class="complex-search__left" v-model="search_type" style="width: 120px" @change="search_type_change">
-                <el-option label="创建者" value="create_user" />
+              <el-select
+                class="complex-search__left"
+                v-model="search_type"
+                style="width: 120px"
+                @change="search_type_change"
+              >
+                <el-option :label="$t('common.creator')" value="create_user" />
                 <el-option label="权限" value="permission_type" />
                 <el-option label="模型类型" value="model_type" />
                 <el-option label="模型名称" value="name" />
@@ -91,7 +98,7 @@
                 v-if="search_type === 'name'"
                 v-model="model_search_form.name"
                 @change="list_model"
-                placeholder="按名称搜索"
+                :placeholder="$t('views.template.searchBar.placeholder')"
                 prefix-icon="Search"
                 style="width: 220px"
                 clearable
@@ -127,13 +134,9 @@
                 @change="list_model"
                 style="width: 220px"
               >
-                <el-option label="大语言模型" value="LLM" />
-                <el-option label="向量模型" value="EMBEDDING" />
-                <el-option label="重排模型" value="RERANKER" />
-                <el-option label="语音识别" value="STT" />
-                <el-option label="语音合成" value="TTS" />
-                <el-option label="图片理解" value="IMAGE" />
-                <el-option label="图片生成" value="TTI" />
+                <template v-for="item in modelTypeList" :key="item.value">
+                  <el-option :label="item.text" :value="item.value" />
+                </template>
               </el-select>
             </div>
           </div>
@@ -189,13 +192,15 @@ import type { Provider, Model } from '@/api/type/model'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import ModelCard from '@/views/template/component/ModelCard.vue'
 import { splitArray } from '@/utils/common'
+import { modelTypeList } from '@/views/template/component/data.ts'
 import CreateModelDialog from '@/views/template/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/template/component/SelectProviderDialog.vue'
+import { t } from '@/locales'
 
 const allObj = {
   icon: '',
   provider: '',
-  name: '全部模型'
+  name: t('views.template.model.allModel')
 }
 
 const commonList1 = ref()

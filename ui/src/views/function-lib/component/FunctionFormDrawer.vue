@@ -4,7 +4,9 @@
       <h4>{{ title }}</h4>
     </template>
     <div>
-      <h4 class="title-decoration-1 mb-16">基础信息</h4>
+      <h4 class="title-decoration-1 mb-16">
+        {{ $t('views.functionLib.functionForm.title.baseInfo') }}
+      </h4>
       <el-form
         ref="FormRef"
         :model="form"
@@ -13,20 +15,23 @@
         require-asterisk-position="right"
         v-loading="loading"
       >
-        <el-form-item label="函数名称" prop="name">
+        <el-form-item
+          :label="$t('views.functionLib.functionForm.form.functionName.label')"
+          prop="name"
+        >
           <el-input
             v-model="form.name"
-            placeholder="请输入函数名称"
+            :placeholder="$t('views.functionLib.functionForm.form.functionName.placeholder')"
             maxlength="64"
             show-word-limit
             @blur="form.name = form.name?.trim()"
           />
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item :label="$t('views.functionLib.functionForm.form.functionDescription.label')">
           <el-input
             v-model="form.desc"
             type="textarea"
-            placeholder="请输入函数的描述"
+            :placeholder="$t('views.functionLib.functionForm.form.functionDescription.placeholder')"
             maxlength="128"
             show-word-limit
             :autosize="{ minRows: 3 }"
@@ -35,7 +40,7 @@
         </el-form-item>
         <el-form-item prop="permission_type">
           <template #label>
-            <span>权限</span>
+            <span>{{ $t('views.functionLib.functionForm.form.permission_type.label') }}</span>
           </template>
 
           <el-radio-group v-model="form.permission_type" class="card__radio">
@@ -62,42 +67,55 @@
       </el-form>
       <div class="flex-between">
         <h4 class="title-decoration-1 mb-16">
-          输入参数 <el-text type="info" class="color-secondary"> 使用函数时显示 </el-text>
+          {{ $t('views.functionLib.functionForm.form.inputParam.label') }}
+          <el-text type="info" class="color-secondary">
+            {{ $t('views.functionLib.functionForm.form.param.paramInfo1') }}
+          </el-text>
         </h4>
         <el-button link type="primary" @click="openAddDialog()">
-          <el-icon class="mr-4"><Plus /></el-icon> 添加
+          <el-icon class="mr-4"><Plus /></el-icon> {{ $t('common.add') }}
         </el-button>
       </div>
 
       <el-table :data="form.input_field_list" class="mb-16">
-        <el-table-column prop="name" label="参数名" />
-        <el-table-column label="数据类型">
+        <el-table-column
+          prop="name"
+          :label="$t('views.functionLib.functionForm.form.paramName.label')"
+        />
+        <el-table-column :label="$t('views.functionLib.functionForm.form.dataType.label')">
           <template #default="{ row }">
             <el-tag type="info" class="info-tag">{{ row.type }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="必填">
+        <el-table-column :label="$t('views.functionLib.functionForm.form.param.required')">
           <template #default="{ row }">
             <div @click.stop>
               <el-switch size="small" v-model="row.is_required" />
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="source" label="来源">
+        <el-table-column
+          prop="source"
+          :label="$t('views.functionLib.functionForm.form.source.label')"
+        >
           <template #default="{ row }">
-            {{ row.source === 'custom' ? '自定义' : '引用参数' }}
+            {{
+              row.source === 'custom'
+                ? $t('views.functionLib.functionForm.form.source.custom')
+                : $t('views.functionLib.functionForm.form.source.reference')
+            }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="left" width="80">
+        <el-table-column :label="$t('common.operation')" align="left" width="80">
           <template #default="{ row, $index }">
             <span class="mr-4">
-              <el-tooltip effect="dark" content="修改" placement="top">
+              <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
                 <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
                   <el-icon><EditPen /></el-icon>
                 </el-button>
               </el-tooltip>
             </span>
-            <el-tooltip effect="dark" content="删除" placement="top">
+            <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
               <el-button type="primary" text @click="deleteField($index)">
                 <el-icon>
                   <Delete />
@@ -108,7 +126,10 @@
         </el-table-column>
       </el-table>
       <h4 class="title-decoration-1 mb-16">
-        Python 代码 <el-text type="info" class="color-secondary"> 使用函数时不显示 </el-text>
+        Python {{ $t('views.functionLib.functionForm.form.param.code') }}
+        <el-text type="info" class="color-secondary">
+          {{ $t('views.functionLib.functionForm.form.param.paramInfo2') }}
+        </el-text>
       </h4>
 
       <div class="function-CodemirrorEditor mb-8" v-if="showEditor">
@@ -120,32 +141,36 @@
         </div>
       </div>
       <h4 class="title-decoration-1 mb-16 mt-16">
-        输出参数 <el-text type="info" class="color-secondary"> 使用函数时显示 </el-text>
+        {{ $t('views.functionLib.functionForm.form.param.outputParam') }} <el-text type="info" class="color-secondary">  {{ $t('views.functionLib.functionForm.form.param.paramInfo1') }} </el-text>
       </h4>
       <div class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter">
-        <span>结果 {result}</span>
+        <span>{{ $t('views.functionLib.functionForm.form.param.result') }} {result}</span>
       </div>
     </div>
 
     <template #footer>
       <div>
-        <el-button :loading="loading" @click="visible = false">取消</el-button>
-        <el-button :loading="loading" @click="openDebug">调试</el-button>
+        <el-button :loading="loading" @click="visible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button :loading="loading" @click="openDebug">{{ $t('common.debug') }}</el-button>
         <el-button type="primary" @click="submit(FormRef)" :loading="loading">
-          {{ isEdit ? '保存' : '创建' }}</el-button
+          {{ isEdit ? $t('common.save') : $t('common.create') }}</el-button
         >
       </div>
     </template>
 
     <!-- Codemirror 弹出层 -->
-    <el-dialog v-model="dialogVisible" title="Python 代码" append-to-body fullscreen>
+    <el-dialog v-model="dialogVisible" :title="'Python '+ $t('views.functionLib.functionForm.form.param.code')" append-to-body fullscreen>
       <CodemirrorEditor
         v-model="cloneContent"
-        style="height: calc(100vh - 160px) !important; border: 1px solid #bbbfc4; border-radius: 4px"
+        style="
+          height: calc(100vh - 160px) !important;
+          border: 1px solid #bbbfc4;
+          border-radius: 4px;
+        "
       />
       <template #footer>
         <div class="dialog-footer mt-24">
-          <el-button type="primary" @click="submitDialog"> 确认</el-button>
+          <el-button type="primary" @click="submitDialog"> {{ $t('common.confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -164,6 +189,7 @@ import type { FormInstance } from 'element-plus'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { cloneDeep } from 'lodash'
 import { PermissionType, PermissionDesc } from '@/enums/model'
+import { t } from '@/locales'
 const props = defineProps({
   title: String
 })
@@ -207,8 +233,8 @@ watch(visible, (bool) => {
 })
 
 const rules = reactive({
-  name: [{ required: true, message: '请输入函数名称', trigger: 'blur' }],
-  permission_type: [{ required: true, message: '请选择', trigger: 'change' }]
+  name: [{ required: true, message: t('views.functionLib.functionForm.form.functionName.requiredMessage'), trigger: 'blur' }],
+  permission_type: [{ required: true, message: t('views.functionLib.functionForm.form.permission_type.requiredMessage'), trigger: 'change' }]
 })
 
 function openCodemirrorDialog() {
@@ -225,8 +251,8 @@ function close() {
   if (isEdit.value || !areAllValuesNonEmpty(form.value)) {
     visible.value = false
   } else {
-    MsgConfirm(`提示`, `当前的更改尚未保存，确认退出吗?`, {
-      confirmButtonText: '确认',
+    MsgConfirm(t('common.tip'), t('views.functionLib.tip.saveMessage'), {
+      confirmButtonText: t('common.confirm'),
       type: 'warning'
     })
       .then(() => {
@@ -275,13 +301,13 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (valid) {
       if (isEdit.value) {
         functionLibApi.putFunctionLib(form.value?.id as string, form.value, loading).then((res) => {
-          MsgSuccess('编辑成功')
+          MsgSuccess(t('common.editSuccess'))
           emit('refresh', res.data)
           visible.value = false
         })
       } else {
         functionLibApi.postFunctionLib(form.value, loading).then((res) => {
-          MsgSuccess('创建成功')
+          MsgSuccess(t('common.createSuccess'))
           emit('refresh')
           visible.value = false
         })

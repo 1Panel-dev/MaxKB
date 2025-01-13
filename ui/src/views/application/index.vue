@@ -1,7 +1,7 @@
 <template>
   <div class="application-list-container p-24" style="padding-top: 16px">
     <div class="flex-between mb-16">
-      <h4>{{ $t('views.application.applicationList.title') }}</h4>
+      <h4>{{ $t('views.application.title') }}</h4>
       <div class="flex-between">
         <el-select
           v-model="selectUserId"
@@ -19,7 +19,7 @@
         <el-input
           v-model="searchValue"
           @change="searchHandle"
-          :placeholder="$t('views.application.applicationList.searchBar.placeholder')"
+          :placeholder="$t('views.application.searchBar.placeholder')"
           prefix-icon="Search"
           class="w-240"
           style="min-width: 240px"
@@ -41,7 +41,7 @@
             <el-card shadow="hover" class="application-card-add" style="--el-card-padding: 8px">
               <div class="card-add-button flex align-center cursor p-8" @click="openCreateDialog">
                 <AppIcon iconName="app-add-application" class="mr-8"></AppIcon>
-                创建应用
+                {{ $t('views.application.createApplication') }}
               </div>
               <el-divider style="margin: 8px 0" />
               <el-upload
@@ -56,7 +56,8 @@
                 class="card-add-button"
               >
                 <div class="flex align-center cursor p-8">
-                  <AppIcon iconName="app-import" class="mr-8"></AppIcon>导入应用
+                  <AppIcon iconName="app-import" class="mr-8"></AppIcon>
+                  {{ $t('views.application.importApplication') }}
                 </div>
               </el-upload>
             </el-card>
@@ -99,22 +100,24 @@
               <template #subTitle>
                 <el-text class="color-secondary" size="small">
                   <auto-tooltip :content="item.username">
-                    创建者: {{ item.username }}
+                    {{ $t('common.creator') }}: {{ item.username }}
                   </auto-tooltip>
                 </el-text>
               </template>
               <div class="status-tag">
-                <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px"
-                  >高级编排</el-tag
+                <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">
+                  {{ $t('views.application.workflow') }}</el-tag
                 >
-                <el-tag class="blue-tag" v-else style="height: 22px">简单配置</el-tag>
+                <el-tag class="blue-tag" v-else style="height: 22px">
+                  {{ $t('views.application.simple') }}
+                </el-tag>
               </div>
 
               <template #footer>
                 <div class="footer-content">
                   <el-tooltip
                     effect="dark"
-                    :content="$t('views.application.applicationList.card.demo')"
+                    :content="$t('views.application.setting.demo')"
                     placement="top"
                   >
                     <el-button text @click.stop @click="getAccessToken(item.id)">
@@ -122,11 +125,7 @@
                     </el-button>
                   </el-tooltip>
                   <el-divider direction="vertical" />
-                  <el-tooltip
-                    effect="dark"
-                    :content="$t('views.application.applicationList.card.setting')"
-                    placement="top"
-                  >
+                  <el-tooltip effect="dark" :content="$t('common.setting')" placement="top">
                     <el-button text @click.stop="settingApplication(item)">
                       <AppIcon iconName="Setting"></AppIcon>
                     </el-button>
@@ -144,14 +143,15 @@
                             @click="copyApplication(item)"
                           >
                             <AppIcon iconName="app-copy"></AppIcon>
-                            复制</el-dropdown-item
-                          >
+                            {{ $t('common.copy') }}
+                          </el-dropdown-item>
                           <el-dropdown-item @click.stop="exportApplication(item)">
                             <AppIcon iconName="app-export"></AppIcon>
-                            导出
+
+                            {{ $t('common.export') }}
                           </el-dropdown-item>
                           <el-dropdown-item icon="Delete" @click.stop="deleteApplication(item)">{{
-                            $t('views.application.applicationList.card.delete.tooltip')
+                            $t('common.delete')
                           }}</el-dropdown-item>
                         </el-dropdown-menu>
                       </template>
@@ -228,7 +228,9 @@ const exportApplication = (application: any) => {
   applicationApi.exportApplication(application.id, application.name, loading).catch((e) => {
     if (e.response.status !== 403) {
       e.response.data.text().then((res: string) => {
-        MsgError(`导出失败:${JSON.parse(res).message}`)
+        MsgError(
+          `${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`
+        )
       })
     }
   })
@@ -245,10 +247,14 @@ function openCreateDialog() {
   if (user.isEnterprise()) {
     CreateApplicationDialogRef.value.open()
   } else {
-    MsgConfirm(`提示`, '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。', {
-      cancelButtonText: '确定',
-      confirmButtonText: '购买专业版'
-    })
+    MsgConfirm(
+      t('common.tip'),
+      t('views.application.tip.professionalMessage'),
+      {
+        cancelButtonText: t('common.confirm'),
+        confirmButtonText: t('common.professional')
+      }
+    )
       .then(() => {
         window.open('https://maxkb.cn/pricing.html', '_blank')
       })
@@ -319,11 +325,11 @@ function getAccessToken(id: string) {
 function deleteApplication(row: any) {
   MsgConfirm(
     // @ts-ignore
-    `${t('views.application.applicationList.card.delete.confirmTitle')}${row.name} ?`,
-    t('views.application.applicationList.card.delete.confirmMessage'),
+    `${t('views.application.delete.confirmTitle')}${row.name} ?`,
+    t('views.application.delete.confirmMessage'),
     {
-      confirmButtonText: t('views.application.applicationList.card.delete.confirmButton'),
-      cancelButtonText: t('views.application.applicationList.card.delete.cancelButton'),
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       confirmButtonClass: 'danger'
     }
   )
@@ -331,7 +337,7 @@ function deleteApplication(row: any) {
       applicationApi.delApplication(row.id, loading).then(() => {
         const index = applicationList.value.findIndex((v) => v.id === row.id)
         applicationList.value.splice(index, 1)
-        MsgSuccess(t('views.application.applicationList.card.delete.successMessage'))
+        MsgSuccess(t('common.deleteSuccess'))
       })
     })
     .catch(() => {})

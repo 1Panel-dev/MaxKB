@@ -79,7 +79,7 @@ const updateContent = (data: any) => {
 
 const deleteHandle = (item: any, cIndex: number) => {
   MsgConfirm(`是否删除分段：${item.title || '-'} ?`, `删除后将不会存入知识库，对本地文档无影响。`, {
-    confirmButtonText: '删除',
+    confirmButtonText: t('common.delete'),
     confirmButtonClass: 'danger'
   })
     .then(() => {

@@ -626,22 +626,6 @@ h5 {
   }
 }
 
-// AI模型选择：添加模型hover样式
-.select-model {
-  .el-select-dropdown__footer {
-    &:hover {
-      background-color: var(--el-fill-color-light);
-    }
-  }
-  .model-icon {
-    width: 20px;
-  }
-  .check-icon {
-    position: absolute;
-    right: 10px;
-  }
-}
-
 // 段落card
 .paragraph-source-card {
   height: 210px;

@@ -153,7 +153,7 @@ function redirectAuth(authType: string) {
     }
     MsgConfirm(`${t('login.jump_tip')}`, t(''), {
       confirmButtonText: t('login.jump'),
-      cancelButtonText: t('views.applicationOverview.appInfo.APIKeyDialog.cancel'),
+      cancelButtonText: t('common.cancel'),
       confirmButtonClass: ''
     })
       .then(() => {

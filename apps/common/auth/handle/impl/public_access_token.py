@@ -15,7 +15,7 @@ from common.constants.permission_constants import RoleConstants, Permission, Gro
 from common.exception.app_exception import AppAuthenticationFailed, ChatException
 from common.models.db_model_manage import DBModelManage
 from common.util.common import password_encrypt
-
+from django.utils.translation import gettext_lazy as _
 
 class PublicAccessToken(AuthBaseHandle):
     def support(self, request, token: str, get_token_details):
@@ -45,13 +45,13 @@ class PublicAccessToken(AuthBaseHandle):
                     if application_setting.authentication_value.get('type') != authentication.get(
                             'type') or password_encrypt(
                         application_setting.authentication_value.get('value')) != authentication.get('value'):
-                        raise ChatException(1002, "身份验证信息不正确")
+                        raise ChatException(1002, _('Authentication information is incorrect'))
         if application_access_token is None:
-            raise AppAuthenticationFailed(1002, "身份验证信息不正确")
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         if not application_access_token.is_active:
-            raise AppAuthenticationFailed(1002, "身份验证信息不正确")
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         if not application_access_token.access_token == auth_details.get('access_token'):
-            raise AppAuthenticationFailed(1002, "身份验证信息不正确")
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
 
         return application_access_token.application.user, Auth(
             role_list=[RoleConstants.APPLICATION_ACCESS_TOKEN],

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.application.applicationForm.dialogues.addDataset')"
+    :title="$t('views.application.applicationForm.dialog.addDataset')"
     v-model="dialogVisible"
     width="600"
     append-to-body
@@ -12,23 +12,22 @@
     <template #header="{ titleId, titleClass }">
       <div class="flex-between mb-8">
         <h4 :id="titleId" :class="titleClass">
-          {{ $t('views.application.applicationForm.dialogues.addDataset') }}
+          {{ $t('views.application.applicationForm.dialog.addDataset') }}
         </h4>
         <div class="flex align-center mr-8">
           <el-button link class="ml-16" @click="refresh">
-            <el-icon class="mr-4"><Refresh /></el-icon
-            >{{ $t('views.application.applicationForm.dialogues.refresh') }}
+            <el-icon class="mr-4"><Refresh /></el-icon>{{ $t('common.refresh') }}
           </el-button>
           <el-divider direction="vertical" />
         </div>
       </div>
       <div class="flex-between">
         <el-text type="info" class="color-secondary">
-          所选知识库必须使用相同的 Embedding 模型
+          {{ $t('views.application.applicationForm.dialog.addDatasetPlaceholder') }}
         </el-text>
         <el-input
           v-model="searchValue"
-          placeholder="搜索"
+          :placeholder="$t('common.search')"
           prefix-icon="Search"
           class="w-240"
           clearable
@@ -50,18 +49,19 @@
       <div class="flex-between">
         <div class="flex">
           <el-text type="info" class="color-secondary mr-8" v-if="checkList.length > 0">
-            已选 {{ checkList.length }} 个知识库
+            {{ $t('views.application.applicationForm.dialog.selected') }} {{ checkList.length }}
+            {{ $t('views.application.applicationForm.dialog.countDataset') }}
           </el-text>
           <el-button link type="primary" v-if="checkList.length > 0" @click="clearCheck">
-            清空
+            {{ $t('common.clear') }}
           </el-button>
         </div>
         <span>
           <el-button @click.prevent="dialogVisible = false">
-            {{ $t('views.application.applicationForm.buttons.cancel') }}
+            {{ $t('common.cancel') }}
           </el-button>
           <el-button type="primary" @click="submitHandle">
-            {{ $t('views.application.applicationForm.buttons.confirm') }}
+            {{ $t('common.confirm') }}
           </el-button>
         </span>
       </div>

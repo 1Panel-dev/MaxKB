@@ -6,6 +6,7 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
+from django.utils.translation import gettext_lazy as _
 
 
 class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
@@ -15,12 +16,13 @@ class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(ValidCode.valid_error.value, f'{model_type} 模型类型不支持')
+            raise AppApiException(ValidCode.valid_error.value,
+                                  _('{model_type} Model type is not supported').format(model_type=model_type))
 
         for key in ['api_key']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, f'{key} 字段为必填字段')
+                    raise AppApiException(ValidCode.valid_error.value, _('{key}  is required').format(key=key))
                 else:
                     return False
         try:
@@ -30,7 +32,9 @@ class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value, f'校验失败,请检查参数是否正确: {str(e)}')
+                raise AppApiException(ValidCode.valid_error.value,
+                                      _('Verification failed, please check whether the parameters are correct: {error}').format(
+                                          error=str(e)))
             else:
                 return False
         return True

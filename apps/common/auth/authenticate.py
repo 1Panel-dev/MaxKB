@@ -16,7 +16,7 @@ from rest_framework.authentication import TokenAuthentication
 
 from common.exception.app_exception import AppAuthenticationFailed, AppEmbedIdentityFailed, AppChatNumOutOfBoundsFailed, \
     ChatException, AppApiException
-
+from django.utils.translation import gettext_lazy as _
 token_cache = cache.caches['token_cache']
 
 
@@ -59,19 +59,19 @@ class OpenAIKeyAuth(TokenAuthentication):
         auth = auth.replace('Bearer ', '')
         # 未认证
         if auth is None:
-            raise AppAuthenticationFailed(1003, '未登录,请先登录')
+            raise AppAuthenticationFailed(1003, _('Not logged in, please log in first'))
         try:
             token_details = TokenDetails(auth)
             for handle in handles:
                 if handle.support(request, auth, token_details.get_token_details):
                     return handle.handle(request, auth, token_details.get_token_details)
-            raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
         except Exception as e:
             traceback.format_exc()
             if isinstance(e, AppEmbedIdentityFailed) or isinstance(e, AppChatNumOutOfBoundsFailed) or isinstance(e,
                                                                                                                  AppApiException):
                 raise e
-            raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
 
 
 class TokenAuth(TokenAuthentication):
@@ -80,16 +80,16 @@ class TokenAuth(TokenAuthentication):
         auth = request.META.get('HTTP_AUTHORIZATION')
         # 未认证
         if auth is None:
-            raise AppAuthenticationFailed(1003, '未登录,请先登录')
+            raise AppAuthenticationFailed(1003, _('Not logged in, please log in first'))
         try:
             token_details = TokenDetails(auth)
             for handle in handles:
                 if handle.support(request, auth, token_details.get_token_details):
                     return handle.handle(request, auth, token_details.get_token_details)
-            raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
         except Exception as e:
             traceback.format_exc()
             if isinstance(e, AppEmbedIdentityFailed) or isinstance(e, AppChatNumOutOfBoundsFailed) or isinstance(e,
                                                                                                                  AppApiException):
                 raise e
-            raise AppAuthenticationFailed(1002, "身份验证信息不正确！非法用户")
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))

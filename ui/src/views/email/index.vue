@@ -46,7 +46,7 @@
 
           <div class="text-right">
             <el-button @click="submit(emailFormRef)" type="primary" :disabled="loading">
-              保存
+              {{ $t('common.save')}}
             </el-button>
           </div>
         </div>

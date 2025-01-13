@@ -32,71 +32,20 @@
                 @click="openAIParamSettingDialog(form_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                {{ $t('views.application.applicationForm.form.paramSetting') }}
+                {{ $t('common.paramSetting') }}
               </el-button>
             </div>
           </template>
-          <el-select
+
+          <ModelSelect
             @change="model_change"
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.model_id"
             placeholder="请选择图片生成模型"
-            class="w-full"
-            popper-class="select-model"
-            :clearable="true"
-          >
-            <el-option-group
-              v-for="(value, label) in modelOptions"
-              :key="value"
-              :label="relatedObject(providerOptions, label, 'provider')?.name"
-            >
-              <el-option
-                v-for="item in value.filter((v: any) => v.status === 'SUCCESS')"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-                class="flex-between"
-              >
-                <div class="flex align-center">
-                  <span
-                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                    class="model-icon mr-8"
-                  ></span>
-                  <span>{{ item.name }}</span>
-                  <el-tag v-if="item.permission_type === 'PUBLIC'" type="info" class="info-tag ml-8"
-                    >公用
-                  </el-tag>
-                </div>
-                <el-icon class="check-icon" v-if="item.id === form_data.model_id">
-                  <Check />
-                </el-icon>
-              </el-option>
-              <!-- 不可用 -->
-              <el-option
-                v-for="item in value.filter((v: any) => v.status !== 'SUCCESS')"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-                class="flex-between"
-                disabled
-              >
-                <div class="flex">
-                  <span
-                    v-html="relatedObject(providerOptions, label, 'provider')?.icon"
-                    class="model-icon mr-8"
-                  ></span>
-                  <span>{{ item.name }}</span>
-                  <span class="danger">（不可用）</span>
-                </div>
-                <el-icon class="check-icon" v-if="item.id === form_data.model_id">
-                  <Check />
-                </el-icon>
-              </el-option>
-            </el-option-group>
-          </el-select>
+            :options="modelOptions"
+          ></ModelSelect>
         </el-form-item>
-
 
         <el-form-item
           label="提示词(正向)"
@@ -159,28 +108,6 @@
             @submitDialog="submitNegativeDialog"
           />
         </el-form-item>
-        <!--
-        <el-form-item>
-          <template #label>
-            <div class="flex-between">
-              <div>历史聊天记录</div>
-              <el-select v-model="form_data.dialogue_type" type="small" style="width: 100px">
-                <el-option label="节点" value="NODE" />
-                <el-option label="工作流" value="WORKFLOW" />
-              </el-select>
-            </div>
-          </template>
-          <el-input-number
-            v-model="form_data.dialogue_number"
-            :min="0"
-            :value-on-clear="0"
-            controls-position="right"
-            class="w-full"
-            :step="1"
-            :step-strictly="true"
-          />
-        </el-form-item>
-        -->
         <el-form-item label="返回内容" @click.prevent>
           <template #label>
             <div class="flex align-center">
@@ -208,12 +135,9 @@
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref } from 'vue'
 import { groupBy, set } from 'lodash'
-import { relatedObject } from '@/utils/utils'
-import type { Provider } from '@/api/type/model'
 import applicationApi from '@/api/application'
 import { app } from '@/main'
 import useStore from '@/stores'
-import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 
@@ -225,7 +149,6 @@ const {
 
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
-const providerOptions = ref<Array<Provider>>([])
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 
 const aiChatNodeFormRef = ref<FormInstance>()
@@ -286,20 +209,13 @@ function getModel() {
   }
 }
 
-function getProvider() {
-  model.asyncGetProvider().then((res: any) => {
-    providerOptions.value = res?.data
-  })
-}
-
 const model_change = () => {
-    if (form_data.value.model_id) {
+  if (form_data.value.model_id) {
     AIModeParamSettingDialogRef.value?.reset_default(form_data.value.model_id, id)
   } else {
     refreshParam({})
   }
 }
-
 
 const openAIParamSettingDialog = (modelId: string) => {
   if (modelId) {
@@ -321,7 +237,6 @@ function submitNegativeDialog(val: string) {
 
 onMounted(() => {
   getModel()
-  getProvider()
 
   set(props.nodeModel, 'validate', validate)
 })

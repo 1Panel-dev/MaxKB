@@ -75,10 +75,10 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="resetPasswordDialog = false">{{
-          $t('layout.topbar.avatar.dialog.cancel')
+          $t('common.cancel')
         }}</el-button>
         <el-button type="primary" @click="resetPassword">
-          {{ $t('layout.topbar.avatar.dialog.save') }}
+          {{ $t('common.save') }}
         </el-button>
       </div>
     </template>

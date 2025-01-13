@@ -396,7 +396,7 @@ const startRecording = async () => {
       },
       (err: any) => {
         MsgAlert(
-          `提示`,
+          t('common.tip'),
           `<p>该功能需要使用麦克风，浏览器禁止不安全页面录音，解决方案如下：<br/>
 1、可开启 https 解决；<br/>
 2、若无 https 配置则需要修改浏览器安全配置，Chrome 设置如下：<br/>
@@ -413,7 +413,7 @@ const startRecording = async () => {
     )
   } catch (error) {
     MsgAlert(
-      `提示`,
+      t('common.tip'),
       `<p>该功能需要使用麦克风，浏览器禁止不安全页面录音，解决方案如下：<br/>
 1、可开启 https 解决；<br/>
 2、若无 https 配置则需要修改浏览器安全配置，Chrome 设置如下：<br/>

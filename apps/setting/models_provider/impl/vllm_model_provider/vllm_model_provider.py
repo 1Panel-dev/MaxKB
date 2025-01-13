@@ -10,19 +10,20 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
 from setting.models_provider.impl.vllm_model_provider.credential.llm import VLLMModelCredential
 from setting.models_provider.impl.vllm_model_provider.model.llm import VllmChatModel
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _
 
 v_llm_model_credential = VLLMModelCredential()
 model_info_list = [
-    ModelInfo('facebook/opt-125m', 'Facebook的125M参数模型', ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel),
-    ModelInfo('BAAI/Aquila-7B', 'BAAI的7B参数模型', ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel),
-    ModelInfo('BAAI/AquilaChat-7B', 'BAAI的13B参数模型', ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel),
+    ModelInfo('facebook/opt-125m', _('Facebook’s 125M parameter model'), ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel),
+    ModelInfo('BAAI/Aquila-7B', _('BAAI’s 7B parameter model'), ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel),
+    ModelInfo('BAAI/AquilaChat-7B', _('BAAI’s 13B parameter mode'), ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel),
 
 ]
 
 model_info_manage = (ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
     ModelInfo(
         'facebook/opt-125m',
-        'Facebook的125M参数模型',
+        _('Facebook’s 125M parameter model'),
         ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel))
                      .build())
 

@@ -34,7 +34,7 @@
         <span>{{ paginationConfig.total }} 段落</span>
         <el-input
           v-model="search"
-          placeholder="搜索"
+          :placeholder="$t('common.search')"
           class="input-with-select"
           style="width: 260px"
           @change="searchHandle"
@@ -130,9 +130,9 @@
                                 <AppIcon iconName="app-migrate"></AppIcon>
                                 迁移</el-dropdown-item
                               >
-                              <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(item)"
-                                >删除</el-dropdown-item
-                              >
+                              <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(item)">{{
+                                $t('common.delete')
+                              }}</el-dropdown-item>
                             </el-dropdown-menu>
                           </template>
                         </el-dropdown>
@@ -155,7 +155,7 @@
         </el-button>
 
         <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
-          删除
+          {{ $t('common.delete') }}
         </el-button>
         <span class="ml-8"> 已选 {{ multipleSelection.length }} 项 </span>
       </div>
@@ -222,7 +222,7 @@ function deleteMulParagraph() {
     `是否批量删除 ${multipleSelection.value.length} 个分段?`,
     `删除后无法恢复，请谨慎操作。`,
     {
-      confirmButtonText: '删除',
+      confirmButtonText: t('common.delete'),
       confirmButtonClass: 'danger'
     }
   )
@@ -277,14 +277,14 @@ function changeState(row: any) {
 
 function deleteParagraph(row: any) {
   MsgConfirm(`是否删除段落：${row.title || '-'} ?`, `删除后无法恢复，请谨慎操作。`, {
-    confirmButtonText: '删除',
+    confirmButtonText: t('common.delete'),
     confirmButtonClass: 'danger'
   })
     .then(() => {
       paragraph.asyncDelParagraph(id, documentId, row.id, loading).then(() => {
         const index = paragraphDetail.value.findIndex((v) => v.id === row.id)
         paragraphDetail.value.splice(index, 1)
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.deleteSuccess'))
       })
     })
     .catch(() => {})

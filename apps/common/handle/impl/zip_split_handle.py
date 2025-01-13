@@ -26,7 +26,7 @@ from common.handle.impl.xls_split_handle import XlsSplitHandle
 from common.handle.impl.xlsx_split_handle import XlsxSplitHandle
 from common.util.common import parse_md_image
 from dataset.models import Image
-
+from django.utils.translation import gettext_lazy as _
 
 class FileBufferHandle:
     buffer = None
@@ -53,7 +53,7 @@ def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int):
     for split_handle in split_handles:
         if split_handle.support(file, get_buffer):
             return split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, save_inner_image)
-    raise Exception("不支持的文件格式")
+    raise Exception(_('Unsupported file format'))
 
 
 def is_valid_uuid(uuid_str: str):

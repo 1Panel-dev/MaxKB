@@ -28,6 +28,7 @@ from setting.models_provider.impl.volcanic_engine_model_provider.model.tti impor
 from setting.models_provider.impl.volcanic_engine_model_provider.model.tts import VolcanicEngineTextToSpeech
 
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _
 
 volcanic_engine_llm_model_credential = OpenAILLMModelCredential()
 volcanic_engine_stt_model_credential = VolcanicEngineSTTModelCredential()
@@ -37,12 +38,12 @@ volcanic_engine_tti_model_credential = VolcanicEngineTTIModelCredential()
 
 model_info_list = [
     ModelInfo('ep-xxxxxxxxxx-yyyy',
-              '用户前往火山方舟的模型推理页面创建推理接入点，这里需要输入ep-xxxxxxxxxx-yyyy进行调用',
+              _('The user goes to the model inference page of Volcano Ark to create an inference access point. Here, you need to enter ep-xxxxxxxxxx-yyyy to call it.'),
               ModelTypeConst.LLM,
               volcanic_engine_llm_model_credential, VolcanicEngineChatModel
               ),
     ModelInfo('ep-xxxxxxxxxx-yyyy',
-              '用户前往火山方舟的模型推理页面创建推理接入点，这里需要输入ep-xxxxxxxxxx-yyyy进行调用',
+              _('The user goes to the model inference page of Volcano Ark to create an inference access point. Here, you need to enter ep-xxxxxxxxxx-yyyy to call it.'),
               ModelTypeConst.IMAGE,
               volcanic_engine_image_model_credential, VolcanicEngineImage
               ),
@@ -57,27 +58,27 @@ model_info_list = [
               volcanic_engine_tts_model_credential, VolcanicEngineTextToSpeech
               ),
     ModelInfo('general_v2.0',
-              '通用2.0-文生图',
+              _('Universal 2.0-Vincent Diagram'),
               ModelTypeConst.TTI,
               volcanic_engine_tti_model_credential, VolcanicEngineTextToImage
               ),
     ModelInfo('general_v2.0_L',
-              '通用2.0Pro-文生图',
+              _('Universal 2.0Pro-Vincent Chart'),
               ModelTypeConst.TTI,
               volcanic_engine_tti_model_credential, VolcanicEngineTextToImage
               ),
     ModelInfo('general_v1.4',
-              '通用1.4-文生图',
+              _('Universal 1.4-Vincent Chart'),
               ModelTypeConst.TTI,
               volcanic_engine_tti_model_credential, VolcanicEngineTextToImage
               ),
     ModelInfo('anime_v1.3',
-              '动漫1.3.0-文生图',
+              _('Animation 1.3.0-Vincent Picture'),
               ModelTypeConst.TTI,
               volcanic_engine_tti_model_credential, VolcanicEngineTextToImage
               ),
     ModelInfo('anime_v1.3.1',
-              '动漫1.3.1-文生图',
+              _('Animation 1.3.1-Vincent Picture'),
               ModelTypeConst.TTI,
               volcanic_engine_tti_model_credential, VolcanicEngineTextToImage
               ),
@@ -86,7 +87,7 @@ model_info_list = [
 open_ai_embedding_credential = VolcanicEmbeddingCredential()
 model_info_embedding_list = [
     ModelInfo('ep-xxxxxxxxxx-yyyy',
-              '用户前往火山方舟的模型推理页面创建推理接入点，这里需要输入ep-xxxxxxxxxx-yyyy进行调用',
+              _('The user goes to the model inference page of Volcano Ark to create an inference access point. Here, you need to enter ep-xxxxxxxxxx-yyyy to call it.'),
               ModelTypeConst.EMBEDDING, open_ai_embedding_credential,
               VolcanicEngineEmbeddingModel)
 ]
@@ -111,7 +112,7 @@ class VolcanicEngineModelProvider(IModelProvider):
         return model_info_manage
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='model_volcanic_engine_provider', name='火山引擎', icon=get_file_content(
+        return ModelProvideInfo(provider='model_volcanic_engine_provider', name=_('volcano engine'), icon=get_file_content(
             os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl', 'volcanic_engine_model_provider',
                          'icon',
                          'volcanic_engine_icon_svg')))

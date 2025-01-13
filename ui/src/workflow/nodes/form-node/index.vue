@@ -100,16 +100,16 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column label="操作" align="left" width="80">
+            <el-table-column :label="$t('common.operation')" align="left" width="80">
               <template #default="{ row, $index }">
                 <span class="mr-4">
-                  <el-tooltip effect="dark" content="修改" placement="top">
+                  <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
                     <el-button type="primary" text @click.stop="openEditFormCollect(row, $index)">
                       <el-icon><EditPen /></el-icon>
                     </el-button>
                   </el-tooltip>
                 </span>
-                <el-tooltip effect="dark" content="删除" placement="top">
+                <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                   <el-button type="primary" text @click="deleteField(row)">
                     <el-icon>
                       <Delete />

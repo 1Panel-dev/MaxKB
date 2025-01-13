@@ -13,6 +13,7 @@ from rest_framework import serializers
 from common.exception.app_exception import AppApiException
 from common.util.field_message import ErrMessage
 from setting.models.system_management import SystemSetting, SettingType
+from django.utils.translation import gettext_lazy as _
 
 
 class SystemSettingSerializer(serializers.Serializer):
@@ -25,13 +26,13 @@ class SystemSettingSerializer(serializers.Serializer):
             return system_setting.meta
 
         class Create(serializers.Serializer):
-            email_host = serializers.CharField(required=True, error_messages=ErrMessage.char("SMTP 主机"))
-            email_port = serializers.IntegerField(required=True, error_messages=ErrMessage.char("SMTP 端口"))
-            email_host_user = serializers.CharField(required=True, error_messages=ErrMessage.char("发件人邮箱"))
-            email_host_password = serializers.CharField(required=True, error_messages=ErrMessage.char("密码"))
-            email_use_tls = serializers.BooleanField(required=True, error_messages=ErrMessage.char("是否开启TLS"))
-            email_use_ssl = serializers.BooleanField(required=True, error_messages=ErrMessage.char("是否开启SSL"))
-            from_email = serializers.EmailField(required=True, error_messages=ErrMessage.char("发送人邮箱"))
+            email_host = serializers.CharField(required=True, error_messages=ErrMessage.char(_('SMTP host')))
+            email_port = serializers.IntegerField(required=True, error_messages=ErrMessage.char(_('SMTP port')))
+            email_host_user = serializers.CharField(required=True, error_messages=ErrMessage.char(_('Sender\'s email')))
+            email_host_password = serializers.CharField(required=True, error_messages=ErrMessage.char(_('Password')))
+            email_use_tls = serializers.BooleanField(required=True, error_messages=ErrMessage.char(_('Whether to enable TLS')))
+            email_use_ssl = serializers.BooleanField(required=True, error_messages=ErrMessage.char(_('Whether to enable SSL')))
+            from_email = serializers.EmailField(required=True, error_messages=ErrMessage.char(_('Sender\'s email')))
 
             def is_valid(self, *, raise_exception=False):
                 super().is_valid(raise_exception=True)
@@ -45,7 +46,7 @@ class SystemSettingSerializer(serializers.Serializer):
                                  self.data.get("email_use_ssl")
                                  ).open()
                 except Exception as e:
-                    raise AppApiException(1004, "邮箱校验失败")
+                    raise AppApiException(1004, _('Email verification failed'))
 
             def update_or_save(self):
                 self.is_valid(raise_exception=True)

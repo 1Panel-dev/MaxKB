@@ -1,0 +1,67 @@
+export default {
+  title: '知识库',
+  createDataset: '创建知识库',
+  general: '通用型',
+  web: 'web 站点',
+  relatedApplications: '关联应用',
+  searchBar: {
+    placeholder: '按名称搜索'
+  },
+  setting: {
+    vectorization: '向量化',
+    sync: '同步'
+  },
+  tip: {
+    professionalMessage: '社区版最多支持 50 个知识库，如需拥有更多知识库，请升级为专业版。',
+    syncSuccess: '同步任务发送成功',
+    updateModeMessage: '修改知识库向量模型后，需要对知识库向量化，是否继续保存？'
+  },
+  delete: {
+    confirmTitle: '是否删除知识库：',
+    confirmMessage1: '此知识库关联',
+    confirmMessage2: '个应用，删除后无法恢复，请谨慎操作。'
+  },
+
+  datasetForm: {
+    title: {
+      info: '基本信息'
+    },
+    form: {
+      datasetName: {
+        label: '知识库名称',
+        placeholder: '请输入知识库名称',
+        requiredMessage: '请输入应用名称'
+      },
+      datasetDescription: {
+        label: '知识库描述',
+        placeholder:
+          '描述知识库的内容，详尽的描述将帮助AI能深入理解该知识库的内容，能更准确的检索到内容，提高该知识库的命中率。',
+        requiredMessage: '请输入知识库描述'
+      },
+      vectorModel: {
+        label: '向量模型',
+        placeholder: '请选择向量模型',
+        requiredMessage: '请输入Embedding模型'
+      },
+      datasetType: {
+        label: '知识库类型',
+        generalInfo: '上传本地文件或手动录入',
+        webInfo: '同步Web网站文本数据'
+      },
+      source_url: {
+        label: 'Web 根地址',
+        placeholder: '请输入 Web 根地址',
+        requiredMessage: ' 请输入 Web 根地址'
+      },
+      selector: {
+        label: '选择器',
+        placeholder: '默认为 body，可输入 .classname/#idname/tagname'
+      }
+    },
+    buttons: {},
+
+    dialog: {
+ 
+    }
+  }
+}

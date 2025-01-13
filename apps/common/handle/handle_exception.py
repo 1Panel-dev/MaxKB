@@ -14,7 +14,7 @@ from rest_framework.views import exception_handler
 
 from common.exception.app_exception import AppApiException
 from common.response import result
-
+from django.utils.translation import gettext_lazy as _
 
 def to_result(key, args, parent_key=None):
     """
@@ -27,7 +27,7 @@ def to_result(key, args, parent_key=None):
     error_detail = list(filter(
         lambda d: True if isinstance(d, ErrorDetail) else True if isinstance(d, dict) and len(
             d.keys()) > 0 else False,
-        (args[0] if len(args) > 0 else {key: [ErrorDetail('未知异常', code='unknown')]}).get(key)))[0]
+        (args[0] if len(args) > 0 else {key: [ErrorDetail(_('Unknown exception'), code='unknown')]}).get(key)))[0]
 
     if isinstance(error_detail, dict):
         return list(map(lambda k: to_result(k, args=[error_detail],

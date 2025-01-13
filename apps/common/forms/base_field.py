@@ -11,6 +11,7 @@ from typing import List, Dict
 
 from common.exception.app_exception import AppApiException
 from common.forms.label.base_label import BaseLabel
+from django.utils.translation import gettext_lazy as _
 
 
 class TriggerType(Enum):
@@ -60,7 +61,7 @@ class BaseField:
         field_label = self.label.label if hasattr(self.label, 'to_dict') else self.label
         if self.required and value is None:
             raise AppApiException(500,
-                                  f"{field_label} 为必填参数")
+                                  _('The field {field_label} is required').format(field_label=field_label))
 
     def to_dict(self, **kwargs):
         return {

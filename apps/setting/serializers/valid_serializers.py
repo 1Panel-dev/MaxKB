@@ -18,23 +18,27 @@ from common.models.db_model_manage import DBModelManage
 from common.util.field_message import ErrMessage
 from dataset.models import DataSet
 from users.models import User
+from django.utils.translation import gettext_lazy as _
 
 model_message_dict = {
     'dataset': {'model': DataSet, 'count': 50,
-                'message': '社区版最多支持 50 个知识库，如需拥有更多知识库，请联系我们（https://fit2cloud.com/）。'},
+                'message': _(
+                    'The community version supports up to 50 knowledge bases. If you need more knowledge bases, please contact us (https://fit2cloud.com/).')},
     'application': {'model': Application, 'count': 5,
-                    'message': '社区版最多支持 5 个应用，如需拥有更多应用，请联系我们（https://fit2cloud.com/）。'},
+                    'message': _(
+                        'The community version supports up to 5 applications. If you need more applications, please contact us (https://fit2cloud.com/).')},
     'user': {'model': User, 'count': 2,
-             'message': '社区版最多支持 2 个用户，如需拥有更多用户，请联系我们（https://fit2cloud.com/）。'}
+             'message': _(
+                 'The community version supports up to 2 users. If you need more users, please contact us (https://fit2cloud.com/).')}
 }
 
 
 class ValidSerializer(serializers.Serializer):
-    valid_type = serializers.CharField(required=True, error_messages=ErrMessage.char("类型"), validators=[
+    valid_type = serializers.CharField(required=True, error_messages=ErrMessage.char(_('type')), validators=[
         validators.RegexValidator(regex=re.compile("^application|dataset|user$"),
                                   message="类型只支持:application|dataset|user", code=500)
     ])
-    valid_count = serializers.IntegerField(required=True, error_messages=ErrMessage.integer("校验数量"))
+    valid_count = serializers.IntegerField(required=True, error_messages=ErrMessage.integer(_('check quantity')))
 
     def valid(self, is_valid=True):
         if is_valid:

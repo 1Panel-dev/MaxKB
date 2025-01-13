@@ -8,8 +8,8 @@
     class="member-dialog"
   >
     <template #header="{ titleId, titleClass }">
-      <h4 :id="titleId" :class="titleClass">添加成员</h4>
-      <div class="dialog-sub-title">成员登录后可以访问到您授权的数据。</div>
+      <h4 :id="titleId" :class="titleClass">{{ $t('views.team.addMember') }}</h4>
+      <div class="dialog-sub-title">{{ $t('views.team.addSubTitle') }}</div>
     </template>
 
     <el-form
@@ -20,15 +20,15 @@
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="用户名/邮箱" prop="users">
-        <tags-input v-model:tags="memberForm.users" placeholder="请输入成员的用户名或邮箱" />
+      <el-form-item :label="$t('views.team.teamForm.form.userName.label')" prop="users">
+        <tags-input v-model:tags="memberForm.users" :placeholder="$t('views.team.teamForm.form.userName.placeholder')" />
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> 取消 </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submitMember(addMemberFormRef)" :loading="loading">
-          添加
+          {{ $t('common.add') }}
         </el-button>
       </span>
     </template>
@@ -39,7 +39,7 @@ import { ref, watch, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import TeamApi from '@/api/team'
-
+import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 
 const dialogVisible = ref<boolean>(false)
@@ -57,7 +57,7 @@ const rules = ref<FormRules>({
     {
       type: 'array',
       required: true,
-      message: '请输入用户名/邮箱',
+      message: t('views.team.teamForm.form.userName.requiredMessage'),
       trigger: 'change'
     }
   ]
@@ -83,7 +83,7 @@ const submitMember = async (formEl: FormInstance | undefined) => {
       let idsArray = memberForm.value.users.map((obj: any) => obj.id)
       TeamApi.postCreatTeamMember(idsArray)
         .then((res) => {
-          MsgSuccess('提交成功')
+          MsgSuccess(t('common.submitSuccess'))
           emit('refresh', idsArray)
           dialogVisible.value = false
           loading.value = false
