@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer header="上传文档" class="create-dataset">
+  <LayoutContainer :header="$t('views.document.uploadDocument')" class="create-dataset">
     <template #backButton>
       <back-button @click="back"></back-button>
     </template>
@@ -22,17 +22,23 @@
       </div>
     </div>
     <div class="create-dataset__footer text-right border-t" v-if="active !== 2">
-      <el-button @click="router.go(-1)" :disabled="SetRulesRef?.loading || loading">{{$t('common.cancel')}}</el-button>
-      <el-button @click="prev" v-if="active === 1" :disabled="SetRulesRef?.loading || loading"
-        >上一步</el-button
-      >
+      <el-button @click="router.go(-1)" :disabled="SetRulesRef?.loading || loading">{{
+        $t('common.cancel')
+      }}</el-button>
+      <el-button @click="prev" v-if="active === 1" :disabled="SetRulesRef?.loading || loading">{{
+        $t('views.document.buttons.prev')
+      }}</el-button>
       <el-button
         @click="next"
         type="primary"
         v-if="active === 0"
         :disabled="SetRulesRef?.loading || loading"
       >
-        {{ documentsType === 'txt' ? '下一步' : '开始导入' }}
+        {{
+          documentsType === 'txt'
+            ? $t('views.document.buttons.next')
+            : $t('views.document.buttons.import')
+        }}
       </el-button>
       <el-button
         @click="submit"
@@ -40,7 +46,7 @@
         v-if="active === 1"
         :disabled="SetRulesRef?.loading || loading"
       >
-        开始导入
+        {{ $t('views.document.buttons.import') }}
       </el-button>
     </div>
   </LayoutContainer>
@@ -151,7 +157,7 @@ function submit() {
 }
 function back() {
   if (documentsFiles.value?.length > 0) {
-    MsgConfirm(t('common.tip'), `当前的更改尚未保存，确认退出吗?`, {
+    MsgConfirm(t('common.tip'), t('views.document.tip.saveMessage'), {
       confirmButtonText: t('common.confirm'),
       type: 'warning'
     })

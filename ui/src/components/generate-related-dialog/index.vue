@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="生成问题"
+    :title="$t('views.document.setting.generateQuestion')"
     v-model="dialogVisible"
     width="650"
     :close-on-click-modal="false"

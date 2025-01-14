@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="选择知识库"
+    :title="$t('views.dataset.selectDataset')"
     v-model="dialogVisible"
     width="600"
     class="select-dataset-dialog"
@@ -9,9 +9,9 @@
   >
     <template #header="{ titleId, titleClass }">
       <div class="my-header flex">
-        <h4 :id="titleId" :class="titleClass">选择知识库</h4>
+        <h4 :id="titleId" :class="titleClass">{{$t('views.dataset.selectDataset')}}</h4>
         <el-button link class="ml-16" @click="refresh">
-          <el-icon class="mr-4"><Refresh /></el-icon>刷新
+          <el-icon class="mr-4"><Refresh /></el-icon>{{ $t('common.refresh') }}
         </el-button>
       </div>
     </template>

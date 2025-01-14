@@ -9,7 +9,9 @@
           </div>
         </template>
         <div class="mb-16">
-          <el-text type="info">{{ item.content.length }} 段落</el-text>
+          <el-text type="info"
+            >{{ item.content.length }} {{ $t('views.document.paragraph.title') }}</el-text
+          >
         </div>
         <div class="paragraph-list" v-if="activeName == index">
           <el-scrollbar>

@@ -1,32 +1,32 @@
 <template>
   <el-dialog
-    title="同步知识库"
+    :title="$t('views.dataset.syncWeb.title')"
     v-model="dialogVisible"
     width="600px"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :destroy-on-close="true"
   >
-    <p class="mb-8">同步方式</p>
+    <p class="mb-8">{{ $t('views.dataset.syncWeb.syncMethod') }}</p>
     <el-radio-group v-model="method" class="card__radio">
       <el-card shadow="never" class="mb-16" :class="method === 'replace' ? 'active' : ''">
         <el-radio value="replace" size="large">
-          <p class="mb-4">替换同步</p>
-          <el-text type="info">重新获取 Web 站点文档，覆盖替换本地知识库中的文档</el-text>
+          <p class="mb-4">{{ $t('views.dataset.syncWeb.replace') }}</p>
+          <el-text type="info">{{ $t('views.dataset.syncWeb.replaceText') }}</el-text>
         </el-radio>
       </el-card>
 
       <el-card shadow="never" class="mb-16" :class="method === 'complete' ? 'active' : ''">
         <el-radio value="complete" size="large">
-          <p class="mb-4">整体同步</p>
-          <el-text type="info">先删除本地知识库所有文档，重新获取 Web 站点文档</el-text>
+          <p class="mb-4">{{ $t('views.dataset.syncWeb.complete') }}</p>
+          <el-text type="info">{{ $t('views.dataset.syncWeb.completeText') }}</el-text>
         </el-radio>
       </el-card>
     </el-radio-group>
-    <p class="danger">注意：所有同步都会删除已有数据重新获取新数据，请谨慎操作。</p>
+    <p class="danger">{{ $t('views.dataset.syncWeb.tip') }}</p>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> {{$t('common.cancel')}} </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit" :loading="loading">
           {{ $t('common.confirm') }}
         </el-button>

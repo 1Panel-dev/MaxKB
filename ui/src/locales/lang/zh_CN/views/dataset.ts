@@ -1,6 +1,7 @@
 export default {
   title: '知识库',
   createDataset: '创建知识库',
+  selectDataset: '选择知识库',
   general: '通用型',
   web: 'web 站点',
   relatedApplications: '关联应用',
@@ -57,11 +58,26 @@ export default {
         label: '选择器',
         placeholder: '默认为 body，可输入 .classname/#idname/tagname'
       }
-    },
-    buttons: {},
-
-    dialog: {
- 
     }
+  },
+  ResultSuccess: {
+    title: '知识库创建成功',
+    paragraph: '分段',
+    paragraph_count: '个分段',
+    documentList: '文档列表',
+    loading: '导入中',
+    buttons: {
+      toDataset: '返回知识库列表',
+      toDocument: '前往文档'
+    }
+  },
+  syncWeb: {
+    title: '同步知识库',
+    syncMethod: '同步方式',
+    replace: '替换同步',
+    replaceText: '重新获取 Web 站点文档，覆盖替换本地知识库中的文档',
+    complete: '整体同步',
+    completeText: '先删除本地知识库所有文档，重新获取 Web 站点文档',
+    tip: '注意：所有同步都会删除已有数据重新获取新数据，请谨慎操作。'
   }
 }

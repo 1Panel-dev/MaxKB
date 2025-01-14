@@ -31,7 +31,9 @@
           {{ child.content }}
         </div>
         <div class="lighter mt-12">
-          <el-text type="info"> {{ child.content.length }} 个字符 </el-text>
+          <el-text type="info">
+            {{ child.content.length }} {{ $t('views.document.paragraph.character_count') }}
+          </el-text>
         </div>
       </el-card>
     </InfiniteScroll>
@@ -48,6 +50,7 @@ import { cloneDeep } from 'lodash'
 import { ref, computed } from 'vue'
 import EditParagraphDialog from './EditParagraphDialog.vue'
 import { MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
 const page_size = ref<number>(30)
 const current_page = ref<number>(1)
 const currentCIndex = ref<number>(0)
@@ -78,10 +81,14 @@ const updateContent = (data: any) => {
 }
 
 const deleteHandle = (item: any, cIndex: number) => {
-  MsgConfirm(`是否删除分段：${item.title || '-'} ?`, `删除后将不会存入知识库，对本地文档无影响。`, {
-    confirmButtonText: t('common.delete'),
-    confirmButtonClass: 'danger'
-  })
+  MsgConfirm(
+    `${t('views.document.paragraph.delete.confirmTitle')}${item.title || '-'} ?`,
+    t('views.document.paragraph.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.delete'),
+      confirmButtonClass: 'danger'
+    }
+  )
     .then(() => {
       const new_value = [...props.modelValue]
       new_value.splice(cIndex, 1)

@@ -7,6 +7,7 @@ import functionLib from './function-lib';
 import user from './user';
 import team from './team';
 import template from './template';
+import document from './document';
 export default {
     notFound,
     application,
@@ -16,5 +17,6 @@ export default {
     functionLib,
     user,
     team,
-    template
+    template,
+    document
 };

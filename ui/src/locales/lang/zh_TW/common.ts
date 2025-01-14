@@ -14,6 +14,8 @@ export default {
   submitSuccess: '提交成功',
   edit: '編輯',
   editSuccess: '編輯成功',
+  modify: '修改',
+  modifySuccess: '修改成功',
   cancel: '取消',
   confirm: '確認',
   tip: '提示',
@@ -35,7 +37,6 @@ export default {
   paramSetting: '參數設定',
   creator: '建立者',
   debug: '調試',
-  modify: '修改',
   required: '必填',
   noData: '暂无数据',
   status: {

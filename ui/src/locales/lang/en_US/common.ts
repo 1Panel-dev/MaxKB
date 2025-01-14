@@ -14,6 +14,8 @@ export default {
   submitSuccess: 'Submitted successfully',
   edit: 'Edit',
   editSuccess: 'Edit Successful',
+  modify: 'Modify',
+  modifySuccess: 'Modify Successful',
   cancel: 'Cancel',
   confirm: 'Confirm',
   tip: 'Prompt',
@@ -35,7 +37,6 @@ export default {
   paramSetting: 'Parameter Settings',
   creator: 'Creator',
   debug: 'Debug',
-  modify: 'Modify',
   required: 'Required',
   noData: 'No data',
   status: {

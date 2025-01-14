@@ -124,11 +124,11 @@
                             <el-dropdown-menu>
                               <el-dropdown-item @click="openGenerateDialog(item)">
                                 <el-icon><Connection /></el-icon>
-                                生成问题</el-dropdown-item
+                                {{ $t('views.document.setting.generateQuestion') }}</el-dropdown-item
                               >
                               <el-dropdown-item @click="openSelectDocumentDialog(item)">
                                 <AppIcon iconName="app-migrate"></AppIcon>
-                                迁移</el-dropdown-item
+                                {{$t('views.document.setting.migration')}}</el-dropdown-item
                               >
                               <el-dropdown-item icon="Delete" @click.stop="deleteParagraph(item)">{{
                                 $t('common.delete')
@@ -148,10 +148,10 @@
 
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
         <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
-          生成问题
+          {{ $t('views.document.setting.generateQuestion') }}
         </el-button>
         <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog()">
-          迁移
+          {{$t('views.document.setting.migration')}}
         </el-button>
 
         <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
