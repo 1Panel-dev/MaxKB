@@ -1,4 +1,5 @@
 export default {
+  title: '系统设置',
   authentication: {
     title: '登录认证',
     ldap: {

@@ -20,7 +20,7 @@ const settingRouter = {
       meta: {
         icon: 'User',
         iconActive: 'UserFilled',
-        title: '用户管理',
+        title: t('views.user.title'),
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting',
@@ -34,7 +34,7 @@ const settingRouter = {
       meta: {
         icon: 'app-team',
         iconActive: 'app-team-active',
-        title: '团队成员',
+        title: t('views.team.title'),
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting'
@@ -47,7 +47,7 @@ const settingRouter = {
       meta: {
         icon: 'app-template',
         iconActive: 'app-template-active',
-        title: '模型设置',
+        title: t('views.template.title'),
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting'
@@ -60,7 +60,7 @@ const settingRouter = {
       meta: {
         icon: 'app-setting',
         iconActive: 'app-setting-active',
-        title: '系统设置',
+        title: t('views.system.title'),
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting',

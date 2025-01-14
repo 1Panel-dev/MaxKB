@@ -1,4 +1,5 @@
 export default {
+  title: '系統設置',
   authentication: {
     title: '登入認證',
     ldap: {
