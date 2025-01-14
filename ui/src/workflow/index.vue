@@ -2,6 +2,7 @@
   <div className="workflow-app" id="container"></div>
   <!-- 辅助工具栏 -->
   <Control class="workflow-control" v-if="lf" :lf="lf"></Control>
+  <TeleportContainer :flow-id="flowId" />
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
@@ -13,10 +14,12 @@ import '@logicflow/extension/lib/style/index.css'
 import '@logicflow/core/dist/style/index.css'
 import { initDefaultShortcut } from '@/workflow/common/shortcut'
 import Dagre from '@/workflow/plugins/dagre'
+import { getTeleport } from '@/workflow/common/teleport'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
 
 defineOptions({ name: 'WorkFlow' })
-
+const TeleportContainer = getTeleport()
+const flowId = ref('')
 type ShapeItem = {
   type?: string
   text?: string
@@ -56,9 +59,6 @@ const render = (data: any) => {
   lf.value.render(data)
 }
 const renderGraphData = (data?: any) => {
-  if (data) {
-    graphData.value = data
-  }
   const container: any = document.querySelector('#container')
   if (container) {
     lf.value = new LogicFlow({
@@ -89,11 +89,14 @@ const renderGraphData = (data?: any) => {
         strokeWidth: 1
       }
     })
+    lf.value.on('graph:rendered', () => {
+      flowId.value = lf.value.graphModel.flowId
+    })
     initDefaultShortcut(lf.value, lf.value.graphModel)
     lf.value.batchRegister([...Object.keys(nodes).map((key) => nodes[key].default), AppEdge])
     lf.value.setDefaultEdgeType('app-edge')
 
-    lf.value.render(graphData.value)
+    lf.value.render(data ? data : {})
 
     lf.value.graphModel.eventCenter.on('delete_edge', (id_list: Array<string>) => {
       id_list.forEach((id: string) => {

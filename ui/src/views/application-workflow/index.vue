@@ -27,11 +27,11 @@
         <el-button icon="Plus" @click="showPopover = !showPopover"> 添加组件 </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug">
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
-          {{ $t('common.debug')}}</el-button
+          {{ $t('common.debug') }}</el-button
         >
         <el-button @click="saveApplication(true)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
-          {{ $t('common.save')}}
+          {{ $t('common.save') }}
         </el-button>
         <el-button type="primary" @click="publicHandle"> 发布 </el-button>
 
@@ -326,7 +326,7 @@ function getDetail() {
     saveTime.value = res.data?.update_time
     workflowRef.value?.clearGraphData()
     nextTick(() => {
-      workflowRef.value?.renderGraphData(detail.value.work_flow)
+      workflowRef.value?.render(detail.value.work_flow)
     })
   })
 }

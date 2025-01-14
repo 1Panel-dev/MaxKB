@@ -1,6 +1,6 @@
 import { BezierEdge, BezierEdgeModel, h } from '@logicflow/core'
 import { createApp, h as vh } from 'vue'
-
+import { isActive, connect, disconnect } from './teleport'
 import CustomLine from './CustomLine.vue'
 function isMouseInElement(element: any, e: any) {
   const rect = element.getBoundingClientRect()
@@ -15,7 +15,8 @@ const DEFAULT_WIDTH = 32
 const DEFAULT_HEIGHT = 32
 class CustomEdge2 extends BezierEdge {
   isMounted
-
+  customLineApp?: any
+  root?: any
   constructor() {
     super()
     this.isMounted = false
@@ -27,6 +28,64 @@ class CustomEdge2 extends BezierEdge {
         this.props.model.graphModel.deleteEdgeById(this.props.model.id)
       }
     }
+  }
+  /**
+   * 渲染vue组件
+   * @param root
+   */
+  protected renderVueComponent(root: any) {
+    this.unmountVueComponent()
+    this.root = root
+    const { graphModel } = this.props
+    if (root) {
+      if (isActive()) {
+        connect(
+          this.targetId(),
+          CustomLine,
+          root,
+          this.props.model,
+          graphModel,
+          (node: any, graph: any) => {
+            return { model: node, graph }
+          }
+        )
+      } else {
+        this.customLineApp = createApp({
+          render: () => vh(CustomLine, { model: this.props.model })
+        })
+        this.customLineApp?.mount(root)
+      }
+    }
+  }
+  protected targetId() {
+    return `${this.props.graphModel.flowId}:${this.props.model.id}`
+  }
+  /**
+   * 组件即将卸载勾子
+   */
+  componentWillUnmount() {
+    if (super.componentWillUnmount) {
+      super.componentWillUnmount()
+    }
+    if (isActive()) {
+      console.log('unmount')
+      disconnect(this.targetId())
+    }
+    this.unmountVueComponent()
+  }
+  /**
+   * 卸载vue
+   * @returns
+   */
+  protected unmountVueComponent() {
+    if (this.customLineApp) {
+      this.customLineApp.unmount()
+      this.customLineApp = null
+    }
+    if (this.root) {
+      this.root.innerHTML = ''
+    }
+    return this.root
   }
 
   getEdge() {
@@ -57,14 +116,11 @@ class CustomEdge2 extends BezierEdge {
       height: customHeight
     }
 
-    const app = createApp({
-      render: () => vh(CustomLine, { model: this.props.model })
-    })
     setTimeout(() => {
       const s = document.getElementById(id)
       if (s && !this.isMounted) {
-        app.mount(s)
         this.isMounted = true
+        this.renderVueComponent(s)
       }
     }, 0)
 
