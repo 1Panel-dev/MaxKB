@@ -2,6 +2,7 @@ import type LogicFlow from '@logicflow/core'
 import { type GraphModel } from '@logicflow/core'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { WorkflowType } from '@/enums/workflow'
+import { t } from '@/locales'
 let selected: any | null = null
 
 function translationNodeData(nodeData: any, distance: any) {

@@ -169,6 +169,7 @@ const applicationNodeFormRef = ref<FormInstance>()
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
+      console.log(props.nodeModel.properties.node_data)
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)
@@ -222,7 +223,6 @@ const update_field = () => {
             return item
           }
         })
-        console.log(merge_api_input_field_list)
         set(
           props.nodeModel.properties.node_data,
           'api_input_field_list',
@@ -248,9 +248,9 @@ const update_field = () => {
           'user_input_field_list',
           merge_user_input_field_list
         )
+        const fileEnable = nodeData.file_upload_enable
         const fileUploadSetting = nodeData.file_upload_setting
-        // 如果是true，说明有文件上传
-        if (fileUploadSetting) {
+        if (fileEnable) {
           handleFileUpload('document', fileUploadSetting.document)
           handleFileUpload('image', fileUploadSetting.image)
           handleFileUpload('audio', fileUploadSetting.audio)
