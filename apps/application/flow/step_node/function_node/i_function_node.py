@@ -25,7 +25,7 @@ class InputField(serializers.Serializer):
     is_required = serializers.BooleanField(required=True, error_messages=ErrMessage.boolean(_("Is this field required")))
     type = serializers.CharField(required=True, error_messages=ErrMessage.char(_("type")), validators=[
         validators.RegexValidator(regex=re.compile("^string|int|dict|array|float$"),
-                                  message=_("字段只支持string|int|dict|array|float"), code=500)
+                                  message=_("The field only supports string|int|dict|array|float"), code=500)
     ])
     source = serializers.CharField(required=True, error_messages=ErrMessage.char(_("source")), validators=[
         validators.RegexValidator(regex=re.compile("^custom|reference$"),

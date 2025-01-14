@@ -24,7 +24,7 @@ class DatasetSettingSerializer(serializers.Serializer):
                                      error_messages=ErrMessage.integer(_("Reference segment number")))
     # 相似度 0-1之间
     similarity = serializers.FloatField(required=True, max_value=2, min_value=0,
-                                        error_messages=ErrMessage.float(_("引用分段数")))
+                                        error_messages=ErrMessage.float(_('similarity')))
     search_mode = serializers.CharField(required=True, validators=[
         validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
                                   message=_("The type only supports register|reset_password"), code=500)
