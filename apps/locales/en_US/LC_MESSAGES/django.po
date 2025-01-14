@@ -404,7 +404,7 @@ msgstr ""
 
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:66
 msgid ""
-"Parameter value error: The uploaded image lacks file_id, and the audio "
+"Parameter value error: The uploaded audio lacks file_id, and the audio "
 "upload fails."
 msgstr ""
 
@@ -502,7 +502,7 @@ msgid "type"
 msgstr ""
 
 #: .\apps\application\flow\step_node\function_node\i_function_node.py:28
-msgid "字段只支持string|int|dict|array|float"
+msgid "The field only supports string|int|dict|array|float"
 msgstr ""
 
 #: .\apps\application\flow\step_node\function_node\i_function_node.py:30
@@ -543,10 +543,6 @@ msgstr ""
 #: .\apps\application\flow\step_node\reranker_node\i_reranker_node.py:26
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:33
 msgid "Maximum number of words in a quoted segment"
-msgstr ""
-
-#: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:27
-msgid "引用分段数"
 msgstr ""
 
 #: .\apps\application\flow\step_node\speech_to_text_step_node\i_speech_to_text_node.py:17

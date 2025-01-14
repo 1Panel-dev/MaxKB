@@ -118,7 +118,7 @@ export default {
     websiteSloganPlaceholder: '請輸入歡迎語',
     websiteSloganTip: '產品 Logo 下的歡迎語',
     defaultSlogan: '歡迎使用 MaxKB 智能知識庫問答系統',
-    defaultTip: '默認為 MaxKB 登錄界面，支持自定義設置',
+    defaultTip: '默認為 MaxKB 平台界面，支持自定義設置',
     platformSetting: '平台設置',
     showUserManual: '顯示用戶手冊',
     showForum: '顯示論壇求助',
