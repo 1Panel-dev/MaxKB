@@ -786,7 +786,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     'user_id': openapi.Schema(type=openapi.TYPE_STRING, title=_('user id'), description=_('user id')),
                     'paragraph_count': openapi.Schema(type=openapi.TYPE_INTEGER, title="_('document count')",
                                                       description="_('document count')", default=1),
-                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_(''),
+                    'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_('Is active'),
                                                 description=_('Is active'), default=True),
                     'update_time': openapi.Schema(type=openapi.TYPE_STRING, title=_('update time'),
                                                   description=_('update time'),

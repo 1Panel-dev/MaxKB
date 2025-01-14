@@ -24,7 +24,7 @@ class FileView(APIView):
     parser_classes = [MultiPartParser]
 
     @action(methods=['POST'], detail=False)
-    @swagger_auto_schema(operation_summary=_(''),
+    @swagger_auto_schema(operation_summary=_('Upload file'),
                          operation_id=_('Upload file'),
                          manual_parameters=[openapi.Parameter(name='file',
                                                               in_=openapi.IN_FORM,
