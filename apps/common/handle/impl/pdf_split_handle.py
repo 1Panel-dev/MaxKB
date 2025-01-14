@@ -19,6 +19,7 @@ from langchain_community.document_loaders import PyPDFLoader
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.util.split_model import SplitModel
+from django.utils.translation import gettext_lazy as _
 
 default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),
@@ -274,7 +275,7 @@ class PdfSplitHandle(BaseSplitHandle):
                     pre_toc[i]['content'] = re.sub(r'(?<!。)\n+', '', pre_toc[i]['content'])
                     pre_toc[i]['content'] = re.sub(r'(?<!.)\n+', '', pre_toc[i]['content'])
             except BaseException as e:
-                max_kb.info(f'此文档没有前言部分，按照普通文本处理: {e}')
+                max_kb.error(_('This document has no preface and is treated as ordinary text: {e}').format(e=e))
                 if pattern_list is not None and len(pattern_list) > 0:
                     split_model = SplitModel(pattern_list, with_filter, limit)
                 else:
