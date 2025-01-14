@@ -3,39 +3,24 @@ import ElementPlus from 'element-plus'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { HtmlResize } from '@logicflow/extension'
-
 import { h as lh } from '@logicflow/core'
 import { createApp, h } from 'vue'
 import directives from '@/directives'
 import i18n from '@/locales'
 import { WorkflowType } from '@/enums/workflow'
 import { nodeDict } from '@/workflow/common/data'
+import { isActive, connect, disconnect } from './teleport'
 class AppNode extends HtmlResize.view {
   isMounted
-  r
-  app
-
+  r?: any
+  component: any
+  app: any
+  root?: any
+  VueNode: any
   constructor(props: any, VueNode: any) {
     super(props)
+    this.component = VueNode
     this.isMounted = false
-    this.r = h(VueNode, {
-      properties: props.model.properties,
-      nodeModel: props.model
-    })
-
-    this.app = createApp({
-      render: () => this.r
-    })
-    this.app.use(ElementPlus, {
-      locale: zhCn
-    })
-    this.app.use(Components)
-    this.app.use(directives)
-    this.app.use(i18n)
-    for (const [key, component] of Object.entries(ElementPlusIcons)) {
-      this.app.component(key, component)
-    }
-
     if (props.model.properties.noRender) {
       delete props.model.properties.noRender
     } else {
@@ -137,12 +122,78 @@ class AppNode extends HtmlResize.view {
       this.isMounted = true
       const node = document.createElement('div')
       rootEl.appendChild(node)
-      this.app?.mount(node)
+      this.renderVueComponent(node)
     } else {
       if (this.r && this.r.component) {
         this.r.component.props.properties = this.props.model.getProperties()
       }
     }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount()
+    this.unmount()
+  }
+  getComponentContainer() {
+    return this.root
+  }
+  protected targetId() {
+    return `${this.props.graphModel.flowId}:${this.props.model.id}`
+  }
+  protected renderVueComponent(root: any) {
+    this.unmountVueComponent()
+    this.root = root
+    const { model, graphModel } = this.props
+
+    if (root) {
+      if (isActive()) {
+        connect(this.targetId(), this.component, root, model, graphModel)
+      } else {
+        this.r = h(this.component, {
+          properties: this.props.model.properties,
+          nodeModel: this.props.model
+        })
+        this.app = createApp({
+          render() {
+            return this.r
+          },
+          provide() {
+            return {
+              getNode: () => model,
+              getGraph: () => graphModel
+            }
+          }
+        })
+
+        this.app.use(ElementPlus, {
+          locale: zhCn
+        })
+        this.app.use(Components)
+        this.app.use(directives)
+        this.app.use(i18n)
+        for (const [key, component] of Object.entries(ElementPlusIcons)) {
+          this.app.component(key, component)
+        }
+        this.app?.mount(root)
+      }
+    }
+  }
+
+  protected unmountVueComponent() {
+    if (this.app) {
+      this.app.unmount()
+      this.app = null
+    }
+    if (this.root) {
+      this.root.innerHTML = ''
+    }
+    return this.root
+  }
+
+  unmount() {
+    if (isActive()) {
+      disconnect(this.targetId())
+    }
+    this.unmountVueComponent()
   }
 }
 
