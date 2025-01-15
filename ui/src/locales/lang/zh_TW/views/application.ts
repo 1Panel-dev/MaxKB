@@ -187,5 +187,11 @@ export default {
       urlInfo: '-事件與回呼-事件配置-配置訂閱方式的 "請求位址" 中'
     },
     copyUrl: '複製連結填入到'
+  },
+  hitTest: {
+    title: '命中測試',
+    text: '針對用戶提問調試段落匹配情況，保障回答效果。',
+    emptyMessage1: '命中的段落顯示在這裡',
+    emptyMessage2: '沒有命中的分段'
   }
 }

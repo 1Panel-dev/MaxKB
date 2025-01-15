@@ -553,7 +553,7 @@ function cancelTaskHandle(val: any) {
     type: val
   }
   documentApi.batchCancelTask(id, obj, loading).then(() => {
-    MsgSuccess(t('views.document.tip.cancelSuccessMessage'))
+    MsgSuccess(t('views.document.tip.cancelSuccess'))
     multipleTableRef.value?.clearSelection()
   })
 }
@@ -734,7 +734,7 @@ function batchRefresh() {
   const arr: string[] = multipleSelection.value.map((v) => v.id)
   const embeddingBatchDocument = (stateList: Array<string>) => {
     documentApi.batchRefresh(id, arr, stateList, loading).then(() => {
-      MsgSuccess(t('views.document.tip.vectorizationSuccessMessage'))
+      MsgSuccess(t('views.document.tip.vectorizationSuccess'))
       multipleTableRef.value?.clearSelection()
     })
   }

@@ -10,7 +10,7 @@
         </template>
         <div class="mb-16">
           <el-text type="info"
-            >{{ item.content.length }} {{ $t('views.document.paragraph.title') }}</el-text
+            >{{ item.content.length }} {{ $t('views.paragraph.title') }}</el-text
           >
         </div>
         <div class="paragraph-list" v-if="activeName == index">

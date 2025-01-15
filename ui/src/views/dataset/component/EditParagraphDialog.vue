@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.document.paragraph.editParagraph')"
+    :title="$t('views.paragraph.editParagraph')"
     v-model="dialogVisible"
     width="80%"
     destroy-on-close
@@ -15,7 +15,7 @@
       <el-col :span="6" class="border-l" style="width: 300px">
         <p class="bold title p-24" style="padding-bottom: 0">
           <span class="flex align-center">
-            <span>{{ $t('views.document.paragraph.relatedProblem.title') }}</span>
+            <span>{{ $t('views.paragraph.relatedProblem.title') }}</span>
             <el-divider direction="vertical" class="mr-4" />
             <el-button text @click="addProblem">
               <el-icon><Plus /></el-icon>
@@ -27,7 +27,7 @@
             <el-input
               v-if="isAddProblem"
               v-model="problemValue"
-              :placeholder="$t('views.document.paragraph.relatedProblem.placeholder')"
+              :placeholder="$t('views.paragraph.relatedProblem.placeholder')"
               @change="addProblemHandle"
               @blur="isAddProblem = false"
               ref="inputRef"

@@ -189,5 +189,11 @@ export default {
     },
 
     copyUrl: '复制链接填入到'
+  },
+  hitTest: {
+    title: '命中测试',
+    text: '针对用户提问调试段落匹配情况，保障回答效果。',
+    emptyMessage1: '命中段落显示在这里',
+    emptyMessage2: '没有命中的分段'
   }
 }

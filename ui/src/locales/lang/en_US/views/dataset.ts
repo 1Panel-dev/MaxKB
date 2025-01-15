@@ -59,7 +59,5 @@ export default {
         placeholder: 'Default is body, can input .classname/#idname/tagname'
       }
     },
-    buttons: {},
-    dialog: {}
   }
 }

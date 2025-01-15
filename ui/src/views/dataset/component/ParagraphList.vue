@@ -32,7 +32,7 @@
         </div>
         <div class="lighter mt-12">
           <el-text type="info">
-            {{ child.content.length }} {{ $t('views.document.paragraph.character_count') }}
+            {{ child.content.length }} {{ $t('views.paragraph.character_count') }}
           </el-text>
         </div>
       </el-card>
@@ -82,8 +82,8 @@ const updateContent = (data: any) => {
 
 const deleteHandle = (item: any, cIndex: number) => {
   MsgConfirm(
-    `${t('views.document.paragraph.delete.confirmTitle')}${item.title || '-'} ?`,
-    t('views.document.paragraph.delete.confirmMessage'),
+    `${t('views.paragraph.delete.confirmTitle')}${item.title || '-'} ?`,
+    t('views.paragraph.delete.confirmMessage'),
     {
       confirmButtonText: t('common.delete'),
       confirmButtonClass: 'danger'

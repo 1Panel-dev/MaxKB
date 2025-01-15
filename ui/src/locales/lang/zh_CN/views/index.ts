@@ -8,6 +8,9 @@ import user from './user';
 import team from './team';
 import template from './template';
 import document from './document';
+import paragraph from './paragraph';
+import problem from './problem';
+import log from './log';
 export default {
     notFound,
     application,
@@ -18,5 +21,8 @@ export default {
     user,
     team,
     template,
-    document
+    document,
+    paragraph,
+    problem,
+    log
 };

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="修改内容"
+    :title="$t('views.log.editContent')"
     v-model="dialogVisible"
     width="600"
     :close-on-click-modal="false"
@@ -14,19 +14,19 @@
       :rules="rules"
       @submit.prevent
     >
-      <el-form-item label="关联问题">
+      <el-form-item :label="$t('views.paragraph.relatedProblem.title')">
         <el-input
           v-model="form.problem_text"
-          placeholder="关联问题"
+          :placeholder="$t('views.paragraph.relatedProblem.title')"
           maxlength="256"
           show-word-limit
         >
         </el-input>
       </el-form-item>
-      <el-form-item label="内容" prop="content">
+      <el-form-item :label="$t('views.log.form.content.label')" prop="content">
         <MdEditor
           v-model="form.content"
-          placeholder="请输入内容"
+          :placeholder="$t('views.log.form.content.placeholder')"
           :maxLength="100000"
           :preview="false"
           :toolbars="toolbars"
@@ -39,20 +39,20 @@
           </template>
         </MdEditor>
       </el-form-item>
-      <el-form-item label="标题">
+      <el-form-item :label="$t('views.log.form.title.label')">
         <el-input
           show-word-limit
           v-model="form.title"
-          placeholder="请给当前内容设置一个标题，以便管理查看"
+          :placeholder="$t('views.log.form.title.placeholder')"
           maxlength="256"
         >
         </el-input>
       </el-form-item>
-      <el-form-item label="选择知识库" prop="dataset_id">
+      <el-form-item :label="$t('views.log.selectDataset')" prop="dataset_id">
         <el-select
           v-model="form.dataset_id"
           filterable
-          placeholder="请选择知识库"
+          :placeholder="$t('views.log.selectDatasetPlaceholder')"
           :loading="optionLoading"
           @change="changeDataset"
         >
@@ -79,11 +79,11 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="保存至文档" prop="document_id">
+      <el-form-item :label="$t('views.log.saveToDocument')" prop="document_id">
         <el-select
           v-model="form.document_id"
           filterable
-          placeholder="请选择文档"
+          :placeholder="$t('views.log.documentPlaceholder')"
           :loading="optionLoading"
           @change="changeDocument"
         >
@@ -100,8 +100,10 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> {{$t('common.cancel')}} </el-button>
-        <el-button type="primary" @click="submitForm(formRef)" :loading="loading"> {{$t('common.save')}} </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
+        <el-button type="primary" @click="submitForm(formRef)" :loading="loading">
+          {{ $t('common.save') }}
+        </el-button>
       </span>
     </template>
   </el-dialog>
@@ -113,7 +115,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import logApi from '@/api/log'
 import imageApi from '@/api/image'
 import useStore from '@/stores'
-
+import { t } from '@/locales'
 const { application, document, user } = useStore()
 
 const route = useRoute()
@@ -170,9 +172,11 @@ const form = ref<any>({
 })
 
 const rules = reactive<FormRules>({
-  content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
-  dataset_id: [{ required: true, message: '请选择知识库', trigger: 'change' }],
-  document_id: [{ required: true, message: '请选择文档', trigger: 'change' }]
+  content: [{ required: true, message: t('views.log.form.content.placeholder'), trigger: 'blur' }],
+  dataset_id: [
+    { required: true, message: t('views.log.selectDatasetPlaceholder'), trigger: 'change' }
+  ],
+  document_id: [{ required: true, message: t('views.log.documentPlaceholder'), trigger: 'change' }]
 })
 
 const datasetList = ref<any[]>([])

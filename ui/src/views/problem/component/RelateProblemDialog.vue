@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="关联分段"
+    :title="$t('views.problem.relateParagraph.title')"
     v-model="dialogVisible"
     width="80%"
     class="paragraph-dialog"
@@ -11,11 +11,13 @@
     <el-row v-loading="loading">
       <el-col :span="6">
         <el-scrollbar height="500" wrap-class="paragraph-scrollbar">
-          <div class="bold title align-center p-24 pb-0">选择文档</div>
+          <div class="bold title align-center p-24 pb-0">
+            {{ $t('views.problem.relateParagraph.selectDocument') }}
+          </div>
           <div class="p-8" style="padding-bottom: 8px">
             <el-input
               v-model="filterDoc"
-              placeholder="按 文档名称 搜索"
+              :placeholder="$t('views.problem.relateParagraph.placeholder')"
               prefix-icon="Search"
               clearable
             />
@@ -47,8 +49,13 @@
           <div class="p-24" style="padding-bottom: 8px; padding-top: 16px">
             <div class="flex-between mb-16">
               <div class="bold title align-center">
-                选择分段
-                <el-text> （已选分段：{{ associationCount(currentDocument) }} 个） </el-text>
+                {{ $t('views.problem.relateParagraph.selectParagraph') }}
+                <el-text>
+                  （{{ $t('views.problem.relateParagraph.selectedParagraph') }}：{{
+                    associationCount(currentDocument)
+                  }}
+                  {{ $t('views.problem.relateParagraph.count') }}）
+                </el-text>
               </div>
               <el-input
                 v-model="search"
@@ -59,13 +66,13 @@
               >
                 <template #prepend>
                   <el-select v-model="searchType" placeholder="Select" style="width: 80px">
-                    <el-option label="标题" value="title" />
-                    <el-option label="内容" value="content" />
+                    <el-option :label="$t('views.paragraph.searchBar.title')" value="title" />
+                    <el-option :label="$t('views.paragraph.searchBar.content')" value="content" />
                   </el-select>
                 </template>
               </el-input>
             </div>
-            <el-empty v-if="paragraphList.length == 0" description="暂无数据" />
+            <el-empty v-if="paragraphList.length == 0" :description="$t('common.noData')" />
 
             <InfiniteScroll
               v-else
@@ -108,7 +115,7 @@ import problemApi from '@/api/problem'
 import paragraphApi from '@/api/paragraph'
 import useStore from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-
+import { t } from '@/locales'
 const { problem, document } = useStore()
 
 const route = useRoute()
@@ -152,7 +159,7 @@ function mulAssociation() {
     }))
   }
   problemApi.postMulAssociationProblem(id, data, loading).then(() => {
-    MsgSuccess('批量关联分段成功')
+    MsgSuccess(t('views.problem.relatedSuccess'))
     dialogVisible.value = false
   })
 }

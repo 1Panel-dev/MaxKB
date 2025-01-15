@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="选择知识库/文档"
+    :title="`${$t('views.log.selectDataset')}/${$t('common.document')}`"
     v-model="dialogVisible"
     width="500"
     :close-on-click-modal="false"
@@ -14,11 +14,11 @@
       :rules="rules"
       @submit.prevent
     >
-      <el-form-item label="选择知识库" prop="dataset_id">
+      <el-form-item :label="$t('views.log.selectDataset')" prop="dataset_id">
         <el-select
           v-model="form.dataset_id"
           filterable
-          placeholder="请选择知识库"
+          :placeholder="$t('views.log.selectDatasetPlaceholder')"
           :loading="optionLoading"
           @change="changeDataset"
         >
@@ -45,11 +45,11 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="保存至文档" prop="document_id">
+      <el-form-item :label="$t('views.log.addToDatase.saveToDocument')" prop="document_id">
         <el-select
           v-model="form.document_id"
           filterable
-          placeholder="请选择文档"
+          :placeholder="$t('views.log.addToDatase.documentPlaceholder')"
           :loading="optionLoading"
         >
           <el-option
@@ -79,7 +79,7 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import paragraphApi from '@/api/paragraph'
 import useStore from '@/stores'
-
+import { t } from '@/locales'
 const { dataset, document } = useStore()
 
 const route = useRoute()
@@ -99,8 +99,8 @@ const form = ref<any>({
 })
 
 const rules = reactive<FormRules>({
-  dataset_id: [{ required: true, message: '请选择知识库', trigger: 'change' }],
-  document_id: [{ required: true, message: '请选择文档', trigger: 'change' }]
+  dataset_id: [{ required: true, message: t('views.log.selectDatasetPlaceholder'), trigger: 'change' }],
+  document_id: [{ required: true, message: t('views.log.documentPlaceholder'), trigger: 'change' }]
 })
 
 const datasetList = ref<any[]>([])

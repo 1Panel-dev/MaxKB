@@ -109,7 +109,7 @@ function editName(val: string, item: any) {
       name: val
     }
     applicationApi.putWorkFlowVersion(id as string, item.id, obj, loading).then(() => {
-      MsgSuccess('修改成功')
+      MsgSuccess(t('common.modifySuccess'))
       item['writeStatus'] = false
       getList()
     })

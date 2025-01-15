@@ -1,21 +1,21 @@
 <template>
-  <LayoutContainer header="问题">
+  <LayoutContainer :header="$t('views.problem.title')">
     <div class="main-calc-height">
       <div class="p-24">
         <div class="flex-between">
           <div>
-            <el-button type="primary" @click="createProblem">创建问题</el-button>
+            <el-button type="primary" @click="createProblem">{{$t('views.problem.createProblem')}}</el-button>
             <el-button @click="relateProblem()" :disabled="multipleSelection.length === 0"
-              >关联分段</el-button
+              >{{$t('views.problem.relateParagraph.title')}}</el-button
             >
             <el-button @click="deleteMulDocument" :disabled="multipleSelection.length === 0"
-              >批量删除</el-button
+              >{{$t('views.problem.setting.batchDelete')}}</el-button
             >
           </div>
 
           <el-input
             v-model="filterText"
-            placeholder="搜索内容"
+            :placeholder="$t('views.problem.searchBar.placeholder')"
             prefix-icon="Search"
             class="w-240"
             @change="getList"
@@ -28,8 +28,8 @@
           :data="problemData"
           :pagination-config="paginationConfig"
           quick-create
-          quickCreateName="问题"
-          quickCreatePlaceholder="快速创建问题"
+          :quickCreateName="$t('views.problem.title')"
+          :quickCreatePlaceholder="$t('views.problem.quickCreateProblem')"
           :quickCreateMaxlength="256"
           @sizeChange="handleSizeChange"
           @changePage="getList"
@@ -43,7 +43,7 @@
           :row-key="(row: any) => row.id"
         >
           <el-table-column type="selection" width="55" :reserve-selection="true" />
-          <el-table-column prop="content" label="问题" min-width="280">
+          <el-table-column prop="content" :label="$t('views.problem.title')" min-width="280">
             <template #default="{ row }">
               <ReadWrite
                 @change="editName($event, row.id)"
@@ -53,7 +53,7 @@
               />
             </template>
           </el-table-column>
-          <el-table-column prop="paragraph_count" label="关联分段数" align="right" min-width="100">
+          <el-table-column prop="paragraph_count" :label="$t('views.problem.table.paragraph_count')" align="right" min-width="100">
             <template #default="{ row }">
               <el-link type="primary" @click.stop="rowClickHandle(row)" v-if="row.paragraph_count">
                 {{ row.paragraph_count }}
@@ -68,7 +68,7 @@
               {{ datetimeFormat(row.create_time) }}
             </template>
           </el-table-column>
-          <el-table-column prop="update_time" label="更新时间" width="170">
+          <el-table-column prop="update_time" :label="$t('views.problem.table.updateTime')" width="170">
             <template #default="{ row }">
               {{ datetimeFormat(row.update_time) }}
             </template>
@@ -77,7 +77,7 @@
             <template #default="{ row }">
               <div>
                 <span class="mr-4">
-                  <el-tooltip effect="dark" content="关联分段" placement="top">
+                  <el-tooltip effect="dark" :content="$t('views.problem.relateParagraph.title')" placement="top">
                     <el-button type="primary" text @click.stop="relateProblem(row)">
                       <el-icon><Connection /></el-icon>
                     </el-button>
@@ -122,7 +122,7 @@ import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import type { Dict } from '@/api/type/common'
 import useStore from '@/stores'
-
+import { t } from '@/locales'
 const route = useRoute()
 const {
   params: { id } // 知识库id
@@ -208,7 +208,7 @@ function deleteMulDocument() {
     }
   })
   problemApi.delMulProblem(id, arr, loading).then(() => {
-    MsgSuccess('批量删除成功')
+    MsgSuccess(t('views.document.delete.successMessage'))
     multipleTableRef.value?.clearSelection()
     getList()
   })
@@ -216,8 +216,8 @@ function deleteMulDocument() {
 
 function deleteProblem(row: any) {
   MsgConfirm(
-    `是否删除问题：${row.content} ?`,
-    `删除问题关联的 ${row.paragraph_count} 个分段会被取消关联，请谨慎操作。`,
+    `${t('views.problem.delete.confirmTitle')} ${row.content} ?`,
+    `${t('views.problem.delete.confirmMessage1')} ${row.paragraph_count} ${t('views.problem.delete.confirmMessage2')}`,
     {
       confirmButtonText: t('common.delete'),
       confirmButtonClass: 'danger'
@@ -239,10 +239,10 @@ function editName(val: string, problemId: string) {
     }
     problemApi.putProblems(id, problemId, obj, loading).then(() => {
       getList()
-      MsgSuccess('修改成功')
+      MsgSuccess(t('common.modifySuccess'))
     })
   } else {
-    MsgError('问题不能为空！')
+    MsgError(t('views.problem.tip.errorMessage'))
   }
 }
 

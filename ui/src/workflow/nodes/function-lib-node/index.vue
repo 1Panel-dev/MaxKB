@@ -48,7 +48,7 @@
           </template>
         </div>
 
-        <el-text type="info" v-else> 暂无数据 </el-text>
+        <el-text type="info" v-else> {{ $t('common.noData') }} </el-text>
       </el-card>
       <el-form-item label="返回内容" @click.prevent>
         <template #label>

@@ -16,11 +16,12 @@ export default {
   },
   tip: {
     saveMessage: '当前的更改尚未保存，确认退出吗?',
-    cancelSuccessMessage: '批量取消成功',
+    cancelSuccess: '批量取消成功',
     sendMessage: '发送成功',
-    vectorizationSuccessMessage: '批量向量化成功',
+    vectorizationSuccess: '批量向量化成功',
     nameMessage: '文件名称不能为空！',
-    importMessage: '导入成功'
+    importMessage: '导入成功',
+    migrationSuccess: '迁移成功'
   },
   upload: {
     selectFile: '选择文件',
@@ -152,31 +153,6 @@ export default {
       label: '选择向量化内容',
       error: '向量化未成功的分段',
       all: '全部分段'
-    }
-  },
-  paragraph: {
-    title: '段落',
-    editParagraph: '编辑分段',
-    character_count: '个字符',
-    delete: {
-      confirmTitle: '是否删除分段：',
-      confirmMessage: '删除后将不会存入知识库，对本地文档无影响。'
-    },
-    relatedProblem: {
-      title: '关联问题',
-      placeholder: '请选择问题'
-    },
-    form: {
-      paragraphTitle: {
-        label: '分段标题',
-        placeholder: '请输入分段标题'
-      },
-      content: {
-        label: '分段内容',
-        placeholder: '请输入分段内容',
-        requiredMessage1: '请输入分段内容',
-        requiredMessage2: '内容最多不超过 100000 个字'
-      }
     }
   }
 }

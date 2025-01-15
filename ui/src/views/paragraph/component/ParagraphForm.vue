@@ -7,22 +7,22 @@
     :rules="rules"
     @submit.prevent
   >
-    <el-form-item :label="$t('views.document.paragraph.form.paragraphTitle.label')">
+    <el-form-item :label="$t('views.paragraph.form.paragraphTitle.label')">
       <el-input
         v-if="isEdit"
         v-model="form.title"
-        :placeholder="$t('views.document.paragraph.form.paragraphTitle.placeholder')"
+        :placeholder="$t('views.paragraph.form.paragraphTitle.placeholder')"
         maxlength="256"
         show-word-limit
       >
       </el-input>
       <span class="lighter" v-else>{{ form.title || '-' }}</span>
     </el-form-item>
-    <el-form-item :label="$t('views.document.paragraph.form.content.label')" prop="content">
+    <el-form-item :label="$t('views.paragraph.form.content.label')" prop="content">
       <MdEditor
         v-if="isEdit"
         v-model="form.content"
-        :placeholder="$t('views.document.paragraph.form.content.placeholder')"
+        :placeholder="$t('views.paragraph.form.content.placeholder')"
         :maxLength="100000"
         :preview="false"
         :toolbars="toolbars"
@@ -98,8 +98,8 @@ const form = ref<any>({
 
 const rules = reactive<FormRules>({
   content: [
-    { required: true, message: t('views.document.paragraph.form.content.requiredMessage1'), trigger: 'blur' },
-    { max: 100000, message: t('views.document.paragraph.form.content.requiredMessage2'), trigger: 'blur' }
+    { required: true, message: t('views.paragraph.form.content.requiredMessage1'), trigger: 'blur' },
+    { max: 100000, message: t('views.paragraph.form.content.requiredMessage2'), trigger: 'blur' }
   ]
 })
 

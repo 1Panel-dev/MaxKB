@@ -198,5 +198,11 @@ export default {
         '-Events and callbacks - event configuration - configure the "request address" of the subscription method'
     },
     copyUrl: 'Copy the link and fill it in'
+  },
+  hitTest: {
+    title: 'Hit testing',
+    text: 'Ensure effective response by matching paragraphs to user inquiries.',
+    emptyMessage1: 'The matching paragraph is displayed here',
+    emptyMessage2: 'No matching sections found'
   }
 }

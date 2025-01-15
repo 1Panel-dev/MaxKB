@@ -64,7 +64,7 @@
           </template>
         </div>
 
-        <el-text type="info" v-else> 暂无数据 </el-text>
+        <el-text type="info" v-else> {{ $t('common.noData') }} </el-text>
       </el-card>
 
       <h5 class="lighter mb-8">Python 代码</h5>

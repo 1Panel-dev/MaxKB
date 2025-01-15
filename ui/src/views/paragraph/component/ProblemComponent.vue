@@ -1,7 +1,7 @@
 <template>
   <p class="bold title p-24" style="padding-bottom: 0">
     <span class="flex align-center">
-      <span>{{ $t('views.document.paragraph.relatedProblem.title') }}</span>
+      <span>{{ $t('views.paragraph.relatedProblem.title') }}</span>
       <el-divider direction="vertical" class="mr-4" />
       <el-button text @click="addProblem">
         <el-icon><Plus /></el-icon>
@@ -18,7 +18,7 @@
           allow-create
           default-first-option
           :reserve-keyword="false"
-          :placeholder="$t('views.document.paragraph.relatedProblem.placeholder')"
+          :placeholder="$t('views.paragraph.relatedProblem.placeholder')"
           remote
           :remote-method="remoteMethod"
           :loading="optionLoading"

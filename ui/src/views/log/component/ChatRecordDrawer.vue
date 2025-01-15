@@ -19,8 +19,12 @@
     </div>
     <template #footer>
       <div>
-        <el-button @click="pre" :disabled="pre_disable || loading">上一条</el-button>
-        <el-button @click="next" :disabled="next_disable || loading">下一条</el-button>
+        <el-button @click="pre" :disabled="pre_disable || loading">{{
+          $t('views.log.buttons.prev')
+        }}</el-button>
+        <el-button @click="next" :disabled="next_disable || loading">{{
+          $t('views.log.buttons.next')
+        }}</el-button>
       </div>
     </template>
   </el-drawer>

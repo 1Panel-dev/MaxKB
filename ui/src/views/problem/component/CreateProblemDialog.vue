@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="创建问题"
+    :title="$t('views.problem.createProblem')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -13,10 +13,10 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item label="问题" prop="data">
+      <el-form-item :label="$t('views.problem.title')" prop="data">
         <el-input
           v-model="form.data"
-          placeholder="请输入问题，支持输入多个，一行一个。"
+          :placeholder="$t('views.problem.tip.placeholder')"
           :rows="10"
           type="textarea"
         />
@@ -38,7 +38,7 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import useStore from '@/stores'
-
+import { t } from '@/locales'
 const route = useRoute()
 const {
   params: { id }
@@ -54,7 +54,7 @@ const form = ref<any>({
 })
 
 const rules = reactive({
-  data: [{ required: true, message: '请输入问题', trigger: 'blur' }]
+  data: [{ required: true, message: t('views.problem.tip.requiredMessage'), trigger: 'blur' }]
 })
 
 const dialogVisible = ref<boolean>(false)

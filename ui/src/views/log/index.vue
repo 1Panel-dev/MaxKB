@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer header="对话日志">
+  <LayoutContainer :header="$t('views.log.title')">
     <div class="p-24">
       <div class="mb-16">
         <el-select v-model="history_day" class="mr-12 w-120" @change="changeDayHandle">
@@ -30,10 +30,12 @@
           clearable
         />
         <div style="display: flex; align-items: center" class="float-right">
-          <el-button @click="dialogVisible = true">清除策略</el-button>
-          <el-button @click="exportLog">{{$t('common.export')}}</el-button>
+          <el-button @click="dialogVisible = true">{{
+            $t('views.log.buttons.clearStrategy')
+          }}</el-button>
+          <el-button @click="exportLog">{{ $t('common.export') }}</el-button>
           <el-button @click="openDocumentDialog" :disabled="multipleSelection.length === 0"
-            >添加至知识库
+            >{{ $t('views.log.addToDataset') }}
           </el-button>
         </div>
       </div>
@@ -51,12 +53,20 @@
         ref="multipleTableRef"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="abstract" label="摘要" show-overflow-tooltip />
-        <el-table-column prop="chat_record_count" label="对话提问数" align="right" />
+        <el-table-column
+          prop="abstract"
+          :label="$t('views.log.table.abstract')"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="chat_record_count"
+          :label="$t('views.log.table.chat_record_count')"
+          align="right"
+        />
         <el-table-column prop="star_num" align="right">
           <template #header>
             <div>
-              <span>用户反馈</span>
+              <span>{{ $t('views.log.table.feedback.label') }}</span>
               <el-popover :width="190" trigger="click" :visible="popoverVisible">
                 <template #reference>
                   <el-button
@@ -73,7 +83,7 @@
                 <div class="filter">
                   <div class="form-item mb-16">
                     <div @click.stop>
-                      赞同 >=
+                      {{ $t('views.log.table.feedback.star') }} >=
                       <el-input-number
                         v-model="filter.min_star"
                         :min="0"
@@ -88,7 +98,7 @@
                   </div>
                   <div class="form-item mb-16">
                     <div @click.stop>
-                      反对 >=
+                      {{ $t('views.log.table.feedback.trample') }} >=
                       <el-input-number
                         v-model="filter.min_trample"
                         :min="0"
@@ -103,8 +113,12 @@
                   </div>
                 </div>
                 <div class="text-right">
-                  <el-button size="small" @click="filterChange('clear')">清除</el-button>
-                  <el-button type="primary" @click="filterChange" size="small">{{ $t('common.confirm') }}</el-button>
+                  <el-button size="small" @click="filterChange('clear')">{{
+                    $t('common.clear')
+                  }}</el-button>
+                  <el-button type="primary" @click="filterChange" size="small">{{
+                    $t('common.confirm')
+                  }}</el-button>
                 </div>
               </el-popover>
             </div>
@@ -123,8 +137,8 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="mark_sum" label="改进标注" align="right" />
-        <el-table-column label="最近对话时间" width="180">
+        <el-table-column prop="mark_sum" :label="$t('views.log.table.mark')" align="right" />
+        <el-table-column :label="$t('views.log.table.recenTimes')" width="180">
           <template #default="{ row }">
             {{ datetimeFormat(row.update_time) }}
           </template>
@@ -153,7 +167,7 @@
       @refresh="refresh"
     />
     <el-dialog
-      title="清除策略"
+      :title="$t('views.log.buttons.clearStrategy')"
       v-model="dialogVisible"
       width="25%"
       :close-on-click-modal="false"
@@ -169,7 +183,7 @@
         step-strictly
         style="width: 110px; margin-left: 8px; margin-right: 8px"
       ></el-input-number>
-      <span>天之前的对话记录</span>
+      <span>{{ $t('views.log.form.daysText') }}</span>
       <template #footer>
         <div class="dialog-footer" style="margin-top: 16px">
           <el-button @click="dialogVisible = false"
@@ -183,7 +197,7 @@
     </el-dialog>
 
     <el-dialog
-      title="添加至知识库"
+      :title="$t('views.log.addToDataset')"
       v-model="documentDialogVisible"
       width="50%"
       :close-on-click-modal="false"
@@ -197,11 +211,11 @@
         :rules="rules"
         @submit.prevent
       >
-        <el-form-item label="选择知识库" prop="dataset_id">
+        <el-form-item :label="$t('views.log.selectDataset')" prop="dataset_id">
           <el-select
             v-model="form.dataset_id"
             filterable
-            placeholder="请选择知识库"
+            :placeholder="$t('views.log.selectDatasetPlaceholder')"
             :loading="optionLoading"
             @change="changeDataset"
           >
@@ -233,11 +247,11 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="保存至文档" prop="document_id">
+        <el-form-item :label="$t('views.log.saveToDocument')" prop="document_id">
           <el-select
             v-model="form.document_id"
             filterable
-            placeholder="请选择文档"
+            :placeholder="$t('views.log.documentPlaceholder')"
             :loading="optionLoading"
             @change="changeDocument"
           >
@@ -254,9 +268,11 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click.prevent="documentDialogVisible = false"> {{$t('common.cancel')}} </el-button>
+          <el-button @click.prevent="documentDialogVisible = false">
+            {{ $t('common.cancel') }}
+          </el-button>
           <el-button type="primary" @click="submitForm(formRef)" :loading="documentLoading">
-            {{$t('common.save')}}
+            {{ $t('common.save') }}
           </el-button>
         </span>
       </template>
@@ -363,8 +379,16 @@ const form = ref<any>({
 })
 
 const rules = reactive<FormRules>({
-  dataset_id: [{ required: true, message: '请选择知识库', trigger: 'change' }],
-  document_id: [{ required: true, message: '请选择文档', trigger: 'change' }]
+  dataset_id: [
+    { required: true, message: t('views.log.selectDatasetPlaceholder'), trigger: 'change' }
+  ],
+  document_id: [
+    {
+      required: true,
+      message: t('views.log.documentPlaceholder'),
+      trigger: 'change'
+    }
+  ]
 })
 
 const optionLoading = ref(false)
@@ -453,20 +477,20 @@ const handleSelectionChange = (val: any[]) => {
   multipleSelection.value = val
 }
 
-function deleteLog(row: any) {
-  MsgConfirm(`是否删除对话：${row.abstract} ?`, `删除后无法恢复，请谨慎操作。`, {
-    confirmButtonText: t('common.delete'),
-    confirmButtonClass: 'danger'
-  })
-    .then(() => {
-      loading.value = true
-      logApi.delChatLog(id as string, row.id, loading).then(() => {
-        MsgSuccess(t('common.deleteSuccess'))
-        getList()
-      })
-    })
-    .catch(() => {})
-}
+// function deleteLog(row: any) {
+//   MsgConfirm(`是否删除对话：${row.abstract} ?`, `删除后无法恢复，请谨慎操作。`, {
+//     confirmButtonText: t('common.delete'),
+//     confirmButtonClass: 'danger'
+//   })
+//     .then(() => {
+//       loading.value = true
+//       logApi.delChatLog(id as string, row.id, loading).then(() => {
+//         MsgSuccess(t('common.deleteSuccess'))
+//         getList()
+//       })
+//     })
+//     .catch(() => {})
+// }
 
 function getList() {
   let obj: any = {

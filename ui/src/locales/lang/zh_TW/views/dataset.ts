@@ -57,7 +57,5 @@ export default {
         placeholder: '預設為 body，可輸入 .classname/#idname/tagname'
       }
     },
-    buttons: {},
-    dialog: {}
   }
 }

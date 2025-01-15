@@ -3,8 +3,8 @@
     <LayoutContainer>
       <template #header>
         <h4>
-          命中测试
-          <el-text type="info" class="ml-4">针对用户提问调试段落匹配情况，保障回答效果。</el-text>
+          {{ $t('views.application.hitTest.title') }}
+          <el-text type="info" class="ml-4"> {{ $t('views.application.hitTest.text') }}</el-text>
         </h4>
       </template>
       <div class="hit-test__main p-16" v-loading="loading">
@@ -20,8 +20,15 @@
         </div>
         <el-scrollbar>
           <div class="hit-test-height">
-            <el-empty v-if="first" :image="emptyImg" description="命中段落显示在这里" />
-            <el-empty v-else-if="paragraphDetail.length == 0" description="没有命中的分段" />
+            <el-empty
+              v-if="first"
+              :image="emptyImg"
+              :description="$t('views.application.hitTest.emptyMessage1')"
+            />
+            <el-empty
+              v-else-if="paragraphDetail.length == 0"
+              :description="$t('views.application.hitTest.emptyMessage2')"
+            />
             <el-row v-else>
               <el-col
                 :xs="24"
@@ -80,10 +87,14 @@
     <div class="hit-test__operate p-24 pt-0">
       <el-popover :visible="popoverVisible" placement="right-end" :width="500" trigger="click">
         <template #reference>
-          <el-button icon="Setting" class="mb-8" @click="settingChange('open')">参数设置</el-button>
+          <el-button icon="Setting" class="mb-8" @click="settingChange('open')">{{
+            $t('common.paramSetting')
+          }}</el-button>
         </template>
         <div class="mb-16">
-          <div class="title mb-8">检索模式</div>
+          <div class="title mb-8">
+            {{ $t('views.application.applicationForm.dialog.selectSearchMode') }}
+          </div>
           <el-radio-group
             v-model="cloneForm.search_mode"
             class="card__radio"
@@ -95,8 +106,12 @@
               :class="cloneForm.search_mode === 'embedding' ? 'active' : ''"
             >
               <el-radio value="embedding" size="large">
-                <p class="mb-4">向量检索</p>
-                <el-text type="info">通过向量距离计算与用户问题最相似的文本分段</el-text>
+                <p class="mb-4">
+                  {{ $t('views.application.applicationForm.dialog.vectorSearch') }}
+                </p>
+                <el-text type="info">{{
+                  $t('views.application.applicationForm.dialog.vectorSearchTooltip')
+                }}</el-text>
               </el-radio>
             </el-card>
             <el-card
@@ -105,8 +120,12 @@
               :class="cloneForm.search_mode === 'keywords' ? 'active' : ''"
             >
               <el-radio value="keywords" size="large">
-                <p class="mb-4">全文检索</p>
-                <el-text type="info">通过关键词检索，返回包含关键词最多的文本分段</el-text>
+                <p class="mb-4">
+                  {{ $t('views.application.applicationForm.dialog.fullTextSearch') }}
+                </p>
+                <el-text type="info">{{
+                  $t('views.application.applicationForm.dialog.fullTextSearchTooltip')
+                }}</el-text>
               </el-radio>
             </el-card>
             <el-card
@@ -115,10 +134,12 @@
               :class="cloneForm.search_mode === 'blend' ? 'active' : ''"
             >
               <el-radio value="blend" size="large">
-                <p class="mb-4">混合检索</p>
-                <el-text type="info"
-                  >同时执行全文检索和向量检索，再进行重排序，从两类查询结果中选择匹配用户问题的最佳结果</el-text
-                >
+                <p class="mb-4">
+                  {{ $t('views.application.applicationForm.dialog.hybridSearch') }}
+                </p>
+                <el-text type="info">{{
+                  $t('views.application.applicationForm.dialog.hybridSearchTooltip')
+                }}</el-text>
               </el-radio>
             </el-card>
           </el-radio-group>
@@ -126,7 +147,9 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <div class="mb-16">
-              <div class="title mb-8">相似度高于</div>
+              <div class="title mb-8">
+                {{ $t('views.application.applicationForm.dialog.similarityThreshold') }}
+              </div>
               <el-input-number
                 v-model="cloneForm.similarity"
                 :min="0"
@@ -141,7 +164,9 @@
           </el-col>
           <el-col :span="12">
             <div class="mb-16">
-              <div class="title mb-8">返回分段数 TOP</div>
+              <div class="title mb-8">
+                {{ $t('views.application.applicationForm.dialogues.topReferences') }}
+              </div>
               <el-input-number
                 v-model="cloneForm.top_number"
                 :min="1"
@@ -154,8 +179,10 @@
         </el-row>
 
         <div class="text-right">
-          <el-button @click="popoverVisible = false">{{$t('common.cancel')}}</el-button>
-          <el-button type="primary" @click="settingChange('close')">{{$t('common.confirm')}}</el-button>
+          <el-button @click="popoverVisible = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="settingChange('close')">{{
+            $t('common.confirm')
+          }}</el-button>
         </div>
       </el-popover>
       <div class="operate-textarea flex">
@@ -195,7 +222,7 @@ import applicationApi from '@/api/application'
 import ParagraphDialog from '@/views/paragraph/component/ParagraphDialog.vue'
 import { arraySort } from '@/utils/utils'
 import emptyImg from '@/assets/hit-test-empty.png'
-
+import { t } from '@/locales'
 const route = useRoute()
 const {
   meta: { activeMenu },
@@ -249,7 +276,7 @@ function settingChange(val: string) {
 }
 
 function editParagraph(row: any) {
-  title.value = '分段详情'
+  title.value = t('views.paragraph.paragraphDetail')
   ParagraphDialogRef.value.open(row)
 }
 
