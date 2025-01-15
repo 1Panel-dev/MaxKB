@@ -6001,227 +6001,201 @@ msgstr "按类型获取用户列表"
 
 #: .\apps\xpack\auth\user_key.py:26
 #: .\apps\xpack\serializers\license_serializers.py:80
-#, fuzzy
-#| msgid "Secret key is invalid"
+
 msgid "The license is invalid"
-msgstr "secret key无效"
+msgstr "License 无效"
 
 #: .\apps\xpack\auth\user_key.py:32 .\apps\xpack\auth\user_key.py:34
-#, fuzzy
-#| msgid "Secret key is invalid"
+
 msgid "secret_key is invalid"
 msgstr "secret key无效"
 
 #: .\apps\xpack\middleware\swagger_middleware.py:19
 msgid "The license has not been uploaded or the license has expired"
-msgstr ""
+msgstr "License 未上传或 License 已过期"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:20
-#, fuzzy
-#| msgid "watercolor"
+
 msgid "theme color"
-msgstr "水彩"
+msgstr "主题颜色"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:22
 msgid "header font color"
-msgstr ""
+msgstr "头部字体颜色"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:26
-#, fuzzy
-#| msgid "Application Type"
+
 msgid "float location type"
-msgstr "应用类型"
+msgstr "浮窗位置类型"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:27
-#, fuzzy
-#| msgid "application name"
+
 msgid "float location value"
-msgstr "应用名称"
+msgstr "浮窗位置值"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:31
-#, fuzzy
-#| msgid "flat illustration"
+
 msgid "float location x"
-msgstr "扁平插画"
+msgstr "浮窗位置 x"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:32
-#, fuzzy
-#| msgid "flat illustration"
+
 msgid "float location y"
-msgstr "扁平插画"
+msgstr "浮窗位置 y"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:36
 #: .\apps\xpack\swagger_api\application_setting_api.py:23
-#, fuzzy
-#| msgid "source"
+
 msgid "show source"
-msgstr "来源"
+msgstr "是否显示来源"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:37
 #: .\apps\xpack\swagger_api\application_setting_api.py:30
 msgid "show history"
-msgstr ""
+msgstr "是否显示历史记录"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:38
 #: .\apps\xpack\swagger_api\application_setting_api.py:37
 msgid "draggable"
-msgstr ""
+msgstr "是否可拖动"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:39
 #: .\apps\xpack\swagger_api\application_setting_api.py:44
 msgid "show guide"
-msgstr ""
+msgstr "是否显示引导图"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:40
 #: .\apps\xpack\swagger_api\application_setting_api.py:51
 msgid "avatar"
-msgstr ""
+msgstr "头像"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:41
 msgid "avatar url"
-msgstr ""
+msgstr "头像地址"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:42
 #: .\apps\xpack\swagger_api\application_setting_api.py:86
 msgid "user avatar"
-msgstr ""
+msgstr "用户头像"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:43
 msgid "user avatar url"
-msgstr ""
+msgstr "用户头像地址"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:44
 #: .\apps\xpack\swagger_api\application_setting_api.py:58
 msgid "float icon"
-msgstr ""
+msgstr "浮窗图标"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:45
-#, fuzzy
-#| msgid "Affiliation user"
+
 msgid "float icon url"
-msgstr "所属用户"
+msgstr "浮窗图标地址"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:46
 #: .\apps\xpack\swagger_api\application_setting_api.py:65
 msgid "disclaimer"
-msgstr ""
+msgstr "免责声明"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:47
 #: .\apps\xpack\swagger_api\application_setting_api.py:72
-#, fuzzy
-#| msgid "variable value"
+
 msgid "disclaimer value"
-msgstr "变量值"
+msgstr "免责声明的值"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:113
 msgid "Float location field type error"
-msgstr ""
+msgstr "浮窗位置字段类型错误"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:119
-#, fuzzy
-#| msgid "Model type error"
+
 msgid "Custom theme field type error"
-msgstr "模型类型错误"
+msgstr "自定义主题字段类型错误"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:19
-#, fuzzy
-#| msgid "Content cannot be empty"
+
 msgid "LDAP server cannot be empty"
-msgstr "内容不能为空"
+msgstr "LDAP 服务器不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:20
-#, fuzzy
-#| msgid "Content cannot be empty"
+
 msgid "Base DN cannot be empty"
-msgstr "内容不能为空"
+msgstr "Base DN 不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:21
-#, fuzzy
-#| msgid "Content cannot be empty"
+
 msgid "Password cannot be empty"
-msgstr "内容不能为空"
+msgstr "密码不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:22
-#, fuzzy
-#| msgid "Content cannot be empty"
+
 msgid "OU cannot be empty"
-msgstr "内容不能为空"
+msgstr "OU 不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:23
-#, fuzzy
-#| msgid "The audio file cannot be empty"
+
 msgid "LDAP filter cannot be empty"
-msgstr "音频文件不能为空"
+msgstr "LDAP 过滤器不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:24
-#, fuzzy
-#| msgid "Content cannot be empty"
+
 msgid "LDAP mapping cannot be empty"
-msgstr "内容不能为空"
+msgstr "LDAP 映射不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:29
-#, fuzzy
-#| msgid "The audio file cannot be empty"
+
 msgid "Authorization address cannot be empty"
-msgstr "音频文件不能为空"
+msgstr "授权地址不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:31
-#, fuzzy
-#| msgid "The audio file cannot be empty"
+
 msgid "Token address cannot be empty"
-msgstr "音频文件不能为空"
+msgstr "令牌地址不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:33
-#, fuzzy
-#| msgid "The audio file cannot be empty"
+
 msgid "User information address cannot be empty"
-msgstr "音频文件不能为空"
+msgstr "用户信息地址不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:34
-#, fuzzy
-#| msgid "Content cannot be empty"
+
 msgid "Scope cannot be empty"
-msgstr "内容不能为空"
+msgstr "Scope 不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:35
-#, fuzzy
-#| msgid "Content cannot be empty"
+
 msgid "Client ID cannot be empty"
-msgstr "内容不能为空"
+msgstr "Client ID 不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:36
-#, fuzzy
-#| msgid "Content cannot be empty"
+
 msgid "Client secret cannot be empty"
-msgstr "内容不能为空"
+msgstr "Client secret 不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:38
-#, fuzzy
-#| msgid "Reference field cannot be empty"
+
 msgid "Redirect address cannot be empty"
-msgstr "引用字段不能为空"
+msgstr "重定向地址不能为空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:39
-#, fuzzy
-#| msgid "Model type cannot be empty"
+
 msgid "Field mapping cannot be empty"
-msgstr "模型类型不能为空"
+msgstr "字段映射不能为空"
 
 #: .\apps\xpack\serializers\cas.py:32
 msgid "HttpClient query failed: "
-msgstr ""
+msgstr "HttpClient 查询失败："
 
 #: .\apps\xpack\serializers\cas.py:56
-#, fuzzy
-#| msgid "Email verification failed"
+
 msgid "CAS authentication failed"
-msgstr "邮箱验证失败"
+msgstr "CAS 认证失败"
 
 #: .\apps\xpack\serializers\channel\chat_manage.py:55
 msgid ""
 "Sorry, no relevant content was found. Please re-describe your problem or "
 "provide more information. "
-msgstr ""
+msgstr "抱歉，没有找到相关内容。请重新描述您的问题或提供更多信息。"
 
 #: .\apps\xpack\serializers\channel\ding_talk.py:17
 #: .\apps\xpack\serializers\channel\wechat.py:89
@@ -6229,34 +6203,31 @@ msgstr ""
 #: .\apps\xpack\serializers\channel\wecom.py:68
 #: .\apps\xpack\serializers\channel\wecom.py:222
 msgid "The corresponding platform configuration was not found"
-msgstr ""
+msgstr "对应的平台配置未找到"
 
 #: .\apps\xpack\serializers\channel\ding_talk.py:27
 #: .\apps\xpack\serializers\channel\feishu.py:111
 msgid "Currently only text messages are supported"
-msgstr ""
+msgstr "目前只支持文本消息"
 
 #: .\apps\xpack\serializers\channel\ding_talk.py:38
-#, fuzzy, python-brace-format
-#| msgid "Deleting application"
 msgid "DingTalk application: {user}"
-msgstr "删除应用"
+msgstr "钉钉应用：{user}"
 
 #: .\apps\xpack\serializers\channel\ding_talk.py:47
 #: .\apps\xpack\serializers\channel\ding_talk.py:92
 msgid "Content generated by AI"
-msgstr ""
+msgstr "内容由 AI 生成"
 
 #: .\apps\xpack\serializers\channel\feishu.py:92
-#, fuzzy
-#| msgid "application id"
+
 msgid "Lark application: "
-msgstr "应用 id"
+msgstr "飞书应用："
 
 #: .\apps\xpack\serializers\channel\wechat.py:141
 #, python-brace-format
 msgid "WeChat Official Account: {account}"
-msgstr ""
+msgstr "微信公众号：{account}"
 
 #: .\apps\xpack\serializers\channel\wechat.py:147
 #: .\apps\xpack\serializers\channel\wecom.py:152
@@ -6264,268 +6235,240 @@ msgstr ""
 msgid ""
 "The app does not enable the speech-to-text function or the speech-to-text "
 "function fails."
-msgstr ""
+msgstr "应用未开启语音转文字功能或语音转文字功能失败。"
 
 #: .\apps\xpack\serializers\channel\wechat.py:175
-#, fuzzy
-#| msgid "task type not support"
+
 msgid "Message types not supported yet"
-msgstr "任务类型不支持"
+msgstr "暂时不支持该类型的消息"
 
 #: .\apps\xpack\serializers\channel\wechat.py:182
 msgid "Welcome to subscribe"
-msgstr ""
+msgstr "欢迎订阅"
 
 #: .\apps\xpack\serializers\channel\wecom.py:76
 msgid "Enterprise WeChat user: "
-msgstr ""
+msgstr "企业微信用户："
 
 #: .\apps\xpack\serializers\channel\wecom.py:85
-#, fuzzy
-#| msgid "Intelligent customer service platform"
+
 msgid "Enterprise WeChat customer service: "
-msgstr "智能客服平台"
+msgstr "企业微信客服："
 
 #: .\apps\xpack\serializers\channel\wecom.py:120
 #: .\apps\xpack\serializers\channel\wecom.py:132
-#, fuzzy
-#| msgid "{model_type} Model type is not supported"
+
 msgid "This type of message is not supported yet"
-msgstr "模型类型 {model_type} 不支持"
+msgstr "暂时不支持该类型的消息"
 
 #: .\apps\xpack\serializers\channel\wecom.py:217
 msgid "Signature missing"
-msgstr ""
+msgstr "签名缺失"
 
 #: .\apps\xpack\serializers\channel\wecom.py:229
 #: .\apps\xpack\serializers\channel\wecom.py:236
 #, python-brace-format
 msgid "An error occurred while processing the GET request {e}"
-msgstr ""
+msgstr "GET 请求处理时发生错误 {e}"
 
 #: .\apps\xpack\serializers\license_serializers.py:52
-#, fuzzy
-#| msgid "image file"
+
 msgid "license file"
-msgstr "图片文件"
+msgstr "License 文件"
 
 #: .\apps\xpack\serializers\oauth2.py:76 .\apps\xpack\serializers\oauth2.py:79
-#, fuzzy
-#| msgid "Get user information"
+
 msgid "Failed to obtain user information"
-msgstr "获取用户信息"
+msgstr "获取用户信息失败"
 
 #: .\apps\xpack\serializers\platform_serializer.py:14
-#, fuzzy
-#| msgid "{key} is required"
+
 msgid "app_id is required"
-msgstr "{key} 是必填项"
+msgstr "app_id 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:15
-#, fuzzy
-#| msgid "{key} is required"
+
 msgid "app_secret is required"
-msgstr "{key} 是必填项"
+msgstr "app_secret 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:16
-#, fuzzy
-#| msgid "{key} is required"
+
 msgid "token is required"
-msgstr "{key} 是必填项"
+msgstr "token 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:17
-#, fuzzy
-#| msgid "{key} is required"
+
 msgid "callback_url is required"
-msgstr "{key} 是必填项"
+msgstr "回调地址是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:23
 #: .\apps\xpack\serializers\platform_serializer.py:32
-#, fuzzy
-#| msgid "{key}  is required"
+
 msgid "App ID is required"
-msgstr "{key} 是必填项"
+msgstr "App ID 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:24
 #: .\apps\xpack\serializers\platform_source_serializer.py:23
-#, fuzzy
-#| msgid "{key}  is required"
+
 msgid "Agent ID is required"
-msgstr "{key} 是必填项"
+msgstr "Agent ID 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:25
-#, fuzzy
-#| msgid "{key} is required"
+
 msgid "Secret is required"
-msgstr "{key} 是必填项"
+msgstr "Secret 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:26
-#, fuzzy
-#| msgid "{key} is required"
+
 msgid "Token is required"
-msgstr "{key} 是必填项"
+msgstr "Token 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:28
 #: .\apps\xpack\serializers\platform_serializer.py:36
 #: .\apps\xpack\serializers\platform_serializer.py:42
 #: .\apps\xpack\serializers\platform_source_serializer.py:18
-#, fuzzy
-#| msgid "{key}  is required"
+
 msgid "Callback URL is required"
-msgstr "{key} 是必填项"
+msgstr "Callback URL 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:33
 #: .\apps\xpack\serializers\platform_source_serializer.py:17
-#, fuzzy
-#| msgid "{key} is required"
+
 msgid "App Secret is required"
-msgstr "{key} 是必填项"
+msgstr "App Secret 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:35
-#, fuzzy
-#| msgid "Verification code"
+
 msgid "Verification Token is required"
-msgstr "验证码"
+msgstr "Verification Token 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:40
-#, fuzzy
-#| msgid "{key}  is required"
+
 msgid "Client ID is required"
-msgstr "{key} 是必填项"
+msgstr "Client ID 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:41
-#, fuzzy
-#| msgid "{key}  is required"
+
 msgid "Client Secret is required"
-msgstr "{key} 是必填项"
+msgstr "Client Secret 是必填项"
 
 #: .\apps\xpack\serializers\platform_serializer.py:61
 msgid "Check if the fields are correct"
-msgstr ""
+msgstr "检查字段是否正确"
 
 #: .\apps\xpack\serializers\platform_serializer.py:108
 msgid "Platform type, for example: wechat"
-msgstr ""
+msgstr "平台类型，例如：wechat"
 
 #: .\apps\xpack\serializers\platform_serializer.py:117
 #: .\apps\xpack\serializers\platform_serializer.py:118
-#, fuzzy
-#| msgid "Get form template"
+
 msgid "Platform type"
-msgstr "获取表单模版"
+msgstr "平台类型"
 
 #: .\apps\xpack\serializers\platform_serializer.py:120
-#, fuzzy
-#| msgid "status"
+
 msgid "Status"
 msgstr "状态"
 
 #: .\apps\xpack\serializers\platform_serializer.py:130
 #: .\apps\xpack\serializers\platform_serializer.py:131
-#, fuzzy
-#| msgid "certification information"
+
 msgid "Configuration information"
-msgstr "认证信息"
+msgstr "配置信息"
 
 #: .\apps\xpack\serializers\platform_serializer.py:182
 #, python-brace-format
 msgid "The platform configuration corresponding to {type} was not found"
-msgstr ""
+msgstr "平台配置 {type} 未找到"
 
 #: .\apps\xpack\serializers\platform_source_serializer.py:22
 #: .\apps\xpack\serializers\platform_source_serializer.py:31
-#, fuzzy
-#| msgid "{key}  is required"
+
 msgid "Corp ID is required"
-msgstr "{key} 是必填项"
+msgstr "Corp ID 是必填项"
 
 #: .\apps\xpack\serializers\platform_source_serializer.py:27
 #: .\apps\xpack\serializers\platform_source_serializer.py:32
-#, fuzzy
-#| msgid "{key} is required"
+
 msgid "App Key is required"
-msgstr "{key} 是必填项"
+msgstr "App Key 是必填项"
 
 #: .\apps\xpack\serializers\platform_source_serializer.py:77
 msgid "Configuration information is wrong and failed to save"
-msgstr ""
+msgstr "配置信息错误，保存失败"
 
 #: .\apps\xpack\serializers\platform_source_serializer.py:103
-#, fuzzy
-#| msgid "Connection List"
+
 msgid "Connection failed"
-msgstr "连线列表"
+msgstr "连接失败"
 
 #: .\apps\xpack\serializers\platform_source_serializer.py:115
-#, fuzzy
-#| msgid "Problem does not exist"
+
 msgid "Platform does not exist"
-msgstr "问题不存在"
+msgstr "平台不存在"
 
 #: .\apps\xpack\serializers\qr_login\qr_login.py:26
 msgid " Team"
-msgstr ""
+msgstr "团队"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:63
 msgid "theme"
-msgstr ""
+msgstr "主题"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:70
 msgid "website icon"
-msgstr ""
+msgstr "网站图标"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:77
 msgid "login logo"
-msgstr ""
+msgstr "登录logo"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:84
 msgid "Login background image"
-msgstr ""
+msgstr "登录背景图"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:91
-#, fuzzy
-#| msgid "Section title"
+
 msgid "website title"
-msgstr "段落标题"
+msgstr "网站标题"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:98
 msgid "website slogan"
-msgstr ""
+msgstr "网站标语"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:105
 msgid "Show user manual"
-msgstr ""
+msgstr "是否显示用户手册"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:112
-#, fuzzy
-#| msgid "Cross-domain address"
+
 msgid "User manual address"
-msgstr "跨域地址"
+msgstr "用户手册地址"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:119
 msgid "Show forum"
-msgstr ""
+msgstr "是否显示论坛"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:126
-#, fuzzy
-#| msgid "Cross-domain address"
+
 msgid "Forum address"
-msgstr "跨域地址"
+msgstr "论坛地址"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:133
 msgid "Show project"
-msgstr ""
+msgstr "是否显示项目"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:140
 msgid "Project address"
-msgstr ""
+msgstr "项目地址"
 
 #: .\apps\xpack\serializers\tools.py:58
 #, python-brace-format
 msgid ""
 "Thinking about 【{question}】...If you want me to continue answering, please "
 "reply"
-msgstr ""
+msgstr "思考中【{question}】...如果您希望我继续回答,请回复“{trigger_message}”。"
 
 #: .\apps\xpack\serializers\tools.py:158
 msgid ""
@@ -6533,30 +6476,32 @@ msgid ""
 " ------------\n"
 "[To be continued, reply \"Continue to answer the question]"
 msgstr ""
+"\n"
+" ------------\n"
+"【未完待续，回复“问题继续回答】"
 
 #: .\apps\xpack\serializers\tools.py:237
 #, python-brace-format
 msgid ""
 "To be continued, reply \"{trigger_message}\" to continue answering the "
 "question"
-msgstr ""
+msgstr "【未完待续，回复“{trigger_message}” 或 问题继续回答】"
 
 #: .\apps\xpack\swagger_api\application_setting_api.py:79
 msgid "Custom theme {theme_color: , header_font_color: }"
-msgstr ""
+msgstr "自定义主题 {theme_color:, header_font_color: }"
 
 #: .\apps\xpack\swagger_api\application_setting_api.py:93
 msgid "Float location {top: 0, left: 0}"
-msgstr ""
+msgstr "浮窗位置 {top: 0, left: 0}"
 
 #: .\apps\xpack\swagger_api\application_setting_api.py:101
 #: .\apps\xpack\swagger_api\application_setting_api.py:102
 #: .\apps\xpack\swagger_api\auth_api.py:10
 #: .\apps\xpack\swagger_api\auth_api.py:11
-#, fuzzy
-#| msgid "Authentication information is incorrect"
+
 msgid "Authentication configuration"
-msgstr "认证信息不正确"
+msgstr "认证配置"
 
 #: .\apps\xpack\swagger_api\application_setting_api.py:106
 #: .\apps\xpack\swagger_api\application_setting_api.py:107
@@ -6564,51 +6509,46 @@ msgstr "认证信息不正确"
 #: .\apps\xpack\swagger_api\auth_api.py:16
 #: .\apps\xpack\swagger_api\auth_api.py:30 .\apps\xpack\views\auth.py:26
 #: .\apps\xpack\views\auth.py:27
-#, fuzzy
-#| msgid "Application Type"
+
 msgid "Authentication type"
-msgstr "应用类型"
+msgstr "认证类型"
 
 #: .\apps\xpack\swagger_api\application_setting_api.py:109
 #: .\apps\xpack\swagger_api\application_setting_api.py:110
 #: .\apps\xpack\swagger_api\auth_api.py:18
 #: .\apps\xpack\swagger_api\auth_api.py:19
-#, fuzzy
-#| msgid "Form Configuration"
+
 msgid "Configuration"
-msgstr "表单配置"
+msgstr "配置"
 
 #: .\apps\xpack\swagger_api\license_api.py:22
-#, fuzzy
-#| msgid "No reference status"
+
 msgid "license status"
-msgstr "无引用状态"
+msgstr "License 状态"
 
 #: .\apps\xpack\swagger_api\license_api.py:24
 msgid ""
 "License status, possible values are: valid, invalid, expired, which "
 "respectively represent: valid, invalid, expired"
-msgstr ""
+msgstr "license状态，可能值为：valid、invalid、expired，分别代表：有效、无效、已过期"
 
 #: .\apps\xpack\swagger_api\license_api.py:26
-#, fuzzy
-#| msgid "Get application details"
+
 msgid "license details"
-msgstr "获取应用详情"
+msgstr "License 详情"
 
 #: .\apps\xpack\swagger_api\license_api.py:30
-#, fuzzy
-#| msgid "document name"
+
 msgid "customer name"
-msgstr "文档名称"
+msgstr "客户名称"
 
 #: .\apps\xpack\swagger_api\license_api.py:31
 msgid "customer name. For example: *** company."
-msgstr ""
+msgstr "客户名称。例如：***公司。"
 
 #: .\apps\xpack\swagger_api\license_api.py:33
 msgid "independent software vendor"
-msgstr ""
+msgstr "独立软件供应商。例如：***公司，适用于产品的嵌入式版本。"
 
 #: .\apps\xpack\swagger_api\license_api.py:35
 msgid ""
@@ -6617,62 +6557,57 @@ msgid ""
 msgstr ""
 
 #: .\apps\xpack\swagger_api\license_api.py:37
-#, fuzzy
-#| msgid "Vectorization documentation"
+
 msgid "Authorization deadline."
-msgstr "向量化文档"
+msgstr "授权截止时间"
 
 #: .\apps\xpack\swagger_api\license_api.py:39
 msgid ""
 "Authorization deadline. For example: 2020-12-31, this license will expire on "
 "2021-01-01."
-msgstr ""
+msgstr "授权截止时间。例如：2020-12-31，此license将在2021-01-01到期。"
 
 #: .\apps\xpack\swagger_api\license_api.py:41
-#, fuzzy
-#| msgid "document name"
+
 msgid "product name."
-msgstr "文档名称"
+msgstr "产品名称"
 
 #: .\apps\xpack\swagger_api\license_api.py:43
 msgid "Product name. For example: JumpServer, CMP, etc."
-msgstr ""
+msgstr "产品名称。例如：CMP、KO、JS、MS。"
 
 #: .\apps\xpack\swagger_api\license_api.py:45
-#, fuzzy
-#| msgid "Export conversation"
+
 msgid "product version."
-msgstr "导出对话"
+msgstr "产品版本"
 
 #: .\apps\xpack\swagger_api\license_api.py:47
 msgid "Product version. For example: JumpServer 2.0, CMP 1.0, etc."
-msgstr ""
+msgstr "产品版本。例如：Standard、Enterprise，代表标准版、企业版。"
 
 #: .\apps\xpack\swagger_api\license_api.py:49
-#, fuzzy
-#| msgid "Application version id"
+
 msgid "license version."
-msgstr "应用版本 id"
+msgstr "License 版本"
 
 #: .\apps\xpack\swagger_api\license_api.py:51
 msgid "License version. For example: 1.0, 2.0, etc."
-msgstr ""
+msgstr "License版本。例如：1.0、2.0、3.0等。"
 
 #: .\apps\xpack\swagger_api\license_api.py:53
-#, fuzzy
-#| msgid "Vectorization documentation"
+
 msgid "authorization quantity."
-msgstr "向量化文档"
+msgstr "认证数量"
 
 #: .\apps\xpack\swagger_api\license_api.py:55
 msgid ""
 "Authorization quantity. For example: 100, this license can be used by 100 "
 "users."
-msgstr ""
+msgstr "授权数量。例如：cmp授权的cpu数量，或JS授权的资产数量。"
 
 #: .\apps\xpack\swagger_api\license_api.py:57
 msgid "Serial number, the unique identifier of the License."
-msgstr ""
+msgstr "序列号，License唯一标识。"
 
 #: .\apps\xpack\swagger_api\license_api.py:59
 msgid ""
@@ -6680,13 +6615,12 @@ msgid ""
 "portal will save the serial number after generating the license. If the "
 "serial number is not recorded in the customer support portal, the license "
 "will be regarded as an unknown source."
-msgstr ""
+msgstr "序列号，License唯一标识。客户支持门户生成License后会保存序列号，如果序列号在客户支持门户中没有记录，则此License将被视为未知来源。"
 
 #: .\apps\xpack\swagger_api\license_api.py:61
-#, fuzzy
-#| msgid "Opening remarks"
+
 msgid "remarks"
-msgstr "开场白"
+msgstr "备注"
 
 #: .\apps\xpack\swagger_api\license_api.py:63
 msgid ""
@@ -6694,55 +6628,48 @@ msgid ""
 "customer purchases two identical JumpServer subscriptions and uses them in "
 "different computer rooms respectively. You can use this field to note the A "
 "computer room and B computer room to help distinguish the licenses."
-msgstr ""
+msgstr "备注，记录额外的信息，长度限制50。例如某个客户买了两个同样的JumpServer订阅分别在不同机房使用，可以用这个字段备注A机房B机房，帮助区别License。"
 
 #: .\apps\xpack\views\application_setting_views.py:21
 #: .\apps\xpack\views\application_setting_views.py:22
-#, fuzzy
-#| msgid "Modify application icon"
+
 msgid "Pro/Modify Application Settings"
-msgstr "修改应用图标"
+msgstr "专业版/修改应用设置"
 
 #: .\apps\xpack\views\application_setting_views.py:23
 #: .\apps\xpack\views\application_setting_views.py:38
-#, fuzzy
-#| msgid "Application/Public Access"
+
 msgid "Pro/Application/Public Access"
-msgstr "应用/公共访问"
+msgstr "专业版/应用/公共访问"
 
 #: .\apps\xpack\views\application_setting_views.py:35
 #: .\apps\xpack\views\application_setting_views.py:36
-#, fuzzy
-#| msgid "Get application details"
+
 msgid "Pro/Get Application Settings"
-msgstr "获取应用详情"
+msgstr "专业版/获取应用详情"
 
 #: .\apps\xpack\views\auth.py:28
-#, fuzzy
-#| msgid "Annotation"
+
 msgid "Authentication"
-msgstr "标注"
+msgstr "认证"
 
 #: .\apps\xpack\views\auth.py:38 .\apps\xpack\views\auth.py:39
-#, fuzzy
-#| msgid "Modify application version information"
+
 msgid "Add or modify authentication configuration"
-msgstr "修改应用版本信息"
+msgstr "添加或修改认证信息"
 
 #: .\apps\xpack\views\auth.py:42 .\apps\xpack\views\auth.py:55
 #: .\apps\xpack\views\auth.py:68
 msgid "System settings/login authentication"
-msgstr ""
+msgstr "系统设置/登录认证"
 
 #: .\apps\xpack\views\auth.py:52 .\apps\xpack\views\auth.py:53
-#, fuzzy
-#| msgid "Get the application AccessToken information"
+
 msgid "Get authentication configuration"
-msgstr "获取应用 AccessToken 信息"
+msgstr "获取认证配置"
 
 #: .\apps\xpack\views\auth.py:65 .\apps\xpack\views\auth.py:66
-#, fuzzy
-#| msgid "Connection"
+
 msgid "test connection"
 msgstr "连线"
 
@@ -6751,161 +6678,145 @@ msgstr "连线"
 #: .\apps\xpack\views\auth.py:182 .\apps\xpack\views\auth.py:199
 #: .\apps\xpack\views\auth.py:216
 msgid "Three-party login"
-msgstr ""
+msgstr "三方登录"
 
 #: .\apps\xpack\views\auth.py:105 .\apps\xpack\views\auth.py:106
 msgid "CAS login"
-msgstr ""
+msgstr "CAS 登录"
 
 #: .\apps\xpack\views\auth.py:120 .\apps\xpack\views\auth.py:121
 msgid "OIDC login"
-msgstr ""
+msgstr "OIDC 登录"
 
 #: .\apps\xpack\views\auth.py:135 .\apps\xpack\views\auth.py:136
 msgid "OAuth2 login"
-msgstr ""
+msgstr "OAuth2 登录"
 
 #: .\apps\xpack\views\auth.py:150 .\apps\xpack\views\auth.py:151
 #: .\apps\xpack\views\auth.py:152 .\apps\xpack\views\auth.py:158
-#, fuzzy
-#| msgid "Get user information"
+
 msgid "Get platform information"
-msgstr "获取用户信息"
+msgstr "获取平台信息"
 
 #: .\apps\xpack\views\auth.py:156 .\apps\xpack\views\auth.py:157
-#, fuzzy
-#| msgid "Modify application version information"
+
 msgid "Modify platform information"
-msgstr "修改应用版本信息"
+msgstr "修改平台信息"
 
 #: .\apps\xpack\views\auth.py:162 .\apps\xpack\views\auth.py:163
 #: .\apps\xpack\views\auth.py:164
 msgid "Test platform connection"
-msgstr ""
+msgstr "测试平台连接"
 
 #: .\apps\xpack\views\auth.py:170 .\apps\xpack\views\auth.py:171
-#, fuzzy
-#| msgid "model type"
+
 msgid "Scan code login type"
-msgstr "模型类型"
+msgstr "扫码登录类型"
 
 #: .\apps\xpack\views\auth.py:172
 msgid "Scan code to log in"
-msgstr ""
+msgstr "扫码登录"
 
 #: .\apps\xpack\views\auth.py:179 .\apps\xpack\views\auth.py:180
 msgid "DingTalk callback"
-msgstr ""
+msgstr "钉钉回调"
 
 #: .\apps\xpack\views\auth.py:196 .\apps\xpack\views\auth.py:197
 msgid "Lark callback"
-msgstr ""
+msgstr "飞书回调"
 
 #: .\apps\xpack\views\auth.py:213 .\apps\xpack\views\auth.py:214
 msgid "Wecom callback"
-msgstr ""
+msgstr "企业微信回调"
 
 #: .\apps\xpack\views\display.py:16 .\apps\xpack\views\display.py:17
-#, fuzzy
-#| msgid "Model parameter settings"
+
 msgid "View appearance settings"
-msgstr "模型参数设置"
+msgstr "查看外观设置"
 
 #: .\apps\xpack\views\display.py:18 .\apps\xpack\views\display.py:31
 msgid "System Settings/Appearance Settings"
-msgstr ""
+msgstr "系统设置/外观设置"
 
 #: .\apps\xpack\views\display.py:28 .\apps\xpack\views\display.py:29
-#, fuzzy
-#| msgid "Model parameter settings"
+
 msgid "Update appearance settings"
-msgstr "模型参数设置"
+msgstr "更新外观设置"
 
 #: .\apps\xpack\views\license.py:28 .\apps\xpack\views\license.py:29
-#, fuzzy
-#| msgid "Get user information"
+
 msgid "Get license information"
-msgstr "获取用户信息"
+msgstr "获取 License 信息"
 
 #: .\apps\xpack\views\license.py:36 .\apps\xpack\views\license.py:37
-#, fuzzy
-#| msgid "Update user information"
+
 msgid "Update license information"
-msgstr "更新用户信息"
+msgstr "更新 License 信息"
 
 #: .\apps\xpack\views\license.py:42
-#, fuzzy
-#| msgid "upload files "
+
 msgid "upload file"
 msgstr "上传文件"
 
 #: .\apps\xpack\views\platform.py:46 .\apps\xpack\views\platform.py:47
-#, fuzzy
-#| msgid "parameter configuration"
+
 msgid "Get platform configuration"
-msgstr "参数配置"
+msgstr "获取平台配置"
 
 #: .\apps\xpack\views\platform.py:49 .\apps\xpack\views\platform.py:57
-#, fuzzy
-#| msgid "Application/Public Access"
+
 msgid "Application/application access"
-msgstr "应用/公共访问"
+msgstr "应用/应用访问"
 
 #: .\apps\xpack\views\platform.py:53 .\apps\xpack\views\platform.py:54
-#, fuzzy
-#| msgid "parameter configuration"
+
 msgid "Update platform configuration"
-msgstr "参数配置"
+msgstr "更新平台配置"
 
 #: .\apps\xpack\views\platform.py:70 .\apps\xpack\views\platform.py:71
-#, fuzzy
-#| msgid "Get form template"
+
 msgid "Get platform status"
-msgstr "获取表单模版"
+msgstr "获取平台状态"
 
 #: .\apps\xpack\views\platform.py:76
-#, fuzzy
-#| msgid "Application/Statistics"
+
 msgid "Application/Get platform status"
-msgstr "应用/统计"
+msgstr "应用/获取平台状态"
 
 #: .\apps\xpack\views\platform.py:86 .\apps\xpack\views\platform.py:87
 msgid "Update platform status"
-msgstr ""
+msgstr "更新平台状态"
 
 #: .\apps\xpack\views\platform.py:93
-#, fuzzy
-#| msgid "Application/Statistics"
+
 msgid "Application/Update platform status"
-msgstr "应用/统计"
+msgstr "应用/更新平台状态"
 
 #: .\apps\xpack\views\system_api_key_views.py:27
 #: .\apps\xpack\views\system_api_key_views.py:28
-#, fuzzy
-#| msgid "Get the application API_KEY list"
+
 msgid "Get personal system API_KEY list"
-msgstr "获取应用 API_KEY 列表"
+msgstr "获取个人系统 API_KEY 列表"
 
 #: .\apps\xpack\views\system_api_key_views.py:29
 #: .\apps\xpack\views\system_api_key_views.py:38
 #: .\apps\xpack\views\system_api_key_views.py:51
 #: .\apps\xpack\views\system_api_key_views.py:59
 msgid "Personal system/API_KEY"
-msgstr ""
+msgstr "个人系统/API_KEY"
 
 #: .\apps\xpack\views\system_api_key_views.py:36
 #: .\apps\xpack\views\system_api_key_views.py:37
 msgid "Update personal system API_KEY"
-msgstr ""
+msgstr "更新个人系统 API_KEY"
 
 #: .\apps\xpack\views\system_api_key_views.py:49
 #: .\apps\xpack\views\system_api_key_views.py:50
-#, fuzzy
-#| msgid "Delete Application API_KEY"
+
 msgid "Delete personal system API_KEY"
-msgstr "删除应用 API_KEY"
+msgstr "删除个人系统 API_KEY"
 
 #: .\apps\xpack\views\system_api_key_views.py:57
 #: .\apps\xpack\views\system_api_key_views.py:58
 msgid "Add personal system API_KEY"
-msgstr ""
+msgstr "添加个人系统 API_KEY"
