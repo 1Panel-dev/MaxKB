@@ -9,5 +9,8 @@ export default {
     title: '请输入密码打开链接',
     errorMessage1: '密码不能为空',
     errorMessage2: '密码错误'
+  },
+  executionDetails: {
+    paramOutput: '参数输出',
   }
 }

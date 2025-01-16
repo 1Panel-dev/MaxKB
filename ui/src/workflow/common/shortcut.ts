@@ -99,7 +99,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       MsgError(`${nodes[0].properties?.stepName}节点不允许删除`)
       return
     }
-    MsgConfirm(t('common.tip'), `确定删除该节点？`, {
+    MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
       confirmButtonText: t('common.delete'),
       confirmButtonClass: 'danger'
     }).then(() => {

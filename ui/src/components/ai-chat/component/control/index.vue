@@ -14,6 +14,7 @@ import { MsgSuccess } from '@/utils/message'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import bus from '@/bus'
 import { ref, nextTick, onMounted } from 'vue'
+import { t } from '@/locales'
 const isOpen = ref<boolean>(false)
 const eventVal = ref({})
 function getSelection() {
@@ -42,14 +43,14 @@ const openControl = (event: any) => {
 
 const menus = ref([
   {
-    label: '复制',
+    label: t('common.copy'),
     icon: 'app-copy',
     click: () => {
       const selectionText = getSelection()
       if (selectionText) {
         clearSelectedText()
         navigator.clipboard.writeText(selectionText).then(() => {
-          MsgSuccess('复制成功')
+          MsgSuccess(t('common.copySuccess'))
         })
       }
     }

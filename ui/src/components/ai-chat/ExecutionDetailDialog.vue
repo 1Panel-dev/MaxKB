@@ -198,7 +198,11 @@
                     </div>
                     <div class="card-never border-r-4 mt-8">
                       <h5 class="p-8-12">
-                        {{ item.type == WorkflowType.Application ? '参数输出' : 'AI 回答' }}
+                        {{
+                          item.type == WorkflowType.Application
+                            ? $t('components.chat.executionDetails.paramOutput')
+                            : 'AI 回答'
+                        }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <MdPreview
@@ -236,7 +240,9 @@
                   <template v-if="item.type === WorkflowType.DocumentExtractNode">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12 flex align-center">
-                        <span class="mr-4">参数输出</span>
+                        <span class="mr-4">{{
+                          $t('components.chat.executionDetails.paramOutput')
+                        }}</span>
 
                         <el-tooltip
                           effect="dark"
@@ -291,7 +297,9 @@
                       </div>
                     </div>
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">参数输出</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('components.chat.executionDetails.paramOutput') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <el-card
                           shadow="never"
@@ -331,7 +339,9 @@
                       </div>
                     </div>
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">参数输出</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('components.chat.executionDetails.paramOutput') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <p class="mb-8 color-secondary">语音文件:</p>
                         <div v-if="item.answer" v-html="item.answer"></div>
@@ -429,7 +439,8 @@
                   <template v-if="item.type === WorkflowType.FormNode">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        参数输出<span style="color: #f54a45">{{
+                        {{ $t('components.chat.executionDetails.paramOutput')
+                        }}<span style="color: #f54a45">{{
                           item.is_submit ? '' : '(用户未提交)'
                         }}</span>
                       </h5>
@@ -517,7 +528,11 @@
                     </div>
                     <div class="card-never border-r-4 mt-8">
                       <h5 class="p-8-12">
-                        {{ item.type == WorkflowType.Application ? '参数输出' : 'AI 回答' }}
+                        {{
+                          item.type == WorkflowType.Application
+                            ? $t('components.chat.executionDetails.paramOutput')
+                            : 'AI 回答'
+                        }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <MdPreview
@@ -541,7 +556,11 @@
                     </div>
                     <div class="card-never border-r-4 mt-8">
                       <h5 class="p-8-12">
-                        {{ item.type == WorkflowType.Application ? '参数输出' : 'AI 回答' }}
+                        {{
+                          item.type == WorkflowType.Application
+                            ? $t('components.chat.executionDetails.paramOutput')
+                            : 'AI 回答'
+                        }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <MdPreview

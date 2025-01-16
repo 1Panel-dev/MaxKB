@@ -9,7 +9,7 @@
       @mouseleave="showicon = false"
     >
       <span>{{ item.label }} {{ '{' + item.value + '}' }}</span>
-      <el-tooltip effect="dark" content="复制参数" placement="top" v-if="showicon === true">
+      <el-tooltip effect="dark" :content="$t('views.applicationWorkflow.setting.copyParam')" placement="top" v-if="showicon === true">
         <el-button
           link
           @click="copyClick('{{' + '全局变量.' + item.value + '}}')"
