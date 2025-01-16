@@ -3,7 +3,7 @@
     :modelValue="show"
     modal-class="positioned-mask"
     width="300"
-    title="请输入密码打开链接"
+    :title="$t('components.chat.passwordValidator.title')"
     custom-class="no-close-button"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -26,6 +26,7 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
+import { t } from '@/locales'
 const route = useRoute()
 const FormRef = ref()
 const {
@@ -51,10 +52,10 @@ const auth = () => {
 }
 const validator_auth = (rule: any, value: string, callback: any) => {
   if (value === '') {
-    callback(new Error('密码不能为空'))
+    callback(new Error(t('components.chat.passwordValidator.errorMessage1')))
   } else {
     auth().catch(() => {
-      callback(new Error('密码错误'))
+      callback(new Error(t('components.chat.passwordValidator.errorMessage2')))
     })
   }
 }

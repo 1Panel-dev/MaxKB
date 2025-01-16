@@ -47,7 +47,8 @@
           <template #operateBefore>
             <div class="chat-width">
               <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
-                <el-icon><Plus /></el-icon><span class="ml-4">新建对话</span>
+                <el-icon><Plus /></el-icon
+                ><span class="ml-4">{{ $t('components.chat.createChat') }}</span>
               </el-button>
             </div>
           </template>
@@ -71,7 +72,7 @@
       <el-collapse-transition>
         <div v-show="show" class="chat-popover w-full" v-click-outside="clickoutside">
           <div class="border-b p-16-24">
-            <span>历史记录</span>
+            <span>{{ $t('components.chat.history') }}</span>
           </div>
 
           <el-scrollbar max-height="300">
@@ -99,13 +100,13 @@
                 </template>
                 <template #empty>
                   <div class="text-center mt-24">
-                    <el-text type="info">暂无历史记录</el-text>
+                    <el-text type="info">{{ $t('components.chat.noHistory') }}</el-text>
                   </div>
                 </template>
               </common-list>
             </div>
             <div v-if="chatLogData.length" class="gradient-divider lighter mt-8">
-              <span>仅显示最近 20 条对话</span>
+              <span>{{ $t('components.chat.only20history') }}</span>
             </div>
           </el-scrollbar>
         </div>
@@ -119,7 +120,6 @@ import { ref, onMounted, reactive, nextTick, computed } from 'vue'
 import { isAppIcon } from '@/utils/application'
 import { hexToRgba } from '@/utils/theme'
 import useStore from '@/stores'
-
 const { user, log } = useStore()
 
 const AiChatRef = ref()

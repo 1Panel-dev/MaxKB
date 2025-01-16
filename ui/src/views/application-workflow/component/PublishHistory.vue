@@ -1,6 +1,6 @@
 <template>
   <div class="workflow-publish-history border-l">
-    <h4 class="border-b p-16-24">发布历史</h4>
+    <h4 class="border-b p-16-24">{{ $t('views.applicationWorkflow.setting.releaseHistory') }}</h4>
     <div class="list-height pt-0">
       <el-scrollbar>
         <div class="p-8 pt-0">
@@ -23,7 +23,9 @@
                       :write="row.writeStatus"
                       @close="closeWrite(row)"
                     />
-                    <el-tag v-if="index === 0" class="default-tag ml-4">最近发布</el-tag>
+                    <el-tag v-if="index === 0" class="default-tag ml-4">{{
+                      $t('views.applicationWorkflow.setting.latestRelease')
+                    }}</el-tag>
                   </h5>
                   <el-text type="info" class="color-secondary flex mt-8">
                     <AppAvatar :size="20" class="avatar-grey mr-4">
@@ -46,7 +48,7 @@
                         </el-dropdown-item>
                         <el-dropdown-item @click="refreshVersion(row)">
                           <el-icon><RefreshLeft /></el-icon>
-                          恢复此版本
+                          {{ $t('views.applicationWorkflow.setting.restoreCurrentVersion') }}
                         </el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
@@ -57,7 +59,7 @@
 
             <template #empty>
               <div class="text-center">
-                <el-text type="info">暂无历史记录</el-text>
+                <el-text type="info"> {{ $t('components.chat.noHistory') }}</el-text>
               </div>
             </template>
           </common-list>
@@ -72,6 +74,7 @@ import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgError } from '@/utils/message'
+import { t } from '@/locales'
 const route = useRoute()
 const {
   params: { id }
@@ -114,7 +117,7 @@ function editName(val: string, item: any) {
       getList()
     })
   } else {
-    MsgError('名字不能为空！')
+    MsgError(t('views.applicationWorkflow.tip.nameMessage'))
   }
 }
 

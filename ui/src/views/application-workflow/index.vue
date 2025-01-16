@@ -8,23 +8,26 @@
         <h4>{{ detail?.name }}</h4>
         <div v-if="showHistory && disablePublic">
           <el-text type="info" class="ml-16 color-secondary"
-            >预览版本：
+            >{{ $t('views.applicationWorkflow.info.previewVersion') }}
             {{ currentVersion.name || datetimeFormat(currentVersion.update_time) }}</el-text
           >
         </div>
         <el-text type="info" class="ml-16 color-secondary" v-else-if="saveTime"
-          >保存时间：{{ datetimeFormat(saveTime) }}</el-text
+          >{{ $t('views.applicationWorkflow.info.saveTime')
+          }}{{ datetimeFormat(saveTime) }}</el-text
         >
       </div>
       <div v-if="showHistory && disablePublic">
-        <el-button type="primary" class="mr-8" @click="refreshVersion()"> 恢复版本 </el-button>
+        <el-button type="primary" class="mr-8" @click="refreshVersion()">
+          {{ $t('views.applicationWorkflow.setting.restoreVersion') }}
+        </el-button>
         <el-divider direction="vertical" />
         <el-button text @click="closeHistory">
           <el-icon><Close /></el-icon>
         </el-button>
       </div>
       <div v-else>
-        <el-button icon="Plus" @click="showPopover = !showPopover"> 添加组件 </el-button>
+        <el-button icon="Plus" @click="showPopover = !showPopover"> {{ $t('views.applicationWorkflow.setting.addComponent') }} </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug">
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
           {{ $t('common.debug') }}</el-button
@@ -33,7 +36,7 @@
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
-        <el-button type="primary" @click="publicHandle"> 发布 </el-button>
+        <el-button type="primary" @click="publicHandle"> {{ $t('views.applicationWorkflow.setting.public') }} </el-button>
 
         <el-dropdown trigger="click">
           <el-button text @click.stop class="ml-8 mt-4">
@@ -43,11 +46,11 @@
             <el-dropdown-menu>
               <el-dropdown-item @click="openHistory">
                 <AppIcon iconName="app-history-outlined"></AppIcon>
-                发布历史
+                {{ $t('views.applicationWorkflow.setting.releaseHistory') }}
               </el-dropdown-item>
               <el-dropdown-item>
                 <AppIcon iconName="app-save-outlined"></AppIcon>
-                自动保存
+                {{ $t('views.applicationWorkflow.setting.autoSave') }}
                 <div class="ml-4">
                   <el-switch size="small" v-model="isSave" @change="changeSave" />
                 </div>
@@ -146,7 +149,7 @@ import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
-
+import { t } from '@/locales'
 const { user, application } = useStore()
 const router = useRouter()
 const route = useRoute()
@@ -258,17 +261,17 @@ async function publicHandle() {
         return
       }
       applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
-        MsgSuccess('发布成功')
+        MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))
       })
     })
     .catch((res: any) => {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(res.node.properties?.stepName + '节点 ' + err_message)
+        MsgError(res.node.properties?.stepName + `${t('views.applicationWorkflow.node')} ` + err_message)
       } else {
         const keys = Object.keys(err_message)
-        MsgError(node.properties?.stepName + '节点 ' + err_message[keys[0]]?.[0]?.message)
+        MsgError(node.properties?.stepName + `${t('views.applicationWorkflow.node')} ` + err_message[keys[0]]?.[0]?.message)
       }
     })
 }
@@ -297,10 +300,10 @@ const clickShowDebug = () => {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(res.node.properties?.stepName + '节点 ' + err_message)
+        MsgError(res.node.properties?.stepName + `${t('views.applicationWorkflow.node')} ` + err_message)
       } else {
         const keys = Object.keys(err_message)
-        MsgError(node.properties?.stepName + '节点 ' + err_message[keys[0]]?.[0]?.message)
+        MsgError(node.properties?.stepName + `${t('views.applicationWorkflow.node')} ` + err_message[keys[0]]?.[0]?.message)
       }
     })
 }

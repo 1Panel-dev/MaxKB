@@ -276,6 +276,7 @@ class AppNodeModel extends HtmlResize.model {
   }
 
   setAttributes() {
+    const { t } = i18n.global;
     this.width = this.get_width()
     const isLoop = (node_id: string, target_node_id: string) => {
       const up_node_list = this.graphModel.getNodeIncomingNode(node_id)
@@ -293,13 +294,13 @@ class AppNodeModel extends HtmlResize.model {
       return false
     }
     const circleOnlyAsTarget = {
-      message: '只允许从右边的锚点连出',
+      message: t('views.applicationWorkflow.tip.onlyRight'),
       validate: (sourceNode: any, targetNode: any, sourceAnchor: any) => {
         return sourceAnchor.type === 'right'
       }
     }
     this.sourceRules.push({
-      message: '不可循环连线',
+      message: t('views.applicationWorkflow.tip.notRecyclable'),
       validate: (sourceNode: any, targetNode: any, sourceAnchor: any, targetAnchor: any) => {
         return !isLoop(sourceNode.id, targetNode.id)
       }
@@ -307,7 +308,7 @@ class AppNodeModel extends HtmlResize.model {
 
     this.sourceRules.push(circleOnlyAsTarget)
     this.targetRules.push({
-      message: '只允许连接左边的锚点',
+      message: t('views.applicationWorkflow.tip.onlylest'),
       validate: (sourceNode: any, targetNode: any, sourceAnchor: any, targetAnchor: any) => {
         return targetAnchor.type === 'left'
       }

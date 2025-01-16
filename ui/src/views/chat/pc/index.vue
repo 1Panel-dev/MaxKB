@@ -38,9 +38,9 @@
               <el-icon>
                 <Plus />
               </el-icon>
-              <span class="ml-4">新建对话</span>
+              <span class="ml-4">{{ $t('components.chat.createChat') }}</span>
             </el-button>
-            <p class="mt-20 mb-8">历史记录</p>
+            <p class="mt-20 mb-8">{{ $t('components.chat.history') }}</p>
           </div>
           <div class="left-height pt-0">
             <el-scrollbar>
@@ -76,13 +76,13 @@
 
                   <template #empty>
                     <div class="text-center">
-                      <el-text type="info">暂无历史记录</el-text>
+                      <el-text type="info">{{ $t('components.chat.noHistory') }}</el-text>
                     </div>
                   </template>
                 </common-list>
               </div>
               <div v-if="chatLogData?.length" class="gradient-divider lighter mt-8">
-                <span>仅显示最近 20 条对话</span>
+                <span>{{ $t('components.chat.only20history') }}</span>
               </div>
             </el-scrollbar>
           </div>
@@ -101,14 +101,18 @@
                 style="font-size: 16px"
               ></AppIcon>
               <span v-if="paginationConfig.total" class="lighter">
-                {{ paginationConfig.total }} 条提问
+                {{ paginationConfig.total }} {{ $t('components.chat.question_count') }}
               </span>
               <el-dropdown class="ml-8">
-                <AppIcon iconName="app-export" class="cursor" title="导出聊天记录"></AppIcon>
+                <AppIcon
+                  iconName="app-export"
+                  class="cursor"
+                  :title="$t('components.chat.exportReords')"
+                ></AppIcon>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item @click="exportMarkdown">导出 Markdown</el-dropdown-item>
-                    <el-dropdown-item @click="exportHTML">导出 HTML</el-dropdown-item>
+                    <el-dropdown-item @click="exportMarkdown">{{ $t('common.exprt') }} Markdown</el-dropdown-item>
+                    <el-dropdown-item @click="exportHTML">{{ $t('common.exprt') }} HTML</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -147,7 +151,7 @@ import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
 import { hexToRgba } from '@/utils/theme'
-
+import { t } from '@/locales'
 useResize()
 
 const { user, log, common } = useStore()
@@ -175,7 +179,7 @@ const classObj = computed(() => {
 
 const newObj = {
   id: 'new',
-  abstract: '新建对话'
+  abstract: t('components.chat.createChat')
 }
 const props = defineProps<{
   application_profile: any
@@ -202,7 +206,7 @@ const paginationConfig = ref({
 
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
-const currentChatName = ref('新建对话')
+const currentChatName = ref(t('components.chat.createChat'))
 const mouseId = ref('')
 
 function mouseenter(row: any) {
@@ -212,7 +216,7 @@ function deleteLog(row: any) {
   log.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
     if (currentChatId.value === row.id) {
       currentChatId.value = 'new'
-      currentChatName.value = '新建对话'
+      currentChatName.value = t('components.chat.createChat')
       paginationConfig.value.current_page = 1
       paginationConfig.value.total = 0
       currentRecordList.value = []
@@ -247,7 +251,7 @@ function newChat() {
     currentRecordList.value = []
   }
   currentChatId.value = 'new'
-  currentChatName.value = '新建对话'
+  currentChatName.value = t('components.chat.createChat')
   if (common.isMobile()) {
     isCollapse.value = false
   }

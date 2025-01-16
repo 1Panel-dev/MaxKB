@@ -1,3 +1,6 @@
+import Password from '@/views/chat/auth/component/password.vue'
+import { create } from 'lodash'
+
 export default {
   title: '应用',
   createApplication: '创建应用',
@@ -195,5 +198,6 @@ export default {
     text: '针对用户提问调试段落匹配情况，保障回答效果。',
     emptyMessage1: '命中段落显示在这里',
     emptyMessage2: '没有命中的分段'
-  }
+  },
+
 }

@@ -25,9 +25,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import DynamicsFormConstructor from '@/components/dynamics-form/constructor/index.vue'
+import { t } from '@/locales'
 const props = withDefaults(
   defineProps<{ title?: string; addFormField: (form_data: any) => void }>(),
-  { title: '添加参数' }
+  { title: t('views.template.templateForm.title.addParam') }
 )
 const dialogVisible = ref<boolean>(false)
 const dynamicsFormConstructorRef = ref<InstanceType<typeof DynamicsFormConstructor>>()
