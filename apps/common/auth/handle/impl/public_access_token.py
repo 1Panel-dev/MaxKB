@@ -34,7 +34,7 @@ class PublicAccessToken(AuthBaseHandle):
         if request.path != '/api/application/profile':
             application_setting_model = DBModelManage.get_model('application_setting')
             xpack_cache = DBModelManage.get_model('xpack_cache')
-            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
+            X_PACK_LICENSE_IS_VALID =True
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(application_id=str(
                     application_access_token.application_id)).first()

@@ -185,9 +185,9 @@ class RegisterSerializer(ApiMixin, serializers.Serializer):
 
         return True
 
-    @valid_license(model=User, count=2,
+    @valid_license(model=User, count=2000,
                    message=_(
-                       "The community version supports up to 2 users. If you need more users, please contact us (https://fit2cloud.com/)."))
+                       "The community version supports up to 2000 users. If you need more users, please contact us (https://fit2cloud.com/)."))
     @transaction.atomic
     def save(self, **kwargs):
         m = User(
@@ -749,9 +749,9 @@ class UserManageSerializer(serializers.Serializer):
             if self.data.get('password') != self.data.get('re_password'):
                 raise ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.to_app_api_exception()
 
-    @valid_license(model=User, count=2,
+    @valid_license(model=User, count=2000,
                    message=_(
-                       'The community version supports up to 2 users. If you need more users, please contact us (https://fit2cloud.com/).'))
+                       'The community version supports up to 2000 users. If you need more users, please contact us (https://fit2cloud.com/).'))
     @transaction.atomic
     def save(self, instance, with_valid=True):
         if with_valid:

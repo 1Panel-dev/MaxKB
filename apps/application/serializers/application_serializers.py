@@ -257,7 +257,7 @@ class ApplicationSerializer(serializers.Serializer):
             show_guide = 'true'
             float_icon = f"{self.data.get('protocol')}://{self.data.get('host')}/ui/MaxKB.gif"
             xpack_cache = DBModelManage.get_model('xpack_cache')
-            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
+            X_PACK_LICENSE_IS_VALID = True
             # 获取接入的query参数
             query = self.get_query_api_input(application_access_token.application, params)
             float_location = {"x": {"type": "right", "value": 0}, "y": {"type": "bottom", "value": 30}}
@@ -361,7 +361,7 @@ class ApplicationSerializer(serializers.Serializer):
             application_access_token.save()
             application_setting_model = DBModelManage.get_model('application_setting')
             xpack_cache = DBModelManage.get_model('xpack_cache')
-            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get("XPACK_LICENSE_IS_VALID", False)
+            X_PACK_LICENSE_IS_VALID = True
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting, _ = application_setting_model.objects.get_or_create(
                     application_id=self.data.get('application_id'))
@@ -443,7 +443,7 @@ class ApplicationSerializer(serializers.Serializer):
         def auth_authentication_value(self, authentication_value, application_id):
             application_setting_model = DBModelManage.get_model('application_setting')
             xpack_cache = DBModelManage.get_model('xpack_cache')
-            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
+            X_PACK_LICENSE_IS_VALID = True
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(application_id=application_id).first()
                 if application_setting.authentication and authentication_value is not None:
@@ -489,9 +489,9 @@ class ApplicationSerializer(serializers.Serializer):
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
 
-        @valid_license(model=Application, count=5,
+        @valid_license(model=Application, count=5000,
                        message=_(
-                           'The community version supports up to 5 applications. If you need more applications, please contact us (https://fit2cloud.com/).'))
+                           'The community version supports up to 5000 applications. If you need more applications, please contact us (https://fit2cloud.com/).'))
         @transaction.atomic
         def insert(self, application: Dict):
             application_type = application.get('type')
@@ -696,9 +696,9 @@ class ApplicationSerializer(serializers.Serializer):
         file = UploadedFileField(required=True, error_messages=ErrMessage.image(_("file")))
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
 
-        @valid_license(model=Application, count=5,
+        @valid_license(model=Application, count=5000,
                        message=_(
-                           'The community version supports up to 5 applications. If you need more applications, please contact us (https://fit2cloud.com/).'))
+                           'The community version supports up to 5000 applications. If you need more applications, please contact us (https://fit2cloud.com/).'))
         @transaction.atomic
         def import_(self, with_valid=True):
             if with_valid:
@@ -937,7 +937,7 @@ class ApplicationSerializer(serializers.Serializer):
                     application.work_flow = work_flow_version.work_flow
 
             xpack_cache = DBModelManage.get_model('xpack_cache')
-            X_PACK_LICENSE_IS_VALID = False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID', False)
+            X_PACK_LICENSE_IS_VALID = True
             application_setting_dict = {}
             if application_setting_model is not None and X_PACK_LICENSE_IS_VALID:
                 application_setting = QuerySet(application_setting_model).filter(
