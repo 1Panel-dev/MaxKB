@@ -65,6 +65,7 @@ import ChatInputOperate from '@/components/ai-chat/component/chat-input-operate/
 import PrologueContent from '@/components/ai-chat/component/prologue-content/index.vue'
 import UserForm from '@/components/ai-chat/component/user-form/index.vue'
 import Control from '@/components/ai-chat/component/control/index.vue'
+import { t } from '@/locales'
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
@@ -270,7 +271,7 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
 const errorWrite = (chat: any, message?: string) => {
   ChatManagement.addChatRecord(chat, 50, loading)
   ChatManagement.write(chat.id)
-  ChatManagement.append(chat.id, message || '抱歉，当前正在维护，无法提供服务，请稍后再试！')
+  ChatManagement.append(chat.id, message || t('components.chat.tip.error500Message'))
   ChatManagement.updateStatus(chat.id, 500)
   ChatManagement.close(chat.id)
 }
@@ -343,9 +344,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
               errorWrite(chat)
             })
         } else if (response.status === 460) {
-          return Promise.reject('无法识别用户身份')
+          return Promise.reject(t('components.chat.tip.errorIdentifyMessage'))
         } else if (response.status === 461) {
-          return Promise.reject('抱歉，您的提问已达到最大限制，请明天再来吧！')
+          return Promise.reject('components.chat.tip.errorLimitMessage')
         } else {
           nextTick(() => {
             // 将滚动条滚动到最下面

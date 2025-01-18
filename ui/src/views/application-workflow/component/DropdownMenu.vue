@@ -13,7 +13,7 @@
         </el-input>
       </div>
 
-      <el-tab-pane :label="$t('views.applicationWorkflow.baseNodes')" name="base">
+      <el-tab-pane :label="$t('views.applicationWorkflow.baseComponent')" name="base">
         <el-scrollbar height="400">
           <div v-if="filter_menu_nodes.length > 0">
             <template v-for="(item, index) in filter_menu_nodes" :key="index">

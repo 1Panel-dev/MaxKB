@@ -39,6 +39,7 @@ export default {
   debug: '调试',
   required: '必填',
   noData: '暂无数据',
+  result: '结果',
   status: {
     label: '状态',
     enableSuccess: '启用成功',

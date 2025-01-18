@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     class="execution-details-dialog"
-    title="执行详情"
+    :title="$t('components.chat.executionDetails.title')"
     v-model="dialogVisible"
     destroy-on-close
     append-to-body
@@ -56,7 +56,9 @@
                     "
                   >
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">参数输入</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('components.chat.executionDetails.paramInput') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="mb-8">
                           <span class="color-secondary">用户问题:</span>

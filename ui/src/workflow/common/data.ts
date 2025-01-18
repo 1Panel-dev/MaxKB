@@ -8,18 +8,18 @@ export const startNode = {
   y: 720,
   properties: {
     height: 200,
-    stepName: '开始',
+    stepName: t('views.applicationWorkflow.nodes.startNode.label'),
     config: {
       fields: [
         {
-          label: '用户问题',
+          label: t('views.applicationWorkflow.nodes.startNode.question'),
           value: 'question'
         }
       ],
       globalFields: [
         {
           value: 'time',
-          label: '当前时间'
+          label: t('views.applicationWorkflow.nodes.startNode.currentTime')
         }
       ]
     }
@@ -34,7 +34,7 @@ export const baseNode = {
   properties: {
     width: 420,
     height: 200,
-    stepName: '基本信息',
+    stepName: t('views.applicationWorkflow.nodes.baseNode.label'),
     input_field_list: [],
     node_data: {
       name: '',
@@ -55,15 +55,15 @@ export const baseNodes = [baseNode, startNode]
  */
 export const aiChatNode = {
   type: WorkflowType.AiChat,
-  text: '与 AI 大模型进行对话',
-  label: 'AI 对话',
+  text: t('views.applicationWorkflow.nodes.aiChatNode.text'),
+  label: t('views.applicationWorkflow.nodes.aiChatNode.label'),
   height: 340,
   properties: {
-    stepName: 'AI 对话',
+    stepName: t('views.applicationWorkflow.nodes.aiChatNode.label'),
     config: {
       fields: [
         {
-          label: 'AI 回答内容',
+          label: t('views.applicationWorkflow.nodes.aiChatNode.answer'),
           value: 'answer'
         }
       ]
@@ -75,21 +75,27 @@ export const aiChatNode = {
  */
 export const searchDatasetNode = {
   type: WorkflowType.SearchDataset,
-  text: '关联知识库，查找与问题相关的分段',
-  label: '知识库检索',
+  text: t('views.applicationWorkflow.nodes.searchDatasetNode.text'),
+  label: t('views.applicationWorkflow.nodes.searchDatasetNode.label'),
   height: 355,
   properties: {
-    stepName: '知识库检索',
+    stepName: t('views.applicationWorkflow.nodes.searchDatasetNode.label'),
     config: {
       fields: [
-        { label: '检索结果的分段列表', value: 'paragraph_list' },
-        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
         {
-          label: '检索结果',
+          label: t('views.applicationWorkflow.nodes.searchDatasetNode.paragraph_list'),
+          value: 'paragraph_list'
+        },
+        {
+          label: t('views.applicationWorkflow.nodes.searchDatasetNode.is_hit_handling_method_list'),
+          value: 'is_hit_handling_method_list'
+        },
+        {
+          label: t('views.applicationWorkflow.nodes.searchDatasetNode.result'),
           value: 'data'
         },
         {
-          label: '满足直接回答的分段内容',
+          label: t('views.applicationWorkflow.nodes.searchDatasetNode.directly_return'),
           value: 'directly_return'
         }
       ]
@@ -98,15 +104,15 @@ export const searchDatasetNode = {
 }
 export const questionNode = {
   type: WorkflowType.Question,
-  text: '根据历史聊天记录优化完善当前问题，更利于匹配知识库分段',
-  label: '问题优化',
+  text: t('views.applicationWorkflow.nodes.searchDatasetNode.text'),
+  label: t('views.applicationWorkflow.nodes.searchDatasetNode.label'),
   height: 345,
   properties: {
-    stepName: '问题优化',
+    stepName: t('views.applicationWorkflow.nodes.searchDatasetNode.label'),
     config: {
       fields: [
         {
-          label: '问题优化结果',
+          label: t('views.applicationWorkflow.nodes.searchDatasetNode.result'),
           value: 'answer'
         }
       ]
@@ -115,16 +121,16 @@ export const questionNode = {
 }
 export const conditionNode = {
   type: WorkflowType.Condition,
-  text: '根据不同条件执行不同的节点',
-  label: '判断器',
+  text: t('views.applicationWorkflow.nodes.conditionNode.text'),
+  label: t('views.applicationWorkflow.nodes.conditionNode.label'),
   height: 175,
   properties: {
     width: 600,
-    stepName: '判断器',
+    stepName: t('views.applicationWorkflow.nodes.conditionNode.label'),
     config: {
       fields: [
         {
-          label: '分支名称',
+          label: t('views.applicationWorkflow.nodes.conditionNode.branch_name'),
           value: 'branch_name'
         }
       ]
@@ -133,15 +139,15 @@ export const conditionNode = {
 }
 export const replyNode = {
   type: WorkflowType.Reply,
-  text: '指定回复内容，引用变量会转换为字符串进行输出',
-  label: '指定回复',
+  text: t('views.applicationWorkflow.nodes.replyNode.text'),
+  label: t('views.applicationWorkflow.nodes.replyNode.label'),
   height: 210,
   properties: {
-    stepName: '指定回复',
+    stepName: t('views.applicationWorkflow.nodes.replyNode.label'),
     config: {
       fields: [
         {
-          label: '内容',
+          label: t('views.applicationWorkflow.nodes.replyNode.content'),
           value: 'answer'
         }
       ]
@@ -150,19 +156,19 @@ export const replyNode = {
 }
 export const rerankerNode = {
   type: WorkflowType.RrerankerNode,
-  text: '使用重排模型对多个知识库的检索结果进行二次召回',
-  label: '多路召回',
+  text: t('views.applicationWorkflow.nodes.rerankerNode.text'),
+  label: t('views.applicationWorkflow.nodes.rerankerNode.label'),
   height: 252,
   properties: {
-    stepName: '多路召回',
+    stepName: t('views.applicationWorkflow.nodes.rerankerNode.label'),
     config: {
       fields: [
         {
-          label: '重排结果列表',
+          label: t('views.applicationWorkflow.nodes.rerankerNode.result_list'),
           value: 'result_list'
         },
         {
-          label: '重排结果',
+          label: t('views.applicationWorkflow.nodes.rerankerNode.result'),
           value: 'result'
         }
       ]
@@ -171,23 +177,21 @@ export const rerankerNode = {
 }
 export const formNode = {
   type: WorkflowType.FormNode,
-  text: '在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程',
-  label: '表单收集',
+  text: t('views.applicationWorkflow.nodes.formNode.text'),
+  label: t('views.applicationWorkflow.nodes.formNode.label'),
   height: 252,
   properties: {
     width: 600,
-    stepName: '表单收集',
+    stepName: t('views.applicationWorkflow.nodes.formNode.label'),
     node_data: {
       is_result: true,
       form_field_list: [],
-      form_content_format: `你好，请先填写下面表单内容：
-{{form}}
-填写后请点击【提交】按钮进行提交。`
+      form_content_format: t('views.applicationWorkflow.nodes.formNode.form_content_format')
     },
     config: {
       fields: [
         {
-          label: '表单全部内容',
+          label: t('views.applicationWorkflow.nodes.formNode.form_data'),
           value: 'form_data'
         }
       ]
@@ -196,15 +200,15 @@ export const formNode = {
 }
 export const documentExtractNode = {
   type: WorkflowType.DocumentExtractNode,
-  text: '提取文档中的内容',
-  label: '文档内容提取',
+  text: t('views.applicationWorkflow.nodes.documentExtractNode.text'),
+  label: t('views.applicationWorkflow.nodes.documentExtractNode.label'),
   height: 252,
   properties: {
-    stepName: '文档内容提取',
+    stepName: t('views.applicationWorkflow.nodes.documentExtractNode.label'),
     config: {
       fields: [
         {
-          label: '文档内容',
+          label: t('views.applicationWorkflow.nodes.documentExtractNode.content'),
           value: 'content'
         }
       ]
@@ -213,15 +217,15 @@ export const documentExtractNode = {
 }
 export const imageUnderstandNode = {
   type: WorkflowType.ImageUnderstandNode,
-  text: '识别出图片中的对象、场景等信息回答用户问题',
-  label: '图片理解',
+  text: t('views.applicationWorkflow.nodes.imageUnderstandNode.text'),
+  label: t('views.applicationWorkflow.nodes.imageUnderstandNode.label'),
   height: 252,
   properties: {
-    stepName: '图片理解',
+    stepName: t('views.applicationWorkflow.nodes.imageUnderstandNode.label'),
     config: {
       fields: [
         {
-          label: 'AI 回答内容',
+          label: t('views.applicationWorkflow.nodes.imageUnderstandNode.answer'),
           value: 'answer'
         }
       ]
@@ -231,19 +235,19 @@ export const imageUnderstandNode = {
 
 export const imageGenerateNode = {
   type: WorkflowType.ImageGenerateNode,
-  text: '根据提供的文本内容生成图片',
-  label: '图片生成',
+  text: t('views.applicationWorkflow.nodes.imageGenerateNode.text'),
+  label: t('views.applicationWorkflow.nodes.imageGenerateNode.label'),
   height: 252,
   properties: {
-    stepName: '图片生成',
+    stepName: t('views.applicationWorkflow.nodes.imageGenerateNode.label'),
     config: {
       fields: [
         {
-          label: 'AI 回答内容',
+          label: t('views.applicationWorkflow.nodes.imageGenerateNode.answer'),
           value: 'answer'
         },
         {
-          label: '图片',
+          label: t('views.applicationWorkflow.nodes.imageGenerateNode.image'),
           value: 'image'
         }
       ]
@@ -253,15 +257,15 @@ export const imageGenerateNode = {
 
 export const speechToTextNode = {
   type: WorkflowType.SpeechToTextNode,
-  text: '将音频通过语音识别模型转换为文本',
-  label: '语音转文本',
+  text: t('views.applicationWorkflow.nodes.speechToTextNode.text'),
+  label: t('views.applicationWorkflow.nodes.speechToTextNode.label'),
   height: 252,
   properties: {
-    stepName: '语音转文本',
+    stepName: t('views.applicationWorkflow.nodes.speechToTextNode.label'),
     config: {
       fields: [
         {
-          label: '结果',
+          label: t('common.result'),
           value: 'result'
         }
       ]
@@ -270,15 +274,15 @@ export const speechToTextNode = {
 }
 export const textToSpeechNode = {
   type: WorkflowType.TextToSpeechNode,
-  text: '将文本通过语音合成模型转换为音频',
-  label: '文本转语音',
+  text: t('views.applicationWorkflow.nodes.textToSpeechNode.text'),
+  label: t('views.applicationWorkflow.nodes.textToSpeechNode.label'),
   height: 252,
   properties: {
-    stepName: '文本转语音',
+    stepName: t('views.applicationWorkflow.nodes.textToSpeechNode.label'),
     config: {
       fields: [
         {
-          label: '结果',
+          label: t('common.result'),
           value: 'result'
         }
       ]
@@ -305,15 +309,15 @@ export const menuNodes = [
  */
 export const functionNode = {
   type: WorkflowType.FunctionLibCustom,
-  text: '通过执行自定义脚本，实现数据处理',
-  label: '自定义函数',
+  text: t('views.applicationWorkflow.nodes.functionNode.text'),
+  label: t('views.applicationWorkflow.nodes.functionNode.label'),
   height: 260,
   properties: {
-    stepName: '自定义函数',
+    stepName: t('views.applicationWorkflow.nodes.functionNode.label'),
     config: {
       fields: [
         {
-          label: '结果',
+          label: t('common.result'),
           value: 'result'
         }
       ]
@@ -322,15 +326,15 @@ export const functionNode = {
 }
 export const functionLibNode = {
   type: WorkflowType.FunctionLib,
-  text: '通过执行自定义脚本，实现数据处理',
-  label: '自定义函数',
+  text: t('views.applicationWorkflow.nodes.functionNode.text'),
+  label: t('views.applicationWorkflow.nodes.functionNode.label'),
   height: 170,
   properties: {
-    stepName: '自定义函数',
+    stepName: t('views.applicationWorkflow.nodes.functionNode.label'),
     config: {
       fields: [
         {
-          label: '结果',
+          label: t('common.result'),
           value: 'result'
         }
       ]
@@ -340,15 +344,15 @@ export const functionLibNode = {
 
 export const applicationNode = {
   type: WorkflowType.Application,
-  text: '应用节点',
-  label: '应用节点',
+  text: t('views.applicationWorkflow.nodes.applicationNode.label'),
+  label: t('views.applicationWorkflow.nodes.applicationNode.label'),
   height: 260,
   properties: {
-    stepName: '应用节点',
+    stepName: t('views.applicationWorkflow.nodes.applicationNode.label'),
     config: {
       fields: [
         {
-          label: '结果',
+          label: t('common.result'),
           value: 'result'
         }
       ]
@@ -357,20 +361,20 @@ export const applicationNode = {
 }
 
 export const compareList = [
-  { value: 'is_null', label: '为空' },
-  { value: 'is_not_null', label: '不为空' },
-  { value: 'contain', label: '包含' },
-  { value: 'not_contain', label: '不包含' },
-  { value: 'eq', label: '等于' },
-  { value: 'ge', label: '大于等于' },
-  { value: 'gt', label: '大于' },
-  { value: 'le', label: '小于等于' },
-  { value: 'lt', label: '小于' },
-  { value: 'len_eq', label: '长度等于' },
-  { value: 'len_ge', label: '长度大于等于' },
-  { value: 'len_gt', label: '长度大于' },
-  { value: 'len_le', label: '长度小于等于' },
-  { value: 'len_lt', label: '长度小于' }
+  { value: 'is_null', label: t('views.applicationWorkflow.compare.is_null') },
+  { value: 'is_not_null', label: t('views.applicationWorkflow.compare.is_not_null') },
+  { value: 'contain', label: t('views.applicationWorkflow.compare.contain') },
+  { value: 'not_contain', label: t('views.applicationWorkflow.compare.not_contain') },
+  { value: 'eq', label:  t('views.applicationWorkflow.compare.eq') },
+  { value: 'ge', label: t('views.applicationWorkflow.compare.ge')  },
+  { value: 'gt', label:t('views.applicationWorkflow.compare.gt') },
+  { value: 'le', label: t('views.applicationWorkflow.compare.le') },
+  { value: 'lt', label: t('views.applicationWorkflow.compare.lt') },
+  { value: 'len_eq', label: t('views.applicationWorkflow.compare.len_eq')},
+  { value: 'len_ge', label: t('views.applicationWorkflow.compare.len_ge') },
+  { value: 'len_gt', label:t('views.applicationWorkflow.compare.len_gt')  },
+  { value: 'len_le', label: t('views.applicationWorkflow.compare.len_le')  },
+  { value: 'len_lt', label: t('views.applicationWorkflow.compare.len_lt') }
 ]
 
 export const nodeDict: any = {

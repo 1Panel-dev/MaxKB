@@ -11,6 +11,13 @@ export default {
     errorMessage2: '密码错误'
   },
   executionDetails: {
+    title: '执行详情',
+    paramInput:  '参数输入',
     paramOutput: '参数输出',
+  },
+  tip: {
+    error500Message: '抱歉，当前正在维护，无法提供服务，请稍后再试！',
+    errorIdentifyMessage: '无法识别用户身份',
+    errorLimitMessage:'抱歉，您的提问已达到最大限制，请明天再来吧！'
   }
 }

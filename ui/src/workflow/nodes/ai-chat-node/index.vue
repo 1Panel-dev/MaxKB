@@ -93,7 +93,7 @@
             <div class="flex-between">
               <div>历史聊天记录</div>
               <el-select v-model="chat_data.dialogue_type" type="small" style="width: 100px">
-                <el-option label="节点" value="NODE" />
+                <el-option :label="$t('views.applicationWorkflow.node')" value="NODE" />
                 <el-option label="工作流" value="WORKFLOW" />
               </el-select>
             </div>

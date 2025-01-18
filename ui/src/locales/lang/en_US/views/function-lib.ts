@@ -67,7 +67,6 @@ export default {
         paramInfo1: 'Displayed when using the function',
         paramInfo2: 'Not displayed when using the function',
         code: 'Code',
-        result: 'Result'
       },
       debug: {
         run: 'Run',

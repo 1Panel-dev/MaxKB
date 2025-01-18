@@ -39,6 +39,7 @@ export default {
   debug: 'Debug',
   required: 'Required',
   noData: 'No data',
+  result: 'Result',
   status: {
     label: 'Status',
     enableSuccess: 'Enable Successful',

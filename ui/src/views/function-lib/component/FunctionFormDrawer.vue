@@ -147,7 +147,7 @@
         </el-text>
       </h4>
       <div class="flex-between border-r-4 p-8-12 mb-8 layout-bg lighter">
-        <span>{{ $t('views.functionLib.functionForm.form.param.result') }} {result}</span>
+        <span>{{ $t('common.result') }} {result}</span>
       </div>
     </div>
 

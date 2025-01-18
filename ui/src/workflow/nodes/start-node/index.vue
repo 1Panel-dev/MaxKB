@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">全局变量</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.variable.global') }}</h5>
     <div
       v-for="(item, index) in nodeModel.properties.config.globalFields"
       :key="index"
@@ -9,10 +9,19 @@
       @mouseleave="showicon = false"
     >
       <span>{{ item.label }} {{ '{' + item.value + '}' }}</span>
-      <el-tooltip effect="dark" :content="$t('views.applicationWorkflow.setting.copyParam')" placement="top" v-if="showicon === true">
+      <el-tooltip
+        effect="dark"
+        content="$t('views.applicationWorkflow.setting.copyParam')"
+        placement="top"
+        v-if="showicon === true"
+      >
         <el-button
           link
-          @click="copyClick('{{' + '全局变量.' + item.value + '}}')"
+          @click="
+            copyClick(
+              `{{${$t('views.applicationWorkflow.variable.global')}.${item.value}}}`
+            )
+          "
           style="padding: 0"
         >
           <AppIcon iconName="app-copy"></AppIcon>
@@ -69,7 +78,13 @@ const refreshFileUploadConfig = () => {
     .map((v: any) => cloneDeep(v.properties.node_data.file_upload_setting))
     .filter((v: any) => v)
 
-  fields = fields.filter((item: any) => item.value !== 'image' && item.value !== 'document' && item.value !== 'audio' && item.value !== 'video')
+  fields = fields.filter(
+    (item: any) =>
+      item.value !== 'image' &&
+      item.value !== 'document' &&
+      item.value !== 'audio' &&
+      item.value !== 'video'
+  )
 
   if (form_data.length === 0) {
     set(props.nodeModel.properties.config, 'fields', fields)

@@ -65,7 +65,6 @@ export default {
         paramInfo1: '使用函數時顯示',
         paramInfo2: '使用函數時不顯示',
         code: '代碼',
-        result: '結果'
       },
       debug: {
         run: '運行',

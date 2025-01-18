@@ -65,7 +65,6 @@ export default {
         paramInfo1: '使用函数时显示',
         paramInfo2: '使用函数时不显示',
         code: '代码',
-        result: '结果'
       },
       debug: {
         run: '运行',
