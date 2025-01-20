@@ -13,7 +13,8 @@ export default {
   default: {
     label: '默认值',
     placeholder: '请输入默认值',
-    requiredMessage: '请输入默认值'
+    requiredMessage: '默认值 为必填属性',
+    show: '显示默认值'
   },
   tip: {
     requiredMessage: '不能为空',
@@ -46,6 +47,21 @@ export default {
       label: '组件类型',
       placeholder: '请选择组件类型',
       requiredMessage: '组建类型 为必填属性'
+    }
+  },
+  DatePicker: {
+    placeholder: '选择日期',
+    year: '年',
+    month: '月',
+    date: '日期',
+    datetime: '日期时间',
+    dataType: {
+      label: '时间类型',
+      placeholder: '请选择时间类型'
+    },
+    format: {
+      label: '格式',
+      placeholder: '请选择格式'
     }
   }
 }

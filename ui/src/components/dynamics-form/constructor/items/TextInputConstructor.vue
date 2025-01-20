@@ -54,18 +54,21 @@
     prop="default_value"
     :label="$t('components.dynamicsForm.default.label')"
     :rules="
-      formValue.required ? [{ required: true, message: '默认值 为必填属性' }, ...rules] : rules
+      formValue.required ? [{ required: true, message: $t('components.dynamicsForm.default.requiredMessage') }, ...rules] : rules
     "
   >
     <div class="defaultValueCheckbox">
-      <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+      <el-checkbox
+        v-model="formValue.show_default_value"
+        :label="$t('components.dynamicsForm.default.show')"
+      />
     </div>
 
     <el-input
       v-model="formValue.default_value"
       :maxlength="formValue.maxlength"
       :minlength="formValue.minlength"
-      placeholder="请输入默认值"
+      :placeholder="$t('components.dynamicsForm.paramForm.default.placeholder')"
       show-word-limit
       type="text"
     />

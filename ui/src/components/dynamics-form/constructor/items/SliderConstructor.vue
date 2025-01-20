@@ -54,7 +54,11 @@
     :label="$t('components.dynamicsForm.default.label')"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
+    :rules="
+      formValue.required
+        ? [{ required: true, message: $t('components.dynamicsForm.default.requiredMessage') }]
+        : []
+    "
   >
     <el-slider
       v-model="formValue.default_value"

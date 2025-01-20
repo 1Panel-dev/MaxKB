@@ -7,7 +7,10 @@
     :rules="[default_value_rule]"
   >
     <div class="defaultValueCheckbox">
-      <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+      <el-checkbox
+        v-model="formValue.show_default_value"
+        :label="$t('components.dynamicsForm.default.show')"
+      />
     </div>
     <JsonInput ref="jsonInputRef" v-model="formValue.default_value"> </JsonInput>
   </el-form-item>

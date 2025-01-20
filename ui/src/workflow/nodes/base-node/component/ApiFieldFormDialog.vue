@@ -37,7 +37,7 @@
         prop="default_value"
         :rules="{
           required: form.is_required,
-          message: $t('components.dynamicsForm.paramForm.default.requiredMessage'),
+          message: $t('components.dynamicsForm.paramForm.default.placeholder'),
           trigger: 'blur'
         }"
       >

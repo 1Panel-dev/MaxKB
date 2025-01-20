@@ -51,10 +51,17 @@
     :required="formValue.required"
     prop="default_value"
     :label="$t('components.dynamicsForm.default.label')"
-    :rules="formValue.required ? [{ required: true, message: '默认值 为必填属性' }] : []"
+    :rules="
+      formValue.required
+        ? [{ required: true, message: $t('components.dynamicsForm.default.requiredMessage') }]
+        : []
+    "
   >
     <div class="defaultValueCheckbox">
-      <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+      <el-checkbox
+        v-model="formValue.show_default_value"
+        :label="$t('components.dynamicsForm.default.show')"
+      />
     </div>
 
     <el-select v-model="formValue.default_value" :teleported="false" popper-class="default-select">
