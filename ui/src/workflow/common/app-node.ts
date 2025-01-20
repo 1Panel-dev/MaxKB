@@ -308,7 +308,7 @@ class AppNodeModel extends HtmlResize.model {
 
     this.sourceRules.push(circleOnlyAsTarget)
     this.targetRules.push({
-      message: t('views.applicationWorkflow.tip.onlylest'),
+      message: t('views.applicationWorkflow.tip.onlyLeft'),
       validate: (sourceNode: any, targetNode: any, sourceAnchor: any, targetAnchor: any) => {
         return targetAnchor.type === 'left'
       }

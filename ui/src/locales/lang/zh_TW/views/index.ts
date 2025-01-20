@@ -1,20 +1,31 @@
 import notFound from './404'
-import application from './application'
-import applicationOverview from './application-overview'
-import system from './system'
-import functionLib from './function-lib'
-import user from './user'
-import team from './team'
-import template from './template'
-import dataset from './dataset'
+import application from './application';
+import applicationOverview from './application-overview';
+import dataset from './dataset';
+import system from './system';
+import functionLib from './function-lib';
+import user from './user';
+import team from './team';
+import template from './template';
+import document from './document';
+import paragraph from './paragraph';
+import problem from './problem';
+import log from './log';
+import applicationWorkflow from './application-workflow';
+
 export default {
-  notFound,
-  application,
-  applicationOverview,
-  system,
-  functionLib,
-  user,
-  team,
-  template,
-  dataset
+    notFound,
+    application,
+    applicationOverview,
+    system,
+    functionLib,
+    user,
+    team,
+    template,
+    dataset,
+    applicationWorkflow,
+    document,
+    paragraph,
+    problem,
+    log,
 }

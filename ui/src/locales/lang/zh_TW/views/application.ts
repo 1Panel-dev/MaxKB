@@ -24,7 +24,7 @@ export default {
   applicationForm: {
     title: {
       info: '應用資訊',
-      apptest: '調試預覽',
+      appTest: '調試預覽',
       copy: '副本'
     },
     form: {

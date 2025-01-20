@@ -384,7 +384,7 @@
       </el-col>
       <el-col :span="14" class="p-24 border-l">
         <h4 class="title-decoration-1 mb-16">
-          {{ $t('views.application.applicationForm.title.apptest') }}
+          {{ $t('views.application.applicationForm.title.appTest') }}
         </h4>
         <div class="dialog-bg">
           <div class="flex align-center p-24">

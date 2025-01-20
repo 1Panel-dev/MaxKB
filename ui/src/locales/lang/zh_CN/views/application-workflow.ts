@@ -26,7 +26,7 @@ export default {
     nameMessage: '名字不能为空！',
     onlyRight: '只允许从右边的锚点连出',
     notRecyclable: '不可循环连线',
-    onlylest: '只允许连接左边的锚点',
+    onlyLeft: '只允许连接左边的锚点',
     applicationNodeError: '该应用不可用',
     functionNodeError: '该函数不可用',
     repeatedNodeError: '节点名称已存在！',

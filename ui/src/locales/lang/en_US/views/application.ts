@@ -28,7 +28,7 @@ export default {
   applicationForm: {
     title: {
       info: 'Application Information',
-      apptest: 'Debug Preview',
+      appTest: 'Debug Preview',
       copy: 'copy'
     },
     form: {
