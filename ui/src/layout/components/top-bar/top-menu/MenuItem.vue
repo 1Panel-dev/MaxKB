@@ -6,8 +6,8 @@
     </div> -->
     <div class="title">
       {{
-        $te(`layout.topbar.MenuItem.${String(props.menu.name)}`)
-          ? $t(`layout.topbar.MenuItem.${String(props.menu.name)}`)
+        $te(`layout.MenuItem.${String(props.menu.name)}`)
+          ? $t(`layout.MenuItem.${String(props.menu.name)}`)
           : menu.meta?.title
       }}
     </div>

@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="resetPasswordDialog"
-    :title="$t('layout.topbar.avatar.resetPassword')"
+    :title="$t('layout.avatar.resetPassword')"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
@@ -11,13 +11,13 @@
       :model="resetPasswordForm"
       :rules="rules1"
     >
-      <p class="mb-8 lighter">{{ $t('layout.topbar.avatar.dialog.newPassword') }}</p>
+      <p class="mb-8 lighter">{{ $t('layout.avatar.dialog.newPassword') }}</p>
       <el-form-item prop="password" style="margin-bottom: 8px">
         <el-input
           type="password"
           class="input-item"
           v-model="resetPasswordForm.password"
-          :placeholder="$t('layout.topbar.avatar.dialog.enterPassword')"
+          :placeholder="$t('layout.avatar.dialog.enterPassword')"
           show-password
         >
         </el-input>
@@ -27,7 +27,7 @@
           type="password"
           class="input-item"
           v-model="resetPasswordForm.re_password"
-          :placeholder="$t('layout.topbar.avatar.dialog.confirmPassword')"
+          :placeholder="$t('layout.avatar.dialog.confirmPassword')"
           show-password
         >
         </el-input>
@@ -39,13 +39,13 @@
       :model="resetPasswordForm"
       :rules="rules2"
     >
-      <p class="mb-8 lighter">{{ $t('layout.topbar.avatar.dialog.useEmail') }}</p>
+      <p class="mb-8 lighter">{{ $t('layout.avatar.dialog.useEmail') }}</p>
       <el-form-item style="margin-bottom: 8px">
         <el-input
           class="input-item"
           :disabled="true"
           v-bind:modelValue="user.userInfo?.email"
-          :placeholder="$t('layout.topbar.avatar.dialog.enterEmail')"
+          :placeholder="$t('layout.avatar.dialog.enterEmail')"
         >
         </el-input>
       </el-form-item>
@@ -54,7 +54,7 @@
           <el-input
             class="code-input"
             v-model="resetPasswordForm.code"
-            :placeholder="$t('layout.topbar.avatar.dialog.enterVerificationCode')"
+            :placeholder="$t('layout.avatar.dialog.enterVerificationCode')"
           >
           </el-input>
           <el-button
@@ -65,8 +65,8 @@
           >
             {{
               isDisabled
-                ? $t('layout.topbar.avatar.dialog.resend', { time })
-                : $t('layout.topbar.avatar.dialog.getVerificationCode')
+                ? $t('layout.avatar.dialog.resend', { time })
+                : $t('layout.avatar.dialog.getVerificationCode')
             }}
           </el-button>
         </div>
@@ -115,32 +115,32 @@ const rules1 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
   password: [
     {
       required: true,
-      message: t('layout.topbar.avatar.dialog.enterPassword'),
+      message: t('layout.avatar.dialog.enterPassword'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: t('layout.topbar.avatar.dialog.passwordLength'),
+      message: t('layout.avatar.dialog.passwordLength'),
       trigger: 'blur'
     }
   ],
   re_password: [
     {
       required: true,
-      message: t('layout.topbar.avatar.dialog.confirmPassword'),
+      message: t('layout.avatar.dialog.confirmPassword'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: t('layout.topbar.avatar.dialog.passwordLength'),
+      message: t('layout.avatar.dialog.passwordLength'),
       trigger: 'blur'
     },
     {
       validator: (rule, value, callback) => {
         if (resetPasswordForm.value.password != resetPasswordForm.value.re_password) {
-          callback(new Error(t('layout.topbar.avatar.dialog.passwordMismatch')))
+          callback(new Error(t('layout.avatar.dialog.passwordMismatch')))
         } else {
           callback()
         }
@@ -154,7 +154,7 @@ const rules2 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
   code: [
     {
       required: true,
-      message: t('layout.topbar.avatar.dialog.enterVerificationCode'),
+      message: t('layout.avatar.dialog.enterVerificationCode'),
       trigger: 'blur'
     }
   ]
@@ -165,7 +165,7 @@ const rules2 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
 const sendEmail = () => {
   resetPasswordFormRef1.value?.validate().then(() => {
     UserApi.sendEmailToCurrent(loading).then(() => {
-      MsgSuccess(t('layout.topbar.avatar.dialog.verificationCodeSentSuccess'))
+      MsgSuccess(t('layout.avatar.dialog.verificationCodeSentSuccess'))
       isDisabled.value = true
       handleTimeChange()
     })

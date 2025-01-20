@@ -176,6 +176,19 @@ const getWecomCallback: (code: string, loading?: Ref<boolean>) => Promise<Result
   return get('wecom', { code }, loading)
 }
 
+/**
+ * 设置语言
+ * data: {
+ * "language": "string"
+ * }
+ */
+const postLanguage: (data: any, loading?: Ref<boolean>) => Promise<Result<User>> = (
+  data,
+  loading
+) => {
+  return post('/user/language', data, undefined, loading)
+}
+
 export default {
   login,
   register,
@@ -192,5 +205,6 @@ export default {
   getAuthType,
   getDingCallback,
   getQrType,
-  getWecomCallback
+  getWecomCallback,
+  postLanguage
 }
