@@ -57,10 +57,11 @@ export default {
       dialogTitle: '設定',
       allowCrossDomainLabel: '允許跨域位址',
       crossDomainPlaceholder:
-        '請輸入允許的跨域位址，開啟後不輸入跨域位址則不限制。\n跨域位址一行一個，如：\nhttp://127.0.0.1:5678 \nhttps://dataease.io',
+        '請輸入允許的跨域位址，開啟後不輸入跨域位址則不限制。\n跨域位址一行一個，如：\nhttp://127.0.0.1:5678 \nhttps://dataease.io'
     },
     SettingDisplayDialog: {
       dialogTitle: '顯示設定',
+      languageLabel: '語言',
       showSourceLabel: '顯示知識來源',
       showExecutionDetail: '顯示執行細節',
       restoreDefault: '恢復預設',

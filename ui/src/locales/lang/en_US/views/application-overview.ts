@@ -62,6 +62,7 @@ export default {
     },
     SettingDisplayDialog: {
       dialogTitle: 'Display Settings',
+      languageLabel: 'Language',
       showSourceLabel: 'Show Source',
       showExecutionDetail: 'Show Execution Detail',
       restoreDefault: 'Restore Default',

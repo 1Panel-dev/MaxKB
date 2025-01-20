@@ -62,6 +62,7 @@ export default {
     },
     SettingDisplayDialog: {
       dialogTitle: '显示设置',
+      languageLabel: '语言',
       showSourceLabel: '显示知识来源',
       showExecutionDetail: '显示执行详情',
       restoreDefault: '恢复默认',

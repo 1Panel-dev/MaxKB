@@ -7,6 +7,19 @@
   >
     <el-form label-position="top" ref="displayFormRef" :model="form">
       <el-form-item>
+        <span>{{
+          $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel')
+        }}</span>
+        <el-select v-model="form.language">
+          <el-option
+            v-for="item in langList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
         <el-space direction="vertical" alignment="start">
           <el-checkbox
             v-model="form.show_source"
@@ -36,7 +49,7 @@ import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import applicationApi from '@/api/application'
 import { isWorkFlow } from '@/utils/application'
 import { MsgSuccess, MsgError } from '@/utils/message'
-import { t } from '@/locales'
+import { langList, t } from '@/locales'
 
 const route = useRoute()
 const {
@@ -62,10 +75,13 @@ watch(dialogVisible, (bool) => {
     }
   }
 })
-
 const open = (data: any, content: any) => {
   detail.value = content
   form.value.show_source = data.show_source
+  form.value.language = data.language
+  if (!form.value.language) {
+    form.value.language = 'zh-CN'
+  }
 
   dialogVisible.value = true
 }
@@ -75,7 +91,8 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       const obj = {
-        show_source: form.value.show_source
+        show_source: form.value.show_source,
+        language: form.value.language
       }
       applicationApi.putAccessToken(id as string, obj, loading).then((res) => {
         emit('refresh')

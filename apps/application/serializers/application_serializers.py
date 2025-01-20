@@ -399,7 +399,8 @@ class ApplicationSerializer(serializers.Serializer):
                     'access_num': application_access_token.access_num,
                     'white_active': application_access_token.white_active,
                     'white_list': application_access_token.white_list,
-                    'show_source': application_access_token.show_source
+                    'show_source': application_access_token.show_source,
+                    'language': application_access_token.language
                     }
 
     class Authentication(serializers.Serializer):

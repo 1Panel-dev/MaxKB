@@ -4,7 +4,7 @@ export default {
   history: '历史记录',
   only20history: '仅显示最近 20 条对话',
   question_count: '条提问',
-  exportReords: '导出聊天记录',
+  exportRecords: '导出聊天记录',
   chatId: '对话id',
   userInput: '用户输入',
   passwordValidator: {

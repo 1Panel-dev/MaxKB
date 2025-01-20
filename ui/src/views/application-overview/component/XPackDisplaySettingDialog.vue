@@ -80,6 +80,19 @@
               </div>
             </div>
             <div>
+              <span>{{
+                $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel')
+              }}</span>
+              <el-select v-model="form.language">
+                <el-option
+                  v-for="item in langList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+            <div>
               <div class="p-16" style="position: relative">
                 <div class="flex">
                   <div class="avatar">
@@ -378,7 +391,7 @@ import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import { isAppIcon, isWorkFlow } from '@/utils/application'
 import applicationXpackApi from '@/api/application-xpack'
 import { MsgSuccess, MsgError } from '@/utils/message'
-import { t } from '@/locales'
+import { langList, t } from '@/locales'
 import useStore from '@/stores'
 import { cloneDeep } from 'lodash'
 
@@ -393,6 +406,7 @@ const emit = defineEmits(['refresh'])
 
 const defaultSetting = {
   show_source: false,
+  language: 'zh-CN',
   show_history: true,
   draggable: true,
   show_guide: true,
@@ -421,6 +435,7 @@ const form = ref<any>({
 
 const xpackForm = ref<any>({
   show_source: false,
+  language: 'zh-CN',
   show_history: false,
   draggable: false,
   show_guide: false,
@@ -488,6 +503,7 @@ const open = (data: any, content: any) => {
   detail.value = content
   xpackForm.value.show_source = data.show_source
   xpackForm.value.show_history = data.show_history
+  xpackForm.value.language = data.language
   xpackForm.value.draggable = data.draggable
   xpackForm.value.show_guide = data.show_guide
   imgUrl.value.avatar = data.avatar

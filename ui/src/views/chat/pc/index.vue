@@ -107,12 +107,16 @@
                 <AppIcon
                   iconName="app-export"
                   class="cursor"
-                  :title="$t('components.chat.exportReords')"
+                  :title="$t('components.chat.exportRecords')"
                 ></AppIcon>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item @click="exportMarkdown">{{ $t('common.exprt') }} Markdown</el-dropdown-item>
-                    <el-dropdown-item @click="exportHTML">{{ $t('common.exprt') }} HTML</el-dropdown-item>
+                    <el-dropdown-item @click="exportMarkdown"
+                      >{{ $t('common.exprt') }} Markdown</el-dropdown-item
+                    >
+                    <el-dropdown-item @click="exportHTML"
+                      >{{ $t('common.exprt') }} HTML</el-dropdown-item
+                    >
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
