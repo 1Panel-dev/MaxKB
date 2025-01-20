@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-15 11:31+0800\n"
+"POT-Creation-Date: 2025-01-20 13:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,9 +41,10 @@ msgstr ""
 #: .\apps\application\serializers\application_serializers.py:72
 #: .\apps\application\serializers\chat_serializers.py:345
 #: .\apps\application\swagger_api\application_api.py:53
-#: .\apps\application\swagger_api\application_api.py:182
-#: .\apps\application\swagger_api\application_api.py:183
-#: .\apps\application\swagger_api\application_api.py:328
+#: .\apps\application\swagger_api\application_api.py:185
+#: .\apps\application\swagger_api\application_api.py:186
+#: .\apps\application\swagger_api\application_api.py:333
+#: .\apps\application\swagger_api\application_api.py:334
 msgid "Model id"
 msgstr ""
 
@@ -106,7 +107,7 @@ msgstr ""
 
 #: .\apps\application\chat_pipeline\step\chat_step\i_chat_step.py:74
 #: .\apps\application\chat_pipeline\step\generate_human_message_step\i_generate_human_message_step.py:46
-#: .\apps\application\swagger_api\application_api.py:259
+#: .\apps\application\swagger_api\application_api.py:262
 msgid "No reference segment settings"
 msgstr ""
 
@@ -114,13 +115,13 @@ msgstr ""
 #: .\apps\application\chat_pipeline\step\reset_problem_step\i_reset_problem_step.py:31
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:48
 #: .\apps\application\serializers\application_serializers.py:70
-#: .\apps\application\serializers\application_serializers.py:490
-#: .\apps\application\serializers\application_serializers.py:561
-#: .\apps\application\serializers\application_serializers.py:606
-#: .\apps\application\serializers\application_serializers.py:676
-#: .\apps\application\serializers\application_serializers.py:697
-#: .\apps\application\serializers\application_serializers.py:771
-#: .\apps\application\serializers\application_serializers.py:1202
+#: .\apps\application\serializers\application_serializers.py:494
+#: .\apps\application\serializers\application_serializers.py:565
+#: .\apps\application\serializers\application_serializers.py:610
+#: .\apps\application\serializers\application_serializers.py:680
+#: .\apps\application\serializers\application_serializers.py:701
+#: .\apps\application\serializers\application_serializers.py:775
+#: .\apps\application\serializers\application_serializers.py:1207
 #: .\apps\application\serializers\chat_serializers.py:104
 #: .\apps\application\serializers\chat_serializers.py:266
 #: .\apps\application\serializers\chat_serializers.py:318
@@ -168,10 +169,10 @@ msgstr ""
 #: .\apps\application\flow\step_node\question_node\i_question_node.py:24
 #: .\apps\application\swagger_api\application_api.py:55
 #: .\apps\application\swagger_api\application_api.py:56
-#: .\apps\application\swagger_api\application_api.py:185
-#: .\apps\application\swagger_api\application_api.py:186
-#: .\apps\application\swagger_api\application_api.py:329
-#: .\apps\application\swagger_api\application_api.py:330
+#: .\apps\application\swagger_api\application_api.py:188
+#: .\apps\application\swagger_api\application_api.py:189
+#: .\apps\application\swagger_api\application_api.py:336
+#: .\apps\application\swagger_api\application_api.py:337
 msgid "Number of multi-round conversations"
 msgstr ""
 
@@ -185,14 +186,14 @@ msgstr ""
 #: .\apps\application\flow\step_node\question_node\i_question_node.py:22
 #: .\apps\application\serializers\application_serializers.py:108
 #: .\apps\application\serializers\application_serializers.py:138
-#: .\apps\application\swagger_api\application_api.py:283
-#: .\apps\application\swagger_api\application_api.py:284
+#: .\apps\application\swagger_api\application_api.py:286
+#: .\apps\application\swagger_api\application_api.py:287
 msgid "Prompt word"
 msgstr ""
 
 #: .\apps\application\chat_pipeline\step\generate_human_message_step\i_generate_human_message_step.py:42
-#: .\apps\application\swagger_api\application_api.py:299
 #: .\apps\application\swagger_api\application_api.py:300
+#: .\apps\application\swagger_api\application_api.py:301
 msgid "System prompt words (role)"
 msgstr ""
 
@@ -207,8 +208,8 @@ msgstr ""
 
 #: .\apps\application\chat_pipeline\step\reset_problem_step\impl\base_reset_problem_step.py:20
 #: .\apps\application\serializers\chat_message_serializers.py:98
-#: .\apps\application\swagger_api\application_api.py:207
-#: .\apps\application\swagger_api\application_api.py:344
+#: .\apps\application\swagger_api\application_api.py:210
+#: .\apps\application\swagger_api\application_api.py:354
 #, python-brace-format
 msgid ""
 "() contains the user's question. Answer the guessed user's question based on "
@@ -238,40 +239,40 @@ msgstr ""
 #: .\apps\application\flow\step_node\reranker_node\i_reranker_node.py:24
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:24
 #: .\apps\application\serializers\application_serializers.py:121
-#: .\apps\application\swagger_api\application_api.py:246
-#: .\apps\application\swagger_api\application_api.py:247
+#: .\apps\application\swagger_api\application_api.py:249
+#: .\apps\application\swagger_api\application_api.py:250
 msgid "Reference segment number"
 msgstr ""
 
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:43
-#: .\apps\application\swagger_api\application_api.py:249
-#: .\apps\application\swagger_api\application_api.py:250
+#: .\apps\application\swagger_api\application_api.py:252
+#: .\apps\application\swagger_api\application_api.py:253
 msgid "Similarity"
 msgstr ""
 
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:46
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:30
 #: .\apps\application\serializers\application_serializers.py:129
-#: .\apps\application\serializers\application_serializers.py:569
+#: .\apps\application\serializers\application_serializers.py:573
 #: .\apps\dataset\serializers\dataset_serializers.py:576
 #: .\apps\users\serializers\user_serializers.py:236
-#: .\apps\users\serializers\user_serializers.py:349
+#: .\apps\users\serializers\user_serializers.py:362
 msgid "The type only supports register|reset_password"
 msgstr ""
 
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:47
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:31
 #: .\apps\application\serializers\application_serializers.py:130
-#: .\apps\application\serializers\application_serializers.py:570
-#: .\apps\application\swagger_api\application_api.py:256
+#: .\apps\application\serializers\application_serializers.py:574
+#: .\apps\application\swagger_api\application_api.py:259
 msgid "Retrieval Mode"
 msgstr ""
 
 #: .\apps\application\chat_pipeline\step\search_dataset_step\impl\base_search_dataset_step.py:31
 #: .\apps\application\serializers\application_serializers.py:84
-#: .\apps\application\serializers\application_serializers.py:1000
-#: .\apps\application\serializers\application_serializers.py:1010
-#: .\apps\application\serializers\application_serializers.py:1020
+#: .\apps\application\serializers\application_serializers.py:1005
+#: .\apps\application\serializers\application_serializers.py:1015
+#: .\apps\application\serializers\application_serializers.py:1025
 #: .\apps\setting\models_provider\tools.py:23
 msgid "Model does not exist"
 msgstr ""
@@ -315,11 +316,11 @@ msgstr ""
 
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:13
 #: .\apps\application\serializers\application_serializers.py:321
-#: .\apps\application\serializers\application_serializers.py:560
-#: .\apps\application\serializers\application_serializers.py:675
-#: .\apps\application\serializers\application_serializers.py:770
-#: .\apps\application\serializers\application_serializers.py:1204
-#: .\apps\application\serializers\application_serializers.py:1246
+#: .\apps\application\serializers\application_serializers.py:564
+#: .\apps\application\serializers\application_serializers.py:679
+#: .\apps\application\serializers\application_serializers.py:774
+#: .\apps\application\serializers\application_serializers.py:1209
+#: .\apps\application\serializers\application_serializers.py:1251
 #: .\apps\application\serializers\application_statistics_serializers.py:26
 #: .\apps\application\serializers\application_version_serializers.py:35
 #: .\apps\application\serializers\application_version_serializers.py:59
@@ -335,8 +336,8 @@ msgstr ""
 #: .\apps\application\swagger_api\application_api.py:101
 #: .\apps\application\swagger_api\application_api.py:112
 #: .\apps\application\swagger_api\application_api.py:143
-#: .\apps\application\swagger_api\application_api.py:380
-#: .\apps\application\swagger_api\application_api.py:401
+#: .\apps\application\swagger_api\application_api.py:390
+#: .\apps\application\swagger_api\application_api.py:411
 #: .\apps\application\swagger_api\application_statistics_api.py:21
 #: .\apps\application\swagger_api\application_version_api.py:42
 #: .\apps\application\swagger_api\application_version_api.py:56
@@ -366,7 +367,7 @@ msgstr ""
 
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:17
 #: .\apps\application\flow\step_node\image_understand_step_node\i_image_understand_node.py:24
-#: .\apps\application\serializers\application_serializers.py:677
+#: .\apps\application\serializers\application_serializers.py:681
 #: .\apps\application\serializers\chat_message_serializers.py:250
 msgid "picture"
 msgstr ""
@@ -416,7 +417,7 @@ msgid "Comparator"
 msgstr ""
 
 #: .\apps\application\flow\step_node\condition_node\i_condition_node.py:20
-#: .\apps\application\swagger_api\application_api.py:268
+#: .\apps\application\swagger_api\application_api.py:271
 msgid "value"
 msgstr ""
 
@@ -597,8 +598,8 @@ msgid "Acquaintance"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:126
-#: .\apps\application\swagger_api\application_api.py:253
-#: .\apps\application\swagger_api\application_api.py:254
+#: .\apps\application\swagger_api\application_api.py:256
+#: .\apps\application\swagger_api\application_api.py:257
 msgid "Maximum number of quoted characters"
 msgstr ""
 
@@ -611,32 +612,34 @@ msgid "Role prompts"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:142
-#: .\apps\application\swagger_api\application_api.py:301
-#: .\apps\application\swagger_api\application_api.py:302
+#: .\apps\application\swagger_api\application_api.py:303
+#: .\apps\application\swagger_api\application_api.py:305
 msgid "No citation segmentation prompt"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:147
-#: .\apps\application\serializers\application_serializers.py:461
-#: .\apps\application\serializers\application_serializers.py:602
+#: .\apps\application\serializers\application_serializers.py:465
+#: .\apps\application\serializers\application_serializers.py:606
 #: .\apps\application\swagger_api\application_api.py:49
 #: .\apps\application\swagger_api\application_api.py:50
-#: .\apps\application\swagger_api\application_api.py:178
-#: .\apps\application\swagger_api\application_api.py:179
-#: .\apps\application\swagger_api\application_api.py:326
-#: .\apps\application\swagger_api\application_api.py:365
+#: .\apps\application\swagger_api\application_api.py:181
+#: .\apps\application\swagger_api\application_api.py:182
+#: .\apps\application\swagger_api\application_api.py:329
+#: .\apps\application\swagger_api\application_api.py:330
+#: .\apps\application\swagger_api\application_api.py:375
 msgid "Application Name"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:150
-#: .\apps\application\serializers\application_serializers.py:463
-#: .\apps\application\serializers\application_serializers.py:604
+#: .\apps\application\serializers\application_serializers.py:467
+#: .\apps\application\serializers\application_serializers.py:608
 #: .\apps\application\swagger_api\application_api.py:51
 #: .\apps\application\swagger_api\application_api.py:52
-#: .\apps\application\swagger_api\application_api.py:180
-#: .\apps\application\swagger_api\application_api.py:181
-#: .\apps\application\swagger_api\application_api.py:327
-#: .\apps\application\swagger_api\application_api.py:370
+#: .\apps\application\swagger_api\application_api.py:183
+#: .\apps\application\swagger_api\application_api.py:184
+#: .\apps\application\swagger_api\application_api.py:331
+#: .\apps\application\swagger_api\application_api.py:332
+#: .\apps\application\swagger_api\application_api.py:380
 msgid "Application Description"
 msgstr ""
 
@@ -646,12 +649,13 @@ msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:153
 #: .\apps\application\serializers\application_serializers.py:211
-#: .\apps\application\serializers\application_serializers.py:471
+#: .\apps\application\serializers\application_serializers.py:475
 #: .\apps\application\swagger_api\application_api.py:57
 #: .\apps\application\swagger_api\application_api.py:58
-#: .\apps\application\swagger_api\application_api.py:187
-#: .\apps\application\swagger_api\application_api.py:188
-#: .\apps\application\swagger_api\application_api.py:331
+#: .\apps\application\swagger_api\application_api.py:190
+#: .\apps\application\swagger_api\application_api.py:191
+#: .\apps\application\swagger_api\application_api.py:338
+#: .\apps\application\swagger_api\application_api.py:339
 msgid "Opening remarks"
 msgstr ""
 
@@ -666,29 +670,29 @@ msgid "application describe"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:205
-#: .\apps\application\serializers\application_serializers.py:465
+#: .\apps\application\serializers\application_serializers.py:469
 msgid "Model"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:209
-#: .\apps\application\serializers\application_serializers.py:469
+#: .\apps\application\serializers\application_serializers.py:473
 msgid "Historical chat records"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:214
-#: .\apps\application\serializers\application_serializers.py:473
+#: .\apps\application\serializers\application_serializers.py:477
 msgid "Related Knowledge Base"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:221
-#: .\apps\application\serializers\application_serializers.py:483
+#: .\apps\application\serializers\application_serializers.py:487
 #: .\apps\application\serializers\chat_serializers.py:359
 msgid "Question completion"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:225
-#: .\apps\application\swagger_api\application_api.py:200
-#: .\apps\application\swagger_api\application_api.py:339
+#: .\apps\application\swagger_api\application_api.py:203
+#: .\apps\application\swagger_api\application_api.py:348
 msgid "Application Type"
 msgstr ""
 
@@ -697,7 +701,7 @@ msgid "Application type only supports SIMPLE|WORK_FLOW"
 msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:233
-#: .\apps\application\serializers\application_serializers.py:487
+#: .\apps\application\serializers\application_serializers.py:491
 msgid "Model parameters"
 msgstr ""
 
@@ -748,65 +752,73 @@ msgstr ""
 msgid "Whether to display knowledge sources"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:402
+#: .\apps\application\serializers\application_serializers.py:340
+#: .\apps\application\swagger_api\application_api.py:169
+#: .\apps\application\swagger_api\application_api.py:170
+#: .\apps\users\serializers\user_serializers.py:273
+#: .\apps\users\views\user.py:80 .\apps\users\views\user.py:81
+msgid "language"
+msgstr ""
+
+#: .\apps\application\serializers\application_serializers.py:406
 msgid "access_token"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:404
+#: .\apps\application\serializers\application_serializers.py:408
 msgid "Certification Information"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:441
+#: .\apps\application\serializers\application_serializers.py:445
 msgid "Invalid access_token"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:452
+#: .\apps\application\serializers\application_serializers.py:456
 msgid "Wrong password"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:477
+#: .\apps\application\serializers\application_serializers.py:481
 msgid "Dataset settings"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:480
+#: .\apps\application\serializers\application_serializers.py:484
 msgid "Model setup"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:484
+#: .\apps\application\serializers\application_serializers.py:488
 msgid "Icon"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:494
-#: .\apps\application\serializers\application_serializers.py:701
+#: .\apps\application\serializers\application_serializers.py:498
+#: .\apps\application\serializers\application_serializers.py:705
 #: .\apps\setting\serializers\valid_serializers.py:29
 msgid ""
 "The community version supports up to 5 applications. If you need more "
 "applications, please contact us (https://fit2cloud.com/)."
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:562
+#: .\apps\application\serializers\application_serializers.py:566
 msgid "Query text"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:564
+#: .\apps\application\serializers\application_serializers.py:568
 msgid "topN"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:566
+#: .\apps\application\serializers\application_serializers.py:570
 msgid "Relevance"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:575
-#: .\apps\application\serializers\application_serializers.py:684
-#: .\apps\application\serializers\application_serializers.py:776
+#: .\apps\application\serializers\application_serializers.py:579
+#: .\apps\application\serializers\application_serializers.py:688
+#: .\apps\application\serializers\application_serializers.py:780
 msgid "Application id does not exist"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:607
+#: .\apps\application\serializers\application_serializers.py:611
 msgid "Select User ID"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:696
+#: .\apps\application\serializers\application_serializers.py:700
 #: .\apps\dataset\serializers\document_serializers.py:162
 #: .\apps\dataset\serializers\document_serializers.py:211
 #: .\apps\dataset\serializers\document_serializers.py:218
@@ -815,7 +827,7 @@ msgstr ""
 msgid "file"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:711
+#: .\apps\application\serializers\application_serializers.py:715
 #: .\apps\common\handle\impl\qa\zip_parse_qa_handle.py:62
 #: .\apps\common\handle\impl\zip_split_handle.py:56
 #: .\apps\dataset\serializers\document_serializers.py:844
@@ -823,28 +835,28 @@ msgstr ""
 msgid "Unsupported file format"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:849
+#: .\apps\application\serializers\application_serializers.py:853
 msgid "work_flow is a required field"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:911
-#: .\apps\application\serializers\application_serializers.py:1050
+#: .\apps\application\serializers\application_serializers.py:915
+#: .\apps\application\serializers\application_serializers.py:1055
 #, python-brace-format
 msgid "Unknown knowledge base id {dataset_id}, unable to associate"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:931
+#: .\apps\application\serializers\application_serializers.py:935
 msgid "Illegal User"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1002
-#: .\apps\application\serializers\application_serializers.py:1012
-#: .\apps\application\serializers\application_serializers.py:1022
+#: .\apps\application\serializers\application_serializers.py:1007
+#: .\apps\application\serializers\application_serializers.py:1017
+#: .\apps\application\serializers\application_serializers.py:1027
 #, python-brace-format
 msgid "No permission to use this model:{model_name}"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1211
+#: .\apps\application\serializers\application_serializers.py:1216
 #: .\apps\application\serializers\chat_message_serializers.py:398
 #: .\apps\xpack\serializers\application_setting_serializer.py:93
 #: .\apps\xpack\serializers\platform_serializer.py:76
@@ -854,32 +866,32 @@ msgstr ""
 msgid "Application does not exist"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1233
+#: .\apps\application\serializers\application_serializers.py:1238
 #: .\apps\application\swagger_api\chat_api.py:385
 #: .\apps\application\swagger_api\chat_api.py:386
 msgid "Availability"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1237
+#: .\apps\application\serializers\application_serializers.py:1242
 #: .\apps\application\swagger_api\application_api.py:129
 #: .\apps\application\swagger_api\application_api.py:130
 msgid "Is cross-domain allowed"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1242
+#: .\apps\application\serializers\application_serializers.py:1247
 msgid "Cross-domain address"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1243
+#: .\apps\application\serializers\application_serializers.py:1248
 #: .\apps\application\swagger_api\application_api.py:131
 msgid "Cross-domain list"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1248
+#: .\apps\application\serializers\application_serializers.py:1253
 msgid "ApiKeyid"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1269
+#: .\apps\application\serializers\application_serializers.py:1274
 msgid "APIKey does not exist"
 msgstr ""
 
@@ -940,9 +952,9 @@ msgstr ""
 
 #: .\apps\application\serializers\chat_message_serializers.py:180
 #: .\apps\setting\serializers\team_serializers.py:45
-#: .\apps\users\serializers\user_serializers.py:456
-#: .\apps\users\serializers\user_serializers.py:478
-#: .\apps\users\serializers\user_serializers.py:568
+#: .\apps\users\serializers\user_serializers.py:470
+#: .\apps\users\serializers\user_serializers.py:493
+#: .\apps\users\serializers\user_serializers.py:584
 msgid "Role"
 msgstr ""
 
@@ -1146,9 +1158,10 @@ msgid "Modification time"
 msgstr ""
 
 #: .\apps\application\swagger_api\application_api.py:74
-#: .\apps\application\swagger_api\application_api.py:191
-#: .\apps\application\swagger_api\application_api.py:192
-#: .\apps\application\swagger_api\application_api.py:334
+#: .\apps\application\swagger_api\application_api.py:194
+#: .\apps\application\swagger_api\application_api.py:195
+#: .\apps\application\swagger_api\application_api.py:342
+#: .\apps\application\swagger_api\application_api.py:343
 #: .\apps\application\swagger_api\chat_api.py:139
 msgid "List of associated knowledge base IDs"
 msgstr ""
@@ -1172,108 +1185,86 @@ msgstr ""
 msgid "Is activation"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:195
-#: .\apps\application\swagger_api\application_api.py:337
-#: .\apps\application\swagger_api\application_api.py:338
+#: .\apps\application\swagger_api\application_api.py:198
+#: .\apps\application\swagger_api\application_api.py:346
+#: .\apps\application\swagger_api\application_api.py:347
 msgid "Problem Optimization"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:196
+#: .\apps\application\swagger_api\application_api.py:199
 msgid "Whether to enable problem optimization"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:201
-#: .\apps\application\swagger_api\application_api.py:340
+#: .\apps\application\swagger_api\application_api.py:204
+#: .\apps\application\swagger_api\application_api.py:349
 msgid "Application Type   SIMPLE |  WORK_FLOW"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:204
-#: .\apps\application\swagger_api\application_api.py:205
-#: .\apps\application\swagger_api\application_api.py:341
-#: .\apps\application\swagger_api\application_api.py:342
+#: .\apps\application\swagger_api\application_api.py:207
+#: .\apps\application\swagger_api\application_api.py:208
+#: .\apps\application\swagger_api\application_api.py:351
+#: .\apps\application\swagger_api\application_api.py:352
 msgid "Question optimization tips"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:208
-#: .\apps\application\swagger_api\application_api.py:209
-#: .\apps\application\swagger_api\application_api.py:345
-#: .\apps\application\swagger_api\application_api.py:346
+#: .\apps\application\swagger_api\application_api.py:211
+#: .\apps\application\swagger_api\application_api.py:212
+#: .\apps\application\swagger_api\application_api.py:355
+#: .\apps\application\swagger_api\application_api.py:356
 msgid "Text-to-speech model ID"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:210
-#: .\apps\application\swagger_api\application_api.py:211
-#: .\apps\application\swagger_api\application_api.py:347
-#: .\apps\application\swagger_api\application_api.py:348
+#: .\apps\application\swagger_api\application_api.py:213
+#: .\apps\application\swagger_api\application_api.py:214
+#: .\apps\application\swagger_api\application_api.py:357
+#: .\apps\application\swagger_api\application_api.py:358
 msgid "Speech-to-text model id"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:212
-#: .\apps\application\swagger_api\application_api.py:213
-#: .\apps\application\swagger_api\application_api.py:349
-#: .\apps\application\swagger_api\application_api.py:350
+#: .\apps\application\swagger_api\application_api.py:215
+#: .\apps\application\swagger_api\application_api.py:216
+#: .\apps\application\swagger_api\application_api.py:359
+#: .\apps\application\swagger_api\application_api.py:360
 msgid "Is speech-to-text enabled"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:214
-#: .\apps\application\swagger_api\application_api.py:215
-#: .\apps\application\swagger_api\application_api.py:351
-#: .\apps\application\swagger_api\application_api.py:352
+#: .\apps\application\swagger_api\application_api.py:217
+#: .\apps\application\swagger_api\application_api.py:218
+#: .\apps\application\swagger_api\application_api.py:361
+#: .\apps\application\swagger_api\application_api.py:362
 msgid "Is text-to-speech enabled"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:216
-#: .\apps\application\swagger_api\application_api.py:217
-#: .\apps\application\swagger_api\application_api.py:353
-#: .\apps\application\swagger_api\application_api.py:354
+#: .\apps\application\swagger_api\application_api.py:219
+#: .\apps\application\swagger_api\application_api.py:220
+#: .\apps\application\swagger_api\application_api.py:363
+#: .\apps\application\swagger_api\application_api.py:364
 msgid "Text-to-speech type"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:230
+#: .\apps\application\swagger_api\application_api.py:233
 msgid "Node List"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:233
+#: .\apps\application\swagger_api\application_api.py:236
 msgid "Connection List"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:263
+#: .\apps\application\swagger_api\application_api.py:266
 msgid "state"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:265
+#: .\apps\application\swagger_api\application_api.py:268
 msgid "ai_questioning|designated_answer"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:270
+#: .\apps\application\swagger_api\application_api.py:273
 msgid ""
 "ai_questioning: is the title, designated_answer: is the designated answer "
 "content"
 msgstr ""
 
-#: .\apps\application\swagger_api\application_api.py:285
-#, python-brace-format
-msgid ""
-"\n"
-"Known information:\n"
-"{data}\n"
-"Answer requirements:\n"
-"- If you don't know the answer or don't get the answer, please answer \"No "
-"relevant information found in the knowledge base, it is recommended to "
-"consult relevant technical support or refer to official documents for "
-"operation\".\n"
-"- Avoid mentioning that you got the knowledge from <data></data>.\n"
-"- Please keep the answer consistent with the description in <data></data>.\n"
-"- Please use markdown syntax to optimize the format of the answer.\n"
-"- Please return the image link, link address and script language in <data></"
-"data> completely.\n"
-"- Please answer in the same language as the question.\n"
-"Question:\n"
-"{question}\n"
-"                                                    "
-msgstr ""
-
-#: .\apps\application\swagger_api\application_api.py:391
+#: .\apps\application\swagger_api\application_api.py:401
 msgid "Upload image files"
 msgstr ""
 
@@ -1904,7 +1895,7 @@ msgid "Please log in first and bring the user Token"
 msgstr ""
 
 #: .\apps\common\constants\exception_code_constants.py:33
-#: .\apps\users\serializers\user_serializers.py:414
+#: .\apps\users\serializers\user_serializers.py:427
 msgid "Email sending failed"
 msgstr ""
 
@@ -2096,20 +2087,6 @@ msgstr ""
 msgid "end reset access_num"
 msgstr ""
 
-#: .\apps\common\mixins\app_model_mixin.py:13
-#: .\apps\common\swagger_api\common_api.py:81
-#: .\apps\common\swagger_api\common_api.py:82
-#: .\apps\users\serializers\user_serializers.py:571
-msgid "Create time"
-msgstr ""
-
-#: .\apps\common\mixins\app_model_mixin.py:14
-#: .\apps\common\swagger_api\common_api.py:78
-#: .\apps\common\swagger_api\common_api.py:79
-#: .\apps\users\serializers\user_serializers.py:572
-msgid "Update time"
-msgstr ""
-
 #: .\apps\common\response\result.py:24
 msgid "Success"
 msgstr ""
@@ -2265,12 +2242,13 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:167
 #: .\apps\function_lib\swagger_api\function_lib_api.py:168
 #: .\apps\setting\serializers\team_serializers.py:46
-#: .\apps\users\serializers\user_serializers.py:457
-#: .\apps\users\serializers\user_serializers.py:479
-#: .\apps\users\serializers\user_serializers.py:567
-#: .\apps\users\serializers\user_serializers.py:698
-#: .\apps\users\serializers\user_serializers.py:714
-#: .\apps\users\serializers\user_serializers.py:715
+#: .\apps\users\serializers\user_serializers.py:471
+#: .\apps\users\serializers\user_serializers.py:494
+#: .\apps\users\serializers\user_serializers.py:582
+#: .\apps\users\serializers\user_serializers.py:583
+#: .\apps\users\serializers\user_serializers.py:719
+#: .\apps\users\serializers\user_serializers.py:735
+#: .\apps\users\serializers\user_serializers.py:736
 #: .\apps\xpack\swagger_api\application_setting_api.py:112
 #: .\apps\xpack\swagger_api\application_setting_api.py:113
 #: .\apps\xpack\swagger_api\auth_api.py:21
@@ -2286,6 +2264,20 @@ msgstr ""
 #: .\apps\common\swagger_api\common_api.py:76
 #: .\apps\common\swagger_api\common_api.py:77
 msgid "Comprehensive score, used for ranking"
+msgstr ""
+
+#: .\apps\common\swagger_api\common_api.py:78
+#: .\apps\common\swagger_api\common_api.py:79
+#: .\apps\users\serializers\user_serializers.py:589
+#: .\apps\users\serializers\user_serializers.py:590
+msgid "Update time"
+msgstr ""
+
+#: .\apps\common\swagger_api\common_api.py:81
+#: .\apps\common\swagger_api\common_api.py:82
+#: .\apps\users\serializers\user_serializers.py:587
+#: .\apps\users\serializers\user_serializers.py:588
+msgid "Create time"
 msgstr ""
 
 #: .\apps\common\util\common.py:218
@@ -2366,6 +2358,7 @@ msgstr ""
 #: .\apps\setting\serializers\provider_serializers.py:277
 #: .\apps\setting\serializers\provider_serializers.py:301
 #: .\apps\setting\serializers\team_serializers.py:42
+#: .\apps\users\serializers\user_serializers.py:272
 msgid "user id"
 msgstr ""
 
@@ -3586,15 +3579,13 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:51
 msgid ""
-"\n"
-"                             Universal text vector is Tongyi Lab's multi-"
-"language text unified vector model based on the LLM base. It provides high-"
-"level vector services for multiple mainstream languages around the world and "
-"helps developers quickly convert text data into high-quality vector data.\n"
-"                             "
+"Universal text vector is Tongyi Lab's multi-language text unified vector "
+"model based on the LLM base. It provides high-level vector services for "
+"multiple mainstream languages around the world and helps developers quickly "
+"convert text data into high-quality vector data."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:71
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:69
 #: .\apps\setting\models_provider\impl\qwen_model_provider\qwen_model_provider.py:40
 msgid ""
 "Tongyi Wanxiang - a large image model for text generation, supports "
@@ -3604,7 +3595,7 @@ msgid ""
 "sketch, flat illustration, two-dimensional, and 3D. Cartoon."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:96
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:94
 msgid "Alibaba Cloud Bailian"
 msgstr ""
 
@@ -4166,68 +4157,62 @@ msgstr ""
 msgid "API Key"
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:35
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:36
 msgid ""
 "An update to Claude 2 that doubles the context window and improves "
 "reliability, hallucination rates, and evidence-based accuracy in long "
 "documents and RAG contexts."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:42
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:43
 msgid ""
 "Anthropic is a powerful model that can handle a variety of tasks, from "
 "complex dialogue and creative content generation to detailed command "
 "obedience."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:49
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:50
 msgid ""
-"\n"
-"            The Claude 3 Haiku is Anthropic's fastest and most compact "
-"model, with near-instant responsiveness. The model can answer simple queries "
-"and requests quickly. Customers will be able to build seamless AI "
-"experiences that mimic human interactions. Claude 3 Haiku can process images "
-"and return text output, and provides 200K context windows.\n"
-"            "
+"The Claude 3 Haiku is Anthropic's fastest and most compact model, with near-"
+"instant responsiveness. The model can answer simple queries and requests "
+"quickly. Customers will be able to build seamless AI experiences that mimic "
+"human interactions. Claude 3 Haiku can process images and return text "
+"output, and provides 200K context windows."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:58
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:57
 msgid ""
-"          \n"
 "The Claude 3 Sonnet model from Anthropic strikes the ideal balance between "
 "intelligence and speed, especially when it comes to handling enterprise "
 "workloads. This model offers maximum utility while being priced lower than "
 "competing products, and it's been engineered to be a solid choice for "
-"deploying AI at scale.\n"
-"            "
+"deploying AI at scale."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:67
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:64
 msgid ""
 "The Claude 3.5 Sonnet raises the industry standard for intelligence, "
 "outperforming competing models and the Claude 3 Opus in extensive "
 "evaluations, with the speed and cost-effectiveness of our mid-range models."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:74
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:71
 msgid ""
 "A faster, more affordable but still very powerful model that can handle a "
 "range of tasks including casual conversation, text analysis, summarization "
 "and document question answering."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:81
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:78
 msgid ""
-"\n"
-"            Titan Text Premier is the most powerful and advanced model in "
-"the Titan Text series, designed to deliver exceptional performance for a "
-"variety of enterprise applications. With its cutting-edge features, it "
-"delivers greater accuracy and outstanding results, making it an excellent "
-"choice for organizations looking for a top-notch text processing solution.\n"
-"            "
+"Titan Text Premier is the most powerful and advanced model in the Titan Text "
+"series, designed to deliver exceptional performance for a variety of "
+"enterprise applications. With its cutting-edge features, it delivers greater "
+"accuracy and outstanding results, making it an excellent choice for "
+"organizations looking for a top-notch text processing solution."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:90
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:85
 msgid ""
 "Amazon Titan Text Lite is a lightweight, efficient model ideal for fine-"
 "tuning English-language tasks, including summarization and copywriting, "
@@ -4235,7 +4220,7 @@ msgid ""
 "customizable models."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:96
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:91
 msgid ""
 "Amazon Titan Text Express has context lengths of up to 8,000 tokens, making "
 "it ideal for a variety of high-level general language tasks, such as open-"
@@ -4244,33 +4229,33 @@ msgid ""
 "English, but other languages are supported."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:102
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:97
 msgid ""
 "7B dense converter for rapid deployment and easy customization. Small in "
 "size yet powerful in a variety of use cases. Supports English and code, as "
 "well as 32k context windows."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:108
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:103
 msgid ""
 "Advanced Mistral AI large-scale language model capable of handling any "
 "language task, including complex multilingual reasoning, text understanding, "
 "transformation, and code generation."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:114
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:109
 msgid ""
 "Ideal for content creation, conversational AI, language understanding, R&D, "
 "and enterprise applications"
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:120
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:115
 msgid ""
 "Ideal for limited computing power and resources, edge devices, and faster "
 "training times."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:128
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:123
 msgid ""
 "Titan Embed Text is the largest embedding model in the Amazon Titan Embed "
 "series and can handle various text embedding tasks, such as text "
@@ -4398,47 +4383,37 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:57
 msgid ""
-"\n"
-"        Compared with previous versions, qwen 1.5 0.5b has significantly "
-"enhanced the model's alignment with human preferences and its multi-language "
+"Compared with previous versions, qwen 1.5 0.5b has significantly enhanced "
+"the model's alignment with human preferences and its multi-language "
 "processing capabilities. Models of all sizes support a context length of "
-"32768 tokens. 500 million parameters.\n"
-"        "
+"32768 tokens. 500 million parameters."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:63
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:61
 msgid ""
-"\n"
-"        \n"
 "Compared with previous versions, qwen 1.5 1.8b has significantly enhanced "
 "the model's alignment with human preferences and its multi-language "
 "processing capabilities. Models of all sizes support a context length of "
-"32768 tokens. 1.8 billion parameters.\n"
-"        "
+"32768 tokens. 1.8 billion parameters."
+msgstr ""
+
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:65
+msgid ""
+"Compared with previous versions, qwen 1.5 4b has significantly enhanced the "
+"model's alignment with human preferences and its multi-language processing "
+"capabilities. Models of all sizes support a context length of 32768 tokens. "
+"4 billion parameters."
 msgstr ""
 
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:70
 msgid ""
-"\n"
-"        \n"
-"Compared with previous versions, qwen 1.5 4b has significantly enhanced the "
+"Compared with previous versions, qwen 1.5 7b has significantly enhanced the "
 "model's alignment with human preferences and its multi-language processing "
 "capabilities. Models of all sizes support a context length of 32768 tokens. "
-"4 billion parameters.\n"
-"        "
+"7 billion parameters."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:78
-msgid ""
-"\n"
-"        Compared with previous versions, qwen 1.5 7b has significantly "
-"enhanced the model's alignment with human preferences and its multi-language "
-"processing capabilities. Models of all sizes support a context length of "
-"32768 tokens. 7 billion parameters.\n"
-"        "
-msgstr ""
-
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:84
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:74
 msgid ""
 "Compared with previous versions, qwen 1.5 14b has significantly enhanced the "
 "model's alignment with human preferences and its multi-language processing "
@@ -4446,7 +4421,7 @@ msgid ""
 "14 billion parameters."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:88
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:78
 msgid ""
 "Compared with previous versions, qwen 1.5 32b has significantly enhanced the "
 "model's alignment with human preferences and its multi-language processing "
@@ -4454,43 +4429,33 @@ msgid ""
 "32 billion parameters."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:92
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:82
 msgid ""
-"\n"
 "Compared with previous versions, qwen 1.5 72b has significantly enhanced the "
 "model's alignment with human preferences and its multi-language processing "
 "capabilities. Models of all sizes support a context length of 32768 tokens. "
 "72 billion parameters."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:97
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:86
 msgid ""
-"\n"
-"        Compared with previous versions, qwen 1.5 110b has significantly "
-"enhanced the model's alignment with human preferences and its multi-language "
+"Compared with previous versions, qwen 1.5 110b has significantly enhanced "
+"the model's alignment with human preferences and its multi-language "
 "processing capabilities. Models of all sizes support a context length of "
-"32768 tokens. 110 billion parameters.\n"
-"        "
+"32768 tokens. 110 billion parameters."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:143
-msgid ""
-"\n"
-"        Phi-3 Mini is Microsoft's 3.8B parameter, lightweight, state-of-the-"
-"art open model.\n"
-"        "
-msgstr ""
-
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:153
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:182
-msgid ""
-"A high-performance open embedding model with a large token context window."
-msgstr ""
-
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:178
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:130
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:163
 msgid ""
 "Phi-3 Mini is Microsoft's 3.8B parameter, lightweight, state-of-the-art open "
 "model."
+msgstr ""
+
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:138
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:167
+msgid ""
+"A high-performance open embedding model with a large token context window."
 msgstr ""
 
 #: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:16
@@ -4736,53 +4701,45 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:57
 msgid ""
-"\n"
-"            Hunyuan's latest version of the role-playing model, a role-"
-"playing model launched by Hunyuan's official fine-tuning training, is based "
-"on the Hunyuan model combined with the role-playing scene data set for "
-"additional training, and has better basic effects in role-playing scenes.\n"
-"            "
+"Hunyuan's latest version of the role-playing model, a role-playing model "
+"launched by Hunyuan's official fine-tuning training, is based on the Hunyuan "
+"model combined with the role-playing scene data set for additional training, "
+"and has better basic effects in role-playing scenes."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:65
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:63
 msgid ""
-"\n"
-"            Hunyuan's latest MOE architecture FunctionCall model has been "
-"trained with high-quality FunctionCall data and has a context window of 32K, "
-"leading in multiple dimensions of evaluation indicators.\n"
-"            "
+"Hunyuan's latest MOE architecture FunctionCall model has been trained with "
+"high-quality FunctionCall data and has a context window of 32K, leading in "
+"multiple dimensions of evaluation indicators."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:73
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:69
 msgid ""
-"\n"
-"            Hunyuan's latest code generation model, after training the base "
-"model with 200B high-quality code data, and iterating on high-quality SFT "
-"data for half a year, the context long window length has been increased to "
-"8K, and it ranks among the top in the automatic evaluation indicators of "
-"code generation in the five major languages; the five major languages In the "
+"Hunyuan's latest code generation model, after training the base model with "
+"200B high-quality code data, and iterating on high-quality SFT data for half "
+"a year, the context long window length has been increased to 8K, and it "
+"ranks among the top in the automatic evaluation indicators of code "
+"generation in the five major languages; the five major languages In the "
 "manual high-quality evaluation of 10 comprehensive code tasks that consider "
-"all aspects, the performance is in the first echelon.\n"
-"            "
+"all aspects, the performance is in the first echelon."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:83
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:77
 msgid ""
-"\n"
-"        Tencent's Hunyuan Embedding interface can convert text into high-"
-"quality vector data. The vector dimension is 1024 dimensions.\n"
-"        "
+"Tencent's Hunyuan Embedding interface can convert text into high-quality "
+"vector data. The vector dimension is 1024 dimensions."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:95
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:87
 msgid "Mixed element visual model"
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:102
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:94
 msgid "Hunyuan graph model"
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:133
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:125
 msgid "Tencent Hunyuan"
 msgstr ""
 
@@ -5250,16 +5207,16 @@ msgstr ""
 #: .\apps\users\serializers\user_serializers.py:112
 #: .\apps\users\serializers\user_serializers.py:143
 #: .\apps\users\serializers\user_serializers.py:211
-#: .\apps\users\serializers\user_serializers.py:280
-#: .\apps\users\serializers\user_serializers.py:333
-#: .\apps\users\serializers\user_serializers.py:649
-#: .\apps\users\serializers\user_serializers.py:680
-#: .\apps\users\serializers\user_serializers.py:681
-#: .\apps\users\serializers\user_serializers.py:720
-#: .\apps\users\serializers\user_serializers.py:740
+#: .\apps\users\serializers\user_serializers.py:293
+#: .\apps\users\serializers\user_serializers.py:346
+#: .\apps\users\serializers\user_serializers.py:669
+#: .\apps\users\serializers\user_serializers.py:701
+#: .\apps\users\serializers\user_serializers.py:702
 #: .\apps\users\serializers\user_serializers.py:741
-#: .\apps\users\views\user.py:79 .\apps\users\views\user.py:80
-#: .\apps\users\views\user.py:81
+#: .\apps\users\serializers\user_serializers.py:761
+#: .\apps\users\serializers\user_serializers.py:762
+#: .\apps\users\views\user.py:103 .\apps\users\views\user.py:104
+#: .\apps\users\views\user.py:105 .\apps\users\views\user.py:106
 msgid "Password"
 msgstr ""
 
@@ -5288,16 +5245,16 @@ msgstr ""
 #: .\apps\users\serializers\user_serializers.py:111
 #: .\apps\users\serializers\user_serializers.py:136
 #: .\apps\users\serializers\user_serializers.py:209
-#: .\apps\users\serializers\user_serializers.py:454
-#: .\apps\users\serializers\user_serializers.py:476
-#: .\apps\users\serializers\user_serializers.py:501
-#: .\apps\users\serializers\user_serializers.py:502
-#: .\apps\users\serializers\user_serializers.py:564
-#: .\apps\users\serializers\user_serializers.py:606
-#: .\apps\users\serializers\user_serializers.py:607
-#: .\apps\users\serializers\user_serializers.py:642
-#: .\apps\users\serializers\user_serializers.py:677
-#: .\apps\users\serializers\user_serializers.py:678
+#: .\apps\users\serializers\user_serializers.py:468
+#: .\apps\users\serializers\user_serializers.py:491
+#: .\apps\users\serializers\user_serializers.py:516
+#: .\apps\users\serializers\user_serializers.py:517
+#: .\apps\users\serializers\user_serializers.py:579
+#: .\apps\users\serializers\user_serializers.py:625
+#: .\apps\users\serializers\user_serializers.py:626
+#: .\apps\users\serializers\user_serializers.py:661
+#: .\apps\users\serializers\user_serializers.py:698
+#: .\apps\users\serializers\user_serializers.py:699
 msgid "Username"
 msgstr ""
 
@@ -5306,19 +5263,19 @@ msgstr ""
 #: .\apps\users\serializers\user_serializers.py:210
 #: .\apps\users\serializers\user_serializers.py:226
 #: .\apps\users\serializers\user_serializers.py:256
-#: .\apps\users\serializers\user_serializers.py:274
-#: .\apps\users\serializers\user_serializers.py:330
+#: .\apps\users\serializers\user_serializers.py:287
 #: .\apps\users\serializers\user_serializers.py:343
-#: .\apps\users\serializers\user_serializers.py:423
-#: .\apps\users\serializers\user_serializers.py:455
-#: .\apps\users\serializers\user_serializers.py:477
-#: .\apps\users\serializers\user_serializers.py:503
-#: .\apps\users\serializers\user_serializers.py:565
-#: .\apps\users\serializers\user_serializers.py:608
-#: .\apps\users\serializers\user_serializers.py:637
-#: .\apps\users\serializers\user_serializers.py:679
-#: .\apps\users\serializers\user_serializers.py:690
+#: .\apps\users\serializers\user_serializers.py:356
+#: .\apps\users\serializers\user_serializers.py:436
+#: .\apps\users\serializers\user_serializers.py:469
+#: .\apps\users\serializers\user_serializers.py:492
+#: .\apps\users\serializers\user_serializers.py:518
+#: .\apps\users\serializers\user_serializers.py:580
+#: .\apps\users\serializers\user_serializers.py:627
+#: .\apps\users\serializers\user_serializers.py:656
+#: .\apps\users\serializers\user_serializers.py:700
 #: .\apps\users\serializers\user_serializers.py:711
+#: .\apps\users\serializers\user_serializers.py:732
 msgid "Email"
 msgstr ""
 
@@ -5397,7 +5354,7 @@ msgstr ""
 
 #: .\apps\setting\serializers\team_serializers.py:202
 #: .\apps\setting\serializers\team_serializers.py:218
-#: .\apps\users\serializers\user_serializers.py:777
+#: .\apps\users\serializers\user_serializers.py:798
 msgid "User does not exist"
 msgstr ""
 
@@ -5423,7 +5380,7 @@ msgstr ""
 
 #: .\apps\setting\serializers\valid_serializers.py:32
 #: .\apps\users\serializers\user_serializers.py:190
-#: .\apps\users\serializers\user_serializers.py:754
+#: .\apps\users\serializers\user_serializers.py:775
 msgid ""
 "The community version supports up to 2 users. If you need more users, please "
 "contact us (https://fit2cloud.com/)."
@@ -5490,7 +5447,7 @@ msgstr ""
 #: .\apps\setting\views\Team.py:51 .\apps\setting\views\Team.py:64
 #: .\apps\setting\views\Team.py:75 .\apps\setting\views\Team.py:86
 #: .\apps\users\serializers\user_serializers.py:198
-#: .\apps\users\serializers\user_serializers.py:768
+#: .\apps\users\serializers\user_serializers.py:789
 msgid "team"
 msgstr ""
 
@@ -5637,14 +5594,14 @@ msgid "The user has been disabled, please contact the administrator!"
 msgstr ""
 
 #: .\apps\users\serializers\user_serializers.py:141
-#: .\apps\users\serializers\user_serializers.py:647
+#: .\apps\users\serializers\user_serializers.py:667
 msgid "Username must be 6-20 characters long"
 msgstr ""
 
 #: .\apps\users\serializers\user_serializers.py:148
 #: .\apps\users\serializers\user_serializers.py:156
-#: .\apps\users\serializers\user_serializers.py:653
-#: .\apps\users\serializers\user_serializers.py:725
+#: .\apps\users\serializers\user_serializers.py:674
+#: .\apps\users\serializers\user_serializers.py:746
 msgid ""
 "The password must be 6-20 characters long and must be a combination of "
 "letters, numbers, and special characters."
@@ -5653,12 +5610,12 @@ msgstr ""
 #: .\apps\users\serializers\user_serializers.py:151
 #: .\apps\users\serializers\user_serializers.py:212
 #: .\apps\users\serializers\user_serializers.py:213
-#: .\apps\users\serializers\user_serializers.py:287
-#: .\apps\users\serializers\user_serializers.py:334
-#: .\apps\users\serializers\user_serializers.py:335
-#: .\apps\users\serializers\user_serializers.py:726
-#: .\apps\users\serializers\user_serializers.py:742
-#: .\apps\users\serializers\user_serializers.py:743
+#: .\apps\users\serializers\user_serializers.py:300
+#: .\apps\users\serializers\user_serializers.py:347
+#: .\apps\users\serializers\user_serializers.py:348
+#: .\apps\users\serializers\user_serializers.py:747
+#: .\apps\users\serializers\user_serializers.py:763
+#: .\apps\users\serializers\user_serializers.py:764
 msgid "Confirm Password"
 msgstr ""
 
@@ -5668,17 +5625,17 @@ msgstr ""
 #: .\apps\users\serializers\user_serializers.py:229
 #: .\apps\users\serializers\user_serializers.py:257
 #: .\apps\users\serializers\user_serializers.py:258
-#: .\apps\users\serializers\user_serializers.py:278
-#: .\apps\users\serializers\user_serializers.py:331
-#: .\apps\users\serializers\user_serializers.py:332
-#: .\apps\users\views\user.py:78
+#: .\apps\users\serializers\user_serializers.py:291
+#: .\apps\users\serializers\user_serializers.py:344
+#: .\apps\users\serializers\user_serializers.py:345
+#: .\apps\users\views\user.py:101 .\apps\users\views\user.py:102
 msgid "Verification code"
 msgstr ""
 
 #: .\apps\users\serializers\user_serializers.py:232
 #: .\apps\users\serializers\user_serializers.py:259
-#: .\apps\users\serializers\user_serializers.py:347
-#: .\apps\users\serializers\user_serializers.py:424
+#: .\apps\users\serializers\user_serializers.py:360
+#: .\apps\users\serializers\user_serializers.py:437
 msgid "Type"
 msgstr ""
 
@@ -5690,175 +5647,185 @@ msgstr ""
 msgid "Error message"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:285
-#: .\apps\users\serializers\user_serializers.py:292
-#: .\apps\users\serializers\user_serializers.py:731
+#: .\apps\users\serializers\user_serializers.py:280
+msgid "language only support:"
+msgstr ""
+
+#: .\apps\users\serializers\user_serializers.py:298
+#: .\apps\users\serializers\user_serializers.py:305
+#: .\apps\users\serializers\user_serializers.py:752
 msgid ""
 "The confirmation password must be 6-20 characters long and must be a "
 "combination of letters, numbers, and special characters."
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:367
+#: .\apps\users\serializers\user_serializers.py:380
 #, python-brace-format
 msgid "Do not send emails again within {seconds} seconds"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:395
+#: .\apps\users\serializers\user_serializers.py:408
 msgid ""
 "The email service has not been set up. Please contact the administrator to "
 "set up the email service in [Email Settings]."
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:406
+#: .\apps\users\serializers\user_serializers.py:419
 #, python-brace-format
 msgid "【Intelligent knowledge base question and answer system-{action}】"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:407
-#: .\apps\users\views\user.py:147 .\apps\users\views\user.py:148
+#: .\apps\users\serializers\user_serializers.py:420
+#: .\apps\users\views\user.py:172 .\apps\users\views\user.py:173
 msgid "User registration"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:407
-#: .\apps\users\views\user.py:164 .\apps\users\views\user.py:165
-#: .\apps\users\views\user.py:245 .\apps\users\views\user.py:246
+#: .\apps\users\serializers\user_serializers.py:420
+#: .\apps\users\views\user.py:189 .\apps\users\views\user.py:190
+#: .\apps\users\views\user.py:270 .\apps\users\views\user.py:271
 msgid "Change password"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:458
+#: .\apps\users\serializers\user_serializers.py:472
+#: .\apps\users\serializers\user_serializers.py:473
 msgid "Permissions"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:492
-#: .\apps\users\serializers\user_serializers.py:589
-#: .\apps\users\serializers\user_serializers.py:597
+#: .\apps\users\serializers\user_serializers.py:507
+#: .\apps\users\serializers\user_serializers.py:608
+#: .\apps\users\serializers\user_serializers.py:616
 msgid "Email or username"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:543
+#: .\apps\users\serializers\user_serializers.py:558
 msgid "All"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:544
+#: .\apps\users\serializers\user_serializers.py:559
 msgid "Me"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:566
-#: .\apps\users\serializers\user_serializers.py:657
-#: .\apps\users\serializers\user_serializers.py:682
-#: .\apps\users\serializers\user_serializers.py:696
-#: .\apps\users\serializers\user_serializers.py:713
+#: .\apps\users\serializers\user_serializers.py:581
+#: .\apps\users\serializers\user_serializers.py:678
+#: .\apps\users\serializers\user_serializers.py:703
+#: .\apps\users\serializers\user_serializers.py:717
+#: .\apps\users\serializers\user_serializers.py:734
 msgid "Phone"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:569
+#: .\apps\users\serializers\user_serializers.py:585
 msgid "Source"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:570
-#: .\apps\users\serializers\user_serializers.py:655
-#: .\apps\users\serializers\user_serializers.py:683
-#: .\apps\users\serializers\user_serializers.py:694
-#: .\apps\users\serializers\user_serializers.py:712
+#: .\apps\users\serializers\user_serializers.py:586
+#: .\apps\users\serializers\user_serializers.py:676
+#: .\apps\users\serializers\user_serializers.py:704
+#: .\apps\users\serializers\user_serializers.py:715
+#: .\apps\users\serializers\user_serializers.py:733
 msgid "Name"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:704
+#: .\apps\users\serializers\user_serializers.py:725
 msgid "Email is already in use"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:785
+#: .\apps\users\serializers\user_serializers.py:806
 msgid "Unable to delete administrator"
 msgstr ""
 
-#: .\apps\users\serializers\user_serializers.py:822
+#: .\apps\users\serializers\user_serializers.py:843
 msgid "Cannot modify administrator status"
 msgstr ""
 
-#: .\apps\users\views\user.py:33 .\apps\users\views\user.py:34
+#: .\apps\users\views\user.py:35 .\apps\users\views\user.py:36
 msgid "Get MaxKB related information"
 msgstr ""
 
-#: .\apps\users\views\user.py:36
+#: .\apps\users\views\user.py:38
 msgid "System parameters"
 msgstr ""
 
-#: .\apps\users\views\user.py:45 .\apps\users\views\user.py:46
+#: .\apps\users\views\user.py:47 .\apps\users\views\user.py:48
 msgid "Get current user information"
 msgstr ""
 
-#: .\apps\users\views\user.py:57 .\apps\users\views\user.py:58
+#: .\apps\users\views\user.py:59 .\apps\users\views\user.py:60
 msgid "Get user list"
 msgstr ""
 
-#: .\apps\users\views\user.py:61 .\apps\users\views\user.py:85
-#: .\apps\users\views\user.py:104 .\apps\users\views\user.py:119
-#: .\apps\users\views\user.py:133 .\apps\users\views\user.py:152
-#: .\apps\users\views\user.py:169 .\apps\users\views\user.py:184
-#: .\apps\users\views\user.py:197 .\apps\users\views\user.py:313
+#: .\apps\users\views\user.py:63 .\apps\users\views\user.py:85
+#: .\apps\users\views\user.py:110 .\apps\users\views\user.py:129
+#: .\apps\users\views\user.py:144 .\apps\users\views\user.py:158
+#: .\apps\users\views\user.py:177 .\apps\users\views\user.py:194
+#: .\apps\users\views\user.py:209 .\apps\users\views\user.py:222
+#: .\apps\users\views\user.py:338
 msgid "User"
 msgstr ""
 
-#: .\apps\users\views\user.py:72 .\apps\users\views\user.py:73
+#: .\apps\users\views\user.py:74 .\apps\users\views\user.py:75
+msgid "Switch Language"
+msgstr ""
+
+#: .\apps\users\views\user.py:95 .\apps\users\views\user.py:96
 msgid "Modify current user password"
 msgstr ""
 
-#: .\apps\users\views\user.py:93
+#: .\apps\users\views\user.py:118
 msgid "Failed to change password"
 msgstr ""
 
-#: .\apps\users\views\user.py:101 .\apps\users\views\user.py:102
+#: .\apps\users\views\user.py:126 .\apps\users\views\user.py:127
 msgid "Send email to current user"
 msgstr ""
 
-#: .\apps\users\views\user.py:116 .\apps\users\views\user.py:117
+#: .\apps\users\views\user.py:141 .\apps\users\views\user.py:142
 msgid "Sign out"
 msgstr ""
 
-#: .\apps\users\views\user.py:128 .\apps\users\views\user.py:129
+#: .\apps\users\views\user.py:153 .\apps\users\views\user.py:154
 #: .\apps\xpack\views\auth.py:91 .\apps\xpack\views\auth.py:92
 msgid "Log in"
 msgstr ""
 
-#: .\apps\users\views\user.py:157
+#: .\apps\users\views\user.py:182
 msgid "Registration successful"
 msgstr ""
 
-#: .\apps\users\views\user.py:179 .\apps\users\views\user.py:180
+#: .\apps\users\views\user.py:204 .\apps\users\views\user.py:205
 msgid "Check whether the verification code is correct"
 msgstr ""
 
-#: .\apps\users\views\user.py:192 .\apps\users\views\user.py:193
+#: .\apps\users\views\user.py:217 .\apps\users\views\user.py:218
 msgid "Send email"
 msgstr ""
 
-#: .\apps\users\views\user.py:208 .\apps\users\views\user.py:209
+#: .\apps\users\views\user.py:233 .\apps\users\views\user.py:234
 msgid "Add user"
 msgstr ""
 
-#: .\apps\users\views\user.py:212 .\apps\users\views\user.py:227
-#: .\apps\users\views\user.py:250 .\apps\users\views\user.py:267
-#: .\apps\users\views\user.py:280 .\apps\users\views\user.py:295
+#: .\apps\users\views\user.py:237 .\apps\users\views\user.py:252
+#: .\apps\users\views\user.py:275 .\apps\users\views\user.py:292
+#: .\apps\users\views\user.py:305 .\apps\users\views\user.py:320
 msgid "User management"
 msgstr ""
 
-#: .\apps\users\views\user.py:225 .\apps\users\views\user.py:226
+#: .\apps\users\views\user.py:250 .\apps\users\views\user.py:251
 msgid "Get user paginated list"
 msgstr ""
 
-#: .\apps\users\views\user.py:263 .\apps\users\views\user.py:264
+#: .\apps\users\views\user.py:288 .\apps\users\views\user.py:289
 msgid "Delete user"
 msgstr ""
 
-#: .\apps\users\views\user.py:276 .\apps\users\views\user.py:277
+#: .\apps\users\views\user.py:301 .\apps\users\views\user.py:302
 msgid "Get user information"
 msgstr ""
 
-#: .\apps\users\views\user.py:290 .\apps\users\views\user.py:291
+#: .\apps\users\views\user.py:315 .\apps\users\views\user.py:316
 msgid "Update user information"
 msgstr ""
 
-#: .\apps\users\views\user.py:309 .\apps\users\views\user.py:310
+#: .\apps\users\views\user.py:334 .\apps\users\views\user.py:335
 msgid "Get user list by type"
 msgstr ""
 
@@ -6272,21 +6239,21 @@ msgstr ""
 msgid "Project address"
 msgstr ""
 
-#: .\apps\xpack\serializers\tools.py:58
+#: .\apps\xpack\serializers\tools.py:59
 #, python-brace-format
 msgid ""
 "Thinking about 【{question}】...If you want me to continue answering, please "
-"reply"
+"reply {trigger_message}"
 msgstr ""
 
-#: .\apps\xpack\serializers\tools.py:158
+#: .\apps\xpack\serializers\tools.py:159
 msgid ""
 "\n"
 " ------------\n"
 "[To be continued, reply \"Continue to answer the question]"
 msgstr ""
 
-#: .\apps\xpack\serializers\tools.py:237
+#: .\apps\xpack\serializers\tools.py:238
 #, python-brace-format
 msgid ""
 "To be continued, reply \"{trigger_message}\" to continue answering the "

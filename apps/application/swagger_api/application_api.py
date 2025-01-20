@@ -165,6 +165,9 @@ class ApplicationApi(ApiMixin):
                     'show_source': openapi.Schema(type=openapi.TYPE_BOOLEAN,
                                                   title=_("Whether to display knowledge sources"),
                                                   description=_("Whether to display knowledge sources")),
+                    'language': openapi.Schema(type=openapi.TYPE_STRING,
+                                               title=_("language"),
+                                               description=_("language"))
                 }
             )
 
@@ -282,24 +285,24 @@ class ApplicationApi(ApiMixin):
                 properties={
                     'prompt': openapi.Schema(type=openapi.TYPE_STRING, title=_("Prompt word"),
                                              description=_("Prompt word"),
-                                             default=_("""
-Known information:
-{data}
-Answer requirements:
-- If you don't know the answer or don't get the answer, please answer "No relevant information found in the knowledge base, it is recommended to consult relevant technical support or refer to official documents for operation".
-- Avoid mentioning that you got the knowledge from <data></data>.
-- Please keep the answer consistent with the description in <data></data>.
-- Please use markdown syntax to optimize the format of the answer.
-- Please return the image link, link address and script language in <data></data> completely.
-- Please answer in the same language as the question.
-Question:
-{question}
-                                                    """)),
+                                             default=_(("Known information:\n"
+                                                        "{data}\n"
+                                                        "Answer requirements:\n"
+                                                        "- If you don't know the answer or don't get the answer, please answer \"No relevant information found in the knowledge base, it is recommended to consult relevant technical support or refer to official documents for operation\".\n"
+                                                        "- Avoid mentioning that you got the knowledge from <data></data>.\n"
+                                                        "- Please keep the answer consistent with the description in <data></data>.\n"
+                                                        "- Please use markdown syntax to optimize the format of the answer.\n"
+                                                        "- Please return the image link, link address and script language in <data></data> completely.\n"
+                                                        "- Please answer in the same language as the question.\n"
+                                                        "Question:\n"
+                                                        "{question}"))),
 
                     'system': openapi.Schema(type=openapi.TYPE_STRING, title=_("System prompt words (role)"),
                                              description=_("System prompt words (role)")),
-                    'no_references_prompt': openapi.Schema(type=openapi.TYPE_STRING, title=_("No citation segmentation prompt"),
-                                                           default="{question}", description=_("No citation segmentation prompt"))
+                    'no_references_prompt': openapi.Schema(type=openapi.TYPE_STRING,
+                                                           title=_("No citation segmentation prompt"),
+                                                           default="{question}",
+                                                           description=_("No citation segmentation prompt"))
 
                 }
             )
@@ -323,22 +326,29 @@ Question:
                 required=['name', 'desc', 'model_id', 'dialogue_number', 'dataset_setting', 'model_setting',
                           'problem_optimization', 'stt_model_enable', 'stt_model_enable', 'tts_type'],
                 properties={
-                    'name': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Name"), description=_("Application Name")),
-                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Description"), description=_("Application Description")),
-                    'model_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Model id"), description=_("Model id")),
-                    "dialogue_number": openapi.Schema(type=openapi.TYPE_NUMBER, title=_("Number of multi-round conversations"),
+                    'name': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Name"),
+                                           description=_("Application Name")),
+                    'desc': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Description"),
+                                           description=_("Application Description")),
+                    'model_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Model id"),
+                                               description=_("Model id")),
+                    "dialogue_number": openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                      title=_("Number of multi-round conversations"),
                                                       description=_("Number of multi-round conversations")),
-                    'prologue': openapi.Schema(type=openapi.TYPE_STRING, title=_("Opening remarks"), description=_("Opening remarks")),
+                    'prologue': openapi.Schema(type=openapi.TYPE_STRING, title=_("Opening remarks"),
+                                               description=_("Opening remarks")),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
-                                                      title=_("List of associated knowledge base IDs"), description=_("List of associated knowledge base IDs")),
+                                                      title=_("List of associated knowledge base IDs"),
+                                                      description=_("List of associated knowledge base IDs")),
                     'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
                     'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
                     'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Problem Optimization"),
                                                            description=_("Problem Optimization"), default=True),
                     'type': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Type"),
                                            description=_("Application Type   SIMPLE |  WORK_FLOW")),
-                    'problem_optimization_prompt': openapi.Schema(type=openapi.TYPE_STRING, title=_('Question optimization tips'),
+                    'problem_optimization_prompt': openapi.Schema(type=openapi.TYPE_STRING,
+                                                                  title=_('Question optimization tips'),
                                                                   description=_("Question optimization tips"),
                                                                   default=_(
                                                                       "() contains the user's question. Answer the guessed user's question based on the context ({question}) Requirement: Output a complete question and put it in the <data></data> tag")),

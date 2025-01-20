@@ -48,9 +48,7 @@ model_info_list = [ModelInfo('gte-rerank',
                              _('CosyVoice is based on a new generation of large generative speech models, which can predict emotions, intonation, rhythm, etc. based on context, and has better anthropomorphic effects.'),
                              ModelTypeConst.TTS, aliyun_bai_lian_tts_model_credential, AliyunBaiLianTextToSpeech),
                    ModelInfo('text-embedding-v1',
-                             _('''
-                             Universal text vector is Tongyi Lab's multi-language text unified vector model based on the LLM base. It provides high-level vector services for multiple mainstream languages around the world and helps developers quickly convert text data into high-quality vector data.
-                             '''),
+                             _("Universal text vector is Tongyi Lab's multi-language text unified vector model based on the LLM base. It provides high-level vector services for multiple mainstream languages around the world and helps developers quickly convert text data into high-quality vector data."),
                              ModelTypeConst.EMBEDDING, aliyun_bai_lian_embedding_model_credential,
                              AliyunBaiLianEmbedding),
                    ModelInfo('qwen-turbo', '', ModelTypeConst.LLM, aliyun_bai_lian_llm_model_credential,

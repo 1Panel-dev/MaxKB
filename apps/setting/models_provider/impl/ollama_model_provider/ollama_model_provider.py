@@ -54,49 +54,36 @@ model_info_list = [
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
         'qwen:0.5b',
-        _('''
-        Compared with previous versions, qwen 1.5 0.5b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 500 million parameters.
-        '''),
+        _("Compared with previous versions, qwen 1.5 0.5b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 500 million parameters."),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
         'qwen:1.8b',
-        _('''
-        
-Compared with previous versions, qwen 1.5 1.8b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 1.8 billion parameters.
-        '''),
+        _("Compared with previous versions, qwen 1.5 1.8b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 1.8 billion parameters."),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
         'qwen:4b',
-        _('''
-        
-Compared with previous versions, qwen 1.5 4b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 4 billion parameters.
-        '''),
+        _("Compared with previous versions, qwen 1.5 4b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 4 billion parameters."),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
 
     ModelInfo(
         'qwen:7b',
-        _('''
-        Compared with previous versions, qwen 1.5 7b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 7 billion parameters.
-        '''),
+        _("Compared with previous versions, qwen 1.5 7b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 7 billion parameters."),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
         'qwen:14b',
-        _('''Compared with previous versions, qwen 1.5 14b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 14 billion parameters.'''),
+        _("Compared with previous versions, qwen 1.5 14b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 14 billion parameters."),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
         'qwen:32b',
-        _('''Compared with previous versions, qwen 1.5 32b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 32 billion parameters.'''),
+        _("Compared with previous versions, qwen 1.5 32b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 32 billion parameters."),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
         'qwen:72b',
-        _('''
-Compared with previous versions, qwen 1.5 72b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 72 billion parameters.'''),
+        _("Compared with previous versions, qwen 1.5 72b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 72 billion parameters."),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
         'qwen:110b',
-        _('''
-        Compared with previous versions, qwen 1.5 110b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 110 billion parameters.
-        '''),
+        _("Compared with previous versions, qwen 1.5 110b has significantly enhanced the model's alignment with human preferences and its multi-language processing capabilities. Models of all sizes support a context length of 32768 tokens. 110 billion parameters."),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
         'qwen2:72b-instruct',
@@ -140,9 +127,7 @@ Compared with previous versions, qwen 1.5 72b has significantly enhanced the mod
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
     ModelInfo(
         'phi3',
-        _('''
-        Phi-3 Mini is Microsoft's 3.8B parameter, lightweight, state-of-the-art open model.
-        '''),
+        _("Phi-3 Mini is Microsoft's 3.8B parameter, lightweight, state-of-the-art open model."),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
 ]
 ollama_embedding_model_credential = OllamaEmbeddingModelCredential()

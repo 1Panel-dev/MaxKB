@@ -54,25 +54,19 @@ def _initialize_model_info():
             TencentModel),
         _create_model_info(
             'hunyuan-role',
-            _('''
-            Hunyuan's latest version of the role-playing model, a role-playing model launched by Hunyuan's official fine-tuning training, is based on the Hunyuan model combined with the role-playing scene data set for additional training, and has better basic effects in role-playing scenes.
-            '''),
+            _("Hunyuan's latest version of the role-playing model, a role-playing model launched by Hunyuan's official fine-tuning training, is based on the Hunyuan model combined with the role-playing scene data set for additional training, and has better basic effects in role-playing scenes."),
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
             TencentModel),
         _create_model_info(
             'hunyuan-functioncall',
-            _('''
-            Hunyuan's latest MOE architecture FunctionCall model has been trained with high-quality FunctionCall data and has a context window of 32K, leading in multiple dimensions of evaluation indicators.
-            '''),
+            _("Hunyuan's latest MOE architecture FunctionCall model has been trained with high-quality FunctionCall data and has a context window of 32K, leading in multiple dimensions of evaluation indicators."),
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
             TencentModel),
         _create_model_info(
             'hunyuan-code',
-            _('''
-            Hunyuan's latest code generation model, after training the base model with 200B high-quality code data, and iterating on high-quality SFT data for half a year, the context long window length has been increased to 8K, and it ranks among the top in the automatic evaluation indicators of code generation in the five major languages; the five major languages In the manual high-quality evaluation of 10 comprehensive code tasks that consider all aspects, the performance is in the first echelon.
-            '''),
+            _("Hunyuan's latest code generation model, after training the base model with 200B high-quality code data, and iterating on high-quality SFT data for half a year, the context long window length has been increased to 8K, and it ranks among the top in the automatic evaluation indicators of code generation in the five major languages; the five major languages In the manual high-quality evaluation of 10 comprehensive code tasks that consider all aspects, the performance is in the first echelon."),
             ModelTypeConst.LLM,
             TencentLLMModelCredential,
             TencentModel),
@@ -80,9 +74,7 @@ def _initialize_model_info():
 
     tencent_embedding_model_info = _create_model_info(
         'hunyuan-embedding',
-        _('''
-        Tencent's Hunyuan Embedding interface can convert text into high-quality vector data. The vector dimension is 1024 dimensions.
-        '''),
+        _("Tencent's Hunyuan Embedding interface can convert text into high-quality vector data. The vector dimension is 1024 dimensions."),
         ModelTypeConst.EMBEDDING,
         TencentEmbeddingCredential,
         TencentEmbeddingModel

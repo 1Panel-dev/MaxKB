@@ -336,6 +336,8 @@ class ApplicationSerializer(serializers.Serializer):
             show_source = serializers.BooleanField(required=False,
                                                    error_messages=ErrMessage.boolean(
                                                        _("Whether to display knowledge sources")))
+            language = serializers.CharField(required=False, allow_blank=True, allow_null=True,
+                                             error_messages=ErrMessage.char(_("language")))
 
         def edit(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -358,6 +360,8 @@ class ApplicationSerializer(serializers.Serializer):
                 application_access_token.white_list = instance.get('white_list')
             if 'show_source' in instance and instance.get('show_source') is not None:
                 application_access_token.show_source = instance.get('show_source')
+            if 'language' in instance and instance.get('language') is not None:
+                application_access_token.language = instance.get('language')
             application_access_token.save()
             application_setting_model = DBModelManage.get_model('application_setting')
             xpack_cache = DBModelManage.get_model('xpack_cache')
@@ -980,6 +984,7 @@ class ApplicationSerializer(serializers.Serializer):
                  'file_upload_setting': application.file_upload_setting,
                  'work_flow': application.work_flow,
                  'show_source': application_access_token.show_source,
+                 'language': application_access_token.language,
                  **application_setting_dict})
 
         @transaction.atomic

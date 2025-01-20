@@ -7,11 +7,11 @@
     @desc:
 """
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+
 
 class AppModelMixin(models.Model):
-    create_time = models.DateTimeField(verbose_name=_('Create time'), auto_now_add=True)
-    update_time = models.DateTimeField(verbose_name=_('Update time'), auto_now=True)
+    create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    update_time = models.DateTimeField(verbose_name="修改时间", auto_now=True)
 
     class Meta:
         abstract = True
