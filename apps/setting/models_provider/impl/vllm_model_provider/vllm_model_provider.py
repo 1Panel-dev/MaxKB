@@ -7,12 +7,16 @@ import requests
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, \
     ModelInfoManage
+from setting.models_provider.impl.vllm_model_provider.credential.image import VllmImageModelCredential
 from setting.models_provider.impl.vllm_model_provider.credential.llm import VLLMModelCredential
+from setting.models_provider.impl.vllm_model_provider.model.image import VllmImage
 from setting.models_provider.impl.vllm_model_provider.model.llm import VllmChatModel
 from smartdoc.conf import PROJECT_DIR
 from django.utils.translation import gettext_lazy as _
 
 v_llm_model_credential = VLLMModelCredential()
+image_model_credential = VllmImageModelCredential()
+
 model_info_list = [
     ModelInfo('facebook/opt-125m', _('Facebook’s 125M parameter model'), ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel),
     ModelInfo('BAAI/Aquila-7B', _('BAAI’s 7B parameter model'), ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel),
@@ -20,12 +24,20 @@ model_info_list = [
 
 ]
 
-model_info_manage = (ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
-    ModelInfo(
-        'facebook/opt-125m',
-        _('Facebook’s 125M parameter model'),
-        ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel))
-                     .build())
+image_model_info_list = [
+    ModelInfo('Qwen/Qwen2-VL-2B-Instruct', '', ModelTypeConst.IMAGE, image_model_credential, VllmImage),
+]
+
+model_info_manage = (
+    ModelInfoManage.builder()
+    .append_model_info_list(model_info_list)
+    .append_default_model_info(ModelInfo('facebook/opt-125m',
+                                         _('Facebook’s 125M parameter model'),
+                                         ModelTypeConst.LLM, v_llm_model_credential, VllmChatModel))
+    .append_model_info_list(image_model_info_list)
+    .append_default_model_info(image_model_info_list[0])
+    .build()
+)
 
 
 def get_base_url(url: str):
