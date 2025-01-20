@@ -45,8 +45,8 @@
         >
           <template #prepend>
             <el-select v-model="searchType" placeholder="Select" style="width: 80px">
-              <el-option :label="$t('views.paragraph.searchBar.title')" value="title" />
-              <el-option :label="$t('views.paragraph.searchBar.content')" value="content" />
+              <el-option :label="$t('common.title')" value="title" />
+              <el-option :label="$t('common.content')" value="content" />
             </el-select>
           </template>
         </el-input>
@@ -134,7 +134,7 @@
                               <el-dropdown-item @click="openGenerateDialog(item)">
                                 <el-icon><Connection /></el-icon>
                                 {{
-                                  $t('views.document.setting.generateQuestion')
+                                  $t('views.document.setting.generateQuestion.title')
                                 }}</el-dropdown-item
                               >
                               <el-dropdown-item @click="openSelectDocumentDialog(item)">
@@ -159,7 +159,7 @@
 
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
         <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
-          {{ $t('views.document.setting.generateQuestion') }}
+          {{ $t('views.document.setting.generateQuestion.title') }}
         </el-button>
         <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog()">
           {{ $t('views.document.setting.migration') }}

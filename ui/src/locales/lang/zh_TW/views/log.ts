@@ -31,11 +31,9 @@ export default {
   editMark: '修改標註',
   form: {
     content: {
-      label: '內容',
       placeholder: '請輸入內容'
     },
     title: {
-      label: '標題',
       placeholder: '請給當前內容設定一個標題，以便管理查看'
     },
   }

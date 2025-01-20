@@ -9,7 +9,7 @@ export default {
   },
   setting: {
     migration: '遷移',
-    generateQuestion: '生成問題',
+
     cancelGenerateQuestion: '取消生成問題',
     cancelVectorization: '取消向量化',
     cancelGenerate: '取消生成'
@@ -154,5 +154,16 @@ export default {
       error: '向量化未成功的分段',
       all: '全部分段'
     }
+  },
+  hitHandlingMethod: {
+    optimization: '模型優化',
+    directly_return: '直接回答'
+  },
+  generateQuestion: {
+    title: '生成問題',
+    successMessage: '生成問題成功',
+    tip1: '提示詞中的 {data} 為分段內容的佔位符，執行時替換為分段內容並發送給 AI 模型；',
+    tip2: 'AI 模型根據分段內容生成相關問題，請將生成的問題放置於 <question></question> 標籤中，系統會自動關聯標籤中的問題；',
+    tip3: '生成效果取決於所選模型和提示詞，用戶可自行調整至最佳效果。'
   }
 }

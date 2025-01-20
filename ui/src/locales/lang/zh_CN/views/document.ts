@@ -9,7 +9,6 @@ export default {
   },
   setting: {
     migration: '迁移',
-    generateQuestion: '生成问题',
     cancelGenerateQuestion: '取消生成问题',
     cancelVectorization: '取消向量化',
     cancelGenerate: '取消生成'
@@ -158,5 +157,12 @@ export default {
   hitHandlingMethod: {
     optimization: '模型优化',
     directly_return: '直接回答'
+  },
+  generateQuestion: {
+    title: '生成问题',
+    successMessage: '生成问题成功',
+    tip1: '提示词中的 {data} 为分段内容的占位符，执行时替换为分段内容发送给 AI 模型；',
+    tip2: 'AI 模型根据分段内容生成相关问题，请将生成的问题放至&lt;question&gt;&lt;/question&gt;标签中，系统会自动关联标签中的问题；',
+    tip3: '生成效果依赖于所选模型和提示词，用户可自行调整至最佳效果。'
   }
 }

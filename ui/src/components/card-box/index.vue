@@ -39,7 +39,7 @@
 </template>
 <script setup lang="ts">
 import { ref, useSlots } from 'vue'
-
+import { t } from '@/locales'
 defineOptions({ name: 'CardBox' })
 const props = withDefaults(
   defineProps<{
@@ -56,7 +56,7 @@ const props = withDefaults(
      */
     showIcon?: boolean
   }>(),
-  { title: '标题', description: '', showIcon: true, border: true }
+  { title: t('common.title'), description: '', showIcon: true, border: true }
 )
 
 const show = ref(false)

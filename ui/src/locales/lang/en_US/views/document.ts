@@ -9,7 +9,6 @@ export default {
   },
   setting: {
     migration: 'Migration',
-    generateQuestion: 'Generate Questions',
     cancelGenerateQuestion: 'Cancel Generating Questions',
     cancelVectorization: 'Cancel Vectorization',
     cancelGenerate: 'Cancel Generation'
@@ -72,7 +71,8 @@ export default {
     },
     patterns: {
       label: 'Segment Delimiters',
-      tooltip: 'Recursively split according to the selected symbols in order. If the split result exceeds the segment length, it will be truncated to the segment length.',
+      tooltip:
+        'Recursively split according to the selected symbols in order. If the split result exceeds the segment length, it will be truncated to the segment length.',
       placeholder: 'Please select'
     },
     limit: {
@@ -83,7 +83,8 @@ export default {
       text: 'Remove duplicate extra symbols, spaces, blank lines, and tab characters.'
     },
     checkedConnect: {
-      label: 'Add Segment Titles as Associated Questions During Import (Applicable for QA Pairs where Titles are Questions)'
+      label:
+        'Add Segment Titles as Associated Questions During Import (Applicable for QA Pairs where Titles are Questions)'
     }
   },
   buttons: {
@@ -117,17 +118,20 @@ export default {
   sync: {
     label: 'Sync',
     confirmTitle: 'Confirm Sync Document?',
-    confirmMessage1: 'Syncing will delete existing data and retrieve new data. Please proceed with caution.',
+    confirmMessage1:
+      'Syncing will delete existing data and retrieve new data. Please proceed with caution.',
     confirmMessage2: 'Cannot sync, please set the document URL first.',
     successMessage: 'Document synced successfully'
   },
   delete: {
     confirmTitle1: 'Confirm Batch Deletion of',
     confirmTitle2: 'Documents?',
-    confirmMessage: 'Segments within the selected documents will also be deleted. Please proceed with caution.',
+    confirmMessage:
+      'Segments within the selected documents will also be deleted. Please proceed with caution.',
     successMessage: 'Batch deletion successful',
     confirmTitle3: 'Confirm Deleting Document:',
-    confirmMessage1: 'All segments under this document will be deleted. Please proceed with caution.'
+    confirmMessage1:
+      'All segments under this document will be deleted. Please proceed with caution.'
   },
   form: {
     source_url: {
@@ -153,5 +157,16 @@ export default {
       error: 'Segments that failed vectorization',
       all: 'All Segments'
     }
+  },
+  hitHandlingMethod: {
+    optimization: 'Model optimization',
+    directly_return: 'Direct answer'
+  },
+  generateQuestion: {
+    title: 'Generate Questions',
+    successMessage: 'Question generation successful',
+    tip1: 'The {data} in the prompt is a placeholder for segmented content, which is replaced by the segmented content when executed and sent to the AI model;',
+    tip2: 'The AI model generates relevant questions based on the segmented content. Please place the generated questions within the <question></question> tags, and the system will automatically associate the questions within these tags;',
+    tip3: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.'
   }
 }

@@ -6,7 +6,7 @@
       <el-input
         v-model="filterText"
         :validate-event="false"
-        placeholder="请输入关键字搜索"
+        :placeholder="$t('components.dynamicsForm.searchBar.placeholder')"
         class="input-with-select"
         style="--el-color-danger: #c0c4cc"
         clearable

@@ -51,5 +51,7 @@ export default {
     enableSuccess: '启用成功',
     disableSuccess: '禁用成功'
   },
-  inputPlaceholder: '请输入'
+  inputPlaceholder: '请输入',
+  title: '标题',
+  content: '内容'
 }

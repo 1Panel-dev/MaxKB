@@ -66,8 +66,8 @@
               >
                 <template #prepend>
                   <el-select v-model="searchType" placeholder="Select" style="width: 80px">
-                    <el-option :label="$t('views.paragraph.searchBar.title')" value="title" />
-                    <el-option :label="$t('views.paragraph.searchBar.content')" value="content" />
+                    <el-option :label="$t('common.title')" value="title" />
+                    <el-option :label="$t('common.content')" value="content" />
                   </el-select>
                 </template>
               </el-input>

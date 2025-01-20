@@ -23,7 +23,7 @@
         >
         </el-input>
       </el-form-item>
-      <el-form-item :label="$t('views.log.form.content.label')" prop="content">
+      <el-form-item :label="$t('common.content')" prop="content">
         <MdEditor
           v-model="form.content"
           :placeholder="$t('views.log.form.content.placeholder')"
@@ -39,7 +39,7 @@
           </template>
         </MdEditor>
       </el-form-item>
-      <el-form-item :label="$t('views.log.form.title.label')">
+      <el-form-item :label="$t('common.title')">
         <el-input
           show-word-limit
           v-model="form.title"

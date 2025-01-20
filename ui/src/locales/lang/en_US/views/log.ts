@@ -31,11 +31,9 @@ export default {
   editMark: 'Edit Label',
   form: {
     content: {
-      label: 'Content',
       placeholder: 'Please enter the content'
     },
     title: {
-      label: 'Title',
       placeholder: 'Please set a title for the current content for management and viewing'
     },
   }

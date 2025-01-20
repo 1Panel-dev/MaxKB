@@ -15,12 +15,19 @@ export default {
     placeholder: '请输入默认值',
     requiredMessage: '请输入默认值'
   },
+  tip: {
+    requiredMessage: '不能为空',
+    jsonMessage: 'JSON格式不正确'
+  },
+  searchBar: {
+    placeholder: '请输入关键字搜索'
+  },
   paramForm: {
     field: {
       label: '参数',
       placeholder: '请输入参数',
       requiredMessage: '参数 为必填属性',
-      requiredMessage2:'只能输入字母数字和下划线'
+      requiredMessage2: '只能输入字母数字和下划线'
     },
     name: {
       label: '显示名称',

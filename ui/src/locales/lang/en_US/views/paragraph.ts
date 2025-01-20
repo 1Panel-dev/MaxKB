@@ -8,11 +8,6 @@ export default {
     batchSelected: 'Batch Select',
     cancelSelected: 'Cancel Selection'
   },
-  tip: {},
-  searchBar: {
-    title: 'Title',
-    content: 'Content'
-  },
   delete: {
     confirmTitle: 'Confirm Deletion of Paragraph:',
     confirmMessage: 'Deletion cannot be undone. Please proceed with caution.'

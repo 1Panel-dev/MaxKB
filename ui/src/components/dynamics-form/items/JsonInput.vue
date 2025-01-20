@@ -43,6 +43,7 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { Codemirror } from 'vue-codemirror'
 import { linter } from '@codemirror/lint'
 import { computed, ref } from 'vue'
+import { t } from '@/locales'
 const props = withDefaults(defineProps<{ modelValue?: any }>(), { modelValue: () => {} })
 const emit = defineEmits(['update:modelValue'])
 
@@ -107,7 +108,7 @@ const validate_rules = (rule: any, value: any, callback: any) => {
     try {
       JSON.parse(model_value.value)
     } catch (e) {
-      callback(new Error('JSON格式不正确'))
+      callback(new Error(t('components.dynamicsForm.tip.requiredMessage')))
       return false
     }
   }

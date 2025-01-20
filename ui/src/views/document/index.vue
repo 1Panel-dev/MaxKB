@@ -26,7 +26,7 @@
               {{ $t('views.dataset.setting.vectorization') }}
             </el-button>
             <el-button @click="openGenerateDialog()" :disabled="multipleSelection.length === 0">
-              {{ $t('views.document.setting.generateQuestion') }}
+              {{ $t('views.document.setting.generateQuestion.title') }}
             </el-button>
             <el-button @click="openBatchEditDocument" :disabled="multipleSelection.length === 0">
               {{ $t('common.setting') }}
@@ -314,7 +314,7 @@
                         </el-dropdown-item>
                         <el-dropdown-item v-else @click="openGenerateDialog(row)">
                           <el-icon><Connection /></el-icon>
-                          {{ $t('views.document.setting.generateQuestion') }}
+                          {{ $t('views.document.setting.generateQuestion.title') }}
                         </el-dropdown-item>
                         <el-dropdown-item @click="openDatasetDialog(row)">
                           <AppIcon iconName="app-migrate"></AppIcon>
@@ -403,7 +403,7 @@
                         </el-dropdown-item>
                         <el-dropdown-item v-else @click="openGenerateDialog(row)">
                           <el-icon><Connection /></el-icon>
-                          {{ $t('views.document.setting.generateQuestion') }}
+                          {{ $t('views.document.setting.generateQuestion.title') }}
                         </el-dropdown-item>
                         <el-dropdown-item @click="openDatasetDialog(row)">
                           <AppIcon iconName="app-migrate"></AppIcon>

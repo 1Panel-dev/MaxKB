@@ -50,5 +50,7 @@ export default {
     enableSuccess: '啟用成功',
     disableSuccess: '停用成功'
   },
-  inputPlaceholder: '請輸入'
+  inputPlaceholder: '請輸入',
+  title: '標題',
+  content: '内容'
 }

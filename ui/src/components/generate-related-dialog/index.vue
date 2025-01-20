@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.document.setting.generateQuestion')"
+    :title="$t('views.document.setting.generateQuestion.title')"
     v-model="dialogVisible"
     width="650"
     :close-on-click-modal="false"
@@ -19,23 +19,31 @@
             <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
           </div>
           <div class="ml-12 lighter">
-            <p>提示词中的 {data} 为分段内容的占位符，执行时替换为分段内容发送给 AI 模型；</p>
-            <p>
-              AI
-              模型根据分段内容生成相关问题，请将生成的问题放至&lt;question&gt;&lt;/question&gt;标签中，系统会自动关联标签中的问题；
-            </p>
-            <p>生成效果依赖于所选模型和提示词，用户可自行调整至最佳效果。</p>
+            <p>{{ $t('views.document.setting.generateQuestion.tip1', { data: '{data}' }) }}</p>
+            <p>{{ $t('views.document.setting.generateQuestion.tip2') }}</p>
+            <p>{{ $t('views.document.setting.generateQuestion.tip3') }}</p>
           </div>
         </div>
-        <el-form-item label="AI 模型" prop="model_id">
+        <el-form-item
+          :label="$t('views.application.applicationForm.form.aiModel.label')"
+          prop="model_id"
+        >
           <ModelSelect
             v-model="form.model_id"
             :placeholder="$t('views.application.applicationForm.form.aiModel.placeholder')"
             :options="modelOptions"
           ></ModelSelect>
         </el-form-item>
-        <el-form-item label="提示词" prop="prompt">
-          <el-input v-model="form.prompt" placeholder="请输入提示词" :rows="7" type="textarea" />
+        <el-form-item
+          :label="$t('views.application.applicationForm.form.prompt.label')"
+          prop="prompt"
+        >
+          <el-input
+            v-model="form.prompt"
+            :placeholder="$t('views.application.applicationForm.form.prompt.placeholder')"
+            :rows="7"
+            type="textarea"
+          />
         </el-form-item>
       </el-form>
     </div>
@@ -82,8 +90,20 @@ const userId = user.userInfo?.id as string
 const form = ref(prompt.get(userId))
 
 const rules = reactive({
-  model_id: [{ required: true, message: '请选择AI 模型', trigger: 'blur' }],
-  prompt: [{ required: true, message: '请输入提示词', trigger: 'blur' }]
+  model_id: [
+    {
+      required: true,
+      message: t('views.application.applicationForm.form.aiModel.placeholder'),
+      trigger: 'blur'
+    }
+  ],
+  prompt: [
+    {
+      required: true,
+      message: t('views.application.applicationForm.form.prompt.placeholder'),
+      trigger: 'blur'
+    }
+  ]
 })
 
 const open = (ids: string[], type: string) => {
@@ -104,14 +124,14 @@ const submitHandle = async (formEl: FormInstance) => {
       if (apiType.value === 'paragraph') {
         const data = { ...form.value, paragraph_id_list: idList.value }
         paragraphApi.batchGenerateRelated(id, documentId, data, loading).then(() => {
-          MsgSuccess('生成问题成功')
+          MsgSuccess(t('views.document.setting.generateQuestion.successMessage'))
           emit('refresh')
           dialogVisible.value = false
         })
       } else if (apiType.value === 'document') {
         const data = { ...form.value, document_id_list: idList.value }
         documentApi.batchGenerateRelated(id, data, loading).then(() => {
-          MsgSuccess('生成问题成功')
+          MsgSuccess(t('views.document.setting.generateQuestion.successMessage'))
           emit('refresh')
           dialogVisible.value = false
         })

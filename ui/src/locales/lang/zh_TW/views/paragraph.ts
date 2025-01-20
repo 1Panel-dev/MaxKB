@@ -8,11 +8,6 @@ export default {
     batchSelected: '批量選擇',
     cancelSelected: '取消選擇'
   },
-  tip: {},
-  searchBar: {
-    title: '標題',
-    content: '內容'
-  },
   delete: {
     confirmTitle: '是否刪除段落：',
     confirmMessage: '刪除後無法恢復，請謹慎操作。'

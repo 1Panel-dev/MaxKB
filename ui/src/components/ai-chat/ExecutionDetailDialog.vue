@@ -68,7 +68,9 @@
                           <span class="color-secondary">{{ f.label }}:</span> {{ f.value }}
                         </div>
                         <div v-if="item.document_list?.length > 0">
-                          <p class="mb-8 color-secondary">文档:</p>
+                          <p class="mb-8 color-secondary">
+                            {{ $t('common.fileUpload.document') }}:
+                          </p>
 
                           <el-space wrap>
                             <template v-for="(f, i) in item.document_list" :key="i">
@@ -88,7 +90,7 @@
                           </el-space>
                         </div>
                         <div v-if="item.image_list?.length > 0">
-                          <p class="mb-8 color-secondary">图片:</p>
+                          <p class="mb-8 color-secondary">{{ $t('common.fileUpload.image') }}:</p>
 
                           <el-space wrap>
                             <template v-for="(f, i) in item.image_list" :key="i">
@@ -165,7 +167,10 @@
                       class="card-never border-r-4"
                       v-if="item.type !== WorkflowType.Application"
                     >
-                      <h5 class="p-8-12">角色设定 (System)</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('views.application.applicationForm.form.roleSettings.label') }}
+                        (System)
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         {{ item.system || '-' }}
                       </div>
@@ -174,7 +179,7 @@
                       class="card-never border-r-4 mt-8"
                       v-if="item.type !== WorkflowType.Application"
                     >
-                      <h5 class="p-8-12">历史记录</h5>
+                      <h5 class="p-8-12">{{ $t('components.chat.history') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.history_message?.length > 0">
                           <p
@@ -278,7 +283,7 @@
                   </template>
                   <template v-if="item.type === WorkflowType.SpeechToTextNode">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">参数输入</h5>
+                      <h5 class="p-8-12"> {{ $t('components.chat.executionDetails.paramInput') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="mb-8">
                           <div v-if="item.audio_list?.length > 0">
@@ -325,7 +330,7 @@
 
                   <template v-if="item.type === WorkflowType.TextToSpeechNode">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">参数输入</h5>
+                      <h5 class="p-8-12"> {{ $t('components.chat.executionDetails.paramInput') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="p-8-12 border-t-dashed lighter">
                           <p class="mb-8 color-secondary">文本内容:</p>
@@ -467,7 +472,12 @@
                       class="card-never border-r-4"
                       v-if="item.type !== WorkflowType.Application"
                     >
-                      <h5 class="p-8-12">角色设定 (System)</h5>
+                      <h5 class="p-8-12">
+                        {{
+                          $t('views.application.applicationForm.form.roleSettings.label')
+                        }}
+                        (System)
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         {{ item.system || '-' }}
                       </div>
@@ -476,7 +486,7 @@
                       class="card-never border-r-4 mt-8"
                       v-if="item.type !== WorkflowType.Application"
                     >
-                      <h5 class="p-8-12">历史记录</h5>
+                      <h5 class="p-8-12">{{ $t('components.chat.history') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.history_message?.length > 0">
                           <p

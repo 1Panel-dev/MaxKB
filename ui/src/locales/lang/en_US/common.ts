@@ -50,5 +50,7 @@ export default {
     enableSuccess: 'Enable Successful',
     disableSuccess: 'Disable Successful'
   },
-  inputPlaceholder: 'Please input'
+  inputPlaceholder: 'Please input',
+  title: 'Title',
+  content: 'Content'
 }
