@@ -95,7 +95,7 @@ export default {
   },
   table: {
     name: 'File Name',
-    char_length: 'Character Count',
+    char_length: 'Character',
     paragraph: 'Segment',
     all: 'All',
     updateTime: 'Update Time'
@@ -111,7 +111,7 @@ export default {
     REVOKE: 'Cancelling'
   },
   enableStatus: {
-    label: 'Enable Status',
+    label: 'Status',
     enable: 'Enabled',
     close: 'Disabled'
   },

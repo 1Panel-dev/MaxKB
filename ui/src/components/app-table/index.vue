@@ -45,6 +45,7 @@
 <script setup lang="ts">
 import { ref, nextTick, watch, computed, onMounted } from 'vue'
 import { MsgError } from '@/utils/message'
+import { t } from '@/locales'
 defineOptions({ name: 'AppTable' })
 
 import useStore from '@/stores'
@@ -102,7 +103,7 @@ function submitHandle() {
       loading.value = false
     }, 200)
   } else {
-    MsgError(`${props.quickCreateName}不能为空！`)
+    MsgError(`${props.quickCreateName}${t('components.dynamicsForm.tip.requiredMessage')}`)
   }
 }
 

@@ -16,7 +16,7 @@ import bus from '@/bus'
 import { ref, nextTick, onMounted } from 'vue'
 import { t } from '@/locales'
 const isOpen = ref<boolean>(false)
-const eventVal = ref({})
+const eventVal = ref()
 function getSelection() {
   const selection = window.getSelection()
   if (selection && selection.anchorNode == null) {

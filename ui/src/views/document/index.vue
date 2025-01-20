@@ -76,6 +76,7 @@
             prop="char_length"
             :label="$t('views.document.table.char_length')"
             align="right"
+            min-width="90"
           >
             <template #default="{ row }">
               {{ numberFormat(row.char_length) }}
@@ -85,6 +86,7 @@
             prop="paragraph_count"
             :label="$t('views.document.table.paragraph')"
             align="right"
+            min-width="90"
           />
           <el-table-column prop="status" :label="$t('views.document.fileStatus.label')" width="130">
             <template #header>
@@ -216,7 +218,7 @@
                     <el-icon><Filter /></el-icon>
                   </el-button>
                   <template #dropdown>
-                    <el-dropdown-menu style="width: 100px">
+                    <el-dropdown-menu style="width: 150px">
                       <el-dropdown-item
                         :class="filterMethod['hit_handling_method'] ? '' : 'is-active'"
                         :command="beforeCommand('hit_handling_method', '')"
@@ -228,7 +230,7 @@
                           :class="filterMethod['hit_handling_method'] === key ? 'is-active' : ''"
                           class="justify-center"
                           :command="beforeCommand('hit_handling_method', key)"
-                          >{{ value }}</el-dropdown-item
+                          >{{ $t(value) }}</el-dropdown-item
                         >
                       </template>
                     </el-dropdown-menu>

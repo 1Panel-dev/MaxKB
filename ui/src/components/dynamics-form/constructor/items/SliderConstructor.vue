@@ -73,7 +73,7 @@
 </template>
 <script setup lang="ts">
 import { computed, onBeforeMount, watch } from 'vue'
-
+import { t } from '@/locales'
 const props = defineProps<{
   modelValue: any
 }>()
@@ -101,7 +101,7 @@ const getData = () => {
     props_info: {
       rules: [
         {
-          message: formValue.value.label + '不能为空',
+          message: formValue.value.label + t('components.dynamicsForm.tip.requiredMessage'),
           trigger: 'blur',
           required: formValue.value.required
         }

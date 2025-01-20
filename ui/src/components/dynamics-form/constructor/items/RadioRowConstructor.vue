@@ -2,7 +2,7 @@
   <el-form-item>
     <template #label>
       <div class="flex-between">
-        选项值
+        {{ $t('components.dynamicsForm.Select.label') }}
         <el-button link type="primary" @click.stop="addOption()">
           <el-icon class="mr-4">
             <Plus />
@@ -13,14 +13,14 @@
     </template>
 
     <el-row style="width: 100%" :gutter="10">
-      <el-col :span="10"
-        ><div class="grid-content ep-bg-purple" />
-        标签</el-col
-      >
-      <el-col :span="12"
-        ><div class="grid-content ep-bg-purple" />
-        选项值</el-col
-      >
+      <el-col :span="10">
+        <div class="grid-content ep-bg-purple" />
+        {{ $t('components.dynamicsForm.tag.label') }}
+      </el-col>
+      <el-col :span="12">
+        <div class="grid-content ep-bg-purple" />
+        {{ $t('components.dynamicsForm.Select.label') }}
+      </el-col>
     </el-row>
     <el-row
       style="width: 100%"
@@ -31,11 +31,15 @@
     >
       <el-col :span="10"
         ><div class="grid-content ep-bg-purple" />
-        <el-input v-model="formValue.option_list[$index].label" placeholder="请输入选项标签"
+        <el-input
+          v-model="formValue.option_list[$index].label"
+          :placeholder="$t('components.dynamicsForm.tag.placeholder')"
       /></el-col>
       <el-col :span="12"
         ><div class="grid-content ep-bg-purple" />
-        <el-input v-model="formValue.option_list[$index].value" placeholder="请输入选项值"
+        <el-input
+          v-model="formValue.option_list[$index].value"
+          :placeholder="$t('components.dynamicsForm.Select.label')"
       /></el-col>
       <el-col :span="1"
         ><div class="grid-content ep-bg-purple" />

@@ -8,7 +8,8 @@ import useUserStore from './user'
 const useApplicationStore = defineStore({
   id: 'application',
   state: () => ({
-    location: `${window.location.origin}/ui/chat/`
+    location: `${window.location.origin}/ui/chat/`,
+    userLanguage: ''
   }),
   actions: {
     async asyncGetAllApplication() {
@@ -77,10 +78,10 @@ const useApplicationStore = defineStore({
 
     async asyncGetAppProfile(loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        const user = useUserStore()
         applicationApi
           .getAppProfile(loading)
           .then((data) => {
+            this.userLanguage = data.data?.language
             resolve(data)
           })
           .catch((error) => {

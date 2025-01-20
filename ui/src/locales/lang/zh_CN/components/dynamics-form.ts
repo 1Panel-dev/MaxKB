@@ -63,5 +63,16 @@ export default {
       label: '格式',
       placeholder: '请选择格式'
     }
+  },
+  Select: {
+    label: '选项值',
+    placeholder: '请输入选项值'
+  },
+  tag: {
+    label: '标签',
+    placeholder: '请输入选项标签'
+  },
+  Slider: {
+    showInput:''
   }
 }

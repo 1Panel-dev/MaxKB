@@ -6,7 +6,7 @@ import UserApi from '@/api/user'
 import ThemeApi from '@/api/theme'
 import { useElementPlusTheme } from 'use-element-plus-theme'
 import { defaultPlatformSetting } from '@/utils/theme'
-
+import useApplicationStore from './application'
 export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
   userInfo: User | null
@@ -30,6 +30,12 @@ const useUserStore = defineStore({
     themeInfo: null
   }),
   actions: {
+    getLanguage() {
+      const application = useApplicationStore()
+      return this.userType === 1
+        ? this.userInfo?.language || localStorage.getItem('language')
+        : application?.userLanguage
+    },
     showXpack() {
       return this.isXPack
     },
@@ -118,6 +124,7 @@ const useUserStore = defineStore({
     async profile() {
       return UserApi.profile().then(async (ok) => {
         this.userInfo = ok.data
+        localStorage.setItem('language', ok.data?.language)
         return this.asyncGetProfile()
       })
     },
