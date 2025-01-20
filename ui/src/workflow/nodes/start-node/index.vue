@@ -17,11 +17,7 @@
       >
         <el-button
           link
-          @click="
-            copyClick(
-              `{{${$t('views.applicationWorkflow.variable.global')}.${item.value}}}`
-            )
-          "
+          @click="copyClick(`{{${$t('views.applicationWorkflow.variable.global')}.${item.value}}}`)"
           style="padding: 0"
         >
           <AppIcon iconName="app-copy"></AppIcon>
@@ -35,14 +31,14 @@ import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { copyClick } from '@/utils/clipboard'
 import { ref, computed, onMounted } from 'vue'
-
+import { t } from '@/locales'
 const props = defineProps<{ nodeModel: any }>()
 
 const showicon = ref(false)
 const globalFields = [
-  { label: '当前时间', value: 'time' },
-  { label: '历史聊天记录', value: 'history_context' },
-  { label: '对话id', value: 'chat_id' }
+  { label: t('views.applicationWorkflow.nodes.startNode.currentTime'), value: 'time' },
+  { label: t('views.application.applicationForm.form.historyRecord.label'), value: 'history_context' },
+  { label: t('components.chat.chatId'), value: 'chat_id' }
 ]
 
 const getRefreshFieldList = () => {
@@ -92,16 +88,16 @@ const refreshFileUploadConfig = () => {
   }
   let fileUploadFields = []
   if (form_data[0].document) {
-    fileUploadFields.push({ label: '文档', value: 'document' })
+    fileUploadFields.push({ label: t('common.fileUpload.document'), value: 'document' })
   }
   if (form_data[0].image) {
-    fileUploadFields.push({ label: '图片', value: 'image' })
+    fileUploadFields.push({ label: t('common.fileUpload.image'), value: 'image' })
   }
   if (form_data[0].audio) {
-    fileUploadFields.push({ label: '音频', value: 'audio' })
+    fileUploadFields.push({ label: t('common.fileUpload.audio'), value: 'audio' })
   }
   if (form_data[0].video) {
-    fileUploadFields.push({ label: '视频', value: 'video' })
+    fileUploadFields.push({ label: t('common.fileUpload.video'), value: 'video' })
   }
 
   set(props.nodeModel.properties.config, 'fields', [...fields, ...fileUploadFields])

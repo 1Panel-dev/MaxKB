@@ -1,5 +1,5 @@
 <template>
-  <LayoutContainer :header="$t('common.document')" class="document-main">
+  <LayoutContainer :header="$t('common.fileUpload.document')" class="document-main">
     <div class="main-calc-height">
       <div class="p-24">
         <div class="flex-between">

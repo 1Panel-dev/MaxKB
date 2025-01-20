@@ -35,6 +35,7 @@ import { cloneDeep } from 'lodash'
 import DynamicsFormConstructor from '@/components/dynamics-form/constructor/index.vue'
 import type { FormField } from '@/components/dynamics-form/type'
 import _ from 'lodash'
+import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 
 const DynamicsFormConstructorRef = ref()
@@ -121,11 +122,11 @@ const currentRow = computed(() => {
 })
 const currentIndex = ref(null)
 const inputTypeList = ref([
-  { label: '文本框', value: 'TextInputConstructor' },
-  { label: '单选框', value: 'SingleSelectConstructor' },
-  { label: '多选框', value: 'MultiSelectConstructor' },
-  { label: '选项卡', value: 'RadioCardConstructor' },
-  { label: '日期', value: 'DatePickerConstructor' }
+  { label: t('components.dynamicsForm.input_type_list.TextInput'), value: 'TextInputConstructor' },
+  { label: t('components.dynamicsForm.input_type_list.SingleSelect'), value: 'SingleSelectConstructor' },
+  { label: t('components.dynamicsForm.input_type_list.MultiSelect'), value: 'MultiSelectConstructor' },
+  { label: t('components.dynamicsForm.input_type_list.RadioCard'), value: 'RadioCardConstructor' },
+  { label: t('components.dynamicsForm.input_type_list.DatePicker'), value: 'DatePickerConstructor' }
 ])
 
 const dialogVisible = ref<boolean>(false)

@@ -190,7 +190,7 @@
           ref="quickInputRef"
           v-model="inputValue"
           type="textarea"
-          placeholder="请输入"
+          :placeholder="$t('common.inputPlaceholder')"
           :autosize="{ minRows: 1, maxRows: 8 }"
           @keydown.enter="sendChatHandle($event)"
         />

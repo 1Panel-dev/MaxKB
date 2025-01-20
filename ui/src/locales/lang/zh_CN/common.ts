@@ -27,7 +27,7 @@ export default {
   createDate: '创建日期',
   createTime: '创建时间',
   operation: '操作',
-  document: '文档',
+
   character: '字符',
   export: '导出',
   exportSuccess: '导出成功',
@@ -40,9 +40,16 @@ export default {
   required: '必填',
   noData: '暂无数据',
   result: '结果',
+  fileUpload: {
+    document: '文档',
+    image: '图片',
+    audio: '音频',
+    video: '视频'
+  },
   status: {
     label: '状态',
     enableSuccess: '启用成功',
     disableSuccess: '禁用成功'
-  }
+  },
+  inputPlaceholder: '请输入'
 }

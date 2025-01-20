@@ -186,7 +186,9 @@ export const formNode = {
     node_data: {
       is_result: true,
       form_field_list: [],
-      form_content_format: t('views.applicationWorkflow.nodes.formNode.form_content_format')
+      form_content_format: t('views.applicationWorkflow.nodes.formNode.form_content_format', {
+        form: '{{form}}'
+      })
     },
     config: {
       fields: [

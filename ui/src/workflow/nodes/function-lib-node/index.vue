@@ -1,7 +1,7 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-16">节点设置</h5>
-    <h5 class="lighter mb-8">输入参数</h5>
+    <h5 class="title-decoration-1 mb-16">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="lighter mb-8">{{ $t('views.functionLib.functionForm.form.inputParam.label') }}</h5>
     <el-form
       @submit.prevent
       ref="FunctionNodeFormRef"
@@ -18,7 +18,7 @@
               :prop="'input_field_list.' + index + '.value'"
               :rules="{
                 required: item.is_required,
-                message: '请输入参数值',
+                message: $t('views.functionLib.functionForm.form.inputParam.requiredMessage'),
                 trigger: 'blur'
               }"
             >
@@ -40,25 +40,31 @@
                 ref="nodeCascaderRef"
                 :nodeModel="nodeModel"
                 class="w-full"
-                placeholder="请选择参数"
+                :placeholder="$t('views.functionLib.functionForm.form.inputParam.placeholder')"
                 v-model="item.value"
               />
-              <el-input v-else v-model="item.value" placeholder="请输入参数值" />
+              <el-input v-else v-model="item.value" :placeholder="$t('views.functionLib.functionForm.form.inputParam.requiredMessage')" />
             </el-form-item>
           </template>
         </div>
 
         <el-text type="info" v-else> {{ $t('common.noData') }} </el-text>
       </el-card>
-      <el-form-item label="返回内容" @click.prevent>
+      <el-form-item
+        :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+        @click.prevent
+      >
         <template #label>
           <div class="flex align-center">
             <div class="mr-4">
-              <span>返回内容<span class="danger">*</span></span>
+              <span
+                >{{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                }}<span class="danger">*</span></span
+              >
             </div>
             <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
               <template #content>
-                关闭后该节点的内容则不输出给用户。 如果你想让用户看到该节点的输出内容，请打开开关。
+                {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
               </template>
               <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
             </el-tooltip>

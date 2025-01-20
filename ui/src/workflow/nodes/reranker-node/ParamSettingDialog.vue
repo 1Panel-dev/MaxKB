@@ -18,8 +18,14 @@
                 <el-form-item>
                   <template #label>
                     <div class="flex align-center">
-                      <span class="mr-4">Score 高于</span>
-                      <el-tooltip effect="dark" content="Score越高相关性越强。" placement="right">
+                      <span class="mr-4"
+                        >Score {{ $t('views.applicationWorkflow.nodes.rerankerNode.higher') }}</span
+                      >
+                      <el-tooltip
+                        effect="dark"
+                        :content="$t('views.applicationWorkflow.nodes.rerankerNode.ScoreTooltip')"
+                        placement="right"
+                      >
                         <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                       </el-tooltip>
                     </div>

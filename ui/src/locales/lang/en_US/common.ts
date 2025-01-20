@@ -27,7 +27,6 @@ export default {
   createDate: 'Create date',
   createTime: 'Create time',
   operation: 'Operation',
-  document: 'Documentation',
   character: 'characters',
   export: 'Export',
   exportSuccess: 'Export successful',
@@ -40,9 +39,16 @@ export default {
   required: 'Required',
   noData: 'No data',
   result: 'Result',
+  fileUpload: {
+    document: 'Documentation',
+    image: 'Image',
+    audio: 'Audio',
+    video: 'Video'
+  },
   status: {
     label: 'Status',
     enableSuccess: 'Enable Successful',
     disableSuccess: 'Disable Successful'
-  }
+  },
+  inputPlaceholder: 'Please input'
 }

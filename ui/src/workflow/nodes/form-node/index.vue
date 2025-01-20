@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">节点设置</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
@@ -12,43 +12,55 @@
         hide-required-asterisk
       >
         <el-form-item
-          label="表单输出内容"
+          :label="$t('views.applicationWorkflow.nodes.formNode.formContent.label')"
           prop="form_content_format"
           :rules="{
             required: true,
-            message: '请表单输出内容',
+            message: $t('views.applicationWorkflow.nodes.formNode.formContent.requiredMessage'),
             trigger: 'blur'
           }"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>表单输出内容<span class="danger">*</span></span>
+                <span
+                  >{{ $t('views.applicationWorkflow.nodes.formNode.formContent.label')
+                  }}<span class="danger">*</span></span
+                >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  设置执行该节点输出的内容，{{ '{ form }' }}为表单的占位符。
+                  {{
+                    $t('views.applicationWorkflow.nodes.formNode.formContent.tooltip', {
+                      form: '{ form }'
+                    })
+                  }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
             </div>
           </template>
           <MdEditorMagnify
-            title="表单输出内容"
+            :title="$t('views.applicationWorkflow.nodes.formNode.formContent.label')"
             v-model="form_data.form_content_format"
             style="height: 150px"
             @submitDialog="submitDialog"
           />
         </el-form-item>
-        <el-form-item label="表单配置" @click.prevent>
+        <el-form-item
+          :label="$t('views.applicationWorkflow.nodes.formNode.formSetting')"
+          @click.prevent
+        >
           <template #label>
             <div class="flex-between">
-              <h5 class="lighter">{{ '表单配置' }}</h5>
+              <h5 class="lighter">
+                {{ $t('views.applicationWorkflow.nodes.formNode.formSetting') }}
+              </h5>
               <el-button link type="primary" @click="openAddFormCollect()">
                 <el-icon class="mr-4">
                   <Plus />
                 </el-icon>
-                添加
+                {{ $t('common.add') }}
               </el-button>
             </div></template
           >
@@ -58,12 +70,18 @@
             v-if="form_data.form_field_list.length > 0"
             :data="form_data.form_field_list"
           >
-            <el-table-column prop="field" label="参数">
+            <el-table-column
+              prop="field"
+              :label="$t('components.dynamicsForm.paramForm.field.label')"
+            >
               <template #default="{ row }">
                 <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="label" label="显示名称">
+            <el-table-column
+              prop="label"
+              :label="$t('components.dynamicsForm.paramForm.name.label')"
+            >
               <template #default="{ row }">
                 <span v-if="row.label && row.label.input_type === 'TooltipLabel'">
                   <span :title="row.label.label" class="ellipsis-1">
@@ -78,7 +96,10 @@
               </template>
             </el-table-column>
 
-            <el-table-column label="组件类型" width="110px">
+            <el-table-column
+              :label="$t('components.dynamicsForm.paramForm.input_type.label')"
+              width="110px"
+            >
               <template #default="{ row }">
                 <el-tag type="info" class="info-tag">{{
                   input_type_list.find((item) => item.value === row.input_type)?.label
@@ -138,6 +159,7 @@ import { ref, onMounted, computed } from 'vue'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import { MsgError } from '@/utils/message'
 import { set, cloneDeep } from 'lodash'
+import { t } from '@/locales'
 const props = defineProps<{ nodeModel: any }>()
 const formNodeFormRef = ref<FormInstance>()
 const editFormField = (form_field_data: any, field_index: number) => {
@@ -152,7 +174,7 @@ const editFormField = (form_field_data: any, field_index: number) => {
 }
 const addFormField = (form_field_data: any) => {
   if (form_data.value.form_field_list.some((field: any) => field.field === form_field_data.field)) {
-    MsgError('参数已存在:' + form_field_data.field)
+    MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + form_field_data.field)
     return
   }
   form_data.value.form_field_list = cloneDeep([...form_data.value.form_field_list, form_field_data])
@@ -161,7 +183,7 @@ const addFormField = (form_field_data: any) => {
 const sync_form_field_list = () => {
   const fields = [
     {
-      label: '表单全部内容',
+      label: t('views.applicationWorkflow.nodes.formNode.formAllContent'),
       value: 'form_data'
     },
     ...form_data.value.form_field_list.map((item: any) => ({
@@ -187,9 +209,9 @@ const deleteField = (form_field_data: any) => {
 }
 const form = ref<any>({
   is_result: true,
-  form_content_format: `你好，请先填写下面表单内容：
-{{form}}
-填写后请点击【提交】按钮进行提交。`,
+  form_content_format: t('views.applicationWorkflow.nodes.formNode.form_content_format', {
+    form: '{{form}}'
+  }),
   form_field_list: []
 })
 const form_data = computed({

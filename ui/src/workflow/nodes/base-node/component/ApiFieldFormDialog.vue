@@ -19,17 +19,17 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item label="参数" prop="variable">
+      <el-form-item :label="$t('components.dynamicsForm.paramForm.field.label')" prop="variable">
         <el-input
           v-model="form.variable"
-          placeholder="请输入参数"
+          :placeholder="$t('components.dynamicsForm.paramForm.field.placeholder')"
           maxlength="64"
           show-word-limit
           @blur="form.variable = form.variable.trim()"
         />
       </el-form-item>
 
-      <el-form-item label="是否必填" @click.prevent>
+      <el-form-item :label="$t('components.dynamicsForm.paramForm.required.label')" @click.prevent>
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
       <el-form-item
@@ -62,7 +62,7 @@
 import { reactive, ref, watch } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
-
+import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
 
 const fieldFormRef = ref()
@@ -80,10 +80,10 @@ const form = ref<any>({
 })
 
 const rules = reactive({
-  name: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
+  name: [{ required: true, message: t('components.dynamicsForm.paramForm.name.requiredMessage'), trigger: 'blur' }],
   variable: [
-    { required: true, message: '请输入参数', trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: '只能输入字母数字和下划线', trigger: 'blur' }
+    { required: true, message:  t('components.dynamicsForm.paramForm.field.requiredMessage'), trigger: 'blur' },
+    { pattern: /^[a-zA-Z0-9_]+$/, message: t('components.dynamicsForm.paramForm.field.requiredMessage2'), trigger: 'blur' }
   ]
 })
 

@@ -41,7 +41,7 @@ export default {
       },
       inputParam: {
         label: '输入参数',
-        placeholder: '请输入参数值',
+        placeholder: '请选择参数',
         requiredMessage: '请输入参数值'
       },
       paramName: {

@@ -7,7 +7,7 @@
           <el-icon class="mr-4">
             <Plus />
           </el-icon>
-          添加
+          {{ $t('common.add') }}
         </el-button>
       </div>
     </template>

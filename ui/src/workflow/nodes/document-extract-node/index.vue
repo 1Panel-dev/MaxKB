@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">节点设置</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -10,10 +10,10 @@
         label-width="auto"
         ref="DatasetNodeFormRef"
       >
-        <el-form-item label="选择文档" :rules="{
+        <el-form-item :label="$t('views.problem.relateParagraph.selectDocument')" :rules="{
             type: 'array',
             required: true,
-            message: '请选择文件',
+            message: $t('views.log.documentPlaceholder'),
             trigger: 'change'
           }"
         >
@@ -21,7 +21,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择文档"
+            :placeholder="$t('views.log.documentPlaceholder')"
             v-model="form_data.document_list"
           />
         </el-form-item>

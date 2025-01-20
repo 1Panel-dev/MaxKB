@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :node-model="nodeModel">
-    <h5 class="title-decoration-1 mb-8">节点设置</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -12,18 +12,21 @@
         hide-required-asterisk
       >
         <el-form-item
-          label="语音识别模型"
+          :label="$t('views.applicationWorkflow.nodes.speechToTextNode.stt_model.label')"
           prop="stt_model_id"
           :rules="{
             required: true,
-            message: '请选择语音识别模型',
+            message: $t('views.application.applicationForm.form.voiceInput.placeholder'),
             trigger: 'change'
           }"
         >
           <template #label>
             <div class="flex-between w-full">
               <div>
-                <span>语音识别模型<span class="danger">*</span></span>
+                <span
+                  >{{ $t('views.applicationWorkflow.nodes.speechToTextNode.stt_model.label')
+                  }}<span class="danger">*</span></span
+                >
               </div>
             </div>
           </template>
@@ -36,10 +39,10 @@
           ></ModelSelect>
         </el-form-item>
         <el-form-item
-          label="选择语音文件"
+          :label="$t('views.applicationWorkflow.nodes.speechToTextNode.audio.label')"
           prop="audio_list"
           :rules="{
-            message: '选择语音文件',
+            message: $t('views.applicationWorkflow.nodes.speechToTextNode.audio.label'),
             trigger: 'change',
             required: true
           }"
@@ -47,7 +50,10 @@
           <template #label>
             <div class="flex-between w-full">
               <div>
-                <span>选择语音文件<span class="danger">*</span></span>
+                <span
+                  >{{ $t('views.applicationWorkflow.nodes.speechToTextNode.audio.label')
+                  }}<span class="danger">*</span></span
+                >
               </div>
             </div>
           </template>
@@ -55,21 +61,26 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择语音文件"
+            :placeholder="$t('views.applicationWorkflow.nodes.speechToTextNode.audio.placeholder')"
             v-model="form_data.audio_list"
           />
         </el-form-item>
 
-        <el-form-item label="返回内容" @click.prevent>
+        <el-form-item
+          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          @click.prevent
+        >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>返回内容<span class="danger">*</span></span>
+                <span
+                  >{{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                  }}<span class="danger">*</span></span
+                >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  关闭后该节点的内容则不输出给用户。
-                  如果你想让用户看到该节点的输出内容，请打开开关。
+                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -153,8 +164,6 @@ function getModel() {
     })
   }
 }
-
-
 
 onMounted(() => {
   getModel()

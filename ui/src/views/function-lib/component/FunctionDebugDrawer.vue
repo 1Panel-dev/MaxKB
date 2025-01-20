@@ -44,7 +44,7 @@
                 </template>
                 <el-input
                   v-model="item.value"
-                  :placeholder="$t('views.functionLib.functionForm.form.inputParam.placeholder')"
+                  :placeholder="$t('views.functionLib.functionForm.form.inputParam.requiredMessage')"
                 />
               </el-form-item>
             </template>

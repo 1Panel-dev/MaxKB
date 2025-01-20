@@ -1,10 +1,11 @@
 <template>
   <div class="flex align-center mt-16" v-if="!isWorkFlow(props.type)">
-    <span class="mr-4 color-secondary">知识来源</span>
+    <span class="mr-4 color-secondary">{{ $t('components.chat.KnowledgeSource.title') }}</span>
     <el-divider direction="vertical" />
     <el-button type="primary" class="mr-8" link @click="openParagraph(data)">
       <AppIcon iconName="app-reference-outlined" class="mr-4"></AppIcon>
-      引用分段 {{ data.paragraph_list?.length || 0 }}</el-button
+      {{ $t('components.chat.KnowledgeSource.referenceParagraph') }}
+      {{ data.paragraph_list?.length || 0 }}</el-button
     >
   </div>
   <div class="mt-8" v-if="!isWorkFlow(props.type)">
@@ -42,8 +43,8 @@
 
   <div class="border-t color-secondary flex-between mt-12" style="padding-top: 12px">
     <div>
-      <span class="mr-8"> 消耗 tokens: {{ data?.message_tokens + data?.answer_tokens }} </span>
-      <span> 耗时: {{ data?.run_time?.toFixed(2) }} s</span>
+      <span class="mr-8"> {{ $t('components.chat.KnowledgeSource.consume') }} tokens: {{ data?.message_tokens + data?.answer_tokens }} </span>
+      <span> {{ $t('components.chat.KnowledgeSource.consumeTime') }}: {{ data?.run_time?.toFixed(2) }} s</span>
     </div>
     <el-button
       v-if="isWorkFlow(props.type)"
@@ -52,7 +53,7 @@
       @click="openExecutionDetail(data.execution_details)"
     >
       <el-icon class="mr-4"><Document /></el-icon>
-      执行详情</el-button
+      {{ $t('components.chat.executionDetails.title') }}</el-button
     >
   </div>
   <!-- 知识库引用 dialog -->

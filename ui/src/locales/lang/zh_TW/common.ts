@@ -27,7 +27,6 @@ export default {
   createDate: '創建日期',
   createTime: '創建時間',
   operation: '操作',
-  document: '文檔',
   character: '字符',
   export: '匯出',
   exportSuccess: '匯出成功',
@@ -40,9 +39,16 @@ export default {
   required: '必填',
   noData: '暂无数据',
   result: '結果',
+  fileUpload: {
+    document: '文檔',
+    image: '圖片',
+    audio: '音頻',
+    video: '視頻'
+  },
   status: {
     label: '狀態',
     enableSuccess: '啟用成功',
     disableSuccess: '停用成功'
-  }
+  },
+  inputPlaceholder: '請輸入'
 }

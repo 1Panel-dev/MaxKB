@@ -4,7 +4,7 @@
       <template #sub-title>
         <div class="mt-8">
           <span class="bold">{{ data?.document_list.length || 0 }}</span>
-          <el-text type="info" class="ml-4">{{ $t('common.document') }}</el-text>
+          <el-text type="info" class="ml-4">{{ $t('common.fileUpload.document') }}</el-text>
           <el-divider direction="vertical" />
           <span class="bold">{{ paragraph_count || 0 }}</span>
           <el-text type="info" class="ml-4">{{

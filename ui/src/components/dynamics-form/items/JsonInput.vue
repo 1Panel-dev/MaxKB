@@ -20,7 +20,7 @@
       </el-button>
     </div>
     <!-- Codemirror 弹出层 -->
-    <el-dialog v-model="dialogVisible" title="Python 代码" append-to-body fullscreen>
+    <el-dialog v-model="dialogVisible" :title="'Python ' + $t('views.functionLib.functionForm.form.param.code')" append-to-body fullscreen>
       <Codemirror
         v-model="cloneContent"
         :extensions="extensions"

@@ -1,11 +1,11 @@
 <template>
   <div class="flex-between mb-16">
-    <h5 class="lighter">{{ '接口传参' }}</h5>
+    <h5 class="lighter">{{ $t('views.applicationWorkflow.templateForm.title.apiParamPassing') }}</h5>
     <el-button link type="primary" @click="openAddDialog()">
       <el-icon class="mr-4">
         <Plus />
       </el-icon>
-      添加
+    {{$t('common.add')}}
     </el-button>
   </div>
   <el-table
@@ -13,7 +13,7 @@
     :data="props.nodeModel.properties.api_input_field_list"
     class="mb-16"
   >
-    <el-table-column prop="variable" label="参数" />
+    <el-table-column prop="variable" :label="$t('components.dynamicsForm.paramForm.field.label')" />
     <el-table-column prop="default_value" :label="$t('components.dynamicsForm.default.label')" />
     <el-table-column :label="$t('common.required')">
       <template #default="{ row }">
@@ -50,7 +50,7 @@ import { onMounted, ref } from 'vue'
 import { set } from 'lodash'
 import ApiFieldFormDialog from './ApiFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
-
+import { t } from '@/locales'
 const props = defineProps<{ nodeModel: any }>()
 
 const currentIndex = ref(null)
@@ -72,7 +72,7 @@ function deleteField(index: any) {
 function refreshFieldList(data: any) {
   for (let i = 0; i < inputFieldList.value.length; i++) {
     if (inputFieldList.value[i].variable === data.variable && currentIndex.value !== i) {
-      MsgError('参数已存在: ' + data.variable)
+      MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.variable)
       return
     }
   }
@@ -80,7 +80,7 @@ function refreshFieldList(data: any) {
   let arr = props.nodeModel.properties.user_input_field_list
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].field === data.variable) {
-      MsgError('参数已存在: ' + data.variable)
+      MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.variable)
       return
     }
   }

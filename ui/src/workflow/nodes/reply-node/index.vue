@@ -9,18 +9,18 @@
         label-width="auto"
         ref="replyNodeFormRef"
       >
-        <el-form-item label="回复内容">
+        <el-form-item :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.label')">
           <template #label>
             <div class="flex-between">
-              <span>回复内容</span>
+              <span>{{ $t('views.applicationWorkflow.nodes.replyNode.replyContent.label') }}</span>
               <el-select
                 :teleported="false"
                 v-model="form_data.reply_type"
                 size="small"
                 style="width: 85px"
               >
-                <el-option label="引用变量" value="referencing" />
-                <el-option label="自定义" value="content" />
+                <el-option :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')" value="referencing" />
+                <el-option :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.custom')" value="content" />
               </el-select>
             </div>
           </template>
@@ -28,7 +28,7 @@
           <MdEditorMagnify
             v-if="form_data.reply_type === 'content'"
             @wheel="wheel"
-            title="回复内容"
+            :title="$t('views.applicationWorkflow.nodes.replyNode.replyContent.label')"
             v-model="form_data.content"
             style="height: 150px"
             @submitDialog="submitDialog"
@@ -38,20 +38,27 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择检索问题"
+            :placeholder="
+              $t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.placeholder')
+            "
             v-model="form_data.fields"
           />
         </el-form-item>
-        <el-form-item label="返回内容" @click.prevent>
+        <el-form-item
+          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          @click.prevent
+        >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>返回内容<span class="danger">*</span></span>
+                <span
+                  >{{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                  }}<span class="danger">*</span></span
+                >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  关闭后该节点的内容则不输出给用户。
-                  如果你想让用户看到该节点的输出内容，请打开开关。
+                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>

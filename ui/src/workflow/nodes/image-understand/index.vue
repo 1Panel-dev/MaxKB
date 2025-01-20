@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :node-model="nodeModel">
-    <h5 class="title-decoration-1 mb-8">节点设置</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -12,18 +12,23 @@
         hide-required-asterisk
       >
         <el-form-item
-          label="图片理解模型"
+          :label="$t('views.applicationWorkflow.nodes.imageUnderstandNode.model.label')"
           prop="model_id"
           :rules="{
             required: true,
-            message: '请选择图片理解模型',
+            message: $t(
+              'views.applicationWorkflow.nodes.imageUnderstandNode.model.requiredMessage'
+            ),
             trigger: 'change'
           }"
         >
           <template #label>
             <div class="flex-between w-full">
               <div>
-                <span>图片理解模型<span class="danger">*</span></span>
+                <span
+                  >{{ t('views.applicationWorkflow.nodes.imageUnderstandNode.model.label')
+                  }}<span class="danger">*</span></span
+                >
               </div>
               <el-button
                 :disabled="!form_data.model_id"
@@ -41,37 +46,42 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.model_id"
-            placeholder="请选择图片理解模型"
+            :placeholder="
+              $t('views.applicationWorkflow.nodes.imageUnderstandNode.model.requiredMessage')
+            "
             :options="modelOptions"
           ></ModelSelect>
         </el-form-item>
 
-        <el-form-item label="角色设定">
+        <el-form-item :label="$t('views.application.applicationForm.form.roleSettings.label')">
           <MdEditorMagnify
-            title="角色设定"
+            :title="$t('views.application.applicationForm.form.roleSettings.label')"
             v-model="form_data.system"
             style="height: 100px"
             @submitDialog="submitSystemDialog"
-            placeholder="角色设定"
+            :placeholder="$t('views.application.applicationForm.form.roleSettings.label')"
           />
         </el-form-item>
         <el-form-item
-          label="提示词"
+          :label="$t('views.application.applicationForm.form.prompt.label')"
           prop="prompt"
           :rules="{
             required: true,
-            message: '请输入提示词',
+            message: $t('views.application.applicationForm.form.prompt.requiredMessage'),
             trigger: 'blur'
           }"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>提示词<span class="danger">*</span></span>
+                <span
+                  >{{ $t('views.application.applicationForm.form.prompt.label')
+                  }}<span class="danger">*</span></span
+                >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。
+                  >{{ $t('views.application.applicationForm.form.prompt.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -79,7 +89,7 @@
           </template>
           <MdEditorMagnify
             @wheel="wheel"
-            title="提示词"
+            :title="$t('views.application.applicationForm.form.prompt.label')"
             v-model="form_data.prompt"
             style="height: 150px"
             @submitDialog="submitDialog"
@@ -88,10 +98,10 @@
         <el-form-item>
           <template #label>
             <div class="flex-between">
-              <div>历史聊天记录</div>
+              <div>{{ $t('views.application.applicationForm.form.historyRecord.label') }}</div>
               <el-select v-model="form_data.dialogue_type" type="small" style="width: 100px">
-                <el-option label="节点" value="NODE" />
-                <el-option label="工作流" value="WORKFLOW" />
+                <el-option :label="$t('views.applicationWorkflow.node')" value="NODE" />
+                <el-option :label="$t('views.applicationWorkflow.workflow')" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -106,33 +116,47 @@
           />
         </el-form-item>
         <el-form-item
-          label="选择图片"
+          :label="$t(
+              'views.applicationWorkflow.nodes.imageUnderstandNode.image.label'
+            ),"
           :rules="{
             type: 'array',
             required: true,
-            message: '请选择图片',
+            message: $t(
+              'views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage'
+            ),
             trigger: 'change'
           }"
         >
-          <template #label>选择图片<span class="danger">*</span></template>
+          <template #label
+            >{{ $t('views.applicationWorkflow.nodes.imageUnderstandNode.image.label')
+            }}<span class="danger">*</span></template
+          >
           <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            placeholder="请选择图片"
+            :placeholder="$t(
+              'views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage'
+            )"
             v-model="form_data.image_list"
           />
         </el-form-item>
-        <el-form-item label="返回内容" @click.prevent>
+        <el-form-item
+          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          @click.prevent
+        >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>返回内容<span class="danger">*</span></span>
+                <span
+                  >{{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                  }}<span class="danger">*</span></span
+                >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  关闭后该节点的内容则不输出给用户。
-                  如果你想让用户看到该节点的输出内容，请打开开关。
+                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -156,7 +180,7 @@ import useStore from '@/stores'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
-
+import { t } from '@/locales'
 const { model } = useStore()
 
 const {
@@ -188,7 +212,7 @@ const wheel = (e: any) => {
   }
 }
 
-const defaultPrompt = `{{开始.question}}`
+const defaultPrompt = `{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',

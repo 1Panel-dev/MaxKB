@@ -19,7 +19,8 @@ export default {
     field: {
       label: '参数',
       placeholder: '请输入参数',
-      requiredMessage: '参数 为必填属性'
+      requiredMessage: '参数 为必填属性',
+      requiredMessage2:'只能输入字母数字和下划线'
     },
     name: {
       label: '显示名称',

@@ -1,6 +1,3 @@
-import Password from '@/views/chat/auth/component/password.vue'
-import { create } from 'lodash'
-
 export default {
   title: '应用',
   createApplication: '创建应用',
@@ -59,6 +56,7 @@ export default {
         references: ' (引用知识库)',
         placeholder: '请输入提示词',
         requiredMessage: '请输入提示词',
+        tooltip:'通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。',
         noReferencesTooltip:
           '通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。可以使用变量：{question} 是用户提出问题的占位符。',
         referencesTooltip:

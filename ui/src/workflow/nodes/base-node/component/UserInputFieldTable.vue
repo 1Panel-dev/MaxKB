@@ -1,11 +1,11 @@
 <template>
   <div class="flex-between mb-16">
-    <h5 class="lighter">{{ '用户输入' }}</h5>
+    <h5 class="lighter">{{ $t('components.chat.userInput') }}</h5>
     <el-button link type="primary" @click="openAddDialog()">
       <el-icon class="mr-4">
         <Plus />
       </el-icon>
-      添加
+      {{ $t('common.add') }}
     </el-button>
   </div>
   <el-table
@@ -13,13 +13,13 @@
     :data="props.nodeModel.properties.user_input_field_list"
     class="mb-16"
   >
-    <el-table-column prop="field" label="参数">
+    <el-table-column prop="field" :label="$t('components.dynamicsForm.paramForm.field.label')">
       <template #default="{ row }">
         <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column prop="label" label="显示名称">
+    <el-table-column prop="label" :label="$t('components.dynamicsForm.paramForm.name.label')">
       <template #default="{ row }">
         <span v-if="row.label && row.label.input_type === 'TooltipLabel'">
           <span :title="row.label.label" class="ellipsis-1">
@@ -33,24 +33,33 @@
         >
       </template>
     </el-table-column>
-    <el-table-column label="组件类型">
+    <el-table-column :label="$t('components.dynamicsForm.paramForm.input_type.label')">
       <template #default="{ row }">
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">文本框</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'">滑块</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'">开关</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'"
-          >单选框</el-tag
-        >
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'MultiSelect'">多选框</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'RadioCard'">选项卡</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">日期</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">{{
+          $t('components.dynamicsForm.input_type_list.TextInput')
+        }}</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'">{{
+          $t('components.dynamicsForm.input_type_list.Slider')
+        }}</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'">{{
+          $t('components.dynamicsForm.input_type_list.SwitchInput')
+        }}</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'">{{
+          $t('components.dynamicsForm.input_type_list.SingleSelect')
+        }}</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'MultiSelect'">{{
+          $t('components.dynamicsForm.input_type_list.MultiSelect')
+        }}</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'RadioCard'">{{
+          $t('components.dynamicsForm.input_type_list.RadioCard')
+        }}</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">{{
+          $t('components.dynamicsForm.input_type_list.DatePicker')
+        }}</el-tag>
       </template>
     </el-table-column>
 
-    <el-table-column
-      prop="default_value"
-      :label="$t('components.dynamicsForm.default.label')"
-    >
+    <el-table-column prop="default_value" :label="$t('components.dynamicsForm.default.label')">
       <template #default="{ row }">
         <span :title="row.default_value" class="ellipsis-1">{{ getDefaultValue(row) }}</span>
       </template>
@@ -90,7 +99,7 @@ import { onMounted, ref } from 'vue'
 import { set } from 'lodash'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
-
+import { t } from '@/locales'
 const props = defineProps<{ nodeModel: any }>()
 
 const UserFieldFormDialogRef = ref()
@@ -108,7 +117,7 @@ function deleteField(index: any) {
 function refreshFieldList(data: any, index: any) {
   for (let i = 0; i < inputFieldList.value.length; i++) {
     if (inputFieldList.value[i].field === data.field && index !== i) {
-      MsgError('参数已存在: ' + data.field)
+      MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.field)
       return
     }
   }
@@ -116,7 +125,7 @@ function refreshFieldList(data: any, index: any) {
   let arr = props.nodeModel.properties.api_input_field_list
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].variable === data.field) {
-      MsgError('参数已存在: ' + data.field)
+      MsgError(t('views.applicationWorkflow.tip.paramErrorMessage') + data.field)
       return
     }
   }

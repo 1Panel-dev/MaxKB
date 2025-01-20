@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="`${$t('views.log.selectDataset')}/${$t('common.document')}`"
+    :title="`${$t('views.log.selectDataset')}/${$t('common.fileUpload.document')}`"
     v-model="dialogVisible"
     width="500"
     :close-on-click-modal="false"

@@ -6,7 +6,7 @@
           <el-input
             ref="quickInputRef"
             v-model="inputValue"
-            :placeholder="`请输入${quickCreateName}`"
+            :placeholder="`${$t('common.inputPlaceholder')}${quickCreateName}`"
             class="w-500 mr-12"
             autofocus
             :maxlength="quickCreateMaxlength || '-'"

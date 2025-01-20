@@ -33,6 +33,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import UserApi from '@/api/user'
+import { t } from '@/locales'
 defineOptions({ name: 'TagsInput' })
 const props = defineProps({
   tags: {
@@ -42,7 +43,7 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: '请输入'
+    default: t('common.inputPlaceholder')
   },
   limit: {
     /* 最多生成标签数 */

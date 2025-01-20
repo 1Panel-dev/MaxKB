@@ -103,7 +103,7 @@
               </div>
               <div class="mt-4 mb-16 url-height">
                 <div>
-                  <el-text>API {{ $t('common.document') }}：</el-text
+                  <el-text>API {{ $t('common.fileUpload.document') }}：</el-text
                   ><el-button
                     type="primary"
                     link
