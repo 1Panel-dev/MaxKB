@@ -126,7 +126,7 @@
         </el-table-column>
       </el-table>
       <h4 class="title-decoration-1 mb-16">
-        Python {{ $t('views.functionLib.functionForm.form.param.code') }}
+        {{ $t('views.functionLib.functionForm.form.param.code') }}
         <el-text type="info" class="color-secondary">
           {{ $t('views.functionLib.functionForm.form.param.paramInfo2') }}
         </el-text>
@@ -164,7 +164,7 @@
     <!-- Codemirror 弹出层 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="'Python ' + $t('views.functionLib.functionForm.form.param.code')"
+      :title="$t('views.functionLib.functionForm.form.param.code')"
       append-to-body
       fullscreen
     >

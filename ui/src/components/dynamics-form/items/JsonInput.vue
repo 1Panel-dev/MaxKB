@@ -20,14 +20,23 @@
       </el-button>
     </div>
     <!-- Codemirror 弹出层 -->
-    <el-dialog v-model="dialogVisible" :title="'Python ' + $t('views.functionLib.functionForm.form.param.code')" append-to-body fullscreen>
+    <el-dialog
+      v-model="dialogVisible"
+      :title="$t('views.functionLib.functionForm.form.param.code')"
+      append-to-body
+      fullscreen
+    >
       <Codemirror
         v-model="cloneContent"
         :extensions="extensions"
         :style="codemirrorStyle"
         :tab-size="4"
         :autofocus="true"
-        style="height: calc(100vh - 160px) !important; border: 1px solid #bbbfc4; border-radius: 4px"
+        style="
+          height: calc(100vh - 160px) !important;
+          border: 1px solid #bbbfc4;
+          border-radius: 4px;
+        "
       />
       <template #footer>
         <div class="dialog-footer mt-24">

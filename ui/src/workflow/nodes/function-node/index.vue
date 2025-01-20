@@ -72,7 +72,7 @@
       </el-card>
 
       <h5 class="lighter mb-8">
-        Python {{ $t('views.functionLib.functionForm.form.param.code') }}
+        {{ $t('views.functionLib.functionForm.form.param.code') }}
       </h5>
       <div class="function-CodemirrorEditor mb-8" v-if="showEditor">
         <CodemirrorEditor
@@ -112,7 +112,12 @@
     </el-form>
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
     <!-- Codemirror 弹出层 -->
-    <el-dialog v-model="dialogVisible" :title="'Python ' + $t('views.functionLib.functionForm.form.param.code')" append-to-body fullscreen>
+    <el-dialog
+      v-model="dialogVisible"
+      :title="$t('views.functionLib.functionForm.form.param.code')"
+      append-to-body
+      fullscreen
+    >
       <CodemirrorEditor
         v-model="cloneContent"
         style="

@@ -10,7 +10,7 @@ export default {
     disabled: '禁用'
   },
   tip: {
-    saveMessage:'当前的更改尚未保存，确认退出吗?'
+    saveMessage: '当前的更改尚未保存，确认退出吗?'
   },
   delete: {
     confirmTitle: '是否删除函数：',
@@ -50,28 +50,28 @@ export default {
         requiredMessage: '请输入参数名'
       },
       dataType: {
-        label: '数据类型',
+        label: '数据类型'
       },
       source: {
         label: '来源',
         custom: '自定义',
-        reference: '引用参数',
+        reference: '引用参数'
       },
       required: {
-        label: '是否必填',
+        label: '是否必填'
       },
       param: {
         outputParam: '输出参数',
         paramInfo1: '使用函数时显示',
         paramInfo2: '使用函数时不显示',
-        code: '代码',
+        code: '函数内容（Python）'
       },
       debug: {
         run: '运行',
         output: '输出',
         runResult: '运行结果',
         runSuccess: '运行成功',
-        runFailed: '运行失败',
+        runFailed: '运行失败'
       }
     }
   }
