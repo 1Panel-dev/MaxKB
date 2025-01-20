@@ -33,10 +33,9 @@ const useUserStore = defineStore({
   }),
   actions: {
     getLanguage() {
-      const application = useApplicationStore()
       return this.userType === 1
-        ? this.userInfo?.language || localStorage.getItem('MaxKB-locale')
-        : application?.userLanguage
+        ? localStorage.getItem('MaxKB-locale')
+        : sessionStorage.getItem('language')
     },
     showXpack() {
       return this.isXPack
