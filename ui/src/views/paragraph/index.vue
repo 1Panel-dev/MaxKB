@@ -134,7 +134,7 @@
                               <el-dropdown-item @click="openGenerateDialog(item)">
                                 <el-icon><Connection /></el-icon>
                                 {{
-                                  $t('views.document.setting.generateQuestion.title')
+                                  $t('views.document.generateQuestion.title')
                                 }}</el-dropdown-item
                               >
                               <el-dropdown-item @click="openSelectDocumentDialog(item)">
@@ -159,7 +159,7 @@
 
       <div class="mul-operation border-t w-full" v-if="isBatch === true">
         <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
-          {{ $t('views.document.setting.generateQuestion.title') }}
+          {{ $t('views.document.generateQuestion.title') }}
         </el-button>
         <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog()">
           {{ $t('views.document.setting.migration') }}

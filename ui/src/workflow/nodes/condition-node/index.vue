@@ -26,11 +26,11 @@
                 style="width: 60px; margin: 0 8px"
               >
                 <el-option
-                  :label="$t('views.applicationWorkflow.nodes.condition.AND')"
+                  :label="$t('views.applicationWorkflow.condition.AND')"
                   value="and"
                 />
                 <el-option
-                  :label="$t('views.applicationWorkflow.nodes.condition.OR')"
+                  :label="$t('views.applicationWorkflow.condition.OR')"
                   value="or"
                 />
               </el-select>

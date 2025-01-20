@@ -1,6 +1,6 @@
 <template>
   <div class="flex-between mb-16">
-    <h5 class="lighter">{{ $t('views.applicationWorkflow.templateForm.title.apiParamPassing') }}</h5>
+    <h5 class="lighter">{{ $t('views.template.templateForm.title.apiParamPassing') }}</h5>
     <el-button link type="primary" @click="openAddDialog()">
       <el-icon class="mr-4">
         <Plus />

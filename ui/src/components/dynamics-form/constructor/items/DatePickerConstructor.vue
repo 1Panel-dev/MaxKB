@@ -57,6 +57,7 @@
 </template>
 <script setup lang="ts">
 import { computed, onBeforeMount } from 'vue'
+import { t } from '@/locales'
 const type_list = [
   {
     label: t('components.dynamicsForm.DatePicker.year'),

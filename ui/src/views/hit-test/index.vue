@@ -165,7 +165,7 @@
           <el-col :span="12">
             <div class="mb-16">
               <div class="title mb-8">
-                {{ $t('views.application.applicationForm.dialogues.topReferences') }}
+                {{ $t('views.application.applicationForm.dialog.topReferences') }}
               </div>
               <el-input-number
                 v-model="cloneForm.top_number"

@@ -132,18 +132,18 @@
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.reranker_model.label')"
+          :label="$t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.label')"
           prop="reranker_model_id"
           :rules="{
             required: true,
-            message: $t('views.applicationWorkflow.nodes.reranker_model.placeholder'),
+            message: $t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.placeholder'),
             trigger: 'change'
           }"
         >
           <template #label>
             <div class="flex-between">
               <span
-                >{{ $t('views.applicationWorkflow.nodes.reranker_model.label')
+                >{{ $t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.label')
                 }}<span class="danger">*</span></span
               >
             </div>
@@ -152,7 +152,7 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.reranker_model_id"
-            :placeholder="$t('views.applicationWorkflow.nodes.reranker_model.placeholder')"
+            :placeholder="$t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.placeholder')"
             :options="modelOptions"
             @submitModel="getModel"
             showFooter

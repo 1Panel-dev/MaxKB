@@ -185,7 +185,11 @@ const {
 } = app.config.globalProperties.$route as any
 
 // @ts-ignore
-const defaultPrompt = t('views.applicationWorkflow.nodes.aiChatNode.defaultPrompt')
+const defaultPrompt = `${t('views.applicationWorkflow.nodes.aiChatNode.defaultPrompt')}：
+{{${t('views.applicationWorkflow.nodes.searchDatasetNode.label')}.data}}
+${t('views.problem.title')}：
+{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`
+
 const form = {
   model_id: '',
   system: '',

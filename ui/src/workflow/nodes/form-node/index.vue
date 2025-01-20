@@ -209,9 +209,9 @@ const deleteField = (form_field_data: any) => {
 }
 const form = ref<any>({
   is_result: true,
-  form_content_format: t('views.applicationWorkflow.nodes.formNode.form_content_format', {
-    form: '{{form}}'
-  }),
+  form_content_format: `${t('views.applicationWorkflow.nodes.formNode.form_content_format1')}
+    {{form}}
+    ${t('views.applicationWorkflow.nodes.formNode.form_content_format2')}`,
   form_field_list: []
 })
 const form_data = computed({

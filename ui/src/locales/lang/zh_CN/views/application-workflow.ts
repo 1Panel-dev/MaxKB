@@ -106,10 +106,7 @@ export default {
         tooltip: `关闭后该节点的内容则不输出给用户。
                   如果你想让用户看到该节点的输出内容，请打开开关。`
       },
-      defaultPrompt: `已知信息：
-{{知识库检索.data}}
-问题：
-{{开始.question}}`
+      defaultPrompt: '已知信息'
     },
     searchDatasetNode: {
       label: '知识库检索',
@@ -177,9 +174,8 @@ export default {
     formNode: {
       label: '表单收集',
       text: '在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程',
-      form_content_format: `你好，请先填写下面表单内容：
-{{form}}
-填写后请点击【提交】按钮进行提交。`,
+      form_content_format1: '你好，请先填写下面表单内容：',
+      form_content_format2: '填写后请点击【提交】按钮进行提交。',
       form_data: '表单全部内容',
       formContent: {
         label: '表单输出内容',

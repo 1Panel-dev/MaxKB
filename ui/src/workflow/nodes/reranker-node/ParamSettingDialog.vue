@@ -44,7 +44,7 @@
               </el-col>
               <el-col :span="12">
                 <el-form-item
-                  :label="$t('views.application.applicationForm.dialogues.topReferences')"
+                  :label="$t('views.application.applicationForm.dialog.topReferences')"
                 >
                   <el-input-number
                     v-model="form.top_n"
@@ -58,7 +58,7 @@
               </el-col>
             </el-row>
 
-            <el-form-item :label="$t('views.application.applicationForm.dialogues.maxCharacters')">
+            <el-form-item :label="$t('views.application.applicationForm.dialog.maxCharacters')">
               <el-slider
                 v-model="form.max_paragraph_char_number"
                 show-input

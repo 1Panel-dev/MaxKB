@@ -105,10 +105,7 @@ export default {
         tooltip: `If turned off, the content of this node will not be output to the user.
                   If you want the user to see the output of this node, please turn on the switch.`
       },
-      defaultPrompt: `Known Information:
-{{knowledgeBaseSearch.data}}
-Question:
-{{start.question}}`
+      defaultPrompt: 'Known Information'
     },
     searchDatasetNode: {
       label: 'Knowledge Base Search',
@@ -176,9 +173,8 @@ Please output an optimized question.`,
     formNode: {
       label: 'Form Collection',
       text: 'Used to collect user information during Q&A process, subsequent processes can be executed based on collected form data',
-      form_content_format: `Hello, please fill out the form below:
-{{form}}
-Click the [Submit] button after filling it out.`,
+      form_content_format1: 'Hello, please fill out the form below:',
+      form_content_format2: 'Click the [Submit] button after filling it out.',
       form_data: 'All Form Content',
       formContent: {
         label: 'Form Output Content',

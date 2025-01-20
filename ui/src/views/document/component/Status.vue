@@ -72,7 +72,7 @@ const startedMap = {
 }
 const taskTypeMap = {
   [TaskType.EMBEDDING]: t('views.dataset.setting.vectorization'),
-  [TaskType.GENERATE_PROBLEM]: t('views.document.setting.generateQuestion.title'),
+  [TaskType.GENERATE_PROBLEM]: t('views.document.generateQuestion.title'),
   [TaskType.SYNC]: t('views.dataset.setting.sync')
 }
 const stateMap: any = {

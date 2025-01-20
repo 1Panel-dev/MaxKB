@@ -186,9 +186,9 @@ export const formNode = {
     node_data: {
       is_result: true,
       form_field_list: [],
-      form_content_format: t('views.applicationWorkflow.nodes.formNode.form_content_format', {
-        form: '{{form}}'
-      })
+      form_content_format: `${t('views.applicationWorkflow.nodes.formNode.form_content_format1')}
+    {{form}}
+    ${t('views.applicationWorkflow.nodes.formNode.form_content_format2')}`
     },
     config: {
       fields: [
@@ -249,7 +249,7 @@ export const imageGenerateNode = {
           value: 'answer'
         },
         {
-          label: t('views.applicationWorkflow.nodes.imageGenerateNode.image'),
+          label: t('common.fileUpload.image'),
           value: 'image'
         }
       ]
@@ -367,15 +367,15 @@ export const compareList = [
   { value: 'is_not_null', label: t('views.applicationWorkflow.compare.is_not_null') },
   { value: 'contain', label: t('views.applicationWorkflow.compare.contain') },
   { value: 'not_contain', label: t('views.applicationWorkflow.compare.not_contain') },
-  { value: 'eq', label:  t('views.applicationWorkflow.compare.eq') },
-  { value: 'ge', label: t('views.applicationWorkflow.compare.ge')  },
-  { value: 'gt', label:t('views.applicationWorkflow.compare.gt') },
+  { value: 'eq', label: t('views.applicationWorkflow.compare.eq') },
+  { value: 'ge', label: t('views.applicationWorkflow.compare.ge') },
+  { value: 'gt', label: t('views.applicationWorkflow.compare.gt') },
   { value: 'le', label: t('views.applicationWorkflow.compare.le') },
   { value: 'lt', label: t('views.applicationWorkflow.compare.lt') },
-  { value: 'len_eq', label: t('views.applicationWorkflow.compare.len_eq')},
+  { value: 'len_eq', label: t('views.applicationWorkflow.compare.len_eq') },
   { value: 'len_ge', label: t('views.applicationWorkflow.compare.len_ge') },
-  { value: 'len_gt', label:t('views.applicationWorkflow.compare.len_gt')  },
-  { value: 'len_le', label: t('views.applicationWorkflow.compare.len_le')  },
+  { value: 'len_gt', label: t('views.applicationWorkflow.compare.len_gt') },
+  { value: 'len_le', label: t('views.applicationWorkflow.compare.len_le') },
   { value: 'len_lt', label: t('views.applicationWorkflow.compare.len_lt') }
 ]
 
