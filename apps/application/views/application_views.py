@@ -629,6 +629,12 @@ class Application(APIView):
         authentication_classes = [TokenAuth]
 
         @action(methods=['POST'], detail=False)
+        @swagger_auto_schema(operation_summary=_("text to speech"),
+                             operation_id=_("text to speech"),
+                             manual_parameters=ApplicationApi.TextToSpeech.get_request_params_api(),
+                             request_body=ApplicationApi.TextToSpeech.get_request_body_api(),
+                             responses=result.get_default_response(),
+                             tags=[_('Application')])
         @has_permissions(
             ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_ACCESS_TOKEN],
                            [lambda r, keywords: Permission(group=Group.APPLICATION,
