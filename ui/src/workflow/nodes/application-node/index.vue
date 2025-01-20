@@ -67,9 +67,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="
-              $t('views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage')
-            "
+            :placeholder="$t('views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage')"
             v-model="form_data.image_list"
           />
         </el-form-item>
@@ -88,7 +86,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.nodes.speechToTextNode.audio.placeholder'),"
+            :placeholder="$t('views.applicationWorkflow.nodes.speechToTextNode.audio.placeholder')"
             v-model="form_data.audio_list"
           />
         </el-form-item>
