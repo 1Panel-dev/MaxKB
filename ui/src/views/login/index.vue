@@ -106,8 +106,11 @@ import type { FormInstance, FormRules } from 'element-plus'
 import useStore from '@/stores'
 import authApi from '@/api/auth-setting'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+
 import { t } from '@/locales'
 import QrCodeTab from '@/views/login/components/QrCodeTab.vue'
+import { useI18n } from 'vue-i18n'
+const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
 const { user } = useStore()
 const router = useRouter()
@@ -212,6 +215,7 @@ const login = () => {
     user
       .login(loginMode.value, loginForm.value.username, loginForm.value.password)
       .then(() => {
+        locale.value = localStorage.getItem('MaxKB-locale') || 'zh-CN'
         router.push({ name: 'home' })
       })
       .finally(() => (loading.value = false))

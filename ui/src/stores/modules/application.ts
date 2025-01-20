@@ -4,12 +4,10 @@ import applicationXpackApi from '@/api/application-xpack'
 import { type Ref } from 'vue'
 
 import useUserStore from './user'
-
 const useApplicationStore = defineStore({
   id: 'application',
   state: () => ({
-    location: `${window.location.origin}/ui/chat/`,
-    userLanguage: ''
+    location: `${window.location.origin}/ui/chat/`
   }),
   actions: {
     async asyncGetAllApplication() {
@@ -80,9 +78,10 @@ const useApplicationStore = defineStore({
       return new Promise((resolve, reject) => {
         applicationApi
           .getAppProfile(loading)
-          .then((data) => {
-            this.userLanguage = data.data?.language
-            resolve(data)
+          .then((res) => {
+            sessionStorage.setItem('language', res.data?.language)
+
+            resolve(res)
           })
           .catch((error) => {
             reject(error)

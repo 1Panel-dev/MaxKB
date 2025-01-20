@@ -6,7 +6,6 @@ import UserApi from '@/api/user'
 import ThemeApi from '@/api/theme'
 import { useElementPlusTheme } from 'use-element-plus-theme'
 import { defaultPlatformSetting } from '@/utils/theme'
-import useApplicationStore from './application'
 import { useLocalStorage } from '@vueuse/core'
 import { localeConfigKey } from '@/locales/index'
 export interface userStateTypes {
@@ -33,10 +32,9 @@ const useUserStore = defineStore({
   }),
   actions: {
     getLanguage() {
-      const application = useApplicationStore()
       return this.userType === 1
-        ? this.userInfo?.language || localStorage.getItem('language')
-        : application?.userLanguage
+        ? localStorage.getItem('MaxKB-locale')
+        : sessionStorage.getItem('language')
     },
     showXpack() {
       return this.isXPack
@@ -127,7 +125,6 @@ const useUserStore = defineStore({
       return UserApi.profile().then(async (ok) => {
         this.userInfo = ok.data
         useLocalStorage(localeConfigKey, 'zh-CN').value = ok.data?.language
-        // localStorage.setItem('language', ok.data?.language)
         return this.asyncGetProfile()
       })
     },
@@ -174,8 +171,8 @@ const useUserStore = defineStore({
       return new Promise((resolve, reject) => {
         UserApi.postLanguage({ language: lang }, loading)
           .then(async (ok) => {
+            useLocalStorage(localeConfigKey, 'zh-CN').value = lang
             window.location.reload()
-
             resolve(ok)
           })
           .catch((error) => {
