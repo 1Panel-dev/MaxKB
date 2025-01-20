@@ -17,6 +17,10 @@ from smartdoc.const import CONFIG
 from users.models import User
 
 
+def get_language():
+    return CONFIG.get_language_code()
+
+
 class ApplicationApiKey(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     secret_key = models.CharField(max_length=1024, verbose_name="秘钥", unique=True)
@@ -46,7 +50,7 @@ class ApplicationAccessToken(AppModelMixin):
                             , default=list)
     show_source = models.BooleanField(default=False, verbose_name="是否显示知识来源")
 
-    language = models.CharField(max_length=10, verbose_name="语言", default=CONFIG.get_language_code)
+    language = models.CharField(max_length=10, verbose_name="语言", default=get_language)
 
     class Meta:
         db_table = "application_access_token"
