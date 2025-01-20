@@ -268,6 +268,19 @@ class CheckCodeSerializer(ApiMixin, serializers.Serializer):
             description=_('Error message')))
 
 
+class SwitchLanguageSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.char(_('user id')), )
+    language = serializers.CharField(required=True, error_messages=ErrMessage.char(_('language')))
+
+    def switch(self):
+        self.is_valid(raise_exception=True)
+        language = self.data.get('language')
+        support_language_list = ['zh-CN', 'zh-Hant', 'en-US']
+        if not support_language_list.__contains__(language):
+            raise AppApiException(500, _('language only support:') + ','.join(support_language_list))
+        QuerySet(User).filter(id=self.data.get('user_id')).update(language=language)
+
+
 class RePasswordSerializer(ApiMixin, serializers.Serializer):
     email = serializers.EmailField(
         required=True,
@@ -405,10 +418,10 @@ class SendEmailSerializer(ApiMixin, serializers.Serializer):
             # 发送邮件
             send_mail(_('【Intelligent knowledge base question and answer system-{action}】').format(
                 action=_('User registration') if state == 'register' else _('Change password')),
-                      '',
-                      html_message=f'{content.replace("${code}", code)}',
-                      from_email=system_setting.meta.get('from_email'),
-                      recipient_list=[email], fail_silently=False, connection=connection)
+                '',
+                html_message=f'{content.replace("${code}", code)}',
+                from_email=system_setting.meta.get('from_email'),
+                recipient_list=[email], fail_silently=False, connection=connection)
         except Exception as e:
             user_cache.delete(code_cache_key_lock)
             raise AppApiException(500, f"{str(e)}" + _("Email sending failed"))
@@ -442,7 +455,8 @@ class UserProfile(ApiMixin):
         permission_list += [p.value for p in get_permission_list_by_role(RoleConstants[user.role])]
         return {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role,
                 'permissions': [str(p) for p in permission_list],
-                'is_edit_password': user.password == 'd880e722c47a34d8e9fce789fc62389d' if user.role == 'ADMIN' else False}
+                'is_edit_password': user.password == 'd880e722c47a34d8e9fce789fc62389d' if user.role == 'ADMIN' else False,
+                'language': user.language}
 
     @staticmethod
     def get_response_body_api():
@@ -455,7 +469,8 @@ class UserProfile(ApiMixin):
                 'email': openapi.Schema(type=openapi.TYPE_STRING, title=_("Email"), description=_("Email")),
                 'role': openapi.Schema(type=openapi.TYPE_STRING, title=_("Role"), description=_("Role")),
                 'is_active': openapi.Schema(type=openapi.TYPE_STRING, title=_("Is active"), description=_("Is active")),
-                "permissions": openapi.Schema(type=openapi.TYPE_ARRAY, title=_("Permissions"), description=_("Permissions"),
+                "permissions": openapi.Schema(type=openapi.TYPE_ARRAY, title=_("Permissions"),
+                                              description=_("Permissions"),
                                               items=openapi.Schema(type=openapi.TYPE_STRING))
             }
         )
@@ -564,12 +579,15 @@ class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):
                 'username': openapi.Schema(type=openapi.TYPE_STRING, title=_("Username"), description=_("Username")),
                 'email': openapi.Schema(type=openapi.TYPE_STRING, title=_("Email"), description=_("Email")),
                 'phone': openapi.Schema(type=openapi.TYPE_STRING, title=_("Phone"), description=_("Phone")),
-                'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Is active"), description=_("Is active")),
+                'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Is active"),
+                                            description=_("Is active")),
                 'role': openapi.Schema(type=openapi.TYPE_STRING, title=_("Role"), description=_("Role")),
                 'source': openapi.Schema(type=openapi.TYPE_STRING, title=_("Source"), description=_("Source")),
                 'nick_name': openapi.Schema(type=openapi.TYPE_STRING, title=_("Name"), description=_("Name")),
-                'create_time': openapi.Schema(type=openapi.TYPE_STRING, title=_("Create time"), description=_("Create time")),
-                'update_time': openapi.Schema(type=openapi.TYPE_STRING, title=_("Update time"), description=_("Update time"))
+                'create_time': openapi.Schema(type=openapi.TYPE_STRING, title=_("Create time"),
+                                              description=_("Create time")),
+                'update_time': openapi.Schema(type=openapi.TYPE_STRING, title=_("Update time"),
+                                              description=_("Update time"))
             }
         )
 
@@ -581,7 +599,8 @@ class UserInstanceSerializer(ApiMixin, serializers.ModelSerializer):
                                   required=True,
                                   description='ID')
 
-                    ]
+                ]
+
 
 class UserManageSerializer(serializers.Serializer):
     class Query(ApiMixin, serializers.Serializer):
@@ -639,23 +658,25 @@ class UserManageSerializer(serializers.Serializer):
                                                   code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
 
         username = serializers.CharField(required=True,
-                                             error_messages=ErrMessage.char(_("Username")),
-                                             max_length=20,
-                                             min_length=6,
-                                             validators=[
-                                                 validators.RegexValidator(regex=re.compile("^.{6,20}$"),
-                                                                           message=_('Username must be 6-20 characters long'))
-                                             ])
+                                         error_messages=ErrMessage.char(_("Username")),
+                                         max_length=20,
+                                         min_length=6,
+                                         validators=[
+                                             validators.RegexValidator(regex=re.compile("^.{6,20}$"),
+                                                                       message=_(
+                                                                           'Username must be 6-20 characters long'))
+                                         ])
         password = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Password")),
-                                             validators=[validators.RegexValidator(regex=re.compile(
-                                                 "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
-                                                 "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$")
-                                                 , message=_("The password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."))])
+                                         validators=[validators.RegexValidator(regex=re.compile(
+                                             "^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z_!@#$%^&*`~.()-+=]+$)(?![a-z0-9]+$)(?![a-z_!@#$%^&*`~()-+=]+$)"
+                                             "(?![0-9_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9_!@#$%^&*`~.()-+=]{6,20}$")
+                                             , message=_(
+                                                 "The password must be 6-20 characters long and must be a combination of letters, numbers, and special characters."))])
 
         nick_name = serializers.CharField(required=False, error_messages=ErrMessage.char(_("Name")), max_length=64,
-                                              allow_null=True, allow_blank=True)
-        phone = serializers.CharField(required=False, error_messages=ErrMessage.char(_("Phone")), max_length=20,
                                           allow_null=True, allow_blank=True)
+        phone = serializers.CharField(required=False, error_messages=ErrMessage.char(_("Phone")), max_length=20,
+                                      allow_null=True, allow_blank=True)
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)

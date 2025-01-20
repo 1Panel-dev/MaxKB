@@ -13,6 +13,7 @@ from setting.models_provider.impl.aws_bedrock_model_provider.model.llm import Be
 from smartdoc.conf import PROJECT_DIR
 from django.utils.translation import gettext_lazy as _
 
+
 def _create_model_info(model_name, description, model_type, credential_class, model_class):
     return ModelInfo(
         name=model_name,
@@ -46,18 +47,14 @@ def _initialize_model_info():
         ),
         _create_model_info(
             'anthropic.claude-3-haiku-20240307-v1:0',
-            _('''
-            The Claude 3 Haiku is Anthropic's fastest and most compact model, with near-instant responsiveness. The model can answer simple queries and requests quickly. Customers will be able to build seamless AI experiences that mimic human interactions. Claude 3 Haiku can process images and return text output, and provides 200K context windows.
-            '''),
+            _("The Claude 3 Haiku is Anthropic's fastest and most compact model, with near-instant responsiveness. The model can answer simple queries and requests quickly. Customers will be able to build seamless AI experiences that mimic human interactions. Claude 3 Haiku can process images and return text output, and provides 200K context windows."),
             ModelTypeConst.LLM,
             BedrockLLMModelCredential,
             BedrockModel
         ),
         _create_model_info(
             'anthropic.claude-3-sonnet-20240229-v1:0',
-            _('''          
-The Claude 3 Sonnet model from Anthropic strikes the ideal balance between intelligence and speed, especially when it comes to handling enterprise workloads. This model offers maximum utility while being priced lower than competing products, and it's been engineered to be a solid choice for deploying AI at scale.
-            '''),
+            _("The Claude 3 Sonnet model from Anthropic strikes the ideal balance between intelligence and speed, especially when it comes to handling enterprise workloads. This model offers maximum utility while being priced lower than competing products, and it's been engineered to be a solid choice for deploying AI at scale."),
             ModelTypeConst.LLM,
             BedrockLLMModelCredential,
             BedrockModel
@@ -78,9 +75,7 @@ The Claude 3 Sonnet model from Anthropic strikes the ideal balance between intel
         ),
         _create_model_info(
             'amazon.titan-text-premier-v1:0',
-            _('''
-            Titan Text Premier is the most powerful and advanced model in the Titan Text series, designed to deliver exceptional performance for a variety of enterprise applications. With its cutting-edge features, it delivers greater accuracy and outstanding results, making it an excellent choice for organizations looking for a top-notch text processing solution.
-            '''),
+            _("Titan Text Premier is the most powerful and advanced model in the Titan Text series, designed to deliver exceptional performance for a variety of enterprise applications. With its cutting-edge features, it delivers greater accuracy and outstanding results, making it an excellent choice for organizations looking for a top-notch text processing solution."),
             ModelTypeConst.LLM,
             BedrockLLMModelCredential,
             BedrockModel

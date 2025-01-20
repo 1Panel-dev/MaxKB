@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-15 11:33+0800\n"
+"POT-Creation-Date: 2025-01-20 13:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,9 +42,10 @@ msgstr "對話列表"
 #: .\apps\application\serializers\application_serializers.py:72
 #: .\apps\application\serializers\chat_serializers.py:345
 #: .\apps\application\swagger_api\application_api.py:53
-#: .\apps\application\swagger_api\application_api.py:182
-#: .\apps\application\swagger_api\application_api.py:183
-#: .\apps\application\swagger_api\application_api.py:328
+#: .\apps\application\swagger_api\application_api.py:185
+#: .\apps\application\swagger_api\application_api.py:186
+#: .\apps\application\swagger_api\application_api.py:333
+#: .\apps\application\swagger_api\application_api.py:334
 msgid "Model id"
 msgstr "模型 id"
 
@@ -107,7 +108,7 @@ msgstr "客戶端類型"
 
 #: .\apps\application\chat_pipeline\step\chat_step\i_chat_step.py:74
 #: .\apps\application\chat_pipeline\step\generate_human_message_step\i_generate_human_message_step.py:46
-#: .\apps\application\swagger_api\application_api.py:259
+#: .\apps\application\swagger_api\application_api.py:262
 msgid "No reference segment settings"
 msgstr "未查詢到引用分段"
 
@@ -115,13 +116,13 @@ msgstr "未查詢到引用分段"
 #: .\apps\application\chat_pipeline\step\reset_problem_step\i_reset_problem_step.py:31
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:48
 #: .\apps\application\serializers\application_serializers.py:70
-#: .\apps\application\serializers\application_serializers.py:490
-#: .\apps\application\serializers\application_serializers.py:561
-#: .\apps\application\serializers\application_serializers.py:606
-#: .\apps\application\serializers\application_serializers.py:676
-#: .\apps\application\serializers\application_serializers.py:697
-#: .\apps\application\serializers\application_serializers.py:771
-#: .\apps\application\serializers\application_serializers.py:1202
+#: .\apps\application\serializers\application_serializers.py:494
+#: .\apps\application\serializers\application_serializers.py:565
+#: .\apps\application\serializers\application_serializers.py:610
+#: .\apps\application\serializers\application_serializers.py:680
+#: .\apps\application\serializers\application_serializers.py:701
+#: .\apps\application\serializers\application_serializers.py:775
+#: .\apps\application\serializers\application_serializers.py:1207
 #: .\apps\application\serializers\chat_serializers.py:104
 #: .\apps\application\serializers\chat_serializers.py:266
 #: .\apps\application\serializers\chat_serializers.py:318
@@ -169,10 +170,10 @@ msgstr "歷史對答"
 #: .\apps\application\flow\step_node\question_node\i_question_node.py:24
 #: .\apps\application\swagger_api\application_api.py:55
 #: .\apps\application\swagger_api\application_api.py:56
-#: .\apps\application\swagger_api\application_api.py:185
-#: .\apps\application\swagger_api\application_api.py:186
-#: .\apps\application\swagger_api\application_api.py:329
-#: .\apps\application\swagger_api\application_api.py:330
+#: .\apps\application\swagger_api\application_api.py:188
+#: .\apps\application\swagger_api\application_api.py:189
+#: .\apps\application\swagger_api\application_api.py:336
+#: .\apps\application\swagger_api\application_api.py:337
 msgid "Number of multi-round conversations"
 msgstr "多輪對話數量"
 
@@ -186,14 +187,14 @@ msgstr "最大攜帶知識庫段落長度"
 #: .\apps\application\flow\step_node\question_node\i_question_node.py:22
 #: .\apps\application\serializers\application_serializers.py:108
 #: .\apps\application\serializers\application_serializers.py:138
-#: .\apps\application\swagger_api\application_api.py:283
-#: .\apps\application\swagger_api\application_api.py:284
+#: .\apps\application\swagger_api\application_api.py:286
+#: .\apps\application\swagger_api\application_api.py:287
 msgid "Prompt word"
 msgstr "提示詞"
 
 #: .\apps\application\chat_pipeline\step\generate_human_message_step\i_generate_human_message_step.py:42
-#: .\apps\application\swagger_api\application_api.py:299
 #: .\apps\application\swagger_api\application_api.py:300
+#: .\apps\application\swagger_api\application_api.py:301
 msgid "System prompt words (role)"
 msgstr "系統提示詞(角色)"
 
@@ -208,8 +209,8 @@ msgstr "問題補全提示詞"
 
 #: .\apps\application\chat_pipeline\step\reset_problem_step\impl\base_reset_problem_step.py:20
 #: .\apps\application\serializers\chat_message_serializers.py:98
-#: .\apps\application\swagger_api\application_api.py:207
-#: .\apps\application\swagger_api\application_api.py:344
+#: .\apps\application\swagger_api\application_api.py:210
+#: .\apps\application\swagger_api\application_api.py:354
 #, python-brace-format
 msgid ""
 "() contains the user's question. Answer the guessed user's question based on "
@@ -241,40 +242,40 @@ msgstr "排除向量 ID 列表"
 #: .\apps\application\flow\step_node\reranker_node\i_reranker_node.py:24
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:24
 #: .\apps\application\serializers\application_serializers.py:121
-#: .\apps\application\swagger_api\application_api.py:246
-#: .\apps\application\swagger_api\application_api.py:247
+#: .\apps\application\swagger_api\application_api.py:249
+#: .\apps\application\swagger_api\application_api.py:250
 msgid "Reference segment number"
 msgstr "引用分段數"
 
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:43
-#: .\apps\application\swagger_api\application_api.py:249
-#: .\apps\application\swagger_api\application_api.py:250
+#: .\apps\application\swagger_api\application_api.py:252
+#: .\apps\application\swagger_api\application_api.py:253
 msgid "Similarity"
 msgstr "相似度"
 
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:46
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:30
 #: .\apps\application\serializers\application_serializers.py:129
-#: .\apps\application\serializers\application_serializers.py:569
+#: .\apps\application\serializers\application_serializers.py:573
 #: .\apps\dataset\serializers\dataset_serializers.py:576
 #: .\apps\users\serializers\user_serializers.py:236
-#: .\apps\users\serializers\user_serializers.py:349
+#: .\apps\users\serializers\user_serializers.py:362
 msgid "The type only supports register|reset_password"
 msgstr "該類型僅支持 register|reset_password"
 
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:47
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:31
 #: .\apps\application\serializers\application_serializers.py:130
-#: .\apps\application\serializers\application_serializers.py:570
-#: .\apps\application\swagger_api\application_api.py:256
+#: .\apps\application\serializers\application_serializers.py:574
+#: .\apps\application\swagger_api\application_api.py:259
 msgid "Retrieval Mode"
 msgstr "檢索方式"
 
 #: .\apps\application\chat_pipeline\step\search_dataset_step\impl\base_search_dataset_step.py:31
 #: .\apps\application\serializers\application_serializers.py:84
-#: .\apps\application\serializers\application_serializers.py:1000
-#: .\apps\application\serializers\application_serializers.py:1010
-#: .\apps\application\serializers\application_serializers.py:1020
+#: .\apps\application\serializers\application_serializers.py:1005
+#: .\apps\application\serializers\application_serializers.py:1015
+#: .\apps\application\serializers\application_serializers.py:1025
 #: .\apps\setting\models_provider\tools.py:23
 msgid "Model does not exist"
 msgstr "模型不存在"
@@ -318,11 +319,11 @@ msgstr "內容類型"
 
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:13
 #: .\apps\application\serializers\application_serializers.py:321
-#: .\apps\application\serializers\application_serializers.py:560
-#: .\apps\application\serializers\application_serializers.py:675
-#: .\apps\application\serializers\application_serializers.py:770
-#: .\apps\application\serializers\application_serializers.py:1204
-#: .\apps\application\serializers\application_serializers.py:1246
+#: .\apps\application\serializers\application_serializers.py:564
+#: .\apps\application\serializers\application_serializers.py:679
+#: .\apps\application\serializers\application_serializers.py:774
+#: .\apps\application\serializers\application_serializers.py:1209
+#: .\apps\application\serializers\application_serializers.py:1251
 #: .\apps\application\serializers\application_statistics_serializers.py:26
 #: .\apps\application\serializers\application_version_serializers.py:35
 #: .\apps\application\serializers\application_version_serializers.py:59
@@ -338,8 +339,8 @@ msgstr "內容類型"
 #: .\apps\application\swagger_api\application_api.py:101
 #: .\apps\application\swagger_api\application_api.py:112
 #: .\apps\application\swagger_api\application_api.py:143
-#: .\apps\application\swagger_api\application_api.py:380
-#: .\apps\application\swagger_api\application_api.py:401
+#: .\apps\application\swagger_api\application_api.py:390
+#: .\apps\application\swagger_api\application_api.py:411
 #: .\apps\application\swagger_api\application_statistics_api.py:21
 #: .\apps\application\swagger_api\application_version_api.py:42
 #: .\apps\application\swagger_api\application_version_api.py:56
@@ -369,7 +370,7 @@ msgstr "用戶輸入字段"
 
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:17
 #: .\apps\application\flow\step_node\image_understand_step_node\i_image_understand_node.py:24
-#: .\apps\application\serializers\application_serializers.py:677
+#: .\apps\application\serializers\application_serializers.py:681
 #: .\apps\application\serializers\chat_message_serializers.py:250
 msgid "picture"
 msgstr "圖片"
@@ -419,7 +420,7 @@ msgid "Comparator"
 msgstr "比較器"
 
 #: .\apps\application\flow\step_node\condition_node\i_condition_node.py:20
-#: .\apps\application\swagger_api\application_api.py:268
+#: .\apps\application\swagger_api\application_api.py:271
 msgid "value"
 msgstr "值"
 
@@ -600,8 +601,8 @@ msgid "Acquaintance"
 msgstr "相似度"
 
 #: .\apps\application\serializers\application_serializers.py:126
-#: .\apps\application\swagger_api\application_api.py:253
-#: .\apps\application\swagger_api\application_api.py:254
+#: .\apps\application\swagger_api\application_api.py:256
+#: .\apps\application\swagger_api\application_api.py:257
 msgid "Maximum number of quoted characters"
 msgstr "最多引用字符數"
 
@@ -614,32 +615,34 @@ msgid "Role prompts"
 msgstr "角色提示詞"
 
 #: .\apps\application\serializers\application_serializers.py:142
-#: .\apps\application\swagger_api\application_api.py:301
-#: .\apps\application\swagger_api\application_api.py:302
+#: .\apps\application\swagger_api\application_api.py:303
+#: .\apps\application\swagger_api\application_api.py:305
 msgid "No citation segmentation prompt"
 msgstr "無引用分段提示詞"
 
 #: .\apps\application\serializers\application_serializers.py:147
-#: .\apps\application\serializers\application_serializers.py:461
-#: .\apps\application\serializers\application_serializers.py:602
+#: .\apps\application\serializers\application_serializers.py:465
+#: .\apps\application\serializers\application_serializers.py:606
 #: .\apps\application\swagger_api\application_api.py:49
 #: .\apps\application\swagger_api\application_api.py:50
-#: .\apps\application\swagger_api\application_api.py:178
-#: .\apps\application\swagger_api\application_api.py:179
-#: .\apps\application\swagger_api\application_api.py:326
-#: .\apps\application\swagger_api\application_api.py:365
+#: .\apps\application\swagger_api\application_api.py:181
+#: .\apps\application\swagger_api\application_api.py:182
+#: .\apps\application\swagger_api\application_api.py:329
+#: .\apps\application\swagger_api\application_api.py:330
+#: .\apps\application\swagger_api\application_api.py:375
 msgid "Application Name"
 msgstr "應用名稱"
 
 #: .\apps\application\serializers\application_serializers.py:150
-#: .\apps\application\serializers\application_serializers.py:463
-#: .\apps\application\serializers\application_serializers.py:604
+#: .\apps\application\serializers\application_serializers.py:467
+#: .\apps\application\serializers\application_serializers.py:608
 #: .\apps\application\swagger_api\application_api.py:51
 #: .\apps\application\swagger_api\application_api.py:52
-#: .\apps\application\swagger_api\application_api.py:180
-#: .\apps\application\swagger_api\application_api.py:181
-#: .\apps\application\swagger_api\application_api.py:327
-#: .\apps\application\swagger_api\application_api.py:370
+#: .\apps\application\swagger_api\application_api.py:183
+#: .\apps\application\swagger_api\application_api.py:184
+#: .\apps\application\swagger_api\application_api.py:331
+#: .\apps\application\swagger_api\application_api.py:332
+#: .\apps\application\swagger_api\application_api.py:380
 msgid "Application Description"
 msgstr "應用描述"
 
@@ -649,12 +652,13 @@ msgstr "工作流對象"
 
 #: .\apps\application\serializers\application_serializers.py:153
 #: .\apps\application\serializers\application_serializers.py:211
-#: .\apps\application\serializers\application_serializers.py:471
+#: .\apps\application\serializers\application_serializers.py:475
 #: .\apps\application\swagger_api\application_api.py:57
 #: .\apps\application\swagger_api\application_api.py:58
-#: .\apps\application\swagger_api\application_api.py:187
-#: .\apps\application\swagger_api\application_api.py:188
-#: .\apps\application\swagger_api\application_api.py:331
+#: .\apps\application\swagger_api\application_api.py:190
+#: .\apps\application\swagger_api\application_api.py:191
+#: .\apps\application\swagger_api\application_api.py:338
+#: .\apps\application\swagger_api\application_api.py:339
 msgid "Opening remarks"
 msgstr "開場白"
 
@@ -669,29 +673,29 @@ msgid "application describe"
 msgstr "應用描述"
 
 #: .\apps\application\serializers\application_serializers.py:205
-#: .\apps\application\serializers\application_serializers.py:465
+#: .\apps\application\serializers\application_serializers.py:469
 msgid "Model"
 msgstr "模型"
 
 #: .\apps\application\serializers\application_serializers.py:209
-#: .\apps\application\serializers\application_serializers.py:469
+#: .\apps\application\serializers\application_serializers.py:473
 msgid "Historical chat records"
 msgstr "歷史聊天記錄"
 
 #: .\apps\application\serializers\application_serializers.py:214
-#: .\apps\application\serializers\application_serializers.py:473
+#: .\apps\application\serializers\application_serializers.py:477
 msgid "Related Knowledge Base"
 msgstr "關聯知識庫"
 
 #: .\apps\application\serializers\application_serializers.py:221
-#: .\apps\application\serializers\application_serializers.py:483
+#: .\apps\application\serializers\application_serializers.py:487
 #: .\apps\application\serializers\chat_serializers.py:359
 msgid "Question completion"
 msgstr "問題補全"
 
 #: .\apps\application\serializers\application_serializers.py:225
-#: .\apps\application\swagger_api\application_api.py:200
-#: .\apps\application\swagger_api\application_api.py:339
+#: .\apps\application\swagger_api\application_api.py:203
+#: .\apps\application\swagger_api\application_api.py:348
 msgid "Application Type"
 msgstr "應用類型"
 
@@ -700,7 +704,7 @@ msgid "Application type only supports SIMPLE|WORK_FLOW"
 msgstr "應用類型只支持 SIMPLE|WORK_FLOW"
 
 #: .\apps\application\serializers\application_serializers.py:233
-#: .\apps\application\serializers\application_serializers.py:487
+#: .\apps\application\serializers\application_serializers.py:491
 msgid "Model parameters"
 msgstr "模型參數"
 
@@ -751,36 +755,44 @@ msgstr "白名單"
 msgid "Whether to display knowledge sources"
 msgstr "是否顯示知識來源"
 
-#: .\apps\application\serializers\application_serializers.py:402
+#: .\apps\application\serializers\application_serializers.py:340
+#: .\apps\application\swagger_api\application_api.py:169
+#: .\apps\application\swagger_api\application_api.py:170
+#: .\apps\users\serializers\user_serializers.py:273
+#: .\apps\users\views\user.py:80 .\apps\users\views\user.py:81
+msgid "language"
+msgstr "語言"
+
+#: .\apps\application\serializers\application_serializers.py:406
 msgid "access_token"
 msgstr "access_token"
 
-#: .\apps\application\serializers\application_serializers.py:404
+#: .\apps\application\serializers\application_serializers.py:408
 msgid "Certification Information"
 msgstr "認證信息"
 
-#: .\apps\application\serializers\application_serializers.py:441
+#: .\apps\application\serializers\application_serializers.py:445
 msgid "Invalid access_token"
 msgstr "無效的access_token"
 
-#: .\apps\application\serializers\application_serializers.py:452
+#: .\apps\application\serializers\application_serializers.py:456
 msgid "Wrong password"
 msgstr "密碼錯誤"
 
-#: .\apps\application\serializers\application_serializers.py:477
+#: .\apps\application\serializers\application_serializers.py:481
 msgid "Dataset settings"
 msgstr "知識庫設置"
 
-#: .\apps\application\serializers\application_serializers.py:480
+#: .\apps\application\serializers\application_serializers.py:484
 msgid "Model setup"
 msgstr "模型設置"
 
-#: .\apps\application\serializers\application_serializers.py:484
+#: .\apps\application\serializers\application_serializers.py:488
 msgid "Icon"
 msgstr "icon 圖標"
 
-#: .\apps\application\serializers\application_serializers.py:494
-#: .\apps\application\serializers\application_serializers.py:701
+#: .\apps\application\serializers\application_serializers.py:498
+#: .\apps\application\serializers\application_serializers.py:705
 #: .\apps\setting\serializers\valid_serializers.py:29
 msgid ""
 "The community version supports up to 5 applications. If you need more "
@@ -789,29 +801,29 @@ msgstr ""
 "社區版最多支持 5 個應用，如需擁有更多應用，請聯繫我們（https://"
 "fit2cloud.com/）"
 
-#: .\apps\application\serializers\application_serializers.py:562
+#: .\apps\application\serializers\application_serializers.py:566
 msgid "Query text"
 msgstr "查詢文本"
 
-#: .\apps\application\serializers\application_serializers.py:564
+#: .\apps\application\serializers\application_serializers.py:568
 msgid "topN"
 msgstr "topN"
 
-#: .\apps\application\serializers\application_serializers.py:566
+#: .\apps\application\serializers\application_serializers.py:570
 msgid "Relevance"
 msgstr "相似度"
 
-#: .\apps\application\serializers\application_serializers.py:575
-#: .\apps\application\serializers\application_serializers.py:684
-#: .\apps\application\serializers\application_serializers.py:776
+#: .\apps\application\serializers\application_serializers.py:579
+#: .\apps\application\serializers\application_serializers.py:688
+#: .\apps\application\serializers\application_serializers.py:780
 msgid "Application id does not exist"
 msgstr "應用 ID 不存在"
 
-#: .\apps\application\serializers\application_serializers.py:607
+#: .\apps\application\serializers\application_serializers.py:611
 msgid "Select User ID"
 msgstr "選擇用戶 ID"
 
-#: .\apps\application\serializers\application_serializers.py:696
+#: .\apps\application\serializers\application_serializers.py:700
 #: .\apps\dataset\serializers\document_serializers.py:162
 #: .\apps\dataset\serializers\document_serializers.py:211
 #: .\apps\dataset\serializers\document_serializers.py:218
@@ -820,7 +832,7 @@ msgstr "選擇用戶 ID"
 msgid "file"
 msgstr "文件"
 
-#: .\apps\application\serializers\application_serializers.py:711
+#: .\apps\application\serializers\application_serializers.py:715
 #: .\apps\common\handle\impl\qa\zip_parse_qa_handle.py:62
 #: .\apps\common\handle\impl\zip_split_handle.py:56
 #: .\apps\dataset\serializers\document_serializers.py:844
@@ -828,28 +840,28 @@ msgstr "文件"
 msgid "Unsupported file format"
 msgstr "文件格式不支持"
 
-#: .\apps\application\serializers\application_serializers.py:849
+#: .\apps\application\serializers\application_serializers.py:853
 msgid "work_flow is a required field"
 msgstr "work_flow是必填字段"
 
-#: .\apps\application\serializers\application_serializers.py:911
-#: .\apps\application\serializers\application_serializers.py:1050
+#: .\apps\application\serializers\application_serializers.py:915
+#: .\apps\application\serializers\application_serializers.py:1055
 #, python-brace-format
 msgid "Unknown knowledge base id {dataset_id}, unable to associate"
 msgstr "未知的知識庫 id {dataset_id}，無法關聯"
 
-#: .\apps\application\serializers\application_serializers.py:931
+#: .\apps\application\serializers\application_serializers.py:935
 msgid "Illegal User"
 msgstr "非法用戶"
 
-#: .\apps\application\serializers\application_serializers.py:1002
-#: .\apps\application\serializers\application_serializers.py:1012
-#: .\apps\application\serializers\application_serializers.py:1022
+#: .\apps\application\serializers\application_serializers.py:1007
+#: .\apps\application\serializers\application_serializers.py:1017
+#: .\apps\application\serializers\application_serializers.py:1027
 #, python-brace-format
 msgid "No permission to use this model:{model_name}"
 msgstr "用戶沒有使用該模型:{model_name}的權限"
 
-#: .\apps\application\serializers\application_serializers.py:1211
+#: .\apps\application\serializers\application_serializers.py:1216
 #: .\apps\application\serializers\chat_message_serializers.py:398
 #: .\apps\xpack\serializers\application_setting_serializer.py:93
 #: .\apps\xpack\serializers\platform_serializer.py:76
@@ -859,32 +871,32 @@ msgstr "用戶沒有使用該模型:{model_name}的權限"
 msgid "Application does not exist"
 msgstr "應用不存在"
 
-#: .\apps\application\serializers\application_serializers.py:1233
+#: .\apps\application\serializers\application_serializers.py:1238
 #: .\apps\application\swagger_api\chat_api.py:385
 #: .\apps\application\swagger_api\chat_api.py:386
 msgid "Availability"
 msgstr "是否可用"
 
-#: .\apps\application\serializers\application_serializers.py:1237
+#: .\apps\application\serializers\application_serializers.py:1242
 #: .\apps\application\swagger_api\application_api.py:129
 #: .\apps\application\swagger_api\application_api.py:130
 msgid "Is cross-domain allowed"
 msgstr "是否允許跨域"
 
-#: .\apps\application\serializers\application_serializers.py:1242
+#: .\apps\application\serializers\application_serializers.py:1247
 msgid "Cross-domain address"
 msgstr "跨域地址"
 
-#: .\apps\application\serializers\application_serializers.py:1243
+#: .\apps\application\serializers\application_serializers.py:1248
 #: .\apps\application\swagger_api\application_api.py:131
 msgid "Cross-domain list"
 msgstr "跨域列表"
 
-#: .\apps\application\serializers\application_serializers.py:1248
+#: .\apps\application\serializers\application_serializers.py:1253
 msgid "ApiKeyid"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1269
+#: .\apps\application\serializers\application_serializers.py:1274
 msgid "APIKey does not exist"
 msgstr "APIKey 不存在"
 
@@ -945,9 +957,9 @@ msgstr "內容"
 
 #: .\apps\application\serializers\chat_message_serializers.py:180
 #: .\apps\setting\serializers\team_serializers.py:45
-#: .\apps\users\serializers\user_serializers.py:456
-#: .\apps\users\serializers\user_serializers.py:478
-#: .\apps\users\serializers\user_serializers.py:568
+#: .\apps\users\serializers\user_serializers.py:470
+#: .\apps\users\serializers\user_serializers.py:493
+#: .\apps\users\serializers\user_serializers.py:584
 msgid "Role"
 msgstr "角色"
 
@@ -1151,9 +1163,10 @@ msgid "Modification time"
 msgstr "修改時間"
 
 #: .\apps\application\swagger_api\application_api.py:74
-#: .\apps\application\swagger_api\application_api.py:191
-#: .\apps\application\swagger_api\application_api.py:192
-#: .\apps\application\swagger_api\application_api.py:334
+#: .\apps\application\swagger_api\application_api.py:194
+#: .\apps\application\swagger_api\application_api.py:195
+#: .\apps\application\swagger_api\application_api.py:342
+#: .\apps\application\swagger_api\application_api.py:343
 #: .\apps\application\swagger_api\chat_api.py:139
 msgid "List of associated knowledge base IDs"
 msgstr "關聯知識庫 ID 列表"
@@ -1177,121 +1190,86 @@ msgstr "應用 api_key id"
 msgid "Is activation"
 msgstr "是否可用"
 
-#: .\apps\application\swagger_api\application_api.py:195
-#: .\apps\application\swagger_api\application_api.py:337
-#: .\apps\application\swagger_api\application_api.py:338
+#: .\apps\application\swagger_api\application_api.py:198
+#: .\apps\application\swagger_api\application_api.py:346
+#: .\apps\application\swagger_api\application_api.py:347
 msgid "Problem Optimization"
 msgstr "問題優化"
 
-#: .\apps\application\swagger_api\application_api.py:196
+#: .\apps\application\swagger_api\application_api.py:199
 msgid "Whether to enable problem optimization"
 msgstr "是否開啓問題優化"
 
-#: .\apps\application\swagger_api\application_api.py:201
-#: .\apps\application\swagger_api\application_api.py:340
+#: .\apps\application\swagger_api\application_api.py:204
+#: .\apps\application\swagger_api\application_api.py:349
 msgid "Application Type   SIMPLE |  WORK_FLOW"
 msgstr "應用類型   SIMPLE |  WORK_FLOW"
 
-#: .\apps\application\swagger_api\application_api.py:204
-#: .\apps\application\swagger_api\application_api.py:205
-#: .\apps\application\swagger_api\application_api.py:341
-#: .\apps\application\swagger_api\application_api.py:342
+#: .\apps\application\swagger_api\application_api.py:207
+#: .\apps\application\swagger_api\application_api.py:208
+#: .\apps\application\swagger_api\application_api.py:351
+#: .\apps\application\swagger_api\application_api.py:352
 msgid "Question optimization tips"
 msgstr "問題優化提示詞"
 
-#: .\apps\application\swagger_api\application_api.py:208
-#: .\apps\application\swagger_api\application_api.py:209
-#: .\apps\application\swagger_api\application_api.py:345
-#: .\apps\application\swagger_api\application_api.py:346
+#: .\apps\application\swagger_api\application_api.py:211
+#: .\apps\application\swagger_api\application_api.py:212
+#: .\apps\application\swagger_api\application_api.py:355
+#: .\apps\application\swagger_api\application_api.py:356
 msgid "Text-to-speech model ID"
 msgstr "文本轉語音模型 ID"
 
-#: .\apps\application\swagger_api\application_api.py:210
-#: .\apps\application\swagger_api\application_api.py:211
-#: .\apps\application\swagger_api\application_api.py:347
-#: .\apps\application\swagger_api\application_api.py:348
+#: .\apps\application\swagger_api\application_api.py:213
+#: .\apps\application\swagger_api\application_api.py:214
+#: .\apps\application\swagger_api\application_api.py:357
+#: .\apps\application\swagger_api\application_api.py:358
 msgid "Speech-to-text model id"
 msgstr "語音轉文本模型 ID"
 
-#: .\apps\application\swagger_api\application_api.py:212
-#: .\apps\application\swagger_api\application_api.py:213
-#: .\apps\application\swagger_api\application_api.py:349
-#: .\apps\application\swagger_api\application_api.py:350
+#: .\apps\application\swagger_api\application_api.py:215
+#: .\apps\application\swagger_api\application_api.py:216
+#: .\apps\application\swagger_api\application_api.py:359
+#: .\apps\application\swagger_api\application_api.py:360
 msgid "Is speech-to-text enabled"
 msgstr "是否開啓語音轉文本"
 
-#: .\apps\application\swagger_api\application_api.py:214
-#: .\apps\application\swagger_api\application_api.py:215
-#: .\apps\application\swagger_api\application_api.py:351
-#: .\apps\application\swagger_api\application_api.py:352
+#: .\apps\application\swagger_api\application_api.py:217
+#: .\apps\application\swagger_api\application_api.py:218
+#: .\apps\application\swagger_api\application_api.py:361
+#: .\apps\application\swagger_api\application_api.py:362
 msgid "Is text-to-speech enabled"
 msgstr "是否開啓文本轉語音"
 
-#: .\apps\application\swagger_api\application_api.py:216
-#: .\apps\application\swagger_api\application_api.py:217
-#: .\apps\application\swagger_api\application_api.py:353
-#: .\apps\application\swagger_api\application_api.py:354
+#: .\apps\application\swagger_api\application_api.py:219
+#: .\apps\application\swagger_api\application_api.py:220
+#: .\apps\application\swagger_api\application_api.py:363
+#: .\apps\application\swagger_api\application_api.py:364
 msgid "Text-to-speech type"
 msgstr "文本轉語音類型"
 
-#: .\apps\application\swagger_api\application_api.py:230
+#: .\apps\application\swagger_api\application_api.py:233
 msgid "Node List"
 msgstr "節點列表"
 
-#: .\apps\application\swagger_api\application_api.py:233
+#: .\apps\application\swagger_api\application_api.py:236
 msgid "Connection List"
 msgstr "連線列表"
 
-#: .\apps\application\swagger_api\application_api.py:263
+#: .\apps\application\swagger_api\application_api.py:266
 msgid "state"
 msgstr "狀態"
 
-#: .\apps\application\swagger_api\application_api.py:265
+#: .\apps\application\swagger_api\application_api.py:268
 msgid "ai_questioning|designated_answer"
 msgstr "ai作答|指定答案"
 
-#: .\apps\application\swagger_api\application_api.py:270
+#: .\apps\application\swagger_api\application_api.py:273
 msgid ""
 "ai_questioning: is the title, designated_answer: is the designated answer "
 "content"
 msgstr "ai作答:就是題詞,指定回答:就是指定回答內容"
 
-#: .\apps\application\swagger_api\application_api.py:285
-#, python-brace-format
-msgid ""
-"\n"
-"Known information:\n"
-"{data}\n"
-"Answer requirements:\n"
-"- If you don't know the answer or don't get the answer, please answer \"No "
-"relevant information found in the knowledge base, it is recommended to "
-"consult relevant technical support or refer to official documents for "
-"operation\".\n"
-"- Avoid mentioning that you got the knowledge from <data></data>.\n"
-"- Please keep the answer consistent with the description in <data></data>.\n"
-"- Please use markdown syntax to optimize the format of the answer.\n"
-"- Please return the image link, link address and script language in <data></"
-"data> completely.\n"
-"- Please answer in the same language as the question.\n"
-"Question:\n"
-"{question}\n"
-"                                                    "
-msgstr ""
-"已知信息:\n"
-"{data}\n"
-"回答要求:\n"
-"- 如果您不知道答案或者得不到答案，請回答\"在知識庫中沒有找到相關信息，建議諮"
-"詢相關技術支持或者參考官方文檔進行操作\".\n"
-"- 避免在回答中提及您從<data></data>中獲得了知識。\n"
-"- 請保持回答與<data></data>中的描述一致。\n"
-"- 請使用markdown語法優化回答的格式。\n"
-"- 請完整返回<data></data>中的圖片鏈接、鏈接地址和腳本語言。\n"
-"- 請使用與問題相同的語言回答。\n"
-"問題:\n"
-"{question}\n"
-"                                                    "
-
-#: .\apps\application\swagger_api\application_api.py:391
+#: .\apps\application\swagger_api\application_api.py:401
 msgid "Upload image files"
 msgstr "上傳圖片文件"
 
@@ -1922,7 +1900,7 @@ msgid "Please log in first and bring the user Token"
 msgstr "請先登錄並攜帶用戶Token"
 
 #: .\apps\common\constants\exception_code_constants.py:33
-#: .\apps\users\serializers\user_serializers.py:414
+#: .\apps\users\serializers\user_serializers.py:427
 msgid "Email sending failed"
 msgstr "郵箱發送失敗"
 
@@ -2114,20 +2092,6 @@ msgstr "開始重置訪問次數"
 msgid "end reset access_num"
 msgstr "結束重置訪問次數"
 
-#: .\apps\common\mixins\app_model_mixin.py:13
-#: .\apps\common\swagger_api\common_api.py:81
-#: .\apps\common\swagger_api\common_api.py:82
-#: .\apps\users\serializers\user_serializers.py:571
-msgid "Create time"
-msgstr "創建時間"
-
-#: .\apps\common\mixins\app_model_mixin.py:14
-#: .\apps\common\swagger_api\common_api.py:78
-#: .\apps\common\swagger_api\common_api.py:79
-#: .\apps\users\serializers\user_serializers.py:572
-msgid "Update time"
-msgstr "更新時間"
-
 #: .\apps\common\response\result.py:24
 msgid "Success"
 msgstr "成功"
@@ -2283,12 +2247,13 @@ msgstr "文檔 id"
 #: .\apps\function_lib\swagger_api\function_lib_api.py:167
 #: .\apps\function_lib\swagger_api\function_lib_api.py:168
 #: .\apps\setting\serializers\team_serializers.py:46
-#: .\apps\users\serializers\user_serializers.py:457
-#: .\apps\users\serializers\user_serializers.py:479
-#: .\apps\users\serializers\user_serializers.py:567
-#: .\apps\users\serializers\user_serializers.py:698
-#: .\apps\users\serializers\user_serializers.py:714
-#: .\apps\users\serializers\user_serializers.py:715
+#: .\apps\users\serializers\user_serializers.py:471
+#: .\apps\users\serializers\user_serializers.py:494
+#: .\apps\users\serializers\user_serializers.py:582
+#: .\apps\users\serializers\user_serializers.py:583
+#: .\apps\users\serializers\user_serializers.py:719
+#: .\apps\users\serializers\user_serializers.py:735
+#: .\apps\users\serializers\user_serializers.py:736
 #: .\apps\xpack\swagger_api\application_setting_api.py:112
 #: .\apps\xpack\swagger_api\application_setting_api.py:113
 #: .\apps\xpack\swagger_api\auth_api.py:21
@@ -2305,6 +2270,20 @@ msgstr "相關性得分"
 #: .\apps\common\swagger_api\common_api.py:77
 msgid "Comprehensive score, used for ranking"
 msgstr "綜合得分,用於排序"
+
+#: .\apps\common\swagger_api\common_api.py:78
+#: .\apps\common\swagger_api\common_api.py:79
+#: .\apps\users\serializers\user_serializers.py:589
+#: .\apps\users\serializers\user_serializers.py:590
+msgid "Update time"
+msgstr "更新時間"
+
+#: .\apps\common\swagger_api\common_api.py:81
+#: .\apps\common\swagger_api\common_api.py:82
+#: .\apps\users\serializers\user_serializers.py:587
+#: .\apps\users\serializers\user_serializers.py:588
+msgid "Create time"
+msgstr "創建時間"
 
 #: .\apps\common\util\common.py:218
 msgid "Text-to-speech node, the text content must be of string type"
@@ -2384,6 +2363,7 @@ msgstr "知識庫設置錯誤,請重新設置知識庫"
 #: .\apps\setting\serializers\provider_serializers.py:277
 #: .\apps\setting\serializers\provider_serializers.py:301
 #: .\apps\setting\serializers\team_serializers.py:42
+#: .\apps\users\serializers\user_serializers.py:272
 msgid "user id"
 msgstr "用戶 id"
 
@@ -3610,18 +3590,16 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:51
 msgid ""
-"\n"
-"                             Universal text vector is Tongyi Lab's multi-"
-"language text unified vector model based on the LLM base. It provides high-"
-"level vector services for multiple mainstream languages around the world and "
-"helps developers quickly convert text data into high-quality vector data.\n"
-"                             "
+"Universal text vector is Tongyi Lab's multi-language text unified vector "
+"model based on the LLM base. It provides high-level vector services for "
+"multiple mainstream languages around the world and helps developers quickly "
+"convert text data into high-quality vector data."
 msgstr ""
 "通用文本向量，是通義實驗室基於LLM底座的多語言文本統一向量模型，面向全球多個主"
 "流語種，提供高水準的向量服務，幫助開發者將文本數據快速轉換爲高質量的向量數"
 "據。"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:71
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:69
 #: .\apps\setting\models_provider\impl\qwen_model_provider\qwen_model_provider.py:40
 msgid ""
 "Tongyi Wanxiang - a large image model for text generation, supports "
@@ -3634,7 +3612,7 @@ msgstr ""
 "或者參考風格遷移，重點風格包括但不限於水彩、油畫、中國畫、素描、扁平插畫、二"
 "次元、3D卡通。"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:96
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:94
 msgid "Alibaba Cloud Bailian"
 msgstr "阿里雲百鍊"
 
@@ -4196,7 +4174,7 @@ msgstr ""
 msgid "API Key"
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:35
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:36
 msgid ""
 "An update to Claude 2 that doubles the context window and improves "
 "reliability, hallucination rates, and evidence-based accuracy in long "
@@ -4205,7 +4183,7 @@ msgstr ""
 "Claude 2 的更新，採用雙倍的上下文窗口，並在長文檔和 RAG 上下文中提高可靠性、"
 "幻覺率和循證準確性。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:42
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:43
 msgid ""
 "Anthropic is a powerful model that can handle a variety of tasks, from "
 "complex dialogue and creative content generation to detailed command "
@@ -4214,35 +4192,31 @@ msgstr ""
 "Anthropic 功能強大的模型，可處理各種任務，從複雜的對話和創意內容生成到詳細的"
 "指令服從。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:49
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:50
 msgid ""
-"\n"
-"            The Claude 3 Haiku is Anthropic's fastest and most compact "
-"model, with near-instant responsiveness. The model can answer simple queries "
-"and requests quickly. Customers will be able to build seamless AI "
-"experiences that mimic human interactions. Claude 3 Haiku can process images "
-"and return text output, and provides 200K context windows.\n"
-"            "
+"The Claude 3 Haiku is Anthropic's fastest and most compact model, with near-"
+"instant responsiveness. The model can answer simple queries and requests "
+"quickly. Customers will be able to build seamless AI experiences that mimic "
+"human interactions. Claude 3 Haiku can process images and return text "
+"output, and provides 200K context windows."
 msgstr ""
 "Claude 3 Haiku 是 Anthropic 最快速、最緊湊的模型，具有近乎即時的響應能力。該"
 "模型可以快速回答簡單的查詢和請求。客戶將能夠構建模仿人類交互的無縫人工智能體"
 "驗。 Claude 3 Haiku 可以處理圖像和返回文本輸出，並且提供 200K 上下文窗口。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:58
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:57
 msgid ""
-"          \n"
 "The Claude 3 Sonnet model from Anthropic strikes the ideal balance between "
 "intelligence and speed, especially when it comes to handling enterprise "
 "workloads. This model offers maximum utility while being priced lower than "
 "competing products, and it's been engineered to be a solid choice for "
-"deploying AI at scale.\n"
-"            "
+"deploying AI at scale."
 msgstr ""
 "Anthropic 推出的 Claude 3 Sonnet 模型在智能和速度之間取得理想的平衡，尤其是在"
 "處理企業工作負載方面。該模型提供最大的效用，同時價格低於競爭產品，並且其經過"
 "精心設計，是大規模部署人工智能的可靠選擇。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:67
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:64
 msgid ""
 "The Claude 3.5 Sonnet raises the industry standard for intelligence, "
 "outperforming competing models and the Claude 3 Opus in extensive "
@@ -4251,7 +4225,7 @@ msgstr ""
 "Claude 3.5 Sonnet提高了智能的行業標準，在廣泛的評估中超越了競爭對手的型號和"
 "Claude 3 Opus，具有我們中端型號的速度和成本效益。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:74
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:71
 msgid ""
 "A faster, more affordable but still very powerful model that can handle a "
 "range of tasks including casual conversation, text analysis, summarization "
@@ -4260,21 +4234,19 @@ msgstr ""
 "一種更快速、更實惠但仍然非常強大的模型，它可以處理一系列任務，包括隨意對話、"
 "文本分析、摘要和文檔問題回答。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:81
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:78
 msgid ""
-"\n"
-"            Titan Text Premier is the most powerful and advanced model in "
-"the Titan Text series, designed to deliver exceptional performance for a "
-"variety of enterprise applications. With its cutting-edge features, it "
-"delivers greater accuracy and outstanding results, making it an excellent "
-"choice for organizations looking for a top-notch text processing solution.\n"
-"            "
+"Titan Text Premier is the most powerful and advanced model in the Titan Text "
+"series, designed to deliver exceptional performance for a variety of "
+"enterprise applications. With its cutting-edge features, it delivers greater "
+"accuracy and outstanding results, making it an excellent choice for "
+"organizations looking for a top-notch text processing solution."
 msgstr ""
 "Titan Text Premier 是 Titan Text 系列中功能強大且先進的型號，旨在爲各種企業應"
 "用程序提供卓越的性能。憑藉其尖端功能，它提供了更高的準確性和出色的結果，使其"
 "成爲尋求一流文本處理解決方案的組織的絕佳選擇。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:90
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:85
 msgid ""
 "Amazon Titan Text Lite is a lightweight, efficient model ideal for fine-"
 "tuning English-language tasks, including summarization and copywriting, "
@@ -4284,7 +4256,7 @@ msgstr ""
 "Amazon Titan Text Lite 是一種輕量級的高效模型，非常適合英語任務的微調，包括摘"
 "要和文案寫作等，在這種場景下，客戶需要更小、更經濟高效且高度可定製的模型"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:96
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:91
 msgid ""
 "Amazon Titan Text Express has context lengths of up to 8,000 tokens, making "
 "it ideal for a variety of high-level general language tasks, such as open-"
@@ -4296,7 +4268,7 @@ msgstr ""
 "常規語言任務，例如開放式文本生成和對話式聊天，以及檢索增強生成（RAG）中的支"
 "持。在發佈時，該模型針對英語進行了優化，但也支持其他語言。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:102
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:97
 msgid ""
 "7B dense converter for rapid deployment and easy customization. Small in "
 "size yet powerful in a variety of use cases. Supports English and code, as "
@@ -4305,7 +4277,7 @@ msgstr ""
 "7B 密集型轉換器，可快速部署，易於定製。體積雖小，但功能強大，適用於各種用例。"
 "支持英語和代碼，以及 32k 的上下文窗口。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:108
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:103
 msgid ""
 "Advanced Mistral AI large-scale language model capable of handling any "
 "language task, including complex multilingual reasoning, text understanding, "
@@ -4314,19 +4286,19 @@ msgstr ""
 "先進的 Mistral AI 大型語言模型，能夠處理任何語言任務，包括複雜的多語言推理、"
 "文本理解、轉換和代碼生成。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:114
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:109
 msgid ""
 "Ideal for content creation, conversational AI, language understanding, R&D, "
 "and enterprise applications"
 msgstr "非常適合內容創作、會話式人工智能、語言理解、研發和企業應用"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:120
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:115
 msgid ""
 "Ideal for limited computing power and resources, edge devices, and faster "
 "training times."
 msgstr "非常適合有限的計算能力和資源、邊緣設備和更快的訓練時間。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:128
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\aws_bedrock_model_provider.py:123
 msgid ""
 "Titan Embed Text is the largest embedding model in the Amazon Titan Embed "
 "series and can handle various text embedding tasks, such as text "
@@ -4464,55 +4436,45 @@ msgstr "Meta Llama 3：迄今爲止最有能力的公開產品LLM。700億參數
 
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:57
 msgid ""
-"\n"
-"        Compared with previous versions, qwen 1.5 0.5b has significantly "
-"enhanced the model's alignment with human preferences and its multi-language "
+"Compared with previous versions, qwen 1.5 0.5b has significantly enhanced "
+"the model's alignment with human preferences and its multi-language "
 "processing capabilities. Models of all sizes support a context length of "
-"32768 tokens. 500 million parameters.\n"
-"        "
+"32768 tokens. 500 million parameters."
 msgstr ""
 "qwen 1.5 0.5b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上有"
 "顯著增強。所有規模的模型都支持32768個tokens的上下文長度。5億參數。"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:63
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:61
 msgid ""
-"\n"
-"        \n"
 "Compared with previous versions, qwen 1.5 1.8b has significantly enhanced "
 "the model's alignment with human preferences and its multi-language "
 "processing capabilities. Models of all sizes support a context length of "
-"32768 tokens. 1.8 billion parameters.\n"
-"        "
+"32768 tokens. 1.8 billion parameters."
 msgstr ""
 "qwen 1.5 1.8b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上有"
 "顯著增強。所有規模的模型都支持32768個tokens的上下文長度。18億參數。"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:70
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:65
 msgid ""
-"\n"
-"        \n"
 "Compared with previous versions, qwen 1.5 4b has significantly enhanced the "
 "model's alignment with human preferences and its multi-language processing "
 "capabilities. Models of all sizes support a context length of 32768 tokens. "
-"4 billion parameters.\n"
-"        "
+"4 billion parameters."
 msgstr ""
 "qwen 1.5 4b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上有顯"
 "著增強。所有規模的模型都支持32768個tokens的上下文長度。40億參數。"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:78
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:70
 msgid ""
-"\n"
-"        Compared with previous versions, qwen 1.5 7b has significantly "
-"enhanced the model's alignment with human preferences and its multi-language "
-"processing capabilities. Models of all sizes support a context length of "
-"32768 tokens. 7 billion parameters.\n"
-"        "
+"Compared with previous versions, qwen 1.5 7b has significantly enhanced the "
+"model's alignment with human preferences and its multi-language processing "
+"capabilities. Models of all sizes support a context length of 32768 tokens. "
+"7 billion parameters."
 msgstr ""
-"qwen 1.5 7b 相較於以往版本，模型與人類偏好的對齊程度以及多語1言處理能力上有顯"
+"qwen 1.5 7b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上有顯"
 "著增強。所有規模的模型都支持32768個tokens的上下文長度。70億參數。"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:84
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:74
 msgid ""
 "Compared with previous versions, qwen 1.5 14b has significantly enhanced the "
 "model's alignment with human preferences and its multi-language processing "
@@ -4522,7 +4484,7 @@ msgstr ""
 "qwen 1.5 14b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上有顯"
 "著增強。所有規模的模型都支持32768個tokens的上下文長度。140億參數。"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:88
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:78
 msgid ""
 "Compared with previous versions, qwen 1.5 32b has significantly enhanced the "
 "model's alignment with human preferences and its multi-language processing "
@@ -4532,9 +4494,8 @@ msgstr ""
 "qwen 1.5 32b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上有顯"
 "著增強。所有規模的模型都支持32768個tokens的上下文長度。320億參數。"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:92
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:82
 msgid ""
-"\n"
 "Compared with previous versions, qwen 1.5 72b has significantly enhanced the "
 "model's alignment with human preferences and its multi-language processing "
 "capabilities. Models of all sizes support a context length of 32768 tokens. "
@@ -4543,37 +4504,28 @@ msgstr ""
 "qwen 1.5 72b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上有顯"
 "著增強。所有規模的模型都支持32768個tokens的上下文長度。720億參數。"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:97
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:86
 msgid ""
-"\n"
-"        Compared with previous versions, qwen 1.5 110b has significantly "
-"enhanced the model's alignment with human preferences and its multi-language "
+"Compared with previous versions, qwen 1.5 110b has significantly enhanced "
+"the model's alignment with human preferences and its multi-language "
 "processing capabilities. Models of all sizes support a context length of "
-"32768 tokens. 110 billion parameters.\n"
-"        "
+"32768 tokens. 110 billion parameters."
 msgstr ""
 "qwen 1.5 110b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上有"
 "顯著增強。所有規模的模型都支持32768個tokens的上下文長度。1100億參數。"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:143
-msgid ""
-"\n"
-"        Phi-3 Mini is Microsoft's 3.8B parameter, lightweight, state-of-the-"
-"art open model.\n"
-"        "
-msgstr "Phi-3 Mini 是微軟的 3.8B 參數、輕量級、最先進的開放模型。"
-
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:153
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:182
-msgid ""
-"A high-performance open embedding model with a large token context window."
-msgstr "一個具有大令牌上下文窗口的高性能開放嵌入模型。"
-
-#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:178
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:130
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:163
 msgid ""
 "Phi-3 Mini is Microsoft's 3.8B parameter, lightweight, state-of-the-art open "
 "model."
 msgstr "Phi-3 Mini是Microsoft的3.8B參數，輕量級，最先進的開放模型。"
+
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:138
+#: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:167
+msgid ""
+"A high-performance open embedding model with a large token context window."
+msgstr "一個具有大令牌上下文窗口的高性能開放嵌入模型。"
 
 #: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:16
 msgid ""
@@ -4831,61 +4783,53 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:57
 msgid ""
-"\n"
-"            Hunyuan's latest version of the role-playing model, a role-"
-"playing model launched by Hunyuan's official fine-tuning training, is based "
-"on the Hunyuan model combined with the role-playing scene data set for "
-"additional training, and has better basic effects in role-playing scenes.\n"
-"            "
+"Hunyuan's latest version of the role-playing model, a role-playing model "
+"launched by Hunyuan's official fine-tuning training, is based on the Hunyuan "
+"model combined with the role-playing scene data set for additional training, "
+"and has better basic effects in role-playing scenes."
 msgstr ""
 "混元最新版角色扮演模型，混元官方精調訓練推出的角色扮演模型，基於混元模型結合"
 "角色扮演場景數據集進行增訓，在角色扮演場景具有更好的基礎效果"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:65
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:63
 msgid ""
-"\n"
-"            Hunyuan's latest MOE architecture FunctionCall model has been "
-"trained with high-quality FunctionCall data and has a context window of 32K, "
-"leading in multiple dimensions of evaluation indicators.\n"
-"            "
+"Hunyuan's latest MOE architecture FunctionCall model has been trained with "
+"high-quality FunctionCall data and has a context window of 32K, leading in "
+"multiple dimensions of evaluation indicators."
 msgstr ""
 "混元最新 MOE 架構 FunctionCall 模型，經過高質量的 FunctionCall 數據訓練，上下"
 "文窗口達 32K，在多個維度的評測指標上處於領先。"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:73
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:69
 msgid ""
-"\n"
-"            Hunyuan's latest code generation model, after training the base "
-"model with 200B high-quality code data, and iterating on high-quality SFT "
-"data for half a year, the context long window length has been increased to "
-"8K, and it ranks among the top in the automatic evaluation indicators of "
-"code generation in the five major languages; the five major languages In the "
+"Hunyuan's latest code generation model, after training the base model with "
+"200B high-quality code data, and iterating on high-quality SFT data for half "
+"a year, the context long window length has been increased to 8K, and it "
+"ranks among the top in the automatic evaluation indicators of code "
+"generation in the five major languages; the five major languages In the "
 "manual high-quality evaluation of 10 comprehensive code tasks that consider "
-"all aspects, the performance is in the first echelon.\n"
-"            "
+"all aspects, the performance is in the first echelon."
 msgstr ""
 "混元最新代碼生成模型，經過 200B 高質量代碼數據增訓基座模型，迭代半年高質量 "
 "SFT 數據訓練，上下文長窗口長度增大到 8K，五大語言代碼生成自動評測指標上位居前"
 "列；五大語言10項考量各方面綜合代碼任務人工高質量評測上，性能處於第一梯隊"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:83
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:77
 msgid ""
-"\n"
-"        Tencent's Hunyuan Embedding interface can convert text into high-"
-"quality vector data. The vector dimension is 1024 dimensions.\n"
-"        "
+"Tencent's Hunyuan Embedding interface can convert text into high-quality "
+"vector data. The vector dimension is 1024 dimensions."
 msgstr ""
 "騰訊混元 Embedding 接口，可以將文本轉化爲高質量的向量數據。向量維度爲1024維。"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:95
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:87
 msgid "Mixed element visual model"
 msgstr "混元視覺模型"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:102
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:94
 msgid "Hunyuan graph model"
 msgstr "混元生圖模型"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:133
+#: .\apps\setting\models_provider\impl\tencent_model_provider\tencent_model_provider.py:125
 msgid "Tencent Hunyuan"
 msgstr "騰訊混元"
 
@@ -5386,16 +5330,16 @@ msgstr "發件人郵箱"
 #: .\apps\users\serializers\user_serializers.py:112
 #: .\apps\users\serializers\user_serializers.py:143
 #: .\apps\users\serializers\user_serializers.py:211
-#: .\apps\users\serializers\user_serializers.py:280
-#: .\apps\users\serializers\user_serializers.py:333
-#: .\apps\users\serializers\user_serializers.py:649
-#: .\apps\users\serializers\user_serializers.py:680
-#: .\apps\users\serializers\user_serializers.py:681
-#: .\apps\users\serializers\user_serializers.py:720
-#: .\apps\users\serializers\user_serializers.py:740
+#: .\apps\users\serializers\user_serializers.py:293
+#: .\apps\users\serializers\user_serializers.py:346
+#: .\apps\users\serializers\user_serializers.py:669
+#: .\apps\users\serializers\user_serializers.py:701
+#: .\apps\users\serializers\user_serializers.py:702
 #: .\apps\users\serializers\user_serializers.py:741
-#: .\apps\users\views\user.py:79 .\apps\users\views\user.py:80
-#: .\apps\users\views\user.py:81
+#: .\apps\users\serializers\user_serializers.py:761
+#: .\apps\users\serializers\user_serializers.py:762
+#: .\apps\users\views\user.py:103 .\apps\users\views\user.py:104
+#: .\apps\users\views\user.py:105 .\apps\users\views\user.py:106
 msgid "Password"
 msgstr "密碼"
 
@@ -5424,16 +5368,16 @@ msgstr "郵箱驗證失敗"
 #: .\apps\users\serializers\user_serializers.py:111
 #: .\apps\users\serializers\user_serializers.py:136
 #: .\apps\users\serializers\user_serializers.py:209
-#: .\apps\users\serializers\user_serializers.py:454
-#: .\apps\users\serializers\user_serializers.py:476
-#: .\apps\users\serializers\user_serializers.py:501
-#: .\apps\users\serializers\user_serializers.py:502
-#: .\apps\users\serializers\user_serializers.py:564
-#: .\apps\users\serializers\user_serializers.py:606
-#: .\apps\users\serializers\user_serializers.py:607
-#: .\apps\users\serializers\user_serializers.py:642
-#: .\apps\users\serializers\user_serializers.py:677
-#: .\apps\users\serializers\user_serializers.py:678
+#: .\apps\users\serializers\user_serializers.py:468
+#: .\apps\users\serializers\user_serializers.py:491
+#: .\apps\users\serializers\user_serializers.py:516
+#: .\apps\users\serializers\user_serializers.py:517
+#: .\apps\users\serializers\user_serializers.py:579
+#: .\apps\users\serializers\user_serializers.py:625
+#: .\apps\users\serializers\user_serializers.py:626
+#: .\apps\users\serializers\user_serializers.py:661
+#: .\apps\users\serializers\user_serializers.py:698
+#: .\apps\users\serializers\user_serializers.py:699
 msgid "Username"
 msgstr "用戶名"
 
@@ -5442,19 +5386,19 @@ msgstr "用戶名"
 #: .\apps\users\serializers\user_serializers.py:210
 #: .\apps\users\serializers\user_serializers.py:226
 #: .\apps\users\serializers\user_serializers.py:256
-#: .\apps\users\serializers\user_serializers.py:274
-#: .\apps\users\serializers\user_serializers.py:330
+#: .\apps\users\serializers\user_serializers.py:287
 #: .\apps\users\serializers\user_serializers.py:343
-#: .\apps\users\serializers\user_serializers.py:423
-#: .\apps\users\serializers\user_serializers.py:455
-#: .\apps\users\serializers\user_serializers.py:477
-#: .\apps\users\serializers\user_serializers.py:503
-#: .\apps\users\serializers\user_serializers.py:565
-#: .\apps\users\serializers\user_serializers.py:608
-#: .\apps\users\serializers\user_serializers.py:637
-#: .\apps\users\serializers\user_serializers.py:679
-#: .\apps\users\serializers\user_serializers.py:690
+#: .\apps\users\serializers\user_serializers.py:356
+#: .\apps\users\serializers\user_serializers.py:436
+#: .\apps\users\serializers\user_serializers.py:469
+#: .\apps\users\serializers\user_serializers.py:492
+#: .\apps\users\serializers\user_serializers.py:518
+#: .\apps\users\serializers\user_serializers.py:580
+#: .\apps\users\serializers\user_serializers.py:627
+#: .\apps\users\serializers\user_serializers.py:656
+#: .\apps\users\serializers\user_serializers.py:700
 #: .\apps\users\serializers\user_serializers.py:711
+#: .\apps\users\serializers\user_serializers.py:732
 msgid "Email"
 msgstr "郵箱"
 
@@ -5533,7 +5477,7 @@ msgstr "當前成員已存在於團隊中，無需再次添加。"
 
 #: .\apps\setting\serializers\team_serializers.py:202
 #: .\apps\setting\serializers\team_serializers.py:218
-#: .\apps\users\serializers\user_serializers.py:777
+#: .\apps\users\serializers\user_serializers.py:798
 msgid "User does not exist"
 msgstr "用戶不存在"
 
@@ -5559,7 +5503,7 @@ msgstr "不支持移除團隊管理員"
 
 #: .\apps\setting\serializers\valid_serializers.py:32
 #: .\apps\users\serializers\user_serializers.py:190
-#: .\apps\users\serializers\user_serializers.py:754
+#: .\apps\users\serializers\user_serializers.py:775
 msgid ""
 "The community version supports up to 2 users. If you need more users, please "
 "contact us (https://fit2cloud.com/)."
@@ -5628,7 +5572,7 @@ msgstr "獲取團隊成員列表"
 #: .\apps\setting\views\Team.py:51 .\apps\setting\views\Team.py:64
 #: .\apps\setting\views\Team.py:75 .\apps\setting\views\Team.py:86
 #: .\apps\users\serializers\user_serializers.py:198
-#: .\apps\users\serializers\user_serializers.py:768
+#: .\apps\users\serializers\user_serializers.py:789
 msgid "team"
 msgstr "團隊"
 
@@ -5775,14 +5719,14 @@ msgid "The user has been disabled, please contact the administrator!"
 msgstr "用戶已被禁用，請聯繫管理員！"
 
 #: .\apps\users\serializers\user_serializers.py:141
-#: .\apps\users\serializers\user_serializers.py:647
+#: .\apps\users\serializers\user_serializers.py:667
 msgid "Username must be 6-20 characters long"
 msgstr "用戶名必須是 6-20 個字符長"
 
 #: .\apps\users\serializers\user_serializers.py:148
 #: .\apps\users\serializers\user_serializers.py:156
-#: .\apps\users\serializers\user_serializers.py:653
-#: .\apps\users\serializers\user_serializers.py:725
+#: .\apps\users\serializers\user_serializers.py:674
+#: .\apps\users\serializers\user_serializers.py:746
 msgid ""
 "The password must be 6-20 characters long and must be a combination of "
 "letters, numbers, and special characters."
@@ -5791,12 +5735,12 @@ msgstr "密碼必須是 6-20 個字符長，且必須是字母、數字和特殊
 #: .\apps\users\serializers\user_serializers.py:151
 #: .\apps\users\serializers\user_serializers.py:212
 #: .\apps\users\serializers\user_serializers.py:213
-#: .\apps\users\serializers\user_serializers.py:287
-#: .\apps\users\serializers\user_serializers.py:334
-#: .\apps\users\serializers\user_serializers.py:335
-#: .\apps\users\serializers\user_serializers.py:726
-#: .\apps\users\serializers\user_serializers.py:742
-#: .\apps\users\serializers\user_serializers.py:743
+#: .\apps\users\serializers\user_serializers.py:300
+#: .\apps\users\serializers\user_serializers.py:347
+#: .\apps\users\serializers\user_serializers.py:348
+#: .\apps\users\serializers\user_serializers.py:747
+#: .\apps\users\serializers\user_serializers.py:763
+#: .\apps\users\serializers\user_serializers.py:764
 msgid "Confirm Password"
 msgstr "確認密碼"
 
@@ -5806,17 +5750,17 @@ msgstr "確認密碼"
 #: .\apps\users\serializers\user_serializers.py:229
 #: .\apps\users\serializers\user_serializers.py:257
 #: .\apps\users\serializers\user_serializers.py:258
-#: .\apps\users\serializers\user_serializers.py:278
-#: .\apps\users\serializers\user_serializers.py:331
-#: .\apps\users\serializers\user_serializers.py:332
-#: .\apps\users\views\user.py:78
+#: .\apps\users\serializers\user_serializers.py:291
+#: .\apps\users\serializers\user_serializers.py:344
+#: .\apps\users\serializers\user_serializers.py:345
+#: .\apps\users\views\user.py:101 .\apps\users\views\user.py:102
 msgid "Verification code"
 msgstr "驗證碼"
 
 #: .\apps\users\serializers\user_serializers.py:232
 #: .\apps\users\serializers\user_serializers.py:259
-#: .\apps\users\serializers\user_serializers.py:347
-#: .\apps\users\serializers\user_serializers.py:424
+#: .\apps\users\serializers\user_serializers.py:360
+#: .\apps\users\serializers\user_serializers.py:437
 msgid "Type"
 msgstr "類型"
 
@@ -5828,186 +5772,194 @@ msgstr "是否成功"
 msgid "Error message"
 msgstr "錯誤信息"
 
-#: .\apps\users\serializers\user_serializers.py:285
-#: .\apps\users\serializers\user_serializers.py:292
-#: .\apps\users\serializers\user_serializers.py:731
+#: .\apps\users\serializers\user_serializers.py:280
+msgid "language only support:"
+msgstr ""
+
+#: .\apps\users\serializers\user_serializers.py:298
+#: .\apps\users\serializers\user_serializers.py:305
+#: .\apps\users\serializers\user_serializers.py:752
 msgid ""
 "The confirmation password must be 6-20 characters long and must be a "
 "combination of letters, numbers, and special characters."
 msgstr "確認密碼長度6-20個字符，必須字母、數字、特殊字符組合"
 
-#: .\apps\users\serializers\user_serializers.py:367
+#: .\apps\users\serializers\user_serializers.py:380
 #, python-brace-format
 msgid "Do not send emails again within {seconds} seconds"
 msgstr "{seconds} 秒內請勿重複發送郵件"
 
-#: .\apps\users\serializers\user_serializers.py:395
+#: .\apps\users\serializers\user_serializers.py:408
 msgid ""
 "The email service has not been set up. Please contact the administrator to "
 "set up the email service in [Email Settings]."
 msgstr "郵箱服務未設置，請聯繫管理員在【郵箱設置】中設置郵箱服務"
 
-#: .\apps\users\serializers\user_serializers.py:406
+#: .\apps\users\serializers\user_serializers.py:419
 #, python-brace-format
 msgid "【Intelligent knowledge base question and answer system-{action}】"
 msgstr "【智能知識庫問答系統-{action}】"
 
-#: .\apps\users\serializers\user_serializers.py:407
-#: .\apps\users\views\user.py:147 .\apps\users\views\user.py:148
+#: .\apps\users\serializers\user_serializers.py:420
+#: .\apps\users\views\user.py:172 .\apps\users\views\user.py:173
 msgid "User registration"
 msgstr "用戶註冊"
 
-#: .\apps\users\serializers\user_serializers.py:407
-#: .\apps\users\views\user.py:164 .\apps\users\views\user.py:165
-#: .\apps\users\views\user.py:245 .\apps\users\views\user.py:246
+#: .\apps\users\serializers\user_serializers.py:420
+#: .\apps\users\views\user.py:189 .\apps\users\views\user.py:190
+#: .\apps\users\views\user.py:270 .\apps\users\views\user.py:271
 msgid "Change password"
 msgstr "修改密碼"
 
-#: .\apps\users\serializers\user_serializers.py:458
+#: .\apps\users\serializers\user_serializers.py:472
+#: .\apps\users\serializers\user_serializers.py:473
 msgid "Permissions"
 msgstr "權限列表"
 
-#: .\apps\users\serializers\user_serializers.py:492
-#: .\apps\users\serializers\user_serializers.py:589
-#: .\apps\users\serializers\user_serializers.py:597
+#: .\apps\users\serializers\user_serializers.py:507
+#: .\apps\users\serializers\user_serializers.py:608
+#: .\apps\users\serializers\user_serializers.py:616
 msgid "Email or username"
 msgstr "郵箱或用戶名"
 
-#: .\apps\users\serializers\user_serializers.py:543
+#: .\apps\users\serializers\user_serializers.py:558
 msgid "All"
 msgstr "全部"
 
-#: .\apps\users\serializers\user_serializers.py:544
+#: .\apps\users\serializers\user_serializers.py:559
 msgid "Me"
 msgstr "我的"
 
-#: .\apps\users\serializers\user_serializers.py:566
-#: .\apps\users\serializers\user_serializers.py:657
-#: .\apps\users\serializers\user_serializers.py:682
-#: .\apps\users\serializers\user_serializers.py:696
-#: .\apps\users\serializers\user_serializers.py:713
+#: .\apps\users\serializers\user_serializers.py:581
+#: .\apps\users\serializers\user_serializers.py:678
+#: .\apps\users\serializers\user_serializers.py:703
+#: .\apps\users\serializers\user_serializers.py:717
+#: .\apps\users\serializers\user_serializers.py:734
 msgid "Phone"
 msgstr "手機號"
 
-#: .\apps\users\serializers\user_serializers.py:569
+#: .\apps\users\serializers\user_serializers.py:585
 msgid "Source"
 msgstr "來源"
 
-#: .\apps\users\serializers\user_serializers.py:570
-#: .\apps\users\serializers\user_serializers.py:655
-#: .\apps\users\serializers\user_serializers.py:683
-#: .\apps\users\serializers\user_serializers.py:694
-#: .\apps\users\serializers\user_serializers.py:712
+#: .\apps\users\serializers\user_serializers.py:586
+#: .\apps\users\serializers\user_serializers.py:676
+#: .\apps\users\serializers\user_serializers.py:704
+#: .\apps\users\serializers\user_serializers.py:715
+#: .\apps\users\serializers\user_serializers.py:733
 msgid "Name"
 msgstr "名字"
 
-#: .\apps\users\serializers\user_serializers.py:704
+#: .\apps\users\serializers\user_serializers.py:725
 msgid "Email is already in use"
 msgstr "郵箱已被使用"
 
-#: .\apps\users\serializers\user_serializers.py:785
+#: .\apps\users\serializers\user_serializers.py:806
 msgid "Unable to delete administrator"
 msgstr "不能刪除管理員"
 
-#: .\apps\users\serializers\user_serializers.py:822
+#: .\apps\users\serializers\user_serializers.py:843
 msgid "Cannot modify administrator status"
 msgstr "不能修改管理員狀態"
 
-#: .\apps\users\views\user.py:33 .\apps\users\views\user.py:34
+#: .\apps\users\views\user.py:35 .\apps\users\views\user.py:36
 msgid "Get MaxKB related information"
 msgstr "獲取 MaxKB 相關信息"
 
-#: .\apps\users\views\user.py:36
+#: .\apps\users\views\user.py:38
 msgid "System parameters"
 msgstr "系統參數"
 
-#: .\apps\users\views\user.py:45 .\apps\users\views\user.py:46
+#: .\apps\users\views\user.py:47 .\apps\users\views\user.py:48
 msgid "Get current user information"
 msgstr "獲取當前用戶信息"
 
-#: .\apps\users\views\user.py:57 .\apps\users\views\user.py:58
+#: .\apps\users\views\user.py:59 .\apps\users\views\user.py:60
 msgid "Get user list"
 msgstr "獲取用戶列表"
 
-#: .\apps\users\views\user.py:61 .\apps\users\views\user.py:85
-#: .\apps\users\views\user.py:104 .\apps\users\views\user.py:119
-#: .\apps\users\views\user.py:133 .\apps\users\views\user.py:152
-#: .\apps\users\views\user.py:169 .\apps\users\views\user.py:184
-#: .\apps\users\views\user.py:197 .\apps\users\views\user.py:313
+#: .\apps\users\views\user.py:63 .\apps\users\views\user.py:85
+#: .\apps\users\views\user.py:110 .\apps\users\views\user.py:129
+#: .\apps\users\views\user.py:144 .\apps\users\views\user.py:158
+#: .\apps\users\views\user.py:177 .\apps\users\views\user.py:194
+#: .\apps\users\views\user.py:209 .\apps\users\views\user.py:222
+#: .\apps\users\views\user.py:338
 msgid "User"
 msgstr "用戶"
 
-#: .\apps\users\views\user.py:72 .\apps\users\views\user.py:73
+#: .\apps\users\views\user.py:74 .\apps\users\views\user.py:75
+msgid "Switch Language"
+msgstr "切换语音"
+
+#: .\apps\users\views\user.py:95 .\apps\users\views\user.py:96
 msgid "Modify current user password"
 msgstr "修改當前用戶密碼"
 
-#: .\apps\users\views\user.py:93
+#: .\apps\users\views\user.py:118
 msgid "Failed to change password"
 msgstr "修改密碼失敗"
 
-#: .\apps\users\views\user.py:101 .\apps\users\views\user.py:102
+#: .\apps\users\views\user.py:126 .\apps\users\views\user.py:127
 msgid "Send email to current user"
 msgstr "給當前用戶發送郵件"
 
-#: .\apps\users\views\user.py:116 .\apps\users\views\user.py:117
+#: .\apps\users\views\user.py:141 .\apps\users\views\user.py:142
 msgid "Sign out"
 msgstr "登出"
 
-#: .\apps\users\views\user.py:128 .\apps\users\views\user.py:129
+#: .\apps\users\views\user.py:153 .\apps\users\views\user.py:154
 #: .\apps\xpack\views\auth.py:91 .\apps\xpack\views\auth.py:92
 msgid "Log in"
 msgstr "登錄"
 
-#: .\apps\users\views\user.py:157
+#: .\apps\users\views\user.py:182
 msgid "Registration successful"
 msgstr "註冊成功"
 
-#: .\apps\users\views\user.py:179 .\apps\users\views\user.py:180
+#: .\apps\users\views\user.py:204 .\apps\users\views\user.py:205
 msgid "Check whether the verification code is correct"
 msgstr "檢查驗證碼是否正確"
 
-#: .\apps\users\views\user.py:192 .\apps\users\views\user.py:193
+#: .\apps\users\views\user.py:217 .\apps\users\views\user.py:218
 msgid "Send email"
 msgstr "發送郵件"
 
-#: .\apps\users\views\user.py:208 .\apps\users\views\user.py:209
+#: .\apps\users\views\user.py:233 .\apps\users\views\user.py:234
 msgid "Add user"
 msgstr "添加用戶"
 
-#: .\apps\users\views\user.py:212 .\apps\users\views\user.py:227
-#: .\apps\users\views\user.py:250 .\apps\users\views\user.py:267
-#: .\apps\users\views\user.py:280 .\apps\users\views\user.py:295
+#: .\apps\users\views\user.py:237 .\apps\users\views\user.py:252
+#: .\apps\users\views\user.py:275 .\apps\users\views\user.py:292
+#: .\apps\users\views\user.py:305 .\apps\users\views\user.py:320
 msgid "User management"
 msgstr "用戶管理"
 
-#: .\apps\users\views\user.py:225 .\apps\users\views\user.py:226
+#: .\apps\users\views\user.py:250 .\apps\users\views\user.py:251
 msgid "Get user paginated list"
 msgstr "獲取用戶分頁列表"
 
-#: .\apps\users\views\user.py:263 .\apps\users\views\user.py:264
+#: .\apps\users\views\user.py:288 .\apps\users\views\user.py:289
 msgid "Delete user"
 msgstr "刪除用戶"
 
-#: .\apps\users\views\user.py:276 .\apps\users\views\user.py:277
+#: .\apps\users\views\user.py:301 .\apps\users\views\user.py:302
 msgid "Get user information"
 msgstr "獲取用戶信息"
 
-#: .\apps\users\views\user.py:290 .\apps\users\views\user.py:291
+#: .\apps\users\views\user.py:315 .\apps\users\views\user.py:316
 msgid "Update user information"
 msgstr "更新用戶信息"
 
-#: .\apps\users\views\user.py:309 .\apps\users\views\user.py:310
+#: .\apps\users\views\user.py:334 .\apps\users\views\user.py:335
 msgid "Get user list by type"
 msgstr "按類型獲取用戶列表"
 
 #: .\apps\xpack\auth\user_key.py:26
 #: .\apps\xpack\serializers\license_serializers.py:80
-
 msgid "The license is invalid"
 msgstr "License 無效"
 
 #: .\apps\xpack\auth\user_key.py:32 .\apps\xpack\auth\user_key.py:34
-
 msgid "secret_key is invalid"
 msgstr "secret key無效"
 
@@ -6016,7 +5968,6 @@ msgid "The license has not been uploaded or the license has expired"
 msgstr "License 未上傳或 License 已過期"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:20
-
 msgid "theme color"
 msgstr "主題顏色"
 
@@ -6025,28 +5976,23 @@ msgid "header font color"
 msgstr "頭部字體顏色"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:26
-
 msgid "float location type"
 msgstr "浮窗位置類型"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:27
-
 msgid "float location value"
 msgstr "浮窗位置值"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:31
-
 msgid "float location x"
 msgstr "浮窗位置 x"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:32
-
 msgid "float location y"
 msgstr "浮窗位置 y"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:36
 #: .\apps\xpack\swagger_api\application_setting_api.py:23
-
 msgid "show source"
 msgstr "是否顯示來源"
 
@@ -6089,7 +6035,6 @@ msgid "float icon"
 msgstr "浮窗圖標"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:45
-
 msgid "float icon url"
 msgstr "浮窗圖標地址"
 
@@ -6100,7 +6045,6 @@ msgstr "免責聲明"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:47
 #: .\apps\xpack\swagger_api\application_setting_api.py:72
-
 msgid "disclaimer value"
 msgstr "免責聲明的值"
 
@@ -6109,77 +6053,62 @@ msgid "Float location field type error"
 msgstr "浮窗位置字段類型錯誤"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:119
-
 msgid "Custom theme field type error"
 msgstr "自定義主題字段類型錯誤"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:19
-
 msgid "LDAP server cannot be empty"
 msgstr "LDAP 服務器不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:20
-
 msgid "Base DN cannot be empty"
 msgstr "Base DN 不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:21
-
 msgid "Password cannot be empty"
 msgstr "密碼不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:22
-
 msgid "OU cannot be empty"
 msgstr "OU 不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:23
-
 msgid "LDAP filter cannot be empty"
 msgstr "LDAP 過濾器不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:24
-
 msgid "LDAP mapping cannot be empty"
 msgstr "LDAP 映射不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:29
-
 msgid "Authorization address cannot be empty"
 msgstr "授權地址不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:31
-
 msgid "Token address cannot be empty"
 msgstr "令牌地址不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:33
-
 msgid "User information address cannot be empty"
 msgstr "用戶信息地址不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:34
-
 msgid "Scope cannot be empty"
 msgstr "Scope 不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:35
-
 msgid "Client ID cannot be empty"
 msgstr "Client ID 不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:36
-
 msgid "Client secret cannot be empty"
 msgstr "Client secret 不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:38
-
 msgid "Redirect address cannot be empty"
 msgstr "重定向地址不能爲空"
 
 #: .\apps\xpack\serializers\auth_config_serializer.py:39
-
 msgid "Field mapping cannot be empty"
 msgstr "字段映射不能爲空"
 
@@ -6188,7 +6117,6 @@ msgid "HttpClient query failed: "
 msgstr "HttpClient 查詢失敗："
 
 #: .\apps\xpack\serializers\cas.py:56
-
 msgid "CAS authentication failed"
 msgstr "CAS 認證失敗"
 
@@ -6212,6 +6140,7 @@ msgid "Currently only text messages are supported"
 msgstr "目前只支持文本消息"
 
 #: .\apps\xpack\serializers\channel\ding_talk.py:38
+#, python-brace-format
 msgid "DingTalk application: {user}"
 msgstr "釘釘應用：{user}"
 
@@ -6221,7 +6150,6 @@ msgid "Content generated by AI"
 msgstr "內容由 AI 生成"
 
 #: .\apps\xpack\serializers\channel\feishu.py:92
-
 msgid "Lark application: "
 msgstr "飛書應用："
 
@@ -6239,7 +6167,6 @@ msgid ""
 msgstr "應用未開啓語音轉文字功能或語音轉文字功能失敗。"
 
 #: .\apps\xpack\serializers\channel\wechat.py:175
-
 msgid "Message types not supported yet"
 msgstr "暫時不支持該類型的消息"
 
@@ -6252,13 +6179,11 @@ msgid "Enterprise WeChat user: "
 msgstr "企業微信用戶："
 
 #: .\apps\xpack\serializers\channel\wecom.py:85
-
 msgid "Enterprise WeChat customer service: "
 msgstr "企業微信客服："
 
 #: .\apps\xpack\serializers\channel\wecom.py:120
 #: .\apps\xpack\serializers\channel\wecom.py:132
-
 msgid "This type of message is not supported yet"
 msgstr "暫時不支持該類型的消息"
 
@@ -6273,54 +6198,44 @@ msgid "An error occurred while processing the GET request {e}"
 msgstr "GET 請求處理時發生錯誤 {e}"
 
 #: .\apps\xpack\serializers\license_serializers.py:52
-
 msgid "license file"
 msgstr "License 文件"
 
 #: .\apps\xpack\serializers\oauth2.py:76 .\apps\xpack\serializers\oauth2.py:79
-
 msgid "Failed to obtain user information"
 msgstr "獲取用戶信息失敗"
 
 #: .\apps\xpack\serializers\platform_serializer.py:14
-
 msgid "app_id is required"
 msgstr "app_id 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:15
-
 msgid "app_secret is required"
 msgstr "app_secret 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:16
-
 msgid "token is required"
 msgstr "token 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:17
-
 msgid "callback_url is required"
 msgstr "回調地址是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:23
 #: .\apps\xpack\serializers\platform_serializer.py:32
-
 msgid "App ID is required"
 msgstr "App ID 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:24
 #: .\apps\xpack\serializers\platform_source_serializer.py:23
-
 msgid "Agent ID is required"
 msgstr "Agent ID 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:25
-
 msgid "Secret is required"
 msgstr "Secret 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:26
-
 msgid "Token is required"
 msgstr "Token 是必填項"
 
@@ -6328,28 +6243,23 @@ msgstr "Token 是必填項"
 #: .\apps\xpack\serializers\platform_serializer.py:36
 #: .\apps\xpack\serializers\platform_serializer.py:42
 #: .\apps\xpack\serializers\platform_source_serializer.py:18
-
 msgid "Callback URL is required"
 msgstr "Callback URL 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:33
 #: .\apps\xpack\serializers\platform_source_serializer.py:17
-
 msgid "App Secret is required"
 msgstr "App Secret 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:35
-
 msgid "Verification Token is required"
 msgstr "Verification Token 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:40
-
 msgid "Client ID is required"
 msgstr "Client ID 是必填項"
 
 #: .\apps\xpack\serializers\platform_serializer.py:41
-
 msgid "Client Secret is required"
 msgstr "Client Secret 是必填項"
 
@@ -6363,18 +6273,15 @@ msgstr "平臺類型，例如：wechat"
 
 #: .\apps\xpack\serializers\platform_serializer.py:117
 #: .\apps\xpack\serializers\platform_serializer.py:118
-
 msgid "Platform type"
 msgstr "平臺類型"
 
 #: .\apps\xpack\serializers\platform_serializer.py:120
-
 msgid "Status"
 msgstr "狀態"
 
 #: .\apps\xpack\serializers\platform_serializer.py:130
 #: .\apps\xpack\serializers\platform_serializer.py:131
-
 msgid "Configuration information"
 msgstr "配置信息"
 
@@ -6385,13 +6292,11 @@ msgstr "平臺配置 {type} 未找到"
 
 #: .\apps\xpack\serializers\platform_source_serializer.py:22
 #: .\apps\xpack\serializers\platform_source_serializer.py:31
-
 msgid "Corp ID is required"
 msgstr "Corp ID 是必填項"
 
 #: .\apps\xpack\serializers\platform_source_serializer.py:27
 #: .\apps\xpack\serializers\platform_source_serializer.py:32
-
 msgid "App Key is required"
 msgstr "App Key 是必填項"
 
@@ -6400,12 +6305,10 @@ msgid "Configuration information is wrong and failed to save"
 msgstr "配置信息錯誤，保存失敗"
 
 #: .\apps\xpack\serializers\platform_source_serializer.py:103
-
 msgid "Connection failed"
 msgstr "連接失敗"
 
 #: .\apps\xpack\serializers\platform_source_serializer.py:115
-
 msgid "Platform does not exist"
 msgstr "平臺不存在"
 
@@ -6430,7 +6333,6 @@ msgid "Login background image"
 msgstr "登錄背景圖"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:91
-
 msgid "website title"
 msgstr "網站標題"
 
@@ -6443,7 +6345,6 @@ msgid "Show user manual"
 msgstr "是否顯示用戶手冊"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:112
-
 msgid "User manual address"
 msgstr "用戶手冊地址"
 
@@ -6452,7 +6353,6 @@ msgid "Show forum"
 msgstr "是否顯示論壇"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:126
-
 msgid "Forum address"
 msgstr "論壇地址"
 
@@ -6464,14 +6364,15 @@ msgstr "是否顯示項目"
 msgid "Project address"
 msgstr "項目地址"
 
-#: .\apps\xpack\serializers\tools.py:58
+#: .\apps\xpack\serializers\tools.py:59
 #, python-brace-format
 msgid ""
 "Thinking about 【{question}】...If you want me to continue answering, please "
-"reply"
-msgstr "思考中【{question}】...如果您希望我繼續回答,請回復“{trigger_message}”。"
+"reply {trigger_message}"
+msgstr ""
+"思考中【{question}】...如果您希望我繼續回答,請回復“ {trigger_message} ”。"
 
-#: .\apps\xpack\serializers\tools.py:158
+#: .\apps\xpack\serializers\tools.py:159
 msgid ""
 "\n"
 " ------------\n"
@@ -6481,7 +6382,7 @@ msgstr ""
 " ------------\n"
 "【未完待續，回覆“問題繼續回答】"
 
-#: .\apps\xpack\serializers\tools.py:237
+#: .\apps\xpack\serializers\tools.py:238
 #, python-brace-format
 msgid ""
 "To be continued, reply \"{trigger_message}\" to continue answering the "
@@ -6500,7 +6401,6 @@ msgstr "浮窗位置 {top: 0, left: 0}"
 #: .\apps\xpack\swagger_api\application_setting_api.py:102
 #: .\apps\xpack\swagger_api\auth_api.py:10
 #: .\apps\xpack\swagger_api\auth_api.py:11
-
 msgid "Authentication configuration"
 msgstr "認證配置"
 
@@ -6510,7 +6410,6 @@ msgstr "認證配置"
 #: .\apps\xpack\swagger_api\auth_api.py:16
 #: .\apps\xpack\swagger_api\auth_api.py:30 .\apps\xpack\views\auth.py:26
 #: .\apps\xpack\views\auth.py:27
-
 msgid "Authentication type"
 msgstr "認證類型"
 
@@ -6518,12 +6417,10 @@ msgstr "認證類型"
 #: .\apps\xpack\swagger_api\application_setting_api.py:110
 #: .\apps\xpack\swagger_api\auth_api.py:18
 #: .\apps\xpack\swagger_api\auth_api.py:19
-
 msgid "Configuration"
 msgstr "配置"
 
 #: .\apps\xpack\swagger_api\license_api.py:22
-
 msgid "license status"
 msgstr "License 狀態"
 
@@ -6531,15 +6428,14 @@ msgstr "License 狀態"
 msgid ""
 "License status, possible values are: valid, invalid, expired, which "
 "respectively represent: valid, invalid, expired"
-msgstr "license狀態，可能值爲：valid、invalid、expired，分別代表：有效、無效、已過期"
+msgstr ""
+"license狀態，可能值爲：valid、invalid、expired，分別代表：有效、無效、已過期"
 
 #: .\apps\xpack\swagger_api\license_api.py:26
-
 msgid "license details"
 msgstr "License 詳情"
 
 #: .\apps\xpack\swagger_api\license_api.py:30
-
 msgid "customer name"
 msgstr "客戶名稱"
 
@@ -6558,7 +6454,6 @@ msgid ""
 msgstr ""
 
 #: .\apps\xpack\swagger_api\license_api.py:37
-
 msgid "Authorization deadline."
 msgstr "授權截止時間"
 
@@ -6569,7 +6464,6 @@ msgid ""
 msgstr "授權截止時間。例如：2020-12-31，此license將在2021-01-01到期。"
 
 #: .\apps\xpack\swagger_api\license_api.py:41
-
 msgid "product name."
 msgstr "產品名稱"
 
@@ -6578,7 +6472,6 @@ msgid "Product name. For example: JumpServer, CMP, etc."
 msgstr "產品名稱。例如：CMP、KO、JS、MS。"
 
 #: .\apps\xpack\swagger_api\license_api.py:45
-
 msgid "product version."
 msgstr "產品版本"
 
@@ -6587,7 +6480,6 @@ msgid "Product version. For example: JumpServer 2.0, CMP 1.0, etc."
 msgstr "產品版本。例如：Standard、Enterprise，代表標準版、企業版。"
 
 #: .\apps\xpack\swagger_api\license_api.py:49
-
 msgid "license version."
 msgstr "License 版本"
 
@@ -6596,7 +6488,6 @@ msgid "License version. For example: 1.0, 2.0, etc."
 msgstr "License版本。例如：1.0、2.0、3.0等。"
 
 #: .\apps\xpack\swagger_api\license_api.py:53
-
 msgid "authorization quantity."
 msgstr "認證數量"
 
@@ -6616,10 +6507,11 @@ msgid ""
 "portal will save the serial number after generating the license. If the "
 "serial number is not recorded in the customer support portal, the license "
 "will be regarded as an unknown source."
-msgstr "序列號，License唯一標識。客戶支持門戶生成License後會保存序列號，如果序列號在客戶支持門戶中沒有記錄，則此License將被視爲未知來源。"
+msgstr ""
+"序列號，License唯一標識。客戶支持門戶生成License後會保存序列號，如果序列號在"
+"客戶支持門戶中沒有記錄，則此License將被視爲未知來源。"
 
 #: .\apps\xpack\swagger_api\license_api.py:61
-
 msgid "remarks"
 msgstr "備註"
 
@@ -6629,33 +6521,30 @@ msgid ""
 "customer purchases two identical JumpServer subscriptions and uses them in "
 "different computer rooms respectively. You can use this field to note the A "
 "computer room and B computer room to help distinguish the licenses."
-msgstr "備註，記錄額外的信息，長度限制50。例如某個客戶買了兩個同樣的JumpServer訂閱分別在不同機房使用，可以用這個字段備註A機房B機房，幫助區別License。"
+msgstr ""
+"備註，記錄額外的信息，長度限制50。例如某個客戶買了兩個同樣的JumpServer訂閱分"
+"別在不同機房使用，可以用這個字段備註A機房B機房，幫助區別License。"
 
 #: .\apps\xpack\views\application_setting_views.py:21
 #: .\apps\xpack\views\application_setting_views.py:22
-
 msgid "Pro/Modify Application Settings"
 msgstr "專業版/修改應用設置"
 
 #: .\apps\xpack\views\application_setting_views.py:23
 #: .\apps\xpack\views\application_setting_views.py:38
-
 msgid "Pro/Application/Public Access"
 msgstr "專業版/應用/公共訪問"
 
 #: .\apps\xpack\views\application_setting_views.py:35
 #: .\apps\xpack\views\application_setting_views.py:36
-
 msgid "Pro/Get Application Settings"
 msgstr "專業版/獲取應用詳情"
 
 #: .\apps\xpack\views\auth.py:28
-
 msgid "Authentication"
 msgstr "認證"
 
 #: .\apps\xpack\views\auth.py:38 .\apps\xpack\views\auth.py:39
-
 msgid "Add or modify authentication configuration"
 msgstr "添加或修改認證信息"
 
@@ -6665,12 +6554,10 @@ msgid "System settings/login authentication"
 msgstr "系統設置/登錄認證"
 
 #: .\apps\xpack\views\auth.py:52 .\apps\xpack\views\auth.py:53
-
 msgid "Get authentication configuration"
 msgstr "獲取認證配置"
 
 #: .\apps\xpack\views\auth.py:65 .\apps\xpack\views\auth.py:66
-
 msgid "test connection"
 msgstr "連線"
 
@@ -6695,12 +6582,10 @@ msgstr "OAuth2 登錄"
 
 #: .\apps\xpack\views\auth.py:150 .\apps\xpack\views\auth.py:151
 #: .\apps\xpack\views\auth.py:152 .\apps\xpack\views\auth.py:158
-
 msgid "Get platform information"
 msgstr "獲取平臺信息"
 
 #: .\apps\xpack\views\auth.py:156 .\apps\xpack\views\auth.py:157
-
 msgid "Modify platform information"
 msgstr "修改平臺信息"
 
@@ -6710,7 +6595,6 @@ msgid "Test platform connection"
 msgstr "測試平臺連接"
 
 #: .\apps\xpack\views\auth.py:170 .\apps\xpack\views\auth.py:171
-
 msgid "Scan code login type"
 msgstr "掃碼登錄類型"
 
@@ -6731,7 +6615,6 @@ msgid "Wecom callback"
 msgstr "企業微信回調"
 
 #: .\apps\xpack\views\display.py:16 .\apps\xpack\views\display.py:17
-
 msgid "View appearance settings"
 msgstr "查看外觀設置"
 
@@ -6740,47 +6623,38 @@ msgid "System Settings/Appearance Settings"
 msgstr "系統設置/外觀設置"
 
 #: .\apps\xpack\views\display.py:28 .\apps\xpack\views\display.py:29
-
 msgid "Update appearance settings"
 msgstr "更新外觀設置"
 
 #: .\apps\xpack\views\license.py:28 .\apps\xpack\views\license.py:29
-
 msgid "Get license information"
 msgstr "獲取 License 信息"
 
 #: .\apps\xpack\views\license.py:36 .\apps\xpack\views\license.py:37
-
 msgid "Update license information"
 msgstr "更新 License 信息"
 
 #: .\apps\xpack\views\license.py:42
-
 msgid "upload file"
 msgstr "上傳文件"
 
 #: .\apps\xpack\views\platform.py:46 .\apps\xpack\views\platform.py:47
-
 msgid "Get platform configuration"
 msgstr "獲取平臺配置"
 
 #: .\apps\xpack\views\platform.py:49 .\apps\xpack\views\platform.py:57
-
 msgid "Application/application access"
 msgstr "應用/應用訪問"
 
 #: .\apps\xpack\views\platform.py:53 .\apps\xpack\views\platform.py:54
-
 msgid "Update platform configuration"
 msgstr "更新平臺配置"
 
 #: .\apps\xpack\views\platform.py:70 .\apps\xpack\views\platform.py:71
-
 msgid "Get platform status"
 msgstr "獲取平臺狀態"
 
 #: .\apps\xpack\views\platform.py:76
-
 msgid "Application/Get platform status"
 msgstr "應用/獲取平臺狀態"
 
@@ -6789,13 +6663,11 @@ msgid "Update platform status"
 msgstr "更新平臺狀態"
 
 #: .\apps\xpack\views\platform.py:93
-
 msgid "Application/Update platform status"
 msgstr "應用/更新平臺狀態"
 
 #: .\apps\xpack\views\system_api_key_views.py:27
 #: .\apps\xpack\views\system_api_key_views.py:28
-
 msgid "Get personal system API_KEY list"
 msgstr "獲取個人系統 API_KEY 列表"
 
@@ -6813,7 +6685,6 @@ msgstr "更新個人系統 API_KEY"
 
 #: .\apps\xpack\views\system_api_key_views.py:49
 #: .\apps\xpack\views\system_api_key_views.py:50
-
 msgid "Delete personal system API_KEY"
 msgstr "刪除個人系統 API_KEY"
 
@@ -6821,3 +6692,102 @@ msgstr "刪除個人系統 API_KEY"
 #: .\apps\xpack\views\system_api_key_views.py:58
 msgid "Add personal system API_KEY"
 msgstr "添加個人系統 API_KEY"
+
+#~ msgid ""
+#~ "\n"
+#~ "        Phi-3 Mini is Microsoft's 3.8B parameter, lightweight, state-of-"
+#~ "the-art open model.\n"
+#~ "        "
+#~ msgstr "Phi-3 Mini 是微軟的 3.8B 參數、輕量級、最先進的開放模型。"
+
+#, python-brace-format
+#~ msgid ""
+#~ "\n"
+#~ "Known information:\n"
+#~ "{data}\n"
+#~ "Answer requirements:\n"
+#~ "- If you don't know the answer or don't get the answer, please answer "
+#~ "\"No relevant information found in the knowledge base, it is recommended "
+#~ "to consult relevant technical support or refer to official documents for "
+#~ "operation\".\n"
+#~ "- Avoid mentioning that you got the knowledge from <data></data>.\n"
+#~ "- Please keep the answer consistent with the description in <data></"
+#~ "data>.\n"
+#~ "- Please use markdown syntax to optimize the format of the answer.\n"
+#~ "- Please return the image link, link address and script language in "
+#~ "<data></data> completely.\n"
+#~ "- Please answer in the same language as the question.\n"
+#~ "Question:\n"
+#~ "{question}\n"
+#~ "                                                    "
+#~ msgstr ""
+#~ "已知信息:\n"
+#~ "{data}\n"
+#~ "回答要求:\n"
+#~ "- 如果您不知道答案或者得不到答案，請回答\"在知識庫中沒有找到相關信息，建議"
+#~ "諮詢相關技術支持或者參考官方文檔進行操作\".\n"
+#~ "- 避免在回答中提及您從<data></data>中獲得了知識。\n"
+#~ "- 請保持回答與<data></data>中的描述一致。\n"
+#~ "- 請使用markdown語法優化回答的格式。\n"
+#~ "- 請完整返回<data></data>中的圖片鏈接、鏈接地址和腳本語言。\n"
+#~ "- 請使用與問題相同的語言回答。\n"
+#~ "問題:\n"
+#~ "{question}\n"
+#~ "                                                    "
+
+#~ msgid ""
+#~ "\n"
+#~ "        Compared with previous versions, qwen 1.5 0.5b has significantly "
+#~ "enhanced the model's alignment with human preferences and its multi-"
+#~ "language processing capabilities. Models of all sizes support a context "
+#~ "length of 32768 tokens. 500 million parameters.\n"
+#~ "        "
+#~ msgstr ""
+#~ "qwen 1.5 0.5b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上"
+#~ "有顯著增強。所有規模的模型都支持32768個tokens的上下文長度。5億參數。"
+
+#~ msgid ""
+#~ "\n"
+#~ "        \n"
+#~ "Compared with previous versions, qwen 1.5 1.8b has significantly enhanced "
+#~ "the model's alignment with human preferences and its multi-language "
+#~ "processing capabilities. Models of all sizes support a context length of "
+#~ "32768 tokens. 1.8 billion parameters.\n"
+#~ "        "
+#~ msgstr ""
+#~ "qwen 1.5 1.8b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上"
+#~ "有顯著增強。所有規模的模型都支持32768個tokens的上下文長度。18億參數。"
+
+#~ msgid ""
+#~ "\n"
+#~ "        \n"
+#~ "Compared with previous versions, qwen 1.5 4b has significantly enhanced "
+#~ "the model's alignment with human preferences and its multi-language "
+#~ "processing capabilities. Models of all sizes support a context length of "
+#~ "32768 tokens. 4 billion parameters.\n"
+#~ "        "
+#~ msgstr ""
+#~ "qwen 1.5 4b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上有"
+#~ "顯著增強。所有規模的模型都支持32768個tokens的上下文長度。40億參數。"
+
+#~ msgid ""
+#~ "\n"
+#~ "        Compared with previous versions, qwen 1.5 7b has significantly "
+#~ "enhanced the model's alignment with human preferences and its multi-"
+#~ "language processing capabilities. Models of all sizes support a context "
+#~ "length of 32768 tokens. 7 billion parameters.\n"
+#~ "        "
+#~ msgstr ""
+#~ "qwen 1.5 7b 相較於以往版本，模型與人類偏好的對齊程度以及多語1言處理能力上"
+#~ "有顯著增強。所有規模的模型都支持32768個tokens的上下文長度。70億參數。"
+
+#~ msgid ""
+#~ "\n"
+#~ "        Compared with previous versions, qwen 1.5 110b has significantly "
+#~ "enhanced the model's alignment with human preferences and its multi-"
+#~ "language processing capabilities. Models of all sizes support a context "
+#~ "length of 32768 tokens. 110 billion parameters.\n"
+#~ "        "
+#~ msgstr ""
+#~ "qwen 1.5 110b 相較於以往版本，模型與人類偏好的對齊程度以及多語言處理能力上"
+#~ "有顯著增強。所有規模的模型都支持32768個tokens的上下文長度。1100億參數。"

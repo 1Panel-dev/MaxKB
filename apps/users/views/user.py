@@ -22,8 +22,10 @@ from common.response import result
 from smartdoc.settings import JWT_AUTH
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
-    SendEmailSerializer, UserProfile, UserSerializer, UserManageSerializer, UserInstanceSerializer, SystemSerializer
+    SendEmailSerializer, UserProfile, UserSerializer, UserManageSerializer, UserInstanceSerializer, SystemSerializer, \
+    SwitchLanguageSerializer
 from django.utils.translation import gettext_lazy as _
+
 user_cache = cache.caches['user_cache']
 token_cache = cache.caches['token_cache']
 
@@ -65,6 +67,27 @@ class User(APIView):
                 UserSerializer.Query(data={'email_or_username': request.query_params.get('email_or_username')}).list())
 
 
+class SwitchUserLanguageView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @action(methods=['POST'], detail=False)
+    @swagger_auto_schema(operation_summary=_("Switch Language"),
+                         operation_id=_("Switch Language"),
+                         request_body=openapi.Schema(
+                             type=openapi.TYPE_OBJECT,
+                             required=['language'],
+                             properties={
+                                 'language': openapi.Schema(type=openapi.TYPE_STRING, title=_("language"),
+                                                            description=_("language")),
+                             }
+                         ),
+                         responses=RePasswordSerializer().get_response_body_api(),
+                         tags=[_("User")])
+    def post(self, request: Request):
+        data = {**request.data, 'user_id': request.user.id}
+        return result.success(SwitchLanguageSerializer(data=data).switch())
+
+
 class ResetCurrentUserPasswordView(APIView):
     authentication_classes = [TokenAuth]
 
@@ -75,8 +98,10 @@ class ResetCurrentUserPasswordView(APIView):
                              type=openapi.TYPE_OBJECT,
                              required=['email', 'code', "password", 're_password'],
                              properties={
-                                 'code': openapi.Schema(type=openapi.TYPE_STRING, title=_("Verification code"), description=_("Verification code")),
-                                 'password': openapi.Schema(type=openapi.TYPE_STRING, title=_("Password"), description=_("Password")),
+                                 'code': openapi.Schema(type=openapi.TYPE_STRING, title=_("Verification code"),
+                                                        description=_("Verification code")),
+                                 'password': openapi.Schema(type=openapi.TYPE_STRING, title=_("Password"),
+                                                            description=_("Password")),
                                  're_password': openapi.Schema(type=openapi.TYPE_STRING, title=_("Password"),
                                                                description=_("Password"))
                              }

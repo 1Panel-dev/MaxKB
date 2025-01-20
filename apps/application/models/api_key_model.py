@@ -13,6 +13,7 @@ from django.db import models
 
 from application.models import Application
 from common.mixins.app_model_mixin import AppModelMixin
+from smartdoc.const import CONFIG
 from users.models import User
 
 
@@ -44,6 +45,8 @@ class ApplicationAccessToken(AppModelMixin):
                             base_field=models.CharField(max_length=128, blank=True)
                             , default=list)
     show_source = models.BooleanField(default=False, verbose_name="是否显示知识来源")
+
+    language = models.CharField(max_length=10, verbose_name="语言", default=CONFIG.get_language_code)
 
     class Meta:
         db_table = "application_access_token"
