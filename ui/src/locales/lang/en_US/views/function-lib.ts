@@ -66,7 +66,7 @@ export default {
         outputParam: 'Output Parameters',
         paramInfo1: 'Displayed when using the function',
         paramInfo2: 'Not displayed when using the function',
-        code: 'Code',
+        code: 'Function Content (Python)'
       },
       debug: {
         run: 'Run',

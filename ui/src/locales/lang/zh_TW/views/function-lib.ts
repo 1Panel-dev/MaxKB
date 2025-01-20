@@ -64,7 +64,7 @@ export default {
         outputParam: '輸出參數',
         paramInfo1: '使用函數時顯示',
         paramInfo2: '使用函數時不顯示',
-        code: '代碼',
+        code: '函数内容（Python）'
       },
       debug: {
         run: '運行',
