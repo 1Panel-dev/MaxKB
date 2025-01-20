@@ -35,7 +35,7 @@ const useUserStore = defineStore({
     getLanguage() {
       const application = useApplicationStore()
       return this.userType === 1
-        ? this.userInfo?.language || localStorage.getItem('language')
+        ? this.userInfo?.language || localStorage.getItem('MaxKB-locale')
         : application?.userLanguage
     },
     showXpack() {
@@ -126,8 +126,7 @@ const useUserStore = defineStore({
     async profile() {
       return UserApi.profile().then(async (ok) => {
         this.userInfo = ok.data
-        useLocalStorage(localeConfigKey, 'zh-CN').value = ok.data?.language
-        // localStorage.setItem('language', ok.data?.language)
+        useLocalStorage(localeConfigKey, 'zh-CN').value = ok.data.language
         return this.asyncGetProfile()
       })
     },
@@ -174,6 +173,7 @@ const useUserStore = defineStore({
       return new Promise((resolve, reject) => {
         UserApi.postLanguage({ language: lang }, loading)
           .then(async (ok) => {
+            useLocalStorage(localeConfigKey, 'zh-CN').value = lang
             window.location.reload()
 
             resolve(ok)
