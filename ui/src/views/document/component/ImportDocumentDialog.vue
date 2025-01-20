@@ -58,7 +58,7 @@
         </template>
         <el-radio-group v-model="form.hit_handling_method" class="radio-block mt-4">
           <template v-for="(value, key) of hitHandlingMethod" :key="key">
-            <el-radio :value="key">{{ value }} </el-radio>
+            <el-radio :value="key">{{ $t(value) }} </el-radio>
           </template>
         </el-radio-group>
       </el-form-item>

@@ -154,5 +154,9 @@ export default {
       error: '向量化未成功的分段',
       all: '全部分段'
     }
+  },
+  hitHandlingMethod: {
+    optimization: '模型优化',
+    directly_return: '直接回答'
   }
 }

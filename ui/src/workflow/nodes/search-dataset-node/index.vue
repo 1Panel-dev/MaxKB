@@ -66,7 +66,7 @@
               }}</el-col>
               <el-col :span="12" class="lighter">
                 {{
-                  SearchMode[form_data.dataset_setting.search_mode as keyof typeof SearchMode]
+                  $t(SearchMode[form_data.dataset_setting.search_mode as keyof typeof SearchMode])
                 }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter">

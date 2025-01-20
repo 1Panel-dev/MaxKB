@@ -86,11 +86,7 @@
             :label="$t('views.document.table.paragraph')"
             align="right"
           />
-          <el-table-column
-            prop="status"
-            :label="$t('views.document.fileStatus.label')"
-            width="130"
-          >
+          <el-table-column prop="status" :label="$t('views.document.fileStatus.label')" width="130">
             <template #header>
               <div>
                 <span>{{ $t('views.document.fileStatus.label') }}</span>
@@ -241,7 +237,7 @@
               </div>
             </template>
             <template #default="{ row }">
-              {{ hitHandlingMethod[row.hit_handling_method as keyof typeof hitHandlingMethod] }}
+              {{ $t(hitHandlingMethod[row.hit_handling_method as keyof typeof hitHandlingMethod]) }}
             </template>
           </el-table-column>
           <el-table-column prop="create_time" :label="$t('common.createTime')" width="175">

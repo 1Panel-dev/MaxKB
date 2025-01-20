@@ -1,5 +1,5 @@
 export enum SearchMode {
-  embedding = '向量检索',
-  keywords = '全文检索',
-  blend = '混合检索'
+  embedding = 'views.application.applicationForm.dialog.vectorSearch',
+  keywords = 'views.application.applicationForm.dialog.fullTextSearch',
+  blend = 'views.application.applicationForm.dialog.hybridSearch'
 }
