@@ -187,10 +187,10 @@
       <template #footer>
         <div class="dialog-footer" style="margin-top: 16px">
           <el-button @click="dialogVisible = false"
-            >{{ $t('layout.topbar.avatar.dialog.cancel') }}
+            >{{ $t('layout.avatar.dialog.cancel') }}
           </el-button>
           <el-button type="primary" @click="saveCleanTime">
-            {{ $t('layout.topbar.avatar.dialog.save') }}
+            {{ $t('layout.avatar.dialog.save') }}
           </el-button>
         </div>
       </template>

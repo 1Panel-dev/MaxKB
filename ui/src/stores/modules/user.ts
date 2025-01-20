@@ -7,6 +7,8 @@ import ThemeApi from '@/api/theme'
 import { useElementPlusTheme } from 'use-element-plus-theme'
 import { defaultPlatformSetting } from '@/utils/theme'
 import useApplicationStore from './application'
+import { useLocalStorage } from '@vueuse/core'
+import { localeConfigKey } from '@/locales/index'
 export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
   userInfo: User | null
@@ -124,7 +126,8 @@ const useUserStore = defineStore({
     async profile() {
       return UserApi.profile().then(async (ok) => {
         this.userInfo = ok.data
-        localStorage.setItem('language', ok.data?.language)
+        useLocalStorage(localeConfigKey, 'zh-CN').value = ok.data?.language
+        // localStorage.setItem('language', ok.data?.language)
         return this.asyncGetProfile()
       })
     },
@@ -165,6 +168,19 @@ const useUserStore = defineStore({
     async getQrType() {
       return UserApi.getQrType().then((ok) => {
         return ok.data
+      })
+    },
+    async postUserLanguage(lang: string, loading?: Ref<boolean>) {
+      return new Promise((resolve, reject) => {
+        UserApi.postLanguage({ language: lang }, loading)
+          .then(async (ok) => {
+            window.location.reload()
+
+            resolve(ok)
+          })
+          .catch((error) => {
+            reject(error)
+          })
       })
     }
   }
