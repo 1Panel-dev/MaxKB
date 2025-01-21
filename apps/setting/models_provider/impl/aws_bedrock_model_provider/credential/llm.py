@@ -1,12 +1,12 @@
 from typing import Dict
 
+from django.utils.translation import gettext_lazy as _, gettext as __
 from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import ValidCode, BaseModelCredential
-from django.utils.translation import gettext_lazy as _
 
 
 class BedrockLLMModelParams(BaseForm):
@@ -36,14 +36,14 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
         if not any(mt.get('value') == model_type for mt in model_type_list):
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      _('{model_type} Model type is not supported').format(model_type=model_type))
+                                      __('{model_type} Model type is not supported').format(model_type=model_type))
             return False
 
         required_keys = ['region_name', 'access_key_id', 'secret_access_key']
         if not all(key in model_credential for key in required_keys):
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      _('The following fields are required: {keys}').format(
+                                      __('The following fields are required: {keys}').format(
                                           keys=", ".join(required_keys)))
             return False
 
@@ -55,7 +55,7 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
         except Exception as e:
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      _('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             return False
 

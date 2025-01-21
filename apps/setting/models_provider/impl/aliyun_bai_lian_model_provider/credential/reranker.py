@@ -8,6 +8,7 @@
 """
 from typing import Dict
 
+from django.utils.translation import gettext as __
 from langchain_core.documents import Document
 
 from common import forms
@@ -15,7 +16,6 @@ from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.reranker import AliyunBaiLianReranker
-from django.utils.translation import gettext_lazy as _
 
 
 class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
@@ -24,22 +24,22 @@ class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
                  raise_exception=False):
         if not model_type == 'RERANKER':
             raise AppApiException(ValidCode.valid_error.value,
-                                  _('{model_type} Model type is not supported').format(model_type=model_type))
+                                  __('{model_type} Model type is not supported').format(model_type=model_type))
         for key in ['dashscope_api_key']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, _('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, __('{key}  is required').format(key=key))
                 else:
                     return False
         try:
             model: AliyunBaiLianReranker = provider.get_model(model_type, model_name, model_credential)
-            model.compress_documents([Document(page_content=_('Hello'))], _('Hello'))
+            model.compress_documents([Document(page_content=__('Hello'))], __('Hello'))
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      _('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             else:
                 return False

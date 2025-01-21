@@ -1,11 +1,12 @@
 # coding=utf-8
-from langchain_core.messages import HumanMessage
+
+from django.utils.translation import gettext_lazy as _, gettext as __
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
-from django.utils.translation import gettext_lazy as _
+
 
 class TencentTTIModelParams(BaseForm):
     Style = forms.SingleSelect(
@@ -72,7 +73,8 @@ class TencentTTIModelCredential(BaseForm, BaseModelCredential):
     def _validate_model_type(cls, model_type, provider, raise_exception=False):
         if not any(mt['value'] == model_type for mt in provider.get_model_type_list()):
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value, _('{model_type} Model type is not supported').format(model_type=model_type))
+                raise AppApiException(ValidCode.valid_error.value,
+                                      __('{model_type} Model type is not supported').format(model_type=model_type))
             return False
         return True
 
@@ -81,7 +83,8 @@ class TencentTTIModelCredential(BaseForm, BaseModelCredential):
         missing_keys = [key for key in cls.REQUIRED_FIELDS if key not in model_credential]
         if missing_keys:
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value, _('{keys} is required').format(keys=", ".join(missing_keys)))
+                raise AppApiException(ValidCode.valid_error.value,
+                                      __('{keys} is required').format(keys=", ".join(missing_keys)))
             return False
         return True
 
@@ -94,7 +97,9 @@ class TencentTTIModelCredential(BaseForm, BaseModelCredential):
             model.check_auth()
         except Exception as e:
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value, _('Verification failed, please check whether the parameters are correct: {error}').format(error=str(e)))
+                raise AppApiException(ValidCode.valid_error.value,
+                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                          error=str(e)))
             return False
         return True
 

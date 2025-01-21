@@ -1,6 +1,6 @@
 from typing import Dict
 
-from openai import OpenAI, AzureOpenAI
+from openai import AzureOpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
