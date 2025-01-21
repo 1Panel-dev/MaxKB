@@ -7,6 +7,7 @@ ARG DEPENDENCIES="                    \
         curl                          \
         ca-certificates               \
         vim                           \
+        gettext                       \
         postgresql-15-pgvector"
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
