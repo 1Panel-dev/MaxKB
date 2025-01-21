@@ -1,7 +1,7 @@
 export default {
-  github: 'Project address',
-  wiki: 'User manual',
-  forum: 'Forum for help',
+  github: 'Project Address',
+  wiki: 'User Manual',
+  forum: 'Forum For Help',
   avatar: {
     about: 'About',
     logout: 'Logout',

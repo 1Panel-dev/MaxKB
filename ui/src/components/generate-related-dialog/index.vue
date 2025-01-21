@@ -20,8 +20,8 @@
           </div>
           <div class="ml-12 lighter">
             <p>{{ $t('views.document.generateQuestion.tip1', { data: '{data}' }) }}</p>
-            <p>{{ $t('views.document.generateQuestion.tip2') }}</p>
-            <p>{{ $t('views.document.generateQuestion.tip3') }}</p>
+            <p>{{ $t('views.document.generateQuestion.tip2')+ '<question></question>' + $t('views.document.generateQuestion.tip3') }}</p>
+            <p>{{ $t('views.document.generateQuestion.tip4') }}</p>
           </div>
         </div>
         <el-form-item
@@ -88,7 +88,6 @@ const apiType = ref('') // 文档document或段落paragraph
 const FormRef = ref()
 const userId = user.userInfo?.id as string
 const form = ref(prompt.get(userId))
-
 const rules = reactive({
   model_id: [
     {

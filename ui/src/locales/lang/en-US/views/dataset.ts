@@ -53,7 +53,7 @@ export default {
       },
       source_url: {
         label: 'Web Root URL',
-        placeholder: 'Please enter the Web root URL',
+        placeholder: 'Please enter the web root URL',
         requiredMessage: 'Please enter the Web root URL'
       },
       selector: {

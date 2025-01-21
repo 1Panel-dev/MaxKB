@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.applicationOverview.appInfo.LimitDialog.dialogTitle')"
+    :title="$t('views.applicationOverview.appInfo.accessControl')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"

@@ -8,8 +8,8 @@ export default {
     copyLinkText: 'Copy Link',
     refreshLinkText: 'Refresh Link',
     demo: 'Demo',
-    embedThirdParty: 'Embed Third Party',
-    accessRestrictions: 'Access Restrictions',
+    embedInWebsite: 'Embed in website',
+    accessControl: 'Access Control',
     displaySetting: 'Display Setting',
     apiAccessCredentials: 'API Access Credentials',
     apiKey: 'API Key',
@@ -38,7 +38,6 @@ export default {
       uploadImagePrompt: 'Please upload an image'
     },
     EmbedDialog: {
-      embedDialogTitle: 'Embed Third Party',
       fullscreenModeTitle: 'Fullscreen Mode',
       copyInstructions: 'Copy the following code to embed',
       floatingModeTitle: 'Floating Mode'
@@ -95,10 +94,10 @@ export default {
     startDatePlaceholder: 'Start Date',
     endDatePlaceholder: 'End Date',
     pastDayOptions: {
-      past7Days: 'Past 7 Days',
-      past30Days: 'Past 30 Days',
-      past90Days: 'Past 90 Days',
-      past183Days: 'Past Half Year',
+      past7Days: 'Last 7 Days',
+      past30Days: 'Last 30 Days',
+      past90Days: 'Last 90 Days',
+      past183Days: 'Last 6 Months',
       other: 'Custom'
     },
     charts: {

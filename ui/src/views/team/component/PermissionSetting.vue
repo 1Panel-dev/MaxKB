@@ -38,7 +38,7 @@
       <el-table-column
         :label="$t('views.team.setting.management')"
         align="center"
-        width="80"
+        width="100"
         fixed="right"
       >
         <template #header>
@@ -57,7 +57,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column :label="$t('views.team.setting.check')"  align="center" width="80" fixed="right">
+      <el-table-column :label="$t('views.team.setting.check')"  align="center" width="100" fixed="right">
         <template #header>
           <el-checkbox
             :disabled="props.manage"

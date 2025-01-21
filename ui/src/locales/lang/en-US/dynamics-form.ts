@@ -11,10 +11,10 @@ export default {
     RadioRow: 'Radio Row'
   },
   default: {
-    label: 'Default Value',
-    placeholder: 'Please enter a default value',
+    label: 'Default',
+    placeholder: 'Please enter a default',
     requiredMessage: ' is a required property',
-    show: 'Show Default Value'
+    show: 'Show Default'
   },
   tip: {
     requiredMessage: 'Cannot be empty',
@@ -31,22 +31,22 @@ export default {
       requiredMessage2: 'Only letters, numbers, and underscores are allowed'
     },
     name: {
-      label: 'Display Name',
-      placeholder: 'Please enter a display name',
-      requiredMessage: 'Display Name is a required property'
+      label: 'Name',
+      placeholder: 'Please enter a name',
+      requiredMessage: 'Name is a required property'
     },
     tooltip: {
-      label: 'Parameter Tooltip',
-      placeholder: 'Please enter a parameter tooltip'
+      label: 'Tooltip',
+      placeholder: 'Please enter a tooltip'
     },
     required: {
-      label: 'Is Required',
-      requiredMessage: 'Is Required is a required property'
+      label: 'Required',
+      requiredMessage: 'Required is a required property'
     },
     input_type: {
-      label: 'Component Type',
-      placeholder: 'Please select a component type',
-      requiredMessage: 'Component Type is a required property'
+      label: 'Type',
+      placeholder: 'Please select a type',
+      requiredMessage: 'Type is a required property'
     }
   },
   DatePicker: {

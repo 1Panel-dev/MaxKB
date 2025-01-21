@@ -34,7 +34,7 @@
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('common.status')" width="80">
+      <el-table-column :label="$t('common.status.label')" width="80">
         <template #default="{ row }">
           <div @click.stop>
             <el-switch size="small" v-model="row.is_active" @change="changeState($event, row)" />
@@ -110,8 +110,8 @@ function settingApiKey(row: any) {
 function deleteApiKey(row: any) {
   MsgConfirm(
     // @ts-ignore
-    `${t('common.msgConfirm1')}: ${row.secret_key}?`,
-    t('common.msgConfirm2'),
+    `${t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm1')}: ${row.secret_key}?`,
+    t(t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm2')),
     {
       confirmButtonText: t('common.delete'),
       cancelButtonText: t('common.cancel'),

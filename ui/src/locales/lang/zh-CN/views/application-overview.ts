@@ -8,8 +8,8 @@ export default {
     copyLinkText: '复制链接',
     refreshLinkText: '刷新链接',
     demo: '演示',
-    embedThirdParty: '嵌入第三方',
-    accessRestrictions: '访问限制',
+    embedInWebsite: '嵌入第三方',
+    accessControl: '访问限制',
     displaySetting: '显示设置',
     apiAccessCredentials: 'API 访问凭据',
     apiKey: 'API Key',
@@ -38,13 +38,11 @@ export default {
       uploadImagePrompt: '请上传一张图片'
     },
     EmbedDialog: {
-      embedDialogTitle: '嵌入第三方',
       fullscreenModeTitle: '全屏模式',
       copyInstructions: '复制以下代码进行嵌入',
       floatingModeTitle: '浮窗模式'
     },
     LimitDialog: {
-      dialogTitle: '访问限制',
       showSourceLabel: '显示知识来源',
       clientQueryLimitLabel: '每个客户端提问限制',
       timesDays: '次/天',

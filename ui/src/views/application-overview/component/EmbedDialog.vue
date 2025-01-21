@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.applicationOverview.appInfo.EmbedDialog.embedDialogTitle')"
+    :title="$t('views.applicationOverview.appInfo.embedInWebsite')"
     v-model="dialogVisible"
     width="900"
     class="embed-dialog"

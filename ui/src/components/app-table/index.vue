@@ -6,7 +6,7 @@
           <el-input
             ref="quickInputRef"
             v-model="inputValue"
-            :placeholder="`${$t('common.inputPlaceholder')}${quickCreateName}`"
+            :placeholder="`${$t('common.inputPlaceholder')} ${quickCreateName}`"
             class="w-500 mr-12"
             autofocus
             :maxlength="quickCreateMaxlength || '-'"
@@ -62,11 +62,11 @@ const props = defineProps({
   },
   quickCreateName: {
     type: String,
-    default: '文档名称'
+    default: t('components.quickCreateName')
   },
   quickCreatePlaceholder: {
     type: String,
-    default: '快速创建空白文档'
+    default: t('components.quickCreatePlaceholder')
   },
   quickCreateMaxlength: {
     type: Number,

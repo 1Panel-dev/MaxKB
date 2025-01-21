@@ -130,8 +130,8 @@ export default {
       'Segments within the selected documents will also be deleted. Please proceed with caution.',
     successMessage: 'Batch deletion successful',
     confirmTitle3: 'Confirm Deleting Document:',
-    confirmMessage1:
-      'All segments under this document will be deleted. Please proceed with caution.'
+    confirmMessage1: 'Under this document',
+    confirmMessage2: 'All segments will be deleted, please operate with caution. '
   },
   form: {
     source_url: {
@@ -166,11 +166,11 @@ export default {
     title: 'Generate Questions',
     successMessage: 'Question generation successful',
     tip1: 'The {data} in the prompt is a placeholder for segmented content, which is replaced by the segmented content when executed and sent to the AI model;',
-    tip2: 'The AI model generates relevant questions based on the segmented content. Please place the generated questions within the &lt;question&gt;&lt;/question&gt; tags, and the system will automatically associate the questions within these tags;',
-    tip3: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.',
-    prompt:`Content: {data}\n 
-    \n
-    Please summarize the above content and generate a summary based on the content 5 a question. \n
-    Answer requirements: \n - Please output only questions; \n - Please place each question in&lt;question&gt;&lt;/question&gt;tag.`
+    tip2: 'The AI model generates relevant questions based on the segmented content. Please place the generated questions within the',
+    tip3: 'tags, and the system will automatically associate the questions within these tags;',
+    tip4: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.',
+    prompt1:
+      'Content: {data}\n \n Please summarize the above content and generate a summary based on the content 5 a question. \nAnswer requirements: \n - Please output only questions; \n - Please place each question in',
+    prompt2: 'tag.'
   }
 }

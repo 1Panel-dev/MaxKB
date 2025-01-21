@@ -8,8 +8,8 @@ export default {
     copyLinkText: '複製連結',
     refreshLinkText: '重新整理連結',
     demo: '示範',
-    embedThirdParty: '嵌入第三方',
-    accessRestrictions: '訪問限制',
+    embedInWebsite: '嵌入第三方',
+    accessControl: '訪問限制',
     displaySetting: '顯示設定',
     apiAccessCredentials: 'API 存取憑證',
     apiKey: 'API Key',
@@ -37,7 +37,6 @@ export default {
       uploadImagePrompt: '請上傳一張圖片'
     },
     EmbedDialog: {
-      embedDialogTitle: '嵌入第三方',
       fullscreenModeTitle: '全螢幕模式',
       copyInstructions: '複製以下程式碼進行嵌入',
       floatingModeTitle: '浮窗模式'

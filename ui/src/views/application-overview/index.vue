@@ -85,10 +85,10 @@
                   {{ $t('views.applicationOverview.appInfo.demo') }}
                 </el-button>
                 <el-button :disabled="!accessToken?.is_active" @click="openDialog">
-                  {{ $t('views.applicationOverview.appInfo.embedThirdParty') }}
+                  {{ $t('views.applicationOverview.appInfo.embedInWebsite') }}
                 </el-button>
                 <el-button @click="openLimitDialog">
-                  {{ $t('views.applicationOverview.appInfo.accessRestrictions') }}
+                  {{ $t('views.applicationOverview.appInfo.accessControl') }}
                 </el-button>
                 <el-button @click="openDisplaySettingDialog">
                   {{ $t('views.applicationOverview.appInfo.displaySetting') }}

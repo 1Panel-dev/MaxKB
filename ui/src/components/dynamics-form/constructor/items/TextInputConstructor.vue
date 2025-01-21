@@ -68,7 +68,7 @@
       v-model="formValue.default_value"
       :maxlength="formValue.maxlength"
       :minlength="formValue.minlength"
-      :placeholder="$t('dynamicsForm.paramForm.default.placeholder')"
+      :placeholder="$t('dynamicsForm.default.placeholder')"
       show-word-limit
       type="text"
     />

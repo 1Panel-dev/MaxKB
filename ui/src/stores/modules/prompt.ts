@@ -2,12 +2,12 @@ import { defineStore } from 'pinia'
 import { t } from '@/locales'
 export interface promptTypes {
   user: string
-  formValue: { model_id: string, prompt: string }
+  formValue: { model_id: string; prompt: string }
 }
 
 const usePromptStore = defineStore({
   id: 'prompt',
-  state: (): promptTypes[] => (JSON.parse(localStorage.getItem('PROMPT_CACHE') || '[]')),
+  state: (): promptTypes[] => JSON.parse(localStorage.getItem('PROMPT_CACHE') || '[]'),
   actions: {
     save(user: string, formValue: any) {
       this.$state.forEach((item: any, index: number) => {
@@ -19,6 +19,7 @@ const usePromptStore = defineStore({
       localStorage.setItem('PROMPT_CACHE', JSON.stringify(this.$state))
     },
     get(user: string) {
+      console.log(this.$state)
       for (let i = 0; i < this.$state.length; i++) {
         if (this.$state[i].user === user) {
           return this.$state[i].formValue
@@ -26,7 +27,10 @@ const usePromptStore = defineStore({
       }
       return {
         model_id: '',
-        prompt: t('views.document.generateQuestion.prompt', { data: '{data}' })
+        prompt:
+          t('views.document.generateQuestion.prompt1', { data: '{data}' }) +
+          '<question></question>' +
+          t('views.document.generateQuestion.prompt2')
       }
     }
   }

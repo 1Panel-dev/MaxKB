@@ -37,13 +37,13 @@
         prop="default_value"
         :rules="{
           required: form.is_required,
-          message: $t('dynamicsForm.paramForm.default.placeholder'),
+          message: $t('dynamicsForm.default.placeholder'),
           trigger: 'blur'
         }"
       >
         <el-input
           v-model="form.default_value"
-          :placeholder="$t('dynamicsForm.paramForm.default.placeholder')"
+          :placeholder="$t('dynamicsForm.default.placeholder')"
           @blur="form.name = form.name.trim()"
         />
       </el-form-item>

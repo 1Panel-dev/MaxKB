@@ -45,7 +45,7 @@
         <template #label>
           <div class="flex align-center">
             <span class="mr-4">{{
-              $t('views.document.form.hit_handling_method.requiredMessage')
+              $t('views.document.form.hit_handling_method.label')
             }}</span>
             <el-tooltip
               effect="dark"
