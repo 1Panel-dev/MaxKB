@@ -291,7 +291,7 @@
                     </span>
 
                     <div class="flex">
-                      <el-checkbox v-model="applicationForm.stt_autosend">{{
+                      <el-checkbox v-if="applicationForm.stt_model_enable" v-model="applicationForm.stt_autosend">{{
                         $t('views.application.applicationForm.form.voiceInput.autoSend')
                       }}</el-checkbox>
                       <el-switch
@@ -331,7 +331,7 @@
                       >
                     </span>
                     <div class="flex">
-                      <el-checkbox v-model="applicationForm.tts_autoplay">{{
+                      <el-checkbox v-if="applicationForm.tts_model_enable" v-model="applicationForm.tts_autoplay">{{
                         $t('views.application.applicationForm.form.voicePlay.autoPlay')
                       }}</el-checkbox>
                       <el-switch
