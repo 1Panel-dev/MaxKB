@@ -16,8 +16,17 @@
     <div class="content">
       <div class="text break-all pre-wrap">
         <div class="mb-8" v-if="document_list.length">
-          <el-space wrap>
-            <template v-for="(item, index) in document_list" :key="index">
+          <el-row :gutter="10">
+            <el-col
+              v-for="(item, index) in document_list"
+              :key="index"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="12"
+              :xl="12"
+              class="mb-8 w-full"
+            >
               <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
                 <div class="download-button flex align-center" @click="downloadFile(item)">
                   <el-icon class="mr-4">
@@ -27,17 +36,26 @@
                 </div>
                 <div class="show flex align-center">
                   <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis" style="max-width: 150px" :title="item && item?.name">
+                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
                 </div>
               </el-card>
-            </template>
-          </el-space>
+            </el-col>
+          </el-row>
         </div>
         <div class="mb-8" v-if="image_list.length">
-          <el-space wrap>
-            <template v-for="(item, index) in image_list" :key="index">
+          <el-row :gutter="10">
+            <el-col
+              v-for="(item, index) in image_list"
+              :key="index"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="12"
+              :xl="12"
+              class="mb-8"
+            >
               <div class="file cursor border-r-4" v-if="item.url">
                 <el-image
                   :src="item.url"
@@ -52,12 +70,21 @@
                   class="border-r-4"
                 />
               </div>
-            </template>
-          </el-space>
+            </el-col>
+          </el-row>
         </div>
         <div class="mb-8" v-if="audio_list.length">
-          <el-space wrap>
-            <template v-for="(item, index) in audio_list" :key="index">
+          <el-row :gutter="10">
+            <el-col
+              v-for="(item, index) in audio_list"
+              :key="index"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="12"
+              :xl="12"
+              class="mb-8"
+            >
               <div class="file cursor border-r-4" v-if="item.url">
                 <audio
                   :src="item.url"
@@ -66,8 +93,8 @@
                   class="border-r-4"
                 />
               </div>
-            </template>
-          </el-space>
+            </el-col>
+          </el-row>
         </div>
         {{ chatRecord.problem_text }}
       </div>
@@ -119,7 +146,6 @@ onMounted(() => {})
 </script>
 <style lang="scss" scoped>
 .download-file {
-  width: 200px;
   height: 43px;
 
   &:hover {
@@ -137,9 +163,6 @@ onMounted(() => {})
     }
   }
 
-  .show {
-    display: block;
-  }
 
   .download-button {
     display: none;

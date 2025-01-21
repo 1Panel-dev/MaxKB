@@ -14,9 +14,22 @@
             uploadVideoList.length
           "
         >
-          <el-space wrap>
-            <template v-for="(item, index) in uploadDocumentList" :key="index">
-              <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
+          <el-row :gutter="10">
+            <el-col
+              v-for="(item, index) in uploadDocumentList"
+              :key="index"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="12"
+              :xl="12"
+              class="mb-8"
+            >
+              <el-card
+                shadow="never"
+                style="--el-card-padding: 8px; max-width: 100%"
+                class="file cursor"
+              >
                 <div
                   class="flex align-center"
                   @mouseenter.stop="mouseenter(item)"
@@ -32,13 +45,22 @@
                     </el-icon>
                   </div>
                   <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis" style="max-width: 160px" :title="item && item?.name">
+                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
                 </div>
               </el-card>
-            </template>
-            <template v-for="(item, index) in uploadImageList" :key="index">
+            </el-col>
+            <el-col
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="12"
+              :xl="12"
+              class="mb-8"
+              v-for="(item, index) in uploadImageList"
+              :key="index"
+            >
               <div
                 class="file cursor border border-r-4"
                 v-if="item.url"
@@ -62,8 +84,17 @@
                   class="border-r-4"
                 />
               </div>
-            </template>
-            <template v-for="(item, index) in uploadAudioList" :key="index">
+            </el-col>
+            <el-col
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="12"
+              :xl="12"
+              class="mb-8"
+              v-for="(item, index) in uploadAudioList"
+              :key="index"
+            >
               <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
                 <div
                   class="flex align-center"
@@ -80,13 +111,13 @@
                     </el-icon>
                   </div>
                   <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-                  <div class="ml-4 ellipsis" style="max-width: 160px" :title="item && item?.name">
+                  <div class="ml-4 ellipsis-1" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
                 </div>
               </el-card>
-            </template>
-          </el-space>
+            </el-col>
+          </el-row>
         </div>
       </el-scrollbar>
       <div class="flex">
@@ -119,8 +150,7 @@
               <el-tooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
                 <template #content>
                   <div class="break-all pre-wrap">
-                    {{ $t('chat.uploadFile.label') }}：{{
-                      $t('chat.uploadFile.most')
+                    {{ $t('chat.uploadFile.label') }}：{{ $t('chat.uploadFile.most')
                     }}{{ props.applicationDetails.file_upload_setting.maxFiles
                     }}{{ $t('chat.uploadFile.limit') }}
                     {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />{{
@@ -191,7 +221,7 @@ import { t } from '@/locales'
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { mode, question },
+  query: { mode, question }
 } = route as any
 const quickInputRef = ref()
 const props = withDefaults(
