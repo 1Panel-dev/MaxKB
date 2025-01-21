@@ -2,7 +2,7 @@
   <div class="app-header" :class="!isDefaultTheme ? 'custom-header' : ''">
     <el-alert
       v-if="user.isExpire()"
-      title="未上传 License 或 License 已过期。"
+      :title="$t('layout.isExpire')"
       type="warning"
       class="border-b"
       show-icon

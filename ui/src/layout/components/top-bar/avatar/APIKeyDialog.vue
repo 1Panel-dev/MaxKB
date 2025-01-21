@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('layout.avatar.apiKey')"
+    :title="$t('layout.apiKey')"
     v-model="dialogVisible"
     width="800"
     :close-on-click-modal="false"
@@ -8,7 +8,7 @@
   >
     <el-card shadow="never" class="layout-bg mb-16">
       <el-text type="info" class="color-secondary">{{
-        $t('layout.avatar.apiServiceAddress')
+        $t('layout.apiServiceAddress')
       }}</el-text>
       <p style="margin-top: 10px">
         <span class="vertical-middle lighter break-all">

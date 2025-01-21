@@ -102,7 +102,7 @@
           <template v-else-if="isDataset">
             <div class="w-full text-left cursor" @click="openCreateDialog">
               <el-button link>
-                <el-icon class="mr-4"><Plus /></el-icon> 创建知识库
+                <el-icon class="mr-4"><Plus /></el-icon> {{ $t('views.dataset.createDataset') }}
               </el-button>
             </div>
           </template>

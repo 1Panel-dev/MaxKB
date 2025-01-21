@@ -25,7 +25,7 @@
         </el-dropdown-item>
         <div v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')">
           <el-dropdown-item class="border-t p-8" @click="openAPIKeyDialog">
-            {{ $t('layout.avatar.apiKey') }}
+            {{ $t('layout.apiKey') }}
           </el-dropdown-item>
         </div>
         <el-dropdown-item class="border-t" style="padding: 0" @click.stop>
@@ -60,11 +60,11 @@
           </el-dropdown>
         </el-dropdown-item>
         <el-dropdown-item class="border-t" @click="openAbout">
-          {{ $t('layout.avatar.about') }}
+          {{ $t('layout.about.label') }}
         </el-dropdown-item>
 
         <el-dropdown-item class="border-t" @click="logout">
-          {{ $t('layout.avatar.logout') }}
+          {{ $t('layout.logout') }}
         </el-dropdown-item>
       </el-dropdown-menu>
     </template>
