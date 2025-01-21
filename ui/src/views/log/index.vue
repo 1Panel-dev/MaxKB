@@ -183,14 +183,12 @@
         step-strictly
         style="width: 110px; margin-left: 8px; margin-right: 8px"
       ></el-input-number>
-      <span>{{ $t('views.log.form.daysText') }}</span>
+      <span>{{ $t('views.log.daysText') }}</span>
       <template #footer>
         <div class="dialog-footer" style="margin-top: 16px">
-          <el-button @click="dialogVisible = false"
-            >{{ $t('layout.avatar.dialog.cancel') }}
-          </el-button>
+          <el-button @click="dialogVisible = false">{{ $t('common.cancel') }} </el-button>
           <el-button type="primary" @click="saveCleanTime">
-            {{ $t('layout.avatar.dialog.save') }}
+            {{ $t('common.save') }}
           </el-button>
         </div>
       </template>

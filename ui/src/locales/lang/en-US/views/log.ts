@@ -22,7 +22,7 @@ export default {
     recenTimes: 'Recent Conversation Time'
   },
   addToDataset: 'Add to Knowledge Base',
-  daysText: 'Conversation records from more than X days ago',
+  daysText: 'Days ago',
   selectDataset: 'Select Knowledge Base',
   selectDatasetPlaceholder: 'Please select a knowledge base',
   saveToDocument: 'Save to Document',
@@ -35,6 +35,6 @@ export default {
     },
     title: {
       placeholder: 'Please set a title for the current content for management and viewing'
-    },
+    }
   }
 }

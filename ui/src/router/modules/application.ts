@@ -1,5 +1,7 @@
 import Layout from '@/layout/layout-template/DetailLayout.vue'
 import { ComplexPermission } from '@/utils/permission/type'
+import { t } from '@/locales'
+
 const applicationRouter = {
   path: '/application',
   name: 'application',
@@ -26,7 +28,7 @@ const applicationRouter = {
           meta: {
             icon: 'app-all-menu',
             iconActive: 'app-all-menu-active',
-            title: '概览',
+            title: t('views.applicationOverview.title'),
             active: 'overview',
             parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail'
@@ -39,7 +41,7 @@ const applicationRouter = {
           meta: {
             icon: 'app-setting',
             iconActive: 'app-setting-active',
-            title: '设置',
+            title: t('common.setting'),
             active: 'setting',
             parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail'
@@ -52,7 +54,7 @@ const applicationRouter = {
           meta: {
             icon: 'app-access',
             iconActive: 'app-access-active',
-            title: '应用接入',
+            title: t('views.application.applicationAccess.title'),
             active: 'access',
             parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail',
@@ -65,7 +67,7 @@ const applicationRouter = {
           name: 'AppHitTest',
           meta: {
             icon: 'app-hit-test',
-            title: '命中测试',
+            title: t('views.application.hitTest.title'),
             active: 'hit-test',
             parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail'
@@ -78,7 +80,7 @@ const applicationRouter = {
           meta: {
             icon: 'app-document',
             iconActive: 'app-document-active',
-            title: '对话日志',
+            title: t('views.log.title'),
             active: 'log',
             parentPath: '/application/:id/:type',
             parentName: 'ApplicationDetail'

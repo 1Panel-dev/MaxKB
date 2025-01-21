@@ -1,4 +1,5 @@
 import Layout from '@/layout/layout-template/DetailLayout.vue'
+import { t } from '@/locales'
 const datasetRouter = {
   path: '/dataset',
   name: 'dataset',
@@ -32,7 +33,7 @@ const datasetRouter = {
           meta: {
             icon: 'app-document',
             iconActive: 'app-document-active',
-            title: '文档',
+            title: t('common.fileUpload.document'),
             active: 'document',
             parentPath: '/dataset/:id',
             parentName: 'DatasetDetail'
@@ -45,7 +46,7 @@ const datasetRouter = {
           meta: {
             icon: 'app-problems',
             iconActive: 'QuestionFilled',
-            title: '问题',
+            title: t('views.problem.title'),
             active: 'problem',
             parentPath: '/dataset/:id',
             parentName: 'DatasetDetail'
@@ -57,7 +58,7 @@ const datasetRouter = {
           name: 'DatasetHitTest',
           meta: {
             icon: 'app-hit-test',
-            title: '命中测试',
+            title: t('views.application.hitTest.title'),
             active: 'hit-test',
             parentPath: '/dataset/:id',
             parentName: 'DatasetDetail'
@@ -70,7 +71,7 @@ const datasetRouter = {
           meta: {
             icon: 'app-setting',
             iconActive: 'app-setting-active',
-            title: '设置',
+            title: t('common.setting'),
             active: 'setting',
             parentPath: '/dataset/:id',
             parentName: 'DatasetDetail'
