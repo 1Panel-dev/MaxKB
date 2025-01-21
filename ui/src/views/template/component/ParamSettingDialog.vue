@@ -12,7 +12,7 @@
       {{ $t('views.template.templateForm.title.addParam') }}
     </el-button>
     <el-table :data="modelParamsForm" class="mb-16">
-      <el-table-column prop="label" :label="$t('components.dynamicsForm.paramForm.name.label')" show-overflow-tooltip>
+      <el-table-column prop="label" :label="$t('dynamicsForm.paramForm.name.label')" show-overflow-tooltip>
         <template #default="{ row }">
           <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
             row.label.label
@@ -20,8 +20,8 @@
           <span v-else>{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="field" :label="$t('components.dynamicsForm.paramForm.field.label')" show-overflow-tooltip />
-      <el-table-column :label="$t('components.dynamicsForm.paramForm.input_type.label')" width="110px">
+      <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')" show-overflow-tooltip />
+      <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="110px">
         <template #default="{ row }">
           <el-tag type="info" class="info-tag">{{
             input_type_list.find((item) => item.value === row.input_type)?.label
@@ -30,7 +30,7 @@
       </el-table-column>
       <el-table-column
         prop="default_value"
-        :label="$t('components.dynamicsForm.default.label')"
+        :label="$t('dynamicsForm.default.label')"
         show-overflow-tooltip
       />
       <el-table-column :label="$t('common.required')">

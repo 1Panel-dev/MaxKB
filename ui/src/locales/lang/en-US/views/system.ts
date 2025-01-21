@@ -9,7 +9,6 @@ export default {
       bindDN: 'Bind DN',
       bindDNPlaceholder: 'Please enter Bind DN',
       password: 'Password',
-      passwordPlaceholder: 'Please enter password',
       ou: 'User OU',
       ouPlaceholder: 'Please enter User OU',
       ldap_filter: 'User Filter',

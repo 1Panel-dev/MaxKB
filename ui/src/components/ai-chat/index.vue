@@ -271,7 +271,7 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
 const errorWrite = (chat: any, message?: string) => {
   ChatManagement.addChatRecord(chat, 50, loading)
   ChatManagement.write(chat.id)
-  ChatManagement.append(chat.id, message || t('components.chat.tip.error500Message'))
+  ChatManagement.append(chat.id, message || t('chat.tip.error500Message'))
   ChatManagement.updateStatus(chat.id, 500)
   ChatManagement.close(chat.id)
 }
@@ -344,9 +344,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
               errorWrite(chat)
             })
         } else if (response.status === 460) {
-          return Promise.reject(t('components.chat.tip.errorIdentifyMessage'))
+          return Promise.reject(t('chat.tip.errorIdentifyMessage'))
         } else if (response.status === 461) {
-          return Promise.reject('components.chat.tip.errorLimitMessage')
+          return Promise.reject('chat.tip.errorLimitMessage')
         } else {
           nextTick(() => {
             // 将滚动条滚动到最下面

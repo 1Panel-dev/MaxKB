@@ -1,7 +1,7 @@
 <template>
   <login-layout v-if="user.isEnterprise() ? user.themeInfo : true" v-loading="loading">
-    <LoginContainer :subTitle="user.themeInfo?.slogan || '欢迎使用 MaxKB 智能知识库问答系统'">
-      <h2 class="mb-24" v-if="!showQrCodeTab">{{ loginMode || '普通登录' }}</h2>
+    <LoginContainer :subTitle="user.themeInfo?.slogan || $t('views.system.theme.defaultSlogan')">
+      <h2 class="mb-24" v-if="!showQrCodeTab">{{ loginMode || $t('views.login.title') }}</h2>
       <div v-if="!showQrCodeTab">
         <el-form
           class="login-form"
@@ -16,7 +16,7 @@
                 size="large"
                 class="input-item"
                 v-model="loginForm.username"
-                placeholder="请输入用户名"
+                :placeholder="$t('views.user.userForm.form.username.placeholder')"
               >
               </el-input>
             </el-form-item>
@@ -28,7 +28,7 @@
                 size="large"
                 class="input-item"
                 v-model="loginForm.password"
-                placeholder="请输入密码"
+                :placeholder="$t('views.user.userForm.form.password.placeholder')"
                 show-password
               >
               </el-input>
@@ -36,7 +36,9 @@
           </div>
         </el-form>
 
-        <el-button size="large" type="primary" class="w-full" @click="login">登录</el-button>
+        <el-button size="large" type="primary" class="w-full" @click="login">{{
+          $t('views.login.buttons.login')
+        }}</el-button>
         <div class="operate-container flex-between mt-12">
           <!-- <el-button class="register" @click="router.push('/register')" link type="primary">
           注册
@@ -47,7 +49,7 @@
             link
             type="primary"
           >
-            忘记密码?
+            {{ $t('views.login.forgotPassword') }}?
           </el-button>
         </div>
       </div>
@@ -56,7 +58,7 @@
       </div>
 
       <div class="login-gradient-divider lighter mt-24" v-if="modeList.length > 1">
-        <span>更多登录方式</span>
+        <span>{{ $t('views.login.moreMethod') }}</span>
       </div>
       <div class="text-center mt-16">
         <template v-for="item in modeList">
@@ -123,14 +125,14 @@ const rules = ref<FormRules<LoginRequest>>({
   username: [
     {
       required: true,
-      message: '请输入用户名',
+      message: t('views.user.userForm.form.username.requiredMessage'),
       trigger: 'blur'
     }
   ],
   password: [
     {
       required: true,
-      message: '请输入密码',
+      message: t('views.user.userForm.form.password.requiredMessage'),
       trigger: 'blur'
     }
   ]
@@ -154,7 +156,7 @@ function redirectAuth(authType: string) {
     if (!res.data) {
       return
     }
-    MsgConfirm(`${t('login.jump_tip')}`, t(''), {
+    MsgConfirm(t('login.jump_tip'), '', {
       confirmButtonText: t('login.jump'),
       cancelButtonText: t('common.cancel'),
       confirmButtonClass: ''

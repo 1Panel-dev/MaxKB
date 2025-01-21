@@ -117,7 +117,7 @@ const validate_rules = (rule: any, value: any, callback: any) => {
     try {
       JSON.parse(model_value.value)
     } catch (e) {
-      callback(new Error(t('components.dynamicsForm.tip.requiredMessage')))
+      callback(new Error(t('dynamicsForm.tip.requiredMessage')))
       return false
     }
   }

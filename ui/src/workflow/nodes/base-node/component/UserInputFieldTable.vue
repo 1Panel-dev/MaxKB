@@ -1,6 +1,6 @@
 <template>
   <div class="flex-between mb-16">
-    <h5 class="lighter">{{ $t('components.chat.userInput') }}</h5>
+    <h5 class="lighter">{{ $t('chat.userInput') }}</h5>
     <el-button link type="primary" @click="openAddDialog()">
       <el-icon class="mr-4">
         <Plus />
@@ -13,13 +13,13 @@
     :data="props.nodeModel.properties.user_input_field_list"
     class="mb-16"
   >
-    <el-table-column prop="field" :label="$t('components.dynamicsForm.paramForm.field.label')">
+    <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')">
       <template #default="{ row }">
         <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
       </template>
     </el-table-column>
 
-    <el-table-column prop="label" :label="$t('components.dynamicsForm.paramForm.name.label')">
+    <el-table-column prop="label" :label="$t('dynamicsForm.paramForm.name.label')">
       <template #default="{ row }">
         <span v-if="row.label && row.label.input_type === 'TooltipLabel'">
           <span :title="row.label.label" class="ellipsis-1">
@@ -33,33 +33,33 @@
         >
       </template>
     </el-table-column>
-    <el-table-column :label="$t('components.dynamicsForm.paramForm.input_type.label')">
+    <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')">
       <template #default="{ row }">
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">{{
-          $t('components.dynamicsForm.input_type_list.TextInput')
+          $t('dynamicsForm.input_type_list.TextInput')
         }}</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'">{{
-          $t('components.dynamicsForm.input_type_list.Slider')
+          $t('dynamicsForm.input_type_list.Slider')
         }}</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'">{{
-          $t('components.dynamicsForm.input_type_list.SwitchInput')
+          $t('dynamicsForm.input_type_list.SwitchInput')
         }}</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'">{{
-          $t('components.dynamicsForm.input_type_list.SingleSelect')
+          $t('dynamicsForm.input_type_list.SingleSelect')
         }}</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'MultiSelect'">{{
-          $t('components.dynamicsForm.input_type_list.MultiSelect')
+          $t('dynamicsForm.input_type_list.MultiSelect')
         }}</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'RadioCard'">{{
-          $t('components.dynamicsForm.input_type_list.RadioCard')
+          $t('dynamicsForm.input_type_list.RadioCard')
         }}</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">{{
-          $t('components.dynamicsForm.input_type_list.DatePicker')
+          $t('dynamicsForm.input_type_list.DatePicker')
         }}</el-tag>
       </template>
     </el-table-column>
 
-    <el-table-column prop="default_value" :label="$t('components.dynamicsForm.default.label')">
+    <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')">
       <template #default="{ row }">
         <span :title="row.default_value" class="ellipsis-1">{{ getDefaultValue(row) }}</span>
       </template>

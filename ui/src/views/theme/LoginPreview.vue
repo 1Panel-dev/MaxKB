@@ -17,7 +17,7 @@
         <el-form class="login-form">
           <div class="mb-24">
             <el-form-item>
-              <el-input size="large" class="input-item" placeholder="请输入用户名"> </el-input>
+              <el-input size="large" class="input-item" :placeholder="$t('views.user.userForm.form.username.placeholder')"> </el-input>
             </el-form-item>
           </div>
           <div class="mb-24">
@@ -26,16 +26,20 @@
                 type="password"
                 size="large"
                 class="input-item"
-                placeholder="请输入密码"
+                :placeholder="$t('views.user.userForm.form.password.placeholder')"
                 show-password
               >
               </el-input>
             </el-form-item>
           </div>
         </el-form>
-        <el-button size="large" type="primary" class="w-full">登录</el-button>
+        <el-button size="large" type="primary" class="w-full">{{
+          $t('views.login.buttons.login')
+        }}</el-button>
         <div class="operate-container flex-between mt-12">
-          <el-button class="forgot-password" link type="primary"> 忘记密码? </el-button>
+          <el-button class="forgot-password" link type="primary">
+            {{ $t('views.login.forgotPassword') }}?
+          </el-button>
         </div>
       </LoginContainer>
     </login-layout>

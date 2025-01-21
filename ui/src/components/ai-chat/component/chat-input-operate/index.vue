@@ -95,10 +95,10 @@
           v-model="inputValue"
           :placeholder="
             startRecorderTime
-              ? '说话中...'
+              ? `${$t('chat.inputPlaceholder.speaking')}...`
               : recorderLoading
-                ? '转文字中...'
-                : '请输入问题，Ctrl+Enter 换行，Enter发送'
+                ? `${$t('chat.inputPlaceholder.recorderLoading')}...`
+                : $t('chat.inputPlaceholder.default')
           "
           :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 10 }"
           type="textarea"
@@ -119,12 +119,13 @@
               <el-tooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
                 <template #content>
                   <div class="break-all pre-wrap">
-                    上传文件：最多{{
-                      props.applicationDetails.file_upload_setting.maxFiles
-                    }}个，每个文件限制
-                    {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />文件类型：{{
-                      getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase()
-                    }}
+                    {{ $t('chat.uploadFile.label') }}：{{
+                      $t('chat.uploadFile.most')
+                    }}{{ props.applicationDetails.file_upload_setting.maxFiles
+                    }}{{ $t('chat.uploadFile.limit') }}
+                    {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />{{
+                      $t('chat.uploadFile.fileType')
+                    }}：{{ getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase() }}
                   </div>
                 </template>
                 <el-button text :disabled="checkMaxFilesLimit()" class="mt-4">
@@ -186,14 +187,11 @@ import bus from '@/bus'
 import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
 import { MsgWarning } from '@/utils/message'
-import useStore from '@/stores'
 import { t } from '@/locales'
 const router = useRouter()
 const route = useRoute()
-const { application } = useStore()
 const {
   query: { mode, question },
-  params: { accessToken }
 } = route as any
 const quickInputRef = ref()
 const props = withDefaults(
@@ -257,7 +255,7 @@ const getAcceptList = () => {
   }
 
   if (accepts.length === 0) {
-    return '.请在文件上传配置中选择文件类型'
+    return `.${t('chat.uploadFile.tipMessage')}`
   }
   return accepts.map((ext: any) => '.' + ext).join(',')
 }
@@ -281,13 +279,13 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadAudioList.value.length +
     uploadVideoList.value.length
   if (file_limit_once >= maxFiles) {
-    MsgWarning('最多上传' + maxFiles + '个文件')
+    MsgWarning(t('chat.uploadFile.limitMessage1') + maxFiles + t('chat.uploadFile.limitMessage2'))
     fileList.splice(0, fileList.length)
     return
   }
   if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) {
     // MB
-    MsgWarning('单个文件大小不能超过' + fileLimit + 'MB')
+    MsgWarning(t('chat.uploadFile.sizeLimit') + fileLimit + 'MB')
     fileList.splice(0, fileList.length)
     return
   }
@@ -356,7 +354,7 @@ const uploadFile = async (file: any, fileList: any) => {
         }
       })
       if (!inputValue.value && uploadImageList.value.length > 0) {
-        inputValue.value = '请解析图片内容'
+        inputValue.value = t('chat.uploadFile.imageMessage')
       }
     })
 }
@@ -397,14 +395,10 @@ const startRecording = async () => {
       (err: any) => {
         MsgAlert(
           t('common.tip'),
-          `<p>该功能需要使用麦克风，浏览器禁止不安全页面录音，解决方案如下：<br/>
-1、可开启 https 解决；<br/>
-2、若无 https 配置则需要修改浏览器安全配置，Chrome 设置如下：<br/>
-(1) 地址栏输入chrome://flags/#unsafely-treat-insecure-origin-as-secure；<br/>
-(2) 将 http 站点配置在文本框中，例如: http://127.0.0.1:8080。</p>
+          `${t('chat.tip.recorderTip')}
     <img src="${new URL(`@/assets/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
           {
-            confirmButtonText: '我知道了',
+            confirmButtonText: t('chat.tip.confirm'),
             dangerouslyUseHTMLString: true,
             customClass: 'record-tip-confirm'
           }
@@ -414,14 +408,10 @@ const startRecording = async () => {
   } catch (error) {
     MsgAlert(
       t('common.tip'),
-      `<p>该功能需要使用麦克风，浏览器禁止不安全页面录音，解决方案如下：<br/>
-1、可开启 https 解决；<br/>
-2、若无 https 配置则需要修改浏览器安全配置，Chrome 设置如下：<br/>
-(1) 地址栏输入chrome://flags/#unsafely-treat-insecure-origin-as-secure；<br/>
-(2) 将 http 站点配置在文本框中，例如: http://127.0.0.1:8080。</p>
+      `${t('chat.tip.recorderTip')}
     <img src="${new URL(`@/assets/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
       {
-        confirmButtonText: '我知道了',
+        confirmButtonText: t('chat.tip.confirm'),
         dangerouslyUseHTMLString: true,
         customClass: 'record-tip-confirm'
       }
@@ -445,7 +435,7 @@ const stopRecording = () => {
         uploadRecording(blob) // 上传录音文件
       },
       (err: any) => {
-        console.error('录音失败:', err)
+        console.error(`${t('chat.tip.recorderError')}:`, err)
       }
     )
   }
@@ -472,7 +462,7 @@ const uploadRecording = async (audioBlob: Blob) => {
       })
   } catch (error) {
     recorderLoading.value = false
-    console.error('上传失败:', error)
+    console.error(`${t('chat.uploadFile.errorMessage')}:`, error)
   }
 }
 const handleTimeChange = () => {

@@ -88,7 +88,7 @@
                 {{ form_data.reranker_setting.similarity?.toFixed(3) }}</el-col
               >
               <el-col :span="12" class="color-secondary lighter">
-                {{ $t('components.chat.KnowledgeSource.referenceParagraph') }} Top</el-col
+                {{ $t('chat.KnowledgeSource.referenceParagraph') }} Top</el-col
               >
               <el-col :span="12" class="lighter"> {{ form_data.reranker_setting.top_n }}</el-col>
               <el-col :span="12" class="color-secondary lighter">

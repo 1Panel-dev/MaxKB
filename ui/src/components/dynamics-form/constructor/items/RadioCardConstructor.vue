@@ -2,7 +2,7 @@
   <el-form-item>
     <template #label>
       <div class="flex-between">
-        {{ $t('components.dynamicsForm.Select.label') }}
+        {{ $t('dynamicsForm.Select.label') }}
         <el-button link type="primary" @click.stop="addOption()">
           <el-icon class="mr-4">
             <Plus />
@@ -15,11 +15,11 @@
     <el-row style="width: 100%" :gutter="10">
       <el-col :span="10">
         <div class="grid-content ep-bg-purple" />
-        {{ $t('components.dynamicsForm.tag.label') }}
+        {{ $t('dynamicsForm.tag.label') }}
       </el-col>
       <el-col :span="12"
         ><div class="grid-content ep-bg-purple" />
-        {{ $t('components.dynamicsForm.Select.label') }}</el-col
+        {{ $t('dynamicsForm.Select.label') }}</el-col
       >
     </el-row>
     <el-row
@@ -31,13 +31,13 @@
     >
       <el-col :span="10"
         ><div class="grid-content ep-bg-purple" />
-        <el-input v-model="formValue.option_list[$index].label" :placeholder="$t('components.dynamicsForm.tag.placeholder')"
+        <el-input v-model="formValue.option_list[$index].label" :placeholder="$t('dynamicsForm.tag.placeholder')"
       /></el-col>
       <el-col :span="12"
         ><div class="grid-content ep-bg-purple" />
         <el-input
           v-model="formValue.option_list[$index].value"
-          :placeholder="$t('components.dynamicsForm.Select.label')"
+          :placeholder="$t('dynamicsForm.Select.label')"
       /></el-col>
       <el-col :span="1"
         ><div class="grid-content ep-bg-purple" />
@@ -50,19 +50,19 @@
   </el-form-item>
   <el-form-item
     class="defaultValueItem"
-    :label="$t('components.dynamicsForm.default.label')"
+    :label="$t('dynamicsForm.default.label')"
     :required="formValue.required"
     prop="default_value"
     :rules="
       formValue.required
-        ? [{ required: true, message: `${$t('components.dynamicsForm.default.label')}${$t('components.dynamicsForm.default.requiredMessage')}` }]
+        ? [{ required: true, message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}` }]
         : []
     "
   >
     <div class="defaultValueCheckbox">
       <el-checkbox
         v-model="formValue.show_default_value"
-        :label="$t('components.dynamicsForm.default.show')"
+        :label="$t('dynamicsForm.default.show')"
       />
     </div>
     <RadioCard

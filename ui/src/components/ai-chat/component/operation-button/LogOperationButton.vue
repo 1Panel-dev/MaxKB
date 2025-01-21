@@ -8,19 +8,19 @@
     <div>
       <!-- 语音播放 -->
       <span v-if="tts">
-        <el-tooltip effect="dark" content="点击播放" placement="top" v-if="!audioPlayerStatus">
+        <el-tooltip effect="dark" :content="$t('chat.operation.play')" placement="top" v-if="!audioPlayerStatus">
           <el-button text @click="playAnswerText(data?.answer_text)">
             <AppIcon iconName="app-video-play"></AppIcon>
           </el-button>
         </el-tooltip>
-        <el-tooltip v-else effect="dark" content="停止" placement="top">
+        <el-tooltip v-else effect="dark" :content="$t('chat.operation.pause')" placement="top">
           <el-button type="primary" text @click="pausePlayAnswerText()">
             <AppIcon iconName="app-video-pause"></AppIcon>
           </el-button>
         </el-tooltip>
         <el-divider direction="vertical" />
       </span>
-      <el-tooltip effect="dark" content="复制" placement="top">
+      <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
         <el-button text @click="copyClick(data?.answer_text)">
           <AppIcon iconName="app-copy"></AppIcon>
         </el-button>
@@ -29,7 +29,7 @@
       <el-tooltip
         v-if="buttonData.improve_paragraph_id_list.length === 0"
         effect="dark"
-        content="修改内容"
+        :content="$t('views.log.editContent')"
         placement="top"
       >
         <el-button text @click="editContent(data)">
@@ -37,7 +37,7 @@
         </el-button>
       </el-tooltip>
 
-      <el-tooltip v-else effect="dark" content="修改标注" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t('views.log.editMark')" placement="top">
         <el-button text @click="editMark(data)">
           <AppIcon iconName="app-document-active" class="primary"></AppIcon>
         </el-button>
@@ -67,7 +67,7 @@ import { datetimeFormat } from '@/utils/time'
 import applicationApi from '@/api/application'
 import { useRoute } from 'vue-router'
 import { MsgError } from '@/utils/message'
-
+import { t } from '@/locales'
 const route = useRoute()
 const {
   params: { id }
@@ -143,7 +143,7 @@ function removeFormRander(text: string) {
 
 const playAnswerText = (text: string) => {
   if (!text) {
-    text = '抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。'
+    text = t('chat.tip.answerMessage')
   }
   // 移除表单渲染器
   text = removeFormRander(text)

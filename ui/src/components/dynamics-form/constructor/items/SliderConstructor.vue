@@ -1,14 +1,14 @@
 <template>
-  <el-form-item :label="$t('components.dynamicsForm.Slider.showInput.label')" required prop="showInput">
+  <el-form-item :label="$t('dynamicsForm.Slider.showInput.label')" required prop="showInput">
     <el-switch v-model="formValue.showInput" />
   </el-form-item>
-  <el-form-item :label="$t('components.dynamicsForm.Slider.valueRange.label')" required>
+  <el-form-item :label="$t('dynamicsForm.Slider.valueRange.label')" required>
     <el-col :span="11" style="padding-left: 0">
       <el-form-item
         :rules="[
           {
             required: true,
-            message: $t('components.dynamicsForm.Slider.valueRange.minRequired'),
+            message: $t('dynamicsForm.Slider.valueRange.minRequired'),
             trigger: 'change'
           }
         ]"
@@ -25,7 +25,7 @@
         :rules="[
           {
             required: true,
-            message: $t('components.dynamicsForm.Slider.valueRange.maxRequired'),
+            message: $t('dynamicsForm.Slider.valueRange.maxRequired'),
             trigger: 'change'
           }
         ]"
@@ -40,7 +40,7 @@
     </el-col>
   </el-form-item>
   <el-col :span="11" style="padding-left: 0">
-    <el-form-item :label="$t('components.dynamicsForm.Slider.step.label')" required prop="step" :rules="step_rules">
+    <el-form-item :label="$t('dynamicsForm.Slider.step.label')" required prop="step" :rules="step_rules">
       <el-input-number
         style="width: 100%"
         v-model="formValue.step"
@@ -51,12 +51,12 @@
   </el-col>
 
   <el-form-item
-    :label="$t('components.dynamicsForm.default.label')"
+    :label="$t('dynamicsForm.default.label')"
     :required="formValue.required"
     prop="default_value"
     :rules="
       formValue.required
-        ? [{ required: true, message: $t('components.dynamicsForm.default.requiredMessage') }]
+        ? [{ required: true, message: $t('dynamicsForm.default.requiredMessage') }]
         : []
     "
   >
@@ -101,7 +101,7 @@ const getData = () => {
     props_info: {
       rules: [
         {
-          message: formValue.value.label + t('components.dynamicsForm.tip.requiredMessage'),
+          message: formValue.value.label + t('dynamicsForm.tip.requiredMessage'),
           trigger: 'blur',
           required: formValue.value.required
         }
@@ -133,11 +133,11 @@ const step_rules = [
     required: true,
     validator: (rule: any, value: any, callback: any) => {
       if (!value) {
-        callback(new Error(t('components.dynamicsForm.Slider.step.requiredMessage1')))
+        callback(new Error(t('dynamicsForm.Slider.step.requiredMessage1')))
         return false
       }
       if (value === 0) {
-        callback(new Error(t('components.dynamicsForm.Slider.step.requiredMessage2')))
+        callback(new Error(t('dynamicsForm.Slider.step.requiredMessage2')))
         return false
       }
       return true

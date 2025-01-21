@@ -23,7 +23,7 @@
                   <el-icon class="mr-4">
                     <Download />
                   </el-icon>
-                  点击下载文件
+                  {{ $t('chat.download') }}
                 </div>
                 <div class="show flex align-center">
                   <img :src="getImgUrl(item && item?.name)" alt="" width="24" />

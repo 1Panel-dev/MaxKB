@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     class="paragraph-source"
-    title="知识库引用"
+    :title="$t('chat.paragraphSource.title')"
     v-model="dialogVisible"
     destroy-on-close
     append-to-body
@@ -13,13 +13,13 @@
       <el-scrollbar>
         <div class="paragraph-source-height p-16 pb-0">
           <el-form label-position="top">
-            <el-form-item label="用户问题">
+            <el-form-item :label="$t('chat.paragraphSource.question')">
               <el-input v-model="detail.problem_text" disabled />
             </el-form-item>
-            <el-form-item label="优化后问题">
+            <el-form-item :label="$t('chat.paragraphSource.optimizationQuestion')">
               <el-input v-model="detail.padding_problem_text" disabled />
             </el-form-item>
-            <el-form-item :label="$t('components.chat.KnowledgeSource.referenceParagraph')">
+            <el-form-item :label="$t('chat.KnowledgeSource.referenceParagraph')">
               <div v-if="detail.paragraph_list.length > 0" class="w-full">
                 <template v-for="(item, index) in detail.paragraph_list" :key="index">
                   <ParagraphCard :data="item" :index="index" />

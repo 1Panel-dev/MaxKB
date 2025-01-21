@@ -56,7 +56,7 @@ const menus = ref([
     }
   },
   {
-    label: '引用',
+    label: t('chat.quote'),
     icon: 'app-quote',
     click: () => {
       bus.emit('chat-input', getSelection())

@@ -66,7 +66,7 @@ const querySearchAsync = (queryString: string, cb: (arg: any) => void) => {
     UserApi.getUserList(queryString).then((res) => {
       if (res.data.length === 0) {
         noData.value = true
-        matchResults = [{ default: t('components.noData') }]
+        matchResults = [{ default: t('common.noData') }]
       } else {
         noData.value = false
         matchResults = res.data

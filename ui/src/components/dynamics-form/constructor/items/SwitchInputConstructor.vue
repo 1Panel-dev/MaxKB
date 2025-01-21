@@ -1,11 +1,11 @@
 <template>
   <el-form-item
-    :label="$t('components.dynamicsForm.default.label')"
+    :label="$t('dynamicsForm.default.label')"
     :required="formValue.required"
     prop="default_value"
     :rules="
       formValue.required
-        ? [{ required: true, message: `${$t('components.dynamicsForm.default.label')}${$t('components.dynamicsForm.default.requiredMessage')}` }]
+        ? [{ required: true, message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}` }]
         : []
     "
   >

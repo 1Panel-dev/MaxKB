@@ -105,8 +105,8 @@ const errMsg = computed(() => {
   return props_info.value.err_msg
     ? props_info.value.err_msg
     : isString(props.formfield.label)
-      ? props.formfield.label + t('components.dynamicsForm.tip.requiredMessage')
-      : props.formfield.label.label + t('components.dynamicsForm.tip.requiredMessage')
+      ? props.formfield.label + t('dynamicsForm.tip.requiredMessage')
+      : props.formfield.label.label + t('dynamicsForm.tip.requiredMessage')
 })
 /**
  * 反序列化

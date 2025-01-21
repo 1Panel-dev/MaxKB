@@ -8,15 +8,19 @@
     style="padding: 0 24px"
   >
     <el-card shadow="always" class="dialog-card" style="--el-card-padding: 16px 8px">
-      <div class="flex align-center cursor w-full" style="padding: 0 8px;" @click="showUserInput = !showUserInput">
+      <div
+        class="flex align-center cursor w-full"
+        style="padding: 0 8px"
+        @click="showUserInput = !showUserInput"
+      >
         <el-icon class="mr-8 arrow-icon" :class="showUserInput ? 'rotate-90' : ''"
           ><CaretRight
         /></el-icon>
-        用户输入
+        {{ $t('chat.userInput') }}
       </div>
       <el-scrollbar max-height="160">
         <el-collapse-transition>
-          <div v-show="showUserInput" class="mt-16" style="padding: 0 8px;">
+          <div v-show="showUserInput" class="mt-16" style="padding: 0 8px">
             <DynamicsForm
               :key="dynamicsFormRefresh"
               v-model="form_data_context"
@@ -47,6 +51,7 @@ import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormField } from '@/components/dynamics-form/type'
 import { useRoute } from 'vue-router'
 import { MsgWarning } from '@/utils/message'
+import { t } from '@/locales'
 const route = useRoute()
 const props = defineProps<{
   application: any
@@ -267,7 +272,7 @@ const checkInputParam = () => {
       inputFieldList.value[i].required &&
       !form_data_context.value[inputFieldList.value[i].field]
     ) {
-      MsgWarning('请填写所有必填字段')
+      MsgWarning(t('chat.tip.requiredMessage'))
       return false
     }
   }
@@ -282,7 +287,7 @@ const checkInputParam = () => {
     }
   }
   if (msg.length > 0) {
-    MsgWarning(`请在URL中填写参数 ${msg.join('、')}的值`)
+    MsgWarning(`${t('chat.tip.inputParamMessage1')} ${msg.join('、')}${t('chat.tip.inputParamMessage2')}`)
     return false
   }
   return true

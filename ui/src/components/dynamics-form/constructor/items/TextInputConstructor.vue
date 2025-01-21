@@ -1,12 +1,12 @@
 <template>
-  <el-form-item :label="$t('components.dynamicsForm.TextInput.length.label')" required>
+  <el-form-item :label="$t('dynamicsForm.TextInput.length.label')" required>
     <el-row class="w-full">
       <el-col :span="11">
         <el-form-item
           :rules="[
             {
               required: true,
-              message: $t('components.dynamicsForm.TextInput.length.minRequired'),
+              message: $t('dynamicsForm.TextInput.length.minRequired'),
               trigger: 'change'
             }
           ]"
@@ -30,7 +30,7 @@
           :rules="[
             {
               required: true,
-              message: $t('components.dynamicsForm.TextInput.length.maxRequired'),
+              message: $t('dynamicsForm.TextInput.length.maxRequired'),
               trigger: 'change'
             }
           ]"
@@ -52,15 +52,15 @@
     class="defaultValueItem"
     :required="formValue.required"
     prop="default_value"
-    :label="$t('components.dynamicsForm.default.label')"
+    :label="$t('dynamicsForm.default.label')"
     :rules="
-      formValue.required ? [{ required: true, message: `${$t('components.dynamicsForm.default.label')}${$t('components.dynamicsForm.default.requiredMessage')}` }, ...rules] : rules
+      formValue.required ? [{ required: true, message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}` }, ...rules] : rules
     "
   >
     <div class="defaultValueCheckbox">
       <el-checkbox
         v-model="formValue.show_default_value"
-        :label="$t('components.dynamicsForm.default.show')"
+        :label="$t('dynamicsForm.default.show')"
       />
     </div>
 
@@ -68,7 +68,7 @@
       v-model="formValue.default_value"
       :maxlength="formValue.maxlength"
       :minlength="formValue.minlength"
-      :placeholder="$t('components.dynamicsForm.paramForm.default.placeholder')"
+      :placeholder="$t('dynamicsForm.paramForm.default.placeholder')"
       show-word-limit
       type="text"
     />
@@ -110,11 +110,11 @@ const getData = () => {
     props_info: {
       rules: formValue.value.required
         ? [
-            { required: true, message: `${formValue.value.label} ${t('components.dynamicsForm.default.requiredMessage')}` },
+            { required: true, message: `${formValue.value.label} ${t('dynamicsForm.default.requiredMessage')}` },
             {
               min: formValue.value.minlength,
               max: formValue.value.maxlength,
-              message: `${formValue.value.label}${t('components.dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('components.dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('components.dynamicsForm.TextInput.length.requiredMessage3')}`,
+              message: `${formValue.value.label}${t('dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('dynamicsForm.TextInput.length.requiredMessage3')}`,
               trigger: 'blur'
             }
           ]
@@ -122,7 +122,7 @@ const getData = () => {
             {
               min: formValue.value.minlength,
               max: formValue.value.maxlength,
-              message: `${formValue.value.label}${t('components.dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('components.dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('components.dynamicsForm.TextInput.length.requiredMessage3')}`,
+              message: `${formValue.value.label}${t('dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('dynamicsForm.TextInput.length.requiredMessage3')}`,
               trigger: 'blur'
             }
           ]
@@ -141,21 +141,21 @@ const rangeRules = [
     required: true,
     validator: (rule: any, value: any, callback: any) => {
       if (!formValue.value.minlength) {
-        callback(new Error(t('components.dynamicsForm.TextInput.length.requiredMessage4')))
+        callback(new Error(t('dynamicsForm.TextInput.length.requiredMessage4')))
       }
       if (!formValue.value.maxlength) {
-        callback(new Error(t('components.dynamicsForm.TextInput.length.requiredMessage4')))
+        callback(new Error(t('dynamicsForm.TextInput.length.requiredMessage4')))
       }
       return true
     },
-    message: `${formValue.value.label} ${t('components.dynamicsForm.default.requiredMessage')}`
+    message: `${formValue.value.label} ${t('dynamicsForm.default.requiredMessage')}`
   }
 ]
 const rules = computed(() => [
   {
     min: formValue.value.minlength,
     max: formValue.value.maxlength,
-    message: `${t('components.dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('components.dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('components.dynamicsForm.TextInput.length.requiredMessage3')}`,
+    message: `${t('dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('dynamicsForm.TextInput.length.requiredMessage3')}`,
     trigger: 'blur'
   }
 ])

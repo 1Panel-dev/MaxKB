@@ -21,7 +21,7 @@
           </p>
         </div>
         <el-dropdown-item class="border-t p-8" @click="openResetPassword">
-          {{ $t('layout.avatar.resetPassword') }}
+          {{ $t('views.login.resetPassword') }}
         </el-dropdown-item>
         <div v-hasPermission="new ComplexPermission([], ['x-pack'], 'OR')">
           <el-dropdown-item class="border-t p-8" @click="openAPIKeyDialog">

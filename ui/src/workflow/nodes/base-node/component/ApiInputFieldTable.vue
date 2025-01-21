@@ -13,8 +13,8 @@
     :data="props.nodeModel.properties.api_input_field_list"
     class="mb-16"
   >
-    <el-table-column prop="variable" :label="$t('components.dynamicsForm.paramForm.field.label')" />
-    <el-table-column prop="default_value" :label="$t('components.dynamicsForm.default.label')" />
+    <el-table-column prop="variable" :label="$t('dynamicsForm.paramForm.field.label')" />
+    <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')" />
     <el-table-column :label="$t('common.required')">
       <template #default="{ row }">
         <div @click.stop>

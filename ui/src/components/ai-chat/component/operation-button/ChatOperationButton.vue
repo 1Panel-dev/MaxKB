@@ -7,12 +7,12 @@
   <div>
     <!-- 语音播放 -->
     <span v-if="tts">
-      <el-tooltip effect="dark" content="点击播放" placement="top" v-if="!audioPlayerStatus">
+      <el-tooltip effect="dark" :content="$t('chat.operation.play')" placement="top" v-if="!audioPlayerStatus">
         <el-button text :disabled="!data?.write_ed" @click="playAnswerText(data?.answer_text)">
           <AppIcon iconName="app-video-play"></AppIcon>
         </el-button>
       </el-tooltip>
-      <el-tooltip v-else effect="dark" content="停止" placement="top">
+      <el-tooltip v-else effect="dark" :content="$t('chat.operation.pause')" placement="top">
         <el-button type="primary" text :disabled="!data?.write_ed" @click="pausePlayAnswerText()">
           <AppIcon iconName="app-video-pause"></AppIcon>
         </el-button>
@@ -20,13 +20,13 @@
       <el-divider direction="vertical" />
     </span>
     <span v-if="type == 'ai-chat' || type == 'log'">
-      <el-tooltip effect="dark" content="换个答案" placement="top">
+      <el-tooltip effect="dark" :content="$t('chat.operation.regeneration')" placement="top">
         <el-button :disabled="chat_loading" text @click="regeneration">
           <el-icon><RefreshRight /></el-icon>
         </el-button>
       </el-tooltip>
       <el-divider direction="vertical" />
-      <el-tooltip effect="dark" content="复制" placement="top">
+      <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
         <el-button text @click="copyClick(data?.answer_text)">
           <AppIcon iconName="app-copy"></AppIcon>
         </el-button>
@@ -34,7 +34,7 @@
       <el-divider direction="vertical" />
       <el-tooltip
         effect="dark"
-        content="赞同"
+        :content="$t('chat.operation.like')"
         placement="top"
         v-if="buttonData?.vote_status === '-1'"
       >
@@ -44,7 +44,7 @@
       </el-tooltip>
       <el-tooltip
         effect="dark"
-        content="取消赞同"
+        :content="$t('chat.operation.cancelLike')"
         placement="top"
         v-if="buttonData?.vote_status === '0'"
       >
@@ -55,7 +55,7 @@
       <el-divider direction="vertical" v-if="buttonData?.vote_status === '-1'" />
       <el-tooltip
         effect="dark"
-        content="反对"
+        :content="$t('chat.operation.oppose')"
         placement="top"
         v-if="buttonData?.vote_status === '-1'"
       >
@@ -65,7 +65,7 @@
       </el-tooltip>
       <el-tooltip
         effect="dark"
-        content="取消反对"
+        :content="$t('chat.operation.cancelOppose')"
         placement="top"
         v-if="buttonData?.vote_status === '1'"
       >
@@ -85,7 +85,7 @@ import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
 import { MsgError } from '@/utils/message'
-
+import { t } from '@/locales'
 const route = useRoute()
 const {
   params: { id }
@@ -164,7 +164,7 @@ function removeFormRander(text: string) {
 
 const playAnswerText = (text: string) => {
   if (!text) {
-    text = '抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。'
+    text = t('chat.tip.answerMessage')
   }
   // 移除表单渲染器
   text = removeFormRander(text)

@@ -3,7 +3,7 @@
     :modelValue="show"
     modal-class="positioned-mask"
     width="300"
-    :title="$t('components.chat.passwordValidator.title')"
+    :title="$t('chat.passwordValidator.title')"
     custom-class="no-close-button"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -52,10 +52,10 @@ const auth = () => {
 }
 const validator_auth = (rule: any, value: string, callback: any) => {
   if (value === '') {
-    callback(new Error(t('components.chat.passwordValidator.errorMessage1')))
+    callback(new Error(t('chat.passwordValidator.errorMessage1')))
   } else {
     auth().catch(() => {
-      callback(new Error(t('components.chat.passwordValidator.errorMessage2')))
+      callback(new Error(t('chat.passwordValidator.errorMessage2')))
     })
   }
 }

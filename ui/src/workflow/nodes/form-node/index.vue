@@ -72,7 +72,7 @@
           >
             <el-table-column
               prop="field"
-              :label="$t('components.dynamicsForm.paramForm.field.label')"
+              :label="$t('dynamicsForm.paramForm.field.label')"
             >
               <template #default="{ row }">
                 <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
@@ -80,7 +80,7 @@
             </el-table-column>
             <el-table-column
               prop="label"
-              :label="$t('components.dynamicsForm.paramForm.name.label')"
+              :label="$t('dynamicsForm.paramForm.name.label')"
             >
               <template #default="{ row }">
                 <span v-if="row.label && row.label.input_type === 'TooltipLabel'">
@@ -97,7 +97,7 @@
             </el-table-column>
 
             <el-table-column
-              :label="$t('components.dynamicsForm.paramForm.input_type.label')"
+              :label="$t('dynamicsForm.paramForm.input_type.label')"
               width="110px"
             >
               <template #default="{ row }">
@@ -109,7 +109,7 @@
 
             <el-table-column
               prop="default_value"
-              :label="$t('components.dynamicsForm.default.label')"
+              :label="$t('dynamicsForm.default.label')"
             >
               <template #default="{ row }">
                 <span :title="row.default_value" class="ellipsis-1">{{

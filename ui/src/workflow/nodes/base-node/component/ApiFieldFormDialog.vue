@@ -19,31 +19,31 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item :label="$t('components.dynamicsForm.paramForm.field.label')" prop="variable">
+      <el-form-item :label="$t('dynamicsForm.paramForm.field.label')" prop="variable">
         <el-input
           v-model="form.variable"
-          :placeholder="$t('components.dynamicsForm.paramForm.field.placeholder')"
+          :placeholder="$t('dynamicsForm.paramForm.field.placeholder')"
           maxlength="64"
           show-word-limit
           @blur="form.variable = form.variable.trim()"
         />
       </el-form-item>
 
-      <el-form-item :label="$t('components.dynamicsForm.paramForm.required.label')" @click.prevent>
+      <el-form-item :label="$t('dynamicsForm.paramForm.required.label')" @click.prevent>
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
       <el-form-item
-        :label="$t('components.dynamicsForm.default.label')"
+        :label="$t('dynamicsForm.default.label')"
         prop="default_value"
         :rules="{
           required: form.is_required,
-          message: $t('components.dynamicsForm.paramForm.default.placeholder'),
+          message: $t('dynamicsForm.paramForm.default.placeholder'),
           trigger: 'blur'
         }"
       >
         <el-input
           v-model="form.default_value"
-          :placeholder="$t('components.dynamicsForm.paramForm.default.placeholder')"
+          :placeholder="$t('dynamicsForm.paramForm.default.placeholder')"
           @blur="form.name = form.name.trim()"
         />
       </el-form-item>
@@ -80,10 +80,10 @@ const form = ref<any>({
 })
 
 const rules = reactive({
-  name: [{ required: true, message: t('components.dynamicsForm.paramForm.name.requiredMessage'), trigger: 'blur' }],
+  name: [{ required: true, message: t('dynamicsForm.paramForm.name.requiredMessage'), trigger: 'blur' }],
   variable: [
-    { required: true, message:  t('components.dynamicsForm.paramForm.field.requiredMessage'), trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: t('components.dynamicsForm.paramForm.field.requiredMessage2'), trigger: 'blur' }
+    { required: true, message:  t('dynamicsForm.paramForm.field.requiredMessage'), trigger: 'blur' },
+    { pattern: /^[a-zA-Z0-9_]+$/, message: t('dynamicsForm.paramForm.field.requiredMessage2'), trigger: 'blur' }
   ]
 })
 

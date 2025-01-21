@@ -32,7 +32,8 @@ export default {
       email: {
         label: '邮箱',
         placeholder: '请输入邮箱',
-        requiredMessage: '请输入邮箱'
+        requiredMessage: '请输入邮箱',
+        validatorEmail: '请输入有效邮箱格式！',
       },
       phone: {
         label: '手机号',

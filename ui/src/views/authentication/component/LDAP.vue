@@ -33,7 +33,7 @@
           >
             <el-input
               v-model="form.config_data.password"
-              :placeholder="$t('views.system.authentication.ldap.passwordPlaceholder')"
+              :placeholder="$t('views.user.userForm.form.password.placeholder')"
               show-password
             />
           </el-form-item>
@@ -123,7 +123,7 @@ const rules = reactive<FormRules<any>>({
   'config_data.password': [
     {
       required: true,
-      message: t('views.system.authentication.ldap.passwordPlaceholder'),
+      message: t('views.user.userForm.form.password.requiredMessage'),
       trigger: 'blur'
     }
   ],

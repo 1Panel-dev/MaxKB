@@ -3,11 +3,15 @@ import components from './components'
 import layout from './layout'
 import views from './views'
 import common from './common'
+import dynamicsForm from './dynamics-form'
+import chat from './ai-chat'
 export default {
   lang: 'English',
   layout,
   views,
   components,
   en,
-  common
+  common,
+  dynamicsForm,
+  chat
 }

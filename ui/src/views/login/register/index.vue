@@ -1,7 +1,7 @@
 <template>
   <login-layout>
-    <LoginContainer subTitle="欢迎使用 MaxKB 智能知识库问答系统">
-      <h2 class="mb-24">用户注册</h2>
+    <LoginContainer :subTitle="$t('views.system.theme.defaultSlogan')">
+      <h2 class="mb-24">{{ $t('views.login.userRegister') }}</h2>
       <el-form class="register-form" :model="registerForm" :rules="rules" ref="registerFormRef">
         <div class="mb-24">
           <el-form-item prop="username">
@@ -9,7 +9,7 @@
               size="large"
               class="input-item"
               v-model="registerForm.username"
-              placeholder="请输入用户名"
+              :placeholder="$t('views.user.userForm.form.username.placeholder')"
             >
             </el-input>
           </el-form-item>
@@ -21,7 +21,7 @@
               size="large"
               class="input-item"
               v-model="registerForm.password"
-              placeholder="请输入密码"
+              :placeholder="$t('views.user.userForm.form.password.placeholder')"
               show-password
             >
             </el-input>
@@ -34,7 +34,7 @@
               size="large"
               class="input-item"
               v-model="registerForm.re_password"
-              placeholder="请输入确认密码"
+              :placeholder="$t('views.user.userForm.form.re_password.placeholder')"
               show-password
             >
             </el-input>
@@ -46,7 +46,7 @@
               size="large"
               class="input-item"
               v-model="registerForm.email"
-              placeholder="请输入邮箱"
+              :placeholder="$t('views.user.userForm.form.email.placeholder')"
             >
             </el-input>
           </el-form-item>
@@ -58,7 +58,7 @@
                 size="large"
                 class="code-input"
                 v-model="registerForm.code"
-                placeholder="请输入验证码"
+                :placeholder="$t('views.login.verificationCode.placeholder')"
               >
               </el-input>
               <el-button
@@ -68,13 +68,19 @@
                 @click="sendEmail"
                 :loading="sendEmailLoading"
               >
-                {{ isDisabled ? `重新发送（${time}s）` : '获取验证码' }}</el-button
+                {{
+                  isDisabled
+                    ? `${$t('views.login.verificationCode.resend')}（${time}s）`
+                    : $t('views.login.verificationCode.getVerificationCode')
+                }}</el-button
               >
             </div>
           </el-form-item>
         </div>
       </el-form>
-      <el-button size="large" type="primary" class="w-full" @click="register">注册</el-button>
+      <el-button size="large" type="primary" class="w-full" @click="register">{{
+        $t('views.login.buttons.register')
+      }}</el-button>
       <div class="operate-container mt-12">
         <el-button
           class="register"
@@ -83,7 +89,7 @@
           type="primary"
           icon="ArrowLeft"
         >
-          返回登录
+          {{ $t('views.login.buttons.backLogin') }}
         </el-button>
       </div>
     </LoginContainer>
@@ -96,7 +102,7 @@ import { useRouter } from 'vue-router'
 import UserApi from '@/api/user'
 import { MsgSuccess } from '@/utils/message'
 import type { FormInstance, FormRules } from 'element-plus'
-
+import { t } from '@/locales'
 const router = useRouter()
 const registerForm = ref<RegisterRequest>({
   username: '',
@@ -110,45 +116,45 @@ const rules = ref<FormRules<RegisterRequest>>({
   username: [
     {
       required: true,
-      message: '请输入用户名',
+      message: t('views.user.userForm.form.username.placeholder'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: '长度在 6 到 20 个字符',
+      message: t('views.user.userForm.form.username.lengthMessage'),
       trigger: 'blur'
     }
   ],
   password: [
     {
       required: true,
-      message: '请输入密码',
+      message: t('views.user.userForm.form.password.requiredMessage'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: '长度在 6 到 20 个字符',
+      message: t('views.user.userForm.form.password.lengthMessage'),
       trigger: 'blur'
     }
   ],
   re_password: [
     {
       required: true,
-      message: '请输入确认密码',
+      message: t('views.user.userForm.form.re_password.requiredMessage'),
       trigger: 'blur'
     },
     {
       min: 6,
       max: 20,
-      message: '长度在 6 到 20 个字符',
+      message: t('views.user.userForm.form.password.lengthMessage'),
       trigger: 'blur'
     },
     {
       validator: (rule, value, callback) => {
         if (registerForm.value.password != registerForm.value.re_password) {
-          callback(new Error('密码不一致'))
+          callback(new Error(t('views.user.userForm.form.password.validatorMessage')))
         } else {
           callback()
         }
@@ -157,12 +163,16 @@ const rules = ref<FormRules<RegisterRequest>>({
     }
   ],
   email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    {
+      required: true,
+      message: t('views.user.userForm.form.email.requiredMessage'),
+      trigger: 'blur'
+    },
     {
       validator: (rule, value, callback) => {
         const emailRegExp = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/
         if (!emailRegExp.test(value) && value != '') {
-          callback(new Error('请输入有效邮箱格式！'))
+          callback(new Error(t('views.user.userForm.form.email.validatorEmail')))
         } else {
           callback()
         }
@@ -170,7 +180,7 @@ const rules = ref<FormRules<RegisterRequest>>({
       trigger: 'blur'
     }
   ],
-  code: [{ required: true, message: '请输入验证码' }]
+  code: [{ required: true, message: t('views.login.verificationCode.placeholder') }]
 })
 
 const registerFormRef = ref<FormInstance>()
@@ -194,7 +204,7 @@ const sendEmail = () => {
   registerFormRef.value?.validateField('email', (v: boolean) => {
     if (v) {
       UserApi.sendEmit(registerForm.value.email, 'register', sendEmailLoading).then(() => {
-        MsgSuccess('发送验证码成功')
+        MsgSuccess(t('views.login.verificationCode.successMessage'))
         isDisabled.value = true
         handleTimeChange()
       })

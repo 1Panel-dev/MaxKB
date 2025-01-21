@@ -59,7 +59,7 @@
 
             <template #empty>
               <div class="text-center">
-                <el-text type="info"> {{ $t('components.chat.noHistory') }}</el-text>
+                <el-text type="info"> {{ $t('chat.noHistory') }}</el-text>
               </div>
             </template>
           </common-list>

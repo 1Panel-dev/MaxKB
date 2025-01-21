@@ -48,7 +48,7 @@
             <div class="chat-width">
               <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
                 <el-icon><Plus /></el-icon
-                ><span class="ml-4">{{ $t('components.chat.createChat') }}</span>
+                ><span class="ml-4">{{ $t('chat.createChat') }}</span>
               </el-button>
             </div>
           </template>
@@ -72,7 +72,7 @@
       <el-collapse-transition>
         <div v-show="show" class="chat-popover w-full" v-click-outside="clickoutside">
           <div class="border-b p-16-24">
-            <span>{{ $t('components.chat.history') }}</span>
+            <span>{{ $t('chat.history') }}</span>
           </div>
 
           <el-scrollbar max-height="300">
@@ -100,13 +100,13 @@
                 </template>
                 <template #empty>
                   <div class="text-center mt-24">
-                    <el-text type="info">{{ $t('components.chat.noHistory') }}</el-text>
+                    <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
                   </div>
                 </template>
               </common-list>
             </div>
             <div v-if="chatLogData.length" class="gradient-divider lighter mt-8">
-              <span>{{ $t('components.chat.only20history') }}</span>
+              <span>{{ $t('chat.only20history') }}</span>
             </div>
           </el-scrollbar>
         </div>

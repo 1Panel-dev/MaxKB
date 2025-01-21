@@ -1,7 +1,7 @@
 <template>
   <el-form-item
     class="defaultValueItem"
-    :label="$t('components.dynamicsForm.default.label')"
+    :label="$t('dynamicsForm.default.label')"
     :required="formValue.required"
     prop="default_value"
     :rules="[default_value_rule]"
@@ -9,7 +9,7 @@
     <div class="defaultValueCheckbox">
       <el-checkbox
         v-model="formValue.show_default_value"
-        :label="$t('components.dynamicsForm.default.show')"
+        :label="$t('dynamicsForm.default.show')"
       />
     </div>
     <JsonInput ref="jsonInputRef" v-model="formValue.default_value"> </JsonInput>

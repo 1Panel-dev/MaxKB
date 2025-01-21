@@ -38,9 +38,9 @@
               <el-icon>
                 <Plus />
               </el-icon>
-              <span class="ml-4">{{ $t('components.chat.createChat') }}</span>
+              <span class="ml-4">{{ $t('chat.createChat') }}</span>
             </el-button>
-            <p class="mt-20 mb-8">{{ $t('components.chat.history') }}</p>
+            <p class="mt-20 mb-8">{{ $t('chat.history') }}</p>
           </div>
           <div class="left-height pt-0">
             <el-scrollbar>
@@ -76,13 +76,13 @@
 
                   <template #empty>
                     <div class="text-center">
-                      <el-text type="info">{{ $t('components.chat.noHistory') }}</el-text>
+                      <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
                     </div>
                   </template>
                 </common-list>
               </div>
               <div v-if="chatLogData?.length" class="gradient-divider lighter mt-8">
-                <span>{{ $t('components.chat.only20history') }}</span>
+                <span>{{ $t('chat.only20history') }}</span>
               </div>
             </el-scrollbar>
           </div>
@@ -101,13 +101,13 @@
                 style="font-size: 16px"
               ></AppIcon>
               <span v-if="paginationConfig.total" class="lighter">
-                {{ paginationConfig.total }} {{ $t('components.chat.question_count') }}
+                {{ paginationConfig.total }} {{ $t('chat.question_count') }}
               </span>
               <el-dropdown class="ml-8">
                 <AppIcon
                   iconName="app-export"
                   class="cursor"
-                  :title="$t('components.chat.exportRecords')"
+                  :title="$t('chat.exportRecords')"
                 ></AppIcon>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -183,7 +183,7 @@ const classObj = computed(() => {
 
 const newObj = {
   id: 'new',
-  abstract: t('components.chat.createChat')
+  abstract: t('chat.createChat')
 }
 const props = defineProps<{
   application_profile: any
@@ -210,7 +210,7 @@ const paginationConfig = ref({
 
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
-const currentChatName = ref(t('components.chat.createChat'))
+const currentChatName = ref(t('chat.createChat'))
 const mouseId = ref('')
 
 function mouseenter(row: any) {
@@ -220,7 +220,7 @@ function deleteLog(row: any) {
   log.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {
     if (currentChatId.value === row.id) {
       currentChatId.value = 'new'
-      currentChatName.value = t('components.chat.createChat')
+      currentChatName.value = t('chat.createChat')
       paginationConfig.value.current_page = 1
       paginationConfig.value.total = 0
       currentRecordList.value = []
@@ -255,7 +255,7 @@ function newChat() {
     currentRecordList.value = []
   }
   currentChatId.value = 'new'
-  currentChatName.value = t('components.chat.createChat')
+  currentChatName.value = t('chat.createChat')
   if (common.isMobile()) {
     isCollapse.value = false
   }

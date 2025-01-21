@@ -1,9 +1,9 @@
 <template>
-  <el-form-item :label="$t('components.dynamicsForm.DatePicker.dataType.label')" required>
+  <el-form-item :label="$t('dynamicsForm.DatePicker.dataType.label')" required>
     <el-select
       @change="type_change"
       v-model="formValue.type"
-      :placeholder="$t('components.dynamicsForm.DatePicker.dataType.placeholder')"
+      :placeholder="$t('dynamicsForm.DatePicker.dataType.placeholder')"
     >
       <el-option
         v-for="input_type in type_list"
@@ -13,13 +13,13 @@
       />
     </el-select>
   </el-form-item>
-  <el-form-item :label="$t('components.dynamicsForm.DatePicker.format.label')" required>
+  <el-form-item :label="$t('dynamicsForm.DatePicker.format.label')" required>
     <el-select
       v-model="formValue.format"
       filterable
       default-first-option
       allow-create
-      :placeholder="$t('components.dynamicsForm.DatePicker.format.placeholder')"
+      :placeholder="$t('dynamicsForm.DatePicker.format.placeholder')"
     >
       <el-option
         v-for="input_type in type_dict[formValue.type]"
@@ -33,23 +33,23 @@
     class="defaultValueItem"
     :required="formValue.required"
     prop="default_value"
-    :label="$t('components.dynamicsForm.default.label')"
+    :label="$t('dynamicsForm.default.label')"
     :rules="
       formValue.required
-        ? [{ required: true, message: `${$t('components.dynamicsForm.default.label')}${$t('components.dynamicsForm.default.requiredMessage')}` }]
+        ? [{ required: true, message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}` }]
         : []
     "
   >
     <div class="defaultValueCheckbox">
       <el-checkbox
         v-model="formValue.show_default_value"
-        :label="$t('components.dynamicsForm.default.show')"
+        :label="$t('dynamicsForm.default.show')"
       />
     </div>
     <el-date-picker
       v-model="formValue.default_value"
       :type="formValue.type"
-      :placeholder="$t('components.dynamicsForm.DatePicker.placeholder')"
+      :placeholder="$t('dynamicsForm.DatePicker.placeholder')"
       :format="formValue.format"
       :value-format="formValue.format"
     />
@@ -60,19 +60,19 @@ import { computed, onBeforeMount } from 'vue'
 import { t } from '@/locales'
 const type_list = [
   {
-    label: t('components.dynamicsForm.DatePicker.year'),
+    label: t('dynamicsForm.DatePicker.year'),
     value: 'year'
   },
   {
-    label: t('components.dynamicsForm.DatePicker.month'),
+    label: t('dynamicsForm.DatePicker.month'),
     value: 'month'
   },
   {
-    label: t('components.dynamicsForm.DatePicker.date'),
+    label: t('dynamicsForm.DatePicker.date'),
     value: 'date'
   },
   {
-    label: t('components.dynamicsForm.DatePicker.datetime'),
+    label: t('dynamicsForm.DatePicker.datetime'),
     value: 'datetime'
   }
 ]

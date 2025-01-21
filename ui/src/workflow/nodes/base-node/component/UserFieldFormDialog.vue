@@ -122,11 +122,11 @@ const currentRow = computed(() => {
 })
 const currentIndex = ref(null)
 const inputTypeList = ref([
-  { label: t('components.dynamicsForm.input_type_list.TextInput'), value: 'TextInputConstructor' },
-  { label: t('components.dynamicsForm.input_type_list.SingleSelect'), value: 'SingleSelectConstructor' },
-  { label: t('components.dynamicsForm.input_type_list.MultiSelect'), value: 'MultiSelectConstructor' },
-  { label: t('components.dynamicsForm.input_type_list.RadioCard'), value: 'RadioCardConstructor' },
-  { label: t('components.dynamicsForm.input_type_list.DatePicker'), value: 'DatePickerConstructor' }
+  { label: t('dynamicsForm.input_type_list.TextInput'), value: 'TextInputConstructor' },
+  { label: t('dynamicsForm.input_type_list.SingleSelect'), value: 'SingleSelectConstructor' },
+  { label: t('dynamicsForm.input_type_list.MultiSelect'), value: 'MultiSelectConstructor' },
+  { label: t('dynamicsForm.input_type_list.RadioCard'), value: 'RadioCardConstructor' },
+  { label: t('dynamicsForm.input_type_list.DatePicker'), value: 'DatePickerConstructor' }
 ])
 
 const dialogVisible = ref<boolean>(false)

@@ -196,7 +196,7 @@
         >
           <el-table-column
             prop="label"
-            :label="$t('components.dynamicsForm.paramForm.name.label')"
+            :label="$t('dynamicsForm.paramForm.name.label')"
             show-overflow-tooltip
           >
             <template #default="{ row }">
@@ -208,11 +208,11 @@
           </el-table-column>
           <el-table-column
             prop="field"
-            :label="$t('components.dynamicsForm.paramForm.field.label')"
+            :label="$t('dynamicsForm.paramForm.field.label')"
             show-overflow-tooltip
           />
           <el-table-column
-            :label="$t('components.dynamicsForm.paramForm.input_type.label')"
+            :label="$t('dynamicsForm.paramForm.input_type.label')"
             width="110px"
           >
             <template #default="{ row }">
@@ -223,7 +223,7 @@
           </el-table-column>
           <el-table-column
             prop="default_value"
-            :label="$t('components.dynamicsForm.default.label')"
+            :label="$t('dynamicsForm.default.label')"
             show-overflow-tooltip
           />
           <el-table-column :label="$t('common.required')">

@@ -1,10 +1,10 @@
 <template>
   <div class="flex align-center mt-16" v-if="!isWorkFlow(props.type)">
-    <span class="mr-4 color-secondary">{{ $t('components.chat.KnowledgeSource.title') }}</span>
+    <span class="mr-4 color-secondary">{{ $t('chat.KnowledgeSource.title') }}</span>
     <el-divider direction="vertical" />
     <el-button type="primary" class="mr-8" link @click="openParagraph(data)">
       <AppIcon iconName="app-reference-outlined" class="mr-4"></AppIcon>
-      {{ $t('components.chat.KnowledgeSource.referenceParagraph') }}
+      {{ $t('chat.KnowledgeSource.referenceParagraph') }}
       {{ data.paragraph_list?.length || 0 }}</el-button
     >
   </div>
@@ -43,8 +43,8 @@
 
   <div class="border-t color-secondary flex-between mt-12" style="padding-top: 12px">
     <div>
-      <span class="mr-8"> {{ $t('components.chat.KnowledgeSource.consume') }} tokens: {{ data?.message_tokens + data?.answer_tokens }} </span>
-      <span> {{ $t('components.chat.KnowledgeSource.consumeTime') }}: {{ data?.run_time?.toFixed(2) }} s</span>
+      <span class="mr-8"> {{ $t('chat.KnowledgeSource.consume') }} tokens: {{ data?.message_tokens + data?.answer_tokens }} </span>
+      <span> {{ $t('chat.KnowledgeSource.consumeTime') }}: {{ data?.run_time?.toFixed(2) }} s</span>
     </div>
     <el-button
       v-if="isWorkFlow(props.type)"
@@ -53,7 +53,7 @@
       @click="openExecutionDetail(data.execution_details)"
     >
       <el-icon class="mr-4"><Document /></el-icon>
-      {{ $t('components.chat.executionDetails.title') }}</el-button
+      {{ $t('chat.executionDetails.title') }}</el-button
     >
   </div>
   <!-- 知识库引用 dialog -->

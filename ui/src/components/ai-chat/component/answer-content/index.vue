@@ -12,7 +12,7 @@
               (chatRecord.write_ed === undefined || chatRecord.write_ed === true) &&
               !answer_text.content
             "
-            source=" 抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
+            :source="$t('chat.tip.answerMessage')"
           ></MdRenderer>
           <MdRenderer
             :chat_record_id="answer_text.chat_record_id"
@@ -24,10 +24,10 @@
             :send-message="chatMessage"
           ></MdRenderer>
           <span v-else-if="chatRecord.is_stop" shadow="always" class="dialog-card">
-            已停止回答
+            {{ $t('chat.tip.stopAnswer') }}
           </span>
           <span v-else shadow="always" class="dialog-card">
-            回答中 <span class="dotting"></span>
+            {{ $t('chat.tip.answerLoading') }} <span class="dotting"></span>
           </span>
           <!-- 知识来源 -->
           <div v-if="showSource(chatRecord) && index === chatRecord.answer_text_list.length - 1">

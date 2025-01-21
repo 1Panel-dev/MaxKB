@@ -9,7 +9,6 @@ export default {
       bindDN: '綁定DN',
       bindDNPlaceholder: '請輸入綁定 DN',
       password: '密碼',
-      passwordPlaceholder: '請輸入密碼',
       ou: '使用者OU',
       ouPlaceholder: '請輸入使用者 OU',
       ldap_filter: '使用者過濾器',

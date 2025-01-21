@@ -103,7 +103,7 @@ function submitHandle() {
       loading.value = false
     }, 200)
   } else {
-    MsgError(`${props.quickCreateName}${t('components.dynamicsForm.tip.requiredMessage')}`)
+    MsgError(`${props.quickCreateName}${t('dynamicsForm.tip.requiredMessage')}`)
   }
 }
 

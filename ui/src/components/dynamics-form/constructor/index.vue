@@ -7,35 +7,35 @@
     :model="form_data"
     v-bind="$attrs"
   >
-    <el-form-item :label="$t('components.dynamicsForm.paramForm.field.label')" :required="true" prop="field" :rules="rules.field">
+    <el-form-item :label="$t('dynamicsForm.paramForm.field.label')" :required="true" prop="field" :rules="rules.field">
       <el-input
         v-model="form_data.field"
         :maxlength="64"
-        :placeholder="$t('components.dynamicsForm.paramForm.field.placeholder')"
+        :placeholder="$t('dynamicsForm.paramForm.field.placeholder')"
         show-word-limit
       />
     </el-form-item>
-    <el-form-item :label="$t('components.dynamicsForm.paramForm.name.label')" :required="true" prop="label" :rules="rules.label">
+    <el-form-item :label="$t('dynamicsForm.paramForm.name.label')" :required="true" prop="label" :rules="rules.label">
       <el-input
         v-model="form_data.label"
         :maxlength="64"
         show-word-limit
-        :placeholder="$t('components.dynamicsForm.paramForm.name.placeholder')"
+        :placeholder="$t('dynamicsForm.paramForm.name.placeholder')"
       />
     </el-form-item>
-    <el-form-item :label="$t('components.dynamicsForm.paramForm.tooltip.label')">
+    <el-form-item :label="$t('dynamicsForm.paramForm.tooltip.label')">
       <el-input
         v-model="form_data.tooltip"
         :maxlength="128"
         show-word-limit
-        :placeholder="$t('components.dynamicsForm.paramForm.tooltip.placeholder')"
+        :placeholder="$t('dynamicsForm.paramForm.tooltip.placeholder')"
       />
     </el-form-item>
-    <el-form-item :label="$t('components.dynamicsForm.paramForm.required.label')" :required="true" prop="required" :rules="rules.required">
+    <el-form-item :label="$t('dynamicsForm.paramForm.required.label')" :required="true" prop="required" :rules="rules.required">
       <el-switch v-model="form_data.required" :active-value="true" :inactive-value="false" />
     </el-form-item>
-    <el-form-item :label="$t('components.dynamicsForm.paramForm.input_type.label')" :required="true" prop="input_type" :rules="rules.input_type">
-      <el-select v-model="form_data.input_type" :placeholder="$t('components.dynamicsForm.paramForm.input_type.placeholder')">
+    <el-form-item :label="$t('dynamicsForm.paramForm.input_type.label')" :required="true" prop="input_type" :rules="rules.input_type">
+      <el-select v-model="form_data.input_type" :placeholder="$t('dynamicsForm.paramForm.input_type.placeholder')">
         <el-option
           v-for="input_type in input_type_list"
           :key="input_type.value"
@@ -81,10 +81,10 @@ const form_data = ref<any>({
   input_type: ''
 })
 const rules = {
-  label: [{ required: true, message: t('components.dynamicsForm.paramForm.name.requiredMessage') }],
-  field: [{ required: true, message: t('components.dynamicsForm.paramForm.field.requiredMessage') }],
-  required: [{ required: true, message: t('components.dynamicsForm.paramForm.required.requiredMessage') }],
-  input_type: [{ required: true, message: t('components.dynamicsForm.paramForm.input_type.requiredMessage') }]
+  label: [{ required: true, message: t('dynamicsForm.paramForm.name.requiredMessage') }],
+  field: [{ required: true, message: t('dynamicsForm.paramForm.field.requiredMessage') }],
+  required: [{ required: true, message: t('dynamicsForm.paramForm.required.requiredMessage') }],
+  input_type: [{ required: true, message: t('dynamicsForm.paramForm.input_type.requiredMessage') }]
 }
 const getData = () => {
   let label: string | any = form_data.value.label

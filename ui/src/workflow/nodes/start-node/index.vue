@@ -38,7 +38,7 @@ const showicon = ref(false)
 const globalFields = [
   { label: t('views.applicationWorkflow.nodes.startNode.currentTime'), value: 'time' },
   { label: t('views.application.applicationForm.form.historyRecord.label'), value: 'history_context' },
-  { label: t('components.chat.chatId'), value: 'chat_id' }
+  { label: t('chat.chatId'), value: 'chat_id' }
 ]
 
 const getRefreshFieldList = () => {

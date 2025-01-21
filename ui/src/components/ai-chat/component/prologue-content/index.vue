@@ -16,6 +16,7 @@
 import { type chatType } from '@/api/type/application'
 import { computed } from 'vue'
 import MdRenderer from '@/components/markdown/MdRenderer.vue'
+import { t } from '@/locales'
 const props = defineProps<{
   application: any
   available: boolean
@@ -28,7 +29,7 @@ const toQuickQuestion = (match: string, offset: number, input: string) => {
 const prologue = computed(() => {
   const temp = props.available
     ? props.application?.prologue
-    : '抱歉，当前正在维护，无法提供服务，请稍后再试！'
+    : t('chat.tip.prologueMessage')
   return temp?.replace(/-\s.+/g, toQuickQuestion)
 })
 </script>

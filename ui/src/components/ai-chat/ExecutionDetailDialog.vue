@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     class="execution-details-dialog"
-    :title="$t('components.chat.executionDetails.title')"
+    :title="$t('chat.executionDetails.title')"
     v-model="dialogVisible"
     destroy-on-close
     append-to-body
@@ -57,11 +57,13 @@
                   >
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('components.chat.executionDetails.paramInput') }}
+                        {{ $t('chat.executionDetails.paramInput') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="mb-8">
-                          <span class="color-secondary">用户问题:</span>
+                          <span class="color-secondary">
+                            {{ $t('chat.paragraphSource.question') }}:</span
+                          >
                           {{ item.question || '-' }}
                         </div>
                         <div v-for="(f, i) in item.global_fields" :key="i" class="mb-8">
@@ -105,7 +107,9 @@
                           </el-space>
                         </div>
                         <div v-if="item.audio_list?.length > 0">
-                          <p class="mb-8 color-secondary">语音文件:</p>
+                          <p class="mb-8 color-secondary">
+                            {{ $t('chat.executionDetails.audioFile') }}:
+                          </p>
 
                           <el-space wrap>
                             <template v-for="(f, i) in item.audio_list" :key="i">
@@ -124,11 +128,15 @@
                   <!-- 知识库检索 -->
                   <template v-if="item.type == WorkflowType.SearchDataset">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">检索内容</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.searchContent') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">{{ item.question || '-' }}</div>
                     </div>
                     <div class="card-never border-r-4 mt-8">
-                      <h5 class="p-8-12">检索结果</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.searchResult') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.paragraph_list?.length > 0">
                           <template
@@ -149,7 +157,9 @@
                   <!-- 判断器 -->
                   <template v-if="item.type == WorkflowType.Condition">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">判断结果</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.conditionResult') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         {{ item.branch_name || '-' }}
                       </div>
@@ -179,7 +189,7 @@
                       class="card-never border-r-4 mt-8"
                       v-if="item.type !== WorkflowType.Application"
                     >
-                      <h5 class="p-8-12">{{ $t('components.chat.history') }}</h5>
+                      <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.history_message?.length > 0">
                           <p
@@ -198,7 +208,9 @@
                       class="card-never border-r-4 mt-8"
                       v-if="item.type !== WorkflowType.Application"
                     >
-                      <h5 class="p-8-12">本次对话</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.currentChat') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.question || '-' }}
                       </div>
@@ -207,8 +219,8 @@
                       <h5 class="p-8-12">
                         {{
                           item.type == WorkflowType.Application
-                            ? $t('components.chat.executionDetails.paramOutput')
-                            : 'AI 回答'
+                            ? $t('chat.executionDetails.paramOutput')
+                            : $t('chat.executionDetails.answer')
                         }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
@@ -227,7 +239,9 @@
                   <!-- 指定回复 -->
                   <template v-if="item.type === WorkflowType.Reply">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">回复内容</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.replyContent') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <el-scrollbar height="150">
                           <MdPreview
@@ -248,12 +262,12 @@
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12 flex align-center">
                         <span class="mr-4">{{
-                          $t('components.chat.executionDetails.paramOutput')
+                          $t('chat.executionDetails.paramOutput')
                         }}</span>
 
                         <el-tooltip
                           effect="dark"
-                          content="每个文档仅支持预览500字"
+                          :content="$t('chat.executionDetails.paramOutputTooltip')"
                           placement="right"
                         >
                           <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
@@ -283,11 +297,15 @@
                   </template>
                   <template v-if="item.type === WorkflowType.SpeechToTextNode">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12"> {{ $t('components.chat.executionDetails.paramInput') }}</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.paramInput') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="mb-8">
                           <div v-if="item.audio_list?.length > 0">
-                            <p class="mb-8 color-secondary">语音文件:</p>
+                            <p class="mb-8 color-secondary">
+                              {{ $t('chat.executionDetails.audioFile') }}:
+                            </p>
 
                             <el-space wrap>
                               <template v-for="(f, i) in item.audio_list" :key="i">
@@ -305,7 +323,7 @@
                     </div>
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('components.chat.executionDetails.paramOutput') }}
+                        {{ $t('chat.executionDetails.paramOutput') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <el-card
@@ -330,10 +348,14 @@
 
                   <template v-if="item.type === WorkflowType.TextToSpeechNode">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12"> {{ $t('components.chat.executionDetails.paramInput') }}</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.paramInput') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="p-8-12 border-t-dashed lighter">
-                          <p class="mb-8 color-secondary">文本内容:</p>
+                          <p class="mb-8 color-secondary">
+                            {{ $t('chat.executionDetails.textContent') }}:
+                          </p>
                           <div v-if="item.content">
                             <MdPreview
                               ref="editorRef"
@@ -347,10 +369,12 @@
                     </div>
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('components.chat.executionDetails.paramOutput') }}
+                        {{ $t('chat.executionDetails.paramOutput') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
-                        <p class="mb-8 color-secondary">语音文件:</p>
+                        <p class="mb-8 color-secondary">
+                          {{ $t('chat.executionDetails.audioFile') }}:
+                        </p>
                         <div v-if="item.answer" v-html="item.answer"></div>
                       </div>
                     </div>
@@ -364,13 +388,13 @@
                     "
                   >
                     <div class="card-never border-r-4 mt-8">
-                      <h5 class="p-8-12">输入</h5>
+                      <h5 class="p-8-12">{{ $t('chat.executionDetails.input') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.params || '-' }}
                       </div>
                     </div>
                     <div class="card-never border-r-4 mt-8">
-                      <h5 class="p-8-12">输出</h5>
+                      <h5 class="p-8-12">{{ $t('chat.executionDetails.output') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.result || '-' }}
                       </div>
@@ -379,11 +403,15 @@
                   <!-- 多路召回 -->
                   <template v-if="item.type == WorkflowType.RrerankerNode">
                     <div class="card-never border-r-4">
-                      <h5 class="p-8-12">检索内容</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.searchContent') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">{{ item.question || '-' }}</div>
                     </div>
                     <div class="card-never border-r-4 mt-8">
-                      <h5 class="p-8-12">重排内容</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.rerankerContent') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.document_list?.length > 0">
                           <template
@@ -407,7 +435,9 @@
                       </div>
                     </div>
                     <div class="card-never border-r-4 mt-8">
-                      <h5 class="p-8-12">重排结果</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.rerankerResult') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.result_list?.length > 0">
                           <template
@@ -416,7 +446,7 @@
                           >
                             <CardBox
                               shadow="never"
-                              :title="`分段${paragraphIndex + 1}`"
+                              :title="`${$t('chat.executionDetails.paragraph')}${paragraphIndex + 1}`"
                               class="paragraph-source-card cursor mb-8 paragraph-source-card-height"
                               :showIcon="false"
                             >
@@ -446,9 +476,11 @@
                   <template v-if="item.type === WorkflowType.FormNode">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('components.chat.executionDetails.paramOutput')
+                        {{ $t('chat.executionDetails.paramOutput')
                         }}<span style="color: #f54a45">{{
-                          item.is_submit ? '' : '(用户未提交)'
+                          item.is_submit
+                            ? ''
+                            : `(${$t('chat.executionDetails.noSubmit')})`
                         }}</span>
                       </h5>
 
@@ -473,9 +505,7 @@
                       v-if="item.type !== WorkflowType.Application"
                     >
                       <h5 class="p-8-12">
-                        {{
-                          $t('views.application.applicationForm.form.roleSettings.label')
-                        }}
+                        {{ $t('views.application.applicationForm.form.roleSettings.label') }}
                         (System)
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
@@ -486,7 +516,7 @@
                       class="card-never border-r-4 mt-8"
                       v-if="item.type !== WorkflowType.Application"
                     >
-                      <h5 class="p-8-12">{{ $t('components.chat.history') }}</h5>
+                      <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <template v-if="item.history_message?.length > 0">
                           <p
@@ -518,7 +548,9 @@
                       </div>
                     </div>
                     <div class="card-never border-r-4 mt-8">
-                      <h5 class="p-8-12">本次对话</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.currentChat') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         <div v-if="item.image_list?.length > 0">
                           <el-space wrap>
@@ -542,8 +574,8 @@
                       <h5 class="p-8-12">
                         {{
                           item.type == WorkflowType.Application
-                            ? $t('components.chat.executionDetails.paramOutput')
-                            : 'AI 回答'
+                            ? $t('chat.executionDetails.paramOutput')
+                            : $t('chat.executionDetails.answer')
                         }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
@@ -561,7 +593,9 @@
                   <!-- 图片生成 -->
                   <template v-if="item.type == WorkflowType.ImageGenerateNode">
                     <div class="card-never border-r-4 mt-8">
-                      <h5 class="p-8-12">本次对话</h5>
+                      <h5 class="p-8-12">
+                        {{ $t('chat.executionDetails.currentChat') }}
+                      </h5>
                       <div class="p-8-12 border-t-dashed lighter pre-wrap">
                         {{ item.question || '-' }}
                       </div>
@@ -570,8 +604,8 @@
                       <h5 class="p-8-12">
                         {{
                           item.type == WorkflowType.Application
-                            ? $t('components.chat.executionDetails.paramOutput')
-                            : 'AI 回答'
+                            ? $t('chat.executionDetails.paramOutput')
+                            : $t('chat.executionDetails.answer')
                         }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
@@ -589,7 +623,7 @@
                 </template>
                 <template v-else>
                   <div class="card-never border-r-4">
-                    <h5 class="p-8-12">错误日志</h5>
+                    <h5 class="p-8-12">{{ $t('chat.executionDetails.errMessage') }}</h5>
                     <div class="p-8-12 border-t-dashed lighter">{{ item.err_message || '-' }}</div>
                   </div>
                 </template>
