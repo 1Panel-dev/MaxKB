@@ -199,7 +199,7 @@ class ConfigManager:
     def load_from_env(self):
         keys = os.environ.keys()
         config = {key.replace('MAXKB_', ''): os.environ.get(key) for key in keys if key.startswith('MAXKB_')}
-        if len(config.keys()) <= 1:
+        if len(config.keys()) <= 0:
             msg = f"""
 
                              Error: No config env found.
