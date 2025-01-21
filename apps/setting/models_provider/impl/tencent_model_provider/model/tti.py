@@ -3,6 +3,7 @@
 import json
 from typing import Dict
 
+from django.utils.translation import gettext as __
 from tencentcloud.common import credential
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.common.profile.client_profile import ClientProfile
@@ -12,7 +13,7 @@ from tencentcloud.hunyuan.v20230901 import hunyuan_client, models
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tti import BaseTextToImage
 from setting.models_provider.impl.tencent_model_provider.model.hunyuan import ChatHunyuan
-from django.utils.translation import gettext_lazy as _
+
 
 class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
     hunyuan_secret_id: str
@@ -50,7 +51,7 @@ class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
                            hunyuan_secret_id=self.hunyuan_secret_id,
                            hunyuan_secret_key=self.hunyuan_secret_key,
                            model="hunyuan-standard")
-        res = chat.invoke(_('Hello'))
+        res = chat.invoke(__('Hello'))
         # print(res)
 
     def generate_image(self, prompt: str, negative_prompt: str = None):

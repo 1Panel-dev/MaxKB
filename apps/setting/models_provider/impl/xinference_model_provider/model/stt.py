@@ -1,4 +1,3 @@
-import asyncio
 import io
 from typing import Dict
 
@@ -56,4 +55,3 @@ class XInferenceSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         buffer.name = "file.mp3"  # this is the important line
         res = client.audio.transcriptions.create(model=self.model, language="zh", file=buffer)
         return res.text
-

@@ -6,7 +6,7 @@
 @Author  ：Brian Yang
 @Date    ：5/12/24 7:44 AM 
 """
-from typing import List, Dict
+from typing import Dict
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
@@ -29,4 +29,3 @@ class DeepSeekChatModel(MaxKBBaseModel, BaseChatOpenAI):
             **optional_params
         )
         return deepseek_chat_open_ai
-

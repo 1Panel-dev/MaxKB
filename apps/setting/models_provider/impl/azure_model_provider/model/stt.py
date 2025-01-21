@@ -1,8 +1,7 @@
-import asyncio
 import io
 from typing import Dict
 
-from openai import OpenAI, AzureOpenAI
+from openai import AzureOpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
@@ -61,4 +60,3 @@ class AzureOpenAISpeechToText(MaxKBBaseModel, BaseSpeechToText):
         buffer.name = "file.mp3"  # this is the important line
         res = client.audio.transcriptions.create(model=self.model, language="zh", file=buffer)
         return res.text
-

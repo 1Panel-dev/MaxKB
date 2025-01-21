@@ -2,7 +2,6 @@
 import threading
 from typing import Dict, Optional, List, Any
 
-from langchain_community.embeddings import XinferenceEmbeddings
 from langchain_core.embeddings import Embeddings
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel

@@ -12,11 +12,10 @@ from langchain_community.chat_models import ChatTongyi
 from langchain_community.llms.tongyi import generate_with_last_element_mark
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models import LanguageModelInput
-from langchain_core.messages import BaseMessage, get_buffer_string
+from langchain_core.messages import BaseMessage
 from langchain_core.outputs import ChatGenerationChunk, ChatGeneration
 from langchain_core.runnables import RunnableConfig, ensure_config
 
-from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 

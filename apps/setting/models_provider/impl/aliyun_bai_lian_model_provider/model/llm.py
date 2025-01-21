@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-from typing import List, Dict
+from typing import Dict
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI

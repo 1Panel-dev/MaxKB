@@ -11,17 +11,17 @@ import hashlib
 import hmac
 import json
 import logging
-import os
+import ssl
 from datetime import datetime, UTC
 from typing import Dict
 from urllib.parse import urlencode, urlparse
-import ssl
+
 import websockets
+from django.utils.translation import gettext as __
 
 from common.util.common import _remove_empty_lines
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tts import BaseTextToSpeech
-from django.utils.translation import gettext_lazy as _
 
 max_kb = logging.getLogger("max_kb")
 
@@ -98,7 +98,7 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         return url
 
     def check_auth(self):
-        self.text_to_speech(_('Hello'))
+        self.text_to_speech(__('Hello'))
 
     def text_to_speech(self, text):
 
