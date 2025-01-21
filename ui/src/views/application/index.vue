@@ -106,8 +106,8 @@
               </template>
               <div class="status-tag">
                 <el-tag type="warning" v-if="isWorkFlow(item.type)" style="height: 22px">
-                  {{ $t('views.application.workflow') }}</el-tag
-                >
+                  {{ $t('views.application.workflow') }}
+                </el-tag>
                 <el-tag class="blue-tag" v-else style="height: 22px">
                   {{ $t('views.application.simple') }}
                 </el-tag>
@@ -180,6 +180,8 @@ import { isWorkFlow } from '@/utils/application'
 import { ValidType, ValidCount } from '@/enums/common'
 import { t } from '@/locales'
 import useStore from '@/stores'
+import { reject } from 'lodash'
+
 const elUploadRef = ref<any>()
 const { application, user, common } = useStore()
 const router = useRouter()
@@ -195,6 +197,7 @@ const paginationConfig = reactive({
   page_size: 30,
   total: 0
 })
+
 interface UserOption {
   label: string
   value: string
@@ -210,13 +213,16 @@ const apiInputParams = ref([])
 
 function copyApplication(row: any) {
   application.asyncGetApplicationDetail(row.id, loading).then((res: any) => {
-    CopyApplicationDialogRef.value.open({ ...res.data, model_id: res.data.model })
+    if (res?.data) {
+      CopyApplicationDialogRef.value.open({ ...res.data, model_id: res.data.model })
+    }
   })
 }
 
 const is_show_copy_button = (row: any) => {
   return user.userInfo ? user.userInfo.id == row.user_id : false
 }
+
 function settingApplication(row: any) {
   if (isWorkFlow(row.type)) {
     router.push({ path: `/application/${row.id}/workflow` })
@@ -224,13 +230,12 @@ function settingApplication(row: any) {
     router.push({ path: `/application/${row.id}/${row.type}/setting` })
   }
 }
+
 const exportApplication = (application: any) => {
   applicationApi.exportApplication(application.id, application.name, loading).catch((e) => {
     if (e.response.status !== 403) {
       e.response.data.text().then((res: string) => {
-        MsgError(
-          `${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`
-        )
+        MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
       })
     }
   })
@@ -239,35 +244,40 @@ const importApplication = (file: any) => {
   const formData = new FormData()
   formData.append('file', file.raw, file.name)
   elUploadRef.value.clearFiles()
-  applicationApi.importApplication(formData, loading).then((ok) => {
-    searchHandle()
-  })
-}
-function openCreateDialog() {
-  if (user.isEnterprise()) {
-    CreateApplicationDialogRef.value.open()
-  } else {
-    MsgConfirm(
-      t('common.tip'),
-      t('views.application.tip.professionalMessage'),
-      {
-        cancelButtonText: t('common.confirm'),
-        confirmButtonText: t('common.professional')
+  applicationApi
+    .importApplication(formData, loading)
+    .then(async (res: any) => {
+      if (res?.data) {
+        searchHandle()
       }
-    )
-      .then(() => {
-        window.open('https://maxkb.cn/pricing.html', '_blank')
-      })
-      .catch(() => {
-        common
-          .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
-          .then(async (res: any) => {
-            if (res?.data) {
-              CreateApplicationDialogRef.value.open()
-            }
-          })
-      })
-  }
+    })
+    .catch((e) => {
+      if (e.code === 400) {
+        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+          cancelButtonText: t('common.confirm'),
+          confirmButtonText: t('common.professional')
+        }).then(() => {
+          window.open('https://maxkb.cn/pricing.html', '_blank')
+        })
+      }
+    })
+}
+
+function openCreateDialog() {
+  common
+    .asyncGetValid(ValidType.Application, ValidCount.Application, loading)
+    .then(async (res: any) => {
+      if (res?.data) {
+        CreateApplicationDialogRef.value.open()
+      } else if (res?.code === 400) {
+        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+          cancelButtonText: t('common.confirm'),
+          confirmButtonText: t('common.professional')
+        }).then(() => {
+          window.open('https://maxkb.cn/pricing.html', '_blank')
+        })
+      }
+    })
 }
 
 function searchHandle() {
@@ -361,6 +371,7 @@ function getList() {
     paginationConfig.total = res.data.total
   })
 }
+
 function getUserList() {
   applicationApi.getUserList('APPLICATION', loading).then((res) => {
     if (res.data) {
@@ -394,15 +405,18 @@ onMounted(() => {
   background: var(--el-disabled-bg-color);
   border-radius: 8px;
   box-sizing: border-box;
+
   &:hover {
     border: 1px solid var(--el-card-bg-color);
     background-color: var(--el-card-bg-color);
   }
+
   .card-add-button {
     &:hover {
       border-radius: 4px;
       background: var(--app-text-color-light-1);
     }
+
     :deep(.el-upload) {
       display: block;
       width: 100%;
@@ -410,6 +424,7 @@ onMounted(() => {
     }
   }
 }
+
 .application-card {
   .status-tag {
     position: absolute;
@@ -417,10 +432,12 @@ onMounted(() => {
     top: 15px;
   }
 }
+
 .dropdown-custom-switch {
   padding: 5px 11px;
   font-size: 14px;
   font-weight: 400;
+
   span {
     margin-right: 26px;
   }
