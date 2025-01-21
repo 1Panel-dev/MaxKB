@@ -55,7 +55,7 @@
     prop="default_value"
     :rules="
       formValue.required
-        ? [{ required: true, message: $t('components.dynamicsForm.default.requiredMessage') }]
+        ? [{ required: true, message: `${$t('components.dynamicsForm.default.label')}${$t('components.dynamicsForm.default.requiredMessage')}` }]
         : []
     "
   >

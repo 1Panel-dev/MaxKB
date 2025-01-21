@@ -39,9 +39,9 @@ export default {
           'Describe the content of the knowledge base. A detailed description will help AI understand the content better, improving the accuracy of content retrieval and hit rate.',
         requiredMessage: 'Please enter the knowledge base description'
       },
-      vectorModel: {
-        label: 'Vector Model',
-        placeholder: 'Please select a vector model',
+      EmbeddingModel: {
+        label: 'Embedding Model',
+        placeholder: 'Please select a Embedding Model',
         requiredMessage: 'Please enter the Embedding model'
       },
       datasetType: {

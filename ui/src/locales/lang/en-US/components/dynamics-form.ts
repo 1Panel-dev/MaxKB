@@ -13,7 +13,7 @@ export default {
   default: {
     label: 'Default Value',
     placeholder: 'Please enter a default value',
-    requiredMessage: 'Default Value is a required property',
+    requiredMessage: ' is a required property',
     show: 'Show Default Value'
   },
   tip: {

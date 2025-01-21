@@ -13,7 +13,7 @@ export default {
   default: {
     label: '預設值',
     placeholder: '請輸入預設值',
-    requiredMessage: '預設值 為必填屬性',
+    requiredMessage: '為必填屬性',
     show: '顯示預設值'
   },
   tip: {

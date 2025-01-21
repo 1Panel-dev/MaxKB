@@ -31,12 +31,12 @@
       />
     </el-form-item>
     <el-form-item
-      :label="$t('views.dataset.datasetForm.form.vectorModel.label')"
+      :label="$t('views.dataset.datasetForm.form.EmbeddingModel.label')"
       prop="embedding_mode_id"
     >
       <ModelSelect
         v-model="form.embedding_mode_id"
-        :placeholder="$t('views.dataset.datasetForm.form.vectorModel.placeholder')"
+        :placeholder="$t('views.dataset.datasetForm.form.EmbeddingModel.placeholder')"
         :options="modelOptions"
       ></ModelSelect>
     </el-form-item>
@@ -79,7 +79,7 @@ const rules = reactive({
   embedding_mode_id: [
     {
       required: true,
-      message: t('views.dataset.datasetForm.form.vectorModel.requiredMessage'),
+      message: t('views.dataset.datasetForm.form.EmbeddingModel.requiredMessage'),
       trigger: 'change'
     }
   ]

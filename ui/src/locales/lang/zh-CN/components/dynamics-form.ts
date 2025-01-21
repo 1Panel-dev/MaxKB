@@ -13,7 +13,7 @@ export default {
   default: {
     label: '默认值',
     placeholder: '请输入默认值',
-    requiredMessage: '默认值 为必填属性',
+    requiredMessage: '为必填属性',
     show: '显示默认值'
   },
   tip: {
@@ -73,6 +73,29 @@ export default {
     placeholder: '请输入选项标签'
   },
   Slider: {
-    showInput:''
+    showInput: {
+      label: '是否带输入框'
+    },
+    valueRange: {
+      label: '取值范围',
+      minRequired: '最小值必填',
+      maxRequired: '最大值必填'
+    },
+    step: {
+      label: '步长值',
+      requiredMessage1: '步长值必填',
+      requiredMessage2: '步长不能为0'
+    }
+  },
+  TextInput: {
+    length: {
+      label: '文本长度',
+      minRequired: '最小长度必填',
+      maxRequired: '最大长度必填',
+      requiredMessage1: '长度在',
+      requiredMessage2: '到',
+      requiredMessage3: '个字符',
+      requiredMessage4: '文本长度为必填参数'
+    }
   }
 }

@@ -1,14 +1,14 @@
 <template>
-  <el-form-item label="是否带输入框" required prop="showInput">
+  <el-form-item :label="$t('components.dynamicsForm.Slider.showInput.label')" required prop="showInput">
     <el-switch v-model="formValue.showInput" />
   </el-form-item>
-  <el-form-item label="取值范围" required>
+  <el-form-item :label="$t('components.dynamicsForm.Slider.valueRange.label')" required>
     <el-col :span="11" style="padding-left: 0">
       <el-form-item
         :rules="[
           {
             required: true,
-            message: '最小值必填',
+            message: $t('components.dynamicsForm.Slider.valueRange.minRequired'),
             trigger: 'change'
           }
         ]"
@@ -25,7 +25,7 @@
         :rules="[
           {
             required: true,
-            message: '最大值必填',
+            message: $t('components.dynamicsForm.Slider.valueRange.maxRequired'),
             trigger: 'change'
           }
         ]"
@@ -40,7 +40,7 @@
     </el-col>
   </el-form-item>
   <el-col :span="11" style="padding-left: 0">
-    <el-form-item label="步长值" required prop="step" :rules="step_rules">
+    <el-form-item :label="$t('components.dynamicsForm.Slider.step.label')" required prop="step" :rules="step_rules">
       <el-input-number
         style="width: 100%"
         v-model="formValue.step"
@@ -133,11 +133,11 @@ const step_rules = [
     required: true,
     validator: (rule: any, value: any, callback: any) => {
       if (!value) {
-        callback(new Error('步长值必填'))
+        callback(new Error(t('components.dynamicsForm.Slider.step.requiredMessage1')))
         return false
       }
       if (value === 0) {
-        callback(new Error('步长不能为0'))
+        callback(new Error(t('components.dynamicsForm.Slider.step.requiredMessage2')))
         return false
       }
       return true

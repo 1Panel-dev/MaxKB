@@ -38,7 +38,7 @@ export default {
           '描述知识库的内容，详尽的描述将帮助AI能深入理解该知识库的内容，能更准确的检索到内容，提高该知识库的命中率。',
         requiredMessage: '请输入知识库描述'
       },
-      vectorModel: {
+      EmbeddingModel: {
         label: '向量模型',
         placeholder: '请选择向量模型',
         requiredMessage: '请输入Embedding模型'
