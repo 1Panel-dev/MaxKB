@@ -1,5 +1,5 @@
 export default {
-  title: 'Function Library',
+  title: 'Function',
   createFunction: 'Create Function',
   editFunction: 'Edit Function',
   copyFunction: 'Copy Function',

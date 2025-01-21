@@ -5,7 +5,7 @@ import { t } from '@/locales'
 const settingRouter = {
   path: '/setting',
   name: 'setting',
-  meta: { icon: 'Setting', title: '系统设置', permission: 'SETTING:READ' },
+  meta: { icon: 'Setting', title: t('views.system.title'), permission: 'SETTING:READ' },
   redirect: () => {
     if (hasPermission(new Role('ADMIN'), 'AND')) {
       return '/user'

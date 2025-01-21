@@ -1,5 +1,5 @@
 export default {
-  title: 'System Settings',
+  title: 'System',
   authentication: {
     title: 'Login Authentication',
     ldap: {

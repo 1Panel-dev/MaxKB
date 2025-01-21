@@ -1,8 +1,8 @@
 export default {
-  title: 'Applications',
-  createApplication: 'Create Application',
-  importApplication: 'Import Application',
-  copyApplication: 'Copy Application',
+  title: 'APP',
+  createApplication: 'Create APP',
+  importApplication: 'Import APP',
+  copyApplication: 'Copy APP',
   workflow: 'WORKFLOW',
   simple: 'SIMPLE',
   searchBar: {
@@ -13,37 +13,37 @@ export default {
     demo: 'Demo'
   },
   delete: {
-    confirmTitle: 'Are you sure you want to delete this application?',
+    confirmTitle: 'Are you sure you want to delete this APP?',
     confirmMessage:
-      'Deleting this application will no longer provide its services. Please proceed with caution.'
+      'Deleting this APP will no longer provide its services. Please proceed with caution.'
   },
   tip: {
     ExportError: 'Export Failed',
     professionalMessage:
-      'The Community Edition supports up to 5 applications. If you need more applications, please upgrade to the Professional Edition.',
+      'The Community Edition supports up to 5 APP. If you need more APP, please upgrade to the Professional Edition.',
     saveErrorMessage: 'Saving failed, please check your input or try again later',
     loadingErrorMessage: 'Failed to load configuration, please check your input or try again later'
   },
 
   applicationForm: {
     title: {
-      info: 'Application Information',
+      info: 'APP Information',
       appTest: 'Debug Preview',
       copy: 'copy'
     },
     form: {
       appName: {
-        label: 'Application Name',
-        placeholder: 'Please enter the application name',
-        requiredMessage: 'Application name is required'
+        label: 'APP Name',
+        placeholder: 'Please enter the APP name',
+        requiredMessage: 'APP name is required'
       },
       appDescription: {
-        label: 'Application Description',
+        label: 'APP Description',
         placeholder:
-          'Describe the application scenario and use, e.g.: XXX assistant answering user questions about XXX product usage'
+          'Describe the APP scenario and use, e.g.: XXX assistant answering user questions about XXX product usage'
       },
       appType: {
-        label: 'Please select the application type',
+        label: 'Please select the APP type',
         simplePlaceholder: 'Suitable for beginners to create assistant.',
         workflowPlaceholder: 'Suitable for advanced users to customize the workflow of assistant'
       },
@@ -140,17 +140,17 @@ export default {
     }
   },
   applicationAccess: {
-    title: 'Application Access',
+    title: 'APP Access',
     wecom: 'WeCom',
-    wecomTip: 'Create WeCom intelligent applications',
+    wecomTip: 'Create WeCom intelligent APP',
     dingtalk: 'DingTalk',
-    dingtalkTip: 'Create DingTalk intelligent applications',
+    dingtalkTip: 'Create DingTalk intelligent APP',
     wechat: 'WeChat',
-    wechatTip: 'Create WeChat intelligent applications',
+    wechatTip: 'Create WeChat intelligent APP',
     lark: 'Lark',
-    larkTip: 'Create Lark intelligent applications',
+    larkTip: 'Create Lark intelligent APP',
     setting: 'Setting',
-    info: 'Application Information',
+    info: 'APP Information',
     callback: 'Callback Address',
     callbackTip: 'Please fill in the callback address',
     wecomPlatform: 'WeCom Open Platform',
@@ -167,7 +167,7 @@ export default {
       encodingAesKeyPlaceholder: 'Please enter EncodingAESKey',
       authenticationSuccessful: 'Authentication successful',
       urlInfo:
-        '-Application management-Self-built-Created application-Receive messages-Set the "URL" received by the API'
+        '-APP management-Self-built-Created APP-Receive messages-Set the "URL" received by the API'
     },
     dingtalkSetting: {
       title: 'DingTalk Configuration',

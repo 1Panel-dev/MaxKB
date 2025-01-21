@@ -1,9 +1,9 @@
 export default {
-  title: 'Knowledge Base',
-  createDataset: 'Create Knowledge Base',
+  title: 'Knowledge',
+  createDataset: 'Create Knowledge',
   general: 'General',
   web: 'Web Site',
-  relatedApplications: 'Related Applications',
+  relatedApplications: 'Related App',
   searchBar: {
     placeholder: 'Search by name'
   },

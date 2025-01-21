@@ -27,7 +27,7 @@ export default {
     onlyRight: 'Only allow connections from the right anchor point',
     notRecyclable: 'Cannot create a loop connection',
     onlyLeft: 'Only allow connections to the left anchor point',
-    applicationNodeError: 'This application is unavailable',
+    applicationNodeError: 'This APP is unavailable',
     functionNodeError: 'This function is unavailable',
     repeatedNodeError: 'Node name already exists!',
     cannotCopy: 'Cannot be copied',
@@ -246,7 +246,7 @@ Please output an optimized question.`,
       text: 'Execute custom scripts to achieve data processing'
     },
     applicationNode: {
-      label: 'Application Node'
+      label: 'APP Node'
     }
   },
   compare: {

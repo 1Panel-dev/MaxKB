@@ -5,7 +5,7 @@ import { t } from '@/locales'
 const applicationRouter = {
   path: '/application',
   name: 'application',
-  meta: { title: '应用', permission: 'APPLICATION:READ' },
+  meta: { title: t('views.application.title'), permission: 'APPLICATION:READ' },
   redirect: '/application',
   component: () => import('@/layout/layout-template/AppLayout.vue'),
   children: [

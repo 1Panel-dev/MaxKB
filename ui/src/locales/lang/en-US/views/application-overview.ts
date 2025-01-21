@@ -1,7 +1,7 @@
 export default {
   title: 'Overview',
   appInfo: {
-    header: 'Application Info',
+    header: 'APP Info',
     publicAccessLink: 'Public Access Link',
     openText: 'On',
     closeText: 'Off',

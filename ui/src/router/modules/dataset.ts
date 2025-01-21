@@ -3,7 +3,7 @@ import { t } from '@/locales'
 const datasetRouter = {
   path: '/dataset',
   name: 'dataset',
-  meta: { title: '知识库', permission: 'DATASET:READ' },
+  meta: { title:  t('views.dataset.title'), permission: 'DATASET:READ' },
   component: () => import('@/layout/layout-template/AppLayout.vue'),
   redirect: '/dataset',
   children: [
@@ -23,7 +23,7 @@ const datasetRouter = {
     {
       path: '/dataset/:id',
       name: 'DatasetDetail',
-      meta: { title: '文档', activeMenu: '/dataset' },
+      meta: { title: t('common.fileUpload.document'), activeMenu: '/dataset' },
       component: Layout,
       hidden: true,
       children: [

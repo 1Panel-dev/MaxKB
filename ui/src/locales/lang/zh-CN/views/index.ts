@@ -12,6 +12,7 @@ import paragraph from './paragraph';
 import problem from './problem';
 import log from './log';
 import applicationWorkflow from './application-workflow';
+import login from './login';
 export default {
     notFound,
     application,
@@ -26,5 +27,6 @@ export default {
     paragraph,
     problem,
     log,
-    applicationWorkflow
+    applicationWorkflow,
+    login
 };
