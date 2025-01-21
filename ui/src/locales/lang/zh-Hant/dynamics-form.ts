@@ -73,6 +73,29 @@ export default {
     placeholder: '請輸入選項標籤'
   },
   Slider: {
-    showInput: ''
+    showInput: {
+      label: '是否帶輸入框'
+    },
+    valueRange: {
+      label: '取值範圍',
+      minRequired: '最小值必填',
+      maxRequired: '最大值必填'
+    },
+    step: {
+      label: '步長值',
+      requiredMessage1: '步長值必填',
+      requiredMessage2: '步長不能為0'
+    }
+  },
+  TextInput: {
+    length: {
+      label: '文字長度',
+      minRequired: '最小長度必填',
+      maxRequired: '最大長度必填',
+      requiredMessage1: '長度在',
+      requiredMessage2: '到',
+      requiredMessage3: '個字元',
+      requiredMessage4: '文字長度為必填參數'
+    }
   }
 }
