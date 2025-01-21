@@ -26,7 +26,8 @@ RUN python3 -m venv /opt/py3 && \
     poetry config virtualenvs.create false && \
     . /opt/py3/bin/activate && \
     if [ "$(uname -m)" = "x86_64" ]; then sed -i 's/^torch.*/torch = {version = "^2.2.1+cpu", source = "pytorch"}/g' pyproject.toml; fi && \
-    poetry install
+    poetry install && \
+    python3 /opt/maxkb/app/apps/manage.py compilemessages
 
 FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11-pg15.8
 ARG DOCKER_IMAGE_TAG=dev \
