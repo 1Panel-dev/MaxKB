@@ -185,9 +185,9 @@ const openChatId: () => Promise<string> = () => {
 /**
  * 对话
  */
-function getChartOpenId(chat?: any) {
+function getChartOpenId(chat?: any, problem?: string, re_chat?: boolean, other_params_data?: any) {
   return openChatId().then(() => {
-    chatMessage(chat)
+    chatMessage(chat, problem, re_chat, other_params_data)
   })
 }
 
@@ -317,7 +317,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
     ChatManagement.write(chat.id)
   }
   if (!chartOpenId.value) {
-    getChartOpenId(chat).catch(() => {
+    getChartOpenId(chat, problem, re_chat, other_params_data).catch(() => {
       errorWrite(chat)
     })
   } else {
