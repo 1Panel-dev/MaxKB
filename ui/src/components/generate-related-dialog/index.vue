@@ -19,9 +19,9 @@
             <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
           </div>
           <div class="ml-12 lighter">
-            <p>{{ $t('views.document.setting.generateQuestion.tip1', { data: '{data}' }) }}</p>
-            <p>{{ $t('views.document.setting.generateQuestion.tip2') }}</p>
-            <p>{{ $t('views.document.setting.generateQuestion.tip3') }}</p>
+            <p>{{ $t('views.document.generateQuestion.tip1', { data: '{data}' }) }}</p>
+            <p>{{ $t('views.document.generateQuestion.tip2') }}</p>
+            <p>{{ $t('views.document.generateQuestion.tip3') }}</p>
           </div>
         </div>
         <el-form-item
@@ -124,14 +124,14 @@ const submitHandle = async (formEl: FormInstance) => {
       if (apiType.value === 'paragraph') {
         const data = { ...form.value, paragraph_id_list: idList.value }
         paragraphApi.batchGenerateRelated(id, documentId, data, loading).then(() => {
-          MsgSuccess(t('views.document.setting.generateQuestion.successMessage'))
+          MsgSuccess(t('views.document.generateQuestion.successMessage'))
           emit('refresh')
           dialogVisible.value = false
         })
       } else if (apiType.value === 'document') {
         const data = { ...form.value, document_id_list: idList.value }
         documentApi.batchGenerateRelated(id, data, loading).then(() => {
-          MsgSuccess(t('views.document.setting.generateQuestion.successMessage'))
+          MsgSuccess(t('views.document.generateQuestion.successMessage'))
           emit('refresh')
           dialogVisible.value = false
         })

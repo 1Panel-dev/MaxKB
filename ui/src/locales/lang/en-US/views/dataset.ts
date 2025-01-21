@@ -3,7 +3,9 @@ export default {
   createDataset: 'Create Knowledge',
   general: 'General',
   web: 'Web Site',
-  relatedApplications: 'Related App',
+  relatedApplications: 'Linked App',
+  document_count: 'docs',
+  relatedApp_count: 'linked apps',
   searchBar: {
     placeholder: 'Search by name'
   },

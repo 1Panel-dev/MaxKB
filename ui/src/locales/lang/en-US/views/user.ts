@@ -26,7 +26,7 @@ export default {
         label: 'Username',
         placeholder: 'Please enter username',
         requiredMessage: 'Please enter username',
-        lengthMessage: 'Length must be between 6 and 20 characters'
+        lengthMessage: 'Length must be between 6 and 20 words'
       },
       nick_name: {
         label: 'Name',
@@ -45,7 +45,7 @@ export default {
         label: 'Login Password',
         placeholder: 'Please enter password',
         requiredMessage: 'Please enter password',
-        lengthMessage: 'Length must be between 6 and 20 characters'
+        lengthMessage: 'Length must be between 6 and 20 words'
       },
       new_password: {
         label: 'New Password',

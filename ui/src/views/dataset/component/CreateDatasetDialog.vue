@@ -2,7 +2,7 @@
   <el-dialog
     :title="$t('views.dataset.createDataset')"
     v-model="dialogVisible"
-    width="680"
+    width="720"
     append-to-body
     :close-on-click-modal="false"
     :close-on-press-escape="false"

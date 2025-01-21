@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-
+import { t } from '@/locales'
 export interface promptTypes {
   user: string
   formValue: { model_id: string, prompt: string }
@@ -26,12 +26,7 @@ const usePromptStore = defineStore({
       }
       return {
         model_id: '',
-        prompt: '内容：{data}\n' +
-          '\n' +
-          '请总结上面的内容，并根据内容总结生成 5 个问题。\n' +
-          '回答要求：\n' +
-          '- 请只输出问题；\n' +
-          '- 请将每个问题放置<question></question>标签中。'
+        prompt: t('views.document.generateQuestion.prompt', { data: '{data}' })
       }
     }
   }

@@ -85,11 +85,11 @@
                   <div class="footer-content flex-between">
                     <div>
                       <span class="bold">{{ item?.document_count || 0 }}</span>
-                      {{ $t('common.fileUpload.document') }}<el-divider direction="vertical" />
+                      {{ $t('views.dataset.document_count') }}<el-divider direction="vertical" />
                       <span class="bold">{{ numberFormat(item?.char_length) || 0 }}</span>
                       {{ $t('common.character') }}<el-divider direction="vertical" />
                       <span class="bold">{{ item?.application_mapping_count || 0 }}</span>
-                      {{ $t('views.dataset.relatedApplications') }}
+                      {{ $t('views.dataset.relatedApp_count') }}
                     </div>
                     <div @click.stop>
                       <el-dropdown trigger="click">

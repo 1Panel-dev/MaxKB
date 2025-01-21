@@ -67,7 +67,7 @@ export default {
     title: 'Execution Details',
     paramInput: 'Parameter Input',
     paramOutput: 'Parameter Output',
-    paramOutputTooltip: 'Each document supports preview of up to 500 characters',
+    paramOutputTooltip: 'Each document supports preview of up to 500 words',
     audioFile: 'Audio File',
     searchContent: 'Search Content',
     searchResult: 'Search Results',
@@ -91,7 +91,7 @@ export default {
     consumeTime: 'Time Consumed'
   },
   paragraphSource: {
-    title: 'Knowledge Base Reference',
+    title: 'Knowledge Reference',
     question: 'User Question',
     optimizationQuestion: 'Optimized Question'
   }

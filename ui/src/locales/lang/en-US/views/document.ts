@@ -80,7 +80,7 @@ export default {
     },
     with_filter: {
       label: 'Auto Clean',
-      text: 'Remove duplicate extra symbols, spaces, blank lines, and tab characters.'
+      text: 'Remove duplicate extra symbols, spaces, blank lines, and tab words.'
     },
     checkedConnect: {
       label:
@@ -95,7 +95,7 @@ export default {
   },
   table: {
     name: 'File Name',
-    char_length: 'Character',
+    char_length: 'words',
     paragraph: 'Segment',
     all: 'All',
     updateTime: 'Update Time'
@@ -166,7 +166,11 @@ export default {
     title: 'Generate Questions',
     successMessage: 'Question generation successful',
     tip1: 'The {data} in the prompt is a placeholder for segmented content, which is replaced by the segmented content when executed and sent to the AI model;',
-    tip2: 'The AI model generates relevant questions based on the segmented content. Please place the generated questions within the <question></question> tags, and the system will automatically associate the questions within these tags;',
-    tip3: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.'
+    tip2: 'The AI model generates relevant questions based on the segmented content. Please place the generated questions within the &lt;question&gt;&lt;/question&gt; tags, and the system will automatically associate the questions within these tags;',
+    tip3: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.',
+    prompt:`Content: {data}\n 
+    \n
+    Please summarize the above content and generate a summary based on the content 5 a question. \n
+    Answer requirements: \n - Please output only questions; \n - Please place each question in&lt;question&gt;&lt;/question&gt;tag.`
   }
 }

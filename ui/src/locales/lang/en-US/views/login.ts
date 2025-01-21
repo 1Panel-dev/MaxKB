@@ -2,7 +2,7 @@ export default {
   title: 'Login',
   jump_tip: 'You will be redirected to the authentication source page for authentication',
   jump: 'Redirect',
-  resetPassword: 'Reset Password',
+  resetPassword: 'Change Password',
   forgotPassword: 'Forgot Password',
   userRegister: 'User Registration',
   buttons: {

@@ -121,6 +121,7 @@
                         })
                       "
                       placement="right"
+                      popper-class="max-w-350"
                     >
                       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
                     </el-tooltip>
@@ -247,6 +248,7 @@
                           question: '{question}'
                         })
                       "
+                      popper-class="max-w-350"
                       placement="right"
                     >
                       <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
@@ -291,9 +293,13 @@
                     </span>
 
                     <div class="flex">
-                      <el-checkbox v-if="applicationForm.stt_model_enable" v-model="applicationForm.stt_autosend">{{
-                        $t('views.application.applicationForm.form.voiceInput.autoSend')
-                      }}</el-checkbox>
+                      <el-checkbox
+                        v-if="applicationForm.stt_model_enable"
+                        v-model="applicationForm.stt_autosend"
+                        >{{
+                          $t('views.application.applicationForm.form.voiceInput.autoSend')
+                        }}</el-checkbox
+                      >
                       <el-switch
                         class="ml-8"
                         size="small"
@@ -331,9 +337,13 @@
                       >
                     </span>
                     <div class="flex">
-                      <el-checkbox v-if="applicationForm.tts_model_enable" v-model="applicationForm.tts_autoplay">{{
-                        $t('views.application.applicationForm.form.voicePlay.autoPlay')
-                      }}</el-checkbox>
+                      <el-checkbox
+                        v-if="applicationForm.tts_model_enable"
+                        v-model="applicationForm.tts_autoplay"
+                        >{{
+                          $t('views.application.applicationForm.form.voicePlay.autoPlay')
+                        }}</el-checkbox
+                      >
                       <el-switch
                         class="ml-8"
                         size="small"
@@ -365,9 +375,9 @@
                       $t('views.application.applicationForm.form.voicePlay.placeholder')
                     "
                     :options="ttsModelOptions"
-                         @change="ttsModelChange()"
+                    @change="ttsModelChange()"
                   ></ModelSelect>
-               
+
                   <el-button
                     v-if="applicationForm.tts_type === 'TTS'"
                     @click="openTTSParamSettingDialog"

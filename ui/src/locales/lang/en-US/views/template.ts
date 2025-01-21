@@ -53,7 +53,7 @@ export default {
       permissionType: {
         label: 'Permission',
         privateDesc: 'Only the current user can use',
-        publicDesc: 'All users can use, but cannot be edited',
+        publicDesc: 'All users can use, but can not be edited',
         requiredMessage: 'Permission cannot be empty'
       },
       model_type: {

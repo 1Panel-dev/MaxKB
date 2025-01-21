@@ -159,7 +159,7 @@ function mulAssociation() {
     }))
   }
   problemApi.postMulAssociationProblem(id, data, loading).then(() => {
-    MsgSuccess(t('views.problem.relatedSuccess'))
+    MsgSuccess(t('views.problem.tip.relatedSuccess'))
     dialogVisible.value = false
   })
 }

@@ -40,7 +40,12 @@
     </el-col>
   </el-form-item>
   <el-col :span="11" style="padding-left: 0">
-    <el-form-item :label="$t('dynamicsForm.Slider.step.label')" required prop="step" :rules="step_rules">
+    <el-form-item
+      :label="$t('dynamicsForm.Slider.step.label')"
+      required
+      prop="step"
+      :rules="step_rules"
+    >
       <el-input-number
         style="width: 100%"
         v-model="formValue.step"
@@ -101,7 +106,7 @@ const getData = () => {
     props_info: {
       rules: [
         {
-          message: formValue.value.label + t('dynamicsForm.tip.requiredMessage'),
+          message: formValue.value.label + ' ' + t('dynamicsForm.tip.requiredMessage'),
           trigger: 'blur',
           required: formValue.value.required
         }

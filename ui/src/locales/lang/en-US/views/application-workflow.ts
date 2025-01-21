@@ -164,7 +164,7 @@ Please output an optimized question.`,
       },
       higher: 'Higher',
       ScoreTooltip: 'The higher the Score, the stronger the relevance.',
-      max_paragraph_char_number: 'Maximum number of characters to quote',
+      max_paragraph_char_number: 'Maximum number of words to quote',
       reranker_model: {
         label: 'Rerank',
         placeholder: 'Please select a Rerank'

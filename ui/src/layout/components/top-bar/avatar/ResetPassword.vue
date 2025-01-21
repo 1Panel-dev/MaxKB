@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="resetPasswordDialog"
-    :title="$t('layout.avatar.resetPassword')"
+    :title="$t('views.login.resetPassword')"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >

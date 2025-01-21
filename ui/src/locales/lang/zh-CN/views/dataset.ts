@@ -4,6 +4,8 @@ export default {
   general: '通用型',
   web: 'web 站点',
   relatedApplications: '关联应用',
+  document_count: '文档数',
+  relatedApp_count: '关联应用',
   searchBar: {
     placeholder: '按名称搜索'
   },
@@ -78,5 +80,5 @@ export default {
     complete: '整体同步',
     completeText: '先删除本地知识库所有文档，重新获取 Web 站点文档',
     tip: '注意：所有同步都会删除已有数据重新获取新数据，请谨慎操作。'
-  },
+  }
 }

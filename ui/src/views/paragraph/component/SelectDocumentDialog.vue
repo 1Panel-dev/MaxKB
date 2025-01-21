@@ -45,11 +45,11 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('views.log.addToDatase.saveToDocument')" prop="document_id">
+      <el-form-item :label="$t('views.log.saveToDocument')" prop="document_id">
         <el-select
           v-model="form.document_id"
           filterable
-          :placeholder="$t('views.log.addToDatase.documentPlaceholder')"
+          :placeholder="$t('views.log.documentPlaceholder')"
           :loading="optionLoading"
         >
           <el-option

@@ -4,6 +4,8 @@ export default {
   general: '通用型',
   web: 'Web 站點',
   relatedApplications: '關聯應用',
+  document_count: '文檔數',
+  relatedApp_count: '關聯應用',
   searchBar: {
     placeholder: '按名稱搜尋'
   },

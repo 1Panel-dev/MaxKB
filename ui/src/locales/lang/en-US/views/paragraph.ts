@@ -3,7 +3,7 @@ export default {
   editParagraph: 'Edit Paragraph',
   addParagraph: 'Add Paragraph',
   paragraphDetail: 'Paragraph Details',
-  character_count: 'characters',
+  character_count: 'words',
   setting: {
     batchSelected: 'Batch Select',
     cancelSelected: 'Cancel Selection'
@@ -25,7 +25,7 @@ export default {
       label: 'Paragraph Content',
       placeholder: 'Please enter the paragraph content',
       requiredMessage1: 'Please enter the paragraph content',
-      requiredMessage2: 'Content must not exceed 100,000 characters'
+      requiredMessage2: 'Content must not exceed 100,000 words'
     }
   }
 }

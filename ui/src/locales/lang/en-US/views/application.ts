@@ -127,11 +127,12 @@ export default {
       hybridSearchTooltip:
         'Hybrid search is a retrieval method based on both vector and text similarity, suitable for medium data volumes in the knowledge.',
       similarityThreshold: 'Similarity Threshold',
+      similarityTooltip: 'The higher the similarity, the stronger the correlation。',
       topReferences: 'Top N References',
-      maxCharacters: 'Maximum Characters per Reference',
+      maxCharacters: 'Maximum words per Reference',
       noReferencesAction: 'When there are no knowledge references',
-      continueQuestioning: 'Continue Questioning AI Model',
-      provideAnswer: 'Provide a Specific Answer',
+      continueQuestioning: 'Continue to ask questions to the Al model',
+      provideAnswer: 'Provide a specific answer',
       designated_answer:
         'Hello, I am XXX Assistant. My knowledge only contains information related to XXX products. Please rephrase your question.',
       defaultPrompt1:

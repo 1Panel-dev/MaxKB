@@ -101,7 +101,7 @@
             </el-checkbox>
           </div>
           <div class="text-right mt-8">
-            <el-button @click="splitDocument"> {{ $t('views.document.setRules.buttons.preview') }}</el-button>
+            <el-button @click="splitDocument"> {{ $t('views.document.buttons.preview') }}</el-button>
           </div>
         </div>
       </el-col>

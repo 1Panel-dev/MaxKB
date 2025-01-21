@@ -112,10 +112,10 @@
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item @click="exportMarkdown"
-                      >{{ $t('common.exprt') }} Markdown</el-dropdown-item
+                      >{{ $t('common.export') }} Markdown</el-dropdown-item
                     >
                     <el-dropdown-item @click="exportHTML"
-                      >{{ $t('common.exprt') }} HTML</el-dropdown-item
+                      >{{ $t('common.export') }} HTML</el-dropdown-item
                     >
                   </el-dropdown-menu>
                 </template>
