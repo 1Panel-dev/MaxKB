@@ -56,6 +56,26 @@ export default {
         label: '選擇器',
         placeholder: '預設為 body，可輸入 .classname/#idname/tagname'
       }
-    },
+    }
+  },
+  ResultSuccess: {
+    title: '知識庫建立成功',
+    paragraph: '段落',
+    paragraph_count: '個段落',
+    documentList: '文件列表',
+    loading: '正在導入',
+    buttons: {
+      toDataset: '返回知識庫列表',
+      toDocument: '前往文件'
+    }
+  },
+  syncWeb: {
+    title: '同步知識庫',
+    syncMethod: '同步方式',
+    replace: '替換同步',
+    replaceText: '重新獲取 Web 站點文件，覆蓋替換本地知識庫中的文件',
+    complete: '完整同步',
+    completeText: '先刪除本地知識庫所有文件，重新獲取 Web 站點文件',
+    tip: '注意：所有同步都會刪除現有數據並重新獲取新數據，請謹慎操作。'
   }
 }

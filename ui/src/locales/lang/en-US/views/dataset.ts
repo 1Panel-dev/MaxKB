@@ -58,6 +58,27 @@ export default {
         label: 'Selector',
         placeholder: 'Default is body, can input .classname/#idname/tagname'
       }
-    },
+    }
+  },
+  ResultSuccess: {
+    title: 'Knowledge Base Created Successfully',
+    paragraph: 'Paragraphs',
+    paragraph_count: 'Paragraphs',
+    documentList: 'Document List',
+    loading: 'Importing',
+    buttons: {
+      toDataset: 'Return to Knowledge Base List',
+      toDocument: 'Go to Document'
+    }
+  },
+  syncWeb: {
+    title: 'Sync Knowledge Base',
+    syncMethod: 'Sync Method',
+    replace: 'Replace Sync',
+    replaceText: 'Re-fetch Web site documents, replacing the documents in the local knowledge base',
+    complete: 'Full Sync',
+    completeText:
+      'Delete all documents in the local knowledge base and re-fetch Web site documents',
+    tip: 'Note: All syncs will delete existing data and re-fetch new data. Please proceed with caution.'
   }
 }
