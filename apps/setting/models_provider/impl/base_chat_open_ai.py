@@ -1,6 +1,7 @@
 # coding=utf-8
 
-from typing import List, Dict, Optional, Any, Iterator, Type, cast
+from typing import List, Dict, Optional, Any, Iterator, cast
+
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.messages import BaseMessage, get_buffer_string
 from langchain_core.outputs import ChatGenerationChunk, ChatGeneration

@@ -7,13 +7,10 @@
     @desc:
 """
 
-from typing import List, Dict, Optional, Any, Iterator, Type
+from typing import List, Dict
 
-from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.messages import BaseMessage, get_buffer_string, BaseMessageChunk, AIMessageChunk
-from langchain_core.outputs import ChatGenerationChunk
+from langchain_core.messages import BaseMessage, get_buffer_string
 from langchain_openai import AzureChatOpenAI
-from langchain_openai.chat_models.base import _convert_delta_to_message_chunk
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel

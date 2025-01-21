@@ -16,7 +16,6 @@ import sys
 from typing import Dict
 
 import requests
-from langchain_openai import ChatOpenAI
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tti import BaseTextToImage

@@ -10,10 +10,11 @@ import hmac
 import json
 import logging
 import os
+import ssl
 from datetime import datetime, UTC
 from typing import Dict
 from urllib.parse import urlencode, urlparse
-import ssl
+
 import websockets
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel
@@ -28,6 +29,7 @@ ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 max_kb = logging.getLogger("max_kb")
+
 
 class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     spark_app_id: str
@@ -94,7 +96,7 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     def check_auth(self):
         cwd = os.path.dirname(os.path.abspath(__file__))
         with open(f'{cwd}/iat_mp3_16k.mp3', 'rb') as f:
-             self.speech_to_text(f)
+            self.speech_to_text(f)
 
     def speech_to_text(self, file):
         async def handle():

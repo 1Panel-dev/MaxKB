@@ -6,17 +6,17 @@
     @date：2023/11/10 17:45
     @desc:
 """
-import uuid
 from typing import List, Dict, Optional, Any, Iterator
 
 from langchain_community.chat_models.baidu_qianfan_endpoint import _convert_dict_to_message, QianfanChatEndpoint
 from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.outputs import ChatGenerationChunk
-from setting.models_provider.base_model_provider import MaxKBBaseModel
 from langchain_core.messages import (
     AIMessageChunk,
     BaseMessage,
 )
+from langchain_core.outputs import ChatGenerationChunk
+
+from setting.models_provider.base_model_provider import MaxKBBaseModel
 
 
 class QianfanChatModel(MaxKBBaseModel, QianfanChatEndpoint):
