@@ -80,19 +80,6 @@
               </div>
             </div>
             <div>
-              <span>{{
-                $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel')
-              }}</span>
-              <el-select v-model="form.language">
-                <el-option
-                  v-for="item in langList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </div>
-            <div>
               <div class="p-16" style="position: relative">
                 <div class="flex">
                   <div class="avatar">
@@ -189,6 +176,19 @@
               </h5>
               <el-color-picker v-model="form.custom_theme.header_font_color" />
             </el-col>
+          </el-row>
+          <el-row class="w-full mb-8">
+            <h5 class="mb-8">
+              {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel') }}
+            </h5>
+            <el-select v-model="form.language">
+              <el-option
+                v-for="item in langList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
           </el-row>
           <el-card shadow="never" class="mb-8">
             <div class="flex-between mb-8">
