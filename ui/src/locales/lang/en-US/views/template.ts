@@ -1,5 +1,5 @@
 export default {
-  title: 'Model Settings',
+  title: 'Models',
   provider: 'Provider',
   providerPlaceholder: 'Select Provider',
   addModel: 'Add Model',
@@ -25,12 +25,12 @@ export default {
     allModel: 'All Models',
     publicModel: 'Public Models',
     privateModel: 'Private Models',
-    LLM: 'Large Language Model',
+    LLM: 'LLM',
     EMBEDDING: 'Embedding Model',
-    RERANKER: 'Reranker Model',
-    STT: 'Speech-to-Text',
-    TTS: 'Text-to-Speech',
-    IMAGE: 'Image Understanding',
+    RERANKER: 'Rerank',
+    STT: 'Speech2Text',
+    TTS: 'TTS',
+    IMAGE: 'Vision Model',
     TTI: 'Image Generation'
   },
   templateForm: {
@@ -60,17 +60,17 @@ export default {
         label: 'Model Type',
         placeholder: 'Select a model type',
         tooltip1:
-          'Large Language Model: An inference model for AI conversations in the application.',
+          'LLM: An inference model for AI conversations in the APP.',
         tooltip2:
-          'Embedding Model: A model for vectorizing document content in the knowledge base.',
-        tooltip3: 'Speech-to-Text: A model used for speech recognition in the application.',
-        tooltip4: 'Text-to-Speech: A model used for text-to-speech in the application.',
+          'Embedding Model: A model for vectorizing document content in the knowledge.',
+        tooltip3: 'Speech2Text: A model used for speech recognition in the APP.',
+        tooltip4: 'TTS: A model used for TTS in the APP.',
         tooltip5:
-          'Reranker Model: A model used to reorder candidate segments when using multi-route recall in advanced orchestration applications.',
+          'Rerank: A model used to reorder candidate segments when using multi-route recall in advanced orchestration APP.',
         tooltip6:
-          'Image Understanding: A visual model used for image understanding in advanced orchestration applications.',
+          'Vision Model: A visual model used for image understanding in advanced orchestration APP.',
         tooltip7:
-          'Image Generation: A visual model used for image generation in advanced orchestration applications.',
+          'Image Generation: A visual model used for image generation in advanced orchestration APP.',
         requiredMessage: 'Model type cannot be empty'
       },
       base_model: {

@@ -1,12 +1,12 @@
 export default {
-  title: 'Problem',
-  createProblem: 'Create Problem',
-  detailProblem: 'Problem Details',
-  quickCreateProblem: 'Quick Create Problem',
+  title: 'Questions',
+  createProblem: 'Create Question',
+  detailProblem: 'Question Details',
+  quickCreateProblem: 'Quick Create Question',
   tip: {
-    placeholder: 'Enter the problem, support multiple entries, one per line.',
-    errorMessage: 'Problem cannot be empty!',
-    requiredMessage: 'Please enter a problem',
+    placeholder: 'Enter the question, support multiple entries, one per line.',
+    errorMessage: 'Question cannot be empty!',
+    requiredMessage: 'Please enter a question',
     relatedSuccess: 'Batch association of paragraphs successful'
   },
 
@@ -22,8 +22,8 @@ export default {
     updateTime: 'Update Time'
   },
   delete: {
-    confirmTitle: 'Confirm Deletion of Problem:',
-    confirmMessage1: 'Deleting this problem will cancel the association of',
+    confirmTitle: 'Confirm Deletion of question:',
+    confirmMessage1: 'Deleting this question will cancel the association of',
     confirmMessage2: 'paragraphs. Please proceed with caution.'
   },
   relateParagraph: {

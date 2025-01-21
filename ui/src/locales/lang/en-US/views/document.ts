@@ -8,7 +8,7 @@ export default {
     placeholder: 'Search by Document Name'
   },
   setting: {
-    migration: 'Migration',
+    migration: 'Move',
     cancelGenerateQuestion: 'Cancel Generating Questions',
     cancelVectorization: 'Cancel Vectorization',
     cancelGenerate: 'Cancel Generation'
@@ -20,7 +20,7 @@ export default {
     vectorizationSuccess: 'Batch vectorization successful',
     nameMessage: 'File name cannot be empty!',
     importMessage: 'Import successful',
-    migrationSuccess: 'Migration successful'
+    migrationSuccess: 'Move successful'
   },
   upload: {
     selectFile: 'Select File',

@@ -15,12 +15,12 @@ export default {
   delete: {
     confirmTitle: 'Confirm Deletion of Function:',
     confirmMessage:
-      'Deleting this function will cause errors in applications that reference it when they are queried. Please proceed with caution.'
+      'Deleting this function will cause errors in APP that reference it when they are queried. Please proceed with caution.'
   },
   disabled: {
     confirmTitle: 'Confirm Disable Function:',
     confirmMessage:
-      'Disabling this function will cause errors in applications that reference it when they are queried. Please proceed with caution.'
+      'Disabling this function will cause errors in APP that reference it when they are queried. Please proceed with caution.'
   },
   functionForm: {
     title: {

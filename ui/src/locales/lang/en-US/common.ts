@@ -40,7 +40,7 @@ export default {
   noData: 'No data',
   result: 'Result',
   fileUpload: {
-    document: 'Documentation',
+    document: 'Documents',
     image: 'Image',
     audio: 'Audio',
     video: 'Video'

@@ -13,15 +13,15 @@ export default {
   },
   tip: {
     professionalMessage:
-      'The community edition supports up to 50 knowledge bases. For more knowledge bases, please upgrade to the professional edition.',
+      'The community edition supports up to 50 knowledge. For more knowledge, please upgrade to the professional edition.',
     syncSuccess: 'Sync task sent successfully',
     updateModeMessage:
-      'After modifying the knowledge base vector model, you need to vectorize the knowledge base. Do you want to continue saving?'
+      'After modifying the knowledge vector model, you need to vectorize the knowledge. Do you want to continue saving?'
   },
   delete: {
-    confirmTitle: 'Confirm Deletion of Knowledge Base:',
-    confirmMessage1: 'This knowledge base is associated with',
-    confirmMessage2: 'applications. Deleting it will be irreversible, please proceed with caution.'
+    confirmTitle: 'Confirm Deletion of Knowledge:',
+    confirmMessage1: 'This knowledge is associated with',
+    confirmMessage2: 'APP. Deleting it will be irreversible, please proceed with caution.'
   },
   datasetForm: {
     title: {
@@ -29,15 +29,15 @@ export default {
     },
     form: {
       datasetName: {
-        label: 'Knowledge Base Name',
-        placeholder: 'Please enter the knowledge base name',
-        requiredMessage: 'Please enter the knowledge base name'
+        label: 'Knowledge Name',
+        placeholder: 'Please enter the knowledge name',
+        requiredMessage: 'Please enter the knowledge name'
       },
       datasetDescription: {
-        label: 'Knowledge Base Description',
+        label: 'Knowledge Description',
         placeholder:
-          'Describe the content of the knowledge base. A detailed description will help AI understand the content better, improving the accuracy of content retrieval and hit rate.',
-        requiredMessage: 'Please enter the knowledge base description'
+          'Describe the content of the knowledge. A detailed description will help AI understand the content better, improving the accuracy of content retrieval and hit rate.',
+        requiredMessage: 'Please enter the knowledge description'
       },
       EmbeddingModel: {
         label: 'Embedding Model',
@@ -45,7 +45,7 @@ export default {
         requiredMessage: 'Please enter the Embedding model'
       },
       datasetType: {
-        label: 'Knowledge Base Type',
+        label: 'Knowledge Type',
         generalInfo: 'Upload local files or manually enter',
         webInfo: 'Sync text data from a Web site'
       },

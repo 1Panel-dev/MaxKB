@@ -1,8 +1,8 @@
 export default {
   title: 'Conversation Logs',
   delete: {
-    confirmTitle: 'Confirm Deletion of Problem:',
-    confirmMessage1: 'Deleting this problem will cancel the association of',
+    confirmTitle: 'Confirm Deletion of Question:',
+    confirmMessage1: 'Deleting this Question will cancel the association of',
     confirmMessage2: 'paragraphs. Please proceed with caution.'
   },
   buttons: {
@@ -21,10 +21,10 @@ export default {
     mark: 'Improvement Label',
     recenTimes: 'Recent Conversation Time'
   },
-  addToDataset: 'Add to Knowledge Base',
+  addToDataset: 'Add to Knowledge',
   daysText: 'Days ago',
-  selectDataset: 'Select Knowledge Base',
-  selectDatasetPlaceholder: 'Please select a knowledge base',
+  selectDataset: 'Select Knowledge',
+  selectDatasetPlaceholder: 'Please select a knowledge',
   saveToDocument: 'Save to Document',
   documentPlaceholder: 'Please select a document',
   editContent: 'Edit Content',

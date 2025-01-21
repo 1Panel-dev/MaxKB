@@ -1,5 +1,5 @@
 export default {
-  title: 'User Management',
+  title: 'User',
   createUser: 'Create User',
   editUser: 'Edit User',
   setting: {
@@ -13,12 +13,12 @@ export default {
   delete: {
     confirmTitle: 'Confirm Deletion of User:',
     confirmMessage:
-      'Deleting this user will also delete all resources (applications, knowledge bases, models) created by this user. Please proceed with caution.'
+      'Deleting this user will also delete all resources (APP, knowledge, models) created by this user. Please proceed with caution.'
   },
   disabled: {
     confirmTitle: 'Confirm Disable Function:',
     confirmMessage:
-      'Disabling this function will cause errors when applications that reference it are queried. Please proceed with caution.'
+      'Disabling this function will cause errors when APP that reference it are queried. Please proceed with caution.'
   },
   userForm: {
     form: {

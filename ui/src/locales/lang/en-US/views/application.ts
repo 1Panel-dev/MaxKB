@@ -65,7 +65,7 @@ export default {
         noReferencesTooltip:
           'By adjusting the content of the prompt, you can guide the direction of the large model conversation. This prompt will be fixed at the beginning of the context. Variables used: {question} is the question posed by the user.',
         referencesTooltip:
-          'By adjusting the content of the prompt, you can guide the direction of the large model conversation. This prompt will be fixed at the beginning of the context. Variables used: {data} carries known information from the knowledge base; {question} is the question posed by the user.',
+          'By adjusting the content of the prompt, you can guide the direction of the large model conversation. This prompt will be fixed at the beginning of the context. Variables used: {data} carries known information from the knowledge; {question} is the question posed by the user.',
         defaultPrompt: `Known information: {data}
           Question: {question}
            Response requirements: 
@@ -76,16 +76,16 @@ export default {
         label: 'Historical chat records'
       },
       relatedKnowledge: {
-        label: 'Related Knowledge Base',
-        placeholder: 'Associated knowledge bases are displayed here'
+        label: 'Related Knowledge',
+        placeholder: 'Associated knowledge are displayed here'
       },
       multipleRoundsDialogue: 'Multiple Rounds Dialogue',
 
       prologue: 'Prologue',
       defaultPrologue:
-        'Hello, I am XXX Assistant. You can ask me questions about using XXX.\n- What are the main features of MaxKB?\n- Which large language models does MaxKB support?\n- What document types does MaxKB support?',
+        'Hello, I am XXX Assistant. You can ask me questions about using XXX.\n- What are the main features of MaxKB?\n- Which LLM does MaxKB support?\n- What document types does MaxKB support?',
       problemOptimization: {
-        label: 'Problem Optimization',
+        label: 'Questions Optimization',
         tooltip:
           'Optimize the current question based on historical chat to better match knowledge points.'
       },
@@ -111,29 +111,29 @@ export default {
       addModel: 'Add Model'
     },
     dialog: {
-      addDataset: 'Add Related Knowledge Base',
-      addDatasetPlaceholder: 'The selected knowledge bases must use the same embedding model',
+      addDataset: 'Add Related Knowledge',
+      addDatasetPlaceholder: 'The selected knowledge must use the same embedding model',
       selected: 'Selected',
       countDataset: 'Knowledge',
 
       selectSearchMode: 'Search Mode',
       vectorSearch: 'Vector Search',
       vectorSearchTooltip:
-        'Vector search is a retrieval method based on vector distance calculations, suitable for large data volumes in the knowledge base.',
+        'Vector search is a retrieval method based on vector distance calculations, suitable for large data volumes in the knowledge.',
       fullTextSearch: 'Full-text Search',
       fullTextSearchTooltip:
-        'Full-text search is a retrieval method based on text similarity, suitable for small data volumes in the knowledge base.',
+        'Full-text search is a retrieval method based on text similarity, suitable for small data volumes in the knowledge.',
       hybridSearch: 'Hybrid Search',
       hybridSearchTooltip:
-        'Hybrid search is a retrieval method based on both vector and text similarity, suitable for medium data volumes in the knowledge base.',
+        'Hybrid search is a retrieval method based on both vector and text similarity, suitable for medium data volumes in the knowledge.',
       similarityThreshold: 'Similarity Threshold',
       topReferences: 'Top N References',
       maxCharacters: 'Maximum Characters per Reference',
-      noReferencesAction: 'When there are no knowledge base references',
+      noReferencesAction: 'When there are no knowledge references',
       continueQuestioning: 'Continue Questioning AI Model',
       provideAnswer: 'Provide a Specific Answer',
       designated_answer:
-        'Hello, I am XXX Assistant. My knowledge base only contains information related to XXX products. Please rephrase your question.',
+        'Hello, I am XXX Assistant. My knowledge only contains information related to XXX products. Please rephrase your question.',
       defaultPrompt1:
         "The content inside the parentheses () represents the user's question. Based on the context, please speculate and complete the user's question ({question}). The requirement is to output a completed question and place it",
       defaultPrompt2: 'tag'
@@ -200,7 +200,7 @@ export default {
     copyUrl: 'Copy the link and fill it in'
   },
   hitTest: {
-    title: 'Hit testing',
+    title: 'Retrieval Test',
     text: 'Ensure effective response by matching paragraphs to user inquiries.',
     emptyMessage1: 'The matching paragraph is displayed here',
     emptyMessage2: 'No matching sections found'

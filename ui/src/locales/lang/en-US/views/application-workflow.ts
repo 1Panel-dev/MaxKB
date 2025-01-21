@@ -108,13 +108,13 @@ export default {
       defaultPrompt: 'Known Information'
     },
     searchDatasetNode: {
-      label: 'Knowledge Base Search',
-      text: 'Associate knowledge base and find relevant segments',
+      label: 'Knowledge Search',
+      text: 'Associate knowledge and find relevant segments',
       paragraph_list: 'List of retrieved paragraphs',
       is_hit_handling_method_list: 'List of segments that meet direct response criteria',
       result: 'Search Result',
       directly_return: 'Content of segments that meet direct response criteria',
-      selectDatasetText: 'Associated knowledge base displayed here',
+      selectDatasetText: 'Associated knowledge displayed here',
       searchParam: 'Search Parameters',
       searchQuestion: {
         label: 'Search Question',
@@ -124,7 +124,7 @@ export default {
     },
     questionNode: {
       label: 'Question Optimization',
-      text: 'Optimize and improve the current question based on historical chat records to better match knowledge base segments',
+      text: 'Optimize and improve the current question based on historical chat records to better match knowledge segments',
       result: 'Optimized Question Result',
       defaultPrompt: `Optimize and improve the user's question based on context: {{start.question}}
 Please output an optimized question.`,
@@ -155,7 +155,7 @@ Please output an optimized question.`,
     },
     rerankerNode: {
       label: 'Multi-path Recall',
-      text: 'Use re-ranking model to perform secondary recall on retrieval results from multiple knowledge bases',
+      text: 'Use Rerank to perform secondary recall on retrieval results from multiple knowledge',
       result_list: 'Re-ranked Results List',
       result: 'Re-ranking Result',
       rerankerContent: {
@@ -166,8 +166,8 @@ Please output an optimized question.`,
       ScoreTooltip: 'The higher the Score, the stronger the relevance.',
       max_paragraph_char_number: 'Maximum number of characters to quote',
       reranker_model: {
-        label: 'Re-ranking Model',
-        placeholder: 'Please select a re-ranking model'
+        label: 'Rerank',
+        placeholder: 'Please select a Rerank'
       }
     },
     formNode: {
@@ -194,8 +194,8 @@ Please output an optimized question.`,
       text: 'Identify objects, scenes, etc., in images to answer user questions',
       answer: 'AI Answer Content',
       model: {
-        label: 'Image Understanding Model',
-        requiredMessage: 'Please select an image understanding model'
+        label: 'Vision Model',
+        requiredMessage: 'Please select a Vision Model'
       },
       image: {
         label: 'Select Image',
@@ -221,7 +221,7 @@ Please output an optimized question.`,
       }
     },
     speechToTextNode: {
-      label: 'Speech-to-Text',
+      label: 'Speech2Text',
       text: 'Convert audio to text through speech recognition model',
       stt_model: {
         label: 'Speech Recognition Model'
@@ -232,7 +232,7 @@ Please output an optimized question.`,
       }
     },
     textToSpeechNode: {
-      label: 'Text-to-Speech',
+      label: 'TTS',
       text: 'Convert text to audio through speech synthesis model',
       tts_model: {
         label: 'Speech Synthesis Model'

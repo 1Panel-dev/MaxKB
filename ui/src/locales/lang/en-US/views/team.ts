@@ -12,7 +12,7 @@ export default {
     button: 'Remove',
     confirmTitle: 'Confirm Removal of Member:',
     confirmMessage:
-      'Removing the member will revoke their access to knowledge bases and applications.'
+      'Removing the member will revoke their access to knowledge and APP.'
   },
   setting: {
     management: 'Manage',

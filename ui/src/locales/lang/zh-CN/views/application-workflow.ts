@@ -92,7 +92,7 @@ export default {
         fileUploadType: {
           label: '上传的文件类型',
           documentText: '需要使用“文档内容提取”节点解析文档内容',
-          imageText: '需要使用“图片理解”节点解析图片内容',
+          imageText: '需要使用“视觉模型”节点解析图片内容',
           audioText: '需要使用“语音转文本”节点解析音频内容'
         }
       }
@@ -195,8 +195,8 @@ export default {
       text: '识别出图片中的对象、场景等信息回答用户问题',
       answer: 'AI 回答内容',
       model: {
-        label: '图片理解模型',
-        requiredMessage: '请选择图片理解模型'
+        label: '视觉模型',
+        requiredMessage: '请选择视觉模型'
       },
       image: {
         label: '选择图片',
