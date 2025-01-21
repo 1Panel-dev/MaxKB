@@ -2,14 +2,13 @@
 
 from typing import Dict
 
+from django.utils.translation import gettext_lazy as _, gettext as __
 from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
-
-from django.utils.translation import gettext_lazy as _
 
 
 class XinferenceLLMModelParams(BaseForm):
@@ -37,18 +36,18 @@ class XinferenceLLMModelCredential(BaseForm, BaseModelCredential):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value,
-                                  _('{model_type} Model type is not supported').format(model_type=model_type))
+                                  __('{model_type} Model type is not supported').format(model_type=model_type))
         try:
             model_list = provider.get_base_model_list(model_credential.get('api_base'), model_credential.get('api_key'),
                                                       model_type)
         except Exception as e:
-            raise AppApiException(ValidCode.valid_error.value, _('API domain name is invalid'))
+            raise AppApiException(ValidCode.valid_error.value, __('API domain name is invalid'))
         exist = provider.get_model_info_by_name(model_list, model_name)
         if len(exist) == 0:
             raise AppApiException(ValidCode.valid_error.value,
-                                  _('The model does not exist, please download the model first'))
+                                  __('The model does not exist, please download the model first'))
         model = provider.get_model(model_type, model_name, model_credential, **model_params)
-        model.invoke([HumanMessage(content=_('Hello'))])
+        model.invoke([HumanMessage(content=__('Hello'))])
         return True
 
     def encryption_dict(self, model_info: Dict[str, object]):
@@ -57,7 +56,7 @@ class XinferenceLLMModelCredential(BaseForm, BaseModelCredential):
     def build_model(self, model_info: Dict[str, object]):
         for key in ['api_key', 'model']:
             if key not in model_info:
-                raise AppApiException(500, _('{key}  is required').format(key=key))
+                raise AppApiException(500, __('{key}  is required').format(key=key))
         self.api_key = model_info.get('api_key')
         return self
 

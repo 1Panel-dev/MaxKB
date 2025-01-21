@@ -13,15 +13,16 @@ import copy
 import gzip
 import json
 import re
+import ssl
 import uuid
 from typing import Dict
-import ssl
+
 import websockets
+from django.utils.translation import gettext as __
 
 from common.util.common import _remove_empty_lines
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from setting.models_provider.impl.base_tts import BaseTextToSpeech
-from django.utils.translation import gettext_lazy as _
 
 MESSAGE_TYPES = {11: "audio-only server response", 12: "frontend server response", 15: "error message from server"}
 MESSAGE_TYPE_SPECIFIC_FLAGS = {0: "no sequence number", 1: "sequence number > 0",
@@ -73,7 +74,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         )
 
     def check_auth(self):
-        self.text_to_speech(_('Hello'))
+        self.text_to_speech(__('Hello'))
 
     def text_to_speech(self, text):
         request_json = {

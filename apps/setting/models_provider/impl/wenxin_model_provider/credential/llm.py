@@ -8,17 +8,18 @@
 """
 from typing import Dict
 
+from django.utils.translation import gettext_lazy as _, gettext as __
 from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
-from django.utils.translation import gettext_lazy as _
 
 
 class WenxinLLMModelParams(BaseForm):
-    temperature = forms.SliderField(TooltipLabel(_('Temperature'), _('Higher values make the output more random, while lower values make it more focused and deterministic')),
+    temperature = forms.SliderField(TooltipLabel(_('Temperature'),
+                                                 _('Higher values make the output more random, while lower values make it more focused and deterministic')),
                                     required=True, default_value=0.95,
                                     _min=0.1,
                                     _max=1.0,
@@ -26,7 +27,8 @@ class WenxinLLMModelParams(BaseForm):
                                     precision=2)
 
     max_tokens = forms.SliderField(
-        TooltipLabel(_('Output the maximum Tokens'), _('Specify the maximum number of tokens that the model can generate')),
+        TooltipLabel(_('Output the maximum Tokens'),
+                     _('Specify the maximum number of tokens that the model can generate')),
         required=True, default_value=1024,
         _min=2,
         _max=100000,
@@ -39,20 +41,22 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(ValidCode.valid_error.value, _('{model_type} Model type is not supported').format(model_type=model_type))
+            raise AppApiException(ValidCode.valid_error.value,
+                                  __('{model_type} Model type is not supported').format(model_type=model_type))
         model = provider.get_model(model_type, model_name, model_credential, **model_params)
         model_info = [model.lower() for model in model.client.models()]
         if not model_info.__contains__(model_name.lower()):
-            raise AppApiException(ValidCode.valid_error.value, _('{model_name} The model does not support').format(model_name=model_name))
+            raise AppApiException(ValidCode.valid_error.value,
+                                  __('{model_name} The model does not support').format(model_name=model_name))
         for key in ['api_key', 'secret_key']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, _('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, __('{key}  is required').format(key=key))
                 else:
                     return False
         try:
             model.invoke(
-                [HumanMessage(content=_('Hello'))])
+                [HumanMessage(content=__('Hello'))])
         except Exception as e:
             raise e
         return True
@@ -63,7 +67,7 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
     def build_model(self, model_info: Dict[str, object]):
         for key in ['api_key', 'secret_key', 'model']:
             if key not in model_info:
-                raise AppApiException(500, _('{key}  is required').format(key=key))
+                raise AppApiException(500, __('{key}  is required').format(key=key))
         self.api_key = model_info.get('api_key')
         self.secret_key = model_info.get('secret_key')
         return self

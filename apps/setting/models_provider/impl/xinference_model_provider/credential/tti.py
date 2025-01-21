@@ -1,20 +1,18 @@
 # coding=utf-8
-import base64
-import os
 from typing import Dict
 
-from langchain_core.messages import HumanMessage
+from django.utils.translation import gettext_lazy as _, gettext as __
 
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
-from django.utils.translation import gettext_lazy as _
 
 
 class XinferenceTTIModelParams(BaseForm):
     size = forms.SingleSelect(
-        TooltipLabel(_('Image size'), _('The image generation endpoint allows you to create raw images based on text prompts. The dimensions of the image can be 1024x1024, 1024x1792, or 1792x1024 pixels.')),
+        TooltipLabel(_('Image size'),
+                     _('The image generation endpoint allows you to create raw images based on text prompts. The dimensions of the image can be 1024x1024, 1024x1792, or 1792x1024 pixels.')),
         required=True,
         default_value='1024x1024',
         option_list=[
@@ -27,7 +25,8 @@ class XinferenceTTIModelParams(BaseForm):
     )
 
     quality = forms.SingleSelect(
-        TooltipLabel(_('Picture quality'), _('By default, images are generated in standard quality, you can set quality: "hd" to enhance detail. Square, standard quality images are generated fastest.')),
+        TooltipLabel(_('Picture quality'),
+                     _('By default, images are generated in standard quality, you can set quality: "hd" to enhance detail. Square, standard quality images are generated fastest.')),
         required=True,
         default_value='standard',
         option_list=[
@@ -39,7 +38,8 @@ class XinferenceTTIModelParams(BaseForm):
     )
 
     n = forms.SliderField(
-        TooltipLabel(_('Number of pictures'), _('You can request 1 image at a time (requesting more images by making parallel requests), or up to 10 images at a time using the n parameter.')),
+        TooltipLabel(_('Number of pictures'),
+                     _('You can request 1 image at a time (requesting more images by making parallel requests), or up to 10 images at a time using the n parameter.')),
         required=True, default_value=1,
         _min=1,
         _max=10,
@@ -55,12 +55,13 @@ class XinferenceTextToImageModelCredential(BaseForm, BaseModelCredential):
                  raise_exception=False):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(ValidCode.valid_error.value, _('{model_type} Model type is not supported').format(model_type=model_type))
+            raise AppApiException(ValidCode.valid_error.value,
+                                  __('{model_type} Model type is not supported').format(model_type=model_type))
 
         for key in ['api_base', 'api_key']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, _('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, __('{key}  is required').format(key=key))
                 else:
                     return False
         try:
@@ -71,7 +72,9 @@ class XinferenceTextToImageModelCredential(BaseForm, BaseModelCredential):
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value, _('Verification failed, please check whether the parameters are correct: {error}').format(error=str(e)))
+                raise AppApiException(ValidCode.valid_error.value,
+                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                          error=str(e)))
             else:
                 return False
         return True
