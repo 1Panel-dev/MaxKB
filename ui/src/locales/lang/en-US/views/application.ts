@@ -13,7 +13,7 @@ export default {
     demo: 'Demo'
   },
   delete: {
-    confirmTitle: 'Are you sure you want to delete this APP?',
+    confirmTitle: 'Are you sure you want to delete this APP: ',
     confirmMessage:
       'Deleting this APP will no longer provide its services. Please proceed with caution.'
   },
