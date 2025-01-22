@@ -1796,7 +1796,7 @@ msgstr ""
 #: .\apps\application\views\application_views.py:632
 #: .\apps\application\views\application_views.py:633
 #: .\apps\setting\models_provider\base_model_provider.py:155
-msgid "text to speech"
+msgid "TTS"
 msgstr ""
 
 #: .\apps\application\views\chat_views.py:33
@@ -3591,27 +3591,27 @@ msgstr ""
 
 #: .\apps\setting\models_provider\base_model_provider.py:152
 #: .\apps\setting\swagger_api\provide_api.py:115
-msgid "large language model"
+msgid "LLM"
 msgstr ""
 
 #: .\apps\setting\models_provider\base_model_provider.py:153
-msgid "vector model"
+msgid "Embedding Model"
 msgstr ""
 
 #: .\apps\setting\models_provider\base_model_provider.py:154
-msgid "speech to text"
+msgid "Speech2Text"
 msgstr ""
 
 #: .\apps\setting\models_provider\base_model_provider.py:156
-msgid "picture understanding"
+msgid "Vision Model"
 msgstr ""
 
 #: .\apps\setting\models_provider\base_model_provider.py:157
-msgid "text to image"
+msgid "Image Generation"
 msgstr ""
 
 #: .\apps\setting\models_provider\base_model_provider.py:158
-msgid "re-ranking"
+msgid "Rerank"
 msgstr ""
 
 #: .\apps\setting\models_provider\base_model_provider.py:232

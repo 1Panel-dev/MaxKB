@@ -149,13 +149,13 @@ class BaseModelCredential(ABC):
 
 
 class ModelTypeConst(Enum):
-    LLM = {'code': 'LLM', 'message': _('large language model')}
-    EMBEDDING = {'code': 'EMBEDDING', 'message': _('vector model')}
-    STT = {'code': 'STT', 'message': _('speech to text')}
-    TTS = {'code': 'TTS', 'message': _('text to speech')}
-    IMAGE = {'code': 'IMAGE', 'message': _('picture understanding')}
-    TTI = {'code': 'TTI', 'message': _('text to image')}
-    RERANKER = {'code': 'RERANKER', 'message': _('re-ranking')}
+    LLM = {'code': 'LLM', 'message': _('LLM')}
+    EMBEDDING = {'code': 'EMBEDDING', 'message': _('Embedding Model')}
+    STT = {'code': 'STT', 'message': _('Speech2Text')}
+    TTS = {'code': 'TTS', 'message': _('TTS')}
+    IMAGE = {'code': 'IMAGE', 'message': _('Vision Model')}
+    TTI = {'code': 'TTI', 'message': _('Image Generation')}
+    RERANKER = {'code': 'RERANKER', 'message': _('Rerank')}
 
 
 class ModelInfo:
