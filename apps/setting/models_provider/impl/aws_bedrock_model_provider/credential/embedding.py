@@ -1,6 +1,6 @@
 from typing import Dict
 
-from django.utils.translation import gettext as __
+from django.utils.translation import gettext as _
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -17,27 +17,27 @@ class BedrockEmbeddingCredential(BaseForm, BaseModelCredential):
         if not any(mt.get('value') == model_type for mt in model_type_list):
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('{model_type} Model type is not supported').format(model_type=model_type))
+                                      _('{model_type} Model type is not supported').format(model_type=model_type))
             return False
 
         required_keys = ['region_name', 'access_key_id', 'secret_access_key']
         if not all(key in model_credential for key in required_keys):
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('The following fields are required: {keys}').format(
+                                      _('The following fields are required: {keys}').format(
                                           keys=", ".join(required_keys)))
             return False
 
         try:
             model: BedrockEmbeddingModel = provider.get_model(model_type, model_name, model_credential)
-            aa = model.embed_query(__('Hello'))
+            aa = model.embed_query(_('Hello'))
             print(aa)
         except AppApiException:
             raise
         except Exception as e:
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      _('Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             return False
 

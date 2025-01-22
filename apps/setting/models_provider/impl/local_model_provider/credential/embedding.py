@@ -8,7 +8,7 @@
 """
 from typing import Dict
 
-from django.utils.translation import gettext_lazy as _, gettext as __
+from django.utils.translation import gettext_lazy as _, gettext
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -23,22 +23,23 @@ class LocalEmbeddingCredential(BaseForm, BaseModelCredential):
                  raise_exception=False):
         if not model_type == 'EMBEDDING':
             raise AppApiException(ValidCode.valid_error.value,
-                                  __('{model_type} Model type is not supported').format(model_type=model_type))
+                                  gettext('{model_type} Model type is not supported').format(model_type=model_type))
         for key in ['cache_folder']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, __('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
                 else:
                     return False
         try:
             model: LocalEmbedding = provider.get_model(model_type, model_name, model_credential)
-            model.embed_query(__('Hello'))
+            model.embed_query(gettext('Hello'))
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      gettext(
+                                          'Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             else:
                 return False

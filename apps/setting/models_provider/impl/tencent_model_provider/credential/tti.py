@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from django.utils.translation import gettext_lazy as _, gettext as __
+from django.utils.translation import gettext_lazy as _, gettext
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -74,7 +74,7 @@ class TencentTTIModelCredential(BaseForm, BaseModelCredential):
         if not any(mt['value'] == model_type for mt in provider.get_model_type_list()):
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('{model_type} Model type is not supported').format(model_type=model_type))
+                                      gettext('{model_type} Model type is not supported').format(model_type=model_type))
             return False
         return True
 
@@ -84,7 +84,7 @@ class TencentTTIModelCredential(BaseForm, BaseModelCredential):
         if missing_keys:
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('{keys} is required').format(keys=", ".join(missing_keys)))
+                                      gettext('{keys} is required').format(keys=", ".join(missing_keys)))
             return False
         return True
 
@@ -98,7 +98,8 @@ class TencentTTIModelCredential(BaseForm, BaseModelCredential):
         except Exception as e:
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      gettext(
+                                          'Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             return False
         return True

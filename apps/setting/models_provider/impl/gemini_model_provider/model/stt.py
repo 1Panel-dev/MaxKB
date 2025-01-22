@@ -1,6 +1,6 @@
 from typing import Dict
 
-from django.utils.translation import gettext as __
+from django.utils.translation import gettext as _
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -40,7 +40,7 @@ class GeminiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             model=self.model,
             google_api_key=self.api_key
         )
-        response_list = client.invoke(__('Hello'))
+        response_list = client.invoke(_('Hello'))
         # print(response_list)
 
     def speech_to_text(self, audio_file):
@@ -50,7 +50,7 @@ class GeminiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         )
         audio_data = audio_file.read()
         msg = HumanMessage(content=[
-            {'type': 'text', 'text': __('convert audio to text')},
+            {'type': 'text', 'text': _('convert audio to text')},
             {"type": "media", 'mime_type': 'audio/mp3', "data": audio_data}
         ])
         res = client.invoke([msg])

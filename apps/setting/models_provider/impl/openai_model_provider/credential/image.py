@@ -9,7 +9,7 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
-from django.utils.translation import gettext_lazy as _, gettext as __
+from django.utils.translation import gettext_lazy as _, gettext
 
 
 class OpenAIImageModelParams(BaseForm):
@@ -40,12 +40,12 @@ class OpenAIImageModelCredential(BaseForm, BaseModelCredential):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value,
-                                  __('{model_type} Model type is not supported').format(model_type=model_type))
+                                  gettext('{model_type} Model type is not supported').format(model_type=model_type))
 
         for key in ['api_base', 'api_key']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, __('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
                 else:
                     return False
         try:
@@ -58,7 +58,8 @@ class OpenAIImageModelCredential(BaseForm, BaseModelCredential):
                 raise e
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      gettext(
+                                          'Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             else:
                 return False

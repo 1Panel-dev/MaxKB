@@ -8,7 +8,7 @@
 """
 from typing import Dict
 
-from django.utils.translation import gettext_lazy as _, gettext as __
+from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.messages import HumanMessage
 
 from common import forms
@@ -43,16 +43,16 @@ class QwenVLModelCredential(BaseForm, BaseModelCredential):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value,
-                                  __('{model_type} Model type is not supported').format(model_type=model_type))
+                                  gettext('{model_type} Model type is not supported').format(model_type=model_type))
         for key in ['api_key']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, __('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
                 else:
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            res = model.stream([HumanMessage(content=[{"type": "text", "text": __('Hello')}])])
+            res = model.stream([HumanMessage(content=[{"type": "text", "text": gettext('Hello')}])])
             for chunk in res:
                 print(chunk)
         except Exception as e:
@@ -60,7 +60,8 @@ class QwenVLModelCredential(BaseForm, BaseModelCredential):
                 raise e
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      gettext(
+                                          'Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             else:
                 return False
