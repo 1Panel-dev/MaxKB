@@ -981,6 +981,8 @@ class ApplicationSerializer(serializers.Serializer):
                  'stt_model_enable': application.stt_model_enable,
                  'tts_model_enable': application.tts_model_enable,
                  'tts_type': application.tts_type,
+                 'tts_autoplay': application.tts_autoplay,
+                 'stt_autosend': application.stt_autosend,
                  'file_upload_enable': application.file_upload_enable,
                  'file_upload_setting': application.file_upload_setting,
                  'work_flow': application.work_flow,
