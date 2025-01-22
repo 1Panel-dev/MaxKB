@@ -79,7 +79,7 @@
   <audio ref="audioPlayer" v-for="item in audioList" :key="item" controls hidden="hidden"></audio>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
@@ -173,8 +173,11 @@ const playAnswerText = (text: string) => {
   // console.log(text)
   audioPlayerStatus.value = true
   // 分割成多份
-  audioList.value = text.split(/(<audio[^>]*><\/audio>)/)
-  playAnswerTextPart()
+  audioList.value = text.split(/(<audio[^>]*><\/audio>)/).filter((item) => item.trim().length > 0)
+  nextTick(()=>{
+    // console.log(audioList.value, audioPlayer.value)
+    playAnswerTextPart()
+  })
 }
 
 const playAnswerTextPart = () => {
