@@ -742,8 +742,9 @@ class WorkflowManage:
                 if global_fields is not None:
                     for field in global_fields:
                         globeLabel = f"全局变量.{field.get('value')}"
+                        globeLabelNew = f"global.{field.get('value')}"
                         globeValue = f"context.get('global').get('{field.get('value', '')}','')"
-                        prompt = prompt.replace(globeLabel, globeValue)
+                        prompt = prompt.replace(globeLabel, globeValue).replace(globeLabelNew, globeLabel)
         return prompt
 
     def generate_prompt(self, prompt: str):
