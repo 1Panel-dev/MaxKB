@@ -1,6 +1,6 @@
 <template>
   <div>
-    <vue3-menus v-model:open="isOpen" :event="eventVal" :menus="menus" hasIcon>
+    <vue3-menus v-model:open="isOpen" :event="eventVal" :zIndex="9999" :menus="menus" hasIcon>
       <template #icon="{ menu }"
         ><AppIcon v-if="menu.icon" :iconName="menu.icon"></AppIcon
       ></template>
