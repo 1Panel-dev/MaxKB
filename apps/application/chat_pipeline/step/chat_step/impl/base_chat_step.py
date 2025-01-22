@@ -208,10 +208,9 @@ class BaseChatStep(IChatStep):
                          problem_text=None):
         if paragraph_list is None:
             paragraph_list = []
-
-        directly_return_chunk_list = [AIMessage(content=paragraph.content)
-                                      for paragraph in paragraph_list if
-                                      paragraph.hit_handling_method == 'directly_return']
+        directly_return_chunk_list = [AIMessageChunk(content=paragraph.content)
+                                      for paragraph in paragraph_list if (
+                                              paragraph.hit_handling_method == 'directly_return' and paragraph.similarity >= paragraph.directly_return_similarity)]
         if directly_return_chunk_list is not None and len(directly_return_chunk_list) > 0:
             return directly_return_chunk_list[0], False
         elif len(paragraph_list) == 0 and no_references_setting.get(
