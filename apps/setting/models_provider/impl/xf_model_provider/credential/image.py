@@ -14,7 +14,7 @@ from setting.models_provider.impl.xf_model_provider.model.image import ImageMess
 
 
 class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
-    spark_api_url = forms.TextInputField('API Url', required=True,
+    spark_api_url = forms.TextInputField('API URL', required=True,
                                          default_value='wss://spark-api.cn-huabei-1.xf-yun.com/v2.1/image')
     spark_app_id = forms.TextInputField('APP ID', required=True)
     spark_api_key = forms.PasswordInputField("API Key", required=True)

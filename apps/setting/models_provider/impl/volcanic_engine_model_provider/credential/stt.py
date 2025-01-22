@@ -11,7 +11,7 @@ from setting.models_provider.base_model_provider import BaseModelCredential, Val
 
 
 class VolcanicEngineSTTModelCredential(BaseForm, BaseModelCredential):
-    volcanic_api_url = forms.TextInputField('API Url', required=True,
+    volcanic_api_url = forms.TextInputField('API URL', required=True,
                                             default_value='wss://openspeech.bytedance.com/api/v2/asr')
     volcanic_app_id = forms.TextInputField('App ID', required=True)
     volcanic_token = forms.PasswordInputField('Access Token', required=True)

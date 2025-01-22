@@ -4149,7 +4149,7 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:35
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:71
-msgid "API Url"
+msgid "API URL"
 msgstr ""
 
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:36

@@ -87,7 +87,7 @@ class XunFeiLLMModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'spark_api_secret': super().encryption(model.get('spark_api_secret', ''))}
 
-    spark_api_url = forms.TextInputField('API Url', required=True)
+    spark_api_url = forms.TextInputField('API URL', required=True)
     spark_app_id = forms.TextInputField('APP ID', required=True)
     spark_api_key = forms.PasswordInputField("API Key", required=True)
     spark_api_secret = forms.PasswordInputField('API Secret', required=True)

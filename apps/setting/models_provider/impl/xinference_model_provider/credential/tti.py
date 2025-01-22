@@ -48,7 +48,7 @@ class XinferenceTTIModelParams(BaseForm):
 
 
 class XinferenceTextToImageModelCredential(BaseForm, BaseModelCredential):
-    api_base = forms.TextInputField('API Url', required=True)
+    api_base = forms.TextInputField('API URL', required=True)
     api_key = forms.PasswordInputField('API Key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,

@@ -46,4 +46,4 @@ class OllamaEmbeddingModelCredential(BaseForm, BaseModelCredential):
                 raise AppApiException(500, __('{key}  is required').format(key=key))
         return self
 
-    api_base = forms.TextInputField('API Url', required=True)
+    api_base = forms.TextInputField('API URL', required=True)

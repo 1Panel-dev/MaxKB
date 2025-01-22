@@ -63,7 +63,7 @@ class VLLMModelCredential(BaseForm, BaseModelCredential):
         self.api_key = model_info.get('api_key')
         return self
 
-    api_base = forms.TextInputField('API Url', required=True)
+    api_base = forms.TextInputField('API URL', required=True)
     api_key = forms.PasswordInputField('API Key', required=True)
 
     def get_model_params_setting_form(self, model_name):

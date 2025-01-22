@@ -34,7 +34,7 @@ class XunFeiTTSModelGeneralParams(BaseForm):
 
 
 class XunFeiTTSModelCredential(BaseForm, BaseModelCredential):
-    spark_api_url = forms.TextInputField('API Url', required=True, default_value='wss://tts-api.xfyun.cn/v2/tts')
+    spark_api_url = forms.TextInputField('API URL', required=True, default_value='wss://tts-api.xfyun.cn/v2/tts')
     spark_app_id = forms.TextInputField('APP ID', required=True)
     spark_api_key = forms.PasswordInputField("API Key", required=True)
     spark_api_secret = forms.PasswordInputField('API Secret', required=True)

@@ -38,7 +38,7 @@ class VolcanicEngineTTSModelGeneralParams(BaseForm):
 
 
 class VolcanicEngineTTSModelCredential(BaseForm, BaseModelCredential):
-    volcanic_api_url = forms.TextInputField('API Url', required=True, default_value='wss://openspeech.bytedance.com/api/v1/tts/ws_binary')
+    volcanic_api_url = forms.TextInputField('API URL', required=True, default_value='wss://openspeech.bytedance.com/api/v1/tts/ws_binary')
     volcanic_app_id = forms.TextInputField('App ID', required=True)
     volcanic_token = forms.PasswordInputField('Access Token', required=True)
     volcanic_cluster = forms.TextInputField('Cluster ID', required=True)
