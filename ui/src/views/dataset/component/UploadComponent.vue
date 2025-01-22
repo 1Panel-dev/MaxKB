@@ -130,8 +130,8 @@
           <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
         </div>
         <div class="ml-16 lighter">
-          <p>{{ $t('views.document.fileType.table.tip1') }}</p>
-          <p>{{ $t('views.document.fileType.table.tip2') }}</p>
+          <p>{{ $t('views.document.fileType.txt.tip1') }}</p>
+          <p>{{ $t('views.document.fileType.txt.tip2') }}</p>
         </div>
       </div>
       <el-upload

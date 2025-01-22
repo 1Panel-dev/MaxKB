@@ -10,14 +10,14 @@ export default {
     demo: 'Demo',
     embedInWebsite: 'Embed in website',
     accessControl: 'Access Control',
-    displaySetting: 'Display Setting',
+    displaySetting: 'Display Settings',
     apiAccessCredentials: 'API Access Credentials',
     apiKey: 'API Key',
     refreshToken: {
       msgConfirm1: 'Do you want to regenerate the public access link?',
       msgConfirm2:
         'Regenerating the public access link will affect third-party embedded scripts changes and will require re-embedding the new script into third-party sites. Please proceed with caution!',
-      refreshSuccess: 'Refresh Successful'
+      refreshSuccess: 'Refresh successful'
     },
     APIKeyDialog: {
       saveSettings: 'Save Settings',
@@ -54,7 +54,6 @@ export default {
         'Please enter allowed third-party source addresses, one per line, such as:\nhttp://127.0.0.1:5678\nhttps://dataease.io'
     },
     SettingAPIKeyDialog: {
-      dialogTitle: 'Settings',
       allowCrossDomainLabel: 'Allow Cross-Domain Address',
       crossDomainPlaceholder:
         'Please enter allowed cross-domain addresses, if open without inputting addresses, there are no restrictions.\nCross-domain addresses one per line, such as:\nhttp://127.0.0.1:5678\nhttps://dataease.io'

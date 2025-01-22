@@ -1,7 +1,7 @@
 export default {
   node: 'Node',
   baseComponent: 'Base Component',
-  nodeSetting: 'Node Setting',
+  nodeSetting: 'Node Settings',
   workflow: 'Workflow',
   searchBar: {
     placeholder: 'Search by name'
@@ -21,7 +21,7 @@ export default {
     copyParam: 'Copy Parameter'
   },
   tip: {
-    publicSuccess: 'Published Successfully',
+    publicSuccess: 'Published successfully',
     noData: 'No related results found',
     nameMessage: 'Name cannot be empty!',
     onlyRight: 'Only allow connections from the right anchor point',

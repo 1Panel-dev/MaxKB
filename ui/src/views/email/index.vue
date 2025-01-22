@@ -34,7 +34,7 @@
                 :placeholder="$t('views.system.email.sendEmailPlaceholder')"
               />
             </el-form-item>
-            <el-form-item :label="$t('views.system.email.smtpPassword')" prop="email_host_password">
+            <el-form-item :label="$t('views.system.password')" prop="email_host_password">
               <el-input
                 v-model="form.email_host_password"
                 :placeholder="$t('views.system.email.smtpPasswordPlaceholder')"
@@ -52,7 +52,7 @@
               </el-checkbox>
             </el-form-item>
             <el-button @click="submit(emailFormRef, 'test')" :disabled="loading">
-              {{ $t('views.system.email.test') }}
+              {{ $t('views.system.test') }}
             </el-button>
           </el-form>
 
@@ -112,7 +112,7 @@ const submit = async (formEl: FormInstance | undefined, test?: string) => {
     if (valid) {
       if (test) {
         emailApi.postTestEmail(form.value, loading).then((res) => {
-          MsgSuccess(t('views.system.email.testSuccess'))
+          MsgSuccess(t('views.system.testSuccess'))
         })
       } else {
         emailApi.putEmailSetting(form.value, loading).then((res) => {

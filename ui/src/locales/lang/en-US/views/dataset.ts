@@ -63,24 +63,24 @@ export default {
     }
   },
   ResultSuccess: {
-    title: 'Knowledge Base Created Successfully',
+    title: 'Knowledge Created Successfully',
     paragraph: 'Paragraphs',
     paragraph_count: 'Paragraphs',
     documentList: 'Document List',
     loading: 'Importing',
     buttons: {
-      toDataset: 'Return to Knowledge Base List',
+      toDataset: 'Return to Knowledge List',
       toDocument: 'Go to Document'
     }
   },
   syncWeb: {
-    title: 'Sync Knowledge Base',
+    title: 'Sync Knowledge',
     syncMethod: 'Sync Method',
     replace: 'Replace Sync',
-    replaceText: 'Re-fetch Web site documents, replacing the documents in the local knowledge base',
+    replaceText: 'Re-fetch Web site documents, replacing the documents in the local knowledge',
     complete: 'Full Sync',
     completeText:
-      'Delete all documents in the local knowledge base and re-fetch web site documents',
+      'Delete all documents in the local knowledge and re-fetch web site documents',
     tip: 'Note: All syncs will delete existing data and re-fetch new data. Please proceed with caution.'
   }
 }

@@ -27,7 +27,7 @@
           type="password"
           class="input-item"
           v-model="resetPasswordForm.re_password"
-          :placeholder="$t('views.user.userForm.form.re_password.label')"
+          :placeholder="$t('views.user.userForm.form.re_password.placeholder')"
           show-password
         >
         </el-input>
@@ -138,7 +138,7 @@ const rules1 = ref<FormRules<ResetCurrentUserPasswordRequest>>({
     {
       validator: (rule, value, callback) => {
         if (resetPasswordForm.value.password != resetPasswordForm.value.re_password) {
-          callback(new Error(t('views.user.userForm.form.password.validatorMessage')))
+          callback(new Error(t('views.user.userForm.form.re_password.validatorMessage')))
         } else {
           callback()
         }

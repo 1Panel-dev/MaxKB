@@ -70,7 +70,7 @@
 
         <div class="text-right">
           <el-button @click="submit(authFormRef, 'test')" :disabled="loading">
-            {{ $t('views.system.authentication.ldap.test') }}</el-button
+            {{ $t('views.system.test') }}</el-button
           >
           <el-button @click="submit(authFormRef)" type="primary" :disabled="loading">
             {{ $t('common.save') }}
@@ -156,7 +156,7 @@ const submit = async (formEl: FormInstance | undefined, test?: string) => {
     if (valid) {
       if (test) {
         authApi.postAuthSetting(form.value, loading).then((res) => {
-          MsgSuccess(t('views.system.authentication.ldap.testConnectionSuccess'))
+          MsgSuccess(t('views.system.testFailed'))
         })
       } else {
         authApi.putAuthSetting(form.value.auth_type, form.value, loading).then((res) => {

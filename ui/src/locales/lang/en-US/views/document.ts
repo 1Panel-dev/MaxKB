@@ -40,20 +40,20 @@ export default {
     txt: {
       label: 'Text File',
       tip1: '1. It is recommended to standardize the paragraph markers in the file before uploading.',
-      tip2: '2. Up to 50 files can be uploaded at once, with each file not exceeding 100MB'
+      tip2: '2. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.'
     },
     table: {
       label: 'Table',
       tip1: '1. Click to download the corresponding template and complete the information:',
       tip2: '2. The first row must be column headers, and the column headers must be meaningful terms. Each record in the table will be treated as a segment.',
       tip3: '3. Each sheet in the uploaded spreadsheet file will be treated as a document, with the sheet name as the document name.',
-      tip4: '4. Up to 50 files can be uploaded at once, with each file not exceeding 100MB'
+      tip4: '4. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.'
     },
     QA: {
       label: 'QA Pairs',
-      tip1: '1. Click to download the corresponding template and complete the information.',
+      tip1: '1. Click to download the corresponding template and complete the information:',
       tip2: '2. Each sheet in the uploaded spreadsheet file will be treated as a document, with the sheet name as the document name.',
-      tip3: '3. Up to 50 files can be uploaded at once, with each file not exceeding 100MB'
+      tip3: '3. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.'
     }
   },
   setRules: {
@@ -108,7 +108,8 @@ export default {
     PENDING: 'Queued',
     GENERATE: 'Generating',
     SYNC: 'Syncing',
-    REVOKE: 'Cancelling'
+    REVOKE: 'Cancelling',
+    finish: 'Finish'
   },
   enableStatus: {
     label: 'Status',

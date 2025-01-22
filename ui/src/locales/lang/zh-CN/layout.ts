@@ -3,7 +3,6 @@ export default {
   wiki: '用户手册',
   forum: '论坛求助',
   logout: '退出',
-  version: '版本号',
   apiKey: 'API Key 管理',
   apiServiceAddress: 'API 服务地址',
   language: '语言',
@@ -12,9 +11,10 @@ export default {
     title: '关于',
     expiredTime: '到期时间',
     edition: '版本',
+    version: '版本号',
     serialNo: '序列号',
     remark: '备注',
     update: '更新',
-    authorize:'授权给'
+    authorize: '授权给'
   }
 }

@@ -106,7 +106,8 @@ export default {
     PENDING: '排队中',
     GENERATE: '生成中',
     SYNC: '同步中',
-    REVOKE: '取消中'
+    REVOKE: '取消中',
+    finish:'完成'
   },
   enableStatus: {
     label: '启用状态',

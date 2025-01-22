@@ -1,5 +1,9 @@
 export default {
   title: '系统设置',
+  test: '测试连接',
+  testSuccess: '测试连接成功',
+  testFailed: '测试连接失败',
+  password: '密码',
   authentication: {
     title: '登录认证',
     ldap: {
@@ -8,17 +12,13 @@ export default {
       serverPlaceholder: '请输入LDAP 地址',
       bindDN: '绑定DN',
       bindDNPlaceholder: '请输入绑定 DN',
-      password: '密码',
       ou: '用户OU',
       ouPlaceholder: '请输入用户 OU',
       ldap_filter: '用户过滤器',
       ldap_filterPlaceholder: '请输入用户过滤器',
       ldap_mapping: 'LDAP 属性映射',
       ldap_mappingPlaceholder: '请输入 LDAP 属性映射',
-      test: '测试连接',
-      enableAuthentication: '启用 LDAP 认证',
-      testConnectionSuccess: '测试连接成功',
-      testConnectionFailed: '测试连接失败'
+      enableAuthentication: '启用 LDAP 认证'
     },
     cas: {
       title: 'CAS 设置',
@@ -138,11 +138,9 @@ export default {
     smtpUserPlaceholder: '请输入 SMTP 账户',
     sendEmail: '发件人邮箱',
     sendEmailPlaceholder: '请输入发件人邮箱',
-    smtpPassword: '密码',
+    smtpPassword: '发件人密码',
     smtpPasswordPlaceholder: '请输入发件人密码',
-    test: '测试连接',
     enableSSL: '启用 SSL（如果 SMTP 端口是 465，通常需要启用 SSL）',
-    enableTLS: '启用 TLS（如果 SMTP 端口是 587，通常需要启用 TLS）',
-    testSuccess: '测试连接成功'
+    enableTLS: '启用 TLS（如果 SMTP 端口是 587，通常需要启用 TLS）'
   }
 }

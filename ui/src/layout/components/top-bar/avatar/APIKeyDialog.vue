@@ -49,7 +49,7 @@
       <el-table-column :label="$t('common.setting')" align="left" width="80">
         <template #default="{ row }">
           <span class="mr-4">
-            <el-tooltip effect="dark" :content="$t('common.settings')" placement="top">
+            <el-tooltip effect="dark" :content="$t('common.setting')" placement="top">
               <el-button type="primary" text @click.stop="settingApiKey(row)">
                 <el-icon><Setting /></el-icon>
               </el-button>

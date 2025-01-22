@@ -27,7 +27,7 @@
       class="ml-8 lighter"
       :style="{ color: [State.FAILURE, State.REVOKED].includes(status.state) ? '#F54A45' : '' }"
     >
-      完成
+    {{ $t('views.document.fileStatus.finish') }}
       {{
         Object.keys(status.aggs ? status.aggs : {})
           .filter((k) => k == State.SUCCESS)

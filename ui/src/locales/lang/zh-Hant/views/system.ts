@@ -1,5 +1,9 @@
 export default {
   title: '系統設置',
+  test: '測試連線',
+  testSuccess: '測試連線成功',
+  testFailed: '測試連線失敗',
+  password: '密碼',
   authentication: {
     title: '登入認證',
     ldap: {
@@ -8,18 +12,14 @@ export default {
       serverPlaceholder: '請輸入LDAP 位址',
       bindDN: '綁定DN',
       bindDNPlaceholder: '請輸入綁定 DN',
-      password: '密碼',
+
       ou: '使用者OU',
       ouPlaceholder: '請輸入使用者 OU',
       ldap_filter: '使用者過濾器',
       ldap_filterPlaceholder: '請輸入使用者過濾器',
       ldap_mapping: 'LDAP 屬性對應',
       ldap_mappingPlaceholder: '請輸入 LDAP 屬性對應',
-      test: '測試連線',
       enableAuthentication: '啟用 LDAP 認證',
-      save: '儲存',
-      testConnectionSuccess: '測試連線成功',
-      testConnectionFailed: '測試連線失敗'
     },
     cas: {
       title: 'CAS 設定',
@@ -139,11 +139,9 @@ export default {
     smtpUserPlaceholder: '請輸入 SMTP 帳戶',
     sendEmail: '發件人信箱',
     sendEmailPlaceholder: '請輸入發件人信箱',
-    smtpPassword: '密碼',
+    smtpPassword: '發件人密碼',
     smtpPasswordPlaceholder: '請輸入發件人密碼',
-    test: '測試連接',
     enableSSL: '啟用 SSL（如果 SMTP 端口是 465，通常需要啟用 SSL）',
     enableTLS: '啟用 TLS（如果 SMTP 端口是 587，通常需要啟用 TLS）',
-    testSuccess: '測試連接成功'
   }
 }

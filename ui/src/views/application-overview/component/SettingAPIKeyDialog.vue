@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.applicationOverview.appInfo.SettingAPIKeyDialog.dialogTitle')"
+    :title="$t('common.setting')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"

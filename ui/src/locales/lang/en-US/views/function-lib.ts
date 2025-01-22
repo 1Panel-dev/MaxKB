@@ -72,7 +72,7 @@ export default {
         run: 'Run',
         output: 'Output',
         runResult: 'Run Result',
-        runSuccess: 'Run Successful',
+        runSuccess: 'Run successful',
         runFailed: 'Run Failed'
       }
     }

@@ -1,5 +1,9 @@
 export default {
   title: 'System',
+  test: 'Test Connection',
+  testSuccess: 'Test connection successful',
+  testFailed: 'Test connection failed',
+  password: 'Password',
   authentication: {
     title: 'Login Authentication',
     ldap: {
@@ -8,17 +12,13 @@ export default {
       serverPlaceholder: 'Please enter LDAP address',
       bindDN: 'Bind DN',
       bindDNPlaceholder: 'Please enter Bind DN',
-      password: 'Password',
       ou: 'User OU',
       ouPlaceholder: 'Please enter user OU',
       ldap_filter: 'User Filter',
       ldap_filterPlaceholder: 'Please enter user filter',
       ldap_mapping: 'LDAP Attribute Mapping',
       ldap_mappingPlaceholder: 'Please enter LDAP attribute mapping',
-      test: 'Test Connection',
       enableAuthentication: 'Enable LDAP Authentication',
-      testConnectionSuccess: 'Test Connection Success',
-      testConnectionFailed: 'Test Connection Failed'
     },
     cas: {
       title: 'CAS Settings',
@@ -78,8 +78,8 @@ export default {
       alreadyTurnedOn: 'Turned On',
       notEnabled: 'Not Enabled',
       validate: 'Validate',
-      validateSuccess: 'Validation Successful',
-      validateFailed: 'Validation Failed',
+      validateSuccess: 'Validation successful',
+      validateFailed: 'Validation failed',
       validateFailedTip: 'Please fill in all required fields and ensure the format is correct',
       appKeyPlaceholder: 'Please enter APP key',
       appSecretPlaceholder: 'Please enter APP secret',
@@ -131,7 +131,7 @@ export default {
     saveSuccess: 'Appearance settings successfully applied'
   },
   email: {
-    title: 'Mail Setting',
+    title: 'Mail Settings',
     smtpHost: 'SMTP Host',
     smtpHostPlaceholder: 'Please enter SMTP host',
     smtpPort: 'SMTP Port',
@@ -142,9 +142,7 @@ export default {
     sendEmailPlaceholder: 'Please enter send email',
     smtpPassword: 'SMTP Password',
     smtpPasswordPlaceholder: 'Please enter SMTP password',
-    test: 'Test Connection',
     enableSSL: 'Enable SSL (if the SMTP port is 465, you usually need to enable SSL)',
     enableTLS: 'Enable TLS (if the SMTP port is 587, you usually need to enable TLS)',
-    testSuccess: 'Test Connection Successful'
   }
 }

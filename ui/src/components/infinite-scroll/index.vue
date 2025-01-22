@@ -4,10 +4,10 @@
   </div>
   <div style="padding: 16px 10px">
     <el-divider v-if="size > 0 && loading">
-      <el-text type="info"> 加载中...</el-text>
+      <el-text type="info"> {{ $t('components.loading') }}...</el-text>
     </el-divider>
     <el-divider v-if="noMore">
-      <el-text type="info"> 到底啦！</el-text>
+      <el-text type="info"> {{ $t('components.noMore') }}</el-text>
     </el-divider>
   </div>
 </template>

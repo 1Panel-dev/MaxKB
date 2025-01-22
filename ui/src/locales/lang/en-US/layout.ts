@@ -3,7 +3,7 @@ export default {
   wiki: 'User Manual',
   forum: 'Forum For Help',
   logout: 'Logout',
-  version: 'Version',
+
   apiKey: 'API Key',
   apiServiceAddress: 'API Service Address',
   language: 'Language',
@@ -12,6 +12,7 @@ export default {
     title: 'About',
     expiredTime: 'Expiration Date',
     edition: 'Edition',
+    version: 'Version',
     serialNo: 'Serial No.',
     remark: 'Remarks',
     update: 'Update',

@@ -11,15 +11,11 @@
       <span>{{ item.label }} {{ '{' + item.value + '}' }}</span>
       <el-tooltip
         effect="dark"
-        content="$t('views.applicationWorkflow.setting.copyParam')"
+        :content="$t('views.applicationWorkflow.setting.copyParam')"
         placement="top"
         v-if="showicon === true"
       >
-        <el-button
-          link
-          @click="copyClick(`{{${$t('views.applicationWorkflow.variable.global')}.${item.value}}}`)"
-          style="padding: 0"
-        >
+        <el-button link @click="copyClick(`{{global.${item.value}}}`)" style="padding: 0">
           <AppIcon iconName="app-copy"></AppIcon>
         </el-button>
       </el-tooltip>
@@ -37,7 +33,10 @@ const props = defineProps<{ nodeModel: any }>()
 const showicon = ref(false)
 const globalFields = [
   { label: t('views.applicationWorkflow.nodes.startNode.currentTime'), value: 'time' },
-  { label: t('views.application.applicationForm.form.historyRecord.label'), value: 'history_context' },
+  {
+    label: t('views.application.applicationForm.form.historyRecord.label'),
+    value: 'history_context'
+  },
   { label: t('chat.chatId'), value: 'chat_id' }
 ]
 
