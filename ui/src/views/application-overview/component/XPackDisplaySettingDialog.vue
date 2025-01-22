@@ -512,7 +512,10 @@ const open = (data: any, content: any) => {
   xpackForm.value.disclaimer = data.disclaimer
   xpackForm.value.disclaimer_value = data.disclaimer_value
   console.log(xpackForm.value.disclaimer_value)
-  if (xpackForm.value.disclaimer_value === '「以上内容均由AI生成，仅供参考和借鉴」') {
+  if (
+    xpackForm.value.disclaimer_value ===
+    t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue')
+  ) {
     xpackForm.value.disclaimer_value = t(
       'views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue'
     )

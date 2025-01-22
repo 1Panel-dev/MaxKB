@@ -26,7 +26,6 @@
           :placeholder="$t('common.search')"
           prefix-icon="Search"
           class="w-240"
-          style="margin-left: 10px"
           clearable
         />
         <div style="display: flex; align-items: center" class="float-right">

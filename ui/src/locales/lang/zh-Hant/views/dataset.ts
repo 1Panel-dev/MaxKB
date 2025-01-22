@@ -46,7 +46,7 @@ export default {
       },
       datasetType: {
         label: '知識庫類型',
-        generalInfo: '上傳本地檔案或手動輸入',
+        generalInfo: '上傳本地檔案',
         webInfo: '同步Web網站文字資料'
       },
       source_url: {

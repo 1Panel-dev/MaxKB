@@ -56,6 +56,8 @@ export default {
         references: ' (引用知識庫)',
         placeholder: '請輸入提示詞',
         requiredMessage: '請輸入提示詞',
+        tooltip:'透過調整提示詞內容，可以引導大模型對話方向，該提示詞會被固定在上下文的開頭。',
+        
         noReferencesTooltip:
           '透過調整提示詞內容，可以引導大模型對話方向，該提示詞會被固定在上下文的開頭。可以使用變數：{question} 是用戶提出問題的佔位符。',
         referencesTooltip:

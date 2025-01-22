@@ -48,7 +48,7 @@ export default {
       },
       datasetType: {
         label: 'Knowledge Type',
-        generalInfo: 'Upload local files or manually enter',
+        generalInfo: 'Upload local documents',
         webInfo: 'Sync text data from a Web site'
       },
       source_url: {

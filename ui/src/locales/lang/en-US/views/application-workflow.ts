@@ -126,8 +126,8 @@ export default {
       label: 'Question Optimization',
       text: 'Optimize and improve the current question based on historical chat records to better match knowledge segments',
       result: 'Optimized Question Result',
-      defaultPrompt: `Optimize and improve the user's question based on context: {{start.question}}
-Please output an optimized question.`,
+      defaultPrompt1: `Optimize and improve the user's question based on context:`,
+      defaultPrompt2: `Please output an optimized question.`,
       systemDefault: 'You are a question optimization expert'
     },
     conditionNode: {
@@ -178,8 +178,10 @@ Please output an optimized question.`,
       form_data: 'All Form Content',
       formContent: {
         label: 'Form Output Content',
-        requiredMessage: 'Please set the output content of this node, { form } is a placeholder for the form.',
-        tooltip: 'Set the content output by executing this node, { form } is a placeholder for the form.'
+        requiredMessage:
+          'Please set the output content of this node, { form } is a placeholder for the form.',
+        tooltip:
+          'Set the content output by executing this node, { form } is a placeholder for the form.'
       },
       formAllContent: 'All Form Content',
       formSetting: 'Form Configuration'
@@ -212,12 +214,15 @@ Please output an optimized question.`,
       },
       prompt: {
         label: 'Positive Prompt',
-        tooltip: 'Positive prompt words, used to describe elements and visual features expected in the generated image'
+        tooltip:
+          'Positive prompt words, used to describe elements and visual features expected in the generated image'
       },
       negative_prompt: {
         label: 'Negative Prompt',
-        tooltip: 'Negative prompt words, used to describe content that should not appear in the image, which can limit the image.',
-        placeholder: 'Please describe content you do not want to generate, such as color, bloody content'
+        tooltip:
+          'Negative prompt words, used to describe content that should not appear in the image, which can limit the image.',
+        placeholder:
+          'Please describe content you do not want to generate, such as color, bloody content'
       }
     },
     speechToTextNode: {

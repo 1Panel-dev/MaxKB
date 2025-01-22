@@ -104,15 +104,15 @@ export const searchDatasetNode = {
 }
 export const questionNode = {
   type: WorkflowType.Question,
-  text: t('views.applicationWorkflow.nodes.searchDatasetNode.text'),
-  label: t('views.applicationWorkflow.nodes.searchDatasetNode.label'),
+  text: t('views.applicationWorkflow.nodes.questionNode.text'),
+  label: t('views.applicationWorkflow.nodes.questionNode.label'),
   height: 345,
   properties: {
-    stepName: t('views.applicationWorkflow.nodes.searchDatasetNode.label'),
+    stepName: t('views.applicationWorkflow.nodes.questionNode.label'),
     config: {
       fields: [
         {
-          label: t('views.applicationWorkflow.nodes.searchDatasetNode.result'),
+          label: t('views.applicationWorkflow.nodes.questionNode.result'),
           value: 'answer'
         }
       ]

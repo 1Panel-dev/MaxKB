@@ -127,8 +127,8 @@ export default {
       label: '問題優化',
       text: '根據歷史聊天記錄優化完善當前問題，更利於匹配知識庫分段',
       result: '問題優化結果',
-      defaultPrompt: `根據上下文優化和完善用戶問題：{{開始.question}}
-請輸出一個優化後的問題。`,
+      defaultPrompt1: `根據上下文優化和完善用戶問題：`,
+      defaultPrompt2: `請輸出一個優化後的問題。`,
       systemDefault: '你是一個問題優化大師'
     },
     conditionNode: {

@@ -47,7 +47,7 @@ export default {
       },
       datasetType: {
         label: '知识库类型',
-        generalInfo: '上传本地文件或手动录入',
+        generalInfo: '上传本地文档',
         webInfo: '同步Web网站文本数据'
       },
       source_url: {

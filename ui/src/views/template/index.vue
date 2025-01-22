@@ -133,8 +133,8 @@
                 @change="list_model"
                 style="width: 220px"
               >
-                <el-option :label="$t('views.template.templateForm.form.permissionType.public')" value="PUBLIC" />
-                <el-option :label="$t('views.template.templateForm.form.permissionType.private')" value="PRIVATE" />
+                <el-option :label="$t('common.public')" value="PUBLIC" />
+                <el-option :label="$t('common.private')" value="PRIVATE" />
               </el-select>
               <el-select
                 v-else-if="search_type === 'model_type'"

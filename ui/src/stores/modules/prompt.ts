@@ -19,7 +19,6 @@ const usePromptStore = defineStore({
       localStorage.setItem('PROMPT_CACHE', JSON.stringify(this.$state))
     },
     get(user: string) {
-      console.log(this.$state)
       for (let i = 0; i < this.$state.length; i++) {
         if (this.$state[i].user === user) {
           return this.$state[i].formValue

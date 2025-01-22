@@ -95,7 +95,7 @@ export default {
   },
   table: {
     name: 'File Name',
-    char_length: 'words',
+    char_length: 'Words',
     paragraph: 'Segment',
     all: 'All',
     updateTime: 'Update Time'

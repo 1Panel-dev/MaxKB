@@ -176,7 +176,9 @@ const {
 } = app.config.globalProperties.$route as any
 
 // @ts-ignore
-const defaultPrompt = t('views.applicationWorkflow.nodes.questionNode.defaultPrompt')
+const defaultPrompt = `${t('views.applicationWorkflow.nodes.questionNode.defaultPrompt1')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}
+${t('views.applicationWorkflow.nodes.questionNode.defaultPrompt2')}`
+
 const form = {
   model_id: '',
   system: t('views.applicationWorkflow.nodes.questionNode.systemDefault'),

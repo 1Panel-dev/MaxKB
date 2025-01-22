@@ -127,8 +127,8 @@ export default {
       label: '问题优化',
       text: '根据历史聊天记录优化完善当前问题，更利于匹配知识库分段',
       result: '问题优化结果',
-      defaultPrompt: `根据上下文优化和完善用户问题：{{开始.question}}
-请输出一个优化后的问题。`,
+      defaultPrompt1: `根据上下文优化和完善用户问题`,
+      defaultPrompt2: `请输出一个优化后的问题。`,
       systemDefault: '你是一个问题优化大师'
     },
     conditionNode: {
