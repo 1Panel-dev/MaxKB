@@ -17,7 +17,7 @@ export default {
     show: 'Show Default'
   },
   tip: {
-    requiredMessage: 'Cannot be empty',
+    requiredMessage: 'cannot be empty',
     jsonMessage: 'Incorrect JSON format'
   },
   searchBar: {

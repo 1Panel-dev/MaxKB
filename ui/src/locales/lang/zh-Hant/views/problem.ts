@@ -3,6 +3,7 @@ export default {
   createProblem: '建立問題',
   detailProblem: '問題詳情',
   quickCreateProblem: '快速建立問題',
+  quickCreateName: '問題',
   tip: {
     placeholder: '請輸入問題，支持輸入多個，一行一個。',
     errorMessage: '問題不能為空！',

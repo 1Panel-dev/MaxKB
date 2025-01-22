@@ -9,7 +9,7 @@ export default {
     cancelSelected: 'Cancel Selection'
   },
   delete: {
-    confirmTitle: 'Confirm Deletion of Paragraph:',
+    confirmTitle: 'Confirm deletion of paragraph:',
     confirmMessage: 'Deletion cannot be undone. Please proceed with caution.'
   },
   relatedProblem: {

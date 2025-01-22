@@ -21,7 +21,7 @@ export default {
       'After modifying the knowledge vector model, you need to vectorize the knowledge. Do you want to continue saving?'
   },
   delete: {
-    confirmTitle: 'Confirm Deletion of Knowledge:',
+    confirmTitle: 'Confirm deletion of knowledge:',
     confirmMessage1: 'This knowledge is associated with',
     confirmMessage2: 'APP. Deleting it will be irreversible, please proceed with caution.'
   },
@@ -43,18 +43,18 @@ export default {
       },
       EmbeddingModel: {
         label: 'Embedding Model',
-        placeholder: 'Please select a Embedding Model',
-        requiredMessage: 'Please enter the Embedding model'
+        placeholder: 'Please select a embedding model',
+        requiredMessage: 'Please enter the embedding model'
       },
       datasetType: {
         label: 'Knowledge Type',
         generalInfo: 'Upload local documents',
-        webInfo: 'Sync text data from a Web site'
+        webInfo: 'Sync text data from a web site'
       },
       source_url: {
         label: 'Web Root URL',
         placeholder: 'Please enter the web root URL',
-        requiredMessage: 'Please enter the Web root URL'
+        requiredMessage: 'Please enter the web root URL'
       },
       selector: {
         label: 'Selector',
@@ -80,7 +80,7 @@ export default {
     replaceText: 'Re-fetch Web site documents, replacing the documents in the local knowledge base',
     complete: 'Full Sync',
     completeText:
-      'Delete all documents in the local knowledge base and re-fetch Web site documents',
+      'Delete all documents in the local knowledge base and re-fetch web site documents',
     tip: 'Note: All syncs will delete existing data and re-fetch new data. Please proceed with caution.'
   }
 }

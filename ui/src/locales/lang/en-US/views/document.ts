@@ -5,7 +5,7 @@ export default {
   selected: 'Selected',
   items: 'Items',
   searchBar: {
-    placeholder: 'Search by Document Name'
+    placeholder: 'Search by document name'
   },
   setting: {
     migration: 'Move',
@@ -84,7 +84,7 @@ export default {
     },
     checkedConnect: {
       label:
-        'Add Segment Titles as Associated Questions During Import (Applicable for QA Pairs where Titles are Questions)'
+        'Add segment titles as associated questions during import (Applicable for QA pairs where titles are questions)'
     }
   },
   buttons: {
@@ -117,26 +117,26 @@ export default {
   },
   sync: {
     label: 'Sync',
-    confirmTitle: 'Confirm Sync Document?',
+    confirmTitle: 'Confirm sync document?',
     confirmMessage1:
       'Syncing will delete existing data and retrieve new data. Please proceed with caution.',
     confirmMessage2: 'Cannot sync, please set the document URL first.',
     successMessage: 'Document synced successfully'
   },
   delete: {
-    confirmTitle1: 'Confirm Batch Deletion of',
+    confirmTitle1: 'Confirm batch deletion of',
     confirmTitle2: 'Documents?',
     confirmMessage:
       'Segments within the selected documents will also be deleted. Please proceed with caution.',
     successMessage: 'Batch deletion successful',
-    confirmTitle3: 'Confirm Deleting Document:',
+    confirmTitle3: 'Confirm deleting document:',
     confirmMessage1: 'Under this document',
     confirmMessage2: 'All segments will be deleted, please operate with caution. '
   },
   form: {
     source_url: {
       label: 'Document URL',
-      placeholder: 'Enter document URLs, one per line. Incorrect URLs will cause import failure.',
+      placeholder: 'Enter document URL, one per line. Incorrect URL will cause import failure.',
       requiredMessage: 'Please enter a document URL'
     },
     selector: {

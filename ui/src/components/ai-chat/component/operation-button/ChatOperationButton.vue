@@ -27,7 +27,7 @@
       </el-tooltip>
       <el-divider direction="vertical" />
       <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
-        <el-button text @click="copyClick(data?.answer_text)">
+        <el-button text @click="copyClick(data?.answer_text.trim())">
           <AppIcon iconName="app-copy"></AppIcon>
         </el-button>
       </el-tooltip>

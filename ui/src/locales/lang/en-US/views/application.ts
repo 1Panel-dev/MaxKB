@@ -163,10 +163,10 @@ export default {
     wecomSetting: {
       title: 'WeCom Configuration',
       cropId: 'Crop ID',
-      cropIdPlaceholder: 'Please enter Crop ID',
-      agentIdPlaceholder: 'Please enter Agent ID',
-      secretPlaceholder: 'Please enter Secret',
-      tokenPlaceholder: 'Please enter Token',
+      cropIdPlaceholder: 'Please enter crop ID',
+      agentIdPlaceholder: 'Please enter agent ID',
+      secretPlaceholder: 'Please enter secret',
+      tokenPlaceholder: 'Please enter token',
       encodingAesKeyPlaceholder: 'Please enter EncodingAESKey',
       authenticationSuccessful: 'Authentication successful',
       urlInfo:
@@ -174,8 +174,8 @@ export default {
     },
     dingtalkSetting: {
       title: 'DingTalk Configuration',
-      clientIdPlaceholder: 'Please enter Client ID',
-      clientSecretPlaceholder: 'Please enter Client Secret',
+      clientIdPlaceholder: 'Please enter client ID',
+      clientSecretPlaceholder: 'Please enter client secret',
       urlInfo:
         '-On the robot page, set the "Message Receiving Mode" to HTTP mode, and fill in the above URL into the "Message Receiving Address"'
     },
@@ -190,13 +190,13 @@ export default {
       aesKey: 'Message Encryption Key',
       aesKeyPlaceholder: 'Please enter the message encryption key',
       urlInfo:
-        '-Settings and Development-Basic Configuration-"Server Address URL" in Server Configuration'
+        '-Settings and Development-Basic Configuration-"Server Address URL" in server configuration'
     },
     larkSetting: {
       title: 'Lark Configuration',
-      appIdPlaceholder: 'Please enter App ID',
-      appSecretPlaceholder: 'Please enter App Secret',
-      verificationTokenPlaceholder: 'Please enter Verification Token',
+      appIdPlaceholder: 'Please enter APP ID',
+      appSecretPlaceholder: 'Please enter APP secret',
+      verificationTokenPlaceholder: 'Please enter verification token',
       urlInfo:
         '-Events and callbacks - event configuration - configure the "request address" of the subscription method'
     },

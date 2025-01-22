@@ -1,8 +1,8 @@
 export default {
   title: 'Conversation Logs',
   delete: {
-    confirmTitle: 'Confirm Deletion of Question:',
-    confirmMessage1: 'Deleting this Question will cancel the association of',
+    confirmTitle: 'Confirm deletion of question:',
+    confirmMessage1: 'Deleting this question will cancel the association of',
     confirmMessage2: 'paragraphs. Please proceed with caution.'
   },
   buttons: {

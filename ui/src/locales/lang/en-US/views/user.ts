@@ -11,12 +11,12 @@ export default {
     updatePwdSuccess: 'User password updated successfully'
   },
   delete: {
-    confirmTitle: 'Confirm Deletion of User:',
+    confirmTitle: 'Confirm deletion of user:',
     confirmMessage:
       'Deleting this user will also delete all resources (APP, knowledge, models) created by this user. Please proceed with caution.'
   },
   disabled: {
-    confirmTitle: 'Confirm Disable Function:',
+    confirmTitle: 'Confirm disable function:',
     confirmMessage:
       'Disabling this function will cause errors when APP that reference it are queried. Please proceed with caution.'
   },

@@ -10,7 +10,7 @@ export default {
   },
   delete: {
     button: 'Remove',
-    confirmTitle: 'Confirm Removal of Member:',
+    confirmTitle: 'Confirm removal of member:',
     confirmMessage:
       'Removing the member will revoke their access to knowledge and APP.'
   },

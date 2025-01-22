@@ -28,7 +28,7 @@
           :data="problemData"
           :pagination-config="paginationConfig"
           quick-create
-          :quickCreateName="$t('views.problem.title')"
+          :quickCreateName="$t('views.problem.quickCreateName')"
           :quickCreatePlaceholder="$t('views.problem.quickCreateProblem')"
           :quickCreateMaxlength="256"
           @sizeChange="handleSizeChange"

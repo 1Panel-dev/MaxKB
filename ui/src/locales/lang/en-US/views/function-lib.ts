@@ -13,12 +13,12 @@ export default {
     saveMessage: 'Unsaved changes will be lost. Are you sure you want to exit?'
   },
   delete: {
-    confirmTitle: 'Confirm Deletion of Function:',
+    confirmTitle: 'Confirm deletion of function:',
     confirmMessage:
       'Deleting this function will cause errors in APP that reference it when they are queried. Please proceed with caution.'
   },
   disabled: {
-    confirmTitle: 'Confirm Disable Function:',
+    confirmTitle: 'Confirm disable function:',
     confirmMessage:
       'Disabling this function will cause errors in APP that reference it when they are queried. Please proceed with caution.'
   },

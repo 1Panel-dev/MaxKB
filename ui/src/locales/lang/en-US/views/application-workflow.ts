@@ -63,9 +63,9 @@ export default {
   },
   validate: {
     startNodeRequired: 'Start Node Required',
-    startNodeOnly: 'There can only be one Start Node',
+    startNodeOnly: 'There can only be one start node',
     baseNodeRequired: 'Base Info Node Required',
-    baseNodeOnly: 'There can only be one Base Info Node',
+    baseNodeOnly: 'There can only be one base info node',
     notInWorkFlowNode: 'Node not in workflow',
     noNextNode: 'Non-existent next node',
     nodeUnavailable: 'Node unavailable',
@@ -197,7 +197,7 @@ export default {
       answer: 'AI Answer Content',
       model: {
         label: 'Vision Model',
-        requiredMessage: 'Please select a Vision Model'
+        requiredMessage: 'Please select a vision model'
       },
       image: {
         label: 'Select Image',

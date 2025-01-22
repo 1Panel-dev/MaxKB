@@ -3,6 +3,7 @@ export default {
   createProblem: 'Create Question',
   detailProblem: 'Question Details',
   quickCreateProblem: 'Quick Create Question',
+  quickCreateName: 'question',
   tip: {
     placeholder: 'Enter the question, support multiple entries, one per line.',
     errorMessage: 'Question cannot be empty!',
@@ -15,23 +16,23 @@ export default {
     cancelRelated: 'Cancel Association'
   },
   searchBar: {
-    placeholder: 'Search by Name'
+    placeholder: 'Search by name'
   },
   table: {
     paragraph_count: 'Number of Associated Paragraphs',
     updateTime: 'Update Time'
   },
   delete: {
-    confirmTitle: 'Confirm Deletion of question:',
+    confirmTitle: 'Confirm deletion of question:',
     confirmMessage1: 'Deleting this question will cancel the association of',
     confirmMessage2: 'paragraphs. Please proceed with caution.'
   },
   relateParagraph: {
     title: 'Associate Paragraphs',
     selectDocument: 'Select Document',
-    placeholder: 'Search by Document Name',
+    placeholder: 'Search by document name',
     selectParagraph: 'Select Paragraph',
     selectedParagraph: 'Selected Paragraphs',
     count: 'Count'
-  },
+  }
 }
