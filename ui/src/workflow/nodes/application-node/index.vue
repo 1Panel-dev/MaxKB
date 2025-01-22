@@ -67,7 +67,9 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage')"
+            :placeholder="
+              $t('views.applicationWorkflow.nodes.imageUnderstandNode.image.requiredMessage')
+            "
             v-model="form_data.image_list"
           />
         </el-form-item>
@@ -192,7 +194,6 @@ const applicationNodeFormRef = ref<FormInstance>()
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
-      console.log(props.nodeModel.properties.node_data)
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)

@@ -119,6 +119,7 @@ export default {
     websiteSloganTip: 'The welcome message below the product logo',
     defaultSlogan: 'Welcome to MaxKB Intelligent Knowledge Q&A System',
     defaultTip: 'Default is the MaxKB platform interface, supports custom settings',
+    logoDefaultTip: 'Default is the MaxKB login interface, supports custom settings',
     platformSetting: 'Platform Settings',
     showUserManual: 'Show User Manual',
     showForum: 'Show Forum Support',

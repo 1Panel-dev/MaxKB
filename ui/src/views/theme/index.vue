@@ -143,7 +143,7 @@
               </div>
             </el-scrollbar>
             <div class="mt-16">
-              <el-text type="info">{{ $t('views.system.theme.defaultTip') }}</el-text>
+              <el-text type="info">{{ $t('views.system.theme.logoDefaultTip') }}</el-text>
             </div>
           </el-card>
         </div>
