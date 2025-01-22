@@ -202,31 +202,31 @@
                           v-model="themeForm.showUserManual"
                           :label="$t('views.system.theme.showUserManual')"
                         />
-                        <div class="ml-16">
+                        <div class="ml-24">
                           <el-input
                             v-model="themeForm.userManualUrl"
                             :placeholder="$t('views.system.theme.urlPlaceholder')"
                           />
                         </div>
                       </div>
-                      <div class="my-2">
+                      <div class="mt-4">
                         <el-checkbox
                           v-model="themeForm.showForum"
                           :label="$t('views.system.theme.showForum')"
                         />
-                        <div class="ml-16">
+                        <div class="ml-24">
                           <el-input
                             v-model="themeForm.forumUrl"
                             :placeholder="$t('views.system.theme.urlPlaceholder')"
                           />
                         </div>
                       </div>
-                      <div class="mt-2">
+                      <div class="mt-4">
                         <el-checkbox
                           v-model="themeForm.showProject"
                           :label="$t('views.system.theme.showProject')"
                         />
-                        <div class="ml-16">
+                        <div class="ml-24">
                           <el-input
                             v-model="themeForm.projectUrl"
                             :placeholder="$t('views.system.theme.urlPlaceholder')"
