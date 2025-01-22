@@ -19,7 +19,7 @@ export default {
       ldap_filterPlaceholder: '請輸入使用者過濾器',
       ldap_mapping: 'LDAP 屬性對應',
       ldap_mappingPlaceholder: '請輸入 LDAP 屬性對應',
-      enableAuthentication: '啟用 LDAP 認證',
+      enableAuthentication: '啟用 LDAP 認證'
     },
     cas: {
       title: 'CAS 設定',
@@ -86,7 +86,9 @@ export default {
       appSecretPlaceholder: '請輸入 App Secret',
       corpIdPlaceholder: '請輸入 Corp Id',
       agentIdPlaceholder: '請輸入 Agent Id',
-      callbackWarning: '請輸入有效的 URL 位址'
+      callbackWarning: '請輸入有效的 URL 位址',
+      larkQrCode: '飛書掃碼登錄',
+      dingtalkQrCode: '釘釘掃碼登錄'
     }
   },
   theme: {
@@ -142,6 +144,6 @@ export default {
     smtpPassword: '發件人密碼',
     smtpPasswordPlaceholder: '請輸入發件人密碼',
     enableSSL: '啟用 SSL（如果 SMTP 端口是 465，通常需要啟用 SSL）',
-    enableTLS: '啟用 TLS（如果 SMTP 端口是 587，通常需要啟用 TLS）',
+    enableTLS: '啟用 TLS（如果 SMTP 端口是 587，通常需要啟用 TLS）'
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="flex-center mb-16">
     <img src="@/assets/logo_lark.svg " alt="" width="24px" class="mr-4" />
-    <h2>飞书扫码登录</h2>
+    <h2>{{ $t('views.system.authentication.scanTheQRCode.larkQrCode') }}</h2>
   </div>
   <div id="lark-qr" class="lark-qrName"></div>
 </template>

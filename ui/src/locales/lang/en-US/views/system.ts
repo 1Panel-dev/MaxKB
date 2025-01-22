@@ -18,7 +18,7 @@ export default {
       ldap_filterPlaceholder: 'Please enter user filter',
       ldap_mapping: 'LDAP Attribute Mapping',
       ldap_mappingPlaceholder: 'Please enter LDAP attribute mapping',
-      enableAuthentication: 'Enable LDAP Authentication',
+      enableAuthentication: 'Enable LDAP Authentication'
     },
     cas: {
       title: 'CAS Settings',
@@ -85,7 +85,9 @@ export default {
       appSecretPlaceholder: 'Please enter APP secret',
       corpIdPlaceholder: 'Please enter corp ID',
       agentIdPlaceholder: 'Please enter agent ID',
-      callbackWarning: 'Please enter a valid URL address'
+      callbackWarning: 'Please enter a valid URL address',
+      larkQrCode: 'Lark Scan Code Login',
+      dingtalkQrCode: 'DingTalk Scan Code Login'
     }
   },
   theme: {
@@ -143,6 +145,6 @@ export default {
     smtpPassword: 'SMTP Password',
     smtpPasswordPlaceholder: 'Please enter SMTP password',
     enableSSL: 'Enable SSL (if the SMTP port is 465, you usually need to enable SSL)',
-    enableTLS: 'Enable TLS (if the SMTP port is 587, you usually need to enable TLS)',
+    enableTLS: 'Enable TLS (if the SMTP port is 587, you usually need to enable TLS)'
   }
 }

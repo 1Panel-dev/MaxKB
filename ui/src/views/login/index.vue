@@ -249,7 +249,12 @@ onMounted(() => {
             QrList.value.forEach((item) => {
               orgOptions.value.push({
                 key: item,
-                value: item === 'wecom' ? '企业微信' : item === 'dingtalk' ? '钉钉' : '飞书'
+                value:
+                  item === 'wecom'
+                    ? t('views.system.authentication.scanTheQRCode.wecom')
+                    : item === 'dingtalk'
+                      ? t('views.system.authentication.scanTheQRCode.dingtalk')
+                      : t('views.system.authentication.scanTheQRCode.lark')
               })
             })
           }

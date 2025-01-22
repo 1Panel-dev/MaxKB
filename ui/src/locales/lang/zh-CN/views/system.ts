@@ -85,7 +85,9 @@ export default {
       appSecretPlaceholder: '请输入 App Secret',
       corpIdPlaceholder: '请输入 Corp Id',
       agentIdPlaceholder: '请输入 Agent Id',
-      callbackWarning: '请输入有效的 URL 地址'
+      callbackWarning: '请输入有效的 URL 地址',
+      larkQrCode: '飞书扫码登录',
+      dingtalkQrCode: '钉钉扫码登录'
     }
   },
   theme: {

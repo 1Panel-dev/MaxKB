@@ -5,7 +5,12 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
 import * as ww from '@wecom/jssdk'
-import { WWLoginPanelSizeType, WWLoginRedirectType, WWLoginType } from '@wecom/jssdk'
+import {
+  WWLoginLangType,
+  WWLoginPanelSizeType,
+  WWLoginRedirectType,
+  WWLoginType
+} from '@wecom/jssdk'
 import { ref, nextTick, defineProps } from 'vue'
 import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
@@ -31,6 +36,7 @@ const init = async () => {
     corpId: props.config.corp_id,
     agentId: props.config.agent_id
   }
+  const lang = localStorage.getItem('MaxKB-locale') || 'zh-CN'
   const redirectUri = window.location.origin
   try {
     wwLogin.value = ww.createWWLoginPanel({
@@ -41,6 +47,7 @@ const init = async () => {
         agentid: data.agentId,
         redirect_uri: redirectUri,
         state: 'fit2cloud-wecom-qr',
+        lang: lang === 'zh-CN' || lang === 'zh-Hant' ? WWLoginLangType.zh : WWLoginLangType.en,
         redirect_type: WWLoginRedirectType.callback,
         panel_size: WWLoginPanelSizeType.small
       },
