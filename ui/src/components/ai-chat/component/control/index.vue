@@ -49,9 +49,26 @@ const menus = ref([
       const selectionText = getSelection()
       if (selectionText) {
         clearSelectedText()
-        navigator.clipboard.writeText(selectionText).then(() => {
-          MsgSuccess(t('common.copySuccess'))
-        })
+        if (
+          typeof navigator.clipboard === 'undefined' ||
+          typeof navigator.clipboard.writeText === 'undefined'
+        ) {
+          const input = document.createElement('input')
+          input.setAttribute('value', selectionText)
+          document.body.appendChild(input)
+          input.select()
+          try {
+            if (document.execCommand('copy')) {
+              MsgSuccess(t('common.copySuccess'))
+            }
+          } finally {
+            document.body.removeChild(input)
+          }
+        } else {
+          navigator.clipboard.writeText(selectionText).then(() => {
+            MsgSuccess(t('common.copySuccess'))
+          })
+        }
       }
     }
   },

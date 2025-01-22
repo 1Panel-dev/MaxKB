@@ -14,6 +14,7 @@ from typing import List
 
 from django.db.models import QuerySet
 from django.http import StreamingHttpResponse
+from django.utils.translation import gettext as __
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
 from langchain.schema.messages import HumanMessage, AIMessage
@@ -26,7 +27,6 @@ from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, Post
 from application.models.api_key_model import ApplicationPublicAccessClient
 from common.constants.authentication_type import AuthenticationType
 from setting.models_provider.tools import get_model_instance_by_model_user_id
-from django.utils.translation import gettext_lazy as _
 
 
 def add_access_num(client_id=None, client_type=None, application_id=None):
@@ -174,7 +174,7 @@ class BaseChatStep(IChatStep):
                 [AIMessageChunk(content=no_references_setting.get('value').replace('{question}', problem_text))]), False
         if chat_model is None:
             return iter([AIMessageChunk(
-                _('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.'))]), False
+                __('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.'))]), False
         else:
             return chat_model.stream(message_list), True
 
@@ -218,7 +218,8 @@ class BaseChatStep(IChatStep):
                 'status') == 'designated_answer':
             return AIMessage(no_references_setting.get('value').replace('{question}', problem_text)), False
         if chat_model is None:
-            return AIMessage(_('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.')), False
+            return AIMessage(
+                __('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.')), False
         else:
             return chat_model.invoke(message_list), True
 
