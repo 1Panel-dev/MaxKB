@@ -63,8 +63,8 @@ export default {
   source: {
     label: 'User Type',
     local: 'System User',
-    wecom: 'WeCom (Enterprise WeChat)',
-    lark: 'Lark (Feishu)',
+    wecom: 'WeCom',
+    lark: 'Lark',
     dingtalk: 'DingTalk'
   }
 }
