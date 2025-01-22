@@ -63,7 +63,7 @@ from embedding.task.embedding import embedding_by_document, delete_embedding_by_
     delete_embedding_by_document, update_embedding_dataset_id, delete_embedding_by_paragraph_ids, \
     embedding_by_document_list
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle(), ZipParseQAHandle()]
 parse_table_handle_list = [CsvSplitTableHandle(), XlsSplitTableHandle(), XlsxSplitTableHandle()]
@@ -631,9 +631,9 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 # 添加工作表
                 worksheet = workbook.create_sheet(document_dict.get(sheet_id))
                 data = [
-                    [_('Section title (optional)',
-                       'Section content (required, question answer, no more than 4096 characters)',
-                       'Question (optional, one per line in the cell)')],
+                    [gettext('Section title (optional)'),
+                     gettext('Section content (required, question answer, no more than 4096 characters)'),
+                     gettext('Question (optional, one per line in the cell)')],
                     *data_dict.get(sheet_id, [])
                 ]
                 # 写入数据到工作表
