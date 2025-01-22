@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-22 15:58+0800\n"
+"POT-Creation-Date: 2025-01-22 18:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -144,7 +144,7 @@ msgid "message type error"
 msgstr ""
 
 #: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:177
-#: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:222
+#: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:221
 msgid ""
 "Sorry, the AI model is not configured. Please go to the application to set "
 "up the AI model first."
@@ -2811,6 +2811,15 @@ msgstr ""
 msgid "Section title (optional)"
 msgstr ""
 
+#: .\apps\dataset\serializers\document_serializers.py:635
+msgid ""
+"Section content (required, question answer, no more than 4096 characters)"
+msgstr ""
+
+#: .\apps\dataset\serializers\document_serializers.py:636
+msgid "Question (optional, one per line in the cell)"
+msgstr ""
+
 #: .\apps\dataset\serializers\document_serializers.py:735
 msgid "The task is being executed, please do not send it repeatedly."
 msgstr ""
@@ -3647,7 +3656,7 @@ msgid ""
 "sketch, flat illustration, two-dimensional, and 3D. Cartoon."
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:94
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:95
 msgid "Alibaba Cloud Bailian"
 msgstr ""
 

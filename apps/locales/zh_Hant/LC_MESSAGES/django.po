@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-22 15:57+0800\n"
+"POT-Creation-Date: 2025-01-22 18:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -145,7 +145,7 @@ msgid "message type error"
 msgstr "消息類型錯誤"
 
 #: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:177
-#: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:222
+#: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:221
 msgid ""
 "Sorry, the AI model is not configured. Please go to the application to set "
 "up the AI model first."
@@ -2818,6 +2818,15 @@ msgstr "文檔 id 不存在"
 msgid "Section title (optional)"
 msgstr "分段標題（選填）"
 
+#: .\apps\dataset\serializers\document_serializers.py:635
+msgid ""
+"Section content (required, question answer, no more than 4096 characters)"
+msgstr "分段內容（必填，問題答案，最長不超過4096個字元）"
+
+#: .\apps\dataset\serializers\document_serializers.py:636
+msgid "Question (optional, one per line in the cell)"
+msgstr "問題（選填，儲存格內一行一個）"
+
 #: .\apps\dataset\serializers\document_serializers.py:735
 msgid "The task is being executed, please do not send it repeatedly."
 msgstr "任務正在執行中，請勿重複發送"
@@ -3664,7 +3673,7 @@ msgstr ""
 "或者參考風格遷移，重點風格包括但不限於水彩、油畫、中國畫、素描、扁平插畫、二"
 "次元、3D卡通。"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:94
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:95
 msgid "Alibaba Cloud Bailian"
 msgstr "阿里雲百鍊"
 
