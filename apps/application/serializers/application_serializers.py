@@ -54,7 +54,7 @@ from setting.models_provider.tools import get_model_instance_by_model_user_id
 from setting.serializers.provider_serializers import ModelSerializer
 from smartdoc.conf import PROJECT_DIR
 from users.models import User
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language, to_locale
 
 chat_cache = cache.caches['chat_cache']
 
@@ -154,11 +154,16 @@ class ApplicationWorkflowSerializer(serializers.Serializer):
 
     @staticmethod
     def to_application_model(user_id: str, application: Dict):
+        language = get_language()
         if application.get('work_flow') is not None:
             default_workflow = application.get('work_flow')
         else:
-            default_workflow_json = get_file_content(
-                os.path.join(PROJECT_DIR, "apps", "application", 'flow', 'default_workflow.json'))
+            workflow_file_path = os.path.join(PROJECT_DIR, "apps", "application", 'flow',
+                                              f'default_workflow_{to_locale(language)}.json')
+            if not os.path.exists(workflow_file_path):
+                workflow_file_path = os.path.join(PROJECT_DIR, "apps", "application", 'flow',
+                                                  f'default_workflow_zh.json')
+            default_workflow_json = get_file_content(workflow_file_path)
             default_workflow = json.loads(default_workflow_json)
         for node in default_workflow.get('nodes'):
             if node.get('id') == 'base-node':
