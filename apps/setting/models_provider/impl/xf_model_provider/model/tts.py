@@ -17,7 +17,7 @@ from typing import Dict
 from urllib.parse import urlencode, urlparse
 
 import websockets
-from django.utils.translation import gettext as __
+from django.utils.translation import gettext as _
 
 from common.util.common import _remove_empty_lines
 from setting.models_provider.base_model_provider import MaxKBBaseModel
@@ -98,7 +98,7 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         return url
 
     def check_auth(self):
-        self.text_to_speech(__('Hello'))
+        self.text_to_speech(_('Hello'))
 
     def text_to_speech(self, text):
 

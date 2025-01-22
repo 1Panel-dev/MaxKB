@@ -1,6 +1,6 @@
 from typing import Dict
 
-from django.utils.translation import gettext_lazy as _, gettext as __
+from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.messages import HumanMessage
 
 from common import forms
@@ -36,14 +36,14 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
         if not any(mt.get('value') == model_type for mt in model_type_list):
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('{model_type} Model type is not supported').format(model_type=model_type))
+                                      gettext('{model_type} Model type is not supported').format(model_type=model_type))
             return False
 
         required_keys = ['region_name', 'access_key_id', 'secret_access_key']
         if not all(key in model_credential for key in required_keys):
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('The following fields are required: {keys}').format(
+                                      gettext('The following fields are required: {keys}').format(
                                           keys=", ".join(required_keys)))
             return False
 
@@ -55,7 +55,8 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
         except Exception as e:
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      gettext(
+                                          'Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             return False
 

@@ -1,5 +1,5 @@
 # coding=utf-8
-from django.utils.translation import gettext_lazy as _, gettext as __
+from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.messages import HumanMessage
 
 from common import forms
@@ -26,7 +26,7 @@ class TencentLLMModelCredential(BaseForm, BaseModelCredential):
         if not any(mt['value'] == model_type for mt in provider.get_model_type_list()):
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('{model_type} Model type is not supported').format(model_type=model_type))
+                                      gettext('{model_type} Model type is not supported').format(model_type=model_type))
             return False
         return True
 
@@ -36,7 +36,7 @@ class TencentLLMModelCredential(BaseForm, BaseModelCredential):
         if missing_keys:
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('{keys} is required').format(keys=", ".join(missing_keys)))
+                                      gettext('{keys} is required').format(keys=", ".join(missing_keys)))
             return False
         return True
 
@@ -46,11 +46,12 @@ class TencentLLMModelCredential(BaseForm, BaseModelCredential):
             return False
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            model.invoke([HumanMessage(content=__('Hello'))])
+            model.invoke([HumanMessage(content=gettext('Hello'))])
         except Exception as e:
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      gettext(
+                                          'Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             return False
         return True

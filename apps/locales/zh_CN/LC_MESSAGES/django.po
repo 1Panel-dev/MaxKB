@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-20 13:36+0800\n"
+"POT-Creation-Date: 2025-01-22 15:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -115,13 +115,13 @@ msgstr "未查询到引用分段"
 #: .\apps\application\chat_pipeline\step\reset_problem_step\i_reset_problem_step.py:31
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:48
 #: .\apps\application\serializers\application_serializers.py:70
-#: .\apps\application\serializers\application_serializers.py:494
-#: .\apps\application\serializers\application_serializers.py:565
-#: .\apps\application\serializers\application_serializers.py:610
-#: .\apps\application\serializers\application_serializers.py:680
-#: .\apps\application\serializers\application_serializers.py:701
-#: .\apps\application\serializers\application_serializers.py:775
-#: .\apps\application\serializers\application_serializers.py:1207
+#: .\apps\application\serializers\application_serializers.py:500
+#: .\apps\application\serializers\application_serializers.py:571
+#: .\apps\application\serializers\application_serializers.py:616
+#: .\apps\application\serializers\application_serializers.py:686
+#: .\apps\application\serializers\application_serializers.py:707
+#: .\apps\application\serializers\application_serializers.py:781
+#: .\apps\application\serializers\application_serializers.py:1215
 #: .\apps\application\serializers\chat_serializers.py:104
 #: .\apps\application\serializers\chat_serializers.py:266
 #: .\apps\application\serializers\chat_serializers.py:318
@@ -144,7 +144,7 @@ msgid "message type error"
 msgstr "消息类型错误"
 
 #: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:177
-#: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:221
+#: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:222
 msgid ""
 "Sorry, the AI model is not configured. Please go to the application to set "
 "up the AI model first."
@@ -202,7 +202,7 @@ msgid "Completion problem"
 msgstr "补齐问题"
 
 #: .\apps\application\chat_pipeline\step\reset_problem_step\i_reset_problem_step.py:34
-#: .\apps\application\serializers\application_serializers.py:223
+#: .\apps\application\serializers\application_serializers.py:228
 msgid "Question completion prompt"
 msgstr "问题补全提示词"
 
@@ -255,7 +255,7 @@ msgstr "相似度"
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:46
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:30
 #: .\apps\application\serializers\application_serializers.py:129
-#: .\apps\application\serializers\application_serializers.py:573
+#: .\apps\application\serializers\application_serializers.py:579
 #: .\apps\dataset\serializers\dataset_serializers.py:576
 #: .\apps\users\serializers\user_serializers.py:236
 #: .\apps\users\serializers\user_serializers.py:362
@@ -265,16 +265,16 @@ msgstr "该类型仅支持 register|reset_password"
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:47
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:31
 #: .\apps\application\serializers\application_serializers.py:130
-#: .\apps\application\serializers\application_serializers.py:574
+#: .\apps\application\serializers\application_serializers.py:580
 #: .\apps\application\swagger_api\application_api.py:259
 msgid "Retrieval Mode"
 msgstr "检索方式"
 
 #: .\apps\application\chat_pipeline\step\search_dataset_step\impl\base_search_dataset_step.py:31
 #: .\apps\application\serializers\application_serializers.py:84
-#: .\apps\application\serializers\application_serializers.py:1005
-#: .\apps\application\serializers\application_serializers.py:1015
-#: .\apps\application\serializers\application_serializers.py:1025
+#: .\apps\application\serializers\application_serializers.py:1013
+#: .\apps\application\serializers\application_serializers.py:1023
+#: .\apps\application\serializers\application_serializers.py:1033
 #: .\apps\setting\models_provider\tools.py:23
 msgid "Model does not exist"
 msgstr "模型不存在"
@@ -317,12 +317,12 @@ msgid "Context Type"
 msgstr "内容类型"
 
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:13
-#: .\apps\application\serializers\application_serializers.py:321
-#: .\apps\application\serializers\application_serializers.py:564
-#: .\apps\application\serializers\application_serializers.py:679
-#: .\apps\application\serializers\application_serializers.py:774
-#: .\apps\application\serializers\application_serializers.py:1209
-#: .\apps\application\serializers\application_serializers.py:1251
+#: .\apps\application\serializers\application_serializers.py:326
+#: .\apps\application\serializers\application_serializers.py:570
+#: .\apps\application\serializers\application_serializers.py:685
+#: .\apps\application\serializers\application_serializers.py:780
+#: .\apps\application\serializers\application_serializers.py:1217
+#: .\apps\application\serializers\application_serializers.py:1259
 #: .\apps\application\serializers\application_statistics_serializers.py:26
 #: .\apps\application\serializers\application_version_serializers.py:35
 #: .\apps\application\serializers\application_version_serializers.py:59
@@ -340,6 +340,7 @@ msgstr "内容类型"
 #: .\apps\application\swagger_api\application_api.py:143
 #: .\apps\application\swagger_api\application_api.py:390
 #: .\apps\application\swagger_api\application_api.py:411
+#: .\apps\application\swagger_api\application_api.py:422
 #: .\apps\application\swagger_api\application_statistics_api.py:21
 #: .\apps\application\swagger_api\application_version_api.py:42
 #: .\apps\application\swagger_api\application_version_api.py:56
@@ -369,7 +370,7 @@ msgstr "用户输入字段"
 
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:17
 #: .\apps\application\flow\step_node\image_understand_step_node\i_image_understand_node.py:24
-#: .\apps\application\serializers\application_serializers.py:681
+#: .\apps\application\serializers\application_serializers.py:687
 #: .\apps\application\serializers\chat_message_serializers.py:250
 msgid "picture"
 msgstr "图片"
@@ -570,6 +571,56 @@ msgstr "参数值错误：上传的音频缺少file_id，音频上传失败"
 msgid "Text content"
 msgstr "文本内容"
 
+#: .\apps\application\flow\workflow_manage.py:109
+#, python-brace-format
+msgid "The branch {branch} of the {node} node needs to be connected"
+msgstr "{node} 节点的{branch}分支需要连接"
+
+#: .\apps\application\flow\workflow_manage.py:115
+#, python-brace-format
+msgid "{node} Nodes cannot be considered as end nodes"
+msgstr "{node} 节点不能当做结束节点"
+
+#: .\apps\application\flow\workflow_manage.py:125
+msgid "The next node that does not exist"
+msgstr "不存在的下一个节点"
+
+#: .\apps\application\flow\workflow_manage.py:139
+msgid "The starting node is required"
+msgstr "开始节点必填"
+
+#: .\apps\application\flow\workflow_manage.py:141
+msgid "There can only be one starting node"
+msgstr "开始节点只能有一个"
+
+#: .\apps\application\flow\workflow_manage.py:149
+#, python-brace-format
+msgid "The node {node} model does not exist"
+msgstr "节点{node} 模型不存在 "
+
+#: .\apps\application\flow\workflow_manage.py:159
+#, python-brace-format
+msgid "Node {node} is unavailable"
+msgstr "节点{node} 不可用"
+
+#: .\apps\application\flow\workflow_manage.py:165
+#, python-brace-format
+msgid "The library ID of node {node} cannot be empty"
+msgstr "节点{node} 函数库id不能为空"
+
+#: .\apps\application\flow\workflow_manage.py:168
+#, python-brace-format
+msgid "The function library for node {node} is not available"
+msgstr "节点{node} 函数库不可用"
+
+#: .\apps\application\flow\workflow_manage.py:174
+msgid "Basic information node is required"
+msgstr "基本信息节点必填"
+
+#: .\apps\application\flow\workflow_manage.py:176
+msgid "There can only be one basic information node"
+msgstr "基本信息节点只能有一个"
+
 #: .\apps\application\serializers\application_serializers.py:75
 #: .\apps\application\serializers\chat_serializers.py:597
 #: .\apps\application\serializers\chat_serializers.py:656
@@ -620,8 +671,8 @@ msgid "No citation segmentation prompt"
 msgstr "无引用分段提示词"
 
 #: .\apps\application\serializers\application_serializers.py:147
-#: .\apps\application\serializers\application_serializers.py:465
-#: .\apps\application\serializers\application_serializers.py:606
+#: .\apps\application\serializers\application_serializers.py:471
+#: .\apps\application\serializers\application_serializers.py:612
 #: .\apps\application\swagger_api\application_api.py:49
 #: .\apps\application\swagger_api\application_api.py:50
 #: .\apps\application\swagger_api\application_api.py:181
@@ -633,8 +684,8 @@ msgid "Application Name"
 msgstr "应用名称"
 
 #: .\apps\application\serializers\application_serializers.py:150
-#: .\apps\application\serializers\application_serializers.py:467
-#: .\apps\application\serializers\application_serializers.py:608
+#: .\apps\application\serializers\application_serializers.py:473
+#: .\apps\application\serializers\application_serializers.py:614
 #: .\apps\application\swagger_api\application_api.py:51
 #: .\apps\application\swagger_api\application_api.py:52
 #: .\apps\application\swagger_api\application_api.py:183
@@ -650,8 +701,8 @@ msgid "Workflow Objects"
 msgstr "工作流对象"
 
 #: .\apps\application\serializers\application_serializers.py:153
-#: .\apps\application\serializers\application_serializers.py:211
-#: .\apps\application\serializers\application_serializers.py:475
+#: .\apps\application\serializers\application_serializers.py:216
+#: .\apps\application\serializers\application_serializers.py:481
 #: .\apps\application\swagger_api\application_api.py:57
 #: .\apps\application\swagger_api\application_api.py:58
 #: .\apps\application\swagger_api\application_api.py:190
@@ -661,137 +712,138 @@ msgstr "工作流对象"
 msgid "Opening remarks"
 msgstr "开场白"
 
-#: .\apps\application\serializers\application_serializers.py:200
+#: .\apps\application\serializers\application_serializers.py:205
 #: .\apps\dataset\serializers\dataset_serializers.py:105
 #: .\apps\dataset\serializers\dataset_serializers.py:106
 msgid "application name"
 msgstr "应用名称"
 
-#: .\apps\application\serializers\application_serializers.py:203
+#: .\apps\application\serializers\application_serializers.py:208
 msgid "application describe"
 msgstr "应用描述"
 
-#: .\apps\application\serializers\application_serializers.py:205
-#: .\apps\application\serializers\application_serializers.py:469
+#: .\apps\application\serializers\application_serializers.py:210
+#: .\apps\application\serializers\application_serializers.py:475
 msgid "Model"
 msgstr "模型"
 
-#: .\apps\application\serializers\application_serializers.py:209
-#: .\apps\application\serializers\application_serializers.py:473
+#: .\apps\application\serializers\application_serializers.py:214
+#: .\apps\application\serializers\application_serializers.py:479
 msgid "Historical chat records"
 msgstr "历史聊天记录"
 
-#: .\apps\application\serializers\application_serializers.py:214
-#: .\apps\application\serializers\application_serializers.py:477
+#: .\apps\application\serializers\application_serializers.py:219
+#: .\apps\application\serializers\application_serializers.py:483
 msgid "Related Knowledge Base"
 msgstr "关联知识库"
 
-#: .\apps\application\serializers\application_serializers.py:221
-#: .\apps\application\serializers\application_serializers.py:487
+#: .\apps\application\serializers\application_serializers.py:226
+#: .\apps\application\serializers\application_serializers.py:493
 #: .\apps\application\serializers\chat_serializers.py:359
 msgid "Question completion"
 msgstr "问题补全"
 
-#: .\apps\application\serializers\application_serializers.py:225
+#: .\apps\application\serializers\application_serializers.py:230
 #: .\apps\application\swagger_api\application_api.py:203
 #: .\apps\application\swagger_api\application_api.py:348
 msgid "Application Type"
 msgstr "应用类型"
 
-#: .\apps\application\serializers\application_serializers.py:229
+#: .\apps\application\serializers\application_serializers.py:234
 msgid "Application type only supports SIMPLE|WORK_FLOW"
 msgstr "应用类型只支持 SIMPLE|WORK_FLOW"
 
-#: .\apps\application\serializers\application_serializers.py:233
-#: .\apps\application\serializers\application_serializers.py:491
+#: .\apps\application\serializers\application_serializers.py:238
+#: .\apps\application\serializers\application_serializers.py:497
 msgid "Model parameters"
 msgstr "模型参数"
 
-#: .\apps\application\serializers\application_serializers.py:241
+#: .\apps\application\serializers\application_serializers.py:246
 msgid "Host"
 msgstr "主机"
 
-#: .\apps\application\serializers\application_serializers.py:242
+#: .\apps\application\serializers\application_serializers.py:247
 msgid "protocol"
 msgstr "协议"
 
-#: .\apps\application\serializers\application_serializers.py:243
+#: .\apps\application\serializers\application_serializers.py:248
 msgid "token"
 msgstr "token"
 
-#: .\apps\application\serializers\application_serializers.py:325
+#: .\apps\application\serializers\application_serializers.py:330
 #: .\apps\application\swagger_api\application_api.py:153
 #: .\apps\application\swagger_api\application_api.py:154
 msgid "Reset Token"
 msgstr "重置 Token"
 
-#: .\apps\application\serializers\application_serializers.py:326
+#: .\apps\application\serializers\application_serializers.py:331
 msgid "Is it enabled"
 msgstr "是否开启"
 
-#: .\apps\application\serializers\application_serializers.py:329
+#: .\apps\application\serializers\application_serializers.py:334
 #: .\apps\application\swagger_api\application_api.py:158
 #: .\apps\application\swagger_api\application_api.py:159
 msgid "Number of visits"
 msgstr "访问次数"
 
-#: .\apps\application\serializers\application_serializers.py:331
+#: .\apps\application\serializers\application_serializers.py:336
 #: .\apps\application\swagger_api\application_api.py:160
 #: .\apps\application\swagger_api\application_api.py:161
 msgid "Whether to enable whitelist"
 msgstr "是否开启白名单"
 
-#: .\apps\application\serializers\application_serializers.py:334
-#: .\apps\application\serializers\application_serializers.py:335
+#: .\apps\application\serializers\application_serializers.py:339
+#: .\apps\application\serializers\application_serializers.py:340
 #: .\apps\application\swagger_api\application_api.py:163
 #: .\apps\application\swagger_api\application_api.py:164
 msgid "Whitelist"
 msgstr "白名单"
 
-#: .\apps\application\serializers\application_serializers.py:338
+#: .\apps\application\serializers\application_serializers.py:343
 #: .\apps\application\swagger_api\application_api.py:166
 #: .\apps\application\swagger_api\application_api.py:167
 msgid "Whether to display knowledge sources"
 msgstr "是否显示知识来源"
 
-#: .\apps\application\serializers\application_serializers.py:340
+#: .\apps\application\serializers\application_serializers.py:345
 #: .\apps\application\swagger_api\application_api.py:169
 #: .\apps\application\swagger_api\application_api.py:170
 #: .\apps\users\serializers\user_serializers.py:273
 #: .\apps\users\views\user.py:80 .\apps\users\views\user.py:81
+#: .\apps\xpack\serializers\application_setting_serializer.py:37
 msgid "language"
 msgstr "语言"
 
-#: .\apps\application\serializers\application_serializers.py:406
+#: .\apps\application\serializers\application_serializers.py:412
 msgid "access_token"
 msgstr "access_token"
 
-#: .\apps\application\serializers\application_serializers.py:408
+#: .\apps\application\serializers\application_serializers.py:414
 msgid "Certification Information"
 msgstr "认证信息"
 
-#: .\apps\application\serializers\application_serializers.py:445
+#: .\apps\application\serializers\application_serializers.py:451
 msgid "Invalid access_token"
 msgstr "无效的access_token"
 
-#: .\apps\application\serializers\application_serializers.py:456
+#: .\apps\application\serializers\application_serializers.py:462
 msgid "Wrong password"
 msgstr "密码错误"
 
-#: .\apps\application\serializers\application_serializers.py:481
+#: .\apps\application\serializers\application_serializers.py:487
 msgid "Dataset settings"
 msgstr "知识库设置"
 
-#: .\apps\application\serializers\application_serializers.py:484
+#: .\apps\application\serializers\application_serializers.py:490
 msgid "Model setup"
 msgstr "模型设置"
 
-#: .\apps\application\serializers\application_serializers.py:488
+#: .\apps\application\serializers\application_serializers.py:494
 msgid "Icon"
 msgstr "icon 图标"
 
-#: .\apps\application\serializers\application_serializers.py:498
-#: .\apps\application\serializers\application_serializers.py:705
+#: .\apps\application\serializers\application_serializers.py:504
+#: .\apps\application\serializers\application_serializers.py:711
 #: .\apps\setting\serializers\valid_serializers.py:29
 msgid ""
 "The community version supports up to 5 applications. If you need more "
@@ -800,29 +852,29 @@ msgstr ""
 "社区版最多支持 5 个应用，如需拥有更多应用，请联系我们（https://"
 "fit2cloud.com/）"
 
-#: .\apps\application\serializers\application_serializers.py:566
+#: .\apps\application\serializers\application_serializers.py:572
 msgid "Query text"
 msgstr "查询文本"
 
-#: .\apps\application\serializers\application_serializers.py:568
+#: .\apps\application\serializers\application_serializers.py:574
 msgid "topN"
 msgstr "topN"
 
-#: .\apps\application\serializers\application_serializers.py:570
+#: .\apps\application\serializers\application_serializers.py:576
 msgid "Relevance"
 msgstr "相似度"
 
-#: .\apps\application\serializers\application_serializers.py:579
-#: .\apps\application\serializers\application_serializers.py:688
-#: .\apps\application\serializers\application_serializers.py:780
+#: .\apps\application\serializers\application_serializers.py:585
+#: .\apps\application\serializers\application_serializers.py:694
+#: .\apps\application\serializers\application_serializers.py:786
 msgid "Application id does not exist"
 msgstr "应用 ID 不存在"
 
-#: .\apps\application\serializers\application_serializers.py:611
+#: .\apps\application\serializers\application_serializers.py:617
 msgid "Select User ID"
 msgstr "选择用户 ID"
 
-#: .\apps\application\serializers\application_serializers.py:700
+#: .\apps\application\serializers\application_serializers.py:706
 #: .\apps\dataset\serializers\document_serializers.py:162
 #: .\apps\dataset\serializers\document_serializers.py:211
 #: .\apps\dataset\serializers\document_serializers.py:218
@@ -831,7 +883,7 @@ msgstr "选择用户 ID"
 msgid "file"
 msgstr "文件"
 
-#: .\apps\application\serializers\application_serializers.py:715
+#: .\apps\application\serializers\application_serializers.py:721
 #: .\apps\common\handle\impl\qa\zip_parse_qa_handle.py:62
 #: .\apps\common\handle\impl\zip_split_handle.py:56
 #: .\apps\dataset\serializers\document_serializers.py:844
@@ -839,30 +891,30 @@ msgstr "文件"
 msgid "Unsupported file format"
 msgstr "文件格式不支持"
 
-#: .\apps\application\serializers\application_serializers.py:853
+#: .\apps\application\serializers\application_serializers.py:859
 msgid "work_flow is a required field"
 msgstr "work_flow是必填字段"
 
-#: .\apps\application\serializers\application_serializers.py:915
-#: .\apps\application\serializers\application_serializers.py:1055
+#: .\apps\application\serializers\application_serializers.py:921
+#: .\apps\application\serializers\application_serializers.py:1063
 #, python-brace-format
 msgid "Unknown knowledge base id {dataset_id}, unable to associate"
 msgstr "未知的知识库 id {dataset_id}，无法关联"
 
-#: .\apps\application\serializers\application_serializers.py:935
+#: .\apps\application\serializers\application_serializers.py:941
 msgid "Illegal User"
 msgstr "非法用户"
 
-#: .\apps\application\serializers\application_serializers.py:1007
-#: .\apps\application\serializers\application_serializers.py:1017
-#: .\apps\application\serializers\application_serializers.py:1027
+#: .\apps\application\serializers\application_serializers.py:1015
+#: .\apps\application\serializers\application_serializers.py:1025
+#: .\apps\application\serializers\application_serializers.py:1035
 #, python-brace-format
 msgid "No permission to use this model:{model_name}"
 msgstr "用户没有使用该模型:{model_name}的权限"
 
-#: .\apps\application\serializers\application_serializers.py:1216
+#: .\apps\application\serializers\application_serializers.py:1224
 #: .\apps\application\serializers\chat_message_serializers.py:398
-#: .\apps\xpack\serializers\application_setting_serializer.py:93
+#: .\apps\xpack\serializers\application_setting_serializer.py:96
 #: .\apps\xpack\serializers\platform_serializer.py:76
 #: .\apps\xpack\serializers\platform_serializer.py:97
 #: .\apps\xpack\serializers\platform_serializer.py:165
@@ -870,32 +922,32 @@ msgstr "用户没有使用该模型:{model_name}的权限"
 msgid "Application does not exist"
 msgstr "应用不存在"
 
-#: .\apps\application\serializers\application_serializers.py:1238
+#: .\apps\application\serializers\application_serializers.py:1246
 #: .\apps\application\swagger_api\chat_api.py:385
 #: .\apps\application\swagger_api\chat_api.py:386
 msgid "Availability"
 msgstr "是否可用"
 
-#: .\apps\application\serializers\application_serializers.py:1242
+#: .\apps\application\serializers\application_serializers.py:1250
 #: .\apps\application\swagger_api\application_api.py:129
 #: .\apps\application\swagger_api\application_api.py:130
 msgid "Is cross-domain allowed"
 msgstr "是否允许跨域"
 
-#: .\apps\application\serializers\application_serializers.py:1247
+#: .\apps\application\serializers\application_serializers.py:1255
 msgid "Cross-domain address"
 msgstr "跨域地址"
 
-#: .\apps\application\serializers\application_serializers.py:1248
+#: .\apps\application\serializers\application_serializers.py:1256
 #: .\apps\application\swagger_api\application_api.py:131
 msgid "Cross-domain list"
 msgstr "跨域列表"
 
-#: .\apps\application\serializers\application_serializers.py:1253
+#: .\apps\application\serializers\application_serializers.py:1261
 msgid "ApiKeyid"
 msgstr ""
 
-#: .\apps\application\serializers\application_serializers.py:1274
+#: .\apps\application\serializers\application_serializers.py:1282
 msgid "APIKey does not exist"
 msgstr "APIKey 不存在"
 
@@ -1272,6 +1324,11 @@ msgstr "ai作答:就是题词,指定回答:就是指定回答内容"
 msgid "Upload image files"
 msgstr "上传图片文件"
 
+#: .\apps\application\swagger_api\application_api.py:432
+#: .\apps\application\swagger_api\application_api.py:433
+msgid "Text"
+msgstr ""
+
 #: .\apps\application\swagger_api\application_statistics_api.py:41
 #: .\apps\application\swagger_api\application_statistics_api.py:42
 #: .\apps\application\swagger_api\chat_api.py:377
@@ -1587,6 +1644,7 @@ msgstr "修改应用图标"
 #: .\apps\application\views\application_views.py:564
 #: .\apps\application\views\application_views.py:584
 #: .\apps\application\views\application_views.py:604
+#: .\apps\application\views\application_views.py:637
 msgid "Application"
 msgstr "应用"
 
@@ -1738,6 +1796,12 @@ msgstr "获取当前应用可用的知识库"
 #: .\apps\application\views\application_views.py:600
 msgid "Get the application list by page"
 msgstr "获取应用列表分页"
+
+#: .\apps\application\views\application_views.py:632
+#: .\apps\application\views\application_views.py:633
+#: .\apps\setting\models_provider\base_model_provider.py:155
+msgid "text to speech"
+msgstr "语音合成"
 
 #: .\apps\application\views\chat_views.py:33
 #: .\apps\application\views\chat_views.py:34
@@ -1934,7 +1998,7 @@ msgstr "密码和确认密码不一致"
 
 #: .\apps\common\constants\permission_constants.py:61
 msgid "ADMIN"
-msgstr ""
+msgstr "管理员"
 
 #: .\apps\common\constants\permission_constants.py:61
 msgid "Admin, prefabs are not currently used"
@@ -2284,14 +2348,6 @@ msgstr "更新时间"
 msgid "Create time"
 msgstr "创建时间"
 
-#: .\apps\common\util\common.py:218
-msgid "Text-to-speech node, the text content must be of string type"
-msgstr "文本转语音节点,文本内容必须是字符串类型"
-
-#: .\apps\common\util\common.py:220
-msgid "Text-to-speech node, the text content cannot be empty"
-msgstr "文本转语音节点,文本内容不能为空"
-
 #: .\apps\dataset\serializers\common_serializers.py:87
 msgid "source url"
 msgstr "文档地址"
@@ -2595,7 +2651,7 @@ msgid "documents"
 msgstr "文档"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:548
-#: .\apps\xpack\serializers\application_setting_serializer.py:68
+#: .\apps\xpack\serializers\application_setting_serializer.py:70
 msgid "application id"
 msgstr "应用 id"
 
@@ -3543,10 +3599,6 @@ msgstr "向量模型"
 msgid "speech to text"
 msgstr "语音识别"
 
-#: .\apps\setting\models_provider\base_model_provider.py:155
-msgid "text to speech"
-msgstr "语音合成"
-
 #: .\apps\setting\models_provider\base_model_provider.py:156
 msgid "picture understanding"
 msgstr "图片理解"
@@ -3587,7 +3639,7 @@ msgstr ""
 "CosyVoice基于新一代生成式语音大模型，能根据上下文预测情绪、语调、韵律等，具有"
 "更好的拟人效果"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:51                         "
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\aliyun_bai_lian_model_provider.py:51
 msgid ""
 "Universal text vector is Tongyi Lab's multi-language text unified vector "
 "model based on the LLM base. It provides high-level vector services for "
@@ -3615,561 +3667,572 @@ msgstr ""
 msgid "Alibaba Cloud Bailian"
 msgstr "阿里云百炼"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\embedding.py:26
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:48
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\embedding.py:27
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:46
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:39
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\reranker.py:27
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\stt.py:20
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:66
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:54
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:42
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\stt.py:21
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:67
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:55
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:41
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:46
 #: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\embedding.py:20
 #: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\llm.py:39
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\embedding.py:25
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\embedding.py:26
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\image.py:44
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\llm.py:46
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\stt.py:20
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:55
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tts.py:36
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\stt.py:22
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:57
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tts.py:40
 #: .\apps\setting\models_provider\impl\deepseek_model_provider\credential\llm.py:46
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\embedding.py:22
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:37
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:42
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\stt.py:17
-#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:43
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:24
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:26
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:24
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:36
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:40
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\embedding.py:23
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:40
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:43
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\stt.py:18
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:59
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tts.py:35
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:44
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:42
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\embedding.py:25
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:41
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:46
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\stt.py:20
+#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:46
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:26
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:27
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:26
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:39
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:44
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\embedding.py:25
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:43
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:46
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\stt.py:21
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:60
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tts.py:39
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:46
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:46
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:67
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\embedding.py:15
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:44
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:26
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:75
-#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:36
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\embedding.py:23
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:38
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:43
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\stt.py:22
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:39
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:50
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\embedding.py:24
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:42
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\embedding.py:23
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\image.py:25
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:59
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\stt.py:22
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:44
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:17
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:43
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:40
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\reranker.py:24
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\stt.py:19
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:58
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:37
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:37
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:43
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:37
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\embedding.py:18
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:46
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:29
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:77
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\embedding.py:25
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\image.py:41
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:39
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\embedding.py:25
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:41
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:46
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\stt.py:25
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:41
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:53
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\embedding.py:26
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:45
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\embedding.py:26
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\image.py:28
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:65
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\stt.py:24
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:47
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:19
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:41
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:39
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\reranker.py:25
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\stt.py:21
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:59
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:39
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:40
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:46
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:39
 #, python-brace-format
 msgid "{model_type} Model type is not supported"
 msgstr "模型类型 {model_type} 不支持"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\embedding.py:31
 #, python-brace-format
 msgid "{key} is required"
 msgstr "{key} 是必填项"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\embedding.py:35
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:57
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\embedding.py:36
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:55
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:49
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\reranker.py:36
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\model\tti.py:42
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\model\tts.py:36
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:52
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\model\tti.py:43
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\model\tts.py:37
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:51
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:56
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\embedding.py:31
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\embedding.py:33
 #: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\llm.py:52
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\embedding.py:35
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\embedding.py:36
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\image.py:54
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\llm.py:56
 #: .\apps\setting\models_provider\impl\deepseek_model_provider\credential\llm.py:56
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\embedding.py:32
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:47
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:52
-#: .\apps\setting\models_provider\impl\gemini_model_provider\model\stt.py:44
-#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:53
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:33
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:35
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:34
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\embedding.py:33
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:50
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:54
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:53
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:51
-#: .\apps\setting\models_provider\impl\qwen_model_provider\model\tti.py:42
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\embedding.py:19
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:53
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:45
-#: .\apps\setting\models_provider\impl\tencent_model_provider\model\tti.py:53
-#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:46
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\embedding.py:33
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:48
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:53
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\model\tts.py:76
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\embedding.py:28
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:55
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\embedding.py:27
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:69
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\embedding.py:35
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:51
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:56
+#: .\apps\setting\models_provider\impl\gemini_model_provider\model\stt.py:43
+#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:56
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:35
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:36
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:37
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\embedding.py:35
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:53
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:57
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:55
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:55
+#: .\apps\setting\models_provider\impl\qwen_model_provider\model\tti.py:43
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\embedding.py:22
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:55
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:49
+#: .\apps\setting\models_provider\impl\tencent_model_provider\model\tti.py:54
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\embedding.py:35
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:50
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\embedding.py:35
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:51
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:56
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\model\tts.py:77
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:59
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:75
 #: .\apps\setting\models_provider\impl\xf_model_provider\model\tts.py:101
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:28
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:53
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:51
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\reranker.py:33
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:31
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:51
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:50
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\reranker.py:34
 #: .\apps\setting\models_provider\impl\xinference_model_provider\model\tts.py:44
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:47
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:52
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:50
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:55
 #: .\apps\setting\models_provider\impl\zhipu_model_provider\model\tti.py:49
 msgid "Hello"
 msgstr "你好！"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\embedding.py:40
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:65
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:55
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\embedding.py:42
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:64
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:56
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\reranker.py:42
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\stt.py:36
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:82
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:70
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:59
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:62
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\embedding.py:37
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\llm.py:58
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\image.py:62
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\stt.py:35
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:71
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tts.py:51
-#: .\apps\setting\models_provider\impl\deepseek_model_provider\credential\llm.py:62
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\embedding.py:37
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:54
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:58
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\stt.py:32
-#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:58
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:38
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:40
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\embedding.py:38
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:57
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:59
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\stt.py:33
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:75
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tts.py:50
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:60
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:56
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:82
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\embedding.py:24
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:60
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:48
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:97
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\embedding.py:38
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:55
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:59
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\stt.py:37
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:54
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:65
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\embedding.py:33
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\embedding.py:32
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\image.py:43
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:74
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\stt.py:37
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:59
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:61
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\reranker.py:38
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\stt.py:34
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:74
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:52
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:54
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:57
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:53
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\stt.py:37
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:84
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:72
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:60
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:63
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\embedding.py:40
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\llm.py:59
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\image.py:63
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\stt.py:38
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:75
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tts.py:56
+#: .\apps\setting\models_provider\impl\deepseek_model_provider\credential\llm.py:63
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\embedding.py:41
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:60
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:64
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\stt.py:36
+#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:62
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:42
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:43
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\embedding.py:41
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:62
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:64
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\stt.py:37
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:78
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tts.py:56
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:64
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:62
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:84
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\embedding.py:28
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:64
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:54
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:102
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\embedding.py:41
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\image.py:60
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\embedding.py:41
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:60
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:64
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\stt.py:41
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:57
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:69
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\embedding.py:36
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\embedding.py:36
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\image.py:48
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:82
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\stt.py:40
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:64
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:60
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\reranker.py:40
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\stt.py:37
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:77
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:56
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:59
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:62
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:57
 #, python-brace-format
 msgid ""
 "Verification failed, please check whether the parameters are correct: {error}"
 msgstr "验证失败，请检查参数是否正确: {error}"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:23
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:21
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:14
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:16
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:14
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:21
 #: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\llm.py:13
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\image.py:16
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\llm.py:21
 #: .\apps\setting\models_provider\impl\deepseek_model_provider\credential\llm.py:21
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:13
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:20
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:15
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:21
 #: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:21
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:11
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:19
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:15
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:12
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:20
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:16
 #: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:21
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:22
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:20
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:22
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:11
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:21
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:21
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:21
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:12
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\image.py:14
 #: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:15
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:15
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:14
 #: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:21
 #: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:21
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:20
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:37
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:16
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:16
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:15
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:21
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:40
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:14
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:15
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:14
 #: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:21
 msgid "Temperature"
 msgstr "温度"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:24
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:22
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:15
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:17
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:15
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:22
 #: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\llm.py:14
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\image.py:17
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\llm.py:22
 #: .\apps\setting\models_provider\impl\deepseek_model_provider\credential\llm.py:22
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:13
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:20
-#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:21
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:11
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:19
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:15
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:21
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:16
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:22
+#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:22
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:13
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:21
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:17
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:22
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:22
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:20
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:22
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:22
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:11
-#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:15
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:13
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\image.py:15
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:16
 #: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:15
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:21
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:21
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:20
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:37
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:17
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:17
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:22
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:22
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:22
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:41
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:15
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:16
 #: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:15
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:21
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:22
 msgid ""
 "Higher values make the output more random, while lower values make it more "
 "focused and deterministic"
 msgstr "较高的数值会使输出更加随机，而较低的数值会使其更加集中和确定"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:32
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:30
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:23
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:25
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:23
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:30
 #: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\llm.py:22
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\image.py:25
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\llm.py:30
 #: .\apps\setting\models_provider\impl\deepseek_model_provider\credential\llm.py:30
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:21
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:28
-#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:29
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:19
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:27
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:23
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:29
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:24
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:30
+#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:30
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:21
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:29
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:25
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:30
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:30
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:28
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:30
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:30
-#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:23
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\image.py:23
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:24
 #: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:23
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:29
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:29
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:28
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:45
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:25
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:25
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:30
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:30
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:30
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:49
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:23
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:24
 #: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:23
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:29
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:30
 msgid "Output the maximum Tokens"
 msgstr "输出最大Token数"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:33
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:31
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:24
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:26
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:24
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:31
 #: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\llm.py:23
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\image.py:26
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\llm.py:31
 #: .\apps\setting\models_provider\impl\deepseek_model_provider\credential\llm.py:31
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:21
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:28
-#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:29
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:19
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:27
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:23
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:29
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:30
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:28
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:30
-#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:23
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:23
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:29
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:29
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:28
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:45
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:26
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:26
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:23
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:29
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:25
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:31
+#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:31
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:22
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:30
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:26
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:31
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:31
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:31
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:31
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\image.py:24
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:25
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:24
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:31
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:31
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:31
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:50
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:24
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:25
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:24
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:31
 msgid "Specify the maximum number of tokens that the model can generate"
 msgstr "指定模型可以生成的最大令牌数"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:52
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:50
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:44
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\reranker.py:31
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\stt.py:25
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:70
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:59
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:47
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\stt.py:26
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:71
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:60
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:46
 #: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:51
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\embedding.py:31
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\image.py:49
 #: .\apps\setting\models_provider\impl\azure_model_provider\credential\llm.py:51
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\stt.py:25
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:60
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tts.py:41
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\stt.py:27
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:62
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tts.py:45
 #: .\apps\setting\models_provider\impl\deepseek_model_provider\credential\llm.py:51
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\embedding.py:27
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:42
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:47
-#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\stt.py:22
-#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:48
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:28
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:30
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:43
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:57
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\embedding.py:28
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:45
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:48
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\stt.py:23
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:64
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tts.py:40
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:48
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:46
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\image.py:46
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\llm.py:51
+#: .\apps\setting\models_provider\impl\gemini_model_provider\credential\stt.py:25
+#: .\apps\setting\models_provider\impl\kimi_model_provider\credential\llm.py:51
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:31
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:46
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:62
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\image.py:48
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\llm.py:51
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\stt.py:26
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:65
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tts.py:44
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\image.py:50
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\llm.py:50
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:71
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:48
-#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:58
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\embedding.py:28
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:43
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:48
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\stt.py:27
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:44
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:55
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:50
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:66
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\image.py:30
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:64
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\stt.py:27
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:49
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:37
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:48
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:60
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\reranker.py:28
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\stt.py:24
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:63
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:42
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:42
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:47
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:42
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\image.py:50
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\image.py:46
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:62
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\image.py:46
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\llm.py:51
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\stt.py:30
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:46
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:58
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:54
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:70
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\image.py:33
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\llm.py:70
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\stt.py:29
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:52
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:40
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\image.py:46
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:59
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\reranker.py:29
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\stt.py:26
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:64
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:44
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:45
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:50
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:44
 #, python-brace-format
 msgid "{key}  is required"
 msgstr "{key} 是必填项"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:20
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:13
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:16
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:22
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:14
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:17
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:13
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:21
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:14
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:14
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:21
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:15
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:14
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:14
 msgid "Image size"
 msgstr "图片尺寸"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:20
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:13
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:22
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:21
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:14
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:21
 msgid "Specify the size of the generated image, such as: 1024x1024"
 msgstr "指定生成图片的尺寸, 如: 1024x1024"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:32
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:38
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:43
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:34
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:42
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:33
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:39
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:42
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:33
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:41
 msgid "Number of pictures"
 msgstr "图片数量"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:32
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:38
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:34
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:33
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:39
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:33
 msgid "Specify the number of generated images"
 msgstr "指定生成图片的数量"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:39
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:41
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:40
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:40
 msgid "Style"
 msgstr "风格"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:39
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:41
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:40
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:40
 msgid "Specify the style of generated images"
 msgstr "指定生成图片的风格"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:43
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:45
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:44
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:44
 msgid "Default value, the image style is randomly output by the model"
 msgstr "默认值，图片风格由模型随机输出"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:44
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:46
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:45
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:45
 msgid "photography"
 msgstr "摄影"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:45
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:47
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:46
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:46
 msgid "Portraits"
 msgstr "人像写真"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:46
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:48
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:47
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:47
 msgid "3D cartoon"
 msgstr "3D卡通"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:47
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:49
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:48
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:48
 msgid "animation"
 msgstr "动画"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:48
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:50
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:49
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:49
 msgid "painting"
 msgstr "油画"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:49
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:51
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:50
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:50
 msgid "watercolor"
 msgstr "水彩"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:50
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:52
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:51
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:51
 msgid "sketch"
 msgstr "素描"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:51
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:53
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:52
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:52
 msgid "Chinese painting"
 msgstr "中国画"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:52
-#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:54
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:53
+#: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:53
 msgid "flat illustration"
 msgstr "扁平插画"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:14
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:14
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:14
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:15
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:15
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:15
 msgid "timbre"
 msgstr "音色"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:14
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:14
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:15
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:15
 msgid "Chinese sounds can support mixed scenes of Chinese and English"
 msgstr "中文音色支持中英文混合场景"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:19
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:20
 msgid "Long Xiaochun"
 msgstr "龙小淳"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:20
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:21
 msgid "Long Xiaoxia"
 msgstr "龙小夏"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:21
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:22
 msgid "Long Xiaochen"
 msgstr "龙小诚"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:22
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:23
 msgid "Long Xiaobai"
 msgstr "龙小白"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:23
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:24
 msgid "Long laotie"
 msgstr "龙老铁"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:24
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:25
 msgid "Long Shu"
 msgstr "龙书"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:25
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:26
 msgid "Long Shuo"
 msgstr "龙硕"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:26
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:27
 msgid "Long Jing"
 msgstr "龙婧"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:27
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:28
 msgid "Long Miao"
 msgstr "龙妙"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:28
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:29
 msgid "Long Yue"
 msgstr "龙悦"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:29
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:30
 msgid "Long Yuan"
 msgstr "龙媛"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:30
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:31
 msgid "Long Fei"
 msgstr "龙飞"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:31
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:32
 msgid "Long Jielidou"
 msgstr "龙杰力豆"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:32
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:33
 msgid "Long Tong"
 msgstr "龙彤"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:33
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:34
 msgid "Long Xiang"
 msgstr "龙祥"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:38
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:32
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:26
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:39
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:33
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:28
 msgid "speaking speed"
 msgstr "语速"
 
-#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:38
+#: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:39
 msgid "[0.5,2], the default is 1, usually one decimal place is enough"
 msgstr "[0.5,2]，默认为1，通常一位小数就足够了"
 
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:35
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:71
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:33
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:72
 msgid "API URL"
 msgstr ""
 
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:36
-#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:72
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\image.py:34
+#: .\apps\setting\models_provider\impl\anthropic_model_provider\credential\llm.py:73
 msgid "API Key"
 msgstr ""
 
@@ -4306,25 +4369,25 @@ msgstr ""
 "Titan Embed Text 是 Amazon Titan Embed 系列中最大的嵌入模型，可以处理各种文本"
 "嵌入任务，如文本分类、文本相似度计算等。"
 
-#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\embedding.py:26
+#: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\embedding.py:27
 #: .\apps\setting\models_provider\impl\aws_bedrock_model_provider\credential\llm.py:46
 #, python-brace-format
 msgid "The following fields are required: {keys}"
 msgstr "以下字段是必填项: {keys}"
 
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\embedding.py:41
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\llm.py:61
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\embedding.py:42
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\llm.py:62
 msgid "Verification failed, please check whether the parameters are correct"
 msgstr "验证失败，请检查参数是否正确"
 
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:26
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:29
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:30
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tti.py:27
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:28
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:28
 msgid "Picture quality"
 msgstr "图片质量"
 
-#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tts.py:13
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tts.py:13
+#: .\apps\setting\models_provider\impl\azure_model_provider\credential\tts.py:16
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tts.py:16
 msgid ""
 "Try out the different sounds (Alloy, Echo, Fable, Onyx, Nova, and Sparkle) "
 "to find one that suits your desired tone and audience. The current voiceover "
@@ -4356,12 +4419,12 @@ msgstr "最新的Gemini 1.0 Pro Vision模型，随Google更新而更新"
 msgid "Latest Gemini 1.5 Flash model, updated with Google updates"
 msgstr "最新的Gemini 1.5 Flash模型，随Google更新而更新"
 
-#: .\apps\setting\models_provider\impl\gemini_model_provider\model\stt.py:54
+#: .\apps\setting\models_provider\impl\gemini_model_provider\model\stt.py:53
 msgid "convert audio to text"
 msgstr "将音频转换为文本"
 
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:46
-#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:48
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:51
+#: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:52
 msgid "Model catalog"
 msgstr "模型目录"
 
@@ -4369,21 +4432,21 @@ msgstr "模型目录"
 msgid "local model"
 msgstr "本地模型"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:28
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:40
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:44
-#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:40
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:22
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:45
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:43
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:48
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:43
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:24
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:44
 msgid "API domain name is invalid"
 msgstr "API域名无效"
 
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:32
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:44
-#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:48
-#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:43
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:27
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:49
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:35
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:48
+#: .\apps\setting\models_provider\impl\ollama_model_provider\credential\llm.py:53
+#: .\apps\setting\models_provider\impl\vllm_model_provider\credential\llm.py:47
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\embedding.py:30
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\llm.py:48
 msgid "The model does not exist, please download the model first"
 msgstr "模型不存在，请先下载模型"
 
@@ -4440,8 +4503,8 @@ msgid ""
 "processing capabilities. Models of all sizes support a context length of "
 "32768 tokens. 500 million parameters."
 msgstr ""
-"qwen 1.5 0.5b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显"
-"著增强。所有规模的模型都支持32768个tokens的上下文长度。5亿参数。"
+"qwen 1.5 0.5b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有"
+"显著增强。所有规模的模型都支持32768个tokens的上下文长度。5亿参数。"
 
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:61
 msgid ""
@@ -4450,8 +4513,8 @@ msgid ""
 "processing capabilities. Models of all sizes support a context length of "
 "32768 tokens. 1.8 billion parameters."
 msgstr ""
-"qwen 1.5 1.8b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显"
-"著增强。所有规模的模型都支持32768个tokens的上下文长度。18亿参数。"
+"qwen 1.5 1.8b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有"
+"显著增强。所有规模的模型都支持32768个tokens的上下文长度。18亿参数。"
 
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:65
 msgid ""
@@ -4510,8 +4573,8 @@ msgid ""
 "processing capabilities. Models of all sizes support a context length of "
 "32768 tokens. 110 billion parameters."
 msgstr ""
-"qwen 1.5 110b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有显"
-"著增强。所有规模的模型都支持32768个tokens的上下文长度。1100亿参数。"
+"qwen 1.5 110b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有"
+"显著增强。所有规模的模型都支持32768个tokens的上下文长度。1100亿参数。"
 
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:130
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:163
@@ -4526,7 +4589,7 @@ msgid ""
 "A high-performance open embedding model with a large token context window."
 msgstr "一个具有大令牌上下文窗口的高性能开放嵌入模型。"
 
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:16
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:15
 msgid ""
 "The image generation endpoint allows you to create raw images based on text "
 "prompts. When using the DALL·E 3, the image size can be 1024x1024, 1024x1792 "
@@ -4535,7 +4598,7 @@ msgstr ""
 "图像生成端点允许您根据文本提示创建原始图像。使用 DALL·E 3 时，图像的尺寸可以"
 "为 1024x1024、1024x1792 或 1792x1024 像素。"
 
-#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:29
+#: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:28
 msgid ""
 "       \n"
 "By default, images are produced in standard quality, but with DALL·E 3 you "
@@ -4631,121 +4694,121 @@ msgstr "2023年11月6日的gpt-4-turbo快照，支持上下文长度128,000 toke
 msgid "Tongyi Qianwen"
 msgstr "通义千问"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:35
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:84
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\llm.py:39
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:87
 #, python-brace-format
 msgid "{keys} is required"
 msgstr "{keys} 是必填项"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:12
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:13
 msgid "painting style"
 msgstr "绘画风格"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:12
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:13
 msgid "If not passed, the default value is 201 (Japanese anime style)"
 msgstr "如果未传递，则默认值为201（日本动漫风格）"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:16
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:17
 msgid "Not limited to style"
 msgstr "不限于风格"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:17
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:18
 msgid "ink painting"
 msgstr "水墨画"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:18
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:19
 msgid "concept art"
 msgstr "概念艺术"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:19
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:20
 msgid "Oil painting 1"
 msgstr "油画1"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:20
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:21
 msgid "Oil Painting 2 (Van Gogh)"
 msgstr "油画2（梵高）"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:21
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:22
 msgid "watercolor painting"
 msgstr "水彩画"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:22
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:23
 msgid "pixel art"
 msgstr "像素画"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:23
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:24
 msgid "impasto style"
 msgstr "厚涂风格"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:24
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:25
 msgid "illustration"
 msgstr "插图"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:25
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:26
 msgid "paper cut style"
 msgstr "剪纸风格"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:26
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:27
 msgid "Impressionism 1 (Monet)"
 msgstr "印象派1（莫奈）"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:27
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:28
 msgid "Impressionism 2"
 msgstr "印象派2"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:29
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:30
 msgid "classical portraiture"
 msgstr "古典肖像画"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:30
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:31
 msgid "black and white sketch"
 msgstr "黑白素描画"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:31
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:32
 msgid "cyberpunk"
 msgstr "赛博朋克"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:32
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:33
 msgid "science fiction style"
 msgstr "科幻风格"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:33
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:34
 msgid "dark style"
 msgstr "暗黑风格"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:35
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:36
 msgid "vaporwave"
 msgstr "蒸汽波"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:36
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:37
 msgid "Japanese animation"
 msgstr "日系动漫"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:37
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:38
 msgid "monster style"
 msgstr "怪兽风格"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:38
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:39
 msgid "Beautiful ancient style"
 msgstr "唯美古风"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:39
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:40
 msgid "retro anime"
 msgstr "复古动漫"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:40
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:41
 msgid "Game cartoon hand drawing"
 msgstr "游戏卡通手绘"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:41
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:42
 msgid "Universal realistic style"
 msgstr "通用写实风格"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:48
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:49
 msgid "Generate image resolution"
 msgstr "生成图像分辨率"
 
-#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:48
+#: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:49
 msgid "If not transmitted, the default value is 768:768."
 msgstr "不传默认使用768:768。"
 
@@ -4832,20 +4895,20 @@ msgstr "混元生图模型"
 msgid "Tencent Hunyuan"
 msgstr "腾讯混元"
 
-#: .\apps\setting\models_provider\impl\vllm_model_provider\vllm_model_provider.py:17
-#: .\apps\setting\models_provider\impl\vllm_model_provider\vllm_model_provider.py:26
+#: .\apps\setting\models_provider\impl\vllm_model_provider\vllm_model_provider.py:24
+#: .\apps\setting\models_provider\impl\vllm_model_provider\vllm_model_provider.py:42
 msgid "Facebook’s 125M parameter model"
 msgstr "Facebook的125M参数模型"
 
-#: .\apps\setting\models_provider\impl\vllm_model_provider\vllm_model_provider.py:18
+#: .\apps\setting\models_provider\impl\vllm_model_provider\vllm_model_provider.py:25
 msgid "BAAI’s 7B parameter model"
 msgstr "BAAI的7B参数模型"
 
-#: .\apps\setting\models_provider\impl\vllm_model_provider\vllm_model_provider.py:19
+#: .\apps\setting\models_provider\impl\vllm_model_provider\vllm_model_provider.py:26
 msgid "BAAI’s 13B parameter mode"
 msgstr "BAAI的13B参数模型"
 
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:15
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tti.py:16
 msgid ""
 "If the gap between width, height and 512 is too large, the picture rendering "
 "effect will be poor and the probability of excessive delay will increase "
@@ -4855,32 +4918,32 @@ msgstr ""
 "宽、高与512差距过大，则出图效果不佳、延迟过长概率显著增加。超分前建议比例及对"
 "应宽高：width*height"
 
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:22
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:28
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:23
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:29
 msgid "Universal female voice"
 msgstr "通用女声"
 
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:24
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:25
 msgid "Supernatural timbre-ZiZi 2.0"
 msgstr "超自然音色-梓梓2.0"
 
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:25
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:26
 msgid "Supernatural timbre-ZiZi"
 msgstr "超自然音色-梓梓"
 
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:26
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:27
 msgid "Supernatural sound-Ranran 2.0"
 msgstr "超自然音色-燃燃2.0"
 
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:27
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:28
 msgid "Supernatural sound-Ranran"
 msgstr "超自然音色-燃燃"
 
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:29
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:30
 msgid "Universal male voice"
 msgstr "通用男声"
 
-#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:32
+#: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:33
 msgid "[0.2,3], the default is 1, usually one decimal place is enough"
 msgstr "[0.2,3]，默认为1，通常保留一位小数即可"
 
@@ -4919,7 +4982,7 @@ msgstr "动漫1.3.1-文生图"
 msgid "volcano engine"
 msgstr "火山引擎"
 
-#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:46
+#: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:50
 #, python-brace-format
 msgid "{model_name} The model does not support"
 msgstr "{model_name} 模型不支持"
@@ -5009,42 +5072,42 @@ msgstr ""
 msgid "Thousand sails large model"
 msgstr "千帆大模型"
 
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\image.py:37
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\image.py:41
 msgid "Please outline this picture"
 msgstr "请描述这张图片"
 
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:14
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:15
 msgid "Speaker"
 msgstr "发音人"
 
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:14
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:16
 msgid ""
 "Speaker, optional value: Please go to the console to add a trial or purchase "
 "speaker. After adding, the speaker parameter value will be displayed."
 msgstr ""
 "发音人，可选值：请到控制台添加试用或购买发音人，添加后即显示发音人参数值"
 
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:19
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:21
 msgid "iFlytek Xiaoyan"
 msgstr "讯飞小燕"
 
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:20
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:22
 msgid "iFlytek Xujiu"
 msgstr "讯飞许久"
 
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:21
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:23
 msgid "iFlytek Xiaoping"
 msgstr "讯飞小萍"
 
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:22
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:24
 msgid "iFlytek Xiaojing"
 msgstr "讯飞小婧"
 
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:23
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:25
 msgid "iFlytek Xuxiaobao"
 msgstr "讯飞许小宝"
 
-#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:26
+#: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:28
 msgid "Speech speed, optional value: [0-100], default is 50"
 msgstr "语速，可选值：[0-100]，默认为50"
 
@@ -5057,7 +5120,7 @@ msgstr "中英文识别"
 msgid "iFlytek Spark"
 msgstr "讯飞星火"
 
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:17
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:15
 msgid ""
 "The image generation endpoint allows you to create raw images based on text "
 "prompts. The dimensions of the image can be 1024x1024, 1024x1792, or "
@@ -5066,7 +5129,7 @@ msgstr ""
 "图像生成端点允许您根据文本提示创建原始图像。图像的尺寸可以为 1024x1024、"
 "1024x1792 或 1792x1024 像素。"
 
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:30
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tti.py:29
 msgid ""
 "By default, images are generated in standard quality, you can set quality: "
 "\"hd\" to enhance detail. Square, standard quality images are generated "
@@ -5083,31 +5146,31 @@ msgstr ""
 "您可以一次请求 1 个图像（通过发出并行请求来请求更多图像），或者使用 n 参数一"
 "次最多请求 10 个图像。"
 
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:19
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:20
 msgid "Chinese female"
 msgstr "中文女"
 
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:20
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:21
 msgid "Chinese male"
 msgstr "中文男"
 
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:21
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:22
 msgid "Japanese male"
 msgstr "日语男"
 
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:22
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:23
 msgid "Cantonese female"
 msgstr "粤语女"
 
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:23
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:24
 msgid "English female"
 msgstr "英文女"
 
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:24
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:25
 msgid "English male"
 msgstr "英文男"
 
-#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:25
+#: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:26
 msgid "Korean female"
 msgstr "韩语女"
 
@@ -5144,7 +5207,7 @@ msgstr "CodeQwen 1.5 Chat 是一个聊天模型版本的 CodeQwen 1.5。"
 msgid "Deepseek is a large-scale language model with 13 billion parameters."
 msgstr "Deepseek Chat 是一个聊天模型版本的 Deepseek。"
 
-#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:14
+#: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\tti.py:15
 msgid ""
 "Image size, only cogview-3-plus supports this parameter. Optional range: "
 "[1024x1024,768x1344,864x1152,1344x768,1152x864,1440x720,720x1440], the "
@@ -5995,63 +6058,63 @@ msgstr "浮窗位置 y"
 msgid "show source"
 msgstr "是否显示来源"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:37
+#: .\apps\xpack\serializers\application_setting_serializer.py:38
 #: .\apps\xpack\swagger_api\application_setting_api.py:30
 msgid "show history"
 msgstr "是否显示历史记录"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:38
+#: .\apps\xpack\serializers\application_setting_serializer.py:39
 #: .\apps\xpack\swagger_api\application_setting_api.py:37
 msgid "draggable"
 msgstr "是否可拖动"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:39
+#: .\apps\xpack\serializers\application_setting_serializer.py:40
 #: .\apps\xpack\swagger_api\application_setting_api.py:44
 msgid "show guide"
 msgstr "是否显示引导图"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:40
+#: .\apps\xpack\serializers\application_setting_serializer.py:41
 #: .\apps\xpack\swagger_api\application_setting_api.py:51
 msgid "avatar"
 msgstr "头像"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:41
+#: .\apps\xpack\serializers\application_setting_serializer.py:42
 msgid "avatar url"
 msgstr "头像地址"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:42
+#: .\apps\xpack\serializers\application_setting_serializer.py:43
 #: .\apps\xpack\swagger_api\application_setting_api.py:86
 msgid "user avatar"
 msgstr "用户头像"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:43
+#: .\apps\xpack\serializers\application_setting_serializer.py:44
 msgid "user avatar url"
 msgstr "用户头像地址"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:44
+#: .\apps\xpack\serializers\application_setting_serializer.py:45
 #: .\apps\xpack\swagger_api\application_setting_api.py:58
 msgid "float icon"
 msgstr "浮窗图标"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:45
+#: .\apps\xpack\serializers\application_setting_serializer.py:46
 msgid "float icon url"
 msgstr "浮窗图标地址"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:46
+#: .\apps\xpack\serializers\application_setting_serializer.py:47
 #: .\apps\xpack\swagger_api\application_setting_api.py:65
 msgid "disclaimer"
 msgstr "免责声明"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:47
+#: .\apps\xpack\serializers\application_setting_serializer.py:48
 #: .\apps\xpack\swagger_api\application_setting_api.py:72
 msgid "disclaimer value"
 msgstr "免责声明的值"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:113
+#: .\apps\xpack\serializers\application_setting_serializer.py:116
 msgid "Float location field type error"
 msgstr "浮窗位置字段类型错误"
 
-#: .\apps\xpack\serializers\application_setting_serializer.py:119
+#: .\apps\xpack\serializers\application_setting_serializer.py:122
 msgid "Custom theme field type error"
 msgstr "自定义主题字段类型错误"
 
@@ -6363,14 +6426,15 @@ msgstr "是否显示项目"
 msgid "Project address"
 msgstr "项目地址"
 
-#: .\apps\xpack\serializers\tools.py:59
+#: .\apps\xpack\serializers\tools.py:58
+#, python-brace-format
 msgid ""
 "Thinking about 【{question}】...If you want me to continue answering, please "
 "reply {trigger_message}"
 msgstr ""
 "思考中【{question}】...如果您希望我继续回答,请回复“{trigger_message}”。"
 
-#: .\apps\xpack\serializers\tools.py:159
+#: .\apps\xpack\serializers\tools.py:158
 msgid ""
 "\n"
 " ------------\n"
@@ -6380,7 +6444,7 @@ msgstr ""
 " ------------\n"
 "【未完待续，回复“问题继续回答】"
 
-#: .\apps\xpack\serializers\tools.py:238
+#: .\apps\xpack\serializers\tools.py:237
 #, python-brace-format
 msgid ""
 "To be continued, reply \"{trigger_message}\" to continue answering the "
@@ -6690,102 +6754,3 @@ msgstr "删除个人系统 API_KEY"
 #: .\apps\xpack\views\system_api_key_views.py:58
 msgid "Add personal system API_KEY"
 msgstr "添加个人系统 API_KEY"
-
-#, python-brace-format
-#~ msgid ""
-#~ "\n"
-#~ "Known information:\n"
-#~ "{data}\n"
-#~ "Answer requirements:\n"
-#~ "- If you don't know the answer or don't get the answer, please answer "
-#~ "\"No relevant information found in the knowledge base, it is recommended "
-#~ "to consult relevant technical support or refer to official documents for "
-#~ "operation\".\n"
-#~ "- Avoid mentioning that you got the knowledge from <data></data>.\n"
-#~ "- Please keep the answer consistent with the description in <data></"
-#~ "data>.\n"
-#~ "- Please use markdown syntax to optimize the format of the answer.\n"
-#~ "- Please return the image link, link address and script language in "
-#~ "<data></data> completely.\n"
-#~ "- Please answer in the same language as the question.\n"
-#~ "Question:\n"
-#~ "{question}\n"
-#~ "                                                    "
-#~ msgstr ""
-#~ "已知信息:\n"
-#~ "{data}\n"
-#~ "回答要求:\n"
-#~ "- 如果您不知道答案或者得不到答案，请回答\"在知识库中没有找到相关信息，建议"
-#~ "咨询相关技术支持或者参考官方文档进行操作\".\n"
-#~ "- 避免在回答中提及您从<data></data>中获得了知识。\n"
-#~ "- 请保持回答与<data></data>中的描述一致。\n"
-#~ "- 请使用markdown语法优化回答的格式。\n"
-#~ "- 请完整返回<data></data>中的图片链接、链接地址和脚本语言。\n"
-#~ "- 请使用与问题相同的语言回答。\n"
-#~ "问题:\n"
-#~ "{question}\n"
-#~ "                                                    "
-
-#~ msgid ""
-#~ "\n"
-#~ "        Compared with previous versions, qwen 1.5 0.5b has significantly "
-#~ "enhanced the model's alignment with human preferences and its multi-"
-#~ "language processing capabilities. Models of all sizes support a context "
-#~ "length of 32768 tokens. 500 million parameters.\n"
-#~ "        "
-#~ msgstr ""
-#~ "qwen 1.5 0.5b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上"
-#~ "有显著增强。所有规模的模型都支持32768个tokens的上下文长度。5亿参数。"
-
-#~ msgid ""
-#~ "\n"
-#~ "        \n"
-#~ "Compared with previous versions, qwen 1.5 1.8b has significantly enhanced "
-#~ "the model's alignment with human preferences and its multi-language "
-#~ "processing capabilities. Models of all sizes support a context length of "
-#~ "32768 tokens. 1.8 billion parameters.\n"
-#~ "        "
-#~ msgstr ""
-#~ "qwen 1.5 1.8b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上"
-#~ "有显著增强。所有规模的模型都支持32768个tokens的上下文长度。18亿参数。"
-
-#~ msgid ""
-#~ "\n"
-#~ "        \n"
-#~ "Compared with previous versions, qwen 1.5 4b has significantly enhanced "
-#~ "the model's alignment with human preferences and its multi-language "
-#~ "processing capabilities. Models of all sizes support a context length of "
-#~ "32768 tokens. 4 billion parameters.\n"
-#~ "        "
-#~ msgstr ""
-#~ "qwen 1.5 4b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上有"
-#~ "显著增强。所有规模的模型都支持32768个tokens的上下文长度。40亿参数。"
-
-#~ msgid ""
-#~ "\n"
-#~ "        Compared with previous versions, qwen 1.5 7b has significantly "
-#~ "enhanced the model's alignment with human preferences and its multi-"
-#~ "language processing capabilities. Models of all sizes support a context "
-#~ "length of 32768 tokens. 7 billion parameters.\n"
-#~ "        "
-#~ msgstr ""
-#~ "qwen 1.5 7b 相较于以往版本，模型与人类偏好的对齐程度以及多语1言处理能力上"
-#~ "有显著增强。所有规模的模型都支持32768个tokens的上下文长度。70亿参数。"
-
-#~ msgid ""
-#~ "\n"
-#~ "        Compared with previous versions, qwen 1.5 110b has significantly "
-#~ "enhanced the model's alignment with human preferences and its multi-"
-#~ "language processing capabilities. Models of all sizes support a context "
-#~ "length of 32768 tokens. 110 billion parameters.\n"
-#~ "        "
-#~ msgstr ""
-#~ "qwen 1.5 110b 相较于以往版本，模型与人类偏好的对齐程度以及多语言处理能力上"
-#~ "有显著增强。所有规模的模型都支持32768个tokens的上下文长度。1100亿参数。"
-
-#~ msgid ""
-#~ "\n"
-#~ "        Phi-3 Mini is Microsoft's 3.8B parameter, lightweight, state-of-"
-#~ "the-art open model.\n"
-#~ "        "
-#~ msgstr "Phi-3 Mini 是微软的 3.8B 参数、轻量级、最先进的开放模型。"

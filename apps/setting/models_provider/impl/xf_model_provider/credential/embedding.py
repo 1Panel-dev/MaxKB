@@ -8,7 +8,7 @@
 """
 from typing import Dict
 
-from django.utils.translation import gettext as __
+from django.utils.translation import gettext as _
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -23,17 +23,17 @@ class XFEmbeddingCredential(BaseForm, BaseModelCredential):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value,
-                                  __('{model_type} Model type is not supported').format(model_type=model_type))
+                                  _('{model_type} Model type is not supported').format(model_type=model_type))
         self.valid_form(model_credential)
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            model.embed_query(__('Hello'))
+            model.embed_query(_('Hello'))
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      _('Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             else:
                 return False

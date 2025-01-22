@@ -1,7 +1,7 @@
 # coding=utf-8
 from typing import Dict
 
-from django.utils.translation import gettext as __
+from django.utils.translation import gettext as _
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -19,12 +19,12 @@ class AzureOpenAISTTModelCredential(BaseForm, BaseModelCredential):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value,
-                                  __('{model_type} Model type is not supported').format(model_type=model_type))
+                                  _('{model_type} Model type is not supported').format(model_type=model_type))
 
         for key in ['api_base', 'api_key', 'api_version']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, __('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, _('{key}  is required').format(key=key))
                 else:
                     return False
         try:
@@ -35,7 +35,7 @@ class AzureOpenAISTTModelCredential(BaseForm, BaseModelCredential):
                 raise e
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      _('Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             else:
                 return False

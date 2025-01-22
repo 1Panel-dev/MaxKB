@@ -8,7 +8,7 @@
 """
 from typing import Dict
 
-from django.utils.translation import gettext_lazy as _, gettext as __
+from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.messages import HumanMessage
 
 from common import forms
@@ -42,21 +42,21 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
             raise AppApiException(ValidCode.valid_error.value,
-                                  __('{model_type} Model type is not supported').format(model_type=model_type))
+                                  gettext('{model_type} Model type is not supported').format(model_type=model_type))
         model = provider.get_model(model_type, model_name, model_credential, **model_params)
         model_info = [model.lower() for model in model.client.models()]
-        if not model_info.__contains__(model_name.lower()):
+        if not model_info.__containsgettext(model_name.lower()):
             raise AppApiException(ValidCode.valid_error.value,
-                                  __('{model_name} The model does not support').format(model_name=model_name))
+                                  gettext('{model_name} The model does not support').format(model_name=model_name))
         for key in ['api_key', 'secret_key']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, __('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
                 else:
                     return False
         try:
             model.invoke(
-                [HumanMessage(content=__('Hello'))])
+                [HumanMessage(content=gettext('Hello'))])
         except Exception as e:
             raise e
         return True
@@ -67,7 +67,7 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
     def build_model(self, model_info: Dict[str, object]):
         for key in ['api_key', 'secret_key', 'model']:
             if key not in model_info:
-                raise AppApiException(500, __('{key}  is required').format(key=key))
+                raise AppApiException(500, gettext('{key}  is required').format(key=key))
         self.api_key = model_info.get('api_key')
         self.secret_key = model_info.get('secret_key')
         return self

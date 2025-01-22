@@ -8,7 +8,7 @@
 """
 from typing import Dict
 
-from django.utils.translation import gettext as __
+from django.utils.translation import gettext as _
 from langchain_core.documents import Document
 
 from common import forms
@@ -22,22 +22,22 @@ class XInferenceRerankerModelCredential(BaseForm, BaseModelCredential):
                  raise_exception=True):
         if not model_type == 'RERANKER':
             raise AppApiException(ValidCode.valid_error.value,
-                                  __('{model_type} Model type is not supported').format(model_type=model_type))
+                                  _('{model_type} Model type is not supported').format(model_type=model_type))
         for key in ['server_url']:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, __('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, _('{key}  is required').format(key=key))
                 else:
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            model.compress_documents([Document(page_content=__('Hello'))], __('Hello'))
+            model.compress_documents([Document(page_content=_('Hello'))], _('Hello'))
         except Exception as e:
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
-                                      __('Verification failed, please check whether the parameters are correct: {error}').format(
+                                      _('Verification failed, please check whether the parameters are correct: {error}').format(
                                           error=str(e)))
             else:
                 return False

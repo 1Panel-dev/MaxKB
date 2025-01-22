@@ -14,7 +14,7 @@ from typing import List
 
 from django.db.models import QuerySet
 from django.http import StreamingHttpResponse
-from django.utils.translation import gettext as __
+from django.utils.translation import gettext as _
 from langchain.chat_models.base import BaseChatModel
 from langchain.schema import BaseMessage
 from langchain.schema.messages import HumanMessage, AIMessage
@@ -174,7 +174,7 @@ class BaseChatStep(IChatStep):
                 [AIMessageChunk(content=no_references_setting.get('value').replace('{question}', problem_text))]), False
         if chat_model is None:
             return iter([AIMessageChunk(
-                __('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.'))]), False
+                _('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.'))]), False
         else:
             return chat_model.stream(message_list), True
 
@@ -219,7 +219,7 @@ class BaseChatStep(IChatStep):
             return AIMessage(no_references_setting.get('value').replace('{question}', problem_text)), False
         if chat_model is None:
             return AIMessage(
-                __('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.')), False
+                _('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.')), False
         else:
             return chat_model.invoke(message_list), True
 
