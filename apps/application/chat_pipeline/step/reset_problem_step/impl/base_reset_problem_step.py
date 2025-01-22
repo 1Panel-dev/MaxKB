@@ -8,15 +8,15 @@
 """
 from typing import List
 
+from django.utils.translation import gettext as __
 from langchain.schema import HumanMessage
 
 from application.chat_pipeline.step.reset_problem_step.i_reset_problem_step import IResetProblemStep
 from application.models import ChatRecord
 from common.util.split_model import flat_map
 from setting.models_provider.tools import get_model_instance_by_model_user_id
-from django.utils.translation import gettext_lazy as _
 
-prompt = _(
+prompt = __(
     "() contains the user's question. Answer the guessed user's question based on the context ({question}) Requirement: Output a complete question and put it in the <data></data> tag")
 
 
