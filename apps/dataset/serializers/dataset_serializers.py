@@ -47,7 +47,7 @@ from dataset.serializers.document_serializers import DocumentSerializers, Docume
 from dataset.task import sync_web_dataset, sync_replace_web_dataset
 from embedding.models import SearchMode
 from embedding.task import embedding_by_dataset, delete_embedding_by_dataset
-from setting.models import AuthOperate
+from setting.models import AuthOperate, Model
 from smartdoc.conf import PROJECT_DIR
 from django.utils.translation import gettext_lazy as _
 
@@ -792,6 +792,15 @@ class DataSetSerializers(serializers.ModelSerializer):
         def re_embedding(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            dataset_id = self.data.get('id')
+            dataset = QuerySet(DataSet).filter(id=dataset_id).first()
+            embedding_model_id = dataset.embedding_mode_id
+            dataset_user_id = dataset.user_id
+            embedding_model = QuerySet(Model).filter(id=embedding_model_id).first()
+            if embedding_model is None:
+                raise AppApiException(500, _('Model does not exist'))
+            if embedding_model.permission_type == 'PRIVATE' and dataset_user_id != embedding_model.user_id:
+                raise AppApiException(500, _('No permission to use this model') + f"{embedding_model.name}")
             ListenerManagement.update_status(QuerySet(Document).filter(dataset_id=self.data.get('id')),
                                              TaskType.EMBEDDING,
                                              State.PENDING)
@@ -801,7 +810,7 @@ class DataSetSerializers(serializers.ModelSerializer):
             ListenerManagement.get_aggregation_document_status_by_dataset_id(self.data.get('id'))()
             embedding_model_id = get_embedding_model_id_by_dataset_id(self.data.get('id'))
             try:
-                embedding_by_dataset.delay(self.data.get('id'), embedding_model_id)
+                embedding_by_dataset.delay(dataset_id, embedding_model_id)
             except AlreadyQueued as e:
                 raise AppApiException(500, _('Failed to send the vectorization task, please try again later!'))
 
