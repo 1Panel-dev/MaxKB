@@ -52,7 +52,7 @@ class QwenVLModelCredential(BaseForm, BaseModelCredential):
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            res = model.stream([HumanMessage(content=[{"type": "text", "text": _('Hello')}])])
+            res = model.stream([HumanMessage(content=[{"type": "text", "text": gettext('Hello')}])])
             for chunk in res:
                 print(chunk)
         except Exception as e:

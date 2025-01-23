@@ -46,7 +46,7 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
             zhipuai_api_key=self.api_key,
             model_name=self.model,
         )
-        chat.invoke([HumanMessage([{"type": "text", "text": _('Hello')}])])
+        chat.invoke([HumanMessage([{"type": "text", "text": gettext('Hello')}])])
 
         # self.generate_image('生成一个小猫图片')
 
