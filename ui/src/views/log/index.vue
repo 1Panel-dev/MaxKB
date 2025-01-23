@@ -66,7 +66,7 @@
           <template #header>
             <div>
               <span>{{ $t('views.log.table.feedback.label') }}</span>
-              <el-popover :width="190" trigger="click" :visible="popoverVisible">
+              <el-popover :width="200" trigger="click" :visible="popoverVisible">
                 <template #reference>
                   <el-button
                     style="margin-top: -2px"
@@ -89,7 +89,7 @@
                         :step="1"
                         :value-on-clear="0"
                         controls-position="right"
-                        style="width: 100px"
+                        style="width: 80px"
                         size="small"
                         step-strictly
                       />
@@ -104,7 +104,7 @@
                         :step="1"
                         :value-on-clear="0"
                         controls-position="right"
-                        style="width: 100px"
+                        style="width: 80px"
                         size="small"
                         step-strictly
                       />

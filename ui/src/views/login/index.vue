@@ -156,8 +156,8 @@ function redirectAuth(authType: string) {
     if (!res.data) {
       return
     }
-    MsgConfirm(t('login.jump_tip'), '', {
-      confirmButtonText: t('login.jump'),
+    MsgConfirm(t('views.login.jump_tip'), '', {
+      confirmButtonText: t('views.login.jump'),
       cancelButtonText: t('common.cancel'),
       confirmButtonClass: ''
     })

@@ -268,10 +268,10 @@ async function publicHandle() {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(res.node.properties?.stepName + `${t('views.applicationWorkflow.node')} ` + err_message)
+        MsgError(res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message)
       } else {
         const keys = Object.keys(err_message)
-        MsgError(node.properties?.stepName + `${t('views.applicationWorkflow.node')} ` + err_message[keys[0]]?.[0]?.message)
+        MsgError(node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message[keys[0]]?.[0]?.message)
       }
     })
 }
@@ -300,10 +300,10 @@ const clickShowDebug = () => {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(res.node.properties?.stepName + `${t('views.applicationWorkflow.node')} ` + err_message)
+        MsgError(res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message)
       } else {
         const keys = Object.keys(err_message)
-        MsgError(node.properties?.stepName + `${t('views.applicationWorkflow.node')} ` + err_message[keys[0]]?.[0]?.message)
+        MsgError(node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message[keys[0]]?.[0]?.message)
       }
     })
 }

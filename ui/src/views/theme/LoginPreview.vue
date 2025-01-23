@@ -13,11 +13,16 @@
     <login-layout style="height: 530px">
       <LoginContainer :subTitle="data.slogan" class="login-container">
         <div class="mask"></div>
-        <h2 class="mb-24">{{ '普通登录' }}</h2>
+        <h2 class="mb-24">{{ $t('views.login.title') }}</h2>
         <el-form class="login-form">
           <div class="mb-24">
             <el-form-item>
-              <el-input size="large" class="input-item" :placeholder="$t('views.user.userForm.form.username.placeholder')"> </el-input>
+              <el-input
+                size="large"
+                class="input-item"
+                :placeholder="$t('views.user.userForm.form.username.placeholder')"
+              >
+              </el-input>
             </el-form-item>
           </div>
           <div class="mb-24">

@@ -49,8 +49,8 @@ export default {
   variable: {
     global: 'Global Variable',
     Referencing: 'Reference Variable',
-    ReferencingRequired: 'Reference Variable Required',
-    ReferencingError: 'Reference Variable Error',
+    ReferencingRequired: 'reference variable required',
+    ReferencingError: 'reference variable error',
     NoReferencing: 'Non-existent Reference Variable',
     fieldMessage: 'Please select a variable'
   },
@@ -167,7 +167,7 @@ export default {
       max_paragraph_char_number: 'Maximum number of words to quote',
       reranker_model: {
         label: 'Rerank',
-        placeholder: 'Please select a Rerank'
+        placeholder: 'Please select a rerank'
       }
     },
     formNode: {

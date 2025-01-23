@@ -3,7 +3,7 @@ export default {
   createProblem: 'Create Question',
   detailProblem: 'Question Details',
   quickCreateProblem: 'Quick Create Question',
-  quickCreateName: 'question',
+  quickCreateName: 'Question',
   tip: {
     placeholder: 'Enter the question, support multiple entries, one per line.',
     errorMessage: 'Question cannot be empty!',

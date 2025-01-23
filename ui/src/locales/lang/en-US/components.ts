@@ -1,6 +1,6 @@
 export default {
   quickCreatePlaceholder: 'Quickly create blank document',
-  quickCreateName: 'document name',
+  quickCreateName: 'File Name',
   noData: 'No Data',
   loading: 'Loading',
   noMore: 'No more！',
