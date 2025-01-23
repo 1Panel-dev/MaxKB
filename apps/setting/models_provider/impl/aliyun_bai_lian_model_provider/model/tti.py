@@ -3,7 +3,7 @@ from http import HTTPStatus
 from typing import Dict
 
 from dashscope import ImageSynthesis
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext
 from langchain_community.chat_models import ChatTongyi
 from langchain_core.messages import HumanMessage
 
