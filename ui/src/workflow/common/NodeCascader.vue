@@ -116,6 +116,9 @@ const validate = () => {
 props.nodeModel.graphModel.eventCenter.on('refresh_incoming_node_field', () => {
   options.value = getIncomingNode(props.nodeModel.id)
 })
+props.nodeModel.graphModel.eventCenter.on('refreshFileUploadConfig', () => {
+  options.value = getIncomingNode(props.nodeModel.id)
+})
 defineExpose({ validate })
 onMounted(() => {
   options.value = getIncomingNode(props.nodeModel.id)
