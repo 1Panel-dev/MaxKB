@@ -206,7 +206,6 @@ function refresh() {
 }
 
 const validate = () => {
-  console.log(DatasetNodeFormRef.value)
   return Promise.all([
     nodeCascaderRef.value.validate(),
     DatasetNodeFormRef.value?.validate()

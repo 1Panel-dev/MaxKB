@@ -22,7 +22,7 @@
         </div>
       </template>
     </el-table-column>
-    <el-table-column :label="$t('common.operation')" align="left" width="80">
+    <el-table-column :label="$t('common.operation')" align="left" width="90">
       <template #default="{ row, $index }">
         <span class="mr-4">
           <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
