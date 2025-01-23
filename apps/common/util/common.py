@@ -17,7 +17,7 @@ from typing import Dict, List
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
-from django.utils.translation import gettext as __
+from django.utils.translation import gettext as _
 from pydub import AudioSegment
 
 from ..exception.app_exception import AppApiException
@@ -216,9 +216,9 @@ def split_and_transcribe(file_path, model, max_segment_length_ms=59000, audio_fo
 
 def _remove_empty_lines(text):
     if not isinstance(text, str):
-        raise AppApiException(500, __('Text-to-speech node, the text content must be of string type'))
+        raise AppApiException(500, _('Text-to-speech node, the text content must be of string type'))
     if not text:
-        raise AppApiException(500, __('Text-to-speech node, the text content cannot be empty'))
+        raise AppApiException(500, _('Text-to-speech node, the text content cannot be empty'))
     result = '\n'.join(line for line in text.split('\n') if line.strip())
     return markdown_to_plain_text(result)
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-22 18:20+0800\n"
+"POT-Creation-Date: 2025-01-23 11:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,7 +40,7 @@ msgstr "對話列表"
 #: .\apps\application\flow\step_node\speech_to_text_step_node\i_speech_to_text_node.py:13
 #: .\apps\application\flow\step_node\text_to_speech_step_node\i_text_to_speech_node.py:13
 #: .\apps\application\serializers\application_serializers.py:72
-#: .\apps\application\serializers\chat_serializers.py:345
+#: .\apps\application\serializers\chat_serializers.py:348
 #: .\apps\application\swagger_api\application_api.py:53
 #: .\apps\application\swagger_api\application_api.py:185
 #: .\apps\application\swagger_api\application_api.py:186
@@ -58,12 +58,13 @@ msgstr "段落列表"
 #: .\apps\application\serializers\chat_message_serializers.py:185
 #: .\apps\application\serializers\chat_message_serializers.py:231
 #: .\apps\application\serializers\chat_serializers.py:71
-#: .\apps\application\serializers\chat_serializers.py:419
-#: .\apps\application\serializers\chat_serializers.py:511
-#: .\apps\application\serializers\chat_serializers.py:566
-#: .\apps\application\serializers\chat_serializers.py:592
-#: .\apps\application\serializers\chat_serializers.py:651
-#: .\apps\application\serializers\chat_serializers.py:691
+#: .\apps\application\serializers\chat_serializers.py:227
+#: .\apps\application\serializers\chat_serializers.py:422
+#: .\apps\application\serializers\chat_serializers.py:514
+#: .\apps\application\serializers\chat_serializers.py:570
+#: .\apps\application\serializers\chat_serializers.py:596
+#: .\apps\application\serializers\chat_serializers.py:655
+#: .\apps\application\serializers\chat_serializers.py:695
 #: .\apps\application\swagger_api\chat_api.py:48
 #: .\apps\application\swagger_api\chat_api.py:83
 #: .\apps\application\swagger_api\chat_api.py:84
@@ -77,6 +78,7 @@ msgstr "對話 ID"
 #: .\apps\application\chat_pipeline\step\chat_step\i_chat_step.py:63
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:14
 #: .\apps\application\serializers\chat_message_serializers.py:232
+#: .\apps\application\serializers\chat_serializers.py:227
 msgid "User Questions"
 msgstr "用戶問題"
 
@@ -124,9 +126,9 @@ msgstr "未查詢到引用分段"
 #: .\apps\application\serializers\application_serializers.py:781
 #: .\apps\application\serializers\application_serializers.py:1215
 #: .\apps\application\serializers\chat_serializers.py:104
-#: .\apps\application\serializers\chat_serializers.py:266
-#: .\apps\application\serializers\chat_serializers.py:318
-#: .\apps\application\serializers\chat_serializers.py:340
+#: .\apps\application\serializers\chat_serializers.py:268
+#: .\apps\application\serializers\chat_serializers.py:321
+#: .\apps\application\serializers\chat_serializers.py:343
 msgid "User ID"
 msgstr "用戶 ID"
 
@@ -136,7 +138,7 @@ msgstr "用戶 ID"
 #: .\apps\application\flow\step_node\image_understand_step_node\i_image_understand_node.py:27
 #: .\apps\application\flow\step_node\question_node\i_question_node.py:27
 #: .\apps\application\flow\step_node\text_to_speech_step_node\i_text_to_speech_node.py:19
-#: .\apps\application\serializers\chat_serializers.py:362
+#: .\apps\application\serializers\chat_serializers.py:365
 msgid "Model parameter settings"
 msgstr "模型參數設置"
 
@@ -154,7 +156,7 @@ msgstr "抱歉，沒有配置 AI 模型，請先去應用中設置 AI 模型。"
 #: .\apps\application\chat_pipeline\step\generate_human_message_step\i_generate_human_message_step.py:27
 #: .\apps\application\chat_pipeline\step\reset_problem_step\i_reset_problem_step.py:25
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:25
-#: .\apps\application\serializers\chat_serializers.py:558
+#: .\apps\application\serializers\chat_serializers.py:562
 msgid "question"
 msgstr "問題"
 
@@ -242,6 +244,7 @@ msgstr "排除向量 ID 列表"
 #: .\apps\application\flow\step_node\reranker_node\i_reranker_node.py:24
 #: .\apps\application\flow\step_node\search_dataset_node\i_search_dataset_node.py:24
 #: .\apps\application\serializers\application_serializers.py:121
+#: .\apps\application\serializers\chat_serializers.py:230
 #: .\apps\application\swagger_api\application_api.py:249
 #: .\apps\application\swagger_api\application_api.py:250
 msgid "Reference segment number"
@@ -276,6 +279,8 @@ msgstr "檢索方式"
 #: .\apps\application\serializers\application_serializers.py:1013
 #: .\apps\application\serializers\application_serializers.py:1023
 #: .\apps\application\serializers\application_serializers.py:1033
+#: .\apps\dataset\serializers\dataset_serializers.py:801
+#: .\apps\dataset\serializers\document_serializers.py:725
 #: .\apps\setting\models_provider\tools.py:23
 msgid "Model does not exist"
 msgstr "模型不存在"
@@ -332,9 +337,9 @@ msgstr "內容類型"
 #: .\apps\application\serializers\chat_serializers.py:72
 #: .\apps\application\serializers\chat_serializers.py:88
 #: .\apps\application\serializers\chat_serializers.py:105
-#: .\apps\application\serializers\chat_serializers.py:268
-#: .\apps\application\serializers\chat_serializers.py:343
-#: .\apps\application\serializers\chat_serializers.py:420
+#: .\apps\application\serializers\chat_serializers.py:270
+#: .\apps\application\serializers\chat_serializers.py:346
+#: .\apps\application\serializers\chat_serializers.py:423
 #: .\apps\application\swagger_api\application_api.py:87
 #: .\apps\application\swagger_api\application_api.py:101
 #: .\apps\application\swagger_api\application_api.py:112
@@ -496,7 +501,7 @@ msgid "Is this field required"
 msgstr "字段是否必填"
 
 #: .\apps\application\flow\step_node\function_node\i_function_node.py:26
-#: .\apps\dataset\serializers\document_serializers.py:227
+#: .\apps\dataset\serializers\document_serializers.py:228
 #: .\apps\function_lib\serializers\function_lib_serializer.py:38
 #: .\apps\function_lib\swagger_api\function_lib_api.py:92
 #: .\apps\function_lib\swagger_api\function_lib_api.py:138
@@ -623,9 +628,9 @@ msgid "There can only be one basic information node"
 msgstr "基本資訊節點只能有一個"
 
 #: .\apps\application\serializers\application_serializers.py:75
-#: .\apps\application\serializers\chat_serializers.py:597
-#: .\apps\application\serializers\chat_serializers.py:656
-#: .\apps\application\serializers\chat_serializers.py:688
+#: .\apps\application\serializers\chat_serializers.py:601
+#: .\apps\application\serializers\chat_serializers.py:660
+#: .\apps\application\serializers\chat_serializers.py:692
 #: .\apps\application\swagger_api\chat_api.py:253
 #: .\apps\application\swagger_api\chat_api.py:281
 #: .\apps\application\swagger_api\chat_api.py:282
@@ -740,7 +745,7 @@ msgstr "關聯知識庫"
 
 #: .\apps\application\serializers\application_serializers.py:226
 #: .\apps\application\serializers\application_serializers.py:493
-#: .\apps\application\serializers\chat_serializers.py:359
+#: .\apps\application\serializers\chat_serializers.py:362
 msgid "Question completion"
 msgstr "問題補全"
 
@@ -876,9 +881,9 @@ msgid "Select User ID"
 msgstr "選擇用戶 ID"
 
 #: .\apps\application\serializers\application_serializers.py:706
-#: .\apps\dataset\serializers\document_serializers.py:162
-#: .\apps\dataset\serializers\document_serializers.py:211
-#: .\apps\dataset\serializers\document_serializers.py:218
+#: .\apps\dataset\serializers\document_serializers.py:163
+#: .\apps\dataset\serializers\document_serializers.py:212
+#: .\apps\dataset\serializers\document_serializers.py:219
 #: .\apps\dataset\serializers\file_serializers.py:59
 #: .\apps\dataset\views\file.py:34 .\apps\dataset\views\file.py:42
 msgid "file"
@@ -887,8 +892,8 @@ msgstr "文件"
 #: .\apps\application\serializers\application_serializers.py:721
 #: .\apps\common\handle\impl\qa\zip_parse_qa_handle.py:62
 #: .\apps\common\handle\impl\zip_split_handle.py:56
-#: .\apps\dataset\serializers\document_serializers.py:844
-#: .\apps\dataset\serializers\document_serializers.py:852
+#: .\apps\dataset\serializers\document_serializers.py:853
+#: .\apps\dataset\serializers\document_serializers.py:861
 msgid "Unsupported file format"
 msgstr "文件格式不支持"
 
@@ -915,6 +920,8 @@ msgstr "用戶沒有使用該模型:{model_name}的權限"
 
 #: .\apps\application\serializers\application_serializers.py:1224
 #: .\apps\application\serializers\chat_message_serializers.py:398
+#: .\apps\application\serializers\chat_serializers.py:277
+#: .\apps\application\serializers\chat_serializers.py:379
 #: .\apps\xpack\serializers\application_setting_serializer.py:96
 #: .\apps\xpack\serializers\platform_serializer.py:76
 #: .\apps\xpack\serializers\platform_serializer.py:97
@@ -975,6 +982,7 @@ msgstr "版本名稱"
 
 #: .\apps\application\serializers\application_version_serializers.py:37
 #: .\apps\application\serializers\chat_serializers.py:101
+#: .\apps\application\serializers\chat_serializers.py:227
 msgid "summary"
 msgstr "摘要"
 
@@ -1028,11 +1036,11 @@ msgid "Do you want to reply again"
 msgstr "是否重新回答"
 
 #: .\apps\application\serializers\chat_message_serializers.py:237
-#: .\apps\application\serializers\chat_serializers.py:422
-#: .\apps\application\serializers\chat_serializers.py:514
-#: .\apps\application\serializers\chat_serializers.py:569
-#: .\apps\application\serializers\chat_serializers.py:595
-#: .\apps\application\serializers\chat_serializers.py:654
+#: .\apps\application\serializers\chat_serializers.py:425
+#: .\apps\application\serializers\chat_serializers.py:517
+#: .\apps\application\serializers\chat_serializers.py:573
+#: .\apps\application\serializers\chat_serializers.py:599
+#: .\apps\application\serializers\chat_serializers.py:658
 #: .\apps\application\swagger_api\chat_api.py:248
 #: .\apps\application\swagger_api\chat_api.py:325
 #: .\apps\application\swagger_api\chat_api.py:358
@@ -1057,6 +1065,7 @@ msgstr "全局變量"
 
 #: .\apps\application\serializers\chat_message_serializers.py:261
 #: .\apps\application\serializers\chat_message_serializers.py:395
+#: .\apps\application\serializers\chat_serializers.py:452
 msgid "Conversation does not exist"
 msgstr "對話不存在"
 
@@ -1073,10 +1082,14 @@ msgid "The model is downloading, please try again later"
 msgstr "模型正在下載中，請稍後再試"
 
 #: .\apps\application\serializers\chat_message_serializers.py:335
+#: .\apps\application\serializers\chat_serializers.py:582
+#: .\apps\application\serializers\chat_serializers.py:628
+#: .\apps\application\serializers\chat_serializers.py:677
 msgid "Conversation record does not exist"
 msgstr "對話記錄不存在"
 
 #: .\apps\application\serializers\chat_message_serializers.py:428
+#: .\apps\application\serializers\chat_serializers.py:297
 msgid "The application has not been published. Please use it after publishing."
 msgstr "應用未發佈，請發佈後使用"
 
@@ -1102,23 +1115,88 @@ msgstr "最小點踩數"
 msgid "Only supports and|or"
 msgstr "只支持 and|or"
 
-#: .\apps\application\serializers\chat_serializers.py:317
+#: .\apps\application\serializers\chat_serializers.py:228
+msgid "Problem after optimization"
+msgstr "問題優化"
+
+#: .\apps\application\serializers\chat_serializers.py:229
+msgid "answer"
+msgstr "回答"
+
+#: .\apps\application\serializers\chat_serializers.py:229
+msgid "User feedback"
+msgstr "用戶回饋"
+
+#: .\apps\application\serializers\chat_serializers.py:231
+msgid "Section title + content"
+msgstr "分段標題+內容"
+
+#: .\apps\application\serializers\chat_serializers.py:232
+#: .\apps\application\views\chat_views.py:355
+#: .\apps\application\views\chat_views.py:356
+msgid "Annotation"
+msgstr "標註"
+
+#: .\apps\application\serializers\chat_serializers.py:232
+msgid "Consuming tokens"
+msgstr "消耗tokens"
+
+#: .\apps\application\serializers\chat_serializers.py:232
+msgid "Time consumed (s)"
+msgstr "耗時（s）'，' 提問時間"
+
+#: .\apps\application\serializers\chat_serializers.py:233
+msgid "Question Time"
+msgstr "提問時間"
+
+#: .\apps\application\serializers\chat_serializers.py:320
 msgid "Workflow"
 msgstr "工作流"
 
-#: .\apps\application\serializers\chat_serializers.py:349
+#: .\apps\application\serializers\chat_serializers.py:352
 msgid "Multi-round conversation"
 msgstr "多輪對話"
 
-#: .\apps\application\serializers\chat_serializers.py:352
+#: .\apps\application\serializers\chat_serializers.py:355
 msgid "Related Datasets"
 msgstr "關聯數據集"
 
-#: .\apps\application\serializers\chat_serializers.py:517
+#: .\apps\application\serializers\chat_serializers.py:432
+#, fuzzy
+#| msgid "Application authentication token"
+msgid "Application authentication information does not exist"
+msgstr "應用認證 token"
+
+#: .\apps\application\serializers\chat_serializers.py:434
+#, fuzzy
+#| msgid "Whether to display knowledge sources"
+msgid "Displaying knowledge sources is not enabled"
+msgstr "是否顯示知識來源"
+
+#: .\apps\application\serializers\chat_serializers.py:520
 msgid "Bidding Status"
 msgstr "投標狀態"
 
-#: .\apps\application\serializers\chat_serializers.py:554
+#: .\apps\application\serializers\chat_serializers.py:529
+#, fuzzy
+#| msgid "The task is being executed, please do not send it repeatedly."
+msgid ""
+"Voting on the current session minutes, please do not send repeated requests"
+msgstr "任務正在執行中，請勿重複發送"
+
+#: .\apps\application\serializers\chat_serializers.py:534
+#, fuzzy
+#| msgid "Get a list of conversation records"
+msgid "Non-existent conversation chat_record_id"
+msgstr "獲取對話記錄列表"
+
+#: .\apps\application\serializers\chat_serializers.py:551
+#, fuzzy
+#| msgid "Already associated, please do not associate again"
+msgid "Already voted, please cancel first and then vote again"
+msgstr "已經關聯,請勿重複關聯"
+
+#: .\apps\application\serializers\chat_serializers.py:558
 #: .\apps\application\swagger_api\chat_api.py:267
 #: .\apps\application\swagger_api\chat_api.py:268
 #: .\apps\dataset\swagger_api\problem_api.py:128
@@ -1126,7 +1204,7 @@ msgstr "投標狀態"
 msgid "Section title"
 msgstr "段落標題"
 
-#: .\apps\application\serializers\chat_serializers.py:555
+#: .\apps\application\serializers\chat_serializers.py:559
 #: .\apps\application\swagger_api\chat_api.py:269
 #: .\apps\application\swagger_api\chat_api.py:270
 #: .\apps\application\swagger_api\chat_api.py:371
@@ -1136,9 +1214,9 @@ msgstr "段落標題"
 msgid "Paragraph content"
 msgstr "段落內容"
 
-#: .\apps\application\serializers\chat_serializers.py:599
-#: .\apps\application\serializers\chat_serializers.py:658
-#: .\apps\application\serializers\chat_serializers.py:689
+#: .\apps\application\serializers\chat_serializers.py:603
+#: .\apps\application\serializers\chat_serializers.py:662
+#: .\apps\application\serializers\chat_serializers.py:693
 #: .\apps\application\swagger_api\chat_api.py:258
 #: .\apps\application\swagger_api\chat_api.py:283
 #: .\apps\application\swagger_api\chat_api.py:284
@@ -1147,18 +1225,30 @@ msgstr "段落內容"
 msgid "Document id"
 msgstr "文檔 ID"
 
-#: .\apps\application\serializers\chat_serializers.py:660
+#: .\apps\application\serializers\chat_serializers.py:609
+#: .\apps\application\serializers\chat_serializers.py:700
+#: .\apps\dataset\serializers\paragraph_serializers.py:576
+msgid "The document id is incorrect"
+msgstr "文檔 id 不正確"
+
+#: .\apps\application\serializers\chat_serializers.py:664
 #: .\apps\application\swagger_api\chat_api.py:203
 #: .\apps\application\swagger_api\chat_api.py:204
 msgid "Paragraph id"
 msgstr "段落 ID"
 
-#: .\apps\application\serializers\chat_serializers.py:676
+#: .\apps\application\serializers\chat_serializers.py:680
 #, python-brace-format
 msgid ""
 "The paragraph id is wrong. The current conversation record does not exist. "
 "[{paragraph_id}] paragraph id"
 msgstr "段落id錯誤。當前對話記錄不存在。[{paragraph_id}] 段落id"
+
+#: .\apps\application\serializers\chat_serializers.py:719
+#, fuzzy
+#| msgid "Conversation record does not exist"
+msgid "Conversation records that do not exist"
+msgstr "對話記錄不存在"
 
 #: .\apps\application\swagger_api\application_api.py:24
 #: .\apps\application\views\chat_views.py:436
@@ -1328,7 +1418,7 @@ msgstr "上傳圖片文件"
 #: .\apps\application\swagger_api\application_api.py:432
 #: .\apps\application\swagger_api\application_api.py:433
 msgid "Text"
-msgstr ""
+msgstr "文字"
 
 #: .\apps\application\swagger_api\application_statistics_api.py:41
 #: .\apps\application\swagger_api\application_statistics_api.py:42
@@ -1800,9 +1890,10 @@ msgstr "獲取應用列表分頁"
 
 #: .\apps\application\views\application_views.py:632
 #: .\apps\application\views\application_views.py:633
-#: .\apps\setting\models_provider\base_model_provider.py:155
-msgid "TTS"
-msgstr "語音合成"
+#, fuzzy
+#| msgid "Text-to-speech type"
+msgid "text to speech"
+msgstr "文本轉語音類型"
 
 #: .\apps\application\views\chat_views.py:33
 #: .\apps\application\views\chat_views.py:34
@@ -1907,11 +1998,6 @@ msgstr "獲取標記段落列表"
 msgid "Application/Conversation Log/Annotation"
 msgstr "應用/對話日誌/標註"
 
-#: .\apps\application\views\chat_views.py:355
-#: .\apps\application\views\chat_views.py:356
-msgid "Annotation"
-msgstr "標註"
-
 #: .\apps\application\views\chat_views.py:381
 #: .\apps\application\views\chat_views.py:382
 msgid "Add to Knowledge Base"
@@ -1999,7 +2085,7 @@ msgstr "密碼和確認密碼不一致"
 
 #: .\apps\common\constants\permission_constants.py:61
 msgid "ADMIN"
-msgstr ""
+msgstr "管理員"
 
 #: .\apps\common\constants\permission_constants.py:61
 msgid "Admin, prefabs are not currently used"
@@ -2225,13 +2311,13 @@ msgstr "點踩數"
 #: .\apps\dataset\serializers\dataset_serializers.py:605
 #: .\apps\dataset\serializers\dataset_serializers.py:688
 #: .\apps\dataset\serializers\dataset_serializers.py:699
-#: .\apps\dataset\serializers\dataset_serializers.py:946
-#: .\apps\dataset\serializers\document_serializers.py:167
-#: .\apps\dataset\serializers\document_serializers.py:278
-#: .\apps\dataset\serializers\document_serializers.py:399
-#: .\apps\dataset\serializers\document_serializers.py:554
-#: .\apps\dataset\serializers\document_serializers.py:1025
-#: .\apps\dataset\serializers\document_serializers.py:1183
+#: .\apps\dataset\serializers\dataset_serializers.py:955
+#: .\apps\dataset\serializers\document_serializers.py:168
+#: .\apps\dataset\serializers\document_serializers.py:279
+#: .\apps\dataset\serializers\document_serializers.py:400
+#: .\apps\dataset\serializers\document_serializers.py:555
+#: .\apps\dataset\serializers\document_serializers.py:1034
+#: .\apps\dataset\serializers\document_serializers.py:1192
 #: .\apps\dataset\serializers\paragraph_serializers.py:96
 #: .\apps\dataset\serializers\paragraph_serializers.py:162
 #: .\apps\dataset\serializers\paragraph_serializers.py:195
@@ -2262,15 +2348,15 @@ msgstr "知識庫 id"
 
 #: .\apps\common\swagger_api\common_api.py:70
 #: .\apps\common\swagger_api\common_api.py:71
-#: .\apps\dataset\serializers\document_serializers.py:285
-#: .\apps\dataset\serializers\document_serializers.py:378
-#: .\apps\dataset\serializers\document_serializers.py:471
-#: .\apps\dataset\serializers\document_serializers.py:553
-#: .\apps\dataset\serializers\document_serializers.py:562
-#: .\apps\dataset\serializers\document_serializers.py:567
-#: .\apps\dataset\serializers\document_serializers.py:824
-#: .\apps\dataset\serializers\document_serializers.py:952
-#: .\apps\dataset\serializers\document_serializers.py:1158
+#: .\apps\dataset\serializers\document_serializers.py:286
+#: .\apps\dataset\serializers\document_serializers.py:379
+#: .\apps\dataset\serializers\document_serializers.py:472
+#: .\apps\dataset\serializers\document_serializers.py:554
+#: .\apps\dataset\serializers\document_serializers.py:563
+#: .\apps\dataset\serializers\document_serializers.py:568
+#: .\apps\dataset\serializers\document_serializers.py:833
+#: .\apps\dataset\serializers\document_serializers.py:961
+#: .\apps\dataset\serializers\document_serializers.py:1167
 #: .\apps\dataset\serializers\paragraph_serializers.py:98
 #: .\apps\dataset\serializers\paragraph_serializers.py:167
 #: .\apps\dataset\serializers\paragraph_serializers.py:212
@@ -2294,10 +2380,10 @@ msgstr "文檔 id"
 
 #: .\apps\common\swagger_api\common_api.py:72
 #: .\apps\common\swagger_api\common_api.py:73
-#: .\apps\dataset\serializers\document_serializers.py:789
-#: .\apps\dataset\serializers\document_serializers.py:790
-#: .\apps\dataset\serializers\document_serializers.py:808
-#: .\apps\dataset\serializers\document_serializers.py:809
+#: .\apps\dataset\serializers\document_serializers.py:798
+#: .\apps\dataset\serializers\document_serializers.py:799
+#: .\apps\dataset\serializers\document_serializers.py:817
+#: .\apps\dataset\serializers\document_serializers.py:818
 #: .\apps\dataset\serializers\paragraph_serializers.py:57
 #: .\apps\dataset\serializers\paragraph_serializers.py:71
 #: .\apps\dataset\serializers\paragraph_serializers.py:718
@@ -2349,6 +2435,14 @@ msgstr "更新時間"
 msgid "Create time"
 msgstr "創建時間"
 
+#: .\apps\common\util\common.py:219
+msgid "Text-to-speech node, the text content must be of string type"
+msgstr "文字轉語音節點，文字內容必須是字串類型"
+
+#: .\apps\common\util\common.py:221
+msgid "Text-to-speech node, the text content cannot be empty"
+msgstr "文字轉語音節點，文字內容不能為空"
+
 #: .\apps\dataset\serializers\common_serializers.py:87
 msgid "source url"
 msgstr "文檔地址"
@@ -2357,8 +2451,8 @@ msgstr "文檔地址"
 #: .\apps\dataset\serializers\dataset_serializers.py:333
 #: .\apps\dataset\serializers\dataset_serializers.py:390
 #: .\apps\dataset\serializers\dataset_serializers.py:391
-#: .\apps\dataset\serializers\document_serializers.py:153
-#: .\apps\dataset\serializers\document_serializers.py:179
+#: .\apps\dataset\serializers\document_serializers.py:154
+#: .\apps\dataset\serializers\document_serializers.py:180
 msgid "selector"
 msgstr "選擇器"
 
@@ -2371,7 +2465,7 @@ msgstr "URL錯誤,無法解析 [{source_url}]"
 #: .\apps\dataset\serializers\common_serializers.py:105
 #: .\apps\dataset\serializers\common_serializers.py:124
 #: .\apps\dataset\serializers\common_serializers.py:125
-#: .\apps\dataset\serializers\document_serializers.py:83
+#: .\apps\dataset\serializers\document_serializers.py:84
 #: .\apps\dataset\swagger_api\document_api.py:23
 #: .\apps\dataset\swagger_api\document_api.py:24
 #: .\apps\dataset\swagger_api\document_api.py:49
@@ -2405,9 +2499,9 @@ msgstr "知識庫設置錯誤,請重新設置知識庫"
 #: .\apps\dataset\serializers\dataset_serializers.py:568
 #: .\apps\dataset\serializers\dataset_serializers.py:607
 #: .\apps\dataset\serializers\dataset_serializers.py:701
-#: .\apps\dataset\serializers\dataset_serializers.py:924
-#: .\apps\dataset\serializers\dataset_serializers.py:925
-#: .\apps\dataset\serializers\document_serializers.py:786
+#: .\apps\dataset\serializers\dataset_serializers.py:933
+#: .\apps\dataset\serializers\dataset_serializers.py:934
+#: .\apps\dataset\serializers\document_serializers.py:795
 #: .\apps\function_lib\serializers\function_lib_serializer.py:101
 #: .\apps\function_lib\serializers\function_lib_serializer.py:130
 #: .\apps\function_lib\serializers\function_lib_serializer.py:146
@@ -2464,10 +2558,10 @@ msgstr "是否發佈"
 #: .\apps\dataset\serializers\dataset_serializers.py:367
 #: .\apps\dataset\serializers\dataset_serializers.py:511
 #: .\apps\dataset\serializers\dataset_serializers.py:512
-#: .\apps\dataset\serializers\dataset_serializers.py:933
-#: .\apps\dataset\serializers\dataset_serializers.py:934
-#: .\apps\dataset\serializers\document_serializers.py:794
-#: .\apps\dataset\serializers\document_serializers.py:795
+#: .\apps\dataset\serializers\dataset_serializers.py:942
+#: .\apps\dataset\serializers\dataset_serializers.py:943
+#: .\apps\dataset\serializers\document_serializers.py:803
+#: .\apps\dataset\serializers\document_serializers.py:804
 #: .\apps\dataset\serializers\paragraph_serializers.py:200
 #: .\apps\dataset\serializers\paragraph_serializers.py:201
 #: .\apps\dataset\serializers\paragraph_serializers.py:723
@@ -2489,10 +2583,10 @@ msgstr "創建時間"
 #: .\apps\dataset\serializers\dataset_serializers.py:364
 #: .\apps\dataset\serializers\dataset_serializers.py:508
 #: .\apps\dataset\serializers\dataset_serializers.py:509
-#: .\apps\dataset\serializers\dataset_serializers.py:930
-#: .\apps\dataset\serializers\dataset_serializers.py:931
-#: .\apps\dataset\serializers\document_serializers.py:791
-#: .\apps\dataset\serializers\document_serializers.py:792
+#: .\apps\dataset\serializers\dataset_serializers.py:939
+#: .\apps\dataset\serializers\dataset_serializers.py:940
+#: .\apps\dataset\serializers\document_serializers.py:800
+#: .\apps\dataset\serializers\document_serializers.py:801
 #: .\apps\dataset\serializers\paragraph_serializers.py:197
 #: .\apps\dataset\serializers\paragraph_serializers.py:198
 #: .\apps\dataset\serializers\paragraph_serializers.py:720
@@ -2524,10 +2618,10 @@ msgstr "更新時間"
 #: .\apps\dataset\serializers\dataset_serializers.py:527
 #: .\apps\dataset\serializers\dataset_serializers.py:528
 #: .\apps\dataset\serializers\dataset_serializers.py:542
-#: .\apps\dataset\serializers\dataset_serializers.py:898
-#: .\apps\dataset\serializers\dataset_serializers.py:899
-#: .\apps\dataset\serializers\dataset_serializers.py:920
-#: .\apps\dataset\serializers\dataset_serializers.py:921
+#: .\apps\dataset\serializers\dataset_serializers.py:907
+#: .\apps\dataset\serializers\dataset_serializers.py:908
+#: .\apps\dataset\serializers\dataset_serializers.py:929
+#: .\apps\dataset\serializers\dataset_serializers.py:930
 msgid "dataset name"
 msgstr "知識庫名稱"
 
@@ -2549,15 +2643,15 @@ msgstr "知識庫名稱"
 #: .\apps\dataset\serializers\dataset_serializers.py:529
 #: .\apps\dataset\serializers\dataset_serializers.py:530
 #: .\apps\dataset\serializers\dataset_serializers.py:544
-#: .\apps\dataset\serializers\dataset_serializers.py:900
-#: .\apps\dataset\serializers\dataset_serializers.py:901
-#: .\apps\dataset\serializers\dataset_serializers.py:922
-#: .\apps\dataset\serializers\dataset_serializers.py:923
+#: .\apps\dataset\serializers\dataset_serializers.py:909
+#: .\apps\dataset\serializers\dataset_serializers.py:910
+#: .\apps\dataset\serializers\dataset_serializers.py:931
+#: .\apps\dataset\serializers\dataset_serializers.py:932
 msgid "dataset description"
 msgstr "知識庫描述"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:175
-#: .\apps\dataset\serializers\dataset_serializers.py:828
+#: .\apps\dataset\serializers\dataset_serializers.py:837
 #: .\apps\function_lib\serializers\function_lib_serializer.py:85
 #: .\apps\function_lib\swagger_api\function_lib_api.py:119
 #: .\apps\function_lib\swagger_api\function_lib_api.py:120
@@ -2579,10 +2673,10 @@ msgstr "向量模型"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:257
 #: .\apps\dataset\serializers\dataset_serializers.py:260
-#: .\apps\dataset\serializers\document_serializers.py:209
-#: .\apps\dataset\serializers\document_serializers.py:216
-#: .\apps\dataset\serializers\document_serializers.py:957
-#: .\apps\dataset\serializers\document_serializers.py:986
+#: .\apps\dataset\serializers\document_serializers.py:210
+#: .\apps\dataset\serializers\document_serializers.py:217
+#: .\apps\dataset\serializers\document_serializers.py:966
+#: .\apps\dataset\serializers\document_serializers.py:995
 msgid "file list"
 msgstr "文件列表"
 
@@ -2596,10 +2690,10 @@ msgstr "上傳文件"
 #: .\apps\dataset\serializers\dataset_serializers.py:360
 #: .\apps\dataset\serializers\dataset_serializers.py:504
 #: .\apps\dataset\serializers\dataset_serializers.py:505
-#: .\apps\dataset\serializers\dataset_serializers.py:926
-#: .\apps\dataset\serializers\dataset_serializers.py:927
-#: .\apps\dataset\serializers\document_serializers.py:784
-#: .\apps\dataset\serializers\document_serializers.py:785
+#: .\apps\dataset\serializers\dataset_serializers.py:935
+#: .\apps\dataset\serializers\dataset_serializers.py:936
+#: .\apps\dataset\serializers\document_serializers.py:793
+#: .\apps\dataset\serializers\document_serializers.py:794
 msgid "char length"
 msgstr "字符長度"
 
@@ -2609,8 +2703,8 @@ msgstr "字符長度"
 #: .\apps\dataset\serializers\dataset_serializers.py:362
 #: .\apps\dataset\serializers\dataset_serializers.py:506
 #: .\apps\dataset\serializers\dataset_serializers.py:507
-#: .\apps\dataset\serializers\dataset_serializers.py:928
-#: .\apps\dataset\serializers\dataset_serializers.py:929
+#: .\apps\dataset\serializers\dataset_serializers.py:937
+#: .\apps\dataset\serializers\dataset_serializers.py:938
 msgid "document count"
 msgstr "文檔數量"
 
@@ -2620,8 +2714,8 @@ msgstr "文檔數量"
 #: .\apps\dataset\serializers\dataset_serializers.py:371
 #: .\apps\dataset\serializers\dataset_serializers.py:515
 #: .\apps\dataset\serializers\dataset_serializers.py:516
-#: .\apps\dataset\serializers\document_serializers.py:282
-#: .\apps\dataset\serializers\document_serializers.py:466
+#: .\apps\dataset\serializers\document_serializers.py:283
+#: .\apps\dataset\serializers\document_serializers.py:467
 msgid "document list"
 msgstr "文檔列表"
 
@@ -2642,7 +2736,7 @@ msgstr ""
 
 #: .\apps\dataset\serializers\dataset_serializers.py:424
 #: .\apps\dataset\serializers\dataset_serializers.py:476
-#: .\apps\dataset\serializers\dataset_serializers.py:856
+#: .\apps\dataset\serializers\dataset_serializers.py:865
 msgid "Knowledge base name duplicate!"
 msgstr "知識庫名稱重複!"
 
@@ -2657,8 +2751,8 @@ msgid "application id"
 msgstr "應用 id"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:549
-#: .\apps\dataset\serializers\dataset_serializers.py:905
-#: .\apps\dataset\serializers\dataset_serializers.py:906
+#: .\apps\dataset\serializers\dataset_serializers.py:914
+#: .\apps\dataset\serializers\dataset_serializers.py:915
 msgid "application id list"
 msgstr "應用 id 列表"
 
@@ -2681,7 +2775,7 @@ msgid "The synchronization type only supports:replace|complete"
 msgstr "同步類型只支持:replace|complete"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:620
-#: .\apps\dataset\serializers\document_serializers.py:480
+#: .\apps\dataset\serializers\document_serializers.py:481
 msgid "Synchronization is only supported for web site types"
 msgstr "只有web站點類型才支持同步"
 
@@ -2691,148 +2785,154 @@ msgid ""
 "complete synchronization"
 msgstr "同步類型->replace:替換同步,complete:完整同步"
 
-#: .\apps\dataset\serializers\dataset_serializers.py:806
+#: .\apps\dataset\serializers\dataset_serializers.py:803
+#: .\apps\dataset\serializers\document_serializers.py:727
+#: .\apps\setting\models_provider\tools.py:25
+msgid "No permission to use this model"
+msgstr "無權限使用該模型"
+
+#: .\apps\dataset\serializers\dataset_serializers.py:815
 msgid "Failed to send the vectorization task, please try again later!"
 msgstr "向量化任務發送失敗，請稍後再試！"
 
-#: .\apps\dataset\serializers\dataset_serializers.py:875
+#: .\apps\dataset\serializers\dataset_serializers.py:884
 #, python-brace-format
 msgid "Unknown application id {dataset_id}, cannot be associated"
 msgstr "未知的應用id {dataset_id},無法關聯"
 
-#: .\apps\dataset\serializers\dataset_serializers.py:902
-#: .\apps\dataset\serializers\document_serializers.py:816
+#: .\apps\dataset\serializers\dataset_serializers.py:911
+#: .\apps\dataset\serializers\document_serializers.py:825
 msgid "meta"
 msgstr "知識庫元數據"
 
-#: .\apps\dataset\serializers\dataset_serializers.py:904
+#: .\apps\dataset\serializers\dataset_serializers.py:913
 msgid "Knowledge base metadata->web:{source_url:xxx,selector:'xxx'},base:{}"
 msgstr "知識庫元數據->web:{source_url:xxx,selector:'xxx'},base:{}"
 
-#: .\apps\dataset\serializers\document_serializers.py:85
-#: .\apps\dataset\serializers\document_serializers.py:98
-#: .\apps\dataset\serializers\document_serializers.py:408
+#: .\apps\dataset\serializers\document_serializers.py:86
+#: .\apps\dataset\serializers\document_serializers.py:99
+#: .\apps\dataset\serializers\document_serializers.py:409
 #: .\apps\dataset\swagger_api\document_api.py:37
 #: .\apps\dataset\swagger_api\document_api.py:51
 msgid "task type"
 msgstr "任務類型"
 
-#: .\apps\dataset\serializers\document_serializers.py:93
-#: .\apps\dataset\serializers\document_serializers.py:106
+#: .\apps\dataset\serializers\document_serializers.py:94
+#: .\apps\dataset\serializers\document_serializers.py:107
 msgid "task type not support"
 msgstr "任務類型不支持"
 
-#: .\apps\dataset\serializers\document_serializers.py:113
-#: .\apps\dataset\serializers\document_serializers.py:186
-#: .\apps\dataset\serializers\document_serializers.py:198
+#: .\apps\dataset\serializers\document_serializers.py:114
+#: .\apps\dataset\serializers\document_serializers.py:187
 #: .\apps\dataset\serializers\document_serializers.py:199
-#: .\apps\dataset\serializers\document_serializers.py:404
-#: .\apps\dataset\serializers\document_serializers.py:457
-#: .\apps\dataset\serializers\document_serializers.py:806
-#: .\apps\dataset\serializers\document_serializers.py:807
+#: .\apps\dataset\serializers\document_serializers.py:200
+#: .\apps\dataset\serializers\document_serializers.py:405
+#: .\apps\dataset\serializers\document_serializers.py:458
+#: .\apps\dataset\serializers\document_serializers.py:815
+#: .\apps\dataset\serializers\document_serializers.py:816
 msgid "document name"
 msgstr "文檔名稱"
 
-#: .\apps\dataset\serializers\document_serializers.py:116
+#: .\apps\dataset\serializers\document_serializers.py:117
 msgid "The type only supports optimization|directly_return"
 msgstr "類型只支持 optimization|directly_return"
 
-#: .\apps\dataset\serializers\document_serializers.py:118
-#: .\apps\dataset\serializers\document_serializers.py:406
-#: .\apps\dataset\serializers\document_serializers.py:461
-#: .\apps\dataset\serializers\document_serializers.py:810
+#: .\apps\dataset\serializers\document_serializers.py:119
+#: .\apps\dataset\serializers\document_serializers.py:407
+#: .\apps\dataset\serializers\document_serializers.py:462
+#: .\apps\dataset\serializers\document_serializers.py:819
 #: .\apps\dataset\swagger_api\document_api.py:25
 msgid "hit handling method"
 msgstr "命中處理方法"
 
-#: .\apps\dataset\serializers\document_serializers.py:124
-#: .\apps\dataset\serializers\document_serializers.py:814
+#: .\apps\dataset\serializers\document_serializers.py:125
+#: .\apps\dataset\serializers\document_serializers.py:823
 #: .\apps\dataset\swagger_api\document_api.py:27
 msgid "directly return similarity"
 msgstr "直接返回相似度"
 
-#: .\apps\dataset\serializers\document_serializers.py:127
-#: .\apps\dataset\serializers\document_serializers.py:407
+#: .\apps\dataset\serializers\document_serializers.py:128
+#: .\apps\dataset\serializers\document_serializers.py:408
 msgid "document is active"
 msgstr "文檔是否可用"
 
-#: .\apps\dataset\serializers\document_serializers.py:148
-#: .\apps\dataset\serializers\document_serializers.py:150
+#: .\apps\dataset\serializers\document_serializers.py:149
+#: .\apps\dataset\serializers\document_serializers.py:151
 msgid "document url list"
 msgstr "文檔 url 列表"
 
-#: .\apps\dataset\serializers\document_serializers.py:176
 #: .\apps\dataset\serializers\document_serializers.py:177
+#: .\apps\dataset\serializers\document_serializers.py:178
 msgid "source url list"
 msgstr "文檔地址列表"
 
-#: .\apps\dataset\serializers\document_serializers.py:200
 #: .\apps\dataset\serializers\document_serializers.py:201
+#: .\apps\dataset\serializers\document_serializers.py:202
 msgid "paragraphs"
 msgstr "段落"
 
-#: .\apps\dataset\serializers\document_serializers.py:225
+#: .\apps\dataset\serializers\document_serializers.py:226
 msgid "The template type only supports excel|csv"
 msgstr "模版類型只支持 excel|csv"
 
-#: .\apps\dataset\serializers\document_serializers.py:235
+#: .\apps\dataset\serializers\document_serializers.py:236
 msgid "Export template type csv|excel"
 msgstr "導出模版類型 csv|excel"
 
-#: .\apps\dataset\serializers\document_serializers.py:261
+#: .\apps\dataset\serializers\document_serializers.py:262
 msgid "MaxKB table template.csv"
 msgstr "MaxKB表格模版.csv"
 
-#: .\apps\dataset\serializers\document_serializers.py:268
+#: .\apps\dataset\serializers\document_serializers.py:269
 msgid "MaxKB table template.xlsx"
 msgstr "MaxKB表格模版.xlsx"
 
-#: .\apps\dataset\serializers\document_serializers.py:281
+#: .\apps\dataset\serializers\document_serializers.py:282
 #: .\apps\dataset\serializers\paragraph_serializers.py:304
 #: .\apps\dataset\serializers\paragraph_serializers.py:436
 msgid "target dataset id"
 msgstr "目標知識庫 id"
 
-#: .\apps\dataset\serializers\document_serializers.py:383
+#: .\apps\dataset\serializers\document_serializers.py:384
 #: .\apps\dataset\serializers\paragraph_serializers.py:305
 #: .\apps\dataset\serializers\paragraph_serializers.py:441
 msgid "target document id"
 msgstr "目標文檔 id"
 
-#: .\apps\dataset\serializers\document_serializers.py:391
 #: .\apps\dataset\serializers\document_serializers.py:392
+#: .\apps\dataset\serializers\document_serializers.py:393
 msgid "document id list"
 msgstr "文檔 id 列表"
 
-#: .\apps\dataset\serializers\document_serializers.py:409
+#: .\apps\dataset\serializers\document_serializers.py:410
 msgid "status"
 msgstr "狀態"
 
-#: .\apps\dataset\serializers\document_serializers.py:478
-#: .\apps\dataset\serializers\document_serializers.py:574
-#: .\apps\dataset\serializers\document_serializers.py:1164
+#: .\apps\dataset\serializers\document_serializers.py:479
+#: .\apps\dataset\serializers\document_serializers.py:575
+#: .\apps\dataset\serializers\document_serializers.py:1173
 msgid "document id not exist"
 msgstr "文檔 id 不存在"
 
-#: .\apps\dataset\serializers\document_serializers.py:634
+#: .\apps\dataset\serializers\document_serializers.py:635
 msgid "Section title (optional)"
 msgstr "分段標題（選填）"
 
-#: .\apps\dataset\serializers\document_serializers.py:635
+#: .\apps\dataset\serializers\document_serializers.py:636
 msgid ""
 "Section content (required, question answer, no more than 4096 characters)"
 msgstr "分段內容（必填，問題答案，最長不超過4096個字元）"
 
-#: .\apps\dataset\serializers\document_serializers.py:636
+#: .\apps\dataset\serializers\document_serializers.py:637
 msgid "Question (optional, one per line in the cell)"
 msgstr "問題（選填，儲存格內一行一個）"
 
-#: .\apps\dataset\serializers\document_serializers.py:735
+#: .\apps\dataset\serializers\document_serializers.py:744
 msgid "The task is being executed, please do not send it repeatedly."
 msgstr "任務正在執行中，請勿重複發送"
 
-#: .\apps\dataset\serializers\document_serializers.py:782
-#: .\apps\dataset\serializers\document_serializers.py:783
+#: .\apps\dataset\serializers\document_serializers.py:791
+#: .\apps\dataset\serializers\document_serializers.py:792
 #: .\apps\setting\swagger_api\provide_api.py:22
 #: .\apps\setting\swagger_api\provide_api.py:48
 #: .\apps\setting\swagger_api\provide_api.py:49
@@ -2843,78 +2943,78 @@ msgstr "任務正在執行中，請勿重複發送"
 msgid "name"
 msgstr "名稱"
 
-#: .\apps\dataset\serializers\document_serializers.py:812
+#: .\apps\dataset\serializers\document_serializers.py:821
 msgid "ai optimization: optimization, direct return: directly_return"
 msgstr "ai優化: optimization, 直接返回: directly_return"
 
-#: .\apps\dataset\serializers\document_serializers.py:818
+#: .\apps\dataset\serializers\document_serializers.py:827
 msgid "Document metadata->web:{source_url:xxx,selector:'xxx'},base:{}"
 msgstr "文檔元數據->web:{source_url:xxx,selector:'xxx'},base:{}"
 
-#: .\apps\dataset\serializers\document_serializers.py:829
+#: .\apps\dataset\serializers\document_serializers.py:838
 msgid "dataset id not exist"
 msgstr "知識庫 id 不存在"
 
-#: .\apps\dataset\serializers\document_serializers.py:960
-#: .\apps\dataset\serializers\document_serializers.py:990
+#: .\apps\dataset\serializers\document_serializers.py:969
+#: .\apps\dataset\serializers\document_serializers.py:999
 msgid "limit"
 msgstr "分段長度"
 
-#: .\apps\dataset\serializers\document_serializers.py:964
-#: .\apps\dataset\serializers\document_serializers.py:966
+#: .\apps\dataset\serializers\document_serializers.py:973
+#: .\apps\dataset\serializers\document_serializers.py:975
 msgid "patterns"
 msgstr "分段標識列表"
 
-#: .\apps\dataset\serializers\document_serializers.py:969
+#: .\apps\dataset\serializers\document_serializers.py:978
 msgid "Auto Clean"
 msgstr "自動清洗"
 
-#: .\apps\dataset\serializers\document_serializers.py:976
+#: .\apps\dataset\serializers\document_serializers.py:985
 msgid "The maximum size of the uploaded file cannot exceed 100MB"
 msgstr "文件上傳最大大小不能超過100MB"
 
-#: .\apps\dataset\serializers\document_serializers.py:995
+#: .\apps\dataset\serializers\document_serializers.py:1004
 msgid "Segmented regular list"
 msgstr "分段正則列表"
 
-#: .\apps\dataset\serializers\document_serializers.py:999
-#: .\apps\dataset\serializers\document_serializers.py:1000
+#: .\apps\dataset\serializers\document_serializers.py:1008
+#: .\apps\dataset\serializers\document_serializers.py:1009
 msgid "Whether to clear special characters"
 msgstr "是否清除特殊字符"
 
-#: .\apps\dataset\serializers\document_serializers.py:1019
+#: .\apps\dataset\serializers\document_serializers.py:1028
 msgid "space"
 msgstr "空格"
 
-#: .\apps\dataset\serializers\document_serializers.py:1020
+#: .\apps\dataset\serializers\document_serializers.py:1029
 msgid "semicolon"
 msgstr "分號"
 
-#: .\apps\dataset\serializers\document_serializers.py:1020
+#: .\apps\dataset\serializers\document_serializers.py:1029
 msgid "comma"
 msgstr "逗號"
 
-#: .\apps\dataset\serializers\document_serializers.py:1021
+#: .\apps\dataset\serializers\document_serializers.py:1030
 msgid "period"
 msgstr "句號"
 
-#: .\apps\dataset\serializers\document_serializers.py:1021
+#: .\apps\dataset\serializers\document_serializers.py:1030
 msgid "enter"
 msgstr "回車"
 
-#: .\apps\dataset\serializers\document_serializers.py:1022
+#: .\apps\dataset\serializers\document_serializers.py:1031
 msgid "blank line"
 msgstr "空行"
 
-#: .\apps\dataset\serializers\document_serializers.py:1132
+#: .\apps\dataset\serializers\document_serializers.py:1141
 msgid "Hit handling method is required"
 msgstr "命中處理方式必填"
 
-#: .\apps\dataset\serializers\document_serializers.py:1134
+#: .\apps\dataset\serializers\document_serializers.py:1143
 msgid "The hit processing method must be directly_return|optimization"
 msgstr "命中處理方式必須是 directly_return|optimization"
 
-#: .\apps\dataset\serializers\document_serializers.py:1180
+#: .\apps\dataset\serializers\document_serializers.py:1189
 #: .\apps\dataset\serializers\paragraph_serializers.py:752
 msgid "The task is being executed, please do not send it again."
 msgstr "任務正在執行中，請勿重複發送"
@@ -3025,10 +3125,6 @@ msgstr "目標文檔 id 不存在 [{document_id}]"
 #: .\apps\dataset\serializers\paragraph_serializers.py:503
 msgid "Problem id does not exist"
 msgstr "問題 id 不存在"
-
-#: .\apps\dataset\serializers\paragraph_serializers.py:576
-msgid "The document id is incorrect"
-msgstr "文檔 id 不正確"
 
 #: .\apps\dataset\serializers\paragraph_serializers.py:712
 #: .\apps\dataset\serializers\paragraph_serializers.py:713
@@ -3597,7 +3693,6 @@ msgid "The current platform does not support downloading models"
 msgstr "當前平臺不支持下載模型"
 
 #: .\apps\setting\models_provider\base_model_provider.py:152
-#: .\apps\setting\swagger_api\provide_api.py:115
 msgid "LLM"
 msgstr "大語言模型"
 
@@ -3608,6 +3703,10 @@ msgstr "向量模型"
 #: .\apps\setting\models_provider\base_model_provider.py:154
 msgid "Speech2Text"
 msgstr "語音識別"
+
+#: .\apps\setting\models_provider\base_model_provider.py:155
+msgid "TTS"
+msgstr "語音合成"
 
 #: .\apps\setting\models_provider\base_model_provider.py:156
 msgid "Vision Model"
@@ -4475,6 +4574,8 @@ msgid ""
 "in size from 7 billion to 70 billion. This is a repository of 13B pretrained "
 "models. Links to other models can be found in the index at the bottom."
 msgstr ""
+"Llama 2 是一組經過預訓練和微調的生成文本模型，其規模從 70 億到 700 億個不等。"
+"這是 13B 預訓練模型的存儲庫。其他模型的鏈接可以在底部的索引中找到。"
 
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:41
 msgid ""
@@ -4483,7 +4584,7 @@ msgid ""
 "models. Links to other models can be found in the index at the bottom."
 msgstr ""
 "Llama 2 是一組經過預訓練和微調的生成文本模型，其規模從 70 億到 700 億個不等。"
-"這是 13B 預訓練模型的存儲庫。其他模型的鏈接可以在底部的索引中找到。"
+"這是 70B 預訓練模型的存儲庫。其他模型的鏈接可以在底部的索引中找到。"
 
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:45
 msgid ""
@@ -5267,10 +5368,6 @@ msgstr "根據用戶文字描述生成高質量圖像，支持多圖片尺寸(�
 msgid "zhipu AI"
 msgstr "智譜 AI"
 
-#: .\apps\setting\models_provider\tools.py:25
-msgid "No permission to use this model"
-msgstr "無權限使用該模型"
-
 #: .\apps\setting\serializers\model_apply_serializers.py:32
 #: .\apps\setting\serializers\model_apply_serializers.py:37
 msgid "vector text"
@@ -5609,6 +5706,12 @@ msgstr "模型認證信息"
 msgid "model type description"
 msgstr "模型類型描述"
 
+#: .\apps\setting\swagger_api\provide_api.py:115
+#, fuzzy
+#| msgid "Create model"
+msgid "large language model"
+msgstr "創建模型"
+
 #: .\apps\setting\swagger_api\provide_api.py:116
 #: .\apps\setting\swagger_api\provide_api.py:117
 #: .\apps\setting\swagger_api\provide_api.py:147
@@ -5846,7 +5949,7 @@ msgstr "錯誤信息"
 
 #: .\apps\users\serializers\user_serializers.py:280
 msgid "language only support:"
-msgstr ""
+msgstr "語言只支持："
 
 #: .\apps\users\serializers\user_serializers.py:298
 #: .\apps\users\serializers\user_serializers.py:305
@@ -6517,13 +6620,13 @@ msgstr "客戶名稱。例如：***公司。"
 
 #: .\apps\xpack\swagger_api\license_api.py:33
 msgid "independent software vendor"
-msgstr "獨立軟件供應商。例如：***公司，適用於產品的嵌入式版本。"
+msgstr "獨立軟件供應商。"
 
 #: .\apps\xpack\swagger_api\license_api.py:35
 msgid ""
 "Independent Software Vendor. For example: *** Company, suitable for the "
 "embedded version of the product."
-msgstr ""
+msgstr "獨立軟件供應商。例如：***公司，適用於產品的嵌入式版本。"
 
 #: .\apps\xpack\swagger_api\license_api.py:37
 msgid "Authorization deadline."
