@@ -588,7 +588,7 @@ class WorkflowManage:
             details['node_id'] = node.id
             details['up_node_id_list'] = node.up_node_id_list
             details['runtime_node_id'] = node.runtime_node_id
-            details_result[str(uuid.uuid1())] = details
+            details_result[node.runtime_node_id] = details
         return details_result
 
     def get_answer_text_list(self):

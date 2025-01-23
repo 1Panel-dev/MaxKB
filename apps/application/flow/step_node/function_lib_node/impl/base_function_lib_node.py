@@ -93,7 +93,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
 class BaseFunctionLibNodeNode(IFunctionLibNode):
     def save_context(self, details, workflow_manage):
         self.context['result'] = details.get('result')
-        self.answer_text = details.get('result')
+        self.answer_text = str(details.get('result'))
 
     def execute(self, function_lib_id, input_field_list, **kwargs) -> NodeResult:
         function_lib = QuerySet(FunctionLib).filter(id=function_lib_id).first()
