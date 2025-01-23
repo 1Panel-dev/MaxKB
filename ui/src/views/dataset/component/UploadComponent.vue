@@ -119,7 +119,7 @@
             </em>
           </p>
           <div class="upload__decoration">
-            <p>{{ $t('views.document.upload.formats') }}XLS、XLSX、CSV、ZIP</p>
+            <p>{{ $t('views.document.upload.formats') }}XLS、XLSX、CSV</p>
           </div>
         </div>
       </el-upload>
