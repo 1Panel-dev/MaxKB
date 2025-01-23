@@ -76,7 +76,7 @@ export default {
       base_model: {
         label: 'Base Model',
         tooltip:
-          'For models not listed, enter the model name and press Enter.',
+          'For models not listed, enter the model name and press Enter',
         placeholder: 'Enter the base model name and press Enter to add',
         requiredMessage: 'Base model cannot be empty'
       }

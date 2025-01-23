@@ -99,7 +99,7 @@
             <div class="flex align-center" style="display: inline-flex">
               <div class="mr-4">
                 <span>{{ $t('views.template.templateForm.form.base_model.label') }} </span>
-                <span class="danger">{{
+                <span class="danger ml-4">{{
                   $t('views.template.templateForm.form.base_model.tooltip')
                 }}</span>
               </div>
