@@ -23,6 +23,7 @@ from django.db import transaction
 from django.db.models import QuerySet, Count
 from django.db.models.functions import Substr, Reverse
 from django.http import HttpResponse
+from django.utils.translation import gettext_lazy as _, gettext
 from drf_yasg import openapi
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
@@ -62,8 +63,8 @@ from dataset.task import sync_web_document, generate_related_by_document_id
 from embedding.task.embedding import embedding_by_document, delete_embedding_by_document_list, \
     delete_embedding_by_document, update_embedding_dataset_id, delete_embedding_by_paragraph_ids, \
     embedding_by_document_list
+from setting.models import Model
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _, gettext
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle(), ZipParseQAHandle()]
 parse_table_handle_list = [CsvSplitTableHandle(), XlsSplitTableHandle(), XlsxSplitTableHandle()]
@@ -716,6 +717,14 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                               State.REVOKED.value, State.IGNORED.value]
             if with_valid:
                 self.is_valid(raise_exception=True)
+            dataset = QuerySet(DataSet).filter(id=self.data.get('dataset_id')).first()
+            embedding_model_id = dataset.embedding_mode_id
+            dataset_user_id = dataset.user_id
+            embedding_model = QuerySet(Model).filter(id=embedding_model_id).first()
+            if embedding_model is None:
+                raise AppApiException(500, _('Model does not exist'))
+            if embedding_model.permission_type == 'PRIVATE' and dataset_user_id != embedding_model.user_id:
+                raise AppApiException(500, _('No permission to use this model') + f"{embedding_model.name}")
             document_id = self.data.get("document_id")
             ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
                                              State.PENDING)
@@ -728,7 +737,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                              TaskType.EMBEDDING,
                                              State.PENDING)
             ListenerManagement.get_aggregation_document_status(document_id)()
-            embedding_model_id = get_embedding_model_id_by_dataset_id(dataset_id=self.data.get('dataset_id'))
+
             try:
                 embedding_by_document.delay(document_id, embedding_model_id, state_list)
             except AlreadyQueued as e:
