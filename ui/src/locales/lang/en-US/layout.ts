@@ -17,5 +17,11 @@ export default {
     remark: 'Remarks',
     update: 'Update',
     authorize: 'Authorized'
+  },
+  time: {
+    daysLater: 'days later',
+    hoursLater: 'hours later',
+    expired: 'expired',
+    expiringSoon: 'expiring soon'
   }
 }

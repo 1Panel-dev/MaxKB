@@ -17,5 +17,11 @@ export default {
     remark: '備註',
     update: '更新',
     authorize: '授權給'
+  },
+  time: {
+    daysLater: '天後',
+    hoursLater: '小時後',
+    expired: '已過期',
+    expiringSoon: '即將到期'
   }
 }

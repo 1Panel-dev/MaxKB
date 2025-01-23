@@ -16,5 +16,11 @@ export default {
     remark: '备注',
     update: '更新',
     authorize: '授权给'
+  },
+  time: {
+    daysLater: '天后',
+    hoursLater: '小时后',
+    expired: '已过期',
+    expiringSoon: '即将到期'
   }
 }
