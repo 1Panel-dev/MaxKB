@@ -20,6 +20,7 @@ from django.core.cache import caches
 from django.db import transaction, models
 from django.db.models import QuerySet, Q
 from django.http import StreamingHttpResponse
+from django.utils.translation import gettext_lazy as _, gettext
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
 from rest_framework.utils.formatting import lazy_format
@@ -45,7 +46,6 @@ from embedding.task import embedding_by_paragraph, embedding_by_paragraph_list
 from setting.models import Model
 from setting.models_provider import get_model_credential
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _, gettext as __
 
 chat_cache = caches['chat_cache']
 
@@ -224,11 +224,13 @@ class ChatSerializers(serializers.Serializer):
                 worksheet = workbook.active
                 worksheet.title = 'Sheet1'
 
-                headers = [__('Conversation ID'), __('summary'), __('User Questions'), __('Problem after optimization'),
-                           __('answer'), __('User feedback'),
-                           __('Reference segment number'),
-                           __('Section title + content'),
-                           __('Annotation'), __('Consuming tokens'), __('Time consumed (s)'), __('Question Time')]
+                headers = [gettext('Conversation ID'), gettext('summary'), gettext('User Questions'),
+                           gettext('Problem after optimization'),
+                           gettext('answer'), gettext('User feedback'),
+                           gettext('Reference segment number'),
+                           gettext('Section title + content'),
+                           gettext('Annotation'), gettext('Consuming tokens'), gettext('Time consumed (s)'),
+                           gettext('Question Time')]
                 for col_idx, header in enumerate(headers, 1):
                     cell = worksheet.cell(row=1, column=col_idx)
                     cell.value = header
@@ -272,7 +274,7 @@ class ChatSerializers(serializers.Serializer):
             user_id = self.data.get('user_id')
             application_id = self.data.get('application_id')
             if not QuerySet(Application).filter(id=application_id, user_id=user_id).exists():
-                raise AppApiException(500, __('Application does not exist'))
+                raise AppApiException(500, gettext('Application does not exist'))
 
         def open(self):
             self.is_valid(raise_exception=True)
@@ -291,7 +293,8 @@ class ChatSerializers(serializers.Serializer):
                 '-create_time')[0:1].first()
             if work_flow_version is None:
                 raise AppApiException(500,
-                                      __("The application has not been published. Please use it after publishing."))
+                                      gettext(
+                                          "The application has not been published. Please use it after publishing."))
             chat_cache.set(chat_id,
                            ChatInfo(chat_id, [],
                                     [],
@@ -373,7 +376,7 @@ class ChatSerializers(serializers.Serializer):
             if 'id' in self.data and self.data.get('id') is not None:
                 application = QuerySet(Application).filter(id=self.data.get('id')).first()
                 if application is None:
-                    raise AppApiException(500, __("Application does not exist"))
+                    raise AppApiException(500, gettext("Application does not exist"))
                 return application.user_id
             return self.data.get('user_id')
 
@@ -426,9 +429,9 @@ class ChatRecordSerializer(serializers.Serializer):
             application_access_token = QuerySet(ApplicationAccessToken).filter(
                 application_id=self.data.get('application_id')).first()
             if application_access_token is None:
-                raise AppApiException(500, __('Application authentication information does not exist'))
+                raise AppApiException(500, gettext('Application authentication information does not exist'))
             if not application_access_token.show_source and current_role == RoleConstants.APPLICATION_ACCESS_TOKEN.value:
-                raise AppApiException(500, __('Displaying knowledge sources is not enabled'))
+                raise AppApiException(500, gettext('Displaying knowledge sources is not enabled'))
 
         def get_chat_record(self):
             chat_record_id = self.data.get('chat_record_id')
@@ -446,7 +449,7 @@ class ChatRecordSerializer(serializers.Serializer):
                 self.is_valid(current_role=current_role, raise_exception=True)
             chat_record = self.get_chat_record()
             if chat_record is None:
-                raise AppApiException(500, __("Conversation does not exist"))
+                raise AppApiException(500, gettext("Conversation does not exist"))
             return ChatRecordSerializer.Query.reset_chat_record(chat_record)
 
     class Query(serializers.Serializer):
@@ -522,12 +525,13 @@ class ChatRecordSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             if not try_lock(self.data.get('chat_record_id')):
                 raise AppApiException(500,
-                                      __("Voting on the current session minutes, please do not send repeated requests"))
+                                      gettext(
+                                          "Voting on the current session minutes, please do not send repeated requests"))
             try:
                 chat_record_details_model = QuerySet(ChatRecord).get(id=self.data.get('chat_record_id'),
                                                                      chat_id=self.data.get('chat_id'))
                 if chat_record_details_model is None:
-                    raise AppApiException(500, __("Non-existent conversation chat_record_id"))
+                    raise AppApiException(500, gettext("Non-existent conversation chat_record_id"))
                 vote_status = self.data.get("vote_status")
                 if chat_record_details_model.vote_status == VoteChoices.UN_VOTE:
                     if vote_status == VoteChoices.STAR:
@@ -544,7 +548,7 @@ class ChatRecordSerializer(serializers.Serializer):
                         chat_record_details_model.vote_status = VoteChoices.UN_VOTE
                         chat_record_details_model.save()
                     else:
-                        raise AppApiException(500, __("Already voted, please cancel first and then vote again"))
+                        raise AppApiException(500, gettext("Already voted, please cancel first and then vote again"))
             finally:
                 un_lock(self.data.get('chat_record_id'))
             return True
@@ -575,7 +579,7 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_id = self.data.get('chat_id')
             chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
             if chat_record is None:
-                raise AppApiException(500, __('Conversation record does not exist'))
+                raise AppApiException(500, gettext('Conversation record does not exist'))
             if chat_record.improve_paragraph_id_list is None or len(chat_record.improve_paragraph_id_list) == 0:
                 return []
 
@@ -602,7 +606,7 @@ class ChatRecordSerializer(serializers.Serializer):
             super().is_valid(raise_exception=True)
             if not QuerySet(Document).filter(id=self.data.get('document_id'),
                                              dataset_id=self.data.get('dataset_id')).exists():
-                raise AppApiException(500, __("The document id is incorrect"))
+                raise AppApiException(500, gettext("The document id is incorrect"))
 
         @staticmethod
         def post_embedding_paragraph(chat_record, paragraph_id, dataset_id):
@@ -621,7 +625,7 @@ class ChatRecordSerializer(serializers.Serializer):
             chat_id = self.data.get('chat_id')
             chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
             if chat_record is None:
-                raise AppApiException(500, __('Conversation record does not exist'))
+                raise AppApiException(500, gettext('Conversation record does not exist'))
 
             document_id = self.data.get("document_id")
             dataset_id = self.data.get("dataset_id")
@@ -670,7 +674,7 @@ class ChatRecordSerializer(serializers.Serializer):
                 paragraph_id = self.data.get('paragraph_id')
                 chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
                 if chat_record is None:
-                    raise AppApiException(500, __('不存在的对话记录'))
+                    raise AppApiException(500, gettext('Conversation record does not exist'))
                 if not chat_record.improve_paragraph_id_list.__contains__(uuid.UUID(paragraph_id)):
                     message = lazy_format(
                         _('The paragraph id is wrong. The current conversation record does not exist. [{paragraph_id}] paragraph id'),
@@ -693,7 +697,7 @@ class ChatRecordSerializer(serializers.Serializer):
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
             if not Document.objects.filter(id=self.data['document_id'], dataset_id=self.data['dataset_id']).exists():
-                raise AppApiException(500, __("The document id is incorrect"))
+                raise AppApiException(500, gettext("The document id is incorrect"))
 
         @staticmethod
         def post_embedding_paragraph(paragraph_ids, dataset_id):
@@ -712,7 +716,7 @@ class ChatRecordSerializer(serializers.Serializer):
             # 获取所有聊天记录
             chat_record_list = list(ChatRecord.objects.filter(chat_id__in=chat_ids))
             if len(chat_record_list) < len(chat_ids):
-                raise AppApiException(500, __("Conversation records that do not exist"))
+                raise AppApiException(500, gettext("Conversation records that do not exist"))
 
             # 批量创建段落和问题映射
             paragraphs = []
