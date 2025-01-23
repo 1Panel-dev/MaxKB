@@ -278,7 +278,7 @@ const pausePlayAnswerText = () => {
 
 onMounted(() => {
   // 第一次回答后自动播放， 打开历史记录不自动播放
-  if (props.tts_autoplay && buttonData.value.write_ed && !buttonData.value.update_time) {
+  if (props.tts && props.tts_autoplay && buttonData.value.write_ed && !buttonData.value.update_time) {
     playAnswerText(buttonData.value.answer_text)
   }
 })
