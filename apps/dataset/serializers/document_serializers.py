@@ -23,7 +23,8 @@ from django.db import transaction
 from django.db.models import QuerySet, Count
 from django.db.models.functions import Substr, Reverse
 from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext_lazy as _, gettext, to_locale
+from django.utils.translation import get_language
 from drf_yasg import openapi
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
@@ -65,8 +66,6 @@ from embedding.task.embedding import embedding_by_document, delete_embedding_by_
     embedding_by_document_list
 from setting.models import Model
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _, gettext, to_locale
-from django.utils.translation import get_language
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle(), ZipParseQAHandle()]
 parse_table_handle_list = [CsvSplitTableHandle(), XlsSplitTableHandle(), XlsxSplitTableHandle()]
