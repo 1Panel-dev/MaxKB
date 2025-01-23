@@ -101,7 +101,9 @@
             </el-checkbox>
           </div>
           <div class="text-right mt-8">
-            <el-button @click="splitDocument"> {{ $t('views.document.buttons.preview') }}</el-button>
+            <el-button @click="splitDocument">
+              {{ $t('views.document.buttons.preview') }}</el-button
+            >
           </div>
         </div>
       </el-col>
@@ -147,19 +149,19 @@ const form = reactive<{
 
 function changeHandle(val: boolean) {
   if (val && firstChecked.value) {
-    const list = paragraphList.value
-    list.map((item: any) => {
-      item.content.map((v: any) => {
-        v['problem_list'] = v.title.trim()
+    paragraphList.value = paragraphList.value.map((item: any) => ({
+      ...item,
+      content: item.content.map((v: any) => ({
+        ...v,
+        problem_list: v.title.trim()
           ? [
               {
                 content: v.title.trim()
               }
             ]
           : []
-      })
-    })
-    paragraphList.value = list
+      }))
+    }))
     firstChecked.value = false
   }
 }
