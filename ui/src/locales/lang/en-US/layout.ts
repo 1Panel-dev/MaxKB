@@ -3,7 +3,6 @@ export default {
   wiki: 'User Manual',
   forum: 'Forum For Help',
   logout: 'Logout',
-
   apiKey: 'API Key',
   apiServiceAddress: 'API Service Address',
   language: 'Language',
@@ -23,5 +22,6 @@ export default {
     hoursLater: 'hours later',
     expired: 'expired',
     expiringSoon: 'expiring soon'
-  }
+  },
+  copyright: 'Copyright © 2014-2025 FIT2CLOUD, All rights reserved.'
 }

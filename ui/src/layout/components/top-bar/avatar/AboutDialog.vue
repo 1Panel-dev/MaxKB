@@ -48,7 +48,7 @@
       </div>
     </div>
     <div class="border-t text-center mt-16 p-16 pb-0">
-      <el-text type="info">2014-2025 版权所有 © 杭州飞致云信息科技有限公司</el-text>
+      <el-text type="info">{{ $t('layout.copyright') }}</el-text>
     </div>
   </el-dialog>
 </template>
