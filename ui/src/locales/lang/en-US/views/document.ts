@@ -18,7 +18,7 @@ export default {
     cancelSuccess: 'Batch cancellation successful',
     sendMessage: 'Sent successfully',
     vectorizationSuccess: 'Batch vectorization successful',
-    nameMessage: 'File name cannot be empty!',
+    nameMessage: 'Document name cannot be empty!',
     importMessage: 'Import successful',
     migrationSuccess: 'Move successful'
   },
@@ -94,7 +94,7 @@ export default {
     preview: 'Generate Preview'
   },
   table: {
-    name: 'File Name',
+    name: 'Document Name',
     char_length: 'Words',
     paragraph: 'Segment',
     all: 'All',

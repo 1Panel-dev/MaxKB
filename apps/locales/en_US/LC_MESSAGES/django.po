@@ -143,7 +143,7 @@ msgstr ""
 
 #: .\apps\application\chat_pipeline\step\chat_step\i_chat_step.py:86
 msgid "message type error"
-msgstr ""
+msgstr "Message type error"
 
 #: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:177
 #: .\apps\application\chat_pipeline\step\chat_step\impl\base_chat_step.py:221
@@ -157,7 +157,7 @@ msgstr ""
 #: .\apps\application\chat_pipeline\step\search_dataset_step\i_search_dataset_step.py:25
 #: .\apps\application\serializers\chat_serializers.py:562
 msgid "question"
-msgstr ""
+msgstr "Question"
 
 #: .\apps\application\chat_pipeline\step\generate_human_message_step\i_generate_human_message_step.py:33
 #: .\apps\application\chat_pipeline\step\reset_problem_step\i_reset_problem_step.py:28
@@ -376,13 +376,13 @@ msgstr ""
 #: .\apps\application\serializers\application_serializers.py:687
 #: .\apps\application\serializers\chat_message_serializers.py:250
 msgid "picture"
-msgstr ""
+msgstr "Picture"
 
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:18
 #: .\apps\application\flow\step_node\document_extract_node\i_document_extract_node.py:13
 #: .\apps\application\serializers\chat_message_serializers.py:251
 msgid "document"
-msgstr ""
+msgstr "Document"
 
 #: .\apps\application\flow\step_node\application_node\i_application_node.py:19
 #: .\apps\application\serializers\chat_message_serializers.py:252
@@ -425,7 +425,7 @@ msgstr ""
 #: .\apps\application\flow\step_node\condition_node\i_condition_node.py:20
 #: .\apps\application\swagger_api\application_api.py:271
 msgid "value"
-msgstr ""
+msgstr "Value"
 
 #: .\apps\application\flow\step_node\condition_node\i_condition_node.py:21
 msgid "Fields"
@@ -508,7 +508,7 @@ msgstr ""
 #: .\apps\setting\serializers\team_serializers.py:85
 #: .\apps\setting\serializers\valid_serializers.py:37
 msgid "type"
-msgstr ""
+msgstr "Type"
 
 #: .\apps\application\flow\step_node\function_node\i_function_node.py:28
 msgid "The field only supports string|int|dict|array|float"
@@ -520,7 +520,7 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:144
 #: .\apps\function_lib\swagger_api\function_lib_api.py:190
 msgid "source"
-msgstr ""
+msgstr "Source"
 
 #: .\apps\application\flow\step_node\function_node\i_function_node.py:32
 #: .\apps\function_lib\serializers\function_lib_serializer.py:44
@@ -534,7 +534,7 @@ msgstr ""
 
 #: .\apps\application\flow\step_node\function_node\i_function_node.py:46
 msgid "function"
-msgstr ""
+msgstr "Function"
 
 #: .\apps\application\flow\step_node\image_generate_step_node\i_image_generate_node.py:15
 msgid "Prompt word (positive)"
@@ -558,7 +558,7 @@ msgstr ""
 #: .\apps\common\swagger_api\common_api.py:36
 #: .\apps\dataset\serializers\dataset_serializers.py:573
 msgid "similarity"
-msgstr ""
+msgstr "Similarity"
 
 #: .\apps\application\flow\step_node\speech_to_text_step_node\i_speech_to_text_node.py:17
 msgid "The audio file cannot be empty"
@@ -719,11 +719,11 @@ msgstr ""
 #: .\apps\dataset\serializers\dataset_serializers.py:105
 #: .\apps\dataset\serializers\dataset_serializers.py:106
 msgid "application name"
-msgstr ""
+msgstr "Application name"
 
 #: .\apps\application\serializers\application_serializers.py:208
 msgid "application describe"
-msgstr ""
+msgstr "Application describe"
 
 #: .\apps\application\serializers\application_serializers.py:210
 #: .\apps\application\serializers\application_serializers.py:475
@@ -767,11 +767,11 @@ msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:247
 msgid "protocol"
-msgstr ""
+msgstr "Protocol"
 
 #: .\apps\application\serializers\application_serializers.py:248
 msgid "token"
-msgstr ""
+msgstr "Token"
 
 #: .\apps\application\serializers\application_serializers.py:330
 #: .\apps\application\swagger_api\application_api.py:153
@@ -815,11 +815,11 @@ msgstr ""
 #: .\apps\users\views\user.py:80 .\apps\users\views\user.py:81
 #: .\apps\xpack\serializers\application_setting_serializer.py:37
 msgid "language"
-msgstr ""
+msgstr "Language"
 
 #: .\apps\application\serializers\application_serializers.py:412
 msgid "access_token"
-msgstr ""
+msgstr "Access token"
 
 #: .\apps\application\serializers\application_serializers.py:414
 msgid "Certification Information"
@@ -859,7 +859,7 @@ msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:574
 msgid "topN"
-msgstr ""
+msgstr "TopN"
 
 #: .\apps\application\serializers\application_serializers.py:576
 msgid "Relevance"
@@ -882,7 +882,7 @@ msgstr ""
 #: .\apps\dataset\serializers\file_serializers.py:59
 #: .\apps\dataset\views\file.py:34 .\apps\dataset\views\file.py:42
 msgid "file"
-msgstr ""
+msgstr "File"
 
 #: .\apps\application\serializers\application_serializers.py:721
 #: .\apps\common\handle\impl\qa\zip_parse_qa_handle.py:62
@@ -894,7 +894,7 @@ msgstr ""
 
 #: .\apps\application\serializers\application_serializers.py:859
 msgid "work_flow is a required field"
-msgstr ""
+msgstr "Work_flow is a required field"
 
 #: .\apps\application\serializers\application_serializers.py:921
 #: .\apps\application\serializers\application_serializers.py:1063
@@ -979,7 +979,7 @@ msgstr ""
 #: .\apps\application\serializers\chat_serializers.py:101
 #: .\apps\application\serializers\chat_serializers.py:227
 msgid "summary"
-msgstr ""
+msgstr "Summary"
 
 #: .\apps\application\serializers\application_version_serializers.py:61
 msgid "Workflow version id"
@@ -1008,7 +1008,7 @@ msgstr ""
 #: .\apps\dataset\swagger_api\problem_api.py:154
 #: .\apps\dataset\swagger_api\problem_api.py:169
 msgid "content"
-msgstr ""
+msgstr "Content"
 
 #: .\apps\application\serializers\chat_message_serializers.py:180
 #: .\apps\setting\serializers\team_serializers.py:45
@@ -1090,7 +1090,7 @@ msgstr ""
 
 #: .\apps\application\serializers\chat_serializers.py:54
 msgid "node"
-msgstr ""
+msgstr "Node"
 
 #: .\apps\application\serializers\chat_serializers.py:55
 msgid "Connection"
@@ -1116,7 +1116,7 @@ msgstr ""
 
 #: .\apps\application\serializers\chat_serializers.py:229
 msgid "answer"
-msgstr ""
+msgstr "Answer"
 
 #: .\apps\application\serializers\chat_serializers.py:229
 msgid "User feedback"
@@ -1440,7 +1440,7 @@ msgstr ""
 #: .\apps\application\swagger_api\application_statistics_api.py:69
 #: .\apps\application\swagger_api\application_statistics_api.py:70
 msgid "time"
-msgstr ""
+msgstr "Time"
 
 #: .\apps\application\swagger_api\application_statistics_api.py:55
 msgid "Time, this field is only available when querying trends"
@@ -1470,7 +1470,7 @@ msgstr ""
 #: .\apps\application\swagger_api\chat_api.py:63
 #: .\apps\dataset\serializers\problem_serializers.py:91
 msgid "problem"
-msgstr ""
+msgstr "Problem"
 
 #: .\apps\application\swagger_api\chat_api.py:40
 msgid "Question content"
@@ -1478,12 +1478,12 @@ msgstr ""
 
 #: .\apps\application\swagger_api\chat_api.py:44
 msgid "role"
-msgstr ""
+msgstr "Role"
 
 #: .\apps\application\swagger_api\chat_api.py:49
 #: .\apps\application\swagger_api\chat_api.py:64
 msgid "regenerate"
-msgstr ""
+msgstr "Regenerate"
 
 #: .\apps\application\swagger_api\chat_api.py:51
 msgid "Stream Output"
@@ -1497,7 +1497,7 @@ msgstr ""
 #: .\apps\application\swagger_api\chat_api.py:82
 #: .\apps\application\swagger_api\chat_api.py:162
 msgid "abstract"
-msgstr ""
+msgstr "Abstract"
 
 #: .\apps\application\swagger_api\chat_api.py:85
 #: .\apps\application\swagger_api\chat_api.py:86
@@ -1526,7 +1526,7 @@ msgstr ""
 #: .\apps\application\swagger_api\chat_api.py:94
 #: .\apps\application\swagger_api\chat_api.py:95
 msgid "Change time"
-msgstr ""
+msgstr "Update time"
 
 #: .\apps\application\swagger_api\chat_api.py:135
 msgid "Application ID, pass when modifying, do not pass when creating"
@@ -1626,7 +1626,7 @@ msgstr ""
 #: .\apps\dataset\serializers\paragraph_serializers.py:706
 #: .\apps\dataset\serializers\paragraph_serializers.py:707
 msgid "title"
-msgstr ""
+msgstr "Title"
 
 #: .\apps\application\swagger_api\chat_api.py:374
 #: .\apps\common\swagger_api\common_api.py:60
@@ -1874,7 +1874,7 @@ msgstr ""
 #: .\apps\application\views\application_views.py:632
 #: .\apps\application\views\application_views.py:633
 msgid "text to speech"
-msgstr ""
+msgstr "Text to speech"
 
 #: .\apps\application\views\chat_views.py:33
 #: .\apps\application\views\chat_views.py:34
@@ -1921,7 +1921,7 @@ msgstr ""
 #: .\apps\application\views\chat_views.py:112
 #: .\apps\application\views\chat_views.py:113
 msgid "dialogue"
-msgstr ""
+msgstr "Dialogue"
 
 #: .\apps\application\views\chat_views.py:149
 #: .\apps\application\views\chat_views.py:150
@@ -2082,7 +2082,7 @@ msgstr ""
 
 #: .\apps\common\constants\permission_constants.py:63
 msgid "chat"
-msgstr ""
+msgstr "Chat"
 
 #: .\apps\common\constants\permission_constants.py:63
 msgid "Only has application dialog interface permissions"
@@ -2201,27 +2201,27 @@ msgstr ""
 
 #: .\apps\common\job\clean_chat_job.py:25
 msgid "start clean chat log"
-msgstr ""
+msgstr "Start cleaning chat logs"
 
 #: .\apps\common\job\clean_chat_job.py:71
 msgid "end clean chat log"
-msgstr ""
+msgstr "End of chat log cleaning"
 
 #: .\apps\common\job\clean_debug_file_job.py:21
 msgid "start clean debug file"
-msgstr ""
+msgstr "Start cleaning debug files"
 
 #: .\apps\common\job\clean_debug_file_job.py:25
 msgid "end clean debug file"
-msgstr ""
+msgstr "End of debug file cleaning"
 
 #: .\apps\common\job\client_access_num_job.py:25
 msgid "start reset access_num"
-msgstr ""
+msgstr "Start resetting access_num"
 
 #: .\apps\common\job\client_access_num_job.py:27
 msgid "end reset access_num"
-msgstr ""
+msgstr "End of access_num reset"
 
 #: .\apps\common\response\result.py:24
 msgid "Success"
@@ -2230,22 +2230,22 @@ msgstr ""
 #: .\apps\common\response\result.py:36 .\apps\common\response\result.py:80
 #: .\apps\common\response\result.py:82
 msgid "current page"
-msgstr ""
+msgstr "Current page"
 
 #: .\apps\common\response\result.py:42 .\apps\common\response\result.py:85
 #: .\apps\common\response\result.py:87
 msgid "page size"
-msgstr ""
+msgstr "Page size"
 
 #: .\apps\common\response\result.py:53 .\apps\common\response\result.py:101
 #: .\apps\common\response\result.py:130
 msgid "response parameters"
-msgstr ""
+msgstr "Response parameters"
 
 #: .\apps\common\response\result.py:59 .\apps\common\response\result.py:107
 #: .\apps\common\response\result.py:136
 msgid "response code"
-msgstr ""
+msgstr "Response code"
 
 #: .\apps\common\response\result.py:61 .\apps\common\response\result.py:109
 #: .\apps\common\response\result.py:138
@@ -2255,26 +2255,26 @@ msgstr ""
 #: .\apps\common\response\result.py:64 .\apps\common\response\result.py:112
 #: .\apps\common\response\result.py:141
 msgid "prompt"
-msgstr ""
+msgstr "Prompt"
 
 #: .\apps\common\response\result.py:65 .\apps\common\response\result.py:113
 #: .\apps\common\response\result.py:142
 msgid "success"
-msgstr ""
+msgstr "Success"
 
 #: .\apps\common\response\result.py:66 .\apps\common\response\result.py:114
 #: .\apps\common\response\result.py:143
 msgid "error prompt"
-msgstr ""
+msgstr "Error prompt"
 
 #: .\apps\common\response\result.py:72 .\apps\common\response\result.py:74
 msgid "total number of data"
-msgstr ""
+msgstr "Total number of data"
 
 #: .\apps\common\swagger_api\common_api.py:24
 #: .\apps\dataset\serializers\dataset_serializers.py:569
 msgid "query text"
-msgstr ""
+msgstr "Query text"
 
 #: .\apps\common\swagger_api\common_api.py:42
 msgid "Retrieval pattern embedding|keywords|blend"
@@ -2325,7 +2325,7 @@ msgstr ""
 #: .\apps\dataset\swagger_api\problem_api.py:149
 #: .\apps\dataset\swagger_api\problem_api.py:177
 msgid "dataset id"
-msgstr ""
+msgstr "Dataset ID"
 
 #: .\apps\common\swagger_api\common_api.py:70
 #: .\apps\common\swagger_api\common_api.py:71
@@ -2357,7 +2357,7 @@ msgstr ""
 #: .\apps\dataset\serializers\problem_serializers.py:58
 #: .\apps\dataset\swagger_api\problem_api.py:64
 msgid "document id"
-msgstr ""
+msgstr "Document ID"
 
 #: .\apps\common\swagger_api\common_api.py:72
 #: .\apps\common\swagger_api\common_api.py:73
@@ -2395,7 +2395,7 @@ msgstr ""
 #: .\apps\common\swagger_api\common_api.py:74
 #: .\apps\common\swagger_api\common_api.py:75
 msgid "relevance score"
-msgstr ""
+msgstr "Relevance score"
 
 #: .\apps\common\swagger_api\common_api.py:76
 #: .\apps\common\swagger_api\common_api.py:77
@@ -2426,7 +2426,7 @@ msgstr ""
 
 #: .\apps\dataset\serializers\common_serializers.py:87
 msgid "source url"
-msgstr ""
+msgstr "Source URL"
 
 #: .\apps\dataset\serializers\common_serializers.py:89
 #: .\apps\dataset\serializers\dataset_serializers.py:333
@@ -2435,7 +2435,7 @@ msgstr ""
 #: .\apps\dataset\serializers\document_serializers.py:154
 #: .\apps\dataset\serializers\document_serializers.py:180
 msgid "selector"
-msgstr ""
+msgstr "Selector"
 
 #: .\apps\dataset\serializers\common_serializers.py:96
 #: .\apps\dataset\serializers\dataset_serializers.py:341
@@ -2452,7 +2452,7 @@ msgstr ""
 #: .\apps\dataset\swagger_api\document_api.py:49
 #: .\apps\dataset\swagger_api\document_api.py:50
 msgid "id list"
-msgstr ""
+msgstr "ID list"
 
 #: .\apps\dataset\serializers\common_serializers.py:115
 #, python-brace-format
@@ -2496,17 +2496,17 @@ msgstr ""
 #: .\apps\setting\serializers\team_serializers.py:42
 #: .\apps\users\serializers\user_serializers.py:272
 msgid "user id"
-msgstr ""
+msgstr "User ID"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:104
 msgid "id"
-msgstr ""
+msgstr "ID"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:109
 #: .\apps\dataset\serializers\dataset_serializers.py:110
 #: .\apps\setting\serializers\model_apply_serializers.py:51
 msgid "model id"
-msgstr ""
+msgstr "Model ID"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:112
 #: .\apps\dataset\serializers\dataset_serializers.py:114
@@ -2516,15 +2516,15 @@ msgstr ""
 #: .\apps\dataset\serializers\dataset_serializers.py:115
 #: .\apps\dataset\serializers\dataset_serializers.py:116
 msgid "opening remarks"
-msgstr ""
+msgstr "Opening remarks"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:118
 msgid "example"
-msgstr ""
+msgstr "Example"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:119
 msgid "User id"
-msgstr ""
+msgstr "User ID"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:121
 #: .\apps\dataset\serializers\dataset_serializers.py:122
@@ -2554,7 +2554,7 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:32
 #: .\apps\function_lib\swagger_api\function_lib_api.py:33
 msgid "create time"
-msgstr ""
+msgstr "Creation time"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:127
 #: .\apps\dataset\serializers\dataset_serializers.py:128
@@ -2579,7 +2579,7 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:34
 #: .\apps\function_lib\swagger_api\function_lib_api.py:35
 msgid "update time"
-msgstr ""
+msgstr "Update time"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:137
 #: .\apps\dataset\serializers\dataset_serializers.py:201
@@ -2604,7 +2604,7 @@ msgstr ""
 #: .\apps\dataset\serializers\dataset_serializers.py:929
 #: .\apps\dataset\serializers\dataset_serializers.py:930
 msgid "dataset name"
-msgstr ""
+msgstr "Knowledge base name"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:142
 #: .\apps\dataset\serializers\dataset_serializers.py:206
@@ -2629,7 +2629,7 @@ msgstr ""
 #: .\apps\dataset\serializers\dataset_serializers.py:931
 #: .\apps\dataset\serializers\dataset_serializers.py:932
 msgid "dataset description"
-msgstr ""
+msgstr "Knowledge base description"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:175
 #: .\apps\dataset\serializers\dataset_serializers.py:837
@@ -2640,7 +2640,7 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:166
 #: .\apps\setting\swagger_api\provide_api.py:81
 msgid "permission"
-msgstr ""
+msgstr "Permission"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:231
 #: .\apps\dataset\serializers\dataset_serializers.py:254
@@ -2650,7 +2650,7 @@ msgstr ""
 #: .\apps\dataset\serializers\dataset_serializers.py:531
 #: .\apps\dataset\serializers\dataset_serializers.py:532
 msgid "embedding mode"
-msgstr ""
+msgstr "Embedding mode"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:257
 #: .\apps\dataset\serializers\dataset_serializers.py:260
@@ -2659,11 +2659,11 @@ msgstr ""
 #: .\apps\dataset\serializers\document_serializers.py:966
 #: .\apps\dataset\serializers\document_serializers.py:995
 msgid "file list"
-msgstr ""
+msgstr "File list"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:269
 msgid "upload files "
-msgstr ""
+msgstr "Upload files"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:297
 #: .\apps\dataset\serializers\dataset_serializers.py:298
@@ -2676,7 +2676,7 @@ msgstr ""
 #: .\apps\dataset\serializers\document_serializers.py:793
 #: .\apps\dataset\serializers\document_serializers.py:794
 msgid "char length"
-msgstr ""
+msgstr "Character length"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:299
 #: .\apps\dataset\serializers\dataset_serializers.py:300
@@ -2687,7 +2687,7 @@ msgstr ""
 #: .\apps\dataset\serializers\dataset_serializers.py:937
 #: .\apps\dataset\serializers\dataset_serializers.py:938
 msgid "document count"
-msgstr ""
+msgstr "Document count"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:308
 #: .\apps\dataset\serializers\dataset_serializers.py:309
@@ -2698,13 +2698,13 @@ msgstr ""
 #: .\apps\dataset\serializers\document_serializers.py:283
 #: .\apps\dataset\serializers\document_serializers.py:467
 msgid "document list"
-msgstr ""
+msgstr "Document list"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:327
 #: .\apps\dataset\serializers\dataset_serializers.py:388
 #: .\apps\dataset\serializers\dataset_serializers.py:389
 msgid "web source url"
-msgstr ""
+msgstr "Web source URL"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:414
 #: .\apps\setting\serializers\valid_serializers.py:26
@@ -2722,32 +2722,32 @@ msgstr ""
 #: .\apps\dataset\serializers\dataset_serializers.py:533
 #: .\apps\dataset\serializers\dataset_serializers.py:534
 msgid "documents"
-msgstr ""
+msgstr "Documents"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:548
 #: .\apps\xpack\serializers\application_setting_serializer.py:70
 msgid "application id"
-msgstr ""
+msgstr "Application ID"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:549
 #: .\apps\dataset\serializers\dataset_serializers.py:914
 #: .\apps\dataset\serializers\dataset_serializers.py:915
 msgid "application id list"
-msgstr ""
+msgstr "Application ID list"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:577
 msgid "search mode"
-msgstr ""
+msgstr "Search mode"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:582
 #: .\apps\dataset\serializers\dataset_serializers.py:618
 #: .\apps\dataset\serializers\dataset_serializers.py:706
 msgid "id does not exist"
-msgstr ""
+msgstr "ID does not exist"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:609
 msgid "sync type"
-msgstr ""
+msgstr "Synchronization type"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:611
 msgid "The synchronization type only supports:replace|complete"
@@ -2782,7 +2782,7 @@ msgstr ""
 #: .\apps\dataset\serializers\dataset_serializers.py:911
 #: .\apps\dataset\serializers\document_serializers.py:825
 msgid "meta"
-msgstr ""
+msgstr "Metadata"
 
 #: .\apps\dataset\serializers\dataset_serializers.py:913
 msgid "Knowledge base metadata->web:{source_url:xxx,selector:'xxx'},base:{}"
@@ -2794,12 +2794,12 @@ msgstr ""
 #: .\apps\dataset\swagger_api\document_api.py:37
 #: .\apps\dataset\swagger_api\document_api.py:51
 msgid "task type"
-msgstr ""
+msgstr "Task type"
 
 #: .\apps\dataset\serializers\document_serializers.py:94
 #: .\apps\dataset\serializers\document_serializers.py:107
 msgid "task type not support"
-msgstr ""
+msgstr "Task type not supported"
 
 #: .\apps\dataset\serializers\document_serializers.py:114
 #: .\apps\dataset\serializers\document_serializers.py:187
@@ -2810,7 +2810,7 @@ msgstr ""
 #: .\apps\dataset\serializers\document_serializers.py:815
 #: .\apps\dataset\serializers\document_serializers.py:816
 msgid "document name"
-msgstr ""
+msgstr "Document name"
 
 #: .\apps\dataset\serializers\document_serializers.py:117
 msgid "The type only supports optimization|directly_return"
@@ -2822,33 +2822,33 @@ msgstr ""
 #: .\apps\dataset\serializers\document_serializers.py:819
 #: .\apps\dataset\swagger_api\document_api.py:25
 msgid "hit handling method"
-msgstr ""
+msgstr "Hit handling method"
 
 #: .\apps\dataset\serializers\document_serializers.py:125
 #: .\apps\dataset\serializers\document_serializers.py:823
 #: .\apps\dataset\swagger_api\document_api.py:27
 msgid "directly return similarity"
-msgstr ""
+msgstr "Directly return similarity"
 
 #: .\apps\dataset\serializers\document_serializers.py:128
 #: .\apps\dataset\serializers\document_serializers.py:408
 msgid "document is active"
-msgstr ""
+msgstr "Document is active"
 
 #: .\apps\dataset\serializers\document_serializers.py:149
 #: .\apps\dataset\serializers\document_serializers.py:151
 msgid "document url list"
-msgstr ""
+msgstr "Document URL list"
 
 #: .\apps\dataset\serializers\document_serializers.py:177
 #: .\apps\dataset\serializers\document_serializers.py:178
 msgid "source url list"
-msgstr ""
+msgstr "Source URL list"
 
 #: .\apps\dataset\serializers\document_serializers.py:201
 #: .\apps\dataset\serializers\document_serializers.py:202
 msgid "paragraphs"
-msgstr ""
+msgstr "Paragraphs"
 
 #: .\apps\dataset\serializers\document_serializers.py:226
 msgid "The template type only supports excel|csv"
@@ -2870,28 +2870,28 @@ msgstr ""
 #: .\apps\dataset\serializers\paragraph_serializers.py:304
 #: .\apps\dataset\serializers\paragraph_serializers.py:436
 msgid "target dataset id"
-msgstr ""
+msgstr "Target knowledge base ID"
 
 #: .\apps\dataset\serializers\document_serializers.py:384
 #: .\apps\dataset\serializers\paragraph_serializers.py:305
 #: .\apps\dataset\serializers\paragraph_serializers.py:441
 msgid "target document id"
-msgstr ""
+msgstr "Target document ID"
 
 #: .\apps\dataset\serializers\document_serializers.py:392
 #: .\apps\dataset\serializers\document_serializers.py:393
 msgid "document id list"
-msgstr ""
+msgstr "Document ID list"
 
 #: .\apps\dataset\serializers\document_serializers.py:410
 msgid "status"
-msgstr ""
+msgstr "Status"
 
 #: .\apps\dataset\serializers\document_serializers.py:479
 #: .\apps\dataset\serializers\document_serializers.py:575
 #: .\apps\dataset\serializers\document_serializers.py:1173
 msgid "document id not exist"
-msgstr ""
+msgstr "Document ID does not exist"
 
 #: .\apps\dataset\serializers\document_serializers.py:635
 msgid "Section title (optional)"
@@ -2920,11 +2920,11 @@ msgstr ""
 #: .\apps\setting\swagger_api\provide_api.py:143
 #: .\apps\setting\swagger_api\provide_api.py:144
 msgid "name"
-msgstr ""
+msgstr "Name"
 
 #: .\apps\dataset\serializers\document_serializers.py:821
 msgid "ai optimization: optimization, direct return: directly_return"
-msgstr ""
+msgstr "AI optimization: optimization, direct return: directly_return"
 
 #: .\apps\dataset\serializers\document_serializers.py:827
 msgid "Document metadata->web:{source_url:xxx,selector:'xxx'},base:{}"
@@ -2932,17 +2932,17 @@ msgstr ""
 
 #: .\apps\dataset\serializers\document_serializers.py:838
 msgid "dataset id not exist"
-msgstr ""
+msgstr "Dataset ID does not exist"
 
 #: .\apps\dataset\serializers\document_serializers.py:969
 #: .\apps\dataset\serializers\document_serializers.py:999
 msgid "limit"
-msgstr ""
+msgstr "Limit"
 
 #: .\apps\dataset\serializers\document_serializers.py:973
 #: .\apps\dataset\serializers\document_serializers.py:975
 msgid "patterns"
-msgstr ""
+msgstr "Patterns"
 
 #: .\apps\dataset\serializers\document_serializers.py:978
 msgid "Auto Clean"
@@ -2963,27 +2963,27 @@ msgstr ""
 
 #: .\apps\dataset\serializers\document_serializers.py:1028
 msgid "space"
-msgstr ""
+msgstr "Space"
 
 #: .\apps\dataset\serializers\document_serializers.py:1029
 msgid "semicolon"
-msgstr ""
+msgstr "Semicolon"
 
 #: .\apps\dataset\serializers\document_serializers.py:1029
 msgid "comma"
-msgstr ""
+msgstr "Comma"
 
 #: .\apps\dataset\serializers\document_serializers.py:1030
 msgid "period"
-msgstr ""
+msgstr "Period"
 
 #: .\apps\dataset\serializers\document_serializers.py:1030
 msgid "enter"
-msgstr ""
+msgstr "Enter"
 
 #: .\apps\dataset\serializers\document_serializers.py:1031
 msgid "blank line"
-msgstr ""
+msgstr "Blank line"
 
 #: .\apps\dataset\serializers\document_serializers.py:1141
 msgid "Hit handling method is required"
@@ -3004,7 +3004,7 @@ msgstr ""
 
 #: .\apps\dataset\serializers\image_serializers.py:23
 msgid "image"
-msgstr ""
+msgstr "Image"
 
 #: .\apps\dataset\serializers\image_serializers.py:42
 msgid "Image not found"
@@ -3019,18 +3019,18 @@ msgstr ""
 #: .\apps\dataset\serializers\paragraph_serializers.py:93
 #: .\apps\dataset\serializers\paragraph_serializers.py:653
 msgid "section title"
-msgstr ""
+msgstr "Section title"
 
 #: .\apps\dataset\serializers\paragraph_serializers.py:65
 #: .\apps\dataset\serializers\paragraph_serializers.py:66
 msgid "section content"
-msgstr ""
+msgstr "Section content"
 
 #: .\apps\dataset\serializers\paragraph_serializers.py:73
 #: .\apps\dataset\serializers\paragraph_serializers.py:74
 #: .\apps\dataset\serializers\problem_serializers.py:88
 msgid "problem list"
-msgstr ""
+msgstr "Problem list"
 
 #: .\apps\dataset\serializers\paragraph_serializers.py:100
 #: .\apps\dataset\serializers\paragraph_serializers.py:172
@@ -3042,7 +3042,7 @@ msgstr ""
 #: .\apps\dataset\serializers\problem_serializers.py:57
 #: .\apps\dataset\swagger_api\problem_api.py:61
 msgid "paragraph id"
-msgstr ""
+msgstr "Paragraph ID"
 
 #: .\apps\dataset\serializers\paragraph_serializers.py:105
 #: .\apps\dataset\serializers\paragraph_serializers.py:467
@@ -3056,13 +3056,13 @@ msgstr ""
 #: .\apps\dataset\serializers\paragraph_serializers.py:191
 #: .\apps\dataset\serializers\paragraph_serializers.py:192
 msgid "question content"
-msgstr ""
+msgstr "Question content"
 
 #: .\apps\dataset\serializers\paragraph_serializers.py:193
 #: .\apps\dataset\serializers\paragraph_serializers.py:708
 #: .\apps\dataset\swagger_api\problem_api.py:26
 msgid "hit num"
-msgstr ""
+msgstr "Hit num"
 
 #: .\apps\dataset\serializers\paragraph_serializers.py:210
 #: .\apps\dataset\serializers\paragraph_serializers.py:281
@@ -3071,7 +3071,7 @@ msgstr ""
 #: .\apps\dataset\serializers\problem_serializers.py:194
 #: .\apps\dataset\swagger_api\problem_api.py:101
 msgid "problem id"
-msgstr ""
+msgstr "Problem ID"
 
 #: .\apps\dataset\serializers\paragraph_serializers.py:222
 msgid "Paragraph does not exist"
@@ -3085,7 +3085,7 @@ msgstr ""
 #: .\apps\dataset\serializers\paragraph_serializers.py:449
 #: .\apps\dataset\serializers\paragraph_serializers.py:450
 msgid "paragraph id list"
-msgstr ""
+msgstr "Paragraph ID list"
 
 #: .\apps\dataset\serializers\paragraph_serializers.py:317
 msgid "The document to be migrated is consistent with the target document"
@@ -3120,7 +3120,7 @@ msgstr ""
 #: .\apps\dataset\swagger_api\problem_api.py:83
 #: .\apps\dataset\swagger_api\problem_api.py:84
 msgid "problem id list"
-msgstr ""
+msgstr "Problem ID list"
 
 #: .\apps\dataset\swagger_api\document_api.py:38
 #: .\apps\dataset\swagger_api\document_api.py:52
@@ -3130,11 +3130,11 @@ msgstr ""
 #: .\apps\dataset\swagger_api\document_api.py:64
 #: .\apps\dataset\swagger_api\document_api.py:65
 msgid "state list"
-msgstr ""
+msgstr "State list"
 
 #: .\apps\dataset\swagger_api\image_api.py:22
 msgid "image file"
-msgstr ""
+msgstr "Image file"
 
 #: .\apps\dataset\swagger_api\problem_api.py:54
 #: .\apps\dataset\swagger_api\problem_api.py:55
@@ -3496,7 +3496,7 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:176
 #: .\apps\function_lib\swagger_api\function_lib_api.py:177
 msgid "variable name"
-msgstr ""
+msgstr "Variable name"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:37
 #: .\apps\function_lib\swagger_api\function_lib_api.py:88
@@ -3506,17 +3506,17 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:180
 #: .\apps\function_lib\swagger_api\function_lib_api.py:181
 msgid "required"
-msgstr ""
+msgstr "Required"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:40
 msgid "fields only support string|int|dict|array|float"
-msgstr ""
+msgstr "Fields only support string|int|dict|array|float"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:51
 #: .\apps\function_lib\swagger_api\function_lib_api.py:72
 #: .\apps\function_lib\swagger_api\function_lib_api.py:73
 msgid "variable value"
-msgstr ""
+msgstr "Variable value"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:57
 #: .\apps\function_lib\serializers\function_lib_serializer.py:68
@@ -3533,7 +3533,7 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\py_lint_api.py:22
 #: .\apps\function_lib\swagger_api\py_lint_api.py:23
 msgid "function content"
-msgstr ""
+msgstr "Function content"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:62
 #: .\apps\function_lib\serializers\function_lib_serializer.py:76
@@ -3546,7 +3546,7 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:159
 #: .\apps\function_lib\swagger_api\function_lib_api.py:160
 msgid "function name"
-msgstr ""
+msgstr "Function name"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:65
 #: .\apps\function_lib\serializers\function_lib_serializer.py:79
@@ -3559,16 +3559,16 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:161
 #: .\apps\function_lib\swagger_api\function_lib_api.py:162
 msgid "function description"
-msgstr ""
+msgstr "Function description"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:169
 msgid "field has no value set"
-msgstr ""
+msgstr "Field has no value set"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:185
 #: .\apps\function_lib\serializers\function_lib_serializer.py:190
 msgid "type error"
-msgstr ""
+msgstr "Type error"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:193
 #, python-brace-format
@@ -3577,7 +3577,7 @@ msgstr ""
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:198
 msgid "function id"
-msgstr ""
+msgstr "Function ID"
 
 #: .\apps\function_lib\serializers\function_lib_serializer.py:204
 #: .\apps\function_lib\serializers\function_lib_serializer.py:227
@@ -3591,7 +3591,7 @@ msgstr ""
 #: .\apps\function_lib\swagger_api\function_lib_api.py:30
 #: .\apps\function_lib\swagger_api\function_lib_api.py:31
 msgid "input field"
-msgstr ""
+msgstr "Input field"
 
 #: .\apps\function_lib\swagger_api\function_lib_api.py:62
 #: .\apps\function_lib\swagger_api\function_lib_api.py:78
@@ -4181,12 +4181,12 @@ msgstr ""
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:45
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:45
 msgid "photography"
-msgstr ""
+msgstr "Photography"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:46
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:46
 msgid "Portraits"
-msgstr ""
+msgstr "Portraits"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:47
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:47
@@ -4196,22 +4196,22 @@ msgstr ""
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:48
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:48
 msgid "animation"
-msgstr ""
+msgstr "Animation"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:49
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:49
 msgid "painting"
-msgstr ""
+msgstr "Painting"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:50
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:50
 msgid "watercolor"
-msgstr ""
+msgstr "Watercolor"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:51
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:51
 msgid "sketch"
-msgstr ""
+msgstr "Sketch"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:52
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:52
@@ -4221,13 +4221,13 @@ msgstr ""
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tti.py:53
 #: .\apps\setting\models_provider\impl\qwen_model_provider\credential\tti.py:53
 msgid "flat illustration"
-msgstr ""
+msgstr "Flat illustration"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:15
 #: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:15
 #: .\apps\setting\models_provider\impl\xinference_model_provider\credential\tts.py:15
 msgid "timbre"
-msgstr ""
+msgstr "Timbre"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:15
 #: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:15
@@ -4298,7 +4298,7 @@ msgstr ""
 #: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\credential\tts.py:33
 #: .\apps\setting\models_provider\impl\xf_model_provider\credential\tts.py:28
 msgid "speaking speed"
-msgstr ""
+msgstr "Speaking speed"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\tts.py:39
 msgid "[0.5,2], the default is 1, usually one decimal place is enough"
@@ -4469,7 +4469,7 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\gemini_model_provider\model\stt.py:53
 msgid "convert audio to text"
-msgstr ""
+msgstr "Convert audio to text"
 
 #: .\apps\setting\models_provider\impl\local_model_provider\credential\embedding.py:51
 #: .\apps\setting\models_provider\impl\local_model_provider\credential\reranker.py:52
@@ -4478,7 +4478,7 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\local_model_provider\local_model_provider.py:39
 msgid "local model"
-msgstr ""
+msgstr "Local model"
 
 #: .\apps\setting\models_provider\impl\ollama_model_provider\credential\embedding.py:30
 #: .\apps\setting\models_provider\impl\ollama_model_provider\credential\image.py:43
@@ -4722,7 +4722,7 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:13
 msgid "painting style"
-msgstr ""
+msgstr "Painting style"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:13
 msgid "If not passed, the default value is 201 (Japanese anime style)"
@@ -4734,11 +4734,11 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:18
 msgid "ink painting"
-msgstr ""
+msgstr "Ink painting"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:19
 msgid "concept art"
-msgstr ""
+msgstr "Concept art"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:20
 msgid "Oil painting 1"
@@ -4750,23 +4750,23 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:22
 msgid "watercolor painting"
-msgstr ""
+msgstr "Watercolor painting"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:23
 msgid "pixel art"
-msgstr ""
+msgstr "Pixel art"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:24
 msgid "impasto style"
-msgstr ""
+msgstr "Impasto style"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:25
 msgid "illustration"
-msgstr ""
+msgstr "Illustration"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:26
 msgid "paper cut style"
-msgstr ""
+msgstr "Paper cut style"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:27
 msgid "Impressionism 1 (Monet)"
@@ -4778,27 +4778,27 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:30
 msgid "classical portraiture"
-msgstr ""
+msgstr "Classical portraiture"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:31
 msgid "black and white sketch"
-msgstr ""
+msgstr "Black and white sketch"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:32
 msgid "cyberpunk"
-msgstr ""
+msgstr "Cyberpunk"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:33
 msgid "science fiction style"
-msgstr ""
+msgstr "Science fiction style"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:34
 msgid "dark style"
-msgstr ""
+msgstr "Dark style"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:36
 msgid "vaporwave"
-msgstr ""
+msgstr "Vaporwave"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:37
 msgid "Japanese animation"
@@ -4806,7 +4806,7 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:38
 msgid "monster style"
-msgstr ""
+msgstr "Monster style"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:39
 msgid "Beautiful ancient style"
@@ -4814,7 +4814,7 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:40
 msgid "retro anime"
-msgstr ""
+msgstr "Retro anime"
 
 #: .\apps\setting\models_provider\impl\tencent_model_provider\credential\tti.py:41
 msgid "Game cartoon hand drawing"
@@ -4981,7 +4981,7 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\volcanic_engine_model_provider.py:115
 msgid "volcano engine"
-msgstr ""
+msgstr "Volcano engine"
 
 #: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:50
 #, python-brace-format
@@ -5227,28 +5227,28 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\zhipu_model_provider\zhipu_model_provider.py:75
 msgid "zhipu AI"
-msgstr ""
+msgstr "Zhipu AI"
 
 #: .\apps\setting\serializers\model_apply_serializers.py:32
 #: .\apps\setting\serializers\model_apply_serializers.py:37
 msgid "vector text"
-msgstr ""
+msgstr "Vector text"
 
 #: .\apps\setting\serializers\model_apply_serializers.py:33
 msgid "vector text list"
-msgstr ""
+msgstr "Vector text list"
 
 #: .\apps\setting\serializers\model_apply_serializers.py:41
 msgid "text"
-msgstr ""
+msgstr "Text"
 
 #: .\apps\setting\serializers\model_apply_serializers.py:42
 msgid "metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: .\apps\setting\serializers\model_apply_serializers.py:47
 msgid "query"
-msgstr ""
+msgstr "Query"
 
 #: .\apps\setting\serializers\provider_serializers.py:79
 #: .\apps\setting\serializers\provider_serializers.py:83
@@ -5262,7 +5262,7 @@ msgstr ""
 #: .\apps\setting\swagger_api\provide_api.py:88
 #: .\apps\setting\swagger_api\provide_api.py:170
 msgid "model name"
-msgstr ""
+msgstr "Model name"
 
 #: .\apps\setting\serializers\provider_serializers.py:81
 #: .\apps\setting\serializers\provider_serializers.py:132
@@ -5276,7 +5276,7 @@ msgstr ""
 #: .\apps\setting\swagger_api\provide_api.py:134
 #: .\apps\setting\swagger_api\provide_api.py:165
 msgid "model type"
-msgstr ""
+msgstr "Model type"
 
 #: .\apps\setting\serializers\provider_serializers.py:85
 #: .\apps\setting\serializers\provider_serializers.py:178
@@ -5291,31 +5291,31 @@ msgstr ""
 #: .\apps\setting\swagger_api\provide_api.py:160
 #: .\apps\setting\swagger_api\provide_api.py:179
 msgid "provider"
-msgstr ""
+msgstr "Provider"
 
 #: .\apps\setting\serializers\provider_serializers.py:87
 #: .\apps\setting\serializers\provider_serializers.py:134
 #: .\apps\setting\serializers\provider_serializers.py:182
 msgid "permission type"
-msgstr ""
+msgstr "Permission type"
 
 #: .\apps\setting\serializers\provider_serializers.py:89
 msgid "create user"
-msgstr ""
+msgstr "Create user"
 
 #: .\apps\setting\serializers\provider_serializers.py:138
 #: .\apps\setting\serializers\provider_serializers.py:186
 msgid "permissions only supportPUBLIC|PRIVATE"
-msgstr ""
+msgstr "Permissions only support PUBLIC|PRIVATE"
 
 #: .\apps\setting\serializers\provider_serializers.py:145
 #: .\apps\setting\serializers\provider_serializers.py:196
 msgid "certification information"
-msgstr ""
+msgstr "Certification information"
 
 #: .\apps\setting\serializers\provider_serializers.py:193
 msgid "parameter configuration"
-msgstr ""
+msgstr "Parameter configuration"
 
 #: .\apps\setting\serializers\provider_serializers.py:202
 #, python-brace-format
@@ -5436,21 +5436,21 @@ msgstr ""
 #: .\apps\setting\serializers\team_serializers.py:147
 #: .\apps\setting\serializers\team_serializers.py:253
 msgid "team id"
-msgstr ""
+msgstr "Team ID"
 
 #: .\apps\setting\serializers\team_serializers.py:48
 #: .\apps\setting\serializers\team_serializers.py:251
 #: .\apps\setting\serializers\team_serializers.py:321
 msgid "member id"
-msgstr ""
+msgstr "Member ID"
 
 #: .\apps\setting\serializers\team_serializers.py:54
 msgid "use"
-msgstr ""
+msgstr "Use"
 
 #: .\apps\setting\serializers\team_serializers.py:55
 msgid "manage"
-msgstr ""
+msgstr "Manage"
 
 #: .\apps\setting\serializers\team_serializers.py:60
 msgid "Operation permissions USE, MANAGE permissions"
@@ -5458,28 +5458,28 @@ msgstr ""
 
 #: .\apps\setting\serializers\team_serializers.py:63
 msgid "use permission"
-msgstr ""
+msgstr "Use permission"
 
 #: .\apps\setting\serializers\team_serializers.py:64
 msgid "use permission True|False"
-msgstr ""
+msgstr "Use permission True|False"
 
 #: .\apps\setting\serializers\team_serializers.py:66
 msgid "manage permission"
-msgstr ""
+msgstr "Manage permission"
 
 #: .\apps\setting\serializers\team_serializers.py:67
 msgid "manage permission True|False"
-msgstr ""
+msgstr "Manage permission True|False"
 
 #: .\apps\setting\serializers\team_serializers.py:73
 msgid "target id"
-msgstr ""
+msgstr "Target ID"
 
 #: .\apps\setting\serializers\team_serializers.py:82
 #: .\apps\setting\serializers\team_serializers.py:83
 msgid "dataset id/application id"
-msgstr ""
+msgstr "Dataset ID/Application ID"
 
 #: .\apps\setting\serializers\team_serializers.py:104
 msgid "Non-existent application|knowledge base id["
@@ -5493,7 +5493,7 @@ msgstr ""
 #: .\apps\setting\serializers\team_serializers.py:156
 #: .\apps\setting\serializers\team_serializers.py:157
 msgid "user id list"
-msgstr ""
+msgstr "User ID list"
 
 #: .\apps\setting\serializers\team_serializers.py:167
 #: .\apps\setting\serializers\team_serializers.py:168
@@ -5517,7 +5517,7 @@ msgstr ""
 
 #: .\apps\setting\serializers\team_serializers.py:245
 msgid "member list"
-msgstr ""
+msgstr "Member list"
 
 #: .\apps\setting\serializers\team_serializers.py:260
 msgid "The member does not exist, please add a member first"
@@ -5542,7 +5542,7 @@ msgstr ""
 #: .\apps\setting\serializers\valid_serializers.py:41
 #: .\apps\setting\swagger_api\valid_api.py:27
 msgid "check quantity"
-msgstr ""
+msgstr "Check quantity"
 
 #: .\apps\setting\swagger_api\provide_api.py:43
 #: .\apps\setting\swagger_api\provide_api.py:44
@@ -5551,39 +5551,39 @@ msgstr ""
 #: .\apps\setting\swagger_api\provide_api.py:190
 #: .\apps\setting\swagger_api\provide_api.py:191
 msgid "parameters required to call the function"
-msgstr ""
+msgstr "Parameters required to call the function"
 
 #: .\apps\setting\swagger_api\provide_api.py:60
 #: .\apps\setting\swagger_api\provide_api.py:61
 #: .\apps\setting\swagger_api\provide_api.py:90
 #: .\apps\setting\swagger_api\provide_api.py:91
 msgid "model certificate information"
-msgstr ""
+msgstr "Model certificate information"
 
 #: .\apps\setting\swagger_api\provide_api.py:114
 #: .\apps\setting\swagger_api\provide_api.py:115
 msgid "model type description"
-msgstr ""
+msgstr "Model type description"
 
 #: .\apps\setting\swagger_api\provide_api.py:115
 msgid "large language model"
-msgstr ""
+msgstr "LLM"
 
 #: .\apps\setting\swagger_api\provide_api.py:116
 #: .\apps\setting\swagger_api\provide_api.py:117
 #: .\apps\setting\swagger_api\provide_api.py:147
 #: .\apps\setting\swagger_api\provide_api.py:148
 msgid "model type value"
-msgstr ""
+msgstr "Model type value"
 
 #: .\apps\setting\swagger_api\provide_api.py:145
 #: .\apps\setting\swagger_api\provide_api.py:146
 msgid "model description"
-msgstr ""
+msgstr "Model description"
 
 #: .\apps\setting\swagger_api\provide_api.py:184
 msgid "function that needs to be executed"
-msgstr ""
+msgstr "Function that needs to be executed"
 
 #: .\apps\setting\swagger_api\system_setting.py:19
 #: .\apps\setting\swagger_api\system_setting.py:20
@@ -5606,7 +5606,7 @@ msgstr ""
 #: .\apps\users\serializers\user_serializers.py:198
 #: .\apps\users\serializers\user_serializers.py:789
 msgid "team"
-msgstr ""
+msgstr "Team"
 
 #: .\apps\setting\views\Team.py:35 .\apps\setting\views\Team.py:36
 msgid "Add member"
@@ -5644,7 +5644,7 @@ msgstr ""
 #: .\apps\setting\views\model_apply.py:36
 #: .\apps\setting\views\model_apply.py:46
 msgid "model"
-msgstr ""
+msgstr "Model"
 
 #: .\apps\setting\views\model.py:39 .\apps\setting\views\model.py:40
 msgid "Download model, trial only with Ollama platform"
@@ -5993,7 +5993,7 @@ msgstr ""
 
 #: .\apps\xpack\auth\user_key.py:32 .\apps\xpack\auth\user_key.py:34
 msgid "secret_key is invalid"
-msgstr ""
+msgstr "Secret key is invalid"
 
 #: .\apps\xpack\middleware\swagger_middleware.py:19
 msgid "The license has not been uploaded or the license has expired"
@@ -6001,84 +6001,84 @@ msgstr ""
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:20
 msgid "theme color"
-msgstr ""
+msgstr "Theme color"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:22
 msgid "header font color"
-msgstr ""
+msgstr "Header font color"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:26
 msgid "float location type"
-msgstr ""
+msgstr "Float location type"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:27
 msgid "float location value"
-msgstr ""
+msgstr "Float location value"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:31
 msgid "float location x"
-msgstr ""
+msgstr "Float location x"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:32
 msgid "float location y"
-msgstr ""
+msgstr "Float location y"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:36
 #: .\apps\xpack\swagger_api\application_setting_api.py:23
 msgid "show source"
-msgstr ""
+msgstr "Show source"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:38
 #: .\apps\xpack\swagger_api\application_setting_api.py:30
 msgid "show history"
-msgstr ""
+msgstr "Show history"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:39
 #: .\apps\xpack\swagger_api\application_setting_api.py:37
 msgid "draggable"
-msgstr ""
+msgstr "Draggable"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:40
 #: .\apps\xpack\swagger_api\application_setting_api.py:44
 msgid "show guide"
-msgstr ""
+msgstr "Show guide"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:41
 #: .\apps\xpack\swagger_api\application_setting_api.py:51
 msgid "avatar"
-msgstr ""
+msgstr "Avatar"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:42
 msgid "avatar url"
-msgstr ""
+msgstr "Avatar URL"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:43
 #: .\apps\xpack\swagger_api\application_setting_api.py:86
 msgid "user avatar"
-msgstr ""
+msgstr "User avatar"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:44
 msgid "user avatar url"
-msgstr ""
+msgstr "User avatar URL"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:45
 #: .\apps\xpack\swagger_api\application_setting_api.py:58
 msgid "float icon"
-msgstr ""
+msgstr "Float icon"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:46
 msgid "float icon url"
-msgstr ""
+msgstr "Float icon URL"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:47
 #: .\apps\xpack\swagger_api\application_setting_api.py:65
 msgid "disclaimer"
-msgstr ""
+msgstr "Disclaimer"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:48
 #: .\apps\xpack\swagger_api\application_setting_api.py:72
 msgid "disclaimer value"
-msgstr ""
+msgstr "Disclaimer value"
 
 #: .\apps\xpack\serializers\application_setting_serializer.py:116
 msgid "Float location field type error"
@@ -6231,7 +6231,7 @@ msgstr ""
 
 #: .\apps\xpack\serializers\license_serializers.py:52
 msgid "license file"
-msgstr ""
+msgstr "License file"
 
 #: .\apps\xpack\serializers\oauth2.py:76 .\apps\xpack\serializers\oauth2.py:79
 msgid "Failed to obtain user information"
@@ -6239,19 +6239,19 @@ msgstr ""
 
 #: .\apps\xpack\serializers\platform_serializer.py:14
 msgid "app_id is required"
-msgstr ""
+msgstr "App ID is required"
 
 #: .\apps\xpack\serializers\platform_serializer.py:15
 msgid "app_secret is required"
-msgstr ""
+msgstr "App Secret is required"
 
 #: .\apps\xpack\serializers\platform_serializer.py:16
 msgid "token is required"
-msgstr ""
+msgstr "Token is required"
 
 #: .\apps\xpack\serializers\platform_serializer.py:17
 msgid "callback_url is required"
-msgstr ""
+msgstr "Callback URL is required"
 
 #: .\apps\xpack\serializers\platform_serializer.py:23
 #: .\apps\xpack\serializers\platform_serializer.py:32
@@ -6366,11 +6366,11 @@ msgstr ""
 
 #: .\apps\xpack\serializers\system_params_serializers.py:91
 msgid "website title"
-msgstr ""
+msgstr "Website title"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:98
 msgid "website slogan"
-msgstr ""
+msgstr "Website slogan"
 
 #: .\apps\xpack\serializers\system_params_serializers.py:105
 msgid "Show user manual"
@@ -6460,19 +6460,19 @@ msgstr ""
 
 #: .\apps\xpack\swagger_api\license_api.py:26
 msgid "license details"
-msgstr ""
+msgstr "License details"
 
 #: .\apps\xpack\swagger_api\license_api.py:30
 msgid "customer name"
-msgstr ""
+msgstr "Customer name"
 
 #: .\apps\xpack\swagger_api\license_api.py:31
 msgid "customer name. For example: *** company."
-msgstr ""
+msgstr "Customer name. For example: *** company."
 
 #: .\apps\xpack\swagger_api\license_api.py:33
 msgid "independent software vendor"
-msgstr ""
+msgstr "Independent software vendor"
 
 #: .\apps\xpack\swagger_api\license_api.py:35
 msgid ""
@@ -6492,7 +6492,7 @@ msgstr ""
 
 #: .\apps\xpack\swagger_api\license_api.py:41
 msgid "product name."
-msgstr ""
+msgstr "Product name"
 
 #: .\apps\xpack\swagger_api\license_api.py:43
 msgid "Product name. For example: JumpServer, CMP, etc."
@@ -6500,7 +6500,7 @@ msgstr ""
 
 #: .\apps\xpack\swagger_api\license_api.py:45
 msgid "product version."
-msgstr ""
+msgstr "Product version"
 
 #: .\apps\xpack\swagger_api\license_api.py:47
 msgid "Product version. For example: JumpServer 2.0, CMP 1.0, etc."
@@ -6508,7 +6508,7 @@ msgstr ""
 
 #: .\apps\xpack\swagger_api\license_api.py:49
 msgid "license version."
-msgstr ""
+msgstr "License version"
 
 #: .\apps\xpack\swagger_api\license_api.py:51
 msgid "License version. For example: 1.0, 2.0, etc."
@@ -6516,7 +6516,7 @@ msgstr ""
 
 #: .\apps\xpack\swagger_api\license_api.py:53
 msgid "authorization quantity."
-msgstr ""
+msgstr "Authorization quantity"
 
 #: .\apps\xpack\swagger_api\license_api.py:55
 msgid ""
@@ -6538,7 +6538,7 @@ msgstr ""
 
 #: .\apps\xpack\swagger_api\license_api.py:61
 msgid "remarks"
-msgstr ""
+msgstr "Remarks"
 
 #: .\apps\xpack\swagger_api\license_api.py:63
 msgid ""
@@ -6582,7 +6582,7 @@ msgstr ""
 
 #: .\apps\xpack\views\auth.py:65 .\apps\xpack\views\auth.py:66
 msgid "test connection"
-msgstr ""
+msgstr "Test connection"
 
 #: .\apps\xpack\views\auth.py:96 .\apps\xpack\views\auth.py:108
 #: .\apps\xpack\views\auth.py:123 .\apps\xpack\views\auth.py:138
@@ -6659,7 +6659,7 @@ msgstr ""
 
 #: .\apps\xpack\views\license.py:42
 msgid "upload file"
-msgstr ""
+msgstr "Upload file"
 
 #: .\apps\xpack\views\platform.py:46 .\apps\xpack\views\platform.py:47
 msgid "Get platform configuration"
