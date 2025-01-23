@@ -85,7 +85,7 @@ export default {
 
       prologue: 'Prologue',
       defaultPrologue:
-        'Hello, I am XXX Assistant. You can ask me questions about using XXX.\n- What are the main features of MaxKB?\n- Which LLM does MaxKB support?\n- What document types does MaxKB support?',
+        'Hello, I am XXX Assistant. You can ask me questions about using XXX.\n- What are the main features of XXX?\n- Which LLM does XXX support?\n- What document types does XXX support?',
       problemOptimization: {
         label: 'Questions Optimization',
         tooltip:
