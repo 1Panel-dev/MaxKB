@@ -38,6 +38,11 @@ def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
 splitter = '\n`-----------------------------------`\n'
 
 class BaseDocumentExtractNode(IDocumentExtractNode):
+    def save_context(self, details, workflow_manage):
+        self.context['content'] = details.get('content')
+        self.answer_text = details.get('content')
+
+
     def execute(self, document, chat_id, **kwargs):
         get_buffer = FileBufferHandle().get_buffer
 
