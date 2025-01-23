@@ -23,7 +23,6 @@ from django.db import transaction
 from django.db.models import QuerySet, Count
 from django.db.models.functions import Substr, Reverse
 from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _, gettext
 from drf_yasg import openapi
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
@@ -65,6 +64,8 @@ from embedding.task.embedding import embedding_by_document, delete_embedding_by_
     embedding_by_document_list
 from setting.models import Model
 from smartdoc.conf import PROJECT_DIR
+from django.utils.translation import gettext_lazy as _, gettext, to_locale
+from django.utils.translation import get_language
 
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle(), ZipParseQAHandle()]
 parse_table_handle_list = [CsvSplitTableHandle(), XlsSplitTableHandle(), XlsxSplitTableHandle()]
@@ -240,15 +241,15 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         def export(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-
+            language = get_language()
             if self.data.get('type') == 'csv':
-                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', 'csv_template.csv'), "rb")
+                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', f'csv_template_{to_locale(language)}.csv'), "rb")
                 content = file.read()
                 file.close()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'text/cxv',
                                                                   'Content-Disposition': 'attachment; filename="csv_template.csv"'})
             elif self.data.get('type') == 'excel':
-                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', 'excel_template.xlsx'), "rb")
+                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', f'csv_template_{to_locale(language)}.xlsx'), "rb")
                 content = file.read()
                 file.close()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'application/vnd.ms-excel',
@@ -257,16 +258,18 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         def table_export(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-
+            language = get_language()
             if self.data.get('type') == 'csv':
-                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', _('MaxKB table template.csv')),
-                            "rb")
+                file = open(
+                    os.path.join(PROJECT_DIR, "apps", "dataset", 'template', f'table_template_{to_locale(language)}.csv'),
+                    "rb")
                 content = file.read()
                 file.close()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'text/cxv',
                                                                   'Content-Disposition': 'attachment; filename="csv_template.csv"'})
             elif self.data.get('type') == 'excel':
-                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', _('MaxKB table template.xlsx')),
+                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template',
+                                         f'table_template_{to_locale(language)}.xlsx'),
                             "rb")
                 content = file.read()
                 file.close()
