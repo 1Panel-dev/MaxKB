@@ -45,7 +45,7 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
                                   gettext('{model_type} Model type is not supported').format(model_type=model_type))
         model = provider.get_model(model_type, model_name, model_credential, **model_params)
         model_info = [model.lower() for model in model.client.models()]
-        if not model_info.__containsgettext(model_name.lower()):
+        if not model_info.__contains__(model_name.lower()):
             raise AppApiException(ValidCode.valid_error.value,
                                   gettext('{model_name} The model does not support').format(model_name=model_name))
         for key in ['api_key', 'secret_key']:
