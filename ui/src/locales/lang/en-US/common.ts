@@ -7,7 +7,7 @@ export default {
   save: 'Save',
   saveSuccess: 'Save successful',
   delete: 'Delete',
-  deleteSuccess: 'Successfully deleted',
+  deleteSuccess: 'Deleted successful',
   setting: 'Settings',
   settingSuccess: 'Setting successful',
   submit: 'Submit',

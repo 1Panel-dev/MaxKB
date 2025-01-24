@@ -62,12 +62,12 @@ export default {
         references: ' (References Knowledge)',
         placeholder: 'Please enter prompt',
         requiredMessage: 'Please enter prompt',
-        tooltip:'By adjusting the content of the prompt, you can guide the direction of the large model conversation.',
+        tooltip:'By adjusting the content of the prompt, you can guide the direction of the large model chat.',
         
         noReferencesTooltip:
-          'By adjusting the content of the prompt, you can guide the direction of the large model conversation. This prompt will be fixed at the beginning of the context. Variables used: {question} is the question posed by the user.',
+          'By adjusting the content of the prompt, you can guide the direction of the large model chat. This prompt will be fixed at the beginning of the context. Variables used: {question} is the question posed by the user.',
         referencesTooltip:
-          'By adjusting the content of the prompt, you can guide the direction of the large model conversation. This prompt will be fixed at the beginning of the context. Variables used: {data} carries known information from the knowledge; {question} is the question posed by the user.',
+          'By adjusting the content of the prompt, you can guide the direction of the large model chat. This prompt will be fixed at the beginning of the context. Variables used: {data} carries known information from the knowledge; {question} is the question posed by the user.',
         defaultPrompt: `Known information: {data}
           Question: {question}
            Response requirements: 

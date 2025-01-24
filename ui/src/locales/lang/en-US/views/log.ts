@@ -1,5 +1,5 @@
 export default {
-  title: 'Conversation Logs',
+  title: 'Chat Logs',
   delete: {
     confirmTitle: 'Confirm deletion of question:',
     confirmMessage1: 'Deleting this question will cancel the association of',
@@ -12,14 +12,14 @@ export default {
   },
   table: {
     abstract: 'Abstract',
-    chat_record_count: 'Number of Conversation Questions',
+    chat_record_count: 'Number of Chat Questions',
     feedback: {
       label: 'User Feedback',
       star: 'Agree',
       trample: 'Disagree'
     },
     mark: 'Improvement Label',
-    recenTimes: 'Recent Conversation Time'
+    recenTimes: 'Recent Chat Time'
   },
   addToDataset: 'Add to Knowledge',
   daysText: 'Days ago',

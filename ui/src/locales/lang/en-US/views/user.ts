@@ -3,7 +3,7 @@ export default {
   createUser: 'Create User',
   editUser: 'Edit User',
   setting: {
-    updatePwd: 'Update User Password'
+    updatePwd: 'Change Password'
   },
   tip: {
     professionalMessage:
@@ -38,8 +38,8 @@ export default {
         requiredMessage: 'Please enter email'
       },
       phone: {
-        label: 'Phone Number',
-        placeholder: 'Please enter phone number'
+        label: 'Phone',
+        placeholder: 'Please enter phone'
       },
       password: {
         label: 'Login Password',

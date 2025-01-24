@@ -60,7 +60,7 @@ export default {
         label: 'Model Type',
         placeholder: 'Select a model type',
         tooltip1:
-          'LLM: An inference model for AI conversations in the APP.',
+          'LLM: An inference model for AI chats in the APP.',
         tooltip2:
           'Embedding Model: A model for vectorizing document content in the knowledge.',
         tooltip3: 'Speech2Text: A model used for speech recognition in the APP.',
