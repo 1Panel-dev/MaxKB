@@ -49,7 +49,7 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
 
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            model.invoke([HumanMessage(content=_('Hello'))])
+            model.invoke([HumanMessage(content=gettext('Hello'))])
         except AppApiException:
             raise
         except Exception as e:
