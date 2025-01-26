@@ -210,11 +210,9 @@
             prop="field"
             :label="$t('dynamicsForm.paramForm.field.label')"
             show-overflow-tooltip
+            width="95px"
           />
-          <el-table-column
-            :label="$t('dynamicsForm.paramForm.input_type.label')"
-            width="110px"
-          >
+          <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="110px">
             <template #default="{ row }">
               <el-tag type="info" class="info-tag">{{
                 input_type_list.find((item) => item.value === row.input_type)?.label
@@ -234,7 +232,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column :label="$t('common.operation')" align="left" width="80">
+          <el-table-column :label="$t('common.operation')" align="left" width="90">
             <template #default="{ row, $index }">
               <span class="mr-4">
                 <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">

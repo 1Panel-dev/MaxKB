@@ -28,7 +28,7 @@
             />
           </el-form-item>
           <el-form-item
-            :label="$t('views.system.authentication.password')"
+            :label="$t('views.system.password')"
             prop="config_data.password"
           >
             <el-input
