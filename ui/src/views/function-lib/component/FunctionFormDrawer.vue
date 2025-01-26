@@ -237,6 +237,7 @@ watch(visible, (bool) => {
       input_field_list: [],
       permission_type: 'PRIVATE'
     }
+    FormRef.value?.clearValidate()
   }
 })
 
