@@ -17,7 +17,7 @@ export default {
   modify: 'Modify',
   modifySuccess: 'Modify successful',
   cancel: 'Cancel',
-  confirm: 'Confirm',
+  confirm: 'OK',
   tip: 'Prompt',
   add: 'Add',
   refresh: 'Refresh',

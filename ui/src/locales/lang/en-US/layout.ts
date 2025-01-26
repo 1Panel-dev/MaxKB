@@ -2,7 +2,7 @@ export default {
   github: 'Project Address',
   wiki: 'User Manual',
   forum: 'Forum For Help',
-  logout: 'Logout',
+  logout: 'Log Out',
   apiKey: 'API Key',
   apiServiceAddress: 'API Service Address',
   language: 'Language',

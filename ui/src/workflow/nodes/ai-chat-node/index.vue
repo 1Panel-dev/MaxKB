@@ -36,7 +36,7 @@
                 @click="openAIParamSettingDialog(chat_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                {{ $t('common.paramSetting') }}
+                <el-icon><Setting /></el-icon>
               </el-button>
             </div>
           </template>

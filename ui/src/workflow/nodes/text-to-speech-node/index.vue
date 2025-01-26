@@ -35,7 +35,7 @@
                 :disabled="!form_data.tts_model_id"
                 class="mr-4"
               >
-                {{ $t('common.paramSetting') }}
+                <el-icon><Setting /></el-icon>
               </el-button>
             </div>
           </template>

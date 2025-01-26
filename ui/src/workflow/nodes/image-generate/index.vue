@@ -35,7 +35,7 @@
                 @click="openAIParamSettingDialog(form_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                {{ $t('common.paramSetting') }}
+                <el-icon><Setting /></el-icon>
               </el-button>
             </div>
           </template>
@@ -103,7 +103,9 @@
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >{{ $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.tooltip') }}
+                  >{{
+                    $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.tooltip')
+                  }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -111,9 +113,11 @@
           </template>
           <MdEditorMagnify
             @wheel="wheel"
-            :title=" $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label')"
+            :title="$t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label')"
             v-model="form_data.negative_prompt"
-            :placeholder="$t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.placeholder')"
+            :placeholder="
+              $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.placeholder')
+            "
             style="height: 150px"
             @submitDialog="submitNegativeDialog"
           />
