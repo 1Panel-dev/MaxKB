@@ -16,6 +16,7 @@ from pydantic.v1 import BaseModel
 from common.exception.app_exception import AppApiException
 from django.utils.translation import gettext_lazy as _
 
+
 class DownModelChunkStatus(Enum):
     success = "success"
     error = "error"
@@ -71,7 +72,8 @@ class IModelProvider(ABC):
         model_info = self.get_model_info_manage().get_model_info(model_type, model_name)
         return model_info.model_credential
 
-    def is_valid_credential(self, model_type, model_name, model_credential: Dict[str, object], model_params: Dict[str, object], raise_exception=False):
+    def is_valid_credential(self, model_type, model_name, model_credential: Dict[str, object],
+                            model_params: Dict[str, object], raise_exception=False):
         model_info = self.get_model_info_manage().get_model_info(model_type, model_name)
         return model_info.model_credential.is_valid(model_type, model_name, model_credential, model_params, self,
                                                     raise_exception=raise_exception)
@@ -101,7 +103,7 @@ class MaxKBBaseModel(ABC):
     def filter_optional_params(model_kwargs):
         optional_params = {}
         for key, value in model_kwargs.items():
-            if key not in ['model_id', 'use_local', 'streaming']:
+            if key not in ['model_id', 'use_local', 'streaming', 'show_ref_label']:
                 optional_params[key] = value
         return optional_params
 
@@ -109,7 +111,8 @@ class MaxKBBaseModel(ABC):
 class BaseModelCredential(ABC):
 
     @abstractmethod
-    def is_valid(self, model_type: str, model_name, model: Dict[str, object], model_params, provider, raise_exception=True):
+    def is_valid(self, model_type: str, model_name, model: Dict[str, object], model_params, provider,
+                 raise_exception=True):
         pass
 
     @abstractmethod
