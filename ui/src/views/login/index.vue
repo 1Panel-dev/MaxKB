@@ -179,7 +179,7 @@ function redirectAuth(authType: string) {
         if (authType === 'OIDC') {
           url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=openid+profile+email`
         }
-        if (authType === 'OAUTH2') {
+        if (authType === 'OAuth2') {
           url =
             `${config.authEndpoint}?client_id=${config.clientId}&response_type=code` +
             `&redirect_uri=${redirectUrl}&state=${res.data.id}`
