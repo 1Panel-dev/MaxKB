@@ -3,7 +3,7 @@ export default {
   createProblem: 'Create Question',
   detailProblem: 'Question Details',
   quickCreateProblem: 'Quick Create Question',
-  quickCreateName: 'Question',
+  quickCreateName: 'question',
   tip: {
     placeholder: 'Enter the question, support multiple entries, one per line.',
     errorMessage: 'Question cannot be empty!',
@@ -19,7 +19,7 @@ export default {
     placeholder: 'Search by name'
   },
   table: {
-    paragraph_count: 'Number of Associated Paragraphs',
+    paragraph_count: 'Associated Paragraphs',
     updateTime: 'Update Time'
   },
   delete: {

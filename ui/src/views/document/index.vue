@@ -205,7 +205,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column width="130">
+          <el-table-column width="170">
             <template #header>
               <div>
                 <span>{{ $t('views.document.form.hit_handling_method.label') }}</span>

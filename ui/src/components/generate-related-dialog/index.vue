@@ -20,7 +20,10 @@
           </div>
           <div class="ml-12 lighter">
             <p>{{ $t('views.document.generateQuestion.tip1', { data: '{data}' }) }}</p>
-            <p>{{ $t('views.document.generateQuestion.tip2')+ '<question></question>' + $t('views.document.generateQuestion.tip3') }}</p>
+            <p>
+              {{ $t('views.document.generateQuestion.tip2')+ '<question></question>' +
+              $t('views.document.generateQuestion.tip3') }}
+            </p>
             <p>{{ $t('views.document.generateQuestion.tip4') }}</p>
           </div>
         </div>
@@ -103,6 +106,13 @@ const rules = reactive({
       trigger: 'blur'
     }
   ]
+})
+
+watch(dialogVisible, (bool) => {
+  if (!bool) {
+    form.value = prompt.get(userId)
+    FormRef.value?.clearValidate()
+  }
 })
 
 const open = (ids: string[], type: string) => {

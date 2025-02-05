@@ -44,7 +44,7 @@ export default {
       EmbeddingModel: {
         label: 'Embedding Model',
         placeholder: 'Please select a embedding model',
-        requiredMessage: 'Please enter the embedding model'
+        requiredMessage: 'Please select the embedding model'
       },
       datasetType: {
         label: 'Knowledge Type',

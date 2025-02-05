@@ -84,7 +84,7 @@ export default {
     },
     checkedConnect: {
       label:
-        'Add segment titles as associated questions during import (Applicable for QA pairs where titles are questions)'
+        'Add "Related Questions" section for question-based QA pairs during import.'
     }
   },
   buttons: {
@@ -126,7 +126,7 @@ export default {
   },
   delete: {
     confirmTitle1: 'Confirm batch deletion of',
-    confirmTitle2: 'Documents?',
+    confirmTitle2: 'documents?',
     confirmMessage:
       'Segments within the selected documents will also be deleted. Please proceed with caution.',
     successMessage: 'Batch deletion successful',
@@ -145,7 +145,7 @@ export default {
       placeholder: 'Default is body, you can input .classname/#idname/tagname'
     },
     hit_handling_method: {
-      label: 'Hit Handling Method',
+      label: 'Retrieve-Respond',
       tooltip: 'When user asks a question, handle matched segments according to the set method.'
     },
     similarity: {
