@@ -61,9 +61,11 @@ class AliyunBaiLianSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             result = recognition.call(temp_file_path)
             text = ''
             if result.status_code == 200:
-                for sentence in result.get_sentence():
-                    text += sentence['text']
-                return text
+                result_sentence = result.get_sentence()
+                if result_sentence is not None:
+                    for sentence in result_sentence:
+                        text += sentence['text']
+                    return text
             else:
                 raise Exception('Error: ', result.message)
         finally:
