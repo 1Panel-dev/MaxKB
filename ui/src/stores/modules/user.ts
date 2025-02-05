@@ -7,7 +7,7 @@ import ThemeApi from '@/api/theme'
 import { useElementPlusTheme } from 'use-element-plus-theme'
 import { defaultPlatformSetting } from '@/utils/theme'
 import { useLocalStorage } from '@vueuse/core'
-import { localeConfigKey } from '@/locales/index'
+import { localeConfigKey, getBrowserLang } from '@/locales/index'
 export interface userStateTypes {
   userType: number // 1 系统操作者 2 对话用户
   userInfo: User | null
@@ -33,7 +33,7 @@ const useUserStore = defineStore({
   actions: {
     getLanguage() {
       return this.userType === 1
-        ? localStorage.getItem('MaxKB-locale')
+        ? localStorage.getItem('MaxKB-locale') || getBrowserLang()
         : sessionStorage.getItem('language')
     },
     showXpack() {
