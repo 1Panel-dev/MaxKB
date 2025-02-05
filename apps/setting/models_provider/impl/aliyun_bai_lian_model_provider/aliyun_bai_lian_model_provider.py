@@ -28,7 +28,7 @@ from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.stt impor
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.tti import QwenTextToImageModel
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.tts import AliyunBaiLianTextToSpeech
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 
 aliyun_bai_lian_model_credential = AliyunBaiLianRerankerCredential()
 aliyun_bai_lian_tts_model_credential = AliyunBaiLianTTSModelCredential()
@@ -92,7 +92,7 @@ class AliyunBaiLianModelProvider(IModelProvider):
         return model_info_manage
 
     def get_model_provide_info(self):
-        return ModelProvideInfo(provider='aliyun_bai_lian_model_provider', name=_('Alibaba Cloud Bailian'),
+        return ModelProvideInfo(provider='aliyun_bai_lian_model_provider', name=gettext('Alibaba Cloud Bailian'),
                                 icon=get_file_content(
                                     os.path.join(PROJECT_DIR, "apps", "setting", 'models_provider', 'impl',
                                                  'aliyun_bai_lian_model_provider',
