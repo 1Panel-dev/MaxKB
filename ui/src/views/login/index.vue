@@ -109,7 +109,7 @@ import useStore from '@/stores'
 import authApi from '@/api/auth-setting'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
-import { t } from '@/locales'
+import { t, getBrowserLang } from '@/locales'
 import QrCodeTab from '@/views/login/components/QrCodeTab.vue'
 import { useI18n } from 'vue-i18n'
 const { locale } = useI18n({ useScope: 'global' })
@@ -217,7 +217,7 @@ const login = () => {
     user
       .login(loginMode.value, loginForm.value.username, loginForm.value.password)
       .then(() => {
-        locale.value = localStorage.getItem('MaxKB-locale') || 'zh-CN'
+        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'zh-CN'
         router.push({ name: 'home' })
       })
       .finally(() => (loading.value = false))
