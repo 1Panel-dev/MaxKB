@@ -109,7 +109,7 @@ export default {
       }
     },
     buttons: {
-      publish: 'Save&Release',
+      publish: 'Save&Publish',
       addModel: 'Add Model'
     },
     dialog: {

@@ -148,7 +148,7 @@
           {{ $t('views.applicationOverview.monitor.monitoringStatistics') }}
         </h4>
         <div class="mb-16">
-          <el-select v-model="history_day" class="mr-12 w-120" @change="changeDayHandle">
+          <el-select v-model="history_day" class="mr-12" @change="changeDayHandle" style="width:180px">
             <el-option
               v-for="item in dayOptions"
               :key="item.value"

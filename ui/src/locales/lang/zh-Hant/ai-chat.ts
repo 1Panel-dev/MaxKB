@@ -85,7 +85,7 @@ export default {
   KnowledgeSource: {
     title: '知識來源',
     referenceParagraph: '引用段落',
-    consume: '消耗',
+    consume: '消耗tokens',
     consumeTime: '耗時'
   },
   paragraphSource: {

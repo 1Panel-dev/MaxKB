@@ -44,7 +44,7 @@ export default {
     },
     LimitDialog: {
       dialogTitle: 'Access Restrictions',
-      showSourceLabel: 'Show Source',
+      showSourceLabel: 'Show Return Knowledge Reference',
       clientQueryLimitLabel: 'Each Client Query Limit',
       authentication: 'Authentication',
       authenticationValue: 'Authentication Password',
@@ -61,7 +61,7 @@ export default {
     SettingDisplayDialog: {
       dialogTitle: 'Display Settings',
       languageLabel: 'Language',
-      showSourceLabel: 'Show Source',
+      showSourceLabel: 'Show Return Knowledge Reference',
       showExecutionDetail: 'Show Execution Detail',
       restoreDefault: 'Reset to default',
       customThemeColor: 'Custom Theme Color',

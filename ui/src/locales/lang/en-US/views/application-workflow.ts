@@ -14,10 +14,10 @@ export default {
     restoreVersion: 'Restore Version',
     restoreCurrentVersion: 'Restore This Version',
     addComponent: 'Add Component',
-    public: 'Release',
-    releaseHistory: 'Release History',
+    public: 'Publish',
+    releaseHistory: 'Publish History',
     autoSave: 'Auto Save',
-    latestRelease: 'Latest Release',
+    latestRelease: 'Latest Publish',
     copyParam: 'Copy Parameter'
   },
   tip: {

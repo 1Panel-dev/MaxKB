@@ -1,7 +1,7 @@
 export default {
   noHistory: 'No History',
-  createChat: 'Create New Chat',
-  history: 'History',
+  createChat: 'New Chat',
+  history: 'Chat History',
   only20history: 'Only showing the last 20 chats',
   question_count: 'Questions',
   exportRecords: 'Export Chat Records',
@@ -17,11 +17,11 @@ export default {
   operation: {
     play: 'Click to Play',
     pause: 'Stop',
-    regeneration: 'Regenerate Answer',
-    like: 'Like',
-    cancelLike: 'Cancel Like',
-    oppose: 'Dislike',
-    cancelOppose: 'Cancel Dislike',
+    regeneration: 'Re-answer',
+    like: 'Agree',
+    cancelLike: 'Cancel Agree',
+    oppose: 'Disagree',
+    cancelOppose: 'Cancel Disagree',
     continue: 'Continue',
     stopChat: 'Stop Output'
   },
@@ -86,9 +86,9 @@ export default {
   },
   KnowledgeSource: {
     title: 'Knowledge Source',
-    referenceParagraph: 'Referenced Segment',
-    consume: 'Consumption',
-    consumeTime: 'Time Consumed'
+    referenceParagraph: 'Quote',
+    consume: 'Tokens',
+    consumeTime: 'Time'
   },
   paragraphSource: {
     title: 'Knowledge Reference',
