@@ -14,7 +14,7 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
 from setting.models_provider.impl.deepseek_model_provider.credential.llm import DeepSeekLLMModelCredential
 from setting.models_provider.impl.deepseek_model_provider.model.llm import DeepSeekChatModel
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 deepseek_llm_model_credential = DeepSeekLLMModelCredential()
 
 deepseek_chat = ModelInfo('deepseek-chat', _('Good at common conversational tasks, supports 32K contexts'), ModelTypeConst.LLM,

@@ -16,7 +16,7 @@ from setting.models_provider.impl.local_model_provider.credential.reranker impor
 from setting.models_provider.impl.local_model_provider.model.embedding import LocalEmbedding
 from setting.models_provider.impl.local_model_provider.model.reranker import LocalReranker
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 embedding_text2vec_base_chinese = ModelInfo('shibing624/text2vec-base-chinese', '', ModelTypeConst.EMBEDDING,
                                             LocalEmbeddingCredential(), LocalEmbedding)

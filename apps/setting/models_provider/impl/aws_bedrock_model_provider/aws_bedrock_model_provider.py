@@ -11,7 +11,7 @@ from setting.models_provider.impl.aws_bedrock_model_provider.credential.llm impo
 from setting.models_provider.impl.aws_bedrock_model_provider.model.embedding import BedrockEmbeddingModel
 from setting.models_provider.impl.aws_bedrock_model_provider.model.llm import BedrockModel
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 
 def _create_model_info(model_name, description, model_type, credential_class, model_class):

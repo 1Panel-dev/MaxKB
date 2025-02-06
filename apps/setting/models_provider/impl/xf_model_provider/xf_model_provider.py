@@ -23,7 +23,7 @@ from setting.models_provider.impl.xf_model_provider.model.llm import XFChatSpark
 from setting.models_provider.impl.xf_model_provider.model.stt import XFSparkSpeechToText
 from setting.models_provider.impl.xf_model_provider.model.tts import XFSparkTextToSpeech
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 ssl._create_default_https_context = ssl.create_default_context()
 

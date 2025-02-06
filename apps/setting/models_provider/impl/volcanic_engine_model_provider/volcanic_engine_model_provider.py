@@ -28,7 +28,7 @@ from setting.models_provider.impl.volcanic_engine_model_provider.model.tti impor
 from setting.models_provider.impl.volcanic_engine_model_provider.model.tts import VolcanicEngineTextToSpeech
 
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 volcanic_engine_llm_model_credential = OpenAILLMModelCredential()
 volcanic_engine_stt_model_credential = VolcanicEngineSTTModelCredential()

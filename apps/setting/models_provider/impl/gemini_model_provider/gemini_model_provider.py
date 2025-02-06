@@ -20,7 +20,7 @@ from setting.models_provider.impl.gemini_model_provider.model.image import Gemin
 from setting.models_provider.impl.gemini_model_provider.model.llm import GeminiChatModel
 from setting.models_provider.impl.gemini_model_provider.model.stt import GeminiSpeechToText
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 
 gemini_llm_model_credential = GeminiLLMModelCredential()

@@ -22,7 +22,7 @@ from setting.models_provider.impl.ollama_model_provider.model.embedding import O
 from setting.models_provider.impl.ollama_model_provider.model.image import OllamaImage
 from setting.models_provider.impl.ollama_model_provider.model.llm import OllamaChatModel
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 ""
 

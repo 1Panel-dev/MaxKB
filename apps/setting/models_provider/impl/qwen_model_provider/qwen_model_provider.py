@@ -19,7 +19,7 @@ from setting.models_provider.impl.qwen_model_provider.model.image import QwenVLC
 from setting.models_provider.impl.qwen_model_provider.model.llm import QwenChatModel
 from setting.models_provider.impl.qwen_model_provider.model.tti import QwenTextToImageModel
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 qwen_model_credential = OpenAILLMModelCredential()
 qwenvl_model_credential = QwenVLModelCredential()
