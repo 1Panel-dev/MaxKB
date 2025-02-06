@@ -44,8 +44,8 @@ docker run -d --name=maxkb --restart=always -p 8080:8080 -v ~/.maxkb:/var/lib/po
 
 - Frontend：[Vue.js](https://vuejs.org/)
 - Backend：[Python / Django](https://www.djangoproject.com/)
-- LangChain：[LangChain](https://www.langchain.com/)
-- Vector DB：[PostgreSQL / pgvector](https://www.postgresql.org/)
+- LLM Framework：[LangChain](https://www.langchain.com/)
+- Database：[PostgreSQL + pgvector](https://www.postgresql.org/)
 
 ## License
 
