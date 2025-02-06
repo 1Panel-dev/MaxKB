@@ -18,7 +18,7 @@ from setting.models_provider.impl.zhipu_model_provider.model.image import ZhiPuI
 from setting.models_provider.impl.zhipu_model_provider.model.llm import ZhipuChatModel
 from setting.models_provider.impl.zhipu_model_provider.model.tti import ZhiPuTextToImage
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 qwen_model_credential = ZhiPuLLMModelCredential()
 zhipu_image_model_credential = ZhiPuImageModelCredential()

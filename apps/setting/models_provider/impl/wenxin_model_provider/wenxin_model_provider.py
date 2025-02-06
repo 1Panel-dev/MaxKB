@@ -16,7 +16,7 @@ from setting.models_provider.impl.wenxin_model_provider.credential.llm import We
 from setting.models_provider.impl.wenxin_model_provider.model.embedding import QianfanEmbeddings
 from setting.models_provider.impl.wenxin_model_provider.model.llm import QianfanChatModel
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 win_xin_llm_model_credential = WenxinLLMModelCredential()
 qianfan_embedding_credential = QianfanEmbeddingCredential()

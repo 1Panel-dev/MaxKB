@@ -14,7 +14,7 @@ from setting.models_provider.impl.vllm_model_provider.model.embedding import Vll
 from setting.models_provider.impl.vllm_model_provider.model.image import VllmImage
 from setting.models_provider.impl.vllm_model_provider.model.llm import VllmChatModel
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 v_llm_model_credential = VLLMModelCredential()
 image_model_credential = VllmImageModelCredential()

@@ -28,7 +28,7 @@ from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.stt impor
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.tti import QwenTextToImageModel
 from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.tts import AliyunBaiLianTextToSpeech
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext as _, gettext
 
 aliyun_bai_lian_model_credential = AliyunBaiLianRerankerCredential()
 aliyun_bai_lian_tts_model_credential = AliyunBaiLianTTSModelCredential()

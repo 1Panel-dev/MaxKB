@@ -15,7 +15,7 @@ from setting.models_provider.impl.tencent_model_provider.model.image import Tenc
 from setting.models_provider.impl.tencent_model_provider.model.llm import TencentModel
 from setting.models_provider.impl.tencent_model_provider.model.tti import TencentTextToImageModel
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 def _create_model_info(model_name, description, model_type, credential_class, model_class):
     return ModelInfo(

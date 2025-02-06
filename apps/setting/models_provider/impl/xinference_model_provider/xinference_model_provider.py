@@ -23,8 +23,7 @@ from setting.models_provider.impl.xinference_model_provider.model.stt import XIn
 from setting.models_provider.impl.xinference_model_provider.model.tti import XinferenceTextToImage
 from setting.models_provider.impl.xinference_model_provider.model.tts import XInferenceTextToSpeech
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
-
+from django.utils.translation import gettext as _
 
 xinference_llm_model_credential = XinferenceLLMModelCredential()
 xinference_stt_model_credential = XInferenceSTTModelCredential()

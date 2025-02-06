@@ -15,7 +15,6 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from setting.models_provider.base_model_provider import BaseModelCredential, ValidCode
-from setting.models_provider.impl.aliyun_bai_lian_model_provider.model.reranker import AliyunBaiLianReranker
 from setting.models_provider.impl.siliconCloud_model_provider.model.reranker import SiliconCloudReranker
 
 
@@ -26,7 +25,7 @@ class SiliconCloudRerankerCredential(BaseForm, BaseModelCredential):
         if not model_type == 'RERANKER':
             raise AppApiException(ValidCode.valid_error.value,
                                   _('{model_type} Model type is not supported').format(model_type=model_type))
-        for key in ['dashscope_api_key']:
+        for key in ['api_base', 'api_key']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, _('{key}  is required').format(key=key))
@@ -47,6 +46,6 @@ class SiliconCloudRerankerCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, 'dashscope_api_key': super().encryption(model.get('dashscope_api_key', ''))}
-
-    dashscope_api_key = forms.PasswordInputField('API Key', required=True)
+        return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
+    api_base = forms.TextInputField('API URL', required=True)
+    api_key = forms.PasswordInputField('API Key', required=True)

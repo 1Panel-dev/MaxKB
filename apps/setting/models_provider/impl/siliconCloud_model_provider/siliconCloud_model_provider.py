@@ -24,7 +24,7 @@ from setting.models_provider.impl.siliconCloud_model_provider.model.reranker imp
 from setting.models_provider.impl.siliconCloud_model_provider.model.stt import SiliconCloudSpeechToText
 from setting.models_provider.impl.siliconCloud_model_provider.model.tti import SiliconCloudTextToImage
 from smartdoc.conf import PROJECT_DIR
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 openai_llm_model_credential = SiliconCloudLLMModelCredential()
 openai_stt_model_credential = SiliconCloudSTTModelCredential()
