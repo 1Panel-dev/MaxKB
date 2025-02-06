@@ -264,6 +264,11 @@ function getList() {
 function refresh(data: any) {
   if (data) {
     const index = functionLibList.value.findIndex((v) => v.id === data.id)
+    if (user.userInfo && data.user_id === user.userInfo.id) {
+      data.username = user.userInfo.username
+    } else {
+      data.username = userOptions.value.find((v) => v.value === data.user_id)?.label
+    }
     functionLibList.value.splice(index, 1, data)
   } else {
     paginationConfig.total = 0
