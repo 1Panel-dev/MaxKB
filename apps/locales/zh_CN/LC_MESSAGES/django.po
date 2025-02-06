@@ -3698,7 +3698,7 @@ msgstr "语音合成"
 
 #: .\apps\setting\models_provider\base_model_provider.py:156
 msgid "Vision Model"
-msgstr "图片理解"
+msgstr "视觉模型"
 
 #: .\apps\setting\models_provider\base_model_provider.py:157
 msgid "Image Generation"
