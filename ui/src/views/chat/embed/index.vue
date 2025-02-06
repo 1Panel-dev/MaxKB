@@ -8,7 +8,7 @@
     }"
   >
     <div class="chat-embed__header" :style="customStyle">
-      <div class="chat-width flex align-center">
+      <div class="flex align-center">
         <div class="mr-12 ml-24 flex">
           <AppAvatar
             v-if="isAppIcon(applicationDetail?.icon)"
@@ -45,10 +45,9 @@
           class="AiChat-embed"
         >
           <template #operateBefore>
-            <div class="chat-width">
+            <div>
               <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
-                <el-icon><Plus /></el-icon
-                ><span class="ml-4">{{ $t('chat.createChat') }}</span>
+                <el-icon><Plus /></el-icon><span class="ml-4">{{ $t('chat.createChat') }}</span>
               </el-button>
             </div>
           </template>
@@ -338,10 +337,6 @@ onMounted(() => {
     .ai-chat__operate {
       padding-top: 12px;
     }
-  }
-  .chat-width {
-    max-width: var(--app-chat-width, 860px);
-    margin: 0 auto;
   }
 }
 </style>

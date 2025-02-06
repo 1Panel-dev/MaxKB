@@ -45,10 +45,10 @@ export default {
     LimitDialog: {
       dialogTitle: 'Access Restrictions',
       showSourceLabel: 'Show Return Knowledge Reference',
-      clientQueryLimitLabel: 'Each Client Query Limit',
+      clientQueryLimitLabel: 'Limit the number of messages for each client',
       authentication: 'Authentication',
       authenticationValue: 'Authentication Password',
-      timesDays: 'Times/Day',
+      timesDays: 'messages per day',
       whitelistLabel: 'Whitelist',
       whitelistPlaceholder:
         'Please enter allowed third-party source addresses, one per line, such as:\nhttp://127.0.0.1:5678\nhttps://dataease.io'
@@ -67,10 +67,10 @@ export default {
       customThemeColor: 'Custom Theme Color',
       headerTitleFontColor: 'Header Title Font Color',
       default: 'Default',
-      askUserAvatar: 'Ask User Avatar',
+      askUserAvatar: 'Questioner\'s Avatar',
       replace: 'Replace',
       imageMessage: 'Suggested size 32*32, supports jpg, png, gif, size no more than 10 MB',
-      AIAvatar: 'AI Reply Avatar',
+      AIAvatar: 'AI Avatar',
       floatIcon: 'Floating Icon',
       iconDefaultPosition: 'Icon Default Position',
       iconPosition: {
@@ -80,7 +80,7 @@ export default {
         top: 'Top'
       },
       draggablePosition: 'Draggable Position',
-      showHistory: 'Show History',
+      showHistory: 'Show Chat History',
       displayGuide: 'Display guide image (floating window mode)',
       disclaimer: 'Disclaimer',
       disclaimerValue:
@@ -102,9 +102,9 @@ export default {
     charts: {
       customerTotal: 'Total Customers',
       customerNew: 'New Customers',
-      queryCount: 'Query Count',
+      queryCount: 'Total Chats',
       tokensTotal: 'Total Tokens',
-      userSatisfaction: 'User Satisfaction',
+      userSatisfaction: 'User Satisfaction Rate',
       approval: 'Approval',
       disapproval: 'Disapproval'
     }

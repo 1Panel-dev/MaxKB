@@ -6,20 +6,20 @@ export default {
     confirmMessage2: 'segments. Please proceed with caution.'
   },
   buttons: {
-    clearStrategy: 'Clear Strategy',
+    clearStrategy: 'Cleanup Strategy',
     prev: 'Previous',
     next: 'Next'
   },
   table: {
-    abstract: 'Abstract',
-    chat_record_count: 'Number of Chat Questions',
+    abstract: 'Title',
+    chat_record_count: 'Total Messages',
     feedback: {
       label: 'User Feedback',
       star: 'Agree',
       trample: 'Disagree'
     },
-    mark: 'Improvement Label',
-    recenTimes: 'Recent Chat Time'
+    mark: 'Marks',
+    recenTimes: 'Last Chat Time'
   },
   addToDataset: 'Add to Knowledge',
   daysText: 'Days ago',

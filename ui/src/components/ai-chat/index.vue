@@ -346,7 +346,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         } else if (response.status === 460) {
           return Promise.reject(t('chat.tip.errorIdentifyMessage'))
         } else if (response.status === 461) {
-          return Promise.reject('chat.tip.errorLimitMessage')
+          return Promise.reject(t('chat.tip.errorLimitMessage'))
         } else {
           nextTick(() => {
             // 将滚动条滚动到最下面
