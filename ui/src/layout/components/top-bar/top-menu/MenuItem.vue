@@ -8,7 +8,7 @@
       <AppIcon :iconName="menu.meta ? (menu.meta.icon as string) : '404'" />
     </div> -->
     <div class="title">
-      {{ $t(menu.meta?.title) }}
+      {{ $t(menu.meta?.title as string) }}
     </div>
   </div>
 </template>

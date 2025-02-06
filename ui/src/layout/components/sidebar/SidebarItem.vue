@@ -29,7 +29,7 @@
     >
       <template #title>
         <AppIcon v-if="menu.meta && menu.meta.icon" :iconName="menuIcon" class="sidebar-icon" />
-        <span v-if="menu.meta && menu.meta.title">{{ $t(menu.meta.title) }}</span>
+        <span v-if="menu.meta && menu.meta.title">{{ $t(menu.meta?.title as string) }}</span>
       </template>
     </el-menu-item>
   </div>
@@ -49,8 +49,6 @@ const route = useRoute()
 const {
   params: { id, type }
 } = route as any
-
-
 
 function showMenu() {
   if (isWorkFlow(type)) {
