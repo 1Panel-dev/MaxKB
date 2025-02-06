@@ -4981,7 +4981,7 @@ msgstr ""
 
 #: .\apps\setting\models_provider\impl\volcanic_engine_model_provider\volcanic_engine_model_provider.py:115
 msgid "volcano engine"
-msgstr "Volcano Engine"
+msgstr "Volcengine"
 
 #: .\apps\setting\models_provider\impl\wenxin_model_provider\credential\llm.py:50
 #, python-brace-format

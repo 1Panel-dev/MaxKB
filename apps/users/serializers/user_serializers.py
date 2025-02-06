@@ -39,8 +39,8 @@ from function_lib.models.function import FunctionLib
 from setting.models import Team, SystemSetting, SettingType, Model, TeamMember, TeamMemberPermission
 from smartdoc.conf import PROJECT_DIR
 from users.models.user import User, password_encrypt, get_user_dynamics_permission
-from django.utils.translation import gettext_lazy as _
-
+from django.utils.translation import gettext_lazy as _, gettext, to_locale
+from django.utils.translation import get_language
 user_cache = cache.caches['user_cache']
 
 
@@ -393,8 +393,10 @@ class SendEmailSerializer(ApiMixin, serializers.Serializer):
         code = "".join(list(map(lambda i: random.choice(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
                                                          ]), range(6))))
         # 获取邮件模板
-        file = open(os.path.join(PROJECT_DIR, "apps", "common", 'template', 'email_template.html'), "r",
-                    encoding='utf-8')
+        language = get_language()
+        file = open(
+            os.path.join(PROJECT_DIR, "apps", "common", 'template', f'email_template{to_locale(language)}.html'), "r",
+            encoding='utf-8')
         content = file.read()
         file.close()
         code_cache_key = email + ":" + state
