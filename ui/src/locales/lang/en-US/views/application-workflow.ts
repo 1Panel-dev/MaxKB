@@ -14,14 +14,14 @@ export default {
     restoreVersion: 'Restore Version',
     restoreCurrentVersion: 'Restore This Version',
     addComponent: 'Add Component',
-    public: 'Publish',
+    public: 'Release',
     releaseHistory: 'Release History',
     autoSave: 'Auto Save',
     latestRelease: 'Latest Release',
     copyParam: 'Copy Parameter'
   },
   tip: {
-    publicSuccess: 'Published successfully',
+    publicSuccess: 'Successfully',
     noData: 'No related results found',
     nameMessage: 'Name cannot be empty!',
     onlyRight: 'Only allow connections from the right anchor point',

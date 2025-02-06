@@ -42,6 +42,11 @@ export const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/login/forgot-password/index.vue')
   },
   {
+    path: '/reset_password/:code/:email',
+    name: 'reset_password',
+    component: () => import('@/views/login/reset-password/index.vue')
+  },
+  {
     path: '/:pathMatch(.*)',
     name: '404',
     component: () => import('@/views/404/index.vue')
