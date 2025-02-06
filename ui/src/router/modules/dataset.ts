@@ -1,9 +1,8 @@
 import Layout from '@/layout/layout-template/DetailLayout.vue'
-import { t } from '@/locales'
 const datasetRouter = {
   path: '/dataset',
   name: 'dataset',
-  meta: { title:  t('views.dataset.title'), permission: 'DATASET:READ' },
+  meta: { title:  'views.dataset.title', permission: 'DATASET:READ' },
   component: () => import('@/layout/layout-template/AppLayout.vue'),
   redirect: '/dataset',
   children: [
@@ -23,7 +22,7 @@ const datasetRouter = {
     {
       path: '/dataset/:id',
       name: 'DatasetDetail',
-      meta: { title: t('common.fileUpload.document'), activeMenu: '/dataset' },
+      meta: { title: 'common.fileUpload.document', activeMenu: '/dataset' },
       component: Layout,
       hidden: true,
       children: [
@@ -33,7 +32,7 @@ const datasetRouter = {
           meta: {
             icon: 'app-document',
             iconActive: 'app-document-active',
-            title: t('common.fileUpload.document'),
+            title: 'common.fileUpload.document',
             active: 'document',
             parentPath: '/dataset/:id',
             parentName: 'DatasetDetail'
@@ -46,7 +45,7 @@ const datasetRouter = {
           meta: {
             icon: 'app-problems',
             iconActive: 'QuestionFilled',
-            title: t('views.problem.title'),
+            title: 'views.problem.title',
             active: 'problem',
             parentPath: '/dataset/:id',
             parentName: 'DatasetDetail'
@@ -58,7 +57,7 @@ const datasetRouter = {
           name: 'DatasetHitTest',
           meta: {
             icon: 'app-hit-test',
-            title: t('views.application.hitTest.title'),
+            title: 'views.application.hitTest.title',
             active: 'hit-test',
             parentPath: '/dataset/:id',
             parentName: 'DatasetDetail'
@@ -71,7 +70,7 @@ const datasetRouter = {
           meta: {
             icon: 'app-setting',
             iconActive: 'app-setting-active',
-            title: t('common.setting'),
+            title: 'common.setting',
             active: 'setting',
             parentPath: '/dataset/:id',
             parentName: 'DatasetDetail'

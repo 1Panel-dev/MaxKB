@@ -1,8 +1,7 @@
-import { t } from '@/locales'
 const functionLibRouter = {
   path: '/function-lib',
   name: 'function_lib',
-  meta: { title: t('views.functionLib.title'), permission: 'APPLICATION:READ' },
+  meta: { title: 'views.functionLib.title', permission: 'APPLICATION:READ' },
   redirect: '/function-lib',
   component: () => import('@/layout/layout-template/AppLayout.vue'),
   children: [

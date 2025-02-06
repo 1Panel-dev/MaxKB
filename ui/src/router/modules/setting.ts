@@ -1,11 +1,10 @@
 import { hasPermission } from '@/utils/permission/index'
 import Layout from '@/layout/layout-template/SystemLayout.vue'
 import { Role, ComplexPermission } from '@/utils/permission/type'
-import { t } from '@/locales'
 const settingRouter = {
   path: '/setting',
   name: 'setting',
-  meta: { icon: 'Setting', title: t('views.system.title'), permission: 'SETTING:READ' },
+  meta: { icon: 'Setting', title: 'views.system.title', permission: 'SETTING:READ' },
   redirect: () => {
     if (hasPermission(new Role('ADMIN'), 'AND')) {
       return '/user'
@@ -20,7 +19,7 @@ const settingRouter = {
       meta: {
         icon: 'User',
         iconActive: 'UserFilled',
-        title: t('views.user.title'),
+        title: 'views.user.title',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting',
@@ -34,7 +33,7 @@ const settingRouter = {
       meta: {
         icon: 'app-team',
         iconActive: 'app-team-active',
-        title: t('views.team.title'),
+        title: 'views.team.title',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting'
@@ -47,7 +46,7 @@ const settingRouter = {
       meta: {
         icon: 'app-template',
         iconActive: 'app-template-active',
-        title: t('views.template.title'),
+        title: 'views.template.title',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting'
@@ -60,7 +59,7 @@ const settingRouter = {
       meta: {
         icon: 'app-setting',
         iconActive: 'app-setting-active',
-        title: t('common.setting'),
+        title: 'common.setting',
         activeMenu: '/setting',
         parentPath: '/setting',
         parentName: 'setting',
@@ -71,7 +70,7 @@ const settingRouter = {
           path: '/system/theme',
           name: 'theme',
           meta: {
-            title: t('views.system.theme.title'),
+            title: 'views.system.theme.title',
             activeMenu: '/setting',
             parentPath: '/setting',
             parentName: 'setting',
@@ -83,7 +82,7 @@ const settingRouter = {
           path: '/system/authentication',
           name: 'authentication',
           meta: {
-            title: t('views.system.authentication.title'),
+            title: 'views.system.authentication.title',
             activeMenu: '/setting',
             parentPath: '/setting',
             parentName: 'setting',
@@ -95,7 +94,7 @@ const settingRouter = {
           path: '/system/email',
           name: 'email',
           meta: {
-            title: t('views.system.email.title'),
+            title: 'views.system.email.title',
             activeMenu: '/setting',
             parentPath: '/setting',
             parentName: 'setting',
