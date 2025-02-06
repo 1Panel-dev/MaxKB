@@ -3,7 +3,7 @@ export default {
   editParagraph: 'Edit Segment',
   addParagraph: 'Add Segment',
   paragraphDetail: 'Segment Details',
-  character_count: 'charcters',
+  character_count: 'characters',
   setting: {
     batchSelected: 'Batch Select',
     cancelSelected: 'Cancel Selection'

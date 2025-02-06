@@ -27,7 +27,7 @@ export default {
   createDate: 'Create Date',
   createTime: 'Create Time',
   operation: 'Operation',
-  character: 'charcters',
+  character: 'characters',
   export: 'Export',
   exportSuccess: 'Successful',
   unavailable: '(Unavailable)',
