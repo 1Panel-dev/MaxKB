@@ -1,15 +1,15 @@
 export default {
-  title: 'Paragraph',
-  editParagraph: 'Edit Paragraph',
-  addParagraph: 'Add Paragraph',
-  paragraphDetail: 'Paragraph Details',
-  character_count: 'words',
+  title: 'Segment',
+  editParagraph: 'Edit Segment',
+  addParagraph: 'Add Segment',
+  paragraphDetail: 'Segment Details',
+  character_count: 'charcters',
   setting: {
     batchSelected: 'Batch Select',
     cancelSelected: 'Cancel Selection'
   },
   delete: {
-    confirmTitle: 'Confirm deletion of paragraph:',
+    confirmTitle: 'Confirm deletion of segment:',
     confirmMessage: 'Deletion cannot be undone. Please proceed with caution.'
   },
   relatedProblem: {
@@ -18,13 +18,13 @@ export default {
   },
   form: {
     paragraphTitle: {
-      label: 'Paragraph Title',
-      placeholder: 'Please enter the paragraph title'
+      label: 'Segment Title',
+      placeholder: 'Please enter the segment title'
     },
     content: {
-      label: 'Paragraph Content',
-      placeholder: 'Please enter the paragraph content',
-      requiredMessage1: 'Please enter the paragraph content',
+      label: 'Segment Content',
+      placeholder: 'Please enter the segment content',
+      requiredMessage1: 'Please enter the segment content',
       requiredMessage2: 'Content must not exceed 100,000 words'
     }
   }

@@ -23,7 +23,7 @@ export default {
     oppose: 'Dislike',
     cancelOppose: 'Cancel Dislike',
     continue: 'Continue',
-    stopChat: 'Stop Answering'
+    stopChat: 'Stop Output'
   },
   tip: {
     error500Message: 'Sorry, the service is currently under maintenance. Please try again later!',
@@ -32,8 +32,8 @@ export default {
       'Sorry, you have reached the maximum number of questions. Please try again tomorrow!',
     answerMessage:
       'Sorry, no relevant content was found. Please rephrase your question or provide more information.',
-    stopAnswer: 'Answering stopped',
-    answerLoading: 'Answering',
+    stopAnswer: 'Output stopped',
+    answerLoading: 'Thinking',
     recorderTip: `<p>This feature requires the use of a microphone. Browsers prohibit recording on insecure pages. Solutions are as follows:<br/>
 1. Enable HTTPS to resolve;<br/>
 2. If there is no HTTPS configuration, modify the browser security settings. Chrome settings as follows:<br/>
@@ -80,13 +80,13 @@ export default {
     output: 'Output',
     rerankerContent: 'Reranked Content',
     rerankerResult: 'Reranked Results',
-    paragraph: 'Paragraph',
+    paragraph: 'Segment',
     noSubmit: 'User did not submit',
     errMessage: 'Error Log'
   },
   KnowledgeSource: {
     title: 'Knowledge Source',
-    referenceParagraph: 'Referenced Paragraph',
+    referenceParagraph: 'Referenced Segment',
     consume: 'Consumption',
     consumeTime: 'Time Consumed'
   },

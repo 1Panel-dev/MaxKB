@@ -3,7 +3,7 @@ export default {
   delete: {
     confirmTitle: 'Confirm deletion of question:',
     confirmMessage1: 'Deleting this question will cancel the association of',
-    confirmMessage2: 'paragraphs. Please proceed with caution.'
+    confirmMessage2: 'segments. Please proceed with caution.'
   },
   buttons: {
     clearStrategy: 'Clear Strategy',

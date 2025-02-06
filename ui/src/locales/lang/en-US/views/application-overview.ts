@@ -17,7 +17,7 @@ export default {
       msgConfirm1: 'Do you want to regenerate the public access link?',
       msgConfirm2:
         'Regenerating the public access link will affect third-party embedded scripts changes and will require re-embedding the new script into third-party sites. Please proceed with caution!',
-      refreshSuccess: 'Refresh successful'
+      refreshSuccess: 'Successful'
     },
     APIKeyDialog: {
       saveSettings: 'Save Settings',
@@ -63,7 +63,7 @@ export default {
       languageLabel: 'Language',
       showSourceLabel: 'Show Source',
       showExecutionDetail: 'Show Execution Detail',
-      restoreDefault: 'Restore Default',
+      restoreDefault: 'Reset to default',
       customThemeColor: 'Custom Theme Color',
       headerTitleFontColor: 'Header Title Font Color',
       default: 'Default',

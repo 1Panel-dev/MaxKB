@@ -31,12 +31,12 @@ export default {
     },
     form: {
       datasetName: {
-        label: 'Knowledge Name',
+        label: 'Name',
         placeholder: 'Please enter the knowledge name',
         requiredMessage: 'Please enter the knowledge name'
       },
       datasetDescription: {
-        label: 'Knowledge Description',
+        label: 'Description',
         placeholder:
           'Describe the content of the knowledge. A detailed description will help AI understand the content better, improving the accuracy of content retrieval and hit rate.',
         requiredMessage: 'Please enter the knowledge description'
@@ -47,7 +47,7 @@ export default {
         requiredMessage: 'Please select the embedding model'
       },
       datasetType: {
-        label: 'Knowledge Type',
+        label: 'Type',
         generalInfo: 'Upload local documents',
         webInfo: 'Sync text data from a web site'
       },
@@ -64,8 +64,8 @@ export default {
   },
   ResultSuccess: {
     title: 'Knowledge Created Successfully',
-    paragraph: 'Paragraphs',
-    paragraph_count: 'Paragraphs',
+    paragraph: 'Segments',
+    paragraph_count: 'Segments',
     documentList: 'Document List',
     loading: 'Importing',
     buttons: {

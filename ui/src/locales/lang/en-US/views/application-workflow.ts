@@ -110,7 +110,7 @@ export default {
     searchDatasetNode: {
       label: 'Knowledge Search',
       text: 'Associate knowledge and find relevant segments',
-      paragraph_list: 'List of retrieved paragraphs',
+      paragraph_list: 'List of retrieved segments',
       is_hit_handling_method_list: 'List of segments that meet direct response criteria',
       result: 'Search Result',
       directly_return: 'Content of segments that meet direct response criteria',

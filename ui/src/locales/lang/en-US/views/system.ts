@@ -1,13 +1,13 @@
 export default {
   title: 'System',
   test: 'Test Connection',
-  testSuccess: 'Test connection successful',
+  testSuccess: 'Successful',
   testFailed: 'Test connection failed',
   password: 'Password',
   authentication: {
     title: 'Login Authentication',
     ldap: {
-      title: 'LDAP Settings',
+      title: 'LDAP',
       address: 'LDAP Address',
       serverPlaceholder: 'Please enter LDAP address',
       bindDN: 'Bind DN',
@@ -21,7 +21,7 @@ export default {
       enableAuthentication: 'Enable LDAP Authentication'
     },
     cas: {
-      title: 'CAS Settings',
+      title: 'CAS',
       ldpUri: 'ldpUri',
       ldpUriPlaceholder: 'Please enter ldpUri',
       validateUrl: 'Validation Address',
@@ -31,7 +31,7 @@ export default {
       enableAuthentication: 'Enable CAS Authentication'
     },
     oidc: {
-      title: 'OIDC Settings',
+      title: 'OIDC',
       authEndpoint: 'Auth Endpoint',
       authEndpointPlaceholder: 'Please enter auth endpoint',
       tokenEndpoint: 'Token Endpoint',
@@ -50,7 +50,7 @@ export default {
     },
 
     oauth2: {
-      title: 'OAuth2 Settings',
+      title: 'OAuth2',
       authEndpoint: 'Auth Endpoint',
       authEndpointPlaceholder: 'Please enter auth endpoint',
       tokenEndpoint: 'Token Endpoint',
@@ -78,7 +78,7 @@ export default {
       alreadyTurnedOn: 'Turned On',
       notEnabled: 'Not Enabled',
       validate: 'Validate',
-      validateSuccess: 'Validation successful',
+      validateSuccess: 'Successful',
       validateFailed: 'Validation failed',
       validateFailedTip: 'Please fill in all required fields and ensure the format is correct',
       appKeyPlaceholder: 'Please enter APP key',
@@ -98,7 +98,7 @@ export default {
     custom: 'Custom',
     pagePreview: 'Page Preview',
     default: 'Default',
-    restoreDefaults: 'Restore Defaults',
+    restoreDefaults: 'Reset to default',
     orange: 'Orange',
     green: 'Green',
     purple: 'Purple',
@@ -119,7 +119,7 @@ export default {
     websiteSlogan: 'Welcome Message',
     websiteSloganPlaceholder: 'Please enter the welcome message',
     websiteSloganTip: 'The welcome message below the product logo',
-    defaultSlogan: 'Welcome to MaxKB Intelligent Knowledge Q&A System',
+    defaultSlogan: 'Ready-to-use, flexible RAG Chatbot',
     defaultTip: 'Default is the MaxKB platform interface, supports custom settings',
     logoDefaultTip: 'Default is the MaxKB login interface, supports custom settings',
     platformSetting: 'Platform Settings',

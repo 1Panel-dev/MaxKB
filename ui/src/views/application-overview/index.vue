@@ -62,13 +62,21 @@
                 <span class="vertical-middle lighter break-all ellipsis-1">
                   {{ shareUrl }}
                 </span>
-
-                <el-button type="primary" text @click="copyClick(shareUrl)">
-                  <AppIcon iconName="app-copy"></AppIcon>
-                </el-button>
-                <el-button @click="refreshAccessToken" type="primary" text style="margin-left: 1px">
-                  <el-icon><RefreshRight /></el-icon>
-                </el-button>
+                <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
+                  <el-button type="primary" text @click="copyClick(shareUrl)">
+                    <AppIcon iconName="app-copy"></AppIcon>
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip effect="dark" :content="$t('common.refresh')" placement="top">
+                  <el-button
+                    @click="refreshAccessToken"
+                    type="primary"
+                    text
+                    style="margin-left: 1px"
+                  >
+                    <el-icon><RefreshRight /></el-icon>
+                  </el-button>
+                </el-tooltip>
               </div>
               <div>
                 <el-button
@@ -121,10 +129,11 @@
                   <span class="vertical-middle lighter break-all ellipsis-1">{{
                     baseUrl + id
                   }}</span>
-
-                  <el-button type="primary" text @click="copyClick(baseUrl + id)">
-                    <AppIcon iconName="app-copy"></AppIcon>
-                  </el-button>
+                  <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
+                    <el-button type="primary" text @click="copyClick(baseUrl + id)">
+                      <AppIcon iconName="app-copy"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
                 </div>
               </div>
               <div>
@@ -324,9 +333,7 @@ function changeState(bool: Boolean) {
   const obj = {
     is_active: bool
   }
-  const str = bool
-    ? t('common.status.enableSuccess')
-    : t('common.status.disableSuccess')
+  const str = bool ? t('common.status.enableSuccess') : t('common.status.disableSuccess')
   updateAccessToken(obj, str)
 }
 

@@ -29,7 +29,7 @@ export default {
     },
     form: {
       functionName: {
-        label: 'Function Name',
+        label: 'Name',
         placeholder: 'Please enter the function name',
         requiredMessage: 'Please enter the function name'
       },
@@ -66,13 +66,13 @@ export default {
         outputParam: 'Output Parameters',
         paramInfo1: 'Displayed when using the function',
         paramInfo2: 'Not displayed when using the function',
-        code: 'Function Content (Python)'
+        code: 'Content (Python)'
       },
       debug: {
         run: 'Run',
         output: 'Output',
         runResult: 'Run Result',
-        runSuccess: 'Run successful',
+        runSuccess: 'Successful',
         runFailed: 'Run Failed'
       }
     }

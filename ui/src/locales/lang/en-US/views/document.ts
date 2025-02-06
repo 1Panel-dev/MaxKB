@@ -15,12 +15,12 @@ export default {
   },
   tip: {
     saveMessage: 'Current changes have not been saved. Confirm exit?',
-    cancelSuccess: 'Batch cancellation successful',
-    sendMessage: 'Sent successfully',
-    vectorizationSuccess: 'Batch vectorization successful',
+    cancelSuccess: 'Successful',
+    sendMessage: 'Successful',
+    vectorizationSuccess: 'Successful',
     nameMessage: 'Document name cannot be empty!',
-    importMessage: 'Import successful',
-    migrationSuccess: 'Move successful'
+    importMessage: 'Successful',
+    migrationSuccess: 'Successful'
   },
   upload: {
     selectFile: 'Select File',
@@ -39,7 +39,7 @@ export default {
   fileType: {
     txt: {
       label: 'Text File',
-      tip1: '1. It is recommended to standardize the paragraph markers in the file before uploading.',
+      tip1: '1. It is recommended to standardize the segment markers in the file before uploading.',
       tip2: '2. Up to 50 files can be uploaded at once, with each file not exceeding 100MB.'
     },
     table: {
@@ -59,11 +59,11 @@ export default {
   setRules: {
     title: {
       setting: 'Set Segment Rules',
-      preview: 'Segment Preview'
+      preview: 'Preview'
     },
     intelligent: {
-      label: 'Intelligent Segmentation (Recommended)',
-      text: 'If you are unsure how to set segmentation rules, it is recommended to use intelligent segmentation.'
+      label: 'Automatic Segmentation (Recommended)',
+      text: 'If you are unsure how to set segmentation rules, it is recommended to use automatic segmentation.'
     },
     advanced: {
       label: 'Advanced Segmentation',
@@ -91,11 +91,11 @@ export default {
     prev: 'Previous',
     next: 'Next',
     import: 'Start Import',
-    preview: 'Generate Preview'
+    preview: 'Apply'
   },
   table: {
     name: 'Document Name',
-    char_length: 'Words',
+    char_length: 'Charcter',
     paragraph: 'Segment',
     all: 'All',
     updateTime: 'Update Time'
@@ -105,7 +105,7 @@ export default {
     SUCCESS: 'Success',
     FAILURE: 'Failure',
     EMBEDDING: 'Indexing',
-    PENDING: 'Queued',
+    PENDING: 'Queuing',
     GENERATE: 'Generating',
     SYNC: 'Syncing',
     REVOKE: 'Cancelling',
@@ -122,14 +122,14 @@ export default {
     confirmMessage1:
       'Syncing will delete existing data and retrieve new data. Please proceed with caution.',
     confirmMessage2: 'Cannot sync, please set the document URL first.',
-    successMessage: 'Document synced successfully'
+    successMessage: 'Successful'
   },
   delete: {
     confirmTitle1: 'Confirm batch deletion of',
     confirmTitle2: 'documents?',
     confirmMessage:
       'Segments within the selected documents will also be deleted. Please proceed with caution.',
-    successMessage: 'Batch deletion successful',
+    successMessage: 'Successful',
     confirmTitle3: 'Confirm deleting document:',
     confirmMessage1: 'Under this document',
     confirmMessage2: 'All segments will be deleted, please operate with caution. '
@@ -161,11 +161,11 @@ export default {
   },
   hitHandlingMethod: {
     optimization: 'Model optimization',
-    directly_return: 'Direct answer'
+    directly_return: 'Respond directly'
   },
   generateQuestion: {
     title: 'Generate Questions',
-    successMessage: 'Question generation successful',
+    successMessage: 'Successful',
     tip1: 'The {data} in the prompt is a placeholder for segmented content, which is replaced by the segmented content when executed and sent to the AI model;',
     tip2: 'The AI model generates relevant questions based on the segmented content. Please place the generated questions within the',
     tip3: 'tags, and the system will automatically associate the questions within these tags;',

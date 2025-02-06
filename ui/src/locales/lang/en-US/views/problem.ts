@@ -8,7 +8,7 @@ export default {
     placeholder: 'Enter the question, support multiple entries, one per line.',
     errorMessage: 'Question cannot be empty!',
     requiredMessage: 'Please enter a question',
-    relatedSuccess: 'Batch association of paragraphs successful'
+    relatedSuccess: 'Successful'
   },
 
   setting: {
@@ -19,20 +19,20 @@ export default {
     placeholder: 'Search by name'
   },
   table: {
-    paragraph_count: 'Associated Paragraphs',
+    paragraph_count: 'Associated Segments',
     updateTime: 'Update Time'
   },
   delete: {
     confirmTitle: 'Confirm deletion of question:',
     confirmMessage1: 'Deleting this question will cancel the association of',
-    confirmMessage2: 'paragraphs. Please proceed with caution.'
+    confirmMessage2: 'segments. Please proceed with caution.'
   },
   relateParagraph: {
-    title: 'Associate Paragraphs',
+    title: 'Associate Segments',
     selectDocument: 'Select Document',
     placeholder: 'Search by document name',
-    selectParagraph: 'Select Paragraph',
-    selectedParagraph: 'Selected Paragraphs',
+    selectParagraph: 'Select Segment',
+    selectedParagraph: 'Selected Segments',
     count: 'Count'
   }
 }

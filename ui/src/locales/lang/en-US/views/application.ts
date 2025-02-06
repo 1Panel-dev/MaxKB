@@ -33,17 +33,17 @@ export default {
     },
     form: {
       appName: {
-        label: 'APP Name',
+        label: 'Name',
         placeholder: 'Please enter the APP name',
         requiredMessage: 'APP name is required'
       },
       appDescription: {
-        label: 'APP Description',
+        label: 'Description',
         placeholder:
           'Describe the APP scenario and use, e.g.: XXX assistant answering user questions about XXX product usage'
       },
       appType: {
-        label: 'Please select the APP type',
+        label: 'Type',
         simplePlaceholder: 'Suitable for beginners to create assistant.',
         workflowPlaceholder: 'Suitable for advanced users to customize the workflow of assistant'
       },
@@ -131,10 +131,10 @@ export default {
       similarityThreshold: 'Similarity Threshold',
       similarityTooltip: 'The higher the similarity, the stronger the correlation.',
       topReferences: 'Top N References',
-      maxCharacters: 'Maximum words per Reference',
+      maxCharacters: 'Maximum  Characters per Reference',
       noReferencesAction: 'When there are no knowledge references',
       continueQuestioning: 'Continue to ask questions to the Al model',
-      provideAnswer: 'Provide a specific answer',
+      provideAnswer: 'Specify Reply Content',
       designated_answer:
         'Hello, I am XXX Assistant. My knowledge only contains information related to XXX products. Please rephrase your question.',
       defaultPrompt1:
@@ -168,7 +168,7 @@ export default {
       secretPlaceholder: 'Please enter secret',
       tokenPlaceholder: 'Please enter token',
       encodingAesKeyPlaceholder: 'Please enter EncodingAESKey',
-      authenticationSuccessful: 'Authentication successful',
+      authenticationSuccessful: 'Successful',
       urlInfo:
         '-APP management-Self-built-Created APP-Receive messages-Set the "URL" received by the API'
     },
@@ -204,8 +204,8 @@ export default {
   },
   hitTest: {
     title: 'Retrieval Test',
-    text: 'Ensure effective response by matching paragraphs to user inquiries.',
-    emptyMessage1: 'The matching paragraph is displayed here',
+    text: 'Ensure effective response by matching segments to user inquiries.',
+    emptyMessage1: 'The matching segment is displayed here',
     emptyMessage2: 'No matching sections found'
   }
 }
