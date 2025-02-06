@@ -118,7 +118,7 @@ export default {
       selected: 'Selected',
       countDataset: 'Knowledge',
 
-      selectSearchMode: 'Search Mode',
+      selectSearchMode: 'Retrieval Mode',
       vectorSearch: 'Vector Search',
       vectorSearchTooltip:
         'Vector search is a retrieval method based on vector distance calculations, suitable for large data volumes in the knowledge.',
