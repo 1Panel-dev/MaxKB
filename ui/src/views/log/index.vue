@@ -277,7 +277,7 @@
   </LayoutContainer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, type Ref, onMounted, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import ChatRecordDrawer from './component/ChatRecordDrawer.vue'
@@ -507,11 +507,13 @@ function getList() {
   })
 }
 
-function getDetail() {
-  application.asyncGetApplicationDetail(id as string, loading).then((res: any) => {
-    detail.value = res.data
-    days.value = res.data.clean_time
-  })
+function getDetail(isLoading = false) {
+  application
+    .asyncGetApplicationDetail(id as string, isLoading ? loading : undefined)
+    .then((res: any) => {
+      detail.value = res.data
+      days.value = res.data.clean_time
+    })
 }
 
 const exportLog = () => {
@@ -562,7 +564,7 @@ function saveCleanTime() {
     .then(() => {
       MsgSuccess(t('common.saveSuccess'))
       dialogVisible.value = false
-      getDetail()
+      getDetail(true)
     })
     .catch(() => {
       dialogVisible.value = false
