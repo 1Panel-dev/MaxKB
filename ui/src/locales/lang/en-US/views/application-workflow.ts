@@ -8,51 +8,51 @@ export default {
   },
   info: {
     previewVersion: 'Preview Version:',
-    saveTime: 'Save Time:'
+    saveTime: 'Last Saved:'
   },
   setting: {
-    restoreVersion: 'Restore Version',
-    restoreCurrentVersion: 'Restore This Version',
-    addComponent: 'Add Component',
+    restoreVersion: 'Restore Previous Version"',
+    restoreCurrentVersion: 'Restore to This Version',
+    addComponent: 'Add',
     public: 'Publish',
-    releaseHistory: 'Publish History',
+    releaseHistory: 'Release History',
     autoSave: 'Auto Save',
-    latestRelease: 'Latest Publish',
-    copyParam: 'Copy Parameter',
+    latestRelease: 'Latest Release',
+    copyParam: 'Copy Parameters',
     debug: 'Run',
   },
   tip: {
-    publicSuccess: 'Successfully',
+    publicSuccess: 'Published successfully',
     noData: 'No related results found',
     nameMessage: 'Name cannot be empty!',
-    onlyRight: 'Only allow connections from the right anchor point',
-    notRecyclable: 'Cannot create a loop connection',
-    onlyLeft: 'Only allow connections to the left anchor point',
-    applicationNodeError: 'This APP is unavailable',
-    functionNodeError: 'This function is unavailable',
-    repeatedNodeError: 'Node name already exists!',
+    onlyRight: 'Connections can only be made from the right anchor',
+    notRecyclable: 'Loop connections are not allowed',
+    onlyLeft: 'Connections can only be made to the left anchor',
+    applicationNodeError: 'This application is unavailable',
+    functionNodeError: 'This function node is unavailable',
+    repeatedNodeError: 'A node with this name already exists',
     cannotCopy: 'Cannot be copied',
-    copyError: 'Node has been copied',
+    copyError: 'Node already copied',
     paramErrorMessage: 'Parameter already exists: '
   },
   delete: {
     confirmTitle: 'Confirm to delete this node?',
-    deleteMessage: 'Node cannot be deleted'
+    deleteMessage: 'This node cannot be deleted'
   },
   control: {
     zoomOut: 'Zoom Out',
     zoomIn: 'Zoom In',
-    fitView: 'Fit View',
-    retract: 'Collapse All Nodes',
-    extend: 'Expand All Nodes',
-    beautify: 'One-click Beautification'
+    fitView: 'Fit to Screen',
+    retract: 'Collapse All',
+    extend: 'Expand All',
+    beautify: 'Auto-Arrange'
   },
   variable: {
     global: 'Global Variable',
-    Referencing: 'Reference Variable',
-    ReferencingRequired: 'reference variable required',
-    ReferencingError: 'reference variable error',
-    NoReferencing: 'Non-existent Reference Variable',
+    Referencing: 'Referenced Variable',
+    ReferencingRequired: 'Referenced variable is required',
+    ReferencingError: 'Invalid referenced variable',
+    NoReferencing: 'Referenced variable does not exist',
     fieldMessage: 'Please select a variable'
   },
   condition: {
@@ -63,15 +63,15 @@ export default {
     text: 'After the connected node is executed, execute the current node'
   },
   validate: {
-    startNodeRequired: 'Start Node Required',
-    startNodeOnly: 'There can only be one start node',
-    baseNodeRequired: 'Base Info Node Required',
-    baseNodeOnly: 'There can only be one base info node',
+    startNodeRequired: 'Start node is required',
+    startNodeOnly: 'Only one start node is allowed',
+    baseNodeRequired: 'Base information node is required',
+    baseNodeOnly: 'Only one base information node is allowed',
     notInWorkFlowNode: 'Node not in workflow',
-    noNextNode: 'Non-existent next node',
+    noNextNode: 'Next node does not exist',
     nodeUnavailable: 'Node unavailable',
     needConnect1: 'The branch of the node needs to be connected',
-    cannotEndNode: 'Node cannot be used as an end node'
+    cannotEndNode: 'This node cannot be used as an end node'
   },
   nodes: {
     startNode: {
@@ -99,7 +99,7 @@ export default {
     },
     aiChatNode: {
       label: 'AI Chat',
-      text: 'Chat with AI large model',
+      text: 'Chat with an AI model',
       answer: 'AI Answer Content',
       returnContent: {
         label: 'Return Content',
@@ -109,13 +109,13 @@ export default {
       defaultPrompt: 'Known Information'
     },
     searchDatasetNode: {
-      label: 'Knowledge Search',
-      text: 'Associate knowledge and find relevant segments',
+      label: 'Knowledge Retrieval',
+      text: 'Allows you to query text content related to user questions from the Knowledge',
       paragraph_list: 'List of retrieved segments',
       is_hit_handling_method_list: 'List of segments that meet direct response criteria',
       result: 'Search Result',
       directly_return: 'Content of segments that meet direct response criteria',
-      selectDatasetText: 'Associated knowledge displayed here',
+      selectDatasetText: 'Related knowledge displayed here',
       searchParam: 'Retrieval Parameters',
       searchQuestion: {
         label: 'Question',
@@ -133,7 +133,7 @@ export default {
     },
     conditionNode: {
       label: 'Conditional Branch',
-      text: 'Execute different nodes based on different conditions',
+      text: 'Trigger different nodes based on conditions',
       branch_name: 'Branch Name',
       conditions: {
         label: 'Conditions',
@@ -156,7 +156,7 @@ export default {
     },
     rerankerNode: {
       label: 'Multi-path Recall',
-      text: 'Use Rerank to perform secondary recall on retrieval results from multiple knowledge',
+      text: 'Use a re-ranking model to refine retrieval results from multiple knowledge sources',
       result_list: 'Re-ranked Results List',
       result: 'Re-ranking Result',
       rerankerContent: {
@@ -172,8 +172,8 @@ export default {
       }
     },
     formNode: {
-      label: 'Form Collection',
-      text: 'Used to collect user information during Q&A process, subsequent processes can be executed based on collected form data',
+      label: 'Form Input',
+      text: 'Collect user input during Q&A and use it in subsequent processes',
       form_content_format1: 'Hello, please fill out the form below:',
       form_content_format2: 'Click the [Submit] button after filling it out.',
       form_data: 'All Form Content',
@@ -182,7 +182,7 @@ export default {
         requiredMessage:
           'Please set the output content of this node, { form } is a placeholder for the form.',
         tooltip:
-          'Set the content output by executing this node, { form } is a placeholder for the form.'
+          'Define the output content of this node. { form } is a placeholder for the form'
       },
       formAllContent: 'All Form Content',
       formSetting: 'Form Configuration'
@@ -194,7 +194,7 @@ export default {
     },
     imageUnderstandNode: {
       label: 'Image Understanding',
-      text: 'Identify objects, scenes, etc., in images to answer user questions',
+      text: 'Analyze images to identify objects, scenes, and provide answers',
       answer: 'AI Answer Content',
       model: {
         label: 'Vision Model',
@@ -216,12 +216,12 @@ export default {
       prompt: {
         label: 'Positive Prompt',
         tooltip:
-          'Positive prompt words, used to describe elements and visual features expected in the generated image'
+          'Describe elements and visual features you want in the generated image'
       },
       negative_prompt: {
         label: 'Negative Prompt',
         tooltip:
-          'Negative prompt words, used to describe content that should not appear in the image, which can limit the image.',
+          'Describe elements you want to exclude from the generated image',
         placeholder:
           'Please describe content you do not want to generate, such as color, bloody content'
       }
@@ -256,20 +256,20 @@ export default {
     }
   },
   compare: {
-    is_null: 'Is Null',
-    is_not_null: 'Is Not Null',
+    is_null: 'Is null',
+    is_not_null: 'Is not null',
     contain: 'Contains',
-    not_contain: 'Does Not Contain',
-    eq: 'Equals',
-    ge: 'Greater Than or Equal To',
-    gt: 'Greater Than',
-    le: 'Less Than or Equal To',
-    lt: 'Less Than',
-    len_eq: 'Length Equals',
-    len_ge: 'Length Greater Than or Equal To',
-    len_gt: 'Length Greater Than',
-    len_le: 'Length Less Than or Equal To',
-    len_lt: 'Length Less Than'
+    not_contain: 'Does not contain',
+    eq: 'Equal to',
+    ge: 'Greater than or equal to',
+    gt: 'Greater than',
+    le: 'Less than or equal to',
+    lt: 'Less than',
+    len_eq: 'Length equal to',
+    len_ge: 'Length greater than or equal to',
+    len_gt: 'Length greater than',
+    len_le: 'Length less than or equal to',
+    len_lt: 'Length less than'
   },
   FileUploadSetting: {}
 }
