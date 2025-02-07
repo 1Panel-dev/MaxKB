@@ -35,7 +35,13 @@ def get_dataset_setting_dict():
 
 
 def get_model_setting_dict():
-    return {'prompt': Application.get_default_model_prompt(), 'no_references_prompt': '{question}'}
+    return {
+        'prompt': Application.get_default_model_prompt(),
+        'no_references_prompt': '{question}',
+        'reasoning_content_start': '<think>',
+        'reasoning_content_end': '</think>',
+        'reasoning_content_enable': False,
+    }
 
 
 class Application(AppModelMixin):

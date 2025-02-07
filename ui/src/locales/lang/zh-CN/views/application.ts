@@ -97,6 +97,11 @@ export default {
         browser: '浏览器播放(免费)',
         tts: 'TTS模型',
         listeningTest: '试听'
+      },
+      reasoningContent: {
+        enable: '输出思考',
+        start: '开始',
+        end: '结束',
       }
     },
     buttons: {

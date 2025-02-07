@@ -68,6 +68,14 @@
                     <el-button
                       type="primary"
                       link
+                      @click="openReasoningParamSettingDialog"
+                      :disabled="!applicationForm.model_id"
+                    >
+                      {{ $t('common.setting') }}
+                    </el-button>
+                    <el-button
+                      type="primary"
+                      link
                       @click="openAIParamSettingDialog"
                       :disabled="!applicationForm.model_id"
                     >
@@ -453,6 +461,7 @@
     />
 
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
+    <ReasoningParamSettingDialog ref="ReasoningParamSettingDialogRef" @refresh="submitReasoningDialog"/>
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -472,6 +481,7 @@ import { MsgSuccess, MsgWarning } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from './component/TTSModeParamSettingDialog.vue'
+import ReasoningParamSettingDialog from './component/ReasoningParamSettingDialog.vue'
 
 const { model, application } = useStore()
 
@@ -493,6 +503,7 @@ const optimizationPrompt =
   t('views.application.applicationForm.dialog.defaultPrompt2')
 
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
 const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
 const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 
@@ -562,6 +573,13 @@ function submitNoReferencesPromptDialog(val: string) {
 function submitSystemDialog(val: string) {
   applicationForm.value.model_setting.system = val
 }
+function submitReasoningDialog(val: any) {
+  console.log(val)
+  applicationForm.value.model_setting = {
+    ...applicationForm.value.model_setting,
+    ...val
+  }
+}
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -588,6 +606,12 @@ const openAIParamSettingDialog = () => {
       id,
       applicationForm.value.model_params_setting
     )
+  }
+}
+
+const openReasoningParamSettingDialog = () => {
+  if (applicationForm.value.model_id) {
+    ReasoningParamSettingDialogRef.value?.open(applicationForm.value.model_setting)
   }
 }
 

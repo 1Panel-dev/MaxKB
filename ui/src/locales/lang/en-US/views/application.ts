@@ -106,6 +106,11 @@ export default {
         browser: 'Browser playback (free)',
         tts: 'TTS Model',
         listeningTest: 'Preview'
+      },
+      reasoningContent: {
+        enable: 'Show Reasoning',
+        start: 'Start',
+        end: 'End',
       }
     },
     buttons: {

@@ -33,6 +33,15 @@
                 :disabled="!chat_data.model_id"
                 type="primary"
                 link
+                @click="openReasoningParamSettingDialog(chat_data.model_id)"
+                @refreshForm="refreshParam"
+              >
+                {{ $t('common.setting') }}
+              </el-button>
+              <el-button
+                :disabled="!chat_data.model_id"
+                type="primary"
+                link
                 @click="openAIParamSettingDialog(chat_data.model_id)"
                 @refreshForm="refreshParam"
               >
@@ -140,6 +149,8 @@
     </el-card>
 
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
+    <ReasoningParamSettingDialog ref="ReasoningParamSettingDialogRef" @refresh="submitReasoningDialog"/>
+
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -153,6 +164,8 @@ import useStore from '@/stores'
 import { isLastNode } from '@/workflow/common/data'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import { t } from '@/locales'
+import ReasoningParamSettingDialog
+  from '@/views/application/component/ReasoningParamSettingDialog.vue'
 const { model } = useStore()
 
 const wheel = (e: any) => {
@@ -220,6 +233,7 @@ const aiChatNodeFormRef = ref<FormInstance>()
 
 const modelOptions = ref<any>(null)
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
 const validate = () => {
   return aiChatNodeFormRef.value?.validate().catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
@@ -244,9 +258,21 @@ const openAIParamSettingDialog = (modelId: string) => {
   }
 }
 
+const openReasoningParamSettingDialog = () => {
+  if (chat_data.value.model_id) {
+    ReasoningParamSettingDialogRef.value?.open(chat_data.value.model_setting)
+  }
+}
+
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'model_params_setting', data)
 }
+
+function submitReasoningDialog(val: any) {
+  console.log(val)
+  set(props.nodeModel.properties.node_data, 'model_setting', val)
+}
+
 
 onMounted(() => {
   getModel()
