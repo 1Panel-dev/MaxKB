@@ -1,6 +1,6 @@
 export default {
   node: 'Node',
-  baseComponent: 'Base Component',
+  baseComponent: 'Base',
   nodeSetting: 'Node Settings',
   workflow: 'Workflow',
   searchBar: {
@@ -18,7 +18,8 @@ export default {
     releaseHistory: 'Publish History',
     autoSave: 'Auto Save',
     latestRelease: 'Latest Publish',
-    copyParam: 'Copy Parameter'
+    copyParam: 'Copy Parameter',
+    debug: 'Run',
   },
   tip: {
     publicSuccess: 'Successfully',

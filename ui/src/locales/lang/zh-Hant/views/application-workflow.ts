@@ -18,7 +18,8 @@ export default {
     releaseHistory: '發布歷史',
     autoSave: '自動保存',
     latestRelease: '最近發布',
-    copyParam: '複製參數'
+    copyParam: '複製參數',
+    debug: '調試',
   },
   tip: {
     publicSuccess: '發布成功',

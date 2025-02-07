@@ -51,40 +51,7 @@
                 </div>
               </el-card>
             </el-col>
-            <el-col
-              :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="12"
-              :xl="12"
-              class="mb-8"
-              v-for="(item, index) in uploadImageList"
-              :key="index"
-            >
-              <div
-                class="file cursor border border-r-4"
-                v-if="item.url"
-                @mouseenter.stop="mouseenter(item)"
-                @mouseleave.stop="mouseleave()"
-              >
-                <div
-                  @click="deleteFile(index, 'image')"
-                  class="delete-icon color-secondary"
-                  v-if="showDelete === item.url"
-                >
-                  <el-icon>
-                    <CircleCloseFilled />
-                  </el-icon>
-                </div>
-                <el-image
-                  :src="item.url"
-                  alt=""
-                  fit="cover"
-                  style="width: 40px; height: 40px; display: block"
-                  class="border-r-4"
-                />
-              </div>
-            </el-col>
+
             <el-col
               :xs="24"
               :sm="12"
@@ -118,6 +85,33 @@
               </el-card>
             </el-col>
           </el-row>
+          <div class="flex">
+            <template v-for="(item, index) in uploadImageList" :key="index">
+              <div
+                class="file cursor border border-r-4 mr-8"
+                v-if="item.url"
+                @mouseenter.stop="mouseenter(item)"
+                @mouseleave.stop="mouseleave()"
+              >
+                <div
+                  @click="deleteFile(index, 'image')"
+                  class="delete-icon color-secondary"
+                  v-if="showDelete === item.url"
+                >
+                  <el-icon>
+                    <CircleCloseFilled />
+                  </el-icon>
+                </div>
+                <el-image
+                  :src="item.url"
+                  alt=""
+                  fit="cover"
+                  style="width: 40px; height: 40px; display: block"
+                  class="border-r-4"
+                />
+              </div>
+            </template>
+          </div>
         </div>
       </el-scrollbar>
       <div class="flex">
