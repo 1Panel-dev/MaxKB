@@ -490,7 +490,7 @@ msgid "Library ID"
 msgstr ""
 
 #: .\apps\application\flow\step_node\function_lib_node\i_function_lib_node.py:35
-msgid "The library has been deleted"
+msgid "The function has been deleted"
 msgstr ""
 
 #: .\apps\application\flow\step_node\function_node\i_function_node.py:25

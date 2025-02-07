@@ -32,7 +32,7 @@ class FunctionLibNodeParamsSerializer(serializers.Serializer):
         super().is_valid(raise_exception=True)
         f_lib = QuerySet(FunctionLib).filter(id=self.data.get('function_lib_id')).first()
         if f_lib is None:
-            raise Exception(_('The library has been deleted'))
+            raise Exception(_('The function has been deleted'))
 
 
 class IFunctionLibNode(INode):

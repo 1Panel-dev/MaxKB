@@ -493,8 +493,8 @@ msgid "Library ID"
 msgstr "函數庫id"
 
 #: .\apps\application\flow\step_node\function_lib_node\i_function_lib_node.py:35
-msgid "The library has been deleted"
-msgstr "函數庫已被刪除"
+msgid "The function has been deleted"
+msgstr "函數已被刪除"
 
 #: .\apps\application\flow\step_node\function_node\i_function_node.py:25
 msgid "Is this field required"
