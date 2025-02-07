@@ -203,9 +203,9 @@ export default {
     copyUrl: 'Copy the link and fill it in'
   },
   hitTest: {
-    title: 'Retrieval Test',
-    text: 'Ensure effective response by matching segments to user inquiries.',
-    emptyMessage1: 'The matching segment is displayed here',
+    title: 'Retrieval Testing',
+    text: 'Test the hitting effect of the Knowledge based on the given query text.',
+    emptyMessage1: 'Retrieval Testing results will show here',
     emptyMessage2: 'No matching sections found'
   }
 }

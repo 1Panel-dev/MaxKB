@@ -26,7 +26,7 @@ export default {
   professional: 'Purchase the Professional Edition',
   createDate: 'Create Date',
   createTime: 'Create Time',
-  operation: 'Operation',
+  operation: 'Action',
   character: 'characters',
   export: 'Export',
   exportSuccess: 'Successful',
