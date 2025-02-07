@@ -99,8 +99,8 @@
         </el-form-item>
       </el-form>
     </el-card>
+    <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
   </NodeContainer>
-  <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
 </template>
 
 <script setup lang="ts">
