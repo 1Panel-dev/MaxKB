@@ -104,7 +104,7 @@ class BaseChatOpenAI(ChatOpenAI):
                 if generation_chunk.message.usage_metadata is not None:
                     self.usage_metadata = generation_chunk.message.usage_metadata
                 # custom code
-                if chunk['choices'][0]['delta']['reasoning_content']:
+                if 'reasoning_content' in chunk['choices'][0]['delta']:
                     generation_chunk.message.additional_kwargs["reasoning_content"] = chunk['choices'][0]['delta']['reasoning_content']
 
                 default_chunk_class = generation_chunk.message.__class__

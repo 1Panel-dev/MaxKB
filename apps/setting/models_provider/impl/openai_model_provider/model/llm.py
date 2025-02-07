@@ -13,6 +13,7 @@ from langchain_openai.chat_models import ChatOpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from setting.models_provider.base_model_provider import MaxKBBaseModel
+from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
 def custom_get_token_ids(text: str):
@@ -20,7 +21,7 @@ def custom_get_token_ids(text: str):
     return tokenizer.encode(text)
 
 
-class OpenAIChatModel(MaxKBBaseModel, ChatOpenAI):
+class OpenAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
 
     @staticmethod
     def is_cache_model():
