@@ -8,14 +8,14 @@ export default {
   chatId: 'Chat ID',
   userInput: 'User Input',
   quote: 'Quote',
-  download: 'Click to Download File',
+  download: 'Download File',
   passwordValidator: {
     title: 'Enter password to open the link',
     errorMessage1: 'Password cannot be empty',
     errorMessage2: 'Incorrect password'
   },
   operation: {
-    play: 'Click to Play',
+    play: 'Play',
     pause: 'Stop',
     regeneration: 'Re-answer',
     like: 'Agree',

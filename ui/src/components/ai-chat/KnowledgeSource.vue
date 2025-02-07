@@ -43,7 +43,7 @@
 
   <div class="border-t color-secondary flex-between mt-12" style="padding-top: 12px">
     <div>
-      <span class="mr-8"> {{ $t('chat.KnowledgeSource.consume') }} tokens: {{ data?.message_tokens + data?.answer_tokens }} </span>
+      <span class="mr-8"> {{ $t('chat.KnowledgeSource.consume') }}: {{ data?.message_tokens + data?.answer_tokens }} </span>
       <span> {{ $t('chat.KnowledgeSource.consumeTime') }}: {{ data?.run_time?.toFixed(2) }} s</span>
     </div>
     <el-button
