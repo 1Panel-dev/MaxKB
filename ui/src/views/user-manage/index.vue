@@ -40,7 +40,9 @@
                     ? $t('views.user.source.lark')
                     : row.source === 'dingtalk'
                       ? $t('views.user.source.dingtalk')
-                      : row.source
+                      : row.source === 'OAUTH2' || row.source === 'OAuth2'
+                        ? 'OAuth2'
+                        : row.source
             }}
           </template>
         </el-table-column>
