@@ -73,7 +73,8 @@ class SiliconCloudReranker(MaxKBBaseModel, BaseDocumentCompressor):
             "model": self.model,
             "query": query,
             "documents": texts,
-            "top_n": self.top_n
+            "top_n": self.top_n,
+            "return_documents": True,
         }
 
         response = requests.post(f"{self.api_base}/rerank", json=payload, headers=headers)
