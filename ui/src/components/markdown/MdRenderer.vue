@@ -1,40 +1,46 @@
 <template>
-  <template v-for="(item, index) in md_view_list" :key="index">
-    <div
-      v-if="item.type === 'question'"
-      @click="sendMessage ? sendMessage(item.content, 'new') : (content: string) => {}"
-      class="problem-button ellipsis-2 mt-4 mb-4"
-      :class="sendMessage ? 'cursor' : 'disabled'"
-    >
-      <el-icon>
-        <EditPen />
-      </el-icon>
-      {{ item.content }}
-    </div>
-    <HtmlRander v-else-if="item.type === 'html_rander'" :source="item.content"></HtmlRander>
-    <EchartsRander
-      v-else-if="item.type === 'echarts_rander'"
-      :option="item.content"
-    ></EchartsRander>
-    <FormRander
-      :chat_record_id="chat_record_id"
-      :runtime_node_id="runtime_node_id"
-      :child_node="child_node"
-      :disabled="disabled"
-      :send-message="sendMessage"
-      v-else-if="item.type === 'form_rander'"
-      :form_setting="item.content"
-    ></FormRander>
-    <MdPreview
-      v-else
-      noIconfont
-      ref="editorRef"
-      editorId="preview-only"
-      :modelValue="item.content"
-      :key="index"
-      class="maxkb-md"
-    />
-  </template>
+  <div>
+    <!-- todo  推理过程组件需要完善,目前用span占位   -->
+    <span style="color: red">
+      {{ reasoning_content }}
+    </span>
+    <template v-for="(item, index) in md_view_list" :key="index">
+      <div
+        v-if="item.type === 'question'"
+        @click="sendMessage ? sendMessage(item.content, 'new') : (content: string) => {}"
+        class="problem-button ellipsis-2 mt-4 mb-4"
+        :class="sendMessage ? 'cursor' : 'disabled'"
+      >
+        <el-icon>
+          <EditPen />
+        </el-icon>
+        {{ item.content }}
+      </div>
+      <HtmlRander v-else-if="item.type === 'html_rander'" :source="item.content"></HtmlRander>
+      <EchartsRander
+        v-else-if="item.type === 'echarts_rander'"
+        :option="item.content"
+      ></EchartsRander>
+      <FormRander
+        :chat_record_id="chat_record_id"
+        :runtime_node_id="runtime_node_id"
+        :child_node="child_node"
+        :disabled="disabled"
+        :send-message="sendMessage"
+        v-else-if="item.type === 'form_rander'"
+        :form_setting="item.content"
+      ></FormRander>
+      <MdPreview
+        v-else
+        noIconfont
+        ref="editorRef"
+        editorId="preview-only"
+        :modelValue="item.content"
+        :key="index"
+        class="maxkb-md"
+      />
+    </template>
+  </div>
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
@@ -65,6 +71,7 @@ config({
 const props = withDefaults(
   defineProps<{
     source?: string
+    reasoning_content?: string
     inner_suffix?: boolean
     sendMessage?: (question: string, type: 'old' | 'new', other_params_data?: any) => void
     child_node?: any

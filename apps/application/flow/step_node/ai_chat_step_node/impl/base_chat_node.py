@@ -14,6 +14,7 @@ from django.db.models import QuerySet
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_core.messages import BaseMessage, AIMessage
 
+from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from setting.models import Model
@@ -21,7 +22,8 @@ from setting.models_provider import get_model_credential
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 
 
-def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
+def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
+                   reasoning_content: str):
     chat_model = node_variable.get('chat_model')
     message_tokens = chat_model.get_num_tokens_from_messages(node_variable.get('message_list'))
     answer_tokens = chat_model.get_num_tokens(answer)
@@ -31,6 +33,7 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['history_message'] = node_variable['history_message']
     node.context['question'] = node_variable['question']
     node.context['run_time'] = time.time() - node.context['start_time']
+    node.context['reasoning_content'] = reasoning_content
     if workflow.is_result(node, NodeResult(node_variable, workflow_variable)):
         node.answer_text = answer
 
@@ -45,10 +48,15 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     """
     response = node_variable.get('result')
     answer = ''
+    reasoning_content = ''
     for chunk in response:
         answer += chunk.content
-        yield chunk.content
-    _write_context(node_variable, workflow_variable, node, workflow, answer)
+        reasoning_content_chunk = chunk.additional_kwargs.get('reasoning_content', '')
+        if reasoning_content_chunk is None:
+            reasoning_content_chunk = ''
+        reasoning_content += reasoning_content_chunk
+        yield {'content': chunk.content, 'reasoning_content': reasoning_content_chunk}
+    _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
 def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
@@ -92,7 +100,15 @@ class BaseChatNode(IChatNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
         self.context['question'] = details.get('question')
+        self.context['reasoning_content'] = details.get('reasoning_content')
         self.answer_text = details.get('answer')
+
+    def get_answer_list(self) -> List[Answer] | None:
+        if self.answer_text is None:
+            return None
+        return [
+            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], {},
+                   self.context.get('reasoning_content'))]
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,
@@ -164,6 +180,7 @@ class BaseChatNode(IChatNode):
                                     'history_message') is not None else [])],
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
+            'reasoning_content': self.context.get('reasoning_content'),
             'type': self.node.type,
             'message_tokens': self.context.get('message_tokens'),
             'answer_tokens': self.context.get('answer_tokens'),

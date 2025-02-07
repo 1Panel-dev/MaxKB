@@ -470,6 +470,7 @@ class WorkflowManage:
             if result is not None:
                 if self.is_result(current_node, current_result):
                     for r in result:
+                        reasoning_content = ''
                         content = r
                         child_node = {}
                         node_is_end = False
@@ -479,9 +480,12 @@ class WorkflowManage:
                             child_node = {'runtime_node_id': r.get('runtime_node_id'),
                                           'chat_record_id': r.get('chat_record_id')
                                 , 'child_node': r.get('child_node')}
-                            real_node_id = r.get('real_node_id')
-                            node_is_end = r.get('node_is_end')
+                            if r.__contains__('real_node_id'):
+                                real_node_id = r.get('real_node_id')
+                            if r.__contains__('node_is_end'):
+                                node_is_end = r.get('node_is_end')
                             view_type = r.get('view_type')
+                            reasoning_content = r.get('reasoning_content')
                         chunk = self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
                                                                                self.params['chat_record_id'],
                                                                                current_node.id,
@@ -492,7 +496,8 @@ class WorkflowManage:
                                                                                 'view_type': view_type,
                                                                                 'child_node': child_node,
                                                                                 'node_is_end': node_is_end,
-                                                                                'real_node_id': real_node_id})
+                                                                                'real_node_id': real_node_id,
+                                                                                'reasoning_content': reasoning_content})
                         current_node.node_chunk.add_chunk(chunk)
                     chunk = (self.base_to_response
                              .to_stream_chunk_response(self.params['chat_id'],
@@ -504,7 +509,8 @@ class WorkflowManage:
                                                                          'node_type': current_node.type,
                                                                          'view_type': view_type,
                                                                          'child_node': child_node,
-                                                                         'real_node_id': real_node_id}))
+                                                                         'real_node_id': real_node_id,
+                                                                         'reasoning_content': ''}))
                     current_node.node_chunk.add_chunk(chunk)
                 else:
                     list(result)

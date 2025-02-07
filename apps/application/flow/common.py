@@ -9,16 +9,18 @@
 
 
 class Answer:
-    def __init__(self, content, view_type, runtime_node_id, chat_record_id, child_node):
+    def __init__(self, content, view_type, runtime_node_id, chat_record_id, child_node, reasoning_content=None):
         self.view_type = view_type
         self.content = content
+        self.reasoning_content = reasoning_content
         self.runtime_node_id = runtime_node_id
         self.chat_record_id = chat_record_id
         self.child_node = child_node
 
     def to_dict(self):
         return {'view_type': self.view_type, 'content': self.content, 'runtime_node_id': self.runtime_node_id,
-                'chat_record_id': self.chat_record_id, 'child_node': self.child_node}
+                'chat_record_id': self.chat_record_id, 'child_node': self.child_node,
+                'reasoning_content': self.reasoning_content}
 
 
 class NodeChunk:
