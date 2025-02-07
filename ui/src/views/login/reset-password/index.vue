@@ -99,7 +99,7 @@ const rules = ref<FormRules<ResetPasswordRequest>>({
   re_password: [
     {
       required: true,
-      message: t('views.user.userForm.form.re_password.requiredMessage'),,
+      message: t('views.user.userForm.form.re_password.requiredMessage'),
       trigger: 'blur'
     },
     {
