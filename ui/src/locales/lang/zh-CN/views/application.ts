@@ -47,7 +47,7 @@ export default {
         placeholder: '请选择 AI 模型'
       },
       roleSettings: {
-        label: '角色设定',
+        label: '系统角色',
         placeholder: '你是 xxx 小助手'
       },
       prompt: {

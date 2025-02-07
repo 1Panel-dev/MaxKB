@@ -52,7 +52,7 @@ export default {
         placeholder: 'Please select an AI model'
       },
       roleSettings: {
-        label: 'Role settings',
+        label: 'System Role',
         placeholder: 'You are xxx assistant'
       },
 
@@ -75,7 +75,7 @@ export default {
            `
       },
       historyRecord: {
-        label: 'Historical chat records'
+        label: 'Chat History'
       },
       relatedKnowledge: {
         label: 'Related Knowledge',

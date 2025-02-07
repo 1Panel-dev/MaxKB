@@ -179,7 +179,6 @@
                     >
                       <h5 class="p-8-12">
                         {{ $t('views.application.applicationForm.form.roleSettings.label') }}
-                        (System)
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         {{ item.system || '-' }}
@@ -506,7 +505,6 @@
                     >
                       <h5 class="p-8-12">
                         {{ $t('views.application.applicationForm.form.roleSettings.label') }}
-                        (System)
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         {{ item.system || '-' }}

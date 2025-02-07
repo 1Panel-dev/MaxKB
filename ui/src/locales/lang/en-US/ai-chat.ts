@@ -88,7 +88,7 @@ export default {
     title: 'Knowledge Source',
     referenceParagraph: 'Quote',
     consume: 'Tokens',
-    consumeTime: 'Time'
+    consumeTime: 'Run Time'
   },
   paragraphSource: {
     title: 'Knowledge Reference',
