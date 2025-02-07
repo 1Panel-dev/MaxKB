@@ -72,7 +72,7 @@ export default {
       },
       relatedKnowledge: {
         label: '關聯知識庫',
-        placeholder: '關聯知識庫展示在此處'
+        placeholder: '關聯的知識庫展示在這裡'
       },
       multipleRoundsDialogue: '多輪對話',
 

@@ -71,7 +71,7 @@ export default {
       },
       relatedKnowledge: {
         label: '关联知识库',
-        placeholder: '关联知识库展示在这里'
+        placeholder: '关联的知识库展示在这里'
       },
       multipleRoundsDialogue: '多轮对话',
 

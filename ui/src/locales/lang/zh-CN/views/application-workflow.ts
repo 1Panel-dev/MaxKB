@@ -116,7 +116,6 @@ export default {
       is_hit_handling_method_list: '满足直接回答的分段列表',
       result: '检索结果',
       directly_return: '满足直接回答的分段内容',
-      selectDatasetText: '关联的知识库展示在这里',
       searchParam: '检索参数',
       searchQuestion: {
         label: '检索问题',

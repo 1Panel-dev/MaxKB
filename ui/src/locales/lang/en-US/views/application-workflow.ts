@@ -115,7 +115,6 @@ export default {
       is_hit_handling_method_list: 'List of segments that meet direct response criteria',
       result: 'Search Result',
       directly_return: 'Content of segments that meet direct response criteria',
-      selectDatasetText: 'Related knowledge displayed here',
       searchParam: 'Retrieval Parameters',
       searchQuestion: {
         label: 'Question',

@@ -21,7 +21,7 @@
           </template>
           <div class="w-full">
             <el-text type="info" v-if="form_data.dataset_id_list?.length === 0">
-              {{ $t('views.applicationWorkflow.nodes.searchDatasetNode.selectDatasetText') }}
+              {{ $t('views.application.applicationForm.form.relatedKnowledge.placeholder') }}
             </el-text>
             <template v-for="(item, index) in form_data.dataset_id_list" :key="index" v-else>
               <div class="flex-between border border-r-4 white-bg mb-4" style="padding: 5px 8px">

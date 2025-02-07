@@ -22,7 +22,7 @@ export default {
   },
   delete: {
     confirmTitle: 'Confirm deletion of knowledge:',
-    confirmMessage1: 'This knowledge is associated with',
+    confirmMessage1: 'This knowledge is related with',
     confirmMessage2: 'APP. Deleting it will be irreversible, please proceed with caution.'
   },
   datasetForm: {

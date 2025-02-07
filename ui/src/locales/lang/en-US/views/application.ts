@@ -79,7 +79,7 @@ export default {
       },
       relatedKnowledge: {
         label: 'Related Knowledge',
-        placeholder: 'Associated knowledge are displayed here'
+        placeholder: 'Related knowledge are displayed here'
       },
       multipleRoundsDialogue: 'Multiple Rounds Dialogue',
 
