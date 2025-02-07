@@ -1,6 +1,6 @@
 export default {
   node: 'Node',
-  baseComponent: 'Base',
+  baseComponent: 'Basic',
   nodeSetting: 'Node Settings',
   workflow: 'Workflow',
   searchBar: {
@@ -116,9 +116,9 @@ export default {
       result: 'Search Result',
       directly_return: 'Content of segments that meet direct response criteria',
       selectDatasetText: 'Associated knowledge displayed here',
-      searchParam: 'Search Parameters',
+      searchParam: 'Retrieval Parameters',
       searchQuestion: {
-        label: 'Search Question',
+        label: 'Question',
         placeholder: 'Please select a search question',
         requiredMessage: 'Please select a search question'
       }
@@ -165,7 +165,7 @@ export default {
       },
       higher: 'Higher',
       ScoreTooltip: 'The higher the Score, the stronger the relevance.',
-      max_paragraph_char_number: 'Maximum number of words to quote',
+      max_paragraph_char_number: 'Maximum Character',
       reranker_model: {
         label: 'Rerank',
         placeholder: 'Please select a rerank'

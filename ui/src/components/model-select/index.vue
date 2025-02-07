@@ -146,7 +146,7 @@ onMounted(() => {
     }
   }
   .model-icon {
-    width: 20px;
+    width: 18px;
   }
   .check-icon {
     position: absolute;

@@ -41,7 +41,7 @@ export default {
       editParam: 'Edit Parameter',
       addParam: 'Add Parameter',
       paramSetting: 'Model Parameter Settings',
-      apiParamPassing: 'Parameter'
+      apiParamPassing: 'Interface Parameters'
     },
     form: {
       templateName: {
