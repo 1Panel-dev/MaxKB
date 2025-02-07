@@ -33,7 +33,7 @@
         >
       </template>
     </el-table-column>
-    <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')">
+    <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="95">
       <template #default="{ row }">
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">{{
           $t('dynamicsForm.input_type_list.TextInput')

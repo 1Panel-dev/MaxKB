@@ -128,9 +128,9 @@ export default {
       hybridSearch: 'Hybrid Search',
       hybridSearchTooltip:
         'Hybrid search is a retrieval method based on both vector and text similarity, suitable for medium data volumes in the knowledge.',
-      similarityThreshold: 'Similarity Threshold',
+      similarityThreshold: 'Lowest Similarity',
       similarityTooltip: 'The higher the similarity, the stronger the correlation.',
-      topReferences: 'Top N References',
+      topReferences: 'Top N Segments',
       maxCharacters: 'Maximum  Characters per Reference',
       noReferencesAction: 'When there are no knowledge references',
       continueQuestioning: 'Continue to ask questions to the Al model',
@@ -203,9 +203,9 @@ export default {
     copyUrl: 'Copy the link and fill it in'
   },
   hitTest: {
-    title: 'Retrieval Test',
-    text: 'Ensure effective response by matching segments to user inquiries.',
-    emptyMessage1: 'The matching segment is displayed here',
+    title: 'Retrieval Testing',
+    text: 'Test the hitting effect of the Knowledge based on the given query text.',
+    emptyMessage1: 'Retrieval Testing results will show here',
     emptyMessage2: 'No matching sections found'
   }
 }

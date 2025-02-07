@@ -1,12 +1,12 @@
 export default {
   input_type_list: {
-    TextInput: 'Text Input',
+    TextInput: 'Input',
     Slider: 'Slider',
     SwitchInput: 'Switch',
     SingleSelect: 'Single Select',
     MultiSelect: 'Multi Select',
     DatePicker: 'Date Picker',
-    JsonInput: 'JSON Text Input',
+    JsonInput: 'JSON',
     RadioCard: 'Radio Card',
     RadioRow: 'Radio Row'
   },

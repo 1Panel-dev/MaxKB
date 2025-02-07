@@ -2,7 +2,7 @@ export default {
   title: 'Questions',
   createProblem: 'Create Question',
   detailProblem: 'Question Details',
-  quickCreateProblem: 'Quick Create Question',
+  quickCreateProblem: 'Quick Create',
   quickCreateName: 'question',
   tip: {
     placeholder: 'Enter the question, support multiple entries, one per line.',
@@ -12,14 +12,14 @@ export default {
   },
 
   setting: {
-    batchDelete: 'Batch Delete',
+    batchDelete: 'Bulk Delete',
     cancelRelated: 'Cancel Association'
   },
   searchBar: {
     placeholder: 'Search by name'
   },
   table: {
-    paragraph_count: 'Associated Segments',
+    paragraph_count: 'Linked Segments',
     updateTime: 'Update Time'
   },
   delete: {
@@ -28,10 +28,10 @@ export default {
     confirmMessage2: 'segments. Please proceed with caution.'
   },
   relateParagraph: {
-    title: 'Associate Segments',
-    selectDocument: 'Select Document',
-    placeholder: 'Search by document name',
-    selectParagraph: 'Select Segment',
+    title: 'Link to Segment',
+    selectDocument: 'Select a Document',
+    placeholder: 'Search document by name',
+    selectParagraph: 'Select Segments',
     selectedParagraph: 'Selected Segments',
     count: 'Count'
   }
