@@ -460,6 +460,7 @@ class WorkflowManage:
         self.node_context.append(current_node)
 
     def hand_event_node_result(self, current_node, node_result_future):
+        runtime_node_id = current_node.runtime_node_id
         real_node_id = current_node.runtime_node_id
         child_node = {}
         view_type = current_node.view_type
@@ -487,7 +488,7 @@ class WorkflowManage:
                                                                                current_node.up_node_id_list,
                                                                                content, False, 0, 0,
                                                                                {'node_type': current_node.type,
-                                                                                'runtime_node_id': real_node_id,
+                                                                                'runtime_node_id': runtime_node_id,
                                                                                 'view_type': view_type,
                                                                                 'child_node': child_node,
                                                                                 'node_is_end': node_is_end,
@@ -499,7 +500,7 @@ class WorkflowManage:
                                                        current_node.id,
                                                        current_node.up_node_id_list,
                                                        '', False, 0, 0, {'node_is_end': True,
-                                                                         'runtime_node_id': real_node_id,
+                                                                         'runtime_node_id': runtime_node_id,
                                                                          'node_type': current_node.type,
                                                                          'view_type': view_type,
                                                                          'child_node': child_node,
