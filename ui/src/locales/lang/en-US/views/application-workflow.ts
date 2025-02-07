@@ -1,6 +1,6 @@
 export default {
   node: 'Node',
-  baseComponent: 'Base Component',
+  baseComponent: 'Base',
   nodeSetting: 'Node Settings',
   workflow: 'Workflow',
   searchBar: {
@@ -18,7 +18,8 @@ export default {
     releaseHistory: 'Release History',
     autoSave: 'Auto Save',
     latestRelease: 'Latest Release',
-    copyParam: 'Copy Parameters'
+    copyParam: 'Copy Parameters',
+    debug: 'Run',
   },
   tip: {
     publicSuccess: 'Published successfully',
@@ -114,7 +115,7 @@ export default {
       is_hit_handling_method_list: 'List of segments that meet direct response criteria',
       result: 'Search Result',
       directly_return: 'Content of segments that meet direct response criteria',
-      selectDatasetText: 'Associated knowledge displayed here',
+      selectDatasetText: 'Related knowledge displayed here',
       searchParam: 'Search Parameters',
       searchQuestion: {
         label: 'Search Question',

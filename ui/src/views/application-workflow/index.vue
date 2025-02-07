@@ -30,7 +30,7 @@
         <el-button icon="Plus" @click="showPopover = !showPopover"> {{ $t('views.applicationWorkflow.setting.addComponent') }} </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug">
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
-          {{ $t('common.debug') }}</el-button
+          {{ $t('views.applicationWorkflow.setting.debug') }}</el-button
         >
         <el-button @click="saveApplication(true)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>

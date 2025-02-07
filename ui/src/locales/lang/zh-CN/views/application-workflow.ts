@@ -18,7 +18,8 @@ export default {
     releaseHistory: '发布历史',
     autoSave: '自动保存',
     latestRelease: '最近发布',
-    copyParam: '复制参数'
+    copyParam: '复制参数',
+    debug: '调试',
   },
   tip: {
     publicSuccess: '发布成功',
