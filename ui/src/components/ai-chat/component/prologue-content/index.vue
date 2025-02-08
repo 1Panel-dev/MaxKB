@@ -7,7 +7,11 @@
     </div>
     <div class="content" v-if="prologue">
       <el-card shadow="always" class="dialog-card" style="--el-card-padding: 10px 16px 12px">
-        <MdRenderer :source="prologue" :send-message="sendMessage"></MdRenderer>
+        <MdRenderer
+          :source="prologue"
+          :send-message="sendMessage"
+          reasoning_content=""
+        ></MdRenderer>
       </el-card>
     </div>
   </div>
@@ -27,9 +31,7 @@ const toQuickQuestion = (match: string, offset: number, input: string) => {
   return `<quick_question>${match.replace('- ', '')}</quick_question>`
 }
 const prologue = computed(() => {
-  const temp = props.available
-    ? props.application?.prologue
-    : t('chat.tip.prologueMessage')
+  const temp = props.available ? props.application?.prologue : t('chat.tip.prologueMessage')
   return temp?.replace(/-\s.+/g, toQuickQuestion)
 })
 </script>

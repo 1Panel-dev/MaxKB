@@ -97,6 +97,12 @@ export default {
         browser: '瀏覽器播放(免費)',
         tts: 'TTS模型',
         listeningTest: '試聽'
+      },
+      reasoningContent: {
+        label: '輸出思考',
+        tooltip:'請根據模型返回的思考標簽設置，標簽中間的內容將爲認定爲思考過程',
+        start: '開始',
+        end: '結束',
       }
     },
     buttons: {

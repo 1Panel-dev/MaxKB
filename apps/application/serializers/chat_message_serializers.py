@@ -22,6 +22,7 @@ from application.chat_pipeline.step.generate_human_message_step.impl.base_genera
     BaseGenerateHumanMessageStep
 from application.chat_pipeline.step.reset_problem_step.impl.base_reset_problem_step import BaseResetProblemStep
 from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset_step import BaseSearchDatasetStep
+from application.flow.common import Answer
 from application.flow.i_step_node import WorkFlowPostHandler
 from application.flow.workflow_manage import WorkflowManage, Flow
 from application.models import ChatRecord, Chat, Application, ApplicationDatasetMapping, ApplicationTypeChoices, \
@@ -104,6 +105,7 @@ class ChatInfo:
             'model_id': model_id,
             'problem_optimization': self.application.problem_optimization,
             'stream': True,
+            'model_setting': model_setting,
             'model_params_setting': model_params_setting if self.application.model_params_setting is None or len(
                 self.application.model_params_setting.keys()) == 0 else self.application.model_params_setting,
             'search_mode': self.application.dataset_setting.get(
@@ -157,6 +159,8 @@ def get_post_handler(chat_info: ChatInfo):
                     padding_problem_text: str = None,
                     client_id=None,
                     **kwargs):
+            answer_list = [[Answer(answer_text, 'ai-chat-node', 'ai-chat-node', 'ai-chat-node', {}, 'ai-chat-node',
+                                   kwargs.get('reasoning_content', '')).to_dict()]]
             chat_record = ChatRecord(id=chat_record_id,
                                      chat_id=chat_id,
                                      problem_text=problem_text,
@@ -164,7 +168,7 @@ def get_post_handler(chat_info: ChatInfo):
                                      details=manage.get_details(),
                                      message_tokens=manage.context['message_tokens'],
                                      answer_tokens=manage.context['answer_tokens'],
-                                     answer_text_list=[answer_text],
+                                     answer_text_list=answer_list,
                                      run_time=manage.context['run_time'],
                                      index=len(chat_info.chat_record_list) + 1)
             chat_info.append_chat_record(chat_record, client_id)
@@ -242,15 +246,18 @@ class ChatMessageSerializer(serializers.Serializer):
     runtime_node_id = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                             error_messages=ErrMessage.char(_("Runtime node id")))
 
-    node_data = serializers.DictField(required=False, allow_null=True, error_messages=ErrMessage.char(_("Node parameters")))
-    application_id = serializers.UUIDField(required=False, allow_null=True, error_messages=ErrMessage.uuid(_("Application ID")))
+    node_data = serializers.DictField(required=False, allow_null=True,
+                                      error_messages=ErrMessage.char(_("Node parameters")))
+    application_id = serializers.UUIDField(required=False, allow_null=True,
+                                           error_messages=ErrMessage.uuid(_("Application ID")))
     client_id = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Client id")))
     client_type = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Client Type")))
     form_data = serializers.DictField(required=False, error_messages=ErrMessage.char(_("Global variables")))
     image_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("picture")))
     document_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("document")))
     audio_list = serializers.ListField(required=False, error_messages=ErrMessage.list(_("Audio")))
-    child_node = serializers.DictField(required=False, allow_null=True, error_messages=ErrMessage.dict(_("Child Nodes")))
+    child_node = serializers.DictField(required=False, allow_null=True,
+                                       error_messages=ErrMessage.dict(_("Child Nodes")))
 
     def is_valid_application_workflow(self, *, raise_exception=False):
         self.is_valid_intraday_access_num()

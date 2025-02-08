@@ -65,15 +65,20 @@ class IChatStep(IBaseChatPipelineStep):
         post_response_handler = InstanceField(model_type=PostResponseHandler,
                                               error_messages=ErrMessage.base(_("Post-processor")))
         # 补全问题
-        padding_problem_text = serializers.CharField(required=False, error_messages=ErrMessage.base(_("Completion Question")))
+        padding_problem_text = serializers.CharField(required=False,
+                                                     error_messages=ErrMessage.base(_("Completion Question")))
         # 是否使用流的形式输出
         stream = serializers.BooleanField(required=False, error_messages=ErrMessage.base(_("Streaming Output")))
         client_id = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Client id")))
         client_type = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Client Type")))
         # 未查询到引用分段
-        no_references_setting = NoReferencesSetting(required=True, error_messages=ErrMessage.base(_("No reference segment settings")))
+        no_references_setting = NoReferencesSetting(required=True,
+                                                    error_messages=ErrMessage.base(_("No reference segment settings")))
 
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
+
+        model_setting = serializers.DictField(required=True, allow_null=True,
+                                              error_messages=ErrMessage.dict(_("Model settings")))
 
         model_params_setting = serializers.DictField(required=False, allow_null=True,
                                                      error_messages=ErrMessage.dict(_("Model parameter settings")))
@@ -101,5 +106,5 @@ class IChatStep(IBaseChatPipelineStep):
                 paragraph_list=None,
                 manage: PipelineManage = None,
                 padding_problem_text: str = None, stream: bool = True, client_id=None, client_type=None,
-                no_references_setting=None, model_params_setting=None, **kwargs):
+                no_references_setting=None, model_params_setting=None, model_setting=None, **kwargs):
         pass

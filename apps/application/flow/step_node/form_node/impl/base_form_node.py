@@ -75,7 +75,8 @@ class BaseFormNode(IFormNode):
         form_content_format = self.workflow_manage.reset_prompt(form_content_format)
         prompt_template = PromptTemplate.from_template(form_content_format, template_format='jinja2')
         value = prompt_template.format(form=form, context=context)
-        return [Answer(value, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], None)]
+        return [Answer(value, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], None,
+                       self.runtime_node_id, '')]
 
     def get_details(self, index: int, **kwargs):
         form_content_format = self.context.get('form_content_format')

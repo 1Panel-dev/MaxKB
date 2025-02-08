@@ -114,7 +114,8 @@ export default {
         tooltip: `关闭后该节点的内容则不输出给用户。
                   如果你想让用户看到该节点的输出内容，请打开开关。`
       },
-      defaultPrompt: '已知信息'
+      defaultPrompt: '已知信息',
+      think: '思考过程',
     },
     searchDatasetNode: {
       label: '知识库检索',

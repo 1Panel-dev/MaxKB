@@ -28,8 +28,9 @@ class ChatNodeSerializer(serializers.Serializer):
                                          error_messages=ErrMessage.boolean(_('Whether to return content')))
 
     model_params_setting = serializers.DictField(required=False,
-                                                 error_messages=ErrMessage.integer(_("Model parameter settings")))
-
+                                                 error_messages=ErrMessage.dict(_("Model parameter settings")))
+    model_setting = serializers.DictField(required=False,
+                                          error_messages=ErrMessage.dict('Model settings'))
     dialogue_type = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                           error_messages=ErrMessage.char(_("Context Type")))
 
@@ -47,5 +48,6 @@ class IChatNode(INode):
                 chat_record_id,
                 model_params_setting=None,
                 dialogue_type=None,
+                model_setting=None,
                 **kwargs) -> NodeResult:
         pass

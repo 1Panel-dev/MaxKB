@@ -62,7 +62,9 @@ class WorkFlowPostHandler:
         answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
                              'answer_tokens' in row and row.get('answer_tokens') is not None])
         answer_text_list = workflow.get_answer_text_list()
-        answer_text = '\n\n'.join(answer['content'] for answer in answer_text_list)
+        answer_text = '\n\n'.join(
+            '\n\n'.join([a.get('content') for a in answer]) for answer in
+            answer_text_list)
         if workflow.chat_record is not None:
             chat_record = workflow.chat_record
             chat_record.answer_text = answer_text
@@ -157,8 +159,10 @@ class INode:
     def get_answer_list(self) -> List[Answer] | None:
         if self.answer_text is None:
             return None
+        reasoning_content_enable = self.context.get('model_setting', {}).get('reasoning_content_enable', False)
         return [
-            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], {})]
+            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], {},
+                   self.runtime_node_id, self.context.get('reasoning_content', '') if reasoning_content_enable else '')]
 
     def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None,
                  get_node_params=lambda node: node.properties.get('node_data')):

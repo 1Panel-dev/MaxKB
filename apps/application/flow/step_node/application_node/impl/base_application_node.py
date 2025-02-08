@@ -19,7 +19,8 @@ def _is_interrupt_exec(node, node_variable: Dict, workflow_variable: Dict):
     return node_variable.get('is_interrupt_exec', False)
 
 
-def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
+def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
+                   reasoning_content: str):
     result = node_variable.get('result')
     node.context['application_node_dict'] = node_variable.get('application_node_dict')
     node.context['node_dict'] = node_variable.get('node_dict', {})
@@ -28,6 +29,7 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['answer_tokens'] = result.get('usage', {}).get('completion_tokens', 0)
     node.context['answer'] = answer
     node.context['result'] = answer
+    node.context['reasoning_content'] = reasoning_content
     node.context['question'] = node_variable['question']
     node.context['run_time'] = time.time() - node.context['start_time']
     if workflow.is_result(node, NodeResult(node_variable, workflow_variable)):
@@ -44,6 +46,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     """
     response = node_variable.get('result')
     answer = ''
+    reasoning_content = ''
     usage = {}
     node_child_node = {}
     application_node_dict = node.context.get('application_node_dict', {})
@@ -60,9 +63,11 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         node_type = response_content.get('node_type')
         real_node_id = response_content.get('real_node_id')
         node_is_end = response_content.get('node_is_end', False)
+        _reasoning_content = response_content.get('reasoning_content', '')
         if node_type == 'form-node':
             is_interrupt_exec = True
         answer += content
+        reasoning_content += _reasoning_content
         node_child_node = {'runtime_node_id': runtime_node_id, 'chat_record_id': chat_record_id,
                            'child_node': child_node}
 
@@ -75,13 +80,16 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
                                                        'chat_record_id': chat_record_id,
                                                        'child_node': child_node,
                                                        'index': len(application_node_dict),
-                                                       'view_type': view_type}
+                                                       'view_type': view_type,
+                                                       'reasoning_content': _reasoning_content}
             else:
                 application_node['content'] += content
+                application_node['reasoning_content'] += _reasoning_content
 
         yield {'content': content,
                'node_type': node_type,
                'runtime_node_id': runtime_node_id, 'chat_record_id': chat_record_id,
+               'reasoning_content': _reasoning_content,
                'child_node': child_node,
                'real_node_id': real_node_id,
                'node_is_end': node_is_end,
@@ -91,7 +99,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     node_variable['is_interrupt_exec'] = is_interrupt_exec
     node_variable['child_node'] = node_child_node
     node_variable['application_node_dict'] = application_node_dict
-    _write_context(node_variable, workflow_variable, node, workflow, answer)
+    _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
 def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
@@ -106,7 +114,8 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     node_variable['result'] = {'usage': {'completion_tokens': response.get('completion_tokens'),
                                          'prompt_tokens': response.get('prompt_tokens')}}
     answer = response.get('content', '') or "抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
-    _write_context(node_variable, workflow_variable, node, workflow, answer)
+    reasoning_content = response.get('reasoning_content', '')
+    _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
 def reset_application_node_dict(application_node_dict, runtime_node_id, node_data):
@@ -139,18 +148,22 @@ class BaseApplicationNode(IApplicationNode):
         if application_node_dict is None or len(application_node_dict) == 0:
             return [
                 Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'],
-                       self.context.get('child_node'))]
+                       self.context.get('child_node'), self.runtime_node_id, '')]
         else:
             return [Answer(n.get('content'), n.get('view_type'), self.runtime_node_id,
                            self.workflow_params['chat_record_id'], {'runtime_node_id': n.get('runtime_node_id'),
                                                                     'chat_record_id': n.get('chat_record_id')
-                               , 'child_node': n.get('child_node')}) for n in
+                               , 'child_node': n.get('child_node')}, n.get('real_node_id'),
+                           n.get('reasoning_content', ''))
+                    for n in
                     sorted(application_node_dict.values(), key=lambda item: item.get('index'))]
 
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
+        self.context['result'] = details.get('answer')
         self.context['question'] = details.get('question')
         self.context['type'] = details.get('type')
+        self.context['reasoning_content'] = details.get('reasoning_content')
         self.answer_text = details.get('answer')
 
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat, client_id, client_type,
@@ -229,6 +242,7 @@ class BaseApplicationNode(IApplicationNode):
             'run_time': self.context.get('run_time'),
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
+            'reasoning_content': self.context.get('reasoning_content'),
             'type': self.node.type,
             'message_tokens': self.context.get('message_tokens'),
             'answer_tokens': self.context.get('answer_tokens'),

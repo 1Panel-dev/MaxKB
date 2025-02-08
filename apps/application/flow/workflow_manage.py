@@ -470,6 +470,7 @@ class WorkflowManage:
             if result is not None:
                 if self.is_result(current_node, current_result):
                     for r in result:
+                        reasoning_content = ''
                         content = r
                         child_node = {}
                         node_is_end = False
@@ -479,9 +480,12 @@ class WorkflowManage:
                             child_node = {'runtime_node_id': r.get('runtime_node_id'),
                                           'chat_record_id': r.get('chat_record_id')
                                 , 'child_node': r.get('child_node')}
-                            real_node_id = r.get('real_node_id')
-                            node_is_end = r.get('node_is_end')
+                            if r.__contains__('real_node_id'):
+                                real_node_id = r.get('real_node_id')
+                            if r.__contains__('node_is_end'):
+                                node_is_end = r.get('node_is_end')
                             view_type = r.get('view_type')
+                            reasoning_content = r.get('reasoning_content')
                         chunk = self.base_to_response.to_stream_chunk_response(self.params['chat_id'],
                                                                                self.params['chat_record_id'],
                                                                                current_node.id,
@@ -492,7 +496,8 @@ class WorkflowManage:
                                                                                 'view_type': view_type,
                                                                                 'child_node': child_node,
                                                                                 'node_is_end': node_is_end,
-                                                                                'real_node_id': real_node_id})
+                                                                                'real_node_id': real_node_id,
+                                                                                'reasoning_content': reasoning_content})
                         current_node.node_chunk.add_chunk(chunk)
                     chunk = (self.base_to_response
                              .to_stream_chunk_response(self.params['chat_id'],
@@ -504,7 +509,8 @@ class WorkflowManage:
                                                                          'node_type': current_node.type,
                                                                          'view_type': view_type,
                                                                          'child_node': child_node,
-                                                                         'real_node_id': real_node_id}))
+                                                                         'real_node_id': real_node_id,
+                                                                         'reasoning_content': ''}))
                     current_node.node_chunk.add_chunk(chunk)
                 else:
                     list(result)
@@ -516,7 +522,7 @@ class WorkflowManage:
                                                                    self.params['chat_record_id'],
                                                                    current_node.id,
                                                                    current_node.up_node_id_list,
-                                                                   str(e), False, 0, 0,
+                                                                   'Exception:' + str(e), False, 0, 0,
                                                                    {'node_is_end': True,
                                                                     'runtime_node_id': current_node.runtime_node_id,
                                                                     'node_type': current_node.type,
@@ -603,20 +609,19 @@ class WorkflowManage:
             if len(current_answer.content) > 0:
                 if up_node is None or current_answer.view_type == 'single_view' or (
                         current_answer.view_type == 'many_view' and up_node.view_type == 'single_view'):
-                    result.append(current_answer)
+                    result.append([current_answer])
                 else:
                     if len(result) > 0:
                         exec_index = len(result) - 1
-                        content = result[exec_index].content
-                        result[exec_index].content += current_answer.content if len(
-                            content) == 0 else ('\n\n' + current_answer.content)
+                        if isinstance(result[exec_index], list):
+                            result[exec_index].append(current_answer)
                     else:
-                        result.insert(0, current_answer)
+                        result.insert(0, [current_answer])
                 up_node = current_answer
         if len(result) == 0:
             # 如果没有响应 就响应一个空数据
-            return [Answer('', '', '', '', {}).to_dict()]
-        return [r.to_dict() for r in result]
+            return [[]]
+        return [[item.to_dict() for item in r] for r in result]
 
     def get_next_node(self):
         """

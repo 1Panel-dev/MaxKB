@@ -14,14 +14,17 @@ from django.db.models import QuerySet
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_core.messages import BaseMessage, AIMessage
 
+from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
+from application.flow.tools import Reasoning
 from setting.models import Model
 from setting.models_provider import get_model_credential
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 
 
-def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
+def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
+                   reasoning_content: str):
     chat_model = node_variable.get('chat_model')
     message_tokens = chat_model.get_num_tokens_from_messages(node_variable.get('message_list'))
     answer_tokens = chat_model.get_num_tokens(answer)
@@ -31,6 +34,7 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['history_message'] = node_variable['history_message']
     node.context['question'] = node_variable['question']
     node.context['run_time'] = time.time() - node.context['start_time']
+    node.context['reasoning_content'] = reasoning_content
     if workflow.is_result(node, NodeResult(node_variable, workflow_variable)):
         node.answer_text = answer
 
@@ -45,10 +49,27 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     """
     response = node_variable.get('result')
     answer = ''
+    reasoning_content = ''
+    model_setting = node.context.get('model_setting',
+                                     {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
+                                      'reasoning_content_start': '<think>'})
+    reasoning = Reasoning(model_setting.get('reasoning_content_start', '<think>'),
+                          model_setting.get('reasoning_content_end', '</think>'))
     for chunk in response:
-        answer += chunk.content
-        yield chunk.content
-    _write_context(node_variable, workflow_variable, node, workflow, answer)
+        reasoning_chunk = reasoning.get_reasoning_content(chunk)
+        content_chunk = reasoning_chunk.get('content')
+        if 'reasoning_content' in chunk.additional_kwargs:
+            reasoning_content_chunk = chunk.additional_kwargs.get('reasoning_content', '')
+        else:
+            reasoning_content_chunk = reasoning_chunk.get('reasoning_content')
+        answer += content_chunk
+        if reasoning_content_chunk is None:
+            reasoning_content_chunk = ''
+        reasoning_content += reasoning_content_chunk
+        yield {'content': content_chunk,
+               'reasoning_content': reasoning_content_chunk if model_setting.get('reasoning_content_enable',
+                                                                                 False) else ''}
+    _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
 def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
@@ -60,8 +81,17 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     @param workflow:           工作流管理器
     """
     response = node_variable.get('result')
-    answer = response.content
-    _write_context(node_variable, workflow_variable, node, workflow, answer)
+    model_setting = node.context.get('model_setting',
+                                     {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
+                                      'reasoning_content_start': '<think>'})
+    reasoning = Reasoning(model_setting.get('reasoning_content_start'), model_setting.get('reasoning_content_end'))
+    reasoning_result = reasoning.get_reasoning_content(response)
+    content = reasoning_result.get('content')
+    if 'reasoning_content' in response.response_metadata:
+        reasoning_content = response.response_metadata.get('reasoning_content', '')
+    else:
+        reasoning_content = reasoning_result.get('reasoning_content')
+    _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 
 def get_default_model_params_setting(model_id):
@@ -92,17 +122,23 @@ class BaseChatNode(IChatNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
         self.context['question'] = details.get('question')
+        self.context['reasoning_content'] = details.get('reasoning_content')
         self.answer_text = details.get('answer')
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,
                 dialogue_type=None,
+                model_setting=None,
                 **kwargs) -> NodeResult:
         if dialogue_type is None:
             dialogue_type = 'WORKFLOW'
 
         if model_params_setting is None:
             model_params_setting = get_default_model_params_setting(model_id)
+        if model_setting is None:
+            model_setting = {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
+                             'reasoning_content_start': '<think>'}
+        self.context['model_setting'] = model_setting
         chat_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'),
                                                          **model_params_setting)
         history_message = self.get_history_message(history_chat_record, dialogue_number, dialogue_type,
@@ -164,6 +200,7 @@ class BaseChatNode(IChatNode):
                                     'history_message') is not None else [])],
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
+            'reasoning_content': self.context.get('reasoning_content'),
             'type': self.node.type,
             'message_tokens': self.context.get('message_tokens'),
             'answer_tokens': self.context.get('answer_tokens'),

@@ -10,19 +10,23 @@
           <MdRenderer
             v-if="
               (chatRecord.write_ed === undefined || chatRecord.write_ed === true) &&
-              !answer_text.content
+              answer_text.length == 0
             "
             :source="$t('chat.tip.answerMessage')"
           ></MdRenderer>
-          <MdRenderer
-            :chat_record_id="answer_text.chat_record_id"
-            :child_node="answer_text.child_node"
-            :runtime_node_id="answer_text.runtime_node_id"
-            :disabled="loading || type == 'log'"
-            v-else-if="answer_text.content"
-            :source="answer_text.content"
-            :send-message="chatMessage"
-          ></MdRenderer>
+          <template v-else-if="answer_text.length > 0">
+            <MdRenderer
+              v-for="(answer, index) in answer_text"
+              :key="index"
+              :chat_record_id="answer.chat_record_id"
+              :child_node="answer.child_node"
+              :runtime_node_id="answer.runtime_node_id"
+              :reasoning_content="answer.reasoning_content"
+              :disabled="loading || type == 'log'"
+              :source="answer.content"
+              :send-message="chatMessage"
+            ></MdRenderer>
+          </template>
           <span v-else-if="chatRecord.is_stop" shadow="always" class="dialog-card">
             {{ $t('chat.tip.stopAnswer') }}
           </span>
@@ -90,9 +94,20 @@ const openControl = (event: any) => {
 const answer_text_list = computed(() => {
   return props.chatRecord.answer_text_list.map((item) => {
     if (typeof item == 'string') {
-      return { content: item }
+      return [
+        {
+          content: item,
+          chat_record_id: undefined,
+          child_node: undefined,
+          runtime_node_id: undefined,
+          reasoning_content: undefined
+        }
+      ]
+    } else if (item instanceof Array) {
+      return item
+    } else {
+      return [item]
     }
-    return item
   })
 })
 

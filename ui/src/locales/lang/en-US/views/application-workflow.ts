@@ -113,7 +113,8 @@ export default {
         tooltip: `If turned off, the content of this node will not be output to the user.
                   If you want the user to see the output of this node, please turn on the switch.`
       },
-      defaultPrompt: 'Known Information'
+      defaultPrompt: 'Known Information',
+      think: 'Thinking Process',
     },
     searchDatasetNode: {
       label: 'Knowledge Retrieval',
