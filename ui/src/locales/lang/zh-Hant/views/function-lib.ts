@@ -39,11 +39,6 @@ export default {
         label: '權限',
         requiredMessage: '請選擇'
       },
-      inputParam: {
-        label: '輸入參數',
-        placeholder: '請輸入參數值',
-        requiredMessage: '請輸入參數值'
-      },
       paramName: {
         label: '參數名',
         placeholder: '請輸入參數名',
@@ -61,10 +56,11 @@ export default {
         label: '是否必填'
       },
       param: {
-        outputParam: '輸出參數',
         paramInfo1: '使用函數時顯示',
         paramInfo2: '使用函數時不顯示',
-        code: '函数内容（Python）'
+        code: '函数内容（Python）',
+        selectPlaceholder: '請选择參數',
+        inputPlaceholder: '請輸入參數值',
       },
       debug: {
         run: '運行',

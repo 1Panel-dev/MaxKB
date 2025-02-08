@@ -82,6 +82,13 @@ export default {
     },
     baseNode: {
       label: '基本信息',
+      appName: {
+        label: '应用名称',
+    
+      },
+      appDescription: {
+        label: '应用描述',
+       },
       fileUpload: {
         label: '文件上传',
         tooltip: '开启后，问答页面会显示上传文件的按钮。'

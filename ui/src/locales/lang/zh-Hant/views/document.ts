@@ -9,10 +9,10 @@ export default {
   },
   setting: {
     migration: '遷移',
-
     cancelGenerateQuestion: '取消生成問題',
     cancelVectorization: '取消向量化',
-    cancelGenerate: '取消生成'
+    cancelGenerate: '取消生成',
+    export: '匯出',
   },
   tip: {
     saveMessage: '當前的更改尚未保存，確認退出嗎?',

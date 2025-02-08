@@ -300,10 +300,10 @@ const drawerTitle = computed(
 const infoTitle = computed(
   () =>
     ({
-      wechat: t('views.application.applicationAccess.info'),
-      dingtalk: t('views.application.applicationAccess.info'),
-      wecom: t('views.application.applicationAccess.info'),
-      feishu: t('views.application.applicationAccess.info')
+      wechat: t('views.applicationOverview.appInfo.header'),
+      dingtalk: t('views.applicationOverview.appInfo.header'),
+      wecom: t('views.applicationOverview.appInfo.header'),
+      feishu: t('views.applicationOverview.appInfo.header')
     })[configType.value]
 )
 

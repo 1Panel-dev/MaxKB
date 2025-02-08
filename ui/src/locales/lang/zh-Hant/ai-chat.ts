@@ -63,8 +63,6 @@ export default {
   },
   executionDetails: {
     title: '執行詳細',
-    paramInput: '參數輸入',
-    paramOutput: '參數輸出',
     paramOutputTooltip: '每個文件僅支持預覽 500 字',
     audioFile: '語音文件',
     searchContent: '檢索內容',

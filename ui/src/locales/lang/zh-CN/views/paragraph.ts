@@ -1,5 +1,6 @@
 export default {
   title: '段落',
+  paragraph_count: '段落',
   editParagraph: '编辑分段',
   addParagraph: '添加分段',
   paragraphDetail: '分段详情',

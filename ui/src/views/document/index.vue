@@ -324,11 +324,11 @@
                         </el-dropdown-item>
                         <el-dropdown-item @click="exportDocument(row)">
                           <AppIcon iconName="app-export"></AppIcon>
-                          {{ $t('common.export') }}Excel
+                          {{ $t('views.document.setting.export') }} Excel
                         </el-dropdown-item>
                         <el-dropdown-item @click="exportDocumentZip(row)">
                           <AppIcon iconName="app-export"></AppIcon>
-                          {{ $t('common.export') }}Zip
+                          {{ $t('views.document.setting.export') }} Zip
                         </el-dropdown-item>
                         <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">{{
                           $t('common.delete')
@@ -413,11 +413,11 @@
                         >
                         <el-dropdown-item @click="exportDocument(row)">
                           <AppIcon iconName="app-export"></AppIcon>
-                          {{ $t('common.export') }}Excel
+                          {{ $t('views.document.setting.export') }} Excel
                         </el-dropdown-item>
                         <el-dropdown-item @click="exportDocumentZip(row)">
                           <AppIcon iconName="app-export"></AppIcon>
-                          {{ $t('common.export') }}Zip
+                          {{ $t('views.document.setting.export') }} Zip
                         </el-dropdown-item>
                         <el-dropdown-item icon="Delete" @click.stop="deleteDocument(row)">{{
                           $t('common.delete')

@@ -13,7 +13,7 @@
     <div>
       <div v-if="form.debug_field_list.length > 0" class="mb-16">
         <h4 class="title-decoration-1 mb-16">
-          {{ $t('views.functionLib.functionForm.form.inputParam.label') }}
+          {{ $t('common.param.inputParam') }}
         </h4>
         <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
           <el-form
@@ -30,7 +30,7 @@
                 :prop="'debug_field_list.' + index + '.value'"
                 :rules="{
                   required: item.is_required,
-                  message: $t('views.functionLib.functionForm.form.inputParam.requiredMessage'),
+                  message: $t('views.functionLib.functionForm.form.param.inputPlaceholder'),
                   trigger: 'blur'
                 }"
               >
@@ -44,7 +44,7 @@
                 </template>
                 <el-input
                   v-model="item.value"
-                  :placeholder="$t('views.functionLib.functionForm.form.inputParam.requiredMessage')"
+                  :placeholder="$t('views.functionLib.functionForm.form.param.inputPlaceholder')"
                 />
               </el-form-item>
             </template>

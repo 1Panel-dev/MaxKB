@@ -11,7 +11,8 @@ export default {
     migration: 'Move',
     cancelGenerateQuestion: 'Cancel Generating Questions',
     cancelVectorization: 'Cancel Vectorization',
-    cancelGenerate: 'Cancel Generation'
+    cancelGenerate: 'Cancel Generation',
+    export: 'Export to',
   },
   tip: {
     saveMessage: 'Current changes have not been saved. Confirm exit?',
@@ -171,7 +172,7 @@ export default {
     tip3: 'tags, and the system will automatically relate the questions within these tags;',
     tip4: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.',
     prompt1:
-      'Content: {data}\n \n Please summarize the above content and generate a summary based on the content 5 a question. \nAnswer requirements: \n - Please output only questions; \n - Please place each question in',
+      'Content: {data}\n \n Please summarize the above and generate 5 questions based on the summary. \nAnswer requirements: \n - Please output only questions; \n - Please place each question in',
     prompt2: 'tag.'
   }
 }

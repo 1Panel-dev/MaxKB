@@ -63,8 +63,6 @@ export default {
   },
   executionDetails: {
     title: 'Execution Details',
-    paramInput: 'Parameter Input',
-    paramOutput: 'Parameter Output',
     paramOutputTooltip: 'Each document supports previewing up to 500 characters',
     audioFile: 'Audio File',
     searchContent: 'Search Query',
