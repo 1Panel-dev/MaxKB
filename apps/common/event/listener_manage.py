@@ -9,6 +9,7 @@
 import logging
 import os
 import threading
+import datetime
 import traceback
 from typing import List
 
@@ -229,9 +230,11 @@ class ListenerManagement:
         next_index = taskType.value + 1
         current_index = taskType.value
         status_number = state.value
+        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') + '+00'
         params_dict = {'${bit_number}': bit_number, '${up_index}': up_index,
                        '${status_number}': status_number, '${next_index}': next_index,
-                       '${table_name}': query_set.model._meta.db_table, '${current_index}': current_index}
+                       '${table_name}': query_set.model._meta.db_table, '${current_index}': current_index,
+                       '${current_time}': current_time}
         for key in params_dict:
             _value_ = params_dict[key]
             exec_sql = exec_sql.replace(key, str(_value_))

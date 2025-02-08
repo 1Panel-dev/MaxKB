@@ -6,8 +6,8 @@ status_meta = jsonb_set (
 		"${table_name}".status_meta,
 		'{state_time,${current_index}}',
 		jsonb_set (
-			COALESCE ( "${table_name}".status_meta #> '{state_time,${current_index}}', jsonb_build_object ( '${status_number}', now( ) ) ),
+			COALESCE ( "${table_name}".status_meta #> '{state_time,${current_index}}', jsonb_build_object ( '${status_number}', '${current_time}' ) ),
 			'{${status_number}}',
-			CONCAT ( '"', now( ), '"' ) :: JSONB
+			CONCAT ( '"', '${current_time}', '"' ) :: JSONB
 		)
 	)
