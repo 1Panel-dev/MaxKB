@@ -7,7 +7,7 @@ export default {
   authentication: {
     title: '登录认证',
     ldap: {
-      title: 'LDAP 设置',
+      title: 'LDAP',
       address: 'LDAP 地址',
       serverPlaceholder: '请输入LDAP 地址',
       bindDN: '绑定DN',
@@ -21,7 +21,7 @@ export default {
       enableAuthentication: '启用 LDAP 认证'
     },
     cas: {
-      title: 'CAS 设置',
+      title: 'CAS',
       ldpUri: 'ldpUri',
       ldpUriPlaceholder: '请输入ldpUri',
       validateUrl: '验证地址',
@@ -31,7 +31,7 @@ export default {
       enableAuthentication: '启用 CAS 认证'
     },
     oidc: {
-      title: 'OIDC 设置',
+      title: 'OIDC',
       authEndpoint: '授权端地址',
       authEndpointPlaceholder: '请输入授权端地址',
       tokenEndpoint: 'Token端地址',
@@ -50,7 +50,7 @@ export default {
     },
 
     oauth2: {
-      title: 'OAuth2 设置',
+      title: 'OAuth2',
       authEndpoint: '授权端地址',
       authEndpointPlaceholder: '请输入授权端地址',
       tokenEndpoint: 'Token 端地址',

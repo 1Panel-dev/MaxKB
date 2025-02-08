@@ -7,7 +7,7 @@ export default {
   authentication: {
     title: '登入認證',
     ldap: {
-      title: 'LDAP 設定',
+      title: 'LDAP',
       address: 'LDAP 位址',
       serverPlaceholder: '請輸入LDAP 位址',
       bindDN: '綁定DN',
@@ -22,7 +22,7 @@ export default {
       enableAuthentication: '啟用 LDAP 認證'
     },
     cas: {
-      title: 'CAS 設定',
+      title: 'CAS',
       ldpUri: 'ldpUri',
       ldpUriPlaceholder: '請輸入ldpUri',
       validateUrl: '驗證位址',
@@ -32,7 +32,7 @@ export default {
       enableAuthentication: '啟用 CAS 認證'
     },
     oidc: {
-      title: 'OIDC 設定',
+      title: 'OIDC',
       authEndpoint: '授權端位址',
       authEndpointPlaceholder: '請輸入授權端位址',
       tokenEndpoint: 'Token端位址',
@@ -51,7 +51,7 @@ export default {
     },
 
     oauth2: {
-      title: 'OAuth2 設定',
+      title: 'OAuth2',
       authEndpoint: '授權端位址',
       authEndpointPlaceholder: '請輸入授權端位址',
       tokenEndpoint: 'Token 端位址',
