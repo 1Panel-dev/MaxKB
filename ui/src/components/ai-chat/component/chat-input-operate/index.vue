@@ -484,6 +484,10 @@ const uploadRecording = async (audioBlob: Blob) => {
           })
         }
       })
+      .catch((error) => {
+        recorderLoading.value = false
+        console.error(`${t('chat.uploadFile.errorMessage')}:`, error)
+      })
   } catch (error) {
     recorderLoading.value = false
     console.error(`${t('chat.uploadFile.errorMessage')}:`, error)
