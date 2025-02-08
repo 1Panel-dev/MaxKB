@@ -1,78 +1,80 @@
 export default {
   title: 'Overview',
   appInfo: {
-    header: 'APP Info',
-    publicAccessLink: 'Public Access Link',
+    header: 'App Information',
+    publicAccessLink: 'Public URL',
     openText: 'On',
     closeText: 'Off',
     copyLinkText: 'Copy Link',
     refreshLinkText: 'Refresh Link',
-    demo: 'Demo',
-    embedInWebsite: 'Embed in website',
+    demo: 'Preview',
+    embedInWebsite: 'Get Embed Code',
     accessControl: 'Access Control',
     displaySetting: 'Display Settings',
     apiAccessCredentials: 'API Access Credentials',
     apiKey: 'API Key',
     refreshToken: {
-      msgConfirm1: 'Do you want to regenerate the public access link?',
+      msgConfirm1: 'Are you sure you want to regenerate the public URL?',
       msgConfirm2:
-        'Regenerating the public access link will affect third-party embedded scripts changes and will require re-embedding the new script into third-party sites. Please proceed with caution!',
-      refreshSuccess: 'Successful'
+        'Regenerating the Public URL will affect any existing embedded codes on third-party sites. You will need to update the embed code and re-integrate it into those sites. Proceed with caution!',
+      refreshSuccess: 'Successfully Refreshed'
     },
     APIKeyDialog: {
       saveSettings: 'Save Settings',
-      msgConfirm1: 'Are you sure you want to delete the API key ',
+      msgConfirm1: 'Are you sure you want to delete the API Key?',
       msgConfirm2:
-        'Deleting the API key cannot be undone. Please confirm if you want to delete it!',
+        'This action is irreversible. Once deleted, the API Key cannot be recovered. Do you still want to proceed?',
       enabledSuccess: 'Enabled',
       disabledSuccess: 'Disabled'
     },
     EditAvatarDialog: {
-      title: 'Edit Logo',
+      title: 'App Logo',
       customizeUpload: 'Custom Upload',
       upload: 'Upload',
       default: 'Default Logo',
       custom: 'Custom',
-      sizeTip: 'Suggested size 32*32, supports jpg, png, gif, size no more than 10 MB',
+      sizeTip:
+        'Recommended size: 32×32 pixels. Supports JPG, PNG, and GIF formats. Max size: 10 MB',
       fileSizeExceeded: 'File size exceeds 10 MB',
       uploadImagePrompt: 'Please upload an image'
     },
     EmbedDialog: {
       fullscreenModeTitle: 'Fullscreen Mode',
-      copyInstructions: 'Copy the following code to embed',
+      copyInstructions: 'Copy the code below to embed',
       floatingModeTitle: 'Floating Mode'
     },
     LimitDialog: {
       dialogTitle: 'Access Restrictions',
-      showSourceLabel: 'Show Return Knowledge Reference',
-      clientQueryLimitLabel: 'Limit the number of messages for each client',
+      showSourceLabel: 'Show Knowledge Source',
+      clientQueryLimitLabel: 'Query Limit per Client',
       authentication: 'Authentication',
-      authenticationValue: 'Authentication Password',
-      timesDays: 'messages per day',
-      whitelistLabel: 'Whitelist',
+      authenticationValue: 'Access Password',
+      timesDays: 'queries per day',
+      whitelistLabel: 'Allowed Domains',
       whitelistPlaceholder:
-        'Please enter allowed third-party source addresses, one per line, such as:\nhttp://127.0.0.1:5678\nhttps://dataease.io'
+        'Enter allowed third-party domains, one per line. For example:\nhttp://127.0.0.1:5678\nhttps://dataease.io'
     },
     SettingAPIKeyDialog: {
-      allowCrossDomainLabel: 'Allow Cross-Domain Address',
+      allowCrossDomainLabel: 'Allow Cross-Domain Access',
       crossDomainPlaceholder:
-        'Please enter allowed cross-domain addresses, if open without inputting addresses, there are no restrictions.\nCross-domain addresses one per line, such as:\nhttp://127.0.0.1:5678\nhttps://dataease.io'
+        'Enter allowed cross-domain addresses. If enabled but left blank, no restrictions will apply.\nEnter one per line, e.g.:\nhttp://127.0.0.1:5678\nhttps://dataease.io'
     },
     SettingDisplayDialog: {
       dialogTitle: 'Display Settings',
       languageLabel: 'Language',
-      showSourceLabel: 'Show Return Knowledge Reference',
-      showExecutionDetail: 'Show Execution Detail',
-      restoreDefault: 'Reset to default',
+      showSourceLabel: 'Show Knowledge Source',
+      showExecutionDetail: 'Show Execution Details',
+      restoreDefault: 'Restore Default',
       customThemeColor: 'Custom Theme Color',
       headerTitleFontColor: 'Header Title Font Color',
       default: 'Default',
-      askUserAvatar: 'Questioner\'s Avatar',
+      askUserAvatar: 'User Avatar (Asking)',
       replace: 'Replace',
-      imageMessage: 'Suggested size 32*32, supports jpg, png, gif, size no more than 10 MB',
+      imageMessage:
+        'Recommended size: 32×32 pixels. Supports JPG, PNG, and GIF formats. Max size: 10 MB',
       AIAvatar: 'AI Avatar',
       floatIcon: 'Floating Icon',
-      iconDefaultPosition: 'Icon Default Position',
+      iconDefaultPosition: 'Default Icon Position',
       iconPosition: {
         left: 'Left',
         right: 'Right',
@@ -81,10 +83,9 @@ export default {
       },
       draggablePosition: 'Draggable Position',
       showHistory: 'Show Chat History',
-      displayGuide: 'Display guide image (floating window mode)',
+      displayGuide: 'Show Guide Image (Floating Mode)',
       disclaimer: 'Disclaimer',
-      disclaimerValue:
-        '「The above content is generated by AI and is for reference and reference only.」'
+      disclaimerValue: 'This content is AI-generated and for reference only.'
     }
   },
   monitor: {
@@ -100,11 +101,11 @@ export default {
       other: 'Custom'
     },
     charts: {
-      customerTotal: 'Total Customers',
-      customerNew: 'New Customers',
-      queryCount: 'Total Chats',
-      tokensTotal: 'Total Tokens',
-      userSatisfaction: 'User Satisfaction Rate',
+      customerTotal: 'Total Users',
+      customerNew: 'New Users',
+      queryCount: 'Total Queries',
+      tokensTotal: 'Total Tokens Used',
+      userSatisfaction: 'User Feedback Metrics',
       approval: 'Like',
       disapproval: 'Dislike'
     }
