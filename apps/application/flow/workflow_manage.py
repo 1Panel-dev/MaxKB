@@ -609,20 +609,19 @@ class WorkflowManage:
             if len(current_answer.content) > 0:
                 if up_node is None or current_answer.view_type == 'single_view' or (
                         current_answer.view_type == 'many_view' and up_node.view_type == 'single_view'):
-                    result.append(current_answer)
+                    result.append([current_answer])
                 else:
                     if len(result) > 0:
                         exec_index = len(result) - 1
-                        content = result[exec_index].content
-                        result[exec_index].content += current_answer.content if len(
-                            content) == 0 else ('\n\n' + current_answer.content)
+                        if isinstance(result[exec_index], list):
+                            result[exec_index].append(current_answer)
                     else:
-                        result.insert(0, current_answer)
+                        result.insert(0, [current_answer])
                 up_node = current_answer
         if len(result) == 0:
             # 如果没有响应 就响应一个空数据
-            return [Answer('', '', '', '', {}).to_dict()]
-        return [r.to_dict() for r in result]
+            return [[]]
+        return [[item.to_dict() for item in r] for r in result]
 
     def get_next_node(self):
         """

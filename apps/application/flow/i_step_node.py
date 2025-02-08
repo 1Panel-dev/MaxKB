@@ -62,7 +62,9 @@ class WorkFlowPostHandler:
         answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
                              'answer_tokens' in row and row.get('answer_tokens') is not None])
         answer_text_list = workflow.get_answer_text_list()
-        answer_text = '\n\n'.join(answer['content'] for answer in answer_text_list)
+        answer_text = '\n\n'.join(
+            '\n\n'.join(["\n\n".join([a.get('reasoning_content'), a.get('content')]) for a in answer]) for answer in
+            answer_text_list)
         if workflow.chat_record is not None:
             chat_record = workflow.chat_record
             chat_record.answer_text = answer_text

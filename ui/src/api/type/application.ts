@@ -290,11 +290,8 @@ export class ChatRecordManage {
             break
           }
           this.append_answer(
-            (node_info.divider_content ? node_info.divider_content.splice(0).join('') : '') +
-              node_info.current_node.buffer.splice(0).join(''),
-            (node_info.divider_reasoning_content
-              ? node_info.divider_reasoning_content.splice(0).join('')
-              : '') + node_info.current_node.reasoning_content_buffer.splice(0).join(''),
+            node_info.current_node.buffer.splice(0).join(''),
+            node_info.current_node.reasoning_content_buffer.splice(0).join(''),
             node_info.answer_text_list_index,
             node_info.current_node.chat_record_id,
             node_info.current_node.runtime_node_id,
@@ -302,7 +299,10 @@ export class ChatRecordManage {
             node_info.current_node.real_node_id
           )
 
-          if (node_info.current_node.buffer.length == 0) {
+          if (
+            node_info.current_node.buffer.length == 0 &&
+            node_info.current_node.reasoning_content_buffer.length == 0
+          ) {
             node_info.current_node.is_end = true
           }
         }
