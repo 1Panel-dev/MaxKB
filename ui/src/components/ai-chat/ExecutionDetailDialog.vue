@@ -214,6 +214,17 @@
                         {{ item.question || '-' }}
                       </div>
                     </div>
+                    <div
+                      class="card-never border-r-4 mt-8"
+                      v-if="item.type == WorkflowType.AiChat"
+                    >
+                      <h5 class="p-8-12">
+                        {{ $t('views.applicationWorkflow.nodes.aiChatNode.think')}}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                        {{ item.reasoning_content || '-' }}
+                      </div>
+                    </div>
                     <div class="card-never border-r-4 mt-8">
                       <h5 class="p-8-12">
                         {{
