@@ -29,6 +29,27 @@ from django.utils.translation import gettext as _
 ollama_llm_model_credential = OllamaLLMModelCredential()
 model_info_list = [
     ModelInfo(
+        'deepseek-r1:1.5b',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'deepseek-r1:7b',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'deepseek-r1:8b',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'deepseek-r1:14b',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+    ModelInfo(
+        'deepseek-r1:32b',
+        '',
+        ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
+
+    ModelInfo(
         'llama2',
         _('Llama 2 is a set of pretrained and fine-tuned generative text models ranging in size from 7 billion to 70 billion. This is a repository of 7B pretrained models. Links to other models can be found in the index at the bottom.'),
         ModelTypeConst.LLM, ollama_llm_model_credential, OllamaChatModel),
