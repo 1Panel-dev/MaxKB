@@ -168,7 +168,7 @@ export default {
     successMessage: 'Successful',
     tip1: 'The {data} in the prompt is a placeholder for segmented content, which is replaced by the segmented content when executed and sent to the AI model;',
     tip2: 'The AI model generates relevant questions based on the segmented content. Please place the generated questions within the',
-    tip3: 'tags, and the system will automatically associate the questions within these tags;',
+    tip3: 'tags, and the system will automatically relate the questions within these tags;',
     tip4: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.',
     prompt1:
       'Content: {data}\n \n Please summarize the above content and generate a summary based on the content 5 a question. \nAnswer requirements: \n - Please output only questions; \n - Please place each question in',

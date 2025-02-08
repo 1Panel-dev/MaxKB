@@ -19,7 +19,7 @@ export default {
     placeholder: 'Search by name'
   },
   table: {
-    paragraph_count: 'Linked Segments',
+    paragraph_count: 'Related Segments',
     updateTime: 'Update Time'
   },
   delete: {
@@ -28,7 +28,7 @@ export default {
     confirmMessage2: 'segments. Please proceed with caution.'
   },
   relateParagraph: {
-    title: 'Link to Segment',
+    title: 'Relate to Segment',
     selectDocument: 'Select a Document',
     placeholder: 'Search document by name',
     selectParagraph: 'Select Segments',
