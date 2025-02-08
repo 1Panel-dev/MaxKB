@@ -105,8 +105,8 @@ export default {
       queryCount: 'Total Chats',
       tokensTotal: 'Total Tokens',
       userSatisfaction: 'User Satisfaction Rate',
-      approval: 'Approval',
-      disapproval: 'Disapproval'
+      approval: 'Like',
+      disapproval: 'Dislike'
     }
   }
 }
