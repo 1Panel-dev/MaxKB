@@ -53,7 +53,8 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     model_setting = node.context.get('model_setting',
                                      {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
                                       'reasoning_content_start': '<think>'})
-    reasoning = Reasoning(model_setting.get('reasoning_content_start'), model_setting.get('reasoning_content_end'))
+    reasoning = Reasoning(model_setting.get('reasoning_content_start', '<think>'),
+                          model_setting.get('reasoning_content_end', '</think>'))
     for chunk in response:
         reasoning_chunk = reasoning.get_reasoning_content(chunk)
         content_chunk = reasoning_chunk.get('content')
@@ -80,9 +81,17 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     @param workflow:           工作流管理器
     """
     response = node_variable.get('result')
-    answer = response.content
-    reasoning_content = response.response_metadata.get('reasoning_content', '')
-    _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
+    model_setting = node.context.get('model_setting',
+                                     {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
+                                      'reasoning_content_start': '<think>'})
+    reasoning = Reasoning(model_setting.get('reasoning_content_start'), model_setting.get('reasoning_content_end'))
+    reasoning_result = reasoning.get_reasoning_content(response)
+    content = reasoning_result.get('content')
+    if 'reasoning_content' in response.response_metadata:
+        reasoning_content = response.response_metadata.get('reasoning_content', '')
+    else:
+        reasoning_content = reasoning_result.get('reasoning_content')
+    _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 
 def get_default_model_params_setting(model_id):

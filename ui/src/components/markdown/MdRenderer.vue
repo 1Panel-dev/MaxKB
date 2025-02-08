@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 推理过程组件 -->
-    <ReasoningRander :content="reasoning_content" v-if="reasoning_content" />
+    <ReasoningRander :content="reasoning_content" v-if="reasoning_content?.trim()" />
     <template v-for="(item, index) in md_view_list" :key="index">
       <div
         v-if="item.type === 'question'"

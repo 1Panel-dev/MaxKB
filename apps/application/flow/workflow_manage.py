@@ -522,7 +522,7 @@ class WorkflowManage:
                                                                    self.params['chat_record_id'],
                                                                    current_node.id,
                                                                    current_node.up_node_id_list,
-                                                                   str(e), False, 0, 0,
+                                                                   'Exception:' + str(e), False, 0, 0,
                                                                    {'node_is_end': True,
                                                                     'runtime_node_id': current_node.runtime_node_id,
                                                                     'node_type': current_node.type,

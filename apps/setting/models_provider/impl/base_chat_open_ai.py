@@ -123,11 +123,15 @@ class BaseChatOpenAI(ChatOpenAI):
         result = super()._create_chat_result(response, generation_info)
         try:
             reasoning_content = ''
+            reasoning_content_enable = False
             for res in response.choices:
-                _reasoning_content = res.message.model_extra.get('reasoning_content')
-                if _reasoning_content is not None:
-                    reasoning_content += _reasoning_content
-            result.llm_output['reasoning_content'] = reasoning_content
+                if 'reasoning_content' in res.message.model_extra:
+                    reasoning_content_enable = True
+                    _reasoning_content = res.message.model_extra.get('reasoning_content')
+                    if _reasoning_content is not None:
+                        reasoning_content += _reasoning_content
+            if reasoning_content_enable:
+                result.llm_output['reasoning_content'] = reasoning_content
         except Exception as e:
             pass
         return result
