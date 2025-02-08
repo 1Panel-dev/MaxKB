@@ -69,7 +69,8 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     """
     response = node_variable.get('result')
     answer = response.content
-    _write_context(node_variable, workflow_variable, node, workflow, answer)
+    reasoning_content = response.response_metadata.get('reasoning_content', '')
+    _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
 def get_default_model_params_setting(model_id):
@@ -102,13 +103,6 @@ class BaseChatNode(IChatNode):
         self.context['question'] = details.get('question')
         self.context['reasoning_content'] = details.get('reasoning_content')
         self.answer_text = details.get('answer')
-
-    def get_answer_list(self) -> List[Answer] | None:
-        if self.answer_text is None:
-            return None
-        return [
-            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], {},
-                   self.context.get('reasoning_content'))]
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,

@@ -1,6 +1,6 @@
 # coding=utf-8
 import warnings
-from typing import List, Dict, Optional, Any, Iterator, cast, Type
+from typing import List, Dict, Optional, Any, Iterator, cast, Type, Union
 
 import openai
 from langchain_core.callbacks import CallbackManagerForLLMRun
@@ -105,7 +105,8 @@ class BaseChatOpenAI(ChatOpenAI):
                     self.usage_metadata = generation_chunk.message.usage_metadata
                 # custom code
                 if 'reasoning_content' in chunk['choices'][0]['delta']:
-                    generation_chunk.message.additional_kwargs["reasoning_content"] = chunk['choices'][0]['delta']['reasoning_content']
+                    generation_chunk.message.additional_kwargs["reasoning_content"] = chunk['choices'][0]['delta'][
+                        'reasoning_content']
 
                 default_chunk_class = generation_chunk.message.__class__
                 logprobs = (generation_chunk.generation_info or {}).get("logprobs")
@@ -115,6 +116,21 @@ class BaseChatOpenAI(ChatOpenAI):
                     )
                 is_first_chunk = False
                 yield generation_chunk
+
+    def _create_chat_result(self,
+                            response: Union[dict, openai.BaseModel],
+                            generation_info: Optional[Dict] = None):
+        result = super()._create_chat_result(response, generation_info)
+        try:
+            reasoning_content = ''
+            for res in response.choices:
+                _reasoning_content = res.message.model_extra.get('reasoning_content')
+                if _reasoning_content is not None:
+                    reasoning_content += _reasoning_content
+            result.llm_output['reasoning_content'] = reasoning_content
+        except Exception as e:
+            pass
+        return result
 
     def invoke(
             self,

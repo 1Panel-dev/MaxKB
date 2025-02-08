@@ -158,7 +158,8 @@ class INode:
         if self.answer_text is None:
             return None
         return [
-            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], {})]
+            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], {},
+                   self.runtime_node_id, self.context.get('reasoning_content'))]
 
     def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None,
                  get_node_params=lambda node: node.properties.get('node_data')):
