@@ -67,7 +67,7 @@
       </el-form>
       <div class="flex-between">
         <h4 class="title-decoration-1 mb-16">
-          {{ $t('views.functionLib.functionForm.form.inputParam.label') }}
+          {{ $t('common.param.inputParam') }}
           <el-text type="info" class="color-secondary">
             {{ $t('views.functionLib.functionForm.form.param.paramInfo1') }}
           </el-text>
@@ -141,7 +141,7 @@
         </div>
       </div>
       <h4 class="title-decoration-1 mb-16 mt-16">
-        {{ $t('views.functionLib.functionForm.form.param.outputParam') }}
+        {{ $t('common.param.outputParam') }}
         <el-text type="info" class="color-secondary">
           {{ $t('views.functionLib.functionForm.form.param.paramInfo1') }}
         </el-text>

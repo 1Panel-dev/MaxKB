@@ -1,7 +1,7 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
     <h5 class="title-decoration-1 mb-16">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
-    <h5 class="lighter mb-8">{{ $t('views.functionLib.functionForm.form.inputParam.label') }}</h5>
+    <h5 class="lighter mb-8">{{ $t('common.param.inputParam') }}</h5>
     <el-form
       @submit.prevent
       ref="FunctionNodeFormRef"
@@ -18,7 +18,10 @@
               :prop="'input_field_list.' + index + '.value'"
               :rules="{
                 required: item.is_required,
-                message: $t('views.functionLib.functionForm.form.inputParam.requiredMessage'),
+                message:
+                  item.source === 'reference'
+                    ? $t('views.functionLib.functionForm.form.param.selectPlaceholder')
+                    : $t('views.functionLib.functionForm.form.param.inputPlaceholder'),
                 trigger: 'blur'
               }"
             >
@@ -40,10 +43,14 @@
                 ref="nodeCascaderRef"
                 :nodeModel="nodeModel"
                 class="w-full"
-                :placeholder="$t('views.functionLib.functionForm.form.inputParam.placeholder')"
+                :placeholder="$t('views.functionLib.functionForm.form.param.selectPlaceholder')"
                 v-model="item.value"
               />
-              <el-input v-else v-model="item.value" :placeholder="$t('views.functionLib.functionForm.form.inputParam.requiredMessage')" />
+              <el-input
+                v-else
+                v-model="item.value"
+                :placeholder="$t('views.functionLib.functionForm.form.param.inputPlaceholder')"
+              />
             </el-form-item>
           </template>
         </div>

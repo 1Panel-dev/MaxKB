@@ -1,5 +1,6 @@
 export default {
   title: 'Segment',
+  paragraph_count: 'Segments',
   editParagraph: 'Edit Segment',
   addParagraph: 'Add Segment',
   paragraphDetail: 'Segment Details',
@@ -18,11 +19,11 @@ export default {
   },
   form: {
     paragraphTitle: {
-      label: 'Segment Title',
+      label: 'Title',
       placeholder: 'Please enter the segment title'
     },
     content: {
-      label: 'Segment Content',
+      label: 'Content',
       placeholder: 'Please enter the segment content',
       requiredMessage1: 'Please enter the segment content',
       requiredMessage2: 'Content must not exceed 100,000 words'

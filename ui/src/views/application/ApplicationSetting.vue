@@ -14,7 +14,7 @@
       <el-col :span="10">
         <div class="p-24 mb-16" style="padding-bottom: 0">
           <h4 class="title-decoration-1">
-            {{ $t('views.application.applicationForm.title.info') }}
+            {{ $t('views.applicationOverview.appInfo.header') }}
           </h4>
         </div>
         <div class="scrollbar-height-left">

@@ -41,11 +41,6 @@ export default {
         label: 'Permissions',
         requiredMessage: 'Please select'
       },
-      inputParam: {
-        label: 'Input Parameters',
-        placeholder: 'Please enter parameter values',
-        requiredMessage: 'Please enter parameter values'
-      },
       paramName: {
         label: 'Parameter Name',
         placeholder: 'Please enter the parameter name',
@@ -63,10 +58,11 @@ export default {
         label: 'Required'
       },
       param: {
-        outputParam: 'Output Parameters',
         paramInfo1: 'Displayed when using the function',
         paramInfo2: 'Not displayed when using the function',
-        code: 'Content (Python)'
+        code: 'Content (Python)',
+        selectPlaceholder: 'Please select parameter',
+        inputPlaceholder: 'Please enter parameter values',
       },
       debug: {
         run: 'Run',

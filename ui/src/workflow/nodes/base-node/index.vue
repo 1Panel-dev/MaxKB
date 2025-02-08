@@ -10,7 +10,7 @@
       ref="baseNodeFormRef"
     >
       <el-form-item
-        :label="$t('views.application.applicationForm.form.appName.label')"
+        :label="$t('views.applicationWorkflow.nodes.baseNode.appName.label')"
         prop="name"
         :rules="{
           message: t('views.application.applicationForm.form.appName.requiredMessage'),
@@ -26,7 +26,7 @@
           @blur="form_data.name = form_data.name?.trim()"
         />
       </el-form-item>
-      <el-form-item :label="$t('views.application.applicationForm.form.appDescription.label')">
+      <el-form-item :label="$t('views.applicationWorkflow.nodes.baseNode.appDescription.label')">
         <el-input
           v-model="form_data.desc"
           :placeholder="$t('views.application.applicationForm.form.appDescription.placeholder')"

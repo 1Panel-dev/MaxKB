@@ -11,7 +11,8 @@ export default {
     migration: '迁移',
     cancelGenerateQuestion: '取消生成问题',
     cancelVectorization: '取消向量化',
-    cancelGenerate: '取消生成'
+    cancelGenerate: '取消生成',
+    export: '导出',
   },
   tip: {
     saveMessage: '当前的更改尚未保存，确认退出吗?',

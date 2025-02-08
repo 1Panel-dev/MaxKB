@@ -80,7 +80,14 @@ export default {
       currentTime: 'Current Time'
     },
     baseNode: {
-      label: 'Base Info',
+      label: 'Base Information',
+      appName: {
+        label: 'App Name',
+    
+      },
+      appDescription: {
+        label: 'App Description',
+       },
       fileUpload: {
         label: 'File Upload',
         tooltip: 'When enabled, the Q&A page will display a file upload button.'
@@ -100,7 +107,7 @@ export default {
     aiChatNode: {
       label: 'AI Chat',
       text: 'Chat with an AI model',
-      answer: 'AI Answer Content',
+      answer: 'AI Content',
       returnContent: {
         label: 'Return Content',
         tooltip: `If turned off, the content of this node will not be output to the user.
@@ -194,7 +201,7 @@ export default {
     imageUnderstandNode: {
       label: 'Image Understanding',
       text: 'Analyze images to identify objects, scenes, and provide answers',
-      answer: 'AI Answer Content',
+      answer: 'AI Content',
       model: {
         label: 'Vision Model',
         requiredMessage: 'Please select a vision model'
@@ -207,7 +214,7 @@ export default {
     imageGenerateNode: {
       label: 'Image Generation',
       text: 'Generate images based on provided text content',
-      answer: 'AI Answer Content',
+      answer: 'AI Content',
       model: {
         label: 'Image Generation Model',
         requiredMessage: 'Please select an image generation model'

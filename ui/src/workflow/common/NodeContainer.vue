@@ -98,7 +98,7 @@
             <slot></slot>
             <template v-if="nodeFields.length > 0">
               <h5 class="title-decoration-1 mb-8 mt-8">
-                {{ $t('chat.executionDetails.paramOutput') }}
+                {{ $t('common.param.outputParam') }}
               </h5>
               <template v-for="(item, index) in nodeFields" :key="index">
                 <div

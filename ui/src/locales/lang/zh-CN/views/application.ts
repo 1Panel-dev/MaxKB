@@ -23,7 +23,6 @@ export default {
   },
   applicationForm: {
     title: {
-      info: '应用信息',
       appTest: '调试预览',
       copy: '副本'
     },
@@ -145,7 +144,6 @@ export default {
     lark: '飞书应用',
     larkTip: '打造飞书智能应用',
     setting: '配置',
-    info: '应用信息',
     callback: '回调地址',
     callbackTip: '请输入回调地址',
     wecomPlatform: '企业微信后台',

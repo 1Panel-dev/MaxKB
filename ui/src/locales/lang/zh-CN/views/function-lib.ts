@@ -39,11 +39,6 @@ export default {
         label: '权限',
         requiredMessage: '请选择'
       },
-      inputParam: {
-        label: '输入参数',
-        placeholder: '请选择参数',
-        requiredMessage: '请输入参数值'
-      },
       paramName: {
         label: '参数名',
         placeholder: '请输入参数名',
@@ -61,10 +56,11 @@ export default {
         label: '是否必填'
       },
       param: {
-        outputParam: '输出参数',
         paramInfo1: '使用函数时显示',
         paramInfo2: '使用函数时不显示',
-        code: '函数内容（Python）'
+        code: '函数内容（Python）',
+        selectPlaceholder: '请选择参数',
+        inputPlaceholder: '请输入参数值',
       },
       debug: {
         run: '运行',

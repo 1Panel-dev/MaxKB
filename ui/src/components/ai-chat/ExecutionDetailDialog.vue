@@ -57,7 +57,7 @@
                   >
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('chat.executionDetails.paramInput') }}
+                        {{ $t('common.param.inputParam') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="mb-8">
@@ -218,7 +218,7 @@
                       <h5 class="p-8-12">
                         {{
                           item.type == WorkflowType.Application
-                            ? $t('chat.executionDetails.paramOutput')
+                            ? $t('common.param.outputParam')
                             : $t('chat.executionDetails.answer')
                         }}
                       </h5>
@@ -260,9 +260,7 @@
                   <template v-if="item.type === WorkflowType.DocumentExtractNode">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12 flex align-center">
-                        <span class="mr-4">{{
-                          $t('chat.executionDetails.paramOutput')
-                        }}</span>
+                        <span class="mr-4">{{ $t('chat.executionDetails.paramOutput') }}</span>
 
                         <el-tooltip
                           effect="dark"
@@ -297,7 +295,7 @@
                   <template v-if="item.type === WorkflowType.SpeechToTextNode">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('chat.executionDetails.paramInput') }}
+                        {{ $t('common.param.inputParam') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="mb-8">
@@ -322,7 +320,7 @@
                     </div>
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('chat.executionDetails.paramOutput') }}
+                        {{ $t('common.param.outputParam') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <el-card
@@ -348,7 +346,7 @@
                   <template v-if="item.type === WorkflowType.TextToSpeechNode">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('chat.executionDetails.paramInput') }}
+                        {{ $t('common.param.inputParam') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="p-8-12 border-t-dashed lighter">
@@ -368,7 +366,7 @@
                     </div>
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('chat.executionDetails.paramOutput') }}
+                        {{ $t('common.param.outputParam') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
                         <p class="mb-8 color-secondary">
@@ -475,11 +473,9 @@
                   <template v-if="item.type === WorkflowType.FormNode">
                     <div class="card-never border-r-4">
                       <h5 class="p-8-12">
-                        {{ $t('chat.executionDetails.paramOutput')
+                        {{ $t('common.param.outputParam')
                         }}<span style="color: #f54a45">{{
-                          item.is_submit
-                            ? ''
-                            : `(${$t('chat.executionDetails.noSubmit')})`
+                          item.is_submit ? '' : `(${$t('chat.executionDetails.noSubmit')})`
                         }}</span>
                       </h5>
 
@@ -572,7 +568,7 @@
                       <h5 class="p-8-12">
                         {{
                           item.type == WorkflowType.Application
-                            ? $t('chat.executionDetails.paramOutput')
+                            ? $t('common.param.outputParam')
                             : $t('chat.executionDetails.answer')
                         }}
                       </h5>
@@ -602,7 +598,7 @@
                       <h5 class="p-8-12">
                         {{
                           item.type == WorkflowType.Application
-                            ? $t('chat.executionDetails.paramOutput')
+                            ? $t('common.param.outputParam')
                             : $t('chat.executionDetails.answer')
                         }}
                       </h5>

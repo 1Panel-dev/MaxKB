@@ -34,7 +34,7 @@
       v-loading="(paginationConfig.current_page === 1 && loading) || changeStateloading"
     >
       <div class="flex-between p-8">
-        <span>{{ paginationConfig.total }} {{ $t('views.paragraph.title') }}</span>
+        <span>{{ paginationConfig.total }} {{ $t('views.paragraph.paragraph_count') }}</span>
         <el-input
           v-model="search"
           :placeholder="$t('common.search')"

@@ -50,6 +50,11 @@ export default {
     enableSuccess: 'Successful',
     disableSuccess: 'Successful'
   },
+  param: {
+    outputParam: 'Output Parameters',
+    inputParam: 'Input Parameters'
+  },
+
   inputPlaceholder: 'Please input',
   title: 'Title',
   content: 'Content'

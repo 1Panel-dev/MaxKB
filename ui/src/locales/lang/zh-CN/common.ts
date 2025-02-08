@@ -27,7 +27,6 @@ export default {
   createDate: '创建日期',
   createTime: '创建时间',
   operation: '操作',
-
   character: '字符',
   export: '导出',
   exportSuccess: '导出成功',
@@ -53,5 +52,9 @@ export default {
   },
   inputPlaceholder: '请输入',
   title: '标题',
-  content: '内容'
+  content: '内容',
+  param: {
+    outputParam: '输出参数',
+    inputParam:'输入参数'
+  }
 }

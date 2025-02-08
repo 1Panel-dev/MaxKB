@@ -119,11 +119,11 @@
                             >
                             <el-dropdown-item @click.stop="export_dataset(item)">
                               <AppIcon iconName="app-export"></AppIcon
-                              >{{ $t('common.export') }}Excel</el-dropdown-item
+                              >{{ $t('views.document.setting.export') }} Excel</el-dropdown-item
                             >
                             <el-dropdown-item @click.stop="export_zip_dataset(item)">
                               <AppIcon iconName="app-export"></AppIcon
-                              >{{ $t('common.export') }}ZIP</el-dropdown-item
+                              >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
                             >
                             <el-dropdown-item icon="Delete" @click.stop="deleteDataset(item)">{{
                               $t('common.delete')

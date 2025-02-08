@@ -19,7 +19,7 @@ export default {
     autoSave: '自動保存',
     latestRelease: '最近發布',
     copyParam: '複製參數',
-    debug: '調試',
+    debug: '調試'
   },
   tip: {
     publicSuccess: '發布成功',
@@ -82,6 +82,12 @@ export default {
     },
     baseNode: {
       label: '基本信息',
+      appName: {
+        label: '應用名稱'
+      },
+      appDescription: {
+        label: '應用描述'
+      },
       fileUpload: {
         label: '文件上傳',
         tooltip: '開啟後，問答頁面會顯示上傳文件的按鈕。'

@@ -187,8 +187,8 @@ export const formNode = {
       is_result: true,
       form_field_list: [],
       form_content_format: `${t('views.applicationWorkflow.nodes.formNode.form_content_format1')}
-    {{form}}
-    ${t('views.applicationWorkflow.nodes.formNode.form_content_format2')}`
+{{form}}
+${t('views.applicationWorkflow.nodes.formNode.form_content_format2')}`
     },
     config: {
       fields: [

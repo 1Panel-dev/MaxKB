@@ -27,7 +27,6 @@ export default {
 
   applicationForm: {
     title: {
-      info: 'APP Information',
       appTest: 'Debug Preview',
       copy: 'copy'
     },
@@ -153,7 +152,6 @@ export default {
     lark: 'Lark',
     larkTip: 'Create Lark intelligent APP',
     setting: 'Setting',
-    info: 'APP Information',
     callback: 'Callback Address',
     callbackTip: 'Please fill in the callback address',
     wecomPlatform: 'WeCom Open Platform',

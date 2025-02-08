@@ -64,8 +64,6 @@ export default {
   },
   executionDetails: {
     title: '执行详情',
-    paramInput: '参数输入',
-    paramOutput: '参数输出',
     paramOutputTooltip: '每个文档仅支持预览500字',
     audioFile: '语音文件',
     searchContent: '检索内容',

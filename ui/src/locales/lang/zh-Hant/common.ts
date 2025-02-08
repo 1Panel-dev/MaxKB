@@ -52,5 +52,9 @@ export default {
   },
   inputPlaceholder: '請輸入',
   title: '標題',
-  content: '内容'
+  content: '内容',
+  param: {
+    outputParam: '輸出參數',
+    inputParam:'輸入參數'
+  }
 }
