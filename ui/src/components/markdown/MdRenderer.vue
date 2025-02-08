@@ -1,9 +1,7 @@
 <template>
   <div>
-    <!-- todo  推理过程组件需要完善,目前用span占位   -->
-    <span style="color: red">
-      {{ reasoning_content }}
-    </span>
+    <!-- 推理过程组件 -->
+    <ReasoningRander :content="reasoning_content" v-if="reasoning_content" />
     <template v-for="(item, index) in md_view_list" :key="index">
       <div
         v-if="item.type === 'question'"
@@ -48,6 +46,7 @@ import { config } from 'md-editor-v3'
 import HtmlRander from './HtmlRander.vue'
 import EchartsRander from './EchartsRander.vue'
 import FormRander from './FormRander.vue'
+import ReasoningRander from './ReasoningRander.vue'
 config({
   markdownItConfig(md) {
     md.renderer.rules.image = (tokens, idx, options, env, self) => {

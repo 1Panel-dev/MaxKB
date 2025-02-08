@@ -65,6 +65,10 @@ export const aiChatNode = {
         {
           label: t('views.applicationWorkflow.nodes.aiChatNode.answer'),
           value: 'answer'
+        },
+        {
+          label: t('views.applicationWorkflow.nodes.aiChatNode.think'),
+          value: 'thinking_process'
         }
       ]
     }

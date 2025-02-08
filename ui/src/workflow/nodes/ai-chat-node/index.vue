@@ -7,7 +7,6 @@
         :model="chat_data"
         label-position="top"
         require-asterisk-position="right"
-        class="mb-24"
         label-width="auto"
         ref="aiChatNodeFormRef"
         hide-required-asterisk
@@ -29,15 +28,7 @@
                   }}<span class="danger">*</span></span
                 >
               </div>
-              <el-button
-                :disabled="!chat_data.model_id"
-                type="primary"
-                link
-                @click="openReasoningParamSettingDialog(chat_data.model_id)"
-                @refreshForm="refreshParam"
-              >
-                {{ $t('common.setting') }}
-              </el-button>
+
               <el-button
                 :disabled="!chat_data.model_id"
                 type="primary"
@@ -123,10 +114,8 @@
             :step-strictly="true"
           />
         </el-form-item>
-        <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
-          @click.prevent
-        >
+
+        <el-form-item @click.prevent>
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
@@ -145,16 +134,38 @@
           </template>
           <el-switch size="small" v-model="chat_data.is_result" />
         </el-form-item>
+        <el-form-item @click.prevent>
+          <template #label>
+            <div class="flex-between w-full">
+              <div>
+                <span>{{
+                  $t('views.application.applicationForm.form.reasoningContent.label')
+                }}</span>
+              </div>
+              <el-button
+                type="primary"
+                link
+                @click="openReasoningParamSettingDialog"
+                @refreshForm="refreshParam"
+              >
+                <el-icon><Setting /></el-icon>
+              </el-button>
+            </div>
+          </template>
+          <el-switch size="small" v-model="chat_data.model_setting.reasoning_content_enable" />
+        </el-form-item>
       </el-form>
     </el-card>
 
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
-    <ReasoningParamSettingDialog ref="ReasoningParamSettingDialogRef" @refresh="submitReasoningDialog"/>
-
+    <ReasoningParamSettingDialog
+      ref="ReasoningParamSettingDialogRef"
+      @refresh="submitReasoningDialog"
+    />
   </NodeContainer>
 </template>
 <script setup lang="ts">
-import { set, groupBy } from 'lodash'
+import { cloneDeep, set, groupBy } from 'lodash'
 import { app } from '@/main'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
@@ -164,8 +175,7 @@ import useStore from '@/stores'
 import { isLastNode } from '@/workflow/common/data'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import { t } from '@/locales'
-import ReasoningParamSettingDialog
-  from '@/views/application/component/ReasoningParamSettingDialog.vue'
+import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
 const { model } = useStore()
 
 const wheel = (e: any) => {
@@ -211,16 +221,29 @@ const form = {
   is_result: false,
   temperature: null,
   max_tokens: null,
-  dialogue_type: 'WORKFLOW'
+  dialogue_type: 'WORKFLOW',
+  model_setting: {
+    reasoning_content_start: '<think>',
+    reasoning_content_end: '</think>',
+    reasoning_content_enable: false
+  }
 }
 
 const chat_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
+      if (!props.nodeModel.properties.node_data.model_setting) {
+        set(props.nodeModel.properties.node_data, 'model_setting', {
+          reasoning_content_start: '<think>',
+          reasoning_content_end: '</think>',
+          reasoning_content_enable: false
+        })
+      }
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)
     }
+
     return props.nodeModel.properties.node_data
   },
   set: (value) => {
@@ -259,9 +282,7 @@ const openAIParamSettingDialog = (modelId: string) => {
 }
 
 const openReasoningParamSettingDialog = () => {
-  if (chat_data.value.model_id) {
-    ReasoningParamSettingDialogRef.value?.open(chat_data.value.model_setting)
-  }
+  ReasoningParamSettingDialogRef.value?.open(chat_data.value.model_setting)
 }
 
 function refreshParam(data: any) {
@@ -269,10 +290,14 @@ function refreshParam(data: any) {
 }
 
 function submitReasoningDialog(val: any) {
-  console.log(val)
-  set(props.nodeModel.properties.node_data, 'model_setting', val)
-}
+  let model_setting = cloneDeep(props.nodeModel.properties.node_data.model_setting)
+  model_setting = {
+    ...model_setting,
+    ...val
+  }
 
+  set(props.nodeModel.properties.node_data, 'model_setting', model_setting)
+}
 
 onMounted(() => {
   getModel()

@@ -65,14 +65,7 @@
                 <template #label>
                   <div class="flex-between">
                     <span>{{ $t('views.application.applicationForm.form.aiModel.label') }}</span>
-                    <el-button
-                      type="primary"
-                      link
-                      @click="openReasoningParamSettingDialog"
-                      :disabled="!applicationForm.model_id"
-                    >
-                      {{ $t('common.setting') }}
-                    </el-button>
+
                     <el-button
                       type="primary"
                       link
@@ -284,6 +277,27 @@
                   @submitDialog="submitPrologueDialog"
                 />
               </el-form-item>
+              <el-form-item @click.prevent>
+                <template #label>
+                  <div class="flex-between">
+                    <span class="mr-4">
+                      {{ $t('views.application.applicationForm.form.reasoningContent.label') }}
+                    </span>
+
+                    <div class="flex">
+                      <el-button type="primary" link @click="openReasoningParamSettingDialog">
+                        <el-icon><Setting /></el-icon>
+                      </el-button>
+                      <el-switch
+                        class="ml-8"
+                        size="small"
+                        v-model="applicationForm.model_setting.reasoning_content_enable"
+                        @change="sttModelEnableChange"
+                      />
+                    </div>
+                  </div>
+                </template>
+              </el-form-item>
 
               <el-form-item
                 prop="stt_model_id"
@@ -461,7 +475,10 @@
     />
 
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshIcon" />
-    <ReasoningParamSettingDialog ref="ReasoningParamSettingDialogRef" @refresh="submitReasoningDialog"/>
+    <ReasoningParamSettingDialog
+      ref="ReasoningParamSettingDialogRef"
+      @refresh="submitReasoningDialog"
+    />
   </LayoutContainer>
 </template>
 <script setup lang="ts">
@@ -533,7 +550,8 @@ const applicationForm = ref<ApplicationFormType>({
   model_setting: {
     prompt: defaultPrompt,
     system: t('views.application.applicationForm.form.roleSettings.placeholder'),
-    no_references_prompt: '{question}'
+    no_references_prompt: '{question}',
+    reasoning_content_enable: false,
   },
   model_params_setting: {},
   problem_optimization: false,
@@ -574,7 +592,6 @@ function submitSystemDialog(val: string) {
   applicationForm.value.model_setting.system = val
 }
 function submitReasoningDialog(val: any) {
-  console.log(val)
   applicationForm.value.model_setting = {
     ...applicationForm.value.model_setting,
     ...val
@@ -610,9 +627,7 @@ const openAIParamSettingDialog = () => {
 }
 
 const openReasoningParamSettingDialog = () => {
-  if (applicationForm.value.model_id) {
-    ReasoningParamSettingDialogRef.value?.open(applicationForm.value.model_setting)
-  }
+  ReasoningParamSettingDialogRef.value?.open(applicationForm.value.model_setting)
 }
 
 const openTTSParamSettingDialog = () => {

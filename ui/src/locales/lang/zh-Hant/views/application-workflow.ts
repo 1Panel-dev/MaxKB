@@ -106,7 +106,8 @@ export default {
         tooltip: `關閉後該節點的內容則不輸出給用戶。
                   如果你想讓用戶看到該節點的輸出內容，請打開開關。`
       },
-      defaultPrompt: '已知信息'
+      defaultPrompt: '已知信息',
+      think: '思考過程',
     },
     searchDatasetNode: {
       label: '知識庫檢索',

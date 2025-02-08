@@ -16,7 +16,8 @@
           ></MdRenderer>
           <template v-else-if="answer_text.length > 0">
             <MdRenderer
-              v-for="answer in answer_text"
+              v-for="(answer, index) in answer_text"
+              :key="index"
               :chat_record_id="answer.chat_record_id"
               :child_node="answer.child_node"
               :runtime_node_id="answer.runtime_node_id"

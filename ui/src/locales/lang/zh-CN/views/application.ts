@@ -56,7 +56,8 @@ export default {
         references: ' (引用知识库)',
         placeholder: '请输入提示词',
         requiredMessage: '请输入提示词',
-        tooltip:'通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。',
+        tooltip:
+          '通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头，可以使用变量。',
         noReferencesTooltip:
           '通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。可以使用变量：{question} 是用户提出问题的占位符。',
         referencesTooltip:
@@ -99,9 +100,10 @@ export default {
         listeningTest: '试听'
       },
       reasoningContent: {
-        enable: '输出思考',
+        label: '输出思考',
+        tooltip: '请根据模型返回的思考标签设置，标签中间的内容将为认定为思考过程',
         start: '开始',
-        end: '结束',
+        end: '结束'
       }
     },
     buttons: {
@@ -201,6 +203,5 @@ export default {
     text: '针对用户提问调试段落匹配情况，保障回答效果。',
     emptyMessage1: '命中段落显示在这里',
     emptyMessage2: '没有命中的分段'
-  },
-
+  }
 }
