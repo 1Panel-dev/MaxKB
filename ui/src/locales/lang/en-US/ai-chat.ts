@@ -3,7 +3,7 @@ export default {
   createChat: 'New Chat',
   history: 'Chat History',
   only20history: 'Only showing the last 20 chats',
-  question_count: 'Questions',
+  question_count: 'Messages',
   exportRecords: 'Export Chat Records',
   chatId: 'Chat ID',
   userInput: 'User Input',
@@ -91,7 +91,7 @@ export default {
     consumeTime: 'Run Time'
   },
   paragraphSource: {
-    title: 'Knowledge Reference',
+    title: 'Quote',
     question: 'User Question',
     optimizationQuestion: 'Optimized Question'
   }
