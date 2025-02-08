@@ -27,10 +27,7 @@
               :placeholder="$t('views.system.authentication.ldap.bindDNPlaceholder')"
             />
           </el-form-item>
-          <el-form-item
-            :label="$t('views.system.password')"
-            prop="config_data.password"
-          >
+          <el-form-item :label="$t('views.system.password')" prop="config_data.password">
             <el-input
               v-model="form.config_data.password"
               :placeholder="$t('views.user.userForm.form.password.placeholder')"
@@ -156,7 +153,7 @@ const submit = async (formEl: FormInstance | undefined, test?: string) => {
     if (valid) {
       if (test) {
         authApi.postAuthSetting(form.value, loading).then((res) => {
-          MsgSuccess(t('views.system.testFailed'))
+          MsgSuccess(t('views.system.testSuccess'))
         })
       } else {
         authApi.putAuthSetting(form.value.auth_type, form.value, loading).then((res) => {
