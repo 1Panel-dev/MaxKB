@@ -17,6 +17,7 @@ from langchain_core.messages import BaseMessage, AIMessage
 from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
+from application.flow.tools import Reasoning
 from setting.models import Model
 from setting.models_provider import get_model_credential
 from setting.models_provider.tools import get_model_instance_by_model_user_id
@@ -49,13 +50,24 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     response = node_variable.get('result')
     answer = ''
     reasoning_content = ''
+    model_setting = node.context.get('model_setting',
+                                     {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
+                                      'reasoning_content_start': '<think>'})
+    reasoning = Reasoning(model_setting.get('reasoning_content_start'), model_setting.get('reasoning_content_end'))
     for chunk in response:
-        answer += chunk.content
-        reasoning_content_chunk = chunk.additional_kwargs.get('reasoning_content', '')
+        reasoning_chunk = reasoning.get_reasoning_content(chunk)
+        content_chunk = reasoning_chunk.get('content')
+        if 'reasoning_content' in chunk.additional_kwargs:
+            reasoning_content_chunk = chunk.additional_kwargs.get('reasoning_content', '')
+        else:
+            reasoning_content_chunk = reasoning_chunk.get('reasoning_content')
+        answer += content_chunk
         if reasoning_content_chunk is None:
             reasoning_content_chunk = ''
         reasoning_content += reasoning_content_chunk
-        yield {'content': chunk.content, 'reasoning_content': reasoning_content_chunk}
+        yield {'content': content_chunk,
+               'reasoning_content': reasoning_content_chunk if model_setting.get('reasoning_content_enable',
+                                                                                 False) else ''}
     _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
@@ -107,12 +119,17 @@ class BaseChatNode(IChatNode):
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,
                 dialogue_type=None,
+                model_setting=None,
                 **kwargs) -> NodeResult:
         if dialogue_type is None:
             dialogue_type = 'WORKFLOW'
 
         if model_params_setting is None:
             model_params_setting = get_default_model_params_setting(model_id)
+        if model_setting is None:
+            model_setting = {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
+                             'reasoning_content_start': '<think>'}
+        self.context['model_setting'] = model_setting
         chat_model = get_model_instance_by_model_user_id(model_id, self.flow_params_serializer.data.get('user_id'),
                                                          **model_params_setting)
         history_message = self.get_history_message(history_chat_record, dialogue_number, dialogue_type,

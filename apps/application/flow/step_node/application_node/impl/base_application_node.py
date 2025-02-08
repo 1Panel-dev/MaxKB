@@ -153,7 +153,8 @@ class BaseApplicationNode(IApplicationNode):
             return [Answer(n.get('content'), n.get('view_type'), self.runtime_node_id,
                            self.workflow_params['chat_record_id'], {'runtime_node_id': n.get('runtime_node_id'),
                                                                     'chat_record_id': n.get('chat_record_id')
-                               , 'child_node': n.get('child_node')}, n.get('real_node_id'), n.get('reasoning_content'))
+                               , 'child_node': n.get('child_node')}, n.get('real_node_id'),
+                           n.get('reasoning_content', ''))
                     for n in
                     sorted(application_node_dict.values(), key=lambda item: item.get('index'))]
 
