@@ -106,8 +106,8 @@ export default {
       queryCount: 'Total Queries',
       tokensTotal: 'Total Tokens Used',
       userSatisfaction: 'User Feedback Metrics',
-      approval: 'Approval',
-      disapproval: 'Disapproval'
+      approval: 'Like',
+      disapproval: 'Dislike'
     }
   }
 }

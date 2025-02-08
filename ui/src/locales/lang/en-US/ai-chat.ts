@@ -1,97 +1,95 @@
 export default {
-  noHistory: 'No History',
-  createChat: 'New Chat',
+  noHistory: 'No Chat History',
+  createChat: 'New Conversation',
   history: 'Chat History',
-  only20history: 'Only showing the last 20 chats',
-  question_count: 'Messages',
-  exportRecords: 'Export Chat Records',
+  only20history: 'Showing only the last 20 conversations',
+  question_count: 'Questions',
+  exportRecords: 'Export Chat History',
   chatId: 'Chat ID',
   userInput: 'User Input',
   quote: 'Quote',
-  download: 'Download File',
+  download: 'Click to Download',
   passwordValidator: {
-    title: 'Enter password to open the link',
+    title: 'Enter Password to Access',
     errorMessage1: 'Password cannot be empty',
     errorMessage2: 'Incorrect password'
   },
   operation: {
     play: 'Play',
-    pause: 'Stop',
-    regeneration: 'Re-answer',
-    like: 'Agree',
-    cancelLike: 'Cancel Agree',
-    oppose: 'Disagree',
-    cancelOppose: 'Cancel Disagree',
+    pause: 'Pause',
+    regeneration: 'Regenerate Response',
+    like: 'Like',
+    cancelLike: 'Unlike',
+    oppose: 'Dislike',
+    cancelOppose: 'Undo Dislike',
     continue: 'Continue',
-    stopChat: 'Stop Output'
+    stopChat: 'Stop Response'
   },
   tip: {
     error500Message: 'Sorry, the service is currently under maintenance. Please try again later!',
-    errorIdentifyMessage: 'Unable to identify user',
-    errorLimitMessage:
-      'Sorry, you have reached the maximum number of questions. Please try again tomorrow!',
-    answerMessage:
-      'Sorry, no relevant content was found. Please rephrase your question or provide more information.',
-    stopAnswer: 'Output stopped',
-    answerLoading: 'Thinking',
-    recorderTip: `<p>This feature requires the use of a microphone. Browsers prohibit recording on insecure pages. Solutions are as follows:<br/>
-1. Enable HTTPS to resolve;<br/>
-2. If there is no HTTPS configuration, modify the browser security settings. Chrome settings as follows:<br/>
+    errorIdentifyMessage: 'Unable to verify user identity',
+    errorLimitMessage: 'Sorry, you have reached the maximum number of questions. Please try again tomorrow!',
+    answerMessage: 'Sorry, no relevant content found. Please rephrase your question or provide more details.',
+    stopAnswer: 'Response Stopped',
+    answerLoading: 'Generating Response...',
+    recorderTip: `<p>This feature requires microphone access. Browsers block recording on insecure pages. Solutions:<br/>
+1. Enable HTTPS;<br/>
+2. If HTTPS is not available, adjust browser security settings. For Chrome:<br/>
 (1) Enter chrome://flags/#unsafely-treat-insecure-origin-as-secure in the address bar;<br/>
-(2) Add the HTTP site to the text box, e.g., http://127.0.0.1:8080.</p>`,
-    recorderError: 'Recording failed',
-    confirm: 'I understand',
+(2) Add your HTTP site, e.g., http://127.0.0.1:8080.</p>`,
+    recorderError: 'Recording Failed',
+    confirm: 'Got it',
     requiredMessage: 'Please fill in all required fields',
-    inputParamMessage1: 'Please enter parameters in the URL',
+    inputParamMessage1: 'Please specify a parameter in the URL',
     inputParamMessage2: 'value',
     prologueMessage: 'Sorry, the service is currently under maintenance. Please try again later!'
   },
   inputPlaceholder: {
-    speaking: 'Speaking',
-    recorderLoading: 'Transcribing',
-    default: 'Enter your question, Ctrl+Enter for new line, Enter to send'
+    speaking: 'Speaking...',
+    recorderLoading: 'Transcribing...',
+    default: 'Type your question, Ctrl+Enter for a new line, Enter to send'
   },
   uploadFile: {
     label: 'Upload File',
-    most: 'Up to',
-    limit: 'files, each file limited to',
+    most: 'Maximum',
+    limit: 'files allowed, each up to',
     fileType: 'File Type',
-    tipMessage: 'Please select file types in the file upload configuration',
-    limitMessage1: 'Up to',
+    tipMessage: 'Please select allowed file types in the upload settings',
+    limitMessage1: 'You can upload up to',
     limitMessage2: 'files',
-    sizeLimit: 'Each file size cannot exceed',
-    imageMessage: 'Please parse the image content',
-    errorMessage: 'Upload failed'
+    sizeLimit: 'Each file must not exceed',
+    imageMessage: 'Please process the image content',
+    errorMessage: 'Upload Failed'
   },
   executionDetails: {
     title: 'Execution Details',
     paramInput: 'Parameter Input',
     paramOutput: 'Parameter Output',
-    paramOutputTooltip: 'Each document supports preview of up to 500 words',
+    paramOutputTooltip: 'Each document supports previewing up to 500 characters',
     audioFile: 'Audio File',
-    searchContent: 'Search Content',
+    searchContent: 'Search Query',
     searchResult: 'Search Results',
-    conditionResult: 'Condition Result',
-    currentChat: 'Current Chat',
+    conditionResult: 'Condition Evaluation',
+    currentChat: 'Current Conversation',
     answer: 'AI Response',
     replyContent: 'Reply Content',
     textContent: 'Text Content',
     input: 'Input',
     output: 'Output',
-    rerankerContent: 'Reranked Content',
-    rerankerResult: 'Reranked Results',
+    rerankerContent: 'Re-ranked Content',
+    rerankerResult: 'Re-ranking Results',
     paragraph: 'Segment',
-    noSubmit: 'User did not submit',
+    noSubmit: 'No submission from user',
     errMessage: 'Error Log'
   },
   KnowledgeSource: {
     title: 'Knowledge Source',
-    referenceParagraph: 'Quote',
-    consume: 'Tokens',
-    consumeTime: 'Run Time'
+    referenceParagraph: 'Cited Segment',
+    consume: 'Token Consumption',
+    consumeTime: 'Processing Time'
   },
   paragraphSource: {
-    title: 'Quote',
+    title: 'Knowledge Quote',
     question: 'User Question',
     optimizationQuestion: 'Optimized Question'
   }
