@@ -21,10 +21,10 @@
               v-for="(item, index) in document_list"
               :key="index"
               :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="12"
-              :xl="12"
+              :sm="props.type === 'debug-ai-chat' ? 24 : 12"
+              :md="props.type === 'debug-ai-chat' ? 24 : 12"
+              :lg="props.type === 'debug-ai-chat' ? 24 : 12"
+              :xl="props.type === 'debug-ai-chat' ? 24 : 12"
               class="mb-8 w-full"
             >
               <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
@@ -45,17 +45,8 @@
           </el-row>
         </div>
         <div class="mb-8" v-if="image_list.length">
-          <el-row :gutter="10">
-            <el-col
-              v-for="(item, index) in image_list"
-              :key="index"
-              :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="12"
-              :xl="12"
-              class="mb-8"
-            >
+          <el-space wrap>
+            <template v-for="(item, index) in image_list" :key="index">
               <div class="file cursor border-r-4" v-if="item.url">
                 <el-image
                   :src="item.url"
@@ -70,8 +61,8 @@
                   class="border-r-4"
                 />
               </div>
-            </el-col>
-          </el-row>
+            </template>
+          </el-space>
         </div>
         <div class="mb-8" v-if="audio_list.length">
           <el-row :gutter="10">
@@ -79,10 +70,10 @@
               v-for="(item, index) in audio_list"
               :key="index"
               :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="12"
-              :xl="12"
+              :sm="props.type === 'debug-ai-chat' ? 24 : 12"
+              :md="props.type === 'debug-ai-chat' ? 24 : 12"
+              :lg="props.type === 'debug-ai-chat' ? 24 : 12"
+              :xl="props.type === 'debug-ai-chat' ? 24 : 12"
               class="mb-8"
             >
               <div class="file cursor border-r-4" v-if="item.url">
@@ -109,6 +100,7 @@ import { onMounted, computed } from 'vue'
 const props = defineProps<{
   application: any
   chatRecord: chatType
+  type: 'log' | 'ai-chat' | 'debug-ai-chat'
 }>()
 const document_list = computed(() => {
   if (props.chatRecord?.upload_meta) {
@@ -162,7 +154,6 @@ onMounted(() => {})
       display: none;
     }
   }
-
 
   .download-button {
     display: none;
