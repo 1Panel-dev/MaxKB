@@ -83,8 +83,8 @@ export default {
   KnowledgeSource: {
     title: 'Knowledge Source',
     referenceParagraph: 'Cited Segment',
-    consume: 'Token Consumption',
-    consumeTime: 'Processing Time'
+    consume: 'Tokens',
+    consumeTime: 'Runtime'
   },
   paragraphSource: {
     title: 'Knowledge Quote',
