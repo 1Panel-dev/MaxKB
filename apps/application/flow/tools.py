@@ -18,6 +18,10 @@ from common.response import result
 
 class Reasoning:
     def __init__(self, reasoning_content_start, reasoning_content_end):
+        if not reasoning_content_start:
+            reasoning_content_start = "<think>"
+        if not reasoning_content_end:
+            reasoning_content_end = "</think>"
         self.content = ""
         self.reasoning_content = ""
         self.all_content = ""
