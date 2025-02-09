@@ -19,10 +19,10 @@
               v-for="(item, index) in uploadDocumentList"
               :key="index"
               :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="12"
-              :xl="12"
+              :sm="props.type === 'debug-ai-chat' ? 24 : 12"
+              :md="props.type === 'debug-ai-chat' ? 24 : 12"
+              :lg="props.type === 'debug-ai-chat' ? 24 : 12"
+              :xl="props.type === 'debug-ai-chat' ? 24 : 12"
               class="mb-8"
             >
               <el-card
@@ -54,10 +54,10 @@
 
             <el-col
               :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="12"
-              :xl="12"
+              :sm="props.type === 'debug-ai-chat' ? 24 : 12"
+              :md="props.type === 'debug-ai-chat' ? 24 : 12"
+              :lg="props.type === 'debug-ai-chat' ? 24 : 12"
+              :xl="props.type === 'debug-ai-chat' ? 24 : 12"
               class="mb-8"
               v-for="(item, index) in uploadAudioList"
               :key="index"
@@ -85,10 +85,10 @@
               </el-card>
             </el-col>
           </el-row>
-          <div class="flex">
+          <el-space wrap>
             <template v-for="(item, index) in uploadImageList" :key="index">
               <div
-                class="file cursor border border-r-4 mr-8"
+                class="file cursor border border-r-4"
                 v-if="item.url"
                 @mouseenter.stop="mouseenter(item)"
                 @mouseleave.stop="mouseleave()"
@@ -111,7 +111,7 @@
                 />
               </div>
             </template>
-          </div>
+          </el-space>
         </div>
       </el-scrollbar>
       <div class="flex">

@@ -93,17 +93,17 @@ export default {
       },
 
       voiceInput: {
-        label: 'Voice input',
+        label: 'Voice Input',
         placeholder: 'Please select a speech recognition model',
         requiredMessage: 'Please select a speech input model',
-        autoSend: 'Automatic sending'
+        autoSend: 'Automatic Sending'
       },
       voicePlay: {
-        label: 'Voice playback',
+        label: 'Voice Playback',
         placeholder: 'Please select a speech synthesis model',
         requiredMessage: 'Please select a speech playback model',
-        autoPlay: 'Automatic playback',
-        browser: 'Browser playback (free)',
+        autoPlay: 'Automatic Playback',
+        browser: 'Browser Playback (free)',
         tts: 'TTS Model',
         listeningTest: 'Preview'
       },

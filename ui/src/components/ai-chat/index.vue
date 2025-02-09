@@ -18,7 +18,11 @@
 
         <template v-for="(item, index) in chatList" :key="index">
           <!-- 问题 -->
-          <QuestionContent :application="applicationDetails" :chat-record="item"></QuestionContent>
+          <QuestionContent
+            :type="type"
+            :application="applicationDetails"
+            :chat-record="item"
+          ></QuestionContent>
           <!-- 回答 -->
           <AnswerContent
             :application="applicationDetails"

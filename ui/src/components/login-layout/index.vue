@@ -54,7 +54,7 @@ const changeLang = (lang: string) => {
 }
 
 const currentLanguage = computed(() => {
-  return langList.value?.filter((v: any) => v.value === user.getLanguage())[0].label
+  return langList.value?.filter((v: any) => v.value === user.getLanguage())?.[0]?.label
 })
 
 const fileURL = computed(() => {
