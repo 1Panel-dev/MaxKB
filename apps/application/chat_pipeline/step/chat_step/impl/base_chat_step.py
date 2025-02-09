@@ -275,7 +275,6 @@ class BaseChatStep(IChatStep):
                 request_token = 0
                 response_token = 0
             write_context(self, manage, request_token, response_token, chat_result.content)
-            reasoning.get_reasoning_content(chat_result)
             reasoning_result = reasoning.get_reasoning_content(chat_result)
             content = reasoning_result.get('content')
             if 'reasoning_content' in chat_result.response_metadata:
