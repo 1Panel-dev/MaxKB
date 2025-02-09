@@ -1,3 +1,5 @@
+import { number } from 'echarts'
+
 export function toThousands(num: any) {
   return num?.toString().replace(/\d+/, function (n: any) {
     return n.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
@@ -51,7 +53,6 @@ export function getImgUrl(name: string) {
 }
 // 是否是白名单后缀
 export function isRightType(name: string, type: string) {
-  console.log(name, type)
   return typeList[type].includes(fileType(name).toLowerCase())
 }
 
@@ -99,4 +100,11 @@ export function downloadByURL(url: string, name: string) {
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
+}
+
+// 截取文件名
+export function cutFilename(filename: string, num: number) {
+  const lastIndex = filename.lastIndexOf('.')
+  const suffix = lastIndex === -1 ? '' : filename.substring(lastIndex + 1)
+  return filename.substring(0, num - suffix.length - 1) + '.' + suffix
 }
