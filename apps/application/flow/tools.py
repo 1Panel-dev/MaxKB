@@ -23,14 +23,23 @@ class Reasoning:
         self.all_content = ""
         self.reasoning_content_start_tag = reasoning_content_start
         self.reasoning_content_end_tag = reasoning_content_end
-        self.reasoning_content_start_tag_len = len(reasoning_content_start)
-        self.reasoning_content_end_tag_len = len(reasoning_content_end)
-        self.reasoning_content_end_tag_prefix = reasoning_content_end[0]
+        self.reasoning_content_start_tag_len = len(
+            reasoning_content_start) if reasoning_content_start is not None else 0
+        self.reasoning_content_end_tag_len = len(reasoning_content_end) if reasoning_content_end is not None else 0
+        self.reasoning_content_end_tag_prefix = reasoning_content_end[
+            0] if self.reasoning_content_end_tag_len > 0 else ''
         self.reasoning_content_is_start = False
         self.reasoning_content_is_end = False
         self.reasoning_content_chunk = ""
 
     def get_reasoning_content(self, chunk):
+        # 如果没有开始思考过程标签那么就全是结果
+        if self.reasoning_content_start_tag is None or len(self.reasoning_content_start_tag) == 0:
+            self.content += chunk.content
+            return {'content': chunk.content, 'reasoning_content': ''}
+        # 如果没有结束思考过程标签那么就全部是思考过程
+        if self.reasoning_content_end_tag is None or len(self.reasoning_content_end_tag) == 0:
+            return {'content': '', 'reasoning_content': chunk.content}
         self.all_content += chunk.content
         if not self.reasoning_content_is_start and len(self.all_content) >= self.reasoning_content_start_tag_len:
             if self.all_content.startswith(self.reasoning_content_start_tag):
