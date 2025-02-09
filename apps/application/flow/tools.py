@@ -46,7 +46,10 @@ class Reasoning:
                 self.reasoning_content_is_start = True
                 self.reasoning_content_chunk = self.all_content[self.reasoning_content_start_tag_len:]
             else:
-                self.reasoning_content_is_end = True
+                if not self.reasoning_content_is_end:
+                    self.reasoning_content_is_end = True
+                    self.content += self.all_content
+                    return {'content': self.all_content, 'reasoning_content': ''}
         else:
             if self.reasoning_content_is_start:
                 self.reasoning_content_chunk += chunk.content
