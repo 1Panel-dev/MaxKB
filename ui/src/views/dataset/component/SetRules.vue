@@ -121,6 +121,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, watch } from 'vue'
 import ParagraphPreview from '@/views/dataset/component/ParagraphPreview.vue'
+import { cutFilename } from '@/utils/utils'
 import documentApi from '@/api/document'
 import useStore from '@/stores'
 import type { KeyValue } from '@/api/type/common'
@@ -186,8 +187,12 @@ function splitDocument() {
     .postSplitDocument(fd)
     .then((res: any) => {
       const list = res.data
-      if (checkedConnect.value) {
-        list.map((item: any) => {
+
+      list.map((item: any) => {
+        if (item.name.length > 128) {
+          item.name = cutFilename(item.name, 128)
+        }
+        if (checkedConnect.value) {
           item.content.map((v: any) => {
             v['problem_list'] = v.title.trim()
               ? [
@@ -197,8 +202,9 @@ function splitDocument() {
                 ]
               : []
           })
-        })
-      }
+        }
+      })
+
       paragraphList.value = list
       loading.value = false
     })

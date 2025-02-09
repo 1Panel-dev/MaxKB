@@ -161,7 +161,11 @@
             </em>
           </p>
           <div class="upload__decoration">
-            <p>{{ $t('views.document.upload.formats') }}TXT、Markdown、PDF、DOCX、HTML、XLS、XLSX、CSV、ZIP</p>
+            <p>
+              {{
+                $t('views.document.upload.formats')
+              }}TXT、Markdown、PDF、DOCX、HTML、XLS、XLSX、CSV、ZIP
+            </p>
           </div>
         </div>
       </el-upload>
@@ -207,7 +211,9 @@ const form = ref({
 })
 
 const rules = reactive({
-  fileList: [{ required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' }]
+  fileList: [
+    { required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' }
+  ]
 })
 const FormRef = ref()
 
@@ -217,11 +223,17 @@ watch(form.value, (value) => {
 })
 
 function downloadTemplate(type: string) {
-  documentApi.exportQATemplate(`${type}${t('views.document.upload.template')}.${type == 'csv' ? type : 'xlsx'}`, type)
+  documentApi.exportQATemplate(
+    `${type}${t('views.document.upload.template')}.${type == 'csv' ? type : 'xlsx'}`,
+    type
+  )
 }
 
 function downloadTableTemplate(type: string) {
-  documentApi.exportTableTemplate(`${type}${t('views.document.upload.template')}.${type == 'csv' ? type : 'xlsx'}`, type)
+  documentApi.exportTableTemplate(
+    `${type}${t('views.document.upload.template')}.${type == 'csv' ? type : 'xlsx'}`,
+    type
+  )
 }
 
 function radioChange() {
