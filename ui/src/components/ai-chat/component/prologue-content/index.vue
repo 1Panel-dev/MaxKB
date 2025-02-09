@@ -32,7 +32,26 @@ const toQuickQuestion = (match: string, offset: number, input: string) => {
 }
 const prologue = computed(() => {
   const temp = props.available ? props.application?.prologue : t('chat.tip.prologueMessage')
-  return temp?.replace(/-\s.+/g, toQuickQuestion)
+  if (temp) {
+    const tag_list = [
+      /<html_rander>[\d\D]*?<\/html_rander>/g,
+      /<echarts_rander>[\d\D]*?<\/echarts_rander>/g,
+      /<quick_question>[\d\D]*?<\/quick_question>/g,
+      /<form_rander>[\d\D]*?<\/form_rander>/g
+    ]
+    let _temp = temp
+    for (const index in tag_list) {
+      _temp = _temp.replaceAll(tag_list[index], '')
+    }
+    const quick_question_list = _temp.match(/-\s.+/g)
+    let result = temp
+    for (const index in quick_question_list) {
+      const quick_question = quick_question_list[index]
+      result = temp.replace(quick_question, toQuickQuestion)
+    }
+    return result
+  }
+  return ''
 })
 </script>
 <style lang="scss" scoped></style>
