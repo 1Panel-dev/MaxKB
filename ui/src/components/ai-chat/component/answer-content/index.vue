@@ -82,7 +82,7 @@ const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: 
   }
 }
 const add_answer_text_list = (answer_text_list: Array<any>) => {
-  answer_text_list.push({ content: '' })
+  answer_text_list.push([ ])
 }
 
 const openControl = (event: any) => {
