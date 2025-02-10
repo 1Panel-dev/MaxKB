@@ -77,7 +77,7 @@ class User(AppModelMixin):
     role = models.CharField(max_length=150, verbose_name="角色")
     source = models.CharField(max_length=10, verbose_name="来源", default="LOCAL")
     is_active = models.BooleanField(default=True)
-    language = models.CharField(max_length=10, verbose_name="语言", default=get_language)
+    language = models.CharField(max_length=10, verbose_name="语言", null=True, default=None)
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True, null=True)
     update_time = models.DateTimeField(verbose_name="修改时间", auto_now=True, null=True)
 
