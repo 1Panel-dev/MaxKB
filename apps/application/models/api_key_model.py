@@ -50,7 +50,7 @@ class ApplicationAccessToken(AppModelMixin):
                             , default=list)
     show_source = models.BooleanField(default=False, verbose_name="是否显示知识来源")
 
-    language = models.CharField(max_length=10, verbose_name="语言", default=get_language)
+    language = models.CharField(max_length=10, verbose_name="语言", default=None, null=True)
 
     class Meta:
         db_table = "application_access_token"
