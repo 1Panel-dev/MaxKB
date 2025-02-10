@@ -388,6 +388,9 @@ export class ChatRecordManage {
       (item) => item.length == 1 && item[0].content == '',
       'index'
     )
+    if (set_index <= -1) {
+      set_index = 0
+    }
     this.chat.answer_text_list[set_index] = [
       {
         content: answer_text_block,
