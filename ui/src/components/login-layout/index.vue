@@ -6,7 +6,7 @@
           <div class="login-image" :style="{ backgroundImage: `url(${loginImage})` }"></div>
         </el-col>
         <el-col :xs="24" :sm="24" :md="14" :lg="14" :xl="14" class="right-container flex-center">
-          <el-dropdown trigger="click" type="primary" class="lang">
+          <el-dropdown trigger="click" type="primary" class="lang" v-if="lang">
             <template #dropdown>
               <el-dropdown-menu style="width: 180px">
                 <el-dropdown-item
@@ -45,6 +45,12 @@ import { getThemeImg } from '@/utils/theme'
 import useStore from '@/stores'
 import { useLocalStorage } from '@vueuse/core'
 import { langList, localeConfigKey, getBrowserLang } from '@/locales/index'
+defineProps({
+  lang: {
+    type: Boolean,
+    default: true
+  }
+})
 defineOptions({ name: 'LoginLayout' })
 const { user } = useStore()
 

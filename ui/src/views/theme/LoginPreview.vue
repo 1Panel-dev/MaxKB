@@ -10,7 +10,7 @@
         <el-icon><Close /></el-icon>
       </div>
     </div>
-    <login-layout style="height: 530px">
+    <login-layout style="height: 530px" :lang="false">
       <LoginContainer :subTitle="data.slogan" class="login-container">
         <div class="mask"></div>
         <h2 class="mb-24">{{ $t('views.login.title') }}</h2>
