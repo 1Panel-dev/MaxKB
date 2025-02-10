@@ -10,7 +10,7 @@
         <span>{{
           $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel')
         }}</span>
-        <el-select v-model="form.language">
+        <el-select v-model="form.language" clearable>
           <el-option
             v-for="item in langList"
             :key="item.value"
