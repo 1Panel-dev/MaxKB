@@ -48,7 +48,7 @@ def handle_sheet(file_name, sheet, limit: int):
                 result_item_content += next_md_content
             else:
                 paragraphs.append({'content': result_item_content, 'title': ''})
-                result_item_content = next_md_content
+                result_item_content = title_md_content + next_md_content
     if len(result_item_content) > 0:
         paragraphs.append({'content': result_item_content, 'title': ''})
     return result
