@@ -21,7 +21,7 @@ export default {
     },
     APIKeyDialog: {
       saveSettings: 'Save Settings',
-      msgConfirm1: 'Are you sure you want to delete the API Key?',
+      msgConfirm1: 'Are you sure you want to delete the API Key',
       msgConfirm2:
         'This action is irreversible. Once deleted, the API Key cannot be recovered. Do you still want to proceed?',
       enabledSuccess: 'Enabled',

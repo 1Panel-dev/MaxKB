@@ -239,7 +239,7 @@ const dayOptions = [
   {
     value: 7,
     // @ts-ignore
-    label: t('views.applicationOverview.monitor.pastDayOptions.past7Days') // 使用 t 方法来国际化显示文本
+    label: t('views.applicationOverview.monitor.pastDayOptions.past7Days')
   },
   {
     value: 30,

@@ -42,9 +42,9 @@ export const defaultSetting = {
 
 export const defaultPlatformSetting = {
   showUserManual: true,
-  userManualUrl: 'https://maxkb.cn/docs/',
+  userManualUrl: t('layout.userManualUrl'),
   showForum: true,
-  forumUrl: 'https://bbs.fit2cloud.com/c/mk/11',
+  forumUrl: t('layout.forumUrl'),
   showProject: true,
   projectUrl: 'https://github.com/1Panel-dev/MaxKB'
 }
