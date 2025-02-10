@@ -20,12 +20,16 @@ MaxKB = Max Knowledge Base, it is a chatbot based on Large Language Models (LLM)
 
 ## Quick start
 
-```
-docker run -d --name=maxkb --restart=always -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data -v ~/.python-packages:/opt/maxkb/app/sandbox/python-packages cr2.fit2cloud.com/1panel/maxkb
+Execute the script below to start a MaxKB container using Docker:
 
-# username: admin
-# pass: MaxKB@123..
+```bash
+docker run -d --name=maxkb --restart=always -p 8080:8080 -v ~/.maxkb:/var/lib/postgresql/data -v ~/.python-packages:/opt/maxkb/app/sandbox/python-packages 1panel/maxkb
 ```
+
+Access MaxKB web interface at `http://your_server_ip:8080` with default admin credentials:
+
+- username: admin
+- password: MaxKB@123..
 
 ## Screenshots
 
