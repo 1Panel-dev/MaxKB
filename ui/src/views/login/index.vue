@@ -217,7 +217,7 @@ const login = () => {
     user
       .login(loginMode.value, loginForm.value.username, loginForm.value.password)
       .then(() => {
-        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'zh-CN'
+        locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
         router.push({ name: 'home' })
       })
       .finally(() => (loading.value = false))
