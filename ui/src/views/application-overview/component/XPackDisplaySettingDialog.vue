@@ -50,7 +50,7 @@
                   />
                 </div>
 
-                <h4>
+                <h4 class="ellipsis">
                   {{ detail?.name || $t('views.application.applicationForm.form.appName.label') }}
                 </h4>
               </div>

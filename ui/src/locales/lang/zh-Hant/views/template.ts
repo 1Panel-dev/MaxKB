@@ -53,7 +53,7 @@ export default {
       permissionType: {
         label: '權限',
         privateDesc: '僅當前使用者使用',
-        publicDesc: '所有使用者都可使用，但不能編輯',
+        publicDesc: '所有使用者都可使用',
         requiredMessage: '權限不能為空'
       },
       model_type: {
