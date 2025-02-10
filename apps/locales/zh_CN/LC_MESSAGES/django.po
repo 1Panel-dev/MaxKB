@@ -1115,7 +1115,7 @@ msgstr "只支持 and|or"
 
 #: .\apps\application\serializers\chat_serializers.py:228
 msgid "Problem after optimization"
-msgstr "優化後的問題"
+msgstr "优化后的问题"
 
 #: .\apps\application\serializers\chat_serializers.py:229
 msgid "answer"
