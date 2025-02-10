@@ -58,7 +58,7 @@ const locale_map: any = {
   'en-US': enUs
 }
 app.use(ElementPlus, {
-  locale: locale_map[localStorage.getItem('MaxKB-locale') || navigator.language || 'zh-CN']
+  locale: locale_map[localStorage.getItem('MaxKB-locale') || navigator.language || 'en-US']
 })
 
 app.use(router)

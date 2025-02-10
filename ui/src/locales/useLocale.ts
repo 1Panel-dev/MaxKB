@@ -9,11 +9,11 @@ export function useLocale() {
     function changeLocale(lang: string) {
         // 如果切换的语言不在对应语言文件里则默认为简体中文
         if (!langCode.includes(lang)) {
-            lang = 'zh-CN';
+            lang = 'en-US';
         }
 
         locale.value = lang;
-        useLocalStorage(localeConfigKey, 'zh-CN').value = lang;
+        useLocalStorage(localeConfigKey, 'en-US').value = lang;
     }
 
     const getComponentsLocale = computed(() => {

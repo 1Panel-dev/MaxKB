@@ -383,7 +383,7 @@ import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import { isAppIcon, isWorkFlow } from '@/utils/application'
 import applicationXpackApi from '@/api/application-xpack'
 import { MsgSuccess, MsgError } from '@/utils/message'
-import { langList, t } from '@/locales'
+import { getBrowserLang, langList, t } from '@/locales'
 import useStore from '@/stores'
 import { cloneDeep } from 'lodash'
 
@@ -398,7 +398,7 @@ const emit = defineEmits(['refresh'])
 
 const defaultSetting = {
   show_source: false,
-  language: 'zh-CN',
+  language: getBrowserLang(),
   show_history: true,
   draggable: true,
   show_guide: true,
@@ -427,7 +427,7 @@ const form = ref<any>({
 
 const xpackForm = ref<any>({
   show_source: false,
-  language: 'zh-CN',
+  language: getBrowserLang(),
   show_history: false,
   draggable: false,
   show_guide: false,

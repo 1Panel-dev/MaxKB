@@ -49,8 +49,7 @@ import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import applicationApi from '@/api/application'
 import { isWorkFlow } from '@/utils/application'
 import { MsgSuccess, MsgError } from '@/utils/message'
-import { langList, t } from '@/locales'
-
+import { getBrowserLang, langList, t } from '@/locales'
 const route = useRoute()
 const {
   params: { id }
@@ -80,7 +79,7 @@ const open = (data: any, content: any) => {
   form.value.show_source = data.show_source
   form.value.language = data.language
   if (!form.value.language) {
-    form.value.language = 'zh-CN'
+    form.value.language = getBrowserLang()
   }
 
   dialogVisible.value = true
