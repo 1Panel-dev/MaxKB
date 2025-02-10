@@ -11,7 +11,11 @@ export default {
   about: {
     title: '關於',
     expiredTime: '到期時間',
-    edition: '版本',
+    edition: {
+      label: '版本',
+      community: '社群版',
+      professional: '專業版'
+    },
     version: '版本號',
     serialNo: '序列號',
     remark: '備註',

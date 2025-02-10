@@ -10,7 +10,11 @@ export default {
   about: {
     title: '关于',
     expiredTime: '到期时间',
-    edition: '版本',
+    edition: {
+      label: '版本',
+      community: '社区版',
+      professional: '专业版'
+    },
     version: '版本号',
     serialNo: '序列号',
     remark: '备注',

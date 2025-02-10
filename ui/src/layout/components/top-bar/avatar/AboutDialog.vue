@@ -23,7 +23,8 @@
         >
       </div>
       <div class="flex">
-        <span class="label">{{ $t('layout.about.edition') }}</span><span>{{ user.showXpack() ? '专业版' : '社区版' }}</span>
+        <span class="label">{{ $t('layout.about.edition.label') }}</span>
+        <span>{{ user.showXpack() ? $t('layout.about.edition.professional') : $t('layout.about.edition.community') }}</span>
       </div>
       <div class="flex">
         <span class="label">{{ $t('layout.about.version') }}</span><span>{{ user.version }}</span>

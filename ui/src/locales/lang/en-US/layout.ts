@@ -10,12 +10,17 @@ export default {
   about: {
     title: 'About',
     expiredTime: 'Expiration Date',
-    edition: 'Edition',
+    edition: {
+      label: 'Edition',
+      community: 'Community Edition',
+      professional: 'Professional Edition'
+    },
     version: 'Version',
     serialNo: 'Serial No.',
     remark: 'Remarks',
     update: 'Update',
-    authorize: 'Authorized'
+    authorize: 'Authorized',
+    
   },
   time: {
     daysLater: 'days later',
