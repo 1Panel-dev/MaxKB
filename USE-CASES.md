@@ -9,3 +9,4 @@
 - [MaxKB 应用案例：孩子要上幼儿园了，AI 智能助手择校好帮手](https://www.bilibili.com/video/BV1wKrhYvEer)
 - [MaxKB 应用案例：产品使用指南AI助手，新手小白也能轻松搞定！](https://www.bilibili.com/video/BV1Yz6gYtEqX)
 - [MaxKB 应用案例：生物医药AI客服智能体验!](https://www.bilibili.com/video/BV13JzvYsE3e)
+- [MaxKB 应用案例：高校行政管理AI小助手](https://www.bilibili.com/video/BV1yvBMYvEdy)
