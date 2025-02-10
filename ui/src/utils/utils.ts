@@ -49,7 +49,7 @@ export function getImgUrl(name: string) {
   const list = Object.values(typeList).flat()
 
   const type = list.includes(fileType(name).toLowerCase()) ? fileType(name).toLowerCase() : 'unknow'
-  return new URL(`../assets/${type}-icon.svg`, import.meta.url).href
+  return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
 }
 // 是否是白名单后缀
 export function isRightType(name: string, type: string) {
