@@ -25,6 +25,7 @@ import useStore from '@/stores'
 import Auth from '@/views/chat/auth/index.vue'
 import { hexToRgba } from '@/utils/theme'
 import { useI18n } from 'vue-i18n'
+import { getBrowserLang } from '@/locales/index'
 const { locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const { application, user } = useStore()
@@ -80,7 +81,7 @@ const init_data_end = ref<boolean>(false)
 const applicationAvailable = ref<boolean>(true)
 function getAppProfile() {
   return application.asyncGetAppProfile(loading).then((res: any) => {
-    locale.value = res.data?.language
+    locale.value = res.data?.language || getBrowserLang()
     show_history.value = res.data?.show_history
     application_profile.value = res.data
   })
