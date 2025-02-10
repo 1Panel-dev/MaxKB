@@ -47,7 +47,7 @@ const prologue = computed(() => {
     let result = temp
     for (const index in quick_question_list) {
       const quick_question = quick_question_list[index]
-      result = temp.replace(quick_question, toQuickQuestion)
+      result = result.replace(quick_question, toQuickQuestion)
     }
     return result
   }
