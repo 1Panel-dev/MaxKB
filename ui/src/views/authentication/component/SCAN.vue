@@ -1,13 +1,13 @@
 <template>
-  <div v-loading="loading">
-    <el-card shadow="hover" class="border-none cursor" style="--el-card-padding: 16px 24px">
+  <div v-loading="loading" class="scan-height">
+    <el-scrollbar>
       <div v-for="item in platforms" :key="item.key" class="mb-16">
-        <el-card class="mb-16" shadow="hover" style="--el-card-padding: 16px">
+        <el-card class="border-none mb-16" shadow="none">
           <div class="flex-between">
-            <div class="flex align-center ml-8 mr-8">
-              <img :src="item.logoSrc" alt="" class="icon" />
-              <h5 style="margin-left: 8px">{{ item.name }}</h5>
-              <el-tag v-if="item.isValid" type="success" class="ml-4"
+            <div class="flex align-center">
+              <img :src="item.logoSrc" alt="" width="24px" />
+              <h5 class="ml-8">{{ item.name }}</h5>
+              <el-tag v-if="item.isValid" type="success" class="ml-8"
                 >{{ $t('views.system.authentication.scanTheQRCode.effective') }}
               </el-tag>
             </div>
@@ -81,7 +81,7 @@
         </el-card>
       </div>
       <EditModel ref="EditModelRef" @refresh="refresh" />
-    </el-card>
+    </el-scrollbar>
   </div>
 </template>
 
@@ -230,46 +230,7 @@ function showDialog(platform: Platform) {
 </script>
 
 <style lang="scss" scoped>
-.icon {
-  width: 24px;
-  height: 24px;
-}
-
-.flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.flex {
-  display: flex;
-}
-
-.align-center {
-  align-items: center;
-}
-
-.ml-4 {
-  margin-left: 4px;
-}
-
-.ml-8 {
-  margin-left: 8px;
-}
-
-.mr-8 {
-  margin-right: 8px;
-}
-
-.mb-16 {
-  margin-bottom: 16px;
-}
-
-.border-t {
-  border-top: 1px solid #ebeef5;
-}
-
-.vertical-middle {
-  vertical-align: middle;
+.scan-height {
+  height: calc(100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 70px);
 }
 </style>

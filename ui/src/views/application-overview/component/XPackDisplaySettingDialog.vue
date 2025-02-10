@@ -174,7 +174,7 @@
           <h5 class="mb-8">
             {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel') }}
           </h5>
-          <el-select v-model="form.language">
+          <el-select v-model="form.language" clearable>
             <el-option
               v-for="item in langList"
               :key="item.value"
@@ -383,7 +383,7 @@ import type { FormInstance, FormRules, UploadFiles } from 'element-plus'
 import { isAppIcon, isWorkFlow } from '@/utils/application'
 import applicationXpackApi from '@/api/application-xpack'
 import { MsgSuccess, MsgError } from '@/utils/message'
-import { getBrowserLang, langList, t } from '@/locales'
+import { langList, t } from '@/locales'
 import useStore from '@/stores'
 import { cloneDeep } from 'lodash'
 
@@ -398,7 +398,7 @@ const emit = defineEmits(['refresh'])
 
 const defaultSetting = {
   show_source: false,
-  language: getBrowserLang(),
+  language: '',
   show_history: true,
   draggable: true,
   show_guide: true,
@@ -427,7 +427,7 @@ const form = ref<any>({
 
 const xpackForm = ref<any>({
   show_source: false,
-  language: getBrowserLang(),
+  language: '',
   show_history: false,
   draggable: false,
   show_guide: false,

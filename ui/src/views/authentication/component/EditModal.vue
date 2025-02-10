@@ -9,7 +9,7 @@ template
   >
     <template #header>
       <div class="flex align-center" style="margin-left: -8px">
-        <h4>{{ currentPlatform.name + ' ' + $t('common.setting') }}</h4>
+        <h4>{{ currentPlatform.name }}</h4>
       </div>
     </template>
 
@@ -225,5 +225,4 @@ function saveConfig() {
 </script>
 
 <style lang="scss" scoped>
-// 保持原有的样式
 </style>
