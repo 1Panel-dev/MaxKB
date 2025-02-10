@@ -51,6 +51,10 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
 - LLM Framework：[LangChain](https://www.langchain.com/)
 - Database：[PostgreSQL + pgvector](https://www.postgresql.org/)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/MaxKB&type=Date)](https://star-history.com/#1Panel-dev/MaxKB&Date)
+
 ## License
 
 Licensed under The GNU General Public License version 3 (GPLv3)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
