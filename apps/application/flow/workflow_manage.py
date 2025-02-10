@@ -10,7 +10,6 @@ import concurrent
 import json
 import threading
 import traceback
-import uuid
 from concurrent.futures import ThreadPoolExecutor
 from functools import reduce
 from typing import List, Dict
@@ -25,7 +24,6 @@ from rest_framework import status
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from application.flow import tools
-from application.flow.common import Answer
 from application.flow.i_step_node import INode, WorkFlowPostHandler, NodeResult
 from application.flow.step_node import get_node
 from common.exception.app_exception import AppApiException
@@ -312,6 +310,7 @@ class WorkflowManage:
             node = self.get_node_cls_by_id(node_id, node_details.get('up_node_id_list'))
             node.valid_args(node.node_params, node.workflow_params)
             node.save_context(node_details, self)
+            node.node_chunk.end()
             self.node_context.append(node)
 
     def run(self):
