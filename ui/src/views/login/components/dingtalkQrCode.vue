@@ -75,6 +75,7 @@ const router = useRouter()
 const { user } = useStore()
 const { load } = useScriptTag('https://g.alicdn.com/dingding/h5-dingtalk-login/0.21.0/ddlogin.js')
 const isConfigReady = ref(false)
+const errorShown = ref(false)
 
 const initActive = async () => {
   try {
@@ -100,10 +101,11 @@ const initActive = async () => {
       {
         redirect_uri: redirectUri,
         client_id: data.appKey,
-        scope: 'openid',
+        scope: 'openid corpid',
         response_type: 'code',
         state: 'fit2cloud-ding-qr',
-        prompt: 'consent'
+        prompt: 'consent',
+        corpId: data.corp_id
       },
       (loginResult) => {
         const authCode = loginResult.authCode
@@ -112,8 +114,10 @@ const initActive = async () => {
         })
       },
       (errorMsg: string) => {
-        MsgError(errorMsg)
-        console.log(errorMsg)
+        if (!errorShown.value) {
+          MsgError(errorMsg)
+          errorShown.value = true // 设置标志位为 true，表示错误已经显示过
+        }
       }
     )
   } catch (error) {
