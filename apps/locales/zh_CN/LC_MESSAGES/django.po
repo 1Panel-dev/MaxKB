@@ -6853,3 +6853,6 @@ msgstr "删除个人系统 API_KEY"
 #: .\apps\xpack\views\system_api_key_views.py:58
 msgid "Add personal system API_KEY"
 msgstr "添加个人系统 API_KEY"
+
+msgid "Tencent Cloud"
+msgstr "腾讯云"
