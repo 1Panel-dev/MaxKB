@@ -33,7 +33,7 @@ model_info_list = [
     ModelInfo('deepseek-v3', '', ModelTypeConst.LLM,
               openai_llm_model_credential, TencentCloudChatModel
               ),
-    ModelInfo('deepseek-r1', '', ModelTypeConst.IMAGE,
+    ModelInfo('deepseek-r1', '', ModelTypeConst.LLM,
               openai_llm_model_credential, TencentCloudChatModel
               ),
 ]
@@ -42,7 +42,7 @@ model_info_manage = (
     ModelInfoManage.builder()
     .append_model_info_list(model_info_list)
     .append_default_model_info(
-        ModelInfo('deepseek-v3', _('The latest gpt-3.5-turbo, updated with OpenAI adjustments'), ModelTypeConst.LLM,
+        ModelInfo('deepseek-v3', '', ModelTypeConst.LLM,
                   openai_llm_model_credential, TencentCloudChatModel
                   ))
     .build()
