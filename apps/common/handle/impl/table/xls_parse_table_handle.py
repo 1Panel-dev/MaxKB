@@ -68,6 +68,9 @@ class XlsSplitHandle(BaseParseTableHandle):
             sheets = workbook.sheets()
             md_tables = ''
             for sheet in sheets:
+                # 过滤空白的sheet
+                if sheet.nrows == 0 or sheet.ncols == 0:
+                    continue
 
                 # 获取表头和内容
                 headers = sheet.row_values(0)
