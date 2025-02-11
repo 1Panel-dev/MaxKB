@@ -6715,3 +6715,6 @@ msgstr ""
 #: .\apps\xpack\views\system_api_key_views.py:58
 msgid "Add personal system API_KEY"
 msgstr ""
+
+msgid "Tencent Cloud"
+msgstr ""

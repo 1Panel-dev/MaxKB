@@ -11,9 +11,7 @@ import os
 from common.util.file_util import get_file_content
 from setting.models_provider.base_model_provider import IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, \
     ModelInfoManage
-from setting.models_provider.impl.openai_model_provider.credential.embedding import OpenAIEmbeddingCredential
 from setting.models_provider.impl.openai_model_provider.credential.llm import OpenAILLMModelCredential
-from setting.models_provider.impl.openai_model_provider.model.embedding import OpenAIEmbeddingModel
 from setting.models_provider.impl.volcanic_engine_model_provider.credential.embedding import VolcanicEmbeddingCredential
 from setting.models_provider.impl.volcanic_engine_model_provider.credential.image import \
     VolcanicEngineImageModelCredential
