@@ -87,7 +87,9 @@ export default {
       agentIdPlaceholder: '请输入 Agent Id',
       callbackWarning: '请输入有效的 URL 地址',
       larkQrCode: '飞书扫码登录',
-      dingtalkQrCode: '钉钉扫码登录'
+      dingtalkQrCode: '钉钉扫码登录',
+      setting: '设置',
+      access: '接入'
     }
   },
   theme: {

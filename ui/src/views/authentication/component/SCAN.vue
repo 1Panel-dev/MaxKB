@@ -13,7 +13,7 @@
             </div>
             <div>
               <el-button type="primary" v-if="!item.isValid" @click="showDialog(item)"
-                >接入
+                >{{ $t('views.system.authentication.scanTheQRCode.access') }}
               </el-button>
               <span v-if="item.isValid">
                 <span class="mr-4">{{

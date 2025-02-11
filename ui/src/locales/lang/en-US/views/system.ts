@@ -87,7 +87,9 @@ export default {
       agentIdPlaceholder: 'Please enter agent ID',
       callbackWarning: 'Please enter a valid URL address',
       larkQrCode: 'Lark Scan Code Login',
-      dingtalkQrCode: 'DingTalk Scan Code Login'
+      dingtalkQrCode: 'DingTalk Scan Code Login',
+      setting: ' Setting',
+      access: 'Access'
     }
   },
   theme: {

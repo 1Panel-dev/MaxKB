@@ -88,7 +88,9 @@ export default {
       agentIdPlaceholder: '請輸入 Agent Id',
       callbackWarning: '請輸入有效的 URL 位址',
       larkQrCode: '飛書掃碼登錄',
-      dingtalkQrCode: '釘釘掃碼登錄'
+      dingtalkQrCode: '釘釘掃碼登錄',
+      setting: '設置',
+      access: '接入'
     }
   },
   theme: {

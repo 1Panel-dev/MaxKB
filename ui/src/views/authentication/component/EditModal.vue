@@ -9,7 +9,9 @@ template
   >
     <template #header>
       <div class="flex align-center" style="margin-left: -8px">
-        <h4>{{ currentPlatform.name }}</h4>
+        <h4>
+          {{ currentPlatform.name + $t('views.system.authentication.scanTheQRCode.setting') }}
+        </h4>
       </div>
     </template>
 
@@ -224,5 +226,4 @@ function saveConfig() {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
