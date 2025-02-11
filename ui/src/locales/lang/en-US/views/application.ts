@@ -110,7 +110,7 @@ export default {
       reasoningContent: {
         label: 'Output Thinking',
         tooltip:
-          'According to the thinking tags set by the model, the content between the tags will be considered as the thought process.',
+          'Please set the thinking label based on the model\'s return, and the content in the middle of the label will be recognized as the thinking process.',
         start: 'Start',
         end: 'End'
       }

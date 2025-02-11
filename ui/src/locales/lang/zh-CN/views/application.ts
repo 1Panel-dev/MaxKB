@@ -100,7 +100,7 @@ export default {
       },
       reasoningContent: {
         label: '输出思考',
-        tooltip: '请根据模型返回的思考标签设置，标签中间的内容将为认定为思考过程',
+        tooltip: '请根据模型返回的思考标签设置，标签中间的内容将会认定为思考过程',
         start: '开始',
         end: '结束'
       }
