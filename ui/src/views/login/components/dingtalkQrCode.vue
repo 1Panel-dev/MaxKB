@@ -80,6 +80,7 @@ const errorShown = ref(false)
 const initActive = async () => {
   try {
     await load(true)
+    errorShown.value = false
     if (!isConfigReady.value) {
       return
     }
@@ -116,7 +117,7 @@ const initActive = async () => {
       (errorMsg: string) => {
         if (!errorShown.value) {
           MsgError(errorMsg)
-          errorShown.value = true // 设置标志位为 true，表示错误已经显示过
+          errorShown.value = true
         }
       }
     )
