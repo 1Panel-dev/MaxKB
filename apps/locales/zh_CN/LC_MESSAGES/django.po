@@ -1141,7 +1141,7 @@ msgstr "消耗tokens"
 
 #: .\apps\application\serializers\chat_serializers.py:232
 msgid "Time consumed (s)"
-msgstr "耗时（s）', '提问时间"
+msgstr "耗时（s）"
 
 #: .\apps\application\serializers\chat_serializers.py:233
 msgid "Question Time"
