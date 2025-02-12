@@ -79,10 +79,7 @@
                 <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
               </template>
             </el-table-column>
-            <el-table-column
-              prop="label"
-              :label="$t('dynamicsForm.paramForm.name.label')"
-            >
+            <el-table-column prop="label" :label="$t('dynamicsForm.paramForm.name.label')">
               <template #default="{ row }">
                 <span v-if="row.label && row.label.input_type === 'TooltipLabel'">
                   <span :title="row.label.label" class="ellipsis-1">
@@ -97,10 +94,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column
-              :label="$t('dynamicsForm.paramForm.input_type.label')"
-              width="110px"
-            >
+            <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="110px">
               <template #default="{ row }">
                 <el-tag type="info" class="info-tag">{{
                   input_type_list.find((item) => item.value === row.input_type)?.label
@@ -108,17 +102,14 @@
               </template>
             </el-table-column>
 
-            <el-table-column
-              prop="default_value"
-              :label="$t('dynamicsForm.default.label')"
-            >
+            <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')">
               <template #default="{ row }">
                 <span :title="row.default_value" class="ellipsis-1">{{
                   getDefaultValue(row)
                 }}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('common.required')"  width="85">
+            <el-table-column :label="$t('common.required')" width="85">
               <template #default="{ row }">
                 <div @click.stop>
                   <el-switch disabled size="small" v-model="row.required" />
@@ -193,6 +184,7 @@ const sync_form_field_list = () => {
     }))
   ]
   set(props.nodeModel.properties.config, 'fields', fields)
+  props.nodeModel.clear_next_node_field(false)
 }
 const addFormCollectRef = ref<InstanceType<typeof AddFormCollect>>()
 const editFormCollectRef = ref<InstanceType<typeof EditFormCollect>>()
