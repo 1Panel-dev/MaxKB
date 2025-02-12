@@ -55,10 +55,12 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
                                       'reasoning_content_start': '<think>'})
     reasoning = Reasoning(model_setting.get('reasoning_content_start', '<think>'),
                           model_setting.get('reasoning_content_end', '</think>'))
+    response_reasoning_content = False
     for chunk in response:
         reasoning_chunk = reasoning.get_reasoning_content(chunk)
         content_chunk = reasoning_chunk.get('content')
         if 'reasoning_content' in chunk.additional_kwargs:
+            response_reasoning_content = True
             reasoning_content_chunk = chunk.additional_kwargs.get('reasoning_content', '')
         else:
             reasoning_content_chunk = reasoning_chunk.get('reasoning_content')
@@ -69,6 +71,16 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         yield {'content': content_chunk,
                'reasoning_content': reasoning_content_chunk if model_setting.get('reasoning_content_enable',
                                                                                  False) else ''}
+
+    reasoning_chunk = reasoning.get_end_reasoning_content()
+    answer += reasoning_chunk.get('content')
+    reasoning_content_chunk = ""
+    if not response_reasoning_content:
+        reasoning_content_chunk = reasoning_chunk.get(
+            'reasoning_content')
+    yield {'content': reasoning_chunk.get('content'),
+           'reasoning_content': reasoning_content_chunk if model_setting.get('reasoning_content_enable',
+                                                                             False) else ''}
     _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
@@ -86,11 +98,12 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
                                       'reasoning_content_start': '<think>'})
     reasoning = Reasoning(model_setting.get('reasoning_content_start'), model_setting.get('reasoning_content_end'))
     reasoning_result = reasoning.get_reasoning_content(response)
-    content = reasoning_result.get('content')
+    reasoning_result_end = reasoning.get_end_reasoning_content()
+    content = reasoning_result.get('content') + reasoning_result_end.get('content')
     if 'reasoning_content' in response.response_metadata:
         reasoning_content = response.response_metadata.get('reasoning_content', '')
     else:
-        reasoning_content = reasoning_result.get('reasoning_content')
+        reasoning_content = reasoning_result.get('reasoning_content') + reasoning_result_end.get('reasoning_content')
     _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 

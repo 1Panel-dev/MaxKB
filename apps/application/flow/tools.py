@@ -32,6 +32,17 @@ class Reasoning:
         self.reasoning_content_is_end = False
         self.reasoning_content_chunk = ""
 
+    def get_end_reasoning_content(self):
+        if not self.reasoning_content_is_start and not self.reasoning_content_is_end:
+            r = {'content': self.all_content, 'reasoning_content': ''}
+            self.reasoning_content_chunk = ""
+            return r
+        if self.reasoning_content_is_start and not self.reasoning_content_is_end:
+            r = {'content': '', 'reasoning_content': self.reasoning_content_chunk}
+            self.reasoning_content_chunk = ""
+            return r
+        return {'content': '', 'reasoning_content': ''}
+
     def get_reasoning_content(self, chunk):
         # 如果没有开始思考过程标签那么就全是结果
         if self.reasoning_content_start_tag is None or len(self.reasoning_content_start_tag) == 0:
@@ -60,8 +71,7 @@ class Reasoning:
             return {'content': chunk.content, 'reasoning_content': ''}
         # 是否包含结束
         if reasoning_content_end_tag_prefix_index > -1:
-            if len(
-                    self.reasoning_content_chunk) - reasoning_content_end_tag_prefix_index > self.reasoning_content_end_tag_len:
+            if len(self.reasoning_content_chunk) - reasoning_content_end_tag_prefix_index >= self.reasoning_content_end_tag_len:
                 reasoning_content_end_tag_index = self.reasoning_content_chunk.find(self.reasoning_content_end_tag)
                 if reasoning_content_end_tag_index > -1:
                     reasoning_content_chunk = self.reasoning_content_chunk[0:reasoning_content_end_tag_index]
