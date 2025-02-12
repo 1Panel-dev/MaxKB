@@ -31,6 +31,7 @@
               @change="addProblemHandle"
               @blur="isAddProblem = false"
               ref="inputRef"
+              class="mb-8"
             />
 
             <template v-for="(item, index) in detail.problem_list" :key="index">

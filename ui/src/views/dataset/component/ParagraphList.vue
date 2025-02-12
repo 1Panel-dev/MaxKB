@@ -76,6 +76,15 @@ const next = () => {
 
 const updateContent = (data: any) => {
   const new_value = [...props.modelValue]
+  if (
+    props.isConnect &&
+    data.title &&
+    !data?.problem_list.some((item: any) => item.content === data.title.trim())
+  ) {
+    data['problem_list'].push({
+      content: data.title.trim()
+    })
+  }
   new_value[currentCIndex.value] = cloneDeep(data)
   emit('update:modelValue', new_value)
 }
