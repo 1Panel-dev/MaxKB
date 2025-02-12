@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       dockerImageTag:
-        description: '镜像Tag'
-        default: 'v1.9.0-dev'
+        description: 'Image Tag'
+        default: 'v1.10.0-dev'
         required: true
       dockerImageTagWithLatest:
         description: '是否发布latest tag（正式发版时选择，测试版本切勿选择）'
@@ -62,6 +62,8 @@ jobs:
           DOCKER_IMAGE=${{ secrets.FIT2CLOUD_REGISTRY_HOST }}/maxkb/maxkb
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
+          TAG_NAME_WITH_LATEST=${{ github.event.inputs.dockerImageTagWithLatest }}
+          echo ${TAG_NAME_WITH_LATEST}
           if [[ ${TAG_NAME} == *dev* ]]; then
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           else
