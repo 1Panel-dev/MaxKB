@@ -59,7 +59,8 @@ const emit = defineEmits(['refresh'])
 
 const displayFormRef = ref()
 const form = ref<any>({
-  show_source: false
+  show_source: false,
+  language: '',
 })
 
 const detail = ref<any>(null)
@@ -70,18 +71,15 @@ const loading = ref(false)
 watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
-      show_source: false
+      show_source: false,
+      language: '',
     }
   }
 })
 const open = (data: any, content: any) => {
   detail.value = content
   form.value.show_source = data.show_source
-  form.value.language = data.language
-  if (!form.value.language) {
-    form.value.language = getBrowserLang()
-  }
-
+  form.value.language = data.language || getBrowserLang()
   dialogVisible.value = true
 }
 

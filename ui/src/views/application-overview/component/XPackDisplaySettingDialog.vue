@@ -146,16 +146,16 @@
         </div>
       </div>
 
-      <el-form ref="displayFormRef" :model="form">
+      <el-form ref="displayFormRef" :model="xpackForm">
         <el-row class="w-full mb-8">
           <el-col :span="12">
             <h5 class="mb-8">
               {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.customThemeColor') }}
             </h5>
             <div>
-              <el-color-picker v-model="form.custom_theme.theme_color" />
+              <el-color-picker v-model="xpackForm.custom_theme.theme_color" />
               {{
-                !form.custom_theme.theme_color
+                !xpackForm.custom_theme.theme_color
                   ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.default')
                   : ''
               }}
@@ -167,14 +167,14 @@
                 $t('views.applicationOverview.appInfo.SettingDisplayDialog.headerTitleFontColor')
               }}
             </h5>
-            <el-color-picker v-model="form.custom_theme.header_font_color" />
+            <el-color-picker v-model="xpackForm.custom_theme.header_font_color" />
           </el-col>
         </el-row>
         <el-row class="w-full mb-8">
           <h5 class="mb-8">
             {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.languageLabel') }}
           </h5>
-          <el-select v-model="form.language" clearable>
+          <el-select v-model="xpackForm.language" clearable>
             <el-option
               v-for="item in langList"
               :key="item.value"
@@ -256,7 +256,7 @@
                 $t('views.applicationOverview.appInfo.SettingDisplayDialog.iconDefaultPosition')
               }}</span>
               <el-checkbox
-                v-model="form.draggable"
+                v-model="xpackForm.draggable"
                 :label="
                   $t('views.applicationOverview.appInfo.SettingDisplayDialog.draggablePosition')
                 "
@@ -265,7 +265,7 @@
             <el-row :gutter="8" class="w-full mb-8">
               <el-col :span="12">
                 <div class="flex align-center">
-                  <el-select v-model="form.float_location.x.type" style="width: 80px">
+                  <el-select v-model="xpackForm.float_location.x.type" style="width: 80px">
                     <el-option
                       :label="
                         $t(
@@ -284,7 +284,7 @@
                     />
                   </el-select>
                   <el-input-number
-                    v-model="form.float_location.x.value"
+                    v-model="xpackForm.float_location.x.value"
                     :min="0"
                     :step="1"
                     :precision="0"
@@ -297,7 +297,7 @@
               </el-col>
               <el-col :span="12">
                 <div class="flex align-center">
-                  <el-select v-model="form.float_location.y.type" style="width: 80px">
+                  <el-select v-model="xpackForm.float_location.y.type" style="width: 80px">
                     <el-option
                       :label="
                         $t(
@@ -316,7 +316,7 @@
                     />
                   </el-select>
                   <el-input-number
-                    v-model="form.float_location.y.value"
+                    v-model="xpackForm.float_location.y.value"
                     :min="0"
                     :step="1"
                     :precision="0"
@@ -333,7 +333,7 @@
 
         <el-space direction="vertical" alignment="start" :size="2">
           <el-checkbox
-            v-model="form.show_source"
+            v-model="xpackForm.show_source"
             :label="
               isWorkFlow(detail.type)
                 ? $t('views.applicationOverview.appInfo.SettingDisplayDialog.showExecutionDetail')
@@ -341,22 +341,22 @@
             "
           />
           <el-checkbox
-            v-model="form.show_history"
+            v-model="xpackForm.show_history"
             :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.showHistory')"
           />
           <el-checkbox
-            v-model="form.show_guide"
+            v-model="xpackForm.show_guide"
             :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.displayGuide')"
           />
           <el-checkbox
-            v-model="form.disclaimer"
+            v-model="xpackForm.disclaimer"
             :label="$t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimer')"
             @change="changeDisclaimer"
           />
-          <span v-if="form.disclaimer"
-            ><el-tooltip :content="form.disclaimer_value" placement="top">
+          <span v-if="xpackForm.disclaimer"
+            ><el-tooltip :content="xpackForm.disclaimer_value" placement="top">
               <el-input
-                v-model="form.disclaimer_value"
+                v-model="xpackForm.disclaimer_value"
                 style="width: 422px; margin-bottom: 10px"
                 @change="changeValue"
                 :maxlength="128"
@@ -421,9 +421,6 @@ const defaultSetting = {
 }
 
 const displayFormRef = ref()
-const form = ref<any>({
-  show_source: false
-})
 
 const xpackForm = ref<any>({
   show_source: false,
@@ -468,7 +465,6 @@ const customStyle = computed(() => {
 })
 
 function resetForm() {
-  form.value = cloneDeep(defaultSetting)
   xpackForm.value = cloneDeep(defaultSetting)
   imgUrl.value = {
     avatar: '',
@@ -503,7 +499,6 @@ const open = (data: any, content: any) => {
   imgUrl.value.user_avatar = data.user_avatar
   xpackForm.value.disclaimer = data.disclaimer
   xpackForm.value.disclaimer_value = data.disclaimer_value
-  console.log(xpackForm.value.disclaimer_value)
   if (
     xpackForm.value.disclaimer_value ===
     t('views.applicationOverview.appInfo.SettingDisplayDialog.disclaimerValue')
@@ -520,7 +515,6 @@ const open = (data: any, content: any) => {
     header_font_color: data.custom_theme?.header_font_color || '#1f2329'
   }
   xpackForm.value.float_location = data.float_location
-  form.value = xpackForm.value
   dialogVisible.value = true
 }
 
