@@ -68,7 +68,6 @@ class CustomEdge2 extends BezierEdge {
       super.componentWillUnmount()
     }
     if (isActive()) {
-      console.log('unmount')
       disconnect(this.targetId())
     }
     this.unmountVueComponent()

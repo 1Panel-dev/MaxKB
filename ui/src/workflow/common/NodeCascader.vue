@@ -49,51 +49,12 @@ const wheel = (e: any) => {
 
 function visibleChange(bool: boolean) {
   if (bool) {
-    options.value = getIncomingNode(props.nodeModel.id)
+    options.value = props.nodeModel.get_up_node_field_list(false, true)
   }
 }
 
-function _getIncomingNode(id: String, startId: String, value: Array<any>) {
-  let list = props.nodeModel.graphModel.getNodeIncomingNode(id)
-  list = list.filter((item: any) => item.id !== startId)
-  let firstElement = null
-  if (list.length > 0) {
-    list.forEach((item: any) => {
-      if (!value.some((obj: any) => obj.id === item.id)) {
-        if (!value.some((value_item) => value_item.value === item.id)) {
-          value.unshift({
-            value: item.id,
-            label: item.properties.stepName,
-            type: item.type,
-            children: item.properties?.config?.fields || []
-          })
-          if (item.properties?.globalFields && item.type === 'start-node') {
-            firstElement = {
-              value: 'global',
-              label: t('views.applicationWorkflow.variable.global'),
-              type: 'global',
-              children: item.properties?.config?.globalFields || []
-            }
-          }
-        }
-      }
-    })
-
-    list.forEach((item: any) => {
-      _getIncomingNode(item.id, startId, value)
-    })
-  }
-  if (firstElement) {
-    value.unshift(firstElement)
-  }
-  return value
-}
-function getIncomingNode(id: string) {
-  return _getIncomingNode(id, id, [])
-}
 const validate = () => {
-  const incomingNodeValue = getIncomingNode(props.nodeModel.id)
-  options.value = incomingNodeValue
+  const incomingNodeValue = props.nodeModel.get_up_node_field_list(false, true)
   if (!data.value || data.value.length === 0) {
     return Promise.reject(t('views.applicationWorkflow.variable.ReferencingRequired'))
   }
@@ -113,15 +74,9 @@ const validate = () => {
   }
   return Promise.resolve('')
 }
-props.nodeModel.graphModel.eventCenter.on('refresh_incoming_node_field', () => {
-  options.value = getIncomingNode(props.nodeModel.id)
-})
-props.nodeModel.graphModel.eventCenter.on('refreshFileUploadConfig', () => {
-  options.value = getIncomingNode(props.nodeModel.id)
-})
 defineExpose({ validate })
 onMounted(() => {
-  options.value = getIncomingNode(props.nodeModel.id)
+  options.value = props.nodeModel.get_up_node_field_list(false, true)
 })
 </script>
 <style scoped></style>

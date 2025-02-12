@@ -103,6 +103,10 @@ const renderGraphData = (data?: any) => {
         lf.value.deleteEdge(id)
       })
     })
+    lf.value.graphModel.eventCenter.on('anchor:drop', (data: any) => {
+      // 清除当前节点下面的子节点的所有缓存
+      data.nodeModel.clear_next_node_field(false)
+    })
 
     setTimeout(() => {
       lf.value?.fitView()

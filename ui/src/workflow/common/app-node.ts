@@ -10,6 +10,8 @@ import i18n from '@/locales'
 import { WorkflowType } from '@/enums/workflow'
 import { nodeDict } from '@/workflow/common/data'
 import { isActive, connect, disconnect } from './teleport'
+import { t } from '@/locales'
+import { type Dict } from '@/api/type/common'
 class AppNode extends HtmlResize.view {
   isMounted
   r?: any
@@ -17,10 +19,16 @@ class AppNode extends HtmlResize.view {
   app: any
   root?: any
   VueNode: any
+  up_node_field_dict?: Dict<Array<any>>
   constructor(props: any, VueNode: any) {
     super(props)
     this.component = VueNode
     this.isMounted = false
+    props.model.clear_next_node_field = this.clear_next_node_field.bind(this)
+    props.model.get_up_node_field_dict = this.get_up_node_field_dict.bind(this)
+    props.model.get_node_field_list = this.get_node_field_list.bind(this)
+    props.model.get_up_node_field_list = this.get_up_node_field_list.bind(this)
+
     if (props.model.properties.noRender) {
       delete props.model.properties.noRender
     } else {
@@ -30,13 +38,12 @@ class AppNode extends HtmlResize.view {
       }
     }
     function getNodesName(num: number) {
-      let number = num
+      const number = num
       const name = props.model.properties.stepName + number
       if (!props.graphModel.nodes?.some((node: any) => node.properties.stepName === name.trim())) {
         props.model.properties.stepName = name
       } else {
-        number += 1
-        getNodesName(number)
+        getNodesName(number + 1)
       }
     }
     props.model.properties.config = nodeDict[props.model.type].properties.config
@@ -44,7 +51,61 @@ class AppNode extends HtmlResize.view {
       props.model.height = props.model.properties.height
     }
   }
+  get_node_field_list() {
+    const result = []
+    if (this.props.model.type === 'start-node') {
+      result.push({
+        value: 'global',
+        label: t('views.applicationWorkflow.variable.global'),
+        type: 'global',
+        children: this.props.model.properties?.config?.globalFields || []
+      })
+    }
+    result.push({
+      value: this.props.model.id,
+      label: this.props.model.properties.stepName,
+      type: this.props.model.type,
+      children: this.props.model.properties?.config?.fields || []
+    })
+    return result
+  }
+  get_up_node_field_dict(contain_self: boolean, use_cache: boolean) {
+    if (!this.up_node_field_dict || !use_cache) {
+      const up_node_list = this.props.graphModel.getNodeIncomingNode(this.props.model.id)
+      this.up_node_field_dict = up_node_list
+        .filter((node) => node.id != 'start-node')
+        .map((node) => node.get_up_node_field_dict(true, use_cache))
+        .reduce((pre, next) => ({ ...pre, ...next }), {})
+    }
+    if (contain_self) {
+      return {
+        ...this.up_node_field_dict,
+        [this.props.model.id]: this.get_node_field_list()
+      }
+    }
+    return this.up_node_field_dict ? this.up_node_field_dict : {}
+  }
 
+  get_up_node_field_list(contain_self: boolean, use_cache: boolean) {
+    const result = Object.values(this.get_up_node_field_dict(contain_self, use_cache)).reduce(
+      (pre, next) => [...pre, ...next],
+      []
+    )
+    const start_node_field_list = this.props.graphModel
+      .getNodeModelById('start-node')
+      .get_node_field_list()
+    return [...start_node_field_list, ...result]
+  }
+
+  clear_next_node_field(contain_self: boolean) {
+    const next_node_list = this.props.graphModel.getNodeOutgoingNode(this.props.model.id)
+    next_node_list.forEach((node) => {
+      node.clear_next_node_field(true)
+    })
+    if (contain_self) {
+      this.up_node_field_dict = undefined
+    }
+  }
   getAnchorShape(anchorData: any) {
     const { x, y, type } = anchorData
     let isConnect = false
@@ -276,7 +337,7 @@ class AppNodeModel extends HtmlResize.model {
   }
 
   setAttributes() {
-    const { t } = i18n.global;
+    const { t } = i18n.global
     this.width = this.get_width()
     const isLoop = (node_id: string, target_node_id: string) => {
       const up_node_list = this.graphModel.getNodeIncomingNode(node_id)
