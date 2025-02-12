@@ -27,7 +27,9 @@
         </el-button>
       </div>
       <div v-else>
-        <el-button icon="Plus" @click="showPopover = !showPopover"> {{ $t('views.applicationWorkflow.setting.addComponent') }} </el-button>
+        <el-button icon="Plus" @click="showPopover = !showPopover">
+          {{ $t('views.applicationWorkflow.setting.addComponent') }}
+        </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug">
           <AppIcon iconName="app-play-outlined" class="mr-4"></AppIcon>
           {{ $t('views.applicationWorkflow.setting.debug') }}</el-button
@@ -36,7 +38,9 @@
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
-        <el-button type="primary" @click="publicHandle"> {{ $t('views.applicationWorkflow.setting.public') }} </el-button>
+        <el-button type="primary" @click="publicHandle">
+          {{ $t('views.applicationWorkflow.setting.public') }}
+        </el-button>
 
         <el-dropdown trigger="click">
           <el-button text @click.stop class="ml-8 mt-4">
@@ -77,12 +81,7 @@
     </div>
     <!-- 调试 -->
     <el-collapse-transition>
-      <div
-        v-click-outside="clickoutsideDebug"
-        class="workflow-debug-container"
-        :class="enlarge ? 'enlarge' : ''"
-        v-if="showDebug"
-      >
+      <div class="workflow-debug-container" :class="enlarge ? 'enlarge' : ''" v-if="showDebug">
         <div class="workflow-debug-header" :class="!isDefaultTheme ? 'custom-header' : ''">
           <div class="flex-between">
             <div class="flex align-center">
@@ -268,10 +267,18 @@ async function publicHandle() {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node').toLowerCase()} ` + err_message.toLowerCase())
+        MsgError(
+          res.node.properties?.stepName +
+            ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
+            err_message.toLowerCase()
+        )
       } else {
         const keys = Object.keys(err_message)
-        MsgError(node.properties?.stepName + ` ${t('views.applicationWorkflow.node').toLowerCase()} ` + err_message[keys[0]]?.[0]?.message.toLowerCase())
+        MsgError(
+          node.properties?.stepName +
+            ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
+            err_message[keys[0]]?.[0]?.message.toLowerCase()
+        )
       }
     })
 }
@@ -300,18 +307,24 @@ const clickShowDebug = () => {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message)
+        MsgError(
+          res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message
+        )
       } else {
         const keys = Object.keys(err_message)
-        MsgError(node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message[keys[0]]?.[0]?.message)
+        MsgError(
+          node.properties?.stepName +
+            ` ${t('views.applicationWorkflow.node')}，` +
+            err_message[keys[0]]?.[0]?.message
+        )
       }
     })
 }
-function clickoutsideDebug(e: any) {
-  if (workflowMainRef.value && e && e.target && workflowMainRef.value.contains(e?.target)) {
-    showDebug.value = false
-  }
-}
+// function clickoutsideDebug(e: any) {
+//   if (workflowMainRef.value && e && e.target && workflowMainRef.value.contains(e?.target)) {
+//     showDebug.value = false
+//   }
+// }
 
 function getGraphData() {
   return workflowRef.value?.getGraphData()

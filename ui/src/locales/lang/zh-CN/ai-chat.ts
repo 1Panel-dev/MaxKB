@@ -5,7 +5,7 @@ export default {
   only20history: '仅显示最近 20 条对话',
   question_count: '条提问',
   exportRecords: '导出聊天记录',
-  chatId: '对话id',
+  chatId: '对话 ID',
   userInput: '用户输入',
   quote: '引用',
   download: '点击下载文件',
