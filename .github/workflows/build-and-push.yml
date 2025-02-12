@@ -63,11 +63,10 @@ jobs:
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=${{ github.event.inputs.dockerImageTag }}
           TAG_NAME_WITH_LATEST=${{ github.event.inputs.dockerImageTagWithLatest }}
-          echo ${TAG_NAME_WITH_LATEST}
-          if [[ ${TAG_NAME} == *dev* ]]; then
-            DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
-          else
+          if [[ ${TAG_NAME_WITH_LATEST} == 'true' ]]; then            
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
+          else
+            DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           fi
           echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
             --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=${GITHUB_SHA::8} --no-cache \
@@ -119,11 +118,12 @@ jobs:
         run: |
           DOCKER_IMAGE=1panel/maxkb
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
-          TAG_NAME=${{ github.event.inputs.dockerImageTag }}
-          if [[ ${TAG_NAME} == *dev* ]]; then
-            DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
-          else
+          TAG_NAME=${{ github.event.inputs.dockerImageTag }}          
+          TAG_NAME_WITH_LATEST=${{ github.event.inputs.dockerImageTagWithLatest }}
+          if [[ ${TAG_NAME_WITH_LATEST} == 'true' ]]; then            
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:latest"
+          else
+            DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           fi
           echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
             --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=${GITHUB_SHA::8} --no-cache \
