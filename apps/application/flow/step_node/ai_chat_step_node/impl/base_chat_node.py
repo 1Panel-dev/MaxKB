@@ -6,6 +6,7 @@
     @date：2024/6/4 14:30
     @desc:
 """
+import re
 import time
 from functools import reduce
 from typing import List, Dict
@@ -14,7 +15,6 @@ from django.db.models import QuerySet
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_core.messages import BaseMessage, AIMessage
 
-from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning
@@ -181,6 +181,9 @@ class BaseChatNode(IChatNode):
             get_message(history_chat_record[index], dialogue_type, runtime_node_id)
             for index in
             range(start_index if start_index > 0 else 0, len(history_chat_record))], [])
+        for message in history_message:
+            if isinstance(message.content, str):
+                message.content = re.sub('<form_rander>[\d\D]*?<\/form_rander>', '', message.content)
         return history_message
 
     def generate_prompt_question(self, prompt):
