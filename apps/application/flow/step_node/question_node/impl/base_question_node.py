@@ -6,6 +6,7 @@
     @date：2024/6/4 14:30
     @desc:
 """
+import re
 import time
 from functools import reduce
 from typing import List, Dict
@@ -114,6 +115,9 @@ class BaseQuestionNode(IQuestionNode):
             [history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
             for index in
             range(start_index if start_index > 0 else 0, len(history_chat_record))], [])
+        for message in history_message:
+            if isinstance(message.content, str):
+                message.content = re.sub('<form_rander>[\d\D]*?<\/form_rander>', '', message.content)
         return history_message
 
     def generate_prompt_question(self, prompt):
