@@ -76,10 +76,12 @@ def event_content(response,
     all_text = ''
     reasoning_content = ''
     try:
+        response_reasoning_content = False
         for chunk in response:
             reasoning_chunk = reasoning.get_reasoning_content(chunk)
             content_chunk = reasoning_chunk.get('content')
             if 'reasoning_content' in chunk.additional_kwargs:
+                response_reasoning_content = True
                 reasoning_content_chunk = chunk.additional_kwargs.get('reasoning_content', '')
             else:
                 reasoning_content_chunk = reasoning_chunk.get('reasoning_content')
@@ -95,6 +97,21 @@ def event_content(response,
                                                                                 'node_type': 'ai-chat-node',
                                                                                 'real_node_id': 'ai-chat-node',
                                                                                 'reasoning_content': reasoning_content_chunk if reasoning_content_enable else ''})
+        reasoning_chunk = reasoning.get_end_reasoning_content()
+        all_text += reasoning_chunk.get('content')
+        reasoning_content_chunk = ""
+        if not response_reasoning_content:
+            reasoning_content_chunk = reasoning_chunk.get(
+                'reasoning_content')
+        yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), 'ai-chat-node',
+                                                                     [], reasoning_chunk.get('content'),
+                                                                     False,
+                                                                     0, 0, {'node_is_end': False,
+                                                                            'view_type': 'many_view',
+                                                                            'node_type': 'ai-chat-node',
+                                                                            'real_node_id': 'ai-chat-node',
+                                                                            'reasoning_content'
+                                                                            : reasoning_content_chunk if reasoning_content_enable else ''})
         # 获取token
         if is_ai_chat:
             try:
@@ -276,11 +293,13 @@ class BaseChatStep(IChatStep):
                 response_token = 0
             write_context(self, manage, request_token, response_token, chat_result.content)
             reasoning_result = reasoning.get_reasoning_content(chat_result)
-            content = reasoning_result.get('content')
+            reasoning_result_end = reasoning.get_end_reasoning_content()
+            content = reasoning_result.get('content') + reasoning_result_end.get('content')
             if 'reasoning_content' in chat_result.response_metadata:
                 reasoning_content = chat_result.response_metadata.get('reasoning_content', '')
             else:
-                reasoning_content = reasoning_result.get('reasoning_content')
+                reasoning_content = reasoning_result.get('reasoning_content') + reasoning_result_end.get(
+                    'reasoning_content')
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                           chat_result.content, manage, self, padding_problem_text, client_id,
                                           reasoning_content=reasoning_content if reasoning_content_enable else '')
