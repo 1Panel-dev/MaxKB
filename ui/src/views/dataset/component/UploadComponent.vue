@@ -253,8 +253,11 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
     fileList.splice(-1, 1) //移除当前超出大小的文件
     return false
   }
+
   if (!isRightType(file?.name, form.value.fileType)) {
-    MsgError(t('views.document.upload.errorMessage2'))
+    if (file?.name !== '.DS_Store') {
+      MsgError(t('views.document.upload.errorMessage2'))
+    }
     fileList.splice(-1, 1)
     return false
   }
