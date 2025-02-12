@@ -23,6 +23,7 @@ from setting.models_provider.impl.siliconCloud_model_provider.siliconCloud_model
     SiliconCloudModelProvider
 from setting.models_provider.impl.tencent_cloud_model_provider.tencent_cloud_model_provider import \
     TencentCloudModelProvider
+from setting.models_provider.impl.coreshub_model_provider.coreshub_model_provider import CoresHubModelProvider
 from setting.models_provider.impl.tencent_model_provider.tencent_model_provider import TencentModelProvider
 from setting.models_provider.impl.vllm_model_provider.vllm_model_provider import VllmModelProvider
 from setting.models_provider.impl.volcanic_engine_model_provider.volcanic_engine_model_provider import \
@@ -55,3 +56,4 @@ class ModelProvideConstants(Enum):
     aliyun_bai_lian_model_provider = AliyunBaiLianModelProvider()
     model_anthropic_provider = AnthropicModelProvider()
     model_siliconCloud_provider = SiliconCloudModelProvider()
+    model_coreshub_provider = CoresHubModelProvider()
