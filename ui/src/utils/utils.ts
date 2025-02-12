@@ -1,5 +1,3 @@
-import { number } from 'echarts'
-
 export function toThousands(num: any) {
   return num?.toString().replace(/\d+/, function (n: any) {
     return n.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
