@@ -48,7 +48,7 @@ export default {
   inputPlaceholder: {
     speaking: '说话中',
     recorderLoading: '转文字中',
-    default: '请输入问题，Ctrl+Enter 换行，Enter发送'
+    default: '请输入问题，Ctrl+Enter 换行'
   },
   uploadFile: {
     label: '上传文件',
