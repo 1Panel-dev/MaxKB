@@ -81,13 +81,7 @@
         <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
           <el-button text :disabled="!is_permisstion" @click.stop="openEditModel">
             <el-icon>
-              <component
-                :is="
-                  currentModel.status === 'ERROR' || currentModel.status === 'PAUSE_DOWNLOAD'
-                    ? 'RefreshRight'
-                    : 'EditPen'
-                "
-              />
+              <el-icon><EditPen /></el-icon>
             </el-icon>
           </el-button>
         </el-tooltip>
