@@ -14,7 +14,7 @@ on:
           - linux/amd64,linux/arm64
 jobs:
   build-and-push-python-pg-to-ghcr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check Disk Space
         run: df -h
