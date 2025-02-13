@@ -75,16 +75,13 @@ const router = useRouter()
 const { user } = useStore()
 const { load } = useScriptTag('https://g.alicdn.com/dingding/h5-dingtalk-login/0.21.0/ddlogin.js')
 const isConfigReady = ref(false)
-const errorShown = ref(false)
 
 const initActive = async () => {
   try {
     await load(true)
-    errorShown.value = false
     if (!isConfigReady.value) {
       return
     }
-    console.log(props.config)
 
     const data = {
       appKey: props.config.app_key,
@@ -115,10 +112,7 @@ const initActive = async () => {
         })
       },
       (errorMsg: string) => {
-        if (!errorShown.value) {
-          MsgError(errorMsg)
-          errorShown.value = true
-        }
+        MsgError(errorMsg)
       }
     )
   } catch (error) {
