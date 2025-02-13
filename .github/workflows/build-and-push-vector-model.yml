@@ -19,7 +19,7 @@ on:
 
 jobs:
   build-and-push-vector-model-to-ghcr:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check Disk Space
         run: df -h
