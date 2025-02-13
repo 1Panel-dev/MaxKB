@@ -135,7 +135,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
         with:
           # Until https://github.com/tonistiigi/binfmt/issues/215
-          image: tonistiigi/binfmt:qemu-v8.1.5
+          image: tonistiigi/binfmt:qemu-v7.0.0-28
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
