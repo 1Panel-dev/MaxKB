@@ -374,6 +374,8 @@ class ApplicationSerializer(serializers.Serializer):
                 application_access_token.show_source = instance.get('show_source')
             if 'language' in instance and instance.get('language') is not None:
                 application_access_token.language = instance.get('language')
+            if 'language' not in instance or instance.get('language') is None:
+                application_access_token.language = None
             application_access_token.save()
             application_setting_model = DBModelManage.get_model('application_setting')
             xpack_cache = DBModelManage.get_model('xpack_cache')

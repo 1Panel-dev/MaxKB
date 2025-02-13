@@ -60,7 +60,7 @@ const emit = defineEmits(['refresh'])
 const displayFormRef = ref()
 const form = ref<any>({
   show_source: false,
-  language: '',
+  language: ''
 })
 
 const detail = ref<any>(null)
@@ -72,14 +72,14 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     form.value = {
       show_source: false,
-      language: '',
+      language: ''
     }
   }
 })
 const open = (data: any, content: any) => {
   detail.value = content
   form.value.show_source = data.show_source
-  form.value.language = data.language || getBrowserLang()
+  form.value.language = data.language
   dialogVisible.value = true
 }
 
@@ -87,11 +87,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      const obj = {
-        show_source: form.value.show_source,
-        language: form.value.language
-      }
-      applicationApi.putAccessToken(id as string, obj, loading).then((res) => {
+      applicationApi.putAccessToken(id as string, form.value, loading).then((res) => {
         emit('refresh')
         // @ts-ignore
         MsgSuccess(t('common.settingSuccess'))
