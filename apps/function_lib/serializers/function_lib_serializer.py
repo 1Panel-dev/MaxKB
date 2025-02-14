@@ -105,7 +105,7 @@ class FunctionLibSerializer(serializers.Serializer):
             query_set = QuerySet(FunctionLib).filter(
                 (Q(user_id=self.data.get('user_id')) | Q(permission_type='PUBLIC')))
             if self.data.get('name') is not None:
-                query_set = query_set.filter(name__contains=self.data.get('name'))
+                query_set = query_set.filter(name__icontains=self.data.get('name'))
             if self.data.get('desc') is not None:
                 query_set = query_set.filter(desc__contains=self.data.get('desc'))
             if self.data.get('is_active') is not None:
