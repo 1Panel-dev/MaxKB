@@ -3,6 +3,7 @@ export default {
   createFunction: 'Create Function',
   editFunction: 'Edit Function',
   copyFunction: 'Copy Function',
+  importFunction: 'Import Function',
   searchBar: {
     placeholder: 'Search by function name'
   },
