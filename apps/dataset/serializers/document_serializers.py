@@ -411,6 +411,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
         is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.boolean(_('document is active')))
         task_type = serializers.IntegerField(required=False, error_messages=ErrMessage.integer(_('task type')))
         status = serializers.CharField(required=False, error_messages=ErrMessage.char(_('status')))
+        order_by = serializers.CharField(required=False, error_messages=ErrMessage.char(_('order by')))
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
@@ -437,7 +438,11 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                         query_set = query_set.filter(status__icontains=status)
                     else:
                         query_set = query_set.filter(status__iregex='^[2n]*$')
-            query_set = query_set.order_by('-create_time', 'id')
+            order_by = self.data.get('order_by', '')
+            if order_by:
+                query_set = query_set.order_by(order_by)
+            else:
+                query_set = query_set.order_by('-create_time', 'id')
             return query_set
 
         def list(self, with_valid=False):
