@@ -3,6 +3,7 @@ export default {
   createFunction: '建立函數',
   editFunction: '編輯函數',
   copyFunction: '複製函數',
+  importFunction: '匯入函數',
   searchBar: {
     placeholder: '按函數名稱搜尋'
   },

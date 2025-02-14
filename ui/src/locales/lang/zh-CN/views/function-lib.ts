@@ -3,6 +3,7 @@ export default {
   createFunction: '创建函数',
   editFunction: '编辑函数',
   copyFunction: '复制函数',
+  importFunction: '导入函数',
   searchBar: {
     placeholder: '按函数名称搜索'
   },
