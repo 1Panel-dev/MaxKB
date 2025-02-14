@@ -220,20 +220,25 @@ class BaseApplicationNode(IApplicationNode):
     def get_details(self, index: int, **kwargs):
         global_fields = []
         for api_input_field in self.node_params_serializer.data.get('api_input_field_list', []):
+            value = api_input_field.get('value', [''])[0] if api_input_field.get('value') else ''
             global_fields.append({
                 'label': api_input_field['variable'],
                 'key': api_input_field['variable'],
                 'value': self.workflow_manage.get_reference_field(
-                    api_input_field['value'][0],
-                    api_input_field['value'][1:])
+                    value,
+                    api_input_field['value'][1:]
+                ) if value != '' else ''
             })
+
         for user_input_field in self.node_params_serializer.data.get('user_input_field_list', []):
+            value = user_input_field.get('value', [''])[0] if user_input_field.get('value') else ''
             global_fields.append({
                 'label': user_input_field['label'],
                 'key': user_input_field['field'],
                 'value': self.workflow_manage.get_reference_field(
-                    user_input_field['value'][0],
-                    user_input_field['value'][1:])
+                    value,
+                    user_input_field['value'][1:]
+                ) if value != '' else ''
             })
         return {
             'name': self.node.properties.get('stepName'),
