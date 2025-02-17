@@ -270,7 +270,16 @@ function getChatLog(id: string, refresh?: boolean) {
   log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
     chatLogData.value = res.data.records
     if (refresh) {
-      currentChatName.value = chatLogData.value?.[0].abstract
+      currentChatName.value = chatLogData.value?.[0]?.abstract
+    } else {
+      paginationConfig.value.current_page = 1
+      paginationConfig.value.total = 0
+      currentRecordList.value = []
+      currentChatId.value = chatLogData.value?.[0]?.id || 'new'
+      currentChatName.value = chatLogData.value?.[0]?.abstract || t('chat.createChat')
+      if (currentChatId.value !== 'new') {
+        getChatRecord()
+      }
     }
   })
 }
