@@ -18,9 +18,11 @@ from setting.models_provider.base_model_provider import IModelProvider, ModelPro
 from setting.models_provider.impl.ollama_model_provider.credential.embedding import OllamaEmbeddingModelCredential
 from setting.models_provider.impl.ollama_model_provider.credential.image import OllamaImageModelCredential
 from setting.models_provider.impl.ollama_model_provider.credential.llm import OllamaLLMModelCredential
+from setting.models_provider.impl.ollama_model_provider.credential.reranker import OllamaReRankModelCredential
 from setting.models_provider.impl.ollama_model_provider.model.embedding import OllamaEmbedding
 from setting.models_provider.impl.ollama_model_provider.model.image import OllamaImage
 from setting.models_provider.impl.ollama_model_provider.model.llm import OllamaChatModel
+from setting.models_provider.impl.ollama_model_provider.model.reranker import OllamaReranker
 from smartdoc.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
 
@@ -153,11 +155,18 @@ model_info_list = [
 ]
 ollama_embedding_model_credential = OllamaEmbeddingModelCredential()
 ollama_image_model_credential = OllamaImageModelCredential()
+ollama_reranker_model_credential = OllamaReRankModelCredential()
 embedding_model_info = [
     ModelInfo(
         'nomic-embed-text',
         _('A high-performance open embedding model with a large token context window.'),
         ModelTypeConst.EMBEDDING, ollama_embedding_model_credential, OllamaEmbedding),
+]
+reranker_model_info = [
+    ModelInfo(
+        'ollama:reranker',
+        '',
+        ModelTypeConst.RERANKER, ollama_reranker_model_credential, OllamaReranker),
 ]
 
 image_model_info = [
@@ -189,6 +198,8 @@ model_info_manage = (
         ModelTypeConst.EMBEDDING, ollama_embedding_model_credential, OllamaEmbedding), )
     .append_model_info_list(image_model_info)
     .append_default_model_info(image_model_info[0])
+    .append_model_info_list(reranker_model_info)
+    .append_default_model_info(reranker_model_info[0])
     .build()
 )
 

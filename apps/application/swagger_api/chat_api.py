@@ -165,7 +165,15 @@ class ChatApi(ApiMixin):
                 openapi.Parameter(name='min_trample', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, required=False,
                                   description=_("Minimum number of clicks")),
                 openapi.Parameter(name='comparer', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, required=False,
-                                  description=_("or|and comparator"))
+                                  description=_("or|and comparator")),
+                openapi.Parameter(name='start_time', in_=openapi.IN_QUERY,
+                                  type=openapi.TYPE_STRING,
+                                  required=True,
+                                  description=_('start time')),
+                openapi.Parameter(name='end_time', in_=openapi.IN_QUERY,
+                                  type=openapi.TYPE_STRING,
+                                  required=True,
+                                  description=_('End time')),
                 ]
 
 
