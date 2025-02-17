@@ -243,13 +243,16 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             language = get_language()
             if self.data.get('type') == 'csv':
-                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', f'csv_template_{to_locale(language)}.csv'), "rb")
+                file = open(
+                    os.path.join(PROJECT_DIR, "apps", "dataset", 'template', f'csv_template_{to_locale(language)}.csv'),
+                    "rb")
                 content = file.read()
                 file.close()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'text/cxv',
                                                                   'Content-Disposition': 'attachment; filename="csv_template.csv"'})
             elif self.data.get('type') == 'excel':
-                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template', f'excel_template_{to_locale(language)}.xlsx'), "rb")
+                file = open(os.path.join(PROJECT_DIR, "apps", "dataset", 'template',
+                                         f'excel_template_{to_locale(language)}.xlsx'), "rb")
                 content = file.read()
                 file.close()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'application/vnd.ms-excel',
@@ -261,7 +264,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             language = get_language()
             if self.data.get('type') == 'csv':
                 file = open(
-                    os.path.join(PROJECT_DIR, "apps", "dataset", 'template', f'table_template_{to_locale(language)}.csv'),
+                    os.path.join(PROJECT_DIR, "apps", "dataset", 'template',
+                                 f'table_template_{to_locale(language)}.csv'),
                     "rb")
                 content = file.read()
                 file.close()
@@ -1180,7 +1184,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if not QuerySet(Document).filter(id=document_id).exists():
                 raise AppApiException(500, _('document id not exist'))
 
-        def generate_related(self, model_id, prompt, with_valid=True):
+        def generate_related(self, model_id, prompt, state_list=None, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get('document_id')
@@ -1192,7 +1196,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                              State.PENDING)
             ListenerManagement.get_aggregation_document_status(document_id)()
             try:
-                generate_related_by_document_id.delay(document_id, model_id, prompt)
+                generate_related_by_document_id.delay(document_id, model_id, prompt, state_list)
             except AlreadyQueued as e:
                 raise AppApiException(500, _('The task is being executed, please do not send it again.'))
 
@@ -1205,17 +1209,23 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             document_id_list = instance.get("document_id_list")
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
+            state_list = instance.get('state_list')
             ListenerManagement.update_status(QuerySet(Document).filter(id__in=document_id_list),
                                              TaskType.GENERATE_PROBLEM,
                                              State.PENDING)
-            ListenerManagement.update_status(QuerySet(Paragraph).filter(document_id__in=document_id_list),
-                                             TaskType.GENERATE_PROBLEM,
+            ListenerManagement.update_status(QuerySet(Paragraph).annotate(
+                reversed_status=Reverse('status'),
+                task_type_status=Substr('reversed_status', TaskType.GENERATE_PROBLEM.value,
+                                        1),
+            ).filter(task_type_status__in=state_list, document_id__in=document_id_list)
+                                             .values('id'),
+                                             TaskType.EMBEDDING,
                                              State.PENDING)
             ListenerManagement.get_aggregation_document_status_by_query_set(
                 QuerySet(Document).filter(id__in=document_id_list))()
             try:
                 for document_id in document_id_list:
-                    generate_related_by_document_id.delay(document_id, model_id, prompt)
+                    generate_related_by_document_id.delay(document_id, model_id, prompt, state_list)
             except AlreadyQueued as e:
                 pass
 
