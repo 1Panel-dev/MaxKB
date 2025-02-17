@@ -62,7 +62,7 @@ class FileSerializer(serializers.Serializer):
     def upload(self, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-        meta = self.data.get('meta')
+        meta = self.data.get('meta', {'debug': True})
         file_id = meta.get('file_id', uuid.uuid1())
         file = File(id=file_id, file_name=self.data.get('file').name, meta=meta)
         file.save(self.data.get('file').read())

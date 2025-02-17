@@ -222,13 +222,19 @@ class OpenAIChatSerializer(serializers.Serializer):
         client_type = self.data.get('client_type')
         chat_id = self.generate_chat(chat_id, application_id, message, client_id)
         return ChatMessageSerializer(
-            data={'chat_id': chat_id, 'message': message,
-                  're_chat': re_chat,
-                  'stream': stream,
-                  'application_id': application_id,
-                  'client_id': client_id,
-                  'client_type': client_type, 'form_data': instance.get('form_data', {})}).chat(
-            base_to_response=OpenaiToResponse())
+            data={
+                'chat_id': chat_id, 'message': message,
+                're_chat': re_chat,
+                'stream': stream,
+                'application_id': application_id,
+                'client_id': client_id,
+                'client_type': client_type,
+                'form_data': instance.get('form_data', {}),
+                'image_list': instance.get('image_list', []),
+                'document_list': instance.get('document_list', []),
+                'audio_list': instance.get('audio_list', []),
+            }
+        ).chat(base_to_response=OpenaiToResponse())
 
 
 class ChatMessageSerializer(serializers.Serializer):
