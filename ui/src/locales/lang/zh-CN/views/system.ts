@@ -38,6 +38,7 @@ export default {
       tokenEndpointPlaceholder: '请输入 Token 端地址',
       userInfoEndpoint: '用户信息端地址',
       userInfoEndpointPlaceholder: '请输入用户信息端地址',
+      scopePlaceholder: '请输入连接范围',
       clientId: '客户端 ID',
       clientIdPlaceholder: '请输入客户端 ID',
       clientSecret: '客户端密钥',
