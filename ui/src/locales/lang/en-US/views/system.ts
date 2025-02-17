@@ -40,6 +40,7 @@ export default {
       userInfoEndpointPlaceholder: 'Please enter user information endpoint',
       clientId: 'Client ID',
       clientIdPlaceholder: 'Please enter client ID',
+      scopePlaceholder: 'Please enter scope',
       clientSecret: 'Client Secret',
       clientSecretPlaceholder: 'Please enter client secret',
       logoutEndpoint: 'Logout Endpoint',
