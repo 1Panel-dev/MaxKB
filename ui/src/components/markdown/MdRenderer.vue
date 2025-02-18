@@ -30,7 +30,6 @@
       ></FormRander>
       <MdPreview
         v-else
-        noIconfont
         ref="editorRef"
         editorId="preview-only"
         :modelValue="item.content"
