@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 defineOptions({ name: 'MdEditorMagnify' })
 const props = defineProps<{
   title: String
@@ -40,8 +40,13 @@ const data = computed({
     return props.modelValue
   }
 })
-
 const dialogVisible = ref(false)
+watch(dialogVisible, (bool) => {
+  if (!bool) {
+    emit('submitDialog', cloneContent.value)
+  }
+})
+
 const cloneContent = ref('')
 const footers: any = [null, '=', 0]
 function openDialog() {
