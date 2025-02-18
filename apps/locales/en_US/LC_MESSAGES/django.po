@@ -6718,3 +6718,32 @@ msgstr ""
 
 msgid "Tencent Cloud"
 msgstr ""
+
+msgid "Image name"
+msgstr ""
+
+msgid "Image URL"
+msgstr ""
+
+msgid "Document name"
+msgstr ""
+
+msgid "Document URL"
+msgstr ""
+
+msgid "Audio name"
+msgstr ""
+
+msgid "Audio URL"
+msgstr ""
+
+msgid "Runtime node id"
+msgstr ""
+
+msgid "Node data"
+msgstr ""
+
+msgid "Conversation record id"
+msgstr ""
+msgid "Child node"
+msgstr ""
