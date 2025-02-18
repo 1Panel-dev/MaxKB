@@ -194,3 +194,24 @@ class FunctionLibApi(ApiMixin):
                                                                             }))
                 }
             )
+
+    class Export(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='id',
+                                      in_=openapi.IN_PATH,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description=_('ID')),
+
+                    ]
+
+    class Import(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='file',
+                                      in_=openapi.IN_FORM,
+                                      type=openapi.TYPE_FILE,
+                                      required=True,
+                                      description=_('Upload image files'))
+                    ]

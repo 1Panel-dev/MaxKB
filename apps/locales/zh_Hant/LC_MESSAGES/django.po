@@ -6870,3 +6870,32 @@ msgstr "添加個人系統 API_KEY"
 
 msgid "Tencent Cloud"
 msgstr "腾訊云"
+
+msgid "Image name"
+msgstr "圖片名稱"
+
+msgid "Image URL"
+msgstr "圖片網址"
+
+msgid "Document name"
+msgstr "文件名稱"
+
+msgid "Document URL"
+msgstr "文件網址"
+
+msgid "Audio name"
+msgstr "音頻名稱"
+
+msgid "Audio URL"
+msgstr "音頻網址"
+
+msgid "Runtime node id"
+msgstr "運行節點id"
+
+msgid "Node data"
+msgstr "節點數據"
+
+msgid "Conversation record id"
+msgstr "對話記錄id"
+msgid "Child node"
+msgstr "子節點"

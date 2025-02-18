@@ -7,15 +7,21 @@
     @desc:
 """
 import json
+import pickle
 import re
 import uuid
+from typing import List
 
 from django.core import validators
+from django.db import transaction
 from django.db.models import QuerySet, Q
-from rest_framework import serializers
+from django.http import HttpResponse
+from rest_framework import serializers, status
 
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
+from common.field.common import UploadedFileField
+from common.response import result
 from common.util.field_message import ErrMessage
 from common.util.function_code import FunctionExecutor
 from function_lib.models.function import FunctionLib
@@ -23,6 +29,11 @@ from smartdoc.const import CONFIG
 from django.utils.translation import gettext_lazy as _
 
 function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
+
+class FlibInstance:
+    def __init__(self, function_lib: dict, version: str):
+        self.function_lib = function_lib
+        self.version = version
 
 
 class FunctionLibModelSerializer(serializers.ModelSerializer):
@@ -105,7 +116,7 @@ class FunctionLibSerializer(serializers.Serializer):
             query_set = QuerySet(FunctionLib).filter(
                 (Q(user_id=self.data.get('user_id')) | Q(permission_type='PUBLIC')))
             if self.data.get('name') is not None:
-                query_set = query_set.filter(name__contains=self.data.get('name'))
+                query_set = query_set.filter(name__icontains=self.data.get('name'))
             if self.data.get('desc') is not None:
                 query_set = query_set.filter(desc__contains=self.data.get('desc'))
             if self.data.get('is_active') is not None:
@@ -227,3 +238,43 @@ class FunctionLibSerializer(serializers.Serializer):
                     raise AppApiException(500, _('Function does not exist'))
             function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
             return FunctionLibModelSerializer(function_lib).data
+
+        def export(self, with_valid=True):
+            try:
+                if with_valid:
+                    self.is_valid()
+                id = self.data.get('id')
+                function_lib = QuerySet(FunctionLib).filter(id=id).first()
+                application_dict = FunctionLibModelSerializer(function_lib).data
+                mk_instance = FlibInstance(application_dict, 'v1')
+                application_pickle = pickle.dumps(mk_instance)
+                response = HttpResponse(content_type='text/plain', content=application_pickle)
+                response['Content-Disposition'] = f'attachment; filename="{function_lib.name}.flib"'
+                return response
+            except Exception as e:
+                return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    class Import(serializers.Serializer):
+        file = UploadedFileField(required=True, error_messages=ErrMessage.image(_("file")))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
+
+        @transaction.atomic
+        def import_(self, with_valid=True):
+            if with_valid:
+                self.is_valid()
+            user_id = self.data.get('user_id')
+            flib_instance_bytes = self.data.get('file').read()
+            try:
+                flib_instance = pickle.loads(flib_instance_bytes)
+            except Exception as e:
+                raise AppApiException(1001, _("Unsupported file format"))
+            function_lib = flib_instance.function_lib
+            function_lib_model = FunctionLib(id=uuid.uuid1(), name=function_lib.get('name'),
+                                             desc=function_lib.get('desc'),
+                                             code=function_lib.get('code'),
+                                             user_id=user_id,
+                                             input_field_list=function_lib.get('input_field_list'),
+                                             permission_type=function_lib.get('permission_type'),
+                                             is_active=function_lib.get('is_active'))
+            function_lib_model.save()
+            return True

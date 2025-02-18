@@ -42,7 +42,29 @@
       >
         <el-row :gutter="15">
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16">
-            <CardAdd :title="$t('views.functionLib.createFunction')" @click="openCreateDialog()" />
+            <el-card shadow="hover" class="application-card-add" style="--el-card-padding: 8px">
+              <div class="card-add-button flex align-center cursor p-8" @click="openCreateDialog">
+                <AppIcon iconName="app-add-application" class="mr-8"></AppIcon>
+                {{ $t('views.functionLib.createFunction') }}
+              </div>
+              <el-divider style="margin: 8px 0" />
+              <el-upload
+                ref="elUploadRef"
+                :file-list="[]"
+                action="#"
+                multiple
+                :auto-upload="false"
+                :show-file-list="false"
+                :limit="1"
+                :on-change="(file: any, fileList: any) => importFunctionLib(file)"
+                class="card-add-button"
+              >
+                <div class="flex align-center cursor p-8">
+                  <AppIcon iconName="app-import" class="mr-8"></AppIcon>
+                  {{ $t('views.functionLib.importFunction') }}
+                </div>
+              </el-upload>
+            </el-card>
           </el-col>
           <el-col
             :xs="24"
@@ -98,6 +120,12 @@
                       </el-button>
                     </el-tooltip>
                     <el-divider direction="vertical" />
+                    <el-tooltip effect="dark" :content="$t('common.export')" placement="top">
+                      <el-button text @click.stop="exportFunctionLib(item)">
+                        <AppIcon iconName="app-export"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+                    <el-divider direction="vertical" />
                     <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                       <el-button
                         :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
@@ -131,7 +159,7 @@ import { ref, onMounted, reactive } from 'vue'
 import { cloneDeep } from 'lodash'
 import functionLibApi from '@/api/function-lib'
 import FunctionFormDrawer from './component/FunctionFormDrawer.vue'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import applicationApi from '@/api/application'
 import { t } from '@/locales'
@@ -161,6 +189,7 @@ interface UserOption {
 const userOptions = ref<UserOption[]>([])
 
 const selectUserId = ref('all')
+const elUploadRef = ref<any>()
 
 const canEdit = (row: any) => {
   return user.userInfo?.id === row?.user_id
@@ -242,6 +271,40 @@ function copyFunctionLib(row: any) {
   FunctionFormDrawerRef.value.open(obj)
 }
 
+function exportFunctionLib(row: any) {
+  functionLibApi.exportFunctionLib(row.id, row.name, loading)
+    .catch((e: any) => {
+      if (e.response.status !== 403) {
+        e.response.data.text().then((res: string) => {
+          MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+        })
+      }
+    })
+}
+
+function importFunctionLib(file: any) {
+  const formData = new FormData()
+  formData.append('file', file.raw, file.name)
+  elUploadRef.value.clearFiles()
+  functionLibApi
+    .importFunctionLib(formData, loading)
+    .then(async (res: any) => {
+      if (res?.data) {
+        searchHandle()
+      }
+    })
+    .catch((e: any) => {
+      if (e.code === 400) {
+        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+          cancelButtonText: t('common.confirm'),
+          confirmButtonText: t('common.professional')
+        }).then(() => {
+          window.open('https://maxkb.cn/pricing.html', '_blank')
+        })
+      }
+    })
+}
+
 function getList() {
   const params = {
     ...(searchValue.value && { name: searchValue.value }),
@@ -303,6 +366,42 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
+.application-card-add {
+  width: 100%;
+  font-size: 14px;
+  min-height: var(--card-min-height);
+  border: 1px dashed var(--el-border-color);
+  background: var(--el-disabled-bg-color);
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  &:hover {
+    border: 1px solid var(--el-card-bg-color);
+    background-color: var(--el-card-bg-color);
+  }
+
+  .card-add-button {
+    &:hover {
+      border-radius: 4px;
+      background: var(--app-text-color-light-1);
+    }
+
+    :deep(.el-upload) {
+      display: block;
+      width: 100%;
+      color: var(--el-text-color-regular);
+    }
+  }
+}
+
+.application-card {
+  .status-tag {
+    position: absolute;
+    right: 16px;
+    top: 15px;
+  }
+}
+
 .function-lib-list-container {
   .status-button {
     position: absolute;

@@ -6856,3 +6856,32 @@ msgstr "添加个人系统 API_KEY"
 
 msgid "Tencent Cloud"
 msgstr "腾讯云"
+
+msgid "Image name"
+msgstr "图片名称"
+
+msgid "Image URL"
+msgstr "图片地址"
+
+msgid "Document name"
+msgstr "文档名称"
+
+msgid "Document URL"
+msgstr "文档地址"
+
+msgid "Audio name"
+msgstr "音频名称"
+
+msgid "Audio URL"
+msgstr "音频地址"
+msgid "Runtime node id"
+msgstr "运行节点id"
+
+msgid "Node data"
+msgstr "节点数据"
+
+msgid "Conversation record id"
+msgstr "会话记录id"
+msgid "Child node"
+msgstr "子节点数据"
+

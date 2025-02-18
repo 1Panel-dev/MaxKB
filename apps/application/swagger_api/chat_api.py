@@ -48,7 +48,8 @@ class OpenAIChatApi(ApiMixin):
                                   'chat_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Conversation ID")),
                                   're_chat': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("regenerate"),
                                                             default=False),
-                                  'stream': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Stream Output"), default=True)
+                                  'stream': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Stream Output"),
+                                                           default=True)
 
                               })
 
@@ -62,7 +63,66 @@ class ChatApi(ApiMixin):
             properties={
                 'message': openapi.Schema(type=openapi.TYPE_STRING, title=_("problem"), description=_("problem")),
                 're_chat': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("regenerate"), default=False),
-                'stream': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Is it streaming output"), default=True)
+                'stream': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Is it streaming output"), default=True),
+
+                'form_data': openapi.Schema(type=openapi.TYPE_OBJECT, title=_("Form data"),
+                                            description=_("Form data"),
+                                            default={}),
+                'image_list': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    title=_("Image list"),
+                    description=_("Image list"),
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'name': openapi.Schema(type=openapi.TYPE_STRING,
+                                                   title=_("Image name")),
+                            'url': openapi.Schema(type=openapi.TYPE_STRING,
+                                                  title=_("Image URL")),
+                            'file_id': openapi.Schema(type=openapi.TYPE_STRING),
+                        }
+                    ),
+                    default=[]
+                ),
+                'document_list': openapi.Schema(type=openapi.TYPE_ARRAY, title=_("Document list"),
+                                                description=_("Document list"),
+                                                items=openapi.Schema(
+                                                    type=openapi.TYPE_OBJECT,
+                                                    properties={
+                                                        # 定义对象的具体属性
+                                                        'name': openapi.Schema(type=openapi.TYPE_STRING,
+                                                                               title=_("Document name")),
+                                                        'url': openapi.Schema(type=openapi.TYPE_STRING,
+                                                                              title=_("Document URL")),
+                                                        'file_id': openapi.Schema(type=openapi.TYPE_STRING),
+                                                    }
+                                                ),
+                                                default=[]),
+                'audio_list': openapi.Schema(type=openapi.TYPE_ARRAY, title=_("Audio list"),
+                                             description=_("Audio list"),
+                                             items=openapi.Schema(
+                                                 type=openapi.TYPE_OBJECT,
+                                                 properties={
+                                                     'name': openapi.Schema(type=openapi.TYPE_STRING,
+                                                                            title=_("Audio name")),
+                                                     'url': openapi.Schema(type=openapi.TYPE_STRING,
+                                                                           title=_("Audio URL")),
+                                                     'file_id': openapi.Schema(type=openapi.TYPE_STRING),
+                                                 }
+                                             ),
+                                             default=[]),
+                'runtime_node_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Runtime node id"),
+                                                  description=_("Runtime node id"),
+                                                  default=""),
+                'node_data': openapi.Schema(type=openapi.TYPE_OBJECT, title=_("Node data"),
+                                            description=_("Node data"),
+                                            default={}),
+                'chat_record_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Conversation record id"),
+                                                 description=_("Conversation record id"),
+                                                 default=""),
+                'child_node': openapi.Schema(type=openapi.TYPE_STRING, title=_("Child node"),
+                                             description=_("Child node"),
+                                             default={}),
 
             }
         )
@@ -132,17 +192,23 @@ class ChatApi(ApiMixin):
                           'problem_optimization'],
                 properties={
                     'id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application ID"),
-                                         description=_("Application ID, pass when modifying, do not pass when creating")),
-                    'model_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Model ID"), description=_("Model ID")),
+                                         description=_(
+                                             "Application ID, pass when modifying, do not pass when creating")),
+                    'model_id': openapi.Schema(type=openapi.TYPE_STRING, title=_("Model ID"),
+                                               description=_("Model ID")),
                     'dataset_id_list': openapi.Schema(type=openapi.TYPE_ARRAY,
                                                       items=openapi.Schema(type=openapi.TYPE_STRING),
-                                                      title=_("List of associated knowledge base IDs"), description=_("List of associated knowledge base IDs")),
-                    'multiple_rounds_dialogue': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Do you want to initiate multiple sessions"),
-                                                               description=_("Do you want to initiate multiple sessions")),
+                                                      title=_("List of associated knowledge base IDs"),
+                                                      description=_("List of associated knowledge base IDs")),
+                    'multiple_rounds_dialogue': openapi.Schema(type=openapi.TYPE_BOOLEAN,
+                                                               title=_("Do you want to initiate multiple sessions"),
+                                                               description=_(
+                                                                   "Do you want to initiate multiple sessions")),
                     'dataset_setting': ApplicationApi.DatasetSetting.get_request_body_api(),
                     'model_setting': ApplicationApi.ModelSetting.get_request_body_api(),
                     'problem_optimization': openapi.Schema(type=openapi.TYPE_BOOLEAN, title=_("Problem optimization"),
-                                                           description=_("Do you want to enable problem optimization"), default=True)
+                                                           description=_("Do you want to enable problem optimization"),
+                                                           default=True)
                 }
             )
 
@@ -165,7 +231,15 @@ class ChatApi(ApiMixin):
                 openapi.Parameter(name='min_trample', in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER, required=False,
                                   description=_("Minimum number of clicks")),
                 openapi.Parameter(name='comparer', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, required=False,
-                                  description=_("or|and comparator"))
+                                  description=_("or|and comparator")),
+                openapi.Parameter(name='start_time', in_=openapi.IN_QUERY,
+                                  type=openapi.TYPE_STRING,
+                                  required=True,
+                                  description=_('start time')),
+                openapi.Parameter(name='end_time', in_=openapi.IN_QUERY,
+                                  type=openapi.TYPE_STRING,
+                                  required=True,
+                                  description=_('End time')),
                 ]
 
 
@@ -206,14 +280,19 @@ class ChatRecordApi(ApiMixin):
                                             description=_("Resource ID"), default=1),
                 'source_type': openapi.Schema(type=openapi.TYPE_STRING, title=_("Resource Type"),
                                               description=_("Resource Type"), default='xxx'),
-                'message_tokens': openapi.Schema(type=openapi.TYPE_INTEGER, title=_("Number of tokens consumed by the question"),
+                'message_tokens': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                                 title=_("Number of tokens consumed by the question"),
                                                  description=_("Number of tokens consumed by the question"), default=0),
-                'answer_tokens': openapi.Schema(type=openapi.TYPE_INTEGER, title=_("The number of tokens consumed by the answer"),
-                                                description=_("The number of tokens consumed by the answer"), default=0),
-                'improve_paragraph_id_list': openapi.Schema(type=openapi.TYPE_STRING, title=_("Improved annotation list"),
+                'answer_tokens': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                                title=_("The number of tokens consumed by the answer"),
+                                                description=_("The number of tokens consumed by the answer"),
+                                                default=0),
+                'improve_paragraph_id_list': openapi.Schema(type=openapi.TYPE_STRING,
+                                                            title=_("Improved annotation list"),
                                                             description=_("Improved annotation list"),
                                                             default=[]),
-                'index': openapi.Schema(type=openapi.TYPE_STRING, title=_("Corresponding session Corresponding subscript"),
+                'index': openapi.Schema(type=openapi.TYPE_STRING,
+                                        title=_("Corresponding session Corresponding subscript"),
                                         description=_("Corresponding session id corresponding subscript"),
                                         default=0
                                         ),
@@ -372,7 +451,8 @@ class ChatRecordImproveApi(ApiMixin):
                                           description=_("Paragraph content"), default=_('Paragraph content')),
                 'title': openapi.Schema(type=openapi.TYPE_STRING, title=_("title"),
                                         description=_("title"), default=_("Description of xxx")),
-                'hit_num': openapi.Schema(type=openapi.TYPE_INTEGER, title=_("Number of hits"), description=_("Number of hits"),
+                'hit_num': openapi.Schema(type=openapi.TYPE_INTEGER, title=_("Number of hits"),
+                                          description=_("Number of hits"),
                                           default=1),
                 'star_num': openapi.Schema(type=openapi.TYPE_INTEGER, title=_("Number of Likes"),
                                            description=_("Number of Likes"), default=1),

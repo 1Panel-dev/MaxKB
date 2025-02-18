@@ -19,7 +19,7 @@ on:
 
 jobs:
   build-and-push-vector-model-to-ghcr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check Disk Space
         run: df -h
@@ -55,6 +55,9 @@ jobs:
             ${DOCKER_IMAGE_TAGS} .
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        with:
+          # Until https://github.com/tonistiigi/binfmt/issues/215
+          image: tonistiigi/binfmt:qemu-v7.0.0-28
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry

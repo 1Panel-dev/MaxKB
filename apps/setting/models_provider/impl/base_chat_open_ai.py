@@ -15,8 +15,14 @@ from langchain_openai.chat_models.base import _convert_chunk_to_generation_chunk
 from common.config.tokenizer_manage_config import TokenizerManage
 
 
+def custom_get_token_ids(text: str):
+    tokenizer = TokenizerManage.get_tokenizer()
+    return tokenizer.encode(text)
+
+
 class BaseChatOpenAI(ChatOpenAI):
     usage_metadata: dict = {}
+    custom_get_token_ids = custom_get_token_ids
 
     def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
         return self.usage_metadata

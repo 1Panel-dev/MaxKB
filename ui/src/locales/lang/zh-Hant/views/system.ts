@@ -40,6 +40,7 @@ export default {
       userInfoEndpoint: '使用者資訊端位址',
       userInfoEndpointPlaceholder: '請輸入使用者資訊端位址',
       clientId: '用戶端 ID',
+      scopePlaceholder: '請輸入連線範圍',
       clientIdPlaceholder: '請輸入用戶端 ID',
       clientSecret: '用戶端密鑰',
       clientSecretPlaceholder: '請輸入用戶端密鑰',

@@ -1,12 +1,21 @@
 <template>
   <div class="flex-between mb-16">
     <h5 class="lighter">{{ $t('chat.userInput') }}</h5>
-    <el-button link type="primary" @click="openAddDialog()">
-      <el-icon class="mr-4">
-        <Plus />
-      </el-icon>
-      {{ $t('common.add') }}
-    </el-button>
+    <div>
+      <el-button type="primary" link @click="openChangeTitleDialog">
+        <el-icon>
+          <Setting />
+        </el-icon>
+      </el-button>
+      <span class="ml-4">
+        <el-button link type="primary" @click="openAddDialog()">
+          <el-icon class="mr-4">
+            <Plus />
+          </el-icon>
+          {{ $t('common.add') }}
+        </el-button>
+      </span>
+    </div>
   </div>
   <el-table
     v-if="props.nodeModel.properties.user_input_field_list?.length > 0"
@@ -92,6 +101,7 @@
   </el-table>
 
   <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshFieldList" />
+  <UserInputTitleDialog ref="UserInputTitleDialogRef" @refresh="refreshFieldTitle" />
 </template>
 
 <script setup lang="ts">
@@ -100,13 +110,20 @@ import { set } from 'lodash'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
 import { t } from '@/locales'
+import UserInputTitleDialog from '@/workflow/nodes/base-node/component/UserInputTitleDialog.vue'
 const props = defineProps<{ nodeModel: any }>()
 
 const UserFieldFormDialogRef = ref()
+const UserInputTitleDialogRef = ref()
 const inputFieldList = ref<any[]>([])
+const inputFieldConfig = ref({ title: t('chat.userInput') })
 
 function openAddDialog(data?: any, index?: any) {
   UserFieldFormDialogRef.value.open(data, index)
+}
+
+function openChangeTitleDialog() {
+  UserInputTitleDialogRef.value.open(inputFieldConfig.value)
 }
 
 function deleteField(index: any) {
@@ -136,6 +153,13 @@ function refreshFieldList(data: any, index: any) {
   }
   UserFieldFormDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
+}
+
+function refreshFieldTitle(data: any) {
+  inputFieldConfig.value = data
+  UserInputTitleDialogRef.value.close()
+
+  console.log('inputFieldConfig', inputFieldConfig.value)
 }
 
 const getDefaultValue = (row: any) => {
@@ -186,6 +210,7 @@ onMounted(() => {
     }
   })
   set(props.nodeModel.properties, 'user_input_field_list', inputFieldList)
+  set(props.nodeModel.properties, 'user_input_config', inputFieldConfig)
 })
 </script>
 

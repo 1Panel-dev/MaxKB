@@ -58,12 +58,18 @@
           @creatQuick="creatQuickHandle"
           @row-click="rowClickHandle"
           @selection-change="handleSelectionChange"
+          @sort-change="handleSortChange"
           v-loading="loading"
           :row-key="(row: any) => row.id"
           :storeKey="storeKey"
         >
           <el-table-column type="selection" width="55" :reserve-selection="true" />
-          <el-table-column prop="name" :label="$t('views.document.table.name')" min-width="280">
+          <el-table-column
+            prop="name"
+            :label="$t('views.document.table.name')"
+            min-width="280"
+            sortable
+          >
             <template #default="{ row }">
               <ReadWrite
                 @change="editName($event, row.id)"
@@ -77,6 +83,7 @@
             :label="$t('views.document.table.char_length')"
             align="right"
             min-width="90"
+            sortable
           >
             <template #default="{ row }">
               {{ numberFormat(row.char_length) }}
@@ -87,6 +94,7 @@
             :label="$t('views.document.table.paragraph')"
             align="right"
             min-width="90"
+            sortable
           />
           <el-table-column prop="status" :label="$t('views.document.fileStatus.label')" width="130">
             <template #header>
@@ -242,7 +250,12 @@
               {{ $t(hitHandlingMethod[row.hit_handling_method as keyof typeof hitHandlingMethod]) }}
             </template>
           </el-table-column>
-          <el-table-column prop="create_time" :label="$t('common.createTime')" width="175">
+          <el-table-column
+            prop="create_time"
+            :label="$t('common.createTime')"
+            width="175"
+            sortable
+          >
             <template #default="{ row }">
               {{ datetimeFormat(row.create_time) }}
             </template>
@@ -251,6 +264,7 @@
             prop="update_time"
             :label="$t('views.document.table.updateTime')"
             width="175"
+            sortable
           >
             <template #default="{ row }">
               {{ datetimeFormat(row.update_time) }}
@@ -509,6 +523,7 @@ const loading = ref(false)
 let interval: any
 const filterText = ref('')
 const filterMethod = ref<any>({})
+const orderBy = ref<string>('')
 const documentData = ref<any[]>([])
 const currentMouseId = ref(null)
 const datasetDetail = ref<any>({})
@@ -805,10 +820,16 @@ function handleSizeChange() {
   getList()
 }
 
+function handleSortChange({ prop, order }: { prop: string; order: string }) {
+  orderBy.value = order === 'ascending' ? prop : `-${prop}`
+  getList()
+}
+
 function getList(bool?: boolean) {
   const param = {
     ...(filterText.value && { name: filterText.value }),
-    ...filterMethod.value
+    ...filterMethod.value,
+    order_by: orderBy.value,
   }
   documentApi
     .getDocument(id as string, paginationConfig.value, param, bool ? undefined : loading)

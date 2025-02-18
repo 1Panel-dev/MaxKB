@@ -48,6 +48,16 @@
             type="textarea"
           />
         </el-form-item>
+        <el-form-item :label="$t('views.problem.relateParagraph.selectParagraph')" prop="state">
+          <el-radio-group v-model="state" class="radio-block">
+            <el-radio value="error" size="large" class="mb-16">{{
+              $t('views.document.form.selectVectorization.error')
+            }}</el-radio>
+            <el-radio value="all" size="large">{{
+              $t('views.document.form.selectVectorization.all')
+            }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
       </el-form>
     </div>
     <template #footer>
@@ -87,7 +97,11 @@ const dialogVisible = ref<boolean>(false)
 const modelOptions = ref<any>(null)
 const idList = ref<string[]>([])
 const apiType = ref('') // 文档document或段落paragraph
-
+const state = ref<'all' | 'error'>('error')
+const stateMap = {
+  all: ['0', '1', '2', '3', '4', '5', 'n'],
+  error: ['0', '1', '3', '4', '5', 'n']
+}
 const FormRef = ref()
 const userId = user.userInfo?.id as string
 const form = ref(prompt.get(userId))
@@ -131,14 +145,22 @@ const submitHandle = async (formEl: FormInstance) => {
       // 保存提示词
       prompt.save(user.userInfo?.id as string, form.value)
       if (apiType.value === 'paragraph') {
-        const data = { ...form.value, paragraph_id_list: idList.value }
+        const data = {
+          ...form.value,
+          paragraph_id_list: idList.value,
+          state_list: stateMap[state.value]
+        }
         paragraphApi.batchGenerateRelated(id, documentId, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))
           emit('refresh')
           dialogVisible.value = false
         })
       } else if (apiType.value === 'document') {
-        const data = { ...form.value, document_id_list: idList.value }
+        const data = {
+          ...form.value,
+          document_id_list: idList.value,
+          state_list: stateMap[state.value]
+        }
         documentApi.batchGenerateRelated(id, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))
           emit('refresh')

@@ -106,7 +106,7 @@ class ModelSerializer(serializers.Serializer):
                 model_query_set = QuerySet(Model).filter((Q(user_id=user_id) | Q(permission_type='PUBLIC')))
             query_params = {}
             if name is not None:
-                query_params['name__contains'] = name
+                query_params['name__icontains'] = name
             if self.data.get('model_type') is not None:
                 query_params['model_type'] = self.data.get('model_type')
             if self.data.get('model_name') is not None:

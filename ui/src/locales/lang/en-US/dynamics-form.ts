@@ -96,6 +96,7 @@ export default {
       requiredMessage2: 'and',
       requiredMessage3: 'characters',
       requiredMessage4: 'Text length is a required parameter'
-    }
+    },
+    showPassword: 'Show Password'
   }
 }

@@ -21,7 +21,12 @@ class XlsxSplitHandle(BaseParseTableHandle):
         data = []
 
         # 获取第一行作为标题行
-        headers = [cell.value for cell in sheet[1]]
+        headers = []
+        for idx, cell in enumerate(sheet[1]):
+            if cell.value is None:
+                headers.append(' ' * (idx + 1))
+            else:
+                headers.append(cell.value)
 
         # 从第二行开始遍历每一行
         for row in sheet.iter_rows(min_row=2, values_only=False):

@@ -57,7 +57,12 @@
           />
         </template>
       </el-table-column>
-      <el-table-column :label="$t('views.team.setting.check')"  align="center" width="100" fixed="right">
+      <el-table-column
+        :label="$t('views.team.setting.check')"
+        align="center"
+        width="100"
+        fixed="right"
+      >
         <template #header>
           <el-checkbox
             :disabled="props.manage"
@@ -135,7 +140,9 @@ const allChecked: any = ref({
 
 const filterText = ref('')
 
-const filterData = computed(() => props.data.filter((v: any) => v.name.includes(filterText.value)))
+const filterData = computed(() =>
+  props.data.filter((v: any) => v.name.toLowerCase().includes(filterText.value.toLowerCase()))
+)
 
 const allIndeterminate: any = ref({
   [TeamEnum.MANAGE]: computed(() => {

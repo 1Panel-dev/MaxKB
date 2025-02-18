@@ -201,6 +201,13 @@ function getChatLog(id: string) {
 
   log.asyncGetChatLogClient(id, page, left_loading).then((res: any) => {
     chatLogData.value = res.data.records
+    paginationConfig.current_page = 1
+    paginationConfig.total = 0
+    currentRecordList.value = []
+    currentChatId.value = chatLogData.value?.[0]?.id || 'new'
+    if (currentChatId.value !== 'new') {
+      getChatRecord()
+    }
   })
 }
 

@@ -52,8 +52,8 @@ export default {
       },
       permissionType: {
         label: 'Permission',
-        privateDesc: 'Only the current user can use',
-        publicDesc: 'All users can use',
+        privateDesc: 'Available only to current user',
+        publicDesc: 'Available to all users',
         requiredMessage: 'Permission cannot be empty'
       },
       model_type: {

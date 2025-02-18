@@ -75,7 +75,6 @@ const router = useRouter()
 const { user } = useStore()
 const { load } = useScriptTag('https://g.alicdn.com/dingding/h5-dingtalk-login/0.21.0/ddlogin.js')
 const isConfigReady = ref(false)
-const errorShown = ref(false)
 
 const initActive = async () => {
   try {
@@ -83,7 +82,6 @@ const initActive = async () => {
     if (!isConfigReady.value) {
       return
     }
-    console.log(props.config)
 
     const data = {
       appKey: props.config.app_key,
@@ -114,10 +112,7 @@ const initActive = async () => {
         })
       },
       (errorMsg: string) => {
-        if (!errorShown.value) {
-          MsgError(errorMsg)
-          errorShown.value = true // 设置标志位为 true，表示错误已经显示过
-        }
+        MsgError(errorMsg)
       }
     )
   } catch (error) {
