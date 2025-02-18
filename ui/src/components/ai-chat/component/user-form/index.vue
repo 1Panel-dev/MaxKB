@@ -16,7 +16,7 @@
         <el-icon class="mr-8 arrow-icon" :class="showUserInput ? 'rotate-90' : ''"
           ><CaretRight
         /></el-icon>
-        {{ $t('chat.userInput') }}
+        {{ inputFieldConfig.title }}
       </div>
       <el-scrollbar max-height="160">
         <el-collapse-transition>
@@ -63,6 +63,7 @@ const props = defineProps<{
 const dynamicsFormRefresh = ref(0)
 const inputFieldList = ref<FormField[]>([])
 const apiInputFieldList = ref<FormField[]>([])
+const inputFieldConfig = ref({ title: t('chat.userInput') })
 const showUserInput = ref(true)
 const emit = defineEmits(['update:api_form_data', 'update:form_data'])
 
@@ -260,6 +261,11 @@ function handleInputFieldList() {
                 }
               })
           : []
+
+      //
+      inputFieldConfig.value = v.properties.user_input_config?.title
+        ? v.properties.user_input_config
+        : { title: t('chat.userInput') }
     })
 }
 /**
