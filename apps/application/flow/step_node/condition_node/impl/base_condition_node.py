@@ -36,6 +36,10 @@ class BaseConditionNode(IConditionNode):
         return all(condition_list) if condition == 'and' else any(condition_list)
 
     def assertion(self, field_list: List[str], compare: str, value):
+        try:
+            value = self.workflow_manage.generate_prompt(value)
+        except Exception as e:
+            pass
         field_value = self.workflow_manage.get_reference_field(field_list[0], field_list[1:])
         for compare_handler in compare_handle_list:
             if compare_handler.support(field_list[0], field_list[1:], field_value, compare, value):
