@@ -2,21 +2,19 @@
   <div class="flex-between mb-16">
     <h5 class="lighter">{{ $t('chat.userInput') }}</h5>
     <div>
-      <el-button
-        type="primary"
-        link
-        @click="openChangeTitleDialog"
-      >
+      <el-button type="primary" link @click="openChangeTitleDialog">
         <el-icon>
           <Setting />
         </el-icon>
       </el-button>
-      <el-button link type="primary" @click="openAddDialog()">
-        <el-icon class="mr-4">
-          <Plus />
-        </el-icon>
-        {{ $t('common.add') }}
-      </el-button>
+      <span class="ml-4">
+        <el-button link type="primary" @click="openAddDialog()">
+          <el-icon class="mr-4">
+            <Plus />
+          </el-icon>
+          {{ $t('common.add') }}
+        </el-button>
+      </span>
     </div>
   </div>
   <el-table
@@ -103,7 +101,7 @@
   </el-table>
 
   <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshFieldList" />
-  <UserInputTitleDialog ref="UserInputTitleDialogRef" @refresh="refreshFieldTitle"/>
+  <UserInputTitleDialog ref="UserInputTitleDialogRef" @refresh="refreshFieldTitle" />
 </template>
 
 <script setup lang="ts">
