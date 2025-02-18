@@ -2,13 +2,13 @@
   <el-card shadow="hover" class="card-box" @mouseenter="cardEnter()" @mouseleave="cardLeave()">
     <div class="card-header">
       <slot name="header">
-        <div class="title flex" :class="$slots.subTitle ? '' : 'align-center'">
+        <div class="title flex align-center" :class="$slots.subTitle?'mt-4':''">
           <slot name="icon">
             <AppAvatar v-if="showIcon" class="mr-12 avatar-blue" shape="square" :size="32">
               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
             </AppAvatar>
           </slot>
-          <div style="width: 90%;margin-top: -5px;">
+          <div style="width: 90%;">
             <auto-tooltip :content="title" style="width: 65%; height: 22px">
               {{ title }}
             </auto-tooltip>
