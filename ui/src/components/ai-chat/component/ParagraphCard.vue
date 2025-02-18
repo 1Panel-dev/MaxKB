@@ -12,7 +12,7 @@
     <div class="active-button primary">{{ data.similarity?.toFixed(3) }}</div>
     <template #description>
       <el-scrollbar height="150">
-        <MdPreview ref="editorRef" editorId="preview-only" :modelValue="data.content" />
+        <MdPreview ref="editorRef" editorId="preview-only" :modelValue="content" noImgZoomIn/>
       </el-scrollbar>
     </template>
     <template #footer>
@@ -61,6 +61,10 @@ const props = defineProps({
   data: {
     type: Object,
     default: () => {}
+  },
+  content: {
+    type: String,
+    default: ''
   },
   index: {
     type: Number,

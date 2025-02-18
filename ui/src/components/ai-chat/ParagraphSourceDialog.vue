@@ -22,7 +22,7 @@
             <el-form-item :label="$t('chat.KnowledgeSource.referenceParagraph')">
               <div v-if="detail.paragraph_list.length > 0" class="w-full">
                 <template v-for="(item, index) in detail.paragraph_list" :key="index">
-                  <ParagraphCard :data="item" :index="index" />
+                  <ParagraphCard :data="item" :content="item.content" :index="index" />
                 </template>
               </div>
               <span v-else> - </span>
@@ -79,7 +79,6 @@ defineExpose({ open })
 @media only screen and (max-width: 768px) {
   .paragraph-source {
     width: 90% !important;
- 
   }
 }
 </style>

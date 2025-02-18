@@ -147,7 +147,11 @@
                             )"
                             :key="paragraphIndex"
                           >
-                            <ParagraphCard :data="paragraph" :index="paragraphIndex" />
+                            <ParagraphCard
+                              :data="paragraph"
+                              :content="paragraph.content"
+                              :index="paragraphIndex"
+                            />
                           </template>
                         </template>
                         <template v-else> -</template>
@@ -423,17 +427,11 @@
                             v-for="(paragraph, paragraphIndex) in item.document_list"
                             :key="paragraphIndex"
                           >
-                            <CardBox shadow="never" title="" class="cursor mb-8" :showIcon="false">
-                              <template #description>
-                                <el-scrollbar max-height="150">
-                                  <MdPreview
-                                    ref="editorRef"
-                                    editorId="preview-only"
-                                    :modelValue="paragraph.page_content"
-                                  />
-                                </el-scrollbar>
-                              </template>
-                            </CardBox>
+                            <ParagraphCard
+                              :data="paragraph.metadata"
+                              :content="paragraph.page_content"
+                              :index="paragraphIndex"
+                            />
                           </template>
                         </template>
                         <template v-else> -</template>
@@ -449,27 +447,11 @@
                             v-for="(paragraph, paragraphIndex) in item.result_list"
                             :key="paragraphIndex"
                           >
-                            <CardBox
-                              shadow="never"
-                              :title="`${$t('chat.executionDetails.paragraph')}${paragraphIndex + 1}`"
-                              class="paragraph-source-card cursor mb-8 paragraph-source-card-height"
-                              :showIcon="false"
-                            >
-                              <div class="active-button primary">
-                                {{ paragraph.metadata.relevance_score?.toFixed(3) }}
-                              </div>
-                              <template #description>
-                                <div class="mt-8">
-                                  <el-scrollbar height="150">
-                                    <MdPreview
-                                      ref="editorRef"
-                                      editorId="preview-only"
-                                      :modelValue="paragraph.page_content"
-                                    />
-                                  </el-scrollbar>
-                                </div>
-                              </template>
-                            </CardBox>
+                            <ParagraphCard
+                              :data="paragraph.metadata"
+                              :content="paragraph.page_content"
+                              :index="paragraphIndex"
+                            />
                           </template>
                         </template>
                         <template v-else> -</template>
