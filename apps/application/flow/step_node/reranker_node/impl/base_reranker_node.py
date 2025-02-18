@@ -23,9 +23,14 @@ def merge_reranker_list(reranker_list, result=None):
             merge_reranker_list(document, result)
         elif isinstance(document, dict):
             content = document.get('title', '') + document.get('content', '')
-            result.append(str(document) if len(content) == 0 else content)
+            title = document.get("title")
+            dataset_name = document.get("dataset_name")
+            document_name = document.get('document_name')
+            result.append(
+                Document(page_content=str(document) if len(content) == 0 else content,
+                         metadata={'title': title, 'dataset_name': dataset_name, 'document_name': document_name}))
         else:
-            result.append(str(document))
+            result.append(Document(page_content=str(document), metadata={}))
     return result
 
 
@@ -43,6 +48,21 @@ def filter_result(document_list: List[Document], max_paragraph_char_number, top_
     return result
 
 
+def reset_result_list(result_list: List[Document], document_list: List[Document]):
+    r = []
+    document_list = document_list.copy()
+    for result in result_list:
+        filter_result_list = [document for document in document_list if document.page_content == result.page_content]
+        if len(filter_result_list) > 0:
+            item = filter_result_list[0]
+            document_list.remove(item)
+            r.append(Document(page_content=item.page_content,
+                              metadata={**item.metadata, 'relevance_score': result.metadata.get('relevance_score')}))
+        else:
+            r.append(result)
+    return r
+
+
 class BaseRerankerNode(IRerankerNode):
     def save_context(self, details, workflow_manage):
         self.context['document_list'] = details.get('document_list', [])
@@ -55,16 +75,18 @@ class BaseRerankerNode(IRerankerNode):
                 **kwargs) -> NodeResult:
         documents = merge_reranker_list(reranker_list)
         top_n = reranker_setting.get('top_n', 3)
-        self.context['document_list'] = documents
+        self.context['document_list'] = [{'page_content': document.page_content, 'metadata': document.metadata} for
+                                         document in documents]
         self.context['question'] = question
         reranker_model = get_model_instance_by_model_user_id(reranker_model_id,
                                                              self.flow_params_serializer.data.get('user_id'),
                                                              top_n=top_n)
         result = reranker_model.compress_documents(
-            [Document(page_content=document) for document in documents if document is not None and len(document) > 0],
+            documents,
             question)
         similarity = reranker_setting.get('similarity', 0.6)
         max_paragraph_char_number = reranker_setting.get('max_paragraph_char_number', 5000)
+        result = reset_result_list(result, documents)
         r = filter_result(result, max_paragraph_char_number, top_n, similarity)
         return NodeResult({'result_list': r, 'result': ''.join([item.get('page_content') for item in r])}, {})
 
