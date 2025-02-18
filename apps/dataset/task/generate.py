@@ -29,7 +29,8 @@ def generate_problem_by_paragraph(paragraph, llm_model, prompt):
     try:
         ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph.id), TaskType.GENERATE_PROBLEM,
                                          State.STARTED)
-        res = llm_model.invoke([HumanMessage(content=prompt.replace('{data}', paragraph.content))])
+        res = llm_model.invoke(
+            [HumanMessage(content=prompt.replace('{data}', paragraph.content).replace('{title}', paragraph.title))])
         if (res.content is None) or (len(res.content) == 0):
             return
         problems = res.content.split('\n')
