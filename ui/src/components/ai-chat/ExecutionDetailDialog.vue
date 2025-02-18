@@ -429,7 +429,7 @@
                                   <MdPreview
                                     ref="editorRef"
                                     editorId="preview-only"
-                                    :modelValue="paragraph"
+                                    :modelValue="paragraph.page_content"
                                   />
                                 </el-scrollbar>
                               </template>
