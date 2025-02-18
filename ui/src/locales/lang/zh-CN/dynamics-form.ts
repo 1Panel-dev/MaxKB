@@ -96,6 +96,7 @@ export default {
       requiredMessage2: '到',
       requiredMessage3: '个字符',
       requiredMessage4: '文本长度为必填参数'
-    }
+    },
+    showPassword: '密文显示'
   }
 }
