@@ -136,7 +136,8 @@ const form = reactive<any>({
     encoding_aes_key: '',
     callback_url: ''
   },
-  feishu: { app_id: '', app_secret: '', verification_token: '', callback_url: '' }
+  feishu: { app_id: '', app_secret: '', verification_token: '', callback_url: '' },
+  slack: {  signing_secret: '', bot_user_token: '', callback_url: '' }
 })
 
 const rules = reactive<{ [propName: string]: any }>({
@@ -245,6 +246,22 @@ const rules = reactive<{ [propName: string]: any }>({
         trigger: 'blur'
       }
     ]
+  },
+  slack: {
+    signing_secret: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.slackSetting.signingSecretPlaceholder'),
+        trigger: 'blur'
+      }
+    ],
+    bot_user_token: [
+      {
+        required: true,
+        message: t('views.application.applicationAccess.slackSetting.botUserTokenPlaceholder'),
+        trigger: 'blur'
+      }
+    ]
   }
 })
 
@@ -282,6 +299,10 @@ const configFields: { [propName: string]: { [propName: string]: any } } = {
     app_id: { label: 'App ID', placeholder: '' },
     app_secret: { label: 'App Secret', placeholder: '' },
     verification_token: { label: 'Verification Token', placeholder: '' }
+  },
+  slack: {
+    signing_secret: { label: 'Signing Secret', placeholder: '' },
+    bot_user_token: { label: 'Bot User Token', placeholder: '' }
   }
 }
 

@@ -83,6 +83,14 @@ const platforms = reactive([
     description: t('views.application.applicationAccess.larkTip'),
     isActive: false,
     exists: false
+  },
+  {
+    key: 'slack',
+    logoSrc: new URL(`../../assets/logo_slack.svg`, import.meta.url).href,
+    name: t('views.application.applicationAccess.slack'),
+    description: t('views.application.applicationAccess.slackTip'),
+    isActive: false,
+    exists: false
   }
 ])
 

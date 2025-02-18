@@ -150,6 +150,8 @@ export default {
     wechatTip: '打造公众号智能应用',
     lark: '飞书应用',
     larkTip: '打造飞书智能应用',
+    slack: 'Slack',
+    slackTip: '打造 Slack 智能应用',
     setting: '配置',
     callback: '回调地址',
     callbackTip: '请输入回调地址',
@@ -193,7 +195,11 @@ export default {
       verificationTokenPlaceholder: '请输入Verification Token',
       urlInfo: '-事件与回调-事件配置-配置订阅方式的 "请求地址" 中'
     },
-
+    slackSetting: {
+      title: 'Slack 应用配置',
+      signingSecretPlaceholder: '请输入 Signing Secret',
+      botUserTokenPlaceholder: '请输入 Bot User Token',
+    },
     copyUrl: '复制链接填入到'
   },
   hitTest: {

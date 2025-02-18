@@ -166,6 +166,8 @@ export default {
     wechatPlatform: 'WeChat Open Platform',
     dingtalkPlatform: 'DingTalk Open Platform',
     larkPlatform: 'Lark Open Platform',
+    slack: 'Slack',
+    slackTip: 'Create Slack intelligent APP',
     wecomSetting: {
       title: 'WeCom Configuration',
       cropId: 'Crop ID',
@@ -205,6 +207,11 @@ export default {
       verificationTokenPlaceholder: 'Please enter verification token',
       urlInfo:
         '-Events and callbacks - event configuration - configure the "request address" of the subscription method'
+    },
+    slackSetting: {
+      title: 'Slack Configuration',
+      signingSecretPlaceholder: 'Please enter signing secret',
+      botUserTokenPlaceholder: 'Please enter bot user token',
     },
     copyUrl: 'Copy the link and fill it in'
   },
