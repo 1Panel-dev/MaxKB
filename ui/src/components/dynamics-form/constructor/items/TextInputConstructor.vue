@@ -1,4 +1,11 @@
 <template>
+  <el-form-item
+    class="defaultValueItem"
+    prop="show_password"
+    :label="$t('dynamicsForm.TextInput.showPassword')"
+  >
+    <el-switch v-model="formValue.show_password" />
+  </el-form-item>
   <el-form-item :label="$t('dynamicsForm.TextInput.length.label')" required>
     <el-row class="w-full">
       <el-col :span="11">
@@ -70,7 +77,8 @@
       :minlength="formValue.minlength"
       :placeholder="$t('dynamicsForm.default.placeholder')"
       show-word-limit
-      type="text"
+      :type="formValue.show_password ? 'password' : 'text'"
+      :show-password="formValue.show_password"
     />
   </el-form-item>
 </template>
@@ -103,7 +111,9 @@ const getData = () => {
     attrs: {
       maxlength: formValue.value.maxlength,
       minlength: formValue.value.minlength,
-      'show-word-limit': true
+      'show-word-limit': true,
+      type: formValue.value.show_password ? 'password' : 'text',
+      'show-password': formValue.value.show_password
     },
     default_value: formValue.value.default_value,
     show_default_value: formValue.value.show_default_value,
@@ -135,6 +145,7 @@ const rander = (form_data: any) => {
   formValue.value.maxlength = attrs.maxlength
   formValue.value.default_value = form_data.default_value
   formValue.value.show_default_value = form_data.show_default_value
+  formValue.value.show_password = attrs['show-password']
 }
 const rangeRules = [
   {
@@ -165,7 +176,8 @@ onMounted(() => {
   formValue.value.minlength = 0
   formValue.value.maxlength = 20
   formValue.value.default_value = ''
-  console.log(formValue.value.show_default_value)
+  formValue.value.show_password = false
+
   if (formValue.value.show_default_value === undefined) {
     formValue.value.show_default_value = true
   }

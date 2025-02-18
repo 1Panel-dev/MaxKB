@@ -96,6 +96,7 @@ export default {
       requiredMessage2: '到',
       requiredMessage3: '個字元',
       requiredMessage4: '文字長度為必填參數'
-    }
+    },
+    showPassword: '密文顯示'
   }
 }
