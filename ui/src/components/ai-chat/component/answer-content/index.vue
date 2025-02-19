@@ -5,7 +5,7 @@
         <img v-if="application.avatar" :src="application.avatar" height="32px" width="32px" />
         <LogoIcon v-else height="32px" width="32px" />
       </div>
-      <div class="content" @click.stop @mouseup="openControl">
+      <div class="content" @mouseup="openControl">
         <el-card shadow="always" class="dialog-card mb-8">
           <MdRenderer
             v-if="
@@ -82,7 +82,7 @@ const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: 
   }
 }
 const add_answer_text_list = (answer_text_list: Array<any>) => {
-  answer_text_list.push([ ])
+  answer_text_list.push([])
 }
 
 const openControl = (event: any) => {
