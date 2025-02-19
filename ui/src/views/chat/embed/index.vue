@@ -1,6 +1,7 @@
 <template>
   <div
     class="chat-embed layout-bg"
+    :class="{ 'chat-embed--popup': isPopup }"
     v-loading="loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
@@ -116,11 +117,16 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive, nextTick, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { isAppIcon } from '@/utils/application'
 import { hexToRgba } from '@/utils/theme'
 import useStore from '@/stores'
 const { user, log } = useStore()
+const route = useRoute()
 
+const isPopup = computed(() => {
+  return route.query.popup !== 'no'
+})
 const AiChatRef = ref()
 const loading = ref(false)
 const left_loading = ref(false)
@@ -303,8 +309,13 @@ onMounted(() => {
     z-index: 2009;
     position: absolute;
     top: 16px;
-    right: 85px;
+    right: 16px;
     font-size: 22px;
+  }
+  &.chat-embed--popup{
+    .chat-popover-button {
+      right: 85px;
+    }
   }
   .chat-popover-mask {
     background-color: var(--el-overlay-color-lighter);
