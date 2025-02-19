@@ -29,7 +29,16 @@
         type="ai-chat"
         :available="applicationAvailable"
         :appId="applicationDetail?.id"
-      ></AiChat>
+        :record="recordList"
+      >
+        <template #operateBefore>
+          <div>
+            <el-button type="primary" link class="new-chat-button mb-8" @click="newChat">
+              <el-icon><Plus /></el-icon><span class="ml-4">{{ $t('chat.createChat') }}</span>
+            </el-button>
+          </div>
+        </template>
+      </AiChat>
     </div>
     <div class="chat__footer"></div>
   </div>
@@ -57,6 +66,11 @@ const applicationDetail = computed({
   },
   set: (v) => {}
 })
+const recordList = ref([])
+
+function newChat() {
+  recordList.value = []
+}
 </script>
 <style lang="scss">
 .chat {
