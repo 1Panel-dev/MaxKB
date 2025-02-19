@@ -1,6 +1,6 @@
 <template>
   <!-- 问题内容 -->
-  <div class="qustion-content item-content mb-16 lighter">
+  <div class="question-content item-content mb-16 lighter">
     <div class="content mr-16">
       <div class="text break-all pre-wrap">
         <div class="mb-8" v-if="document_list.length">
@@ -137,7 +137,7 @@ function downloadFile(item: any) {
 onMounted(() => {})
 </script>
 <style lang="scss" scoped>
-.qustion-content {
+.question-content {
   display: flex;
   justify-content: flex-end;
 
