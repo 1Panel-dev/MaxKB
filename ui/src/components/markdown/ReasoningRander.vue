@@ -7,7 +7,6 @@
     <el-collapse-transition>
       <div class="border-l mt-8" v-show="showThink">
         <MdPreview
-          noIconfont
           ref="editorRef"
           editorId="preview-only"
           :modelValue="content"

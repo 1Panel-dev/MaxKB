@@ -1,19 +1,7 @@
 <template>
   <!-- 问题内容 -->
-  <div class="item-content mb-16 lighter">
-    <div class="avatar">
-      <el-image
-        v-if="application.user_avatar"
-        :src="application.user_avatar"
-        alt=""
-        fit="cover"
-        style="width: 32px; height: 32px; display: block"
-      />
-      <AppAvatar v-else>
-        <img src="@/assets/user-icon.svg" style="width: 50%" alt="" />
-      </AppAvatar>
-    </div>
-    <div class="content">
+  <div class="qustion-content item-content mb-16 lighter">
+    <div class="content mr-16">
       <div class="text break-all pre-wrap">
         <div class="mb-8" v-if="document_list.length">
           <el-row :gutter="10">
@@ -90,6 +78,18 @@
         {{ chatRecord.problem_text }}
       </div>
     </div>
+    <div class="avatar">
+      <el-image
+        v-if="application.user_avatar"
+        :src="application.user_avatar"
+        alt=""
+        fit="cover"
+        style="width: 32px; height: 32px; display: block"
+      />
+      <AppAvatar v-else>
+        <img src="@/assets/user-icon.svg" style="width: 50%" alt="" />
+      </AppAvatar>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -137,26 +137,31 @@ function downloadFile(item: any) {
 onMounted(() => {})
 </script>
 <style lang="scss" scoped>
-.download-file {
-  height: 43px;
+.qustion-content {
+  display: flex;
+  justify-content: flex-end;
 
-  &:hover {
-    color: var(--el-color-primary);
-    border: 1px solid var(--el-color-primary);
+  .download-file {
+    height: 43px;
+
+    &:hover {
+      color: var(--el-color-primary);
+      border: 1px solid var(--el-color-primary);
+
+      .download-button {
+        display: block;
+        text-align: center;
+        line-height: 26px;
+      }
+
+      .show {
+        display: none;
+      }
+    }
 
     .download-button {
-      display: block;
-      text-align: center;
-      line-height: 26px;
-    }
-
-    .show {
       display: none;
     }
-  }
-
-  .download-button {
-    display: none;
   }
 }
 </style>
