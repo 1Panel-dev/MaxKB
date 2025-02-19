@@ -212,6 +212,22 @@ export default {
         requiredMessage: 'Please select an image'
       }
     },
+    variableAssignNode: {
+      label: 'Variable assign',
+      text: 'Update the value of the global variable',
+      variable: {
+        label: 'select variable',
+        requiredMessage: 'Please select a variable'
+      },
+      value: {
+        label: 'Set value',
+      },
+      source: {
+        reference: 'Reference Variable',
+        custom: 'Custom'
+      },
+      addVariable: 'Add Variable',
+    },
     imageGenerateNode: {
       label: 'Image Generation',
       text: 'Generate images based on provided text content',

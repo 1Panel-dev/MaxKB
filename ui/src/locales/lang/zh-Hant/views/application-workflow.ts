@@ -210,6 +210,22 @@ export default {
         requiredMessage: '請選擇圖片'
       }
     },
+    variableAssignNode: {
+      label: '變數賦值',
+      text: '更新全域變數的值',
+      variable: {
+        label: '選擇變數',
+        requiredMessage: '請選擇變數'
+      },
+      value: {
+        label: '設置值',
+      },
+      source: {
+        reference: '引用變數',
+        custom: '自定義'
+      },
+      addVariable: '添加變數',
+    },
     imageGenerateNode: {
       label: '圖片生成',
       text: '根據提供的文本內容生成圖片',

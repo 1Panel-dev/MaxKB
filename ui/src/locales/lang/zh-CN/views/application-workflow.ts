@@ -211,6 +211,22 @@ export default {
         requiredMessage: '请选择图片'
       }
     },
+    variableAssignNode: {
+      label: '变量赋值',
+      text: '更新全局变量的值',
+      variable: {
+        label: '选择变量',
+        requiredMessage: '请选择变量'
+      },
+      value: {
+        label: '赋值',
+      },
+      source: {
+        reference: '引用变量',
+        custom: '自定义'
+      },
+      addVariable: '添加变量'
+    },
     imageGenerateNode: {
       label: '图片生成',
       text: '根据提供的文本内容生成图片',
