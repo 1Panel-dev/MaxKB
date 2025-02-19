@@ -149,6 +149,8 @@ export default {
     wechatTip: '打造公眾號智慧應用',
     lark: '飛書應用',
     larkTip: '打造飛書智慧應用',
+    slack: 'Slack',
+    slackTip: '打造 Slack 智慧應用',
     setting: '配置',
     callback: '回呼位址',
     callbackTip: '請輸入回呼位址',
@@ -191,6 +193,11 @@ export default {
       appSecretPlaceholder: '請輸入App Secret',
       verificationTokenPlaceholder: '請輸入Verification Token',
       urlInfo: '-事件與回呼-事件配置-配置訂閱方式的 "請求位址" 中'
+    },
+    slackSetting: {
+      title: 'Slack 應用配置',
+      signingSecretPlaceholder: '請輸入 Signing Secret',
+      botUserTokenPlaceholder: '請輸入 Bot User Token',
     },
     copyUrl: '複製連結填入到'
   },
