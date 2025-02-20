@@ -59,13 +59,16 @@
                       <h5 class="p-8-12">
                         {{ $t('common.param.inputParam') }}
                       </h5>
+
                       <div class="p-8-12 border-t-dashed lighter">
                         <div class="mb-8">
                           <span class="color-secondary">
                             {{ $t('chat.paragraphSource.question') }}:</span
                           >
+
                           {{ item.question || '-' }}
                         </div>
+
                         <div v-for="(f, i) in item.global_fields" :key="i" class="mb-8">
                           <span class="color-secondary">{{ f.label }}:</span> {{ f.value }}
                         </div>
@@ -601,6 +604,30 @@
                           style="background: none"
                         />
                         <template v-else> -</template>
+                      </div>
+                    </div>
+                  </template>
+
+                  <!-- 变量赋值 -->
+                  <template v-if="item.type === WorkflowType.VariableAssignNode">
+                    <div class="card-never border-r-4">
+                      <h5 class="p-8-12">
+                        {{ $t('common.param.inputParam') }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <div v-for="(f, i) in item.variable_list" :key="i" class="mb-8">
+                          <span class="color-secondary">{{ f.name }}:</span> {{ f.input_value }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-never border-r-4">
+                      <h5 class="p-8-12">
+                        {{ $t('common.param.outputParam') }}
+                      </h5>
+                      <div class="p-8-12 border-t-dashed lighter">
+                        <div v-for="(f, i) in item.variable_list" :key="i" class="mb-8">
+                          <span class="color-secondary">{{ f.name }}:</span> {{ f.output_value }}
+                        </div>
                       </div>
                     </div>
                   </template>
