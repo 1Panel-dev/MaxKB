@@ -22,6 +22,7 @@
     :data="props.nodeModel.properties.user_input_field_list"
     class="mb-16"
     ref="tableRef"
+    row-key="field"
   >
     <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')" width="95">
       <template #default="{ row }">
@@ -132,7 +133,7 @@ function openChangeTitleDialog() {
 function deleteField(index: any) {
   inputFieldList.value.splice(index, 1)
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
-  ondragHandel()
+  onDragHandel()
 }
 
 function refreshFieldList(data: any, index: any) {
@@ -157,7 +158,7 @@ function refreshFieldList(data: any, index: any) {
   }
   UserFieldFormDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
-  ondragHandel()
+  onDragHandel()
 }
 
 function refreshFieldTitle(data: any) {
@@ -183,28 +184,24 @@ const getDefaultValue = (row: any) => {
   }
 }
 
-function ondragHandel() {
+function onDragHandel() {
   if (!tableRef.value) return
 
   // 获取表格的 tbody DOM 元素
   const wrapper = tableRef.value.$el as HTMLElement
   const tbody = wrapper.querySelector('.el-table__body-wrapper tbody')
   if (!tbody) return
-  console.log(tbody)
   // 初始化 Sortable
   Sortable.create(tbody, {
     animation: 150,
     ghostClass: 'ghost-row',
     onEnd: (evt) => {
       if (evt.oldIndex === undefined || evt.newIndex === undefined) return
-      console.log(inputFieldList.value)
       // 更新数据顺序
       const items = [...inputFieldList.value]
       const [movedItem] = items.splice(evt.oldIndex, 1)
       items.splice(evt.newIndex, 0, movedItem)
       inputFieldList.value = items
-      console.log(inputFieldList.value)
-      // set(props.nodeModel.properties, 'user_input_field_list', inputFieldList.value)
       props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
     }
   })
@@ -243,7 +240,7 @@ onMounted(() => {
   })
   set(props.nodeModel.properties, 'user_input_field_list', inputFieldList)
   set(props.nodeModel.properties, 'user_input_config', inputFieldConfig)
-  ondragHandel()
+  onDragHandel()
 })
 </script>
 
