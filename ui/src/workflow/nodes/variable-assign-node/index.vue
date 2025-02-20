@@ -31,6 +31,7 @@
               :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
               v-model="item.fields"
               :global="true"
+              @change="variableChange(item)"
             />
           </el-form-item>
           <el-form-item>
@@ -38,7 +39,7 @@
               <div class="flex-between">
                 <div>
                   <span
-                    >{{ $t('views.applicationWorkflow.nodes.variableAssignNode.assign')
+                  >{{ $t('views.applicationWorkflow.nodes.variableAssignNode.assign')
                     }}<span class="danger">*</span></span
                   >
                 </div>
@@ -116,7 +117,15 @@ const wheel = (e: any) => {
 }
 const form = {
   variable_list: [
-    { id: randomId(), fields: [], value: null, reference: [], type: 'string', source: 'custom' }
+    {
+      id: randomId(),
+      fields: [],
+      value: null,
+      reference: [],
+      type: 'string',
+      source: 'custom',
+      name: ''
+    }
   ]
 }
 
@@ -154,10 +163,10 @@ function addVariable() {
     value: null,
     reference: [],
     type: 'string',
-    source: 'custom'
+    source: 'custom',
+    name: ''
   }
   list.push(obj)
-  console.log(list)
   set(props.nodeModel.properties.node_data, 'variable_list', list)
 }
 
@@ -165,6 +174,18 @@ function deleteVariable(index: number) {
   const list = cloneDeep(props.nodeModel.properties.node_data.variable_list)
   list.splice(index, 1)
   set(props.nodeModel.properties.node_data, 'variable_list', list)
+}
+
+function variableChange(item: any) {
+  props.nodeModel.graphModel.nodes.map((node: any) => {
+    if (node.id === 'start-node') {
+      node.properties.config.globalFields.forEach((field: any) => {
+        if (field.value === item.fields[1]) {
+          item.name = field.label
+        }
+      })
+    }
+  })
 }
 
 onMounted(() => {

@@ -615,7 +615,7 @@
                         {{ $t('common.param.inputParam') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
-                        <div v-for="(f, i) in item.variable_list" :key="i" class="mb-8">
+                        <div v-for="(f, i) in item.result_list" :key="i" class="mb-8">
                           <span class="color-secondary">{{ f.name }}:</span> {{ f.input_value }}
                         </div>
                       </div>
@@ -625,7 +625,7 @@
                         {{ $t('common.param.outputParam') }}
                       </h5>
                       <div class="p-8-12 border-t-dashed lighter">
-                        <div v-for="(f, i) in item.variable_list" :key="i" class="mb-8">
+                        <div v-for="(f, i) in item.result_list" :key="i" class="mb-8">
                           <span class="color-secondary">{{ f.name }}:</span> {{ f.output_value }}
                         </div>
                       </div>

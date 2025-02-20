@@ -1,4 +1,5 @@
 # coding=utf-8
+import json
 from typing import List
 
 from application.flow.i_step_node import NodeResult
@@ -18,18 +19,25 @@ class BaseVariableAssignNode(IVariableAssignNode):
                 continue
             if 'global' == variable['fields'][0]:
                 result = {
-                    'name': variable['fields'][1],
+                    'name': variable['name'],
                     'input_value': self.get_reference_content(variable['fields']),
                 }
                 if variable['source'] == 'custom':
-                    self.workflow_manage.context[variable['fields'][1]] = variable['value']
-                    result['output_value'] = variable['value']
+                    if variable['type'] in ['dict', 'array']:
+                        if isinstance(variable['value'], dict) or isinstance(variable['value'], list):
+                            val = variable['value']
+                        else:
+                            val = json.loads(variable['value'])
+                        self.workflow_manage.context[variable['fields'][1]] = val
+                        result['output_value'] = variable['value'] = val
+                    else:
+                        self.workflow_manage.context[variable['fields'][1]] = variable['value']
+                        result['output_value'] = variable['value']
                 else:
                     reference = self.get_reference_content(variable['reference'])
                     self.workflow_manage.context[variable['fields'][1]] = reference
                     result['output_value'] = reference
                 result_list.append(result)
-        print(result_list)
 
         return NodeResult({'variable_list': variable_list, 'result_list': result_list}, {})
 
