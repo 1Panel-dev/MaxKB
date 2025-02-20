@@ -48,7 +48,7 @@
                     :rules="{
                       type: 'array',
                       required: true,
-                      message: $t('views.applicationWorkflow.variable.fieldMessage'),
+                      message: $t('views.applicationWorkflow.variable.placeholder'),
                       trigger: 'change'
                     }"
                   >
@@ -57,7 +57,7 @@
                       :nodeModel="nodeModel"
                       class="w-full"
                       :placeholder="
-                        $t('views.applicationWorkflow.variable.fieldMessage')
+                        $t('views.applicationWorkflow.variable.placeholder')
                       "
                       v-model="condition.field"
                     />

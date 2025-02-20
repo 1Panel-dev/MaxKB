@@ -19,7 +19,7 @@ export default {
     autoSave: 'Auto Save',
     latestRelease: 'Latest Release',
     copyParam: 'Copy Parameters',
-    debug: 'Run',
+    debug: 'Run'
   },
   tip: {
     publicSuccess: 'Published successfully',
@@ -48,12 +48,13 @@ export default {
     beautify: 'Auto-Arrange'
   },
   variable: {
+    label: 'Variable',
     global: 'Global Variable',
     Referencing: 'Referenced Variable',
     ReferencingRequired: 'Referenced variable is required',
     ReferencingError: 'Invalid referenced variable',
     NoReferencing: 'Referenced variable does not exist',
-    fieldMessage: 'Please select a variable'
+    placeholder: 'Please select a variable'
   },
   condition: {
     title: 'Execution Condition',
@@ -82,12 +83,11 @@ export default {
     baseNode: {
       label: 'Base Information',
       appName: {
-        label: 'App Name',
-    
+        label: 'App Name'
       },
       appDescription: {
-        label: 'App Description',
-       },
+        label: 'App Description'
+      },
       fileUpload: {
         label: 'File Upload',
         tooltip: 'When enabled, the Q&A page will display a file upload button.'
@@ -114,7 +114,7 @@ export default {
                   If you want the user to see the output of this node, please turn on the switch.`
       },
       defaultPrompt: 'Known Information',
-      think: 'Thinking Process',
+      think: 'Thinking Process'
     },
     searchDatasetNode: {
       label: 'Knowledge Retrieval',
@@ -188,8 +188,7 @@ export default {
         label: 'Form Output Content',
         requiredMessage:
           'Please set the output content of this node, { form } is a placeholder for the form.',
-        tooltip:
-          'Define the output content of this node. { form } is a placeholder for the form'
+        tooltip: 'Define the output content of this node. { form } is a placeholder for the form'
       },
       formAllContent: 'All Form Content',
       formSetting: 'Form Configuration'
@@ -213,20 +212,9 @@ export default {
       }
     },
     variableAssignNode: {
-      label: 'Variable assign',
+      label: 'Variable Assign',
       text: 'Update the value of the global variable',
-      variable: {
-        label: 'select variable',
-        requiredMessage: 'Please select a variable'
-      },
-      value: {
-        label: 'Set value',
-      },
-      source: {
-        reference: 'Reference Variable',
-        custom: 'Custom'
-      },
-      addVariable: 'Add Variable',
+      assign: 'Set Value'
     },
     imageGenerateNode: {
       label: 'Image Generation',
@@ -238,13 +226,11 @@ export default {
       },
       prompt: {
         label: 'Positive Prompt',
-        tooltip:
-          'Describe elements and visual features you want in the generated image'
+        tooltip: 'Describe elements and visual features you want in the generated image'
       },
       negative_prompt: {
         label: 'Negative Prompt',
-        tooltip:
-          'Describe elements you want to exclude from the generated image',
+        tooltip: 'Describe elements you want to exclude from the generated image',
         placeholder:
           'Please describe content you do not want to generate, such as color, bloody content'
       }

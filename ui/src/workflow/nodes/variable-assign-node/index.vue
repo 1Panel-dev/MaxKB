@@ -9,21 +9,15 @@
       ref="replyNodeFormRef"
     >
       <template v-for="(item, index) in form_data.variable_list" :key="item.id">
-        <el-card
-          shadow="never"
-          class="card-never mb-8"
-          style="--el-card-padding: 12px"
-        >
-          <el-form-item
-            :label="$t('views.applicationWorkflow.nodes.variableAssignNode.variable.label')"
-          >
+        <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
+          <el-form-item :label="$t('views.applicationWorkflow.variable.label')">
             <template #label>
               <div class="flex-between">
                 <div>
-                  {{ $t('views.applicationWorkflow.nodes.variableAssignNode.variable.label') }}
+                  {{ $t('views.applicationWorkflow.variable.label') }}
                   <span class="danger">*</span>
                 </div>
-                <el-button text @click="deleteVariable(index)">
+                <el-button text @click="deleteVariable(index)" v-if="index !== 0">
                   <el-icon>
                     <Delete />
                   </el-icon>
@@ -34,10 +28,9 @@
               ref="nodeCascaderRef"
               :nodeModel="nodeModel"
               class="w-full"
-              :placeholder="
-              $t('views.applicationWorkflow.nodes.variableAssignNode.variable.requiredMessage')
-            "
+              :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
               v-model="item.fields"
+              :global="true"
             />
           </el-form-item>
           <el-form-item>
@@ -45,45 +38,49 @@
               <div class="flex-between">
                 <div>
                   <span
-                  >{{ $t('views.applicationWorkflow.nodes.variableAssignNode.value.label')
+                    >{{ $t('views.applicationWorkflow.nodes.variableAssignNode.assign')
                     }}<span class="danger">*</span></span
                   >
                 </div>
-                <el-select v-model="item.source" type="small" style="width: 100px">
+                <el-select
+                  :teleported="false"
+                  v-model="item.source"
+                  size="small"
+                  style="width: 85px"
+                >
                   <el-option
-                    :label="$t('views.applicationWorkflow.nodes.variableAssignNode.source.reference')"
-                    value="reference"
+                    :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
+                    value="referencing"
                   />
                   <el-option
-                    :label="$t('views.applicationWorkflow.nodes.variableAssignNode.source.custom')"
+                    :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.custom')"
                     value="custom"
                   />
                 </el-select>
               </div>
             </template>
-            <div v-if="item.source === 'custom'">
-              <el-select v-model="item.type">
+            <div v-if="item.source === 'custom'" class="flex">
+              <el-select v-model="item.type" style="width: 130px;">
                 <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
               </el-select>
               <el-input
+                class="ml-4"
                 v-model="item.value"
-                placeholder="请输入"
+                :placeholder="$t('common.inputPlaceholder')"
                 show-word-limit
                 clearable
                 @wheel="wheel"
               ></el-input>
             </div>
-            <div v-else>
-              <NodeCascader
-                ref="nodeCascaderRef2"
-                :nodeModel="nodeModel"
-                class="w-full"
-                :placeholder="
-              $t('views.applicationWorkflow.nodes.variableAssignNode.variable.requiredMessage')
-            "
-                v-model="item.reference"
-              />
-            </div>
+
+            <NodeCascader
+              v-else
+              ref="nodeCascaderRef2"
+              :nodeModel="nodeModel"
+              class="w-full"
+              :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+              v-model="item.reference"
+            />
           </el-form-item>
         </el-card>
       </template>
@@ -91,7 +88,7 @@
         <el-icon class="mr-4">
           <Plus />
         </el-icon>
-        {{ $t('views.applicationWorkflow.nodes.variableAssignNode.addVariable') }}
+        {{ $t('common.add') }}
       </el-button>
     </el-form>
   </NodeContainer>
@@ -103,7 +100,6 @@ import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import { computed, onMounted, ref } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import { randomId } from '@/utils/utils'
-
 
 const props = defineProps<{ nodeModel: any }>()
 
@@ -145,13 +141,10 @@ function submitDialog(val: string) {
 const replyNodeFormRef = ref()
 const nodeCascaderRef = ref()
 const validate = async () => {
-  return Promise.all([
-    replyNodeFormRef.value?.validate()
-  ]).catch((err: any) => {
+  return Promise.all([replyNodeFormRef.value?.validate()]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }
-
 
 function addVariable() {
   const list = cloneDeep(props.nodeModel.properties.node_data.variable_list)

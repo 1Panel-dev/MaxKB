@@ -45,7 +45,7 @@
                 :rules="{
                   type: 'array',
                   required: true,
-                  message: $t('views.applicationWorkflow.variable.fieldMessage'),
+                  message: $t('views.applicationWorkflow.variable.placeholder'),
                   trigger: 'change'
                 }"
               >
