@@ -27,7 +27,7 @@ class DatasetSettingSerializer(serializers.Serializer):
                                         error_messages=ErrMessage.float(_('similarity')))
     search_mode = serializers.CharField(required=True, validators=[
         validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
-                                  message=_("The type only supports register|reset_password"), code=500)
+                                  message=_("The type only supports embedding|keywords|blend"), code=500)
     ], error_messages=ErrMessage.char(_("Retrieval Mode")))
     max_paragraph_char_number = serializers.IntegerField(required=True,
                                                          error_messages=ErrMessage.float(_("Maximum number of words in a quoted segment")))

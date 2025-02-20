@@ -126,7 +126,7 @@ class DatasetSettingSerializer(serializers.Serializer):
                                                              _("Maximum number of quoted characters")))
     search_mode = serializers.CharField(required=True, validators=[
         validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
-                                  message=_("The type only supports register|reset_password"), code=500)
+                                  message=_("The type only supports embedding|keywords|blend"), code=500)
     ], error_messages=ErrMessage.char(_("Retrieval Mode")))
 
     no_references_setting = NoReferencesSetting(required=True,
@@ -585,7 +585,7 @@ class ApplicationSerializer(serializers.Serializer):
                                             error_messages=ErrMessage.float(_("Relevance")))
         search_mode = serializers.CharField(required=True, validators=[
             validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
-                                      message=_("The type only supports register|reset_password"), code=500)
+                                      message=_("The type only supports embedding|keywords|blend"), code=500)
         ], error_messages=ErrMessage.char(_("Retrieval Mode")))
 
         def is_valid(self, *, raise_exception=False):

@@ -573,7 +573,7 @@ class DataSetSerializers(serializers.ModelSerializer):
                                             error_messages=ErrMessage.char(_('similarity')))
         search_mode = serializers.CharField(required=True, validators=[
             validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
-                                      message=_('The type only supports register|reset_password'), code=500)
+                                      message=_('The type only supports embedding|keywords|blend'), code=500)
         ], error_messages=ErrMessage.char(_('search mode')))
 
         def is_valid(self, *, raise_exception=True):
