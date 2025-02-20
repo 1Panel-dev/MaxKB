@@ -8,21 +8,30 @@ from application.flow.step_node.variable_assign.i_variable_assign_node import IV
 class BaseVariableAssignNode(IVariableAssignNode):
     def save_context(self, details, workflow_manage):
         self.context['variable_list'] = details.get('variable_list')
+        self.context['result_list'] = details.get('result_list')
 
     def execute(self, variable_list, stream, **kwargs) -> NodeResult:
         #
+        result_list = []
         for variable in variable_list:
             if 'fields' not in variable:
                 continue
             if 'global' == variable['fields'][0]:
+                result = {
+                    'name': variable['fields'][1],
+                    'input_value': self.get_reference_content(variable['fields']),
+                }
                 if variable['source'] == 'custom':
                     self.workflow_manage.context[variable['fields'][1]] = variable['value']
+                    result['output_value'] = variable['value']
                 else:
                     reference = self.get_reference_content(variable['reference'])
                     self.workflow_manage.context[variable['fields'][1]] = reference
-        # print('variable_list:', variable_list)
+                    result['output_value'] = reference
+                result_list.append(result)
+        print(result_list)
 
-        return NodeResult({'variable_list': variable_list}, {})
+        return NodeResult({'variable_list': variable_list, 'result_list': result_list}, {})
 
     def get_reference_content(self, fields: List[str]):
         return str(self.workflow_manage.get_reference_field(
@@ -36,6 +45,7 @@ class BaseVariableAssignNode(IVariableAssignNode):
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
             'variable_list': self.context.get('variable_list'),
+            'result_list': self.context.get('result_list'),
             'status': self.status,
             'err_message': self.err_message
         }
