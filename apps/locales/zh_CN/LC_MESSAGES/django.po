@@ -6885,3 +6885,14 @@ msgstr "会话记录id"
 msgid "Child node"
 msgstr "子节点数据"
 
+
+msgid "Please analyze the content of the image."
+msgstr "请分析图片内容。"
+
+msgid "License usage limit exceeded."
+msgstr "超出许可证使用限制。"
+
+msgid "Image download failed, check network"
+msgstr "图片下载失败，请检查网络"
+
+

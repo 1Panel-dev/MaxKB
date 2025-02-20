@@ -6747,3 +6747,13 @@ msgid "Conversation record id"
 msgstr ""
 msgid "Child node"
 msgstr ""
+
+msgid "Please analyze the content of the image."
+msgstr ""
+
+msgid "License usage limit exceeded."
+msgstr ""
+
+msgid "Image download failed, check network"
+msgstr ""
+

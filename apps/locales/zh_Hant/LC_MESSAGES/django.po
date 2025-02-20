@@ -6899,3 +6899,12 @@ msgid "Conversation record id"
 msgstr "對話記錄id"
 msgid "Child node"
 msgstr "子節點"
+
+msgid "Please analyze the content of the image."
+msgstr "請分析圖片內容。"
+
+msgid "License usage limit exceeded."
+msgstr "超出許可證使用限制。"
+
+msgid "Image download failed, check network"
+msgstr "圖片下載失敗，檢查網絡"
