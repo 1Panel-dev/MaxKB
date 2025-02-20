@@ -6737,13 +6737,9 @@ msgstr ""
 msgid "Audio URL"
 msgstr ""
 
-msgid "Runtime node id"
-msgstr ""
 
 msgid "Node data"
 msgstr ""
 
-msgid "Conversation record id"
-msgstr ""
 msgid "Child node"
 msgstr ""

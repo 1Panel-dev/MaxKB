@@ -6874,14 +6874,11 @@ msgstr "音频名称"
 
 msgid "Audio URL"
 msgstr "音频地址"
-msgid "Runtime node id"
-msgstr "运行节点id"
 
 msgid "Node data"
 msgstr "节点数据"
 
-msgid "Conversation record id"
-msgstr "会话记录id"
+
 msgid "Child node"
 msgstr "子节点数据"
 
