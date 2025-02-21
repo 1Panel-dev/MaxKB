@@ -19,7 +19,7 @@ export default {
     autoSave: '自动保存',
     latestRelease: '最近发布',
     copyParam: '复制参数',
-    debug: '调试',
+    debug: '调试'
   },
   tip: {
     publicSuccess: '发布成功',
@@ -48,12 +48,13 @@ export default {
     beautify: '一键美化'
   },
   variable: {
+    label: '变量',
     global: '全局变量',
     Referencing: '引用变量',
     ReferencingRequired: '引用变量必填',
     ReferencingError: '引用变量错误',
     NoReferencing: '不存在的引用变量',
-    fieldMessage: '请选择变量'
+    placeholder: '请选择变量'
   },
   condition: {
     title: '执行条件',
@@ -83,12 +84,11 @@ export default {
     baseNode: {
       label: '基本信息',
       appName: {
-        label: '应用名称',
-    
+        label: '应用名称'
       },
       appDescription: {
-        label: '应用描述',
-       },
+        label: '应用描述'
+      },
       fileUpload: {
         label: '文件上传',
         tooltip: '开启后，问答页面会显示上传文件的按钮。'
@@ -115,7 +115,7 @@ export default {
                   如果你想让用户看到该节点的输出内容，请打开开关。`
       },
       defaultPrompt: '已知信息',
-      think: '思考过程',
+      think: '思考过程'
     },
     searchDatasetNode: {
       label: '知识库检索',
@@ -210,6 +210,11 @@ export default {
         label: '选择图片',
         requiredMessage: '请选择图片'
       }
+    },
+    variableAssignNode: {
+      label: '变量赋值',
+      text: '更新全局变量的值',
+      assign: '赋值'
     },
     imageGenerateNode: {
       label: '图片生成',
