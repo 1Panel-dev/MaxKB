@@ -25,6 +25,7 @@ import { t } from '@/locales'
 const props = defineProps<{
   nodeModel: any
   modelValue: Array<any>
+  global?: Boolean
 }>()
 const emit = defineEmits(['update:modelValue'])
 const data = computed({
@@ -49,7 +50,9 @@ const wheel = (e: any) => {
 
 function visibleChange(bool: boolean) {
   if (bool) {
-    options.value = props.nodeModel.get_up_node_field_list(false, true)
+    options.value = props.global
+      ? props.nodeModel.get_up_node_field_list(false, true).filter((v) => v.value === 'global')
+      : props.nodeModel.get_up_node_field_list(false, true)
   }
 }
 
@@ -76,7 +79,9 @@ const validate = () => {
 }
 defineExpose({ validate })
 onMounted(() => {
-  options.value = props.nodeModel.get_up_node_field_list(false, true)
+  options.value = props.global
+    ? props.nodeModel.get_up_node_field_list(false, true).filter((v) => v.value === 'global')
+    : props.nodeModel.get_up_node_field_list(false, true)
 })
 </script>
 <style scoped></style>

@@ -48,12 +48,13 @@ export default {
     beautify: '一鍵美化'
   },
   variable: {
+    label: '變量',
     global: '全局變量',
     Referencing: '引用變量',
     ReferencingRequired: '引用變量必填',
     ReferencingError: '引用變量錯誤',
     NoReferencing: '不存在的引用變量',
-    fieldMessage: '請選擇變量'
+    placeholder: '請選擇變量'
   },
   condition: {
     title: '執行條件',
@@ -114,7 +115,7 @@ export default {
                   如果你想讓用戶看到該節點的輸出內容，請打開開關。`
       },
       defaultPrompt: '已知信息',
-      think: '思考過程',
+      think: '思考過程'
     },
     searchDatasetNode: {
       label: '知識庫檢索',
@@ -209,6 +210,11 @@ export default {
         label: '選擇圖片',
         requiredMessage: '請選擇圖片'
       }
+    },
+    variableAssignNode: {
+      label: '變數賦值',
+      text: '更新全域變數的值',
+      assign: '賦值'
     },
     imageGenerateNode: {
       label: '圖片生成',

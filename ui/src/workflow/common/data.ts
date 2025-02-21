@@ -239,6 +239,19 @@ export const imageUnderstandNode = {
   }
 }
 
+export const variableAssignNode = {
+  type: WorkflowType.VariableAssignNode,
+  text: t('views.applicationWorkflow.nodes.variableAssignNode.text'),
+  label: t('views.applicationWorkflow.nodes.variableAssignNode.label'),
+  height: 252,
+  properties: {
+    stepName: t('views.applicationWorkflow.nodes.variableAssignNode.label'),
+    config: {
+
+    }
+  }
+}
+
 export const imageGenerateNode = {
   type: WorkflowType.ImageGenerateNode,
   text: t('views.applicationWorkflow.nodes.imageGenerateNode.text'),
@@ -307,7 +320,8 @@ export const menuNodes = [
   questionNode,
   documentExtractNode,
   speechToTextNode,
-  textToSpeechNode
+  textToSpeechNode,
+  variableAssignNode
 ]
 
 /**
@@ -400,7 +414,8 @@ export const nodeDict: any = {
   [WorkflowType.ImageUnderstandNode]: imageUnderstandNode,
   [WorkflowType.TextToSpeechNode]: textToSpeechNode,
   [WorkflowType.SpeechToTextNode]: speechToTextNode,
-  [WorkflowType.ImageGenerateNode]: imageGenerateNode
+  [WorkflowType.ImageGenerateNode]: imageGenerateNode,
+  [WorkflowType.VariableAssignNode]: variableAssignNode,
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'
