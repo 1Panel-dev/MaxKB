@@ -21,6 +21,8 @@
     v-if="props.nodeModel.properties.user_input_field_list?.length > 0"
     :data="props.nodeModel.properties.user_input_field_list"
     class="mb-16"
+    ref="tableRef"
+    row-key="field"
   >
     <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')" width="95">
       <template #default="{ row }">
@@ -107,12 +109,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { set } from 'lodash'
+import Sortable from 'sortablejs'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
 import { t } from '@/locales'
 import UserInputTitleDialog from '@/workflow/nodes/base-node/component/UserInputTitleDialog.vue'
 const props = defineProps<{ nodeModel: any }>()
 
+const tableRef = ref()
 const UserFieldFormDialogRef = ref()
 const UserInputTitleDialogRef = ref()
 const inputFieldList = ref<any[]>([])
@@ -129,6 +133,7 @@ function openChangeTitleDialog() {
 function deleteField(index: any) {
   inputFieldList.value.splice(index, 1)
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
+  onDragHandle()
 }
 
 function refreshFieldList(data: any, index: any) {
@@ -153,6 +158,7 @@ function refreshFieldList(data: any, index: any) {
   }
   UserFieldFormDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
+  onDragHandle()
 }
 
 function refreshFieldTitle(data: any) {
@@ -176,6 +182,29 @@ const getDefaultValue = (row: any) => {
   if (row.default_value !== undefined) {
     return row.default_value
   }
+}
+
+function onDragHandle() {
+  if (!tableRef.value) return
+
+  // 获取表格的 tbody DOM 元素
+  const wrapper = tableRef.value.$el as HTMLElement
+  const tbody = wrapper.querySelector('.el-table__body-wrapper tbody')
+  if (!tbody) return
+  // 初始化 Sortable
+  Sortable.create(tbody, {
+    animation: 150,
+    ghostClass: 'ghost-row',
+    onEnd: (evt) => {
+      if (evt.oldIndex === undefined || evt.newIndex === undefined) return
+      // 更新数据顺序
+      const items = [...inputFieldList.value]
+      const [movedItem] = items.splice(evt.oldIndex, 1)
+      items.splice(evt.newIndex, 0, movedItem)
+      inputFieldList.value = items
+      props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
+    }
+  })
 }
 
 onMounted(() => {
@@ -211,6 +240,7 @@ onMounted(() => {
   })
   set(props.nodeModel.properties, 'user_input_field_list', inputFieldList)
   set(props.nodeModel.properties, 'user_input_config', inputFieldConfig)
+  onDragHandle()
 })
 </script>
 
