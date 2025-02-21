@@ -71,7 +71,7 @@ function openAddDialog(data?: any, index?: any) {
 function deleteField(index: any) {
   inputFieldList.value.splice(index, 1)
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
-  onDragHandel()
+  onDragHandle()
 }
 
 function refreshFieldList(data: any) {
@@ -97,10 +97,10 @@ function refreshFieldList(data: any) {
   currentIndex.value = null
   ApiFieldFormDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
-  onDragHandel()
+  onDragHandle()
 }
 
-function onDragHandel() {
+function onDragHandle() {
   if (!tableRef.value) return
 
   // 获取表格的 tbody DOM 元素

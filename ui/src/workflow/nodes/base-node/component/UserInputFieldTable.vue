@@ -133,7 +133,7 @@ function openChangeTitleDialog() {
 function deleteField(index: any) {
   inputFieldList.value.splice(index, 1)
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
-  onDragHandel()
+  onDragHandle()
 }
 
 function refreshFieldList(data: any, index: any) {
@@ -158,7 +158,7 @@ function refreshFieldList(data: any, index: any) {
   }
   UserFieldFormDialogRef.value.close()
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
-  onDragHandel()
+  onDragHandle()
 }
 
 function refreshFieldTitle(data: any) {
@@ -184,7 +184,7 @@ const getDefaultValue = (row: any) => {
   }
 }
 
-function onDragHandel() {
+function onDragHandle() {
   if (!tableRef.value) return
 
   // 获取表格的 tbody DOM 元素
@@ -240,7 +240,7 @@ onMounted(() => {
   })
   set(props.nodeModel.properties, 'user_input_field_list', inputFieldList)
   set(props.nodeModel.properties, 'user_input_config', inputFieldConfig)
-  onDragHandel()
+  onDragHandle()
 })
 </script>
 
