@@ -51,7 +51,7 @@ const wheel = (e: any) => {
 function visibleChange(bool: boolean) {
   if (bool) {
     options.value = props.global
-      ? props.nodeModel.get_up_node_field_list(false, true).filter((v) => v.value === 'global')
+      ? props.nodeModel.get_up_node_field_list(false, true).filter((v: any) => v.value === 'global')
       : props.nodeModel.get_up_node_field_list(false, true)
   }
 }
@@ -80,7 +80,7 @@ const validate = () => {
 defineExpose({ validate })
 onMounted(() => {
   options.value = props.global
-    ? props.nodeModel.get_up_node_field_list(false, true).filter((v) => v.value === 'global')
+    ? props.nodeModel.get_up_node_field_list(false, true).filter((v: any) => v.value === 'global')
     : props.nodeModel.get_up_node_field_list(false, true)
 })
 </script>
