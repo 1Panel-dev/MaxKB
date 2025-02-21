@@ -108,7 +108,7 @@ function onDragHandle() {
   const tbody = wrapper.querySelector('.el-table__body-wrapper tbody')
   if (!tbody) return
   // 初始化 Sortable
-  Sortable.create(tbody, {
+  Sortable.create(tbody as HTMLElement, {
     animation: 150,
     ghostClass: 'ghost-row',
     onEnd: (evt) => {
