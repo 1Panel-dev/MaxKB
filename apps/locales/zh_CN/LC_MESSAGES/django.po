@@ -6892,4 +6892,5 @@ msgstr "超出许可证使用限制。"
 msgid "Image download failed, check network"
 msgstr "图片下载失败，请检查网络"
 
-
+msgid "Client modifies dialogue summary"
+msgstr "客户端修改对话摘要"
