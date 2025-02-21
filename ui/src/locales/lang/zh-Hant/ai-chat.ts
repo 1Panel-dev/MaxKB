@@ -90,5 +90,6 @@ export default {
     title: '知識庫引用',
     question: '用戶問題',
     optimizationQuestion: '優化後問題'
-  }
+  },
+  editTitle: '編輯標題',
 }
