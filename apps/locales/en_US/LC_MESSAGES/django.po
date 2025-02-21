@@ -6753,3 +6753,5 @@ msgstr ""
 msgid "Image download failed, check network"
 msgstr ""
 
+msgid "Client modifies dialogue summary"
+msgstr ""

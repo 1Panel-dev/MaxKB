@@ -23,6 +23,34 @@ class ChatClientHistoryApi(ApiMixin):
                                   description=_('Application ID'))
                 ]
 
+    class Operate(ApiMixin):
+        @staticmethod
+        def get_request_params_api():
+            return [openapi.Parameter(name='application_id',
+                                      in_=openapi.IN_PATH,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description=_('Application ID')),
+                    openapi.Parameter(name='chat_id',
+                                      in_=openapi.IN_PATH,
+                                      type=openapi.TYPE_STRING,
+                                      required=True,
+                                      description=_('Conversation ID')),
+                    ]
+
+        class ReAbstract(ApiMixin):
+            @staticmethod
+            def get_request_body_api():
+                return openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    required=['abstract'],
+                    properties={
+                        'abstract': openapi.Schema(type=openapi.TYPE_STRING, title=_("abstract"),
+                                                   description=_("abstract"))
+
+                    }
+                )
+
 
 class OpenAIChatApi(ApiMixin):
     @staticmethod
