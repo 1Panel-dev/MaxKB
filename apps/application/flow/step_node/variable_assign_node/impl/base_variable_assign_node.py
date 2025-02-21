@@ -3,7 +3,7 @@ import json
 from typing import List
 
 from application.flow.i_step_node import NodeResult
-from application.flow.step_node.variable_assign.i_variable_assign_node import IVariableAssignNode
+from application.flow.step_node.variable_assign_node.i_variable_assign_node import IVariableAssignNode
 
 
 class BaseVariableAssignNode(IVariableAssignNode):
