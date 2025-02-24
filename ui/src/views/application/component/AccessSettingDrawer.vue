@@ -90,8 +90,8 @@
     <template #footer>
       <div>
         <el-button @click="closeDrawer">{{ $t('common.cancel') }}</el-button>
-        <el-button type="primary" @click="submit" :disabled="loading"
-          >{{ $t('common.save') }}
+        <el-button type="primary" @click="submit" :disabled="loading">
+          {{ $t('common.save') }}
         </el-button>
       </div>
     </template>
@@ -107,11 +107,13 @@ import { MsgError, MsgSuccess } from '@/utils/message'
 import { copyClick } from '@/utils/clipboard'
 import { t } from '@/locales'
 
+type PlatformType = 'wechat' | 'dingtalk' | 'wecom' | 'feishu' | 'slack'
+
 const formRef = ref<FormInstance>()
 const visible = ref(false)
 const loading = ref(false)
 const dataLoaded = ref(false)
-const configType = ref<'wechat' | 'dingtalk' | 'wecom' | 'feishu'>('wechat')
+const configType = ref<PlatformType>('wechat')
 const route = useRoute()
 const emit = defineEmits(['refresh'])
 const {
@@ -137,7 +139,7 @@ const form = reactive<any>({
     callback_url: ''
   },
   feishu: { app_id: '', app_secret: '', verification_token: '', callback_url: '' },
-  slack: {  signing_secret: '', bot_user_token: '', callback_url: '' }
+  slack: { signing_secret: '', bot_user_token: '', callback_url: '' }
 })
 
 const rules = reactive<{ [propName: string]: any }>({
@@ -306,7 +308,13 @@ const configFields: { [propName: string]: { [propName: string]: any } } = {
   }
 }
 
-const passwordFields = new Set(['app_secret', 'client_secret', 'secret'])
+const passwordFields = new Set([
+  'app_secret',
+  'client_secret',
+  'secret',
+  'bot_user_token',
+  'signing_secret'
+])
 
 const drawerTitle = computed(
   () =>
@@ -314,8 +322,9 @@ const drawerTitle = computed(
       wechat: t('views.application.applicationAccess.wechatSetting.title'),
       dingtalk: t('views.application.applicationAccess.dingtalkSetting.title'),
       wecom: t('views.application.applicationAccess.wecomSetting.title'),
-      feishu: t('views.application.applicationAccess.larkSetting.title')
-    })[configType.value]
+      feishu: t('views.application.applicationAccess.larkSetting.title'),
+      slack: t('views.application.applicationAccess.slackSetting.title')
+    }[configType.value])
 )
 
 const infoTitle = computed(
@@ -324,8 +333,9 @@ const infoTitle = computed(
       wechat: t('views.applicationOverview.appInfo.header'),
       dingtalk: t('views.applicationOverview.appInfo.header'),
       wecom: t('views.applicationOverview.appInfo.header'),
-      feishu: t('views.applicationOverview.appInfo.header')
-    })[configType.value]
+      feishu: t('views.applicationOverview.appInfo.header'),
+      slack: t('views.applicationOverview.appInfo.header')
+    }[configType.value])
 )
 
 const passwordVisible = reactive<Record<string, boolean>>(
@@ -366,7 +376,7 @@ const submit = async () => {
   })
 }
 
-const open = async (id: string, type: 'wechat' | 'dingtalk' | 'wecom' | 'feishu') => {
+const open = async (id: string, type: PlatformType) => {
   visible.value = true
   configType.value = type
   loading.value = true
@@ -388,5 +398,3 @@ const open = async (id: string, type: 'wechat' | 'dingtalk' | 'wecom' | 'feishu'
 
 defineExpose({ open })
 </script>
-
-<style lang="scss"></style>
