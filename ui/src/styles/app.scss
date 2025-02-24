@@ -756,3 +756,9 @@ h5 {
     border-right: 1px solid var(--el-border-color);
   }
 }
+
+@media only screen and (max-width: 768px) {
+  .responsive-dialog {
+    width: 90% !important;
+  }
+}

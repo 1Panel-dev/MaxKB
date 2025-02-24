@@ -1,5 +1,6 @@
 <template>
   <el-dialog
+    class="responsive-dialog"
     :title="$t('chat.editTitle')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
@@ -27,6 +28,7 @@
           v-model="form.abstract"
           maxlength="1024"
           show-word-limit
+          type="textarea"
           @blur="form.abstract = form.abstract.trim()"
         />
       </el-form-item>

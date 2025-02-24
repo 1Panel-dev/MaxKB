@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    class="paragraph-source"
+    class="paragraph-source responsive-dialog"
     :title="$t('chat.paragraphSource.title')"
     v-model="dialogVisible"
     destroy-on-close
@@ -74,11 +74,6 @@ defineExpose({ open })
   }
   .paragraph-source-height {
     max-height: calc(100vh - 260px);
-  }
-}
-@media only screen and (max-width: 768px) {
-  .paragraph-source {
-    width: 90% !important;
   }
 }
 </style>

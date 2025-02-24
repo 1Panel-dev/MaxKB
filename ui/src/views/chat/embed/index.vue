@@ -88,10 +88,22 @@
               >
                 <template #default="{ row }">
                   <div class="flex-between">
-                    <auto-tooltip :content="row.abstract">
-                      {{ row.abstract }}
-                    </auto-tooltip>
-                    <div @click.stop v-if="mouseId === row.id && row.id !== 'new'">
+                    <ReadWrite
+                      @change="editName($event, row)"
+                      :data="row.abstract"
+                      trigger="manual"
+                      :write="row.writeStatus"
+                      @close="closeWrite(row)"
+                      :maxlength="1024"
+                    />
+                    <div
+                      @click.stop
+                      v-if="mouseId === row.id && row.id !== 'new' && !row.writeStatus"
+                      class="flex"
+                    >
+                      <el-button style="padding: 0" link @click.stop="openWrite(row)">
+                        <el-icon><EditPen /></el-icon>
+                      </el-button>
                       <el-button style="padding: 0" link @click.stop="deleteLog(row)">
                         <el-icon><Delete /></el-icon>
                       </el-button>
@@ -120,6 +132,7 @@ import { ref, onMounted, reactive, nextTick, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { isAppIcon } from '@/utils/application'
 import { hexToRgba } from '@/utils/theme'
+import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
 const { user, log } = useStore()
 const route = useRoute()
@@ -159,6 +172,29 @@ const customStyle = computed(() => {
     color: applicationDetail.value?.custom_theme?.header_font_color
   }
 })
+
+function editName(val: string, item: any) {
+  if (val) {
+    const obj = {
+      abstract: val
+    }
+
+    log.asyncPutChatClientLog(applicationDetail.value.id, item.id, obj, loading).then(() => {
+      getChatLog(applicationDetail.value.id)
+      item['writeStatus'] = false
+    })
+  } else {
+    MsgError(t('views.applicationWorkflow.tip.nameMessage'))
+  }
+}
+
+function openWrite(item: any) {
+  item['writeStatus'] = true
+}
+
+function closeWrite(item: any) {
+  item['writeStatus'] = false
+}
 
 function mouseenter(row: any) {
   mouseId.value = row.id
@@ -312,7 +348,7 @@ onMounted(() => {
     right: 16px;
     font-size: 22px;
   }
-  &.chat-embed--popup{
+  &.chat-embed--popup {
     .chat-popover-button {
       right: 85px;
     }
