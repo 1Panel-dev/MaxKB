@@ -108,7 +108,7 @@ MaxKB is positioned as an Ready-to-use RAG (Retrieval-Augmented Generation) inte
     <td align="center">✅ (Pro)</td>
   </tr>
   <tr>
-    <td align="center">Local Deployment</td>
+    <td align="center">On-premise Deployment</td>
     <td align="center">✅</td>
     <td align="center">✅</td>
     <td align="center">✅</td>
