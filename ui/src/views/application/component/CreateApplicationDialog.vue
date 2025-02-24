@@ -38,11 +38,7 @@
         <el-radio-group v-model="applicationForm.type" class="card__radio">
           <el-row :gutter="16">
             <el-col :span="12">
-              <el-card
-                shadow="never"
-                class="mb-16"
-                :class="applicationForm.type === 'SIMPLE' ? 'active' : ''"
-              >
+              <el-card shadow="never" :class="applicationForm.type === 'SIMPLE' ? 'active' : ''">
                 <el-radio value="SIMPLE" size="large">
                   <p class="mb-4">{{ $t('views.application.simple') }}</p>
                   <el-text type="info">{{
@@ -52,11 +48,7 @@
               </el-card>
             </el-col>
             <el-col :span="12">
-              <el-card
-                shadow="never"
-                class="mb-16"
-                :class="isWorkFlow(applicationForm.type) ? 'active' : ''"
-              >
+              <el-card shadow="never" :class="isWorkFlow(applicationForm.type) ? 'active' : ''">
                 <el-radio value="WORK_FLOW" size="large">
                   <p class="mb-4">{{ $t('views.application.workflow') }}</p>
                   <el-text type="info">{{
@@ -67,6 +59,35 @@
             </el-col>
           </el-row>
         </el-radio-group>
+      </el-form-item>
+      <el-form-item
+        :label="$t('views.document.upload.template')"
+        v-if="applicationForm.type === 'WORK_FLOW'"
+      >
+        <div class="w-full">
+          <el-row :gutter="16">
+            <el-col :span="12">
+              <el-card
+                class="radio-card cursor"
+                shadow="never"
+                @click="selectedType('blank')"
+                :class="appTemplate === 'blank' ? 'active' : ''"
+              >
+                {{ $t('views.application.applicationForm.form.appTemplate.blankApp') }}
+              </el-card>
+            </el-col>
+            <el-col :span="12">
+              <el-card
+                class="radio-card cursor"
+                shadow="never"
+                :class="appTemplate === 'assistant' ? 'active' : ''"
+                @click="selectedType('assistant')"
+              >
+                {{ $t('views.application.applicationForm.form.appTemplate.assistantApp') }}
+              </el-card>
+            </el-col>
+          </el-row>
+        </div>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -89,6 +110,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import applicationApi from '@/api/application'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { isWorkFlow } from '@/utils/application'
+import { baseNodes } from '@/workflow/common/data'
 import { t } from '@/locales'
 const router = useRouter()
 const emit = defineEmits(['refresh'])
@@ -105,6 +127,12 @@ const optimizationPrompt =
   }) +
   '<data></data>' +
   t('views.application.applicationForm.dialog.defaultPrompt2')
+
+const workflowDefault = ref<any>({
+  edges: [],
+  nodes: baseNodes
+})
+const appTemplate = ref('blank')
 
 const applicationFormRef = ref()
 
@@ -207,6 +235,11 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
+      if (isWorkFlow(applicationForm.value.type) && appTemplate.value === 'blank') {
+        workflowDefault.value.nodes[0].properties.node_data.desc = applicationForm.value.desc
+        workflowDefault.value.nodes[0].properties.node_data.name = applicationForm.value.name
+        applicationForm.value['work_flow'] = workflowDefault.value
+      }
       applicationApi.postApplication(applicationForm.value, loading).then((res) => {
         MsgSuccess(t('common.createSuccess'))
         if (isWorkFlow(applicationForm.value.type)) {
@@ -220,6 +253,18 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
   })
 }
 
+function selectedType(type: string) {
+  appTemplate.value = type
+}
+
 defineExpose({ open })
 </script>
-<style lang="scss" scope></style>
+<style lang="scss" scope>
+.radio-card {
+  line-height: 22px;
+  &.active {
+    border-color: var(--el-color-primary);
+    color: var(--el-color-primary);
+  }
+}
+</style>

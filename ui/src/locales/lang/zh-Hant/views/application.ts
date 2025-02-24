@@ -41,6 +41,10 @@ export default {
         simplePlaceholder: '適合新手建立小助手',
         workflowPlaceholder: '適合高階用戶自訂小助手的工作流程'
       },
+      appTemplate: {
+        blankApp: '空白應用',
+        assistantApp: '知識庫問答助手'
+      },
       aiModel: {
         label: 'AI 模型',
         placeholder: '請選擇 AI 模型'
