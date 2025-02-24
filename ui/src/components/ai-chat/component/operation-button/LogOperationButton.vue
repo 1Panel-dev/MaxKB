@@ -176,7 +176,7 @@ const playAnswerTextPart = () => {
     if (audioList.value[currentAudioIndex.value] !== utterance.value?.text) {
       window.speechSynthesis.cancel()
     }
-    if (window.speechSynthesis.paused) {
+    if (window.speechSynthesis.paused && audioList.value[currentAudioIndex.value] === utterance.value?.text) {
       window.speechSynthesis.resume()
       return
     }

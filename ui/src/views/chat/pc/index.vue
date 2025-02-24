@@ -340,6 +340,14 @@ const clickListHandle = (item: any) => {
     currentChatName.value = item.abstract
     if (currentChatId.value !== 'new') {
       getChatRecord()
+
+      // 切换对话后，取消暂停的浏览器播放
+      if (window.speechSynthesis.paused && window.speechSynthesis.speaking) {
+        window.speechSynthesis.resume()
+        nextTick(() => {
+          window.speechSynthesis.cancel()
+        })
+      }
     }
   }
   if (common.isMobile()) {
