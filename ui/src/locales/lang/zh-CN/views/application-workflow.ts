@@ -19,7 +19,9 @@ export default {
     autoSave: '自动保存',
     latestRelease: '最近发布',
     copyParam: '复制参数',
-    debug: '调试'
+    debug: '调试',
+    exit: '直接退出',
+    exitSave: '保存并退出',
   },
   tip: {
     publicSuccess: '发布成功',
@@ -33,7 +35,8 @@ export default {
     repeatedNodeError: '节点名称已存在！',
     cannotCopy: '不能被复制',
     copyError: '已复制节点',
-    paramErrorMessage: '参数已存在: '
+    paramErrorMessage: '参数已存在: ',
+    saveMessage: '当前的更改尚未保存，是否保存后退出?',
   },
   delete: {
     confirmTitle: '确定删除该节点？',

@@ -19,7 +19,9 @@ export default {
     autoSave: '自動保存',
     latestRelease: '最近發布',
     copyParam: '複製參數',
-    debug: '調試'
+    debug: '調試',
+    exit: '直接退出',
+    exitSave: '保存並退出',
   },
   tip: {
     publicSuccess: '發布成功',
@@ -33,7 +35,8 @@ export default {
     repeatedNodeError: '節點名稱已存在！',
     cannotCopy: '不能被複製',
     copyError: '已複製節點',
-    paramErrorMessage: '參數已存在: '
+    paramErrorMessage: '參數已存在: ',
+    saveMessage: '當前修改未保存，是否保存後退出？',
   },
   delete: {
     confirmTitle: '確定刪除該節點？',
