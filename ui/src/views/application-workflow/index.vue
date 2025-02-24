@@ -2,9 +2,7 @@
   <div class="application-workflow" v-loading="loading">
     <div class="header border-b flex-between p-12-24">
       <div class="flex align-center">
-        <back-button
-          @click="router.push({ path: `/application/${id}/WORK_FLOW/overview` })"
-        ></back-button>
+        <back-button @click="back"></back-button>
         <h4>{{ detail?.name }}</h4>
         <div v-if="showHistory && disablePublic">
           <el-text type="info" class="ml-16 color-secondary"
@@ -143,7 +141,7 @@ import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vu
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
 import applicationApi from '@/api/application'
 import { isAppIcon } from '@/utils/application'
-import { MsgSuccess, MsgError } from '@/utils/message'
+import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
@@ -175,6 +173,19 @@ const showHistory = ref(false)
 const disablePublic = ref(false)
 const currentVersion = ref<any>({})
 
+function back() {
+  MsgConfirm(t('common.tip'), t('views.applicationWorkflow.tip.saveMessage'), {
+    confirmButtonText: t('views.applicationWorkflow.setting.exitSave'),
+    cancelButtonText: t('views.applicationWorkflow.setting.exit'),
+    type: 'warning'
+  })
+    .then(() => {
+      saveApplication(true, true)
+    })
+    .catch(() => {
+      router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+    })
+}
 function clickoutsideHistory() {
   if (!disablePublic.value) {
     showHistory.value = false
@@ -347,14 +358,18 @@ function getDetail() {
   })
 }
 
-function saveApplication(bool?: boolean) {
+function saveApplication(bool?: boolean, back?: boolean) {
   const obj = {
     work_flow: getGraphData()
   }
+  loading.value = back || false
   application.asyncPutApplication(id, obj).then((res) => {
     saveTime.value = new Date()
     if (bool) {
       MsgSuccess(t('common.saveSuccess'))
+      if (back) {
+        router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+      }
     }
   })
 }
