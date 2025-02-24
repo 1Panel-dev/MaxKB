@@ -55,6 +55,8 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
 
 ## Feature Comparison
 
+MaxKB is positioned as an Ready-to-use RAG (Retrieval-Augmented Generation) intelligent Q&A application, rather than a middleware platform for building large model applications. The following table is merely a comparison from a functional perspective.
+
 <table style="width: 100%;">
   <tr>
     <th align="center">Feature</th>
