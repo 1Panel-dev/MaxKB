@@ -220,6 +220,29 @@ const delChatClientLog: (
   return del(`${prefix}/${application_id}/chat/client/${chat_id}`, undefined, {}, loading)
 }
 
+/**
+ * 修改历史日志abstract
+ * @param 参数
+ * application_id, chat_id, 
+ * data {
+          "abstract": "string",
+        }
+ */
+
+const putChatClientLog: (
+  application_id: string,
+  chat_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (application_id, chat_id, data, loading) => {
+  return put(
+    `${prefix}/${application_id}/chat/client/${chat_id}`,
+    data,
+    undefined,
+    loading
+  )
+}
+
 export default {
   getChatLog,
   delChatLog,
@@ -231,5 +254,6 @@ export default {
   exportChatLog,
   getChatLogClient,
   delChatClientLog,
-  postChatRecordLog
+  postChatRecordLog,
+  putChatClientLog
 }

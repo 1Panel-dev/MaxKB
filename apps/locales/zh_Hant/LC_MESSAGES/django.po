@@ -6903,3 +6903,6 @@ msgstr "超出許可證使用限制。"
 
 msgid "Image download failed, check network"
 msgstr "圖片下載失敗，檢查網絡"
+
+msgid "Client modifies dialogue summary"
+msgstr "用戶端修改對話摘要"

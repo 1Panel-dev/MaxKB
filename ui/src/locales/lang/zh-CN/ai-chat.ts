@@ -25,7 +25,6 @@ export default {
     continue: '继续',
     stopChat: '停止回答'
   },
-
   tip: {
     error500Message: '抱歉，当前正在维护，无法提供服务，请稍后再试！',
     errorIdentifyMessage: '无法识别用户身份',
@@ -91,5 +90,6 @@ export default {
     title: '知识库引用',
     question: '用户问题',
     optimizationQuestion: '优化后问题'
-  }
+  },
+  editTitle: '编辑标题',
 }

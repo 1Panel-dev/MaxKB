@@ -66,6 +66,10 @@ def valid_model_params_setting(model_id, model_params_setting):
     credential.get_model_params_setting_form(model.model_name).valid_form(model_params_setting)
 
 
+class ReAbstractInstanceSerializers(serializers.Serializer):
+    abstract = serializers.CharField(required=True, error_messages=ErrMessage.char(_("abstract")))
+
+
 class ChatSerializers(serializers.Serializer):
     class Operate(serializers.Serializer):
         chat_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("Conversation ID")))
@@ -76,6 +80,15 @@ class ChatSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             QuerySet(Chat).filter(id=self.data.get('chat_id'), application_id=self.data.get('application_id')).update(
                 is_deleted=True)
+            return True
+
+        def re_abstract(self, instance, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                ReAbstractInstanceSerializers(data=instance).is_valid(raise_exception=True)
+
+            QuerySet(Chat).filter(id=self.data.get('chat_id'), application_id=self.data.get('application_id')).update(
+                abstract=instance.get('abstract'))
             return True
 
         def delete(self, with_valid=True):

@@ -150,7 +150,7 @@ class ChatView(APIView):
                          operation_id=_("Get the conversation list"),
                          manual_parameters=ChatApi.get_request_params_api(),
                          responses=result.get_api_array_response(ChatApi.get_response_body_api()),
-                             tags=[_("Application/Conversation Log")]
+                         tags=[_("Application/Conversation Log")]
                          )
     @has_permissions(
         ViewPermission([RoleConstants.ADMIN, RoleConstants.USER, RoleConstants.APPLICATION_KEY],
@@ -221,6 +221,23 @@ class ChatView(APIView):
                     ChatSerializers.Operate(
                         data={'application_id': application_id, 'user_id': request.user.id,
                               'chat_id': chat_id}).logic_delete())
+
+            @action(methods=['PUT'], detail=False)
+            @swagger_auto_schema(operation_summary=_("Client modifies dialogue summary"),
+                                 operation_id=_("Client modifies dialogue summary"),
+                                 request_body=ChatClientHistoryApi.Operate.ReAbstract.get_request_body_api(),
+                                 tags=[_("Application/Conversation Log")])
+            @has_permissions(ViewPermission(
+                [RoleConstants.APPLICATION_ACCESS_TOKEN],
+                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
+                                                dynamic_tag=keywords.get('application_id'))],
+                compare=CompareConstants.AND),
+                compare=CompareConstants.AND)
+            def put(self, request: Request, application_id: str, chat_id: str):
+                return result.success(
+                    ChatSerializers.Operate(
+                        data={'application_id': application_id, 'user_id': request.user.id,
+                              'chat_id': chat_id}).re_abstract(request.data))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]

@@ -66,10 +66,22 @@
                       <auto-tooltip :content="row.abstract">
                         {{ row.abstract }}
                       </auto-tooltip>
-                      <div @click.stop v-if="mouseId === row.id && row.id !== 'new'">
-                        <el-button style="padding: 0" link @click.stop="deleteLog(row)">
-                          <el-icon><Delete /></el-icon>
-                        </el-button>
+                      <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
+                        <el-dropdown trigger="click" :teleported="false">
+                          <el-icon class="rotate-90 mt-4"><MoreFilled /></el-icon>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item @click.stop="editLogTitle(row)">
+                                <el-icon><EditPen /></el-icon>
+                                {{ $t('common.edit') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item @click.stop="deleteLog(row)">
+                                <el-icon><Delete /></el-icon>
+                                {{ $t('common.delete') }}
+                              </el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
                       </div>
                     </div>
                   </template>
@@ -145,6 +157,7 @@
       </div>
     </div>
   </div>
+  <EditTitleDialog ref="EditTitleDialogRef" @refresh="refreshFieldTitle" />
 </template>
 
 <script setup lang="ts">
@@ -155,14 +168,13 @@ import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
 import { hexToRgba } from '@/utils/theme'
+import EditTitleDialog from './EditTitleDialog.vue'
 import { t } from '@/locales'
 useResize()
 
 const { user, log, common } = useStore()
 
-const isDefaultTheme = computed(() => {
-  return user.isDefaultTheme()
-})
+const EditTitleDialogRef = ref()
 
 const isCollapse = ref(false)
 
@@ -215,6 +227,13 @@ const mouseId = ref('')
 
 function mouseenter(row: any) {
   mouseId.value = row.id
+}
+
+function editLogTitle(row: any) {
+  EditTitleDialogRef.value.open(row, applicationDetail.value.id)
+}
+function refreshFieldTitle() {
+  getChatLog(applicationDetail.value.id)
 }
 function deleteLog(row: any) {
   log.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {

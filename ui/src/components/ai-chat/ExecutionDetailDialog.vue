@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    class="execution-details-dialog"
+    class="execution-details-dialog responsive-dialog"
     :title="$t('chat.executionDetails.title')"
     v-model="dialogVisible"
     destroy-on-close
@@ -697,9 +697,5 @@ defineExpose({ open })
   }
 }
 
-@media only screen and (max-width: 768px) {
-  .execution-details-dialog {
-    width: 90% !important;
-  }
-}
+
 </style>

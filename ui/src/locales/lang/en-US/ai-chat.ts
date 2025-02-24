@@ -90,5 +90,6 @@ export default {
     title: 'Knowledge Quote',
     question: 'User Question',
     optimizationQuestion: 'Optimized Question'
-  }
+  },
+  editTitle: 'Edit Title',
 }
