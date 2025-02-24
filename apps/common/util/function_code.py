@@ -31,7 +31,7 @@ class FunctionExecutor:
             self.user = None
         self._createdir()
         if self.sandbox:
-            os.system(f"chown -R {self.user}:{self.user} {self.sandbox_path}")
+            os.system(f"chown -R {self.user}:root {self.sandbox_path}")
 
     def _createdir(self):
         old_mask = os.umask(0o077)
