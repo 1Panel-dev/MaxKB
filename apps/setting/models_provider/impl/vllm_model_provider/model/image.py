@@ -18,3 +18,6 @@ class VllmImage(MaxKBBaseModel, BaseChatOpenAI):
             stream_usage=True,
             **optional_params,
         )
+
+    def is_cache_model(self):
+        return False
