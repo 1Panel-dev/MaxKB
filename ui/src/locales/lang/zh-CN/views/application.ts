@@ -41,6 +41,10 @@ export default {
         simplePlaceholder: '适合新手创建小助手',
         workflowPlaceholder: '适合高级用户自定义小助手的工作流'
       },
+      appTemplate: {
+        blankApp: '空白应用',
+        assistantApp: '知识库问答助手'
+      },
       aiModel: {
         label: 'AI 模型',
         placeholder: '请选择 AI 模型'
@@ -198,7 +202,7 @@ export default {
     slackSetting: {
       title: 'Slack 应用配置',
       signingSecretPlaceholder: '请输入 Signing Secret',
-      botUserTokenPlaceholder: '请输入 Bot User Token',
+      botUserTokenPlaceholder: '请输入 Bot User Token'
     },
     copyUrl: '复制链接填入到'
   },

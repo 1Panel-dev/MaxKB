@@ -46,6 +46,10 @@ export default {
         simplePlaceholder: 'Suitable for beginners to create assistant.',
         workflowPlaceholder: 'Suitable for advanced users to customize the workflow of assistant'
       },
+      appTemplate: {
+        blankApp: 'Blank APP',
+        assistantApp: 'Knowledge Assistant'
+      },
       aiModel: {
         label: 'AI Model',
         placeholder: 'Please select an AI model'
@@ -110,7 +114,7 @@ export default {
       reasoningContent: {
         label: 'Output Thinking',
         tooltip:
-          'Please set the thinking label based on the model\'s return, and the content in the middle of the label will be recognized as the thinking process.',
+          "Please set the thinking label based on the model's return, and the content in the middle of the label will be recognized as the thinking process.",
         start: 'Start',
         end: 'End'
       }
@@ -211,7 +215,7 @@ export default {
     slackSetting: {
       title: 'Slack Configuration',
       signingSecretPlaceholder: 'Please enter signing secret',
-      botUserTokenPlaceholder: 'Please enter bot user token',
+      botUserTokenPlaceholder: 'Please enter bot user token'
     },
     copyUrl: 'Copy the link and fill it in'
   },
