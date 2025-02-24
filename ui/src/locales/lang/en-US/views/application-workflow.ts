@@ -19,7 +19,9 @@ export default {
     autoSave: 'Auto Save',
     latestRelease: 'Latest Release',
     copyParam: 'Copy Parameters',
-    debug: 'Run'
+    debug: 'Run',
+    exit: 'Exit',
+    exitSave: 'Save & Exit',
   },
   tip: {
     publicSuccess: 'Published successfully',
@@ -33,7 +35,8 @@ export default {
     repeatedNodeError: 'A node with this name already exists',
     cannotCopy: 'Cannot be copied',
     copyError: 'Node already copied',
-    paramErrorMessage: 'Parameter already exists: '
+    paramErrorMessage: 'Parameter already exists: ',
+    saveMessage: 'Current changes have not been saved. Save before exiting?',
   },
   delete: {
     confirmTitle: 'Confirm to delete this node?',
