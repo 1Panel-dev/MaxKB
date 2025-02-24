@@ -59,6 +59,7 @@ pydub = "^0.25.1"
 cffi = "^1.17.1"
 pysilk = "^0.0.1"
 django-db-connection-pool = "^1.2.5"
+opencv-python-headless = "^4.11.0.86"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
