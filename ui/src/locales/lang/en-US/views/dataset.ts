@@ -27,7 +27,7 @@ export default {
   },
   datasetForm: {
     title: {
-      info: 'Knowledge settings'
+      info: 'Knowledge Settings'
     },
     form: {
       datasetName: {

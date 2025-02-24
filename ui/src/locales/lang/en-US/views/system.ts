@@ -136,15 +136,15 @@ export default {
     saveSuccess: 'Appearance settings successfully applied'
   },
   email: {
-    title: 'Mail Settings',
+    title: 'Email Settings',
     smtpHost: 'SMTP Host',
     smtpHostPlaceholder: 'Please enter SMTP host',
     smtpPort: 'SMTP Port',
     smtpPortPlaceholder: 'Please enter SMTP port',
     smtpUser: 'SMTP User',
     smtpUserPlaceholder: 'Please enter SMTP user',
-    sendEmail: 'Send Email',
-    sendEmailPlaceholder: 'Please enter send email',
+    sendEmail: 'Sender\'s Email',
+    sendEmailPlaceholder: 'Please enter the sender\'s email',
     smtpPassword: 'SMTP Password',
     smtpPasswordPlaceholder: 'Please enter SMTP password',
     enableSSL: 'Enable SSL (if the SMTP port is 465, you usually need to enable SSL)',
