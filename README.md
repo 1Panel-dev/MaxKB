@@ -53,6 +53,69 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
 - LLM Framework：[LangChain](https://www.langchain.com/)
 - Database：[PostgreSQL + pgvector](https://www.postgresql.org/)
 
+## Feature Comparison
+
+
+
+<table style="width: 100%;">
+  <tr>
+    <th align="center">Feature</th>
+    <th align="center">Dify.AI</th>
+    <th align="center">LangChain</th>
+    <th align="center">Flowise</th>
+    <th align="center">MaxKB <br>（Built upon LangChain）</th>
+  </tr>
+  <tr>
+    <td align="center">Supported LLMs</td>
+    <td align="center">Rich Variety</td>
+    <td align="center">Rich Variety</td>
+    <td align="center">Rich Variety</td>
+    <td align="center">Rich Variety</td>
+  </tr>
+  <tr>
+    <td align="center">RAG Engine</td>
+    <td align="center">✅</td>
+    <td align="center">✅</td>
+    <td align="center">✅</td>
+    <td align="center">✅</td>
+  </tr>
+  <tr>
+    <td align="center">Agent</td>
+    <td align="center">✅</td>
+    <td align="center">✅</td>
+    <td align="center">❌</td>
+    <td align="center">✅</td>
+  </tr>
+  <tr>
+    <td align="center">Workflow</td>
+    <td align="center">✅</td>
+    <td align="center">❌</td>
+    <td align="center">✅</td>
+    <td align="center">✅</td>
+  </tr>
+  <tr>
+    <td align="center">Observability</td>
+    <td align="center">✅</td>
+    <td align="center">✅</td>
+    <td align="center">❌</td>
+    <td align="center">✅</td>
+  </tr>
+  <tr>
+    <td align="center">Enterprise Feature (SSO/Access control)</td>
+    <td align="center">✅</td>
+    <td align="center">❌</td>
+    <td align="center">❌</td>
+    <td align="center">✅ (Pro)</td>
+  </tr>
+  <tr>
+    <td align="center">Local Deployment</td>
+    <td align="center">✅</td>
+    <td align="center">✅</td>
+    <td align="center">✅</td>
+    <td align="center">✅</td>
+  </tr>
+</table>
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/MaxKB&type=Date)](https://star-history.com/#1Panel-dev/MaxKB&Date)
