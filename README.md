@@ -99,7 +99,7 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
     <td align="center">✅</td>
   </tr>
   <tr>
-    <td align="center">Enterprise Feature (SSO/Access control)</td>
+    <td align="center">SSO/Access control</td>
     <td align="center">✅</td>
     <td align="center">❌</td>
     <td align="center">❌</td>
