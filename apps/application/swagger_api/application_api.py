@@ -234,7 +234,7 @@ class ApplicationApi(ApiMixin):
                                             default=[]),
                     'edges': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT),
                                             title=_('Connection List'), description=_("Connection List"),
-                                            default={}),
+                                            default=[]),
 
                 }
             )
@@ -324,7 +324,8 @@ class ApplicationApi(ApiMixin):
             return openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 required=['name', 'desc', 'model_id', 'dialogue_number', 'dataset_setting', 'model_setting',
-                          'problem_optimization', 'stt_model_enable', 'stt_model_enable', 'tts_type'],
+                          'problem_optimization', 'stt_model_enable', 'stt_model_enable', 'tts_type',
+                          'work_flow'],
                 properties={
                     'name': openapi.Schema(type=openapi.TYPE_STRING, title=_("Application Name"),
                                            description=_("Application Name")),
@@ -361,7 +362,8 @@ class ApplicationApi(ApiMixin):
                     'tts_model_enable': openapi.Schema(type=openapi.TYPE_STRING, title=_("Is text-to-speech enabled"),
                                                        description=_("Is text-to-speech enabled")),
                     'tts_type': openapi.Schema(type=openapi.TYPE_STRING, title=_("Text-to-speech type"),
-                                               description=_("Text-to-speech type"))
+                                               description=_("Text-to-speech type")),
+                    'work_flow': ApplicationApi.WorkFlow.get_request_body_api(),
                 }
             )
 
