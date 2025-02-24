@@ -58,8 +58,8 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
 <table style="width: 100%;">
   <tr>
     <th align="center">Feature</th>
-    <th align="center">Dify.AI</th>
     <th align="center">LangChain</th>
+    <th align="center">Dify.AI</th>
     <th align="center">Flowise</th>
     <th align="center">MaxKB <br>（Built upon LangChain）</th>
   </tr>
@@ -86,8 +86,8 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
   </tr>
   <tr>
     <td align="center">Workflow</td>
-    <td align="center">✅</td>
     <td align="center">❌</td>
+    <td align="center">✅</td>
     <td align="center">✅</td>
     <td align="center">✅</td>
   </tr>
@@ -100,8 +100,8 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
   </tr>
   <tr>
     <td align="center">SSO/Access control</td>
-    <td align="center">✅</td>
     <td align="center">❌</td>
+    <td align="center">✅</td>
     <td align="center">❌</td>
     <td align="center">✅ (Pro)</td>
   </tr>
