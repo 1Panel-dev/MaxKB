@@ -64,4 +64,3 @@ class OllamaReRankModelCredential(BaseForm, BaseModelCredential):
         return self
 
     api_base = forms.TextInputField('API URL', required=True)
-    api_key = forms.TextInputField('API Key', required=True)
