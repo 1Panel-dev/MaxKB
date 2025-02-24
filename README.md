@@ -106,7 +106,7 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
     <td align="center">✅ (Pro)</td>
   </tr>
   <tr>
-    <td align="center">Local Deployment</td>
+    <td align="center">On-Premise Deployment</td>
     <td align="center">✅</td>
     <td align="center">✅</td>
     <td align="center">✅</td>
