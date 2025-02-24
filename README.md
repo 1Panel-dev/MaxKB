@@ -55,8 +55,6 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
 
 ## Feature Comparison
 
-
-
 <table style="width: 100%;">
   <tr>
     <th align="center">Feature</th>
