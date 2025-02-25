@@ -134,6 +134,7 @@ import { isAppIcon } from '@/utils/application'
 import { hexToRgba } from '@/utils/theme'
 import { MsgError } from '@/utils/message'
 import useStore from '@/stores'
+import { t } from '@/locales'
 const { user, log } = useStore()
 const route = useRoute()
 
