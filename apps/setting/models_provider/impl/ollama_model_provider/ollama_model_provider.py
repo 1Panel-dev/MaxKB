@@ -164,7 +164,7 @@ embedding_model_info = [
 ]
 reranker_model_info = [
     ModelInfo(
-        'ollama:reranker',
+        'linux6200/bge-reranker-v2-m3',
         '',
         ModelTypeConst.RERANKER, ollama_reranker_model_credential, OllamaReranker),
 ]
