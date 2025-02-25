@@ -23,7 +23,7 @@ class BaseVariableAssignNode(IVariableAssignNode):
                     'input_value': self.get_reference_content(variable['fields']),
                 }
                 if variable['source'] == 'custom':
-                    if variable['type'] in ['dict', 'array']:
+                    if variable['type'] == 'json':
                         if isinstance(variable['value'], dict) or isinstance(variable['value'], list):
                             val = variable['value']
                         else:
@@ -31,8 +31,10 @@ class BaseVariableAssignNode(IVariableAssignNode):
                         self.workflow_manage.context[variable['fields'][1]] = val
                         result['output_value'] = variable['value'] = val
                     else:
-                        self.workflow_manage.context[variable['fields'][1]] = variable['value']
-                        result['output_value'] = variable['value']
+                        # 变量解析 例如：{{global.xxx}}
+                        val = self.workflow_manage.generate_prompt(variable['value'])
+                        self.workflow_manage.context[variable['fields'][1]] = val
+                        result['output_value'] = val
                 else:
                     reference = self.get_reference_content(variable['reference'])
                     self.workflow_manage.context[variable['fields'][1]] = reference
