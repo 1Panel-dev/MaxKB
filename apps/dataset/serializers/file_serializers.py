@@ -57,7 +57,7 @@ mime_types = {"html": "text/html", "htm": "text/html", "shtml": "text/html", "cs
 
 class FileSerializer(serializers.Serializer):
     file = UploadedFileField(required=True, error_messages=ErrMessage.image(_('file')))
-    meta = serializers.JSONField(required=False)
+    meta = serializers.JSONField(required=False, allow_null=True)
 
     def upload(self, with_valid=True):
         if with_valid:
