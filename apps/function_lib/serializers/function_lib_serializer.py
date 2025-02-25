@@ -211,7 +211,7 @@ class FunctionLibSerializer(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            if not QuerySet(FunctionLib).filter(id=self.data.get('id'), user_id=self.data.get('user_id')).exists():
+            if not QuerySet(FunctionLib).filter(id=self.data.get('id')).exists():
                 raise AppApiException(500, _('Function does not exist'))
 
         def delete(self, with_valid=True):
