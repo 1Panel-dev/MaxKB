@@ -43,7 +43,7 @@
         <el-row :gutter="15">
           <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16">
             <el-card shadow="hover" class="application-card-add" style="--el-card-padding: 8px">
-              <div class="card-add-button flex align-center cursor p-8" @click="openCreateDialog">
+              <div class="card-add-button flex align-center cursor p-8" @click="openCreateDialog()">
                 <AppIcon iconName="app-add-application" class="mr-8"></AppIcon>
                 {{ $t('views.functionLib.createFunction') }}
               </div>
