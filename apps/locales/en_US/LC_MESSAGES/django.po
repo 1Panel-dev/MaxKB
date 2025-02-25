@@ -6756,7 +6756,7 @@ msgstr ""
 msgid "Client modifies dialogue summary"
 msgstr ""
 
-msgid "Think : "
+msgid "Think: "
 msgstr ""
 
 msgid "AI reply: "
