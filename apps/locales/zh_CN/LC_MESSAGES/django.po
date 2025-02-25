@@ -6894,3 +6894,9 @@ msgstr "图片下载失败，请检查网络"
 
 msgid "Client modifies dialogue summary"
 msgstr "客户端修改对话摘要"
+
+msgid "Think: "
+msgstr "思考过程: "
+
+msgid "AI reply: "
+msgstr "AI 回复: "
