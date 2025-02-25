@@ -101,7 +101,8 @@ class UpdateTeamMemberPermissionSerializer(ApiMixin, serializers.Serializer):
                 os.path.join(PROJECT_DIR, "apps", "setting", 'sql', 'check_member_permission_target_exists.sql')),
             [json.dumps(permission_list), user_id, user_id])
         if illegal_target_id_list is not None and len(illegal_target_id_list) > 0:
-            raise AppApiException(500, _('Non-existent application|knowledge base id[') + str(illegal_target_id_list) + ']')
+            raise AppApiException(500,
+                                  _('Non-existent application|knowledge base id[') + str(illegal_target_id_list) + ']')
 
     def update_or_save(self, member_id: str):
         team_member_permission_list = self.data.get("team_member_permission_list")
@@ -188,18 +189,20 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
         create_team_member_list = [
             self.to_member_model(add_user_id, team_member_user_id_list, use_user_id_list, team_id) for add_user_id in
             user_id_list]
-        QuerySet(TeamMember).bulk_create(create_team_member_list) if len(create_team_member_list) > 0 else None
+        QuerySet(TeamMember).bulk_create(
+            [team_member for team_member in create_team_member_list if team_member is not None]) if len(
+            create_team_member_list) > 0 else None
         return TeamMemberSerializer(
             data={'team_id': self.data.get("team_id")}).list_member()
 
     def to_member_model(self, add_user_id, team_member_user_id_list, use_user_id_list, user_id):
         if use_user_id_list.__contains__(add_user_id):
             if team_member_user_id_list.__contains__(add_user_id) or user_id == add_user_id:
-                raise AppApiException(500, _('The current members already exist in the team, do not add them again.'))
+                return None
             else:
                 return TeamMember(team_id=self.data.get("team_id"), user_id=add_user_id)
         else:
-            raise AppApiException(500, _('User does not exist'))
+            return None
 
     def add_member(self, username_or_email: str, with_valid=True):
         """
@@ -318,4 +321,4 @@ class TeamMemberSerializer(ApiMixin, serializers.Serializer):
                                       in_=openapi.IN_PATH,
                                       type=openapi.TYPE_STRING,
                                       required=True,
-                                      description=_('member id')),]
+                                      description=_('member id')), ]
