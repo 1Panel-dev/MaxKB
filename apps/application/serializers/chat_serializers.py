@@ -13,7 +13,7 @@ import uuid
 from functools import reduce
 from io import BytesIO
 from typing import Dict
-
+import pytz
 import openpyxl
 from django.core import validators
 from django.core.cache import caches
@@ -46,6 +46,7 @@ from embedding.task import embedding_by_paragraph, embedding_by_paragraph_list
 from setting.models import Model
 from setting.models_provider import get_model_credential
 from smartdoc.conf import PROJECT_DIR
+from smartdoc.settings import TIME_ZONE
 
 chat_cache = caches['chat_cache']
 
@@ -208,7 +209,6 @@ class ChatSerializers(serializers.Serializer):
                                                                                               [])) for
                  key, node in search_dataset_node_list])
             improve_paragraph_list = row.get('improve_paragraph_list')
-
             vote_status_map = {'-1': '未投票', '0': '赞同', '1': '反对'}
             return [str(row.get('chat_id')), row.get('abstract'), row.get('problem_text'), padding_problem_text,
                     row.get('answer_text'), vote_status_map.get(row.get('vote_status')), reference_paragraph_len,
@@ -217,7 +217,7 @@ class ChatSerializers(serializers.Serializer):
                         f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
                         for index in range(len(improve_paragraph_list))]),
                     row.get('message_tokens') + row.get('answer_tokens'), row.get('run_time'),
-                    str(row.get('create_time').strftime('%Y-%m-%d %H:%M:%S')
+                    str(row.get('create_time').astimezone(pytz.timezone(TIME_ZONE)).strftime('%Y-%m-%d %H:%M:%S')
                         )]
 
         def export(self, data, with_valid=True):
@@ -256,6 +256,10 @@ class ChatSerializers(serializers.Serializer):
                             cell = worksheet.cell(row=row_idx, column=col_idx)
                             if isinstance(value, str):
                                 value = re.sub(ILLEGAL_CHARACTERS_RE, '', value)
+                            if isinstance(value, datetime.datetime):
+                                eastern = pytz.timezone(TIME_ZONE)
+                                c = datetime.timezone(eastern._utcoffset)
+                                value = value.astimezone(c)
                             cell.value = value
 
                 output = BytesIO()
