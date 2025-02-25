@@ -173,6 +173,8 @@ export default {
     tip4: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.',
     prompt1:
       'Content: {data}\n \n Please summarize the above and generate 5 questions based on the summary. \nAnswer requirements: \n - Please output only questions; \n - Please place each question in',
-    prompt2: 'tag.'
+    prompt2: 'tag.',
+    error: 'Segments only failed',
+    all: 'All Segments'
   }
 }
