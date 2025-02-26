@@ -1225,7 +1225,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                                         1),
             ).filter(task_type_status__in=state_list, document_id__in=document_id_list)
                                              .values('id'),
-                                             TaskType.EMBEDDING,
+                                             TaskType.GENERATE_PROBLEM,
                                              State.PENDING)
             ListenerManagement.get_aggregation_document_status_by_query_set(
                 QuerySet(Document).filter(id__in=document_id_list))()
