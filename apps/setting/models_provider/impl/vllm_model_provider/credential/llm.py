@@ -48,9 +48,11 @@ class VLLMModelCredential(BaseForm, BaseModelCredential):
         model = provider.get_model(model_type, model_name, model_credential, **model_params)
         try:
             res = model.invoke([HumanMessage(content=gettext('Hello'))])
-            print(res)
         except Exception as e:
-            print(e)
+            raise AppApiException(ValidCode.valid_error.value,
+                                  gettext(
+                                      'Verification failed, please check whether the parameters are correct: {error}').format(
+                                      error=str(e)))
         return True
 
     def encryption_dict(self, model_info: Dict[str, object]):
