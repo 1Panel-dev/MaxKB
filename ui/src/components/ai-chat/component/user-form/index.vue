@@ -286,17 +286,41 @@ const checkInputParam = () => {
   let msg = []
   for (let f of apiInputFieldList.value) {
     if (!api_form_data_context.value[f.field]) {
-      api_form_data_context.value[f.field] = route.query[f.field]
+      let _value = route.query[f.field]
+      if (_value != null) {
+        if (_value instanceof Array) {
+          _value = _value
+            .map((item) => {
+              if (item != null) {
+                return decodeQuery(item)
+              }
+              return null
+            })
+            .filter((item) => item != null)
+        } else {
+          _value = decodeQuery(_value)
+        }
+        api_form_data_context.value[f.field] = _value
+      }
     }
     if (f.required && !api_form_data_context.value[f.field]) {
       msg.push(f.field)
     }
   }
   if (msg.length > 0) {
-    MsgWarning(`${t('chat.tip.inputParamMessage1')} ${msg.join('、')}${t('chat.tip.inputParamMessage2')}`)
+    MsgWarning(
+      `${t('chat.tip.inputParamMessage1')} ${msg.join('、')}${t('chat.tip.inputParamMessage2')}`
+    )
     return false
   }
   return true
+}
+const decodeQuery = (query: string) => {
+  try {
+    return decodeURIComponent(query)
+  } catch (e) {
+    return query
+  }
 }
 defineExpose({ checkInputParam })
 onMounted(() => {
