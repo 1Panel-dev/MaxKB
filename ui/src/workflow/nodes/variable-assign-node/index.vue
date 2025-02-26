@@ -209,11 +209,14 @@ const nodeCascaderRef = ref()
 const nodeCascaderRef2 = ref()
 const validate = async () => {
   // console.log(replyNodeFormRef.value.validate())
-  return Promise.all([
+  let ps = [
     replyNodeFormRef.value?.validate(),
-    ...nodeCascaderRef.value.map((item: any) => item.validate()),
-    ...nodeCascaderRef2.value.map((item: any) => item.validate())
-  ]).catch((err: any) => {
+    ...nodeCascaderRef.value.map((item: any) => item.validate())
+  ]
+  if (nodeCascaderRef2.value) {
+    ps = [...ps, ...nodeCascaderRef.value.map((item: any) => item.validate())]
+  }
+  return Promise.all(ps).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }
