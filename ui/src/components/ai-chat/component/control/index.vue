@@ -17,27 +17,41 @@ import { ref, nextTick, onMounted } from 'vue'
 import { t } from '@/locales'
 const isOpen = ref<boolean>(false)
 const eventVal = ref<any>({})
+
 function getSelection() {
   const selection = window.getSelection()
-  if (selection && selection.anchorNode == null) {
-    return null
+  if (selection) {
+    if (selection.rangeCount === 0) return undefined
+    const range = selection.getRangeAt(0)
+    const fragment = range.cloneContents() // 克隆选区内容
+    const div = document.createElement('div')
+    div.appendChild(fragment)
+    if (div.textContent) {
+      return div.textContent.trim()
+    }
   }
-  const text = selection?.anchorNode?.textContent
-  return text && text.substring(selection.anchorOffset, selection.focusOffset)
+  return undefined
 }
+
 /**
  * 打开控制台
  * @param event
  */
 const openControl = (event: any) => {
   const c = getSelection()
-  isOpen.value = false
   if (c) {
-    nextTick(() => {
-      eventVal.value = event
-      isOpen.value = true
-    })
+    if (!isOpen.value) {
+      nextTick(() => {
+        eventVal.value = event
+        isOpen.value = true
+      })
+    } else {
+      clearSelectedText()
+      isOpen.value = false
+    }
     event.preventDefault()
+  } else {
+    isOpen.value = false
   }
 }
 
