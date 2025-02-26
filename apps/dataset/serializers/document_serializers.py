@@ -19,7 +19,7 @@ from typing import List, Dict
 import openpyxl
 from celery_once import AlreadyQueued
 from django.core import validators
-from django.db import transaction
+from django.db import transaction, models
 from django.db.models import QuerySet, Count
 from django.db.models.functions import Substr, Reverse
 from django.http import HttpResponse
@@ -28,7 +28,7 @@ from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
 from xlwt import Utils
 
-from common.db.search import native_search, native_page_search
+from common.db.search import native_search, native_page_search, get_dynamics_model
 from common.event import ListenerManagement
 from common.event.common import work_thread_pool
 from common.exception.app_exception import AppApiException
@@ -443,11 +443,17 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                     else:
                         query_set = query_set.filter(status__iregex='^[2n]*$')
             order_by = self.data.get('order_by', '')
+            order_by_query_set = QuerySet(model=get_dynamics_model(
+                {'char_length': models.CharField(), 'paragraph_count': models.IntegerField(),
+                 "update_time": models.IntegerField(), 'create_time': models.DateTimeField()}))
             if order_by:
-                query_set = query_set.order_by(order_by)
+                order_by_query_set = order_by_query_set.order_by(order_by)
             else:
-                query_set = query_set.order_by('-create_time', 'id')
-            return query_set
+                order_by_query_set = order_by_query_set.order_by('-create_time', 'id')
+            return {
+                'document_custom_sql': query_set,
+                'order_by_query': order_by_query_set
+            }
 
         def list(self, with_valid=False):
             if with_valid:
