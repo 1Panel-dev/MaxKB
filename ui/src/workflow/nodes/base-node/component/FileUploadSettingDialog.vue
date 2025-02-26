@@ -15,7 +15,9 @@
       :model="form_data"
       require-asterisk-position="right"
     >
-      <el-form-item :label="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.maxFiles')">
+      <el-form-item
+        :label="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.maxFiles')"
+      >
         <el-slider
           v-model="form_data.maxFiles"
           show-input
@@ -24,7 +26,9 @@
           :max="10"
         />
       </el-form-item>
-      <el-form-item :label="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileLimit')">
+      <el-form-item
+        :label="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileLimit')"
+      >
         <el-slider
           v-model="form_data.fileLimit"
           show-input
@@ -33,7 +37,11 @@
           :max="100"
         />
       </el-form-item>
-      <el-form-item :label="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.label')">
+      <el-form-item
+        :label="
+          $t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.label')
+        "
+      >
         <el-card
           shadow="hover"
           class="card-checkbox cursor w-full mb-8"
@@ -48,7 +56,11 @@
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.document') }}（TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF）
                 </p>
-                <el-text class="color-secondary">{{$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText')}}</el-text>
+                <el-text class="color-secondary">{{
+                  $t(
+                    'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText'
+                  )
+                }}</el-text>
               </div>
             </div>
             <el-checkbox
@@ -71,7 +83,11 @@
                 <p class="line-height-22 mt-4">
                   {{ $t('common.fileUpload.image') }}（JPG、JPEG、PNG、GIF）
                 </p>
-                <el-text class="color-secondary">{{$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText')}}</el-text>
+                <el-text class="color-secondary">{{
+                  $t(
+                    'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText'
+                  )
+                }}</el-text>
               </div>
             </div>
             <el-checkbox v-model="form_data.image" @change="form_data.image = !form_data.image" />
@@ -89,8 +105,14 @@
             <div class="flex align-center">
               <img class="mr-12" src="@/assets/icon_file-audio.svg" alt="" />
               <div>
-                <p class="line-height-22 mt-4">{{ $t('common.fileUpload.audio') }}（MP3、WAV、OGG、ACC）</p>
-                <el-text class="color-secondary">{{$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText')}}</el-text>
+                <p class="line-height-22 mt-4">
+                  {{ $t('common.fileUpload.audio') }}（MP3、WAV、OGG、ACC、M4A）
+                </p>
+                <el-text class="color-secondary">{{
+                  $t(
+                    'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText'
+                  )
+                }}</el-text>
               </div>
             </div>
             <el-checkbox v-model="form_data.audio" @change="form_data.audio = !form_data.audio" />
