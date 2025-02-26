@@ -136,6 +136,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
@@ -147,6 +148,7 @@ import useStore from '@/stores'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
 import { t } from '@/locales'
+
 const { user, application } = useStore()
 const router = useRouter()
 const route = useRoute()
@@ -177,13 +179,14 @@ function back() {
   MsgConfirm(t('common.tip'), t('views.applicationWorkflow.tip.saveMessage'), {
     confirmButtonText: t('views.applicationWorkflow.setting.exitSave'),
     cancelButtonText: t('views.applicationWorkflow.setting.exit'),
-    type: 'warning'
+    type: 'warning',
+    distinguishCancelAndClose: true
   })
     .then(() => {
       saveApplication(true, true)
     })
-    .catch(() => {
-      router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+    .catch((action: Action) => {
+      action === 'cancel' && router.push({ path: `/application/${id}/WORK_FLOW/overview` })
     })
 }
 function clickoutsideHistory() {

@@ -28,16 +28,16 @@ export default {
     },
     form: {
       appName: {
-        label: '应用名称',
+        label: '名称',
         placeholder: '请输入应用名称',
         requiredMessage: '请输入应用名称'
       },
       appDescription: {
-        label: '应用描述',
+        label: '描述',
         placeholder: '描述该应用的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题'
       },
       appType: {
-        label: '选择应用类型',
+        label: '类型',
         simplePlaceholder: '适合新手创建小助手',
         workflowPlaceholder: '适合高级用户自定义小助手的工作流'
       },
