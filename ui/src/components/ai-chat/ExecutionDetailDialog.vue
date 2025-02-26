@@ -454,6 +454,7 @@
                               :data="paragraph.metadata"
                               :content="paragraph.page_content"
                               :index="paragraphIndex"
+                              :score="paragraph.metadata?.relevance_score"
                             />
                           </template>
                         </template>

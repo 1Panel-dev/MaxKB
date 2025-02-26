@@ -9,10 +9,10 @@
     <template #icon>
       <AppAvatar class="mr-12 avatar-light" :size="22"> {{ index + 1 + '' }}</AppAvatar>
     </template>
-    <div class="active-button primary">{{ data.similarity?.toFixed(3) }}</div>
+    <div class="active-button primary">{{ score?.toFixed(3) || data.similarity?.toFixed(3) }}</div>
     <template #description>
       <el-scrollbar height="150">
-        <MdPreview ref="editorRef" editorId="preview-only" :modelValue="content" noImgZoomIn/>
+        <MdPreview ref="editorRef" editorId="preview-only" :modelValue="content" noImgZoomIn />
       </el-scrollbar>
     </template>
     <template #footer>
@@ -67,6 +67,10 @@ const props = defineProps({
     default: ''
   },
   index: {
+    type: Number,
+    default: 0
+  },
+  score: {
     type: Number,
     default: 0
   }
