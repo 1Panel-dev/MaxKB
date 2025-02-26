@@ -1,0 +1,15 @@
+
+services:
+  maxkb:
+    image: 1panel/maxkb
+    container_name: maxkb
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      http_proxy: "http://10.160.3.88:8080"
+      https_proxy: "http://10.160.3.88:8080"
+      no_proxy: "10.144.84.71,10.144.84.72,127.0.0.1,localhost"
+    volumes:
+      - ~/.maxkb:/var/lib/postgresql/data
+      - ~/.python-packages:/opt/maxkb/app/sandbox/python-packages
