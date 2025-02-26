@@ -51,10 +51,10 @@
         <el-form-item :label="$t('views.problem.relateParagraph.selectParagraph')" prop="state">
           <el-radio-group v-model="state" class="radio-block">
             <el-radio value="error" size="large" class="mb-16">{{
-              $t('views.document.generateQuestion.error')
+              $t('views.document.form.selectVectorization.error')
             }}</el-radio>
             <el-radio value="all" size="large">{{
-              $t('views.document.generateQuestion.all')
+              $t('views.document.form.selectVectorization.all')
             }}</el-radio>
           </el-radio-group>
         </el-form-item>
