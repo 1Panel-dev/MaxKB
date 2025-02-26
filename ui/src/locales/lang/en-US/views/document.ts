@@ -175,6 +175,5 @@ export default {
       'Content: {data}\n \n Please summarize the above and generate 5 questions based on the summary. \nAnswer requirements: \n - Please output only questions; \n - Please place each question in',
     prompt2: 'tag.',
     error: 'Segments only failed',
-    all: 'All Segments'
   }
 }

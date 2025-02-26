@@ -151,7 +151,7 @@ export default {
       requiredMessage: '请输入相似度'
     },
     selectVectorization: {
-      label: '选择向量化内容',
+      label: '選擇向量化',
       error: '向量化未成功的分段',
       all: '全部分段'
     }
@@ -170,6 +170,5 @@ export default {
     prompt1: `內容：{data}\n\n請總結上面的內容，並根據內容總結生成 5 個問題。\n回答要求：\n - 請只輸出問題；\n - 請將每個問題放置在`,
     prompt2: `標籤中。`,
     error: '只執行未成功的分段',
-    all: '全部分節'
   }
 }
