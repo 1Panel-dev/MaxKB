@@ -7,7 +7,7 @@
     class="mb-16"
     style="padding: 0 24px"
   >
-    <el-card shadow="always" class="dialog-card" style="--el-card-padding: 16px 8px">
+    <el-card shadow="always" class="border-r-8" style="--el-card-padding: 16px 8px">
       <div
         class="flex align-center cursor w-full"
         style="padding: 0 8px"

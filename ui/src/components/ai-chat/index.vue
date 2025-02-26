@@ -1,5 +1,5 @@
 <template>
-  <div ref="aiChatRef" class="ai-chat" :class="type == 'log' ? 'chart-log' : ''">
+  <div ref="aiChatRef" class="ai-chat" :class="type">
     <UserForm
       v-model:api_form_data="api_form_data"
       v-model:form_data="form_data"
