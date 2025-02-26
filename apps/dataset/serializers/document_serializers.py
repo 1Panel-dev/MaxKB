@@ -712,7 +712,10 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 self.is_valid(raise_exception=True)
             query_set = QuerySet(model=Document)
             query_set = query_set.filter(**{'id': self.data.get("document_id")})
-            return native_search(query_set, select_string=get_file_content(
+            return native_search({
+                'document_custom_sql': query_set,
+                'order_by_query': QuerySet(Document).order_by('-create_time', 'id')
+            }, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_document.sql')), with_search_one=True)
 
         def edit(self, instance: Dict, with_valid=False):
@@ -1098,7 +1101,10 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
             if len(document_model_list) == 0:
                 return [], dataset_id
             query_set = query_set.filter(**{'id__in': [d.id for d in document_model_list]})
-            return native_search(query_set, select_string=get_file_content(
+            return native_search({
+                'document_custom_sql': query_set,
+                'order_by_query': QuerySet(Document).order_by('-create_time', 'id')
+            }, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_document.sql')),
                                  with_search_one=False), dataset_id
 

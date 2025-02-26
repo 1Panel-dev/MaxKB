@@ -663,6 +663,7 @@ class ParagraphSerializers(ApiMixin, serializers.Serializer):
                     **{'title__icontains': self.data.get('title')})
             if 'content' in self.data:
                 query_set = query_set.filter(**{'content__icontains': self.data.get('content')})
+            query_set.order_by('-create_time', 'id')
             return query_set
 
         def list(self):
