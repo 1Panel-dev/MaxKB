@@ -382,6 +382,8 @@ class WorkflowManage:
                     break
                 yield chunk
         finally:
+            while self.is_run():
+                pass
             details = self.get_runtime_details()
             message_tokens = sum([row.get('message_tokens') for row in details.values() if
                                   'message_tokens' in row and row.get('message_tokens') is not None])
