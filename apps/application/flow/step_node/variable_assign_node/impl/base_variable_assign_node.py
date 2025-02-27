@@ -30,9 +30,13 @@ class BaseVariableAssignNode(IVariableAssignNode):
                             val = json.loads(variable['value'])
                         self.workflow_manage.context[variable['fields'][1]] = val
                         result['output_value'] = variable['value'] = val
-                    else:
+                    elif variable['type'] == 'string':
                         # 变量解析 例如：{{global.xxx}}
                         val = self.workflow_manage.generate_prompt(variable['value'])
+                        self.workflow_manage.context[variable['fields'][1]] = val
+                        result['output_value'] = val
+                    else:
+                        val = variable['value']
                         self.workflow_manage.context[variable['fields'][1]] = val
                         result['output_value'] = val
                 else:
