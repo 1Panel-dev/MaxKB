@@ -6900,3 +6900,6 @@ msgstr "思考过程: "
 
 msgid "AI reply: "
 msgstr "AI 回复: "
+
+msgid "The network is busy, try again later."
+msgstr "网络繁忙，请稍后再试。"

@@ -6761,3 +6761,6 @@ msgstr ""
 
 msgid "AI reply: "
 msgstr ""
+
+msgid "The network is busy, try again later."
+msgstr ""
