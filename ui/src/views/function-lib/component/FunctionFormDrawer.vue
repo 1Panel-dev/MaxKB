@@ -14,6 +14,7 @@
         label-position="top"
         require-asterisk-position="right"
         v-loading="loading"
+        @submit.prevent
       >
         <el-form-item
           :label="$t('views.functionLib.functionForm.form.functionName.label')"

@@ -17,14 +17,11 @@
 
     .content {
       padding-left: var(--padding-left);
+      padding-right: var(--padding-left);
 
       :deep(ol) {
         margin-left: 16px !important;
       }
-    }
-
-    .text {
-      padding: 6px 0;
     }
   }
   &__operate {

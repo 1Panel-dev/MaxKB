@@ -1106,7 +1106,7 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
                 'order_by_query': QuerySet(Document).order_by('-create_time', 'id')
             }, select_string=get_file_content(
                 os.path.join(PROJECT_DIR, "apps", "dataset", 'sql', 'list_document.sql')),
-                                 with_search_one=False), dataset_id
+                with_search_one=False), dataset_id
 
         @staticmethod
         def _batch_sync(document_id_list: List[str]):
@@ -1263,6 +1263,7 @@ def save_image(image_list):
         exist_image_list = [str(i.get('id')) for i in
                             QuerySet(Image).filter(id__in=[i.id for i in image_list]).values('id')]
         save_image_list = [image for image in image_list if not exist_image_list.__contains__(str(image.id))]
+        save_image_list = list({img.id: img for img in save_image_list}.values())
         if len(save_image_list) > 0:
             QuerySet(Image).bulk_create(save_image_list)
 

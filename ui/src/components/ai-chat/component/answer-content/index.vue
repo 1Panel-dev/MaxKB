@@ -6,7 +6,7 @@
         <LogoIcon v-else height="32px" width="32px" />
       </div>
       <div class="content" @mouseup="openControl">
-        <el-card shadow="always" class="dialog-card mb-8">
+        <el-card shadow="always" class="mb-8 border-r-8">
           <MdRenderer
             v-if="
               (chatRecord.write_ed === undefined || chatRecord.write_ed === true) &&
@@ -27,10 +27,10 @@
               :send-message="chatMessage"
             ></MdRenderer>
           </template>
-          <span v-else-if="chatRecord.is_stop" shadow="always" class="dialog-card">
+          <span v-else-if="chatRecord.is_stop" shadow="always">
             {{ $t('chat.tip.stopAnswer') }}
           </span>
-          <span v-else shadow="always" class="dialog-card">
+          <span v-else shadow="always">
             {{ $t('chat.tip.answerLoading') }} <span class="dotting"></span>
           </span>
           <!-- 知识来源 -->

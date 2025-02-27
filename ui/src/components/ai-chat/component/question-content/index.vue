@@ -1,20 +1,14 @@
 <template>
   <!-- 问题内容 -->
   <div class="question-content item-content mb-16 lighter">
-    <div class="content mr-16">
+    <div
+      class="content mr-12 p-12-16 border-r-8"
+      :class="document_list.length >= 2 ? 'media_2' : `media_${document_list.length}`"
+    >
       <div class="text break-all pre-wrap">
         <div class="mb-8" v-if="document_list.length">
-          <el-row :gutter="10">
-            <el-col
-              v-for="(item, index) in document_list"
-              :key="index"
-              :xs="24"
-              :sm="props.type === 'debug-ai-chat' ? 24 : 12"
-              :md="props.type === 'debug-ai-chat' ? 24 : 12"
-              :lg="props.type === 'debug-ai-chat' ? 24 : 12"
-              :xl="props.type === 'debug-ai-chat' ? 24 : 12"
-              class="mb-8 w-full"
-            >
+          <el-space wrap class="w-full media-file-width">
+            <template v-for="(item, index) in document_list" :key="index">
               <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
                 <div class="download-button flex align-center" @click="downloadFile(item)">
                   <el-icon class="mr-4">
@@ -29,8 +23,8 @@
                   </div>
                 </div>
               </el-card>
-            </el-col>
-          </el-row>
+            </template>
+          </el-space>
         </div>
         <div class="mb-8" v-if="image_list.length">
           <el-space wrap>
@@ -53,17 +47,8 @@
           </el-space>
         </div>
         <div class="mb-8" v-if="audio_list.length">
-          <el-row :gutter="10">
-            <el-col
-              v-for="(item, index) in audio_list"
-              :key="index"
-              :xs="24"
-              :sm="props.type === 'debug-ai-chat' ? 24 : 12"
-              :md="props.type === 'debug-ai-chat' ? 24 : 12"
-              :lg="props.type === 'debug-ai-chat' ? 24 : 12"
-              :xl="props.type === 'debug-ai-chat' ? 24 : 12"
-              class="mb-8"
-            >
+          <el-space wrap>
+            <template v-for="(item, index) in audio_list" :key="index">
               <div class="file cursor border-r-4" v-if="item.url">
                 <audio
                   :src="item.url"
@@ -72,10 +57,10 @@
                   class="border-r-4"
                 />
               </div>
-            </el-col>
-          </el-row>
+            </template>
+          </el-space>
         </div>
-        {{ chatRecord.problem_text }}
+        <span> {{ chatRecord.problem_text }}</span>
       </div>
     </div>
     <div class="avatar">
@@ -140,6 +125,16 @@ onMounted(() => {})
 .question-content {
   display: flex;
   justify-content: flex-end;
+  padding-left: var(--padding-left);
+  width: 100%;
+  box-sizing: border-box;
+
+  .content {
+    background: #d6e2ff;
+    padding-left: 16px;
+    padding-right: 16px;
+
+  }
 
   .download-file {
     height: 43px;
@@ -161,6 +156,45 @@ onMounted(() => {})
 
     .download-button {
       display: none;
+    }
+  }
+  .media-file-width {
+    :deep(.el-space__item) {
+      min-width: 40% !important;
+      flex-grow: 1;
+    }
+  }
+  .media_2 {
+    flex: 1;
+  }
+  .media_0 {
+    flex: inherit;
+  }
+  .media_1 {
+    width: 50%;
+  }
+}
+@media only screen and (max-width: 768px) {
+  .question-content {
+    .media-file-width {
+      :deep(.el-space__item) {
+        min-width: 100% !important;
+      }
+    }
+    .media_1 {
+      width: 100%;
+    }
+  }
+}
+.debug-ai-chat {
+  .question-content {
+    .media-file-width {
+      :deep(.el-space__item) {
+        min-width: 100% !important;
+      }
+    }
+    .media_1 {
+      width: 100%;
     }
   }
 }

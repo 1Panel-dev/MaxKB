@@ -6,7 +6,7 @@
       <LogoIcon v-else height="32px" width="32px" />
     </div>
     <div class="content" v-if="prologue">
-      <el-card shadow="always" class="dialog-card" style="--el-card-padding: 10px 16px 12px">
+      <el-card shadow="always" class="border-r-8" style="--el-card-padding: 10px 16px 12px">
         <MdRenderer
           :source="prologue"
           :send-message="sendMessage"

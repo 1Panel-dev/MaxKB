@@ -101,7 +101,7 @@
         </div>
         <div class="chat-pc__right">
           <div class="right-header border-b mb-24 p-16-24 flex-between">
-            <h4 class="ellipsis-1" style="width: 70%">
+            <h4 class="ellipsis-1" style="width: 66%">
               {{ currentChatName }}
             </h4>
 
