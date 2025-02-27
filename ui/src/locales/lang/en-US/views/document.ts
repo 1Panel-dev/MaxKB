@@ -12,7 +12,7 @@ export default {
     cancelGenerateQuestion: 'Cancel Generating Questions',
     cancelVectorization: 'Cancel Vectorization',
     cancelGenerate: 'Cancel Generation',
-    export: 'Export to',
+    export: 'Export to'
   },
   tip: {
     saveMessage: 'Current changes have not been saved. Confirm exit?',
@@ -84,8 +84,7 @@ export default {
       text: 'Remove duplicate extra symbols, spaces, blank lines, and tab words.'
     },
     checkedConnect: {
-      label:
-        'Add "Related Questions" section for question-based QA pairs during import.'
+      label: 'Add "Related Questions" section for question-based QA pairs during import.'
     }
   },
   buttons: {
@@ -153,11 +152,6 @@ export default {
       label: 'Similarity Higher Than',
       placeholder: 'Directly return segment content',
       requiredMessage: 'Please enter similarity value'
-    },
-    selectVectorization: {
-      label: 'Select Vectorization Content',
-      error: 'Segments that failed vectorization',
-      all: 'All Segments'
     }
   },
   hitHandlingMethod: {
@@ -173,7 +167,6 @@ export default {
     tip4: 'The generation effect depends on the selected model and prompt. Users can adjust to achieve the best effect.',
     prompt1:
       'Content: {data}\n \n Please summarize the above and generate 5 questions based on the summary. \nAnswer requirements: \n - Please output only questions; \n - Please place each question in',
-    prompt2: 'tag.',
-    error: 'Segments only failed',
+    prompt2: 'tag.'
   }
 }

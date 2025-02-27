@@ -150,11 +150,6 @@ export default {
       placeholder: '直接返回分段内容',
       requiredMessage: '请输入相似度'
     },
-    selectVectorization: {
-      label: '选择向量化内容',
-      error: '向量化未成功的分段',
-      all: '全部分段'
-    }
   },
   hitHandlingMethod: {
     optimization: '模型优化',
@@ -169,6 +164,5 @@ export default {
     tip4: '生成效果依赖于所选模型和提示词，用户可自行调整至最佳效果。',
     prompt1: `内容：{data}\n\n请总结上面的内容，并根据内容总结生成 5 个问题。\n回答要求：\n- 请只输出问题；\n- 请将每个问题放置`,
     prompt2: `标签中。`,
-    error: '仅执行未成功的分段',
   }
 }

@@ -49,7 +49,7 @@
           <div class="p-24" style="padding-bottom: 8px; padding-top: 16px">
             <div class="flex-between mb-16">
               <div class="bold title align-center">
-                {{ $t('views.problem.relateParagraph.selectParagraph') }}
+                {{ $t('components.selectParagraph.title') }}
                 <el-text>
                   （{{ $t('views.problem.relateParagraph.selectedParagraph') }}：{{
                     associationCount(currentDocument)

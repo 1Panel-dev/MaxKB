@@ -28,7 +28,7 @@
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(fieldFormRef)" :loading="loading">
-          {{ isEdit ? $t('common.save') : $t('common.add') }}
+          {{ $t('common.save') }}
         </el-button>
       </span>
     </template>
@@ -43,14 +43,15 @@ const emit = defineEmits(['refresh'])
 
 const fieldFormRef = ref()
 const loading = ref<boolean>(false)
-const isEdit = ref(false)
 
 const form = ref<any>({
-  title: t('chat.userInput') ,
+  title: t('chat.userInput')
 })
 
 const rules = reactive({
-  title: [{ required: true, message: t('dynamicsForm.paramForm.name.requiredMessage'), trigger: 'blur' }],
+  title: [
+    { required: true, message: t('dynamicsForm.paramForm.name.requiredMessage'), trigger: 'blur' }
+  ]
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -58,7 +59,6 @@ const dialogVisible = ref<boolean>(false)
 const open = (row: any) => {
   if (row) {
     form.value = cloneDeep(row)
-    isEdit.value = true
   }
 
   dialogVisible.value = true
@@ -66,7 +66,6 @@ const open = (row: any) => {
 
 const close = () => {
   dialogVisible.value = false
-  isEdit.value = false
 }
 
 const submit = async (formEl: FormInstance | undefined) => {

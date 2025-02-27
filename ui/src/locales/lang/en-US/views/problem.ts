@@ -31,7 +31,6 @@ export default {
     title: 'Relate to Segment',
     selectDocument: 'Select a Document',
     placeholder: 'Search document by name',
-    selectParagraph: 'Select Segments',
     selectedParagraph: 'Selected Segments',
     count: 'Count'
   }
