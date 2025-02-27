@@ -57,5 +57,6 @@ export default {
 
   inputPlaceholder: 'Please input',
   title: 'Title',
-  content: 'Content'
+  content: 'Content',
+  rename: 'Rename'
 }

@@ -7,28 +7,14 @@
     >
       <div v-resize="resizeStepContainer">
         <div class="flex-between">
-          <div
-            class="flex align-center"
-            :style="{ maxWidth: node_status == 200 ? 'calc(100% - 85px)' : 'calc(100% - 85px)' }"
-          >
+          <div class="flex align-center" style="width: 70%;">
             <component
               :is="iconComponent(`${nodeModel.type}-icon`)"
               class="mr-8"
               :size="24"
               :item="nodeModel?.properties.node_data"
             />
-            <h4 v-if="showOperate(nodeModel.type)" style="max-width: 90%">
-              <ReadWrite
-                @mousemove.stop
-                @mousedown.stop
-                @keydown.stop
-                @click.stop
-                @change="editName"
-                :data="nodeModel.properties.stepName"
-                trigger="dblclick"
-              />
-            </h4>
-            <h4 v-else>{{ nodeModel.properties.stepName }}</h4>
+            <h4 class="ellipsis-1 break-all">{{ nodeModel.properties.stepName }}</h4>
           </div>
 
           <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
@@ -70,6 +56,9 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu style="min-width: 80px">
+                  <el-dropdown-item @click="renameNode" class="p-8">{{
+                    $t('common.rename')
+                  }}</el-dropdown-item>
                   <el-dropdown-item @click="copyNode" class="p-8">{{
                     $t('common.copy')
                   }}</el-dropdown-item>
@@ -138,6 +127,40 @@
         @clickNodes="clickNodes"
       />
     </el-collapse-transition>
+
+    <el-dialog
+      :title="$t('views.applicationWorkflow.nodeName')"
+      v-model="nodeNameDialogVisible"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :destroy-on-close="true"
+      append-to-body
+    >
+      <el-form label-position="top" ref="titleFormRef" :model="form">
+        <el-form-item
+          prop="title"
+          :rules="[
+            {
+              required: true,
+              message: $t('common.inputPlaceholder'),
+              trigger: 'blur'
+            }
+          ]"
+        >
+          <el-input v-model="form.title" @blur="form.title = form.title.trim()" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click.prevent="nodeNameDialogVisible = false">
+            {{ $t('common.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="editName(titleFormRef)">
+            {{ $t('common.save') }}
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -149,6 +172,7 @@ import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
 import { WorkflowType } from '@/enums/workflow'
 import { MsgError, MsgConfirm } from '@/utils/message'
+import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
 const {
   params: { id }
@@ -165,6 +189,11 @@ const height = ref<{
 })
 const showAnchor = ref<boolean>(false)
 const anchorData = ref<any>()
+const titleFormRef = ref()
+const nodeNameDialogVisible = ref<boolean>(false)
+const form = ref<any>({
+  title: ''
+})
 
 const condition = computed({
   set: (v) => {
@@ -190,6 +219,7 @@ const showNode = computed({
     return true
   }
 })
+
 const handleWheel = (event: any) => {
   const isCombinationKeyPressed = event.ctrlKey || event.metaKey
   if (!isCombinationKeyPressed) {
@@ -202,19 +232,30 @@ const node_status = computed(() => {
   }
   return 200
 })
-function editName(val: string) {
-  if (val.trim() && val.trim() !== props.nodeModel.properties.stepName) {
-    if (
-      !props.nodeModel.graphModel.nodes?.some(
-        (node: any) => node.properties.stepName === val.trim()
-      )
-    ) {
-      set(props.nodeModel.properties, 'stepName', val.trim())
-    } else {
-      MsgError(t('views.applicationWorkflow.tip.repeatedNodeError'))
-    }
-  }
+
+function renameNode() {
+  form.value.title = props.nodeModel.properties.stepName
+  nodeNameDialogVisible.value = true
 }
+const editName = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid) => {
+    if (valid) {
+      if (
+        !props.nodeModel.graphModel.nodes?.some(
+          (node: any) => node.properties.stepName === form.value.title
+        )
+      ) {
+        set(props.nodeModel.properties, 'stepName', form.value.title)
+        nodeNameDialogVisible.value = false
+        formEl.resetFields()
+      } else {
+        MsgError(t('views.applicationWorkflow.tip.repeatedNodeError'))
+      }
+    }
+  })
+}
+
 const mousedown = () => {
   props.nodeModel.graphModel.clearSelectElements()
   set(props.nodeModel, 'isSelected', true)

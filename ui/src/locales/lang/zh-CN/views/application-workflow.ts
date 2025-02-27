@@ -1,5 +1,6 @@
 export default {
   node: '节点',
+  nodeName: '节点名称',
   baseComponent: '基础组件',
   nodeSetting: '节点设置',
   workflow: '工作流',
