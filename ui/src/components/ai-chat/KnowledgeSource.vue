@@ -21,11 +21,7 @@
                 </div>
                 <div class="ml-8" v-else>
                   <a
-                    :href="
-                      item.source_url && !item.source_url.endsWith('/')
-                        ? item.source_url + '/'
-                        : item.source_url
-                    "
+                    :href="getNormalizedUrl(item?.source_url)"
                     target="_blank"
                     class="ellipsis"
                     :title="item?.document_name?.trim()"
@@ -43,7 +39,9 @@
 
   <div class="border-t color-secondary flex-between mt-12" style="padding-top: 12px">
     <div>
-      <span class="mr-8"> {{ $t('chat.KnowledgeSource.consume') }}: {{ data?.message_tokens + data?.answer_tokens }} </span>
+      <span class="mr-8">
+        {{ $t('chat.KnowledgeSource.consume') }}: {{ data?.message_tokens + data?.answer_tokens }}
+      </span>
       <span> {{ $t('chat.KnowledgeSource.consumeTime') }}: {{ data?.run_time?.toFixed(2) }} s</span>
     </div>
     <el-button
@@ -66,7 +64,7 @@ import { computed, ref } from 'vue'
 import ParagraphSourceDialog from './ParagraphSourceDialog.vue'
 import ExecutionDetailDialog from './ExecutionDetailDialog.vue'
 import { isWorkFlow } from '@/utils/application'
-import { getImgUrl } from '@/utils/utils'
+import { getImgUrl, getNormalizedUrl } from '@/utils/utils'
 const props = defineProps({
   data: {
     type: Object,

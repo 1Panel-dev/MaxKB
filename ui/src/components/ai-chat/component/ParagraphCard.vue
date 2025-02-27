@@ -22,11 +22,7 @@
 
           <template v-if="meta?.source_url">
             <a
-              :href="
-                meta?.source_url && !meta?.source_url.endsWith('/')
-                  ? meta?.source_url + '/'
-                  : meta?.source_url
-              "
+              :href="getNormalizedUrl(meta?.source_url)"
               target="_blank"
               class="ellipsis-1 break-all"
               :title="data?.document_name?.trim()"
@@ -54,7 +50,7 @@
   </CardBox>
 </template>
 <script setup lang="ts">
-import { getImgUrl } from '@/utils/utils'
+import { getImgUrl, getNormalizedUrl } from '@/utils/utils'
 import { computed } from 'vue'
 
 const props = defineProps({
@@ -94,6 +90,7 @@ const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.v
     }
   }
 }
+
 .paragraph-source-card-height {
   height: 260px;
 }
@@ -105,6 +102,7 @@ const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.v
   .paragraph-source-card {
     .footer-content {
       display: block;
+
       .item {
         max-width: 100%;
       }

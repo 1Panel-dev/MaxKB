@@ -106,3 +106,10 @@ export function cutFilename(filename: string, num: number) {
   const suffix = lastIndex === -1 ? '' : filename.substring(lastIndex + 1)
   return filename.substring(0, num - suffix.length - 1) + '.' + suffix
 }
+
+export function getNormalizedUrl(url: string) {
+  if (url && !url.endsWith('/') && !/\.[^/]+$/.test(url)) {
+    return url + '/'
+  }
+  return url
+}
