@@ -1,5 +1,6 @@
 export default {
   node: '節點',
+  nodeName: '節點名稱',
   baseComponent: '基礎組件',
   nodeSetting: '節點設置',
   workflow: '工作流',
