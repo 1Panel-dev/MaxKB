@@ -43,7 +43,8 @@
             :step="1"
             v-model="formValue.maxlength"
             controls-position="right"
-        /></el-form-item>
+          />
+        </el-form-item>
       </el-col>
     </el-row>
   </el-form-item>
@@ -70,13 +71,15 @@
       :minlength="formValue.minlength"
       :placeholder="$t('dynamicsForm.default.placeholder')"
       show-word-limit
-      type="text"
+      type="password"
+      show-password
     />
   </el-form-item>
 </template>
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue'
 import { t } from '@/locales'
+
 const props = defineProps<{
   modelValue: any
 }>()
@@ -99,33 +102,38 @@ watch(
 )
 const getData = () => {
   return {
-    input_type: 'TextInput',
+    input_type: 'PasswordInput',
     attrs: {
       maxlength: formValue.value.maxlength,
       minlength: formValue.value.minlength,
-      'show-word-limit': true
+      'show-word-limit': true,
+      type: 'password',
+      'show-password': true
     },
     default_value: formValue.value.default_value,
     show_default_value: formValue.value.show_default_value,
     props_info: {
       rules: formValue.value.required
         ? [
-            { required: true, message: `${formValue.value.label} ${t('dynamicsForm.default.requiredMessage')}` },
-            {
-              min: formValue.value.minlength,
-              max: formValue.value.maxlength,
-              message: `${formValue.value.label}${t('dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('dynamicsForm.TextInput.length.requiredMessage3')}`,
-              trigger: 'blur'
-            }
-          ]
+          {
+            required: true,
+            message: `${formValue.value.label} ${t('dynamicsForm.default.requiredMessage')}`
+          },
+          {
+            min: formValue.value.minlength,
+            max: formValue.value.maxlength,
+            message: `${formValue.value.label}${t('dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('dynamicsForm.TextInput.length.requiredMessage3')}`,
+            trigger: 'blur'
+          }
+        ]
         : [
-            {
-              min: formValue.value.minlength,
-              max: formValue.value.maxlength,
-              message: `${formValue.value.label}${t('dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('dynamicsForm.TextInput.length.requiredMessage3')}`,
-              trigger: 'blur'
-            }
-          ]
+          {
+            min: formValue.value.minlength,
+            max: formValue.value.maxlength,
+            message: `${formValue.value.label}${t('dynamicsForm.TextInput.length.requiredMessage1')} ${formValue.value.minlength} ${t('dynamicsForm.TextInput.length.requiredMessage2')} ${formValue.value.maxlength} ${t('dynamicsForm.TextInput.length.requiredMessage3')}`,
+            trigger: 'blur'
+          }
+        ]
     }
   }
 }
@@ -135,6 +143,7 @@ const rander = (form_data: any) => {
   formValue.value.maxlength = attrs.maxlength
   formValue.value.default_value = form_data.default_value
   formValue.value.show_default_value = form_data.show_default_value
+  formValue.value.show_password = attrs['show-password']
 }
 const rangeRules = [
   {
@@ -165,7 +174,8 @@ onMounted(() => {
   formValue.value.minlength = 0
   formValue.value.maxlength = 20
   formValue.value.default_value = ''
-  // console.log(formValue.value.show_default_value)
+  formValue.value.show_password = true
+
   if (formValue.value.show_default_value === undefined) {
     formValue.value.show_default_value = true
   }
@@ -174,6 +184,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .defaultValueItem {
   position: relative;
+
   .defaultValueCheckbox {
     position: absolute;
     right: 0;
