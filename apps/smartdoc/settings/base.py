@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.gzip.GZipMiddleware',
+    'common.middleware.gzip.GZipMiddleware',
     'common.middleware.static_headers_middleware.StaticHeadersMiddleware',
     'common.middleware.cross_domain_middleware.CrossDomainMiddleware'
 
