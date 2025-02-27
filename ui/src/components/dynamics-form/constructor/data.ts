@@ -5,6 +5,10 @@ const input_type_list = [
     value: 'TextInput'
   },
   {
+    label: t('dynamicsForm.input_type_list.PasswordInput'),
+    value: 'PasswordInput'
+  },
+  {
     label: t('dynamicsForm.input_type_list.Slider'),
     value: 'Slider'
   },
