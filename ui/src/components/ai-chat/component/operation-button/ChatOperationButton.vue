@@ -86,6 +86,7 @@ import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
 import { MsgError } from '@/utils/message'
 import { t } from '@/locales'
+import bus from '@/bus'
 const route = useRoute()
 const {
   params: { id }
@@ -277,6 +278,11 @@ const pausePlayAnswerText = () => {
 }
 
 onMounted(() => {
+  bus.on('pause-autoplay', () => {
+    pausePlayAnswerText()
+    // console.log(1234)
+  })
+  bus.emit('pause-autoplay')
   // 第一次回答后自动播放， 打开历史记录不自动播放
   if (props.tts && props.tts_autoplay && buttonData.value.write_ed && !buttonData.value.update_time) {
     playAnswerText(buttonData.value.answer_text)
