@@ -535,9 +535,19 @@ function sendChatHandle(event?: any) {
       }
     }
   } else {
-    // 如果同时按下ctrl+回车键，则会换行
-    inputValue.value += '\n'
+      // 如果同时按下ctrl+回车键，则会换行
+    insertNewlineAtCursor()
   }
+}
+const insertNewlineAtCursor = () => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const startPos = textarea.selectionStart
+  const endPos = textarea.selectionEnd
+  // 在光标处插入换行符
+  inputValue.value = inputValue.value.slice(0, startPos) + '\n' + inputValue.value.slice(endPos)
+  nextTick(() => {
+    textarea.setSelectionRange(startPos + 1, startPos + 1) // 光标定位到换行后位置
+  })
 }
 
 function deleteFile(index: number, val: string) {

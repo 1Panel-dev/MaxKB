@@ -5,7 +5,7 @@ export default {
   loading: 'Loading',
   noMore: 'No more! ',
   selectParagraph: {
-    title: 'Select Paragraph',
+    title: 'Select Segments',
     error: 'Process only the failed segments',
     all: 'All Segments'
   }
