@@ -64,12 +64,7 @@
           :storeKey="storeKey"
         >
           <el-table-column type="selection" width="55" :reserve-selection="true" />
-          <el-table-column
-            prop="name"
-            :label="$t('views.document.table.name')"
-            min-width="280"
-            sortable
-          >
+          <el-table-column prop="name" :label="$t('views.document.table.name')" min-width="280">
             <template #default="{ row }">
               <ReadWrite
                 @change="editName($event, row.id)"
@@ -250,12 +245,7 @@
               {{ $t(hitHandlingMethod[row.hit_handling_method as keyof typeof hitHandlingMethod]) }}
             </template>
           </el-table-column>
-          <el-table-column
-            prop="create_time"
-            :label="$t('common.createTime')"
-            width="175"
-            sortable
-          >
+          <el-table-column prop="create_time" :label="$t('common.createTime')" width="175" sortable>
             <template #default="{ row }">
               {{ datetimeFormat(row.create_time) }}
             </template>
@@ -829,7 +819,7 @@ function getList(bool?: boolean) {
   const param = {
     ...(filterText.value && { name: filterText.value }),
     ...filterMethod.value,
-    order_by: orderBy.value,
+    order_by: orderBy.value
   }
   documentApi
     .getDocument(id as string, paginationConfig.value, param, bool ? undefined : loading)
