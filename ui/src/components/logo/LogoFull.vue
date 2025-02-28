@@ -55,7 +55,7 @@
         />
       </g>
     </svg>
-    <img v-else src="@/assets/logo/MaxKB-logo.svg" :height="height" />
+    <img src="@/assets/logo/MaxKB-logo.svg" :height="height" />
   </template>
 </template>
 <script setup lang="ts">
@@ -75,7 +75,7 @@ const isDefaultTheme = computed(() => {
 })
 
 const fileURL = computed(() => {
-  if (user.themeInfo?.loginLogo) {
+  if (user.themeInfo) {
     if (typeof user.themeInfo?.loginLogo === 'string') {
       return user.themeInfo?.loginLogo
     } else {
