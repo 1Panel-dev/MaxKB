@@ -244,6 +244,7 @@
                           editorId="preview-only"
                           :modelValue="item.answer"
                           style="background: none"
+                          noImgZoomIn
                         />
                         <template v-else> -</template>
                       </div>
@@ -264,6 +265,7 @@
                             editorId="preview-only"
                             :modelValue="item.answer"
                             style="background: none"
+                            noImgZoomIn
                           />
                           <template v-else> -</template>
                         </el-scrollbar>
@@ -300,6 +302,7 @@
                               editorId="preview-only"
                               :modelValue="file_content"
                               style="background: none"
+                              noImgZoomIn
                             />
                             <template v-else> -</template>
                           </el-card>
@@ -351,6 +354,7 @@
                             editorId="preview-only"
                             :modelValue="file_content"
                             style="background: none"
+                            noImgZoomIn
                           />
                           <template v-else> -</template>
                         </el-card>
@@ -374,6 +378,7 @@
                               editorId="preview-only"
                               :modelValue="item.content"
                               style="background: none"
+                              noImgZoomIn
                             />
                           </div>
                         </div>
@@ -573,6 +578,7 @@
                           editorId="preview-only"
                           :modelValue="item.answer"
                           style="background: none"
+                          noImgZoomIn
                         />
                         <template v-else> -</template>
                       </div>
@@ -603,6 +609,7 @@
                           editorId="preview-only"
                           :modelValue="item.answer"
                           style="background: none"
+                          noImgZoomIn
                         />
                         <template v-else> -</template>
                       </div>
