@@ -8,8 +8,10 @@
 """
 
 from django.utils.translation import gettext_lazy as _
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -448,11 +450,28 @@ class ChatView(APIView):
 
     class UploadFile(APIView):
         authentication_classes = [TokenAuth]
+        parser_classes = [MultiPartParser]
 
         @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary=_("Upload files"),
                              operation_id=_("Upload files"),
-                             manual_parameters=ChatRecordApi.get_request_params_api(),
+                             manual_parameters=[
+                                 openapi.Parameter(name='application_id',
+                                                   in_=openapi.IN_PATH,
+                                                   type=openapi.TYPE_STRING,
+                                                   required=True,
+                                                   description=_('Application ID')),
+                                 openapi.Parameter(name='chat_id',
+                                                   in_=openapi.IN_PATH,
+                                                   type=openapi.TYPE_STRING,
+                                                   required=True,
+                                                   description=_('Conversation ID')),
+                                 openapi.Parameter(name='file',
+                                                   in_=openapi.IN_FORM,
+                                                   type=openapi.TYPE_FILE,
+                                                   required=True,
+                                                   description=_('Upload file'))
+                             ],
                              tags=[_("Application/Conversation Log")]
                              )
         @has_permissions(
