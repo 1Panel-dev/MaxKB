@@ -1,4 +1,5 @@
 import { hasPermission } from '@/utils/permission/index'
+import NProgress from 'nprogress'
 import {
   createRouter,
   createWebHistory,
@@ -9,6 +10,7 @@ import {
 } from 'vue-router'
 import useStore from '@/stores'
 import { routes } from '@/router/routes'
+NProgress.configure({ showSpinner: false, speed: 500, minimum: 0.3 })
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes
@@ -17,6 +19,7 @@ const router = createRouter({
 // 路由前置拦截器
 router.beforeEach(
   async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    NProgress.start()
     if (to.name === '404') {
       next()
       return
@@ -48,6 +51,9 @@ router.beforeEach(
     }
   }
 )
+router.afterEach(() => {
+  NProgress.done()
+})
 
 export const getChildRouteListByPathAndName = (path: any, name?: RouteRecordName | any) => {
   return getChildRouteList(routes, path, name)

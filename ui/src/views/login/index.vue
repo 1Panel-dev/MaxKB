@@ -1,5 +1,5 @@
 <template>
-  <login-layout v-if="user.isEnterprise() ? user.themeInfo : true" v-loading="loading">
+  <login-layout v-if="!loading" v-loading="loading">
     <LoginContainer :subTitle="user.themeInfo?.slogan || $t('views.system.theme.defaultSlogan')">
       <h2 class="mb-24" v-if="!showQrCodeTab">{{ loginMode || $t('views.login.title') }}</h2>
       <div v-if="!showQrCodeTab">
@@ -225,10 +225,10 @@ const login = () => {
   })
 }
 
-onMounted(() => {
+onBeforeMount(() => {
+  loading.value = true
   user.asyncGetProfile().then((res) => {
     if (user.isEnterprise()) {
-      loading.value = true
       user
         .getAuthType()
         .then((res) => {
@@ -261,6 +261,8 @@ onMounted(() => {
           }
         })
         .finally(() => (loading.value = false))
+    } else {
+      loading.value = false
     }
   })
 })
