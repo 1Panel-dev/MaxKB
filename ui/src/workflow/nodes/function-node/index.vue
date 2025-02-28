@@ -23,7 +23,8 @@
               :prop="'input_field_list.' + index + '.value'"
               :rules="{
                 required: item.is_required,
-                message: item.source === 'reference'
+                message:
+                  item.source === 'reference'
                     ? $t('views.functionLib.functionForm.form.param.selectPlaceholder')
                     : $t('views.functionLib.functionForm.form.param.inputPlaceholder'),
                 trigger: 'blur'
@@ -76,17 +77,13 @@
       <h5 class="lighter mb-8">
         {{ $t('views.functionLib.functionForm.form.param.code') }}
       </h5>
-      <div class="function-CodemirrorEditor mb-8" v-if="showEditor">
+      <div class="mb-8" v-if="showEditor">
         <CodemirrorEditor
           v-model="chat_data.code"
           @wheel="wheel"
           style="height: 130px !important"
+          @submitDialog="submitCodemirrorEditor"
         />
-        <div class="function-CodemirrorEditor__footer">
-          <el-button text type="info" @click="openCodemirrorDialog" class="magnify">
-            <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
-          </el-button>
-        </div>
       </div>
 
       <el-form-item
@@ -113,27 +110,6 @@
       </el-form-item>
     </el-form>
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
-    <!-- Codemirror 弹出层 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="$t('views.functionLib.functionForm.form.param.code')"
-      append-to-body
-      fullscreen
-    >
-      <CodemirrorEditor
-        v-model="cloneContent"
-        style="
-          height: calc(100vh - 160px) !important;
-          border: 1px solid #bbbfc4;
-          border-radius: 4px;
-        "
-      />
-      <template #footer>
-        <div class="dialog-footer mt-24">
-          <el-button type="primary" @click="submitDialog"> {{ $t('common.confirm') }}</el-button>
-        </div>
-      </template>
-    </el-dialog>
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -190,17 +166,8 @@ const validate = () => {
   })
 }
 
-const dialogVisible = ref(false)
-const cloneContent = ref('')
-
-function openCodemirrorDialog() {
-  cloneContent.value = chat_data.value.code
-  dialogVisible.value = true
-}
-
-function submitDialog() {
-  set(props.nodeModel.properties.node_data, 'code', cloneContent.value)
-  dialogVisible.value = false
+function submitCodemirrorEditor(val: string) {
+  set(props.nodeModel.properties.node_data, 'code', val)
 }
 
 function openAddDialog(data?: any, index?: any) {
@@ -244,13 +211,4 @@ onMounted(() => {
   }, 100)
 })
 </script>
-<style lang="scss">
-.function-CodemirrorEditor__footer {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-}
-.function-CodemirrorEditor {
-  position: relative;
-}
-</style>
+<style lang="scss"></style>

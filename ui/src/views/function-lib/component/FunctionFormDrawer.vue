@@ -133,13 +133,8 @@
         </el-text>
       </h4>
 
-      <div class="function-CodemirrorEditor mb-8" v-if="showEditor">
-        <CodemirrorEditor v-model="form.code" />
-        <div class="function-CodemirrorEditor__footer">
-          <el-button text type="info" @click="openCodemirrorDialog" class="magnify">
-            <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
-          </el-button>
-        </div>
+      <div class="mb-8" v-if="showEditor">
+        <CodemirrorEditor v-model="form.code" @submitDialog="submitCodemirrorEditor" />
       </div>
       <h4 class="title-decoration-1 mb-16 mt-16">
         {{ $t('common.param.outputParam') }}
@@ -162,27 +157,6 @@
       </div>
     </template>
 
-    <!-- Codemirror 弹出层 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="$t('views.functionLib.functionForm.form.param.code')"
-      append-to-body
-      fullscreen
-    >
-      <CodemirrorEditor
-        v-model="cloneContent"
-        style="
-          height: calc(100vh - 160px) !important;
-          border: 1px solid #bbbfc4;
-          border-radius: 4px;
-        "
-      />
-      <template #footer>
-        <div class="dialog-footer mt-24">
-          <el-button type="primary" @click="submitDialog"> {{ $t('common.confirm') }}</el-button>
-        </div>
-      </template>
-    </el-dialog>
     <FunctionDebugDrawer ref="FunctionDebugDrawerRef" />
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
   </el-drawer>
@@ -223,9 +197,6 @@ const form = ref<functionLibData>({
   permission_type: 'PRIVATE'
 })
 
-const dialogVisible = ref(false)
-const cloneContent = ref<any>('')
-
 watch(visible, (bool) => {
   if (!bool) {
     isEdit.value = false
@@ -259,14 +230,8 @@ const rules = reactive({
   ]
 })
 
-function openCodemirrorDialog() {
-  cloneContent.value = form.value.code
-  dialogVisible.value = true
-}
-
-function submitDialog() {
-  form.value.code = cloneContent.value
-  dialogVisible.value = false
+function submitCodemirrorEditor(val: string) {
+  form.value.code = val
 }
 
 function close() {
@@ -353,13 +318,4 @@ defineExpose({
   open
 })
 </script>
-<style lang="scss" scoped>
-.function-CodemirrorEditor__footer {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-}
-.function-CodemirrorEditor {
-  position: relative;
-}
-</style>
+<style lang="scss" scoped></style>
