@@ -122,7 +122,7 @@ function showSource(row: any) {
   return false
 }
 const regenerationChart = (chat: chatType) => {
-  props.sendMessage(chat.problem_text, { rechat: true })
+  props.sendMessage(chat.problem_text, { re_chat: true })
 }
 const stopChat = (chat: chatType) => {
   props.chatManagement.stop(chat.id)
