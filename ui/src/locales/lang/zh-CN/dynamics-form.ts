@@ -1,6 +1,7 @@
 export default {
   input_type_list: {
     TextInput: '文本框',
+    PasswordInput: '密码框',
     Slider: '滑块',
     SwitchInput: '开关',
     SingleSelect: '单选框',
@@ -96,7 +97,6 @@ export default {
       requiredMessage2: '到',
       requiredMessage3: '个字符',
       requiredMessage4: '文本长度为必填参数'
-    },
-    showPassword: '密文显示'
+    }
   }
 }

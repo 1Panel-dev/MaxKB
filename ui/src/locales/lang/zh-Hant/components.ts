@@ -4,4 +4,9 @@ export default {
   noData: '無匹配数据',
   loading: '加載中',
   noMore: '到底啦！',
+  selectParagraph: {
+    title: '選擇分段',
+    error: '僅執行未成功分段',
+    all: '全部分段'
+  }
 }

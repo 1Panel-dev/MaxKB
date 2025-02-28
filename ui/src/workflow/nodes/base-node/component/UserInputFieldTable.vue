@@ -49,6 +49,9 @@
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">{{
           $t('dynamicsForm.input_type_list.TextInput')
         }}</el-tag>
+        <el-tag type="info" class="info-tag" v-if="row.input_type === 'PasswordInput'">{{
+          $t('dynamicsForm.input_type_list.PasswordInput')
+        }}</el-tag>
         <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'">{{
           $t('dynamicsForm.input_type_list.Slider')
         }}</el-tag>
@@ -169,6 +172,9 @@ function refreshFieldTitle(data: any) {
 }
 
 const getDefaultValue = (row: any) => {
+  if(row.input_type === 'PasswordInput') {
+    return '******'
+  }
   if (row.default_value) {
     const default_value = row.option_list
       ?.filter((v: any) => row.default_value.indexOf(v.value) > -1)

@@ -16,7 +16,9 @@
         <el-icon class="mr-8 arrow-icon" :class="showUserInput ? 'rotate-90' : ''"
           ><CaretRight
         /></el-icon>
+        <span class="break-all ellipsis-1 mr-16" :title="inputFieldConfig.title">
         {{ inputFieldConfig.title }}
+        </span>
       </div>
       <el-scrollbar max-height="160">
         <el-collapse-transition>

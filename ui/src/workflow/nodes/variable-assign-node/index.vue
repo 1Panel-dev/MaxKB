@@ -39,7 +39,7 @@
               <div class="flex-between">
                 <div>
                   <span
-                  >{{ $t('views.applicationWorkflow.nodes.variableAssignNode.assign')
+                    >{{ $t('views.applicationWorkflow.nodes.variableAssignNode.assign')
                     }}<span class="danger">*</span></span
                   >
                 </div>
@@ -60,77 +60,83 @@
                 </el-select>
               </div>
             </template>
-          </el-form-item>
-          <div v-if="item.source === 'custom'" class="flex">
-            <el-row :gutter="8">
-              <el-col :span="8">
-                <el-select v-model="item.type" style="width: 130px;">
-                  <el-option v-for="item in typeOptions" :key="item" :label="item"
-                             :value="item" />
-                </el-select>
-              </el-col>
-              <el-col :span="16">
-                <el-form-item v-if="item.type === 'string'"
-                              :prop="'variable_list.' + index + '.value'"
-                              :rules="{
-                                message: t('dynamicsForm.tip.requiredMessage'),
-                                trigger: 'blur',
-                                required: true
-                              }"
-                >
-                  <el-input
-                    class="ml-4"
-                    v-model="item.value"
-                    :placeholder="$t('common.inputPlaceholder')"
-                    show-word-limit
-                    clearable
-                    @wheel="wheel"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item v-else-if="item.type ==='num'"
-                              :prop="'variable_list.' + index + '.value'"
-                              :rules="{
-                                message: t('dynamicsForm.tip.requiredMessage'),
-                                trigger: 'blur',
-                                required: true
-                              }"
-                >
-                  <el-input-number
-                    class="ml-4"
-                    v-model="item.value"
-                  ></el-input-number>
-                </el-form-item>
-                <el-form-item v-else-if="item.type === 'json'"
-                              :prop="'variable_list.' + index + '.value'"
-                              :rules="[{
-                                message: t('dynamicsForm.tip.requiredMessage'),
-                                trigger: 'blur',
-                                required: true
-                              },
-                              {
-                                validator: (rule:any, value:any, callback:any) => {
-                                  try {
-                                    JSON.parse(value);
-                                    callback();  // Valid JSON
-                                  } catch (e) {
-                                    callback(new Error('Invalid JSON format'));
-                                  }
-                                },
-                                trigger: 'blur',
-                              }]"
-                >
-                  <el-input
-                    class="ml-4"
-                    v-model="item.value"
-                    :placeholder="$t('common.inputPlaceholder')"
-                    type="textarea"
-                  ></el-input>
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </div>
-          <el-form-item v-else>
+            <div v-if="item.source === 'custom'" class="flex">
+              <el-row :gutter="8">
+                <el-col :span="8">
+                  <el-select v-model="item.type" style="width: 85px">
+                    <el-option
+                      v-for="item in typeOptions"
+                      :key="item"
+                      :label="item"
+                      :value="item"
+                    />
+                  </el-select>
+                </el-col>
+                <el-col :span="16">
+                  <el-form-item
+                    v-if="item.type === 'string'"
+                    :prop="'variable_list.' + index + '.value'"
+                    :rules="{
+                      message: t('dynamicsForm.tip.requiredMessage'),
+                      trigger: 'blur',
+                      required: true
+                    }"
+                  >
+                    <el-input
+                      class="ml-4"
+                      v-model="item.value"
+                      :placeholder="$t('common.inputPlaceholder')"
+                      show-word-limit
+                      clearable
+                      @wheel="wheel"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item
+                    v-else-if="item.type === 'num'"
+                    :prop="'variable_list.' + index + '.value'"
+                    :rules="{
+                      message: $t('common.inputPlaceholder'),
+                      trigger: 'blur',
+                      required: true
+                    }"
+                  >
+                    <el-input-number class="ml-4" v-model="item.value"></el-input-number>
+                  </el-form-item>
+                  <el-form-item
+                    v-else-if="item.type === 'json'"
+                    :prop="'variable_list.' + index + '.value'"
+                    :rules="[
+                      {
+                        message: $t('common.inputPlaceholder'),
+                        trigger: 'blur',
+                        required: true
+                      },
+                      {
+                        validator: (rule: any, value: any, callback: any) => {
+                          try {
+                            JSON.parse(value)
+                            callback() // Valid JSON
+                          } catch (e) {
+                            callback(new Error('Invalid JSON format'))
+                          }
+                        },
+                        trigger: 'blur'
+                      }
+                    ]"
+                  >
+                    <el-input
+                      class="ml-4"
+                      v-model="item.value"
+                      :placeholder="$t('common.inputPlaceholder')"
+                      type="textarea"
+                      autosize
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </div>
             <NodeCascader
+              v-else
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
               class="w-full"
@@ -138,7 +144,6 @@
               v-model="item.reference"
             />
           </el-form-item>
-
         </el-card>
       </template>
       <el-button link type="primary" @click="addVariable">

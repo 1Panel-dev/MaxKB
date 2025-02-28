@@ -31,7 +31,6 @@ export default {
     title: '關聯分段',
     selectDocument: '選擇文件',
     placeholder: '按 文件名稱 搜尋',
-    selectParagraph: '選擇分段',
     selectedParagraph: '已選分段',
     count: '個'
   },

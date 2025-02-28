@@ -31,7 +31,6 @@ export default {
     title: '关联分段',
     selectDocument: '选择文档',
     placeholder: '按 文档名称 搜索',
-    selectParagraph: '选择分段',
     selectedParagraph: '已选分段',
     count: '个'
   },

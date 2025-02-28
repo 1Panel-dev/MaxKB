@@ -1,6 +1,7 @@
 export default {
   input_type_list: {
     TextInput: 'Input',
+    PasswordInput: 'Password',
     Slider: 'Slider',
     SwitchInput: 'Switch',
     SingleSelect: 'Single Select',
@@ -96,7 +97,6 @@ export default {
       requiredMessage2: 'and',
       requiredMessage3: 'characters',
       requiredMessage4: 'Text length is a required parameter'
-    },
-    showPassword: 'Show Password'
+    }
   }
 }

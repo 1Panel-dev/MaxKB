@@ -1,5 +1,6 @@
 export default {
   node: 'Node',
+  nodeName: 'Node Name',
   baseComponent: 'Basic',
   nodeSetting: 'Node Settings',
   workflow: 'Workflow',

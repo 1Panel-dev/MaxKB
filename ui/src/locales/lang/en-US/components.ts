@@ -3,5 +3,10 @@ export default {
   quickCreateName: 'document name',
   noData: 'No Data',
   loading: 'Loading',
-  noMore: 'No more！'
+  noMore: 'No more! ',
+  selectParagraph: {
+    title: 'Select Paragraph',
+    error: 'Process only the failed segments',
+    all: 'All Segments'
+  }
 }
