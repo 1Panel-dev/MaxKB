@@ -17,6 +17,7 @@ MaxKB = Max Knowledge Base, it is a chatbot based on Large Language Models (LLM)
 - **Flexible Orchestration**: Equipped with a powerful workflow engine and function library, enabling the orchestration of AI processes to meet the needs of complex business scenarios. 
 - **Seamless Integration**: Facilitates zero-coding rapid integration into third-party business systems, quickly equipping existing systems with intelligent Q&A capabilities to enhance user satisfaction.
 - **Model-Agnostic**: Supports various large models, including private models (such as DeepSeek, Llama, Qwen, etc.) and public models (like OpenAI, Claude, Gemini, etc.).
+- **Multi Modal**: Native support for input and output text, image, audio and video.
 
 ## Quick start
 

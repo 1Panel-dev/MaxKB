@@ -1,6 +1,6 @@
 <template>
   <div class="flex-between mb-16">
-    <h5 class="lighter">{{ $t('chat.userInput') }}</h5>
+    <h5 class="lighter">{{ inputFieldConfig.title }}</h5>
     <div>
       <el-button type="primary" link @click="openChangeTitleDialog">
         <el-icon>

@@ -249,7 +249,7 @@ class FunctionLibSerializer(serializers.Serializer):
                 mk_instance = FlibInstance(application_dict, 'v1')
                 application_pickle = pickle.dumps(mk_instance)
                 response = HttpResponse(content_type='text/plain', content=application_pickle)
-                response['Content-Disposition'] = f'attachment; filename="{function_lib.name}.flib"'
+                response['Content-Disposition'] = f'attachment; filename="{function_lib.name}.fx"'
                 return response
             except Exception as e:
                 return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -440,7 +440,7 @@
       <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
       <!-- 选择知识库 -->
       <SelectDatasetDialog ref="SelectDatasetDialogRef" @refresh="refreshMigrate" />
-      <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" />
+      <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" />
     </div>
     <div class="mul-operation w-full flex" v-if="multipleSelection.length !== 0">
       <el-button :disabled="multipleSelection.length === 0" @click="cancelTaskHandle(1)">

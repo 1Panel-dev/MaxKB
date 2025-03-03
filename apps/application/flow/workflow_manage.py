@@ -337,13 +337,15 @@ class WorkflowManage:
         answer_text = '\n\n'.join(
             '\n\n'.join([a.get('content') for a in answer]) for answer in
             answer_text_list)
+        answer_list = reduce(lambda pre, _n: [*pre, *_n], answer_text_list, [])
         self.work_flow_post_handler.handler(self.params['chat_id'], self.params['chat_record_id'],
                                             answer_text,
                                             self)
         return self.base_to_response.to_block_response(self.params['chat_id'],
                                                        self.params['chat_record_id'], answer_text, True
                                                        , message_tokens, answer_tokens,
-                                                       _status=status.HTTP_200_OK if self.status == 200 else status.HTTP_500_INTERNAL_SERVER_ERROR)
+                                                       _status=status.HTTP_200_OK if self.status == 200 else status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                                       other_params={'answer_list': answer_list})
 
     def run_stream(self, current_node, node_result_future, language='zh'):
         """
