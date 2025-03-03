@@ -179,7 +179,12 @@ const render = (
     const value = formFieldList.value
       .map((item) => {
         if (form_data[item.field] !== undefined) {
-          return { [item.field]: form_data[item.field] }
+          const v: any = item.option_list?.filter(i => i.value_field === form_data[item.field])
+          if (v?.length > 0) {
+            return { [item.field]: form_data[item.field] };
+          } else {
+            return { [item.field]: item.default_value };
+          }
         }
         if (item.show_default_value === true || item.show_default_value === undefined) {
           return { [item.field]: item.default_value }
