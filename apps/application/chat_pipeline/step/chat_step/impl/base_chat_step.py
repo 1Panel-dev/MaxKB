@@ -308,10 +308,10 @@ class BaseChatStep(IChatStep):
                                                                    content, True,
                                                                    request_token, response_token,
                                                                    {'reasoning_content': reasoning_content,
-                                                                    'answer_list': {
+                                                                    'answer_list': [{
                                                                         'content': content,
                                                                         'reasoning_content': reasoning_content
-                                                                    }})
+                                                                    }]})
         except Exception as e:
             all_text = 'Exception:' + str(e)
             write_context(self, manage, 0, 0, all_text)
