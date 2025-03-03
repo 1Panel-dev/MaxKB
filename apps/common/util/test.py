@@ -13,7 +13,7 @@ from django.core import signing
 from django.core.cache import cache
 
 # alg使用的算法
-HEADER = {'typ': 'JWP', 'alg': 'default'}
+HEADER = {'type': 'JWP', 'alg': 'default'}
 TOKEN_KEY = 'solomon_world_token'
 TOKEN_SALT = 'solomonwanc@gmail.com'
 TIME_OUT = 30 * 60
