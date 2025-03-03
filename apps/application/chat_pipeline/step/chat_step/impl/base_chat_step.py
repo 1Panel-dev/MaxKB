@@ -301,7 +301,7 @@ class BaseChatStep(IChatStep):
                 reasoning_content = reasoning_result.get('reasoning_content') + reasoning_result_end.get(
                     'reasoning_content')
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
-                                          chat_result.content, manage, self, padding_problem_text, client_id,
+                                          content, manage, self, padding_problem_text, client_id,
                                           reasoning_content=reasoning_content if reasoning_content_enable else '')
             add_access_num(client_id, client_type, manage.context.get('application_id'))
             return manage.get_base_to_response().to_block_response(str(chat_id), str(chat_record_id),

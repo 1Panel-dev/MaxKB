@@ -135,6 +135,7 @@
       :close-on-press-escape="false"
       :destroy-on-close="true"
       append-to-body
+      @submit.prevent
     >
       <el-form label-position="top" ref="titleFormRef" :model="form">
         <el-form-item

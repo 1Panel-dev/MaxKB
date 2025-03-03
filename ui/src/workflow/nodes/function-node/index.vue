@@ -79,6 +79,7 @@
       </h5>
       <div class="mb-8" v-if="showEditor">
         <CodemirrorEditor
+          :title="$t('views.functionLib.functionForm.form.param.code')"
           v-model="chat_data.code"
           @wheel="wheel"
           style="height: 130px !important"

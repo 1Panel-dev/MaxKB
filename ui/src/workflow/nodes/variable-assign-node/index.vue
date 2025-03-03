@@ -118,6 +118,7 @@
               ]"
             >
               <CodemirrorEditor
+                title="JSON"
                 v-model="item.value"
                 :style="{
                   height: '100px'
