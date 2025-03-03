@@ -105,7 +105,7 @@ const exportFunctionLib = (
   loading?: Ref<boolean>
 ) => {
   return exportFile(
-    name + '.flib',
+    name + '.fx',
     `${prefix}/${id}/export`,
     undefined,
     loading
