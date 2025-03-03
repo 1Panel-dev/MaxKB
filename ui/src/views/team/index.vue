@@ -3,7 +3,7 @@
     <div class="team-manage flex main-calc-height">
       <div class="team-member p-8 border-r">
         <div class="flex-between p-16">
-          <h4>{{$t('views.team.member')}}</h4>
+          <h4>{{ $t('views.team.member') }}</h4>
           <el-button type="primary" link @click="addMember">
             <AppIcon iconName="app-add-users" class="add-user-icon" />
           </el-button>
@@ -29,7 +29,9 @@
                 <div class="flex-between">
                   <div>
                     <span class="mr-8">{{ row.username }}</span>
-                    <el-tag v-if="isManage(row.type)" class="default-tag">{{$t('views.team.manage')}}</el-tag>
+                    <el-tag v-if="isManage(row.type)" class="default-tag">{{
+                      $t('views.team.manage')
+                    }}</el-tag>
                   </div>
                   <div @click.stop style="margin-top: 5px">
                     <el-dropdown trigger="click" v-if="!isManage(row.type)">
@@ -38,9 +40,9 @@
                       </span>
                       <template #dropdown>
                         <el-dropdown-menu>
-                          <el-dropdown-item @click.prevent="deleteMember(row)"
-                            >{{$t('views.team.delete.button')}}</el-dropdown-item
-                          >
+                          <el-dropdown-item @click.prevent="deleteMember(row)">{{
+                            $t('views.team.delete.button')
+                          }}</el-dropdown-item>
                         </el-dropdown-menu>
                       </template>
                     </el-dropdown>
@@ -53,7 +55,7 @@
       </div>
       <div class="permission-setting flex" v-loading="rLoading">
         <div class="team-manage__table">
-          <h4 class="p-24 pb-0 mb-4">{{$t('views.team.permissionSetting')}}</h4>
+          <h4 class="p-24 pb-0 mb-4">{{ $t('views.team.permissionSetting') }}</h4>
           <el-tabs v-model="activeName" class="team-manage__tabs">
             <el-tab-pane
               v-for="(item, index) in settingTags"
@@ -73,7 +75,7 @@
         </div>
 
         <div class="submit-button">
-          <el-button type="primary" @click="submitPermissions">{{ $t('common.save')}}</el-button>
+          <el-button type="primary" @click="submitPermissions">{{ $t('common.save') }}</el-button>
         </div>
       </div>
     </div>
@@ -118,7 +120,9 @@ const settingTags = reactive([
 
 watch(filterText, (val) => {
   if (val) {
-    filterMember.value = memberList.value.filter((v) => v.username.includes(val))
+    filterMember.value = memberList.value.filter((v) =>
+      v.username.toLowerCase().includes(val.toLowerCase())
+    )
   } else {
     filterMember.value = memberList.value
   }
