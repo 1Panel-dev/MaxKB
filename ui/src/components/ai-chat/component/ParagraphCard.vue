@@ -68,7 +68,7 @@ const props = defineProps({
   },
   score: {
     type: Number,
-    default: 0
+    default: null
   }
 })
 const isMetaObject = computed(() => typeof props.data.meta === 'object')
