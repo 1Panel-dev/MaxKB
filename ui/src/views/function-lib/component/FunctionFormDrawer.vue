@@ -134,7 +134,11 @@
       </h4>
 
       <div class="mb-8" v-if="showEditor">
-        <CodemirrorEditor v-model="form.code" @submitDialog="submitCodemirrorEditor" />
+        <CodemirrorEditor
+          :title="$t('views.functionLib.functionForm.form.param.code')"
+          v-model="form.code"
+          @submitDialog="submitCodemirrorEditor"
+        />
       </div>
       <h4 class="title-decoration-1 mb-16 mt-16">
         {{ $t('common.param.outputParam') }}

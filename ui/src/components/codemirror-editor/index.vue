@@ -16,12 +16,7 @@
       </el-button>
     </div>
     <!-- Codemirror 弹出层 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="$t('views.functionLib.functionForm.form.param.code')"
-      append-to-body
-      fullscreen
-    >
+    <el-dialog v-model="dialogVisible" :title="title" append-to-body fullscreen>
       <Codemirror
         v-model="cloneContent"
         :extensions="extensions"
@@ -54,6 +49,7 @@ import FunctionApi from '@/api/function-lib'
 defineOptions({ name: 'CodemirrorEditor' })
 
 const props = defineProps<{
+  title: String
   modelValue: any
 }>()
 const emit = defineEmits(['update:modelValue', 'submitDialog'])

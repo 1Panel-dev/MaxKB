@@ -22,7 +22,7 @@
     <!-- Codemirror 弹出层 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="$t('views.functionLib.functionForm.form.param.code')"
+      :title="$t('dynamicsForm.default.label')"
       append-to-body
       fullscreen
     >
