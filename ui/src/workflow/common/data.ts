@@ -17,17 +17,14 @@ export const startNode = {
         }
       ],
       globalFields: [
+        { label: t('views.applicationWorkflow.nodes.startNode.currentTime'), value: 'time' },
         {
-          value: 'time',
-          label: t('views.applicationWorkflow.nodes.startNode.currentTime')
+          label: t('views.application.applicationForm.form.historyRecord.label'),
+          value: 'history_context'
         },
         {
-          value: 'history_context',
-          label: t('views.application.applicationForm.form.historyRecord.label')
-        },
-        {
-          value: 'chat_id',
-          label: t('chat.chatId')
+          label: t('chat.chatId'),
+          value: 'chat_id'
         }
       ]
     },
