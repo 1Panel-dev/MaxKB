@@ -174,20 +174,25 @@ const isSave = ref(false)
 const showHistory = ref(false)
 const disablePublic = ref(false)
 const currentVersion = ref<any>({})
+const cloneWorkFlow = ref(null)
 
 function back() {
-  MsgConfirm(t('common.tip'), t('views.applicationWorkflow.tip.saveMessage'), {
-    confirmButtonText: t('views.applicationWorkflow.setting.exitSave'),
-    cancelButtonText: t('views.applicationWorkflow.setting.exit'),
-    type: 'warning',
-    distinguishCancelAndClose: true
-  })
-    .then(() => {
-      saveApplication(true, true)
+  if (JSON.stringify(cloneWorkFlow.value) !== JSON.stringify(getGraphData())) {
+    MsgConfirm(t('common.tip'), t('views.applicationWorkflow.tip.saveMessage'), {
+      confirmButtonText: t('views.applicationWorkflow.setting.exitSave'),
+      cancelButtonText: t('views.applicationWorkflow.setting.exit'),
+      type: 'warning',
+      distinguishCancelAndClose: true
     })
-    .catch((action: Action) => {
-      action === 'cancel' && router.push({ path: `/application/${id}/WORK_FLOW/overview` })
-    })
+      .then(() => {
+        saveApplication(true, true)
+      })
+      .catch((action: Action) => {
+        action === 'cancel' && router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+      })
+  } else {
+    router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+  }
 }
 function clickoutsideHistory() {
   if (!disablePublic.value) {
@@ -357,6 +362,7 @@ function getDetail() {
     workflowRef.value?.clearGraphData()
     nextTick(() => {
       workflowRef.value?.render(detail.value.work_flow)
+      cloneWorkFlow.value = getGraphData()
     })
   })
 }
@@ -366,15 +372,20 @@ function saveApplication(bool?: boolean, back?: boolean) {
     work_flow: getGraphData()
   }
   loading.value = back || false
-  application.asyncPutApplication(id, obj).then((res) => {
-    saveTime.value = new Date()
-    if (bool) {
-      MsgSuccess(t('common.saveSuccess'))
-      if (back) {
-        router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+  application
+    .asyncPutApplication(id, obj)
+    .then((res) => {
+      saveTime.value = new Date()
+      if (bool) {
+        MsgSuccess(t('common.saveSuccess'))
+        if (back) {
+          router.push({ path: `/application/${id}/WORK_FLOW/overview` })
+        }
       }
-    }
-  })
+    })
+    .catch(() => {
+      loading.value = false
+    })
 }
 
 /**
