@@ -115,13 +115,17 @@
                 <div class="footer-content flex-between">
                   <div>
                     <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
-                      <el-button text @click.stop="copyFunctionLib(item)">
+                      <el-button text @click.stop="copyFunctionLib(item)"
+                        :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                      >
                         <AppIcon iconName="app-copy"></AppIcon>
                       </el-button>
                     </el-tooltip>
                     <el-divider direction="vertical" />
                     <el-tooltip effect="dark" :content="$t('common.export')" placement="top">
-                      <el-button text @click.stop="exportFunctionLib(item)">
+                      <el-button text @click.stop="exportFunctionLib(item)"
+                        :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                      >
                         <AppIcon iconName="app-export"></AppIcon>
                       </el-button>
                     </el-tooltip>
