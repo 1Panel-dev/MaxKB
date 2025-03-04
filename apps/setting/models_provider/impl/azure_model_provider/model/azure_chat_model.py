@@ -27,6 +27,7 @@ class AzureChatModel(MaxKBBaseModel, AzureChatOpenAI):
 
         return AzureChatModel(
             azure_endpoint=model_credential.get('api_base'),
+            model_name=model_name,
             openai_api_version=model_credential.get('api_version', '2024-02-15-preview'),
             deployment_name=model_credential.get('deployment_name'),
             openai_api_key=model_credential.get('api_key'),
