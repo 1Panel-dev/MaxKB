@@ -472,7 +472,7 @@ class ChatRecordSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
         application_id = serializers.UUIDField(required=True)
         chat_id = serializers.UUIDField(required=True)
-        order_asc = serializers.BooleanField(required=False)
+        order_asc = serializers.BooleanField(required=False, allow_null=True)
 
         def list(self, with_valid=True):
             if with_valid:

@@ -179,7 +179,18 @@ const render = (
     const value = formFieldList.value
       .map((item) => {
         if (form_data[item.field] !== undefined) {
-          return { [item.field]: form_data[item.field] }
+          if (item.value_field && item.option_list && item.option_list.length > 0) {
+            const value_field = item.value_field
+            const find = item.option_list?.find((i) => i[value_field] === form_data[item.field])
+            if (find) {
+              return { [item.field]: form_data[item.field] }
+            }
+            if (item.show_default_value === true || item.show_default_value === undefined) {
+              return { [item.field]: item.default_value }
+            }
+          } else {
+            return { [item.field]: form_data[item.field] }
+          }
         }
         if (item.show_default_value === true || item.show_default_value === undefined) {
           return { [item.field]: item.default_value }
@@ -187,7 +198,6 @@ const render = (
         return {}
       })
       .reduce((x, y) => ({ ...x, ...y }), {})
-
     formValue.value = _.cloneDeep(value)
   }
 }
