@@ -567,7 +567,7 @@ class DataSetSerializers(serializers.ModelSerializer):
         id = serializers.CharField(required=True, error_messages=ErrMessage.char("id"))
         user_id = serializers.UUIDField(required=False, error_messages=ErrMessage.char(_('user id')))
         query_text = serializers.CharField(required=True, error_messages=ErrMessage.char(_('query text')))
-        top_number = serializers.IntegerField(required=True, max_value=100, min_value=1,
+        top_number = serializers.IntegerField(required=True, max_value=10000, min_value=1,
                                               error_messages=ErrMessage.char("top number"))
         similarity = serializers.FloatField(required=True, max_value=2, min_value=0,
                                             error_messages=ErrMessage.char(_('similarity')))
