@@ -142,10 +142,12 @@ class ModelSettingSerializer(serializers.Serializer):
                                                  error_messages=ErrMessage.char(_("No citation segmentation prompt")))
     reasoning_content_enable = serializers.BooleanField(required=False,
                                                         error_messages=ErrMessage.char(_("Thinking process switch")))
-    reasoning_content_start = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=256,
+    reasoning_content_start = serializers.CharField(required=False, allow_null=True, default="<think>",
+                                                    allow_blank=True, max_length=256,
                                                     error_messages=ErrMessage.char(
                                                         _("The thinking process begins to mark")))
-    reasoning_content_end = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=256,
+    reasoning_content_end = serializers.CharField(required=False, allow_null=True, allow_blank=True, default="</think>",
+                                                  max_length=256,
                                                   error_messages=ErrMessage.char(_("End of thinking process marker")))
 
 
