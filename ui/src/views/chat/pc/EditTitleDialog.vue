@@ -75,7 +75,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid) => {
     if (valid) {
       log.asyncPutChatClientLog(applicationId.value, chatId.value, form.value, loading).then(() => {
-        emit('refresh')
+        emit('refresh', chatId.value, form.value.abstract)
         dialogVisible.value = false
       })
     }

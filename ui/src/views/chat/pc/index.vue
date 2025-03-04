@@ -232,8 +232,11 @@ function mouseenter(row: any) {
 function editLogTitle(row: any) {
   EditTitleDialogRef.value.open(row, applicationDetail.value.id)
 }
-function refreshFieldTitle() {
-  getChatLog(applicationDetail.value.id)
+function refreshFieldTitle(chatId: string, abstract: string) {
+  const find = chatLogData.value.find((item: any) => item.id == chatId)
+  if (find) {
+    find.abstract = abstract
+  }
 }
 function deleteLog(row: any) {
   log.asyncDelChatClientLog(applicationDetail.value.id, row.id, left_loading).then(() => {

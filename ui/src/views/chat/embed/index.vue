@@ -181,7 +181,10 @@ function editName(val: string, item: any) {
     }
 
     log.asyncPutChatClientLog(applicationDetail.value.id, item.id, obj, loading).then(() => {
-      getChatLog(applicationDetail.value.id)
+      const find = chatLogData.value.find((item: any) => item.id == item.id)
+      if (find) {
+        find.abstract = val
+      }
       item['writeStatus'] = false
     })
   } else {
