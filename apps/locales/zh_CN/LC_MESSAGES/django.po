@@ -6903,3 +6903,6 @@ msgstr "AI 回复: "
 
 msgid "The network is busy, try again later."
 msgstr "网络繁忙，请稍后再试。"
+
+msgid "Is it ascending order"
+msgstr "是否升序"
