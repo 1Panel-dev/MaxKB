@@ -117,7 +117,7 @@ def valid_model_params_setting(model_id, model_params_setting):
 
 
 class DatasetSettingSerializer(serializers.Serializer):
-    top_n = serializers.FloatField(required=True, max_value=100, min_value=1,
+    top_n = serializers.FloatField(required=True, max_value=10000, min_value=1,
                                    error_messages=ErrMessage.float(_("Reference segment number")))
     similarity = serializers.FloatField(required=True, max_value=1, min_value=0,
                                         error_messages=ErrMessage.float(_("Acquaintance")))
@@ -581,7 +581,7 @@ class ApplicationSerializer(serializers.Serializer):
         id = serializers.CharField(required=True, error_messages=ErrMessage.uuid(_("Application ID")))
         user_id = serializers.UUIDField(required=False, error_messages=ErrMessage.uuid(_("User ID")))
         query_text = serializers.CharField(required=True, error_messages=ErrMessage.char(_("Query text")))
-        top_number = serializers.IntegerField(required=True, max_value=100, min_value=1,
+        top_number = serializers.IntegerField(required=True, max_value=10000, min_value=1,
                                               error_messages=ErrMessage.integer(_("topN")))
         similarity = serializers.FloatField(required=True, max_value=2, min_value=0,
                                             error_messages=ErrMessage.float(_("Relevance")))
