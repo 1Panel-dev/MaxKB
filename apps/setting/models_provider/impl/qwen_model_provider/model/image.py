@@ -7,6 +7,9 @@ from setting.models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
 class QwenVLChatModel(MaxKBBaseModel, BaseChatOpenAI):
+    @staticmethod
+    def is_cache_model():
+        return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
