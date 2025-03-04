@@ -115,6 +115,10 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
                                          'prompt_tokens': response.get('prompt_tokens')}}
     answer = response.get('content', '') or "抱歉，没有查找到相关内容，请重新描述您的问题或提供更多信息。"
     reasoning_content = response.get('reasoning_content', '')
+    answer_list = response.get('answer_list', [])
+    node_variable['application_node_dict'] = {answer.get('real_node_id'): {**answer, 'index': index} for answer, index
+                                              in
+                                              zip(answer_list, range(len(answer_list)))}
     _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 

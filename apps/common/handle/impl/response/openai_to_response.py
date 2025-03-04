@@ -26,7 +26,7 @@ class OpenaiToResponse(BaseToResponse):
             other_params = {}
         data = ChatCompletion(id=chat_record_id, choices=[
             BlockChoice(finish_reason='stop', index=0, chat_id=chat_id,
-                        reasoning_content=other_params.get('reasoning_content', ""),
+                        answer_list=other_params.get('answer_list', ""),
                         message=ChatCompletionMessage(role='assistant', content=content))],
                               created=datetime.datetime.now().second, model='', object='chat.completion',
                               usage=CompletionUsage(completion_tokens=completion_tokens,
