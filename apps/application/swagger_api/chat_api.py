@@ -284,6 +284,11 @@ class ChatRecordApi(ApiMixin):
                                   type=openapi.TYPE_STRING,
                                   required=True,
                                   description=_('Conversation ID')),
+                openapi.Parameter(name='order_asc',
+                                  in_=openapi.IN_QUERY,
+                                  type=openapi.TYPE_BOOLEAN,
+                                  required=False,
+                                  description=_('Is it ascending order')),
                 ]
 
     @staticmethod

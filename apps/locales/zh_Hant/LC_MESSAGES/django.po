@@ -6915,3 +6915,6 @@ msgstr "AI 回覆: "
 
 msgid "The network is busy, try again later."
 msgstr "網絡繁忙，請稍後再試。"
+
+msgid "Is it ascending order"
+msgstr "是否昇冪"
