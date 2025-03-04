@@ -6,6 +6,7 @@
     v-model="dialogVisible"
     style="width: 550px"
     append-to-body
+    destroy-on-close
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >

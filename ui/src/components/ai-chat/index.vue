@@ -417,7 +417,7 @@ const handleScrollTop = ($event: any) => {
   scrollTop.value = $event.scrollTop
   if (
     dialogScrollbar.value.scrollHeight - (scrollTop.value + scrollDiv.value.wrapRef.offsetHeight) <=
-    30
+    40
   ) {
     scorll.value = true
   } else {
