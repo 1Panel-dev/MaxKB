@@ -5,8 +5,9 @@
         <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
           <el-card
             :key="item.value"
-            class="item"
+            class="item break-all"
             shadow="never"
+            style="--el-card-padding: 12px 16px"
             :class="[
               inputDisabled ? 'is-disabled' : '',
               modelValue == item[valueField] ? 'active' : ''
@@ -93,8 +94,8 @@ const option_list = computed(() => {
     color: var(--el-color-primary);
   }
   .item {
+    line-height: 22px;
     cursor: pointer;
-    height: 38px;
     display: flex;
     justify-content: center;
     align-items: center;
