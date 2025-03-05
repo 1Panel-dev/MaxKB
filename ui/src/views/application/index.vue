@@ -180,7 +180,6 @@ import { isWorkFlow } from '@/utils/application'
 import { ValidType, ValidCount } from '@/enums/common'
 import { t } from '@/locales'
 import useStore from '@/stores'
-import { reject } from 'lodash'
 
 const elUploadRef = ref<any>()
 const { application, user, common } = useStore()

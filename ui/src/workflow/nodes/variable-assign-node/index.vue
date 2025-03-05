@@ -9,7 +9,6 @@
       ref="replyNodeFormRef"
       hide-required-asterisk
     >
-    <el-scrollbar max-height="750" @wheel="wheel">
       <template v-for="(item, index) in form_data.variable_list" :key="item.id">
         <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
           <el-form-item :label="$t('views.applicationWorkflow.variable.label')">
@@ -139,7 +138,7 @@
           </el-form-item>
         </el-card>
       </template>
-    </el-scrollbar>
+
       <el-button link type="primary" @click="addVariable">
         <el-icon class="mr-4">
           <Plus />

@@ -377,6 +377,7 @@ function saveApplication(bool?: boolean, back?: boolean) {
     .then((res) => {
       saveTime.value = new Date()
       if (bool) {
+        cloneWorkFlow.value = getGraphData()
         MsgSuccess(t('common.saveSuccess'))
         if (back) {
           router.push({ path: `/application/${id}/WORK_FLOW/overview` })
