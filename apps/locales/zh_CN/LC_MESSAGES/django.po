@@ -4087,7 +4087,7 @@ msgstr "输出最大Token数"
 #: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\image.py:24
 #: .\apps\setting\models_provider\impl\zhipu_model_provider\credential\llm.py:31
 msgid "Specify the maximum number of tokens that the model can generate"
-msgstr "指定模型可以生成的最大令牌数"
+msgstr "指定模型可以生成的最大 tokens 数"
 
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\image.py:50
 #: .\apps\setting\models_provider\impl\aliyun_bai_lian_model_provider\credential\llm.py:44
@@ -4423,7 +4423,7 @@ msgid ""
 "retrieval-augmented generation (RAG). At launch, the model is optimized for "
 "English, but other languages are supported."
 msgstr ""
-"Amazon Titan Text Express 的上下文长度长达 8000 个令牌，因而非常适合各种高级"
+"Amazon Titan Text Express 的上下文长度长达 8000 个 tokens，因而非常适合各种高级"
 "常规语言任务，例如开放式文本生成和对话式聊天，以及检索增强生成（RAG）中的支"
 "持。在发布时，该模型针对英语进行了优化，但也支持其他语言。"
 
@@ -4686,7 +4686,7 @@ msgstr "Phi-3 Mini是Microsoft的3.8B参数，轻量级，最先进的开放模�
 #: .\apps\setting\models_provider\impl\ollama_model_provider\ollama_model_provider.py:167
 msgid ""
 "A high-performance open embedding model with a large token context window."
-msgstr "一个具有大令牌上下文窗口的高性能开放嵌入模型。"
+msgstr "一个具有大 tokens上下文窗口的高性能开放嵌入模型。"
 
 #: .\apps\setting\models_provider\impl\openai_model_provider\credential\tti.py:15
 msgid ""
