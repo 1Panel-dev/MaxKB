@@ -307,11 +307,12 @@ class BaseChatStep(IChatStep):
             return manage.get_base_to_response().to_block_response(str(chat_id), str(chat_record_id),
                                                                    content, True,
                                                                    request_token, response_token,
-                                                                   {'reasoning_content': reasoning_content,
-                                                                    'answer_list': [{
-                                                                        'content': content,
-                                                                        'reasoning_content': reasoning_content
-                                                                    }]})
+                                                                   {
+                                                                       'reasoning_content': reasoning_content if reasoning_content_enable else '',
+                                                                       'answer_list': [{
+                                                                           'content': content,
+                                                                           'reasoning_content': reasoning_content if reasoning_content_enable else ''
+                                                                       }]})
         except Exception as e:
             all_text = 'Exception:' + str(e)
             write_context(self, manage, 0, 0, all_text)
