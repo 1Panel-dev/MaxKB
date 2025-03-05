@@ -9,6 +9,7 @@ export default {
     placeholder: 'Enter username to search'
   },
   delete: {
+    button: 'Remove',
     confirmTitle: 'Confirm removal of member:',
     confirmMessage:
       'Removing the member will revoke their access to knowledge and APP.'
