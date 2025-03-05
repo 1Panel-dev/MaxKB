@@ -9,6 +9,7 @@ export default {
     placeholder: '請輸入使用者名稱搜尋'
   },
   delete: {
+    button: '移除',
     confirmTitle: '是否移除成員：',
     confirmMessage: '移除後將會取消成員擁有之知識庫和應用程式權限。'
   },
