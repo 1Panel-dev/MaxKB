@@ -90,7 +90,7 @@ function deleteApiKey(row: any) {
     `${t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm1')}: ${row.secret_key}?`,
     t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm2'),
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
       confirmButtonClass: 'danger'
     }

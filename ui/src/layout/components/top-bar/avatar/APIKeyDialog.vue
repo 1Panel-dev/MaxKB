@@ -7,9 +7,7 @@
     :close-on-press-escape="false"
   >
     <el-card shadow="never" class="layout-bg mb-16">
-      <el-text type="info" class="color-secondary">{{
-        $t('layout.apiServiceAddress')
-      }}</el-text>
+      <el-text type="info" class="color-secondary">{{ $t('layout.apiServiceAddress') }}</el-text>
       <p style="margin-top: 10px">
         <span class="vertical-middle lighter break-all">
           {{ apiUrl }}
@@ -113,7 +111,7 @@ function deleteApiKey(row: any) {
     `${t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm1')}: ${row.secret_key}?`,
     t(t('views.applicationOverview.appInfo.APIKeyDialog.msgConfirm2')),
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
       confirmButtonClass: 'danger'
     }

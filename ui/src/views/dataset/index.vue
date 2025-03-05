@@ -236,7 +236,7 @@ function deleteDataset(row: any) {
     `${t('views.dataset.delete.confirmTitle')}${row.name} ?`,
     `${t('views.dataset.delete.confirmMessage1')} ${row.application_mapping_count} ${t('views.dataset.delete.confirmMessage2')}`,
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )

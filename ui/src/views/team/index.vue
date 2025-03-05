@@ -180,7 +180,7 @@ function deleteMember(row: TeamMember) {
     t('views.team.delete.confirmMessage'),
 
     {
-      confirmButtonText: t('views.team.delete.button'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )

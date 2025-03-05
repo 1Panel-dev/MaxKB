@@ -219,7 +219,7 @@ function deleteProblem(row: any) {
     `${t('views.problem.delete.confirmTitle')} ${row.content} ?`,
     `${t('views.problem.delete.confirmMessage1')} ${row.paragraph_count} ${t('views.problem.delete.confirmMessage2')}`,
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )
