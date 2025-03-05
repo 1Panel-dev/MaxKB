@@ -6,6 +6,7 @@
     @date：2024/10/16 17:01
     @desc:
 """
+import traceback
 from typing import Dict
 
 from django.utils.translation import gettext as _
@@ -35,6 +36,7 @@ class AliyunBaiLianEmbeddingCredential(BaseForm, BaseModelCredential):
             model: AliyunBaiLianEmbedding = provider.get_model(model_type, model_name, model_credential)
             model.embed_query(_('Hello'))
         except Exception as e:
+            traceback.print_exc()
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

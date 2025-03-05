@@ -1,4 +1,5 @@
 # coding=utf-8
+import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -49,6 +50,7 @@ class AzureOpenAITTSModelCredential(BaseForm, BaseModelCredential):
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
+            traceback.print_exc()
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

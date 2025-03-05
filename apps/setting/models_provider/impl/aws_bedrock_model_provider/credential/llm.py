@@ -1,3 +1,4 @@
+import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -53,6 +54,7 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
         except AppApiException:
             raise
         except Exception as e:
+            traceback.print_exc()
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
                                       gettext(

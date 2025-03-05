@@ -6,6 +6,7 @@
     @date：2024/7/11 18:41
     @desc:
 """
+import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -56,6 +57,7 @@ class TencentVisionModelCredential(BaseForm, BaseModelCredential):
             for chunk in res:
                 print(chunk)
         except Exception as e:
+            traceback.print_exc()
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

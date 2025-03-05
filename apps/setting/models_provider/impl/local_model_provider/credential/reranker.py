@@ -6,6 +6,7 @@
     @date：2024/9/3 14:33
     @desc:
 """
+import traceback
 from typing import Dict
 
 from langchain_core.documents import Document
@@ -35,6 +36,7 @@ class LocalRerankerCredential(BaseForm, BaseModelCredential):
             model: LocalBaseReranker = provider.get_model(model_type, model_name, model_credential)
             model.compress_documents([Document(page_content=gettext('Hello'))], gettext('Hello'))
         except Exception as e:
+            traceback.print_exc()
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

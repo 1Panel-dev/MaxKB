@@ -1,6 +1,7 @@
 # coding=utf-8
 import base64
 import os
+import traceback
 from typing import Dict
 
 from langchain_core.messages import HumanMessage
@@ -55,6 +56,7 @@ class AzureOpenAIImageModelCredential(BaseForm, BaseModelCredential):
             for chunk in res:
                 print(chunk)
         except Exception as e:
+            traceback.print_exc()
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

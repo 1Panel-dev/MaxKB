@@ -6,6 +6,7 @@
     @date：2024/9/9 17:51
     @desc:
 """
+import traceback
 from typing import Dict
 
 from django.utils.translation import gettext as _
@@ -35,6 +36,7 @@ class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
             model: AliyunBaiLianReranker = provider.get_model(model_type, model_name, model_credential)
             model.compress_documents([Document(page_content=_('Hello'))], _('Hello'))
         except Exception as e:
+            traceback.print_exc()
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
