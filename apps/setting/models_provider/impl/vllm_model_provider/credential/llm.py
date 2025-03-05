@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -49,6 +49,7 @@ class VLLMModelCredential(BaseForm, BaseModelCredential):
         try:
             res = model.invoke([HumanMessage(content=gettext('Hello'))])
         except Exception as e:
+            traceback.print_exc()
             raise AppApiException(ValidCode.valid_error.value,
                                   gettext(
                                       'Verification failed, please check whether the parameters are correct: {error}').format(

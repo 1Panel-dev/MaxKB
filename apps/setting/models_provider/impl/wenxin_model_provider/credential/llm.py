@@ -6,6 +6,7 @@
     @date：2024/7/12 10:19
     @desc:
 """
+import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -58,6 +59,7 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
             model.invoke(
                 [HumanMessage(content=gettext('Hello'))])
         except Exception as e:
+            traceback.print_exc()
             raise e
         return True
 

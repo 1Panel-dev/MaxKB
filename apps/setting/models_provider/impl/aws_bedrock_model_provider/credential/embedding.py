@@ -1,3 +1,4 @@
+import traceback
 from typing import Dict
 
 from django.utils.translation import gettext as _
@@ -35,6 +36,7 @@ class BedrockEmbeddingCredential(BaseForm, BaseModelCredential):
         except AppApiException:
             raise
         except Exception as e:
+            traceback.print_exc()
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
                                       _('Verification failed, please check whether the parameters are correct: {error}').format(

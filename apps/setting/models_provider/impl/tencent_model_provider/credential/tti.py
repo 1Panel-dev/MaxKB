@@ -1,4 +1,5 @@
 # coding=utf-8
+import traceback
 
 from django.utils.translation import gettext_lazy as _, gettext
 
@@ -96,6 +97,7 @@ class TencentTTIModelCredential(BaseForm, BaseModelCredential):
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
+            traceback.print_exc()
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
                                       gettext(
