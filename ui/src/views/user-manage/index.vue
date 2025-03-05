@@ -180,7 +180,7 @@ function deleteUserManage(row: any) {
     `${t('views.user.delete.confirmTitle')}${row.username} ?`,
     t('views.user.delete.confirmMessage'),
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )

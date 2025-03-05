@@ -252,7 +252,7 @@ function deleteFunctionLib(row: any) {
     `${t('views.functionLib.delete.confirmTitle')}${row.name} ?`,
     t('views.functionLib.delete.confirmMessage'),
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
       confirmButtonClass: 'danger'
     }

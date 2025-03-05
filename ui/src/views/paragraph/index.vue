@@ -236,7 +236,7 @@ function deleteMulParagraph() {
     `${t('views.document.delete.confirmTitle1')} ${multipleSelection.value.length} ${t('views.document.delete.confirmTitle2')}`,
     t('views.paragraph.delete.confirmMessage'),
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )
@@ -294,7 +294,7 @@ function deleteParagraph(row: any) {
     `${t('views.paragraph.delete.confirmTitle')} ${row.title || '-'} ?`,
     t('views.paragraph.delete.confirmMessage'),
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )

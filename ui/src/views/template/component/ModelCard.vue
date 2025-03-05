@@ -169,7 +169,7 @@ const deleteModel = () => {
     t('views.template.delete.confirmTitle'),
     `${t('views.template.delete.confirmMessage')}${props.model.name} ?`,
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )

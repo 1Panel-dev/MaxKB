@@ -100,7 +100,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       return
     }
     MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }).then(() => {
       if (!keyboardOptions?.enabled) return true

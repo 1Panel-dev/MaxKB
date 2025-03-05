@@ -713,7 +713,7 @@ function deleteMulDocument() {
     `${t('views.document.delete.confirmTitle1')} ${multipleSelection.value.length} ${t('views.document.delete.confirmTitle2')}`,
     t('views.document.delete.confirmMessage'),
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )
@@ -749,7 +749,7 @@ function deleteDocument(row: any) {
     `${t('views.document.delete.confirmTitle3')} ${row.name} ?`,
     `${t('views.document.delete.confirmMessage1')} ${row.paragraph_count} ${t('views.document.delete.confirmMessage2')}`,
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )

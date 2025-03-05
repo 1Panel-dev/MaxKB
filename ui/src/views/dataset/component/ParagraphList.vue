@@ -94,7 +94,7 @@ const deleteHandle = (item: any, cIndex: number) => {
     `${t('views.paragraph.delete.confirmTitle')}${item.title || '-'} ?`,
     t('views.paragraph.delete.confirmMessage'),
     {
-      confirmButtonText: t('common.delete'),
+      confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger'
     }
   )

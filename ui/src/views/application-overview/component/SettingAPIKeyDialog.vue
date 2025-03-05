@@ -39,7 +39,7 @@ import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import overviewApi from '@/api/application-overview'
 import overviewSystemApi from '@/api/system-api-key'
-import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 
 const route = useRoute()
