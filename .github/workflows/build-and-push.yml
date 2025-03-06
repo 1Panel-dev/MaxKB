@@ -52,6 +52,10 @@ jobs:
           swap-storage: true
       - name: Check Disk Space
         run: df -h
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 8
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -116,6 +120,10 @@ jobs:
           swap-storage: true
       - name: Check Disk Space
         run: df -h
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 8
       - name: Checkout
         uses: actions/checkout@v4
         with:
