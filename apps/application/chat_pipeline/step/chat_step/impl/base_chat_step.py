@@ -135,16 +135,20 @@ def event_content(response,
         add_access_num(client_id, client_type, manage.context.get('application_id'))
     except Exception as e:
         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
-        all_text = '异常' + str(e)
+        all_text = 'Exception:' + str(e)
         write_context(step, manage, 0, 0, all_text)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text, client_id)
         add_access_num(client_id, client_type, manage.context.get('application_id'))
-        yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), all_text,
-                                                                     'ai-chat-node',
-                                                                     [], True, 0, 0,
-                                                                     {'node_is_end': True, 'view_type': 'many_view',
-                                                                      'node_type': 'ai-chat-node'})
+        yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), 'ai-chat-node',
+                                                                     [], all_text,
+                                                                     False,
+                                                                     0, 0, {'node_is_end': False,
+                                                                            'view_type': 'many_view',
+                                                                            'node_type': 'ai-chat-node',
+                                                                            'real_node_id': 'ai-chat-node',
+                                                                            'reasoning_content': ''})
+
 
 
 class BaseChatStep(IChatStep):
