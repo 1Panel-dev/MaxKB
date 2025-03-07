@@ -54,5 +54,8 @@ def sync_replace_web_dataset(dataset_id: str, url: str, selector: str):
 def sync_web_document(dataset_id, source_url_list: List[str], selector: str):
     handler = get_sync_web_document_handler(dataset_id)
     for source_url in source_url_list:
-        result = Fork(base_fork_url=source_url, selector_list=selector.split(' ')).fork()
-        handler(source_url, selector, result)
+        try:
+            result = Fork(base_fork_url=source_url, selector_list=selector.split(' ')).fork()
+            handler(source_url, selector, result)
+        except Exception as e:
+            pass
