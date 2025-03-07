@@ -269,10 +269,35 @@ class WorkflowManage:
         self.child_node = child_node
         self.future_list = []
         self.lock = threading.Lock()
+        self.field_list = []
+        self.global_field_list = []
+        self.init_fields()
         if start_node_id is not None:
             self.load_node(chat_record, start_node_id, start_node_data)
         else:
             self.node_context = []
+
+    def init_fields(self):
+        field_list = []
+        global_field_list = []
+        for node in self.flow.nodes:
+            properties = node.properties
+            node_name = properties.get('stepName')
+            node_id = node.id
+            node_config = properties.get('config')
+            if node_config is not None:
+                fields = node_config.get('fields')
+                if fields is not None:
+                    for field in fields:
+                        field_list.append({**field, 'node_id': node_id, 'node_name': node_name})
+                global_fields = node_config.get('globalFields')
+                if global_fields is not None:
+                    for global_field in global_fields:
+                        global_field_list.append({**global_field, 'node_id': node_id, 'node_name': node_name})
+        field_list.sort(key=lambda f: len(f.get('node_name')), reverse=True)
+        global_field_list.sort(key=lambda f: len(f.get('node_name')), reverse=True)
+        self.field_list = field_list
+        self.global_field_list = global_field_list
 
     def append_answer(self, content):
         self.answer += content
@@ -739,23 +764,15 @@ class WorkflowManage:
 
     def reset_prompt(self, prompt: str):
         placeholder = "{}"
-        for node in self.flow.nodes:
-            properties = node.properties
-            node_config = properties.get('config')
-            if node_config is not None:
-                fields = node_config.get('fields')
-                if fields is not None:
-                    for field in fields:
-                        globeLabel = f"{properties.get('stepName')}.{field.get('value')}"
-                        globeValue = f"context.get('{node.id}',{placeholder}).get('{field.get('value', '')}','')"
-                        prompt = prompt.replace(globeLabel, globeValue)
-                global_fields = node_config.get('globalFields')
-                if global_fields is not None:
-                    for field in global_fields:
-                        globeLabel = f"全局变量.{field.get('value')}"
-                        globeLabelNew = f"global.{field.get('value')}"
-                        globeValue = f"context.get('global').get('{field.get('value', '')}','')"
-                        prompt = prompt.replace(globeLabel, globeValue).replace(globeLabelNew, globeValue)
+        for field in self.field_list:
+            globeLabel = f"{field.get('node_name')}.{field.get('value')}"
+            globeValue = f"context.get('{field.get('node_id')}',{placeholder}).get('{field.get('value', '')}','')"
+            prompt = prompt.replace(globeLabel, globeValue)
+        for field in self.global_field_list:
+            globeLabel = f"全局变量.{field.get('value')}"
+            globeLabelNew = f"global.{field.get('value')}"
+            globeValue = f"context.get('global').get('{field.get('value', '')}','')"
+            prompt = prompt.replace(globeLabel, globeValue).replace(globeLabelNew, globeValue)
         return prompt
 
     def generate_prompt(self, prompt: str):
