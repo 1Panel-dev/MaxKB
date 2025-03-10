@@ -26,13 +26,13 @@
             @mouseleave="showEditIcon = false"
           >
             <AppAvatar
-              v-if="isAppIcon(form.icon)"
+              v-if="isAppIcon(form.icon as string)"
               :id="form.id"
               shape="square"
               :size="32"
               style="background: none"
             >
-              <img :src="form.icon" alt="" />
+              <img :src="form.icon as string" alt="" />
             </AppAvatar>
             <AppAvatar
               v-else-if="form.name"
@@ -72,6 +72,7 @@
             @blur="form.desc = form.desc?.trim()"
           />
         </el-form-item>
+<!--
         <el-form-item prop="permission_type">
           <template #label>
             <span>{{ $t('views.functionLib.functionForm.form.permission_type.label') }}</span>
@@ -98,6 +99,7 @@
             </el-row>
           </el-radio-group>
         </el-form-item>
+        -->
       </el-form>
       <div class="flex-between">
         <h4 class="title-decoration-1 mb-16">

@@ -19,6 +19,10 @@ class PermissionType(models.TextChoices):
     PUBLIC = "PUBLIC", '公开'
     PRIVATE = "PRIVATE", "私有"
 
+class FunctionType(models.TextChoices):
+    INTERNAL = "INTERNAL", '内置'
+    PUBLIC = "PUBLIC", "公开"
+
 
 class FunctionLib(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
@@ -34,6 +38,10 @@ class FunctionLib(AppModelMixin):
     is_active = models.BooleanField(default=True)
     permission_type = models.CharField(max_length=20, verbose_name='权限类型', choices=PermissionType.choices,
                                        default=PermissionType.PRIVATE)
+    function_type = models.CharField(max_length=20, verbose_name='函数类型', choices=FunctionType.choices,
+                                       default=FunctionType.PUBLIC)
+    template_id =  models.UUIDField(max_length=128, verbose_name="模版id", null=True, default=None)
+    init_params = models.CharField(max_length=102400, verbose_name="初始化参数", null=True)
 
     class Meta:
         db_table = "function_lib"

@@ -1,5 +1,7 @@
 export default {
   title: '函數庫',
+  internalTitle: '內置函數',
+  added: '已新增',
   createFunction: '建立函數',
   editFunction: '編輯函數',
   copyFunction: '複製函數',

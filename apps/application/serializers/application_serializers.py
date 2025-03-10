@@ -45,7 +45,7 @@ from common.util.file_util import get_file_content
 from dataset.models import DataSet, Document, Image
 from dataset.serializers.common_serializers import list_paragraph, get_embedding_model_by_dataset_id_list
 from embedding.models import SearchMode
-from function_lib.models.function import FunctionLib, PermissionType
+from function_lib.models.function import FunctionLib, PermissionType, FunctionType
 from function_lib.serializers.function_lib_serializer import FunctionLibSerializer, FunctionLibModelSerializer
 from setting.models import AuthOperate, TeamMemberPermission
 from setting.models.model_management import Model
@@ -810,8 +810,10 @@ class ApplicationSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
-            return FunctionLibSerializer.Query(data={'user_id': application.user_id, 'is_active': True}).list(
-                with_valid=True)
+            return FunctionLibSerializer.Query(
+                data={'user_id': application.user_id, 'is_active': True,
+                      'function_type': FunctionType.PUBLIC}
+                ).list(with_valid=True)
 
         def get_function_lib(self, function_lib_id, with_valid=True):
             if with_valid:

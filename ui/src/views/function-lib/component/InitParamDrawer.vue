@@ -11,10 +11,10 @@
       </div>
     </template>
     <div>
-      <div v-if="form.init_field_list.length > 0">
+      <div v-if="form.init_field_list?.length > 0">
         <DynamicsForm
-          v-model="init_form_data"
-          :model="init_form_data"
+          v-model="form.init_params"
+          :model="form.init_params"
           label-position="top"
           require-asterisk-position="right"
           :render_data="form.init_field_list"
@@ -51,10 +51,9 @@ const debugVisible = ref(false)
 const showResult = ref(false)
 const isSuccess = ref(false)
 const result = ref('')
-const init_form_data = ref<any>({})
 
 const form = ref<any>({
-  init_field_list: []
+  init_params: {}
 })
 
 watch(debugVisible, (bool) => {
@@ -63,17 +62,13 @@ watch(debugVisible, (bool) => {
     isSuccess.value = false
     result.value = ''
     form.value = {
-      init_field_list: []
+      init_params: {}
     }
   }
 })
 
 const submit = async () => {
   dynamicsFormRef.value.validate().then(() => {
-    form.value.init_field_list.forEach((item: any) => {
-      item.value = init_form_data.value[item.field]
-    })
-    // console.log(init_form_data.value)
     functionLibApi.putFunctionLib(form.value?.id as string, form.value, loading)
       .then((res) => {
         MsgSuccess(t('common.editSuccess'))
@@ -87,17 +82,15 @@ const open = (data: any) => {
   if (data) {
     form.value = cloneDeep(data)
   }
-  init_form_data.value = form.value.init_field_list
+  const init_params = form.value.init_field_list
     .map((item: any) => {
-      if (item.value) {
-        return { [item.field]: item.value }
-      }
       if (item.show_default_value === false) {
         return { [item.field]: undefined }
       }
       return { [item.field]: item.default_value }
     })
     .reduce((x: any, y: any) => ({ ...x, ...y }), {})
+  form.value.init_params = { ...init_params, ...form.value.init_params }
   debugVisible.value = true
 }
 

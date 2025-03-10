@@ -35,6 +35,7 @@ export default {
   private: '私有',
   paramSetting: '参数设置',
   creator: '创建者',
+  author: '作者',
   debug: '调试',
   required: '必填',
   noData: '暂无数据',
