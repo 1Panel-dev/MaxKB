@@ -113,33 +113,7 @@
               </div>
               <template #footer>
                 <div class="footer-content flex-between">
-                  <div>
-                    <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
-                      <el-button text @click.stop="copyFunctionLib(item)"
-                        :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
-                      >
-                        <AppIcon iconName="app-copy"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
-                    <el-divider direction="vertical" />
-                    <el-tooltip effect="dark" :content="$t('common.export')" placement="top">
-                      <el-button text @click.stop="exportFunctionLib(item)"
-                        :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
-                      >
-                        <AppIcon iconName="app-export"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
-                    <el-divider direction="vertical" />
-                    <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
-                      <el-button
-                        :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
-                        text
-                        @click.stop="deleteFunctionLib(item)"
-                      >
-                        <el-icon><Delete /></el-icon>
-                      </el-button>
-                    </el-tooltip>
-                  </div>
+                  <div></div>
                   <div @click.stop>
                     <el-switch
                       :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
@@ -147,6 +121,50 @@
                       @change="changeState($event, item)"
                       size="small"
                     />
+                    <el-dropdown trigger="click">
+                      <el-button text @click.stop>
+                        <el-icon><MoreFilled /></el-icon>
+                      </el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="copyFunctionLib(item)"
+                          >
+                            <AppIcon iconName="app-copy"></AppIcon>
+                            {{$t('common.copy')}}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="configInitParams(item)"
+                          >
+                            <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                            {{ $t('common.param.initParam') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="configPermission(item)"
+                          >
+                            <AppIcon iconName="app-copy"></AppIcon>
+                            {{ $t('views.functionLib.functionForm.form.permission_type.label') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="exportFunctionLib(item)"
+                          >
+                            <AppIcon iconName="app-export"></AppIcon>
+                            {{$t('common.export')}}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="deleteFunctionLib(item)"
+                          >
+                            <el-icon><Delete /></el-icon>
+                            {{ $t('common.delete') }}
+                          </el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
                   </div>
                 </div>
               </template>
@@ -156,6 +174,8 @@
       </InfiniteScroll>
     </div>
     <FunctionFormDrawer ref="FunctionFormDrawerRef" @refresh="refresh" :title="title" />
+    <PermissionDialog ref="PermissionDialogRef" @refresh="refresh" />
+    <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
   </div>
 </template>
 <script setup lang="ts">
@@ -167,11 +187,15 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import applicationApi from '@/api/application'
 import { t } from '@/locales'
+import PermissionDialog from '@/views/function-lib/component/PermissionDialog.vue'
+import InitParamDrawer from '@/views/function-lib/component/InitParamDrawer.vue'
 const { user } = useStore()
 
 const loading = ref(false)
 
 const FunctionFormDrawerRef = ref()
+const PermissionDialogRef = ref()
+const InitParamDrawerRef = ref()
 
 const functionLibList = ref<any[]>([])
 
@@ -284,6 +308,14 @@ function exportFunctionLib(row: any) {
         })
       }
     })
+}
+
+function configPermission(item: any) {
+  PermissionDialogRef.value.open(item)
+}
+
+function configInitParams(item: any) {
+  InitParamDrawerRef.value.open(item)
 }
 
 function importFunctionLib(file: any) {

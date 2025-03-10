@@ -55,7 +55,8 @@ export default {
   content: '内容',
   param: {
     outputParam: '输出参数',
-    inputParam:'输入参数'
+    inputParam: '输入参数',
+    initParam: '启动参数',
   },
   rename:'重命名'
 }

@@ -137,3 +137,15 @@ class FunctionLibView(APIView):
         def get(self, request: Request, id: str):
             return FunctionLibSerializer.Operate(
                 data={'id': id, 'user_id': request.user.id}).export()
+
+    class EditIcon(APIView):
+        authentication_classes = [TokenAuth]
+        parser_classes = [MultiPartParser]
+
+        @action(methods=['PUT'], detail=False)
+        @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
+        def put(self, request: Request, id: str):
+            return result.success(
+                FunctionLibSerializer.IconOperate(
+                    data={'id': id, 'user_id': request.user.id,
+                          'image': request.FILES.get('file')}).edit(request.data))

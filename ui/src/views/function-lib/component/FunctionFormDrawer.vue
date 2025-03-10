@@ -20,6 +20,39 @@
           :label="$t('views.functionLib.functionForm.form.functionName.label')"
           prop="name"
         >
+          <div v-if="form.id"
+            class="edit-avatar mr-12"
+            @mouseenter="showEditIcon = true"
+            @mouseleave="showEditIcon = false"
+          >
+            <AppAvatar
+              v-if="isAppIcon(form.icon)"
+              :id="form.id"
+              shape="square"
+              :size="32"
+              style="background: none"
+            >
+              <img :src="form.icon" alt="" />
+            </AppAvatar>
+            <AppAvatar
+              v-else-if="form.name"
+              :id="form.id"
+              :name="form.name"
+              pinyinColor
+              shape="square"
+              :size="32"
+            />
+            <AppAvatar
+              v-if="showEditIcon"
+              :id="form.id"
+              shape="square"
+              class="edit-mask"
+              :size="32"
+              @click="openEditAvatar"
+            >
+              <el-icon><EditPen /></el-icon>
+            </AppAvatar>
+          </div>
           <el-input
             v-model="form.name"
             :placeholder="$t('views.functionLib.functionForm.form.functionName.placeholder')"
@@ -66,6 +99,74 @@
           </el-radio-group>
         </el-form-item>
       </el-form>
+      <div class="flex-between">
+        <h4 class="title-decoration-1 mb-16">
+          {{ $t('common.param.initParam') }}
+        </h4>
+        <el-button link type="primary" @click="openAddInitDialog()">
+          <el-icon class="mr-4"><Plus /></el-icon> {{ $t('common.add') }}
+        </el-button>
+      </div>
+      <el-table :data="form.init_field_list" class="mb-16">
+        <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')" >
+          <template #default="{ row }">
+            <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')">
+          <template #default="{ row }">
+            <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">{{
+              $t('dynamicsForm.input_type_list.TextInput')
+            }}</el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.input_type === 'PasswordInput'">{{
+              $t('dynamicsForm.input_type_list.PasswordInput')
+            }}</el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'">{{
+              $t('dynamicsForm.input_type_list.Slider')
+            }}</el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'">{{
+              $t('dynamicsForm.input_type_list.SwitchInput')
+            }}</el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'">{{
+              $t('dynamicsForm.input_type_list.SingleSelect')
+            }}</el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.input_type === 'MultiSelect'">{{
+              $t('dynamicsForm.input_type_list.MultiSelect')
+            }}</el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.input_type === 'RadioCard'">{{
+              $t('dynamicsForm.input_type_list.RadioCard')
+            }}</el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">{{
+              $t('dynamicsForm.input_type_list.DatePicker')
+            }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('common.required')">
+          <template #default="{ row }">
+            <div @click.stop>
+              <el-switch disabled size="small" v-model="row.required" />
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('common.operation')" align="left" width="90">
+          <template #default="{ row, $index }">
+            <span class="mr-4">
+              <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
+                <el-button type="primary" text @click.stop="openAddInitDialog(row, $index)">
+                  <el-icon><EditPen /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </span>
+            <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
+              <el-button type="primary" text @click="deleteInitField($index)">
+                <el-icon>
+                  <Delete />
+                </el-icon>
+              </el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
       <div class="flex-between">
         <h4 class="title-decoration-1 mb-16">
           {{ $t('common.param.inputParam') }}
@@ -163,6 +264,8 @@
 
     <FunctionDebugDrawer ref="FunctionDebugDrawerRef" />
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
+    <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList"/>
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshFunctionLib" />
   </el-drawer>
 </template>
 
@@ -177,6 +280,10 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { cloneDeep } from 'lodash'
 import { PermissionType, PermissionDesc } from '@/enums/model'
 import { t } from '@/locales'
+import UserFieldFormDialog from '@/workflow/nodes/base-node/component/UserFieldFormDialog.vue'
+import {isAppIcon} from "@/utils/application";
+import EditAvatarDialog from "./EditAvatarDialog.vue";
+
 const props = defineProps({
   title: String
 })
@@ -184,6 +291,8 @@ const props = defineProps({
 const emit = defineEmits(['refresh'])
 const FieldFormDialogRef = ref()
 const FunctionDebugDrawerRef = ref()
+const UserFieldFormDialogRef = ref()
+const EditAvatarDialogRef = ref()
 
 const FormRef = ref()
 
@@ -192,12 +301,15 @@ const loading = ref(false)
 const visible = ref(false)
 const showEditor = ref(false)
 const currentIndex = ref<any>(null)
+const showEditIcon = ref(false)
 
 const form = ref<functionLibData>({
   name: '',
   desc: '',
   code: '',
+  icon: '',
   input_field_list: [],
+  init_field_list: [],
   permission_type: 'PRIVATE'
 })
 
@@ -210,7 +322,9 @@ watch(visible, (bool) => {
       name: '',
       desc: '',
       code: '',
+      icon: '',
       input_field_list: [],
+      init_field_list: [],
       permission_type: 'PRIVATE'
     }
     FormRef.value?.clearValidate()
@@ -286,10 +400,44 @@ function refreshFieldList(data: any) {
   currentIndex.value = null
 }
 
+
+function openAddInitDialog(data?: any, index?: any) {
+  if (typeof index !== 'undefined') {
+    currentIndex.value = index
+  }
+
+  UserFieldFormDialogRef.value.open(data)
+}
+
+function refreshInitFieldList(data: any) {
+  if (currentIndex.value !== null) {
+    form.value.init_field_list?.splice(currentIndex.value, 1, data)
+  } else {
+    form.value.init_field_list?.push(data)
+  }
+  currentIndex.value = null
+  UserFieldFormDialogRef.value.close()
+}
+
+function refreshFunctionLib(data: any) {
+  form.value.icon = data
+  // console.log(data)
+}
+
+function deleteInitField(index: any) {
+  form.value.init_field_list?.splice(index, 1)
+}
+
+function openEditAvatar() {
+  EditAvatarDialogRef.value.open(form.value)
+}
+
+
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid: any) => {
     if (valid) {
+      // console.log(form.value)
       if (isEdit.value) {
         functionLibApi.putFunctionLib(form.value?.id as string, form.value, loading).then((res) => {
           MsgSuccess(t('common.editSuccess'))
