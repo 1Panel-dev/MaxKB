@@ -16,6 +16,7 @@ from application.flow.i_step_node import NodeResult
 from application.flow.step_node.function_lib_node.i_function_lib_node import IFunctionLibNode
 from common.exception.app_exception import AppApiException
 from common.util.function_code import FunctionExecutor
+from common.util.rsa_util import rsa_long_decrypt
 from function_lib.models.function import FunctionLib
 from smartdoc.const import CONFIG
 
@@ -107,8 +108,11 @@ class BaseFunctionLibNodeNode(IFunctionLibNode):
                                              ), **field}
                    for field in
                    function_lib.input_field_list]}
+
         self.context['params'] = params
-        result = function_executor.exec_code(function_lib.code, params)
+        # 合并初始化参数
+        all_params = json.loads(rsa_long_decrypt(function_lib.init_params)) | params
+        result = function_executor.exec_code(function_lib.code, all_params)
         return NodeResult({'result': result}, {}, _write_context=write_context)
 
     def get_details(self, index: int, **kwargs):
