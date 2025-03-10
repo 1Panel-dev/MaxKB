@@ -111,11 +111,8 @@ const onChange = (file: any) => {
 
 function submit() {
   if (radioType.value === 'default') {
-    // application.asyncPutApplication(props.id as string, { icon: defaultIcon }, loading).then((res: any) => {
-    //   emit('refresh')
-    //   MsgSuccess(t('views.applicationOverview.appInfo.EditAvatarDialog.setSuccess'))
-    //   dialogVisible.value = false
-    // })
+    emit('refresh', '/ui/favicon.ico')
+    dialogVisible.value = false
   } else if (radioType.value === 'custom' && iconFile.value) {
     let fd = new FormData()
     fd.append('file', iconFile.value.raw)

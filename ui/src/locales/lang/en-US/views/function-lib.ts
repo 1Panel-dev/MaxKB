@@ -1,5 +1,7 @@
 export default {
   title: 'Function',
+  internalTitle: 'Internal Function',
+  added: 'Added',
   createFunction: 'Create Function',
   editFunction: 'Edit Function',
   copyFunction: 'Copy Function',

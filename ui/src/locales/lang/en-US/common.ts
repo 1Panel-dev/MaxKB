@@ -35,6 +35,7 @@ export default {
   private: 'Private',
   paramSetting: 'Parameter Settings',
   creator: 'Creator',
+  author: 'Author',
   debug: 'Debug',
   required: 'Required',
   noData: 'No data',
