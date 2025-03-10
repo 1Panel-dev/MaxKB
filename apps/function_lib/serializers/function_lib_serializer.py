@@ -10,23 +10,23 @@ import json
 import pickle
 import re
 import uuid
-from typing import List
 
 from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
-from common.field.common import UploadedFileField
+from common.field.common import UploadedFileField, UploadedImageField
 from common.response import result
 from common.util.field_message import ErrMessage
 from common.util.function_code import FunctionExecutor
+from dataset.models import Image
 from function_lib.models.function import FunctionLib
 from smartdoc.const import CONFIG
-from django.utils.translation import gettext_lazy as _
 
 function_executor = FunctionExecutor(CONFIG.get('SANDBOX'))
 
@@ -39,7 +39,7 @@ class FlibInstance:
 class FunctionLibModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = FunctionLib
-        fields = ['id', 'name', 'desc', 'code', 'input_field_list', 'permission_type', 'is_active', 'user_id',
+        fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list','init_field_list', 'permission_type', 'is_active', 'user_id',
                   'create_time', 'update_time']
 
 
@@ -65,6 +65,7 @@ class DebugField(serializers.Serializer):
 class DebugInstance(serializers.Serializer):
     debug_field_list = DebugField(required=True, many=True)
     input_field_list = FunctionLibInputField(required=True, many=True)
+    init_field_list = serializers.ListField(required=False, default=list)
     code = serializers.CharField(required=True, error_messages=ErrMessage.char(_('function content')))
 
 
@@ -80,6 +81,8 @@ class EditFunctionLib(serializers.Serializer):
 
     input_field_list = FunctionLibInputField(required=False, many=True)
 
+    init_field_list = serializers.ListField(required=False, default=list)
+
     is_active = serializers.BooleanField(required=False, error_messages=ErrMessage.char(_('Is active')))
 
 
@@ -92,6 +95,8 @@ class CreateFunctionLib(serializers.Serializer):
     code = serializers.CharField(required=True, error_messages=ErrMessage.char(_('function content')))
 
     input_field_list = FunctionLibInputField(required=True, many=True)
+
+    init_field_list = serializers.ListField(required=False, default=list)
 
     permission_type = serializers.CharField(required=True, error_messages=ErrMessage.char(_('permission')), validators=[
         validators.RegexValidator(regex=re.compile("^PUBLIC|PRIVATE$"),
@@ -148,6 +153,7 @@ class FunctionLibSerializer(serializers.Serializer):
                                        code=instance.get('code'),
                                        user_id=self.data.get('user_id'),
                                        input_field_list=instance.get('input_field_list'),
+                                       init_field_list=instance.get('init_field_list'),
                                        permission_type=instance.get('permission_type'),
                                        is_active=instance.get('is_active', True))
             function_lib.save()
@@ -163,12 +169,16 @@ class FunctionLibSerializer(serializers.Serializer):
             input_field_list = debug_instance.get('input_field_list')
             code = debug_instance.get('code')
             debug_field_list = debug_instance.get('debug_field_list')
+            init_field_list = debug_instance.get('init_field_list')
+            init_params = {field.get('field'): field.get('value') if field.get('value', None) is not None else field.get('default_value') for field in init_field_list}
             params = {field.get('name'): self.convert_value(field.get('name'), field.get('value'), field.get('type'),
                                                             field.get('is_required'))
                       for field in
                       [{'value': self.get_field_value(debug_field_list, field.get('name'), field.get('is_required')),
                         **field} for field in
                        input_field_list]}
+            # 合并初始化参数
+            params = init_params | params
             return function_executor.exec_code(code, params)
 
         @staticmethod
@@ -224,7 +234,7 @@ class FunctionLibSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 EditFunctionLib(data=instance).is_valid(raise_exception=True)
-            edit_field_list = ['name', 'desc', 'code', 'input_field_list', 'permission_type', 'is_active']
+            edit_field_list = ['name', 'desc', 'code', 'input_field_list', 'init_field_list', 'permission_type', 'is_active']
             edit_dict = {field: instance.get(field) for field in edit_field_list if (
                     field in instance and instance.get(field) is not None)}
             QuerySet(FunctionLib).filter(id=self.data.get('id')).update(**edit_dict)
@@ -278,3 +288,22 @@ class FunctionLibSerializer(serializers.Serializer):
                                              is_active=function_lib.get('is_active'))
             function_lib_model.save()
             return True
+
+    class IconOperate(serializers.Serializer):
+        id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("function ID")))
+        user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
+        image = UploadedImageField(required=True, error_messages=ErrMessage.image(_("picture")))
+
+        def edit(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            functionLib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
+            if functionLib is None:
+                raise AppApiException(500, _('Function does not exist'))
+            image_id = uuid.uuid1()
+            image = Image(id=image_id, image=self.data.get('image').read(), image_name=self.data.get('image').name)
+            image.save()
+            functionLib.icon = f'/api/image/{image_id}'
+            functionLib.save()
+
+            return functionLib.icon
