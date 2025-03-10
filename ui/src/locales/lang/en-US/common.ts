@@ -52,7 +52,8 @@ export default {
   },
   param: {
     outputParam: 'Output Parameters',
-    inputParam: 'Input Parameters'
+    inputParam: 'Input Parameters',
+    initParam: 'Startup Parameters',
   },
 
   inputPlaceholder: 'Please input',

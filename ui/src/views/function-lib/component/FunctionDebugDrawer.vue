@@ -11,6 +11,22 @@
       </div>
     </template>
     <div>
+      <div v-if="form.init_field_list.length > 0">
+        <h4 class="title-decoration-1 mb-16">
+          {{ $t('common.param.initParam') }}
+        </h4>
+        <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
+           <DynamicsForm
+            v-model="init_form_data"
+            :model="init_form_data"
+            label-position="top"
+            require-asterisk-position="right"
+            :render_data="form.init_field_list"
+            ref="dynamicsFormRef"
+          >
+          </DynamicsForm>
+        </el-card>
+      </div>
       <div v-if="form.debug_field_list.length > 0" class="mb-16">
         <h4 class="title-decoration-1 mb-16">
           {{ $t('common.param.inputParam') }}
@@ -95,6 +111,7 @@
 import { ref, reactive, watch } from 'vue'
 import functionLibApi from '@/api/function-lib'
 import type { FormInstance } from 'element-plus'
+import DynamicsForm from '@/components/dynamics-form/index.vue'
 
 const FormRef = ref()
 const loading = ref(false)
@@ -102,11 +119,13 @@ const debugVisible = ref(false)
 const showResult = ref(false)
 const isSuccess = ref(false)
 const result = ref('')
+const init_form_data = ref<any>({})
 
 const form = ref<any>({
   debug_field_list: [],
   code: '',
-  input_field_list: []
+  input_field_list: [],
+  init_field_list: []
 })
 
 watch(debugVisible, (bool) => {
@@ -117,7 +136,8 @@ watch(debugVisible, (bool) => {
     form.value = {
       debug_field_list: [],
       code: '',
-      input_field_list: []
+      input_field_list: [],
+      init_field_list: []
     }
   }
 })
@@ -150,6 +170,7 @@ const open = (data: any) => {
   }
   form.value.code = data.code
   form.value.input_field_list = data.input_field_list
+  form.value.init_field_list = data.init_field_list
   debugVisible.value = true
 }
 

@@ -29,6 +29,8 @@ class FunctionLib(AppModelMixin):
     input_field_list = ArrayField(verbose_name="输入字段列表",
                                   base_field=models.JSONField(verbose_name="输入字段", default=dict)
                                   , default=list)
+    init_field_list = models.JSONField(verbose_name="启动字段列表", default=list)
+    icon = models.CharField(max_length=256, verbose_name="函数库icon", default="/ui/favicon.ico")
     is_active = models.BooleanField(default=True)
     permission_type = models.CharField(max_length=20, verbose_name='权限类型', choices=PermissionType.choices,
                                        default=PermissionType.PRIVATE)
