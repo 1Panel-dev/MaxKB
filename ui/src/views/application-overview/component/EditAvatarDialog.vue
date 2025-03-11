@@ -121,7 +121,7 @@ function submit() {
   if (radioType.value === 'default') {
     application.asyncPutApplication(id as string, { icon: defaultIcon }, loading).then((res) => {
       emit('refresh')
-      MsgSuccess(t('views.applicationOverview.appInfo.EditAvatarDialog.setSuccess'))
+      MsgSuccess(t('common.saveSuccess'))
       dialogVisible.value = false
     })
   } else if (radioType.value === 'custom' && iconFile.value) {
@@ -129,7 +129,7 @@ function submit() {
     fd.append('file', iconFile.value.raw)
     overviewApi.putAppIcon(id as string, fd, loading).then((res: any) => {
       emit('refresh')
-      MsgSuccess(t('views.applicationOverview.appInfo.EditAvatarDialog.setSuccess'))
+      MsgSuccess(t('common.saveSuccess'))
       dialogVisible.value = false
     })
   } else {
