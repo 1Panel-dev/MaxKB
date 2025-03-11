@@ -100,6 +100,7 @@ function refreshFieldList(data: any) {
   onDragHandle()
 }
 
+// 表格排序拖拽
 function onDragHandle() {
   if (!tableRef.value) return
 

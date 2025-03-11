@@ -69,6 +69,8 @@
             class="border"
             v-if="form_data.form_field_list.length > 0"
             :data="form_data.form_field_list"
+            ref="tableRef"
+            row-key="field"
           >
             <el-table-column
               prop="field"
@@ -151,9 +153,11 @@ import { ref, onMounted, computed } from 'vue'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import { MsgError } from '@/utils/message'
 import { set, cloneDeep } from 'lodash'
+import Sortable from 'sortablejs'
 import { t } from '@/locales'
 const props = defineProps<{ nodeModel: any }>()
 const formNodeFormRef = ref<FormInstance>()
+const tableRef = ref()
 const editFormField = (form_field_data: any, field_index: number) => {
   const _value = form_data.value.form_field_list.map((item: any, index: number) => {
     if (field_index === index) {
@@ -185,6 +189,7 @@ const sync_form_field_list = () => {
   ]
   set(props.nodeModel.properties.config, 'fields', fields)
   props.nodeModel.clear_next_node_field(false)
+  onDragHandle()
 }
 const addFormCollectRef = ref<InstanceType<typeof AddFormCollect>>()
 const editFormCollectRef = ref<InstanceType<typeof EditFormCollect>>()
@@ -242,6 +247,30 @@ const validate = () => {
 }
 function submitDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'form_content_format', val)
+}
+
+// 表格排序拖拽
+function onDragHandle() {
+  if (!tableRef.value) return
+
+  // 获取表格的 tbody DOM 元素
+  const wrapper = tableRef.value.$el as HTMLElement
+  const tbody = wrapper.querySelector('.el-table__body-wrapper tbody')
+  if (!tbody) return
+  // 初始化 Sortable
+  Sortable.create(tbody as HTMLElement, {
+    animation: 150,
+    ghostClass: 'ghost-row',
+    onEnd: (evt) => {
+      if (evt.oldIndex === undefined || evt.newIndex === undefined) return
+      // 更新数据顺序
+      const items = [...form_data.value.form_field_list]
+      const [movedItem] = items.splice(evt.oldIndex, 1)
+      items.splice(evt.newIndex, 0, movedItem)
+      form_data.value.form_field_list = items
+      sync_form_field_list()
+    }
+  })
 }
 onMounted(() => {
   set(props.nodeModel, 'validate', validate)
