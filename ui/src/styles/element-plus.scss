@@ -7,6 +7,7 @@
   --el-color-info: #8f959e !important;
   --el-disabled-bg-color: #eff0f1 !important;
   --el-text-color-primary: #1f2329;
+  --el-font-line-height-primary: 22px;
 }
 
 .el-button {
@@ -134,7 +135,7 @@
 }
 .el-message-box__headerbtn {
   right: 10px;
-  top: 15px;
+  top: 16px;
   .el-message-box__close {
     font-size: 20px;
   }
@@ -267,7 +268,7 @@
 }
 
 .el-select__wrapper.is-disabled {
-  background-color: var(--el-disabled-bg-color)!important;
+  background-color: var(--el-disabled-bg-color) !important;
 }
 .el-select__placeholder {
   font-weight: 400;
@@ -350,7 +351,7 @@
 }
 
 .radio_content .is-disabled {
-  background-color: var(--el-disabled-bg-color)!important;;
+  background-color: var(--el-disabled-bg-color) !important;
 }
 
 .el-input-number.is-controls-right .el-input__wrapper {

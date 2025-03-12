@@ -37,7 +37,10 @@
     </el-row>
   </div>
 
-  <div class="border-t color-secondary flex-between mt-12" style="padding-top: 12px">
+  <div
+    class="border-t color-secondary flex-between mt-12"
+    style="padding-top: 12px; padding-bottom: 8px"
+  >
     <div>
       <span class="mr-8">
         {{ $t('chat.KnowledgeSource.consume') }}: {{ data?.message_tokens + data?.answer_tokens }}
