@@ -121,7 +121,8 @@
                 title="JSON"
                 v-model="item.value"
                 :style="{
-                  height: '100px'
+                  height: '100px',
+                  width: '155px'
                 }"
                 @submitDialog="(val: string) => (form_data.variable_list[index].value = val)"
               />

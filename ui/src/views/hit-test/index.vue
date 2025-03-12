@@ -24,10 +24,14 @@
               v-if="first"
               :image="emptyImg"
               :description="$t('views.application.hitTest.emptyMessage1')"
+              style="padding-top: 160px"
+              :image-size="125"
             />
             <el-empty
               v-else-if="paragraphDetail.length == 0"
               :description="$t('views.application.hitTest.emptyMessage2')"
+              style="padding-top: 160px"
+              :image-size="125"
             />
             <el-row v-else>
               <el-col
@@ -385,7 +389,7 @@ onMounted(() => {})
   }
 
   .hit-test-height {
-    height: calc(var(--app-main-height) - 170px);
+    height: calc(var(--app-main-height) - 135px);
   }
   .document-card {
     height: 210px;
