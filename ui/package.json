@@ -22,7 +22,7 @@
     "@vavt/cm-extension": "^1.6.0",
     "@vueuse/core": "^10.9.0",
     "@wecom/jssdk": "^2.1.0",
-    "axios": "^0.28.0",
+    "axios": "^1.8.3",
     "codemirror": "^6.0.1",
     "cropperjs": "^1.6.2",
     "dingtalk-jsapi": "^2.15.6",
