@@ -25,6 +25,7 @@
     "axios": "^0.28.0",
     "codemirror": "^6.0.1",
     "cropperjs": "^1.6.2",
+    "dingtalk-jsapi": "^2.15.6",
     "echarts": "^5.5.0",
     "element-plus": "^2.9.1",
     "file-saver": "^2.0.5",

@@ -123,7 +123,7 @@ const initActive = async () => {
 watch(
   () => props.config,
   (newConfig) => {
-    if (newConfig.app_secret && newConfig.app_key && newConfig.corp_id) {
+    if (newConfig.app_key && newConfig.corp_id) {
       isConfigReady.value = true
       initActive()
     }

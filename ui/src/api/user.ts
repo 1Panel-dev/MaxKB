@@ -162,6 +162,10 @@ const getQrType: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) =>
   return get('qr_type', undefined, loading)
 }
 
+const getQrSource: (loading?: Ref<boolean>) => Promise<Result<any>> = (loading) => {
+  return get('qr_type/source', undefined, loading)
+}
+
 const getDingCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
   loading
@@ -169,11 +173,24 @@ const getDingCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<
   return get('dingtalk', { code }, loading)
 }
 
+const getDingOauth2Callback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  code,
+  loading
+) => {
+  return get('dingtalk/oauth2', { code }, loading)
+}
+
 const getWecomCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
   loading
 ) => {
   return get('wecom', { code }, loading)
+}
+const getlarkCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  code,
+  loading
+) => {
+  return get('feishu/oauth2', { code }, loading)
 }
 
 /**
@@ -206,5 +223,8 @@ export default {
   getDingCallback,
   getQrType,
   getWecomCallback,
-  postLanguage
+  postLanguage,
+  getDingOauth2Callback,
+  getlarkCallback,
+  getQrSource
 }

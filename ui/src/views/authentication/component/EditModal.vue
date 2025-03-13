@@ -174,6 +174,7 @@ const open = async (platform: Platform) => {
         app_secret: currentPlatform.config.app_secret,
         callback_url: defaultCallbackUrl
       }
+      currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/dingtalk`
       break
     case 'lark':
       currentPlatform.config.callback_url = `${defaultCallbackUrl}/api/feishu`

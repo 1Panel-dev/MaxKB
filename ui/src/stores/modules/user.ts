@@ -143,8 +143,22 @@ const useUserStore = defineStore({
         return this.profile()
       })
     },
+    async dingOauth2Callback(code: string) {
+      return UserApi.getDingOauth2Callback(code).then((ok) => {
+        this.token = ok.data
+        localStorage.setItem('token', ok.data)
+        return this.profile()
+      })
+    },
     async wecomCallback(code: string) {
       return UserApi.getWecomCallback(code).then((ok) => {
+        this.token = ok.data
+        localStorage.setItem('token', ok.data)
+        return this.profile()
+      })
+    },
+    async larkCallback(code: string) {
+      return UserApi.getlarkCallback(code).then((ok) => {
         this.token = ok.data
         localStorage.setItem('token', ok.data)
         return this.profile()
@@ -164,6 +178,11 @@ const useUserStore = defineStore({
     },
     async getQrType() {
       return UserApi.getQrType().then((ok) => {
+        return ok.data
+      })
+    },
+    async getQrSource() {
+      return UserApi.getQrSource().then((ok) => {
         return ok.data
       })
     },

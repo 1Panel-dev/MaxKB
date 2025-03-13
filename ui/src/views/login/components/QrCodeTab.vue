@@ -17,6 +17,7 @@
 import { onMounted, ref, defineAsyncComponent } from 'vue'
 
 import platformApi from '@/api/platform-source'
+import useStore from '@/stores'
 
 interface Tab {
   key: string
@@ -42,11 +43,10 @@ const activeKey = ref('')
 const allConfigs = ref<PlatformConfig[]>([])
 const config = ref<Config>({ app_key: '', app_secret: '' })
 // const logoUrl = ref('')
-
+const { user } = useStore()
 async function getPlatformInfo() {
   try {
-    const res = await platformApi.getPlatformInfo()
-    return res.data
+    return await user.getQrSource()
   } catch (error) {
     return []
   }

@@ -36,9 +36,9 @@
           </div>
         </el-form>
 
-        <el-button size="large" type="primary" class="w-full" @click="login">{{
-          $t('views.login.buttons.login')
-        }}</el-button>
+        <el-button size="large" type="primary" class="w-full" @click="login"
+          >{{ $t('views.login.buttons.login') }}
+        </el-button>
         <div class="operate-container flex-between mt-12">
           <!-- <el-button class="register" @click="router.push('/register')" link type="primary">
           注册
@@ -103,15 +103,17 @@
 <script setup lang="ts">
 import { onMounted, ref, onBeforeMount } from 'vue'
 import type { LoginRequest } from '@/api/type/user'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import useStore from '@/stores'
 import authApi from '@/api/auth-setting'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 
 import { t, getBrowserLang } from '@/locales'
 import QrCodeTab from '@/views/login/components/QrCodeTab.vue'
 import { useI18n } from 'vue-i18n'
+import * as dd from 'dingtalk-jsapi'
+import { loadScript } from '@/utils/utils'
 const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
 const { user } = useStore()
@@ -143,11 +145,14 @@ const modeList = ref<string[]>([''])
 const QrList = ref<any[]>([''])
 const loginMode = ref('')
 const showQrCodeTab = ref(false)
+
 interface qrOption {
   key: string
   value: string
 }
+
 const orgOptions = ref<qrOption[]>([])
+
 function redirectAuth(authType: string) {
   if (authType === 'LDAP' || authType === '') {
     return
@@ -265,6 +270,83 @@ onBeforeMount(() => {
       loading.value = false
     }
   })
+})
+declare const window: any
+
+onMounted(() => {
+  const route = useRoute()
+  const currentUrl = ref(route.fullPath)
+  const params = new URLSearchParams(currentUrl.value.split('?')[1])
+  const client = params.get('client')
+
+  const handleDingTalk = () => {
+    const code = params.get('corpId')
+    if (code) {
+      dd.runtime.permission.requestAuthCode({ corpId: code }).then((res) => {
+        console.log('DingTalk client request success:', res)
+        user.dingOauth2Callback(res.code).then(() => {
+          router.push({ name: 'home' })
+        })
+      })
+    }
+  }
+
+  const handleLark = () => {
+    const appId = params.get('appId')
+    const callRequestAuthCode = () => {
+      window.tt?.requestAuthCode({
+        appId: appId,
+        success: (res: any) => {
+          user.larkCallback(res.code).then(() => {
+            router.push({ name: 'home' })
+          })
+        },
+        fail: (error: any) => {
+          MsgError(error)
+        }
+      })
+    }
+
+    loadScript('https://lf-scm-cn.feishucdn.com/lark/op/h5-js-sdk-1.5.35.js', {
+      jsId: 'lark-sdk',
+      forceReload: true
+    })
+      .then(() => {
+        if (window.tt) {
+          window.tt.requestAccess({
+            appID: appId,
+            scopeList: [],
+            success: (res: any) => {
+              user.larkCallback(res.code).then(() => {
+                router.push({ name: 'home' })
+              })
+            },
+            fail: (error: any) => {
+              const { errno } = error
+              if (errno === 103) {
+                callRequestAuthCode()
+              }
+            }
+          })
+        } else {
+          callRequestAuthCode()
+        }
+      })
+      .catch((error) => {
+        console.error('SDK 加载失败:', error)
+      })
+  }
+
+  switch (client) {
+    case 'dingtalk':
+      handleDingTalk()
+      break
+    case 'lark':
+      handleLark()
+      break
+    default:
+      break
+  }
 })
 </script>
 <style lang="scss" scope>
