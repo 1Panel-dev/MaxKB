@@ -87,7 +87,7 @@ import { set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { ref, computed, onMounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
-import { loopBodyNode } from '@/workflow/common/data'
+import { loopBodyNode, loopStartNode } from '@/workflow/common/data'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 const props = defineProps<{ nodeModel: any }>()
 
@@ -131,11 +131,15 @@ onMounted(() => {
   set(props.nodeModel, 'validate', validate)
   const nodeOutgoingNode = props.nodeModel.graphModel.getNodeOutgoingNode(props.nodeModel.id)
   if (!nodeOutgoingNode.some((item: any) => item.type == loopBodyNode.type)) {
+    let workflow = { nodes: [loopStartNode], edges: [] }
+    if (props.nodeModel.properties.node_data.loop_body) {
+      workflow = props.nodeModel.properties.node_data.loop_body
+    }
     const nodeModel = props.nodeModel.graphModel.addNode({
       type: loopBodyNode.type,
       properties: {
         ...loopBodyNode.properties,
-        workflow: props.nodeModel.properties.node_data.loop_body,
+        workflow: workflow,
         loop_node_id: props.nodeModel.id
       },
       x: props.nodeModel.x,

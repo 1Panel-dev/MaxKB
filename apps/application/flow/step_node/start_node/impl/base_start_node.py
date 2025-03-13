@@ -64,7 +64,9 @@ class BaseStartStepNode(IStarNode):
             'question': question,
             'image': self.workflow_manage.image_list,
             'document': self.workflow_manage.document_list,
-            'audio': self.workflow_manage.audio_list
+            'audio': self.workflow_manage.audio_list,
+            **self.workflow_manage.start_data
+
         }
         return NodeResult(node_variable, workflow_variable)
 

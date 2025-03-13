@@ -239,9 +239,11 @@ class WorkflowManage:
                  document_list=None,
                  audio_list=None,
                  start_node_id=None,
-                 start_node_data=None, chat_record=None, child_node=None):
+                 start_node_data=None, chat_record=None, child_node=None, start_data=None):
         if form_data is None:
             form_data = {}
+        if start_data is None:
+            start_data = {}
         if image_list is None:
             image_list = []
         if document_list is None:
@@ -272,6 +274,7 @@ class WorkflowManage:
         self.field_list = []
         self.global_field_list = []
         self.init_fields()
+        self.start_data = start_data
         if start_node_id is not None:
             self.load_node(chat_record, start_node_id, start_node_data)
         else:

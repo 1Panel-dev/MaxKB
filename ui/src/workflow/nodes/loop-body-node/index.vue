@@ -79,6 +79,10 @@ const renderGraphData = (data?: any) => {
     lf.value.graphModel.eventCenter.on('history:change', (data: any) => {
       set(props.nodeModel.properties, 'workflow', lf.value.getGraphData())
     })
+
+    lf.value.graphModel.eventCenter.on('loop:change', (data: any) => {
+      console.log('xx')
+    })
     setTimeout(() => {
       lf.value?.fitView()
     }, 500)

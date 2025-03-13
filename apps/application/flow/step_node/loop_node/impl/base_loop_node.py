@@ -32,7 +32,9 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     @param node:               节点
     @param workflow:           工作流管理器
     """
+
     response = node_variable.get('result')
+    workflow_manage = node_variable.get('workflow_manage')
     answer = ''
     reasoning_content = ''
     for chunk in response:
@@ -42,7 +44,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         answer += content_chunk
         yield {'content': content_chunk,
                'reasoning_content': reasoning_content_chunk}
-
+    runtime_details = workflow_manage.get_runtime_details()
     _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
@@ -69,28 +71,53 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 
-def loop_number(number, loop_body):
-    """
-    指定次数循环
-    @return:
-    """
-    pass
+def loop_number(number: int, loop_body, workflow_manage_new_instance, workflow):
+    loop_global_data = {}
+    for index in range(number):
+        """
+        指定次数循环
+        @return:
+        """
+        instance = workflow_manage_new_instance({'index': index}, loop_global_data)
+        response = instance.stream()
+        answer = ''
+        reasoning_content = ''
+        for chunk in response:
+            content_chunk = chunk.get('content', '')
+            reasoning_content_chunk = chunk.get('reasoning_content', '')
+            reasoning_content += reasoning_content_chunk
+            answer += content_chunk
+            yield chunk
+        loop_global_data = instance.context
 
 
-def loop_array(array, loop_body):
-    """
-    循环数组
-    @return:
-    """
-    pass
+def loop_array(array, loop_body, workflow_manage_new_instance, workflow):
+    loop_global_data = {}
+    for item, index in zip(array, range(len(array))):
+        """
+        指定次数循环
+        @return:
+        """
+        instance = workflow_manage_new_instance({'index': index, 'item': item}, loop_global_data)
+        response = instance.stream()
+        answer = ''
+        reasoning_content = ''
+        for chunk in response:
+            content_chunk = chunk.get('content', '')
+            reasoning_content_chunk = chunk.get('reasoning_content', '')
+            reasoning_content += reasoning_content_chunk
+            answer += content_chunk
+            yield chunk
+        loop_global_data = instance.context
 
 
-def loop_loop(loop_body):
-    """
-    无线循环
-    @return:
-    """
-    pass
+def get_write_context(loop_type, array, number, loop_body, stream):
+    def inner_write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
+        if loop_type == 'ARRAY':
+            return loop_array(array, loop_body, node_variable['workflow_manage_new_instance'], workflow)
+        return loop_number(number, loop_body, node_variable['workflow_manage_new_instance'], workflow)
+
+    return inner_write_context
 
 
 class LoopWorkFlowPostHandler(WorkFlowPostHandler):
@@ -108,14 +135,55 @@ class BaseLoopNode(ILoopNode):
 
     def execute(self, loop_type, array, number, loop_body, stream, **kwargs) -> NodeResult:
         from application.flow.workflow_manage import WorkflowManage, Flow
-        workflow_manage = WorkflowManage(Flow.new_instance(loop_body), self.workflow_manage.params,
-                                         LoopWorkFlowPostHandler(self.workflow_manage.work_flow_post_handler.chat_info
-                                                                 ,
-                                                                 self.workflow_manage.work_flow_post_handler.client_id,
-                                                                 self.workflow_manage.work_flow_post_handler.client_type)
-                                         , base_to_response=LoopToResponse())
-        result = workflow_manage.stream()
-        return NodeResult({"result": result}, {}, _write_context=write_context_stream)
+        def workflow_manage_new_instance(start_data, global_data):
+            workflow_manage = WorkflowManage(Flow.new_instance(loop_body), self.workflow_manage.params,
+                                             LoopWorkFlowPostHandler(
+                                                 self.workflow_manage.work_flow_post_handler.chat_info
+                                                 ,
+                                                 self.workflow_manage.work_flow_post_handler.client_id,
+                                                 self.workflow_manage.work_flow_post_handler.client_type)
+                                             , base_to_response=LoopToResponse(),
+                                             start_data=start_data,
+                                             form_data=global_data)
+
+            return workflow_manage
+
+        return NodeResult({'workflow_manage_new_instance': workflow_manage_new_instance}, {},
+                          _write_context=get_write_context(loop_type, array, number, loop_body, stream))
+
+    def loop_number(self, number: int, loop_body, stream):
+        for index in range(number):
+            """
+            指定次数循环
+            @return:
+            """
+            from application.flow.workflow_manage import WorkflowManage, Flow
+            workflow_manage = WorkflowManage(Flow.new_instance(loop_body), self.workflow_manage.params,
+                                             LoopWorkFlowPostHandler(
+                                                 self.workflow_manage.work_flow_post_handler.chat_info
+                                                 ,
+                                                 self.workflow_manage.work_flow_post_handler.client_id,
+                                                 self.workflow_manage.work_flow_post_handler.client_type)
+                                             , base_to_response=LoopToResponse(),
+                                             start_data={'index': index})
+            result = workflow_manage.stream()
+            return NodeResult({"result": result, "workflow_manage": workflow_manage}, {},
+                              _write_context=write_context_stream)
+        pass
+
+    def loop_array(self, array, loop_body, stream):
+        """
+        循环数组
+        @return:
+        """
+        pass
+
+    def loop_loop(self, loop_body, stream):
+        """
+        无线循环
+        @return:
+        """
+        pass
 
     def get_details(self, index: int, **kwargs):
         return {

@@ -35,6 +35,34 @@ export const startNode = {
     showNode: true
   }
 }
+export const loopStartNode = {
+  id: WorkflowType.Start,
+  type: WorkflowType.Start,
+  x: 480,
+  y: 3340,
+  properties: {
+    height: 364,
+    stepName: t('views.applicationWorkflow.nodes.startNode.label'),
+    config: {
+      fields: [
+        {
+          label: t('views.applicationWorkflow.nodes.startNode.index', '下标'),
+          value: 'index'
+        },
+        {
+          label: t('views.applicationWorkflow.nodes.startNode.item', '循环元素'),
+          value: 'item'
+        }
+      ],
+      globalFields: []
+    },
+    fields: [{ label: t('views.applicationWorkflow.nodes.startNode.question'), value: 'question' }],
+    globalFields: [
+      { label: t('views.applicationWorkflow.nodes.startNode.currentTime'), value: 'time' }
+    ],
+    showNode: true
+  }
+}
 export const baseNode = {
   id: WorkflowType.Base,
   type: WorkflowType.Base,
