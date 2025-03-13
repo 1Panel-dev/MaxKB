@@ -8,6 +8,7 @@
 import LogicFlow from '@logicflow/core'
 import { ref, onMounted, computed } from 'vue'
 import AppEdge from './common/edge'
+import loopEdge from './common/loopEdge'
 import Control from './common/NodeControl.vue'
 import { baseNodes } from '@/workflow/common/data'
 import '@logicflow/extension/lib/style/index.css'
@@ -93,7 +94,11 @@ const renderGraphData = (data?: any) => {
       flowId.value = lf.value.graphModel.flowId
     })
     initDefaultShortcut(lf.value, lf.value.graphModel)
-    lf.value.batchRegister([...Object.keys(nodes).map((key) => nodes[key].default), AppEdge])
+    lf.value.batchRegister([
+      ...Object.keys(nodes).map((key) => nodes[key].default),
+      AppEdge,
+      loopEdge
+    ])
     lf.value.setDefaultEdgeType('app-edge')
 
     lf.value.render(data ? data : {})
@@ -117,7 +122,18 @@ const validate = () => {
   return Promise.all(lf.value.graphModel.nodes.map((element: any) => element?.validate?.()))
 }
 const getGraphData = () => {
-  return lf.value.getGraphData()
+  const graph_data = lf.value.getGraphData()
+  graph_data.nodes = graph_data.nodes.filter((node: any) => {
+    if (node.type === 'loop-body-node') {
+      const node_model = lf.value.getNodeModelById(node.id)
+      console.log(node_model)
+      node_model.set_loop_body()
+      return false
+    }
+    return true
+  })
+  graph_data.edges = graph_data.edges.filter((node: any) => node.type !== 'loop-edge')
+  return graph_data
 }
 
 const onmousedown = (shapeItem: ShapeItem) => {

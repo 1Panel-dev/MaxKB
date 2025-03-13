@@ -338,6 +338,12 @@ class WorkflowManage:
             node.node_chunk.end()
             self.node_context.append(node)
 
+    def stream(self):
+        close_old_connections()
+        language = get_language()
+        self.run_chain_async(self.start_node, None, language)
+        return self.await_result()
+
     def run(self):
         close_old_connections()
         language = get_language()
@@ -801,6 +807,8 @@ class WorkflowManage:
         @return:
         """
         base_node_list = [node for node in self.flow.nodes if node.type == 'base-node']
+        if len(base_node_list) == 0:
+            return None
         return base_node_list[0]
 
     def get_node_cls_by_id(self, node_id, up_node_id_list=None,

@@ -15,7 +15,7 @@ from .function_lib_node import *
 from .function_node import *
 from .question_node import *
 from .reranker_node import *
-
+from .loop_node import *
 from .document_extract_node import *
 from .image_understand_step_node import *
 from .image_generate_step_node import *
@@ -31,7 +31,7 @@ node_list = [BaseStartStepNode, BaseChatNode, BaseSearchDatasetNode, BaseQuestio
              BaseFunctionNodeNode, BaseFunctionLibNodeNode, BaseRerankerNode, BaseApplicationNode,
              BaseDocumentExtractNode,
              BaseImageUnderstandNode, BaseFormNode, BaseSpeechToTextNode, BaseTextToSpeechNode,
-             BaseImageGenerateNode, BaseVariableAssignNode]
+             BaseImageGenerateNode, BaseVariableAssignNode, BaseLoopNode]
 
 
 def get_node(node_type):

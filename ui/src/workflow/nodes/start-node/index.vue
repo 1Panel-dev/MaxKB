@@ -1,6 +1,8 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.variable.global') }}</h5>
+    <h5 v-if="nodeModel.properties.config.globalFields.length > 0" class="title-decoration-1 mb-8">
+      {{ $t('views.applicationWorkflow.variable.global') }}
+    </h5>
     <div
       v-for="(item, index) in nodeModel.properties.config.globalFields"
       :key="index"
@@ -63,7 +65,6 @@ const refreshFieldList = () => {
   const refreshFieldList = getRefreshFieldList()
   set(props.nodeModel.properties.config, 'globalFields', [...globalFields, ...refreshFieldList])
 }
-props.nodeModel.graphModel.eventCenter.on('refreshFieldList', refreshFieldList)
 
 const refreshFileUploadConfig = () => {
   let fields = cloneDeep(props.nodeModel.properties.config.fields)
@@ -101,11 +102,13 @@ const refreshFileUploadConfig = () => {
 
   set(props.nodeModel.properties.config, 'fields', [...fields, ...fileUploadFields])
 }
-props.nodeModel.graphModel.eventCenter.on('refreshFileUploadConfig', refreshFileUploadConfig)
 
 onMounted(() => {
-  refreshFieldList()
-  refreshFileUploadConfig()
+  console.log(props.nodeModel.graphModel)
+  //   refreshFieldList()
+  //   refreshFileUploadConfig()
+  //   props.nodeModel.graphModel.eventCenter.on('refreshFileUploadConfig', refreshFileUploadConfig)
+  // props.nodeModel.graphModel.eventCenter.on('refreshFieldList', refreshFieldList)
 })
 </script>
 <style lang="scss" scoped></style>

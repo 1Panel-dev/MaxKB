@@ -319,6 +319,65 @@ export const textToSpeechNode = {
     }
   }
 }
+
+export const loopNode = {
+  type: WorkflowType.LoopNode,
+  visible: false,
+  text: t('views.applicationWorkflow.nodes.loopNode.text', '循环节点'),
+  label: t('views.applicationWorkflow.nodes.loopNode.label', '循环节点'),
+  height: 252,
+  properties: {
+    stepName: t('views.applicationWorkflow.nodes.loopNode.label', '循环节点'),
+    workflow: {
+      edges: [],
+      nodes: [
+        {
+          x: 480,
+          y: 3340,
+          id: 'start-node',
+          type: 'start-node',
+          properties: {
+            config: {
+              fields: [],
+              globalFields: []
+            },
+            fields: [],
+            height: 361.333,
+            showNode: true,
+            stepName: '开始',
+            globalFields: []
+          }
+        }
+      ]
+    },
+    config: {
+      fields: [
+        {
+          label: t('loop.item', '循环参数'),
+          value: 'item'
+        },
+        {
+          label: t('common.result'),
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
+
+export const loopBodyNode = {
+  type: WorkflowType.LoopBodyNode,
+  text: t('views.applicationWorkflow.nodes.loopBodyNode.text', '循环体'),
+  label: t('views.applicationWorkflow.nodes.loopBodyNode.label', '循环体'),
+  height: 600,
+  properties: {
+    width: 1800,
+    stepName: t('views.applicationWorkflow.nodes.loopBodyNode.label', '循环体'),
+    config: {
+      fields: []
+    }
+  }
+}
 export const menuNodes = [
   aiChatNode,
   imageUnderstandNode,
@@ -332,7 +391,8 @@ export const menuNodes = [
   documentExtractNode,
   speechToTextNode,
   textToSpeechNode,
-  variableAssignNode
+  variableAssignNode,
+  loopNode
 ]
 
 /**
@@ -426,7 +486,9 @@ export const nodeDict: any = {
   [WorkflowType.TextToSpeechNode]: textToSpeechNode,
   [WorkflowType.SpeechToTextNode]: speechToTextNode,
   [WorkflowType.ImageGenerateNode]: imageGenerateNode,
-  [WorkflowType.VariableAssignNode]: variableAssignNode
+  [WorkflowType.VariableAssignNode]: variableAssignNode,
+  [WorkflowType.LoopNode]: loopNode,
+  [WorkflowType.LoopBodyNode]: loopBodyNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'

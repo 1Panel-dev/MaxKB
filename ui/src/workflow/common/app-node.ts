@@ -46,7 +46,6 @@ class AppNode extends HtmlResize.view {
         getNodesName(number + 1)
       }
     }
-    props.model.properties.config = nodeDict[props.model.type].properties.config
     if (props.model.properties.height) {
       props.model.height = props.model.properties.height
     }
@@ -115,12 +114,11 @@ class AppNode extends HtmlResize.view {
     } else {
       isConnect = this.props.graphModel.edges.some((edge) => edge.sourceAnchorId == anchorData.id)
     }
-
     return lh(
       'foreignObject',
       {
         ...anchorData,
-        x: x - 10,
+        x: x - 14,
         y: y - 12,
         width: 30,
         height: 30
@@ -134,7 +132,7 @@ class AppNode extends HtmlResize.view {
             }
           },
           dangerouslySetInnerHTML: {
-            __html: isConnect
+            __html: (type == 'children' ? true : isConnect)
               ? `<svg width="100%" height="100%" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g filter="url(#filter0_d_5119_232585)">
               <path d="M20.9998 29.8333C28.0875 29.8333 33.8332 24.0876 33.8332 17C33.8332 9.91231 28.0875 4.16663 20.9998 4.16663C13.9122 4.16663 8.1665 9.91231 8.1665 17C8.1665 24.0876 13.9122 29.8333 20.9998 29.8333Z" fill="white"/>

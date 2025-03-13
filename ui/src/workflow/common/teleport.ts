@@ -65,9 +65,9 @@ export function getTeleport(): any {
 
           // 比对当前界面显示的flowId，只更新items[当前页面flowId:nodeId]的数据
           // 比如items[0]属于Page1的数据，那么Page2无论active=true/false，都无法执行items[0]
-          if (id.startsWith(props.flowId)) {
-            children.push(items[id])
-          }
+          // if (id.startsWith(props.flowId)) {
+          children.push(items[id])
+          // }
         })
         return h(
           Fragment,

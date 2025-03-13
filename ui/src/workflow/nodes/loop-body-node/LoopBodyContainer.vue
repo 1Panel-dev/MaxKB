@@ -16,59 +16,6 @@
             />
             <h4 class="ellipsis-1 break-all">{{ nodeModel.properties.stepName }}</h4>
           </div>
-
-          <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
-            <el-button text @click="showNode = !showNode">
-              <el-icon class="arrow-icon color-secondary" :class="showNode ? 'rotate-180' : ''"
-                ><ArrowDownBold />
-              </el-icon>
-            </el-button>
-            <el-dropdown
-              v-if="showOperate(nodeModel.type)"
-              :teleported="false"
-              trigger="click"
-              placement="bottom-start"
-            >
-              <el-button text>
-                <img src="@/assets/icon_or.svg" alt="" v-if="condition === 'OR'" />
-                <img src="@/assets/icon_and.svg" alt="" v-if="condition === 'AND'" />
-              </el-button>
-              <template #dropdown>
-                <div style="width: 280px" class="p-12-16">
-                  <h5>{{ $t('views.applicationWorkflow.condition.title') }}</h5>
-                  <p class="mt-8 lighter">
-                    <span>{{ $t('views.applicationWorkflow.condition.front') }}</span>
-                    <el-select v-model="condition" size="small" style="width: 60px; margin: 0 8px">
-                      <el-option
-                        :label="$t('views.applicationWorkflow.condition.AND')"
-                        value="AND"
-                      />
-                      <el-option :label="$t('views.applicationWorkflow.condition.OR')" value="OR" />
-                    </el-select>
-                    <span>{{ $t('views.applicationWorkflow.condition.text') }}</span>
-                  </p>
-                </div>
-              </template>
-            </el-dropdown>
-            <el-dropdown v-if="showOperate(nodeModel.type)" :teleported="false" trigger="click">
-              <el-button text>
-                <el-icon class="color-secondary"><MoreFilled /></el-icon>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu style="min-width: 80px">
-                  <el-dropdown-item @click="renameNode" class="p-8">{{
-                    $t('common.rename')
-                  }}</el-dropdown-item>
-                  <el-dropdown-item @click="copyNode" class="p-8">{{
-                    $t('common.copy')
-                  }}</el-dropdown-item>
-                  <el-dropdown-item @click="deleteNode" class="border-t p-8">{{
-                    $t('common.delete')
-                  }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
         </div>
         <el-collapse-transition>
           <div @mousedown.stop @keydown.stop @click.stop v-show="showNode" class="mt-16">
@@ -114,20 +61,6 @@
       </div>
     </div>
 
-    <el-collapse-transition>
-      <DropdownMenu
-        v-if="showAnchor"
-        @mousemove.stop
-        @mousedown.stop
-        @click.stop
-        @wheel="handleWheel"
-        :show="showAnchor"
-        :id="id"
-        style="left: 100%; top: 50%; transform: translate(0, -50%)"
-        @clickNodes="clickNodes"
-      />
-    </el-collapse-transition>
-
     <el-dialog
       :title="$t('views.applicationWorkflow.nodeName')"
       v-model="nodeNameDialogVisible"
@@ -166,18 +99,12 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { app } from '@/main'
-import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
 import { set } from 'lodash'
-import { iconComponent } from '../icons/utils'
+import { iconComponent } from '../../icons/utils'
 import { copyClick } from '@/utils/clipboard'
-import { WorkflowType } from '@/enums/workflow'
-import { MsgError, MsgConfirm } from '@/utils/message'
+import { MsgError } from '@/utils/message'
 import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
-const {
-  params: { id }
-} = app.config.globalProperties.$route as any
 
 const height = ref<{
   stepContainerHeight: number
@@ -196,18 +123,6 @@ const form = ref<any>({
   title: ''
 })
 
-const condition = computed({
-  set: (v) => {
-    set(props.nodeModel.properties, 'condition', v)
-  },
-  get: () => {
-    if (props.nodeModel.properties.condition) {
-      return props.nodeModel.properties.condition
-    }
-    set(props.nodeModel.properties, 'condition', 'AND')
-    return true
-  }
-})
 const showNode = computed({
   set: (v) => {
     set(props.nodeModel.properties, 'showNode', v)
@@ -221,12 +136,6 @@ const showNode = computed({
   }
 })
 
-const handleWheel = (event: any) => {
-  const isCombinationKeyPressed = event.ctrlKey || event.metaKey
-  if (!isCombinationKeyPressed) {
-    event.stopPropagation()
-  }
-}
 const node_status = computed(() => {
   if (props.nodeModel.properties.status) {
     return props.nodeModel.properties.status
@@ -234,10 +143,6 @@ const node_status = computed(() => {
   return 200
 })
 
-function renameNode() {
-  form.value.title = props.nodeModel.properties.stepName
-  nodeNameDialogVisible.value = true
-}
 const editName = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
@@ -264,22 +169,7 @@ const mousedown = () => {
   props.nodeModel.graphModel.toFront(props.nodeModel.id)
 }
 const showicon = ref<number | null>(null)
-const copyNode = () => {
-  props.nodeModel.graphModel.clearSelectElements()
-  const cloneNode = props.nodeModel.graphModel.cloneNode(props.nodeModel.id)
-  set(cloneNode, 'isSelected', true)
-  set(cloneNode, 'isHovered', true)
-  props.nodeModel.graphModel.toFront(cloneNode.id)
-}
-const deleteNode = () => {
-  MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
-    confirmButtonText: t('common.confirm'),
-    confirmButtonClass: 'danger'
-  }).then(() => {
-    props.nodeModel.graphModel.deleteNode(props.nodeModel.id)
-  })
-  props.nodeModel.graphModel.eventCenter.emit('delete_node')
-}
+
 const resizeStepContainer = (wh: any) => {
   if (wh.height) {
     if (!props.nodeModel.virtual) {
@@ -287,25 +177,6 @@ const resizeStepContainer = (wh: any) => {
       props.nodeModel.setHeight(height.value.stepContainerHeight)
     }
   }
-}
-
-function clickNodes(item: any) {
-  console.log('clickNodes', item)
-  const width = item.properties.width ? item.properties.width : 214
-  const nodeModel = props.nodeModel.graphModel.addNode({
-    type: item.type,
-    properties: item.properties,
-    x: anchorData.value?.x + width / 2 + 200,
-    y: anchorData.value?.y - item.height
-  })
-  props.nodeModel.graphModel.addEdge({
-    type: 'app-edge',
-    sourceNodeId: props.nodeModel.id,
-    sourceAnchorId: anchorData.value?.id,
-    targetNodeId: nodeModel.id
-  })
-
-  closeNodeMenu()
 }
 
 const props = defineProps<{
@@ -324,23 +195,6 @@ const nodeFields = computed(() => {
     return fields
   }
   return []
-})
-
-function showOperate(type: string) {
-  return type !== WorkflowType.Base && type !== WorkflowType.Start
-}
-const openNodeMenu = (anchorValue: any) => {
-  showAnchor.value = true
-  anchorData.value = anchorValue
-}
-const closeNodeMenu = () => {
-  showAnchor.value = false
-  anchorData.value = undefined
-}
-onMounted(() => {
-  set(props.nodeModel, 'openNodeMenu', (anchorData: any) => {
-    showAnchor.value ? closeNodeMenu() : openNodeMenu(anchorData)
-  })
 })
 </script>
 <style lang="scss" scoped>

@@ -91,12 +91,20 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       return
     }
     if (elements.edges.length > 0 && elements.nodes.length == 0) {
-      elements.edges.forEach((edge: any) => lf.deleteEdge(edge.id))
+      elements.edges.forEach((edge: any) => {
+        if (edge.type === 'app-edge') {
+          lf.deleteEdge(edge.id)
+        }
+      })
       return
     }
-    const nodes = elements.nodes.filter((node) => ['start-node', 'base-node'].includes(node.type))
+    const nodes = elements.nodes.filter((node) =>
+      ['start-node', 'base-node', 'loop-body-node'].includes(node.type)
+    )
     if (nodes.length > 0) {
-      MsgError(`${nodes[0].properties?.stepName}${t('views.applicationWorkflow.delete.deleteMessage')}`)
+      MsgError(
+        `${nodes[0].properties?.stepName}${t('views.applicationWorkflow.delete.deleteMessage')}`
+      )
       return
     }
     MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
@@ -107,7 +115,17 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       if (graph.textEditElement) return true
 
       elements.edges.forEach((edge: any) => lf.deleteEdge(edge.id))
-      elements.nodes.forEach((node: any) => lf.deleteNode(node.id))
+      elements.nodes.forEach((node: any) => {
+        if (node.type === 'loop-node') {
+          const next = lf.getNodeOutgoingNode(node.id)
+          next.forEach((n: any) => {
+            if (n.type === 'loop-body-node') {
+              lf.deleteNode(n.id)
+            }
+          })
+        }
+        lf.deleteNode(node.id)
+      })
     })
 
     return false

@@ -1,0 +1,52 @@
+# coding=utf-8
+"""
+    @project: MaxKB
+    @Author：虎
+    @file： i_loop_node.py
+    @date：2025/3/11 18:19
+    @desc:
+"""
+from typing import Type
+
+from application.flow.i_step_node import INode, NodeResult
+from rest_framework import serializers
+
+from common.exception.app_exception import AppApiException
+from common.util.field_message import ErrMessage
+from django.utils.translation import gettext_lazy as _
+
+
+class ILoopNodeSerializer(serializers.Serializer):
+    loop_type = serializers.CharField(required=True, error_messages=ErrMessage.char(_("loop_type")))
+    array = serializers.ListField(required=False, allow_null=True,
+                                  error_messages=ErrMessage.char(_("array")))
+    number = serializers.IntegerField(required=False, allow_null=True,
+                                      error_messages=ErrMessage.char(_("number")))
+    loop_body = serializers.DictField(required=True, error_messages=ErrMessage.char("循环体"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        loop_type = self.data.get('loop_type')
+        if loop_type == 'ARRAY':
+            array = self.data.get('array')
+            if array is None or len(array) == 0:
+                message = _('{field}, this field is required.', field='array')
+                raise AppApiException(500, message)
+        elif loop_type == 'NUMBER':
+            number = self.data.get('number')
+            if number is None:
+                message = _('{field}, this field is required.', field='number')
+                raise AppApiException(500, message)
+
+
+class ILoopNode(INode):
+    type = 'loop-node'
+
+    def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
+        return ILoopNodeSerializer
+
+    def _run(self):
+        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
+
+    def execute(self, loop_type, array, number, loop_body, stream, **kwargs) -> NodeResult:
+        pass
