@@ -6,7 +6,7 @@
     @date：2023/9/5 14:01
     @desc: 用于swagger 分组
 """
-
+from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.inspectors import SwaggerAutoSchema
 
 tags_dict = {
@@ -20,10 +20,10 @@ class CustomSwaggerAutoSchema(SwaggerAutoSchema):
         if "api" in tags and operation_keys:
             return [tags_dict.get(operation_keys[1]) if operation_keys[1] in tags_dict else operation_keys[1]]
         return tags
+
+
+class CustomOpenAPISchemaGenerator(OpenAPISchemaGenerator):
     def get_schema(self, request=None, public=False):
         schema = super().get_schema(request, public)
-        if request.is_secure():
-            schema.schemes = ['https']
-        else:
-            schema.schemes = ['http']
+        schema.schemes = ['https', 'http']
         return schema

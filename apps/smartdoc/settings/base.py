@@ -86,6 +86,7 @@ TEMPLATES = [
 
 SWAGGER_SETTINGS = {
     'DEFAULT_AUTO_SCHEMA_CLASS': 'common.config.swagger_conf.CustomSwaggerAutoSchema',
+    'DEFAULT_GENERATOR_CLASS': 'common.config.swagger_conf.CustomOpenAPISchemaGenerator',
     "DEFAULT_MODEL_RENDERING": "example",
     'USE_SESSION_AUTH': False,
     'SECURITY_DEFINITIONS': {
