@@ -1,7 +1,6 @@
 <template>
   <div class="ai-chat__operate p-16-24">
     <slot name="operateBefore" />
-
     <div class="operate-textarea">
       <el-scrollbar max-height="136">
         <div
