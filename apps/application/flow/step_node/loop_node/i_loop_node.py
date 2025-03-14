@@ -46,7 +46,12 @@ class ILoopNode(INode):
         return ILoopNodeSerializer
 
     def _run(self):
-        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
+        array = self.node_params_serializer.data.get('array')
+        if self.node_params_serializer.data.get('loop_type') == 'ARRAY':
+            array = self.workflow_manage.get_reference_field(
+                array[0],
+                array[1:])
+        return self.execute(**{**self.node_params_serializer.data, "array": array}, **self.flow_params_serializer.data)
 
     def execute(self, loop_type, array, number, loop_body, stream, **kwargs) -> NodeResult:
         pass
