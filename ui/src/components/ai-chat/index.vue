@@ -1,56 +1,76 @@
 <template>
   <div ref="aiChatRef" class="ai-chat" :class="type">
-    <UserForm
-      v-model:api_form_data="api_form_data"
-      v-model:form_data="form_data"
-      :application="applicationDetails"
-      :type="type"
-      ref="userFormRef"
-    ></UserForm>
-    <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
-      <div ref="dialogScrollbar" class="ai-chat__content p-24">
-        <PrologueContent
-          :type="type"
-          :application="applicationDetails"
-          :available="available"
-          :send-message="sendMessage"
-        ></PrologueContent>
-
-        <template v-for="(item, index) in chatList" :key="index">
-          <!-- 问题 -->
-          <QuestionContent
-            :type="type"
-            :application="applicationDetails"
-            :chat-record="item"
-          ></QuestionContent>
-          <!-- 回答 -->
-          <AnswerContent
-            :application="applicationDetails"
-            :loading="loading"
-            v-model:chat-record="chatList[index]"
-            :type="type"
-            :send-message="sendMessage"
-            :chat-management="ChatManagement"
-          ></AnswerContent>
-        </template>
-      </div>
-    </el-scrollbar>
-
-    <ChatInputOperate
-      :app-id="appId"
-      :application-details="applicationDetails"
-      :is-mobile="isMobile"
-      :type="type"
-      :send-message="sendMessage"
-      :open-chat-id="openChatId"
-      :chat-management="ChatManagement"
-      v-model:chat-id="chartOpenId"
-      v-model:loading="loading"
-      v-if="type !== 'log'"
+    <div
+      v-show="(isUserInput && firsUserInput) || showUserInput"
+      :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'"
     >
-      <template #operateBefore> <slot name="operateBefore" /> </template>
-    </ChatInputOperate>
-    <Control></Control>
+      <UserForm
+        v-model:api_form_data="api_form_data"
+        v-model:form_data="form_data"
+        :application="applicationDetails"
+        :type="type"
+        :first="firsUserInput"
+        @confirm="UserFormConfirm"
+        @cancel="() => (showUserInput = false)"
+        ref="userFormRef"
+      ></UserForm>
+    </div>
+    <template v-if="!firsUserInput">
+      <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
+        <div ref="dialogScrollbar" class="ai-chat__content p-24">
+          <PrologueContent
+            :type="type"
+            :application="applicationDetails"
+            :available="available"
+            :send-message="sendMessage"
+          ></PrologueContent>
+
+          <template v-for="(item, index) in chatList" :key="index">
+            <!-- 问题 -->
+            <QuestionContent
+              :type="type"
+              :application="applicationDetails"
+              :chat-record="item"
+            ></QuestionContent>
+            <!-- 回答 -->
+            <AnswerContent
+              :application="applicationDetails"
+              :loading="loading"
+              v-model:chat-record="chatList[index]"
+              :type="type"
+              :send-message="sendMessage"
+              :chat-management="ChatManagement"
+            ></AnswerContent>
+          </template>
+        </div>
+      </el-scrollbar>
+
+      <ChatInputOperate
+        :app-id="appId"
+        :application-details="applicationDetails"
+        :is-mobile="isMobile"
+        :type="type"
+        :send-message="sendMessage"
+        :open-chat-id="openChatId"
+        :chat-management="ChatManagement"
+        v-model:chat-id="chartOpenId"
+        v-model:loading="loading"
+        v-if="type !== 'log'"
+      >
+        <template #operateBefore>
+          <div class="flex-between">
+            <slot name="operateBefore">
+              <span></span>
+            </slot>
+            <el-button class="user-input-button mb-8" type="primary" text @click="toggleUserInput">
+              <AppIcon iconName="app-user-input"></AppIcon>
+            </el-button>
+          </div>
+        </template>
+      </ChatInputOperate>
+
+      <Control></Control>
+    </template>
   </div>
 </template>
 <script setup lang="ts">
@@ -62,7 +82,7 @@ import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
 import { isWorkFlow } from '@/utils/application'
-import { debounce } from 'lodash'
+import { debounce, first } from 'lodash'
 import AnswerContent from '@/components/ai-chat/component/answer-content/index.vue'
 import QuestionContent from '@/components/ai-chat/component/question-content/index.vue'
 import ChatInputOperate from '@/components/ai-chat/component/chat-input-operate/index.vue'
@@ -106,13 +126,25 @@ const chatList = ref<any[]>([])
 const form_data = ref<any>({})
 const api_form_data = ref<any>({})
 const userFormRef = ref<InstanceType<typeof UserForm>>()
+// 用户输入
+const firsUserInput = ref(true)
+const showUserInput = ref(false)
+
+const isUserInput = computed(
+  () =>
+    props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
+      .properties.user_input_field_list.length > 0
+)
+
 watch(
   () => props.chatId,
   (val) => {
     if (val && val !== 'new') {
       chartOpenId.value = val
+      firsUserInput.value = false
     } else {
       chartOpenId.value = ''
+      firsUserInput.value = true
     }
   },
   { deep: true }
@@ -135,6 +167,15 @@ watch(
     immediate: true
   }
 )
+
+const toggleUserInput = () => {
+  showUserInput.value = !showUserInput.value
+}
+
+function UserFormConfirm() {
+  firsUserInput.value = false
+  showUserInput.value = false
+}
 
 function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
   if (!userFormRef.value?.checkInputParam()) {
@@ -467,4 +508,18 @@ defineExpose({
 </script>
 <style lang="scss" scoped>
 @import './index.scss';
+.firstUserInput {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.popperUserInput {
+  position: absolute;
+  z-index: 999;
+  right: 50px;
+  bottom: 80px;
+  width: calc(100% - 50px);
+  max-width: 400px;
+}
 </style>

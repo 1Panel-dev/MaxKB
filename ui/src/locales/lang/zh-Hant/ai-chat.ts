@@ -23,7 +23,8 @@ export default {
     oppose: '反對',
     cancelOppose: '取消反對',
     continue: '繼續',
-    stopChat: '停止回答'
+    stopChat: '停止回答',
+    startChat: '開始回答',
   },
   tip: {
     error500Message: '抱歉，當前正在維護，無法提供服務，請稍後再試！',

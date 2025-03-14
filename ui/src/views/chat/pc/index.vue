@@ -156,8 +156,8 @@
         </el-button>
       </div>
     </div>
+    <EditTitleDialog ref="EditTitleDialogRef" @refresh="refreshFieldTitle" />
   </div>
-  <EditTitleDialog ref="EditTitleDialogRef" @refresh="refreshFieldTitle" />
 </template>
 
 <script setup lang="ts">
