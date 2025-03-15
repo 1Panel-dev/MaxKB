@@ -1,5 +1,7 @@
 export default {
   title: '函数库',
+  internalTitle: '内置函数',
+  added: '已添加',
   createFunction: '创建函数',
   editFunction: '编辑函数',
   copyFunction: '复制函数',

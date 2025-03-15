@@ -34,6 +34,7 @@ class FunctionLibView(APIView):
             FunctionLibSerializer.Query(
                 data={'name': request.query_params.get('name'),
                       'desc': request.query_params.get('desc'),
+                      'function_type': request.query_params.get('function_type'),
                       'user_id': request.user.id}).list())
 
     @action(methods=['POST'], detail=False)
@@ -107,6 +108,7 @@ class FunctionLibView(APIView):
                 FunctionLibSerializer.Query(
                     data={'name': request.query_params.get('name'),
                           'desc': request.query_params.get('desc'),
+                          'function_type': request.query_params.get('function_type'),
                           'user_id': request.user.id,
                           'select_user_id': request.query_params.get('select_user_id')}).page(
                     current_page, page_size))
@@ -137,3 +139,25 @@ class FunctionLibView(APIView):
         def get(self, request: Request, id: str):
             return FunctionLibSerializer.Operate(
                 data={'id': id, 'user_id': request.user.id}).export()
+
+    class EditIcon(APIView):
+        authentication_classes = [TokenAuth]
+        parser_classes = [MultiPartParser]
+
+        @action(methods=['PUT'], detail=False)
+        @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
+        def put(self, request: Request, id: str):
+            return result.success(
+                FunctionLibSerializer.IconOperate(
+                    data={'id': id, 'user_id': request.user.id,
+                          'image': request.FILES.get('file')}).edit(request.data))
+
+    class AddInternalFun(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
+        def get(self, request: Request, id: str):
+            return result.success(
+                FunctionLibSerializer.InternalFunction(
+                    data={'id': id, 'user_id': request.user.id}).add())

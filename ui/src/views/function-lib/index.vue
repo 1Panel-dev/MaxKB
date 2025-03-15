@@ -1,7 +1,11 @@
 <template>
   <div class="function-lib-list-container p-24" style="padding-top: 16px">
+    <el-tabs v-model="functionType" >
+      <el-tab-pane :label="$t('views.functionLib.title')" name="PUBLIC"></el-tab-pane>
+      <el-tab-pane :label="$t('views.functionLib.internalTitle')" name="INTERNAL"></el-tab-pane>
+    </el-tabs>
     <div class="flex-between mb-16">
-      <h4>{{ $t('views.functionLib.title') }}</h4>
+      <h4></h4>
       <div class="flex-between">
         <el-select
           v-model="selectUserId"
@@ -41,7 +45,7 @@
         :loading="loading"
       >
         <el-row :gutter="15">
-          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16">
+          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16" v-if="functionType === 'PUBLIC'">
             <el-card shadow="hover" class="application-card-add" style="--el-card-padding: 8px">
               <div class="card-add-button flex align-center cursor p-8" @click="openCreateDialog()">
                 <AppIcon iconName="app-add-application" class="mr-8"></AppIcon>
@@ -77,6 +81,7 @@
             class="mb-16"
           >
             <CardBox
+              v-if="functionType === 'PUBLIC'"
               :title="item.name"
               :description="item.desc"
               class="function-lib-card"
@@ -84,12 +89,26 @@
               :class="item.permission_type === 'PUBLIC' && !canEdit(item) ? '' : 'cursor'"
             >
               <template #icon>
-                <AppAvatar class="mr-12 avatar-green" shape="square" :size="32">
-                  <img src="@/assets/icon_function_outlined.svg" style="width: 58%" alt="" />
+                <AppAvatar
+                  v-if="isAppIcon(item?.icon)"
+                  shape="square"
+                  :size="32"
+                  style="background: none"
+                  class="mr-8"
+                >
+                  <img :src="getImageUrl(item?.icon)" alt="" />
                 </AppAvatar>
+                <AppAvatar
+                  v-else-if="item?.name"
+                  :name="item?.name"
+                  pinyinColor
+                  shape="square"
+                  :size="32"
+                  class="mr-8"
+                />
               </template>
               <template #subTitle>
-                <el-text class="color-secondary" size="small">
+                <el-text class="color-secondary" size="small" v-if="!item.template_id">
                   <auto-tooltip :content="item.username">
                     {{ $t('common.creator') }}: {{ item.username }}
                   </auto-tooltip>
@@ -113,33 +132,7 @@
               </div>
               <template #footer>
                 <div class="footer-content flex-between">
-                  <div>
-                    <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
-                      <el-button text @click.stop="copyFunctionLib(item)"
-                        :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
-                      >
-                        <AppIcon iconName="app-copy"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
-                    <el-divider direction="vertical" />
-                    <el-tooltip effect="dark" :content="$t('common.export')" placement="top">
-                      <el-button text @click.stop="exportFunctionLib(item)"
-                        :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
-                      >
-                        <AppIcon iconName="app-export"></AppIcon>
-                      </el-button>
-                    </el-tooltip>
-                    <el-divider direction="vertical" />
-                    <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
-                      <el-button
-                        :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
-                        text
-                        @click.stop="deleteFunctionLib(item)"
-                      >
-                        <el-icon><Delete /></el-icon>
-                      </el-button>
-                    </el-tooltip>
-                  </div>
+                  <div><span v-if="item.template_id"> {{ $t('common.author') }}: MaxKB</span></div>
                   <div @click.stop>
                     <el-switch
                       :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
@@ -147,6 +140,103 @@
                       @change="changeState($event, item)"
                       size="small"
                     />
+                    <el-dropdown trigger="click">
+                      <el-button text @click.stop>
+                        <el-icon><MoreFilled /></el-icon>
+                      </el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            v-if="!item.template_id"
+                            @click.stop="copyFunctionLib(item)"
+                          >
+                            <AppIcon iconName="app-copy"></AppIcon>
+                            {{$t('common.copy')}}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="configInitParams(item)"
+                          >
+                            <AppIcon iconName="app-operation" class="mr-4"></AppIcon>
+                            {{ $t('common.param.initParam') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="configPermission(item)"
+                          >
+                            <AppIcon iconName="app-copy"></AppIcon>
+                            {{ $t('views.functionLib.functionForm.form.permission_type.label') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            v-if="!item.template_id"
+                            @click.stop="exportFunctionLib(item)"
+                          >
+                            <AppIcon iconName="app-export"></AppIcon>
+                            {{$t('common.export')}}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="deleteFunctionLib(item)"
+                          >
+                            <el-icon><Delete /></el-icon>
+                            {{ $t('common.delete') }}
+                          </el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </div>
+                </div>
+              </template>
+            </CardBox>
+            <CardBox
+              v-if="functionType === 'INTERNAL'"
+              :title="item.name"
+              :description="item.desc"
+              class="function-lib-card"
+              @click="openDescDrawer(item)"
+              :class="item.permission_type === 'PUBLIC' && !canEdit(item) ? '' : 'cursor'"
+            >
+              <template #icon>
+                <AppAvatar
+                  v-if="isAppIcon(item?.icon)"
+                  shape="square"
+                  :size="32"
+                  style="background: none"
+                  class="mr-8"
+                >
+                  <img :src="getImageUrl(item?.icon)" alt="" />
+                </AppAvatar>
+                <AppAvatar
+                  v-else-if="item?.name"
+                  :name="item?.name"
+                  pinyinColor
+                  shape="square"
+                  :size="32"
+                  class="mr-8"
+                />
+              </template>
+              <div class="status-button">
+                <el-tag
+                  class="info-tag"
+                  v-if="item.added"
+                  style="height: 22px"
+                >
+                  {{ $t('views.functionLib.added') }}</el-tag
+                >
+              </div>
+              <template #footer>
+                <div class="footer-content flex-between">
+                  <div>{{ $t('common.author') }}: MaxKB</div>
+                  <div @click.stop v-if="!item.added">
+                    <el-button
+                      type="primary"
+                      link
+                      @click="addInternalFunction(item)"
+                    >
+                      {{ $t('common.add') }}
+                    </el-button>
                   </div>
                 </div>
               </template>
@@ -156,10 +246,13 @@
       </InfiniteScroll>
     </div>
     <FunctionFormDrawer ref="FunctionFormDrawerRef" @refresh="refresh" :title="title" />
+    <PermissionDialog ref="PermissionDialogRef" @refresh="refresh" />
+    <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
+    <component :is="internalDescComponent" ref="internalDescRef" />
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, watch, nextTick } from 'vue'
 import { cloneDeep } from 'lodash'
 import functionLibApi from '@/api/function-lib'
 import FunctionFormDrawer from './component/FunctionFormDrawer.vue'
@@ -167,11 +260,25 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import applicationApi from '@/api/application'
 import { t } from '@/locales'
+import PermissionDialog from '@/views/function-lib/component/PermissionDialog.vue'
+import InitParamDrawer from '@/views/function-lib/component/InitParamDrawer.vue'
+import { isAppIcon } from '@/utils/application'
+import InfiniteScroll from '@/components/infinite-scroll/index.vue'
+import CardBox from '@/components/card-box/index.vue'
+import type { Dict } from '@/api/type/common'
+
+const internalIcons: Dict<any> = import.meta.glob('@/assets/fx/*/*.png', { eager: true })
+let internalDesc: Dict<any> = import.meta.glob('@/assets/fx/*/index.vue', { eager: true })
+const internalDescRef = ref()
+const internalDescComponent = ref()
+
 const { user } = useStore()
 
 const loading = ref(false)
 
 const FunctionFormDrawerRef = ref()
+const PermissionDialogRef = ref()
+const InitParamDrawerRef = ref()
 
 const functionLibList = ref<any[]>([])
 
@@ -195,19 +302,63 @@ const userOptions = ref<UserOption[]>([])
 const selectUserId = ref('all')
 const elUploadRef = ref<any>()
 
+const functionType = ref('PUBLIC')
+
+watch(
+  functionType,
+  (val) => {
+    paginationConfig.total = 0
+    paginationConfig.current_page = 1
+    functionLibList.value = []
+    getList()
+  },
+  { immediate: true }
+)
+
 const canEdit = (row: any) => {
   return user.userInfo?.id === row?.user_id
 }
 
 function openCreateDialog(data?: any) {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+  // console.log(data)
   title.value = data ? t('views.functionLib.editFunction') : t('views.functionLib.createFunction')
   if (data) {
     if (data?.permission_type !== 'PUBLIC' || canEdit(data)) {
-      FunctionFormDrawerRef.value.open(data)
+      functionLibApi.getFunctionLibById(data?.id, changeStateloading).then((res) => {
+        FunctionFormDrawerRef.value.open(res.data)
+      })
     }
   } else {
     FunctionFormDrawerRef.value.open(data)
   }
+}
+
+function getImageUrl(name: string) {
+  if (name.startsWith('/src/assets/fx/')) {
+    return internalIcons[name]?.default;
+  }
+  return name
+}
+
+
+function openDescDrawer(row: any) {
+  const index = row.icon.replace('icon.png', 'index.vue')
+  internalDescComponent.value = internalDesc[index].default
+  nextTick(()=> {
+    internalDescRef.value?.open(row);
+  })
+}
+
+function addInternalFunction(data?: any) {
+  functionLibApi.addInternalFunction(data.id, changeStateloading)
+    .then((res) => {
+      MsgSuccess(t('common.submitSuccess'))
+      searchHandle()
+    })
 }
 
 function searchHandle() {
@@ -220,7 +371,7 @@ function searchHandle() {
   getList()
 }
 
-function changeState(bool: Boolean, row: any) {
+async function changeState(bool: Boolean, row: any) {
   if (!bool) {
     MsgConfirm(
       `${t('views.functionLib.disabled.confirmTitle')}${row.name} ?`,
@@ -240,6 +391,12 @@ function changeState(bool: Boolean, row: any) {
         row.is_active = true
       })
   } else {
+    const res = await functionLibApi.getFunctionLibById(row.id, changeStateloading)
+    if (!res.data.init_params && res.data.init_field_list && res.data.init_field_list.length > 0) {
+      InitParamDrawerRef.value.open(res.data)
+      row.is_active = false
+      return
+    }
     const obj = {
       is_active: bool
     }
@@ -286,6 +443,16 @@ function exportFunctionLib(row: any) {
     })
 }
 
+function configPermission(item: any) {
+  PermissionDialogRef.value.open(item)
+}
+
+function configInitParams(item: any) {
+  functionLibApi.getFunctionLibById(item?.id, changeStateloading).then((res) => {
+    InitParamDrawerRef.value.open(res.data)
+  })
+}
+
 function importFunctionLib(file: any) {
   const formData = new FormData()
   formData.append('file', file.raw, file.name)
@@ -312,6 +479,7 @@ function importFunctionLib(file: any) {
 function getList() {
   const params = {
     ...(searchValue.value && { name: searchValue.value }),
+    ...(functionType.value && { function_type: functionType.value }),
     ...(selectUserId.value &&
       selectUserId.value !== 'all' && { select_user_id: selectUserId.value })
   }
@@ -337,12 +505,11 @@ function refresh(data: any) {
       data.username = userOptions.value.find((v) => v.value === data.user_id)?.label
     }
     functionLibList.value.splice(index, 1, data)
-  } else {
-    paginationConfig.total = 0
-    paginationConfig.current_page = 1
-    functionLibList.value = []
-    getList()
   }
+  paginationConfig.total = 0
+  paginationConfig.current_page = 1
+  functionLibList.value = []
+  getList()
 }
 
 function getUserList() {
@@ -360,7 +527,7 @@ function getUserList() {
           selectUserId.value = selectUserIdValue
         }
       }
-      getList()
+      // getList()
     }
   })
 }

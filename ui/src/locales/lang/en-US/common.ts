@@ -35,6 +35,7 @@ export default {
   private: 'Private',
   paramSetting: 'Parameter Settings',
   creator: 'Creator',
+  author: 'Author',
   debug: 'Debug',
   required: 'Required',
   noData: 'No data',
@@ -52,7 +53,8 @@ export default {
   },
   param: {
     outputParam: 'Output Parameters',
-    inputParam: 'Input Parameters'
+    inputParam: 'Input Parameters',
+    initParam: 'Startup Parameters',
   },
 
   inputPlaceholder: 'Please input',

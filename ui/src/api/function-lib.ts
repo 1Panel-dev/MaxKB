@@ -112,6 +112,21 @@ const exportFunctionLib = (
   )
 }
 
+const putFunctionLibIcon: (
+    id: string,
+    data: any,
+    loading?: Ref<boolean>
+) => Promise<Result<any>> = (id, data, loading) => {
+  return put(`${prefix}/${id}/edit_icon`, data, undefined, loading)
+}
+
+const addInternalFunction: (
+    id: string,
+    loading?: Ref<boolean>
+) => Promise<Result<any>> = (id, loading) => {
+  return get(`${prefix}/${id}/add_internal_fun`, undefined, loading)
+}
+
 const importFunctionLib: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
   data,
   loading
@@ -128,5 +143,7 @@ export default {
   getFunctionLibById,
   exportFunctionLib,
   importFunctionLib,
-  pylint
+  pylint,
+  putFunctionLibIcon,
+  addInternalFunction
 }

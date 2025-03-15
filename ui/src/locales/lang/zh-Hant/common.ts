@@ -35,6 +35,7 @@ export default {
   private: '私有',
   paramSetting: '參數設定',
   creator: '建立者',
+  author: '作者',
   debug: '調試',
   required: '必填',
   noData: '暂无数据',
@@ -55,7 +56,8 @@ export default {
   content: '内容',
   param: {
     outputParam: '輸出參數',
-    inputParam: '輸入參數'
+    inputParam: '輸入參數',
+    initParam: '啟動參數',
   },
   rename: '重命名'
 }
