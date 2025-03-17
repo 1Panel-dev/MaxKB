@@ -323,8 +323,5 @@ defineExpose({
     color: var(--el-color-primary-light-5);
   }
 }
-.update-info {
-  background: #d6e2ff;
-  line-height: 25px;
-}
+
 </style>

@@ -168,5 +168,11 @@ export default {
     prompt1:
       'Content: {data}\n \n Please summarize the above and generate 5 questions based on the summary. \nAnswer requirements: \n - Please output only questions; \n - Please place each question in',
     prompt2: 'tag.'
+  },
+  feishu: {
+    selectDocument: 'Select Document',
+    tip1: 'Only documents and tables are supported. Documents will be segmented based on titles, and tables will be converted to Markdown format before segmentation.',
+    tip2: 'The system does not store the original document. Before importing the document, it is recommended to standardize the document segmentation markers.',
+    allCheck: 'Select All'
   }
 }
