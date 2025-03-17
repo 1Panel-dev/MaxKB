@@ -10,6 +10,7 @@ import uuid
 
 from django.db import models
 
+from common.encoder.encoder import SystemEncoder
 from common.mixins.app_model_mixin import AppModelMixin
 
 
@@ -29,7 +30,7 @@ class Log(AppModelMixin):
 
     ip_address = models.CharField(max_length=128, verbose_name="ip地址")
 
-    details = models.JSONField(verbose_name="详情", default=dict)
+    details = models.JSONField(verbose_name="详情", default=dict, encoder=SystemEncoder)
 
     class Meta:
         db_table = "log"

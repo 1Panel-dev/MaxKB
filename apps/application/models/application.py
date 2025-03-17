@@ -6,15 +6,13 @@
     @date：2023/9/25 14:24
     @desc:
 """
-import datetime
-import decimal
-import json
 import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from langchain.schema import HumanMessage, AIMessage
 
+from common.encoder.encoder import SystemEncoder
 from common.mixins.app_model_mixin import AppModelMixin
 from dataset.models.data_set import DataSet
 from setting.models.model_management import Model
@@ -135,18 +133,6 @@ class VoteChoices(models.TextChoices):
     TRAMPLE = 1, '反对'
 
 
-class DateEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, uuid.UUID):
-            return str(obj)
-        if isinstance(obj, datetime.datetime):
-            return obj.strftime("%Y-%m-%d %H:%M:%S")
-        if isinstance(obj, decimal.Decimal):
-            return float(obj)
-        else:
-            return json.JSONEncoder.default(self, obj)
-
-
 class ChatRecord(AppModelMixin):
     """
     对话日志 详情
@@ -163,7 +149,7 @@ class ChatRecord(AppModelMixin):
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)
     const = models.IntegerField(verbose_name="总费用", default=0)
-    details = models.JSONField(verbose_name="对话详情", default=dict, encoder=DateEncoder)
+    details = models.JSONField(verbose_name="对话详情", default=dict, encoder=SystemEncoder)
     improve_paragraph_id_list = ArrayField(verbose_name="改进标注列表",
                                            base_field=models.UUIDField(max_length=128, blank=True)
                                            , default=list)
