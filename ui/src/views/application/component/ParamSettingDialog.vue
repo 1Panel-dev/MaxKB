@@ -131,32 +131,29 @@
                   v-model="form.dataset_setting.no_references_setting.status"
                   class="radio-block"
                 >
-                  <div>
-                    <el-radio value="ai_questioning">
-                      <p>
-                        {{ $t('views.application.applicationForm.dialog.continueQuestioning') }}
-                      </p>
-                    </el-radio>
-                  </div>
-                  <div>
-                    <el-radio value="designated_answer">
-                      <p>{{ $t('views.application.applicationForm.dialog.provideAnswer') }}</p>
-                      <el-form-item
-                        v-if="
-                          form.dataset_setting.no_references_setting.status === 'designated_answer'
-                        "
-                        prop="designated_answer"
-                      >
-                        <el-input
-                          v-model="noReferencesform.designated_answer"
-                          :rows="2"
-                          type="textarea"
-                          maxlength="2048"
-                          :placeholder="defaultValue['designated_answer']"
-                        />
-                      </el-form-item>
-                    </el-radio>
-                  </div>
+                  <el-radio value="ai_questioning">
+                    <p>
+                      {{ $t('views.application.applicationForm.dialog.continueQuestioning') }}
+                    </p>
+                  </el-radio>
+
+                  <el-radio value="designated_answer">
+                    <p>{{ $t('views.application.applicationForm.dialog.provideAnswer') }}</p>
+                    <el-form-item
+                      v-if="
+                        form.dataset_setting.no_references_setting.status === 'designated_answer'
+                      "
+                      prop="designated_answer"
+                    >
+                      <el-input
+                        v-model="noReferencesform.designated_answer"
+                        :rows="2"
+                        type="textarea"
+                        maxlength="2048"
+                        :placeholder="defaultValue['designated_answer']"
+                      />
+                    </el-form-item>
+                  </el-radio>
                 </el-radio-group>
               </el-form>
             </el-form-item>

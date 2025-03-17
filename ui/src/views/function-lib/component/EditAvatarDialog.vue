@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-      :title="$t('views.applicationOverview.appInfo.EditAvatarDialog.title')"
+      :title="`Logo ${$t('common.setting')}`"
       v-model="dialogVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"

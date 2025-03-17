@@ -30,7 +30,7 @@ export default {
     },
     form: {
       functionName: {
-        label: '函数名称',
+        label: '名称',
         placeholder: '请输入函数名称',
         requiredMessage: '请输入函数名称'
       },

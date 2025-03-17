@@ -30,7 +30,7 @@ export default {
     },
     form: {
       functionName: {
-        label: '函數名稱',
+        label: '名稱',
         placeholder: '請輸入函數名稱',
         requiredMessage: '請輸入函數名稱'
       },
