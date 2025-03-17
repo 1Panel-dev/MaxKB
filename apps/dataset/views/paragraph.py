@@ -13,6 +13,7 @@ from rest_framework.views import Request
 
 from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import Permission, Group, Operate, CompareConstants
+from common.log.log import log
 from common.response import result
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.common_serializers import BatchSerializer
@@ -33,6 +34,7 @@ class Paragraph(APIView):
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                 dynamic_tag=k.get('dataset_id')))
+    @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Paragraph list'))
     def get(self, request: Request, dataset_id: str, document_id: str):
         q = ParagraphSerializers.Query(
             data={**query_params_to_single_dict(request.query_params), 'dataset_id': dataset_id,
@@ -50,6 +52,7 @@ class Paragraph(APIView):
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
+    @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Create Paragraph'))
     def post(self, request: Request, dataset_id: str, document_id: str):
         return result.success(
             ParagraphSerializers.Create(data={'dataset_id': dataset_id, 'document_id': document_id}).save(request.data))
@@ -67,6 +70,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
+        @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Add associated questions'))
         def post(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str):
             return result.success(ParagraphSerializers.Problem(
                 data={"dataset_id": dataset_id, 'document_id': document_id, 'paragraph_id': paragraph_id}).save(
@@ -82,6 +86,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                     dynamic_tag=k.get('dataset_id')))
+        @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Get a list of paragraph questions'))
         def get(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str):
             return result.success(ParagraphSerializers.Problem(
                 data={"dataset_id": dataset_id, 'document_id': document_id, 'paragraph_id': paragraph_id}).list(
@@ -99,6 +104,7 @@ class Paragraph(APIView):
             @has_permissions(
                 lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                         dynamic_tag=k.get('dataset_id')))
+            @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Disassociation issue'))
             def put(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str, problem_id: str):
                 return result.success(ParagraphSerializers.Association(
                     data={'dataset_id': dataset_id, 'document_id': document_id, 'paragraph_id': paragraph_id,
@@ -116,6 +122,7 @@ class Paragraph(APIView):
             @has_permissions(
                 lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                         dynamic_tag=k.get('dataset_id')))
+            @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Related questions'))
             def put(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str, problem_id: str):
                 return result.success(ParagraphSerializers.Association(
                     data={'dataset_id': dataset_id, 'document_id': document_id, 'paragraph_id': paragraph_id,
@@ -134,6 +141,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
+        @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Modify paragraph data'))
         def put(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str):
             o = ParagraphSerializers.Operate(
                 data={"paragraph_id": paragraph_id, 'dataset_id': dataset_id, 'document_id': document_id})
@@ -149,6 +157,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                     dynamic_tag=k.get('dataset_id')))
+        @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Get paragraph details'))
         def get(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str):
             o = ParagraphSerializers.Operate(
                 data={"dataset_id": dataset_id, 'document_id': document_id, "paragraph_id": paragraph_id})
@@ -164,6 +173,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
+        @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Delete paragraph'))
         def delete(self, request: Request, dataset_id: str, document_id: str, paragraph_id: str):
             o = ParagraphSerializers.Operate(
                 data={"dataset_id": dataset_id, 'document_id': document_id, "paragraph_id": paragraph_id})
@@ -184,6 +194,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
+        @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Delete paragraphs in batches'))
         def delete(self, request: Request, dataset_id: str, document_id: str):
             return result.success(ParagraphSerializers.Batch(
                 data={"dataset_id": dataset_id, 'document_id': document_id}).batch_delete(request.data))
@@ -206,6 +217,7 @@ class Paragraph(APIView):
                                     dynamic_tag=k.get('target_dataset_id')),
             compare=CompareConstants.AND
         )
+        @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Migrate paragraphs in batches'))
         def put(self, request: Request, dataset_id: str, target_dataset_id: str, document_id: str, target_document_id):
             return result.success(
                 ParagraphSerializers.Migrate(
@@ -227,6 +239,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.USE,
                                     dynamic_tag=k.get('dataset_id')))
+        @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Get paragraph list by pagination'))
         def get(self, request: Request, dataset_id: str, document_id: str, current_page, page_size):
             d = ParagraphSerializers.Query(
                 data={**query_params_to_single_dict(request.query_params), 'dataset_id': dataset_id,
@@ -241,6 +254,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
+        @log(menu=_('Knowledge Base/Documentation/Paragraph'), operate=_('Batch generate related'))
         def put(self, request: Request, dataset_id: str, document_id: str):
             return result.success(
                 ParagraphSerializers.BatchGenerateRelated(data={'dataset_id': dataset_id, 'document_id': document_id})
