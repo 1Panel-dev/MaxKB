@@ -156,6 +156,7 @@ class FunctionLibView(APIView):
 
         @action(methods=['PUT'], detail=False)
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
+        @log(menu=_('Function'), operate=_("Edit icon"))
         def put(self, request: Request, id: str):
             return result.success(
                 FunctionLibSerializer.IconOperate(
@@ -167,6 +168,7 @@ class FunctionLibView(APIView):
 
         @action(methods=['GET'], detail=False)
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
+        @log(menu=_('Function'), operate=_("Add internal function"))
         def get(self, request: Request, id: str):
             return result.success(
                 FunctionLibSerializer.InternalFunction(
