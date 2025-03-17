@@ -62,6 +62,7 @@ cffi = "^1.17.1"
 pysilk = "^0.0.1"
 django-db-connection-pool = "^1.2.5"
 opencv-python-headless = "^4.11.0.86"
+pymysql = "^1.1.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
