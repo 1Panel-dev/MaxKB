@@ -6,6 +6,7 @@
     :close-on-press-escape="false"
     :destroy-on-close="true"
     append-to-body
+    width="450"
   >
     <el-form
       label-position="top"
@@ -14,17 +15,20 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-radio-group v-model="form.permission_type">
-        <el-radio value="PRIVATE">
+      <el-radio-group v-model="form.permission_type" class="radio-block">
+        <el-radio value="PRIVATE" size="large" class="mb-16">
           {{ $t('common.private') }}
-          {{ $t('views.template.templateForm.form.permissionType.privateDesc') }}
+          <el-text type="info">{{
+            $t('views.template.templateForm.form.permissionType.privateDesc')
+          }}</el-text>
         </el-radio>
-        <el-radio value="PUBLIC">
+        <el-radio value="PUBLIC" size="large">
           {{ $t('common.public') }}
-          {{ $t('views.template.templateForm.form.permissionType.publicDesc') }}
+          <el-text type="info">{{
+            $t('views.template.templateForm.form.permissionType.publicDesc')
+          }}</el-text>
         </el-radio>
       </el-radio-group>
-
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -43,7 +47,6 @@ import { cloneDeep } from 'lodash'
 import { t } from '@/locales'
 import functionLibApi from '@/api/function-lib'
 import { MsgSuccess } from '@/utils/message'
-
 
 const emit = defineEmits(['refresh'])
 
@@ -89,12 +92,11 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      functionLibApi.putFunctionLib(form.value?.id as string, form.value, loading)
-        .then((res) => {
-          MsgSuccess(t('common.editSuccess'))
-          emit('refresh')
-          dialogVisible.value = false
-        })
+      functionLibApi.putFunctionLib(form.value?.id as string, form.value, loading).then((res) => {
+        MsgSuccess(t('common.editSuccess'))
+        emit('refresh')
+        dialogVisible.value = false
+      })
     }
   })
 }

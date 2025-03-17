@@ -1,6 +1,6 @@
 <template>
   <div class="function-lib-list-container p-24" style="padding-top: 16px">
-    <el-tabs v-model="functionType" >
+    <el-tabs v-model="functionType">
       <el-tab-pane :label="$t('views.functionLib.title')" name="PUBLIC"></el-tab-pane>
       <el-tab-pane :label="$t('views.functionLib.internalTitle')" name="INTERNAL"></el-tab-pane>
     </el-tabs>
@@ -45,7 +45,15 @@
         :loading="loading"
       >
         <el-row :gutter="15">
-          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6" class="mb-16" v-if="functionType === 'PUBLIC'">
+          <el-col
+            :xs="24"
+            :sm="12"
+            :md="8"
+            :lg="6"
+            :xl="6"
+            class="mb-16"
+            v-if="functionType === 'PUBLIC'"
+          >
             <el-card shadow="hover" class="application-card-add" style="--el-card-padding: 8px">
               <div class="card-add-button flex align-center cursor p-8" @click="openCreateDialog()">
                 <AppIcon iconName="app-add-application" class="mr-8"></AppIcon>
@@ -132,13 +140,16 @@
               </div>
               <template #footer>
                 <div class="footer-content flex-between">
-                  <div><span v-if="item.template_id"> {{ $t('common.author') }}: MaxKB</span></div>
+                  <div>
+                    <span v-if="item.template_id"> {{ $t('common.author') }}: MaxKB</span>
+                  </div>
                   <div @click.stop>
                     <el-switch
                       :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
                       v-model="item.is_active"
                       @change="changeState($event, item)"
                       size="small"
+                      class="mr-4"
                     />
                     <el-dropdown trigger="click">
                       <el-button text @click.stop>
@@ -152,7 +163,7 @@
                             @click.stop="copyFunctionLib(item)"
                           >
                             <AppIcon iconName="app-copy"></AppIcon>
-                            {{$t('common.copy')}}
+                            {{ $t('common.copy') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
@@ -165,7 +176,7 @@
                             :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
                             @click.stop="configPermission(item)"
                           >
-                            <AppIcon iconName="app-copy"></AppIcon>
+                            <el-icon><User /></el-icon>
                             {{ $t('views.functionLib.functionForm.form.permission_type.label') }}
                           </el-dropdown-item>
                           <el-dropdown-item
@@ -174,7 +185,7 @@
                             @click.stop="exportFunctionLib(item)"
                           >
                             <AppIcon iconName="app-export"></AppIcon>
-                            {{$t('common.export')}}
+                            {{ $t('common.export') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
@@ -218,11 +229,7 @@
                 />
               </template>
               <div class="status-button">
-                <el-tag
-                  class="info-tag"
-                  v-if="item.added"
-                  style="height: 22px"
-                >
+                <el-tag class="info-tag" v-if="item.added" style="height: 22px">
                   {{ $t('views.functionLib.added') }}</el-tag
                 >
               </div>
@@ -230,11 +237,7 @@
                 <div class="footer-content flex-between">
                   <div>{{ $t('common.author') }}: MaxKB</div>
                   <div @click.stop v-if="!item.added">
-                    <el-button
-                      type="primary"
-                      link
-                      @click="addInternalFunction(item)"
-                    >
+                    <el-button type="primary" link @click="addInternalFunction(item)">
                       {{ $t('common.add') }}
                     </el-button>
                   </div>
@@ -339,26 +342,24 @@ function openCreateDialog(data?: any) {
 
 function getImageUrl(name: string) {
   if (name.startsWith('/src/assets/fx/')) {
-    return internalIcons[name]?.default;
+    return internalIcons[name]?.default
   }
   return name
 }
 
-
 function openDescDrawer(row: any) {
   const index = row.icon.replace('icon.png', 'index.vue')
   internalDescComponent.value = internalDesc[index].default
-  nextTick(()=> {
-    internalDescRef.value?.open(row);
+  nextTick(() => {
+    internalDescRef.value?.open(row)
   })
 }
 
 function addInternalFunction(data?: any) {
-  functionLibApi.addInternalFunction(data.id, changeStateloading)
-    .then((res) => {
-      MsgSuccess(t('common.submitSuccess'))
-      searchHandle()
-    })
+  functionLibApi.addInternalFunction(data.id, changeStateloading).then((res) => {
+    MsgSuccess(t('common.submitSuccess'))
+    searchHandle()
+  })
 }
 
 function searchHandle() {
@@ -433,14 +434,13 @@ function copyFunctionLib(row: any) {
 }
 
 function exportFunctionLib(row: any) {
-  functionLibApi.exportFunctionLib(row.id, row.name, loading)
-    .catch((e: any) => {
-      if (e.response.status !== 403) {
-        e.response.data.text().then((res: string) => {
-          MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
-        })
-      }
-    })
+  functionLibApi.exportFunctionLib(row.id, row.name, loading).catch((e: any) => {
+    if (e.response.status !== 403) {
+      e.response.data.text().then((res: string) => {
+        MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+      })
+    }
+  })
 }
 
 function configPermission(item: any) {

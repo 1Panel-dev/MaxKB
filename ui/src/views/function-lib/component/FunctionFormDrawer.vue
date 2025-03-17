@@ -20,47 +20,54 @@
           :label="$t('views.functionLib.functionForm.form.functionName.label')"
           prop="name"
         >
-          <div v-if="form.id"
-            class="edit-avatar mr-12"
-            @mouseenter="showEditIcon = true"
-            @mouseleave="showEditIcon = false"
-          >
-            <AppAvatar
-              v-if="isAppIcon(form.icon as string)"
-              :id="form.id"
-              shape="square"
-              :size="32"
-              style="background: none"
+          <div class="flex w-full">
+            <div
+              v-if="form.id"
+              class="edit-avatar mr-12"
+              @mouseenter="showEditIcon = true"
+              @mouseleave="showEditIcon = false"
             >
-              <img :src="form.icon as string" alt="" />
+              <AppAvatar
+                v-if="isAppIcon(form.icon)"
+                :id="form.id"
+                shape="square"
+                :size="32"
+                style="background: none"
+              >
+                <img :src="String(form.icon)" alt="" />
+              </AppAvatar>
+              <AppAvatar
+                v-else-if="form.name"
+                :id="form.id"
+                :name="form.name"
+                pinyinColor
+                shape="square"
+                :size="32"
+              />
+              <AppAvatar
+                v-if="showEditIcon"
+                :id="form.id"
+                shape="square"
+                class="edit-mask"
+                :size="32"
+                @click="openEditAvatar"
+              >
+                <el-icon><EditPen /></el-icon>
+              </AppAvatar>
+            </div>
+            <AppAvatar shape="square" style="background: #34c724" class="mr-12" v-else>
+              <img src="@/assets/icon_function_outlined.svg" style="width: 75%" alt="" />
             </AppAvatar>
-            <AppAvatar
-              v-else-if="form.name"
-              :id="form.id"
-              :name="form.name"
-              pinyinColor
-              shape="square"
-              :size="32"
+            <el-input
+              v-model="form.name"
+              :placeholder="$t('views.functionLib.functionForm.form.functionName.placeholder')"
+              maxlength="64"
+              show-word-limit
+              @blur="form.name = form.name?.trim()"
             />
-            <AppAvatar
-              v-if="showEditIcon"
-              :id="form.id"
-              shape="square"
-              class="edit-mask"
-              :size="32"
-              @click="openEditAvatar"
-            >
-              <el-icon><EditPen /></el-icon>
-            </AppAvatar>
           </div>
-          <el-input
-            v-model="form.name"
-            :placeholder="$t('views.functionLib.functionForm.form.functionName.placeholder')"
-            maxlength="64"
-            show-word-limit
-            @blur="form.name = form.name?.trim()"
-          />
         </el-form-item>
+
         <el-form-item :label="$t('views.functionLib.functionForm.form.functionDescription.label')">
           <el-input
             v-model="form.desc"
@@ -72,7 +79,7 @@
             @blur="form.desc = form.desc?.trim()"
           />
         </el-form-item>
-<!--
+        <!--
         <el-form-item prop="permission_type">
           <template #label>
             <span>{{ $t('views.functionLib.functionForm.form.permission_type.label') }}</span>
@@ -110,7 +117,7 @@
         </el-button>
       </div>
       <el-table :data="form.init_field_list" class="mb-16">
-        <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')" >
+        <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')">
           <template #default="{ row }">
             <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
           </template>
@@ -266,7 +273,7 @@
 
     <FunctionDebugDrawer ref="FunctionDebugDrawerRef" />
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
-    <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList"/>
+    <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshFunctionLib" />
   </el-drawer>
 </template>
@@ -283,8 +290,8 @@ import { cloneDeep } from 'lodash'
 import { PermissionType, PermissionDesc } from '@/enums/model'
 import { t } from '@/locales'
 import UserFieldFormDialog from '@/workflow/nodes/base-node/component/UserFieldFormDialog.vue'
-import {isAppIcon} from "@/utils/application";
-import EditAvatarDialog from "./EditAvatarDialog.vue";
+import { isAppIcon } from '@/utils/application'
+import EditAvatarDialog from './EditAvatarDialog.vue'
 
 const props = defineProps({
   title: String
@@ -402,7 +409,6 @@ function refreshFieldList(data: any) {
   currentIndex.value = null
 }
 
-
 function openAddInitDialog(data?: any, index?: any) {
   if (typeof index !== 'undefined') {
     currentIndex.value = index
@@ -433,7 +439,6 @@ function deleteInitField(index: any) {
 function openEditAvatar() {
   EditAvatarDialogRef.value.open(form.value)
 }
-
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
