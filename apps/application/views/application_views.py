@@ -24,6 +24,7 @@ from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import CompareConstants, PermissionConstants, Permission, Group, Operate, \
     ViewPermission, RoleConstants
 from common.exception.app_exception import AppAuthenticationFailed
+from common.log.log import log
 from common.response import result
 from common.swagger_api.common_api import CommonApi
 from common.util.common import query_params_to_single_dict
@@ -603,6 +604,7 @@ class Application(APIView):
                              responses=result.get_page_api_response(ApplicationApi.get_response_body_api()),
                              tags=[_('Application')])
         @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
+        @log(menu=_('Application'), operate=_("Get the application list by page"))
         def get(self, request: Request, current_page: int, page_size: int):
             return result.success(
                 ApplicationSerializer.Query(
