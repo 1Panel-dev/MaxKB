@@ -42,6 +42,5 @@ class FileView(APIView):
         @swagger_auto_schema(operation_summary=_('Get file'),
                              operation_id=_('Get file'),
                              tags=[_('file')])
-        @log(menu=_('file'), operate=_('Get file'))
         def get(self, request: Request, file_id: str):
             return FileSerializer.Operate(data={'id': file_id}).get()
