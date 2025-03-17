@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.views import Request
 
 from common.auth import TokenAuth
+from common.log.log import log
 from common.response import result
 from dataset.serializers.file_serializers import FileSerializer
 from django.utils.translation import gettext_lazy as _
@@ -32,6 +33,7 @@ class FileView(APIView):
                                                               required=True,
                                                               description=_('Upload file'))],
                          tags=[_('file')])
+    @log(menu=_('file'), operate=_('Upload file'))
     def post(self, request: Request):
         return result.success(FileSerializer(data={'file': request.FILES.get('file')}).upload())
 
@@ -40,5 +42,6 @@ class FileView(APIView):
         @swagger_auto_schema(operation_summary=_('Get file'),
                              operation_id=_('Get file'),
                              tags=[_('file')])
+        @log(menu=_('file'), operate=_('Get file'))
         def get(self, request: Request, file_id: str):
             return FileSerializer.Operate(data={'id': file_id}).get()

@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.views import Request
 
 from common.auth import TokenAuth
+from common.log.log import log
 from common.response import result
 from dataset.serializers.image_serializers import ImageSerializer
 from django.utils.translation import gettext_lazy as _
@@ -32,6 +33,7 @@ class Image(APIView):
                                                               required=True,
                                                               description=_('Upload image'))],
                          tags=[_('Image')])
+    @log(menu=_('Image'), operate=_('Upload image'))
     def post(self, request: Request):
         return result.success(ImageSerializer(data={'image': request.FILES.get('file')}).upload())
 
@@ -40,5 +42,6 @@ class Image(APIView):
         @swagger_auto_schema(operation_summary=_('Get Image'),
                              operation_id=_('Get Image'),
                              tags=[_('Image')])
+        @log(menu=_('Image'), operate=_('Get Image'))
         def get(self, request: Request, image_id: str):
             return ImageSerializer.Operate(data={'id': image_id}).get()
