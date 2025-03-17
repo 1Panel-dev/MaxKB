@@ -2,7 +2,7 @@ import Layout from '@/layout/layout-template/DetailLayout.vue'
 const datasetRouter = {
   path: '/dataset',
   name: 'dataset',
-  meta: { title:  'views.dataset.title', permission: 'DATASET:READ' },
+  meta: { title: 'views.dataset.title', permission: 'DATASET:READ' },
   component: () => import('@/layout/layout-template/AppLayout.vue'),
   redirect: '/dataset',
   children: [
@@ -13,7 +13,7 @@ const datasetRouter = {
       component: () => import('@/views/dataset/index.vue')
     },
     {
-      path: '/dataset/:type', // upload
+      path: '/dataset/upload',
       name: 'UploadDocumentDataset',
       meta: { activeMenu: '/dataset' },
       component: () => import('@/views/dataset/UploadDocumentDataset.vue'),
@@ -85,7 +85,14 @@ const datasetRouter = {
       meta: { activeMenu: '/dataset' },
       component: () => import('@/views/paragraph/index.vue'),
       hidden: true
-    }
+    },
+    {
+      path: '/dataset/import',
+      name: 'ImportDocumentDataset',
+      meta: { activeMenu: '/dataset' },
+      component: () => import('@/views/dataset/ImportDocumentDataset.vue'),
+      hidden: true
+    },
   ]
 }
 

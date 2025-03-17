@@ -12,7 +12,7 @@ export default {
     cancelGenerateQuestion: '取消生成问题',
     cancelVectorization: '取消向量化',
     cancelGenerate: '取消生成',
-    export: '导出',
+    export: '导出'
   },
   tip: {
     saveMessage: '当前的更改尚未保存，确认退出吗?',
@@ -108,7 +108,7 @@ export default {
     GENERATE: '生成中',
     SYNC: '同步中',
     REVOKE: '取消中',
-    finish:'完成'
+    finish: '完成'
   },
   enableStatus: {
     label: '启用状态',
@@ -149,7 +149,7 @@ export default {
       label: '相似度高于',
       placeholder: '直接返回分段内容',
       requiredMessage: '请输入相似度'
-    },
+    }
   },
   hitHandlingMethod: {
     optimization: '模型优化',
@@ -163,6 +163,12 @@ export default {
     tip3: '标签中，系统会自动关联标签中的问题；',
     tip4: '生成效果依赖于所选模型和提示词，用户可自行调整至最佳效果。',
     prompt1: `内容：{data}\n\n请总结上面的内容，并根据内容总结生成 5 个问题。\n回答要求：\n- 请只输出问题；\n- 请将每个问题放置`,
-    prompt2: `标签中。`,
+    prompt2: `标签中。`
+  },
+  feishu: {
+    selectDocument: '选择文档',
+    tip1: '仅支持文档和表格类型，文档会根据标题分段，表格会转为Markdown格式后再分段。',
+    tip2: '系统不存储原始文档，导入文档前，建议规范文档的分段标识。',
+    allCheck: '全选'
   }
 }

@@ -48,14 +48,16 @@
             type="textarea"
           />
         </el-form-item>
-        <el-form-item v-if="apiType === 'document'" :label="$t('components.selectParagraph.title')" prop="state">
+        <el-form-item
+          v-if="apiType === 'document'"
+          :label="$t('components.selectParagraph.title')"
+          prop="state"
+        >
           <el-radio-group v-model="state" class="radio-block">
             <el-radio value="error" size="large">{{
               $t('components.selectParagraph.error')
             }}</el-radio>
-            <el-radio value="all" size="large">{{
-               $t('components.selectParagraph.all')
-            }}</el-radio>
+            <el-radio value="all" size="large">{{ $t('components.selectParagraph.all') }}</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -147,7 +149,7 @@ const submitHandle = async (formEl: FormInstance) => {
       if (apiType.value === 'paragraph') {
         const data = {
           ...form.value,
-          paragraph_id_list: idList.value,
+          paragraph_id_list: idList.value
         }
         paragraphApi.batchGenerateRelated(id, documentId, data, loading).then(() => {
           MsgSuccess(t('views.document.generateQuestion.successMessage'))
@@ -185,9 +187,4 @@ function getModel() {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope>
-.update-info {
-  background: #d6e2ff;
-  line-height: 25px;
-}
-</style>
+<style lang="scss" scope></style>
