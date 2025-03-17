@@ -82,6 +82,9 @@ class Type(models.TextChoices):
 
     web = 1, 'web站点类型'
 
+    lark = 2, '飞书类型'
+    yuque = 3, '语雀类型'
+
 
 class HitHandlingMethod(models.TextChoices):
     optimization = 'optimization', '模型优化'
