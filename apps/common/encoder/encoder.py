@@ -11,7 +11,7 @@ import decimal
 import json
 import uuid
 
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 
 
 class SystemEncoder(json.JSONEncoder):
@@ -23,6 +23,8 @@ class SystemEncoder(json.JSONEncoder):
         if isinstance(obj, decimal.Decimal):
             return float(obj)
         if isinstance(obj, InMemoryUploadedFile):
+            return {'name': obj.name, 'size': obj.size}
+        if isinstance(obj, TemporaryUploadedFile):
             return {'name': obj.name, 'size': obj.size}
         else:
             return json.JSONEncoder.default(self, obj)
