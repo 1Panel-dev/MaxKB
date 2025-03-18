@@ -41,7 +41,6 @@ class AppNode extends HtmlResize.view {
       }
     }
     function getNodesName(num: number) {
-      console.log(props.model.properties.stepName)
       const number = num
       const name = props.model.properties.stepName + number
       if (!props.graphModel.nodes?.some((node: any) => node.properties.stepName === name.trim())) {

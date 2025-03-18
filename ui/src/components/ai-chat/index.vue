@@ -15,7 +15,7 @@
         ref="userFormRef"
       ></UserForm>
     </div>
-    <template v-if="!firsUserInput">
+    <template v-if="!isUserInput || !firsUserInput">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
         <div ref="dialogScrollbar" class="ai-chat__content p-24">
           <PrologueContent
