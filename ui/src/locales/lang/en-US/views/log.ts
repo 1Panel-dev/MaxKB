@@ -13,6 +13,7 @@ export default {
   table: {
     abstract: 'Title',
     chat_record_count: 'Total Messages',
+    user: 'User',
     feedback: {
       label: 'User Feedback',
       star: 'Agree',

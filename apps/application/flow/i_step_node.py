@@ -84,7 +84,8 @@ class WorkFlowPostHandler:
                                      answer_text_list=answer_text_list,
                                      run_time=time.time() - workflow.context['start_time'],
                                      index=0)
-        self.chat_info.append_chat_record(chat_record, self.client_id)
+        asker = workflow.context.get('asker', None)
+        self.chat_info.append_chat_record(chat_record, self.client_id, asker)
         # 重新设置缓存
         chat_cache.set(chat_id,
                        self.chat_info, timeout=60 * 30)

@@ -115,10 +115,15 @@ class ApplicationDatasetMapping(AppModelMixin):
         db_table = "application_dataset_mapping"
 
 
+def default_asker():
+    return {'user_name': '游客'}
+
+
 class Chat(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid1, editable=False, verbose_name="主键id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     abstract = models.CharField(max_length=1024, verbose_name="摘要")
+    asker = models.JSONField(verbose_name="访问者", default=default_asker, encoder=SystemEncoder)
     client_id = models.UUIDField(verbose_name="客户端id", default=None, null=True)
     is_deleted = models.BooleanField(verbose_name="", default=False)
 

@@ -1,5 +1,5 @@
 SELECT
-	*
+	*,to_json(asker) as asker
 FROM
 	application_chat application_chat
 	LEFT JOIN (
