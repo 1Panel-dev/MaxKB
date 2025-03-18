@@ -12,7 +12,7 @@ export default {
     },
     status: {
       label: 'Status',
-      success: 'Successed',
+      success: 'Successful',
       fail: 'Failed',
       all: 'All'
     },
