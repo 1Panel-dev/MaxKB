@@ -103,6 +103,20 @@ const settingRouter = {
           component: () => import('@/views/email/index.vue')
         }
       ]
+    },
+    {
+      path: '/operate',
+      name: 'operate',
+      meta: {
+        icon: 'app-document',
+        iconActive: 'app-document-active',
+        title: 'views.operateLog.title',
+        activeMenu: '/setting',
+        parentPath: '/setting',
+        parentName: 'setting',
+        permission: new ComplexPermission(['ADMIN'], ['x-pack'], 'AND')
+      },
+      component: () => import('@/views/operate-log/index.vue')
     }
   ]
 }
