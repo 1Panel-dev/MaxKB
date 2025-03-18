@@ -33,9 +33,9 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
 
 def valid_reference_value(_type, value, name):
     if _type == 'int':
-        instance_type = int
+        instance_type = int | float
     elif _type == 'float':
-        instance_type = float
+        instance_type = float | int
     elif _type == 'dict':
         instance_type = dict
     elif _type == 'array':
@@ -56,6 +56,10 @@ def convert_value(name: str, value, _type, is_required, source, node):
             value[0],
             value[1:])
         valid_reference_value(_type, value, name)
+        if _type == 'int':
+            return int(value)
+        if _type == 'float':
+            return float(value)
         return value
     try:
         if _type == 'int':
