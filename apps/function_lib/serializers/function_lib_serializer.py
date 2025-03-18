@@ -222,8 +222,11 @@ class FunctionLibSerializer(serializers.Serializer):
                         **field} for field in
                        input_field_list]}
             # 合并初始化参数
-            params = init_params | params
-            return function_executor.exec_code(code, params)
+            if init_params is not None:
+                all_params = init_params | params
+            else:
+                all_params = params
+            return function_executor.exec_code(code, all_params)
 
         @staticmethod
         def get_field_value(debug_field_list, name, is_required):

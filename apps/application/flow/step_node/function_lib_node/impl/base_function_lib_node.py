@@ -111,7 +111,10 @@ class BaseFunctionLibNodeNode(IFunctionLibNode):
 
         self.context['params'] = params
         # 合并初始化参数
-        all_params = json.loads(rsa_long_decrypt(function_lib.init_params)) | params
+        if function_lib.init_params is not None:
+            all_params = json.loads(rsa_long_decrypt(function_lib.init_params)) | params
+        else:
+            all_params = params
         result = function_executor.exec_code(function_lib.code, all_params)
         return NodeResult({'result': result}, {}, _write_context=write_context)
 
