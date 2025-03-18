@@ -13,6 +13,7 @@ export default {
   table: {
     abstract: '摘要',
     chat_record_count: '對話提問數',
+    user: '用戶',
     feedback: {
       label: '用戶反饋',
       star: '贊同',
@@ -35,6 +36,6 @@ export default {
     },
     title: {
       placeholder: '請給當前內容設定一個標題，以便管理查看'
-    },
+    }
   }
 }

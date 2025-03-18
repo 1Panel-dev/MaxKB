@@ -142,21 +142,16 @@
           </template>
         </el-table-column>
         <el-table-column prop="mark_sum" :label="$t('views.log.table.mark')" align="right" />
+        <el-table-column prop="asker" :label="$t('views.log.table.user')">
+          <template #default="{ row }">
+            {{ row.asker?.user_name }}
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('views.log.table.recenTimes')" width="180">
           <template #default="{ row }">
             {{ datetimeFormat(row.update_time) }}
           </template>
         </el-table-column>
-
-        <!-- <el-table-column label="操作" width="70" align="left">
-          <template #default="{ row }">
-            <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
-              <el-button type="primary" text @click.stop="deleteLog(row)">
-                <el-icon><Delete /></el-icon>
-              </el-button>
-            </el-tooltip>
-          </template>
-        </el-table-column> -->
       </app-table>
     </div>
     <ChatRecordDrawer

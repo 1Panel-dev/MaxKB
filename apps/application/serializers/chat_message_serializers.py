@@ -116,13 +116,15 @@ class ChatInfo:
         }
 
     def to_pipeline_manage_params(self, problem_text: str, post_response_handler: PostResponseHandler,
-                                  exclude_paragraph_id_list, client_id: str, client_type, stream=True):
+                                  exclude_paragraph_id_list, client_id: str, client_type, stream=True, form_data=None):
+        if form_data is None:
+            form_data = {}
         params = self.to_base_pipeline_manage_params()
         return {**params, 'problem_text': problem_text, 'post_response_handler': post_response_handler,
                 'exclude_paragraph_id_list': exclude_paragraph_id_list, 'stream': stream, 'client_id': client_id,
-                'client_type': client_type}
+                'client_type': client_type, 'form_data': form_data}
 
-    def append_chat_record(self, chat_record: ChatRecord, client_id=None):
+    def append_chat_record(self, chat_record: ChatRecord, client_id=None, asker=None):
         chat_record.problem_text = chat_record.problem_text[0:10240] if chat_record.problem_text is not None else ""
         chat_record.answer_text = chat_record.answer_text[0:40960] if chat_record.problem_text is not None else ""
         is_save = True
@@ -137,8 +139,17 @@ class ChatInfo:
         if self.application.id is not None:
             # 插入数据库
             if not QuerySet(Chat).filter(id=self.chat_id).exists():
+                asker_dict = {'user_name': '游客'}
+                if asker is not None:
+                    if isinstance(asker, str):
+                        asker_dict = {
+                            'user_name': asker
+                        }
+                    elif isinstance(asker, dict):
+                        asker_dict = asker
+
                 Chat(id=self.chat_id, application_id=self.application.id, abstract=chat_record.problem_text[0:1024],
-                     client_id=client_id, update_time=datetime.now()).save()
+                     client_id=client_id, asker=asker_dict, update_time=datetime.now()).save()
             else:
                 Chat.objects.filter(id=self.chat_id).update(update_time=datetime.now())
             # 插入会话记录
@@ -171,7 +182,8 @@ def get_post_handler(chat_info: ChatInfo):
                                      answer_text_list=answer_list,
                                      run_time=manage.context['run_time'],
                                      index=len(chat_info.chat_record_list) + 1)
-            chat_info.append_chat_record(chat_record, client_id)
+            asker = kwargs.get("asker", None)
+            chat_info.append_chat_record(chat_record, client_id, asker=asker)
             # 重新设置缓存
             chat_cache.set(chat_id,
                            chat_info, timeout=60 * 30)
@@ -310,6 +322,7 @@ class ChatMessageSerializer(serializers.Serializer):
         stream = self.data.get('stream')
         client_id = self.data.get('client_id')
         client_type = self.data.get('client_type')
+        form_data = self.data.get("form_data")
         pipeline_manage_builder = PipelineManage.builder()
         # 如果开启了问题优化,则添加上问题优化步骤
         if chat_info.application.problem_optimization:
@@ -331,7 +344,7 @@ class ChatMessageSerializer(serializers.Serializer):
             exclude_paragraph_id_list = list(set(paragraph_id_list))
         # 构建运行参数
         params = chat_info.to_pipeline_manage_params(message, get_post_handler(chat_info), exclude_paragraph_id_list,
-                                                     client_id, client_type, stream)
+                                                     client_id, client_type, stream, form_data)
         # 运行流水线作业
         pipeline_message.run(params)
         return pipeline_message.context['chat_result']
