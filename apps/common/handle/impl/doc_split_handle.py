@@ -110,24 +110,51 @@ def get_image_id_func():
     return get_image_id
 
 
+title_font_list = [
+    [36, 100],
+    [26, 36],
+    [24, 26],
+    [22, 24],
+    [18, 22],
+    [16, 18]
+]
+
+
+def get_title_level(paragraph: Paragraph):
+    try:
+        if paragraph.style is not None:
+            psn = paragraph.style.name
+            if psn.startswith('Heading') or psn.startswith('TOC 标题') or psn.startswith('标题'):
+                return int(psn.replace("Heading ", '').replace('TOC 标题', '').replace('标题',
+                                                                                       ''))
+        if len(paragraph.runs) == 1:
+            font_size = paragraph.runs[0].font.size
+            pt = font_size.pt
+            if pt >= 16:
+                for _value, index in zip(title_font_list, range(len(title_font_list))):
+                    if pt >= _value[0] and pt < _value[1]:
+                        return index + 1
+    except Exception as e:
+        pass
+    return None
+
+
 class DocSplitHandle(BaseSplitHandle):
     @staticmethod
     def paragraph_to_md(paragraph: Paragraph, doc: Document, images_list, get_image_id):
         try:
-            psn = paragraph.style.name
-            if psn.startswith('Heading') or psn.startswith('TOC 标题') or psn.startswith('标题'):
-                title = "".join(["#" for i in range(
-                    int(psn.replace("Heading ", '').replace('TOC 标题', '').replace('标题',
-                                                                                    '')))]) + " " + paragraph.text
+            title_level = get_title_level(paragraph)
+            if title_level is not None:
+                title = "".join(["#" for i in range(title_level)]) + " " + paragraph.text
                 images = reduce(lambda x, y: [*x, *y],
                                 [get_paragraph_element_images(e, doc, images_list, get_image_id) for e in
                                  paragraph._element],
                                 [])
-
                 if len(images) > 0:
                     return title + '\n' + images_to_string(images, doc, images_list, get_image_id) if len(
                         paragraph.text) > 0 else images_to_string(images, doc, images_list, get_image_id)
                 return title
+
         except Exception as e:
             traceback.print_exc()
             return paragraph.text
