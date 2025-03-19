@@ -229,14 +229,12 @@
                 />
               </template>
               <div class="status-button">
-                <el-tag class="info-tag" v-if="item.added" style="height: 22px">
-                  {{ $t('views.functionLib.added') }}</el-tag
-                >
+
               </div>
               <template #footer>
                 <div class="footer-content flex-between">
                   <div>{{ $t('common.author') }}: MaxKB</div>
-                  <div @click.stop v-if="!item.added">
+                  <div @click.stop>
                     <el-button type="primary" link @click="addInternalFunction(item)">
                       {{ $t('common.add') }}
                     </el-button>
@@ -250,6 +248,7 @@
     </div>
     <FunctionFormDrawer ref="FunctionFormDrawerRef" @refresh="refresh" :title="title" />
     <PermissionDialog ref="PermissionDialogRef" @refresh="refresh" />
+    <AddInternalFunctionDialog ref="AddInternalFunctionDialogRef" @refresh="confirmAddInternalFunction" />
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <component :is="internalDescComponent" ref="internalDescRef" />
   </div>
@@ -269,6 +268,7 @@ import { isAppIcon } from '@/utils/application'
 import InfiniteScroll from '@/components/infinite-scroll/index.vue'
 import CardBox from '@/components/card-box/index.vue'
 import type { Dict } from '@/api/type/common'
+import AddInternalFunctionDialog from '@/views/function-lib/component/AddInternalFunctionDialog.vue'
 
 const internalIcons: Dict<any> = import.meta.glob('@/assets/fx/*/*.png', { eager: true })
 let internalDesc: Dict<any> = import.meta.glob('@/assets/fx/*/index.vue', { eager: true })
@@ -281,6 +281,7 @@ const loading = ref(false)
 
 const FunctionFormDrawerRef = ref()
 const PermissionDialogRef = ref()
+const AddInternalFunctionDialogRef = ref()
 const InitParamDrawerRef = ref()
 
 const functionLibList = ref<any[]>([])
@@ -356,7 +357,11 @@ function openDescDrawer(row: any) {
 }
 
 function addInternalFunction(data?: any) {
-  functionLibApi.addInternalFunction(data.id, changeStateloading).then((res) => {
+  AddInternalFunctionDialogRef.value.open(data)
+}
+
+function confirmAddInternalFunction(data?: any) {
+  functionLibApi.addInternalFunction(data.id, {name: data.name}, changeStateloading).then((res) => {
     MsgSuccess(t('common.submitSuccess'))
     searchHandle()
   })

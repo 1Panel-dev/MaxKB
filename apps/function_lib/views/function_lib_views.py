@@ -166,10 +166,11 @@ class FunctionLibView(APIView):
     class AddInternalFun(APIView):
         authentication_classes = [TokenAuth]
 
-        @action(methods=['GET'], detail=False)
+        @action(methods=['POST'], detail=False)
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
         @log(menu=_('Function'), operate=_("Add internal function"))
-        def get(self, request: Request, id: str):
+        def post(self, request: Request, id: str):
             return result.success(
                 FunctionLibSerializer.InternalFunction(
-                    data={'id': id, 'user_id': request.user.id}).add())
+                    data={'id': id, 'user_id': request.user.id, 'name': request.data.get('name')})
+                .add())
