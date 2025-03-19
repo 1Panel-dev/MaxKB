@@ -75,6 +75,7 @@ def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, 
                 return func(view, request, **kwargs)
             except Exception as e:
                 status = 500
+                raise e
             finally:
                 ip = get_ip_address(request)
                 user = get_user(request)
