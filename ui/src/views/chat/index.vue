@@ -41,10 +41,10 @@ const {
 const is_auth = ref<boolean>(false)
 const currentTemplate = computed(() => {
   let modeName = ''
-  if (mode && mode === 'embed') {
-    modeName = 'embed'
-  } else {
+  if (!mode || mode === 'pc') {
     modeName = show_history.value || !user.isEnterprise() ? 'pc' : 'base'
+  } else {
+    modeName = mode
   }
   const name = `/src/views/chat/${modeName}/index.vue`
   return components[name].default

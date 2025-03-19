@@ -41,7 +41,8 @@ export default {
     EmbedDialog: {
       fullscreenModeTitle: 'Fullscreen Mode',
       copyInstructions: 'Copy the code below to embed',
-      floatingModeTitle: 'Floating Mode'
+      floatingModeTitle: 'Floating Mode',
+      mobileModeTitle: 'Mobile Mode'
     },
     LimitDialog: {
       dialogTitle: 'Access Restrictions',
