@@ -13,6 +13,7 @@ from rest_framework.views import Request
 
 from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import PermissionConstants
+from common.log.log import log
 from common.response import result
 from setting.serializers.team_serializers import TeamMemberSerializer, get_response_body_api, \
     UpdateTeamMemberPermissionSerializer
@@ -28,6 +29,7 @@ class TeamMember(APIView):
                          responses=result.get_api_response(get_response_body_api()),
                          tags=[_('team')])
     @has_permissions(PermissionConstants.TEAM_READ)
+    @log(menu='team', operate='Get a list of team members')
     def get(self, request: Request):
         return result.success(TeamMemberSerializer(data={'team_id': str(request.user.id)}).list_member())
 
@@ -37,6 +39,7 @@ class TeamMember(APIView):
                          request_body=TeamMemberSerializer().get_request_body_api(),
                          tags=[_('team')])
     @has_permissions(PermissionConstants.TEAM_CREATE)
+    @log(menu='team', operate='Add member')
     def post(self, request: Request):
         team = TeamMemberSerializer(data={'team_id': str(request.user.id)})
         return result.success((team.add_member(**request.data)))
@@ -50,6 +53,7 @@ class TeamMember(APIView):
                              request_body=TeamMemberSerializer.get_bach_request_body_api(),
                              tags=[_('team')])
         @has_permissions(PermissionConstants.TEAM_CREATE)
+        @log(menu='team', operate='Add members in batches')
         def post(self, request: Request):
             return result.success(
                 TeamMemberSerializer(data={'team_id': request.user.id}).batch_add_member(request.data))
@@ -63,6 +67,7 @@ class TeamMember(APIView):
                              manual_parameters=TeamMemberSerializer.Operate.get_request_params_api(),
                              tags=[_('team')])
         @has_permissions(PermissionConstants.TEAM_READ)
+        @log(menu='team', operate='Get team member permissions')
         def get(self, request: Request, member_id: str):
             return result.success(TeamMemberSerializer.Operate(
                 data={'member_id': member_id, 'team_id': str(request.user.id)}).list_member_permission())
@@ -75,6 +80,7 @@ class TeamMember(APIView):
                              tags=[_('team')]
                              )
         @has_permissions(PermissionConstants.TEAM_EDIT)
+        @log(menu='team', operate='Update team member permissions')
         def put(self, request: Request, member_id: str):
             return result.success(TeamMemberSerializer.Operate(
                 data={'member_id': member_id, 'team_id': str(request.user.id)}).edit(request.data))
@@ -86,6 +92,7 @@ class TeamMember(APIView):
                              tags=[_('team')]
                              )
         @has_permissions(PermissionConstants.TEAM_DELETE)
+        @log(menu='team', operate='Remove member')
         def delete(self, request: Request, member_id: str):
             return result.success(TeamMemberSerializer.Operate(
                 data={'member_id': member_id, 'team_id': str(request.user.id)}).delete())

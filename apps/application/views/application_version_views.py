@@ -16,6 +16,7 @@ from application.swagger_api.application_version_api import ApplicationVersionAp
 from common.auth import has_permissions, TokenAuth
 from common.constants.permission_constants import PermissionConstants, CompareConstants, ViewPermission, RoleConstants, \
     Permission, Group, Operate
+from common.log.log import log
 from common.response import result
 from django.utils.translation import gettext_lazy as _
 
@@ -30,6 +31,7 @@ class ApplicationVersionView(APIView):
                          responses=result.get_api_array_response(ApplicationVersionApi.get_response_body_api()),
                          tags=[_('Application/Version')])
     @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
+    @log(menu='Application', operate="Get the application list")
     def get(self, request: Request, application_id: str):
         return result.success(
             ApplicationVersionSerializer.Query(
@@ -47,6 +49,7 @@ class ApplicationVersionView(APIView):
                              responses=result.get_page_api_response(ApplicationVersionApi.get_response_body_api()),
                              tags=[_('Application/Version')])
         @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
+        @log(menu='Application', operate="Get the list of application versions by page")
         def get(self, request: Request, application_id: str, current_page: int, page_size: int):
             return result.success(
                 ApplicationVersionSerializer.Query(
@@ -64,6 +67,7 @@ class ApplicationVersionView(APIView):
                              responses=result.get_api_response(ApplicationVersionApi.get_response_body_api()),
                              tags=[_('Application/Version')])
         @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
+        @log(menu='Application', operate="Get application version details")
         def get(self, request: Request, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(
@@ -82,6 +86,7 @@ class ApplicationVersionView(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Modify application version information")
         def put(self, request: Request, application_id: str, work_flow_version_id: str):
             return result.success(
                 ApplicationVersionSerializer.Operate(

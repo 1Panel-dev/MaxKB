@@ -18,7 +18,9 @@ from rest_framework.views import Request
 from common.auth.authenticate import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, CompareConstants, ViewPermission, RoleConstants
+from common.log.log import log
 from common.response import result
+from common.util.common import encryption
 from smartdoc.settings import JWT_AUTH
 from users.serializers.user_serializers import RegisterSerializer, LoginSerializer, CheckCodeSerializer, \
     RePasswordSerializer, \
@@ -36,6 +38,7 @@ class Profile(APIView):
                          operation_id=_("Get MaxKB related information"),
                          responses=result.get_api_response(SystemSerializer.get_response_body_api()),
                          tags=[_('System parameters')])
+    @log(menu='System parameters', operate='Get MaxKB related information')
     def get(self, request: Request):
         return result.success(SystemSerializer.get_profile())
 
@@ -49,6 +52,7 @@ class User(APIView):
                          responses=result.get_api_response(UserProfile.get_response_body_api()),
                          tags=[])
     @has_permissions(PermissionConstants.USER_READ)
+    @log(menu='User', operate='Get current user information')
     def get(self, request: Request):
         return result.success(UserProfile.get_user_profile(request.user))
 
@@ -62,6 +66,7 @@ class User(APIView):
                              responses=result.get_api_array_response(UserSerializer.Query.get_response_body_api()),
                              tags=[_("User")])
         @has_permissions(PermissionConstants.USER_READ)
+        @log(menu='User', operate='Get user list')
         def get(self, request: Request):
             return result.success(
                 UserSerializer.Query(data={'email_or_username': request.query_params.get('email_or_username')}).list())
@@ -83,6 +88,7 @@ class SwitchUserLanguageView(APIView):
                          ),
                          responses=RePasswordSerializer().get_response_body_api(),
                          tags=[_("User")])
+    @log(menu='User', operate='Switch Language')
     def post(self, request: Request):
         data = {**request.data, 'user_id': request.user.id}
         return result.success(SwitchLanguageSerializer(data=data).switch())
@@ -108,6 +114,7 @@ class ResetCurrentUserPasswordView(APIView):
                          ),
                          responses=RePasswordSerializer().get_response_body_api(),
                          tags=[_("User")])
+    @log(menu='User', operate='Modify current user password')
     def post(self, request: Request):
         data = {'email': request.user.email}
         data.update(request.data)
@@ -127,6 +134,7 @@ class SendEmailToCurrentUserView(APIView):
                          operation_id=_("Send email to current user"),
                          responses=SendEmailSerializer().get_response_body_api(),
                          tags=[_("User")])
+    @log(menu='User', operate='Send email to current user')
     def post(self, request: Request):
         serializer_obj = SendEmailSerializer(data={'email': request.user.email, 'type': "reset_password"})
         if serializer_obj.is_valid(raise_exception=True):
@@ -142,9 +150,21 @@ class Logout(APIView):
                          operation_id=_("Sign out"),
                          responses=SendEmailSerializer().get_response_body_api(),
                          tags=[_("User")])
+    @log(menu='User', operate='Sign out')
     def post(self, request: Request):
         token_cache.delete(request.META.get('HTTP_AUTHORIZATION'))
         return result.success(True)
+
+
+def _get_details(request):
+    path = request.path
+    body = request.data
+    query = request.query_params
+    return {
+        'path': path,
+        'body': {**body, 'password': encryption(body.get('password', ''))},
+        'query': query
+    }
 
 
 class Login(APIView):
@@ -156,6 +176,8 @@ class Login(APIView):
                          responses=LoginSerializer().get_response_body_api(),
                          security=[],
                          tags=[_("User")])
+    @log(menu='User', operate='Log in', get_user=lambda r: {'user_name': r.data.get('username', None)},
+         get_details=_get_details)
     def post(self, request: Request):
         login_request = LoginSerializer(data=request.data)
         # 校验请求参数
@@ -175,6 +197,7 @@ class Register(APIView):
                          responses=RegisterSerializer().get_response_body_api(),
                          security=[],
                          tags=[_("User")])
+    @log(menu='User', operate='User registration', get_user=lambda r: {'user_name': r.data.get('username', None)})
     def post(self, request: Request):
         serializer_obj = RegisterSerializer(data=request.data)
         if serializer_obj.is_valid(raise_exception=True):
@@ -192,6 +215,8 @@ class RePasswordView(APIView):
                          responses=RePasswordSerializer().get_response_body_api(),
                          security=[],
                          tags=[_("User")])
+    @log(menu='User', operate='Change password',
+         get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)})
     def post(self, request: Request):
         serializer_obj = RePasswordSerializer(data=request.data)
         return result.success(serializer_obj.reset_password())
@@ -207,6 +232,8 @@ class CheckCode(APIView):
                          responses=CheckCodeSerializer().get_response_body_api(),
                          security=[],
                          tags=[_("User")])
+    @log(menu='User', operate='Check whether the verification code is correct',
+         get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)})
     def post(self, request: Request):
         return result.success(CheckCodeSerializer(data=request.data).is_valid(raise_exception=True))
 
@@ -220,6 +247,8 @@ class SendEmail(APIView):
                          responses=SendEmailSerializer().get_response_body_api(),
                          security=[],
                          tags=[_("User")])
+    @log(menu='User', operate='Send email',
+         get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)})
     def post(self, request: Request):
         serializer_obj = SendEmailSerializer(data=request.data)
         if serializer_obj.is_valid(raise_exception=True):
@@ -240,6 +269,7 @@ class UserManage(APIView):
         [RoleConstants.ADMIN],
         [PermissionConstants.USER_READ],
         compare=CompareConstants.AND))
+    @log(menu='User', operate='Add user')
     def post(self, request: Request):
         return result.success(UserManageSerializer().save(request.data))
 
@@ -257,6 +287,7 @@ class UserManage(APIView):
             [RoleConstants.ADMIN],
             [PermissionConstants.USER_READ],
             compare=CompareConstants.AND))
+        @log(menu='User', operate='Get user paginated list')
         def get(self, request: Request, current_page, page_size):
             d = UserManageSerializer.Query(
                 data={'email_or_username': request.query_params.get('email_or_username', None),
@@ -277,6 +308,7 @@ class UserManage(APIView):
             [RoleConstants.ADMIN],
             [PermissionConstants.USER_READ],
             compare=CompareConstants.AND))
+        @log(menu='User', operate='Change password')
         def put(self, request: Request, user_id):
             return result.success(
                 UserManageSerializer.Operate(data={'id': user_id}).re_password(request.data, with_valid=True))
@@ -294,6 +326,7 @@ class UserManage(APIView):
             [RoleConstants.ADMIN],
             [PermissionConstants.USER_READ],
             compare=CompareConstants.AND))
+        @log(menu='User', operate='Delete user')
         def delete(self, request: Request, user_id):
             return result.success(UserManageSerializer.Operate(data={'id': user_id}).delete(with_valid=True))
 
@@ -308,6 +341,7 @@ class UserManage(APIView):
             [RoleConstants.ADMIN],
             [PermissionConstants.USER_READ],
             compare=CompareConstants.AND))
+        @log(menu='User', operate='Get user information')
         def get(self, request: Request, user_id):
             return result.success(UserManageSerializer.Operate(data={'id': user_id}).one(with_valid=True))
 
@@ -323,6 +357,7 @@ class UserManage(APIView):
             [RoleConstants.ADMIN],
             [PermissionConstants.USER_READ],
             compare=CompareConstants.AND))
+        @log(menu='User', operate='Update user information')
         def put(self, request: Request, user_id):
             return result.success(
                 UserManageSerializer.Operate(data={'id': user_id}).edit(request.data, with_valid=True))
@@ -337,5 +372,6 @@ class UserListView(APIView):
                          responses=result.get_api_array_response(UserSerializer.Query.get_response_body_api()),
                          tags=[_("User")])
     @has_permissions(PermissionConstants.USER_READ)
+    @log(menu='User', operate='Get user list by type')
     def get(self, request: Request, type):
         return result.success(UserSerializer().listByType(type, request.user.id))

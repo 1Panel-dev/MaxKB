@@ -6918,3 +6918,9 @@ msgstr "網絡繁忙，請稍後再試。"
 
 msgid "Is it ascending order"
 msgstr "是否昇冪"
+
+msgid "Create QA knowledge base"
+msgstr "創建QA知識庫"
+
+msgid "Synchronize the knowledge base of the website"
+msgstr "同步Web網站知識庫"

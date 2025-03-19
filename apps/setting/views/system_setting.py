@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth, has_permissions
 from common.constants.permission_constants import RoleConstants
+from common.log.log import log
 from common.response import result
 from setting.serializers.system_setting import SystemSettingSerializer
 from setting.swagger_api.system_setting import SystemSettingEmailApi
@@ -30,6 +31,7 @@ class SystemSetting(APIView):
                              request_body=SystemSettingEmailApi.get_request_body_api(), tags=[_('Email settings')],
                              responses=result.get_api_response(SystemSettingEmailApi.get_response_body_api()))
         @has_permissions(RoleConstants.ADMIN)
+        @log(menu='Email settings', operate='Create or update email settings')
         def put(self, request: Request):
             return result.success(
                 SystemSettingSerializer.EmailSerializer.Create(
@@ -42,6 +44,7 @@ class SystemSetting(APIView):
                              responses=result.get_default_response(),
                              tags=[_('Email settings')])
         @has_permissions(RoleConstants.ADMIN)
+        @log(menu='Email settings', operate='Test email settings')
         def post(self, request: Request):
             return result.success(
                 SystemSettingSerializer.EmailSerializer.Create(
@@ -53,6 +56,7 @@ class SystemSetting(APIView):
                              responses=result.get_api_response(SystemSettingEmailApi.get_response_body_api()),
                              tags=[_('Email settings')])
         @has_permissions(RoleConstants.ADMIN)
+        @log(menu='Email settings', operate='Get email settings')
         def get(self, request: Request):
             return result.success(
                 SystemSettingSerializer.EmailSerializer.one())

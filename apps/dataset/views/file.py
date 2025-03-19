@@ -33,7 +33,7 @@ class FileView(APIView):
                                                               required=True,
                                                               description=_('Upload file'))],
                          tags=[_('file')])
-    @log(menu=_('file'), operate=_('Upload file'))
+    @log(menu='file', operate='Upload file')
     def post(self, request: Request):
         return result.success(FileSerializer(data={'file': request.FILES.get('file')}).upload())
 

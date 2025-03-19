@@ -9,8 +9,9 @@
 
 from django.core import cache
 from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from drf_yasg.utils import swagger_auto_schema
+from langchain_core.prompts import PromptTemplate
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
@@ -50,6 +51,7 @@ class ApplicationStatistics(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="User Statistics")
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationStatisticsSerializer(data={'application_id': application_id,
@@ -74,6 +76,7 @@ class ApplicationStatistics(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="User demographic trends")
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationStatisticsSerializer(data={'application_id': application_id,
@@ -99,6 +102,7 @@ class ApplicationStatistics(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Conversation statistics")
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationStatisticsSerializer(data={'application_id': application_id,
@@ -124,6 +128,7 @@ class ApplicationStatistics(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Dialogue-related statistical trends")
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationStatisticsSerializer(data={'application_id': application_id,
@@ -153,6 +158,7 @@ class Application(APIView):
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND), PermissionConstants.APPLICATION_EDIT,
             compare=CompareConstants.AND)
+        @log(menu='Application', operate="Modify application icon")
         def put(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.IconOperate(
@@ -169,6 +175,7 @@ class Application(APIView):
                              tags=[_("Application")]
                              )
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
+        @log(menu='Application', operate="Import Application")
         def post(self, request: Request):
             return result.success(ApplicationSerializer.Import(
                 data={'user_id': request.user.id, 'file': request.FILES.get('file')}).import_())
@@ -183,6 +190,7 @@ class Application(APIView):
                              )
         @has_permissions(lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                                         dynamic_tag=keywords.get('application_id')))
+        @log(menu='Application', operate="Export Application")
         def get(self, request: Request, application_id: str):
             return ApplicationSerializer.Operate(
                 data={'application_id': application_id, 'user_id': request.user.id}).export()
@@ -193,6 +201,7 @@ class Application(APIView):
                              operation_id=_("Get embedded js"),
                              tags=[_("Application")],
                              manual_parameters=ApplicationApi.ApiKey.get_request_params_api())
+        @log(menu='Application', operate="Get embedded js")
         def get(self, request: Request):
             return ApplicationSerializer.Embed(
                 data={'protocol': request.query_params.get('protocol'), 'token': request.query_params.get('token'),
@@ -211,6 +220,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Get a list of models")
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.Operate(
@@ -229,6 +239,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Get model parameter form")
         def get(self, request: Request, application_id: str, model_id: str):
             return result.success(
                 ApplicationSerializer.Operate(
@@ -247,6 +258,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Get a list of function libraries")
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.Operate(
@@ -266,6 +278,7 @@ class Application(APIView):
                 [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                 dynamic_tag=keywords.get('application_id'))],
                 compare=CompareConstants.AND))
+            @log(menu='Application', operate="Get library details")
             def get(self, request: Request, application_id: str, function_lib_id: str):
                 return result.success(
                     ApplicationSerializer.Operate(
@@ -284,6 +297,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Get the list of apps created by the current user")
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.Operate(
@@ -303,6 +317,7 @@ class Application(APIView):
                 [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                 dynamic_tag=keywords.get('application_id'))],
                 compare=CompareConstants.AND))
+            @log(menu='Application', operate="Get application data")
             def get(self, request: Request, application_id: str, app_id: str):
                 return result.success(
                     ApplicationSerializer.Operate(
@@ -316,6 +331,7 @@ class Application(APIView):
         @swagger_auto_schema(operation_summary=_("Get application related information"),
                              operation_id=_("Get application related information"),
                              tags=[_("Application/Chat")])
+        @log(menu='Application', operate="Get application related information")
         def get(self, request: Request):
             if 'application_id' in request.auth.keywords:
                 return result.success(ApplicationSerializer.Operate(
@@ -336,6 +352,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Add ApiKey")
         def post(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.ApplicationKeySerializer(
@@ -352,6 +369,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Get the application API_KEY list")
         def get(self, request: Request, application_id: str):
             return result.success(ApplicationSerializer.ApplicationKeySerializer(
                 data={'application_id': application_id, 'user_id': request.user.id}).list())
@@ -371,6 +389,7 @@ class Application(APIView):
                                                 dynamic_tag=keywords.get('application_id'))],
                 compare=CompareConstants.AND), PermissionConstants.APPLICATION_EDIT,
                 compare=CompareConstants.AND)
+            @log(menu='Application', operate="Modify application API_KEY")
             def put(self, request: Request, application_id: str, api_key_id: str):
                 return result.success(
                     ApplicationSerializer.ApplicationKeySerializer.Operate(
@@ -388,6 +407,7 @@ class Application(APIView):
                                                 dynamic_tag=keywords.get('application_id'))],
                 compare=CompareConstants.AND), PermissionConstants.APPLICATION_DELETE,
                 compare=CompareConstants.AND)
+            @log(menu='Application', operate="Delete Application API_KEY")
             def delete(self, request: Request, application_id: str, api_key_id: str):
                 return result.success(
                     ApplicationSerializer.ApplicationKeySerializer.Operate(
@@ -408,6 +428,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Modify Application AccessToken")
         def put(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.AccessTokenSerializer(data={'application_id': application_id}).edit(
@@ -424,6 +445,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Get the application AccessToken information")
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.AccessTokenSerializer(data={'application_id': application_id}).one())
@@ -459,6 +481,7 @@ class Application(APIView):
                          request_body=ApplicationApi.Create.get_request_body_api(),
                          tags=[_('Application')])
     @has_permissions(PermissionConstants.APPLICATION_CREATE, compare=CompareConstants.AND)
+    @log(menu='Application', operate="Create an application")
     def post(self, request: Request):
         return result.success(ApplicationSerializer.Create(data={'user_id': request.user.id}).insert(request.data))
 
@@ -469,6 +492,7 @@ class Application(APIView):
                          responses=result.get_api_array_response(ApplicationApi.get_response_body_api()),
                          tags=[_('Application')])
     @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
+    @log(menu='Application', operate="Get the application list")
     def get(self, request: Request):
         return result.success(
             ApplicationSerializer.Query(
@@ -488,6 +512,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Hit Test List")
         def get(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.HitTest(data={'id': application_id, 'user_id': request.user.id,
@@ -513,6 +538,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Publishing an application")
         def put(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.Operate(
@@ -534,6 +560,7 @@ class Application(APIView):
             compare=CompareConstants.AND),
             lambda r, k: Permission(group=Group.APPLICATION, operate=Operate.DELETE,
                                     dynamic_tag=k.get('application_id')), compare=CompareConstants.AND)
+        @log(menu='Application', operate="Deleting application")
         def delete(self, request: Request, application_id: str):
             return result.success(ApplicationSerializer.Operate(
                 data={'application_id': application_id, 'user_id': request.user.id}).delete(
@@ -551,6 +578,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.MANAGE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Modify the application")
         def put(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.Operate(
@@ -569,6 +597,7 @@ class Application(APIView):
             [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND))
+        @log(menu='Application', operate="Get application details")
         def get(self, request: Request, application_id: str):
             return result.success(ApplicationSerializer.Operate(
                 data={'application_id': application_id, 'user_id': request.user.id}).one())
@@ -589,6 +618,7 @@ class Application(APIView):
                                                                         dynamic_tag=keywords.get(
                                                                             'application_id'))],
                                         compare=CompareConstants.AND))
+        @log(menu='Application', operate="Get the knowledge base available to the current application")
         def get(self, request: Request, application_id: str):
             return result.success(ApplicationSerializer.Operate(
                 data={'application_id': application_id, 'user_id': request.user.id}).list_dataset())
@@ -604,7 +634,7 @@ class Application(APIView):
                              responses=result.get_page_api_response(ApplicationApi.get_response_body_api()),
                              tags=[_('Application')])
         @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
-        @log(menu=_('Application'), operate=_("Get the application list by page"))
+        @log(menu='Application', operate="Get the application list by page")
         def get(self, request: Request, current_page: int, page_size: int):
             return result.success(
                 ApplicationSerializer.Query(
@@ -622,6 +652,7 @@ class Application(APIView):
                                                            dynamic_tag=keywords.get(
                                                                'application_id'))],
                            compare=CompareConstants.AND))
+        @log(menu='Application', operate="speech to text")
         def post(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.Operate(data={'application_id': application_id, 'user_id': request.user.id})
@@ -644,6 +675,7 @@ class Application(APIView):
                                                            dynamic_tag=keywords.get(
                                                                'application_id'))],
                            compare=CompareConstants.AND))
+        @log(menu='Application', operate="text to speech")
         def post(self, request: Request, application_id: str):
             byte_data = ApplicationSerializer.Operate(
                 data={'application_id': application_id, 'user_id': request.user.id}).text_to_speech(
@@ -662,6 +694,7 @@ class Application(APIView):
                                                            dynamic_tag=keywords.get(
                                                                'application_id'))],
                            compare=CompareConstants.AND))
+        @log(menu='Application', operate="trial listening")
         def post(self, request: Request, application_id: str):
             byte_data = ApplicationSerializer.Operate(
                 data={'application_id': application_id, 'user_id': request.user.id}).play_demo_text(request.data)

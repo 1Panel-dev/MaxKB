@@ -33,7 +33,7 @@ class Image(APIView):
                                                               required=True,
                                                               description=_('Upload image'))],
                          tags=[_('Image')])
-    @log(menu=_('Image'), operate=_('Upload image'))
+    @log(menu='Image', operate='Upload image')
     def post(self, request: Request):
         return result.success(ImageSerializer(data={'image': request.FILES.get('file')}).upload())
 
@@ -42,6 +42,5 @@ class Image(APIView):
         @swagger_auto_schema(operation_summary=_('Get Image'),
                              operation_id=_('Get Image'),
                              tags=[_('Image')])
-        @log(menu=_('Image'), operate=_('Get Image'))
         def get(self, request: Request, image_id: str):
             return ImageSerializer.Operate(data={'id': image_id}).get()
