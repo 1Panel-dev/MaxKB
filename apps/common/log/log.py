@@ -6,6 +6,7 @@
     @date：2025/3/14 16:09
     @desc:
 """
+from gettext import gettext
 
 from setting.models.log_management import Log
 
@@ -31,6 +32,10 @@ def _get_user(request):
     @return:
     """
     user = request.user
+    if user is None:
+        return {
+            "user_name": gettext('unknown')
+        }
     return {
         "id": str(user.id),
         "email": user.email,
