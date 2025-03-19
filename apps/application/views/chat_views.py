@@ -23,6 +23,7 @@ from common.auth import TokenAuth, has_permissions, OpenAIKeyAuth
 from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import Permission, Group, Operate, \
     RoleConstants, ViewPermission, CompareConstants
+from common.log.log import log
 from common.response import result
 from common.util.common import query_params_to_single_dict
 from dataset.serializers.file_serializers import FileSerializer
@@ -177,6 +178,7 @@ class ChatView(APIView):
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND),
             compare=CompareConstants.AND)
+        @log(menu='Application/Conversation Log', operate="Delete a conversation")
         def delete(self, request: Request, application_id: str, chat_id: str):
             return result.success(
                 ChatSerializers.Operate(
@@ -199,6 +201,7 @@ class ChatView(APIView):
                            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                            dynamic_tag=keywords.get('application_id'))])
         )
+        @log(menu='Application/Conversation Log', operate="Get client conversation list by paging")
         def get(self, request: Request, application_id: str, current_page: int, page_size: int):
             return result.success(ChatSerializers.ClientChatHistory(
                 data={'client_id': request.auth.client_id, 'application_id': application_id}).page(
@@ -218,6 +221,7 @@ class ChatView(APIView):
                                                 dynamic_tag=keywords.get('application_id'))],
                 compare=CompareConstants.AND),
                 compare=CompareConstants.AND)
+            @log(menu='Application/Conversation Log', operate="Client deletes conversation")
             def delete(self, request: Request, application_id: str, chat_id: str):
                 return result.success(
                     ChatSerializers.Operate(
@@ -235,6 +239,7 @@ class ChatView(APIView):
                                                 dynamic_tag=keywords.get('application_id'))],
                 compare=CompareConstants.AND),
                 compare=CompareConstants.AND)
+            @log(menu='Application/Conversation Log', operate="Client modifies dialogue summary")
             def put(self, request: Request, application_id: str, chat_id: str):
                 return result.success(
                     ChatSerializers.Operate(
@@ -256,6 +261,7 @@ class ChatView(APIView):
                            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                            dynamic_tag=keywords.get('application_id'))])
         )
+        @log(menu='Application/Conversation Log', operate="Get the conversation list by page")
         def get(self, request: Request, application_id: str, current_page: int, page_size: int):
             return result.success(ChatSerializers.Query(
                 data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,
@@ -281,6 +287,7 @@ class ChatView(APIView):
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))])
             )
+            @log(menu='Application/Conversation Log', operate="Get conversation record details")
             def get(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
                 return result.success(ChatRecordSerializer.Operate(
                     data={'application_id': application_id,
@@ -299,6 +306,7 @@ class ChatView(APIView):
                            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                            dynamic_tag=keywords.get('application_id'))])
         )
+        @log(menu='Application/Conversation Log', operate="Get a list of conversation records")
         def get(self, request: Request, application_id: str, chat_id: str):
             return result.success(ChatRecordSerializer.Query(
                 data={'application_id': application_id,
@@ -320,6 +328,7 @@ class ChatView(APIView):
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))])
             )
+            @log(menu='Application/Conversation Log', operate="Get the conversation history list by page")
             def get(self, request: Request, application_id: str, chat_id: str, current_page: int, page_size: int):
                 return result.success(ChatRecordSerializer.Query(
                     data={'application_id': application_id,
@@ -343,6 +352,7 @@ class ChatView(APIView):
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))])
             )
+            @log(menu='Application/Conversation Log', operate="Like, Dislike")
             def put(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
                 return result.success(ChatRecordSerializer.Vote(
                     data={'vote_status': request.data.get('vote_status'), 'chat_id': chat_id,
@@ -363,6 +373,7 @@ class ChatView(APIView):
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))]
                                ))
+            @log(menu='Application/Conversation Log', operate="Get the list of marked paragraphs")
             def get(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
                 return result.success(ChatRecordSerializer.ChatRecordImprove(
                     data={'chat_id': chat_id, 'chat_record_id': chat_record_id}).get())
@@ -390,6 +401,7 @@ class ChatView(APIView):
                                                                                      'dataset_id'))],
                                                  compare=CompareConstants.AND
                                                  ), compare=CompareConstants.AND)
+            @log(menu='Application/Conversation Log', operate="Annotation")
             def put(self, request: Request, application_id: str, chat_id: str, chat_record_id: str, dataset_id: str,
                     document_id: str):
                 return result.success(ChatRecordSerializer.Improve(
@@ -415,6 +427,7 @@ class ChatView(APIView):
                                                                                      'dataset_id'))],
                                                  compare=CompareConstants.AND
                                                  ), compare=CompareConstants.AND)
+            @log(menu='Application/Conversation Log', operate="Add to Knowledge Base")
             def post(self, request: Request, application_id: str, dataset_id: str):
                 return result.success(ChatRecordSerializer.PostImprove().post_improve(request.data))
 
@@ -440,6 +453,7 @@ class ChatView(APIView):
                                                                                          'dataset_id'))],
                                                      compare=CompareConstants.AND
                                                      ), compare=CompareConstants.AND)
+                @log(menu='Application/Conversation Log', operate="Delete a Annotation")
                 def delete(self, request: Request, application_id: str, chat_id: str, chat_record_id: str,
                            dataset_id: str,
                            document_id: str, paragraph_id: str):

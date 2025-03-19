@@ -1,7 +1,7 @@
 <template>
   <div ref="aiChatRef" class="ai-chat" :class="type">
     <div
-      v-show="(isUserInput && firsUserInput) || showUserInput"
+      v-show="showUserInputContent"
       :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'"
     >
       <UserForm
@@ -15,7 +15,7 @@
         ref="userFormRef"
       ></UserForm>
     </div>
-    <template v-if="!isUserInput || !firsUserInput">
+    <template v-if="!isUserInput || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
         <div ref="dialogScrollbar" class="ai-chat__content p-24">
           <PrologueContent
@@ -62,7 +62,13 @@
             <slot name="operateBefore">
               <span></span>
             </slot>
-            <el-button class="user-input-button mb-8" type="primary" text @click="toggleUserInput">
+            <el-button
+              v-if="isUserInput"
+              class="user-input-button mb-8"
+              type="primary"
+              text
+              @click="toggleUserInput"
+            >
               <AppIcon iconName="app-user-input"></AppIcon>
             </el-button>
           </div>
@@ -114,7 +120,7 @@ const props = withDefaults(
 const emit = defineEmits(['refresh', 'scroll'])
 const { application, common } = useStore()
 const isMobile = computed(() => {
-  return common.isMobile() || mode === 'embed'
+  return common.isMobile() || mode === 'embed' || mode === 'mobile'
 })
 const aiChatRef = ref()
 const scrollDiv = ref()
@@ -135,7 +141,9 @@ const isUserInput = computed(
     props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
       .properties.user_input_field_list.length > 0
 )
-
+const showUserInputContent = computed(() => {
+  return ((isUserInput.value && firsUserInput.value) || showUserInput.value) && props.type !== 'log'
+})
 watch(
   () => props.chatId,
   (val) => {

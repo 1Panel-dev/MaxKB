@@ -48,7 +48,7 @@ export default {
   inputPlaceholder: {
     speaking: 'Speaking...',
     recorderLoading: 'Transcribing...',
-    default: 'Type your question, Ctrl+Enter for a new line'
+    default: 'Type your question'
   },
   uploadFile: {
     label: 'Upload File',

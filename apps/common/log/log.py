@@ -6,6 +6,7 @@
     @date：2025/3/14 16:09
     @desc:
 """
+from gettext import gettext
 
 from setting.models.log_management import Log
 
@@ -31,6 +32,10 @@ def _get_user(request):
     @return:
     """
     user = request.user
+    if user is None:
+        return {
+            "user_name": gettext('unknown')
+        }
     return {
         "id": str(user.id),
         "email": user.email,
@@ -70,6 +75,7 @@ def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, 
                 return func(view, request, **kwargs)
             except Exception as e:
                 status = 500
+                raise e
             finally:
                 ip = get_ip_address(request)
                 user = get_user(request)

@@ -6906,3 +6906,9 @@ msgstr "网络繁忙，请稍后再试。"
 
 msgid "Is it ascending order"
 msgstr "是否升序"
+
+msgid "Create QA knowledge base"
+msgstr "创建QA知识库"
+
+msgid "Synchronize the knowledge base of the website"
+msgstr "同步Web站点知识库"

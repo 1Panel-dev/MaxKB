@@ -6767,3 +6767,9 @@ msgstr ""
 
 msgid "Is it ascending order"
 msgstr ""
+
+msgid "Create QA knowledge base"
+msgstr ""
+
+msgid "Synchronize the knowledge base of the website"
+msgstr ""

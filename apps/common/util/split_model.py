@@ -339,13 +339,14 @@ class SplitModel:
         for e in result:
             if len(e['content']) > 4096:
                 pass
-        return [item for item in [self.post_reset_paragraph(row) for row in result] if
+        title_list = list(set([row.get('title') for row in result]))
+        return [item for item in [self.post_reset_paragraph(row, title_list) for row in result] if
                 'content' in item and len(item.get('content').strip()) > 0]
 
-    def post_reset_paragraph(self, paragraph: Dict):
+    def post_reset_paragraph(self, paragraph: Dict, title_list: List[str]):
         result = self.filter_title_special_characters(paragraph)
         result = self.sub_title(result)
-        result = self.content_is_null(result)
+        result = self.content_is_null(result, title_list)
         return result
 
     @staticmethod
@@ -357,11 +358,14 @@ class SplitModel:
         return paragraph
 
     @staticmethod
-    def content_is_null(paragraph: Dict):
+    def content_is_null(paragraph: Dict, title_list: List[str]):
         if 'title' in paragraph:
             title = paragraph.get('title')
             content = paragraph.get('content')
             if (content is None or len(content.strip()) == 0) and (title is not None and len(title) > 0):
+                find = [t for t in title_list if t.__contains__(title) and t != title]
+                if find:
+                    return {'title': '', 'content': ''}
                 return {'title': '', 'content': title}
         return paragraph
 
