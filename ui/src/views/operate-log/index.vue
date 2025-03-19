@@ -76,7 +76,49 @@
         @changePage="getList"
         v-loading="loading"
       >
-        <el-table-column prop="menu" :label="$t('views.operateLog.table.menu.label')" width="160" />
+        <el-table-column prop="menu" :label="$t('views.operateLog.table.menu.label')" width="160">
+          <template #header>
+            <div>
+              <span>{{ $t('views.operateLog.table.menu.label') }}</span>
+              <el-popover :width="200" trigger="click" :visible="popoverVisible">
+                <template #reference>
+                  <el-button
+                    style="margin-top: -2px"
+                    :type="operateTypeArr && operateTypeArr.length > 0 ? 'primary' : ''"
+                    link
+                    @click="popoverVisible = !popoverVisible"
+                  >
+                    <el-icon>
+                      <Filter />
+                    </el-icon>
+                  </el-button>
+                </template>
+                <div class="filter">
+                  <div class="form-item mb-16">
+                    <div @click.stop>
+                      <el-scrollbar height="300" style="margin: 0 0 0 10px;">
+                        <el-checkbox-group v-model="operateTypeArr" style="display: flex; flex-direction: column;">
+                          <el-checkbox v-for="item in operateOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value" />
+                        </el-checkbox-group>
+                      </el-scrollbar>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <el-button size="small" @click="filterChange('clear')">{{
+                    $t('common.clear')
+                  }}</el-button>
+                  <el-button type="primary" @click="filterChange" size="small">{{
+                    $t('common.confirm')
+                  }}</el-button>
+                </div>
+              </el-popover>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="operate" :label="$t('views.operateLog.table.operate.label')" />
         <el-table-column
           width="120"
@@ -119,11 +161,13 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
-import getOperateLog from '@/api/operate-log'
+import operateLog from '@/api/operate-log'
 import DetailDialog from './component/DetailDialog.vue'
 import { t } from '@/locales'
 import { beforeDay, datetimeFormat, nowDate } from '@/utils/time'
 
+const popoverVisible = ref(false)
+const operateTypeArr = ref<any[]>([])
 const DetailDialogRef = ref()
 const loading = ref(false)
 const paginationConfig = reactive({
@@ -134,7 +178,7 @@ const paginationConfig = reactive({
 const searchValue = ref('')
 const tableData = ref<any[]>([])
 const history_day = ref<number | string>(7)
-const filter_type = ref<string>('menu')
+const filter_type = ref<string>('user')
 const filter_status = ref<string>('')
 const daterange = ref({
   start_time: '',
@@ -166,14 +210,6 @@ const dayOptions = [
 ]
 const filterOptions = [
   {
-    value: 'menu',
-    label: t('views.operateLog.table.menu.label')
-  },
-  {
-    value: 'operate',
-    label: t('views.operateLog.table.operate.label')
-  },
-  {
     value: 'user',
     label: t('views.operateLog.table.user.label')
   },
@@ -196,6 +232,15 @@ const statusOptions = [
     label: t('views.operateLog.table.status.fail')
   }
 ]
+const operateOptions = ref<any[]>([])
+
+function filterChange(val: string) {
+  if (val === 'clear') {
+    operateTypeArr.value = []
+  }
+  getList()
+  popoverVisible.value = false
+}
 
 function changeStatusHandle(val: string) {
   getList()
@@ -241,15 +286,29 @@ function getList() {
   if (filter_type.value === 'status') {
     obj['status'] = filter_status.value
   }
-  return getOperateLog.getOperateLog(paginationConfig, obj, loading).then((res) => {
+  if(operateTypeArr.value.length > 0) {
+    obj['menu'] = JSON.stringify(operateTypeArr.value)
+  }
+  return operateLog.getOperateLog(paginationConfig, obj, loading).then((res) => {
     tableData.value = res.data.records
     paginationConfig.total = res.data.total
   })
 }
 
+function getMenuList() {
+  return operateLog.getMenuList().then((res) => {
+    let arr: any[] = res.data
+    arr.filter((item, index, self) =>
+      index === self.findIndex((i) => i['menu'] === item['menu'])
+    ).forEach(ele => {
+      operateOptions.value.push({label:ele.menu_label, value:ele.menu})
+    })
+  }) 
+}
+
 onMounted(() => {
+  getMenuList()
   changeDayHandle(history_day.value)
-  getList()
 })
 </script>
 <style lang="scss" scoped>
