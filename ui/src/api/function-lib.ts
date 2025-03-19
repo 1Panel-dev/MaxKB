@@ -122,9 +122,10 @@ const putFunctionLibIcon: (
 
 const addInternalFunction: (
     id: string,
+    data: any,
     loading?: Ref<boolean>
-) => Promise<Result<any>> = (id, loading) => {
-  return get(`${prefix}/${id}/add_internal_fun`, undefined, loading)
+) => Promise<Result<any>> = (id, data, loading) => {
+  return post(`${prefix}/${id}/add_internal_fun`, data, undefined, loading)
 }
 
 const importFunctionLib: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (

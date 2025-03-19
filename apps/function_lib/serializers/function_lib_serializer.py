@@ -158,10 +158,6 @@ class FunctionLibSerializer(serializers.Serializer):
                 query_set = query_set.filter(function_type=self.data.get('function_type'))
             query_set = query_set.order_by("-create_time")
 
-            subquery = FunctionLib.objects.filter(template_id=OuterRef('id'))
-            subquery = subquery.filter(user_id=self.data.get('user_id'))
-            query_set = query_set.annotate(added=Exists(subquery))
-
             return query_set
 
         def list(self, with_valid=True):
@@ -180,7 +176,6 @@ class FunctionLibSerializer(serializers.Serializer):
             def post_records_handler(row):
                 return {
                     **FunctionLibModelSerializer(row).data,
-                    'added': row.added,
                     'init_params': None
                 }
 
@@ -390,14 +385,11 @@ class FunctionLibSerializer(serializers.Serializer):
     class InternalFunction(serializers.Serializer):
         id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("function ID")))
         user_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_("User ID")))
+        name = serializers.CharField(required=True, error_messages=ErrMessage.char(_("function name")))
 
         def add(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-
-            if QuerySet(FunctionLib).filter(template_id=self.data.get('id')).filter(
-                    user_id=self.data.get('user_id')).exists():
-                raise AppApiException(500, _('Function already exists'))
 
             internal_function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
             if internal_function_lib is None:
@@ -405,7 +397,7 @@ class FunctionLibSerializer(serializers.Serializer):
 
             function_lib = FunctionLib(
                 id=uuid.uuid1(),
-                name=internal_function_lib.name,
+                name=self.data.get('name'),
                 desc=internal_function_lib.desc,
                 code=internal_function_lib.code,
                 user_id=self.data.get('user_id'),
