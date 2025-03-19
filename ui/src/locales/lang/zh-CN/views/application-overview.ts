@@ -40,7 +40,8 @@ export default {
     EmbedDialog: {
       fullscreenModeTitle: '全屏模式',
       copyInstructions: '复制以下代码进行嵌入',
-      floatingModeTitle: '浮窗模式'
+      floatingModeTitle: '浮窗模式',
+      mobileModeTitle: '移动端模式'
     },
     LimitDialog: {
       showSourceLabel: '显示知识来源',

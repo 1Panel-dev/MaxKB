@@ -525,8 +525,8 @@ function autoSendMessage() {
 }
 
 function sendChatHandle(event?: any) {
-  if (!event?.ctrlKey) {
-    // 如果没有按下组合键ctrl，则会阻止默认事件
+  if (!event?.ctrlKey && !event?.shiftKey && !event?.altKey && !event?.metaKey) {
+    // 如果没有按下组合键，则会阻止默认事件
     event?.preventDefault()
     if (!isDisabledChat.value && !props.loading && !event?.isComposing) {
       if (inputValue.value.trim()) {
@@ -534,14 +534,16 @@ function sendChatHandle(event?: any) {
       }
     }
   } else {
-    // 如果同时按下ctrl+回车键，则会换行
-    insertNewlineAtCursor()
+    // 如果同时按下ctrl/shift/cmd/opt +enter，则会换行
+    insertNewlineAtCursor(event)
   }
 }
-const insertNewlineAtCursor = () => {
+const insertNewlineAtCursor = (event?: any) => {
   const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
   const startPos = textarea.selectionStart
   const endPos = textarea.selectionEnd
+  // 阻止默认行为（避免额外的换行符）
+  event.preventDefault()
   // 在光标处插入换行符
   inputValue.value = inputValue.value.slice(0, startPos) + '\n' + inputValue.value.slice(endPos)
   nextTick(() => {
