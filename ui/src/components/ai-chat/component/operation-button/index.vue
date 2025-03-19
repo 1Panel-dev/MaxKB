@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="chat-operation-button">
     <LogOperationButton
       v-if="type === 'log'"
       v-bind:data="chatRecord"
@@ -10,37 +10,31 @@
       :type="type"
     />
 
-    <div class="flex-between mt-8" v-else>
-      <div>
-        <el-button
-          type="primary"
-          v-if="chatRecord.is_stop && !chatRecord.write_ed"
-          @click="startChat(chatRecord)"
-          link
-          >{{ $t('chat.operation.continue') }}
-        </el-button>
-        <el-button
-          type="primary"
-          v-else-if="!chatRecord.write_ed"
-          @click="stopChat(chatRecord)"
-          link
-          >{{ $t('chat.operation.stopChat') }}
-        </el-button>
-      </div>
+    <div class="mt-8" v-else>
+      <el-button
+        type="primary"
+        v-if="chatRecord.is_stop && !chatRecord.write_ed"
+        @click="startChat(chatRecord)"
+        link
+        >{{ $t('chat.operation.continue') }}
+      </el-button>
+      <el-button type="primary" v-else-if="!chatRecord.write_ed" @click="stopChat(chatRecord)" link
+        >{{ $t('chat.operation.stopChat') }}
+      </el-button>
     </div>
-    <div v-if="chatRecord.write_ed && 500 != chatRecord.status" class="flex-between">
-      <ChatOperationButton
-        :tts="application.tts_model_enable"
-        :tts_type="application.tts_type"
-        :tts_autoplay="application.tts_autoplay"
-        :data="chatRecord"
-        :type="type"
-        :applicationId="application.id"
-        :chatId="chatRecord.chat_id"
-        :chat_loading="loading"
-        @regeneration="regenerationChart(chatRecord)"
-      />
-    </div>
+
+    <ChatOperationButton
+      v-if="chatRecord.write_ed && 500 != chatRecord.status"
+      :tts="application.tts_model_enable"
+      :tts_type="application.tts_type"
+      :tts_autoplay="application.tts_autoplay"
+      :data="chatRecord"
+      :type="type"
+      :applicationId="application.id"
+      :chatId="chatRecord.chat_id"
+      :chat_loading="loading"
+      @regeneration="regenerationChart(chatRecord)"
+    />
   </div>
 </template>
 <script setup lang="ts">

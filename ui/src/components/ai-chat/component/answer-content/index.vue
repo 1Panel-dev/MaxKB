@@ -34,9 +34,11 @@
             {{ $t('chat.tip.answerLoading') }} <span class="dotting"></span>
           </p>
           <!-- 知识来源 -->
-          <div v-if="showSource(chatRecord) && index === chatRecord.answer_text_list.length - 1">
-            <KnowledgeSource :data="chatRecord" :type="application.type" />
-          </div>
+          <KnowledgeSource
+            :data="chatRecord"
+            :type="application.type"
+            v-if="showSource(chatRecord) && index === chatRecord.answer_text_list.length - 1"
+          />
         </el-card>
       </div>
     </template>
