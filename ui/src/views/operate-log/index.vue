@@ -211,7 +211,7 @@ function changeFilterHandle(val: string) {
 function changeDayHandle(val: number | string) {
   if (val !== 'other') {
     daterange.value.start_time = beforeDay(val)
-    daterange.value.end_time = nowDate
+    daterange.value.end_time = ''
     getList()
   }
 }
