@@ -22,6 +22,11 @@ const getOperateLog: (
   return get(`${prefix}/${page.current_page}/${page.page_size}`, param, loading)
 }
 
+const getMenuList: () => Promise<Result<any>> = () => {
+  return get(`${prefix}/menu_operate_option/`, undefined, undefined)
+}
+
 export default {
-  getOperateLog
+  getOperateLog,
+  getMenuList
 }
