@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get } from '@/request/index'
+import { get, exportExcelPost } from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import { type Ref } from 'vue'
 
@@ -26,7 +26,21 @@ const getMenuList: () => Promise<Result<any>> = () => {
   return get(`${prefix}/menu_operate_option/`, undefined, undefined)
 }
 
+const exportOperateLog: (
+  param: any,
+  loading?: Ref<boolean>
+) => void = (param, loading) => {
+  exportExcelPost(
+    'log.xlsx',
+    `${prefix}/export/`,
+    param,
+    undefined,
+    loading
+  )
+}
+
 export default {
   getOperateLog,
-  getMenuList
+  getMenuList,
+  exportOperateLog
 }
