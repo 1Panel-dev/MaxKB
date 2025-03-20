@@ -10,6 +10,7 @@ import hashlib
 import importlib
 import io
 import mimetypes
+import pickle
 import re
 import shutil
 from functools import reduce
@@ -22,6 +23,30 @@ from pydub import AudioSegment
 
 from ..exception.app_exception import AppApiException
 from ..models.db_model_manage import DBModelManage
+
+safe_builtins = {
+    'MKInstance'
+}
+
+ALLOWED_CLASSES = {
+    ("builtins", "dict"),
+    ('uuid', 'UUID'),
+    ("application.serializers.application_serializers", "MKInstance")
+}
+
+
+class RestrictedUnpickler(pickle.Unpickler):
+
+    def find_class(self, module, name):
+        if (module, name) in ALLOWED_CLASSES:
+            return super().find_class(module, name)
+        raise pickle.UnpicklingError("global '%s.%s' is forbidden" %
+                                     (module, name))
+
+
+def restricted_loads(s):
+    """Helper function analogous to pickle.loads()."""
+    return RestrictedUnpickler(io.BytesIO(s)).load()
 
 
 def encryption(message: str):
