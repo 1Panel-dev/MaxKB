@@ -7632,3 +7632,24 @@ msgstr "按类型获取用户列表"
 
 #~ msgid "MaxKB table template.xlsx"
 #~ msgstr "MaxKB表格模版.xlsx"
+
+msgid "Fail"
+msgstr "失败"
+
+msgid "Menu"
+msgstr "操作菜单"
+
+msgid "Operate"
+msgstr "操作"
+
+msgid "Operate user"
+msgstr "操作用户"
+
+msgid "Ip Address"
+msgstr "IP地址"
+
+msgid "API Details"
+msgstr "API详情"
+
+msgid "Operate Time"
+msgstr "操作时间"

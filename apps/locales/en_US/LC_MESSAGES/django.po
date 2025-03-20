@@ -7447,3 +7447,24 @@ msgstr ""
 #: community/apps/users/views/user.py:370
 msgid "Get user list by type"
 msgstr ""
+
+msgid "Fail"
+msgstr "Fail"
+
+msgid "Menu"
+msgstr "Operate menu"
+
+msgid "Operate"
+msgstr "Operate"
+
+msgid "Operate user"
+msgstr "Operate user"
+
+msgid "Ip Address"
+msgstr "IP Address"
+
+msgid "API Details"
+msgstr "API Details"
+
+msgid "Operate Time"
+msgstr "Operate time"
