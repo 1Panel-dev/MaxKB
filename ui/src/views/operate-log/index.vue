@@ -28,43 +28,46 @@
           />
         </div>
 
-        <div class="flex-between complex-search">
-          <el-select
-            v-model="filter_type"
-            class="complex-search__left"
-            @change="changeFilterHandle"
-            style="width: 120px"
-          >
-            <el-option
-              v-for="item in filterOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+        <div style="display: flex;">
+          <div class="flex-between complex-search">
+            <el-select
+              v-model="filter_type"
+              class="complex-search__left"
+              @change="changeFilterHandle"
+              style="width: 120px"
+            >
+              <el-option
+                v-for="item in filterOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+            <el-select
+              v-if="filter_type === 'status'"
+              v-model="filter_status"
+              @change="changeStatusHandle"
+              style="width: 220px"
+              clearable
+            >
+              <el-option
+                v-for="item in statusOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+            <el-input
+              v-else
+              v-model="searchValue"
+              @change="getList"
+              :placeholder="$t('common.search')"
+              prefix-icon="Search"
+              style="width: 220px"
+              clearable
             />
-          </el-select>
-          <el-select
-            v-if="filter_type === 'status'"
-            v-model="filter_status"
-            @change="changeStatusHandle"
-            style="width: 220px"
-            clearable
-          >
-            <el-option
-              v-for="item in statusOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-          <el-input
-            v-else
-            v-model="searchValue"
-            @change="getList"
-            :placeholder="$t('common.search')"
-            prefix-icon="Search"
-            style="width: 220px"
-            clearable
-          />
+          </div>
+          <el-button @click="exportLog" style="margin-left: 10px;">{{ $t('common.export') }}</el-button>
         </div>
       </div>
 
@@ -275,7 +278,7 @@ function handleSizeChange() {
   getList()
 }
 
-function getList() {
+function getRequestParams() {
   let obj: any = {
     start_time: daterange.value.start_time,
     end_time: daterange.value.end_time
@@ -289,7 +292,11 @@ function getList() {
   if(operateTypeArr.value.length > 0) {
     obj['menu'] = JSON.stringify(operateTypeArr.value)
   }
-  return operateLog.getOperateLog(paginationConfig, obj, loading).then((res) => {
+  return obj
+}
+
+function getList() {
+  return operateLog.getOperateLog(paginationConfig, getRequestParams(), loading).then((res) => {
     tableData.value = res.data.records
     paginationConfig.total = res.data.total
   })
@@ -304,6 +311,10 @@ function getMenuList() {
       operateOptions.value.push({label:ele.menu_label, value:ele.menu})
     })
   }) 
+}
+
+const exportLog = () => {
+  operateLog.exportOperateLog(getRequestParams(), loading)
 }
 
 onMounted(() => {
