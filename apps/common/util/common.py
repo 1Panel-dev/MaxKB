@@ -31,7 +31,8 @@ safe_builtins = {
 ALLOWED_CLASSES = {
     ("builtins", "dict"),
     ('uuid', 'UUID'),
-    ("application.serializers.application_serializers", "MKInstance")
+    ("application.serializers.application_serializers", "MKInstance"),
+    ("function_lib.serializers.function_lib_serializer", "FlibInstance")
 }
 
 

@@ -22,6 +22,7 @@ from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField, UploadedImageField
 from common.response import result
+from common.util.common import restricted_loads
 from common.util.field_message import ErrMessage
 from common.util.function_code import FunctionExecutor
 from common.util.rsa_util import rsa_long_decrypt, rsa_long_encrypt
@@ -338,7 +339,7 @@ class FunctionLibSerializer(serializers.Serializer):
             user_id = self.data.get('user_id')
             flib_instance_bytes = self.data.get('file').read()
             try:
-                flib_instance = pickle.loads(flib_instance_bytes)
+                flib_instance = restricted_loads(flib_instance_bytes)
             except Exception as e:
                 raise AppApiException(1001, _("Unsupported file format"))
             function_lib = flib_instance.function_lib
