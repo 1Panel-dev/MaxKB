@@ -181,6 +181,18 @@ const putDocumentSync: (
 ) => Promise<Result<any>> = (dataset_id, document_id, loading) => {
   return put(`${prefix}/${dataset_id}/document/${document_id}/sync`, undefined, undefined, loading)
 }
+const putLarkDocumentSync: (
+  dataset_id: string,
+  document_id: string,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (dataset_id, document_id, loading) => {
+  return put(
+    `${prefix}/lark/${dataset_id}/document/${document_id}/sync`,
+    undefined,
+    undefined,
+    loading
+  )
+}
 
 /**
  * 批量同步文档
@@ -192,6 +204,13 @@ const delMulSyncDocument: (
   loading?: Ref<boolean>
 ) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
   return put(`${prefix}/${dataset_id}/document/_bach`, { id_list: data }, undefined, loading)
+}
+const delMulLarkSyncDocument: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<boolean>> = (dataset_id, data, loading) => {
+  return put(`${prefix}/lark/${dataset_id}/_batch`, { id_list: data }, undefined, loading)
 }
 
 /**
@@ -394,5 +413,7 @@ export default {
   batchGenerateRelated,
   cancelTask,
   exportDocumentZip,
-  batchCancelTask
+  batchCancelTask,
+  putLarkDocumentSync,
+  delMulLarkSyncDocument
 }

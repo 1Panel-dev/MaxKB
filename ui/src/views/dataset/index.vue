@@ -79,6 +79,20 @@
                     style="height: 22px"
                     >{{ $t('views.dataset.web') }}</el-tag
                   >
+                  <el-tag
+                    class="purple-tag"
+                    v-else-if="item.type === '2'"
+                    type="warning"
+                    style="height: 22px"
+                    >{{ $t('views.dataset.lark') }}</el-tag
+                  >
+                  <el-tag
+                    class="purple-tag"
+                    v-else-if="item.type === '3'"
+                    type="warning"
+                    style="height: 22px"
+                    >{{ $t('views.dataset.yuque') }}</el-tag
+                  >
                 </div>
 
                 <template #footer>

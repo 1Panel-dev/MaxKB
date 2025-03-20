@@ -59,8 +59,8 @@ export default {
         references: ' (引用知識庫)',
         placeholder: '請輸入提示詞',
         requiredMessage: '請輸入提示詞',
-        tooltip:'透過調整提示詞內容，可以引導大模型對話方向，該提示詞會被固定在上下文的開頭。',
-        
+        tooltip: '透過調整提示詞內容，可以引導大模型對話方向，該提示詞會被固定在上下文的開頭。',
+
         noReferencesTooltip:
           '透過調整提示詞內容，可以引導大模型對話方向，該提示詞會被固定在上下文的開頭。可以使用變數：{question} 是用戶提出問題的佔位符。',
         referencesTooltip:
@@ -104,9 +104,9 @@ export default {
       },
       reasoningContent: {
         label: '輸出思考',
-        tooltip:'請根據模型返回的思考標簽設置，標簽中間的內容將會認定爲思考過程',
+        tooltip: '請根據模型返回的思考標簽設置，標簽中間的內容將會認定爲思考過程',
         start: '開始',
-        end: '結束',
+        end: '結束'
       }
     },
     buttons: {
@@ -196,12 +196,13 @@ export default {
       appIdPlaceholder: '請輸入App ID',
       appSecretPlaceholder: '請輸入App Secret',
       verificationTokenPlaceholder: '請輸入Verification Token',
-      urlInfo: '-事件與回呼-事件配置-配置訂閱方式的 "請求位址" 中'
+      urlInfo: '-事件與回呼-事件配置-配置訂閱方式的 "請求位址" 中',
+      folderTokenPlaceholder: '請輸入Folder Token'
     },
     slackSetting: {
       title: 'Slack 應用配置',
       signingSecretPlaceholder: '請輸入 Signing Secret',
-      botUserTokenPlaceholder: '請輸入 Bot User Token',
+      botUserTokenPlaceholder: '請輸入 Bot User Token'
     },
     copyUrl: '複製連結填入到'
   },

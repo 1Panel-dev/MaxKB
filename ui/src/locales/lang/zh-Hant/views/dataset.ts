@@ -3,6 +3,8 @@ export default {
   createDataset: '建立知識庫',
   general: '通用型',
   web: 'Web 站點',
+  lark: '飛書',
+  yuque: '語雀',
   relatedApplications: '關聯應用',
   document_count: '文檔數',
   relatedApp_count: '關聯應用',
@@ -46,13 +48,21 @@ export default {
       },
       datasetType: {
         label: '知識庫類型',
-        generalInfo: '上傳本地檔案',
-        webInfo: '同步Web網站文字資料'
+        generalInfo: '透過上傳檔案或手動錄入建置知識庫',
+        webInfo: '透過網站連結建立知識庫',
+        larkInfo: '透過飛書文檔建構知識庫',
+        yuqueInfo: '透過語雀文件建構知識庫'
       },
       source_url: {
         label: 'Web 根位址',
         placeholder: '請輸入 Web 根位址',
         requiredMessage: '請輸入 Web 根位址'
+      },
+      user_id: {
+        requiredMessage: '請輸入 User ID'
+      },
+      token: {
+        requiredMessage: '請輸入 Token'
       },
       selector: {
         label: '選擇器',
