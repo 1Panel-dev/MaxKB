@@ -11,7 +11,7 @@ from enum import Enum
 from functools import reduce
 from typing import Dict, Iterator, Type, List
 
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
 
 from common.exception.app_exception import AppApiException
 from django.utils.translation import gettext_lazy as _

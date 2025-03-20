@@ -10,7 +10,7 @@ from typing import Dict, List
 
 import requests
 from langchain_core.embeddings import Embeddings
-from langchain_core.pydantic_v1 import BaseModel
+from pydantic import BaseModel
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from setting.models_provider.base_model_provider import MaxKBBaseModel

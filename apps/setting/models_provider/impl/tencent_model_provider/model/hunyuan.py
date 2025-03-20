@@ -18,7 +18,7 @@ from langchain_core.messages import (
     HumanMessageChunk, SystemMessage,
 )
 from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResult
-from langchain_core.pydantic_v1 import Field, SecretStr, root_validator
+from pydantic import Field, SecretStr, root_validator
 from langchain_core.utils import (
     convert_to_secret_str,
     get_from_dict_or_env,
@@ -137,7 +137,7 @@ class ChatHunyuan(BaseChatModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        allow_population_by_field_name = True
+        validate_by_name = True
 
     @root_validator(pre=True)
     def build_extra(cls, values: Dict[str, Any]) -> Dict[str, Any]:
