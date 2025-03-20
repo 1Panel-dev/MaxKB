@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig } from 'axios'
+import axios, { type InternalAxiosRequestConfig, AxiosHeaders } from 'axios'
 import { MsgError } from '@/utils/message'
 import type { NProgress } from 'nprogress'
 import type { Ref } from 'vue'
@@ -19,9 +19,9 @@ const instance = axios.create(axiosConfig)
 
 /* 设置请求拦截器 */
 instance.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config: InternalAxiosRequestConfig) => {
     if (config.headers === undefined) {
-      config.headers = {}
+      config.headers = new AxiosHeaders()
     }
     const { user } = useStore()
     const token = user.getToken()
