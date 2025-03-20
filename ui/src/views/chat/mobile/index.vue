@@ -1,6 +1,6 @@
 <template>
   <div
-    class="chat-embed layout-bg"
+    class="chat-mobile layout-bg"
     v-loading="loading"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
@@ -310,7 +310,7 @@ onMounted(() => {
 })
 </script>
 <style lang="scss">
-.chat-embed {
+.chat-mobile {
   overflow: hidden;
   &__header {
     background: var(--app-header-bg-color);
@@ -325,16 +325,17 @@ onMounted(() => {
     border-bottom: 1px solid var(--el-border-color);
   }
   &__main {
-    padding-top: calc(var(--app-header-height) + 24px);
-    height: calc(100vh - var(--app-header-height) - 24px);
+    padding-top: calc(var(--app-header-height) + 16px);
+    height: calc(100vh - var(--app-header-height) - 16px);
     overflow: hidden;
   }
   .new-chat-button {
     z-index: 11;
+    font-size: 1rem;
   }
   // 历史对话弹出层
   .chat-popover {
-    position: absolute;
+    position: fixed;
     top: var(--app-header-height);
     background: #ffffff;
     padding-bottom: 24px;
@@ -342,7 +343,7 @@ onMounted(() => {
   }
   .chat-popover-button {
     z-index: 2009;
-    position: absolute;
+    position: fixed;
     top: 16px;
     right: 16px;
     font-size: 22px;
@@ -386,11 +387,11 @@ onMounted(() => {
       top: 50%;
     }
   }
-  .AiChat-embed {
-    .ai-chat__operate {
-      padding-top: 12px;
-    }
-  }
+  // .AiChat-embed {
+  //   .ai-chat__operate {
+  //     padding-top: 12px;
+  //   }
+  // }
 }
 </style>
 <style lang="scss" scoped>

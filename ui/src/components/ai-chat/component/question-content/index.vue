@@ -69,7 +69,7 @@
         :src="application.user_avatar"
         alt=""
         fit="cover"
-        style="width: 32px; height: 32px; display: block"
+        style="width: 28px; height: 28px; display: block"
       />
       <AppAvatar v-else>
         <img src="@/assets/user-icon.svg" style="width: 50%" alt="" />

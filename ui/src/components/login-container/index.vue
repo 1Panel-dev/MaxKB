@@ -20,7 +20,7 @@ defineProps({
   subTitle: String
 })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .login-form-container {
   width: 480px;
 

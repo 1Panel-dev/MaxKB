@@ -2,8 +2,8 @@
   <!-- 开场白组件 -->
   <div class="item-content mb-16">
     <div class="avatar" v-if="prologue">
-      <img v-if="application.avatar" :src="application.avatar" height="32px" width="32px" />
-      <LogoIcon v-else height="32px" width="32px" />
+      <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
+      <LogoIcon v-else height="28px" width="28px" />
     </div>
     <div class="content" v-if="prologue">
       <el-card shadow="always" class="border-r-8" style="--el-card-padding: 10px 16px 12px">

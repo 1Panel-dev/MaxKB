@@ -186,7 +186,7 @@ function firstGeneration() {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .authentication-append-input {
   .el-input-group__append {
     padding: 0 !important;

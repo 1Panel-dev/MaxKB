@@ -1,5 +1,5 @@
 <template>
-  <div class="ai-chat__operate p-16">
+  <div class="ai-chat__operate p-16-24">
     <slot name="operateBefore" />
     <div class="operate-textarea">
       <el-scrollbar max-height="136">
@@ -114,9 +114,7 @@
         </div>
       </el-scrollbar>
       <div class="flex">
-        <TouchChat v-if="isMicrophone" />
         <el-input
-          v-else
           ref="quickInputRef"
           v-model="inputValue"
           :placeholder="
@@ -133,82 +131,61 @@
         />
 
         <div class="operate flex align-center">
-          <template v-if="props.applicationDetails.stt_model_enable">
-            <span v-if="mode === 'mobile'">
-              <el-button text @click="isMicrophone = !isMicrophone">
-                <AppIcon v-if="isMicrophone" iconName="app-keyboard"></AppIcon>
-                <el-icon v-else>
-                  <Microphone />
-                </el-icon>
-              </el-button>
-            </span>
-            <span class="flex align-center" v-else>
-              <el-button text @click="startRecording" v-if="mediaRecorderStatus">
-                <el-icon>
-                  <Microphone />
-                </el-icon>
-              </el-button>
-
-              <div v-else class="operate flex align-center">
-                <el-text type="info"
-                  >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
-                >
-                <el-button text type="primary" @click="stopRecording" :loading="recorderLoading">
-                  <AppIcon iconName="app-video-stop"></AppIcon>
-                </el-button>
-              </div>
-            </span>
-          </template>
-
-          <template v-if="!startRecorderTime && !recorderLoading">
-            <span v-if="props.applicationDetails.file_upload_enable" class="flex align-center ml-4">
-              <el-upload
-                action="#"
-                multiple
-                :auto-upload="false"
-                :show-file-list="false"
-                :accept="getAcceptList()"
-                :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
-              >
-                <el-tooltip
-                  :disabled="mode === 'mobile'"
-                  effect="dark"
-                  placement="top"
-                  popper-class="upload-tooltip-width"
-                >
-                  <template #content>
-                    <div class="break-all pre-wrap">
-                      {{ $t('chat.uploadFile.label') }}：{{ $t('chat.uploadFile.most')
-                      }}{{ props.applicationDetails.file_upload_setting.maxFiles
-                      }}{{ $t('chat.uploadFile.limit') }}
-                      {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />{{
-                        $t('chat.uploadFile.fileType')
-                      }}：{{ getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase() }}
-                    </div>
-                  </template>
-                  <el-button text :disabled="checkMaxFilesLimit()" class="mt-4">
-                    <el-icon><Paperclip /></el-icon>
-                  </el-button>
-                </el-tooltip>
-              </el-upload>
-            </span>
-            <el-divider
-              direction="vertical"
-              v-if="
-                props.applicationDetails.file_upload_enable ||
-                props.applicationDetails.stt_model_enable
-              "
-            />
-            <el-button
-              text
-              class="sent-button"
-              :disabled="isDisabledChat || loading"
-              @click="sendChatHandle"
+          <span v-if="props.applicationDetails.file_upload_enable" class="flex align-center">
+            <el-upload
+              action="#"
+              multiple
+              :auto-upload="false"
+              :show-file-list="false"
+              :accept="getAcceptList()"
+              :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
             >
-              <img v-show="isDisabledChat || loading" src="@/assets/icon_send.svg" alt="" />
-              <SendIcon v-show="!isDisabledChat && !loading" />
+              <el-tooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
+                <template #content>
+                  <div class="break-all pre-wrap">
+                    {{ $t('chat.uploadFile.label') }}：{{ $t('chat.uploadFile.most')
+                    }}{{ props.applicationDetails.file_upload_setting.maxFiles
+                    }}{{ $t('chat.uploadFile.limit') }}
+                    {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />{{
+                      $t('chat.uploadFile.fileType')
+                    }}：{{ getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase() }}
+                  </div>
+                </template>
+                <el-button text :disabled="checkMaxFilesLimit()" class="mt-4">
+                  <el-icon><Paperclip /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </el-upload>
+            <el-divider direction="vertical" />
+          </span>
+          <span v-if="props.applicationDetails.stt_model_enable" class="flex align-center">
+            <el-button text @click="startRecording" v-if="mediaRecorderStatus">
+              <el-icon>
+                <Microphone />
+              </el-icon>
             </el-button>
-          </template>
+
+            <div v-else class="operate flex align-center">
+              <el-text type="info"
+                >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
+              >
+              <el-button text type="primary" @click="stopRecording" :loading="recorderLoading">
+                <AppIcon iconName="app-video-stop"></AppIcon>
+              </el-button>
+            </div>
+            <el-divider v-if="!startRecorderTime && !recorderLoading" direction="vertical" />
+          </span>
+
+          <el-button
+            v-if="!startRecorderTime && !recorderLoading"
+            text
+            class="sent-button"
+            :disabled="isDisabledChat || loading"
+            @click="sendChatHandle"
+          >
+            <img v-show="isDisabledChat || loading" src="@/assets/icon_send.svg" alt="" />
+            <SendIcon v-show="!isDisabledChat && !loading" />
+          </el-button>
         </div>
       </div>
     </div>
@@ -224,7 +201,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
 import Recorder from 'recorder-core'
-import TouchChat from './TouchChat.vue'
 import applicationApi from '@/api/application'
 import { MsgAlert } from '@/utils/message'
 import { type chatType } from '@/api/type/application'
@@ -421,8 +397,6 @@ const mediaRecorder = ref<any>(null)
 const isDisabledChat = computed(
   () => !(inputValue.value.trim() && (props.appId || props.applicationDetails?.name))
 )
-// 移动端语音
-const isMicrophone = ref(false)
 
 // 开始录音
 const startRecording = async () => {
@@ -630,95 +604,22 @@ onMounted(() => {
   }, 1800)
 })
 </script>
-<style lang="scss" scoped>
-.ai-chat {
-  &__operate {
-    background: #f3f7f9;
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 10;
+<style lang="scss" scope>
+@import '../../index.scss';
 
-    &:before {
-      background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
-      content: '';
-      position: absolute;
-      width: 100%;
-      top: -16px;
-      left: 0;
-      height: 16px;
-    }
+.file {
+  position: relative;
+  overflow: inherit;
 
-    :deep(.operate-textarea) {
-      box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
-      background-color: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #ffffff;
-      box-sizing: border-box;
-
-      &:has(.el-textarea__inner:focus) {
-        border: 1px solid var(--el-color-primary);
-      }
-
-      .el-textarea__inner {
-        border-radius: 8px !important;
-        box-shadow: none;
-        resize: none;
-        padding: 13px 16px;
-        box-sizing: border-box;
-      }
-
-      .operate {
-        padding: 6px 10px;
-        .el-icon {
-          font-size: 20px;
-        }
-
-        .sent-button {
-          max-height: none;
-          .el-icon {
-            font-size: 24px;
-          }
-        }
-
-        .el-loading-spinner {
-          margin-top: -15px;
-
-          .circular {
-            width: 31px;
-            height: 31px;
-          }
-        }
-      }
-    }
-    .file {
-      position: relative;
-      overflow: inherit;
-
-      .delete-icon {
-        position: absolute;
-        right: -5px;
-        top: -5px;
-        z-index: 1;
-      }
-    }
-
-    .upload-tooltip-width {
-      width: 300px;
-    }
+  .delete-icon {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    z-index: 1;
   }
 }
 
-@media only screen and (max-width: 768px) {
-  .ai-chat {
-    &__operate {
-      position: fixed;
-      bottom: 0;
-      font-size: 1rem;
-      .el-icon {
-        font-size: 1.4rem !important;
-      }
-    }
-  }
+.upload-tooltip-width {
+  width: 300px;
 }
 </style>

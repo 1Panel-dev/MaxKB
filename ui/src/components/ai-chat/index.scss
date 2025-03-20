@@ -1,6 +1,6 @@
 .ai-chat {
-  --padding-left: 40px;
-  height: 100%;
+  --padding-left: 36px;
+  height: calc(100% - 100px);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -24,65 +24,9 @@
       }
     }
   }
-  &__operate {
-    background: #f3f7f9;
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 10;
-
-    &:before {
-      background: linear-gradient(0deg, #f3f7f9 0%, rgba(243, 247, 249, 0) 100%);
-      content: '';
-      position: absolute;
-      width: 100%;
-      top: -16px;
-      left: 0;
-      height: 16px;
-    }
-
-    .operate-textarea {
-      box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
-      background-color: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #ffffff;
-      box-sizing: border-box;
-
-      &:has(.el-textarea__inner:focus) {
-        border: 1px solid var(--el-color-primary);
-      }
-
-      .el-textarea__inner {
-        border-radius: 8px !important;
-        box-shadow: none;
-        resize: none;
-        padding: 12px 16px;
-        box-sizing: border-box;
-      }
-
-      .operate {
-        padding: 6px 10px;
-        .el-icon {
-          font-size: 20px;
-        }
-
-        .sent-button {
-          max-height: none;
-          .el-icon {
-            font-size: 24px;
-          }
-        }
-
-        .el-loading-spinner {
-          margin-top: -15px;
-
-          .circular {
-            width: 31px;
-            height: 31px;
-          }
-        }
-      }
-    }
+  &.log,
+  &.debug-ai-chat {
+    height: 100%;
   }
 }
 
@@ -95,4 +39,6 @@
     max-width: 100% !important;
     margin: 0 auto;
   }
+}
+.chat-mobile {
 }

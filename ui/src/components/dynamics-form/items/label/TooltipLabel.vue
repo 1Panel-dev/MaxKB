@@ -17,7 +17,7 @@ defineProps<{
   tooltip: string
 }>()
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .aiMode-param-dialog {
   padding: 8px 8px 24px 8px;
 

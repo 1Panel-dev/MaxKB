@@ -174,4 +174,4 @@ function checkedOperateChange(Name: string | number, row: any, e: boolean) {
   })
 }
 </script>
-<style lang="scss" scope></style>
+<style lang="scss" scoped></style>

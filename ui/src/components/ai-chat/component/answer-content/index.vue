@@ -2,8 +2,8 @@
   <div class="item-content mb-16 lighter">
     <template v-for="(answer_text, index) in answer_text_list" :key="index">
       <div class="avatar">
-        <img v-if="application.avatar" :src="application.avatar" height="32px" width="32px" />
-        <LogoIcon v-else height="32px" width="32px" />
+        <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
+        <LogoIcon v-else height="28px" width="28px" />
       </div>
       <div class="content" @mouseup="openControl">
         <el-card shadow="always" class="mb-8 border-r-8" style="--el-card-padding: 6px 16px">
