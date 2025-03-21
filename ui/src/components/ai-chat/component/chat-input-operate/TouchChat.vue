@@ -15,7 +15,9 @@
     <transition name="el-fade-in-linear">
       <el-card class="custom-speech-card" :class="isTouching ? '' : 'active'" v-if="dialogVisible">
         <p>
-          <el-text type="info" v-if="isTouching">{{ '00:06' }}</el-text>
+          <el-text type="info" v-if="isTouching"
+            >00:{{ props.time < 10 ? `0${props.time}` : props.time }}</el-text
+          >
           <span class="lighter" v-else>
             {{ message }}
           </span>
@@ -36,17 +38,54 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { el } from 'element-plus/es/locale'
+import { ref, watch } from 'vue'
+const props = defineProps({
+  time: {
+    type: Number,
+    default: 0
+  },
+  start: {
+    type: Boolean,
+    default: false
+  }
+})
+const emit = defineEmits(['TouchStart', 'TouchEnd'])
 // 移动端语音
 const startY = ref(0)
 const isTouching = ref(false)
 const dialogVisible = ref(false)
 const message = ref('按住说话')
+
+watch(
+  () => props.time,
+  (val) => {
+    if (val && val === 60) {
+      dialogVisible.value = false
+      emit('TouchEnd', isTouching.value)
+      isTouching.value = false
+    }
+  }
+)
+watch(
+  () => props.start,
+  (val) => {
+    if (val) {
+      isTouching.value = true
+      dialogVisible.value = true
+      message.value = '松开发送，上滑取消'
+    } else {
+      dialogVisible.value = false
+      isTouching.value = false
+    }
+  }
+)
+
 function onTouchStart(event: any) {
-  isTouching.value = true
+  emit('TouchStart')
   startY.value = event.touches[0].clientY
-  dialogVisible.value = true
-  message.value = '松开发送，上滑取消'
+  // 阻止默认滚动行为
+  event.preventDefault()
 }
 function onTouchMove(event: any) {
   if (!isTouching.value) return
@@ -62,13 +101,7 @@ function onTouchMove(event: any) {
   }
 }
 function onTouchEnd() {
-  if (isTouching.value) {
-    message.value = '发送成功'
-  } else {
-    message.value = '已取消'
-  }
-  isTouching.value = false
-  dialogVisible.value = false
+  emit('TouchEnd', isTouching.value)
 }
 </script>
 
@@ -85,10 +118,12 @@ function onTouchEnd() {
   z-index: 999;
   text-align: center;
   color: var(--app-text-color-secondary);
-  user-select: none; /* 禁止选中 */
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none; /* 老版Firefox */
-  -ms-user-select: none; /* IE 10及以下 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   .close {
     box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.1);
     border: 1px solid rgba(222, 224, 227, 1);

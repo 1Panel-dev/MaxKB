@@ -1,6 +1,6 @@
 .ai-chat {
   --padding-left: 36px;
-  height: calc(100% - 100px);
+  height: 100%;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -24,10 +24,6 @@
       }
     }
   }
-  &.log,
-  &.debug-ai-chat {
-    height: 100%;
-  }
 }
 
 .chat-width {
@@ -40,5 +36,14 @@
     margin: 0 auto;
   }
 }
+
+@media only screen and (max-width: 768px) {
+  .ai-chat {
+    height: calc(100% - 100px);
+  }
+}
 .chat-mobile {
+  .el-button.is-text:not(.is-disabled):hover {
+    background: none;
+  }
 }

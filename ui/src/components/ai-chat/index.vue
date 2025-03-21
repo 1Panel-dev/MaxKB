@@ -526,7 +526,7 @@ defineExpose({
   position: absolute;
   z-index: 999;
   right: 50px;
-  bottom: 80px;
+  bottom: 0;
   width: calc(100% - 50px);
   max-width: 400px;
 }

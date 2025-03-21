@@ -114,7 +114,13 @@
         </div>
       </el-scrollbar>
       <div class="flex">
-        <TouchChat v-if="isMicrophone" />
+        <TouchChat
+          v-if="isMicrophone"
+          @TouchStart="startRecording"
+          @TouchEnd="TouchEnd"
+          :time="recorderTime"
+          :start="!mediaRecorderStatus"
+        />
         <el-input
           v-else
           ref="quickInputRef"
@@ -405,6 +411,8 @@ const uploadFile = async (file: any, fileList: any) => {
       }
     })
 }
+
+const intervalId = ref<number | null>(null)
 const recorderTime = ref(0)
 const startRecorderTime = ref(false)
 const recorderLoading = ref(false)
@@ -424,13 +432,21 @@ const isDisabledChat = computed(
 // 移动端语音
 const isMicrophone = ref(false)
 
+const TouchEnd = (bool: Boolean) => {
+  if (bool) {
+    stopRecording()
+  } else {
+    stopTimer()
+    mediaRecorder.value.close()
+    mediaRecorder.value = null
+  }
+}
+
 // 开始录音
 const startRecording = async () => {
   try {
     // 取消录音控制台日志
     Recorder.CLog = function () {}
-    mediaRecorderStatus.value = false
-    handleTimeChange()
     mediaRecorder.value = new Recorder({
       type: 'mp3',
       bitRate: 128,
@@ -440,8 +456,12 @@ const startRecording = async () => {
     mediaRecorder.value.open(
       () => {
         mediaRecorder.value.start()
+        mediaRecorderStatus.value = false
+        handleTimeChange()
       },
       (err: any) => {
+        stopTimer()
+        mediaRecorder.value.close()
         MsgAlert(
           t('common.tip'),
           `${t('chat.tip.recorderTip')}
@@ -465,6 +485,8 @@ const startRecording = async () => {
         customClass: 'record-tip-confirm'
       }
     )
+    mediaRecorder.value.close()
+    stopTimer()
   }
 }
 
@@ -507,6 +529,8 @@ const uploadRecording = async (audioBlob: Blob) => {
           nextTick(() => {
             autoSendMessage()
           })
+        } else {
+          isMicrophone.value = false
         }
       })
       .catch((error) => {
@@ -518,21 +542,35 @@ const uploadRecording = async (audioBlob: Blob) => {
     console.error(`${t('chat.uploadFile.errorMessage')}:`, error)
   }
 }
+
 const handleTimeChange = () => {
   startRecorderTime.value = true
-
-  setTimeout(() => {
-    if (recorderTime.value === 60) {
-      recorderTime.value = 0
-      stopRecording()
-      startRecorderTime.value = false
-    }
+  recorderTime.value = 0
+  intervalId.value = setInterval(() => {
     if (!startRecorderTime.value) {
+      clearInterval(intervalId.value!)
+      intervalId.value = null
       return
     }
+
     recorderTime.value++
-    handleTimeChange()
+
+    if (recorderTime.value === 60) {
+      stopRecording()
+      clearInterval(intervalId.value!)
+      intervalId.value = null
+      startRecorderTime.value = false
+    }
   }, 1000)
+}
+// 停止计时的函数
+const stopTimer = () => {
+  if (intervalId.value !== null) {
+    clearInterval(intervalId.value)
+    intervalId.value = null
+    startRecorderTime.value = false
+    mediaRecorderStatus.value = true
+  }
 }
 
 function autoSendMessage() {
@@ -711,6 +749,7 @@ onMounted(() => {
 
 @media only screen and (max-width: 768px) {
   .ai-chat {
+    height: calc(100% - 100px);
     &__operate {
       position: fixed;
       bottom: 0;
@@ -720,5 +759,7 @@ onMounted(() => {
       }
     }
   }
+}
+.chat-pc {
 }
 </style>

@@ -2,8 +2,8 @@ import { nextTick, onBeforeMount, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import { DeviceType } from '@/enums/common'
-/** 参考 Bootstrap 的响应式设计 WIDTH = 600 */
-const WIDTH = 600
+/** 参考 Bootstrap 的响应式设计 WIDTH = 768 */
+const WIDTH = 768
 
 /** 根据大小变化重新布局 */
 export default () => {
