@@ -1,5 +1,6 @@
 import { type Dict } from '@/api/type/common'
 import { type Ref } from 'vue'
+import bus from '@/bus'
 interface ApplicationFormType {
   name?: string
   desc?: string
@@ -144,8 +145,8 @@ export class ChatRecordManage {
         })
       }
     }
-
     this.chat.answer_text = this.chat.answer_text + chunk_answer
+    bus.emit('change:answer', { record_id: this.chat.record_id, is_end: false })
   }
   get_current_up_node(run_node: any) {
     const index = this.node_list.findIndex((item) => item == run_node)
@@ -232,6 +233,7 @@ export class ChatRecordManage {
     if (this.loading) {
       this.loading.value = false
     }
+    bus.emit('change:answer', { record_id: this.chat.record_id, is_end: true })
     if (this.id) {
       clearInterval(this.id)
     }
