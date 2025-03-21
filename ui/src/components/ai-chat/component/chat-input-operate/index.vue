@@ -527,7 +527,7 @@ const uploadRecording = async (audioBlob: Blob) => {
         // 自动发送
         if (props.applicationDetails.stt_autosend) {
           nextTick(() => {
-            autoSendMessage()
+            autoSendMessage() 
           })
         } else {
           isMicrophone.value = false
