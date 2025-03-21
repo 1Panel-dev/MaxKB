@@ -984,6 +984,7 @@ class ApplicationSerializer(serializers.Serializer):
                                                 'draggable': application_setting.draggable,
                                                 'show_guide': application_setting.show_guide,
                                                 'avatar': application_setting.avatar,
+                                                'show_avatar': application_setting.show_avatar,
                                                 'float_icon': application_setting.float_icon,
                                                 'authentication': application_setting.authentication,
                                                 'authentication_type': application_setting.authentication_value.get(
@@ -992,6 +993,7 @@ class ApplicationSerializer(serializers.Serializer):
                                                 'disclaimer_value': application_setting.disclaimer_value,
                                                 'custom_theme': application_setting.custom_theme,
                                                 'user_avatar': application_setting.user_avatar,
+                                                'show_user_avatar': application_setting.show_user_avatar,
                                                 'float_location': application_setting.float_location}
             return ApplicationSerializer.Query.reset_application(
                 {**ApplicationSerializer.ApplicationModel(application).data,

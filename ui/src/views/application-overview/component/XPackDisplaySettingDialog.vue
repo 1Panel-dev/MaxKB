@@ -81,7 +81,7 @@
           <div>
             <div class="p-16" style="position: relative">
               <div class="flex">
-                <div class="avatar">
+                <div class="avatar" v-if="xpackForm.show_avatar">
                   <el-image
                     v-if="imgUrl.avatar"
                     :src="imgUrl.avatar"
@@ -99,7 +99,8 @@
                 <img src="@/assets/display-bg2.png" alt="" width="270" />
               </div>
               <div class="flex-between">
-                <div class="avatar">
+                <img src="@/assets/display-bg3.png" alt="" width="270" class="ml-8" />
+                <div class="avatar" v-if="xpackForm.show_user_avatar">
                   <el-image
                     v-if="imgUrl.user_avatar"
                     :src="imgUrl.user_avatar"
@@ -111,8 +112,6 @@
                     <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
                   </AppAvatar>
                 </div>
-
-                <img src="@/assets/display-bg3.png" alt="" width="270" class="ml-8" />
               </div>
             </div>
             <div
@@ -188,7 +187,11 @@
             <span class="lighter">{{
               $t('views.applicationOverview.appInfo.SettingDisplayDialog.askUserAvatar')
             }}</span>
-
+            <el-checkbox v-model="xpackForm.show_user_avatar" style="margin-left: 200px">
+              {{
+                $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
+              }}</el-checkbox
+            >
             <el-upload
               ref="uploadRef"
               action="#"
@@ -211,7 +214,9 @@
             <span class="lighter">{{
               $t('views.applicationOverview.appInfo.SettingDisplayDialog.AIAvatar')
             }}</span>
-
+            <el-checkbox v-model="xpackForm.show_avatar" style="margin-left: 200px">{{
+              $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
+            }}</el-checkbox>
             <el-upload
               ref="uploadRef"
               action="#"
@@ -417,7 +422,9 @@ const defaultSetting = {
   float_location: {
     y: { type: 'bottom', value: 30 },
     x: { type: 'right', value: 0 }
-  }
+  },
+  show_avatar: true,
+  show_user_avatar: false
 }
 
 const displayFormRef = ref()
@@ -443,7 +450,9 @@ const xpackForm = ref<any>({
   float_location: {
     y: { type: 'bottom', value: 30 },
     x: { type: 'right', value: 0 }
-  }
+  },
+  show_avatar: true,
+  show_user_avatar: false
 })
 
 const imgUrl = ref<any>({
@@ -510,6 +519,8 @@ const open = (data: any, content: any) => {
   xpackForm.value.avatar_url = data.avatar
   xpackForm.value.user_avatar_url = data.user_avatar
   xpackForm.value.float_icon_url = data.float_icon
+  xpackForm.value.show_avatar = data.show_avatar
+  xpackForm.value.show_user_avatar = data.show_user_avatar
   xpackForm.value.custom_theme = {
     theme_color: data.custom_theme?.theme_color || '',
     header_font_color: data.custom_theme?.header_font_color || '#1f2329'

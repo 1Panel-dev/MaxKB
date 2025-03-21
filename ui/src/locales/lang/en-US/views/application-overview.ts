@@ -71,6 +71,7 @@ export default {
       default: 'Default',
       askUserAvatar: 'User Avatar (Asking)',
       replace: 'Replace',
+      display: 'Display',
       imageMessage:
         'Recommended size: 32×32 pixels. Supports JPG, PNG, and GIF formats. Max size: 10 MB',
       AIAvatar: 'AI Avatar',
