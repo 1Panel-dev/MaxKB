@@ -700,3 +700,13 @@ class Application(APIView):
                 data={'application_id': application_id, 'user_id': request.user.id}).play_demo_text(request.data)
             return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
                                                                 'Content-Disposition': 'attachment; filename="abc.mp3"'})
+
+    class McpServers(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['GET'], detail=False)
+        @has_permissions(PermissionConstants.APPLICATION_READ, compare=CompareConstants.AND)
+        @log(menu='Application', operate="Get the MCP server tools")
+        def get(self, request: Request):
+            return result.success(ApplicationSerializer.McpServers(
+                data={'mcp_servers': request.query_params.get('mcp_servers')}).get_mcp_servers())

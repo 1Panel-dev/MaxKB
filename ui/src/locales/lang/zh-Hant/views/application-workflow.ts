@@ -220,6 +220,10 @@ export default {
       text: '更新全域變數的值',
       assign: '賦值'
     },
+    mcpNode: {
+      label: 'MCP 節點',
+      text: '呼叫 MCP 工具',
+    },
     imageGenerateNode: {
       label: '圖片生成',
       text: '根據提供的文本內容生成圖片',

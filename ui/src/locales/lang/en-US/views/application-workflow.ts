@@ -220,6 +220,10 @@ export default {
       text: 'Update the value of the global variable',
       assign: 'Set Value'
     },
+    mcpNode: {
+      label: 'MCP Server',
+      text: 'Call MCP Tools',
+    },
     imageGenerateNode: {
       label: 'Image Generation',
       text: 'Generate images based on provided text content',
