@@ -90,6 +90,8 @@
             <el-form-item label="App Secret" prop="app_id" v-if="detail.type === '2'">
               <el-input
                 v-model="form.app_secret"
+                type="password"
+                show-password
                 :placeholder="
                   $t('views.application.applicationAccess.larkSetting.appSecretPlaceholder')
                 "
