@@ -49,12 +49,20 @@ export default {
       datasetType: {
         label: 'Type',
         generalInfo: 'Upload local documents',
-        webInfo: 'Sync text data from a web site'
+        webInfo: 'Sync text data from a web site',
+        larkInfo: 'Sync documents from Feishu',
+        yuqueInfo: 'Sync documents from Yuque'
       },
       source_url: {
         label: 'Web Root URL',
         placeholder: 'Please enter the web root URL',
         requiredMessage: 'Please enter the web root URL'
+      },
+      user_id: {
+        requiredMessage: 'Please enter User ID'
+      },
+      token: {
+        requiredMessage: 'Please enter Token'
       },
       selector: {
         label: 'Selector',
@@ -79,8 +87,7 @@ export default {
     replace: 'Replace Sync',
     replaceText: 'Re-fetch Web site documents, replacing the documents in the local knowledge',
     complete: 'Full Sync',
-    completeText:
-      'Delete all documents in the local knowledge and re-fetch web site documents',
+    completeText: 'Delete all documents in the local knowledge and re-fetch web site documents',
     tip: 'Note: All syncs will delete existing data and re-fetch new data. Please proceed with caution.'
   }
 }

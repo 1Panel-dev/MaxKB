@@ -3,6 +3,8 @@ export default {
   createDataset: '创建知识库',
   general: '通用型',
   web: 'web 站点',
+  lark: '飞书',
+  yuque: '语雀',
   relatedApplications: '关联应用',
   document_count: '文档数',
   relatedApp_count: '关联应用',
@@ -47,13 +49,21 @@ export default {
       },
       datasetType: {
         label: '知识库类型',
-        generalInfo: '上传本地文档',
-        webInfo: '同步Web网站文本数据'
+        generalInfo: '通过上传文件或手动录入构建知识库',
+        webInfo: '通过网站链接构建知识库',
+        larkInfo: '通过飞书文档构建知识库',
+        yuqueInfo: '通过语雀文档构建知识库'
       },
       source_url: {
         label: 'Web 根地址',
         placeholder: '请输入 Web 根地址',
         requiredMessage: ' 请输入 Web 根地址'
+      },
+      user_id: {
+        requiredMessage: '请输入User ID'
+      },
+      token: {
+        requiredMessage: '请输入Token'
       },
       selector: {
         label: '选择器',

@@ -197,7 +197,8 @@ export default {
       appIdPlaceholder: '请输入App ID',
       appSecretPlaceholder: '请输入App Secret',
       verificationTokenPlaceholder: '请输入Verification Token',
-      urlInfo: '-事件与回调-事件配置-配置订阅方式的 "请求地址" 中'
+      urlInfo: '-事件与回调-事件配置-配置订阅方式的 "请求地址" 中',
+      folderTokenPlaceholder: '请输入Folder Token'
     },
     slackSetting: {
       title: 'Slack 应用配置',

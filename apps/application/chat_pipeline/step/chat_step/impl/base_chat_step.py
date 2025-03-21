@@ -139,7 +139,7 @@ def event_content(response,
         logging.getLogger("max_kb_error").error(f'{str(e)}:{traceback.format_exc()}')
         all_text = 'Exception:' + str(e)
         write_context(step, manage, 0, 0, all_text)
-        asker = manage.context.get('asker', None)
+        asker = manage.context.get('form_data', {}).get('asker', None)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text, client_id, reasoning_content='',
                                       asker=asker)
@@ -307,7 +307,7 @@ class BaseChatStep(IChatStep):
             else:
                 reasoning_content = reasoning_result.get('reasoning_content') + reasoning_result_end.get(
                     'reasoning_content')
-            asker = manage.context.get('asker', None)
+            asker = manage.context.get('form_data', {}).get('asker', None)
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                           content, manage, self, padding_problem_text, client_id,
                                           reasoning_content=reasoning_content if reasoning_content_enable else '',
@@ -325,7 +325,7 @@ class BaseChatStep(IChatStep):
         except Exception as e:
             all_text = 'Exception:' + str(e)
             write_context(self, manage, 0, 0, all_text)
-            asker = manage.context.get('asker', None)
+            asker = manage.context.get('form_data', {}).get('asker', None)
             post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                           all_text, manage, self, padding_problem_text, client_id, reasoning_content='',
                                           asker=asker)

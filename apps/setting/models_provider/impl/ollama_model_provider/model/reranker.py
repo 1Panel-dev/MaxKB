@@ -1,10 +1,11 @@
 from typing import Sequence, Optional, Any, Dict
+
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import Document
-from langchain_community.embeddings import OllamaEmbeddings
 from setting.models_provider.base_model_provider import MaxKBBaseModel
 from sklearn.metrics.pairwise import cosine_similarity
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 
 
 class OllamaReranker(MaxKBBaseModel, OllamaEmbeddings, BaseModel):

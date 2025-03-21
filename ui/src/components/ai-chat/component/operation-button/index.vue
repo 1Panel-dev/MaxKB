@@ -1,5 +1,7 @@
 <template>
+
   <div class="operation-button-container">
+
     <LogOperationButton
       v-if="type === 'log'"
       v-bind:data="chatRecord"

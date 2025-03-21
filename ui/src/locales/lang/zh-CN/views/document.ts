@@ -55,7 +55,8 @@ export default {
       tip1: '1、点击下载对应模版并完善信息',
       tip2: '2、上传的表格文件中每个 sheet 会作为一个文档，sheet名称为文档名称',
       tip3: '3、每次最多上传 50 个文件，每个文件不超过 100MB'
-    }
+    },
+    lark: {}
   },
   setRules: {
     title: {

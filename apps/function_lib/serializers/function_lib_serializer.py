@@ -6,6 +6,7 @@
     @date：2024/8/2 17:35
     @desc:
 """
+import io
 import json
 import pickle
 import re
@@ -22,6 +23,7 @@ from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField, UploadedImageField
 from common.response import result
+from common.util.common import restricted_loads
 from common.util.field_message import ErrMessage
 from common.util.function_code import FunctionExecutor
 from common.util.rsa_util import rsa_long_decrypt, rsa_long_encrypt
@@ -288,7 +290,7 @@ class FunctionLibSerializer(serializers.Serializer):
                 if function_lib.init_params:
                     old_init_params = json.loads(rsa_long_decrypt(function_lib.init_params))
                     for key in edit_dict['init_params']:
-                        if edit_dict['init_params'][key] == encryption(old_init_params[key]):
+                        if key in old_init_params and edit_dict['init_params'][key] == encryption(old_init_params[key]):
                             edit_dict['init_params'][key] = old_init_params[key]
 
                 edit_dict['init_params'] = rsa_long_encrypt(json.dumps(edit_dict['init_params']))
@@ -308,7 +310,7 @@ class FunctionLibSerializer(serializers.Serializer):
                 password_fields = [i["field"] for i in function_lib.init_field_list if i.get("input_type") == "PasswordInput"]
                 if function_lib.init_params:
                     for k in function_lib.init_params:
-                        if k in password_fields:
+                        if k in password_fields and function_lib.init_params[k]:
                             function_lib.init_params[k] = encryption(function_lib.init_params[k])
             return {**FunctionLibModelSerializer(function_lib).data, 'init_params': function_lib.init_params}
 
@@ -338,7 +340,7 @@ class FunctionLibSerializer(serializers.Serializer):
             user_id = self.data.get('user_id')
             flib_instance_bytes = self.data.get('file').read()
             try:
-                flib_instance = pickle.loads(flib_instance_bytes)
+                flib_instance = restricted_loads(flib_instance_bytes)
             except Exception as e:
                 raise AppApiException(1001, _("Unsupported file format"))
             function_lib = flib_instance.function_lib

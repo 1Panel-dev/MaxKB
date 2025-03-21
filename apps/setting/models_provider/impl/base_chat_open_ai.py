@@ -10,7 +10,6 @@ from langchain_core.outputs import ChatGenerationChunk, ChatGeneration
 from langchain_core.runnables import RunnableConfig, ensure_config
 from langchain_core.utils.pydantic import is_basemodel_subclass
 from langchain_openai import ChatOpenAI
-from langchain_openai.chat_models.base import _convert_chunk_to_generation_chunk
 
 from common.config.tokenizer_manage_config import TokenizerManage
 
@@ -98,7 +97,7 @@ class BaseChatOpenAI(ChatOpenAI):
                 if not isinstance(chunk, dict):
                     chunk = chunk.model_dump()
 
-                generation_chunk = _convert_chunk_to_generation_chunk(
+                generation_chunk = super()._convert_chunk_to_generation_chunk(
                     chunk,
                     default_chunk_class,
                     base_generation_info if is_first_chunk else {},

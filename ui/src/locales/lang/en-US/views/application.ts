@@ -210,7 +210,8 @@ export default {
       appSecretPlaceholder: 'Please enter APP secret',
       verificationTokenPlaceholder: 'Please enter verification token',
       urlInfo:
-        '-Events and callbacks - event configuration - configure the "request address" of the subscription method'
+        '-Events and callbacks - event configuration - configure the "request address" of the subscription method',
+      folderTokenPlaceholder: 'Please enter folder token'
     },
     slackSetting: {
       title: 'Slack Configuration',

@@ -6,7 +6,7 @@
     @date：2024/9/2 16:42
     @desc:
 """
-from typing import Sequence, Optional, Dict, Any
+from typing import Sequence, Optional, Dict, Any, ClassVar
 
 import requests
 import torch
@@ -69,7 +69,7 @@ class LocalBaseReranker(MaxKBBaseModel, BaseDocumentCompressor):
     tokenizer: Any = None
     model: Optional[str] = None
     cache_dir: Optional[str] = None
-    model_kwargs = {}
+    model_kwargs: ClassVar = {}
 
     def __init__(self, model_name, cache_dir=None, **model_kwargs):
         super().__init__()

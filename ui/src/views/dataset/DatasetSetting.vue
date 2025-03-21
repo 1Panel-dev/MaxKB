@@ -23,9 +23,9 @@
                   </AppAvatar>
                   <div>
                     <div>{{ $t('views.dataset.general') }}</div>
-                    <el-text type="info">{{
-                      $t('views.dataset.datasetForm.form.datasetType.generalInfo')
-                    }}</el-text>
+                    <el-text type="info"
+                      >{{ $t('views.dataset.datasetForm.form.datasetType.generalInfo') }}
+                    </el-text>
                   </div>
                 </div>
               </el-card>
@@ -38,6 +38,21 @@
                     <div>{{ $t('views.dataset.web') }}</div>
                     <el-text type="info">
                       {{ $t('views.dataset.datasetForm.form.datasetType.webInfo') }}
+                    </el-text>
+                  </div>
+                </div>
+              </el-card>
+              <el-card shadow="never" class="mb-8" style="width: 50%" v-if="detail?.type === '2'">
+                <div class="flex align-center">
+                  <AppAvatar shape="square" :size="32" style="background: none">
+                    <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
+                  </AppAvatar>
+                  <div>
+                    <p>
+                      <el-text>{{ $t('views.dataset.lark') }}</el-text>
+                    </p>
+                    <el-text type="info"
+                      >{{ $t('views.dataset.datasetForm.form.datasetType.larkInfo') }}
                     </el-text>
                   </div>
                 </div>
@@ -62,6 +77,32 @@
                 v-model="form.selector"
                 :placeholder="$t('views.dataset.datasetForm.form.selector.placeholder')"
                 @blur="form.selector = form.selector.trim()"
+              />
+            </el-form-item>
+            <el-form-item label="App ID" prop="app_id" v-if="detail.type === '2'">
+              <el-input
+                v-model="form.app_id"
+                :placeholder="
+                  $t('views.application.applicationAccess.larkSetting.appIdPlaceholder')
+                "
+              />
+            </el-form-item>
+            <el-form-item label="App Secret" prop="app_id" v-if="detail.type === '2'">
+              <el-input
+                v-model="form.app_secret"
+                type="password"
+                show-password
+                :placeholder="
+                  $t('views.application.applicationAccess.larkSetting.appSecretPlaceholder')
+                "
+              />
+            </el-form-item>
+            <el-form-item label="Folder Token" prop="folder_token" v-if="detail.type === '2'">
+              <el-input
+                v-model="form.folder_token"
+                :placeholder="
+                  $t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder')
+                "
               />
             </el-form-item>
           </el-form>
@@ -105,7 +146,7 @@
           </div>
 
           <div class="text-right">
-            <el-button @click="submit" type="primary"> {{ $t('common.save') }} </el-button>
+            <el-button @click="submit" type="primary"> {{ $t('common.save') }}</el-button>
           </div>
         </div>
       </el-scrollbar>
@@ -122,6 +163,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { isAppIcon } from '@/utils/application'
 import useStore from '@/stores'
 import { t } from '@/locales'
+
 const route = useRoute()
 const {
   params: { id }
@@ -138,7 +180,10 @@ const cloneModelId = ref('')
 
 const form = ref<any>({
   source_url: '',
-  selector: ''
+  selector: '',
+  app_id: '',
+  app_secret: '',
+  folder_token: ''
 })
 
 const rules = reactive({
@@ -146,6 +191,27 @@ const rules = reactive({
     {
       required: true,
       message: t('views.dataset.datasetForm.form.source_url.requiredMessage'),
+      trigger: 'blur'
+    }
+  ],
+  app_id: [
+    {
+      required: true,
+      message: t('views.application.applicationAccess.larkSetting.appIdPlaceholder'),
+      trigger: 'blur'
+    }
+  ],
+  app_secret: [
+    {
+      required: true,
+      message: t('views.application.applicationAccess.larkSetting.appSecretPlaceholder'),
+      trigger: 'blur'
+    }
+  ],
+  folder_token: [
+    {
+      required: true,
+      message: t('views.application.applicationAccess.larkSetting.folderTokenPlaceholder'),
       trigger: 'blur'
     }
   ]
@@ -156,7 +222,7 @@ async function submit() {
     await webFormRef.value.validate((valid: any) => {
       if (valid) {
         const obj =
-          detail.value.type === '1'
+          detail.value.type === '1' || detail.value.type === '2'
             ? {
                 application_id_list: application_id_list.value,
                 meta: form.value,
@@ -172,17 +238,33 @@ async function submit() {
             confirmButtonText: t('views.dataset.setting.vectorization')
           })
             .then(() => {
-              datasetApi.putDataset(id, obj, loading).then((res) => {
-                datasetApi.putReEmbeddingDataset(id).then(() => {
-                  MsgSuccess(t('common.saveSuccess'))
+              if (detail.value.type === '2') {
+                datasetApi.putLarkDataset(id, obj, loading).then((res) => {
+                  datasetApi.putReEmbeddingDataset(id).then(() => {
+                    MsgSuccess(t('common.saveSuccess'))
+                  })
                 })
-              })
+              } else {
+                datasetApi.putDataset(id, obj, loading).then((res) => {
+                  datasetApi.putReEmbeddingDataset(id).then(() => {
+                    MsgSuccess(t('common.saveSuccess'))
+                  })
+                })
+              }
             })
             .catch(() => {})
         } else {
-          datasetApi.putDataset(id, obj, loading).then((res) => {
-            MsgSuccess(t('common.saveSuccess'))
-          })
+          if (detail.value.type === '2') {
+            datasetApi.putLarkDataset(id, obj, loading).then((res) => {
+              datasetApi.putReEmbeddingDataset(id).then(() => {
+                MsgSuccess(t('common.saveSuccess'))
+              })
+            })
+          } else {
+            datasetApi.putDataset(id, obj, loading).then((res) => {
+              MsgSuccess(t('common.saveSuccess'))
+            })
+          }
         }
       }
     })
@@ -193,7 +275,7 @@ function getDetail() {
   dataset.asyncGetDatasetDetail(id, loading).then((res: any) => {
     detail.value = res.data
     cloneModelId.value = res.data?.embedding_mode_id
-    if (detail.value.type === '1') {
+    if (detail.value.type === '1' || detail.value.type === '2') {
       form.value = res.data.meta
     }
     application_id_list.value = res.data?.application_id_list
