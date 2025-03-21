@@ -70,20 +70,15 @@
 <script setup lang="ts">
 import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import { computed, onMounted, ref } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import applicationApi from '@/api/application'
-import { randomId } from '@/utils/utils'
 import { t } from '@/locales'
-import { copyClick } from '@/utils/clipboard'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormField } from '@/components/dynamics-form/type'
 
 const props = defineProps<{ nodeModel: any }>()
 
-const typeOptions = ['string', 'num', 'json']
-const showicon = ref(false)
 const dynamicsFormRef = ref()
 
 
