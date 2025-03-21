@@ -56,11 +56,12 @@
     <h5 class="title-decoration-1 mb-8">工具参数</h5>
     <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">
       <DynamicsForm
-        v-model="tool_form_data"
-        :model="tool_form_data"
+        v-if="form_data.mcpTool"
+        v-model="form_data.tool_params"
+        :model="form_data.tool_params"
         label-position="top"
         require-asterisk-position="right"
-        :render_data="tool_form_field"
+        :render_data="form_data.tool_form_field"
         ref="dynamicsFormRef"
       >
       </DynamicsForm>
@@ -75,7 +76,7 @@ import { isLastNode } from '@/workflow/common/data'
 import applicationApi from '@/api/application'
 import { t } from '@/locales'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-import type { FormField } from '@/components/dynamics-form/type'
+import { MsgSuccess } from '@/utils/message'
 
 const props = defineProps<{ nodeModel: any }>()
 
@@ -92,11 +93,12 @@ const wheel = (e: any) => {
   }
 }
 const form = {
-  mcpServers: ''
+  mcpTool: '',
+  mcpServers: '',
+  tool_params: {},
+  tool_form_field: []
 }
 
-const tool_form_data = ref({})
-const tool_form_field = ref<FormField[]>([])
 
 function submitDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'mcpServers', val)
@@ -105,14 +107,15 @@ function submitDialog(val: string) {
 function getTools() {
   applicationApi.getMcpTools({ mcp_servers: form_data.value.mcpServers }).then((res: any) => {
     form_data.value.mcpTools = res.data
+    MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
   })
 }
 
 function changeTool() {
   const params = form_data.value.mcpTools.filter((item: any) => item.name === form_data.value.mcpTool)[0].args.params
-  tool_form_field.value = []
+  form_data.value.tool_form_field = []
   for (const item in params.properties) {
-    tool_form_field.value.push({
+    form_data.value.tool_form_field.push({
       field: item,
       label: {
         input_type: 'TooltipLabel',
@@ -126,12 +129,17 @@ function changeTool() {
       show_default_value: false,
       props_info: {
         rules: [
-          { required: params.required.indexOf(item) !== -1, message: t('dynamicsForm.tip.requiredMessage'), trigger: 'blur' }
+          {
+            required: params.required.indexOf(item) !== -1,
+            message: t('dynamicsForm.tip.requiredMessage'),
+            trigger: 'blur'
+          }
         ]
       }
     })
   }
-  dynamicsFormRef.value.render(tool_form_field.value, tool_form_data.value)
+  //
+  dynamicsFormRef.value?.render(form_data.value.tool_form_field, form_data.value.tool_params)
 }
 
 const form_data = computed({

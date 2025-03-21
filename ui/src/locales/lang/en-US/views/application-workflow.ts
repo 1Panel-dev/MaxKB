@@ -223,6 +223,7 @@ export default {
     mcpNode: {
       label: 'MCP Server',
       text: 'Call MCP Tools',
+      getToolsSuccess: 'Get Tools Successfully',
     },
     imageGenerateNode: {
       label: 'Image Generation',

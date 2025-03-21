@@ -223,6 +223,7 @@ export default {
     mcpNode: {
       label: 'MCP 节点',
       text: '调用 MCP 工具',
+      getToolsSuccess: '获取工具成功',
     },
     imageGenerateNode: {
       label: '图片生成',
