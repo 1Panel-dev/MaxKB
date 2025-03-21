@@ -9,6 +9,7 @@ urlpatterns = [
     path('application/profile', views.Application.Profile.as_view(), name='application/profile'),
     path('application/embed', views.Application.Embed.as_view()),
     path('application/authentication', views.Application.Authentication.as_view()),
+    path('application/mcp_servers', views.Application.McpServers.as_view()),
     path('application/<str:application_id>/publish', views.Application.Publish.as_view()),
     path('application/<str:application_id>/edit_icon', views.Application.EditIcon.as_view()),
     path('application/<str:application_id>/export', views.Application.Export.as_view()),

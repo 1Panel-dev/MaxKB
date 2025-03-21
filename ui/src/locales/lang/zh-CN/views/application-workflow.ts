@@ -220,6 +220,14 @@ export default {
       text: '更新全局变量的值',
       assign: '赋值'
     },
+    mcpNode: {
+      label: 'MCP 节点',
+      text: '调用 MCP 工具',
+      getToolsSuccess: '获取工具成功',
+      getTool: '获取工具',
+      tool: '工具',
+      toolParam: '工具参数'
+    },
     imageGenerateNode: {
       label: '图片生成',
       text: '根据提供的文本内容生成图片',

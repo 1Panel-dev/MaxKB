@@ -263,6 +263,24 @@ export const variableAssignNode = {
   }
 }
 
+export const mcpNode = {
+  type: WorkflowType.McpNode,
+  text: t('views.applicationWorkflow.nodes.mcpNode.text'),
+  label: t('views.applicationWorkflow.nodes.mcpNode.label'),
+  height: 252,
+  properties: {
+    stepName: t('views.applicationWorkflow.nodes.mcpNode.label'),
+    config: {
+      fields:[
+        {
+          label: t('common.result'),
+          value: 'result'
+        }
+      ]
+    }
+  }
+}
+
 export const imageGenerateNode = {
   type: WorkflowType.ImageGenerateNode,
   text: t('views.applicationWorkflow.nodes.imageGenerateNode.text'),
@@ -332,7 +350,8 @@ export const menuNodes = [
   documentExtractNode,
   speechToTextNode,
   textToSpeechNode,
-  variableAssignNode
+  variableAssignNode,
+  mcpNode
 ]
 
 /**
@@ -426,7 +445,8 @@ export const nodeDict: any = {
   [WorkflowType.TextToSpeechNode]: textToSpeechNode,
   [WorkflowType.SpeechToTextNode]: speechToTextNode,
   [WorkflowType.ImageGenerateNode]: imageGenerateNode,
-  [WorkflowType.VariableAssignNode]: variableAssignNode
+  [WorkflowType.VariableAssignNode]: variableAssignNode,
+  [WorkflowType.McpNode]: mcpNode,
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'
