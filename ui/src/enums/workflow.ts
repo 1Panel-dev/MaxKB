@@ -16,5 +16,6 @@ export enum WorkflowType {
   FormNode = 'form-node',
   TextToSpeechNode = 'text-to-speech-node',
   SpeechToTextNode = 'speech-to-text-node',
-  ImageGenerateNode = 'image-generate-node'
+  ImageGenerateNode = 'image-generate-node',
+  McpNode = 'mcp-node',
 }

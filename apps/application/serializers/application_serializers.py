@@ -6,6 +6,7 @@
     @date：2023/11/7 10:02
     @desc:
 """
+import asyncio
 import datetime
 import hashlib
 import json
@@ -23,6 +24,8 @@ from django.db.models import QuerySet
 from django.db.models.expressions import RawSQL
 from django.http import HttpResponse
 from django.template import Template, Context
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from mcp.client.sse import sse_client
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
 
@@ -1305,3 +1308,28 @@ class ApplicationSerializer(serializers.Serializer):
                 application_api_key.save()
                 # 写入缓存
                 get_application_api_key(application_api_key.secret_key, False)
+
+    class McpServers(serializers.Serializer):
+        mcp_servers = serializers.JSONField(required=True)
+
+        def get_mcp_servers(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            servers = json.loads(self.data.get('mcp_servers'))
+
+            async def get_mcp_tools(servers):
+                async with MultiServerMCPClient(servers) as client:
+                    return client.get_tools()
+
+            tools = []
+            for server in servers:
+                tools += [
+                    {
+                        'server': server,
+                        'name': tool.name,
+                        'description': tool.description,
+                        'args_schema': tool.args_schema,
+                    }
+                    for tool in asyncio.run(get_mcp_tools({server: servers[server]}))]
+            return tools
+
