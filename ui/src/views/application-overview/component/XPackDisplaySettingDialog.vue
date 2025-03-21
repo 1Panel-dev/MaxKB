@@ -561,7 +561,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .setting-preview {
   background: #f5f6f7;
   height: 570px;

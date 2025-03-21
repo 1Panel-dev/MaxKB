@@ -84,7 +84,7 @@ const loginImage = computed(() => {
   }
 })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .login-warp {
   height: 100vh;
 

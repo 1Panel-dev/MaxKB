@@ -419,7 +419,7 @@
           {{ $t('views.application.applicationForm.title.appTest') }}
         </h4>
         <div class="dialog-bg">
-          <div class="flex align-center p-24">
+          <div class="flex align-center p-16 mb-8">
             <div
               class="edit-avatar mr-12"
               @mouseenter="showEditIcon = true"

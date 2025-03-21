@@ -326,4 +326,4 @@ function radioChange() {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope></style>
+<style lang="scss" scoped></style>

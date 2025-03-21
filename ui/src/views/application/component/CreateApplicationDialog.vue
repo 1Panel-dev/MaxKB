@@ -259,7 +259,7 @@ function selectedType(type: string) {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .radio-card {
   line-height: 22px;
   &.active {

@@ -349,7 +349,7 @@ onMounted(() => {
   }
 })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .login-gradient-divider {
   position: relative;
   text-align: center;

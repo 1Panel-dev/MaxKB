@@ -17,7 +17,7 @@
     </div>
     <template v-if="!isUserInput || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
-        <div ref="dialogScrollbar" class="ai-chat__content p-24">
+        <div ref="dialogScrollbar" class="ai-chat__content p-16">
           <PrologueContent
             :type="type"
             :application="applicationDetails"
@@ -514,7 +514,7 @@ defineExpose({
   setScrollBottom
 })
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 @import './index.scss';
 .firstUserInput {
   height: 100%;
@@ -526,7 +526,7 @@ defineExpose({
   position: absolute;
   z-index: 999;
   right: 50px;
-  bottom: 80px;
+  bottom: 0;
   width: calc(100% - 50px);
   max-width: 400px;
 }

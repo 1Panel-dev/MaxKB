@@ -307,7 +307,9 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-@media only screen and (max-width: 430px) {
+
+@media only screen and (max-width: 420px) {
+
   .chat-operation-button {
     display: block;
   }

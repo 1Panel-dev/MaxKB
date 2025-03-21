@@ -121,7 +121,7 @@ const refresh = () => {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .select-dataset-dialog {
   padding: 0;
   .el-dialog__header {

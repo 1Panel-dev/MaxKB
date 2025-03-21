@@ -30,7 +30,7 @@ const showBack = computed(() => {
 })
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .content-container {
   transition: 0.3s;
   padding: 0 var(--app-view-padding) var(--app-view-padding);

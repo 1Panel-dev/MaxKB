@@ -99,7 +99,7 @@ onMounted(() => {})
 
 defineExpose({ open, close })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .member-dialog {
   .el-dialog__header {
     padding-bottom: 19px;

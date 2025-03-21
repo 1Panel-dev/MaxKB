@@ -288,7 +288,7 @@ const open = (problemId: any) => {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .paragraph-card {
   position: relative;
 }

@@ -132,7 +132,7 @@ src="${window.location.origin}/api/application/embed?protocol=${window.location.
 <\/script>
 `
  source3.value = `<iframe
-src="${application.location + val + urlParams1.value}&mode=mobile"
+src="${application.location + val + urlParams1.value}?mode=mobile"
 style="width: 100%; height: 100%;"
 frameborder="0"
 allow="microphone">
@@ -144,7 +144,7 @@ allow="microphone">
 
 defineExpose({ open })
 </script>
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .embed-dialog {
   .title {
     color: var(--app-text-color) !important;

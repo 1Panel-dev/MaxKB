@@ -296,4 +296,4 @@ const click = () => {
   dynamicsFormRef.value?.validate()
 }
 </script>
-<style lang="scss" scope></style>
+<style lang="scss" scoped></style>

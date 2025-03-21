@@ -330,8 +330,8 @@ onMounted(() => {
     border-bottom: 1px solid var(--el-border-color);
   }
   &__main {
-    padding-top: calc(var(--app-header-height) + 24px);
-    height: calc(100vh - var(--app-header-height) - 24px);
+    padding-top: calc(var(--app-header-height) + 16px);
+    height: calc(100vh - var(--app-header-height) - 16px);
     overflow: hidden;
   }
   .new-chat-button {
