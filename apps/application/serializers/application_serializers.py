@@ -1319,11 +1319,15 @@ class ApplicationSerializer(serializers.Serializer):
                 async with MultiServerMCPClient(servers) as client:
                     return client.get_tools()
 
-            tools = asyncio.run(get_mcp_tools(servers))
-            return [
-                {
-                    'name': tool.name,
-                    'description': tool.description,
-                    'args': tool.args,
-                }
-                for tool in tools]
+            tools = []
+            for server in servers:
+                tools += [
+                    {
+                        'server': server,
+                        'name': tool.name,
+                        'description': tool.description,
+                        'args': tool.args,
+                    }
+                    for tool in asyncio.run(get_mcp_tools({server: servers[server]}))]
+            return tools
+

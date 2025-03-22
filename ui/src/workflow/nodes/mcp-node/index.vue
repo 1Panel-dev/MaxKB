@@ -15,7 +15,7 @@
           <MdEditorMagnify
             @wheel="wheel"
             title="MCP Server Config"
-            v-model="form_data.mcpServers"
+            v-model="form_data.mcp_servers"
             style="height: 150px"
             @submitDialog="submitDialog"
           />
@@ -23,17 +23,18 @@
         <el-form-item>
           <template v-slot:label>
             <div class="flex-between">
-              <span>工具</span>
-              <el-button type="primary" link @click="getTools()">获取工具</el-button>
+              <span>{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</span>
+              <el-button type="primary" link @click="getTools()">
+                {{ $t('views.applicationWorkflow.nodes.mcpNode.getTool') }}
+              </el-button>
             </div>
           </template>
           <el-select
-            v-model="form_data.mcpTool"
-            placeholder="请选择工具"
+            v-model="form_data.mcp_tool"
             @change="changeTool"
           >
             <el-option
-              v-for="item in form_data.mcpTools"
+              v-for="item in form_data.mcp_tools"
               :key="item.value"
               :label="item.name"
               :value="item.name"
@@ -53,10 +54,11 @@
         </el-form-item>
       </el-form>
     </div>
-    <h5 class="title-decoration-1 mb-8">工具参数</h5>
+    <h5 class="title-decoration-1 mb-8">
+      {{ $t('views.applicationWorkflow.nodes.mcpNode.toolParam') }}</h5>
     <div class="border-r-4 p-8-12 mb-8 layout-bg lighter">
       <DynamicsForm
-        v-if="form_data.mcpTool"
+        v-if="form_data.mcp_tool"
         v-model="form_data.tool_params"
         :model="form_data.tool_params"
         label-position="top"
@@ -93,26 +95,31 @@ const wheel = (e: any) => {
   }
 }
 const form = {
-  mcpTool: '',
-  mcpServers: '',
+  mcp_tool: '',
+  mcp_tools: [],
+  mcp_servers: '',
+  mcp_server: '',
   tool_params: {},
   tool_form_field: []
 }
 
 
 function submitDialog(val: string) {
-  set(props.nodeModel.properties.node_data, 'mcpServers', val)
+  set(props.nodeModel.properties.node_data, 'mcp_servers', val)
 }
 
 function getTools() {
-  applicationApi.getMcpTools({ mcp_servers: form_data.value.mcpServers }).then((res: any) => {
-    form_data.value.mcpTools = res.data
+  applicationApi.getMcpTools({ mcp_servers: form_data.value.mcp_servers }).then((res: any) => {
+    form_data.value.mcp_tools = res.data
     MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
   })
 }
 
 function changeTool() {
-  const params = form_data.value.mcpTools.filter((item: any) => item.name === form_data.value.mcpTool)[0].args.params
+  // form_data.value.mcp_server = item.server
+  // console.log(item.server)
+
+  const params = form_data.value.mcp_tools.filter((item: any) => item.name === form_data.value.mcp_tool)[0].args.params
   form_data.value.tool_form_field = []
   for (const item in params.properties) {
     form_data.value.tool_form_field.push({
@@ -124,13 +131,13 @@ function changeTool() {
         props_info: {}
       },
       input_type: 'TextInput',
-      required: params.required.indexOf(item) !== -1,
+      required: params.required?.indexOf(item) !== -1,
       default_value: '',
       show_default_value: false,
       props_info: {
         rules: [
           {
-            required: params.required.indexOf(item) !== -1,
+            required: params.required?.indexOf(item) !== -1,
             message: t('dynamicsForm.tip.requiredMessage'),
             trigger: 'blur'
           }
@@ -158,18 +165,12 @@ const form_data = computed({
 
 
 const replyNodeFormRef = ref()
-const nodeCascaderRef = ref()
-const nodeCascaderRef2 = ref()
 
 const validate = async () => {
-  // console.log(replyNodeFormRef.value.validate())
   let ps = [
     replyNodeFormRef.value?.validate(),
-    ...nodeCascaderRef.value.map((item: any) => item.validate())
+    dynamicsFormRef.value?.validate()
   ]
-  if (nodeCascaderRef2.value) {
-    ps = [...ps, ...nodeCascaderRef.value.map((item: any) => item.validate())]
-  }
   return Promise.all(ps).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
