@@ -116,8 +116,8 @@ function getTools() {
 }
 
 function changeTool() {
-  // form_data.value.mcp_server = item.server
-  // console.log(item.server)
+  form_data.value.mcp_server = form_data.value.mcp_tools.filter((item: any) => item.name === form_data.value.mcp_tool)[0].server
+  // console.log(form_data.value.mcp_server)
 
   const params = form_data.value.mcp_tools.filter((item: any) => item.name === form_data.value.mcp_tool)[0].args.params
   form_data.value.tool_form_field = []
