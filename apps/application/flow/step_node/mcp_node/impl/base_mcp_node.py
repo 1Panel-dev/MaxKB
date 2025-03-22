@@ -17,18 +17,18 @@ class BaseMcpNode(IMcpNode):
 
     def execute(self, mcp_servers, mcp_server, mcp_tool, tool_params, **kwargs) -> NodeResult:
         servers = json.loads(mcp_servers)
-        tool_params = {'query': '中北大学如何'}
+        arguments = {
+            'params': tool_params
+        }
 
-        async def call_tool(servers, tool_params):
-            async with MultiServerMCPClient(servers) as client:
-                print(tool_params)
-                s = await client.sessions['composio_search'].call_tool(mcp_tool, tool_params)
-
+        async def call_tool(s, t, a):
+            async with MultiServerMCPClient(s) as client:
+                s = await client.sessions['composio_search'].call_tool(t, a)
                 return s
 
-        res = asyncio.run(call_tool(servers, tool_params))
+        res = asyncio.run(call_tool(servers, mcp_tool, arguments))
         print(res)
-        return NodeResult({'result': ''}, {})
+        return NodeResult({'result': res.content}, {})
 
     def get_reference_content(self, fields: List[str]):
         return str(self.workflow_manage.get_reference_field(
