@@ -21,12 +21,12 @@ class BaseMcpNode(IMcpNode):
             'params': tool_params
         }
 
-        async def call_tool(s, t, a):
+        async def call_tool(s, session, t, a):
             async with MultiServerMCPClient(s) as client:
-                s = await client.sessions['composio_search'].call_tool(t, a)
+                s = await client.sessions[session].call_tool(t, a)
                 return s
 
-        res = asyncio.run(call_tool(servers, mcp_tool, arguments))
+        res = asyncio.run(call_tool(servers, mcp_server, mcp_tool, arguments))
         return NodeResult({'result': [content.text for content in res.content]}, {})
 
     def get_reference_content(self, fields: List[str]):
