@@ -28,7 +28,7 @@ class BaseMcpNode(IMcpNode):
 
         res = asyncio.run(call_tool(servers, mcp_tool, arguments))
         print(res)
-        return NodeResult({'result': res.content}, {})
+        return NodeResult({'result': res.content[0].text}, {})
 
     def get_reference_content(self, fields: List[str]):
         return str(self.workflow_manage.get_reference_field(
