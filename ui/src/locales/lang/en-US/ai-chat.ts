@@ -24,7 +24,7 @@ export default {
     cancelOppose: 'Undo Dislike',
     continue: 'Continue',
     stopChat: 'Stop Response',
-    startChat: 'Start Response',
+    startChat: 'Start Chat',
   },
   tip: {
     error500Message: 'Sorry, the service is currently under maintenance. Please try again later!',

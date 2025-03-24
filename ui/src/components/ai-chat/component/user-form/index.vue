@@ -16,7 +16,7 @@
           {{ inputFieldConfig.title }}
         </span>
       </div>
-      <el-scrollbar :max-height="!props.first ? 160 : 0">
+      <el-scrollbar max-height="160">
         <el-collapse-transition>
           <div v-show="showUserInput" class="mt-16" style="padding: 0 8px">
             <DynamicsForm
