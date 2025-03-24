@@ -38,7 +38,6 @@
 </template>
 
 <script setup lang="ts">
-import { el } from 'element-plus/es/locale'
 import { ref, watch } from 'vue'
 const props = defineProps({
   time: {

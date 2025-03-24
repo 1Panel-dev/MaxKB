@@ -412,7 +412,7 @@ const uploadFile = async (file: any, fileList: any) => {
     })
 }
 
-const intervalId = ref<number | null>(null)
+const intervalId = ref<any | null>(null)
 const recorderTime = ref(0)
 const startRecorderTime = ref(false)
 const recorderLoading = ref(false)
@@ -527,7 +527,7 @@ const uploadRecording = async (audioBlob: Blob) => {
         // 自动发送
         if (props.applicationDetails.stt_autosend) {
           nextTick(() => {
-            autoSendMessage() 
+            autoSendMessage()
           })
         } else {
           isMicrophone.value = false
