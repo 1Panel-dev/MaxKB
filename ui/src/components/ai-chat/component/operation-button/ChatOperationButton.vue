@@ -413,7 +413,9 @@ class AudioManage {
     this.reTryError()
 
     // 需要播放的内容
-    const index = this.statusList.findIndex((status) => [AudioStatus.READY].includes(status))
+    const index = this.statusList.findIndex((status) =>
+      [AudioStatus.MOUNTED, AudioStatus.READY].includes(status)
+    )
 
     if (index < 0 || this.statusList[index] === AudioStatus.MOUNTED) {
       return
