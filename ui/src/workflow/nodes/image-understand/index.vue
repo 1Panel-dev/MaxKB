@@ -50,6 +50,8 @@
               $t('views.applicationWorkflow.nodes.imageUnderstandNode.model.requiredMessage')
             "
             :options="modelOptions"
+            showFooter
+            :model-type="'IMAGE'"
           ></ModelSelect>
         </el-form-item>
 

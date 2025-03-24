@@ -49,6 +49,7 @@
             :options="modelOptions"
             @submitModel="getModel"
             showFooter
+            :model-type="'LLM'"
           ></ModelSelect>
         </el-form-item>
         <el-form-item :label="$t('views.application.applicationForm.form.roleSettings.label')">

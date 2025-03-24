@@ -152,10 +152,13 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.reranker_model_id"
-            :placeholder="$t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.placeholder')"
+            :placeholder="
+              $t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.placeholder')
+            "
             :options="modelOptions"
             @submitModel="getModel"
             showFooter
+            :model-type="'RERANKER'"
           ></ModelSelect>
         </el-form-item>
       </el-form>

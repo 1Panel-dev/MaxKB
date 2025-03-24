@@ -108,6 +108,8 @@
           v-model="form_data.stt_model_id"
           :placeholder="$t('views.application.applicationForm.form.voiceInput.placeholder')"
           :options="sttModelOptions"
+          showFooter
+          :model-type="'STT'"
         ></ModelSelect>
       </el-form-item>
       <el-form-item>
@@ -149,6 +151,8 @@
             :placeholder="$t('views.application.applicationForm.form.voicePlay.placeholder')"
             :options="ttsModelOptions"
             @change="ttsModelChange()"
+            showFooter
+            :model-type="'TTS'"
           ></ModelSelect>
 
           <el-button
