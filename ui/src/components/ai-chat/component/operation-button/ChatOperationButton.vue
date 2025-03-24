@@ -29,7 +29,7 @@
             @click="
               () => {
                 bus.emit('play:pause', props.data.record_id)
-                audioManage?.play(props.data.answer_text, true)
+                audioManage?.play(props.data.answer_text, true, true)
               }
             "
           >
@@ -261,12 +261,14 @@ class AudioManage {
   textList: Array<string>
   statusList: Array<AudioStatus>
   audioList: Array<HTMLAudioElement | SpeechSynthesisUtterance>
+  tryList: Array<number>
   ttsType: string
   root: Element
   constructor(ttsType: string, root: HTMLDivElement) {
     this.textList = []
     this.audioList = []
     this.statusList = []
+    this.tryList = []
     this.ttsType = ttsType
     this.root = root
   }
@@ -279,6 +281,7 @@ class AudioManage {
     newTextList.forEach((text, index) => {
       this.textList.push(text)
       this.statusList.push(AudioStatus.MOUNTED)
+      this.tryList.push(1)
       index = this.textList.length - 1
       if (this.ttsType === 'TTS') {
         const audioElement: HTMLAudioElement = document.createElement('audio')
@@ -363,10 +366,12 @@ class AudioManage {
   }
   reTryError() {
     this.statusList.forEach((status, index) => {
-      if (status === AudioStatus.ERROR) {
+      if (status === AudioStatus.ERROR && this.tryList[index] <= 3) {
+        this.tryList[index]++
         const audioElement = this.audioList[index]
         if (audioElement instanceof HTMLAudioElement) {
           const text = this.textList[index]
+          this.statusList[index] = AudioStatus.MOUNTED
           applicationApi
             .postTextToSpeech(
               (props.applicationId as string) || (id as string),
@@ -401,7 +406,10 @@ class AudioManage {
   isPlaying() {
     return this.statusList.some((item) => [AudioStatus.PLAY_INT].includes(item))
   }
-  play(text?: string, is_end?: boolean) {
+  play(text?: string, is_end?: boolean, self?: boolean) {
+    if (self) {
+      this.tryList = this.tryList.map((item) => 0)
+    }
     if (text) {
       const textList = this.getTextList(text, is_end ? true : false)
       this.appendTextList(textList)
