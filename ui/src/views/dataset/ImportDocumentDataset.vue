@@ -39,6 +39,7 @@
                   :label="$t('views.document.feishu.allCheck')"
                   size="large"
                   class="ml-24"
+                  @change="handleAllCheckChange"
                 />
               </div>
 
@@ -49,7 +50,15 @@
                 show-checkbox
                 node-key="token"
                 ref="treeRef"
-              />
+              >
+                <template #default="{ node, data }">
+                  <div class="custom-tree-node flex align-center lighter">
+                    <el-icon v-if="data.type === 'folder'"><FolderOpened /></el-icon>
+                    <el-icon v-else><Document /></el-icon>
+                    <span class="ml-4">{{ node.label }}</span>
+                  </div>
+                </template>
+              </el-tree>
             </el-form>
           </div>
         </el-scrollbar>
@@ -67,8 +76,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-
-import documentApi from '@/api/document'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import type Node from 'element-plus/es/components/tree/src/model/node'
@@ -113,24 +120,46 @@ const props = {
 }
 
 const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
-  console.log(node)
   const token = node.level === 0 ? folderToken : node.data.token // 根节点使用 folder_token，其他节点使用 node.data.token
   dataset
     .getLarkDocumentList(datasetId, token, {}, loading)
-    .then((res) => {
-      const data: any = res.data
-      resolve(data.files as Tree[])
+    .then((res: any) => {
+      const nodes = res.data.files as Tree[]
+
+      nodes.forEach((childNode) => {
+        if (childNode.is_exist) {
+          treeRef.value?.setchecked(childNode.token, true, false)
+        }
+      })
+      resolve(nodes)
     })
+
     .catch((err) => {
       console.error('Failed to load tree nodes:', err)
     })
+}
+
+const handleAllCheckChange = (checked: boolean) => {
+  if (checked) {
+    // 获取所有已加载的节点
+    const nodes = Object.values(treeRef.value?.store.nodesMap || {}) as any[]
+    nodes.forEach((node) => {
+      // 只选择未禁用且是文件的节点
+      if (!node.disabled) {
+        treeRef.value?.setChecked(node.data, true, false)
+      }
+    })
+  } else {
+    treeRef.value?.setCheckedKeys([])
+  }
 }
 
 function submit() {
   loading.value = true
   // 选中的节点的token
   const checkedNodes = treeRef.value?.getCheckedNodes() || []
-  const newList = checkedNodes.map((node: any) => {
+  const filteredNodes = checkedNodes.filter((node: any) => !node.is_exist)
+  const newList = filteredNodes.map((node: any) => {
     return {
       name: node.name,
       token: node.token,

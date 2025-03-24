@@ -423,3 +423,7 @@
 .el-table .el-popper {
   max-width: 500px !important;
 }
+
+.el-tree {
+  --el-tree-node-content-height: 32px;
+}
