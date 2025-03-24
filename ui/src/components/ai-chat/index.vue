@@ -490,6 +490,7 @@ const handleScroll = () => {
 }
 
 onMounted(() => {
+  window.speechSynthesis.cancel()
   window.sendMessage = sendMessage
 })
 

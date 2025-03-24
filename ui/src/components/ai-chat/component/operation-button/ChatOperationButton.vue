@@ -8,11 +8,21 @@
       <!-- 语音播放 -->
       <span v-if="tts">
         <el-tooltip
+          v-if="audioManage?.isPlaying()"
           effect="dark"
-          :content="$t('chat.operation.play')"
+          :content="$t('chat.operation.pause')"
           placement="top"
-          v-if="!audioPlayerStatus"
         >
+          <el-button
+            type="primary"
+            text
+            :disabled="!data?.write_ed"
+            @click="audioManage?.pause(true)"
+          >
+            <AppIcon iconName="app-video-pause"></AppIcon>
+          </el-button>
+        </el-tooltip>
+        <el-tooltip effect="dark" :content="$t('chat.operation.play')" placement="top" v-else>
           <el-button
             text
             :disabled="!data?.write_ed"
@@ -26,16 +36,7 @@
             <AppIcon iconName="app-video-play"></AppIcon>
           </el-button>
         </el-tooltip>
-        <el-tooltip v-else effect="dark" :content="$t('chat.operation.pause')" placement="top">
-          <el-button
-            type="primary"
-            text
-            :disabled="!data?.write_ed"
-            @click="audioManage?.pause.bind(audioManage)"
-          >
-            <AppIcon iconName="app-video-pause"></AppIcon>
-          </el-button>
-        </el-tooltip>
+
         <el-divider direction="vertical" />
       </span>
       <span v-if="type == 'ai-chat' || type == 'log'">
@@ -100,14 +101,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
 import { MsgError } from '@/utils/message'
-import { t } from '@/locales'
 import bus from '@/bus'
+import { da } from 'element-plus/es/locale'
 
 const route = useRoute()
 const {
@@ -138,12 +139,9 @@ const audioCiontainer = ref<HTMLDivElement>()
 const audioPlayerStatus = ref(false)
 const buttonData = ref(props.data)
 const loading = ref(false)
-const utterance = ref<SpeechSynthesisUtterance | null>(null)
+
 const audioList = ref<string[]>([])
-const currentAudioIndex = ref(0)
-const demo = computed(() => {
-  return props.data.answer_text
-})
+
 function regeneration() {
   emit('regeneration')
 }
@@ -248,14 +246,6 @@ enum AudioStatus {
    */
   PLAY_INT = 'PLAY_INT',
   /**
-   * 手动暂停
-   */
-  PAUSE = 'PAUSE',
-  /**
-   * 等待 程序流式输出新分段未出来
-   */
-  WAIT = 'WAIT',
-  /**
    * 刚挂载
    */
   MOUNTED = 'MOUNTED',
@@ -263,7 +253,9 @@ enum AudioStatus {
    * 就绪
    */
   READY = 'READY',
-
+  /**
+   * 错误
+   */
   ERROR = 'ERROR'
 }
 class AudioManage {
@@ -285,41 +277,6 @@ class AudioManage {
     if (newTextList.length <= 0) {
       return
     }
-    this.statusList.forEach((status, index) => {
-      if (status === AudioStatus.ERROR) {
-        const audioElement = this.audioList[index]
-        if (audioElement instanceof HTMLAudioElement) {
-          const text = this.textList[index]
-          applicationApi
-            .postTextToSpeech(
-              (props.applicationId as string) || (id as string),
-              { text: text },
-              loading
-            )
-            .then(async (res: any) => {
-              if (res.type === 'application/json') {
-                const text = await res.text()
-                MsgError(text)
-                this.statusList[index] = AudioStatus.ERROR
-                return
-              }
-              // 假设我们有一个 MP3 文件的字节数组
-              // 创建 Blob 对象
-              const blob = new Blob([res], { type: 'audio/mp3' })
-
-              // 创建对象 URL
-              const url = URL.createObjectURL(blob)
-              audioElement.src = url
-              this.statusList[index] = AudioStatus.READY
-              this.play()
-            })
-            .catch((err) => {
-              console.log('err: ', err)
-              this.statusList[index] = AudioStatus.ERROR
-            })
-        }
-      }
-    })
     newTextList.forEach((text, index) => {
       this.textList.push(text)
       this.statusList.push(AudioStatus.MOUNTED)
@@ -333,9 +290,11 @@ class AudioManage {
          */
         audioElement.onended = () => {
           this.statusList[index] = AudioStatus.END
+          // 如果所有的节点都播放结束
           if (this.statusList.every((item) => item === AudioStatus.END)) {
             this.statusList = this.statusList.map((item) => AudioStatus.READY)
           } else {
+            // next
             this.play()
           }
         }
@@ -380,58 +339,130 @@ class AudioManage {
         const speechSynthesisUtterance: SpeechSynthesisUtterance = new SpeechSynthesisUtterance(
           text
         )
+        speechSynthesisUtterance.onpause = () => {
+          console.log('onpause')
+        }
         speechSynthesisUtterance.onend = () => {
           this.statusList[index] = AudioStatus.END
+          // 如果所有的节点都播放结束
+          if (this.statusList.every((item) => item === AudioStatus.END)) {
+            this.statusList = this.statusList.map((item) => AudioStatus.READY)
+          } else {
+            // next
+            this.play()
+          }
         }
+        speechSynthesisUtterance.onerror = (e) => {
+          this.statusList[index] = AudioStatus.READY
+        }
+
         this.statusList[index] = AudioStatus.READY
         this.audioList.push(speechSynthesisUtterance)
+        this.play()
       }
     })
+  }
+  reTryError() {
+    this.statusList.forEach((status, index) => {
+      if (status === AudioStatus.ERROR) {
+        const audioElement = this.audioList[index]
+        if (audioElement instanceof HTMLAudioElement) {
+          const text = this.textList[index]
+          applicationApi
+            .postTextToSpeech(
+              (props.applicationId as string) || (id as string),
+              { text: text },
+              loading
+            )
+            .then(async (res: any) => {
+              if (res.type === 'application/json') {
+                const text = await res.text()
+                MsgError(text)
+                this.statusList[index] = AudioStatus.ERROR
+                return
+              }
+              // 假设我们有一个 MP3 文件的字节数组
+              // 创建 Blob 对象
+              const blob = new Blob([res], { type: 'audio/mp3' })
+
+              // 创建对象 URL
+              const url = URL.createObjectURL(blob)
+              audioElement.src = url
+              this.statusList[index] = AudioStatus.READY
+              this.play()
+            })
+            .catch((err) => {
+              console.log('err: ', err)
+              this.statusList[index] = AudioStatus.ERROR
+            })
+        }
+      }
+    })
+  }
+  isPlaying() {
+    return this.statusList.some((item) => [AudioStatus.PLAY_INT].includes(item))
   }
   play(text?: string, is_end?: boolean) {
     if (text) {
       const textList = this.getTextList(text, is_end ? true : false)
       this.appendTextList(textList)
     }
-
     // 如果存在在阅读的元素则直接返回
-    if (this.statusList.some((item) => [AudioStatus.PAUSE, AudioStatus.PLAY_INT].includes(item))) {
+    if (this.statusList.some((item) => [AudioStatus.PLAY_INT].includes(item))) {
       return
     }
+    this.reTryError()
+
     // 需要播放的内容
-    const index = this.statusList.findIndex((status) =>
-      [AudioStatus.READY, AudioStatus.MOUNTED].includes(status)
-    )
+    const index = this.statusList.findIndex((status) => [AudioStatus.READY].includes(status))
 
     if (index < 0 || this.statusList[index] === AudioStatus.MOUNTED) {
       return
     }
-    console.log(index, this.audioList, this.statusList)
+
     const audioElement = this.audioList[index]
     if (audioElement instanceof SpeechSynthesisUtterance) {
-      this.statusList[index] = AudioStatus.PLAY_INT
-      // 调用浏览器的朗读功能
-      window.speechSynthesis.speak(audioElement)
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume()
+      } else {
+        if (window.speechSynthesis.pending) {
+          window.speechSynthesis.cancel()
+        }
+        speechSynthesis.speak(audioElement)
+        this.statusList[index] = AudioStatus.PLAY_INT
+      }
     } else {
       // 标签朗读
-      this.statusList[index] = AudioStatus.PLAY_INT
-      audioElement.play()
+      try {
+        audioElement.play()
+        this.statusList[index] = AudioStatus.PLAY_INT
+      } catch (e) {
+        this.statusList[index] = AudioStatus.ERROR
+      }
     }
   }
-  pause() {
+  pause(self?: boolean) {
     const index = this.statusList.findIndex((status) => status === AudioStatus.PLAY_INT)
     if (index < 0) {
       return
     }
     const audioElement = this.audioList[index]
     if (audioElement instanceof SpeechSynthesisUtterance) {
-      this.statusList[index] = AudioStatus.PAUSE
-      // 调用浏览器的朗读功能
-      window.speechSynthesis.pause()
+      this.statusList[index] = AudioStatus.READY
+      if (self) {
+        window.speechSynthesis.pause()
+        nextTick(() => {
+          if (!window.speechSynthesis.paused) {
+            window.speechSynthesis.cancel()
+          }
+        })
+      } else {
+        window.speechSynthesis.cancel()
+      }
     } else {
       if (this.statusList[index] === AudioStatus.PLAY_INT) {
         // 标签朗读
-        this.statusList[index] = AudioStatus.PAUSE
+        this.statusList[index] = AudioStatus.READY
         audioElement.pause()
       }
     }
@@ -470,9 +501,9 @@ onMounted(() => {
     const record_id = data.record_id
     bus.emit('play:pause', record_id)
     if (props.data.record_id == record_id) {
-      if (props.tts) {
+      if (props.tts && props.tts_autoplay) {
         if (audioManage.value) {
-          audioManage.value.play(props.data.answer_text)
+          audioManage.value.play(props.data.answer_text, data.is_end)
         }
       }
     }
