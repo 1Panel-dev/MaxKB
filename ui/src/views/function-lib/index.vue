@@ -117,7 +117,7 @@
                 />
               </template>
               <template #subTitle>
-                <el-text class="color-secondary" size="small" v-if="!item.template_id">
+                <el-text class="color-secondary" size="small">
                   <auto-tooltip :content="item.username">
                     {{ $t('common.creator') }}: {{ item.username }}
                   </auto-tooltip>
