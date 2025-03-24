@@ -8,6 +8,7 @@
       <h4></h4>
       <div class="flex-between">
         <el-select
+          v-if="functionType === 'PUBLIC'"
           v-model="selectUserId"
           class="mr-12"
           style="max-width: 240px; width: 150px"
