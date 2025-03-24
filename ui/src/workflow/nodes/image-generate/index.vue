@@ -49,6 +49,8 @@
               $t('views.applicationWorkflow.nodes.imageGenerateNode.model.requiredMessage')
             "
             :options="modelOptions"
+            showFooter
+            :model-type="'TTI'"
           ></ModelSelect>
         </el-form-item>
 

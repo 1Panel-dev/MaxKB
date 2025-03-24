@@ -45,6 +45,8 @@
             v-model="form_data.tts_model_id"
             :placeholder="$t('views.application.applicationForm.form.voicePlay.placeholder')"
             :options="modelOptions"
+            showFooter
+            :model-type="'TTS'"
           ></ModelSelect>
         </el-form-item>
         <el-form-item

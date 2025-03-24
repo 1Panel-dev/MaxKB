@@ -56,13 +56,13 @@ const loading = ref<boolean>(false)
 const dialogVisible = ref<boolean>(false)
 const list_provider = ref<Array<Provider>>([])
 const currentModelType = ref('')
-
+const selectModelType = ref('')
 const modelTypeOptions = [{ text: t('views.template.model.allModel'), value: '' }, ...modelTypeList]
 
-const open = () => {
+const open = (model_type?: string) => {
   dialogVisible.value = true
   const option = modelTypeOptions.find((item) => item.text === currentModelType.value)
-  checkModelType(option ? option.value : '')
+  checkModelType(model_type ? model_type : option ? option.value : '')
 }
 
 const close = () => {
@@ -70,9 +70,8 @@ const close = () => {
 }
 
 const checkModelType = (model_type: string) => {
-  currentModelType.value = modelTypeOptions.filter(
-    (item) => item.value === model_type
-  )[0].text
+  selectModelType.value = model_type
+  currentModelType.value = modelTypeOptions.filter((item) => item.value === model_type)[0].text
   ModelApi.getProviderByModelType(model_type, loading).then((ok) => {
     list_provider.value = ok.data
     list_provider.value.sort((a, b) => a.provider.localeCompare(b.provider))
@@ -82,7 +81,7 @@ const checkModelType = (model_type: string) => {
 const emit = defineEmits(['change'])
 const go_create = (provider: Provider) => {
   close()
-  emit('change', provider)
+  emit('change', provider, selectModelType.value)
 }
 defineExpose({ open, close })
 </script>

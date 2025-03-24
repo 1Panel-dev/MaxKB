@@ -36,6 +36,8 @@
             v-model="form_data.stt_model_id"
             :placeholder="$t('views.application.applicationForm.form.voiceInput.placeholder')"
             :options="modelOptions"
+            showFooter
+            :model-type="'STT'"
           ></ModelSelect>
         </el-form-item>
         <el-form-item

@@ -83,6 +83,7 @@
                   @change="model_change"
                   @submitModel="getModel"
                   showFooter
+                  :model-type="'LLM'"
                 ></ModelSelect>
               </el-form-item>
               <el-form-item
@@ -336,6 +337,7 @@
                   v-model="applicationForm.stt_model_id"
                   :placeholder="$t('views.application.applicationForm.form.voiceInput.placeholder')"
                   :options="sttModelOptions"
+                  :model-type="'STT'"
                 ></ModelSelect>
               </el-form-item>
               <el-form-item
@@ -398,6 +400,7 @@
                     "
                     :options="ttsModelOptions"
                     @change="ttsModelChange()"
+                    :model-type="'TTS'"
                   ></ModelSelect>
 
                   <el-button
@@ -551,7 +554,7 @@ const applicationForm = ref<ApplicationFormType>({
     prompt: defaultPrompt,
     system: t('views.application.applicationForm.form.roleSettings.placeholder'),
     no_references_prompt: '{question}',
-    reasoning_content_enable: false,
+    reasoning_content_enable: false
   },
   model_params_setting: {},
   problem_optimization: false,

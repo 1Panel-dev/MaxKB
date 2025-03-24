@@ -51,7 +51,7 @@
       </el-option-group>
       <template #footer v-if="showFooter">
         <slot name="footer">
-          <div class="w-full text-left cursor" @click="openCreateModel()">
+          <div class="w-full text-left cursor" @click="openCreateModel(undefined, props.modelType)">
             <el-button type="primary" link>
               <el-icon class="mr-4">
                 <Plus />
@@ -72,7 +72,7 @@
     <SelectProviderDialog
       v-if="showFooter"
       ref="selectProviderRef"
-      @change="openCreateModel($event)"
+      @change="(provider, modelType) => openCreateModel(provider, modelType)"
     />
   </div>
 </template>
@@ -85,11 +85,13 @@ import SelectProviderDialog from '@/views/template/component/SelectProviderDialo
 
 import { t } from '@/locales'
 import useStore from '@/stores'
+
 defineOptions({ name: 'ModelSelect' })
 const props = defineProps<{
   modelValue: any
   options: any
   showFooter?: false
+  modelType?: ''
 }>()
 
 const emit = defineEmits(['update:modelValue', 'change', 'submitModel'])
@@ -121,11 +123,12 @@ function getProvider() {
     })
 }
 
-const openCreateModel = (provider?: Provider) => {
+const openCreateModel = (provider?: Provider, model_type?: string) => {
   if (provider && provider.provider) {
-    createModelRef.value?.open(provider)
+    createModelRef.value?.open(provider, model_type)
   } else {
-    selectProviderRef.value?.open()
+    console.log(model_type)
+    selectProviderRef.value?.open(model_type)
   }
 }
 
@@ -145,9 +148,11 @@ onMounted(() => {
       background-color: var(--el-fill-color-light);
     }
   }
+
   .model-icon {
     width: 18px;
   }
+
   .check-icon {
     position: absolute;
     right: 10px;

@@ -38,6 +38,8 @@
         v-model="form.embedding_mode_id"
         :placeholder="$t('views.dataset.datasetForm.form.EmbeddingModel.placeholder')"
         :options="modelOptions"
+        :model-type="'EMBEDDING'"
+        showFooter
       ></ModelSelect>
     </el-form-item>
   </el-form>

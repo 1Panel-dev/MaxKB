@@ -189,7 +189,7 @@
 
     <SelectProviderDialog
       ref="selectProviderRef"
-      @change="openCreateModel($event)"
+      @change="(provider, modelType) => openCreateModel(provider, modelType)"
     ></SelectProviderDialog>
   </LayoutContainer>
 </template>
@@ -259,9 +259,11 @@ const clickListHandle = (item: Provider) => {
   }
 }
 
-const openCreateModel = (provider?: Provider) => {
+const openCreateModel = (provider?: Provider, model_type?: string) => {
+  console.log(provider)
+  console.log(model_type)
   if (provider && provider.provider) {
-    createModelRef.value?.open(provider)
+    createModelRef.value?.open(provider, model_type)
   } else {
     selectProviderRef.value?.open()
   }

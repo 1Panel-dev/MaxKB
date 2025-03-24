@@ -35,6 +35,8 @@
             v-model="form.model_id"
             :placeholder="$t('views.application.applicationForm.form.aiModel.placeholder')"
             :options="modelOptions"
+            showFooter
+            :model-type="'LLM'"
           ></ModelSelect>
         </el-form-item>
         <el-form-item
