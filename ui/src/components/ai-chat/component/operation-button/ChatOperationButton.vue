@@ -108,7 +108,6 @@ import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
 import { MsgError } from '@/utils/message'
 import bus from '@/bus'
-import { da } from 'element-plus/es/locale'
 
 const route = useRoute()
 const {
@@ -511,9 +510,7 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-
 @media only screen and (max-width: 420px) {
-
   .chat-operation-button {
     display: block;
   }
