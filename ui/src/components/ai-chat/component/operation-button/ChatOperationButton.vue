@@ -6,7 +6,7 @@
 
     <div>
       <!-- 语音播放 -->
-      <span v-if="tts">
+      <span>
         <el-tooltip
           v-if="audioManage?.isPlaying()"
           effect="dark"
@@ -40,15 +40,15 @@
         <el-divider direction="vertical" />
       </span>
       <span v-if="type == 'ai-chat' || type == 'log'">
-        <el-tooltip effect="dark" :content="$t('chat.operation.regeneration')" placement="top">
-          <el-button :disabled="chat_loading" text @click="regeneration">
-            <el-icon><RefreshRight /></el-icon>
-          </el-button>
-        </el-tooltip>
-        <el-divider direction="vertical" />
         <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
           <el-button text @click="copyClick(data?.answer_text.trim())">
             <AppIcon iconName="app-copy"></AppIcon>
+          </el-button>
+        </el-tooltip>
+        <el-divider direction="vertical" />
+        <el-tooltip effect="dark" :content="$t('chat.operation.regeneration')" placement="top">
+          <el-button :disabled="chat_loading" text @click="regeneration">
+            <el-icon><RefreshRight /></el-icon>
           </el-button>
         </el-tooltip>
         <el-divider direction="vertical" />
@@ -94,10 +94,17 @@
           </el-button>
         </el-tooltip>
       </span>
+
+      <!-- 先渲染，不然不能播放   -->
+      <audio
+        ref="audioPlayer"
+        v-for="item in audioList"
+        :key="item"
+        controls
+        hidden="hidden"
+      ></audio>
+      <div ref="audioCiontainer"></div>
     </div>
-    <!-- 先渲染，不然不能播放   -->
-    <audio ref="audioPlayer" v-for="item in audioList" :key="item" controls hidden="hidden"></audio>
-    <div ref="audioCiontainer"></div>
   </div>
 </template>
 <script setup lang="ts">
@@ -520,9 +527,10 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-@media only screen and (max-width: 420px) {
+@media only screen and (max-width: 430px) {
   .chat-operation-button {
     display: block;
+    text-align: right;
   }
 }
 </style>

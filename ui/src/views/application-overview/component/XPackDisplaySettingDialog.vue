@@ -87,26 +87,44 @@
                     :src="imgUrl.avatar"
                     alt=""
                     fit="cover"
-                    style="width: 35px; height: 35px; display: block"
+                    style="width: 28px; height: 28px; display: block"
                   />
                   <LogoIcon
                     v-else
-                    height="35px"
-                    style="width: 35px; height: 35px; display: block"
+                    height="28px"
+                    style="width: 28px; height: 28px; display: block"
                   />
                 </div>
 
-                <img src="@/assets/display-bg2.png" alt="" width="270" />
+                <img
+                  src="@/assets/display-bg2.png"
+                  alt=""
+                  :width="
+                    xpackForm.show_avatar
+                      ? xpackForm.show_user_avatar
+                        ? '240px'
+                        : '270px'
+                      : xpackForm.show_user_avatar
+                        ? '270px'
+                        : '300px'
+                  "
+                />
               </div>
-              <div class="flex-between">
-                <img src="@/assets/display-bg3.png" alt="" width="270" class="ml-8" />
+              <div class="flex" style="justify-content: flex-end">
+                <img
+                  src="@/assets/display-bg3.png"
+                  alt=""
+                  :width="xpackForm.show_user_avatar ? '240px' : '270px'"
+                  class="mr-8"
+                  style="object-fit: contain"
+                />
                 <div class="avatar" v-if="xpackForm.show_user_avatar">
                   <el-image
                     v-if="imgUrl.user_avatar"
                     :src="imgUrl.user_avatar"
                     alt=""
                     fit="cover"
-                    style="width: 35px; height: 35px; display: block"
+                    style="width: 28px; height: 28px; display: block"
                   />
                   <AppAvatar v-else>
                     <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
@@ -185,53 +203,59 @@
         <el-card shadow="never" class="mb-8">
           <div class="flex-between mb-8">
             <span class="lighter">{{
-              $t('views.applicationOverview.appInfo.SettingDisplayDialog.askUserAvatar')
+              $t('views.applicationOverview.appInfo.SettingDisplayDialog.AIAvatar')
             }}</span>
-            <el-checkbox v-model="xpackForm.show_user_avatar" style="margin-left: 200px">
-              {{
+            <span class="flex align-center">
+              <el-checkbox v-model="xpackForm.show_avatar">{{
                 $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
-              }}</el-checkbox
-            >
-            <el-upload
-              ref="uploadRef"
-              action="#"
-              :auto-upload="false"
-              :show-file-list="false"
-              accept="image/jpeg, image/png, image/gif"
-              :on-change="(file: any, fileList: any) => onChange(file, fileList, 'user_avatar')"
-            >
-              <el-button size="small">
-                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
-              </el-button>
-            </el-upload>
+              }}</el-checkbox>
+              <el-upload
+                class="ml-8"
+                ref="uploadRef"
+                action="#"
+                :auto-upload="false"
+                :show-file-list="false"
+                accept="image/jpeg, image/png, image/gif"
+                :on-change="(file: any, fileList: any) => onChange(file, fileList, 'avatar')"
+              >
+                <el-button size="small">
+                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                </el-button>
+              </el-upload>
+            </span>
           </div>
-          <el-text type="info" size="small"
-            >{{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+          <el-text type="info" size="small">
+            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
           </el-text>
         </el-card>
         <el-card shadow="never" class="mb-8">
           <div class="flex-between mb-8">
             <span class="lighter">{{
-              $t('views.applicationOverview.appInfo.SettingDisplayDialog.AIAvatar')
+              $t('views.applicationOverview.appInfo.SettingDisplayDialog.askUserAvatar')
             }}</span>
-            <el-checkbox v-model="xpackForm.show_avatar" style="margin-left: 200px">{{
-              $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
-            }}</el-checkbox>
-            <el-upload
-              ref="uploadRef"
-              action="#"
-              :auto-upload="false"
-              :show-file-list="false"
-              accept="image/jpeg, image/png, image/gif"
-              :on-change="(file: any, fileList: any) => onChange(file, fileList, 'avatar')"
-            >
-              <el-button size="small">
-                {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
-              </el-button>
-            </el-upload>
+            <span class="flex align-center">
+              <el-checkbox v-model="xpackForm.show_user_avatar">
+                {{
+                  $t('views.applicationOverview.appInfo.SettingDisplayDialog.display')
+                }}</el-checkbox
+              >
+              <el-upload
+                class="ml-8"
+                ref="uploadRef"
+                action="#"
+                :auto-upload="false"
+                :show-file-list="false"
+                accept="image/jpeg, image/png, image/gif"
+                :on-change="(file: any, fileList: any) => onChange(file, fileList, 'user_avatar')"
+              >
+                <el-button size="small">
+                  {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.replace') }}
+                </el-button>
+              </el-upload>
+            </span>
           </div>
-          <el-text type="info" size="small">
-            {{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
+          <el-text type="info" size="small"
+            >{{ $t('views.applicationOverview.appInfo.SettingDisplayDialog.imageMessage') }}
           </el-text>
         </el-card>
         <el-card shadow="never" class="mb-8">

@@ -1,11 +1,17 @@
 <template>
   <!-- 开场白组件 -->
   <div class="item-content mb-16">
-    <div class="avatar" v-if="prologue">
+    <div class="avatar mr-8" v-if="prologue && application.show_avatar">
       <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
       <LogoIcon v-else height="28px" width="28px" />
     </div>
-    <div class="content" v-if="prologue">
+    <div
+      class="content"
+      v-if="prologue"
+      :style="{
+        'padding-right': application.show_user_avatar ? 'var(--padding-left)' : '0'
+      }"
+    >
       <el-card shadow="always" class="border-r-8" style="--el-card-padding: 10px 16px 12px">
         <MdRenderer
           :source="prologue"

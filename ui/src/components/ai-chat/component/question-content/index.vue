@@ -2,7 +2,7 @@
   <!-- 问题内容 -->
   <div class="question-content item-content mb-16 lighter">
     <div
-      class="content mr-12 p-12-16 border-r-8"
+      class="content p-12-16 border-r-8"
       :class="document_list.length >= 2 ? 'media_2' : `media_${document_list.length}`"
     >
       <div class="text break-all pre-wrap">
@@ -63,7 +63,7 @@
         <span> {{ chatRecord.problem_text }}</span>
       </div>
     </div>
-    <div class="avatar">
+    <div class="avatar ml-8" v-if="application.show_user_avatar">
       <el-image
         v-if="application.user_avatar"
         :src="application.user_avatar"
@@ -133,7 +133,6 @@ onMounted(() => {})
     background: #d6e2ff;
     padding-left: 16px;
     padding-right: 16px;
-
   }
 
   .download-file {

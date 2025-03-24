@@ -1,11 +1,17 @@
 <template>
   <div class="item-content mb-16 lighter">
     <template v-for="(answer_text, index) in answer_text_list" :key="index">
-      <div class="avatar">
+      <div class="avatar mr-8" v-if="application.show_avatar">
         <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
         <LogoIcon v-else height="28px" width="28px" />
       </div>
-      <div class="content" @mouseup="openControl">
+      <div
+        class="content"
+        @mouseup="openControl"
+        :style="{
+          'padding-right': application.show_user_avatar ? 'var(--padding-left)' : '0'
+        }"
+      >
         <el-card shadow="always" class="mb-8 border-r-8" style="--el-card-padding: 6px 16px">
           <MdRenderer
             v-if="
@@ -42,7 +48,13 @@
         </el-card>
       </div>
     </template>
-    <div class="content">
+    <div
+      class="content"
+      :style="{
+        'padding-left': application.show_avatar ? 'var(--padding-left)' : '0',
+        'padding-right': application.show_user_avatar ? 'var(--padding-left)' : '0'
+      }"
+    >
       <OperationButton
         :type="type"
         :application="application"
