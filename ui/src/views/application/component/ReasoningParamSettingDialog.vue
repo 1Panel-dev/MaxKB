@@ -19,6 +19,7 @@
             :label="$t('views.application.applicationForm.form.reasoningContent.start')"
           >
             <el-input
+              type="textarea"
               v-model="form.reasoning_content_start"
               :rows="6"
               maxlength="50"
@@ -29,6 +30,7 @@
         <el-col :span="12">
           <el-form-item :label="$t('views.application.applicationForm.form.reasoningContent.end')">
             <el-input
+              type="textarea"
               v-model="form.reasoning_content_end"
               :rows="6"
               maxlength="50"

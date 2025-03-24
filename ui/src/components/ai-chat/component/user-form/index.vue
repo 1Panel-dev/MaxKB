@@ -323,7 +323,10 @@ const checkInputParam = () => {
     }
   }
   if (!api_form_data_context.value['asker']) {
-    api_form_data_context.value['asker'] = getRouteQueryValue('asker')
+    const asker = getRouteQueryValue('asker')
+    if (asker) {
+      api_form_data_context.value['asker'] = getRouteQueryValue('asker')
+    }
   }
 
   if (msg.length > 0) {
