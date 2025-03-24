@@ -303,7 +303,9 @@ const checkInputParam = () => {
   for (let i = 0; i < inputFieldList.value.length; i++) {
     if (
       inputFieldList.value[i].required &&
-      !form_data_context.value[inputFieldList.value[i].field]
+      (form_data_context.value[inputFieldList.value[i].field] === null ||
+        form_data_context.value[inputFieldList.value[i].field] === undefined ||
+        form_data_context.value[inputFieldList.value[i].field] === '')
     ) {
       MsgWarning(t('chat.tip.requiredMessage'))
       return false
