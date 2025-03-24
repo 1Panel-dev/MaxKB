@@ -33,6 +33,9 @@ class ChatNodeSerializer(serializers.Serializer):
                                           error_messages=ErrMessage.dict('Model settings'))
     dialogue_type = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                           error_messages=ErrMessage.char(_("Context Type")))
+    mcp_enable = serializers.BooleanField(required=False,
+                                         error_messages=ErrMessage.boolean(_("Whether to enable MCP")))
+    mcp_servers = serializers.JSONField(required=False, error_messages=ErrMessage.list(_("MCP Server")))
 
 
 class IChatNode(INode):
@@ -49,5 +52,7 @@ class IChatNode(INode):
                 model_params_setting=None,
                 dialogue_type=None,
                 model_setting=None,
+                mcp_enable=False,
+                mcp_servers=None,
                 **kwargs) -> NodeResult:
         pass

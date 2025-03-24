@@ -116,6 +116,22 @@
           />
         </el-form-item>
 
+        <el-form-item>
+          <template #label>
+            <div class="flex-between">
+              <div>{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</div>
+              <el-button
+                type="primary"
+                link
+                @click="openMcpServersDialog"
+                @refreshForm="refreshParam"
+              >
+                <el-icon><Setting /></el-icon>
+              </el-button>
+            </div>
+          </template>
+        </el-form-item>
+
         <el-form-item @click.prevent>
           <template #label>
             <div class="flex align-center">
@@ -163,6 +179,7 @@
       ref="ReasoningParamSettingDialogRef"
       @refresh="submitReasoningDialog"
     />
+    <McpServersDialog ref="mcpServersDialogRef" @refresh="submitMcpServersDialog" />
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -177,6 +194,7 @@ import { isLastNode } from '@/workflow/common/data'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import { t } from '@/locales'
 import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
+import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
 const { model } = useStore()
 
 const wheel = (e: any) => {
@@ -298,6 +316,20 @@ function submitReasoningDialog(val: any) {
   }
 
   set(props.nodeModel.properties.node_data, 'model_setting', model_setting)
+}
+
+const mcpServersDialogRef = ref()
+function openMcpServersDialog() {
+  const config = {
+    mcp_servers: chat_data.value.mcp_servers,
+    mcp_enable: chat_data.value.mcp_enable
+  }
+  mcpServersDialogRef.value.open(config)
+}
+
+function submitMcpServersDialog(config: any) {
+  set(props.nodeModel.properties.node_data, 'mcp_servers', config.mcp_servers)
+  set(props.nodeModel.properties.node_data, 'mcp_enable', config.mcp_enable)
 }
 
 onMounted(() => {
