@@ -122,7 +122,7 @@ def queryPgSQL(database, user, password, host, port, query):
 
     # 数据库连接信息
     conn_params = {
-        "database": database,
+        "dbname": database,
         "user": user,
         "password": password,
         "host": host,
