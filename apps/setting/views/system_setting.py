@@ -20,6 +20,8 @@ from setting.serializers.system_setting import SystemSettingSerializer
 from setting.swagger_api.system_setting import SystemSettingEmailApi
 from django.utils.translation import gettext_lazy as _
 
+from setting.views.common import get_email_details
+
 
 class SystemSetting(APIView):
     class Email(APIView):
@@ -31,7 +33,9 @@ class SystemSetting(APIView):
                              request_body=SystemSettingEmailApi.get_request_body_api(), tags=[_('Email settings')],
                              responses=result.get_api_response(SystemSettingEmailApi.get_response_body_api()))
         @has_permissions(RoleConstants.ADMIN)
-        @log(menu='Email settings', operate='Create or update email settings')
+        @log(menu='Email settings', operate='Create or update email settings',
+             get_details=get_email_details
+             )
         def put(self, request: Request):
             return result.success(
                 SystemSettingSerializer.EmailSerializer.Create(
@@ -44,7 +48,9 @@ class SystemSetting(APIView):
                              responses=result.get_default_response(),
                              tags=[_('Email settings')])
         @has_permissions(RoleConstants.ADMIN)
-        @log(menu='Email settings', operate='Test email settings')
+        @log(menu='Email settings', operate='Test email settings',
+             get_details=get_email_details
+             )
         def post(self, request: Request):
             return result.success(
                 SystemSettingSerializer.EmailSerializer.Create(
@@ -56,7 +62,6 @@ class SystemSetting(APIView):
                              responses=result.get_api_response(SystemSettingEmailApi.get_response_body_api()),
                              tags=[_('Email settings')])
         @has_permissions(RoleConstants.ADMIN)
-        @log(menu='Email settings', operate='Get email settings')
         def get(self, request: Request):
             return result.success(
                 SystemSettingSerializer.EmailSerializer.one())

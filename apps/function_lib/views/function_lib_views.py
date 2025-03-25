@@ -6,6 +6,7 @@
     @date：2024/8/2 17:08
     @desc:
 """
+from django.utils.translation import gettext_lazy as _
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
@@ -13,12 +14,12 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common.auth import TokenAuth, has_permissions
-from common.constants.permission_constants import RoleConstants, Permission, Group, Operate
+from common.constants.permission_constants import RoleConstants
 from common.log.log import log
 from common.response import result
 from function_lib.serializers.function_lib_serializer import FunctionLibSerializer
 from function_lib.swagger_api.function_lib_api import FunctionLibApi
-from django.utils.translation import gettext_lazy as _
+from function_lib.views.common import get_function_lib_operation_object
 
 
 class FunctionLibView(APIView):
@@ -45,7 +46,8 @@ class FunctionLibView(APIView):
                          request_body=FunctionLibApi.Create.get_request_body_api(),
                          tags=[_('Function')])
     @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-    @log(menu='Function', operate="Create function")
+    @log(menu='Function', operate="Create function",
+         get_operation_object=lambda r, k: r.data.get('name'))
     def post(self, request: Request):
         return result.success(FunctionLibSerializer.Create(data={'user_id': request.user.id}).insert(request.data))
 
@@ -58,7 +60,6 @@ class FunctionLibView(APIView):
                              request_body=FunctionLibApi.Debug.get_request_body_api(),
                              tags=[_('Function')])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-        @log(menu='Function', operate="Debug function")
         def post(self, request: Request):
             return result.success(
                 FunctionLibSerializer.Debug(data={'user_id': request.user.id}).debug(
@@ -73,7 +74,8 @@ class FunctionLibView(APIView):
                              request_body=FunctionLibApi.Edit.get_request_body_api(),
                              tags=[_('Function')])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-        @log(menu='Function', operate="Update function")
+        @log(menu='Function', operate="Update function",
+             get_operation_object=lambda r, k: get_function_lib_operation_object(k.get('function_lib_id')))
         def put(self, request: Request, function_lib_id: str):
             return result.success(
                 FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).edit(
@@ -84,7 +86,8 @@ class FunctionLibView(APIView):
                              operation_id=_('Delete function'),
                              tags=[_('Function')])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-        @log(menu='Function', operate="Delete function")
+        @log(menu='Function', operate="Delete function",
+             get_operation_object=lambda r, k: get_function_lib_operation_object(k.get('function_lib_id')))
         def delete(self, request: Request, function_lib_id: str):
             return result.success(
                 FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).delete())
@@ -94,7 +97,6 @@ class FunctionLibView(APIView):
                              operation_id=_('Get function details'),
                              tags=[_('Function')])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-        @log(menu='Function', operate="Get function details")
         def get(self, request: Request, function_lib_id: str):
             return result.success(
                 FunctionLibSerializer.Operate(data={'user_id': request.user.id, 'id': function_lib_id}).one())
@@ -110,7 +112,6 @@ class FunctionLibView(APIView):
                              responses=result.get_page_api_response(FunctionLibApi.get_response_body_api()),
                              tags=[_('Function')])
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-        @log(menu='Function', operate="Get function list by pagination")
         def get(self, request: Request, current_page: int, page_size: int):
             return result.success(
                 FunctionLibSerializer.Query(
@@ -145,7 +146,8 @@ class FunctionLibView(APIView):
                              tags=[_("function")]
                              )
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-        @log(menu='Function', operate="Export function")
+        @log(menu='Function', operate="Export function",
+             get_operation_object=lambda r, k: get_function_lib_operation_object(k.get('id')))
         def get(self, request: Request, id: str):
             return FunctionLibSerializer.Operate(
                 data={'id': id, 'user_id': request.user.id}).export()
@@ -156,7 +158,8 @@ class FunctionLibView(APIView):
 
         @action(methods=['PUT'], detail=False)
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-        @log(menu='Function', operate="Edit icon")
+        @log(menu='Function', operate="Edit icon",
+             get_operation_object=lambda r, k: get_function_lib_operation_object(k.get('id')))
         def put(self, request: Request, id: str):
             return result.success(
                 FunctionLibSerializer.IconOperate(
@@ -168,7 +171,8 @@ class FunctionLibView(APIView):
 
         @action(methods=['POST'], detail=False)
         @has_permissions(RoleConstants.ADMIN, RoleConstants.USER)
-        @log(menu='Function', operate="Add internal function")
+        @log(menu='Function', operate="Add internal function",
+             get_operation_object=lambda r, k: get_function_lib_operation_object(k.get('id')))
         def post(self, request: Request, id: str):
             return result.success(
                 FunctionLibSerializer.InternalFunction(
