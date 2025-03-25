@@ -206,8 +206,8 @@ export default {
     },
     larkSetting: {
       title: 'Lark Configuration',
-      appIdPlaceholder: 'Please enter APP ID',
-      appSecretPlaceholder: 'Please enter APP secret',
+      appIdPlaceholder: 'Please enter App ID',
+      appSecretPlaceholder: 'Please enter App secret',
       verificationTokenPlaceholder: 'Please enter verification token',
       urlInfo:
         '-Events and callbacks - event configuration - configure the "request address" of the subscription method',

@@ -151,7 +151,7 @@
           :placeholder="$t('views.application.applicationAccess.larkSetting.appIdPlaceholder')"
         />
       </el-form-item>
-      <el-form-item label="App Secret" prop="app_id" v-if="datasetForm.type === '2'">
+      <el-form-item label="App Secret" prop="app_secret" v-if="datasetForm.type === '2'">
         <el-input
           v-model="datasetForm.app_secret"
           type="password"

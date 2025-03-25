@@ -3,6 +3,7 @@ export default {
   createDataset: 'Create Knowledge',
   general: 'General',
   web: 'Web Site',
+  lark: 'Lark',
   relatedApplications: 'Linked App',
   document_count: 'docs',
   relatedApp_count: 'linked apps',
