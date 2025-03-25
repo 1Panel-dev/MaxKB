@@ -2,7 +2,6 @@
   <el-card shadow="always" style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px">
     <el-button link @click="zoomOut">
       <el-tooltip
-        class="box-item"
         effect="dark"
         :content="$t('views.applicationWorkflow.control.zoomOut')"
         placement="top"
@@ -14,7 +13,6 @@
     </el-button>
     <el-button link @click="zoomIn">
       <el-tooltip
-        class="box-item"
         effect="dark"
         :content="$t('views.applicationWorkflow.control.zoomIn')"
         placement="top"
@@ -26,7 +24,6 @@
     </el-button>
     <el-button link @click="fitView">
       <el-tooltip
-        class="box-item"
         effect="dark"
         :content="$t('views.applicationWorkflow.control.fitView')"
         placement="top"
@@ -40,7 +37,6 @@
     <el-divider direction="vertical" />
     <el-button link @click="retract">
       <el-tooltip
-        class="box-item"
         effect="dark"
         :content="$t('views.applicationWorkflow.control.retract')"
         placement="top"
@@ -54,7 +50,6 @@
     </el-button>
     <el-button link @click="extend">
       <el-tooltip
-        class="box-item"
         effect="dark"
         :content="$t('views.applicationWorkflow.control.extend')"
         placement="top"
@@ -68,7 +63,6 @@
     </el-button>
     <el-button link @click="layout">
       <el-tooltip
-        class="box-item"
         effect="dark"
         :content="$t('views.applicationWorkflow.control.beautify')"
         placement="top"

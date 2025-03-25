@@ -152,12 +152,21 @@
                       size="small"
                       class="mr-4"
                     />
+                    <el-divider direction="vertical" />
                     <el-dropdown trigger="click">
                       <el-button text @click.stop>
                         <el-icon><MoreFilled /></el-icon>
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
+                          <el-dropdown-item
+                            v-if="!item.template_id"
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="openCreateDialog(item)"
+                          >
+                            <el-icon><EditPen /></el-icon>
+                            {{ $t('common.edit') }}
+                          </el-dropdown-item>
                           <el-dropdown-item
                             :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
                             v-if="!item.template_id"

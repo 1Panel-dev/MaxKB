@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { isAppIcon } from '@/utils/application'
 const props = defineProps<{
-  item: {
+  item?: {
     name: string
     icon: string
   }
