@@ -238,6 +238,7 @@
       </el-table>
       <h4 class="title-decoration-1 mb-16">
         {{ $t('views.functionLib.functionForm.form.param.code') }}
+        <span style="color: red; margin-left: -10px">*</span>
         <el-text type="info" class="color-secondary">
           {{ $t('views.functionLib.functionForm.form.param.paramInfo2') }}
         </el-text>
