@@ -105,7 +105,7 @@
                   style="background: none"
                   class="mr-8"
                 >
-                  <img :src="getImageUrl(item?.icon)" alt="" />
+                  <img :src="item?.icon" alt="" />
                 </AppAvatar>
                 <AppAvatar
                   v-else-if="item?.name"
@@ -218,7 +218,7 @@
                   style="background: none"
                   class="mr-8"
                 >
-                  <img :src="getImageUrl(item?.icon)" alt="" />
+                  <img :src="item?.icon" alt="" />
                 </AppAvatar>
                 <AppAvatar
                   v-else-if="item?.name"
@@ -229,9 +229,7 @@
                   class="mr-8"
                 />
               </template>
-              <div class="status-button">
-
-              </div>
+              <div class="status-button"></div>
               <template #footer>
                 <div class="footer-content flex-between">
                   <div>{{ $t('common.author') }}: MaxKB</div>
@@ -249,9 +247,12 @@
     </div>
     <FunctionFormDrawer ref="FunctionFormDrawerRef" @refresh="refresh" :title="title" />
     <PermissionDialog ref="PermissionDialogRef" @refresh="refresh" />
-    <AddInternalFunctionDialog ref="AddInternalFunctionDialogRef" @refresh="confirmAddInternalFunction" />
+    <AddInternalFunctionDialog
+      ref="AddInternalFunctionDialogRef"
+      @refresh="confirmAddInternalFunction"
+    />
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
-    <component :is="internalDescComponent" ref="internalDescRef" />
+    <InternalDescDrawer ref="InternalDescDrawerRef" @addFunction="addInternalFunction" />
   </div>
 </template>
 <script setup lang="ts">
@@ -265,21 +266,21 @@ import applicationApi from '@/api/application'
 import { t } from '@/locales'
 import PermissionDialog from '@/views/function-lib/component/PermissionDialog.vue'
 import InitParamDrawer from '@/views/function-lib/component/InitParamDrawer.vue'
+import InternalDescDrawer from '@/views/function-lib/component/InternalDescDrawer.vue'
 import { isAppIcon } from '@/utils/application'
 import InfiniteScroll from '@/components/infinite-scroll/index.vue'
 import CardBox from '@/components/card-box/index.vue'
-import type { Dict } from '@/api/type/common'
 import AddInternalFunctionDialog from '@/views/function-lib/component/AddInternalFunctionDialog.vue'
-
-const internalIcons: Dict<any> = import.meta.glob('@/assets/fx/*/*.png', { eager: true })
-let internalDesc: Dict<any> = import.meta.glob('@/assets/fx/*/index.vue', { eager: true })
-const internalDescRef = ref()
-const internalDescComponent = ref()
+const internalDesc: Record<string, any> = import.meta.glob('@/assets/fx/*/detail.md', {
+  eager: true,
+  as: 'raw'
+})
 
 const { user } = useStore()
 
 const loading = ref(false)
 
+const InternalDescDrawerRef = ref()
 const FunctionFormDrawerRef = ref()
 const PermissionDialogRef = ref()
 const AddInternalFunctionDialogRef = ref()
@@ -342,19 +343,9 @@ function openCreateDialog(data?: any) {
   }
 }
 
-function getImageUrl(name: string) {
-  if (name.startsWith('/src/assets/fx/')) {
-    return internalIcons[name]?.default
-  }
-  return name
-}
-
 function openDescDrawer(row: any) {
-  const index = row.icon.replace('icon.png', 'index.vue')
-  internalDescComponent.value = internalDesc[index].default
-  nextTick(() => {
-    internalDescRef.value?.open(row)
-  })
+  const index = row.icon.replace('icon.png', 'detail.md')
+  InternalDescDrawerRef.value.open(internalDesc[index], row)
 }
 
 function addInternalFunction(data?: any) {
@@ -362,10 +353,12 @@ function addInternalFunction(data?: any) {
 }
 
 function confirmAddInternalFunction(data?: any) {
-  functionLibApi.addInternalFunction(data.id, {name: data.name}, changeStateloading).then((res) => {
-    MsgSuccess(t('common.submitSuccess'))
-    searchHandle()
-  })
+  functionLibApi
+    .addInternalFunction(data.id, { name: data.name }, changeStateloading)
+    .then((res) => {
+      MsgSuccess(t('common.submitSuccess'))
+      searchHandle()
+    })
 }
 
 function searchHandle() {
