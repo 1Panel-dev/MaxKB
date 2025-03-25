@@ -54,7 +54,7 @@ const currentRow = computed(() => {
           return currentItem.value
         }
         return {
-          attrs: row.attrs || { maxlength: 20, minlength: 0 },
+          attrs: row.attrs || { maxlength: 200, minlength: 0 },
           field: row.field || row.variable,
           input_type: 'TextInput',
           label: row.label || row.name,
@@ -117,7 +117,7 @@ const currentRow = computed(() => {
         return currentItem.value
     }
   } else {
-    return { input_type: 'TextInput', required: false, attrs: { maxlength: 20, minlength: 0 } }
+    return { input_type: 'TextInput', required: false, attrs: { maxlength: 200, minlength: 0 } }
   }
 })
 const currentIndex = ref(null)

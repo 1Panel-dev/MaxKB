@@ -172,7 +172,7 @@ const rules = computed(() => [
 defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.minlength = 0
-  formValue.value.maxlength = 20
+  formValue.value.maxlength = 200
   formValue.value.default_value = ''
   formValue.value.show_password = true
 

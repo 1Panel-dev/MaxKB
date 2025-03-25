@@ -163,7 +163,7 @@ const rules = computed(() => [
 defineExpose({ getData, rander })
 onMounted(() => {
   formValue.value.minlength = 0
-  formValue.value.maxlength = 20
+  formValue.value.maxlength = 200
   formValue.value.default_value = ''
   // console.log(formValue.value.show_default_value)
   if (formValue.value.show_default_value === undefined) {
