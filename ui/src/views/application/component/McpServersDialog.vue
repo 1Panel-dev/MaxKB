@@ -14,7 +14,7 @@
       <el-form-item label="MCP" prop="mcp_enable">
         <el-switch v-model="form.mcp_enable" />
       </el-form-item>
-      <el-form-item label="MCP Server Config" prop="mcp_servers"
+      <el-form-item v-if="form.mcp_enable" label="MCP Server Config" prop="mcp_servers"
                     :rules="[{ required: true, message: $t('common.required') }]">
         <el-input
           v-model="form.mcp_servers"
