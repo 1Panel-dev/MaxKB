@@ -24,6 +24,8 @@ class Log(AppModelMixin):
 
     operate = models.CharField(max_length=128, verbose_name="操作")
 
+    operation_object = models.JSONField(verbose_name="操作对象", default=dict, encoder=SystemEncoder)
+
     user = models.JSONField(verbose_name="用户信息", default=dict)
 
     status = models.IntegerField(max_length=20, verbose_name="状态")

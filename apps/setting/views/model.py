@@ -22,6 +22,8 @@ from setting.serializers.provider_serializers import ProviderSerializer, ModelSe
 from setting.swagger_api.provide_api import ProvideApi, ModelCreateApi, ModelQueryApi, ModelEditApi
 from django.utils.translation import gettext_lazy as _
 
+from setting.views.common import get_model_operation_object, get_edit_model_details
+
 
 class Model(APIView):
     authentication_classes = [TokenAuth]
@@ -32,7 +34,9 @@ class Model(APIView):
                          request_body=ModelCreateApi.get_request_body_api()
         , tags=[_('model')])
     @has_permissions(PermissionConstants.MODEL_CREATE)
-    @log(menu='model', operate='Create model')
+    @log(menu='model', operate='Create model',
+         get_operation_object=lambda r, k: {'name': r.data.get('name')},
+         get_details=get_edit_model_details)
     def post(self, request: Request):
         return result.success(
             ModelSerializer.Create(data={**request.data, 'user_id': str(request.user.id)}).insert(request.user.id,
@@ -44,7 +48,6 @@ class Model(APIView):
                          request_body=ModelCreateApi.get_request_body_api()
         , tags=[_('model')])
     @has_permissions(PermissionConstants.MODEL_CREATE)
-    @log(menu='model', operate='Download model, trial only with Ollama platform')
     def put(self, request: Request):
         return result.success(
             ModelSerializer.Create(data={**request.data, 'user_id': str(request.user.id)}).insert(request.user.id,
@@ -56,7 +59,6 @@ class Model(APIView):
                          manual_parameters=ModelQueryApi.get_request_params_api()
         , tags=[_('model')])
     @has_permissions(PermissionConstants.MODEL_READ)
-    @log(menu='model', operate='Get model list')
     def get(self, request: Request):
         return result.success(
             ModelSerializer.Query(
@@ -73,8 +75,6 @@ class Model(APIView):
                 'Query model meta information, this interface does not carry authentication information'),
             tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_READ)
-        @log(menu='model',
-             operate='Query model meta information, this interface does not carry authentication information')
         def get(self, request: Request, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).one_meta(with_valid=True))
@@ -87,8 +87,6 @@ class Model(APIView):
                              operation_id=_('Pause model download'),
                              tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_CREATE)
-        @log(menu='model',
-             operate='Pause model download')
         def put(self, request: Request, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).pause_download())
@@ -102,7 +100,6 @@ class Model(APIView):
                              manual_parameters=ProvideApi.ModelForm.get_request_params_api(),
                              tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_READ)
-        @log(menu='model', operate='Get model parameter form')
         def get(self, request: Request, model_id: str):
             return result.success(
                 ModelSerializer.ModelParams(data={'id': model_id, 'user_id': request.user.id}).get_model_params())
@@ -113,7 +110,8 @@ class Model(APIView):
                              manual_parameters=ProvideApi.ModelForm.get_request_params_api(),
                              tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_READ)
-        @log(menu='model', operate='Save model parameter form')
+        @log(menu='model', operate='Save model parameter form',
+             get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')))
         def put(self, request: Request, model_id: str):
             return result.success(
                 ModelSerializer.ModelParamsForm(data={'id': model_id, 'user_id': request.user.id})
@@ -128,7 +126,9 @@ class Model(APIView):
                              request_body=ModelEditApi.get_request_body_api()
             , tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_CREATE)
-        @log(menu='model', operate='Update model')
+        @log(menu='model', operate='Update model',
+             get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')),
+             get_details=get_edit_model_details)
         def put(self, request: Request, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).edit(request.data,
@@ -140,7 +140,8 @@ class Model(APIView):
                              responses=result.get_default_response()
             , tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_DELETE)
-        @log(menu='model', operate='Delete model')
+        @log(menu='model', operate='Delete model',
+             get_operation_object=lambda r, k: get_model_operation_object(k.get('model_id')))
         def delete(self, request: Request, model_id: str):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'user_id': request.user.id}).delete())
@@ -149,7 +150,6 @@ class Model(APIView):
         @swagger_auto_schema(operation_summary=_('Query model details'),
                              operation_id=_('Query model details'),
                              tags=[_('model')])
-        @log(menu='model', operate='Query model details')
         @has_permissions(PermissionConstants.MODEL_READ)
         def get(self, request: Request, model_id: str):
             return result.success(
@@ -179,7 +179,6 @@ class Provide(APIView):
                          operation_id=_('Get a list of model suppliers')
         , tags=[_('model')])
     @has_permissions(PermissionConstants.MODEL_READ)
-    @log(menu='model', operate='Get a list of model suppliers')
     def get(self, request: Request):
         model_type = request.query_params.get('model_type')
         if model_type:
@@ -203,7 +202,6 @@ class Provide(APIView):
                              responses=result.get_api_array_response(ProvideApi.ModelTypeList.get_response_body_api())
             , tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_READ)
-        @log(menu='model', operate='Get a list of model types')
         def get(self, request: Request):
             provider = request.query_params.get('provider')
             return result.success(ModelProvideConstants[provider].value.get_model_type_list())
@@ -219,7 +217,6 @@ class Provide(APIView):
             , tags=[_('model')]
                              )
         @has_permissions(PermissionConstants.MODEL_READ)
-        @log(menu='model', operate='Get the model creation form')
         def get(self, request: Request):
             provider = request.query_params.get('provider')
             model_type = request.query_params.get('model_type')
@@ -239,7 +236,6 @@ class Provide(APIView):
             , tags=[_('model')]
                              )
         @has_permissions(PermissionConstants.MODEL_READ)
-        @log(menu='model', operate='Get model default parameters')
         def get(self, request: Request):
             provider = request.query_params.get('provider')
             model_type = request.query_params.get('model_type')
@@ -256,7 +252,6 @@ class Provide(APIView):
                              manual_parameters=ProvideApi.ModelForm.get_request_params_api(),
                              tags=[_('model')])
         @has_permissions(PermissionConstants.MODEL_READ)
-        @log(menu='model', operate='Get the model creation form')
         def get(self, request: Request):
             provider = request.query_params.get('provider')
             model_type = request.query_params.get('model_type')

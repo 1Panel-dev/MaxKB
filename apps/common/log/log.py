@@ -57,7 +57,8 @@ def _get_details(request):
     }
 
 
-def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, get_details=_get_details):
+def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, get_details=_get_details,
+        get_operation_object=None):
     """
     记录审计日志
     @param menu: 操作菜单 str
@@ -65,12 +66,19 @@ def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, 
     @param get_user: 获取用户
     @param get_ip_address:获取IP地址
     @param get_details: 获取执行详情
+    @param get_operation_object: 获取操作对象
     @return:
     """
 
     def inner(func):
         def run(view, request, **kwargs):
             status = 200
+            operation_object = {}
+            try:
+                if get_operation_object is not None:
+                    operation_object = get_operation_object(request, kwargs)
+            except Exception as e:
+                pass
             try:
                 return func(view, request, **kwargs)
             except Exception as e:
@@ -84,7 +92,8 @@ def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, 
                 if callable(operate):
                     _operate = operate(request)
                 # 插入审计日志
-                Log(menu=menu, operate=_operate, user=user, status=status, ip_address=ip, details=details).save()
+                Log(menu=menu, operate=_operate, user=user, status=status, ip_address=ip, details=details,
+                    operation_object=operation_object).save()
 
         return run
 
