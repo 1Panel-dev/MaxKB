@@ -109,7 +109,7 @@ def query_mysql(host,port, user, password, database, sql):
         print(f"Error while connecting to MySQL: {e}")
         raise e', '{"{\\"name\\": \\"sql\\", \\"type\\": \\"string\\", \\"source\\": \\"reference\\", \\"is_required\\": true}"}', 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab', true, 'PUBLIC', 'INTERNAL', '/src/assets/fx/mysql/icon.png', '[{"attrs": {"maxlength": 200, "minlength": 1, "show-word-limit": true}, "field": "host", "label": "host", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "host 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "host长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}, {"attrs": {"maxlength": 20, "minlength": 1, "show-word-limit": true}, "field": "port", "label": "port", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "port 为必填属性", "required": true}, {"max": 20, "min": 1, "message": "port长度在 1 到 20 个字符", "trigger": "blur"}]}, "default_value": "3306", "show_default_value": false}, {"attrs": {"maxlength": 200, "minlength": 1, "show-word-limit": true}, "field": "user", "label": "user", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "user 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "user长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "root", "show_default_value": false}, {"attrs": {"type": "password", "maxlength": 200, "minlength": 1, "show-password": true, "show-word-limit": true}, "field": "password", "label": "password", "required": true, "input_type": "PasswordInput", "props_info": {"rules": [{"message": "password 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "password长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}, {"attrs": {"maxlength": 200, "minlength": 1, "show-word-limit": true}, "field": "database", "label": "database", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "database 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "database长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}]', null, null);
 INSERT INTO function_lib (create_time, update_time, id, name, "desc", code, input_field_list, user_id, is_active, permission_type, function_type, icon, init_field_list, init_params, template_id) VALUES ('2025-03-17 07:37:54.620836 +00:00', '2025-03-17 07:37:54.620887 +00:00', 'bd1e8b88-0302-11f0-87bb-5618c4394482', 'PostgreSQL 查询', '', e'
-def queryPgSQL(dbname, user, password, host, port, query):
+def queryPgSQL(database, user, password, host, port, query):
     import psycopg2
     import json
     from datetime import datetime
@@ -122,7 +122,7 @@ def queryPgSQL(dbname, user, password, host, port, query):
 
     # 数据库连接信息
     conn_params = {
-        "dbname": dbname,
+        "database": database,
         "user": user,
         "password": password,
         "host": host,
