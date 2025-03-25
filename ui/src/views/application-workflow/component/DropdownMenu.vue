@@ -55,21 +55,13 @@
               @click.stop="clickNodes(functionLibNode, item, 'function')"
               @mousedown.stop="onmousedown(functionLibNode, item, 'function')"
             >
-              <AppAvatar
-                v-if="item.icon != '/ui/favicon.ico'"
-                shape="square"
-                :size="32"
-                style="background: none"
-                class="mr-8"
-              >
-                <img :src="item?.icon || ''" alt="" />
-              </AppAvatar>
               <component
-                v-else
                 :is="iconComponent(`function-lib-node-icon`)"
                 class="mr-8"
                 :size="32"
+                :item="item"
               />
+
               <div class="pre-wrap">
                 <div class="lighter ellipsis-1" :title="item.name">{{ item.name }}</div>
                 <p>
@@ -141,7 +133,7 @@ import { ref, onMounted, computed } from 'vue'
 import { menuNodes, functionLibNode, functionNode, applicationNode } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import applicationApi from '@/api/application'
-import { isWorkFlow } from '@/utils/application'
+import { isWorkFlow, isAppIcon } from '@/utils/application'
 const search_text = ref<string>('')
 const props = defineProps({
   show: {

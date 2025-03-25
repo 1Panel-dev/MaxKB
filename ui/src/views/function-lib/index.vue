@@ -252,7 +252,7 @@
       @refresh="confirmAddInternalFunction"
     />
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
-    <component :is="internalDescComponent" ref="internalDescRef" />
+    <InternalDescDrawer ref="InternalDescDrawerRef" @addFunction="addInternalFunction" />
   </div>
 </template>
 <script setup lang="ts">
@@ -266,21 +266,21 @@ import applicationApi from '@/api/application'
 import { t } from '@/locales'
 import PermissionDialog from '@/views/function-lib/component/PermissionDialog.vue'
 import InitParamDrawer from '@/views/function-lib/component/InitParamDrawer.vue'
+import InternalDescDrawer from '@/views/function-lib/component/InternalDescDrawer.vue'
 import { isAppIcon } from '@/utils/application'
 import InfiniteScroll from '@/components/infinite-scroll/index.vue'
 import CardBox from '@/components/card-box/index.vue'
-import type { Dict } from '@/api/type/common'
 import AddInternalFunctionDialog from '@/views/function-lib/component/AddInternalFunctionDialog.vue'
-
-// const internalIcons: Dict<any> = import.meta.glob('@/assets/fx/*/*.png', { eager: true })
-let internalDesc: Dict<any> = import.meta.glob('@/assets/fx/*/index.vue', { eager: true })
-const internalDescRef = ref()
-const internalDescComponent = ref()
+const internalDesc: Record<string, any> = import.meta.glob('@/assets/fx/*/detail.md', {
+  eager: true,
+  as: 'raw'
+})
 
 const { user } = useStore()
 
 const loading = ref(false)
 
+const InternalDescDrawerRef = ref()
 const FunctionFormDrawerRef = ref()
 const PermissionDialogRef = ref()
 const AddInternalFunctionDialogRef = ref()
@@ -344,11 +344,8 @@ function openCreateDialog(data?: any) {
 }
 
 function openDescDrawer(row: any) {
-  const index = row.icon.replace('icon.png', 'index.vue')
-  internalDescComponent.value = internalDesc[index].default
-  nextTick(() => {
-    internalDescRef.value?.open(row)
-  })
+  const index = row.icon.replace('icon.png', 'detail.md')
+  InternalDescDrawerRef.value.open(internalDesc[index], row)
 }
 
 function addInternalFunction(data?: any) {
