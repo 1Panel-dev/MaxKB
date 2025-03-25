@@ -39,26 +39,28 @@ class FlibInstance:
         self.version = version
 
 def encryption(message: str):
-            """
-                加密敏感字段数据  加密方式是 如果密码是 1234567890  那么给前端则是 123******890
-            :param message:
-            :return:
-            """
-            max_pre_len = 8
-            max_post_len = 4
-            message_len = len(message)
-            pre_len = int(message_len / 5 * 2)
-            post_len = int(message_len / 5 * 1)
-            pre_str = "".join([message[index] for index in
-                               range(0,
-                                     max_pre_len if pre_len > max_pre_len else 1 if pre_len <= 0 else int(
-                                         pre_len))])
-            end_str = "".join(
-                [message[index] for index in
-                 range(message_len - (int(post_len) if pre_len < max_post_len else max_post_len),
-                       message_len)])
-            content = "***************"
-            return pre_str + content + end_str
+    """
+        加密敏感字段数据  加密方式是 如果密码是 1234567890  那么给前端则是 123******890
+    :param message:
+    :return:
+    """
+    if message == "":
+        return ""
+    max_pre_len = 8
+    max_post_len = 4
+    message_len = len(message)
+    pre_len = int(message_len / 5 * 2)
+    post_len = int(message_len / 5 * 1)
+    pre_str = "".join([message[index] for index in
+                       range(0,
+                             max_pre_len if pre_len > max_pre_len else 1 if pre_len <= 0 else int(
+                                 pre_len))])
+    end_str = "".join(
+        [message[index] for index in
+         range(message_len - (int(post_len) if pre_len < max_post_len else max_post_len),
+               message_len)])
+    content = "***************"
+    return pre_str + content + end_str
 
 
 class FunctionLibModelSerializer(serializers.ModelSerializer):
