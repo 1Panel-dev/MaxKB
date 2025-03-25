@@ -4,8 +4,7 @@
       (inputFieldList.length > 0 || (type === 'debug-ai-chat' && apiInputFieldList.length > 0)) &&
       type !== 'log'
     "
-    class="mb-16 w-full"
-    style="padding: 0 24px; max-width: 400px"
+    class="user-form-container mb-16 w-full"
   >
     <el-card shadow="always" class="border-r-8" style="--el-card-padding: 16px 8px">
       <div class="flex align-center cursor w-full" style="padding: 0 8px">
@@ -16,9 +15,14 @@
           {{ inputFieldConfig.title }}
         </span>
       </div>
-      <el-scrollbar max-height="160">
+
+      <el-scrollbar :max-height="first ? 0 : 450">
         <el-collapse-transition>
-          <div v-show="showUserInput" class="mt-16" style="padding: 0 8px">
+          <div
+            v-show="showUserInput"
+            class="mt-16"
+            style="padding: 0 8px; height: calc(100% - 100px)"
+          >
             <DynamicsForm
               :key="dynamicsFormRefresh"
               v-model="form_data_context"
@@ -40,6 +44,7 @@
           </div>
         </el-collapse-transition>
       </el-scrollbar>
+
       <div class="text-right mr-8">
         <el-button type="primary" v-if="first" @click="confirmHandle">{{
           $t('chat.operation.startChat')
@@ -359,4 +364,13 @@ onMounted(() => {
   handleInputFieldList()
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.user-form-container {
+  padding: 0 24px;
+}
+@media only screen and (max-width: 768px) {
+  .user-form-container {
+    max-width: 100%;
+  }
+}
+</style>

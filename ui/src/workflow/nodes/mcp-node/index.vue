@@ -38,17 +38,18 @@
               :key="item.value"
               :label="item.name"
               :value="item.name"
+              class="flex align-center"
             >
               <el-tooltip
-                class="box-item"
                 effect="dark"
                 :content="item.description"
                 placement="top-start"
+                popper-class="max-w-350"
               >
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
 
-              <span>{{ item.name }}</span>
+              <span class="ml-4">{{ item.name }}</span>
             </el-option>
           </el-select>
         </el-form-item>

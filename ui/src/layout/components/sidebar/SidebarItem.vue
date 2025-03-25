@@ -58,8 +58,8 @@ function showMenu() {
   }
 }
 
-function clickHandle(item: any) {
-  if (isWorkFlow(type) && item.name === 'AppSetting') {
+function clickHandle(item?: any) {
+  if (isWorkFlow(type) && item?.name === 'AppSetting') {
     router.push({ path: `/application/${id}/workflow` })
   }
 }

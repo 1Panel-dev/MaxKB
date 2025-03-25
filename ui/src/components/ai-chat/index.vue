@@ -1,5 +1,10 @@
 <template>
-  <div ref="aiChatRef" class="ai-chat" :class="type">
+  <div
+    ref="aiChatRef"
+    class="ai-chat"
+    :class="type"
+    :style="{ height: firsUserInput ? '100%' : undefined }"
+  >
     <div
       v-show="showUserInputContent"
       :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'"
@@ -521,7 +526,15 @@ defineExpose({
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  overflow: auto;
+  .user-form-container {
+    max-width: 70%;
+  }
+}
+.debug-ai-chat {
+  .user-form-container {
+    max-width: 100%;
+  }
 }
 .popperUserInput {
   position: absolute;
@@ -530,5 +543,12 @@ defineExpose({
   bottom: 0;
   width: calc(100% - 50px);
   max-width: 400px;
+}
+@media only screen and (max-width: 768px) {
+  .firstUserInput {
+    .user-form-container {
+      max-width: 100%;
+    }
+  }
 }
 </style>

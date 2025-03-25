@@ -749,7 +749,6 @@ onMounted(() => {
 
 @media only screen and (max-width: 768px) {
   .ai-chat {
-    height: calc(100% - 100px);
     &__operate {
       position: fixed;
       bottom: 0;
