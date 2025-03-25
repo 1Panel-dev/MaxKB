@@ -55,7 +55,21 @@
               @click.stop="clickNodes(functionLibNode, item, 'function')"
               @mousedown.stop="onmousedown(functionLibNode, item, 'function')"
             >
-              <component :is="iconComponent(`function-lib-node-icon`)" class="mr-8" :size="32" />
+              <AppAvatar
+                v-if="item.icon != '/ui/favicon.ico'"
+                shape="square"
+                :size="32"
+                style="background: none"
+                class="mr-8"
+              >
+                <img :src="item?.icon || ''" alt="" />
+              </AppAvatar>
+              <component
+                v-else
+                :is="iconComponent(`function-lib-node-icon`)"
+                class="mr-8"
+                :size="32"
+              />
               <div class="pre-wrap">
                 <div class="lighter ellipsis-1" :title="item.name">{{ item.name }}</div>
                 <p>

@@ -25,14 +25,14 @@
             <div class="flex-between">
               <span>{{ $t('views.applicationWorkflow.nodes.mcpNode.tool') }}</span>
               <el-button type="primary" link @click="getTools()">
+                <el-icon class="mr-4">
+                  <Plus />
+                </el-icon>
                 {{ $t('views.applicationWorkflow.nodes.mcpNode.getTool') }}
               </el-button>
             </div>
           </template>
-          <el-select
-            v-model="form_data.mcp_tool"
-            @change="changeTool"
-          >
+          <el-select v-model="form_data.mcp_tool" @change="changeTool">
             <el-option
               v-for="item in form_data.mcp_tools"
               :key="item.value"
@@ -55,8 +55,12 @@
       </el-form>
     </div>
     <h5 class="title-decoration-1 mb-8">
-      {{ $t('views.applicationWorkflow.nodes.mcpNode.toolParam') }}</h5>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter" v-if="form_data.tool_params[form_data.params_nested]">
+      {{ $t('views.applicationWorkflow.nodes.mcpNode.toolParam') }}
+    </h5>
+    <div
+      class="border-r-4 p-8-12 mb-8 layout-bg lighter"
+      v-if="form_data.tool_params[form_data.params_nested]"
+    >
       <DynamicsForm
         v-if="form_data.mcp_tool"
         v-model="form_data.tool_params[form_data.params_nested]"
@@ -116,7 +120,6 @@ const form = {
   params_nested: ''
 }
 
-
 function submitDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'mcp_servers', val)
 }
@@ -132,17 +135,23 @@ function getTools() {
     MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
     return
   }
-  applicationApi.getMcpTools({ mcp_servers: form_data.value.mcp_servers }, loading).then((res: any) => {
-    form_data.value.mcp_tools = res.data
-    MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
-  })
+  applicationApi
+    .getMcpTools({ mcp_servers: form_data.value.mcp_servers }, loading)
+    .then((res: any) => {
+      form_data.value.mcp_tools = res.data
+      MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
+    })
 }
 
 function changeTool() {
-  form_data.value.mcp_server = form_data.value.mcp_tools.filter((item: any) => item.name === form_data.value.mcp_tool)[0].server
+  form_data.value.mcp_server = form_data.value.mcp_tools.filter(
+    (item: any) => item.name === form_data.value.mcp_tool
+  )[0].server
   // console.log(form_data.value.mcp_server)
 
-  const args_schema = form_data.value.mcp_tools.filter((item: any) => item.name === form_data.value.mcp_tool)[0].args_schema
+  const args_schema = form_data.value.mcp_tools.filter(
+    (item: any) => item.name === form_data.value.mcp_tool
+  )[0].args_schema
   form_data.value.tool_form_field = []
   for (const item in args_schema.properties) {
     let params = args_schema.properties[item].properties
@@ -201,7 +210,10 @@ function changeTool() {
   //
   if (form_data.value.params_nested) {
     form_data.value.tool_params = { [form_data.value.params_nested]: {} }
-    dynamicsFormRef.value?.render(form_data.value.tool_form_field, form_data.value.tool_params[form_data.value.params_nested])
+    dynamicsFormRef.value?.render(
+      form_data.value.tool_form_field,
+      form_data.value.tool_params[form_data.value.params_nested]
+    )
   } else {
     form_data.value.tool_params = {}
     dynamicsFormRef.value?.render(form_data.value.tool_form_field, form_data.value.tool_params)
@@ -223,14 +235,10 @@ const form_data = computed({
   }
 })
 
-
 const replyNodeFormRef = ref()
 
 const validate = async () => {
-  let ps = [
-    replyNodeFormRef.value?.validate(),
-    dynamicsFormRef.value?.validate()
-  ]
+  let ps = [replyNodeFormRef.value?.validate(), dynamicsFormRef.value?.validate()]
   return Promise.all(ps).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })

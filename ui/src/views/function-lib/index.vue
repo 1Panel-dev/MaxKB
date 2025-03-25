@@ -105,7 +105,7 @@
                   style="background: none"
                   class="mr-8"
                 >
-                  <img :src="getImageUrl(item?.icon)" alt="" />
+                  <img :src="item?.icon" alt="" />
                 </AppAvatar>
                 <AppAvatar
                   v-else-if="item?.name"
@@ -218,7 +218,7 @@
                   style="background: none"
                   class="mr-8"
                 >
-                  <img :src="getImageUrl(item?.icon)" alt="" />
+                  <img :src="item?.icon" alt="" />
                 </AppAvatar>
                 <AppAvatar
                   v-else-if="item?.name"
@@ -229,9 +229,7 @@
                   class="mr-8"
                 />
               </template>
-              <div class="status-button">
-
-              </div>
+              <div class="status-button"></div>
               <template #footer>
                 <div class="footer-content flex-between">
                   <div>{{ $t('common.author') }}: MaxKB</div>
@@ -249,7 +247,10 @@
     </div>
     <FunctionFormDrawer ref="FunctionFormDrawerRef" @refresh="refresh" :title="title" />
     <PermissionDialog ref="PermissionDialogRef" @refresh="refresh" />
-    <AddInternalFunctionDialog ref="AddInternalFunctionDialogRef" @refresh="confirmAddInternalFunction" />
+    <AddInternalFunctionDialog
+      ref="AddInternalFunctionDialogRef"
+      @refresh="confirmAddInternalFunction"
+    />
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <component :is="internalDescComponent" ref="internalDescRef" />
   </div>
@@ -271,7 +272,7 @@ import CardBox from '@/components/card-box/index.vue'
 import type { Dict } from '@/api/type/common'
 import AddInternalFunctionDialog from '@/views/function-lib/component/AddInternalFunctionDialog.vue'
 
-const internalIcons: Dict<any> = import.meta.glob('@/assets/fx/*/*.png', { eager: true })
+// const internalIcons: Dict<any> = import.meta.glob('@/assets/fx/*/*.png', { eager: true })
 let internalDesc: Dict<any> = import.meta.glob('@/assets/fx/*/index.vue', { eager: true })
 const internalDescRef = ref()
 const internalDescComponent = ref()
@@ -342,13 +343,6 @@ function openCreateDialog(data?: any) {
   }
 }
 
-function getImageUrl(name: string) {
-  if (name.startsWith('/src/assets/fx/')) {
-    return internalIcons[name]?.default
-  }
-  return name
-}
-
 function openDescDrawer(row: any) {
   const index = row.icon.replace('icon.png', 'index.vue')
   internalDescComponent.value = internalDesc[index].default
@@ -362,10 +356,12 @@ function addInternalFunction(data?: any) {
 }
 
 function confirmAddInternalFunction(data?: any) {
-  functionLibApi.addInternalFunction(data.id, {name: data.name}, changeStateloading).then((res) => {
-    MsgSuccess(t('common.submitSuccess'))
-    searchHandle()
-  })
+  functionLibApi
+    .addInternalFunction(data.id, { name: data.name }, changeStateloading)
+    .then((res) => {
+      MsgSuccess(t('common.submitSuccess'))
+      searchHandle()
+    })
 }
 
 function searchHandle() {
