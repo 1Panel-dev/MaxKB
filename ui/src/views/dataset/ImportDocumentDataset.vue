@@ -53,8 +53,30 @@
               >
                 <template #default="{ node, data }">
                   <div class="custom-tree-node flex align-center lighter">
-                    <el-icon v-if="data.type === 'folder'"><FolderOpened /></el-icon>
-                    <el-icon v-else><Document /></el-icon>
+                    <el-icon v-if="data.type === 'folder'">
+                      <FolderOpened />
+                    </el-icon>
+                    <el-icon v-else-if="data.type === 'docx'">
+                      <Document />
+                    </el-icon>
+                    <el-icon class="xlsx-icon" v-else-if="data.type === 'sheet'">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 文件轮廓 -->
+                        <path
+                          d="M5 3H14L19 8V19C19 20.1 18.1 21 17 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3Z"
+                          fill="white"
+                          stroke="currentColor"
+                          stroke-width="1.2"
+                        />
+                        <!-- 放大后的 X 符号（占比提升30%） -->
+                        <path
+                          d="M7 9L17 19M17 9L7 19"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </el-icon>
                     <span class="ml-4">{{ node.label }}</span>
                   </div>
                 </template>
@@ -93,6 +115,7 @@ const loading = ref(false)
 const disabled = ref(false)
 const allCheck = ref(false)
 const treeRef = ref<any>(null)
+
 interface Tree {
   name: string
   leaf?: boolean
@@ -125,13 +148,12 @@ const loadNode = (node: Node, resolve: (nodeData: Tree[]) => void) => {
     .getLarkDocumentList(datasetId, token, {}, loading)
     .then((res: any) => {
       const nodes = res.data.files as Tree[]
-
+      resolve(nodes)
       nodes.forEach((childNode) => {
         if (childNode.is_exist) {
-          treeRef.value?.setchecked(childNode.token, true, false)
+          treeRef.value?.setChecked(childNode.token, true, false)
         }
       })
-      resolve(nodes)
     })
 
     .catch((err) => {
@@ -204,6 +226,14 @@ function back() {
     width: 70%;
     margin: 0 auto;
     margin-bottom: 20px;
+  }
+}
+.xlsx-icon {
+  svg {
+    width: 24px;
+    height: 24px;
+    stroke: #000000 !important;
+    fill: #ffffff !important;
   }
 }
 </style>
