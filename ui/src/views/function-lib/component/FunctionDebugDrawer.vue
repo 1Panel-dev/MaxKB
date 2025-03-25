@@ -39,6 +39,7 @@
             require-asterisk-position="right"
             hide-required-asterisk
             v-loading="loading"
+            @submit.prevent
           >
             <template v-for="(item, index) in form.debug_field_list" :key="index">
               <el-form-item
