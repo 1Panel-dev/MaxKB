@@ -226,7 +226,8 @@ export default {
       getToolsSuccess: 'Get Tools Successfully',
       getTool: 'Get Tools',
       tool: 'Tool',
-      toolParam: 'Tool Params'
+      toolParam: 'Tool Params',
+      mcpServerTip: 'Please enter the JSON format of the MCP server config',
     },
     imageGenerateNode: {
       label: 'Image Generation',

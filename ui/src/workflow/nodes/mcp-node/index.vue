@@ -90,12 +90,12 @@ import { isLastNode } from '@/workflow/common/data'
 import applicationApi from '@/api/application'
 import { t } from '@/locales'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-import { MsgSuccess } from '@/utils/message'
+import { MsgError, MsgSuccess } from '@/utils/message'
 
 const props = defineProps<{ nodeModel: any }>()
 
 const dynamicsFormRef = ref()
-
+const loading = ref(false)
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
@@ -122,7 +122,17 @@ function submitDialog(val: string) {
 }
 
 function getTools() {
-  applicationApi.getMcpTools({ mcp_servers: form_data.value.mcp_servers }).then((res: any) => {
+  if (!form_data.value.mcp_servers) {
+    MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
+    return
+  }
+  try {
+    JSON.parse(form_data.value.mcp_servers)
+  } catch (e) {
+    MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
+    return
+  }
+  applicationApi.getMcpTools({ mcp_servers: form_data.value.mcp_servers }, loading).then((res: any) => {
     form_data.value.mcp_tools = res.data
     MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
   })

@@ -226,7 +226,8 @@ export default {
       getToolsSuccess: '獲取工具成功',
       getTool: '獲取工具',
       tool: '工具',
-      toolParam: '工具變數'
+      toolParam: '工具變數',
+      mcpServerTip: '請輸入 JSON 格式的 MCP 服務器配置',
     },
     imageGenerateNode: {
       label: '圖片生成',
