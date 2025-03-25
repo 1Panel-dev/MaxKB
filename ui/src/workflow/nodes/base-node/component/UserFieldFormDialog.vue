@@ -117,7 +117,7 @@ const currentRow = computed(() => {
         return currentItem.value
     }
   } else {
-    return { input_type: 'TextInput', required: false, attrs: { maxlength: 200, minlength: 0 } }
+    return { input_type: 'TextInput', required: false, attrs: { maxlength: 200, minlength: 0 }, show_default_value: true }
   }
 })
 const currentIndex = ref(null)
