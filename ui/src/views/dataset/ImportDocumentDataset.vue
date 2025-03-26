@@ -53,30 +53,25 @@
               >
                 <template #default="{ node, data }">
                   <div class="custom-tree-node flex align-center lighter">
-                    <el-icon v-if="data.type === 'folder'">
-                      <FolderOpened />
-                    </el-icon>
-                    <el-icon v-else-if="data.type === 'docx'">
-                      <Document />
-                    </el-icon>
-                    <el-icon class="xlsx-icon" v-else-if="data.type === 'sheet'">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- 文件轮廓 -->
-                        <path
-                          d="M5 3H14L19 8V19C19 20.1 18.1 21 17 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3Z"
-                          fill="white"
-                          stroke="currentColor"
-                          stroke-width="1.2"
-                        />
-                        <!-- 放大后的 X 符号（占比提升30%） -->
-                        <path
-                          d="M7 9L17 19M17 9L7 19"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          stroke-linecap="round"
-                        />
-                      </svg>
-                    </el-icon>
+                    <img
+                      src="@/assets/fileType/file-icon.svg"
+                      alt=""
+                      height="20"
+                      v-if="data.type === 'folder'"
+                    />
+                    <img
+                      src="@/assets/fileType/docx-icon.svg"
+                      alt=""
+                      height="22"
+                      v-else-if="data.type === 'docx'"
+                    />
+                    <img
+                      src="@/assets/fileType/xlsx-icon.svg"
+                      alt=""
+                      height="22"
+                      v-else-if="data.type === 'sheet'"
+                    />
+
                     <span class="ml-4">{{ node.label }}</span>
                   </div>
                 </template>
@@ -99,6 +94,7 @@
 import { ref, reactive, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { getImgUrl } from '@/utils/utils'
 import { t } from '@/locales'
 import type Node from 'element-plus/es/components/tree/src/model/node'
 import dataset from '@/api/dataset'
