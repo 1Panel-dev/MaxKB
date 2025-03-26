@@ -7619,3 +7619,6 @@ msgstr "API詳情"
 
 msgid "Operate Time"
 msgstr "操作時間"
+
+msgid "System Settings/API Key"
+msgstr "系統設置/API Key"

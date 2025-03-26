@@ -7446,3 +7446,6 @@ msgstr "API Details"
 
 msgid "Operate Time"
 msgstr "Operate time"
+
+msgid "System Settings/API Key"
+msgstr "System Settings/API Key"
