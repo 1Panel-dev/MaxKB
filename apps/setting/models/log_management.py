@@ -28,7 +28,7 @@ class Log(AppModelMixin):
 
     user = models.JSONField(verbose_name="用户信息", default=dict)
 
-    status = models.IntegerField(max_length=20, verbose_name="状态")
+    status = models.IntegerField(verbose_name="状态")
 
     ip_address = models.CharField(max_length=128, verbose_name="ip地址")
 
