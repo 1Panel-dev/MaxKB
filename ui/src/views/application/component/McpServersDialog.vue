@@ -20,6 +20,7 @@
           v-model="form.mcp_servers"
           :rows="6"
           type="textarea"
+          :placeholder="mcpServerJson"
         />
       </el-form-item>
     </el-form>
@@ -40,6 +41,14 @@ import { ref, watch } from 'vue'
 const emit = defineEmits(['refresh'])
 
 const paramFormRef = ref()
+
+const mcpServerJson = `{
+  "math": {
+    "url": "your_server",
+    "transport": "sse"
+  }
+}`
+
 
 const form = ref<any>({
   mcp_servers: '',

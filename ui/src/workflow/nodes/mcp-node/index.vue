@@ -18,6 +18,7 @@
             v-model="form_data.mcp_servers"
             style="height: 150px"
             @submitDialog="submitDialog"
+            :placeholder="mcpServerJson"
           />
         </el-form-item>
         <el-form-item>
@@ -169,6 +170,13 @@ const props = defineProps<{ nodeModel: any }>()
 
 const dynamicsFormRef = ref()
 const loading = ref(false)
+
+const mcpServerJson = `{
+  "math": {
+    "url": "your_server",
+    "transport": "sse"
+  }
+}`
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
