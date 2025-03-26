@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -278,7 +277,6 @@ msgid "Lark application: "
 msgstr "飞书应用："
 
 #: apps/xpack/serializers/channel/slack.py:116
-#, fuzzy
 #| msgid "The corresponding platform configuration was not found"
 msgid "The corresponding platform configuration for Slack was not found"
 msgstr "对应的平台配置未找到"
@@ -292,16 +290,14 @@ msgid "Invalid json format."
 msgstr "json 格式无效。"
 
 #: apps/xpack/serializers/channel/slack.py:327
-#, fuzzy
 #| msgid "Invalid access_token"
 msgid "Invalid Slack request"
-msgstr "无效的access_token"
+msgstr "无效的 Slack 请求"
 
 #: apps/xpack/serializers/channel/slack.py:335
-#, fuzzy, python-brace-format
 #| msgid "DingTalk application: {user}"
 msgid "Slack application: {user}"
-msgstr "钉钉应用：{user}"
+msgstr "Slack 应用：{user}"
 
 #: apps/xpack/serializers/channel/slack.py:471
 msgid "Stop"
@@ -575,7 +571,6 @@ msgstr "类型"
 
 #: apps/xpack/serializers/dataset_lark_serializer.py:151
 #: apps/xpack/serializers/dataset_lark_serializer.py:152
-#, fuzzy
 #| msgid "id does not exist"
 msgid "is exist"
 msgstr "ID 不存在"
@@ -583,10 +578,9 @@ msgstr "ID 不存在"
 #: apps/xpack/serializers/dataset_lark_serializer.py:173
 #: apps/xpack/serializers/dataset_lark_serializer.py:230
 #: apps/xpack/task/sync.py:120
-#, fuzzy
 #| msgid "Knowledge base id"
 msgid "Knowledge base not found!"
-msgstr "知识库 id"
+msgstr "知识库未找到！"
 
 #: apps/xpack/serializers/dataset_lark_serializer.py:185
 #: apps/xpack/serializers/dataset_lark_serializer.py:252
@@ -635,10 +629,9 @@ msgid "document id not exist"
 msgstr "文档 id 不存在"
 
 #: apps/xpack/serializers/dataset_lark_serializer.py:271
-#, fuzzy
 #| msgid "Synchronization is only supported for web site types"
 msgid "Synchronization is only supported for lark documents"
-msgstr "只有web站点类型才支持同步"
+msgstr "只有飞书知识库类型才支持同步"
 
 #: apps/xpack/serializers/dataset_lark_serializer.py:374
 #: community/apps/dataset/serializers/dataset_serializers.py:549
@@ -709,18 +702,16 @@ msgstr "菜单"
 #: apps/xpack/swagger_api/operate_log.py:21
 #: apps/xpack/swagger_api/operate_log.py:48
 #: apps/xpack/swagger_api/operate_log.py:49
-#, fuzzy
 #| msgid "Temperature"
 msgid "operate"
-msgstr "温度"
+msgstr "操作"
 
 #: apps/xpack/serializers/operate_log.py:40
 #: apps/xpack/swagger_api/operate_log.py:51
 #: apps/xpack/swagger_api/operate_log.py:52
-#, fuzzy
 #| msgid "user id"
 msgid "user"
-msgstr "用户 id"
+msgstr "用户"
 
 #: apps/xpack/serializers/operate_log.py:41
 #: apps/xpack/swagger_api/operate_log.py:54
@@ -732,10 +723,9 @@ msgstr "状态"
 #: apps/xpack/serializers/operate_log.py:42
 #: apps/xpack/swagger_api/operate_log.py:57
 #: apps/xpack/swagger_api/operate_log.py:58
-#, fuzzy
 #| msgid "Forum address"
 msgid "ip_address"
-msgstr "论坛地址"
+msgstr "IP 地址"
 
 #: apps/xpack/serializers/platform_serializer.py:14
 msgid "app_id is required"
@@ -797,16 +787,14 @@ msgid "Client Secret is required"
 msgstr "Client Secret 是必填项"
 
 #: apps/xpack/serializers/platform_serializer.py:46
-#, fuzzy
 #| msgid "Client Secret is required"
 msgid "Signing Secret is required"
-msgstr "Client Secret 是必填项"
+msgstr "Signing Secret 是必填项"
 
 #: apps/xpack/serializers/platform_serializer.py:47
-#, fuzzy
 #| msgid "Token is required"
 msgid "Bot User Token is required"
-msgstr "Token 是必填项"
+msgstr "Bot User Token 是必填项"
 
 #: apps/xpack/serializers/platform_serializer.py:68
 msgid "Check if the fields are correct"
@@ -904,10 +892,9 @@ msgid "Platform does not exist"
 msgstr "平台不存在"
 
 #: apps/xpack/serializers/platform_source_serializer.py:134
-#, fuzzy
 #| msgid "Unsupported file format"
 msgid "Unsupported platform type"
-msgstr "文件格式不支持"
+msgstr "三方平台类型不支持"
 
 #: apps/xpack/serializers/qr_login/qr_login.py:28
 msgid " Team"
@@ -1050,16 +1037,14 @@ msgid "Is active"
 msgstr "是否可用"
 
 #: apps/xpack/swagger_api/auth_api.py:37
-#, fuzzy
 #| msgid "Form Configuration"
 msgid "Wecom configuration"
-msgstr "表单配置"
+msgstr "企业微信配置"
 
 #: apps/xpack/swagger_api/auth_api.py:38
-#, fuzzy
 #| msgid "Get function details"
 msgid "Wecom configuration details"
-msgstr "获取函数详情"
+msgstr "企业微信配置详情"
 
 #: apps/xpack/swagger_api/auth_api.py:40 apps/xpack/swagger_api/auth_api.py:53
 msgid "Corp ID"
@@ -1071,45 +1056,39 @@ msgstr ""
 
 #: apps/xpack/swagger_api/auth_api.py:42 apps/xpack/swagger_api/auth_api.py:55
 #: apps/xpack/swagger_api/auth_api.py:67
-#, fuzzy
 #| msgid "App Secret is required"
 msgid "App Secret"
 msgstr "App Secret 是必填项"
 
 #: apps/xpack/swagger_api/auth_api.py:43 apps/xpack/swagger_api/auth_api.py:56
 #: apps/xpack/swagger_api/auth_api.py:68
-#, fuzzy
 #| msgid "Callback URL is required"
 msgid "Callback URL"
 msgstr "Callback URL 是必填项"
 
 #: apps/xpack/swagger_api/auth_api.py:50
-#, fuzzy
 #| msgid "Configuration"
 msgid "Dingtalk configuration"
-msgstr "配置"
+msgstr "钉钉配置"
 
 #: apps/xpack/swagger_api/auth_api.py:51
-#, fuzzy
 #| msgid "Get application details"
 msgid "Dingtalk configuration details"
-msgstr "获取应用详情"
+msgstr "钉钉配置详情"
 
 #: apps/xpack/swagger_api/auth_api.py:54 apps/xpack/swagger_api/auth_api.py:66
 msgid "App Key"
 msgstr ""
 
 #: apps/xpack/swagger_api/auth_api.py:63
-#, fuzzy
 #| msgid "Form Configuration"
 msgid "Feishu configuration"
-msgstr "表单配置"
+msgstr "飞书配置"
 
 #: apps/xpack/swagger_api/auth_api.py:64
-#, fuzzy
 #| msgid "Get function details"
 msgid "Feishu configuration details"
-msgstr "获取函数详情"
+msgstr "飞书配置详情"
 
 #: apps/xpack/swagger_api/license_api.py:22
 msgid "license status"
@@ -1242,17 +1221,15 @@ msgstr ""
 
 #: apps/xpack/swagger_api/operate_log.py:60
 #: apps/xpack/swagger_api/operate_log.py:61
-#, fuzzy
 #| msgid "license details"
 msgid "details"
-msgstr "License 详情"
+msgstr "详情"
 
 #: apps/xpack/views/application_setting_views.py:22
 #: apps/xpack/views/application_setting_views.py:23
-#, fuzzy
 #| msgid "Pro/Modify Application Settings"
 msgid "Modify Application Settings"
-msgstr "专业版/修改应用设置"
+msgstr "修改应用设置"
 
 #: apps/xpack/views/application_setting_views.py:24
 #: apps/xpack/views/application_setting_views.py:40
@@ -1261,10 +1238,9 @@ msgstr "专业版/应用/公共访问"
 
 #: apps/xpack/views/application_setting_views.py:37
 #: apps/xpack/views/application_setting_views.py:38
-#, fuzzy
 #| msgid "Pro/Get Application Settings"
 msgid "Get Application Settings"
-msgstr "专业版/获取应用详情"
+msgstr "获取应用设置"
 
 #: apps/xpack/views/auth.py:29
 msgid "Authentication"
@@ -1342,7 +1318,6 @@ msgid "DingTalk callback"
 msgstr "钉钉回调"
 
 #: apps/xpack/views/auth.py:221 apps/xpack/views/auth.py:222
-#, fuzzy
 #| msgid "DingTalk callback"
 msgid "DingTalk OAuth2 callback"
 msgstr "钉钉回调"
@@ -1352,7 +1327,6 @@ msgid "Lark callback"
 msgstr "飞书回调"
 
 #: apps/xpack/views/auth.py:257 apps/xpack/views/auth.py:258
-#, fuzzy
 #| msgid "Lark callback"
 msgid "Lark OAuth2 callback"
 msgstr "飞书回调"
@@ -1362,14 +1336,12 @@ msgid "Wecom callback"
 msgstr "企业微信回调"
 
 #: apps/xpack/views/auth.py:293 apps/xpack/views/auth.py:294
-#, fuzzy
 #| msgid "Wecom callback"
 msgid "Wecom OAuth2 callback"
 msgstr "企业微信回调"
 
 #: apps/xpack/views/dataset_lark_views.py:22
 #: apps/xpack/views/dataset_lark_views.py:23
-#, fuzzy
 #| msgid "Create a knowledge base"
 msgid "Create a lark knowledge base"
 msgstr "创建知识库"
@@ -1395,17 +1367,15 @@ msgstr "知识库"
 
 #: apps/xpack/views/dataset_lark_views.py:36
 #: apps/xpack/views/dataset_lark_views.py:37
-#, fuzzy
 #| msgid "Create a knowledge base"
 msgid "Update the lark knowledge base"
-msgstr "创建知识库"
+msgstr "更新知识库"
 
 #: apps/xpack/views/dataset_lark_views.py:53
 #: apps/xpack/views/dataset_lark_views.py:54
-#, fuzzy
 #| msgid "Get a list of applications available in the knowledge base"
 msgid "Get the list of documents in the lark knowledge base"
-msgstr "获取知识库中可用的应用列表"
+msgstr "获取知识库文档列表"
 
 #: apps/xpack/views/dataset_lark_views.py:57
 #: apps/xpack/views/dataset_lark_views.py:74
@@ -1441,24 +1411,21 @@ msgstr "知识库/文档"
 
 #: apps/xpack/views/dataset_lark_views.py:70
 #: apps/xpack/views/dataset_lark_views.py:71
-#, fuzzy
 #| msgid "Create a knowledge base"
 msgid "Import documents to the lark knowledge base"
 msgstr "创建知识库"
 
 #: apps/xpack/views/dataset_lark_views.py:86
 #: apps/xpack/views/dataset_lark_views.py:87
-#, fuzzy
 #| msgid "Create document"
 msgid "Synchronize lark document"
-msgstr "创建文档"
+msgstr "同步飞书文档"
 
 #: apps/xpack/views/dataset_lark_views.py:104
 #: apps/xpack/views/dataset_lark_views.py:105
-#, fuzzy
 #| msgid "Batch sync documents"
 msgid "Batch sync lark documents"
-msgstr "批量同步文档"
+msgstr "批量同步飞书文档"
 
 #: apps/xpack/views/display.py:17 apps/xpack/views/display.py:18
 msgid "View appearance settings"
@@ -1485,16 +1452,14 @@ msgid "upload file"
 msgstr "上传文件"
 
 #: apps/xpack/views/operate_log.py:21 apps/xpack/views/operate_log.py:22
-#, fuzzy
 #| msgid "Get model parameter form"
 msgid "Get menu operate log"
-msgstr "获取模型参数表单"
+msgstr "获取菜单操作日志"
 
 #: apps/xpack/views/operate_log.py:33 apps/xpack/views/operate_log.py:34
-#, fuzzy
 #| msgid "Get model parameter form"
 msgid "Get operate log"
-msgstr "获取模型参数表单"
+msgstr "获取操作日志"
 
 #: apps/xpack/views/platform.py:56 apps/xpack/views/platform.py:57
 msgid "Get platform configuration"
@@ -1672,7 +1637,6 @@ msgid "User ID"
 msgstr "用户 ID"
 
 #: community/apps/application/chat_pipeline/step/chat_step/i_chat_step.py:81
-#, fuzzy
 #| msgid "Model parameter settings"
 msgid "Model settings"
 msgstr "模型参数设置"
@@ -1806,7 +1770,6 @@ msgstr "相似度"
 #: community/apps/application/serializers/application_serializers.py:129
 #: community/apps/application/serializers/application_serializers.py:590
 #: community/apps/dataset/serializers/dataset_serializers.py:576
-#, fuzzy
 #| msgid "Retrieval pattern embedding|keywords|blend"
 msgid "The type only supports embedding|keywords|blend"
 msgstr "检索模式 embedding|keywords|blend"
@@ -2985,17 +2948,15 @@ msgstr "是否流式输出"
 
 #: community/apps/application/swagger_api/chat_api.py:96
 #: community/apps/application/swagger_api/chat_api.py:97
-#, fuzzy
 #| msgid "Form Data"
 msgid "Form data"
 msgstr "表单数据"
 
 #: community/apps/application/swagger_api/chat_api.py:101
 #: community/apps/application/swagger_api/chat_api.py:102
-#, fuzzy
 #| msgid "state list"
 msgid "Image list"
-msgstr "状态列表"
+msgstr "图片列表"
 
 #: community/apps/application/swagger_api/chat_api.py:107
 msgid "Image name"
@@ -3022,10 +2983,9 @@ msgstr "文档地址"
 
 #: community/apps/application/swagger_api/chat_api.py:129
 #: community/apps/application/swagger_api/chat_api.py:130
-#, fuzzy
 #| msgid "id list"
 msgid "Audio list"
-msgstr "id 列表"
+msgstr "音频列表"
 
 #: community/apps/application/swagger_api/chat_api.py:135
 msgid "Audio name"
@@ -3105,7 +3065,6 @@ msgid "or|and comparator"
 msgstr "or|and 比较器"
 
 #: community/apps/application/swagger_api/chat_api.py:266
-#, fuzzy
 #| msgid "Start time"
 msgid "start time"
 msgstr "开始时间"
@@ -4966,7 +4925,6 @@ msgstr "函数不存在"
 
 #: community/apps/function_lib/serializers/function_lib_serializer.py:357
 #: community/apps/function_lib/serializers/function_lib_serializer.py:386
-#, fuzzy
 #| msgid "function"
 msgid "function ID"
 msgstr "函数"
@@ -5047,16 +5005,14 @@ msgid "Get function list by pagination"
 msgstr "获取分页函数列表"
 
 #: community/apps/function_lib/views/function_lib_views.py:129
-#, fuzzy
 #| msgid "not a function"
 msgid "Import function"
-msgstr "不是函数"
+msgstr "导入函数"
 
 #: community/apps/function_lib/views/function_lib_views.py:143
-#, fuzzy
 #| msgid "not a function"
 msgid "Export function"
-msgstr "不是函数"
+msgstr "导出函数"
 
 #: community/apps/function_lib/views/py_lint.py:26
 #: community/apps/function_lib/views/py_lint.py:27
