@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('operate', models.CharField(max_length=128, verbose_name='操作')),
                 ('operation_object', models.JSONField(default=dict, encoder=common.encoder.encoder.SystemEncoder, verbose_name='操作对象')),
                 ('user', models.JSONField(default=dict, verbose_name='用户信息')),
-                ('status', models.IntegerField(max_length=20, verbose_name='状态')),
+                ('status', models.IntegerField(verbose_name='状态')),
                 ('ip_address', models.CharField(max_length=128, verbose_name='ip地址')),
                 ('details', models.JSONField(default=dict, encoder=common.encoder.encoder.SystemEncoder, verbose_name='详情')),
             ],
