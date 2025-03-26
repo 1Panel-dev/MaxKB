@@ -73,9 +73,9 @@ export default {
         referencesTooltip:
           'By adjusting the content of the prompt, you can guide the direction of the large model chat. This prompt will be fixed at the beginning of the context. Variables used: {data} carries known information from the knowledge; {question} is the question posed by the user.',
         defaultPrompt: `Known information: {data}
-          Question: {question}
-           Response requirements: 
-           - Please use concise and professional language to answer the user's question.
+Question: {question}
+Response requirements: 
+- Please use concise and professional language to answer the user's question.
            `
       },
       historyRecord: {
