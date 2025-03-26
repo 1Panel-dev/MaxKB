@@ -142,7 +142,6 @@ const emit = defineEmits(['update:data', 'regeneration'])
 
 const audioPlayer = ref<HTMLAudioElement[] | null>([])
 const audioCiontainer = ref<HTMLDivElement>()
-const audioPlayerStatus = ref(false)
 const buttonData = ref(props.data)
 const loading = ref(false)
 
@@ -271,6 +270,7 @@ class AudioManage {
   tryList: Array<number>
   ttsType: string
   root: Element
+  is_end: boolean
   constructor(ttsType: string, root: HTMLDivElement) {
     this.textList = []
     this.audioList = []
@@ -278,6 +278,7 @@ class AudioManage {
     this.tryList = []
     this.ttsType = ttsType
     this.root = root
+    this.is_end = false
   }
   appendTextList(textList: Array<string>) {
     const newTextList = textList.slice(this.textList.length)
@@ -300,8 +301,9 @@ class AudioManage {
         audioElement.onended = () => {
           this.statusList[index] = AudioStatus.END
           // 如果所有的节点都播放结束
-          if (this.statusList.every((item) => item === AudioStatus.END)) {
+          if (this.statusList.every((item) => item === AudioStatus.END) && this.is_end) {
             this.statusList = this.statusList.map((item) => AudioStatus.READY)
+            this.is_end = false
           } else {
             // next
             this.play()
@@ -323,13 +325,11 @@ class AudioManage {
                 const text = await res.text()
                 MsgError(text)
                 this.statusList[index] = AudioStatus.ERROR
-                this.play()
-                return
+                throw ''
               }
               // 假设我们有一个 MP3 文件的字节数组
               // 创建 Blob 对象
               const blob = new Blob([res], { type: 'audio/mp3' })
-
               // 创建对象 URL
               const url = URL.createObjectURL(blob)
               audioElement.src = url
@@ -337,7 +337,6 @@ class AudioManage {
               this.play()
             })
             .catch((err) => {
-              console.log('err: ', err)
               this.statusList[index] = AudioStatus.ERROR
               this.play()
             })
@@ -348,9 +347,6 @@ class AudioManage {
         const speechSynthesisUtterance: SpeechSynthesisUtterance = new SpeechSynthesisUtterance(
           text
         )
-        speechSynthesisUtterance.onpause = () => {
-          console.log('onpause')
-        }
         speechSynthesisUtterance.onend = () => {
           this.statusList[index] = AudioStatus.END
           // 如果所有的节点都播放结束
@@ -389,8 +385,8 @@ class AudioManage {
               if (res.type === 'application/json') {
                 const text = await res.text()
                 MsgError(text)
-                this.statusList[index] = AudioStatus.ERROR
-                return
+
+                throw ''
               }
               // 假设我们有一个 MP3 文件的字节数组
               // 创建 Blob 对象
@@ -405,6 +401,7 @@ class AudioManage {
             .catch((err) => {
               console.log('err: ', err)
               this.statusList[index] = AudioStatus.ERROR
+              this.play()
             })
         }
       }
@@ -414,6 +411,9 @@ class AudioManage {
     return this.statusList.some((item) => [AudioStatus.PLAY_INT].includes(item))
   }
   play(text?: string, is_end?: boolean, self?: boolean) {
+    if (is_end) {
+      this.is_end = true
+    }
     if (self) {
       this.tryList = this.tryList.map((item) => 0)
     }
@@ -431,7 +431,6 @@ class AudioManage {
     const index = this.statusList.findIndex((status) =>
       [AudioStatus.MOUNTED, AudioStatus.READY].includes(status)
     )
-
     if (index < 0 || this.statusList[index] === AudioStatus.MOUNTED) {
       return
     }
@@ -497,6 +496,7 @@ class AudioManage {
       },
       is_end
     )
+
     return split
   }
 }
