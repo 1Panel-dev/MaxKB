@@ -19,8 +19,14 @@
                 size="small"
                 style="width: 85px"
               >
-                <el-option :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')" value="referencing" />
-                <el-option :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.custom')" value="content" />
+                <el-option
+                  :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
+                  value="referencing"
+                />
+                <el-option
+                  :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.custom')"
+                  value="content"
+                />
               </el-select>
             </div>
           </template>
@@ -51,10 +57,9 @@
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span
-                  >{{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                  }}<span class="danger">*</span></span
-                >
+                <span>{{
+                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>

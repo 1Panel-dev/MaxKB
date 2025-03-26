@@ -7,7 +7,6 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-  
     <el-row :gutter="12">
       <el-col :span="8">
         <div class="border">
@@ -104,7 +103,9 @@ const source3 = ref('')
 
 const urlParams1 = computed(() => (props.apiInputParams ? '?' + props.apiInputParams : ''))
 const urlParams2 = computed(() => (props.apiInputParams ? '&' + props.apiInputParams : ''))
-
+const urlParams3 = computed(() =>
+  props.apiInputParams ? '?mode=mobile&' + props.apiInputParams : '?mode=mobile'
+)
 watch(dialogVisible, (bool) => {
   if (!bool) {
     source1.value = ''
@@ -131,8 +132,8 @@ src="${window.location.origin}/api/application/embed?protocol=${window.location.
   )}&host=${window.location.host}&token=${val}${urlParams2.value}">
 <\/script>
 `
- source3.value = `<iframe
-src="${application.location + val + urlParams1.value}?mode=mobile"
+  source3.value = `<iframe
+src="${application.location + val + urlParams3.value}"
 style="width: 100%; height: 100%;"
 frameborder="0"
 allow="microphone">
