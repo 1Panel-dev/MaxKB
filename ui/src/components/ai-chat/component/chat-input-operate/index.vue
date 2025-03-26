@@ -589,6 +589,14 @@ function autoSendMessage() {
 }
 
 function sendChatHandle(event?: any) {
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  )
+  // 如果是移动端，且按下回车键，不直接发送
+  if ((isMobile || mode === 'mobile') && event?.key === 'Enter') {
+    // 阻止默认事件
+    return
+  }
   if (!event?.ctrlKey && !event?.shiftKey && !event?.altKey && !event?.metaKey) {
     // 如果没有按下组合键，则会阻止默认事件
     event?.preventDefault()
