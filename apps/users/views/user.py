@@ -179,7 +179,7 @@ class Login(APIView):
                          responses=LoginSerializer().get_response_body_api(),
                          security=[],
                          tags=[_("User")])
-    @log(menu='User', operate='Log in', get_user=lambda r: {'user_name': r.data.get('username', None)},
+    @log(menu='User', operate='Log in', get_user=lambda r: {'username': r.data.get('username', None)},
          get_details=_get_details,
          get_operation_object=lambda r, k: {'name': r.data.get('username')})
     def post(self, request: Request):
