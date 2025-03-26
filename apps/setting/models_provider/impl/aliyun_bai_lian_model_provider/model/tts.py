@@ -46,6 +46,8 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             from dashscope.audio.tts_v2 import SpeechSynthesizer
             synthesizer = SpeechSynthesizer(model=self.model, **self.params)
             audio = synthesizer.call(text)
+        if audio is None:
+            raise Exception('Failed to generate audio')
         if type(audio) == str:
             print(audio)
             raise Exception(audio)
