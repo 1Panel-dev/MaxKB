@@ -18,7 +18,8 @@ class BaseMcpNode(IMcpNode):
 
     def execute(self, mcp_servers, mcp_server, mcp_tool, tool_params, **kwargs) -> NodeResult:
         servers = json.loads(mcp_servers)
-        params = self.handle_variables(tool_params)
+        params = json.loads(json.dumps(tool_params))
+        params = self.handle_variables(params)
 
         async def call_tool(s, session, t, a):
             async with MultiServerMCPClient(s) as client:
