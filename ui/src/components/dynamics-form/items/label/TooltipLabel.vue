@@ -17,26 +17,4 @@ defineProps<{
   tooltip: string
 }>()
 </script>
-<style lang="scss" scoped>
-.aiMode-param-dialog {
-  padding: 8px 8px 24px 8px;
-
-  .el-dialog__header {
-    padding: 16px 16px 0 16px;
-  }
-
-  .el-dialog__body {
-    padding: 16px !important;
-  }
-
-  .dialog-max-height {
-    height: 550px;
-  }
-
-  .custom-slider {
-    .el-input-number.is-without-controls .el-input__wrapper {
-      padding: 0 !important;
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

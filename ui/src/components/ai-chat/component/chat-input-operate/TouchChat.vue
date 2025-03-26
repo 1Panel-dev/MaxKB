@@ -8,6 +8,7 @@
       @touchstart="onTouchStart"
       @touchmove="onTouchMove"
       @touchend="onTouchEnd"
+      :disabled="props.disabled"
     >
       按住说话
     </el-button>
@@ -47,6 +48,10 @@ const props = defineProps({
   start: {
     type: Boolean,
     default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 const emit = defineEmits(['TouchStart', 'TouchEnd'])
@@ -57,11 +62,19 @@ const dialogVisible = ref(false)
 const message = ref('按住说话')
 
 watch(
-  () => props.time,
-  (val) => {
-    if (val && val === 60) {
+  () => [props.time, props.start],
+  ([time, start]) => {
+    if (start) {
+      isTouching.value = true
+      dialogVisible.value = true
+      message.value = '松开发送，上滑取消'
+      if (time === 60) {
+        dialogVisible.value = false
+        emit('TouchEnd', isTouching.value)
+        isTouching.value = false
+      }
+    } else {
       dialogVisible.value = false
-      emit('TouchEnd', isTouching.value)
       isTouching.value = false
     }
   }

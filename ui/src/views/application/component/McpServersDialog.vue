@@ -9,13 +9,21 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <el-form label-position="top" ref="paramFormRef" :model="form"
-             require-asterisk-position="right">
+    <el-form
+      label-position="top"
+      ref="paramFormRef"
+      :model="form"
+      require-asterisk-position="right"
+    >
       <el-form-item label="MCP" prop="mcp_enable">
         <el-switch v-model="form.mcp_enable" />
       </el-form-item>
-      <el-form-item v-if="form.mcp_enable" label="MCP Server Config" prop="mcp_servers"
-                    :rules="[{ required: true, message: $t('common.required') }]">
+      <el-form-item
+        v-if="form.mcp_enable"
+        label="MCP Server Config"
+        prop="mcp_servers"
+        :rules="[{ required: true, message: $t('common.required') }]"
+      >
         <el-input
           v-model="form.mcp_servers"
           :rows="6"
@@ -49,7 +57,6 @@ const mcpServerJson = `{
   }
 }`
 
-
 const form = ref<any>({
   mcp_servers: '',
   mcp_enable: false
@@ -82,26 +89,4 @@ const submit = () => {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scoped>
-.param-dialog {
-  padding: 8px 8px 24px 8px;
-
-  .el-dialog__header {
-    padding: 16px 16px 0 16px;
-  }
-
-  .el-dialog__body {
-    padding: 0 !important;
-  }
-
-  .dialog-max-height {
-    height: 560px;
-  }
-
-  .custom-slider {
-    .el-input-number.is-without-controls .el-input__wrapper {
-      padding: 0 !important;
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

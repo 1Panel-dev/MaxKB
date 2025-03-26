@@ -1,5 +1,6 @@
 <template>
   <div class="item-content mb-16 lighter">
+    
     <template v-for="(answer_text, index) in answer_text_list" :key="index">
       <div class="avatar mr-8" v-if="application.show_avatar">
         <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
