@@ -28,6 +28,7 @@ from common.util.common import parse_md_image
 from dataset.models import Image
 from django.utils.translation import gettext_lazy as _
 
+
 class FileBufferHandle:
     buffer = None
 
@@ -75,6 +76,7 @@ def get_image_list(result_list: list, zip_files: List[str]):
                 if search:
                     new_image_id = str(uuid.uuid1())
                     source_image_path = search.group().replace('(', '').replace(')', '')
+                    source_image_path = source_image_path.strip().split(" ")[0]
                     image_path = urljoin(result.get('name'), '.' + source_image_path if source_image_path.startswith(
                         '/') else source_image_path)
                     if not zip_files.__contains__(image_path):
