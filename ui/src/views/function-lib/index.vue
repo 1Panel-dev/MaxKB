@@ -266,7 +266,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive, watch, nextTick } from 'vue'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, get } from 'lodash'
 import functionLibApi from '@/api/function-lib'
 import FunctionFormDrawer from './component/FunctionFormDrawer.vue'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
@@ -280,10 +280,11 @@ import { isAppIcon } from '@/utils/application'
 import InfiniteScroll from '@/components/infinite-scroll/index.vue'
 import CardBox from '@/components/card-box/index.vue'
 import AddInternalFunctionDialog from '@/views/function-lib/component/AddInternalFunctionDialog.vue'
-const internalDesc: Record<string, any> = import.meta.glob('@/assets/fx/*/detail.md', {
-  eager: true,
-  as: 'raw'
-})
+// const internalDesc: Record<string, any> = import.meta.glob('/fx/*/detail.md', {
+//   eager: true,
+//   as: 'raw'
+// })
+// console.log(internalDesc)
 
 const { user } = useStore()
 
@@ -352,9 +353,11 @@ function openCreateDialog(data?: any) {
   }
 }
 
-function openDescDrawer(row: any) {
+async function openDescDrawer(row: any) {
   const index = row.icon.replace('icon.png', 'detail.md')
-  InternalDescDrawerRef.value.open(internalDesc[index], row)
+  const response = await fetch(index)
+  const content = await response.text()
+  InternalDescDrawerRef.value.open(content, row)
 }
 
 function addInternalFunction(data?: any) {
