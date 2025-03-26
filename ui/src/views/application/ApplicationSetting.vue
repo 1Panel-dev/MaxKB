@@ -204,7 +204,15 @@
                             >
                               <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
                             </AppAvatar>
-
+                            <AppAvatar
+                              v-if="relatedObject(datasetList, item, 'id')?.type === '2'"
+                              class="mr-8 avatar-purple"
+                              shape="square"
+                              :size="32"
+                              style="background: none"
+                            >
+                              <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
+                            </AppAvatar>
                             <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="32">
                               <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                             </AppAvatar>

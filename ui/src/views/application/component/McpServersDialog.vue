@@ -2,7 +2,6 @@
   <el-dialog
     align-center
     :title="$t('common.setting')"
-    class="param-dialog"
     v-model="dialogVisible"
     style="width: 550px"
     append-to-body
@@ -34,7 +33,7 @@
     </el-form>
 
     <template #footer>
-      <span class="dialog-footer p-16">
+      <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
         <el-button type="primary" @click="submit()" :loading="loading">
           {{ $t('common.save') }}

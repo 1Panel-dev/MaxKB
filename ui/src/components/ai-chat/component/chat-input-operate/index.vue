@@ -198,7 +198,7 @@
                       }}：{{ getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase() }}
                     </div>
                   </template>
-                  <el-button text :disabled="checkMaxFilesLimit()" class="mt-4">
+                  <el-button text :disabled="checkMaxFilesLimit() || loading" class="mt-4">
                     <el-icon><Paperclip /></el-icon>
                   </el-button>
                 </el-tooltip>

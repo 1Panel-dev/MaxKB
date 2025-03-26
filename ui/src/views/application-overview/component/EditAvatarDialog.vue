@@ -5,7 +5,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <el-radio-group v-model="radioType" class="radio-block mb-16">
+    <el-radio-group v-model="radioType" class="radio-block-avatar mb-16">
       <div>
         <el-radio value="default">
           <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.default') }}</p>
@@ -139,4 +139,19 @@ function submit() {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.radio-block-avatar {
+  width: 100%;
+  display: block;
+  .el-radio {
+    align-items: flex-start;
+    height: 100%;
+    width: 100%;
+  }
+  .el-radio__label {
+    width: 100%;
+    margin-top: -8px;
+    line-height: 30px;
+  }
+}
+</style>

@@ -33,6 +33,15 @@
                 <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
               </AppAvatar>
               <AppAvatar
+                v-if="!item.dataset_id && item.type === '2'"
+                class="mr-12 avatar-purple"
+                shape="square"
+                :size="24"
+                style="background: none"
+              >
+                <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
+              </AppAvatar>
+              <AppAvatar
                 v-else-if="!item.dataset_id && item.type === '0'"
                 class="mr-12 avatar-blue"
                 shape="square"
@@ -99,7 +108,9 @@ const form = ref<any>({
 })
 
 const rules = reactive<FormRules>({
-  dataset_id: [{ required: true, message: t('views.log.selectDatasetPlaceholder'), trigger: 'change' }],
+  dataset_id: [
+    { required: true, message: t('views.log.selectDatasetPlaceholder'), trigger: 'change' }
+  ],
   document_id: [{ required: true, message: t('views.log.documentPlaceholder'), trigger: 'change' }]
 })
 
