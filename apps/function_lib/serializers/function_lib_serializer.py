@@ -199,7 +199,7 @@ class FunctionLibSerializer(serializers.Serializer):
                                        input_field_list=instance.get('input_field_list'),
                                        init_field_list=instance.get('init_field_list'),
                                        permission_type=instance.get('permission_type'),
-                                       is_active=instance.get('is_active', True))
+                                       is_active=False)
             function_lib.save()
             return FunctionLibModelSerializer(function_lib).data
 
@@ -289,12 +289,18 @@ class FunctionLibSerializer(serializers.Serializer):
 
             function_lib = QuerySet(FunctionLib).filter(id=self.data.get('id')).first()
             if 'init_params' in edit_dict:
+                if edit_dict['init_field_list'] is not None:
+                    rm_key = []
+                    for key in edit_dict['init_params']:
+                        if key not in [field['field'] for field in edit_dict['init_field_list']]:
+                            rm_key.append(key)
+                    for key in rm_key:
+                        edit_dict['init_params'].pop(key)
                 if function_lib.init_params:
                     old_init_params = json.loads(rsa_long_decrypt(function_lib.init_params))
                     for key in edit_dict['init_params']:
                         if key in old_init_params and edit_dict['init_params'][key] == encryption(old_init_params[key]):
                             edit_dict['init_params'][key] = old_init_params[key]
-
                 edit_dict['init_params'] = rsa_long_encrypt(json.dumps(edit_dict['init_params']))
             QuerySet(FunctionLib).filter(id=self.data.get('id')).update(**edit_dict)
             return self.one(False)
