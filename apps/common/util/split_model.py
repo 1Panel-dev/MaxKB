@@ -344,9 +344,9 @@ class SplitModel:
                 'content' in item and len(item.get('content').strip()) > 0]
 
     def post_reset_paragraph(self, paragraph: Dict, title_list: List[str]):
-        result = self.filter_title_special_characters(paragraph)
+        result = self.content_is_null(paragraph, title_list)
+        result = self.filter_title_special_characters(result)
         result = self.sub_title(result)
-        result = self.content_is_null(result, title_list)
         return result
 
     @staticmethod
