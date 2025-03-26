@@ -33,7 +33,7 @@ export default {
       datasetName: {
         label: '知識庫名稱',
         placeholder: '請輸入知識庫名稱',
-        requiredMessage: '請輸入應用名稱'
+        requiredMessage: '請輸入知識庫名稱'
       },
       datasetDescription: {
         label: '知識庫描述',

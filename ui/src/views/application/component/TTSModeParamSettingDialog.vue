@@ -2,9 +2,9 @@
   <el-dialog
     align-center
     :title="$t('common.paramSetting')"
-    class="aiMode-param-dialog"
     v-model="dialogVisible"
     style="width: 550px"
+    class="param-dialog"
     append-to-body
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -25,7 +25,6 @@
           <el-button @click="testPlay" :loading="playLoading">
             <AppIcon iconName="app-video-play" class="mr-4"></AppIcon>
             {{ $t('views.application.applicationForm.form.voicePlay.listeningTest') }}
-            
           </el-button>
         </span>
         <span class="dialog-footer p-16">
@@ -77,15 +76,17 @@ const open = (model_id: string, application_id?: string, model_setting_data?: an
   api.then((ok) => {
     model_form_field.value = ok.data
     const resp = ok.data
-      .map((item: any) => ({ [item.field]: item.show_default_value !== false ? item.default_value : undefined }))
+      .map((item: any) => ({
+        [item.field]: item.show_default_value !== false ? item.default_value : undefined
+      }))
       .reduce((x, y) => ({ ...x, ...y }), {})
     // 删除不存在的字段
     if (model_setting_data) {
-      Object.keys(model_setting_data).forEach(key => {
+      Object.keys(model_setting_data).forEach((key) => {
         if (!(key in resp)) {
-          delete model_setting_data[key];
+          delete model_setting_data[key]
         }
-      });
+      })
     }
     model_setting_data = { ...resp, ...model_setting_data }
     // 渲染动态表单
@@ -99,7 +100,9 @@ const reset_default = (model_id: string, application_id?: string) => {
   api.then((ok) => {
     model_form_field.value = ok.data
     const model_setting_data = ok.data
-      .map((item) => ({ [item.field]: item.show_default_value !== false ? item.default_value : undefined }))
+      .map((item) => ({
+        [item.field]: item.show_default_value !== false ? item.default_value : undefined
+      }))
       .reduce((x, y) => ({ ...x, ...y }), {})
 
     emit('refresh', model_setting_data)
@@ -149,26 +152,4 @@ const testPlay = () => {
 defineExpose({ open, reset_default })
 </script>
 
-<style lang="scss" scoped>
-.aiMode-param-dialog {
-  padding: 8px 8px 24px 8px;
-
-  .el-dialog__header {
-    padding: 16px 16px 0 16px;
-  }
-
-  .el-dialog__body {
-    padding: 16px !important;
-  }
-
-  .dialog-max-height {
-    height: 550px;
-  }
-
-  .custom-slider {
-    .el-input-number.is-without-controls .el-input__wrapper {
-      padding: 0 !important;
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

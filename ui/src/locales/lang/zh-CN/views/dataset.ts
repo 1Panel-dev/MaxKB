@@ -34,7 +34,7 @@ export default {
       datasetName: {
         label: '知识库名称',
         placeholder: '请输入知识库名称',
-        requiredMessage: '请输入应用名称'
+        requiredMessage: '请输入知识库名称'
       },
       datasetDescription: {
         label: '知识库描述',

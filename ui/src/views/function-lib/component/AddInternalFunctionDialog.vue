@@ -16,7 +16,7 @@
       require-asterisk-position="right"
     >
       <el-form-item prop="name">
-        <el-input v-model="form.name"></el-input>
+        <el-input v-model="form.name" maxlength="64" show-word-limit></el-input>
       </el-form-item>
     </el-form>
     <template #footer>

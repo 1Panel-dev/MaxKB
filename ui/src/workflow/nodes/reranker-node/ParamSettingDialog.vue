@@ -43,9 +43,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item
-                  :label="$t('views.application.applicationForm.dialog.topReferences')"
-                >
+                <el-form-item :label="$t('views.application.applicationForm.dialog.topReferences')">
                   <el-input-number
                     v-model="form.top_n"
                     :min="1"
@@ -125,22 +123,4 @@ const submit = () => {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scoped>
-.param-dialog {
-  padding: 8px 8px 24px 8px;
-  .el-dialog__header {
-    padding: 16px 16px 0 16px;
-  }
-  .el-dialog__body {
-    padding: 0 !important;
-  }
-  .dialog-max-height {
-    height: 550px;
-  }
-  .custom-slider {
-    .el-input-number.is-without-controls .el-input__wrapper {
-      padding: 0 !important;
-    }
-  }
-}
-</style>
+<style lang="scss"></style>

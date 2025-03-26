@@ -120,6 +120,7 @@
           @TouchEnd="TouchEnd"
           :time="recorderTime"
           :start="!mediaRecorderStatus"
+          :disabled="loading"
         />
         <el-input
           v-else
@@ -149,7 +150,12 @@
               </el-button>
             </span>
             <span class="flex align-center" v-else>
-              <el-button text @click="startRecording" v-if="mediaRecorderStatus">
+              <el-button
+                :disabled="loading"
+                text
+                @click="startRecording"
+                v-if="mediaRecorderStatus"
+              >
                 <el-icon>
                   <Microphone />
                 </el-icon>
@@ -166,7 +172,7 @@
             </span>
           </template>
 
-          <template v-if="!startRecorderTime && !recorderLoading">
+          <template v-if="(!startRecorderTime && !recorderLoading) || mode === 'mobile'">
             <span v-if="props.applicationDetails.file_upload_enable" class="flex align-center ml-4">
               <el-upload
                 action="#"
@@ -515,7 +521,12 @@ const stopRecording = () => {
 // 上传录音文件
 const uploadRecording = async (audioBlob: Blob) => {
   try {
+    // 非自动发送切换输入框
+    if (!props.applicationDetails.stt_autosend) {
+      isMicrophone.value = false
+    }
     recorderLoading.value = true
+
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
     applicationApi
