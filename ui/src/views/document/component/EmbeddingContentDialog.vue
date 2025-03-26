@@ -6,7 +6,7 @@
     width="450"
   >
     <el-radio-group v-model="state" class="radio-block">
-      <el-radio value="error" size="large" class="mb-16">{{
+      <el-radio value="error" size="large">{{
         $t('components.selectParagraph.error')
       }}</el-radio>
       <el-radio value="all" size="large">{{ $t('components.selectParagraph.all') }}</el-radio>

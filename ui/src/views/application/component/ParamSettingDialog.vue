@@ -9,181 +9,179 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <div class="dialog-max-height">
-      <el-scrollbar>
-        <div class="p-16">
-          <el-form label-position="top" ref="paramFormRef" :model="form">
-            <el-form-item :label="$t('views.application.applicationForm.dialog.selectSearchMode')">
-              <el-radio-group
-                v-model="form.dataset_setting.search_mode"
-                class="card__radio"
-                @change="changeHandle"
-              >
-                <el-card
-                  shadow="never"
-                  class="mb-16"
-                  :class="form.search_mode === 'embedding' ? 'active' : ''"
-                >
-                  <el-radio value="embedding" size="large">
-                    <p class="mb-4">
-                      {{ $t('views.application.applicationForm.dialog.vectorSearch') }}
-                    </p>
-                    <el-text type="info">{{
-                      $t('views.application.applicationForm.dialog.vectorSearchTooltip')
-                    }}</el-text>
-                  </el-radio>
-                </el-card>
-                <el-card
-                  shadow="never"
-                  class="mb-16"
-                  :class="form.dataset_setting.search_mode === 'keywords' ? 'active' : ''"
-                >
-                  <el-radio value="keywords" size="large">
-                    <p class="mb-4">
-                      {{ $t('views.application.applicationForm.dialog.fullTextSearch') }}
-                    </p>
-                    <el-text type="info">{{
-                      $t('views.application.applicationForm.dialog.fullTextSearchTooltip')
-                    }}</el-text>
-                  </el-radio>
-                </el-card>
-                <el-card
-                  shadow="never"
-                  :class="form.dataset_setting.search_mode === 'blend' ? 'active' : ''"
-                >
-                  <el-radio value="blend" size="large">
-                    <p class="mb-4">
-                      {{ $t('views.application.applicationForm.dialog.hybridSearch') }}
-                    </p>
-                    <el-text type="info">{{
-                      $t('views.application.applicationForm.dialog.hybridSearchTooltip')
-                    }}</el-text>
-                  </el-radio>
-                </el-card>
-              </el-radio-group>
-            </el-form-item>
-            <el-row :gutter="20">
-              <el-col :span="12">
-                <el-form-item>
-                  <template #label>
-                    <div class="flex align-center">
-                      <span class="mr-4">{{
-                        $t('views.application.applicationForm.dialog.similarityThreshold')
-                      }}</span>
-                      <el-tooltip
-                        effect="dark"
-                        :content="$t('views.application.applicationForm.dialog.similarityTooltip')"
-                        placement="right"
-                      >
-                        <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                      </el-tooltip>
-                    </div>
-                  </template>
-                  <el-input-number
-                    v-model="form.dataset_setting.similarity"
-                    :min="0"
-                    :max="form.search_mode === 'blend' ? 2 : 1"
-                    :precision="3"
-                    :step="0.1"
-                    :value-on-clear="0"
-                    controls-position="right"
-                    class="w-full"
-                  />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item :label="$t('views.application.applicationForm.dialog.topReferences')">
-                  <el-input-number
-                    v-model="form.dataset_setting.top_n"
-                    :min="1"
-                    :max="10000"
-                    :value-on-clear="1"
-                    controls-position="right"
-                    class="w-full"
-                  />
-                </el-form-item>
-              </el-col>
-            </el-row>
-
-            <el-form-item :label="$t('views.application.applicationForm.dialog.maxCharacters')">
-              <el-slider
-                v-model="form.dataset_setting.max_paragraph_char_number"
-                show-input
-                :show-input-controls="false"
-                :min="500"
-                :max="100000"
-                class="custom-slider"
-              />
-            </el-form-item>
-            <el-form-item
-              v-if="!isWorkflowType"
-              :label="$t('views.application.applicationForm.dialog.noReferencesAction')"
+    <el-scrollbar max-height="550">
+      <div class="p-16">
+        <el-form label-position="top" ref="paramFormRef" :model="form">
+          <el-form-item :label="$t('views.application.applicationForm.dialog.selectSearchMode')">
+            <el-radio-group
+              v-model="form.dataset_setting.search_mode"
+              class="card__radio"
+              @change="changeHandle"
             >
-              <el-form
-                label-position="top"
-                ref="noReferencesformRef"
-                :model="noReferencesform"
-                :rules="noReferencesRules"
-                class="w-full"
-                :hide-required-asterisk="true"
+              <el-card
+                shadow="never"
+                class="mb-16"
+                :class="form.search_mode === 'embedding' ? 'active' : ''"
               >
-                <el-radio-group
-                  v-model="form.dataset_setting.no_references_setting.status"
-                  class="radio-block"
-                >
-                  <el-radio value="ai_questioning">
-                    <p>
-                      {{ $t('views.application.applicationForm.dialog.continueQuestioning') }}
-                    </p>
-                  </el-radio>
-
-                  <el-radio value="designated_answer">
-                    <p>{{ $t('views.application.applicationForm.dialog.provideAnswer') }}</p>
-                    <el-form-item
-                      v-if="
-                        form.dataset_setting.no_references_setting.status === 'designated_answer'
-                      "
-                      prop="designated_answer"
+                <el-radio value="embedding" size="large">
+                  <p class="mb-4">
+                    {{ $t('views.application.applicationForm.dialog.vectorSearch') }}
+                  </p>
+                  <el-text type="info">{{
+                    $t('views.application.applicationForm.dialog.vectorSearchTooltip')
+                  }}</el-text>
+                </el-radio>
+              </el-card>
+              <el-card
+                shadow="never"
+                class="mb-16"
+                :class="form.dataset_setting.search_mode === 'keywords' ? 'active' : ''"
+              >
+                <el-radio value="keywords" size="large">
+                  <p class="mb-4">
+                    {{ $t('views.application.applicationForm.dialog.fullTextSearch') }}
+                  </p>
+                  <el-text type="info">{{
+                    $t('views.application.applicationForm.dialog.fullTextSearchTooltip')
+                  }}</el-text>
+                </el-radio>
+              </el-card>
+              <el-card
+                shadow="never"
+                :class="form.dataset_setting.search_mode === 'blend' ? 'active' : ''"
+              >
+                <el-radio value="blend" size="large">
+                  <p class="mb-4">
+                    {{ $t('views.application.applicationForm.dialog.hybridSearch') }}
+                  </p>
+                  <el-text type="info">{{
+                    $t('views.application.applicationForm.dialog.hybridSearchTooltip')
+                  }}</el-text>
+                </el-radio>
+              </el-card>
+            </el-radio-group>
+          </el-form-item>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item>
+                <template #label>
+                  <div class="flex align-center">
+                    <span class="mr-4">{{
+                      $t('views.application.applicationForm.dialog.similarityThreshold')
+                    }}</span>
+                    <el-tooltip
+                      effect="dark"
+                      :content="$t('views.application.applicationForm.dialog.similarityTooltip')"
+                      placement="right"
                     >
-                      <el-input
-                        v-model="noReferencesform.designated_answer"
-                        :rows="2"
-                        type="textarea"
-                        maxlength="2048"
-                        :placeholder="defaultValue['designated_answer']"
-                      />
-                    </el-form-item>
-                  </el-radio>
-                </el-radio-group>
-              </el-form>
-            </el-form-item>
+                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                    </el-tooltip>
+                  </div>
+                </template>
+                <el-input-number
+                  v-model="form.dataset_setting.similarity"
+                  :min="0"
+                  :max="form.search_mode === 'blend' ? 2 : 1"
+                  :precision="3"
+                  :step="0.1"
+                  :value-on-clear="0"
+                  controls-position="right"
+                  class="w-full"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item :label="$t('views.application.applicationForm.dialog.topReferences')">
+                <el-input-number
+                  v-model="form.dataset_setting.top_n"
+                  :min="1"
+                  :max="10000"
+                  :value-on-clear="1"
+                  controls-position="right"
+                  class="w-full"
+                />
+              </el-form-item>
+            </el-col>
+          </el-row>
 
-            <el-form-item @click.prevent v-if="!isWorkflowType">
-              <template #label>
-                <div class="flex align-center">
-                  <span class="mr-4">{{
-                    $t('views.application.applicationForm.form.problemOptimization.label')
-                  }}</span>
-                </div>
-              </template>
-              <el-switch size="small" v-model="form.problem_optimization"></el-switch>
-            </el-form-item>
-            <el-form-item
-              v-if="form.problem_optimization"
-              :label="$t('views.application.applicationForm.form.prompt.label')"
+          <el-form-item :label="$t('views.application.applicationForm.dialog.maxCharacters')">
+            <el-slider
+              v-model="form.dataset_setting.max_paragraph_char_number"
+              show-input
+              :show-input-controls="false"
+              :min="500"
+              :max="100000"
+              class="custom-slider"
+            />
+          </el-form-item>
+
+          <el-form-item
+            v-if="!isWorkflowType"
+            :label="$t('views.application.applicationForm.dialog.noReferencesAction')"
+          >
+            <el-form
+              label-position="top"
+              ref="noReferencesformRef"
+              :model="noReferencesform"
+              :rules="noReferencesRules"
+              :hide-required-asterisk="true"
+              class="w-full"
             >
-              <el-input
-                v-model="form.problem_optimization_prompt"
-                :rows="6"
-                type="textarea"
-                maxlength="2048"
-                :placeholder="defaultPrompt"
-              />
-            </el-form-item>
-          </el-form>
-        </div>
-      </el-scrollbar>
-    </div>
+              <el-radio-group
+                v-model="form.dataset_setting.no_references_setting.status"
+                class="radio-block"
+              >
+                <el-radio value="ai_questioning">
+                  <p>
+                    {{ $t('views.application.applicationForm.dialog.continueQuestioning') }}
+                  </p>
+                </el-radio>
+
+                <el-radio value="designated_answer">
+                  <p>{{ $t('views.application.applicationForm.dialog.provideAnswer') }}</p>
+                  <el-form-item
+                    v-if="form.dataset_setting.no_references_setting.status === 'designated_answer'"
+                    prop="designated_answer"
+                  >
+                    <el-input
+                      v-model="noReferencesform.designated_answer"
+                      :rows="2"
+                      type="textarea"
+                      maxlength="2048"
+                      :placeholder="defaultValue['designated_answer']"
+                    />
+                  </el-form-item>
+                </el-radio>
+              </el-radio-group>
+            </el-form>
+          </el-form-item>
+
+          <el-form-item @click.prevent v-if="!isWorkflowType">
+            <template #label>
+              <div class="flex align-center">
+                <span class="mr-4">{{
+                  $t('views.application.applicationForm.form.problemOptimization.label')
+                }}</span>
+              </div>
+            </template>
+            <el-switch size="small" v-model="form.problem_optimization"></el-switch>
+          </el-form-item>
+          <el-form-item
+            v-if="form.problem_optimization"
+            :label="$t('views.application.applicationForm.form.prompt.label')"
+          >
+            <el-input
+              v-model="form.problem_optimization_prompt"
+              :rows="6"
+              type="textarea"
+              maxlength="2048"
+              :placeholder="defaultPrompt"
+            />
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-scrollbar>
+
     <template #footer>
       <span class="dialog-footer p-16">
         <el-button @click.prevent="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
@@ -326,6 +324,4 @@ function changeHandle(val: string) {
 
 defineExpose({ open })
 </script>
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>

@@ -585,7 +585,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .setting-preview {
   background: #f5f6f7;
   height: 570px;
@@ -621,11 +621,11 @@ defineExpose({ open })
 
 .display-setting-dialog {
   .el-dialog__header {
-    padding-right: 16px;
+    padding-right: 8px;
   }
 
   .el-dialog__headerbtn {
-    top: 13px;
+    top: 8px;
   }
 }
 </style>

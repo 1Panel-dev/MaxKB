@@ -93,6 +93,7 @@
 .el-dialog__header {
   padding-bottom: 24px;
   font-weight: 500;
+  margin-top: -5px;
 }
 .el-dialog__footer {
   padding-top: 0;
@@ -378,18 +379,7 @@
 
 // radio 一行一个样式
 .radio-block {
-  width: 100%;
-  display: block;
-  .el-radio {
-    align-items: flex-start;
-    height: 100%;
-    width: 100%;
-  }
-  .el-radio__label {
-    width: 100%;
-    margin-top: -8px;
-    line-height: 30px;
-  }
+  display: inline-grid;
 }
 
 // 提示横幅

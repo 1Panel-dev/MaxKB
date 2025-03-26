@@ -158,7 +158,7 @@ defineExpose({ open })
   }
 
   .el-dialog__headerbtn {
-    top: 13px;
+    top: 9px;
   }
   .max-height {
     max-height: calc(100vh - 260px);

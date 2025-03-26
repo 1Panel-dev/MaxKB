@@ -34,7 +34,15 @@
                   >
                     <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
                   </AppAvatar>
-
+                  <AppAvatar
+                    v-if="relatedObject(datasetList, item, 'id')?.type === '2'"
+                    class="mr-8 avatar-purple"
+                    shape="square"
+                    :size="20"
+                    style="background: none"
+                  >
+                    <img src="@/assets/logo_lark.svg" style="width: 100%" alt="" />
+                  </AppAvatar>
                   <AppAvatar v-else class="mr-8 avatar-blue" shape="square" :size="20">
                     <img src="@/assets/icon_document.svg" style="width: 58%" alt="" />
                   </AppAvatar>
@@ -92,7 +100,9 @@
           :label="$t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.label')"
           prop="question_reference_address"
           :rules="{
-            message: $t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.requiredMessage'),
+            message: $t(
+              'views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.requiredMessage'
+            ),
             trigger: 'blur',
             required: true
           }"
@@ -101,7 +111,9 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.placeholder')"
+            :placeholder="
+              $t('views.applicationWorkflow.nodes.searchDatasetNode.searchQuestion.placeholder')
+            "
             v-model="form_data.question_reference_address"
           />
         </el-form-item>

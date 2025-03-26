@@ -4,7 +4,6 @@
     :title="$t('common.paramSetting')"
     v-model="dialogVisible"
     style="width: 550px"
-    class="param-dialog"
     append-to-body
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -21,13 +20,12 @@
 
     <template #footer>
       <div class="flex-between">
-        <span class="p-16">
-          <el-button @click="testPlay" :loading="playLoading">
-            <AppIcon iconName="app-video-play" class="mr-4"></AppIcon>
-            {{ $t('views.application.applicationForm.form.voicePlay.listeningTest') }}
-          </el-button>
-        </span>
-        <span class="dialog-footer p-16">
+        <el-button @click="testPlay" :loading="playLoading">
+          <AppIcon iconName="app-video-play" class="mr-4"></AppIcon>
+          {{ $t('views.application.applicationForm.form.voicePlay.listeningTest') }}
+        </el-button>
+
+        <span class="dialog-footer">
           <el-button @click.prevent="dialogVisible = false">
             {{ $t('common.cancel') }}
           </el-button>

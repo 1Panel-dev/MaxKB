@@ -16,7 +16,7 @@
       require-asterisk-position="right"
     >
       <el-radio-group v-model="form.permission_type" class="radio-block">
-        <el-radio value="PRIVATE" size="large" class="mb-16">
+        <el-radio value="PRIVATE" size="large">
           {{ $t('common.private') }}
           <el-text type="info">{{
             $t('views.template.templateForm.form.permissionType.privateDesc')
