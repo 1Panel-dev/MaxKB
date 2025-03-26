@@ -34,7 +34,7 @@ def _get_user(request):
     user = request.user
     if user is None:
         return {
-            "user_name": gettext('unknown')
+
         }
     return {
         "id": str(user.id),
