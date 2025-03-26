@@ -62,28 +62,95 @@
       class="border-r-4 p-8-12 mb-8 layout-bg lighter"
       v-if="form_data.tool_params[form_data.params_nested]"
     >
-      <DynamicsForm
-        v-if="form_data.mcp_tool"
-        v-model="form_data.tool_params[form_data.params_nested]"
-        :model="form_data.tool_params[form_data.params_nested]"
-        label-position="top"
-        require-asterisk-position="right"
-        :render_data="form_data.tool_form_field"
+      <el-form
         ref="dynamicsFormRef"
+        label-position="top"
+        v-loading="loading"
+        require-asterisk-position="right"
+        :hide-required-asterisk="true"
+        v-if="form_data.mcp_tool"
+        @submit.prevent
       >
-      </DynamicsForm>
+        <el-form-item v-for="item in form_data.tool_form_field" :key="item.field"
+                      :rules="[item.props_info.rules]" :required="item.required">
+          <template #label>
+            <div class="flex-between">
+              <div>
+                <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
+                <span v-if="item.required" class="danger">*</span>
+              </div>
+              <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px"
+                         @change="form_data.tool_params[form_data.params_nested] = {}">
+                <el-option
+                  :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
+                  value="referencing"
+                />
+                <el-option
+                  :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.custom')"
+                  value="custom"
+                />
+              </el-select>
+            </div>
+          </template>
+          <el-input
+            v-if="item.source === 'custom'"
+            v-model="form_data.tool_params[form_data.params_nested][item.label.label]"
+          />
+          <NodeCascader
+            v-else
+            ref="nodeCascaderRef2"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+            v-model="form_data.tool_params[form_data.params_nested][item.label.label]"
+          />
+        </el-form-item>
+      </el-form>
     </div>
     <div class="border-r-4 p-8-12 mb-8 layout-bg lighter" v-else>
-      <DynamicsForm
-        v-if="form_data.mcp_tool"
-        v-model="form_data.tool_params"
-        :model="form_data.tool_params"
-        label-position="top"
-        require-asterisk-position="right"
-        :render_data="form_data.tool_form_field"
+      <el-form
         ref="dynamicsFormRef"
+        label-position="top"
+        v-loading="loading"
+        require-asterisk-position="right"
+        :hide-required-asterisk="true"
+        v-if="form_data.mcp_tool"
+        @submit.prevent
       >
-      </DynamicsForm>
+        <el-form-item v-for="item in form_data.tool_form_field" :key="item.field"
+                      :rules="[item.props_info.rules]" :required="item.required">
+          <template #label>
+            <div class="flex-between">
+              <div>
+                <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
+                <span v-if="item.required" class="danger">*</span>
+              </div>
+              <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px">
+                <el-option
+                  :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
+                  value="referencing"
+                />
+                <el-option
+                  :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.custom')"
+                  value="custom"
+                />
+              </el-select>
+            </div>
+          </template>
+          <el-input
+            v-if="item.source === 'custom'"
+            v-model="form_data.tool_params[item.label.label]"
+          />
+          <NodeCascader
+            v-else
+            ref="nodeCascaderRef2"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+            v-model="form_data.tool_params[item.label.label]"
+          />
+        </el-form-item>
+      </el-form>
     </div>
   </NodeContainer>
 </template>
@@ -94,8 +161,9 @@ import { computed, onMounted, ref } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import applicationApi from '@/api/application'
 import { t } from '@/locales'
-import DynamicsForm from '@/components/dynamics-form/index.vue'
 import { MsgError, MsgSuccess } from '@/utils/message'
+import TooltipLabel from '@/components/dynamics-form/items/label/TooltipLabel.vue'
+import NodeCascader from '@/workflow/common/NodeCascader.vue'
 
 const props = defineProps<{ nodeModel: any }>()
 
@@ -168,9 +236,8 @@ function changeTool() {
             props_info: {}
           },
           input_type: 'TextInput',
+          source: 'custom',
           required: args_schema.properties[item].required?.indexOf(item2) !== -1,
-          default_value: '',
-          show_default_value: false,
           props_info: {
             rules: [
               {
@@ -193,9 +260,8 @@ function changeTool() {
           props_info: {}
         },
         input_type: 'TextInput',
+        source: 'custom',
         required: args_schema.required?.indexOf(item) !== -1,
-        default_value: '',
-        show_default_value: false,
         props_info: {
           rules: [
             {
@@ -211,15 +277,9 @@ function changeTool() {
   //
   if (form_data.value.params_nested) {
     form_data.value.tool_params = { [form_data.value.params_nested]: {} }
-    dynamicsFormRef.value?.render(
-      form_data.value.tool_form_field,
-      form_data.value.tool_params[form_data.value.params_nested]
-    )
   } else {
     form_data.value.tool_params = {}
-    dynamicsFormRef.value?.render(form_data.value.tool_form_field, form_data.value.tool_params)
   }
-  console.log(form_data.value.tool_params)
 }
 
 const form_data = computed({

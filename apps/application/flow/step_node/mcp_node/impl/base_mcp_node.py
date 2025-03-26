@@ -35,6 +35,8 @@ class BaseMcpNode(IMcpNode):
                 tool_params[k] = self.workflow_manage.generate_prompt(tool_params[k])
             if type(v) == dict:
                 self.handle_variables(v)
+            if (type(v) == list) and (type(v[0]) == str):
+                tool_params[k] = self.get_reference_content(v)
         return tool_params
 
     def get_reference_content(self, fields: List[str]):
