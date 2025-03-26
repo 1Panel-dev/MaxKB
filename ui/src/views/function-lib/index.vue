@@ -1,6 +1,6 @@
 <template>
   <div class="function-lib-list-container p-24" style="padding-top: 16px">
-    <el-tabs v-model="functionType">
+    <el-tabs v-model="functionType" @tab-change="selectUserId = ''">
       <el-tab-pane :label="$t('views.functionLib.title')" name="PUBLIC"></el-tab-pane>
       <el-tab-pane :label="$t('views.functionLib.internalTitle')" name="INTERNAL"></el-tab-pane>
     </el-tabs>
