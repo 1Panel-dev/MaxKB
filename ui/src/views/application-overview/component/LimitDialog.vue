@@ -4,6 +4,7 @@
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    width="650"
   >
     <el-form label-position="top" ref="limitFormRef" :model="form">
       <!-- <el-form-item

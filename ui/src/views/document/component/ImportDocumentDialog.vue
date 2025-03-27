@@ -5,6 +5,7 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :destroy-on-close="true"
+    width="550"
   >
     <el-form
       label-position="top"
@@ -44,9 +45,7 @@
       <el-form-item v-if="!isImport">
         <template #label>
           <div class="flex align-center">
-            <span class="mr-4">{{
-              $t('views.document.form.hit_handling_method.label')
-            }}</span>
+            <span class="mr-4">{{ $t('views.document.form.hit_handling_method.label') }}</span>
             <el-tooltip
               effect="dark"
               :content="$t('views.document.form.hit_handling_method.tooltip')"

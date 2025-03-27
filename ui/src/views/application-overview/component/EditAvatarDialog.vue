@@ -4,52 +4,49 @@
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    width="550"
   >
-    <el-radio-group v-model="radioType" class="radio-block-avatar mb-16">
-      <div>
-        <el-radio value="default">
-          <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.default') }}</p>
+    <el-radio-group v-model="radioType" class="radio-block mb-16">
+      <el-radio value="default">
+        <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.default') }}</p>
+        <AppAvatar
+          v-if="detail?.name"
+          :name="detail?.name"
+          pinyinColor
+          class="mt-8 mb-8"
+          shape="square"
+          :size="32"
+        />
+      </el-radio>
+      <el-radio value="custom">
+        <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.customizeUpload') }}</p>
+        <div class="flex mt-8">
           <AppAvatar
-            v-if="detail?.name"
-            :name="detail?.name"
-            pinyinColor
-            class="mt-8 mb-8"
+            v-if="fileURL"
             shape="square"
             :size="32"
-          />
-        </el-radio>
-      </div>
-      <div class="mt-8">
-        <el-radio value="custom">
-          <p>{{ $t('views.applicationOverview.appInfo.EditAvatarDialog.customizeUpload') }}</p>
-          <div class="flex mt-8">
-            <AppAvatar
-              v-if="fileURL"
-              shape="square"
-              :size="32"
-              style="background: none"
-              class="mr-16"
-            >
-              <img :src="fileURL" alt="" />
-            </AppAvatar>
-            <el-upload
-              ref="uploadRef"
-              action="#"
-              :auto-upload="false"
-              :show-file-list="false"
-              accept="image/jpeg, image/png, image/gif"
-              :on-change="onChange"
-            >
-              <el-button icon="Upload" :disabled="radioType !== 'custom'">{{
-                $t('views.applicationOverview.appInfo.EditAvatarDialog.upload')
-              }}</el-button>
-            </el-upload>
-          </div>
-          <div class="el-upload__tip info mt-16">
-            {{ $t('views.applicationOverview.appInfo.EditAvatarDialog.sizeTip') }}
-          </div>
-        </el-radio>
-      </div>
+            style="background: none"
+            class="mr-16"
+          >
+            <img :src="fileURL" alt="" />
+          </AppAvatar>
+          <el-upload
+            ref="uploadRef"
+            action="#"
+            :auto-upload="false"
+            :show-file-list="false"
+            accept="image/jpeg, image/png, image/gif"
+            :on-change="onChange"
+          >
+            <el-button icon="Upload" :disabled="radioType !== 'custom'">{{
+              $t('views.applicationOverview.appInfo.EditAvatarDialog.upload')
+            }}</el-button>
+          </el-upload>
+        </div>
+        <div class="el-upload__tip info mt-8">
+          {{ $t('views.applicationOverview.appInfo.EditAvatarDialog.sizeTip') }}
+        </div>
+      </el-radio>
     </el-radio-group>
     <template #footer>
       <span class="dialog-footer">
