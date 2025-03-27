@@ -899,8 +899,8 @@ msgid "Unsupported platform type"
 msgstr "不支持的平臺類型"
 
 #: apps/xpack/serializers/qr_login/qr_login.py:28
-msgid " Team"
-msgstr "團隊"
+msgid "Team"
+msgstr "團隊成员"
 
 #: apps/xpack/serializers/system_params_serializers.py:63
 msgid "theme"
@@ -1263,7 +1263,7 @@ msgstr "獲取認證配置"
 
 #: apps/xpack/views/auth.py:69 apps/xpack/views/auth.py:70
 msgid "test connection"
-msgstr "連線"
+msgstr "測試連接"
 
 #: apps/xpack/views/auth.py:96 apps/xpack/views/auth.py:97
 #: community/apps/users/views/user.py:173
@@ -3625,7 +3625,7 @@ msgstr "所有用戶權限"
 
 #: community/apps/common/constants/permission_constants.py:63
 msgid "chat"
-msgstr "會話"
+msgstr "對話"
 
 #: community/apps/common/constants/permission_constants.py:63
 msgid "Only has application dialog interface permissions"
@@ -4981,7 +4981,7 @@ msgstr "獲取函數列表"
 #: community/apps/function_lib/views/function_lib_views.py:111
 #: community/apps/function_lib/views/py_lint.py:29
 msgid "Function"
-msgstr "函數"
+msgstr "函數库"
 
 #: community/apps/function_lib/views/function_lib_views.py:43
 #: community/apps/function_lib/views/function_lib_views.py:44
@@ -7221,7 +7221,7 @@ msgstr "創建模型"
 #: community/apps/setting/views/model_apply.py:36
 #: community/apps/setting/views/model_apply.py:46
 msgid "model"
-msgstr "模型"
+msgstr "模型設置"
 
 #: community/apps/setting/views/model.py:42
 #: community/apps/setting/views/model.py:43
@@ -7622,3 +7622,15 @@ msgstr "操作時間"
 
 msgid "System Settings/API Key"
 msgstr "系統設置/API Key"
+
+msgid "Appearance Settings"
+msgstr "外觀設置"
+
+msgid "Conversation Log"
+msgstr "對話日誌"
+
+msgid "login authentication"
+msgstr "登錄驗證"
+
+msgid "Paragraph"
+msgstr "段落"

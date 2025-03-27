@@ -63,7 +63,7 @@ class WebDocument(APIView):
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
-    @log(menu='Knowledge Base/Documentation', operate="Create Web site documents",
+    @log(menu='document', operate="Create Web site documents",
          get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
              get_dataset_operation_object(keywords.get('dataset_id')),
              {'name': f'[{",".join([url for url in r.data.get("source_url_list", [])])}]',
@@ -86,7 +86,7 @@ class QaDocument(APIView):
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
-    @log(menu='Knowledge Base/Documentation', operate="Import QA and create documentation",
+    @log(menu='document', operate="Import QA and create documentation",
          get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
              get_dataset_operation_object(keywords.get('dataset_id')),
              {'name': f'[{",".join([file.name for file in r.FILES.getlist("file")])}]',
@@ -111,7 +111,7 @@ class TableDocument(APIView):
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
-    @log(menu='Knowledge Base/Documentation', operate="Import tables and create documents",
+    @log(menu='document', operate="Import tables and create documents",
          get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
              get_dataset_operation_object(keywords.get('dataset_id')),
              {'name': f'[{",".join([file.name for file in r.FILES.getlist("file")])}]',
@@ -173,7 +173,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Modify document hit processing methods in batches",
+        @log(menu='document', operate="Modify document hit processing methods in batches",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object_batch(r.data.get('id_list'))))
@@ -196,7 +196,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Create documents in batches",
+        @log(menu='document', operate="Create documents in batches",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  {'name': f'[{",".join([document.get("name") for document in r.data])}]',
@@ -216,7 +216,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Batch sync documents",
+        @log(menu='document', operate="Batch sync documents",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object_batch(r.data.get('id_list')))
@@ -235,7 +235,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Delete documents in batches",
+        @log(menu='document', operate="Delete documents in batches",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object_batch(r.data.get('id_list'))))
@@ -255,7 +255,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Synchronize web site types",
+        @log(menu='document', operate="Synchronize web site types",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -279,7 +279,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Cancel task",
+        @log(menu='document', operate="Cancel task",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -304,7 +304,7 @@ class Document(APIView):
             @has_permissions(
                 lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                         dynamic_tag=k.get('dataset_id')))
-            @log(menu='Knowledge Base/Documentation', operate="Cancel tasks in batches",
+            @log(menu='document', operate="Cancel tasks in batches",
                  get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                      get_dataset_operation_object(keywords.get('dataset_id')),
                      get_document_operation_object_batch(r.data.get('id_list'))
@@ -328,7 +328,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Refresh document vector library",
+        @log(menu='document', operate="Refresh document vector library",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -354,7 +354,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Batch refresh document vector library",
+        @log(menu='document', operate="Batch refresh document vector library",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object_batch(r.data.get('id_list'))
@@ -382,7 +382,7 @@ class Document(APIView):
                                     dynamic_tag=k.get('target_dataset_id')),
             compare=CompareConstants.AND
         )
-        @log(menu='Knowledge Base/Documentation', operate="Migrate documents in batches",
+        @log(menu='document', operate="Migrate documents in batches",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object_batch(r.data)
@@ -407,7 +407,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Export document",
+        @log(menu='document', operate="Export document",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -427,7 +427,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Export Zip document",
+        @log(menu='document', operate="Export Zip document",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -464,7 +464,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Modify document",
+        @log(menu='document', operate="Modify document",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -485,7 +485,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Delete document",
+        @log(menu='document', operate="Delete document",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -555,7 +555,7 @@ class Document(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation', operate="Batch generate related documents",
+        @log(menu='document', operate="Batch generate related documents",
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object_batch(r.data.get('document_id_list'))

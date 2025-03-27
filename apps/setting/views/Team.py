@@ -29,7 +29,7 @@ class TeamMember(APIView):
     @swagger_auto_schema(operation_summary=_('Get a list of team members'),
                          operation_id=_('Get a list of team members'),
                          responses=result.get_api_response(get_response_body_api()),
-                         tags=[_('team')])
+                         tags=[_('Team')])
     @has_permissions(PermissionConstants.TEAM_READ)
     def get(self, request: Request):
         return result.success(TeamMemberSerializer(data={'team_id': str(request.user.id)}).list_member())
@@ -38,9 +38,9 @@ class TeamMember(APIView):
     @swagger_auto_schema(operation_summary=_('Add member'),
                          operation_id=_('Add member'),
                          request_body=TeamMemberSerializer().get_request_body_api(),
-                         tags=[_('team')])
+                         tags=[_('Team')])
     @has_permissions(PermissionConstants.TEAM_CREATE)
-    @log(menu='team', operate='Add member',
+    @log(menu='Team', operate='Add member',
          get_operation_object=lambda r, k: {'name': r.data.get('username_or_email')})
     def post(self, request: Request):
         team = TeamMemberSerializer(data={'team_id': str(request.user.id)})
@@ -53,9 +53,9 @@ class TeamMember(APIView):
         @swagger_auto_schema(operation_summary=_('Add members in batches'),
                              operation_id=_('Add members in batches'),
                              request_body=TeamMemberSerializer.get_bach_request_body_api(),
-                             tags=[_('team')])
+                             tags=[_('Team')])
         @has_permissions(PermissionConstants.TEAM_CREATE)
-        @log(menu='team', operate='Add members in batches',
+        @log(menu='Team', operate='Add members in batches',
              get_operation_object=lambda r, k: get_member_operation_object_batch(r.data))
         def post(self, request: Request):
             return result.success(
@@ -68,7 +68,7 @@ class TeamMember(APIView):
         @swagger_auto_schema(operation_summary=_('Get team member permissions'),
                              operation_id=_('Get team member permissions'),
                              manual_parameters=TeamMemberSerializer.Operate.get_request_params_api(),
-                             tags=[_('team')])
+                             tags=[_('Team')])
         @has_permissions(PermissionConstants.TEAM_READ)
         def get(self, request: Request, member_id: str):
             return result.success(TeamMemberSerializer.Operate(
@@ -79,10 +79,10 @@ class TeamMember(APIView):
                              operation_id=_('Update team member permissions'),
                              request_body=UpdateTeamMemberPermissionSerializer().get_request_body_api(),
                              manual_parameters=TeamMemberSerializer.Operate.get_request_params_api(),
-                             tags=[_('team')]
+                             tags=[_('Team')]
                              )
         @has_permissions(PermissionConstants.TEAM_EDIT)
-        @log(menu='team', operate='Update team member permissions',
+        @log(menu='Team', operate='Update team member permissions',
              get_operation_object=lambda r, k: get_member_operation_object(k.get('member_id'))
              )
         def put(self, request: Request, member_id: str):
@@ -93,10 +93,10 @@ class TeamMember(APIView):
         @swagger_auto_schema(operation_summary=_('Remove member'),
                              operation_id=_('Remove member'),
                              manual_parameters=TeamMemberSerializer.Operate.get_request_params_api(),
-                             tags=[_('team')]
+                             tags=[_('Team')]
                              )
         @has_permissions(PermissionConstants.TEAM_DELETE)
-        @log(menu='team', operate='Remove member',
+        @log(menu='Team', operate='Remove member',
              get_operation_object=lambda r, k: get_member_operation_object(k.get('member_id')))
         def delete(self, request: Request, member_id: str):
             return result.success(TeamMemberSerializer.Operate(

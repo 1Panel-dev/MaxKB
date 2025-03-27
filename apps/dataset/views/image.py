@@ -33,7 +33,6 @@ class Image(APIView):
                                                               required=True,
                                                               description=_('Upload image'))],
                          tags=[_('Image')])
-    @log(menu='Image', operate='Upload image')
     def post(self, request: Request):
         return result.success(ImageSerializer(data={'image': request.FILES.get('file')}).upload())
 
