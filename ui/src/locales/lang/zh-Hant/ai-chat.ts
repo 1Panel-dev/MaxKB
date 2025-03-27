@@ -9,6 +9,7 @@ export default {
   userInput: '用戶輸入',
   quote: '引用',
   download: '點擊下載文件',
+  transcribing: '轉文字中',
   passwordValidator: {
     title: '請輸入密碼打開連結',
     errorMessage1: '密碼不能為空',
@@ -24,7 +25,7 @@ export default {
     cancelOppose: '取消反對',
     continue: '繼續',
     stopChat: '停止回答',
-    startChat: '開始對話',
+    startChat: '開始對話'
   },
   tip: {
     error500Message: '抱歉，當前正在維護，無法提供服務，請稍後再試！',
@@ -92,5 +93,5 @@ export default {
     question: '用戶問題',
     optimizationQuestion: '優化後問題'
   },
-  editTitle: '編輯標題',
+  editTitle: '編輯標題'
 }

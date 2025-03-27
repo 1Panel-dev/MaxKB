@@ -529,6 +529,7 @@ const uploadRecording = async (audioBlob: Blob) => {
 
     const formData = new FormData()
     formData.append('file', audioBlob, 'recording.mp3')
+    bus.emit('on:transcribing', true)
     applicationApi
       .postSpeechToText(props.applicationDetails.id as string, formData, localLoading)
       .then((response) => {
@@ -548,6 +549,7 @@ const uploadRecording = async (audioBlob: Blob) => {
         recorderLoading.value = false
         console.error(`${t('chat.uploadFile.errorMessage')}:`, error)
       })
+      .finally(() => bus.emit('on:transcribing', false))
   } catch (error) {
     recorderLoading.value = false
     console.error(`${t('chat.uploadFile.errorMessage')}:`, error)
