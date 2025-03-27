@@ -181,7 +181,13 @@ const render = (
         if (form_data[item.field] !== undefined) {
           if (item.value_field && item.option_list && item.option_list.length > 0) {
             const value_field = item.value_field
-            const find = item.option_list?.find((i) => i[value_field] === form_data[item.field])
+            const find = item.option_list?.find((i) => {
+              if (typeof form_data[item.field] === 'string') {
+                return i[value_field] === form_data[item.field]
+              } else {
+                return form_data[item.field].indexOf([value_field]) === -1
+              }
+            })
             if (find) {
               return { [item.field]: form_data[item.field] }
             }
