@@ -9,6 +9,7 @@ export default {
   userInput: 'User Input',
   quote: 'Quote',
   download: 'Click to Download',
+  transcribing: 'Transcribing',
   passwordValidator: {
     title: 'Enter Password to Access',
     errorMessage1: 'Password cannot be empty',
@@ -24,13 +25,15 @@ export default {
     cancelOppose: 'Undo Dislike',
     continue: 'Continue',
     stopChat: 'Stop Response',
-    startChat: 'Start Chat',
+    startChat: 'Start Chat'
   },
   tip: {
     error500Message: 'Sorry, the service is currently under maintenance. Please try again later!',
     errorIdentifyMessage: 'Unable to verify user identity',
-    errorLimitMessage: 'Sorry, you have reached the maximum number of questions. Please try again tomorrow!',
-    answerMessage: 'Sorry, no relevant content found. Please rephrase your question or provide more details.',
+    errorLimitMessage:
+      'Sorry, you have reached the maximum number of questions. Please try again tomorrow!',
+    answerMessage:
+      'Sorry, no relevant content found. Please rephrase your question or provide more details.',
     stopAnswer: 'Response Stopped',
     answerLoading: 'Generating Response...',
     recorderTip: `<p>This feature requires microphone access. Browsers block recording on insecure pages. Solutions:<br/>
@@ -92,5 +95,5 @@ export default {
     question: 'User Question',
     optimizationQuestion: 'Optimized Question'
   },
-  editTitle: 'Edit Title',
+  editTitle: 'Edit Title'
 }

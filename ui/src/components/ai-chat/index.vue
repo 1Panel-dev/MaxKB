@@ -47,6 +47,12 @@
               :chat-management="ChatManagement"
             ></AnswerContent>
           </template>
+          <TransitionContent
+            v-if="transcribing"
+            :text="t('chat.transcribing')"
+            :type="type"
+            :application="applicationDetails"
+          ></TransitionContent>
         </div>
       </el-scrollbar>
 
@@ -94,14 +100,17 @@ import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/utils'
 import useStore from '@/stores'
 import { isWorkFlow } from '@/utils/application'
-import { debounce, first } from 'lodash'
+import { debounce } from 'lodash'
 import AnswerContent from '@/components/ai-chat/component/answer-content/index.vue'
 import QuestionContent from '@/components/ai-chat/component/question-content/index.vue'
+import TransitionContent from '@/components/ai-chat/component/transition-content/index.vue'
 import ChatInputOperate from '@/components/ai-chat/component/chat-input-operate/index.vue'
 import PrologueContent from '@/components/ai-chat/component/prologue-content/index.vue'
 import UserForm from '@/components/ai-chat/component/user-form/index.vue'
 import Control from '@/components/ai-chat/component/control/index.vue'
 import { t } from '@/locales'
+import bus from '@/bus'
+const transcribing = ref<boolean>(false)
 defineOptions({ name: 'AiChat' })
 const route = useRoute()
 const {
@@ -498,6 +507,9 @@ const handleScroll = () => {
 onMounted(() => {
   window.speechSynthesis.cancel()
   window.sendMessage = sendMessage
+  bus.on('on:transcribing', (status: boolean) => {
+    transcribing.value = status
+  })
 })
 
 onBeforeUnmount(() => {
