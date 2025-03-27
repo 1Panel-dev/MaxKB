@@ -84,7 +84,7 @@
     <div class="create-dataset__footer text-right border-t">
       <el-button @click="router.go(-1)">{{ $t('common.cancel') }}</el-button>
 
-      <el-button @click="submit" type="primary">
+      <el-button @click="submit" type="primary" :disabled="disabled">
         {{ $t('views.document.buttons.import') }}
       </el-button>
     </div>
@@ -174,6 +174,7 @@ const handleAllCheckChange = (checked: boolean) => {
 
 function submit() {
   loading.value = true
+  disabled.value = true
   // 选中的节点的token
   const checkedNodes = treeRef.value?.getCheckedNodes() || []
   const filteredNodes = checkedNodes.filter((node: any) => !node.is_exist)
@@ -188,10 +189,14 @@ function submit() {
     .importLarkDocument(datasetId, newList, loading)
     .then((res) => {
       MsgSuccess(t('views.document.tip.importMessage'))
+      disabled.value = false
       router.go(-1)
     })
     .catch((err) => {
       console.error('Failed to load tree nodes:', err)
+    })
+    .finally(() => {
+      disabled.value = false
     })
   loading.value = false
 }
