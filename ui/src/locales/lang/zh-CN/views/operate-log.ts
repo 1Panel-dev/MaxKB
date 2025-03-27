@@ -5,7 +5,8 @@ export default {
       label: '操作菜单'
     },
     operate: {
-      label: '操作'
+      label: '操作',
+      detail: '操作详情'
     },
     user: {
       label: '操作用户'
