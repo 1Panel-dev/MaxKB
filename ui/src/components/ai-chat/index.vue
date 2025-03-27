@@ -527,6 +527,11 @@ onMounted(() => {
   window.sendMessage = sendMessage
   bus.on('on:transcribing', (status: boolean) => {
     transcribing.value = status
+    nextTick(() => {
+      if (scorll.value) {
+        scrollDiv.value.setScrollTop(getMaxHeight())
+      }
+    })
   })
 })
 
