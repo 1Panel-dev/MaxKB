@@ -119,17 +119,6 @@ def mcp_response_generator(chat_model, message_list, mcp_servers):
 async def anext_async(agen):
     return await agen.__anext__()
 
-async def _get_mcp_response(chat_model, message_list, mcp_servers):
-    async with MultiServerMCPClient(json.loads(mcp_servers)) as client:
-        agent = create_react_agent(chat_model, client.get_tools())
-        response = agent.astream({"messages": message_list}, stream_mode='messages')
-        result = []
-        async for chunk in response:
-            # if isinstance(chunk[0], ToolMessage):
-            #     print(chunk[0].content)
-            if isinstance(chunk[0], AIMessageChunk):
-                result.append(chunk[0])
-        return result
 
 def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
     """
