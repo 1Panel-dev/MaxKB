@@ -65,6 +65,9 @@ import { useRoute } from 'vue-router'
 import { MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
 const route = useRoute()
+const {
+  params: { accessToken }
+} = route
 const props = defineProps<{
   application: any
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
@@ -78,6 +81,8 @@ const inputFieldList = ref<FormField[]>([])
 const apiInputFieldList = ref<FormField[]>([])
 const inputFieldConfig = ref({ title: t('chat.userInput') })
 const showUserInput = ref(true)
+const firstMounted = ref(false)
+
 const emit = defineEmits(['update:api_form_data', 'update:form_data', 'confirm', 'cancel'])
 
 const api_form_data_context = computed({
@@ -100,7 +105,7 @@ const form_data_context = computed({
 
 watch(
   () => props.application,
-  () => {
+  (data) => {
     handleInputFieldList()
   }
 )
@@ -352,15 +357,15 @@ const decodeQuery = (query: string) => {
   }
 }
 const confirmHandle = () => {
-  if (checkInputParam()) {
-    emit('confirm')
-  }
+  localStorage.setItem(`${accessToken}userForm`, JSON.stringify(form_data_context.value))
+  emit('confirm')
 }
 const cancelHandle = () => {
   emit('cancel')
 }
 defineExpose({ checkInputParam })
 onMounted(() => {
+  firstMounted.value = true
   handleInputFieldList()
 })
 </script>
