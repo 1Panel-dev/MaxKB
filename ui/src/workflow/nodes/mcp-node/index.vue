@@ -33,7 +33,7 @@
               </el-button>
             </div>
           </template>
-          <el-select v-model="form_data.mcp_tool" @change="changeTool">
+          <el-select v-model="form_data.mcp_tool" @change="changeTool" filterable>
             <el-option
               v-for="item in form_data.mcp_tools"
               :key="item.value"
@@ -72,15 +72,18 @@
         v-if="form_data.mcp_tool"
         @submit.prevent
       >
-        <el-form-item v-for="item in form_data.tool_form_field" :key="item.field"
-                      :rules="[item.props_info.rules]" :required="item.required">
+        <el-form-item
+          v-for="item in form_data.tool_form_field" :key="item.field"
+          :required="item.required"
+        >
           <template #label>
             <div class="flex-between">
               <div>
                 <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
                 <span v-if="item.required" class="danger">*</span>
               </div>
-              <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px"
+              <el-select :teleported="false" v-model="item.source" size="small"
+                         style="width: 85px"
                          @change="form_data.tool_params[form_data.params_nested] = {}">
                 <el-option
                   :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
@@ -108,7 +111,10 @@
         </el-form-item>
       </el-form>
     </div>
-    <div class="border-r-4 p-8-12 mb-8 layout-bg lighter" v-else>
+    <div
+      v-else
+      class="border-r-4 p-8-12 mb-8 layout-bg lighter"
+    >
       <el-form
         ref="dynamicsFormRef"
         label-position="top"
@@ -118,15 +124,18 @@
         v-if="form_data.mcp_tool"
         @submit.prevent
       >
-        <el-form-item v-for="item in form_data.tool_form_field" :key="item.field"
-                      :rules="[item.props_info.rules]" :required="item.required">
+        <el-form-item
+          v-for="item in form_data.tool_form_field" :key="item.field"
+          :required="item.required"
+        >
           <template #label>
             <div class="flex-between">
               <div>
                 <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
                 <span v-if="item.required" class="danger">*</span>
               </div>
-              <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px">
+              <el-select :teleported="false" v-model="item.source" size="small"
+                         style="width: 85px">
                 <el-option
                   :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
                   value="referencing"
@@ -307,7 +316,24 @@ const form_data = computed({
 const replyNodeFormRef = ref()
 
 const validate = async () => {
-  let ps = [replyNodeFormRef.value?.validate(), dynamicsFormRef.value?.validate()]
+  // 对动态表单，只验证必填字段
+  if (dynamicsFormRef.value) {
+    const requiredFields = form_data.value.tool_form_field
+      .filter((item: any) => item.required)
+      .map((item: any) => item.label.label)
+
+    if (requiredFields.length > 0) {
+      for (const item of requiredFields) {
+        if (!form_data.value.tool_params[form_data.value.params_nested][item]) {
+          return Promise.reject({
+            node: props.nodeModel,
+            errMessage: item + t('dynamicsForm.tip.requiredMessage')
+          })
+        }
+      }
+    }
+  }
+  let ps = [replyNodeFormRef.value?.validate()]
   return Promise.all(ps).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
