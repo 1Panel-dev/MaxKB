@@ -14,7 +14,7 @@ class BaiLianChatModel(MaxKBBaseModel, BaseChatOpenAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
-        if 'qwen-omni-turbo' in model_name:
+        if 'qwen-omni-turbo' in model_name or 'qwq-plus' in model_name:
             optional_params['streaming'] = True
         return BaiLianChatModel(
             model=model_name,
