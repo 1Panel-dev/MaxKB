@@ -1,6 +1,12 @@
 <template>
   <div class="function-lib-list-container p-24" style="padding-top: 16px">
-    <el-tabs v-model="functionType" @tab-change="selectUserId = ''">
+    <el-tabs
+      v-model="functionType"
+      @tab-change="
+      tabChangeHandle
+    
+      "
+    >
       <el-tab-pane :label="$t('views.functionLib.title')" name="PUBLIC"></el-tab-pane>
       <el-tab-pane :label="$t('views.functionLib.internalTitle')" name="INTERNAL"></el-tab-pane>
     </el-tabs>
@@ -280,11 +286,6 @@ import { isAppIcon } from '@/utils/application'
 import InfiniteScroll from '@/components/infinite-scroll/index.vue'
 import CardBox from '@/components/card-box/index.vue'
 import AddInternalFunctionDialog from '@/views/function-lib/component/AddInternalFunctionDialog.vue'
-// const internalDesc: Record<string, any> = import.meta.glob('/fx/*/detail.md', {
-//   eager: true,
-//   as: 'raw'
-// })
-// console.log(internalDesc)
 
 const { user } = useStore()
 
@@ -330,6 +331,11 @@ watch(
   },
   { immediate: true }
 )
+
+function tabChangeHandle() {
+  selectUserId.value = 'all'
+  searchValue.value = ''
+}
 
 const canEdit = (row: any) => {
   return user.userInfo?.id === row?.user_id
@@ -404,10 +410,12 @@ async function changeState(bool: Boolean, row: any) {
       })
   } else {
     const res = await functionLibApi.getFunctionLibById(row.id, changeStateloading)
-    if (!res.data.init_params &&
+    if (
+      !res.data.init_params &&
       res.data.init_field_list &&
       res.data.init_field_list.length > 0 &&
-      res.data.init_field_list.filter((item: any) => item.default_value).length !== res.data.init_field_list.length
+      res.data.init_field_list.filter((item: any) => item.default_value).length !==
+        res.data.init_field_list.length
     ) {
       InitParamDrawerRef.value.open(res.data, bool)
       row.is_active = false

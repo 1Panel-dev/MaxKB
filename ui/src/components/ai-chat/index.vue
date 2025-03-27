@@ -196,13 +196,27 @@ const toggleUserInput = () => {
 }
 
 function UserFormConfirm() {
-  firsUserInput.value = false
-  showUserInput.value = false
+  if (userFormRef.value?.checkInputParam()) {
+    firsUserInput.value = false
+    showUserInput.value = false
+  }
 }
 
 function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
   if (!userFormRef.value?.checkInputParam()) {
+    if (isUserInput.value) {
+      showUserInput.value = true
+    }
     return
+  } else {
+    let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
+    const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
+      result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
+        ? userFormData[key]
+        : form_data.value[key]
+      return result
+    }, {})
+    localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
   }
   if (!loading.value && props.applicationDetails?.name) {
     handleDebounceClick(val, other_params_data, chat)
@@ -505,6 +519,10 @@ const handleScroll = () => {
 }
 
 onMounted(() => {
+  if (isUserInput.value && localStorage.getItem(`${accessToken}userForm`)) {
+    let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
+    form_data.value = userFormData
+  }
   window.speechSynthesis.cancel()
   window.sendMessage = sendMessage
   bus.on('on:transcribing', (status: boolean) => {

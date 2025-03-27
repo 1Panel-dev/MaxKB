@@ -780,6 +780,4 @@ onMounted(() => {
     }
   }
 }
-.chat-pc {
-}
 </style>
