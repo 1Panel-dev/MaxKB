@@ -53,9 +53,7 @@
     </el-radio-group>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false">
-          {{ $t('common.cancel') }}</el-button
-        >
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }}</el-button>
         <el-button type="primary" @click="submit" :loading="loading">
           {{ $t('common.save') }}</el-button
         >
@@ -139,19 +137,4 @@ function submit() {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scoped>
-.radio-block-avatar {
-  width: 100%;
-  display: block;
-  .el-radio {
-    align-items: flex-start;
-    height: 100%;
-    width: 100%;
-  }
-  .el-radio__label {
-    width: 100%;
-    margin-top: -8px;
-    line-height: 30px;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

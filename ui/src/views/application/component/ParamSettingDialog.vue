@@ -129,7 +129,7 @@
             >
               <el-radio-group
                 v-model="form.dataset_setting.no_references_setting.status"
-                class="radio-block"
+                class="radio-block-avatar"
               >
                 <el-radio value="ai_questioning">
                   <p>

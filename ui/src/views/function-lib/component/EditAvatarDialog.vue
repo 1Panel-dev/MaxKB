@@ -125,18 +125,5 @@ function submit() {
 defineExpose({ open })
 </script>
 <style lang="scss" scoped>
-.radio-block-avatar {
-  width: 100%;
-  display: block;
-  .el-radio {
-    align-items: flex-start;
-    height: 100%;
-    width: 100%;
-  }
-  .el-radio__label {
-    width: 100%;
-    margin-top: -8px;
-    line-height: 30px;
-  }
-}
+
 </style>

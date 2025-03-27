@@ -381,6 +381,21 @@
 .radio-block {
   display: inline-grid;
 }
+// radio 一行一个样式 有输入框 上传头像的内容
+.radio-block-avatar {
+  width: 100%;
+  display: block;
+  .el-radio {
+    align-items: flex-start;
+    height: 100%;
+    width: 100%;
+  }
+  .el-radio__label {
+    width: 100%;
+    margin-top: -8px;
+    line-height: 30px;
+  }
+}
 
 // 提示横幅
 .el-alert__title {
