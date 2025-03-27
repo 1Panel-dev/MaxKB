@@ -405,7 +405,7 @@ async function changeState(bool: Boolean, row: any) {
   } else {
     const res = await functionLibApi.getFunctionLibById(row.id, changeStateloading)
     if (!res.data.init_params && res.data.init_field_list && res.data.init_field_list.length > 0) {
-      InitParamDrawerRef.value.open(res.data)
+      InitParamDrawerRef.value.open(res.data, bool)
       row.is_active = false
       return
     }

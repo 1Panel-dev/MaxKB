@@ -48,9 +48,6 @@ const emit = defineEmits(['refresh'])
 const dynamicsFormRef = ref()
 const loading = ref(false)
 const debugVisible = ref(false)
-const showResult = ref(false)
-const isSuccess = ref(false)
-const result = ref('')
 
 const form = ref<any>({
   init_params: {}
@@ -58,11 +55,9 @@ const form = ref<any>({
 
 watch(debugVisible, (bool) => {
   if (!bool) {
-    showResult.value = false
-    isSuccess.value = false
-    result.value = ''
     form.value = {
-      init_params: {}
+      init_params: {},
+      is_active: false
     }
   }
 })
@@ -78,9 +73,10 @@ const submit = async () => {
   })
 }
 
-const open = (data: any) => {
+const open = (data: any, is_active: boolean) => {
   if (data) {
     form.value = cloneDeep(data)
+    form.value.is_active = is_active
   }
   const init_params = form.value.init_field_list
     .map((item: any) => {
