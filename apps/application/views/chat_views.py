@@ -179,7 +179,7 @@ class ChatView(APIView):
                                             dynamic_tag=keywords.get('application_id'))],
             compare=CompareConstants.AND),
             compare=CompareConstants.AND)
-        @log(menu='Application/Conversation Log', operate="Delete a conversation",
+        @log(menu='Conversation Log', operate="Delete a conversation",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
         def delete(self, request: Request, application_id: str, chat_id: str):
             return result.success(
@@ -222,7 +222,7 @@ class ChatView(APIView):
                                                 dynamic_tag=keywords.get('application_id'))],
                 compare=CompareConstants.AND),
                 compare=CompareConstants.AND)
-            @log(menu='Application/Conversation Log', operate="Client deletes conversation",
+            @log(menu='Conversation Log', operate="Client deletes conversation",
                  get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
             def delete(self, request: Request, application_id: str, chat_id: str):
                 return result.success(
@@ -241,7 +241,7 @@ class ChatView(APIView):
                                                 dynamic_tag=keywords.get('application_id'))],
                 compare=CompareConstants.AND),
                 compare=CompareConstants.AND)
-            @log(menu='Application/Conversation Log', operate="Client modifies dialogue summary",
+            @log(menu='Conversation Log', operate="Client modifies dialogue summary",
                  get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
             def put(self, request: Request, application_id: str, chat_id: str):
                 return result.success(
@@ -351,7 +351,7 @@ class ChatView(APIView):
                                [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                                dynamic_tag=keywords.get('application_id'))])
             )
-            @log(menu='Application/Conversation Log', operate="Like, Dislike",
+            @log(menu='Conversation Log', operate="Like, Dislike",
                  get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
             def put(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
                 return result.success(ChatRecordSerializer.Vote(
@@ -400,7 +400,7 @@ class ChatView(APIView):
                                                                                      'dataset_id'))],
                                                  compare=CompareConstants.AND
                                                  ), compare=CompareConstants.AND)
-            @log(menu='Application/Conversation Log', operate="Annotation",
+            @log(menu='Conversation Log', operate="Annotation",
                  get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
             def put(self, request: Request, application_id: str, chat_id: str, chat_record_id: str, dataset_id: str,
                     document_id: str):
@@ -427,7 +427,7 @@ class ChatView(APIView):
                                                                                      'dataset_id'))],
                                                  compare=CompareConstants.AND
                                                  ), compare=CompareConstants.AND)
-            @log(menu='Application/Conversation Log', operate="Add to Knowledge Base",
+            @log(menu='Conversation Log', operate="Add to Knowledge Base",
                  get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
             def post(self, request: Request, application_id: str, dataset_id: str):
                 return result.success(ChatRecordSerializer.PostImprove().post_improve(request.data))
@@ -454,7 +454,7 @@ class ChatView(APIView):
                                                                                          'dataset_id'))],
                                                      compare=CompareConstants.AND
                                                      ), compare=CompareConstants.AND)
-                @log(menu='Application/Conversation Log', operate="Delete a Annotation",
+                @log(menu='Conversation Log', operate="Delete a Annotation",
                      get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
                 def delete(self, request: Request, application_id: str, chat_id: str, chat_record_id: str,
                            dataset_id: str,

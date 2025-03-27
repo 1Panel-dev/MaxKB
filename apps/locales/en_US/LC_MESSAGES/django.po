@@ -891,8 +891,8 @@ msgid "Unsupported platform type"
 msgstr ""
 
 #: apps/xpack/serializers/qr_login/qr_login.py:28
-msgid " Team"
-msgstr ""
+msgid "Team"
+msgstr "Team Member"
 
 #: apps/xpack/serializers/system_params_serializers.py:63
 msgid "theme"
@@ -4935,7 +4935,7 @@ msgstr ""
 #: community/apps/function_lib/views/function_lib_views.py:111
 #: community/apps/function_lib/views/py_lint.py:29
 msgid "Function"
-msgstr ""
+msgstr "Function Library"
 
 #: community/apps/function_lib/views/function_lib_views.py:43
 #: community/apps/function_lib/views/function_lib_views.py:44
@@ -7054,7 +7054,7 @@ msgstr ""
 #: community/apps/setting/views/model_apply.py:36
 #: community/apps/setting/views/model_apply.py:46
 msgid "model"
-msgstr "Model"
+msgstr "Model Settings"
 
 #: community/apps/setting/views/model.py:42
 #: community/apps/setting/views/model.py:43
@@ -7449,3 +7449,15 @@ msgstr "Operate time"
 
 msgid "System Settings/API Key"
 msgstr "System Settings/API Key"
+
+msgid "Appearance Settings"
+msgstr "Appearance Settings"
+
+msgid "Conversation Log"
+msgstr ""
+
+msgid "login authentication"
+msgstr "Login Authentication"
+
+msgid "Paragraph"
+msgstr ""

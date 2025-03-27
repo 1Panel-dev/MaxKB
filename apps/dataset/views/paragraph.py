@@ -54,7 +54,7 @@ class Paragraph(APIView):
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
-    @log(menu='Knowledge Base/Documentation/Paragraph', operate='Create Paragraph',
+    @log(menu='Paragraph', operate='Create Paragraph',
          get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
              get_dataset_operation_object(keywords.get('dataset_id')),
              get_document_operation_object(keywords.get('document_id'))
@@ -77,7 +77,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation/Paragraph', operate='Add associated questions',
+        @log(menu='Paragraph', operate='Add associated questions',
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -115,7 +115,7 @@ class Paragraph(APIView):
             @has_permissions(
                 lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                         dynamic_tag=k.get('dataset_id')))
-            @log(menu='Knowledge Base/Documentation/Paragraph', operate='Disassociation issue',
+            @log(menu='Paragraph', operate='Disassociation issue',
                  get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                      get_dataset_operation_object(keywords.get('dataset_id')),
                      get_document_operation_object(keywords.get('document_id'))
@@ -138,7 +138,7 @@ class Paragraph(APIView):
             @has_permissions(
                 lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                         dynamic_tag=k.get('dataset_id')))
-            @log(menu='Knowledge Base/Documentation/Paragraph', operate='Related questions',
+            @log(menu='Paragraph', operate='Related questions',
                  get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                      get_dataset_operation_object(keywords.get('dataset_id')),
                      get_document_operation_object(keywords.get('document_id'))
@@ -162,7 +162,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation/Paragraph', operate='Modify paragraph data',
+        @log(menu='Paragraph', operate='Modify paragraph data',
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -198,7 +198,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation/Paragraph', operate='Delete paragraph',
+        @log(menu='Paragraph', operate='Delete paragraph',
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -224,7 +224,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation/Paragraph', operate='Delete paragraphs in batches',
+        @log(menu='Paragraph', operate='Delete paragraphs in batches',
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -252,7 +252,7 @@ class Paragraph(APIView):
                                     dynamic_tag=k.get('target_dataset_id')),
             compare=CompareConstants.AND
         )
-        @log(menu='Knowledge Base/Documentation/Paragraph', operate='Migrate paragraphs in batches',
+        @log(menu='Paragraph', operate='Migrate paragraphs in batches',
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))
@@ -293,7 +293,7 @@ class Paragraph(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation/Paragraph', operate='Batch generate related',
+        @log(menu='Paragraph', operate='Batch generate related',
              get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
                  get_dataset_operation_object(keywords.get('dataset_id')),
                  get_document_operation_object(keywords.get('document_id'))

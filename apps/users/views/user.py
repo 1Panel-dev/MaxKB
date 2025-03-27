@@ -63,7 +63,7 @@ class User(APIView):
                              operation_id=_("Get user list"),
                              manual_parameters=UserSerializer.Query.get_request_params_api(),
                              responses=result.get_api_array_response(UserSerializer.Query.get_response_body_api()),
-                             tags=[_("User")])
+                             tags=[_("User management")])
         @has_permissions(PermissionConstants.USER_READ)
         def get(self, request: Request):
             return result.success(
@@ -85,8 +85,8 @@ class SwitchUserLanguageView(APIView):
                              }
                          ),
                          responses=RePasswordSerializer().get_response_body_api(),
-                         tags=[_("User")])
-    @log(menu='User', operate='Switch Language',
+                         tags=[_("User management")])
+    @log(menu='User management', operate='Switch Language',
          get_operation_object=lambda r, k: {'name': r.user.username})
     def post(self, request: Request):
         data = {**request.data, 'user_id': request.user.id}
@@ -112,8 +112,8 @@ class ResetCurrentUserPasswordView(APIView):
                              }
                          ),
                          responses=RePasswordSerializer().get_response_body_api(),
-                         tags=[_("User")])
-    @log(menu='User', operate='Modify current user password',
+                         tags=[_("User management")])
+    @log(menu='User management', operate='Modify current user password',
          get_operation_object=lambda r, k: {'name': r.user.username},
          get_details=get_re_password_details)
     def post(self, request: Request):
@@ -134,8 +134,8 @@ class SendEmailToCurrentUserView(APIView):
     @swagger_auto_schema(operation_summary=_("Send email to current user"),
                          operation_id=_("Send email to current user"),
                          responses=SendEmailSerializer().get_response_body_api(),
-                         tags=[_("User")])
-    @log(menu='User', operate='Send email to current user',
+                         tags=[_("User management")])
+    @log(menu='User management', operate='Send email to current user',
          get_operation_object=lambda r, k: {'name': r.user.username})
     def post(self, request: Request):
         serializer_obj = SendEmailSerializer(data={'email': request.user.email, 'type': "reset_password"})
@@ -151,8 +151,8 @@ class Logout(APIView):
     @swagger_auto_schema(operation_summary=_("Sign out"),
                          operation_id=_("Sign out"),
                          responses=SendEmailSerializer().get_response_body_api(),
-                         tags=[_("User")])
-    @log(menu='User', operate='Sign out',
+                         tags=[_("User management")])
+    @log(menu='User management', operate='Sign out',
          get_operation_object=lambda r, k: {'name': r.user.username})
     def post(self, request: Request):
         token_cache.delete(request.META.get('HTTP_AUTHORIZATION'))
@@ -178,8 +178,8 @@ class Login(APIView):
                          request_body=LoginSerializer().get_request_body_api(),
                          responses=LoginSerializer().get_response_body_api(),
                          security=[],
-                         tags=[_("User")])
-    @log(menu='User', operate='Log in', get_user=lambda r: {'username': r.data.get('username', None)},
+                         tags=[_("User management")])
+    @log(menu='User management', operate='Log in', get_user=lambda r: {'username': r.data.get('username', None)},
          get_details=_get_details,
          get_operation_object=lambda r, k: {'name': r.data.get('username')})
     def post(self, request: Request):
@@ -200,8 +200,8 @@ class Register(APIView):
                          request_body=RegisterSerializer().get_request_body_api(),
                          responses=RegisterSerializer().get_response_body_api(),
                          security=[],
-                         tags=[_("User")])
-    @log(menu='User', operate='User registration',
+                         tags=[_("User management")])
+    @log(menu='User management', operate='User registration',
          get_operation_object=lambda r, k: {'name': r.data.get('username', None)},
          get_user=lambda r: {'user_name': r.data.get('username', None)})
     def post(self, request: Request):
@@ -220,8 +220,8 @@ class RePasswordView(APIView):
                          request_body=RePasswordSerializer().get_request_body_api(),
                          responses=RePasswordSerializer().get_response_body_api(),
                          security=[],
-                         tags=[_("User")])
-    @log(menu='User', operate='Change password',
+                         tags=[_("User management")])
+    @log(menu='User management', operate='Change password',
          get_operation_object=lambda r, k: {'name': r.data.get('email', None)},
          get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)},
          get_details=get_re_password_details)
@@ -239,8 +239,8 @@ class CheckCode(APIView):
                          request_body=CheckCodeSerializer().get_request_body_api(),
                          responses=CheckCodeSerializer().get_response_body_api(),
                          security=[],
-                         tags=[_("User")])
-    @log(menu='User', operate='Check whether the verification code is correct',
+                         tags=[_("User management")])
+    @log(menu='User management', operate='Check whether the verification code is correct',
          get_operation_object=lambda r, k: {'name': r.data.get('email', None)},
          get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)})
     def post(self, request: Request):
@@ -255,8 +255,8 @@ class SendEmail(APIView):
                          request_body=SendEmailSerializer().get_request_body_api(),
                          responses=SendEmailSerializer().get_response_body_api(),
                          security=[],
-                         tags=[_("User")])
-    @log(menu='User', operate='Send email',
+                         tags=[_("User management")])
+    @log(menu='User management', operate='Send email',
          get_operation_object=lambda r, k: {'name': r.data.get('email', None)},
          get_user=lambda r: {'user_name': None, 'email': r.data.get('email', None)})
     def post(self, request: Request):
@@ -279,7 +279,7 @@ class UserManage(APIView):
         [RoleConstants.ADMIN],
         [PermissionConstants.USER_READ],
         compare=CompareConstants.AND))
-    @log(menu='User', operate='Add user',
+    @log(menu='User management', operate='Add user',
          get_operation_object=lambda r, k: {'name': r.data.get('username', None)})
     def post(self, request: Request):
         return result.success(UserManageSerializer().save(request.data))
@@ -318,7 +318,7 @@ class UserManage(APIView):
             [RoleConstants.ADMIN],
             [PermissionConstants.USER_READ],
             compare=CompareConstants.AND))
-        @log(menu='User', operate='Change password',
+        @log(menu='User management', operate='Change password',
              get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')),
              get_details=get_re_password_details)
         def put(self, request: Request, user_id):
@@ -338,7 +338,7 @@ class UserManage(APIView):
             [RoleConstants.ADMIN],
             [PermissionConstants.USER_READ],
             compare=CompareConstants.AND))
-        @log(menu='User', operate='Delete user',
+        @log(menu='User management', operate='Delete user',
              get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
         def delete(self, request: Request, user_id):
             return result.success(UserManageSerializer.Operate(data={'id': user_id}).delete(with_valid=True))
@@ -369,7 +369,7 @@ class UserManage(APIView):
             [RoleConstants.ADMIN],
             [PermissionConstants.USER_READ],
             compare=CompareConstants.AND))
-        @log(menu='User', operate='Update user information',
+        @log(menu='User management', operate='Update user information',
              get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
         def put(self, request: Request, user_id):
             return result.success(
@@ -383,7 +383,7 @@ class UserListView(APIView):
                          operation_id=_("Get user list by type"),
                          manual_parameters=UserSerializer.Query.get_request_params_api(),
                          responses=result.get_api_array_response(UserSerializer.Query.get_response_body_api()),
-                         tags=[_("User")])
+                         tags=[_("User management")])
     @has_permissions(PermissionConstants.USER_READ)
     def get(self, request: Request, type):
         return result.success(UserSerializer().listByType(type, request.user.id))

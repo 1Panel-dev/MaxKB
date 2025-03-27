@@ -52,7 +52,7 @@ class Problem(APIView):
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
-    @log(menu='Knowledge Base/Documentation/Paragraph/Question', operate='Create question',
+    @log(menu='problem', operate='Create question',
          get_operation_object=lambda r, keywords: get_dataset_operation_object(keywords.get('dataset_id'))
          )
     def post(self, request: Request, dataset_id: str):
@@ -91,7 +91,7 @@ class Problem(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation/Paragraph/Question', operate='Batch deletion issues',
+        @log(menu='problem', operate='Batch deletion issues',
              get_operation_object=lambda r, keywords: get_dataset_operation_object(keywords.get('dataset_id')))
         def delete(self, request: Request, dataset_id: str):
             return result.success(
@@ -107,7 +107,7 @@ class Problem(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation/Paragraph/Question', operate='Batch associated paragraphs',
+        @log(menu='problem', operate='Batch associated paragraphs',
              get_operation_object=lambda r, keywords: get_dataset_operation_object(keywords.get('dataset_id')))
         def post(self, request: Request, dataset_id: str):
             return result.success(
@@ -125,7 +125,7 @@ class Problem(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation/Paragraph/Question', operate='Delete question',
+        @log(menu='problem', operate='Delete question',
              get_operation_object=lambda r, keywords: get_dataset_operation_object(keywords.get('dataset_id')))
         def delete(self, request: Request, dataset_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
@@ -142,7 +142,7 @@ class Problem(APIView):
         @has_permissions(
             lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                     dynamic_tag=k.get('dataset_id')))
-        @log(menu='Knowledge Base/Documentation/Paragraph/Question', operate='Modify question',
+        @log(menu='problem', operate='Modify question',
              get_operation_object=lambda r, keywords: get_dataset_operation_object(keywords.get('dataset_id')))
         def put(self, request: Request, dataset_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
