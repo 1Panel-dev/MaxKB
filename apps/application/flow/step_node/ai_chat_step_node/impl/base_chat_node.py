@@ -27,6 +27,18 @@ from setting.models import Model
 from setting.models_provider import get_model_credential
 from setting.models_provider.tools import get_model_instance_by_model_user_id
 
+tool_message_template = """
+<details>
+    <summary>
+        <strong>Called MCP Tool: <em>%s</em></strong>
+    </summary>
+
+```json
+%s
+```
+</details>
+
+"""
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
                    reasoning_content: str):
@@ -96,8 +108,10 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers):
         agent = create_react_agent(chat_model, client.get_tools())
         response = agent.astream({"messages": message_list}, stream_mode='messages')
         async for chunk in response:
-            # if isinstance(chunk[0], ToolMessage):
-            #     print(chunk[0])
+            if isinstance(chunk[0], ToolMessage):
+                content = tool_message_template % (chunk[0].name, chunk[0].content)
+                chunk[0].content = content
+                yield chunk[0]
             if isinstance(chunk[0], AIMessageChunk):
                 yield chunk[0]
 
