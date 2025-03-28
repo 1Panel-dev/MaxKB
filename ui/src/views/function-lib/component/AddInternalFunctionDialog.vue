@@ -23,7 +23,7 @@
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(fieldFormRef)" :loading="loading">
-          {{ isEdit ? $t('common.save') : $t('common.add') }}
+          {{ $t('common.add') }}
         </el-button>
       </span>
     </template>
@@ -34,14 +34,11 @@ import { reactive, ref, watch } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { t } from '@/locales'
-import functionLibApi from '@/api/function-lib'
-import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits(['refresh'])
 
 const fieldFormRef = ref()
 const loading = ref<boolean>(false)
-const isEdit = ref(false)
 
 const form = ref<any>({
   name: ''
@@ -64,14 +61,12 @@ watch(dialogVisible, (bool) => {
     form.value = {
       name: ''
     }
-    isEdit.value = false
   }
 })
 
 const open = (row: any) => {
   if (row) {
     form.value = cloneDeep(row)
-    isEdit.value = true
   }
 
   dialogVisible.value = true
