@@ -63,13 +63,55 @@
                         src="@/assets/fileType/docx-icon.svg"
                         alt=""
                         height="22"
-                        v-else-if="data.type === 'docx'"
+                        v-else-if="data.type === 'docx' || data.name.endsWith('.docx')"
                       />
                       <img
                         src="@/assets/fileType/xlsx-icon.svg"
                         alt=""
                         height="22"
-                        v-else-if="data.type === 'sheet'"
+                        v-else-if="data.type === 'sheet' || data.name.endsWith('.xlsx')"
+                      />
+                      <img
+                        src="@/assets/fileType/xls-icon.svg"
+                        alt=""
+                        height="22"
+                        v-else-if="data.name.endsWith('xls')"
+                      />
+                      <img
+                        src="@/assets/fileType/csv-icon.svg"
+                        alt=""
+                        height="22"
+                        v-else-if="data.name.endsWith('csv')"
+                      />
+                      <img
+                        src="@/assets/fileType/pdf-icon.svg"
+                        alt=""
+                        height="22"
+                        v-else-if="data.name.endsWith('.pdf')"
+                      />
+                      <img
+                        src="@/assets/fileType/html-icon.svg"
+                        alt=""
+                        height="22"
+                        v-else-if="data.name.endsWith('.html')"
+                      />
+                      <img
+                        src="@/assets/fileType/txt-icon.svg"
+                        alt=""
+                        height="22"
+                        v-else-if="data.name.endsWith('.txt')"
+                      />
+                      <img
+                        src="@/assets/fileType/zip-icon.svg"
+                        alt=""
+                        height="22"
+                        v-else-if="data.name.endsWith('.zip')"
+                      />
+                      <img
+                        src="@/assets/fileType/md-icon.svg"
+                        alt=""
+                        height="22"
+                        v-else-if="data.name.endsWith('.md')"
                       />
 
                       <span class="ml-4">{{ node.label }}</span>
@@ -236,6 +278,7 @@ function back() {
     margin-bottom: 20px;
   }
 }
+
 .xlsx-icon {
   svg {
     width: 24px;
