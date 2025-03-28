@@ -7461,3 +7461,6 @@ msgstr "Login Authentication"
 
 msgid "Paragraph"
 msgstr ""
+
+msgid "Batch generate related"
+msgstr "Batch generate related problems"

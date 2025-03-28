@@ -7634,3 +7634,6 @@ msgstr "登錄驗證"
 
 msgid "Paragraph"
 msgstr "段落"
+
+msgid "Batch generate related"
+msgstr "批量生成相關问题"
