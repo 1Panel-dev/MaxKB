@@ -272,8 +272,6 @@ class ListenerManagement:
             ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING,
                                              State.STARTED)
 
-            # 删除文档向量数据
-            VectorStore.get_embedding_vector().delete_by_document_id(document_id)
 
             # 根据段落进行向量化处理
             page_desc(QuerySet(Paragraph)
