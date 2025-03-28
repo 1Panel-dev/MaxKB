@@ -171,7 +171,7 @@ export default {
   },
   feishu: {
     selectDocument: 'Select Document',
-    tip1: 'Only documents and tables are supported. Documents will be segmented based on titles, and tables will be converted to Markdown format before segmentation.',
+    tip1: 'Supports document and table types such as Feishu documents, TXT, Markdown, PDF, DOCX, HTML, XLS, XLSX, CSV, ZIP Feishu files. Documents will be segmented according to titles, and tables will be converted to Markdown format before segmentation.',
     tip2: 'The system does not store the original document. Before importing the document, it is recommended to standardize the document segmentation markers.',
     allCheck: 'Select All',
     errorMessage1: 'Please select a document'
