@@ -170,6 +170,7 @@ export default {
     selectDocument: '选择文档',
     tip1: '仅支持文档和表格类型，文档会根据标题分段，表格会转为Markdown格式后再分段。',
     tip2: '系统不存储原始文档，导入文档前，建议规范文档的分段标识。',
-    allCheck: '全选'
+    allCheck: '全选',
+    errorMessage1: '请选择文档'
   }
 }
