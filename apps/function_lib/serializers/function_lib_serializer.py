@@ -357,7 +357,7 @@ class FunctionLibSerializer(serializers.Serializer):
                                              code=function_lib.get('code'),
                                              user_id=user_id,
                                              input_field_list=function_lib.get('input_field_list'),
-                                             init_field_list=function_lib.get('init_field_list'),
+                                             init_field_list=function_lib.get('init_field_list', []),
                                              permission_type='PRIVATE',
                                              is_active=function_lib.get('is_active'))
             function_lib_model.save()
