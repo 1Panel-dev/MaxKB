@@ -94,15 +94,6 @@
           </el-button>
         </el-tooltip>
       </span>
-
-      <!-- 先渲染，不然不能播放   -->
-      <audio
-        ref="audioPlayer"
-        v-for="item in audioList"
-        :key="item"
-        controls
-        hidden="hidden"
-      ></audio>
       <div ref="audioCiontainer"></div>
     </div>
   </div>
@@ -293,7 +284,7 @@ class AudioManage {
       index = this.textList.length - 1
       if (this.ttsType === 'TTS') {
         const audioElement: HTMLAudioElement = document.createElement('audio')
-        audioElement.controls = true
+        audioElement.controls = false
         audioElement.hidden = true
         /**
          * 播放结束事件
@@ -436,7 +427,21 @@ class AudioManage {
     }
 
     const audioElement = this.audioList[index]
-    if (audioElement instanceof SpeechSynthesisUtterance) {
+
+    if (audioElement instanceof HTMLAudioElement) {
+      // 标签朗读
+      try {
+        this.statusList[index] = AudioStatus.PLAY_INT
+        const play = audioElement.play()
+        if (play instanceof Promise) {
+          play.catch((e) => {
+            this.statusList[index] = AudioStatus.READY
+          })
+        }
+      } catch (e: any) {
+        this.statusList[index] = AudioStatus.ERROR
+      }
+    } else {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume()
       } else {
@@ -446,14 +451,6 @@ class AudioManage {
         speechSynthesis.speak(audioElement)
         this.statusList[index] = AudioStatus.PLAY_INT
       }
-    } else {
-      // 标签朗读
-      try {
-        audioElement.play()
-        this.statusList[index] = AudioStatus.PLAY_INT
-      } catch (e) {
-        this.statusList[index] = AudioStatus.ERROR
-      }
     }
   }
   pause(self?: boolean) {
@@ -462,7 +459,14 @@ class AudioManage {
       return
     }
     const audioElement = this.audioList[index]
-    if (audioElement instanceof SpeechSynthesisUtterance) {
+
+    if (audioElement instanceof HTMLAudioElement) {
+      if (this.statusList[index] === AudioStatus.PLAY_INT) {
+        // 标签朗读
+        this.statusList[index] = AudioStatus.READY
+        audioElement.pause()
+      }
+    } else {
       this.statusList[index] = AudioStatus.READY
       if (self) {
         window.speechSynthesis.pause()
@@ -473,12 +477,6 @@ class AudioManage {
         })
       } else {
         window.speechSynthesis.cancel()
-      }
-    } else {
-      if (this.statusList[index] === AudioStatus.PLAY_INT) {
-        // 标签朗读
-        this.statusList[index] = AudioStatus.READY
-        audioElement.pause()
       }
     }
   }
