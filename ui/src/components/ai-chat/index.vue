@@ -523,7 +523,10 @@ onMounted(() => {
     let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
     form_data.value = userFormData
   }
-  window.speechSynthesis.cancel()
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel()
+  }
+
   window.sendMessage = sendMessage
   bus.on('on:transcribing', (status: boolean) => {
     transcribing.value = status
