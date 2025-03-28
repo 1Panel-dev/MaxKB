@@ -7632,7 +7632,7 @@ msgid "Application access"
 msgstr "应用接入"
 
 msgid "Add internal function"
-msgstr "添加内部函数"
+msgstr "添加内置函数"
 
 msgid "Batch generate related documents"
 msgstr "批量生成问题"
