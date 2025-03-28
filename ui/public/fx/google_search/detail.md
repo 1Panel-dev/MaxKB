@@ -10,7 +10,7 @@ Google 搜索工具是一个实时 API，可提取搜索引擎结果，提供来
 2. 获取cx参数
 进入添加的引擎详情中，在【基本】菜单中获取搜索引擎的ID，即cx。
 ![google cx ](/ui/fx/img/google_cx.jpg)
-3.获取 API Key
+3. 获取 API Key
 打开 https://developers.google.com/custom-search/v1/overview?hl=zh-cn 获取API Key。
 ![google API Key](/ui/fx/img/google_APIKey.jpg)
 4. 配置启动参数
