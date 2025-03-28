@@ -60,6 +60,8 @@ class ChatView(APIView):
                            [lambda r, keywords: Permission(group=Group.APPLICATION, operate=Operate.USE,
                                                            dynamic_tag=keywords.get('application_id'))])
         )
+        @log(menu='Conversation Log', operate="Export conversation",
+             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
         def post(self, request: Request, application_id: str):
             return ChatSerializers.Query(
                 data={**query_params_to_single_dict(request.query_params), 'application_id': application_id,

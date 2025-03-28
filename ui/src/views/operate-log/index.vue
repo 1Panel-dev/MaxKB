@@ -129,7 +129,16 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="operate" :label="$t('views.operateLog.table.operate.detail')" />
+        <el-table-column prop="operate" :label="$t('views.operateLog.table.operate.detail')">
+          <template #default="{ row }">
+            {{
+              row.operate +
+              (row.operation_object && row.operation_object.name
+                ? `【${row.operation_object.name}】`
+                : '')
+            }}
+          </template>
+        </el-table-column>
         <el-table-column
           width="120"
           prop="user.username"

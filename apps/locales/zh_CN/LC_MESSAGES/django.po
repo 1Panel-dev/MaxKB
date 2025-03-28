@@ -234,7 +234,7 @@ msgstr "AI 回复: "
 
 #: apps/xpack/serializers/channel/chat_manage.py:298
 msgid "Thinking, please wait a moment!"
-msgstr "正在思考中，请稍后！"
+msgstr "正在思考中，请稍后......"
 
 #: apps/xpack/serializers/channel/ding_talk.py:19
 #: apps/xpack/serializers/channel/wechat.py:89
@@ -1229,7 +1229,7 @@ msgstr "详情"
 #: apps/xpack/views/application_setting_views.py:23
 #| msgid "Pro/Modify Application Settings"
 msgid "Modify Application Settings"
-msgstr "修改应用设置"
+msgstr "修改应用显示设置"
 
 #: apps/xpack/views/application_setting_views.py:24
 #: apps/xpack/views/application_setting_views.py:40
@@ -4515,7 +4515,7 @@ msgstr "导出知识库"
 #: community/apps/dataset/views/dataset.py:184
 #: community/apps/dataset/views/dataset.py:185
 msgid "Export knowledge base containing images"
-msgstr "导出包含图片的知识库"
+msgstr "导出ZIP知识库"
 
 #: community/apps/dataset/views/dataset.py:199
 msgid "Delete knowledge base"
@@ -4606,12 +4606,12 @@ msgstr "批量取消任务"
 #: community/apps/dataset/views/document.py:279
 #: community/apps/dataset/views/document.py:280
 msgid "Refresh document vector library"
-msgstr "刷新文档向量库"
+msgstr "文档向量化"
 
 #: community/apps/dataset/views/document.py:300
 #: community/apps/dataset/views/document.py:301
 msgid "Batch refresh document vector library"
-msgstr "批量刷新文档向量库"
+msgstr "批量文档向量化"
 
 #: community/apps/dataset/views/document.py:319
 #: community/apps/dataset/views/document.py:320
@@ -7611,7 +7611,7 @@ msgid "Operate Time"
 msgstr "操作时间"
 
 msgid "System Settings/API Key"
-msgstr "系统设置/API Key"
+msgstr "系统 API Key"
 
 msgid "Appearance Settings"
 msgstr "外观设置"
@@ -7626,4 +7626,13 @@ msgid "Paragraph"
 msgstr "段落"
 
 msgid "Batch generate related"
-msgstr "批量生成相关问题"
+msgstr "分段生成问题"
+
+msgid "Application access"
+msgstr "应用接入"
+
+msgid "Add internal function"
+msgstr "添加内部函数"
+
+msgid "Batch generate related documents"
+msgstr "批量生成问题"

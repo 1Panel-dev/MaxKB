@@ -234,7 +234,7 @@ msgstr ""
 
 #: apps/xpack/serializers/channel/chat_manage.py:298
 msgid "Thinking, please wait a moment!"
-msgstr ""
+msgstr "Thinking, please wait a moment......"
 
 #: apps/xpack/serializers/channel/ding_talk.py:19
 #: apps/xpack/serializers/channel/wechat.py:89
@@ -1210,7 +1210,7 @@ msgstr "Details"
 #: apps/xpack/views/application_setting_views.py:23
 #| msgid "Modification time"
 msgid "Modify Application Settings"
-msgstr ""
+msgstr "Modify Application Display Settings"
 
 #: apps/xpack/views/application_setting_views.py:24
 #: apps/xpack/views/application_setting_views.py:40
@@ -4478,7 +4478,7 @@ msgstr ""
 #: community/apps/dataset/views/dataset.py:184
 #: community/apps/dataset/views/dataset.py:185
 msgid "Export knowledge base containing images"
-msgstr ""
+msgstr "Export ZIP Knowledge Base"
 
 #: community/apps/dataset/views/dataset.py:199
 msgid "Delete knowledge base"
@@ -7448,7 +7448,7 @@ msgid "Operate Time"
 msgstr "Operate time"
 
 msgid "System Settings/API Key"
-msgstr "System Settings/API Key"
+msgstr "System API Key"
 
 msgid "Appearance Settings"
 msgstr "Appearance Settings"
@@ -7463,4 +7463,13 @@ msgid "Paragraph"
 msgstr ""
 
 msgid "Batch generate related"
+msgstr "Paragraph generate related problems"
+
+msgid "Application access"
+msgstr ""
+
+msgid "Add internal function"
+msgstr ""
+
+msgid "Batch generate related documents"
 msgstr "Batch generate related problems"
