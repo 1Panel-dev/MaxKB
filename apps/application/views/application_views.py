@@ -644,8 +644,6 @@ class Application(APIView):
                                                            dynamic_tag=keywords.get(
                                                                'application_id'))],
                            compare=CompareConstants.AND))
-        @log(menu='Application', operate="speech to text",
-             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
         def post(self, request: Request, application_id: str):
             return result.success(
                 ApplicationSerializer.Operate(data={'application_id': application_id, 'user_id': request.user.id})
@@ -668,8 +666,6 @@ class Application(APIView):
                                                            dynamic_tag=keywords.get(
                                                                'application_id'))],
                            compare=CompareConstants.AND))
-        @log(menu='Application', operate="text to speech",
-             get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
         def post(self, request: Request, application_id: str):
             byte_data = ApplicationSerializer.Operate(
                 data={'application_id': application_id, 'user_id': request.user.id}).text_to_speech(
