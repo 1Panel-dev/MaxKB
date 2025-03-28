@@ -41,7 +41,7 @@
                 @change="handleAllCheckChange"
               />
             </div>
-            <div style="height:calc(100vh - 430px)">
+            <div style="height: calc(100vh - 430px)">
               <el-scrollbar>
                 <el-tree
                   :props="props"
@@ -94,7 +94,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { MsgConfirm, MsgSuccess, MsgWarning } from '@/utils/message'
 import { getImgUrl } from '@/utils/utils'
 import { t } from '@/locales'
 import type Node from 'element-plus/es/components/tree/src/model/node'
@@ -186,6 +186,12 @@ function submit() {
       type: node.type
     }
   })
+  if (newList.length === 0) {
+    disabled.value = false
+    MsgWarning(t('views.document.feishu.errorMessage1'))
+    loading.value = false
+    return
+  }
   dataset
     .importLarkDocument(datasetId, newList, loading)
     .then((res) => {
