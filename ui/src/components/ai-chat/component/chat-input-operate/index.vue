@@ -142,7 +142,7 @@
         <div class="operate flex align-center">
           <template v-if="props.applicationDetails.stt_model_enable">
             <span v-if="mode === 'mobile'">
-              <el-button text @click="isMicrophone = !isMicrophone">
+              <el-button text @click="switchMicrophone(!isMicrophone)">
                 <!-- 键盘 -->
                 <AppIcon v-if="isMicrophone" iconName="app-keyboard"></AppIcon>
                 <el-icon v-else>
@@ -444,15 +444,19 @@ const isDisabledChat = computed(
 )
 // 是否显示移动端语音按钮
 const isMicrophone = ref(false)
-watch(isMicrophone, (value: boolean) => {
-  if (value) {
+const switchMicrophone = (status: boolean) => {
+  if (status) {
     // 如果显示就申请麦克风权限
-    recorderManage.open()
+    recorderManage.open(() => {
+      isMicrophone.value = true
+    })
   } else {
     // 关闭麦克风
     recorderManage.close()
+    isMicrophone.value = false
   }
-})
+}
+
 const TouchEnd = (bool: Boolean) => {
   if (bool) {
     stopRecording()
@@ -471,7 +475,7 @@ class RecorderManage {
   constructor(uploadRecording: (blob: Blob, duration: number) => void) {
     this.uploadRecording = uploadRecording
   }
-  open() {
+  open(callback?: () => void) {
     const recorder = new Recorder({
       type: 'mp3',
       bitRate: 128,
@@ -480,6 +484,9 @@ class RecorderManage {
     if (!this.recorder) {
       recorder.open(() => {
         this.recorder = recorder
+        if (callback) {
+          callback()
+        }
       }, this.errorCallBack)
     }
   }
@@ -556,7 +563,7 @@ const uploadRecording = async (audioBlob: Blob) => {
   try {
     // 非自动发送切换输入框
     if (!props.applicationDetails.stt_autosend) {
-      isMicrophone.value = false
+      switchMicrophone(false)
     }
     recorderStatus.value = 'TRANSCRIBING'
     const formData = new FormData()
@@ -572,7 +579,7 @@ const uploadRecording = async (audioBlob: Blob) => {
             autoSendMessage()
           })
         } else {
-          isMicrophone.value = false
+          switchMicrophone(false)
         }
       })
       .catch((error) => {
