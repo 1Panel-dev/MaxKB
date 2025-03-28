@@ -131,12 +131,20 @@
         </el-table-column>
         <el-table-column prop="operate" :label="$t('views.operateLog.table.operate.detail')">
           <template #default="{ row }">
-            {{
-              row.operate +
-              (row.operation_object && row.operation_object.name
-                ? `【${row.operation_object.name}】`
-                : '')
-            }}
+            <el-tooltip
+              :content="
+                row.operate + (row.operation_object?.name ? `【${row.operation_object.name}】` : '')
+              "
+              effect="dark"
+              placement="top"
+            >
+              <span class="text-ellipsis">
+                {{
+                  row.operate +
+                  (row.operation_object?.name ? `【${row.operation_object.name}】` : '')
+                }}
+              </span>
+            </el-tooltip>
           </template>
         </el-table-column>
         <el-table-column
@@ -341,5 +349,12 @@ onMounted(() => {
 <style lang="scss" scoped>
 .text-button {
   font-size: 14px;
+}
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
 }
 </style>
