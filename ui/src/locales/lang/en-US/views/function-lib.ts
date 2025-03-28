@@ -33,6 +33,7 @@ export default {
     form: {
       functionName: {
         label: 'Name',
+        name: 'Function Name',
         placeholder: 'Please enter the function name',
         requiredMessage: 'Please enter the function name'
       },

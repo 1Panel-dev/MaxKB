@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.functionLib.functionForm.form.functionName.placeholder')"
+    :title="$t('views.functionLib.functionForm.form.functionName.name')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -23,7 +23,7 @@
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
         <el-button type="primary" @click="submit(fieldFormRef)" :loading="loading">
-          {{ $t('common.add') }}
+          {{ isEdit ? $t('common.save') : $t('common.add') }}
         </el-button>
       </span>
     </template>
@@ -39,6 +39,7 @@ const emit = defineEmits(['refresh'])
 
 const fieldFormRef = ref()
 const loading = ref<boolean>(false)
+const isEdit = ref<boolean>(false)
 
 const form = ref<any>({
   name: ''
@@ -64,11 +65,11 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-const open = (row: any) => {
+const open = (row: any, edit: boolean) => {
   if (row) {
     form.value = cloneDeep(row)
   }
-
+  isEdit.value = edit || false
   dialogVisible.value = true
 }
 
@@ -76,7 +77,7 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      emit('refresh', form.value)
+      emit('refresh', form.value, isEdit.value)
       dialogVisible.value = false
     }
   })

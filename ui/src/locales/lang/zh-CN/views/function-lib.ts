@@ -31,6 +31,7 @@ export default {
     form: {
       functionName: {
         label: '名称',
+        name: '函数名称',
         placeholder: '请输入函数名称',
         requiredMessage: '请输入函数名称'
       },
@@ -63,7 +64,7 @@ export default {
         paramInfo2: '使用函数时不显示',
         code: '函数内容（Python）',
         selectPlaceholder: '请选择参数',
-        inputPlaceholder: '请输入参数值',
+        inputPlaceholder: '请输入参数值'
       },
       debug: {
         run: '运行',
