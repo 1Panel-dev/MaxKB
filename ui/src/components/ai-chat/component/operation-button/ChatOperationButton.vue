@@ -6,7 +6,7 @@
 
     <div>
       <!-- 语音播放 -->
-      <span>
+      <span v-if="tts">
         <el-tooltip
           v-if="audioManage?.isPlaying()"
           effect="dark"
