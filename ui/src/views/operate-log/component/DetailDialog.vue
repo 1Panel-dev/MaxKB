@@ -5,11 +5,15 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <el-scrollbar height="400" class="details">
-      <div class="content">{{ details }}</div>
-    </el-scrollbar>
+    <div class="border border-r-4 mb-16" style="white-space: pre-wrap; height: 400px">
+      <el-scrollbar>
+        <div class="p-16">
+          {{ details }}
+        </div>
+      </el-scrollbar>
+    </div>
     <template #footer>
-      <span class="dialog-footer">
+      <span class="dialog-footer mt-16">
         <el-button @click.prevent="dialogVisible = false">
           {{ $t('views.operateLog.close') }}
         </el-button>
@@ -29,13 +33,4 @@ const open = (data: any) => {
 
 defineExpose({ open })
 </script>
-<style lang="scss" scoped>
-.details {
-  margin: 0 10px 30px;
-  border: 1px #cccccc solid;
-  .content {
-    padding: 10px 20px;
-    white-space: pre-wrap;
-  }
-}
-</style>
+<style lang="scss" scoped></style>
