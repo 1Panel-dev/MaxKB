@@ -1,12 +1,6 @@
 <template>
   <div class="function-lib-list-container p-24" style="padding-top: 16px">
-    <el-tabs
-      v-model="functionType"
-      @tab-change="
-      tabChangeHandle
-    
-      "
-    >
+    <el-tabs v-model="functionType" @tab-change="tabChangeHandle">
       <el-tab-pane :label="$t('views.functionLib.title')" name="PUBLIC"></el-tab-pane>
       <el-tab-pane :label="$t('views.functionLib.internalTitle')" name="INTERNAL"></el-tab-pane>
     </el-tabs>
@@ -165,6 +159,14 @@
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
+                          <el-dropdown-item
+                            v-if="item.template_id"
+                            :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
+                            @click.stop="addInternalFunction(item, true)"
+                          >
+                            <el-icon><EditPen /></el-icon>
+                            {{ $t('common.edit') }}
+                          </el-dropdown-item>
                           <el-dropdown-item
                             v-if="!item.template_id"
                             :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
@@ -366,17 +368,24 @@ async function openDescDrawer(row: any) {
   InternalDescDrawerRef.value.open(content, row)
 }
 
-function addInternalFunction(data?: any) {
-  AddInternalFunctionDialogRef.value.open(data)
+function addInternalFunction(data?: any, isEdit?: boolean) {
+  AddInternalFunctionDialogRef.value.open(data, isEdit)
 }
 
-function confirmAddInternalFunction(data?: any) {
-  functionLibApi
-    .addInternalFunction(data.id, { name: data.name }, changeStateloading)
-    .then((res) => {
-      MsgSuccess(t('common.submitSuccess'))
+function confirmAddInternalFunction(data?: any, isEdit?: boolean) {
+  if (isEdit) {
+    functionLibApi.putFunctionLib(data?.id as string, data, loading).then((res) => {
+      MsgSuccess(t('common.saveSuccess'))
       searchHandle()
     })
+  } else {
+    functionLibApi
+      .addInternalFunction(data.id, { name: data.name }, changeStateloading)
+      .then((res) => {
+        MsgSuccess(t('common.addSuccess'))
+        searchHandle()
+      })
+  }
 }
 
 function searchHandle() {
