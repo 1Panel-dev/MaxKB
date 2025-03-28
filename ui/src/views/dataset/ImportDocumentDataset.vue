@@ -5,80 +5,81 @@
     </template>
     <div class="create-dataset__main flex" v-loading="loading">
       <div class="create-dataset__component main-calc-height">
-        <el-scrollbar>
-          <div class="upload-document p-24">
-            <h4 class="title-decoration-1 mb-8">
-              {{ $t('views.document.feishu.selectDocument') }}
-            </h4>
-            <el-form
-              ref="FormRef"
-              :model="form"
-              :rules="rules"
-              label-position="top"
-              require-asterisk-position="right"
-            >
-              <div class="mt-16 mb-16">
-                <el-radio-group v-model="form.fileType" class="app-radio-button-group">
-                  <el-radio-button value="txt"
-                    >{{ $t('views.document.fileType.txt.label') }}
-                  </el-radio-button>
-                </el-radio-group>
+        <div class="upload-document p-24">
+          <h4 class="title-decoration-1 mb-8">
+            {{ $t('views.document.feishu.selectDocument') }}
+          </h4>
+          <el-form
+            ref="FormRef"
+            :model="form"
+            :rules="rules"
+            label-position="top"
+            require-asterisk-position="right"
+          >
+            <div class="mt-16 mb-16">
+              <el-radio-group v-model="form.fileType" class="app-radio-button-group">
+                <el-radio-button value="txt"
+                  >{{ $t('views.document.fileType.txt.label') }}
+                </el-radio-button>
+              </el-radio-group>
+            </div>
+            <div class="update-info flex p-8-12 border-r-4 mb-16">
+              <div class="mt-4">
+                <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
               </div>
-              <div class="update-info flex p-8-12 border-r-4 mb-16">
-                <div class="mt-4">
-                  <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
-                </div>
-                <div class="ml-16 lighter">
-                  <p>{{ $t('views.document.feishu.tip1') }}</p>
-                  <p>{{ $t('views.document.feishu.tip2') }}</p>
-                </div>
+              <div class="ml-16 lighter">
+                <p>{{ $t('views.document.feishu.tip1') }}</p>
+                <p>{{ $t('views.document.feishu.tip2') }}</p>
               </div>
-              <div class="card-never border-r-4 mb-16">
-                <el-checkbox
-                  v-model="allCheck"
-                  :label="$t('views.document.feishu.allCheck')"
-                  size="large"
-                  class="ml-24"
-                  @change="handleAllCheckChange"
-                />
-              </div>
+            </div>
+            <div class="card-never border-r-4 mb-16">
+              <el-checkbox
+                v-model="allCheck"
+                :label="$t('views.document.feishu.allCheck')"
+                size="large"
+                class="ml-24"
+                @change="handleAllCheckChange"
+              />
+            </div>
+            <div style="height:calc(100vh - 430px)">
+              <el-scrollbar>
+                <el-tree
+                  :props="props"
+                  :load="loadNode"
+                  lazy
+                  show-checkbox
+                  node-key="token"
+                  ref="treeRef"
+                >
+                  <template #default="{ node, data }">
+                    <div class="custom-tree-node flex align-center lighter">
+                      <img
+                        src="@/assets/fileType/file-icon.svg"
+                        alt=""
+                        height="20"
+                        v-if="data.type === 'folder'"
+                      />
+                      <img
+                        src="@/assets/fileType/docx-icon.svg"
+                        alt=""
+                        height="22"
+                        v-else-if="data.type === 'docx'"
+                      />
+                      <img
+                        src="@/assets/fileType/xlsx-icon.svg"
+                        alt=""
+                        height="22"
+                        v-else-if="data.type === 'sheet'"
+                      />
 
-              <el-tree
-                :props="props"
-                :load="loadNode"
-                lazy
-                show-checkbox
-                node-key="token"
-                ref="treeRef"
-              >
-                <template #default="{ node, data }">
-                  <div class="custom-tree-node flex align-center lighter">
-                    <img
-                      src="@/assets/fileType/file-icon.svg"
-                      alt=""
-                      height="20"
-                      v-if="data.type === 'folder'"
-                    />
-                    <img
-                      src="@/assets/fileType/docx-icon.svg"
-                      alt=""
-                      height="22"
-                      v-else-if="data.type === 'docx'"
-                    />
-                    <img
-                      src="@/assets/fileType/xlsx-icon.svg"
-                      alt=""
-                      height="22"
-                      v-else-if="data.type === 'sheet'"
-                    />
-
-                    <span class="ml-4">{{ node.label }}</span>
-                  </div>
-                </template>
-              </el-tree>
-            </el-form>
-          </div>
-        </el-scrollbar>
+                      <span class="ml-4">{{ node.label }}</span>
+                    </div>
+                  </template>
+                </el-tree>
+              </el-scrollbar>
+            </div>
+          </el-form>
+        </div>
       </div>
     </div>
     <div class="create-dataset__footer text-right border-t">

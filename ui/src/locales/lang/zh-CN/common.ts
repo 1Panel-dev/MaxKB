@@ -16,10 +16,11 @@ export default {
   editSuccess: '编辑成功',
   modify: '修改',
   modifySuccess: '修改成功',
+  add: '添加',
+  addSuccess: '添加成功',
   cancel: '取消',
   confirm: '确定',
   tip: '提示',
-  add: '添加',
   refresh: '刷新',
   search: '搜索',
   clear: '清空',
@@ -57,7 +58,7 @@ export default {
   param: {
     outputParam: '输出参数',
     inputParam: '输入参数',
-    initParam: '启动参数',
+    initParam: '启动参数'
   },
-  rename:'重命名'
+  rename: '重命名'
 }

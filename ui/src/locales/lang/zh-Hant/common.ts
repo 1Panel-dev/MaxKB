@@ -16,10 +16,11 @@ export default {
   editSuccess: '編輯成功',
   modify: '修改',
   modifySuccess: '修改成功',
+  add: '添加',
+  addSuccess: '添加成功',
   cancel: '取消',
   confirm: '確認',
   tip: '提示',
-  add: '新增',
   refresh: '重新整理',
   search: '搜尋',
   clear: '清除',
@@ -57,7 +58,7 @@ export default {
   param: {
     outputParam: '輸出參數',
     inputParam: '輸入參數',
-    initParam: '啟動參數',
+    initParam: '啟動參數'
   },
   rename: '重命名'
 }
