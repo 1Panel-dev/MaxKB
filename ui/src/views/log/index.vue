@@ -232,7 +232,7 @@
                   <img src="@/assets/icon_web.svg" style="width: 58%" alt="" />
                 </AppAvatar>
                 <AppAvatar
-                  v-if="!item.dataset_id && item.type === '2'"
+                  v-else-if="!item.dataset_id && item.type === '2'"
                   class="mr-12 avatar-purple"
                   shape="square"
                   :size="24"
