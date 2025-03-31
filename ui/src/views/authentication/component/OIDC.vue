@@ -39,6 +39,9 @@
           <el-form-item label="Scope" prop="config_data.scope">
             <el-input v-model="form.config_data.scope" placeholder="openid+profile+email " />
           </el-form-item>
+          <el-form-item label="State" prop="config_data.state">
+            <el-input v-model="form.config_data.state" placeholder="" />
+          </el-form-item>
           <el-form-item
             :label="$t('views.system.authentication.oidc.clientId')"
             prop="config_data.clientId"
@@ -98,6 +101,7 @@ const form = ref<any>({
     tokenEndpoint: '',
     userInfoEndpoint: '',
     scope: '',
+    state: '',
     clientId: '',
     clientSecret: '',
     redirectUrl: ''

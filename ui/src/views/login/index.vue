@@ -184,6 +184,9 @@ function redirectAuth(authType: string) {
         if (authType === 'OIDC') {
           const scope = config.scope || 'openid+profile+email'
           url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=${scope}`
+          if (config.state) {
+            url += `&state=${config.state}`
+          }
         }
         if (authType === 'OAuth2') {
           url =
