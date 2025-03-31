@@ -3337,7 +3337,7 @@ msgstr "刪除應用 API_KEY"
 #: community/apps/application/views/application_views.py:421
 #: community/apps/application/views/application_views.py:422
 msgid "Modify Application AccessToken"
-msgstr "修改應用 AccessToken"
+msgstr "修改應用访问限制"
 
 #: community/apps/application/views/application_views.py:423
 #: community/apps/application/views/application_views.py:441
