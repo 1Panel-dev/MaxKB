@@ -392,28 +392,36 @@ const uploadFile = async (file: any, fileList: any) => {
     .then((response) => {
       fileList.splice(0, fileList.length)
       uploadImageList.value.forEach((file: any) => {
-        const f = response.data.filter((f: any) => f.name === file.name)
+        const f = response.data.filter(
+          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
+        )
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id
         }
       })
       uploadDocumentList.value.forEach((file: any) => {
-        const f = response.data.filter((f: any) => f.name === file.name)
+        const f = response.data.filter(
+          (f: any) => f.name.replaceAll(' ', '') == file.name.replaceAll(' ', '')
+        )
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id
         }
       })
       uploadAudioList.value.forEach((file: any) => {
-        const f = response.data.filter((f: any) => f.name === file.name)
+        const f = response.data.filter(
+          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
+        )
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id
         }
       })
       uploadVideoList.value.forEach((file: any) => {
-        const f = response.data.filter((f: any) => f.name === file.name)
+        const f = response.data.filter(
+          (f: any) => f.name.replaceAll(' ', '') === file.name.replaceAll(' ', '')
+        )
         if (f.length > 0) {
           file.url = f[0].url
           file.file_id = f[0].file_id
