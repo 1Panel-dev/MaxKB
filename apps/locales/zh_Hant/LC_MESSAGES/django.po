@@ -7646,3 +7646,18 @@ msgstr "添加內寘函數"
 
 msgid "Batch generate related documents"
 msgstr "批量生成问题"
+
+msgid "No permission to use this function {name}"
+msgstr "無權使用此模型{name}"
+
+msgid "Function {name} is unavailable"
+msgstr "函數{name} 不可用"
+
+msgid "Field: {name} Type: {_type} Value: {value} Type error"
+msgstr "欄位: {name} 類型: {_type} 值: {value} 類型錯誤"
+
+msgid "Field: {name} Type: {_type} Value: {value} Unsupported types"
+msgstr "欄位: {name} 類型: {_type} 值: {value} 不支持的類型"
+
+msgid "Field: {name} No value set"
+msgstr "欄位: {name} 未設定值"

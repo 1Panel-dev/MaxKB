@@ -7473,3 +7473,18 @@ msgstr ""
 
 msgid "Batch generate related documents"
 msgstr "Batch generate related problems"
+
+msgid "No permission to use this function {name}"
+msgstr ""
+
+msgid "Function {name} is unavailable"
+msgstr ""
+
+msgid "Field: {name} Type: {_type} Value: {value} Type error"
+msgstr ""
+
+msgid "Field: {name} Type: {_type} Value: {value} Unsupported types"
+msgstr ""
+
+msgid "Field: {name} No value set"
+msgstr ""

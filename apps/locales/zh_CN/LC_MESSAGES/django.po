@@ -7636,3 +7636,18 @@ msgstr "添加内置函数"
 
 msgid "Batch generate related documents"
 msgstr "批量生成问题"
+
+msgid "No permission to use this function {name}"
+msgstr "无权使用此模型 {name}"
+
+msgid "Function {name} is unavailable"
+msgstr "函数{name} 不可用"
+
+msgid "Field: {name} Type: {_type} Value: {value} Type error"
+msgstr "字段: {name} 类型: {_type} 值: {value} 类型错误"
+
+msgid "Field: {name} Type: {_type} Value: {value} Unsupported types"
+msgstr "字段: {name} 类型: {_type} 值: {value} 不支持的类型"
+
+msgid "Field: {name} No value set"
+msgstr "字段: {name} 未设置值"
