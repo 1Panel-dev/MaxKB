@@ -44,6 +44,8 @@ def encryption(message: str):
     :param message:
     :return:
     """
+    if type(message) != str:
+        return message
     if message == "":
         return ""
     max_pre_len = 8
