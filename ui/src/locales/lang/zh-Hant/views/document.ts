@@ -167,7 +167,7 @@ export default {
   },
   feishu: {
     selectDocument: '選擇文檔',
-    tip1: '支持檔案和表格類型飛書檔案、支持TXT、Markdown、PDF、DOCX、HTML、XLS、XLSX、CSV、ZIP飛書檔案，檔案會根據標題分段，表格會轉為Markdown格式後再分段。',
+    tip1: '支持文檔和表格類型，包含TXT、Markdown、PDF、DOCX、HTML、XLS、XLSX、CSV、ZIP格式；',
     tip2: '系統不存儲原始文檔，導入文檔前，建議規範文檔的分段標識。',
     allCheck: '全選',
     errorMessage1: '請選擇文檔'
