@@ -146,10 +146,9 @@
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span
-                  >{{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                  }}</span
-                >
+                <span>{{
+                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
@@ -288,7 +287,7 @@ const update_field = () => {
       }
     })
     .catch((err) => {
-      // set(props.nodeModel.properties, 'status', 500)
+      set(props.nodeModel.properties, 'status', 500)
     })
 }
 

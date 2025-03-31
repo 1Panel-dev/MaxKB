@@ -1209,7 +1209,9 @@ class ApplicationSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             if with_valid:
                 self.is_valid()
-            embed_application = QuerySet(Application).get(id=app_id)
+            embed_application = QuerySet(Application).filter(id=app_id).first()
+            if embed_application is None:
+                raise AppApiException(500, _('Application does not exist'))
             if embed_application.type == ApplicationTypeChoices.WORK_FLOW:
                 work_flow_version = QuerySet(WorkFlowVersion).filter(application_id=embed_application.id).order_by(
                     '-create_time')[0:1].first()
@@ -1332,4 +1334,3 @@ class ApplicationSerializer(serializers.Serializer):
                     }
                     for tool in asyncio.run(get_mcp_tools({server: servers[server]}))]
             return tools
-
