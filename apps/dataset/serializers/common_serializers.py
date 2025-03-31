@@ -40,6 +40,14 @@ def zip_dir(zip_path, output=None):
     zip.close()
 
 
+def is_valid_uuid(s):
+    try:
+        uuid.UUID(s)
+        return True
+    except ValueError:
+        return False
+
+
 def write_image(zip_path: str, image_list: List[str]):
     for image in image_list:
         search = re.search("\(.*\)", image)
@@ -47,6 +55,9 @@ def write_image(zip_path: str, image_list: List[str]):
             text = search.group()
             if text.startswith('(/api/file/'):
                 r = text.replace('(/api/file/', '').replace(')', '')
+                r = r.strip().split(" ")[0]
+                if not is_valid_uuid(r):
+                    break
                 file = QuerySet(File).filter(id=r).first()
                 if file is None:
                     break
@@ -58,6 +69,9 @@ def write_image(zip_path: str, image_list: List[str]):
                     f.write(file.get_byte())
             else:
                 r = text.replace('(/api/image/', '').replace(')', '')
+                r = r.strip().split(" ")[0]
+                if not is_valid_uuid(r):
+                    break
                 image_model = QuerySet(Image).filter(id=r).first()
                 if image_model is None:
                     break
