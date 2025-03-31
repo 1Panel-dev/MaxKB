@@ -116,7 +116,7 @@
           <el-icon class="mr-4"><Plus /></el-icon> {{ $t('common.add') }}
         </el-button>
       </div>
-      <el-table :data="form.init_field_list" class="mb-16">
+      <el-table ref="initFieldTableRef" :data="form.init_field_list" class="mb-16">
         <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')">
           <template #default="{ row }">
             <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
@@ -188,7 +188,7 @@
         </el-button>
       </div>
 
-      <el-table :data="form.input_field_list" class="mb-16">
+      <el-table ref="inputFieldTableRef" :data="form.input_field_list" class="mb-16">
         <el-table-column
           prop="name"
           :label="$t('views.functionLib.functionForm.form.paramName.label')"
@@ -280,7 +280,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, nextTick } from 'vue'
 import FieldFormDialog from './FieldFormDialog.vue'
 import FunctionDebugDrawer from './FunctionDebugDrawer.vue'
 import type { functionLibData } from '@/api/type/function-lib'
@@ -293,6 +293,7 @@ import { t } from '@/locales'
 import UserFieldFormDialog from '@/workflow/nodes/base-node/component/UserFieldFormDialog.vue'
 import { isAppIcon } from '@/utils/application'
 import EditAvatarDialog from './EditAvatarDialog.vue'
+import Sortable from 'sortablejs'
 
 const props = defineProps({
   title: String
@@ -303,6 +304,8 @@ const FieldFormDialogRef = ref()
 const FunctionDebugDrawerRef = ref()
 const UserFieldFormDialogRef = ref()
 const EditAvatarDialogRef = ref()
+const initFieldTableRef = ref()
+const inputFieldTableRef = ref()
 
 const FormRef = ref()
 
@@ -357,6 +360,40 @@ const rules = reactive({
     }
   ]
 })
+
+function onDragHandle() {
+  // For init_field_list table
+  if (initFieldTableRef.value) {
+    const el = initFieldTableRef.value.$el.querySelector('.el-table__body-wrapper tbody')
+    Sortable.create(el, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      onEnd: ({ newIndex, oldIndex }) => {
+        if (newIndex === undefined || oldIndex === undefined) return
+        if (newIndex !== oldIndex) {
+          const item = form.value.init_field_list?.splice(oldIndex, 1)[0]
+          form.value.init_field_list?.splice(newIndex, 0, item)
+        }
+      }
+    })
+  }
+
+  // For input_field_list table
+  if (inputFieldTableRef.value) {
+    const el = inputFieldTableRef.value.$el.querySelector('.el-table__body-wrapper tbody')
+    Sortable.create(el, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      onEnd: ({ newIndex, oldIndex }) => {
+        if (newIndex === undefined || oldIndex === undefined) return
+        if (newIndex !== oldIndex) {
+          const item = form.value.input_field_list?.splice(oldIndex, 1)[0]
+          form.value.input_field_list?.splice(newIndex, 0, item)
+        }
+      }
+    })
+  }
+}
 
 function submitCodemirrorEditor(val: string) {
   form.value.code = val
@@ -471,6 +508,9 @@ const open = (data: any) => {
   visible.value = true
   setTimeout(() => {
     showEditor.value = true
+    nextTick(() => {
+      onDragHandle()
+    })
   }, 100)
 }
 
