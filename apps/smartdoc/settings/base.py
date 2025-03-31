@@ -57,8 +57,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'common.middleware.gzip.GZipMiddleware',
     'common.middleware.static_headers_middleware.StaticHeadersMiddleware',
-    'common.middleware.cross_domain_middleware.CrossDomainMiddleware'
-
+    'common.middleware.cross_domain_middleware.CrossDomainMiddleware',
+    'common.middleware.doc_headers_middleware.DocHeadersMiddleware'
 ]
 
 JWT_AUTH = {
