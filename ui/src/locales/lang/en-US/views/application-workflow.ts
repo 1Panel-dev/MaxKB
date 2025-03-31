@@ -222,7 +222,7 @@ export default {
     },
     mcpNode: {
       label: 'MCP Server',
-      text: 'Call MCP Tools',
+      text: 'Call MCP Tools through SSE',
       getToolsSuccess: 'Get Tools Successfully',
       getTool: 'Get Tools',
       tool: 'Tool',

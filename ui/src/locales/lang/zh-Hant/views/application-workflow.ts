@@ -221,8 +221,8 @@ export default {
       assign: '賦值'
     },
     mcpNode: {
-      label: 'MCP 節點',
-      text: '呼叫 MCP 工具',
+      label: 'MCP 調用',
+      text: '透過SSE方式執行MCP服務中的工具',
       getToolsSuccess: '獲取工具成功',
       getTool: '獲取工具',
       tool: '工具',
