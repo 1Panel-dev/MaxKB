@@ -703,6 +703,8 @@ class DocumentSerializers(ApiMixin, serializers.Serializer):
 
         @staticmethod
         def reset_document_name(document_name):
+            if document_name is not None:
+                document_name = document_name.strip()[0:29]
             if document_name is None or not Utils.valid_sheet_name(document_name):
                 return "Sheet"
             return document_name.strip()
