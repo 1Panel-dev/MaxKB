@@ -693,6 +693,9 @@ function getDetail() {
     applicationForm.value.tts_type = res.data.tts_type
     applicationForm.value.model_setting.no_references_prompt =
       res.data.model_setting.no_references_prompt || '{question}'
+    application.asyncGetAccessToken(id, loading).then((res: any) => {
+      applicationForm.value = { ...applicationForm.value, ...res.data }
+    })
   })
 }
 

@@ -359,6 +359,9 @@ function getDetail() {
     detail.value.tts_model_id = res.data.tts_model
     detail.value.tts_type = res.data.tts_type
     saveTime.value = res.data?.update_time
+    application.asyncGetAccessToken(id, loading).then((res: any) => {
+      detail.value = { ...detail.value, ...res.data }
+    })
     workflowRef.value?.clearGraphData()
     nextTick(() => {
       workflowRef.value?.render(detail.value.work_flow)
