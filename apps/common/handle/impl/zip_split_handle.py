@@ -14,6 +14,7 @@ import zipfile
 from typing import List
 from urllib.parse import urljoin
 
+from charset_normalizer import detect
 from django.db.models import QuerySet
 
 from common.handle.base_split_handle import BaseSplitHandle
@@ -100,6 +101,15 @@ def get_image_list(result_list: list, zip_files: List[str]):
     return image_file_list
 
 
+def get_file_name(file_name):
+    try:
+        file_name_code = file_name.encode('cp437')
+        charset = detect(file_name_code)['encoding']
+        return file_name_code.decode(charset)
+    except Exception as e:
+        return file_name
+
+
 def filter_image_file(result_list: list, image_list):
     image_source_file_list = [image.get('source_file') for image in image_list]
     return [r for r in result_list if not image_source_file_list.__contains__(r.get('name', ''))]
@@ -121,6 +131,8 @@ class ZipSplitHandle(BaseSplitHandle):
                 with zip_ref.open(file) as f:
                     # 对文件内容进行处理
                     try:
+                        # 处理一下文件名
+                        f.name = get_file_name(f.name)
                         value = file_to_paragraph(f, pattern_list, with_filter, limit)
                         if isinstance(value, list):
                             result = [*result, *value]
