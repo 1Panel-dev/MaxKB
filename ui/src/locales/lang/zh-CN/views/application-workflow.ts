@@ -221,8 +221,8 @@ export default {
       assign: '赋值'
     },
     mcpNode: {
-      label: 'MCP 节点',
-      text: '调用 MCP 工具',
+      label: 'MCP 调用',
+      text: '通过 SSE 方式执行 MCP 服务中的工具',
       getToolsSuccess: '获取工具成功',
       getTool: '获取工具',
       tool: '工具',

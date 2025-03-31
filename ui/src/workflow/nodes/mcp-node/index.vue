@@ -324,11 +324,21 @@ const validate = async () => {
 
     if (requiredFields.length > 0) {
       for (const item of requiredFields) {
-        if (!form_data.value.tool_params[form_data.value.params_nested][item]) {
-          return Promise.reject({
-            node: props.nodeModel,
-            errMessage: item + t('dynamicsForm.tip.requiredMessage')
-          })
+        if (form_data.value.params_nested) {
+          if (!form_data.value.tool_params[form_data.value.params_nested][item]) {
+            return Promise.reject({
+              node: props.nodeModel,
+              errMessage: item + t('dynamicsForm.tip.requiredMessage')
+            })
+          }
+        } else {
+          // 这里是没有嵌套的情况
+          if (!form_data.value.tool_params[item]) {
+            return Promise.reject({
+              node: props.nodeModel,
+              errMessage: item + t('dynamicsForm.tip.requiredMessage')
+            })
+          }
         }
       }
     }
