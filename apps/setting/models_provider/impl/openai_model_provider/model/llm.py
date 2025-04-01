@@ -35,6 +35,7 @@ class OpenAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
             openai_api_base=model_credential.get('api_base'),
             openai_api_key=model_credential.get('api_key'),
             **optional_params,
+            streaming=True,
             custom_get_token_ids=custom_get_token_ids
         )
         return azure_chat_open_ai
