@@ -184,6 +184,7 @@
                             {{ $t('common.copy') }}
                           </el-dropdown-item>
                           <el-dropdown-item
+                            v-if="item.init_field_list?.length > 0"
                             :disabled="item.permission_type === 'PUBLIC' && !canEdit(item)"
                             @click.stop="configInitParams(item)"
                           >
