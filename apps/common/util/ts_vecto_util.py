@@ -12,9 +12,6 @@ from typing import List
 
 import jieba
 import jieba.posseg
-from jieba import analyse
-
-from common.util.split_model import group_by
 
 jieba_word_list_cache = [chr(item) for item in range(38, 84)]
 
@@ -80,37 +77,12 @@ def get_key_by_word_dict(key, word_dict):
 
 
 def to_ts_vector(text: str):
-    # 获取不分词的数据
-    word_list = get_word_list(text)
-    # 获取关键词关系
-    word_dict = to_word_dict(word_list, text)
-    # 替换字符串
-    text = replace_word(word_dict, text)
     # 分词
-    filter_word = jieba.analyse.extract_tags(text, topK=100)
-    result = jieba.lcut(text, HMM=True, use_paddle=True)
-    # 过滤标点符号
-    result = [item for item in result if filter_word.__contains__(item) and len(item) < 10]
-    result_ = [{'word': get_key_by_word_dict(result[index], word_dict), 'index': index} for index in
-               range(len(result))]
-    result_group = group_by(result_, lambda r: r['word'])
-    return " ".join(
-        [f"{key.lower()}:{','.join([str(item['index'] + 1) for item in result_group[key]][:20])}" for key in
-         result_group if
-         not remove_chars.__contains__(key) and len(key.strip()) >= 0])
+    result = jieba.lcut(text)
+    return " ".join(result)
 
 
 def to_query(text: str):
-    # 获取不分词的数据
-    word_list = get_word_list(text)
-    # 获取关键词关系
-    word_dict = to_word_dict(word_list, text)
-    # 替换字符串
-    text = replace_word(word_dict, text)
-    extract_tags = analyse.extract_tags(text, topK=5, withWeight=True, allowPOS=('ns', 'n', 'vn', 'v', 'eng'))
-    result = " ".join([get_key_by_word_dict(word, word_dict) for word, score in extract_tags if
-                       not remove_chars.__contains__(word)])
-    # 删除词库
-    for word in word_list:
-        jieba.del_word(word)
+    extract_tags = jieba.lcut(text)
+    result = " ".join(extract_tags)
     return result

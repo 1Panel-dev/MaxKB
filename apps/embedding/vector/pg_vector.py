@@ -12,7 +12,9 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import Dict, List
 
-from django.db.models import QuerySet
+import jieba
+from django.contrib.postgres.search import SearchVector
+from django.db.models import QuerySet, Value
 from langchain_core.embeddings import Embeddings
 
 from common.db.search import generate_sql_by_query_dict
@@ -68,7 +70,8 @@ class PGVector(BaseVectorStore):
                                     source_id=text_list[index].get('source_id'),
                                     source_type=text_list[index].get('source_type'),
                                     embedding=embeddings[index],
-                                    search_vector=to_ts_vector(text_list[index]['text'])) for index in
+                                    search_vector=SearchVector(Value(to_ts_vector(text_list[index]['text'])))) for
+                          index in
                           range(0, len(texts))]
         if not is_the_task_interrupted():
             QuerySet(Embedding).bulk_create(embedding_list) if len(embedding_list) > 0 else None
