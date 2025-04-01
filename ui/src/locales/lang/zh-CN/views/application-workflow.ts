@@ -222,7 +222,7 @@ export default {
     },
     mcpNode: {
       label: 'MCP 调用',
-      text: '通过 SSE 方式执行 MCP 服务中的工具',
+      text: '通过SSE方式执行MCP服务中的工具',
       getToolsSuccess: '获取工具成功',
       getTool: '获取工具',
       tool: '工具',

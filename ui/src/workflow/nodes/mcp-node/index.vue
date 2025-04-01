@@ -253,7 +253,7 @@ function changeTool() {
             props_info: {}
           },
           input_type: 'TextInput',
-          source: 'custom',
+          source: 'referencing',
           required: args_schema.properties[item].required?.indexOf(item2) !== -1,
           props_info: {
             rules: [
@@ -277,7 +277,7 @@ function changeTool() {
           props_info: {}
         },
         input_type: 'TextInput',
-        source: 'custom',
+        source: 'referencing',
         required: args_schema.required?.indexOf(item) !== -1,
         props_info: {
           rules: [
