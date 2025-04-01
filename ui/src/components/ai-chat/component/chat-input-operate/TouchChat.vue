@@ -23,9 +23,8 @@
             {{ message }}
           </span>
         </p>
-        <div class="close">
-          <el-icon><Close /></el-icon>
-        </div>
+        <el-avatar :size="isTouching ? 43 : 50" icon="Close" class="close" />
+        <!-- <div class="close"></div> -->
         <p class="lighter" :style="{ visibility: isTouching ? 'visible' : 'hidden' }">
           {{ message }}
         </p>
@@ -40,6 +39,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+// import { Close } from '@element-plus/icons-vue'
 const props = defineProps({
   time: {
     type: Number,
@@ -143,12 +143,8 @@ function onTouchEnd() {
     box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.1);
     border: 1px solid rgba(222, 224, 227, 1);
     background: rgba(255, 255, 255, 1);
-    border-radius: 100px;
-    display: inline-block;
-    width: 43px;
-    height: 43px;
-    line-height: 50px;
-    font-size: 1.8rem;
+    color: var(--app-text-color-secondary);
+    font-size: 1.6rem;
     margin: 20px 0;
   }
   .speech-img {
@@ -163,9 +159,7 @@ function onTouchEnd() {
     .close {
       background: #f54a45;
       color: #ffffff;
-      width: 50px;
-      height: 50px;
-      line-height: 57px;
+      border: none;
       font-size: 2rem;
     }
     .speech-img {

@@ -113,7 +113,7 @@
           </el-space>
         </div>
       </el-scrollbar>
-      <div class="flex">
+      <div class="flex" :style="{ alignItems: isMicrophone ? 'center' : 'end' }">
         <TouchChat
           v-if="isMicrophone"
           @TouchStart="startRecording"
@@ -554,7 +554,7 @@ class RecorderManage {
       MsgAlert(
         t('common.tip'),
         `${err}
-        <div style="width: 100%;height:1px;border-top:1px var(--el-border-color) var(--el-border-style);margin:10px 0;"></div> 
+        <div style="width: 100%;height:1px;border-top:1px var(--el-border-color) var(--el-border-style);margin:10px 0;"></div>
         ${t('chat.tip.recorderTip')}
     <img src="${new URL(`@/assets/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
         {
@@ -653,13 +653,23 @@ function autoSendMessage() {
     audio_list: uploadAudioList.value,
     video_list: uploadVideoList.value
   })
-  inputValue.value = ''
-  uploadImageList.value = []
-  uploadDocumentList.value = []
-  uploadAudioList.value = []
-  uploadVideoList.value = []
-  if (quickInputRef.value) {
-    quickInputRef.value.textareaStyle.height = '45px'
+
+  if (
+    props.sendMessage(inputValue.value, {
+      image_list: uploadImageList.value,
+      document_list: uploadDocumentList.value,
+      audio_list: uploadAudioList.value,
+      video_list: uploadVideoList.value
+    }) !== undefined
+  ) {
+    inputValue.value = ''
+    uploadImageList.value = []
+    uploadDocumentList.value = []
+    uploadAudioList.value = []
+    uploadVideoList.value = []
+    if (quickInputRef.value) {
+      quickInputRef.value.textareaStyle.height = '45px'
+    }
   }
 }
 
