@@ -2,7 +2,6 @@
   <el-select
     class="m-2"
     multiple
-    collapse-tags
     filterable
     clearable
     v-bind="$attrs"

@@ -1,6 +1,8 @@
 <template>
   <div class="flex-between mb-16">
-    <h5 class="lighter">{{ inputFieldConfig.title }}</h5>
+    <h5 class="break-all ellipsis lighter" style="max-width:80%" :title="inputFieldConfig.title">
+      {{ inputFieldConfig.title }}
+    </h5>
     <div>
       <el-button type="primary" link @click="openChangeTitleDialog">
         <el-icon>
@@ -172,7 +174,7 @@ function refreshFieldTitle(data: any) {
 }
 
 const getDefaultValue = (row: any) => {
-  if(row.input_type === 'PasswordInput') {
+  if (row.input_type === 'PasswordInput') {
     return '******'
   }
   if (row.default_value) {

@@ -102,23 +102,30 @@
                   :width="
                     xpackForm.show_avatar
                       ? xpackForm.show_user_avatar
-                        ? '240px'
+                        ? '232px'
                         : '270px'
                       : xpackForm.show_user_avatar
-                        ? '270px'
+                        ? '260px'
                         : '300px'
                   "
                 />
               </div>
-              <div class="flex" style="justify-content: flex-end">
+              <div class="flex mt-4" style="justify-content: flex-end">
                 <img
                   src="@/assets/display-bg3.png"
                   alt=""
-                  :width="xpackForm.show_user_avatar ? '240px' : '270px'"
-                  class="mr-8"
+                  :width="
+                    xpackForm.show_user_avatar
+                      ? xpackForm.show_avatar
+                        ? '227px'
+                        : '255px'
+                      : xpackForm.show_avatar
+                        ? '265px'
+                        : '292px'
+                  "
                   style="object-fit: contain"
                 />
-                <div class="avatar" v-if="xpackForm.show_user_avatar">
+                <div class="avatar ml-8" v-if="xpackForm.show_user_avatar">
                   <el-image
                     v-if="imgUrl.user_avatar"
                     :src="imgUrl.user_avatar"
