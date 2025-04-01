@@ -92,7 +92,7 @@ function getAccessToken(token: string) {
   })
 }
 onBeforeMount(() => {
-  user.changeUserType(2)
+  user.changeUserType(2, accessToken)
   Promise.all([user.asyncGetProfile(), getAccessToken(accessToken)])
     .catch(() => {
       applicationAvailable.value = false
