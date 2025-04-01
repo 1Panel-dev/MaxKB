@@ -686,7 +686,9 @@ function sendChatHandle(event?: any) {
   }
 }
 const insertNewlineAtCursor = (event?: any) => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = quickInputRef.value.$el.querySelector(
+    '.el-textarea__inner'
+  ) as HTMLTextAreaElement
   const startPos = textarea.selectionStart
   const endPos = textarea.selectionEnd
   // 阻止默认行为（避免额外的换行符）

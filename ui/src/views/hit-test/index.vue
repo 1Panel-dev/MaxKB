@@ -8,7 +8,7 @@
         </h4>
       </template>
       <div class="hit-test__main p-16" v-loading="loading">
-        <div class="question-title clearfix" v-if="questionTitle">
+        <div class="question-title" :style="{ visibility: questionTitle ? 'visible' : 'hidden' }">
           <div class="avatar">
             <AppAvatar>
               <img src="@/assets/user-icon.svg" style="width: 54%" alt="" />
@@ -233,6 +233,7 @@ const {
   params: { id }
 } = route as any
 
+const quickInputRef = ref()
 const ParagraphDialogRef = ref()
 const loading = ref(false)
 const paragraphDetail = ref<any[]>([])
@@ -297,7 +298,9 @@ function sendChatHandle(event: any) {
   }
 }
 const insertNewlineAtCursor = (event?: any) => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = quickInputRef.value.$el.querySelector(
+    '.el-textarea__inner'
+  ) as HTMLTextAreaElement
   const startPos = textarea.selectionStart
   const endPos = textarea.selectionEnd
   // 阻止默认行为（避免额外的换行符）
@@ -354,6 +357,8 @@ onMounted(() => {})
       padding-left: 40px;
       .text {
         padding: 6px 0;
+        height: 34px;
+        box-sizing: border-box;
       }
     }
   }
@@ -402,7 +407,7 @@ onMounted(() => {})
   }
 
   .hit-test-height {
-    height: calc(var(--app-main-height) - 135px);
+    height: calc(var(--app-main-height) - 170px);
   }
   .document-card {
     height: 210px;
