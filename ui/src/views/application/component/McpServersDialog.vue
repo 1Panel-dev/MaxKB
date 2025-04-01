@@ -19,7 +19,7 @@
       </el-form-item>
       <el-form-item
         v-if="form.mcp_enable"
-        label="MCP Server Config"
+        :label="$t('views.applicationWorkflow.nodes.mcpNode.configLabel')"
         prop="mcp_servers"
         :rules="[{ required: true, message: $t('common.required') }]"
       >

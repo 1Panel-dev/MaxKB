@@ -228,6 +228,7 @@ export default {
       tool: 'Tool',
       toolParam: 'Tool Params',
       mcpServerTip: 'Please enter the JSON format of the MCP server config',
+      configLabel: 'MCP Server Config (Only supports SSE call method)',
     },
     imageGenerateNode: {
       label: 'Image Generation',

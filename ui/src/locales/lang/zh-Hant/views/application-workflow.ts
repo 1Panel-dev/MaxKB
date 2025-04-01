@@ -228,6 +228,7 @@ export default {
       tool: '工具',
       toolParam: '工具變數',
       mcpServerTip: '請輸入 JSON 格式的 MCP 服務器配置',
+      configLabel: 'MCP Server Config (僅支持SSE調用方式)',
     },
     imageGenerateNode: {
       label: '圖片生成',
