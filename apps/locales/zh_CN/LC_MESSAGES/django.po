@@ -7651,3 +7651,6 @@ msgstr "字段: {name} 类型: {_type} 值: {value} 不支持的类型"
 
 msgid "Field: {name} No value set"
 msgstr "字段: {name} 未设置值"
+
+msgid "Generate related"
+msgstr "生成问题"

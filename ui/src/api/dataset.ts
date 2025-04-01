@@ -277,6 +277,20 @@ const importLarkDocument: (
 ) => Promise<Result<Array<any>>> = (dataset_id, data, loading) => {
   return post(`${prefix}/lark/${dataset_id}/import`, data, null, loading)
 }
+/**
+ * 生成关联问题
+ * @param dataset_id 知识库id
+ * @param data
+ * @param loading
+ * @returns
+ */
+const generateRelated: (
+  dataset_id: string,
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<Array<any>>> = (dataset_id, data, loading) => {
+  return put(`${prefix}/${dataset_id}/generate_related`, data, null, loading)
+}
 
 export default {
   getDataset,
@@ -297,5 +311,6 @@ export default {
   postLarkDataset,
   getLarkDocumentList,
   importLarkDocument,
-  putLarkDataset
+  putLarkDataset,
+  generateRelated
 }
