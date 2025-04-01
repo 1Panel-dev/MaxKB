@@ -509,7 +509,10 @@ function importFunctionLib(file: any) {
     })
 }
 
-function getList() {
+async function getList() {
+  if (userOptions.value?.length === 0) {
+    await getUserList()
+  }
   const params = {
     ...(searchValue.value && { name: searchValue.value }),
     ...(functionType.value && { function_type: functionType.value }),
@@ -545,28 +548,26 @@ function refresh(data: any) {
   getList()
 }
 
-function getUserList() {
-  applicationApi.getUserList('FUNCTION', loading).then((res) => {
-    if (res.data) {
-      userOptions.value = res.data.map((item: any) => {
-        return {
-          label: item.username,
-          value: item.id
-        }
-      })
-      if (user.userInfo) {
-        const selectUserIdValue = localStorage.getItem(user.userInfo.id + 'function')
-        if (selectUserIdValue && userOptions.value.find((v) => v.value === selectUserIdValue)) {
-          selectUserId.value = selectUserIdValue
-        }
+async function getUserList() {
+  const res = await applicationApi.getUserList('FUNCTION', loading)
+  if (res.data) {
+    userOptions.value = res.data.map((item: any) => {
+      return {
+        label: item.username,
+        value: item.id
       }
-      // getList()
+    })
+    if (user.userInfo) {
+      const selectUserIdValue = localStorage.getItem(user.userInfo.id + 'function')
+      if (selectUserIdValue && userOptions.value.find((v) => v.value === selectUserIdValue)) {
+        selectUserId.value = selectUserIdValue
+      }
     }
-  })
+  }
 }
 
 onMounted(() => {
-  getUserList()
+
 })
 </script>
 <style lang="scss" scoped>
