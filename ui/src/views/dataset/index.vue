@@ -127,12 +127,18 @@
                               v-if="item.type === '1'"
                               >{{ $t('views.dataset.setting.sync') }}</el-dropdown-item
                             >
+
                             <el-dropdown-item @click="reEmbeddingDataset(item)">
                               <AppIcon
                                 iconName="app-document-refresh"
                                 style="font-size: 16px"
                               ></AppIcon>
                               {{ $t('views.dataset.setting.vectorization') }}</el-dropdown-item
+                            >
+                            <el-dropdown-item
+                              icon="Connection"
+                              @click.stop="openGenerateDialog(item)"
+                              >{{ $t('views.document.generateQuestion.title') }}</el-dropdown-item
                             >
                             <el-dropdown-item
                               icon="Setting"
@@ -165,10 +171,11 @@
     </div>
     <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
     <CreateDatasetDialog ref="CreateDatasetDialogRef" />
+    <GenerateRelatedDialog ref="GenerateRelatedDialogRef" />
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
 import CreateDatasetDialog from './component/CreateDatasetDialog.vue'
 import datasetApi from '@/api/dataset'
@@ -179,7 +186,7 @@ import { ValidType, ValidCount } from '@/enums/common'
 import { t } from '@/locales'
 import useStore from '@/stores'
 import applicationApi from '@/api/application'
-
+import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
 const { user, common } = useStore()
 const router = useRouter()
 
@@ -192,6 +199,12 @@ const paginationConfig = reactive({
   page_size: 30,
   total: 0
 })
+const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
+function openGenerateDialog(row: any) {
+  if (GenerateRelatedDialogRef.value) {
+    GenerateRelatedDialogRef.value.open([], 'dataset', row.id)
+  }
+}
 
 const searchValue = ref('')
 

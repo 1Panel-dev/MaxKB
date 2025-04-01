@@ -21,6 +21,7 @@ from common.log.log import log
 from common.response import result
 from common.response.result import get_page_request_params, get_page_api_response, get_api_response
 from common.swagger_api.common_api import CommonApi
+from dataset.serializers.common_serializers import GenerateRelatedSerializer
 from dataset.serializers.dataset_serializers import DataSetSerializers
 from dataset.views.common import get_dataset_operation_object
 from setting.serializers.provider_serializers import ModelSerializer
@@ -172,6 +173,23 @@ class Dataset(APIView):
         def put(self, request: Request, dataset_id: str):
             return result.success(
                 DataSetSerializers.Operate(data={'id': dataset_id, 'user_id': request.user.id}).re_embedding())
+
+    class GenerateRelated(APIView):
+        authentication_classes = [TokenAuth]
+
+        @action(methods=['PUT'], detail=False)
+        @swagger_auto_schema(operation_summary=_('Generate related'), operation_id=_('Generate related'),
+                             manual_parameters=DataSetSerializers.Operate.get_request_params_api(),
+                             request_body=GenerateRelatedSerializer.get_request_body_api(),
+                             tags=[_('Knowledge Base')]
+                             )
+        @log(menu='document', operate="Generate related documents",
+             get_operation_object=lambda r, keywords: get_dataset_operation_object(keywords.get('dataset_id'))
+             )
+        def put(self, request: Request, dataset_id: str):
+            return result.success(
+                DataSetSerializers.Operate(data={'id': dataset_id, 'user_id': request.user.id}).generate_related(
+                    request.data))
 
     class Export(APIView):
         authentication_classes = [TokenAuth]

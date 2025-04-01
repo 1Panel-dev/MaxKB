@@ -11,6 +11,8 @@ urlpatterns = [
     path('dataset/<str:dataset_id>/export', views.Dataset.Export.as_view(), name="export"),
     path('dataset/<str:dataset_id>/export_zip', views.Dataset.ExportZip.as_view(), name="export_zip"),
     path('dataset/<str:dataset_id>/re_embedding', views.Dataset.Embedding.as_view(), name="dataset_key"),
+    path('dataset/<str:dataset_id>/generate_related', views.Dataset.GenerateRelated.as_view(),
+         name="dataset_generate_related"),
     path('dataset/<str:dataset_id>/application', views.Dataset.Application.as_view()),
     path('dataset/<int:current_page>/<int:page_size>', views.Dataset.Page.as_view(), name="dataset"),
     path('dataset/<str:dataset_id>/sync_web', views.Dataset.SyncWeb.as_view()),

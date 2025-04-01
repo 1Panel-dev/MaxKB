@@ -64,6 +64,17 @@ def get_is_the_task_interrupted(document_id):
     return is_the_task_interrupted
 
 
+@celery_app.task(base=QueueOnce, once={'keys': ['dataset_id']},
+                 name='celery:generate_related_by_dataset')
+def generate_related_by_dataset_id(dataset_id, model_id, prompt, state_list=None):
+    document_list = QuerySet(Document).filter(dataset_id=dataset_id)
+    for document in document_list:
+        try:
+            generate_related_by_document_id.delay(document.id, model_id, prompt, state_list)
+        except Exception as e:
+            pass
+
+
 @celery_app.task(base=QueueOnce, once={'keys': ['document_id']},
                  name='celery:generate_related_by_document')
 def generate_related_by_document_id(document_id, model_id, prompt, state_list=None):

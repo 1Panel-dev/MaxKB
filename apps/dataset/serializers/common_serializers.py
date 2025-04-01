@@ -222,3 +222,26 @@ def get_embedding_model_id_by_dataset_id_list(dataset_id_list: List):
     if len(dataset_list) == 0:
         raise Exception(_('Knowledge base setting error, please reset the knowledge base'))
     return str(dataset_list[0].embedding_mode_id)
+
+
+class GenerateRelatedSerializer(ApiMixin, serializers.Serializer):
+    model_id = serializers.UUIDField(required=True, error_messages=ErrMessage.uuid(_('Model id')))
+    prompt = serializers.CharField(required=True, error_messages=ErrMessage.uuid(_('Prompt word')))
+    state_list = serializers.ListField(required=False, child=serializers.CharField(required=True),
+                                       error_messages=ErrMessage.list("state list"))
+
+    @staticmethod
+    def get_request_body_api():
+        return openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'model_id': openapi.Schema(type=openapi.TYPE_STRING,
+                                           title=_('Model id'),
+                                           description=_('Model id')),
+                'prompt': openapi.Schema(type=openapi.TYPE_STRING, title=_('Prompt word'),
+                                         description=_("Prompt word")),
+                'state_list': openapi.Schema(type=openapi.TYPE_ARRAY,
+                                             items=openapi.Schema(type=openapi.TYPE_STRING),
+                                             title=_('state list'))
+            }
+        )
