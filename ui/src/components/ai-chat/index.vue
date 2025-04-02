@@ -5,7 +5,10 @@
     :class="type"
     :style="{ height: firsUserInput ? '100%' : undefined }"
   >
-    <div v-show="showUserInputContent" :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'">
+    <div
+      v-show="showUserInputContent"
+      :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'"
+    >
       <UserForm
         v-model:api_form_data="api_form_data"
         v-model:form_data="form_data"
@@ -60,9 +63,11 @@
         :type="type"
         :send-message="sendMessage"
         :open-chat-id="openChatId"
+        :check-input-param="checkInputParam"
         :chat-management="ChatManagement"
         v-model:chat-id="chartOpenId"
         v-model:loading="loading"
+        v-model:show-user-input="showUserInput"
         v-if="type !== 'log'"
       >
         <template #operateBefore>
@@ -209,6 +214,9 @@ function UserFormCancel() {
   // form_data.value = JSON.parse(JSON.stringify(initialFormData.value))
   // api_form_data.value = JSON.parse(JSON.stringify(initialApiFormData.value))
   showUserInput.value = false
+}
+const checkInputParam = () => {
+  userFormRef.value?.checkInputParam()
 }
 
 function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
