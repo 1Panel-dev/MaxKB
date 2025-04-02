@@ -136,7 +136,7 @@ class Document(APIView):
     @has_permissions(
         lambda r, k: Permission(group=Group.DATASET, operate=Operate.MANAGE,
                                 dynamic_tag=k.get('dataset_id')))
-    @log(menu='Knowledge Base/Document', operate="Create document",
+    @log(menu='document', operate="Create document",
          get_operation_object=lambda r, keywords: get_dataset_document_operation_object(
              get_dataset_operation_object(keywords.get('dataset_id')),
              {'name': r.data.get('name')}))
