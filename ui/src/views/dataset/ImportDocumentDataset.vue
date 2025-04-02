@@ -5,7 +5,7 @@
     </template>
     <div class="create-dataset__main flex" v-loading="loading">
       <div class="create-dataset__component main-calc-height">
-        <div class="upload-document p-24">
+        <div class="upload-document p-24" style="min-width: 850px">
           <h4 class="title-decoration-1 mb-8">
             {{ $t('views.document.feishu.selectDocument') }}
           </h4>
@@ -41,7 +41,7 @@
                 @change="handleAllCheckChange"
               />
             </div>
-            <div style="height: calc(100vh - 430px)">
+            <div style="height: calc(100vh - 450px)">
               <el-scrollbar>
                 <el-tree
                   :props="props"
