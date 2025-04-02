@@ -13,21 +13,19 @@ from setting.models_provider.base_model_provider import BaseModelCredential, Val
 class VolcanicEngineTTSModelGeneralParams(BaseForm):
     voice_type = forms.SingleSelect(
         TooltipLabel(_('timbre'), _('Chinese sounds can support mixed scenes of Chinese and English')),
-        required=True, default_value='BV002_streaming',
+        required=True, default_value='zh_female_cancan_mars_bigtts',
         text_field='value',
         value_field='value',
         option_list=[
-            {'text': 'CanCan 2.0', 'value': 'BV700_V2_streaming'},
-            {'text': 'Yangyang', 'value': 'BV705_streaming'},
-            {'text': 'Qingcang 2.0', 'value': 'BV701_V2_streaming'},
-            {'text': _('Universal female voice'), 'value': 'BV001_V2_streaming'},
-            {'text': 'CanCan', 'value': 'BV700_streaming'},
-            {'text': _('Supernatural timbre-ZiZi 2.0'), 'value': 'BV406_V2_streaming'},
-            {'text': _('Supernatural timbre-ZiZi'), 'value': 'BV406_streaming'},
-            {'text': _('Supernatural sound-Ranran 2.0'), 'value': 'BV407_V2_streaming'},
-            {'text': _('Supernatural sound-Ranran'), 'value': 'BV407_streaming'},
-            {'text': _('Universal female voice'), 'value': 'BV001_streaming'},
-            {'text': _('Universal male voice'), 'value': 'BV002_streaming'},
+            {'text': '灿灿/Shiny', 'value': 'zh_female_cancan_mars_bigtts'},
+            {'text': '清新女声', 'value': 'zh_female_qingxinnvsheng_mars_bigtts'},
+            {'text': '爽快思思/Skye', 'value': 'zh_female_shuangkuaisisi_moon_bigtts'},
+            {'text': '湾区大叔', 'value': 'zh_female_wanqudashu_moon_bigtts' },
+            {'text': '呆萌川妹', 'value': 'zh_female_daimengchuanmei_moon_bigtts'},
+            {'text': '广州德哥', 'value': 'zh_male_guozhoudege_moon_bigtts'},
+            {'text': '北京小爷', 'value': 'zh_male_beijingxiaoye_moon_bigtts'},
+            {'text': '少年梓辛/Brayan', 'value': 'zh_male_shaonianzixin_moon_bigtts'},
+            {'text': '魅力女友', 'value': 'zh_female_meilinvyou_moon_bigtts'},
         ])
     speed_ratio = forms.SliderField(
         TooltipLabel(_('speaking speed'), _('[0.2,3], the default is 1, usually one decimal place is enough')),

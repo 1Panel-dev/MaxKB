@@ -61,7 +61,7 @@ class VolcanicEngineTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {'voice_type': 'BV002_streaming', 'speed_ratio': 1.0}}
+        optional_params = {'params': {'voice_type': 'zh_female_cancan_mars_bigtts', 'speed_ratio': 1.0}}
         for key, value in model_kwargs.items():
             if key not in ['model_id', 'use_local', 'streaming']:
                 optional_params['params'][key] = value
