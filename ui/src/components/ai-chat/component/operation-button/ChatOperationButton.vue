@@ -41,7 +41,7 @@
       </span>
       <span v-if="type == 'ai-chat' || type == 'log'">
         <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
-          <el-button text @click="copyClick(data?.answer_text.trim())">
+          <el-button text @click="copy(data)">
             <AppIcon iconName="app-copy"></AppIcon>
           </el-button>
         </el-tooltip>
@@ -106,7 +106,16 @@ import applicationApi from '@/api/application'
 import { datetimeFormat } from '@/utils/time'
 import { MsgError } from '@/utils/message'
 import bus from '@/bus'
-
+const copy = (data: any) => {
+  try {
+    const text = data.answer_text_list
+      .map((item: Array<any>) => item.map((i) => i.content).join('\n'))
+      .join('\n\n')
+    copyClick(text)
+  } catch (e: any) {
+    copyClick(removeFormRander(data?.answer_text.trim()))
+  }
+}
 const route = useRoute()
 const {
   params: { id }
