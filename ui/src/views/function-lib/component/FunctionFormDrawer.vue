@@ -508,9 +508,6 @@ const open = (data: any) => {
   visible.value = true
   setTimeout(() => {
     showEditor.value = true
-    nextTick(() => {
-      onDragHandle()
-    })
   }, 100)
 }
 

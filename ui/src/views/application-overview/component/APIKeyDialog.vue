@@ -24,7 +24,11 @@
       <el-table-column :label="$t('common.status.label')" width="70">
         <template #default="{ row }">
           <div @click.stop>
-            <el-switch size="small" v-model="row.is_active" @change="changeState($event, row)" />
+            <el-switch
+              size="small"
+              v-model="row.is_active"
+              :before-change="() => changeState(row)"
+            />
           </div>
         </template>
       </el-table-column>
@@ -104,17 +108,23 @@ function deleteApiKey(row: any) {
     .catch(() => {})
 }
 
-function changeState(bool: Boolean, row: any) {
+function changeState(row: any) {
   const obj = {
-    is_active: bool
+    is_active: !row.is_active
   }
-  const str = bool
+  const str = obj.is_active
     ? t('views.applicationOverview.appInfo.APIKeyDialog.enabledSuccess')
     : t('views.applicationOverview.appInfo.APIKeyDialog.disabledSuccess')
-  overviewApi.putAPIKey(id as string, row.id, obj, loading).then((res) => {
-    MsgSuccess(str)
-    getApiKeyList()
-  })
+  overviewApi
+    .putAPIKey(id as string, row.id, obj, loading)
+    .then((res) => {
+      MsgSuccess(str)
+      getApiKeyList()
+      return true
+    })
+    .catch(() => {
+      return false
+    })
 }
 
 function createApiKey() {

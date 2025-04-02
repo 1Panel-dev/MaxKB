@@ -172,7 +172,7 @@ export default {
   feishu: {
     selectDocument: 'Select Document',
     tip1: 'Supports document and table types, including TXT, Markdown, PDF, DOCX, HTML, XLS, XLSX, CSV, and ZIP formats;',
-    tip2: 'The system does not store the original documents. Before importing a document, it is recommended to standardize the paragraph segmentation markings of the document.',
+    tip2: 'The system does not store original documents. Before importing, Please ensure the document follows standardized paragraph markers',
     allCheck: 'Select All',
     errorMessage1: 'Please select a document'
   }
