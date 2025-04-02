@@ -132,7 +132,8 @@ class ZipParseQAHandle(BaseParseQAHandle):
             files = zip_ref.namelist()
             # 读取压缩包中的文件内容
             for file in files:
-                if file.endswith('/'):
+                # 跳过 macOS 特有的元数据目录和文件
+                if file.endswith('/') or file.startswith('__MACOSX'):
                     continue
                 with zip_ref.open(file) as f:
                     # 对文件内容进行处理
