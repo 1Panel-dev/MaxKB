@@ -65,7 +65,6 @@
                 ref="elUploadRef"
                 :file-list="[]"
                 action="#"
-                multiple
                 :auto-upload="false"
                 :show-file-list="false"
                 :limit="1"
