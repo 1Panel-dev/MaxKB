@@ -357,8 +357,10 @@ const decodeQuery = (query: string) => {
   }
 }
 const confirmHandle = () => {
-  localStorage.setItem(`${accessToken}userForm`, JSON.stringify(form_data_context.value))
-  emit('confirm')
+  if (checkInputParam()) {
+    localStorage.setItem(`${accessToken}userForm`, JSON.stringify(form_data_context.value))
+    emit('confirm')
+  }
 }
 const cancelHandle = () => {
   emit('cancel')

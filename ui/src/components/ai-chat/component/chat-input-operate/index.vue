@@ -653,23 +653,13 @@ function autoSendMessage() {
     audio_list: uploadAudioList.value,
     video_list: uploadVideoList.value
   })
-
-  if (
-    props.sendMessage(inputValue.value, {
-      image_list: uploadImageList.value,
-      document_list: uploadDocumentList.value,
-      audio_list: uploadAudioList.value,
-      video_list: uploadVideoList.value
-    }) !== undefined
-  ) {
-    inputValue.value = ''
-    uploadImageList.value = []
-    uploadDocumentList.value = []
-    uploadAudioList.value = []
-    uploadVideoList.value = []
-    if (quickInputRef.value) {
-      quickInputRef.value.textareaStyle.height = '45px'
-    }
+  inputValue.value = ''
+  uploadImageList.value = []
+  uploadDocumentList.value = []
+  uploadAudioList.value = []
+  uploadVideoList.value = []
+  if (quickInputRef.value) {
+    quickInputRef.value.textareaStyle.height = '45px'
   }
 }
 

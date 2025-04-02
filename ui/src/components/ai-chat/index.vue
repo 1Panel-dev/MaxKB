@@ -5,7 +5,7 @@
     :class="type"
     :style="{ height: firsUserInput ? '100%' : undefined }"
   >
-    <div v-if="showUserInputContent" :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'">
+    <div v-show="showUserInputContent" :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'">
       <UserForm
         v-model:api_form_data="api_form_data"
         v-model:form_data="form_data"
@@ -193,23 +193,21 @@ watch(
 
 const toggleUserInput = () => {
   showUserInput.value = !showUserInput.value
-  if (showUserInput.value) {
-    // 保存当前数据作为初始数据（用于可能的恢复）
-    initialFormData.value = JSON.parse(JSON.stringify(form_data.value))
-    initialApiFormData.value = JSON.parse(JSON.stringify(api_form_data.value))
-  }
+  // if (showUserInput.value) {
+  //   // 保存当前数据作为初始数据（用于可能的恢复）
+  //   initialFormData.value = JSON.parse(JSON.stringify(form_data.value))
+  //   initialApiFormData.value = JSON.parse(JSON.stringify(api_form_data.value))
+  // }
 }
 
 function UserFormConfirm() {
-  if (userFormRef.value?.checkInputParam()) {
-    firsUserInput.value = false
-    showUserInput.value = false
-  }
+  firsUserInput.value = false
+  showUserInput.value = false
 }
 function UserFormCancel() {
-  // 恢复初始数据
-  form_data.value = JSON.parse(JSON.stringify(initialFormData.value))
-  api_form_data.value = JSON.parse(JSON.stringify(initialApiFormData.value))
+  // // 恢复初始数据
+  // form_data.value = JSON.parse(JSON.stringify(initialFormData.value))
+  // api_form_data.value = JSON.parse(JSON.stringify(initialApiFormData.value))
   showUserInput.value = false
 }
 
