@@ -249,7 +249,10 @@ export class ChatRecordManage {
   write() {
     this.chat.is_stop = false
     this.is_stop = false
-    this.is_close = false
+    if (!this.is_close) {
+      this.is_close = false
+    }
+
     this.write_ed = false
     this.chat.write_ed = false
     if (this.loading) {
