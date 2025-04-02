@@ -343,10 +343,21 @@ const validate = async () => {
       }
     }
   }
-  let ps = [replyNodeFormRef.value?.validate()]
-  return Promise.all(ps).catch((err: any) => {
-    return Promise.reject({ node: props.nodeModel, errMessage: err })
-  })
+  if (replyNodeFormRef.value) {
+    const form = cloneDeep(form_data.value)
+    if (!form.mcp_servers) {
+      return Promise.reject({
+        node: props.nodeModel,
+        errMessage: t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip')
+      })
+    }
+    if (!form.mcp_tool) {
+      return Promise.reject({
+        node: props.nodeModel,
+        errMessage: t('views.applicationWorkflow.nodes.mcpNode.mcpToolTip')
+      })
+    }
+  }
 }
 
 onMounted(() => {

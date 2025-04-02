@@ -227,7 +227,8 @@ export default {
       getTool: '獲取工具',
       tool: '工具',
       toolParam: '工具變數',
-      mcpServerTip: '請輸入 JSON 格式的 MCP 服務器配置',
+      mcpServerTip: '請輸入JSON格式的MCP服務器配置',
+      mcpToolTip: '請選擇工具',
       configLabel: 'MCP Server Config (僅支持SSE調用方式)',
     },
     imageGenerateNode: {
