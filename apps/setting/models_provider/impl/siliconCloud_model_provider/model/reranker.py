@@ -36,26 +36,6 @@ class SiliconCloudReranker(MaxKBBaseModel, BaseDocumentCompressor):
             top_n=model_kwargs.get('top_n', 3)
         )
 
-    def __init__(
-            self, api_base: Optional[str] = None, model: Optional[str] = None, top_n=3,
-            api_key: Optional[str] = None
-    ):
-        super().__init__()
-
-        if not api_base:
-            raise ValueError(_('Please provide server URL'))
-
-        if not model:
-            raise ValueError(_('Please provide the model'))
-
-        if not api_key:
-            raise ValueError(_('Please provide the API Key'))
-
-        self.api_base = api_base
-        self.model = model
-        self.api_key = api_key
-        self.top_n = top_n
-
     def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \
             Sequence[Document]:
         if not documents:
