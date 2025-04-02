@@ -179,9 +179,8 @@ function editName(val: string, item: any) {
     const obj = {
       abstract: val
     }
-
     log.asyncPutChatClientLog(applicationDetail.value.id, item.id, obj, loading).then(() => {
-      const find = chatLogData.value.find((item: any) => item.id == item.id)
+      const find = chatLogData.value.find((row: any) => row.id === item.id)
       if (find) {
         find.abstract = val
       }
