@@ -99,7 +99,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import applicationApi from '@/api/application'
@@ -489,7 +489,7 @@ class AudioManage {
     // text 处理成纯文本
     text = markdownToPlainText(text)
     const split = smartSplit(
-      props.data.answer_text,
+      text,
       {
         0: 20,
         1: 50,
@@ -525,6 +525,11 @@ onMounted(() => {
       }
     }
   })
+})
+onBeforeUnmount(() => {
+  if (audioManage.value) {
+    audioManage.value.pause()
+  }
 })
 </script>
 <style lang="scss" scoped>
