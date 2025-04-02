@@ -268,15 +268,17 @@ const props = withDefaults(
     isMobile: boolean
     appId?: string
     chatId: string
+    showUserInput?: boolean
     sendMessage: (question: string, other_params_data?: any, chat?: chatType) => void
     openChatId: () => Promise<string>
+    checkInputParam: () => boolean
   }>(),
   {
     applicationDetails: () => ({}),
     available: true
   }
 )
-const emit = defineEmits(['update:chatId', 'update:loading'])
+const emit = defineEmits(['update:chatId', 'update:loading', 'update:showUserInput'])
 const chartOpenId = ref<string>()
 const chatId_context = computed({
   get: () => {
