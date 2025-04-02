@@ -314,7 +314,9 @@ class AudioManage {
             .then(async (res: any) => {
               if (res.type === 'application/json') {
                 const text = await res.text()
-                MsgError(text)
+                if (this.tryList[index] >= 3) {
+                  MsgError(text)
+                }
                 this.statusList[index] = AudioStatus.ERROR
                 throw ''
               }
@@ -375,8 +377,9 @@ class AudioManage {
             .then(async (res: any) => {
               if (res.type === 'application/json') {
                 const text = await res.text()
-                MsgError(text)
-
+                if (this.tryList[index] >= 3) {
+                  MsgError(text)
+                }
                 throw ''
               }
               // 假设我们有一个 MP3 文件的字节数组
