@@ -313,6 +313,7 @@ class ModelSerializer(serializers.Serializer):
             return ModelSerializer.model_to_dict(model)
 
         def one_meta(self, with_valid=False):
+            model = None
             if with_valid:
                 super().is_valid(raise_exception=True)
                 model = QuerySet(Model).filter(id=self.data.get("id")).first()
@@ -320,7 +321,8 @@ class ModelSerializer(serializers.Serializer):
                     raise AppApiException(500, _('Model does not exist'))
                 if model.permission_type == 'PRIVATE' and str(model.user_id) != str(self.data.get("user_id")):
                     raise Exception(_('No permission to use this model') + f"{model.name}")
-            model = QuerySet(Model).get(id=self.data.get('id'))
+            if model is None:
+                model = QuerySet(Model).get(id=self.data.get('id'))
             return {'id': str(model.id), 'provider': model.provider, 'name': model.name, 'model_type': model.model_type,
                     'model_name': model.model_name,
                     'status': model.status,
