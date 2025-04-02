@@ -655,13 +655,17 @@ function autoSendMessage() {
     audio_list: uploadAudioList.value,
     video_list: uploadVideoList.value
   })
-  inputValue.value = ''
-  uploadImageList.value = []
-  uploadDocumentList.value = []
-  uploadAudioList.value = []
-  uploadVideoList.value = []
-  if (quickInputRef.value) {
-    quickInputRef.value.textareaStyle.height = '45px'
+  if (!props.checkInputParam()) {
+    return
+  } else {
+    inputValue.value = ''
+    uploadImageList.value = []
+    uploadDocumentList.value = []
+    uploadAudioList.value = []
+    uploadVideoList.value = []
+    if (quickInputRef.value) {
+      quickInputRef.value.textareaStyle.height = '45px'
+    }
   }
 }
 

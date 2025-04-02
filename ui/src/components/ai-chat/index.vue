@@ -198,11 +198,11 @@ watch(
 
 const toggleUserInput = () => {
   showUserInput.value = !showUserInput.value
-  // if (showUserInput.value) {
-  //   // 保存当前数据作为初始数据（用于可能的恢复）
-  //   initialFormData.value = JSON.parse(JSON.stringify(form_data.value))
-  //   initialApiFormData.value = JSON.parse(JSON.stringify(api_form_data.value))
-  // }
+  if (showUserInput.value) {
+    // 保存当前数据作为初始数据（用于可能的恢复）
+    initialFormData.value = JSON.parse(JSON.stringify(form_data.value))
+    initialApiFormData.value = JSON.parse(JSON.stringify(api_form_data.value))
+  }
 }
 
 function UserFormConfirm() {
@@ -210,13 +210,14 @@ function UserFormConfirm() {
   showUserInput.value = false
 }
 function UserFormCancel() {
-  // // 恢复初始数据
-  // form_data.value = JSON.parse(JSON.stringify(initialFormData.value))
-  // api_form_data.value = JSON.parse(JSON.stringify(initialApiFormData.value))
+  // 恢复初始数据
+  form_data.value = JSON.parse(JSON.stringify(initialFormData.value))
+  api_form_data.value = JSON.parse(JSON.stringify(initialApiFormData.value))
+  userFormRef.value?.render(form_data.value)
   showUserInput.value = false
 }
 const checkInputParam = () => {
-  userFormRef.value?.checkInputParam()
+  return userFormRef.value?.checkInputParam() || false
 }
 
 function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
