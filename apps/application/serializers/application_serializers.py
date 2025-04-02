@@ -332,7 +332,8 @@ class ApplicationSerializer(serializers.Serializer):
                                 for field in input_field_list:
                                     if field['assignment_method'] == 'api_input' and field['variable'] in params:
                                         query += f"&{field['variable']}={params[field['variable']]}"
-
+            if 'asker' in params:
+                query += f"&asker={params.get('asker')}"
             return query
 
     class AccessTokenSerializer(serializers.Serializer):
