@@ -111,7 +111,7 @@ const copy = (data: any) => {
     const text = data.answer_text_list
       .map((item: Array<any>) => item.map((i) => i.content).join('\n'))
       .join('\n\n')
-    copyClick(text)
+    copyClick(removeFormRander(text))
   } catch (e: any) {
     copyClick(removeFormRander(data?.answer_text.trim()))
   }
