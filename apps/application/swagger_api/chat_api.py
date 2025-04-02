@@ -54,6 +54,85 @@ class ChatClientHistoryApi(ApiMixin):
 
 class OpenAIChatApi(ApiMixin):
     @staticmethod
+    def get_response_body_api():
+        return openapi.Responses(responses={
+            200: openapi.Response(description=_('response parameters'),
+                                  schema=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                        required=['id',
+                                                                  'choices'],
+                                                        properties={
+                                                            'id': openapi.Schema(
+                                                                type=openapi.TYPE_STRING,
+                                                                title=_(
+                                                                    "Conversation ID")),
+                                                            'choices': openapi.Schema(
+                                                                type=openapi.TYPE_ARRAY,
+                                                                items=openapi.Schema(
+                                                                    type=openapi.TYPE_OBJECT,
+                                                                    required=[
+                                                                        'message'],
+                                                                    properties={
+                                                                        'finish_reason': openapi.Schema(
+                                                                            type=openapi.TYPE_STRING, ),
+                                                                        'index': openapi.Schema(
+                                                                            type=openapi.TYPE_INTEGER),
+                                                                        'answer_list': openapi.Schema(
+                                                                            type=openapi.TYPE_ARRAY,
+                                                                            items=openapi.Schema(
+                                                                                type=openapi.TYPE_OBJECT,
+                                                                                required=[
+                                                                                    'content'],
+                                                                                properties={
+                                                                                    'content': openapi.Schema(
+                                                                                        type=openapi.TYPE_STRING),
+                                                                                    'view_type': openapi.Schema(
+                                                                                        type=openapi.TYPE_STRING),
+                                                                                    'runtime_node_id': openapi.Schema(
+                                                                                        type=openapi.TYPE_STRING),
+                                                                                    'chat_record_id': openapi.Schema(
+                                                                                        type=openapi.TYPE_STRING),
+                                                                                    'reasoning_content': openapi.Schema(
+                                                                                        type=openapi.TYPE_STRING),
+                                                                                }
+                                                                            )),
+                                                                        'message': openapi.Schema(
+                                                                            type=openapi.TYPE_OBJECT,
+                                                                            required=[
+                                                                                'content'],
+                                                                            properties={
+                                                                                'content': openapi.Schema(
+                                                                                    type=openapi.TYPE_STRING),
+                                                                                'role': openapi.Schema(
+                                                                                    type=openapi.TYPE_STRING)
+
+                                                                            }),
+
+                                                                    }
+                                                                )),
+                                                            'created': openapi.Schema(
+                                                                type=openapi.TYPE_INTEGER),
+                                                            'model': openapi.Schema(
+                                                                type=openapi.TYPE_STRING),
+                                                            'object': openapi.Schema(
+                                                                type=openapi.TYPE_STRING),
+                                                            'usage': openapi.Schema(
+                                                                type=openapi.TYPE_OBJECT,
+                                                                required=[
+                                                                    'completion_tokens',
+                                                                    'prompt_tokens',
+                                                                    'total_tokens'],
+                                                                properties={
+                                                                    'completion_tokens': openapi.Schema(
+                                                                        type=openapi.TYPE_INTEGER),
+                                                                    'prompt_tokens': openapi.Schema(
+                                                                        type=openapi.TYPE_INTEGER),
+                                                                    'total_tokens': openapi.Schema(
+                                                                        type=openapi.TYPE_INTEGER)
+                                                                })
+
+                                                        }))})
+
+    @staticmethod
     def get_request_body_api():
         return openapi.Schema(type=openapi.TYPE_OBJECT,
                               required=['message'],

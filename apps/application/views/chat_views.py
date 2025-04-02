@@ -37,6 +37,7 @@ class Openai(APIView):
     @swagger_auto_schema(operation_summary=_("OpenAI Interface Dialogue"),
                          operation_id=_("OpenAI Interface Dialogue"),
                          request_body=OpenAIChatApi.get_request_body_api(),
+                         responses=OpenAIChatApi.get_response_body_api(),
                          tags=[_("OpenAI Dialogue")])
     def post(self, request: Request, application_id: str):
         return OpenAIChatSerializer(data={'application_id': application_id, 'client_id': request.auth.client_id,
