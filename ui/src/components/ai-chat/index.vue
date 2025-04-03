@@ -221,20 +221,21 @@ const checkInputParam = () => {
 }
 
 function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
-  if (!userFormRef.value?.checkInputParam()) {
-    if (isUserInput.value) {
+  if (isUserInput.value) {
+    if (!userFormRef.value?.checkInputParam()) {
       showUserInput.value = true
+      return
+    } else {
+      let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
+      const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
+        result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
+          ? userFormData[key]
+          : form_data.value[key]
+        return result
+      }, {})
+      localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
+      showUserInput.value = false
     }
-    return
-  } else {
-    let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
-    const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
-      result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
-        ? userFormData[key]
-        : form_data.value[key]
-      return result
-    }, {})
-    localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
   }
   if (!loading.value && props.applicationDetails?.name) {
     handleDebounceClick(val, other_params_data, chat)
