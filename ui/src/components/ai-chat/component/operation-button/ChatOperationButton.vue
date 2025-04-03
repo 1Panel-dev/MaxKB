@@ -539,6 +539,9 @@ onBeforeUnmount(() => {
   if (audioManage.value) {
     audioManage.value.pause()
   }
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel()
+  }
 })
 </script>
 <style lang="scss" scoped>
