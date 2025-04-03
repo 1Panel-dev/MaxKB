@@ -536,6 +536,8 @@ onMounted(() => {
   })
 })
 onBeforeUnmount(() => {
+  bus.off('change:answer')
+  bus.off('play:pause')
   if (audioManage.value) {
     audioManage.value.pause()
   }
