@@ -78,11 +78,11 @@ def get_key_by_word_dict(key, word_dict):
 
 def to_ts_vector(text: str):
     # 分词
-    result = jieba.lcut(text)
+    result = jieba.lcut(text, cut_all=True)
     return " ".join(result)
 
 
 def to_query(text: str):
-    extract_tags = jieba.lcut(text)
+    extract_tags = jieba.lcut(text, cut_all=True)
     result = " ".join(extract_tags)
     return result
