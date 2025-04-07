@@ -8,7 +8,8 @@ FROM
 		"id",
 		"name",
 		'DATASET' AS "type",
-		user_id
+		user_id,
+		"type" AS "icon"
 	FROM
 		dataset
 	WHERE
@@ -17,7 +18,8 @@ FROM
 		"id",
 		"name",
 		'APPLICATION' AS "type",
-		user_id
+		user_id,
+	    "icon" AS "icon"
 	FROM
 		application
 	WHERE
