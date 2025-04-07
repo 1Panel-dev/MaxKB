@@ -25,7 +25,6 @@ import LogoIcon from './logo/LogoIcon.vue'
 import SendIcon from './logo/SendIcon.vue'
 import CodemirrorEditor from './codemirror-editor/index.vue'
 import ModelSelect from './model-select/index.vue'
-
 export default {
   install(app: App) {
     app.component(AppIcon.name, AppIcon)
