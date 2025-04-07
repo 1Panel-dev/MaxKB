@@ -377,6 +377,9 @@ const open = (provider: Provider, model_type?: string) => {
   dialogVisible.value = true
   base_form_data.value.model_type = model_type || ''
   activeName.value = 'base-info'
+  if (model_type) {
+    list_base_model(model_type)
+  }
 }
 
 const list_base_model = (model_type: any, change?: boolean) => {
