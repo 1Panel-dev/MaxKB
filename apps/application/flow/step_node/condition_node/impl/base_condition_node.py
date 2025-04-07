@@ -40,7 +40,11 @@ class BaseConditionNode(IConditionNode):
             value = self.workflow_manage.generate_prompt(value)
         except Exception as e:
             pass
-        field_value = self.workflow_manage.get_reference_field(field_list[0], field_list[1:])
+        field_value = None
+        try:
+            field_value = self.workflow_manage.get_reference_field(field_list[0], field_list[1:])
+        except  Exception as e:
+            pass
         for compare_handler in compare_handle_list:
             if compare_handler.support(field_list[0], field_list[1:], field_value, compare, value):
                 return compare_handler.compare(field_value, compare, value)

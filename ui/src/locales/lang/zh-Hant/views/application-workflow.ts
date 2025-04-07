@@ -22,7 +22,7 @@ export default {
     copyParam: '複製參數',
     debug: '調試',
     exit: '直接退出',
-    exitSave: '保存並退出',
+    exitSave: '保存並退出'
   },
   tip: {
     publicSuccess: '發布成功',
@@ -37,7 +37,7 @@ export default {
     cannotCopy: '不能被複製',
     copyError: '已複製節點',
     paramErrorMessage: '參數已存在: ',
-    saveMessage: '當前修改未保存，是否保存後退出？',
+    saveMessage: '當前修改未保存，是否保存後退出？'
   },
   delete: {
     confirmTitle: '確定刪除該節點？',
@@ -229,7 +229,7 @@ export default {
       toolParam: '工具變數',
       mcpServerTip: '請輸入JSON格式的MCP服務器配置',
       mcpToolTip: '請選擇工具',
-      configLabel: 'MCP Server Config (僅支持SSE調用方式)',
+      configLabel: 'MCP Server Config (僅支持SSE調用方式)'
     },
     imageGenerateNode: {
       label: '圖片生成',
@@ -292,7 +292,9 @@ export default {
     len_ge: '長度大於等於',
     len_gt: '長度大於',
     len_le: '長度小於等於',
-    len_lt: '長度小於'
+    len_lt: '長度小於',
+    is_true: '為真',
+    is_not_true: '不為真'
   },
   FileUploadSetting: {}
 }

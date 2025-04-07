@@ -271,7 +271,7 @@ export const mcpNode = {
   properties: {
     stepName: t('views.applicationWorkflow.nodes.mcpNode.label'),
     config: {
-      fields:[
+      fields: [
         {
           label: t('common.result'),
           value: 'result'
@@ -424,7 +424,9 @@ export const compareList = [
   { value: 'len_ge', label: t('views.applicationWorkflow.compare.len_ge') },
   { value: 'len_gt', label: t('views.applicationWorkflow.compare.len_gt') },
   { value: 'len_le', label: t('views.applicationWorkflow.compare.len_le') },
-  { value: 'len_lt', label: t('views.applicationWorkflow.compare.len_lt') }
+  { value: 'len_lt', label: t('views.applicationWorkflow.compare.len_lt') },
+  { value: 'is_true', label: t('views.applicationWorkflow.compare.is_true') },
+  { value: 'is_not_true', label: t('views.applicationWorkflow.compare.is_not_true') }
 ]
 
 export const nodeDict: any = {
@@ -446,7 +448,7 @@ export const nodeDict: any = {
   [WorkflowType.SpeechToTextNode]: speechToTextNode,
   [WorkflowType.ImageGenerateNode]: imageGenerateNode,
   [WorkflowType.VariableAssignNode]: variableAssignNode,
-  [WorkflowType.McpNode]: mcpNode,
+  [WorkflowType.McpNode]: mcpNode
 }
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'
