@@ -69,7 +69,7 @@ class LocalBaseReranker(MaxKBBaseModel, BaseDocumentCompressor):
     tokenizer: Any = None
     model: Optional[str] = None
     cache_dir: Optional[str] = None
-    model_kwargs: ClassVar = {}
+    model_kwargs: Any = {}
 
     def __init__(self, model_name, cache_dir=None, **model_kwargs):
         super().__init__()
