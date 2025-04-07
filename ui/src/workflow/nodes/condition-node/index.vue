@@ -25,14 +25,8 @@
                 size="small"
                 style="width: 60px; margin: 0 8px"
               >
-                <el-option
-                  :label="$t('views.applicationWorkflow.condition.AND')"
-                  value="and"
-                />
-                <el-option
-                  :label="$t('views.applicationWorkflow.condition.OR')"
-                  value="or"
-                />
+                <el-option :label="$t('views.applicationWorkflow.condition.AND')" value="and" />
+                <el-option :label="$t('views.applicationWorkflow.condition.OR')" value="or" />
               </el-select>
               <span>{{
                 $t('views.applicationWorkflow.nodes.conditionNode.conditions.label')
@@ -56,9 +50,7 @@
                       ref="nodeCascaderRef"
                       :nodeModel="nodeModel"
                       class="w-full"
-                      :placeholder="
-                        $t('views.applicationWorkflow.variable.placeholder')
-                      "
+                      :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
                       v-model="condition.field"
                     />
                   </el-form-item>
@@ -94,7 +86,11 @@
                 </el-col>
                 <el-col :span="6">
                   <el-form-item
-                    v-if="condition.compare !== 'is_null' && condition.compare !== 'is_not_null'"
+                    v-if="
+                      !['is_null', 'is_not_null', 'is_true', 'is_not_true'].includes(
+                        condition.compare
+                      )
+                    "
                     :prop="'branch.' + index + '.conditions.' + cIndex + '.value'"
                     :rules="{
                       required: true,
@@ -137,7 +133,8 @@
         </el-card>
       </template>
       <el-button link type="primary" @click="addBranch">
-        <el-icon class="mr-4"><Plus /></el-icon> {{ $t('views.applicationWorkflow.nodes.conditionNode.addBranch') }}
+        <el-icon class="mr-4"><Plus /></el-icon>
+        {{ $t('views.applicationWorkflow.nodes.conditionNode.addBranch') }}
       </el-button>
     </el-form>
   </NodeContainer>

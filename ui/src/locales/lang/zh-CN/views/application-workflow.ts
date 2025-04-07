@@ -22,7 +22,7 @@ export default {
     copyParam: '复制参数',
     debug: '调试',
     exit: '直接退出',
-    exitSave: '保存并退出',
+    exitSave: '保存并退出'
   },
   tip: {
     publicSuccess: '发布成功',
@@ -37,7 +37,7 @@ export default {
     cannotCopy: '不能被复制',
     copyError: '已复制节点',
     paramErrorMessage: '参数已存在: ',
-    saveMessage: '当前的更改尚未保存，是否保存后退出?',
+    saveMessage: '当前的更改尚未保存，是否保存后退出?'
   },
   delete: {
     confirmTitle: '确定删除该节点？',
@@ -292,7 +292,9 @@ export default {
     len_ge: '长度大于等于',
     len_gt: '长度大于',
     len_le: '长度小于等于',
-    len_lt: '长度小于'
+    len_lt: '长度小于',
+    is_true: '为真',
+    is_not_true: '不为真'
   },
   FileUploadSetting: {}
 }

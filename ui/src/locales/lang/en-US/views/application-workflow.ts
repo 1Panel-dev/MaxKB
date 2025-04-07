@@ -22,7 +22,7 @@ export default {
     copyParam: 'Copy Parameters',
     debug: 'Run',
     exit: 'Exit',
-    exitSave: 'Save & Exit',
+    exitSave: 'Save & Exit'
   },
   tip: {
     publicSuccess: 'Published successfully',
@@ -37,7 +37,7 @@ export default {
     cannotCopy: 'Cannot be copied',
     copyError: 'Node already copied',
     paramErrorMessage: 'Parameter already exists: ',
-    saveMessage: 'Current changes have not been saved. Save before exiting?',
+    saveMessage: 'Current changes have not been saved. Save before exiting?'
   },
   delete: {
     confirmTitle: 'Confirm to delete this node?',
@@ -229,7 +229,7 @@ export default {
       toolParam: 'Tool Params',
       mcpServerTip: 'Please enter the JSON format of the MCP server config',
       mcpToolTip: 'Please select a tool',
-      configLabel: 'MCP Server Config (Only supports SSE call method)',
+      configLabel: 'MCP Server Config (Only supports SSE call method)'
     },
     imageGenerateNode: {
       label: 'Image Generation',
@@ -293,7 +293,9 @@ export default {
     len_ge: 'Length greater than or equal to',
     len_gt: 'Length greater than',
     len_le: 'Length less than or equal to',
-    len_lt: 'Length less than'
+    len_lt: 'Length less than',
+    is_true: 'Is true',
+    is_not_true: 'Is not true'
   },
   FileUploadSetting: {}
 }
