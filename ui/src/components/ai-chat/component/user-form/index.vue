@@ -327,20 +327,8 @@ const checkInputParam = () => {
   // 浏览器query参数找到接口传参
   let msg = []
   for (let f of apiInputFieldList.value) {
-    if (!api_form_data_context.value[f.field]) {
-      let _value = getRouteQueryValue(f.field)
-      if (_value != null) {
-        api_form_data_context.value[f.field] = _value
-      }
-    }
     if (f.required && !api_form_data_context.value[f.field]) {
       msg.push(f.field)
-    }
-  }
-  if (!api_form_data_context.value['asker']) {
-    const asker = getRouteQueryValue('asker')
-    if (asker) {
-      api_form_data_context.value['asker'] = getRouteQueryValue('asker')
     }
   }
 
@@ -351,6 +339,22 @@ const checkInputParam = () => {
     return false
   }
   return true
+}
+const initRouteQueryValue = () => {
+  for (let f of apiInputFieldList.value) {
+    if (!api_form_data_context.value[f.field]) {
+      let _value = getRouteQueryValue(f.field)
+      if (_value != null) {
+        api_form_data_context.value[f.field] = _value
+      }
+    }
+  }
+  if (!api_form_data_context.value['asker']) {
+    const asker = getRouteQueryValue('asker')
+    if (asker) {
+      api_form_data_context.value['asker'] = getRouteQueryValue('asker')
+    }
+  }
 }
 const decodeQuery = (query: string) => {
   try {
@@ -383,6 +387,7 @@ defineExpose({ checkInputParam, render, renderDebugAiChat })
 onMounted(() => {
   firstMounted.value = true
   handleInputFieldList()
+  initRouteQueryValue()
 })
 </script>
 <style lang="scss" scoped>
