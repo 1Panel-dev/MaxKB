@@ -173,14 +173,15 @@ class PdfSplitHandle(BaseSplitHandle):
 
             # Null characters are not allowed.
             chapter_text = chapter_text.replace('\0', '')
-
+            # 限制标题长度
+            real_chapter_title = chapter_title[:256]
             # 限制章节内容长度
             if 0 < limit < len(chapter_text):
                 split_text = PdfSplitHandle.split_text(chapter_text, limit)
                 for text in split_text:
-                    chapters.append({"title": chapter_title, "content": text})
+                    chapters.append({"title": real_chapter_title, "content": text})
             else:
-                chapters.append({"title": chapter_title, "content": chapter_text if chapter_text else chapter_title})
+                chapters.append({"title": real_chapter_title, "content": chapter_text if chapter_text else real_chapter_title})
             # 保存章节内容和章节标题
         return chapters
 
