@@ -326,7 +326,7 @@ function deleteCondition(index: number, cIndex: number) {
 }
 
 function changeCondition(val: string, index: number, cIndex: number) {
-  if (val === 'is_null' || val === 'is_not_null') {
+  if (['is_null', 'is_not_null', 'is_true', 'is_not_true'].includes(val)) {
     const list = cloneDeep(props.nodeModel.properties.node_data.branch)
     list[index]['conditions'][cIndex].value = 1
     set(props.nodeModel.properties.node_data, 'branch', list)
