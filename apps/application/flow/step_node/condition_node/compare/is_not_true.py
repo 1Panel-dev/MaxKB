@@ -14,7 +14,7 @@ from application.flow.step_node.condition_node.compare import Compare
 class IsNotTrueCompare(Compare):
 
     def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'is_not_ture':
+        if compare == 'is_not_true':
             return True
 
     def compare(self, source_value, compare, target_value):
