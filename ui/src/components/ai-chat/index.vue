@@ -268,8 +268,10 @@ const openChatId: () => Promise<string> = () => {
       })
   } else {
     if (isWorkFlow(obj.type)) {
+      console.log(obj)
       const submitObj = {
-        work_flow: obj.work_flow
+        work_flow: obj.work_flow,
+        user_id: obj.user
       }
       return applicationApi.postWorkflowChatOpen(submitObj).then((res) => {
         chartOpenId.value = res.data
