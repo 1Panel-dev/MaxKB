@@ -22,12 +22,15 @@
           <el-card
             v-resize="(wh: any) => resizeCondition(wh, item, index)"
             shadow="never"
-            class="card-never mb-8"
+            class="drag-card card-never mb-8"
             :class="{ 'no-drag': index === form_data.branch.length - 1 }"
             style="--el-card-padding: 12px"
           >
             <div class="handle flex-between lighter">
-              {{ item.type }}
+              <span class="flex align-center">
+                <img src="@/assets/sort.svg" alt="" height="15" class="handle-img mr-4" />
+                {{ item.type }}
+              </span>
               <div class="info" v-if="item.conditions.length > 1">
                 <span>{{
                   $t('views.applicationWorkflow.nodes.conditionNode.conditions.info')
@@ -337,4 +340,24 @@ onMounted(() => {
   set(props.nodeModel, 'validate', validate)
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.drag-card.no-drag {
+  .handle {
+    .handle-img {
+      display: none;
+    }
+  }
+}
+.drag-card:not(.no-drag) {
+  .handle {
+    .handle-img {
+      display: none;
+    }
+    &:hover {
+      .handle-img {
+        display: block;
+      }
+    }
+  }
+}
+</style>
