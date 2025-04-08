@@ -15,8 +15,20 @@
     ref="tableRef"
     row-key="field"
   >
-    <el-table-column prop="variable" :label="$t('dynamicsForm.paramForm.field.label')" />
-    <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')" />
+    <el-table-column prop="variable" :label="$t('dynamicsForm.paramForm.field.label')">
+      <template #default="{ row }">
+        <span class="ellipsis-1" :title="row.variable">
+          {{ row.variable }}
+        </span>
+      </template>
+    </el-table-column>
+    <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')">
+      <template #default="{ row }">
+        <span class="ellipsis-1" :title="row.default_value">
+          {{ row.default_value }}
+        </span>
+      </template>
+    </el-table-column>
     <el-table-column :label="$t('common.required')">
       <template #default="{ row }">
         <div @click.stop>
