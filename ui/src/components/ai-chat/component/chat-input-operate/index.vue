@@ -467,7 +467,7 @@ const switchMicrophone = (status: boolean) => {
   }
 }
 
-const TouchEnd = (bool: Boolean) => {
+const TouchEnd = (bool?: Boolean) => {
   if (bool) {
     stopRecording()
     recorderStatus.value = 'STOP'

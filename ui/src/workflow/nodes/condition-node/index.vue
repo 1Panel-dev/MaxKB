@@ -161,7 +161,7 @@ import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { randomId } from '@/utils/utils'
 import { compareList } from '@/workflow/common/data'
-import { type DraggableEvent, type UseDraggableReturn, VueDraggable } from 'vue-draggable-plus'
+import { VueDraggable } from 'vue-draggable-plus'
 
 const props = defineProps<{ nodeModel: any }>()
 const form = {
@@ -238,8 +238,8 @@ const validate = () => {
   })
 }
 
-function onEnd(evt: DraggableEvent) {
-  const { oldIndex, newIndex, clonedData } = evt
+function onEnd(event?: any) {
+  const { oldIndex, newIndex, clonedData } = event
   if (oldIndex === undefined || newIndex === undefined) return
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
 
