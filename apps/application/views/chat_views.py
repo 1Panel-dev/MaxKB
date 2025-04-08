@@ -97,7 +97,7 @@ class ChatView(APIView):
                              tags=[_("Application/Chat")])
         def post(self, request: Request):
             return result.success(ChatSerializers.OpenWorkFlowChat(
-                data={**request.data, 'user_id': request.user.id}).open())
+                data={'user_id': request.user.id, **request.data}).open())
 
     class OpenTemp(APIView):
         authentication_classes = [TokenAuth]
