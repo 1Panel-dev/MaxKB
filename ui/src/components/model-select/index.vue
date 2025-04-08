@@ -97,6 +97,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue', 'change', 'submitModel'])
 const modelValue = computed({
   set: (item) => {
+    emit('change', item)
     emit('update:modelValue', item)
   },
   get: () => {
@@ -127,7 +128,6 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
   if (provider && provider.provider) {
     createModelRef.value?.open(provider, model_type)
   } else {
-    console.log(model_type)
     selectProviderRef.value?.open(model_type)
   }
 }
