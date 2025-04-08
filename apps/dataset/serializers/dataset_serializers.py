@@ -455,11 +455,13 @@ class DataSetSerializers(serializers.ModelSerializer):
             # 批量插入关联问题
             QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
                 problem_paragraph_mapping_list) > 0 else None
-
             # 响应数据
             return {**DataSetSerializers(dataset).data,
-                'document_list': DocumentSerializers.Query(data={'dataset_id': dataset_id}).list(
-                    with_valid=True)}, dataset_id
+                    'user_id': user_id,
+                    'document_list': document_model_list,
+                    "document_count": len(document_model_list),
+                    "char_length": reduce(lambda x, y: x + y, [d.char_length for d in document_model_list],
+                                           0)}, dataset_id
 
         @staticmethod
         def get_last_url_path(url):
