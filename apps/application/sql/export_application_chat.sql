@@ -10,7 +10,8 @@ SELECT
     application_chat_record_temp."index" as "index",
     application_chat_record_temp.improve_paragraph_list  as improve_paragraph_list,
     application_chat_record_temp.vote_status as vote_status,
-    application_chat_record_temp.create_time as create_time
+    application_chat_record_temp.create_time as create_time,
+    	to_json(application_chat.asker) as asker
 FROM
 	application_chat application_chat
 	LEFT JOIN (

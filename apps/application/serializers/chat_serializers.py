@@ -216,6 +216,7 @@ class ChatSerializers(serializers.Serializer):
                     "\n".join([
                         f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
                         for index in range(len(improve_paragraph_list))]),
+                    row.get('asker').get('user_name'),
                     row.get('message_tokens') + row.get('answer_tokens'), row.get('run_time'),
                     str(row.get('create_time').astimezone(pytz.timezone(TIME_ZONE)).strftime('%Y-%m-%d %H:%M:%S')
                         )]
@@ -242,7 +243,8 @@ class ChatSerializers(serializers.Serializer):
                            gettext('answer'), gettext('User feedback'),
                            gettext('Reference segment number'),
                            gettext('Section title + content'),
-                           gettext('Annotation'), gettext('Consuming tokens'), gettext('Time consumed (s)'),
+                           gettext('Annotation'), gettext('USER'), gettext('Consuming tokens'),
+                           gettext('Time consumed (s)'),
                            gettext('Question Time')]
                 for col_idx, header in enumerate(headers, 1):
                     cell = worksheet.cell(row=1, column=col_idx)
