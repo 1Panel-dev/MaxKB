@@ -1,6 +1,5 @@
 <template>
   <div class="item-content mb-16 lighter">
-    
     <template v-for="(answer_text, index) in answer_text_list" :key="index">
       <div class="avatar mr-8" v-if="application.show_avatar">
         <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
@@ -91,6 +90,7 @@ const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: 
   if (type === 'old') {
     add_answer_text_list(props.chatRecord.answer_text_list)
     props.sendMessage(question, other_params_data, props.chatRecord)
+    props.chatManagement.open(props.chatRecord.id)
     props.chatManagement.write(props.chatRecord.id)
   } else {
     props.sendMessage(question, other_params_data)

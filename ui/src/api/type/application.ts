@@ -442,6 +442,12 @@ export class ChatManagement {
       chatRecord.write()
     }
   }
+  static open(chatRecordId: string) {
+    const chatRecord = this.chatMessageContainer[chatRecordId]
+    if (chatRecord) {
+      chatRecord.open()
+    }
+  }
   /**
    * 等待所有数据输出完毕后 才会关闭流
    * @param chatRecordId 对话记录id
