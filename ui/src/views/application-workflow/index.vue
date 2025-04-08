@@ -270,7 +270,7 @@ async function publicHandle() {
       const obj = {
         work_flow: getGraphData()
       }
-      await application.asyncPutApplication(id, obj)
+      await application.asyncPutApplication(id, obj, loading)
       const workflow = new WorkFlowInstance(obj.work_flow)
       try {
         workflow.is_valid()
@@ -280,6 +280,7 @@ async function publicHandle() {
       }
       applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
         MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))
+        getDetail()
       })
     })
     .catch((res: any) => {
