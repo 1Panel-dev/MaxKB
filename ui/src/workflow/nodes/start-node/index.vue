@@ -8,7 +8,7 @@
       @mouseenter="showicon = true"
       @mouseleave="showicon = false"
     >
-      <span>{{ item.label }} {{ '{' + item.value + '}' }}</span>
+      <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
       <el-tooltip
         effect="dark"
         :content="$t('views.applicationWorkflow.setting.copyParam')"
