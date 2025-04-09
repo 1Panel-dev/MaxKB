@@ -10,7 +10,7 @@
     >
       <VueDraggable
         ref="el"
-        v-model="form_data.branch"
+        v-bind:modelValue="form_data.branch"
         :disabled="form_data.branch === 2"
         :filter="'.no-drag'"
         handle=".handle"
@@ -169,6 +169,7 @@ import { compareList } from '@/workflow/common/data'
 import { VueDraggable } from 'vue-draggable-plus'
 
 const props = defineProps<{ nodeModel: any }>()
+
 const form = {
   branch: [
     {
@@ -248,13 +249,12 @@ function onEnd(event?: any) {
   if (oldIndex === undefined || newIndex === undefined) return
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
   if (oldIndex === list.length - 1 || newIndex === list.length - 1) {
-    list[newIndex] = list[oldIndex]
-    list[oldIndex] = clonedData
-    set(props.nodeModel.properties.node_data, 'branch', list)
     return
   }
-  list[newIndex].type = list[oldIndex].type
-  list[oldIndex].type = clonedData.type // 恢复原始 type
+  const newInstance = { ...list[oldIndex], type: list[newIndex].type, id: list[newIndex].id }
+  const oldInstance = { ...list[newIndex], type: list[oldIndex].type, id: list[oldIndex].id }
+  list[newIndex] = newInstance
+  list[oldIndex] = oldInstance
   set(props.nodeModel.properties.node_data, 'branch', list)
 }
 
