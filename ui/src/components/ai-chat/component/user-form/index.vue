@@ -308,22 +308,18 @@ const getRouteQueryValue = (field: string) => {
   }
   return null
 }
-/**
- * 校验参数
- */
-const checkInputParam = () => {
-  // 检查inputFieldList是否有未填写的字段
-  for (let i = 0; i < inputFieldList.value.length; i++) {
-    if (
-      inputFieldList.value[i].required &&
-      (form_data_context.value[inputFieldList.value[i].field] === null ||
-        form_data_context.value[inputFieldList.value[i].field] === undefined ||
-        form_data_context.value[inputFieldList.value[i].field] === '')
-    ) {
-      MsgWarning(t('chat.tip.requiredMessage'))
-      return false
-    }
+const validate = () => {
+  const promise_list = []
+  if (dynamicsFormRef.value) {
+    promise_list.push(dynamicsFormRef.value?.validate())
   }
+  if (dynamicsFormRef2.value) {
+    promise_list.push(dynamicsFormRef2.value?.validate())
+  }
+  promise_list.push(validate_query())
+  return Promise.all(promise_list)
+}
+const validate_query = () => {
   // 浏览器query参数找到接口传参
   let msg = []
   for (let f of apiInputFieldList.value) {
@@ -331,15 +327,15 @@ const checkInputParam = () => {
       msg.push(f.field)
     }
   }
-
   if (msg.length > 0) {
     MsgWarning(
       `${t('chat.tip.inputParamMessage1')} ${msg.join('、')}${t('chat.tip.inputParamMessage2')}`
     )
-    return false
+    return Promise.reject(false)
   }
-  return true
+  return Promise.resolve(false)
 }
+
 const initRouteQueryValue = () => {
   for (let f of apiInputFieldList.value) {
     if (!api_form_data_context.value[f.field]) {
@@ -356,6 +352,7 @@ const initRouteQueryValue = () => {
     }
   }
 }
+
 const decodeQuery = (query: string) => {
   try {
     return decodeURIComponent(query)
@@ -364,10 +361,10 @@ const decodeQuery = (query: string) => {
   }
 }
 const confirmHandle = () => {
-  if (checkInputParam()) {
+  validate().then((ok) => {
     localStorage.setItem(`${accessToken}userForm`, JSON.stringify(form_data_context.value))
     emit('confirm')
-  }
+  })
 }
 const cancelHandle = () => {
   emit('cancel')
@@ -383,7 +380,7 @@ const renderDebugAiChat = (data: any) => {
     dynamicsFormRef2.value?.render(apiInputFieldList.value, data)
   }
 }
-defineExpose({ checkInputParam, render, renderDebugAiChat })
+defineExpose({ validate, render, renderDebugAiChat })
 onMounted(() => {
   firstMounted.value = true
   handleInputFieldList()
