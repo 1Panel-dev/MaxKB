@@ -248,6 +248,9 @@ function onEnd(event?: any) {
   if (oldIndex === undefined || newIndex === undefined) return
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
   if (oldIndex === list.length - 1 || newIndex === list.length - 1) {
+    list[newIndex] = list[oldIndex]
+    list[oldIndex] = clonedData
+    set(props.nodeModel.properties.node_data, 'branch', list)
     return
   }
   list[newIndex].type = list[oldIndex].type
