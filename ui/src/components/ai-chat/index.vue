@@ -243,6 +243,11 @@ function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
         showUserInput.value = true
         return
       })
+  } else {
+    showUserInput.value = false
+    if (!loading.value && props.applicationDetails?.name) {
+      handleDebounceClick(val, other_params_data, chat)
+    }
   }
 }
 
