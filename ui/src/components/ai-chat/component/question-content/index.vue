@@ -63,7 +63,7 @@
         <span> {{ chatRecord.problem_text }}</span>
       </div>
     </div>
-    <div class="avatar ml-8" v-if="application.show_user_avatar">
+    <div class="avatar ml-8" v-if="showAvatar">
       <el-image
         v-if="application.user_avatar"
         :src="application.user_avatar"
@@ -81,12 +81,18 @@
 import { type chatType } from '@/api/type/application'
 import { getImgUrl, getAttrsArray, downloadByURL } from '@/utils/utils'
 import { onMounted, computed } from 'vue'
-
+import useStore from '@/stores'
 const props = defineProps<{
   application: any
   chatRecord: chatType
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
 }>()
+
+const { user } = useStore()
+
+const showAvatar = computed(() => {
+  return user.isEnterprise() ? props.application.show_user_avatar : true
+})
 const document_list = computed(() => {
   if (props.chatRecord?.upload_meta) {
     return props.chatRecord.upload_meta?.document_list || []
