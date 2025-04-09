@@ -153,6 +153,14 @@ interface qrOption {
 
 const orgOptions = ref<qrOption[]>([])
 
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
 function redirectAuth(authType: string) {
   if (authType === 'LDAP' || authType === '') {
     return
@@ -191,7 +199,7 @@ function redirectAuth(authType: string) {
         if (authType === 'OAuth2') {
           url =
             `${config.authEndpoint}?client_id=${config.clientId}&response_type=code` +
-            `&redirect_uri=${redirectUrl}&state=${res.data.id}`
+            `&redirect_uri=${redirectUrl}&state=${uuidv4()}`
           if (config.scope) {
             url += `&scope=${config.scope}`
           }
