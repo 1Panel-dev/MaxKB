@@ -245,7 +245,7 @@ const validate = () => {
 }
 
 function onEnd(event?: any) {
-  const { oldIndex, newIndex, clonedData } = event
+  const { oldIndex, newIndex } = event
   if (oldIndex === undefined || newIndex === undefined) return
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
   if (oldIndex === list.length - 1 || newIndex === list.length - 1) {
