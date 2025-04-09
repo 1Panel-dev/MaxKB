@@ -23,7 +23,9 @@
             v-resize="(wh: any) => resizeCondition(wh, item, index)"
             shadow="never"
             class="drag-card card-never mb-8"
-            :class="{ 'no-drag': index === form_data.branch.length - 1 }"
+            :class="{
+              'no-drag': index === form_data.branch.length - 1 || form_data.branch.length === 2
+            }"
             style="--el-card-padding: 12px"
           >
             <div class="handle flex-between lighter">
@@ -245,7 +247,9 @@ function onEnd(event?: any) {
   const { oldIndex, newIndex, clonedData } = event
   if (oldIndex === undefined || newIndex === undefined) return
   const list = cloneDeep(props.nodeModel.properties.node_data.branch)
-
+  if (oldIndex === list.length - 1 || newIndex === list.length - 1) {
+    return
+  }
   list[newIndex].type = list[oldIndex].type
   list[oldIndex].type = clonedData.type // 恢复原始 type
   set(props.nodeModel.properties.node_data, 'branch', list)
