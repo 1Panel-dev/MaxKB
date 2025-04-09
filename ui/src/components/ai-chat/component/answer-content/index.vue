@@ -1,7 +1,7 @@
 <template>
   <div class="item-content mb-16 lighter">
     <template v-for="(answer_text, index) in answer_text_list" :key="index">
-      <div class="avatar mr-8" v-if="application.show_avatar">
+      <div class="avatar mr-8" v-if="showAvatar">
         <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
         <LogoIcon v-else height="28px" width="28px" />
       </div>
@@ -9,7 +9,7 @@
         class="content"
         @mouseup="openControl"
         :style="{
-          'padding-right': application.show_user_avatar ? 'var(--padding-left)' : '0'
+          'padding-right': showAvatar ? 'var(--padding-left)' : '0'
         }"
       >
         <el-card shadow="always" class="mb-8 border-r-8" style="--el-card-padding: 6px 16px">
@@ -51,8 +51,8 @@
     <div
       class="content"
       :style="{
-        'padding-left': application.show_avatar ? 'var(--padding-left)' : '0',
-        'padding-right': application.show_user_avatar ? 'var(--padding-left)' : '0'
+        'padding-left': showAvatar ? 'var(--padding-left)' : '0',
+        'padding-right': showAvatar ? 'var(--padding-left)' : '0'
       }"
     >
       <OperationButton
@@ -75,6 +75,7 @@ import OperationButton from '@/components/ai-chat/component/operation-button/ind
 import { type chatType } from '@/api/type/application'
 import { computed } from 'vue'
 import bus from '@/bus'
+import useStore from '@/stores'
 const props = defineProps<{
   chatRecord: chatType
   application: any
@@ -84,7 +85,13 @@ const props = defineProps<{
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
 }>()
 
+const { user } = useStore()
+
 const emit = defineEmits(['update:chatRecord'])
+
+const showAvatar = computed(() => {
+  return user.isEnterprise() ? props.application.show_avatar : true
+})
 
 const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: any) => {
   if (type === 'old') {
