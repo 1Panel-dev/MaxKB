@@ -279,8 +279,11 @@ async function publicHandle() {
         return
       }
       applicationApi.putPublishApplication(id as String, obj, loading).then(() => {
-        MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))
-        getDetail()
+
+        application.asyncGetApplicationDetail(id, loading).then((res: any) => {
+          detail.value.name = res.data.name
+          MsgSuccess(t('views.applicationWorkflow.tip.publicSuccess'))
+        })
       })
     })
     .catch((res: any) => {
