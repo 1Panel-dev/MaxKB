@@ -9,7 +9,7 @@
         class="content"
         @mouseup="openControl"
         :style="{
-          'padding-right': showAvatar ? 'var(--padding-left)' : '0'
+          'padding-right': showUserAvatar ? 'var(--padding-left)' : '0'
         }"
       >
         <el-card shadow="always" class="mb-8 border-r-8" style="--el-card-padding: 6px 16px">
@@ -52,7 +52,7 @@
       class="content"
       :style="{
         'padding-left': showAvatar ? 'var(--padding-left)' : '0',
-        'padding-right': showAvatar ? 'var(--padding-left)' : '0'
+        'padding-right': showUserAvatar ? 'var(--padding-left)' : '0'
       }"
     >
       <OperationButton
@@ -92,7 +92,9 @@ const emit = defineEmits(['update:chatRecord'])
 const showAvatar = computed(() => {
   return user.isEnterprise() ? props.application.show_avatar : true
 })
-
+const showUserAvatar = computed(() => {
+  return user.isEnterprise() ? props.application.show_user_avatar : true
+})
 const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: any) => {
   if (type === 'old') {
     add_answer_text_list(props.chatRecord.answer_text_list)
