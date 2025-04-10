@@ -3,7 +3,10 @@
     ref="aiChatRef"
     class="ai-chat"
     :class="type"
-    :style="{ height: firsUserInput ? '100%' : undefined }"
+    :style="{
+      height: firsUserInput ? '100%' : undefined,
+      paddingBottom: applicationDetails.disclaimer ? '20px' : 0
+    }"
   >
     <div
       v-show="showUserInputContent"

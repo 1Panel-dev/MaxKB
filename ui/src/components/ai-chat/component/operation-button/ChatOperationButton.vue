@@ -1,7 +1,7 @@
 <template>
   <div class="chat-operation-button flex-between">
     <el-text type="info">
-      <span class="ml-4">{{ datetimeFormat(data.create_time) }}</span>
+      <span class="ml-4" v-if="data.create_time">{{ datetimeFormat(data.create_time) }}</span>
     </el-text>
 
     <div>
