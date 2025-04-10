@@ -30,6 +30,8 @@
         :available="applicationAvailable"
         :appId="applicationDetail?.id"
         :record="recordList"
+        :chatId="currentChatId"
+        @refresh="refresh"
       >
         <template #operateBefore>
           <div>
@@ -67,9 +69,14 @@ const applicationDetail = computed({
   set: (v) => {}
 })
 const recordList = ref([])
+const currentChatId = ref('')
 
 function newChat() {
+  currentChatId.value = 'new'
   recordList.value = []
+}
+function refresh(id: string) {
+  currentChatId.value = id
 }
 </script>
 <style lang="scss">

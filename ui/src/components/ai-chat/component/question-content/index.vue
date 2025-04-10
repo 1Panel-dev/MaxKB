@@ -93,6 +93,7 @@ const { user } = useStore()
 const showAvatar = computed(() => {
   return user.isEnterprise() ? props.application.show_user_avatar : true
 })
+
 const document_list = computed(() => {
   if (props.chatRecord?.upload_meta) {
     return props.chatRecord.upload_meta?.document_list || []
