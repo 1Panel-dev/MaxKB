@@ -271,7 +271,7 @@ const props = withDefaults(
     showUserInput?: boolean
     sendMessage: (question: string, other_params_data?: any, chat?: chatType) => void
     openChatId: () => Promise<string>
-    validate: () => Promise<boolean | string>
+    validate: () => Promise<any>
   }>(),
   {
     applicationDetails: () => ({}),
