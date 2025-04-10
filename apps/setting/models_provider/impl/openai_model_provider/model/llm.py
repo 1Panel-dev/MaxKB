@@ -30,12 +30,15 @@ class OpenAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
+        streaming = model_kwargs.get('streaming', True)
+        if 'o1' in model_name:
+            streaming = False
         azure_chat_open_ai = OpenAIChatModel(
             model=model_name,
             openai_api_base=model_credential.get('api_base'),
             openai_api_key=model_credential.get('api_key'),
             **optional_params,
-            streaming=True,
+            streaming=streaming,
             custom_get_token_ids=custom_get_token_ids
         )
         return azure_chat_open_ai
