@@ -271,7 +271,7 @@ const props = withDefaults(
     showUserInput?: boolean
     sendMessage: (question: string, other_params_data?: any, chat?: chatType) => void
     openChatId: () => Promise<string>
-    checkInputParam: () => boolean
+    validate: () => Promise<any>
   }>(),
   {
     applicationDetails: () => ({}),
@@ -649,24 +649,27 @@ const stopTimer = () => {
 }
 
 function autoSendMessage() {
-  props.sendMessage(inputValue.value, {
-    image_list: uploadImageList.value,
-    document_list: uploadDocumentList.value,
-    audio_list: uploadAudioList.value,
-    video_list: uploadVideoList.value
-  })
-  if (!props.checkInputParam()) {
-    return
-  } else {
-    inputValue.value = ''
-    uploadImageList.value = []
-    uploadDocumentList.value = []
-    uploadAudioList.value = []
-    uploadVideoList.value = []
-    if (quickInputRef.value) {
-      quickInputRef.value.textareaStyle.height = '45px'
-    }
-  }
+  props
+    .validate()
+    .then(() => {
+      props.sendMessage(inputValue.value, {
+        image_list: uploadImageList.value,
+        document_list: uploadDocumentList.value,
+        audio_list: uploadAudioList.value,
+        video_list: uploadVideoList.value
+      })
+      inputValue.value = ''
+      uploadImageList.value = []
+      uploadDocumentList.value = []
+      uploadAudioList.value = []
+      uploadVideoList.value = []
+      if (quickInputRef.value) {
+        quickInputRef.value.textareaStyle.height = '45px'
+      }
+    })
+    .catch(() => {
+      emit('update:showUserInput', true)
+    })
 }
 
 function sendChatHandle(event?: any) {

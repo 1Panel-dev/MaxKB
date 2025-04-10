@@ -63,7 +63,7 @@
         :type="type"
         :send-message="sendMessage"
         :open-chat-id="openChatId"
-        :check-input-param="checkInputParam"
+        :validate="validate"
         :chat-management="ChatManagement"
         v-model:chat-id="chartOpenId"
         v-model:loading="loading"
@@ -216,29 +216,38 @@ function UserFormCancel() {
   userFormRef.value?.render(form_data.value)
   showUserInput.value = false
 }
-const checkInputParam = () => {
-  return userFormRef.value?.checkInputParam() || false
+
+const validate = () => {
+  return userFormRef.value?.validate() || Promise.reject(false)
 }
 
 function sendMessage(val: string, other_params_data?: any, chat?: chatType) {
   if (isUserInput.value) {
-    if (!userFormRef.value?.checkInputParam()) {
-      showUserInput.value = true
-      return
-    } else {
-      let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
-      const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
-        result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
-          ? userFormData[key]
-          : form_data.value[key]
-        return result
-      }, {})
-      localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
-      showUserInput.value = false
+    userFormRef.value
+      ?.validate()
+      .then((ok) => {
+        let userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
+        const newData = Object.keys(form_data.value).reduce((result: any, key: string) => {
+          result[key] = Object.prototype.hasOwnProperty.call(userFormData, key)
+            ? userFormData[key]
+            : form_data.value[key]
+          return result
+        }, {})
+        localStorage.setItem(`${accessToken}userForm`, JSON.stringify(newData))
+        showUserInput.value = false
+        if (!loading.value && props.applicationDetails?.name) {
+          handleDebounceClick(val, other_params_data, chat)
+        }
+      })
+      .catch((e) => {
+        showUserInput.value = true
+        return
+      })
+  } else {
+    showUserInput.value = false
+    if (!loading.value && props.applicationDetails?.name) {
+      handleDebounceClick(val, other_params_data, chat)
     }
-  }
-  if (!loading.value && props.applicationDetails?.name) {
-    handleDebounceClick(val, other_params_data, chat)
   }
 }
 
@@ -268,7 +277,6 @@ const openChatId: () => Promise<string> = () => {
       })
   } else {
     if (isWorkFlow(obj.type)) {
-      console.log(obj)
       const submitObj = {
         work_flow: obj.work_flow,
         user_id: obj.user

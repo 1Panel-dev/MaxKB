@@ -61,11 +61,15 @@ const useUserStore = defineStore({
       return this.userType === 1 ? localStorage.getItem('token') : this.getAccessToken()
     },
     getAccessToken() {
-      const token = sessionStorage.getItem(`${this.userAccessToken}accessToken`)
+      const token = sessionStorage.getItem(`${this.userAccessToken}-accessToken`)
       if (token) {
         return token
       }
-      return localStorage.getItem(`${this.userAccessToken}accessToken`)
+      const local_token = localStorage.getItem(`${token}-accessToken`)
+      if (local_token) {
+        return local_token
+      }
+      return localStorage.getItem(`accessToken`)
     },
 
     getPermissions() {
