@@ -97,8 +97,8 @@ const useApplicationStore = defineStore({
         applicationApi
           .postAppAuthentication(token, loading, authentication_value)
           .then((res) => {
-            localStorage.setItem(`${token}accessToken`, res.data)
-            sessionStorage.setItem(`${token}accessToken`, res.data)
+            localStorage.setItem(`${token}-accessToken`, res.data)
+            sessionStorage.setItem(`${token}-accessToken`, res.data)
             resolve(res)
           })
           .catch((error) => {
