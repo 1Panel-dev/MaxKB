@@ -1,2 +1,0 @@
-SELECT "problem"."content",problem_paragraph_mapping.paragraph_id FROM problem problem
-LEFT JOIN problem_paragraph_mapping problem_paragraph_mapping ON problem_paragraph_mapping.problem_id=problem."id"
