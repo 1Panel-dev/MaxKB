@@ -1,5 +1,6 @@
 export default {
   title: 'System',
+  subTitle: 'Setting',
   test: 'Test Connection',
   testSuccess: 'Successful',
   testFailed: 'Test connection failed',
